@@ -526,4 +526,13 @@
   <data name="StatusAnalysisSaving" xml:space="preserve">
     <value>Saving Node.js analysis to disk...</value>
   </data>
+  <data name="StatusAnalysisLoaded" xml:space="preserve">
+    <value>Cached Node.js analysis loaded.</value>
+  </data>
+  <data name="StatusAnalysisLoadFailed" xml:space="preserve">
+    <value>Loading cached Node.js analysis failed.</value>
+  </data>
+  <data name="StatusAnalysisLoading" xml:space="preserve">
+    <value>Loading cached Node.js analysis for project...</value>
+  </data>
 </root>

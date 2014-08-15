@@ -298,7 +298,7 @@ namespace Microsoft.NodejsTools.Project {
                     _analyzer.Dispose();
                 }
                 _analyzer = new VsProjectAnalyzer(ProjectHome);
-                _analyzer.Project.MaxLogLength = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMax;
+                _analyzer.MaxLogLength = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMax;
                 LogAnalysisLevel();
 
                 base.Reload();
@@ -310,14 +310,7 @@ namespace Microsoft.NodejsTools.Project {
 
                 // scan for files which were loaded from cached analysis but no longer
                 // exist and remove them.
-                foreach (var module in _analyzer.Project.AllModules) {
-                    if (Path.IsPathRooted(module.FilePath)) {   // ignore built-in modules
-                        var treeNode = FindNodeByFullPath(module.FilePath);
-                        if (treeNode == null) {
-                            _analyzer.UnloadFile(module);
-                        }
-                    }
-                }
+                _analyzer.ReloadComplete();
 
                 var ignoredPaths = GetProjectProperty(NodejsConstants.AnalysisIgnoredDirectories);
 
@@ -372,12 +365,12 @@ namespace Microsoft.NodejsTools.Project {
                 }
             }
             _analyzer = analyzer;
-            _analyzer.Project.MaxLogLength = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMax;
+            _analyzer.MaxLogLength = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMax;
             LogAnalysisLevel();
         }
 
         private void AnalysisLogMaximumChanged(object sender, EventArgs e) {
-            _analyzer.Project.MaxLogLength = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMax;
+            _analyzer.MaxLogLength = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMax;
         }
 
         protected override void RaiseProjectPropertyChanged(string propertyName, string oldValue, string newValue) {

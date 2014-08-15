@@ -34,7 +34,6 @@ namespace Microsoft.NodejsTools.Intellisense {
         private readonly IntellisenseControllerProvider _provider;
         private readonly IIncrementalSearch _incSearch;
         private readonly IClassifier _classifier;
-        private BufferParser _bufferParser;
         private ICompletionSession _activeSession;
         private ISignatureHelpSession _sigHelpSession;
         private IQuickInfoSession _quickInfoSession;
@@ -54,11 +53,6 @@ namespace Microsoft.NodejsTools.Intellisense {
             _incSearch = provider._IncrementalSearch.GetIncrementalSearch(textView);
             _textView.MouseHover += TextViewMouseHover;
             textView.Properties.AddProperty(typeof(IntellisenseController), this);  // added so our key processors can get back to us
-        }
-
-        internal void SetBufferParser(BufferParser bufferParser) {
-            Utilities.CheckNotNull(bufferParser, "Cannot set buffer parser multiple times");
-            _bufferParser = bufferParser;
         }
 
         internal static bool IsNodejsContent(ITextBuffer buffer) {
@@ -90,35 +84,11 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         public void ConnectSubjectBuffer(ITextBuffer subjectBuffer) {
-            PropagateAnalyzer(subjectBuffer);
-
-            Debug.Assert(_bufferParser != null, "SetBufferParser has not been called");
-            BufferParser existingParser;
-            if (!subjectBuffer.Properties.TryGetProperty(typeof(BufferParser), out existingParser)) {
-                _bufferParser.AddBuffer(subjectBuffer);
-            } else {
-                // already connected to a buffer parser, we should have the same project entry
-                Debug.Assert(_bufferParser._currentProjEntry == existingParser._currentProjEntry);
-            }
-        }
-
-        public void PropagateAnalyzer(ITextBuffer subjectBuffer) {
-#if FALSE
-            PythonReplEvaluator replEvaluator;
-            if (_textView.Properties.TryGetProperty<PythonReplEvaluator>(typeof(PythonReplEvaluator), out replEvaluator)) {
-                subjectBuffer.Properties.AddProperty(typeof(VsProjectAnalyzer), replEvaluator.ReplAnalyzer);
-            }
-#endif
+            _textView.GetAnalyzer().AddBuffer(_textView, subjectBuffer);
         }
 
         public void DisconnectSubjectBuffer(ITextBuffer subjectBuffer) {
-            // only disconnect if we own the buffer parser
-            Debug.Assert(_bufferParser != null, "SetBufferParser has not been called");
-            BufferParser existingParser;
-            if (subjectBuffer.Properties.TryGetProperty<BufferParser>(typeof(BufferParser), out existingParser) &&
-                --existingParser.AttachedViews == 0) {
-                _bufferParser.RemoveBuffer(subjectBuffer);
-            }
+            _textView.GetAnalyzer().RemoveBuffer(_textView, subjectBuffer);
         }
 
         /// <summary>
@@ -137,8 +107,6 @@ namespace Microsoft.NodejsTools.Intellisense {
             _textView.Properties.RemoveProperty(typeof(IntellisenseController));
 
             DetachKeyboardFilter();
-
-            _bufferParser = null;
         }
 
         /// <summary>

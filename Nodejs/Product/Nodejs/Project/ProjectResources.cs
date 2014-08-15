@@ -152,6 +152,9 @@ namespace Microsoft.NodejsTools.Project {
         internal const string StartBrowserToolTip = "StartBrowserToolTip";
         internal const string StatusAnalysisSaved = "StatusAnalysisSaved";
         internal const string StatusAnalysisSaving = "StatusAnalysisSaving";
+        internal const string StatusAnalysisLoading = "StatusAnalysisLoading";
+        internal const string StatusAnalysisLoaded = "StatusAnalysisLoaded";
+        internal const string StatusAnalysisLoadFailed = "StatusAnalysisLoadFailed";
         internal const string TestFramework = "TestFramework";
         internal const string TestFrameworkDescription = "TestFrameworkDescription";
         internal const string WorkingDirInvalidOrMissing = "WorkingDirInvalidOrMissing";

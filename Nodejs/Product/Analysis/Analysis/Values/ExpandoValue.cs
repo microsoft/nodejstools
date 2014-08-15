@@ -159,6 +159,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             if (_descriptors != null) {
                 foreach (var kvp in _descriptors) {
                     var key = kvp.Key;
+                    if (key == "prototype") {
+                        // including prototype can cause things to explode, and it's not
+                        // enumerable anyway...  This should be replaced w/ more general
+                        // support for non-enumerable properties.
+                        continue;
+                    }
                     if (kvp.Value.Values != null) {
                         var types = kvp.Value.Values.GetTypesNoCopy(unit, ProjectEntry);
                         kvp.Value.Values.ClearOldValues();

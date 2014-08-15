@@ -27,13 +27,18 @@ using Microsoft.NodejsTools.Options;
 using Microsoft.NodejsTools.Parsing;
 using Microsoft.NodejsTools.Project;
 using Microsoft.NodejsTools.Repl;
+using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Language.Intellisense;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Adornments;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudioTools;
+using Microsoft.VisualStudioTools.Project;
 using Microsoft.Win32;
+using SR = Microsoft.NodejsTools.Project.SR;
+using Task = System.Threading.Tasks.Task;
 
 namespace Microsoft.NodejsTools.Intellisense {
 #if INTERACTIVE_WINDOW
@@ -50,76 +55,45 @@ namespace Microsoft.NodejsTools.Intellisense {
     /// maintains the thread safety invarients of working with that class, handles parsing of files as they're
     /// updated via interfacing w/ the Visual Studio editor APIs, and supports adding additional files to the 
     /// analysis.
+    /// 
+    /// Code is parsed in parallel using the ParseQueue class.
+    /// 
+    /// Code is analyzed in a single thread using the analysis engine instance with the AnalysisQueue class.
     /// </summary>
-    public sealed class VsProjectAnalyzer : IDisposable {
-        private readonly ParseQueue _queue;
-        private readonly AnalysisQueue _analysisQueue;
-        private readonly Dictionary<BufferParser, IProjectEntry> _openFiles = new Dictionary<BufferParser, IProjectEntry>();
+    sealed partial class VsProjectAnalyzer : IDisposable {
+        private AnalysisQueue _analysisQueue;
+        private readonly Dictionary<ITextView, BufferParser> _viewBufferParserMap = new Dictionary<ITextView, BufferParser>();
         private readonly ConcurrentDictionary<string, ProjectItem> _projectFiles;
-        private readonly JsAnalyzer _jsAnalyzer;
+        private JsAnalyzer _jsAnalyzer;
         private readonly bool _implicitProject;
         private readonly AutoResetEvent _queueActivityEvent = new AutoResetEvent(false);
         private readonly CodeSettings _codeSettings = new CodeSettings();
         private readonly string _projectDir;
         private readonly AnalysisLevel _analysisLevel;
+        private readonly object _contentsLock = new object();
+        private readonly HashSet<IProjectEntry> _hasParseErrors = new HashSet<IProjectEntry>();
         private DateTime? _reparseDateTime;
-
         private int _userCount;
+        private bool _fullyLoaded;
+        private List<Action> _loadingDeltas = new List<Action>();
 
-        internal readonly HashSet<IProjectEntry> _hasParseErrors = new HashSet<IProjectEntry>();
-        private static AnalysisLimits _lowLimits = MakeLowAnalysisLimits();
+        private static AnalysisLimits _lowLimits = AnalysisLimits.MakeLowAnalysisLimits();
         private static AnalysisLimits _highLimits = new AnalysisLimits();
+        private static byte[] _dbHeader;
 
         // Moniker strings allow the task provider to distinguish between
         // different sources of items for the same file.
         private const string ParserTaskMoniker = "Parser";
-        internal const string UnresolvedImportMoniker = "UnresolvedImport";
 
+        private static readonly Lazy<TaskProvider> _defaultTaskProvider = CreateDefaultTaskProvider();
 
-        internal static Lazy<TaskProvider> ReplaceTaskProviderForTests(Lazy<TaskProvider> newProvider) {
-            return Interlocked.Exchange(ref _taskProvider, newProvider);
-        }
-
-        private static Lazy<TaskProvider> _taskProvider;
-        private static readonly Lazy<TaskProvider> _defaultTaskProvider = new Lazy<TaskProvider>(() => {
-            var errorList = NodejsPackage.GetGlobalService(typeof(SVsErrorList)) as IVsTaskList;
-            var model = NodejsPackage.ComponentModel;
-            var errorProvider = model != null ? model.GetService<IErrorProviderFactory>() : null;
-            return new TaskProvider(errorList, errorProvider);
-        }, LazyThreadSafetyMode.ExecutionAndPublication);
-
-        private static Lazy<TaskProvider> TaskProvider {
-            get {
-                return _taskProvider ?? _defaultTaskProvider;
-            }
-        }
 #if FALSE
         private readonly UnresolvedImportSquiggleProvider _unresolvedSquiggles;
 #endif
 
-        private object _contentsLock = new object();
-
-        private static byte[] _dbHeader;
-
-        private static byte[] DbHeader {
-            get {
-                if (_dbHeader == null) {
-                    _dbHeader = new byte[] { (byte)'J', (byte)'S', (byte)'A', (byte)'N' }
-                        .Concat(JsAnalyzer.SerializationVersion)
-                        .ToArray();
-                }
-                return _dbHeader;
-            }
-        }
-
-        internal AnalysisLevel AnalysisLevel {
-            get { return _analysisLevel; }
-        }
-
         internal VsProjectAnalyzer(
             string projectDir = null
         ) {
-            _queue = new ParseQueue(this);
             _projectFiles = new ConcurrentDictionary<string, ProjectItem>(StringComparer.OrdinalIgnoreCase);
             if (NodejsPackage.Instance != null) {
                 _analysisLevel = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel;
@@ -130,64 +104,28 @@ namespace Microsoft.NodejsTools.Intellisense {
             var limits = LoadLimits();
             if (projectDir != null) {
                 _projectDir = projectDir;
-                string analysisDb = GetAnalysisPath();
-                if (File.Exists(analysisDb) && _analysisLevel != AnalysisLevel.None) {
-                    try {
-                        using (FileStream stream = new FileStream(analysisDb, FileMode.Open)) {
-                            byte[] header = new byte[DbHeader.Length];
-                            stream.Read(header, 0, header.Length);                            
-                            bool match = true;
-                            for (int i = 0; i < header.Length; i++) {
-                                if (header[i] != DbHeader[i]) {
-                                    match = false;
-                                    break;
-                                }
-                            }
-                            if (match) {
-                                try {
-                                    using (new DebugTimer("LoadAnalysis")) {
-                                        var serializer = new AnalysisSerializer();
-                                        _jsAnalyzer = (JsAnalyzer)serializer.Deserialize(stream);
-                                        if (_jsAnalyzer.Limits.Equals(limits)) {
-                                            _analysisQueue = new AnalysisQueue(this, serializer, stream);
-                                            foreach (var entry in _jsAnalyzer.AllModules) {
-                                                _projectFiles[entry.FilePath] = new ProjectItem(entry);
-                                            }
-                                            _reparseDateTime = new FileInfo(analysisDb).LastWriteTime;
-                                        } else {
-                                            _jsAnalyzer = null;
-                                        }
-                                    }
-                                } catch (InvalidOperationException) {
-                                    // corrupt or invalid DB
-                                    _jsAnalyzer = null;
-                                    _analysisQueue = null;
-                                } catch (Exception e) {
-                                    Debug.Fail(String.Format("Unexpected exception while loading analysis: {0}", e));
-                                    // bug in deserialization
-                                    _jsAnalyzer = null;
-                                    _analysisQueue = null;
-                                }
-                            }
-                        }
-                    } catch (IOException) {
-                        _jsAnalyzer = null;
-                        _analysisQueue = null;
-                    }
+                if (!LoadCachedAnalysis(projectDir, limits)) {
+                    CreateNewAnalyzer(limits);
                 }
             } else {
                 _implicitProject = true;
-            }
-
-
-            if (_jsAnalyzer == null) {
-                _jsAnalyzer = new JsAnalyzer(limits);
-                if (_analysisLevel != AnalysisLevel.None) {
-                    _analysisQueue = new AnalysisQueue(this);
-                }
+                CreateNewAnalyzer(limits);
             }
 
             _userCount = 1;
+
+            InitializeCodeSettings();
+        }
+
+        private void InitializeCodeSettings() {
+            if (!_fullyLoaded) {
+                lock (_loadingDeltas) {
+                    if (!_fullyLoaded) {
+                        _loadingDeltas.Add(() => InitializeCodeSettings());
+                        return;
+                    }
+                }
+            }
 
             foreach (var name in _jsAnalyzer.GlobalMembers) {
                 _codeSettings.AddKnownGlobal(name);
@@ -200,19 +138,18 @@ namespace Microsoft.NodejsTools.Intellisense {
             _codeSettings.AllowShebangLine = true;
         }
 
-        private static AnalysisLimits MakeLowAnalysisLimits() {
-            return new AnalysisLimits() {
-                ReturnTypes = 1,
-                AssignedTypes = 1,
-                DictKeyTypes = 1,
-                DictValueTypes = 1,
-                IndexTypes = 1,
-                InstanceMembers = 1
-            };
+        private void CreateNewAnalyzer(AnalysisLimits limits) {
+            _jsAnalyzer = new JsAnalyzer(limits);
+            if (_analysisLevel != AnalysisLevel.None) {
+                _analysisQueue = new AnalysisQueue(this);
+            }
+            _fullyLoaded = true;
         }
 
-        private string GetAnalysisPath() {
-            return Path.Combine(_projectDir, ".ntvs_analysis.dat");
+        #region Public API
+
+        public AnalysisLevel AnalysisLevel {
+            get { return _analysisLevel; }
         }
 
         public void AddUser() {
@@ -227,150 +164,134 @@ namespace Microsoft.NodejsTools.Intellisense {
             return Interlocked.Decrement(ref _userCount) == 0;
         }
 
-        /// <summary>
-        /// Creates a new ProjectEntry for the collection of buffers.
-        /// 
-        /// _openFiles must be locked when calling this function.
-        /// </summary>
-        internal void ReAnalyzeTextBuffers(BufferParser bufferParser) {
-            ITextBuffer[] buffers = bufferParser.Buffers;
-            if (buffers.Length > 0) {
-                var projEntry = CreateProjectEntry(buffers[0], new SnapshotCookie(buffers[0].CurrentSnapshot));
-                foreach (var buffer in buffers) {
-                    buffer.Properties.RemoveProperty(typeof(IProjectEntry));
-                    buffer.Properties.AddProperty(typeof(IProjectEntry), projEntry);
-
-                    var classifier = buffer.GetNodejsClassifier();
-                    if (classifier != null) {
-                        classifier.NewVersion();
-                    }
-
-                    ConnectErrorList(projEntry, buffer);
-                }
-
-                bufferParser._currentProjEntry = _openFiles[bufferParser] = projEntry;
-                bufferParser._parser = this;
-
-#if FALSE
-                foreach (var buffer in buffers) {
-                    // A buffer may have multiple DropDownBarClients, given one may open multiple CodeWindows
-                    // over a single buffer using Window/New Window
-                    List<DropDownBarClient> clients;
-                    if (buffer.Properties.TryGetProperty<List<DropDownBarClient>>(typeof(DropDownBarClient), out clients)) {
-                        foreach (var client in clients) {
-                            client.UpdateProjectEntry(projEntry);
-                        }
-                    }
-                }
-#endif
-
-                bufferParser.Requeue();
-            }
-        }
-
-        internal void SwitchAnalyzers(VsProjectAnalyzer oldAnalyzer) {
-            lock (_openFiles) {
-                // copy the Keys here as ReAnalyzeTextBuffers can mutuate the dictionary
-                foreach (var bufferParser in oldAnalyzer._openFiles.Keys.ToArray()) {
-                    ReAnalyzeTextBuffers(bufferParser);
-                }
-            }
-        }
-
-        public static void ConnectErrorList(IProjectEntry projEntry, ITextBuffer buffer) {
-            TaskProvider.Value.AddBufferForErrorSource(projEntry, ParserTaskMoniker, buffer);
-        }
-
-        public static void DisconnectErrorList(IProjectEntry projEntry, ITextBuffer buffer) {
-            TaskProvider.Value.RemoveBufferForErrorSource(projEntry, ParserTaskMoniker, buffer);
-        }
+        public EventHandler<FileEventArgs> WarningAdded;
+        public EventHandler<FileEventArgs> WarningRemoved;
+        public EventHandler<FileEventArgs> ErrorAdded;
+        public EventHandler<FileEventArgs> ErrorRemoved;
 
         /// <summary>
         /// Starts monitoring a buffer for changes so we will re-parse the buffer to update the analysis
         /// as the text changes.
         /// </summary>
-        internal MonitoredBufferResult MonitorTextBuffer(ITextView textView, ITextBuffer buffer) {
-            IProjectEntry projEntry = CreateProjectEntry(buffer, new SnapshotCookie(buffer.CurrentSnapshot));
-
-            ConnectErrorList(projEntry, buffer);
-
-            if (!buffer.Properties.ContainsProperty(typeof(IReplEvaluator))) {
-                TaskProvider.Value.AddBufferForErrorSource(projEntry, UnresolvedImportMoniker, buffer);
+        public void MonitorTextView(ITextView textView, IList<ITextBuffer> buffers) {
+            Utilities.ArgumentNotNull("buffers", buffers);
+            if (buffers.Count == 0) {
+                throw new ArgumentException("must provide at least one buffer");
             }
+
+            if (!_fullyLoaded) {
+                lock (_loadingDeltas) {
+                    if (!_fullyLoaded) {
+                        _loadingDeltas.Add(() => MonitorTextView(textView, buffers));
+                        return;
+                    }
+                }
+            }
+
+            var buffer = buffers.First();
+
+            IProjectEntry projEntry = GetOrCreateProjectEntry(
+                buffer,
+                new SnapshotCookie(buffer.CurrentSnapshot)
+            );
+
+            ConnectErrorList(projEntry, buffers.First());
 
             // kick off initial processing on the buffer
-            lock (_openFiles) {
-                var bufferParser = _queue.EnqueueBuffer(projEntry, textView, buffer);
-                _openFiles[bufferParser] = projEntry;
-                return new MonitoredBufferResult(bufferParser, textView, projEntry);
+            BufferParser bufferParser;
+            lock (_viewBufferParserMap) {
+                bufferParser = EnqueueBuffer(projEntry, buffer);
+                
+                _viewBufferParserMap[textView] = bufferParser;
+            }
+
+            for (int i = 1; i < buffers.Count; i++) {
+                bufferParser.AddBuffer(buffers[i]);
             }
         }
 
-        internal void StopMonitoringTextBuffer(BufferParser bufferParser, ITextView textView) {
-            bufferParser.StopMonitoring();
-            lock (_openFiles) {
-                _openFiles.Remove(bufferParser);
+        public void StopMonitoringTextView(ITextView textView) {
+            if (!_fullyLoaded) {
+                lock (_loadingDeltas) {
+                    if (!_fullyLoaded) {
+                        _loadingDeltas.Add(() => StopMonitoringTextView(textView));
+                        return;
+                    }
+                }
             }
+
+            BufferParser bufferParser;
+            if (!_viewBufferParserMap.TryGetValue(textView, out bufferParser)) {
+                return;
+            }
+
+            if (--bufferParser.AttachedViews == 0) {
+                bufferParser.StopMonitoring();
+                lock (_viewBufferParserMap) {
+                    _viewBufferParserMap.Remove(textView);
+                }
 
 #if FALSE
-            _unresolvedSquiggles.StopListening(bufferParser._currentProjEntry as IPythonProjectEntry);
+                _unresolvedSquiggles.StopListening(bufferParser._currentProjEntry as IPythonProjectEntry);
 #endif
 
-            if (TaskProvider.IsValueCreated) {
-                TaskProvider.Value.ClearErrorSource(bufferParser._currentProjEntry, ParserTaskMoniker);
-                TaskProvider.Value.ClearErrorSource(bufferParser._currentProjEntry, UnresolvedImportMoniker);
+                if (TaskProvider.IsValueCreated) {
+                    TaskProvider.Value.ClearErrorSource(bufferParser._currentProjEntry, ParserTaskMoniker);
 
-                if (ImplicitProject) {
-                    // remove the file from the error list
-                    TaskProvider.Value.Clear(bufferParser._currentProjEntry, ParserTaskMoniker);
-                    TaskProvider.Value.Clear(bufferParser._currentProjEntry, UnresolvedImportMoniker);
+                    if (_implicitProject) {
+                        // remove the file from the error list
+                        TaskProvider.Value.Clear(bufferParser._currentProjEntry, ParserTaskMoniker);
+                    }
                 }
             }
         }
 
-        private IProjectEntry CreateProjectEntry(ITextBuffer buffer, IAnalysisCookie analysisCookie) {
-            var replEval = buffer.GetReplEvaluator();
-            if (replEval != null) {
-                // We have a repl window, create an untracked module.
-                return _jsAnalyzer.AddModule(
-                    Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "repl" + Guid.NewGuid() + ".js"), 
-                    analysisCookie
-                );
-            }
-
-            string path = buffer.GetFilePath();
-            if (path == null) {
-                return null;
-            }
-
-            ProjectItem file;
-            IProjectEntry entry;
-            if (!_projectFiles.TryGetValue(path, out file)) {
-                if (buffer.ContentType.IsOfType(NodejsConstants.Nodejs)) {
-                    entry = _jsAnalyzer.AddModule(
-                        buffer.GetFilePath(),
-                        analysisCookie
-                    );
-                } else {
-                    return null;
+        public void AddBuffer(ITextView textView, ITextBuffer buffer) {
+            if (!_fullyLoaded) {
+                lock (_loadingDeltas) {
+                    if (!_fullyLoaded) {
+                        _loadingDeltas.Add(() => AddBuffer(textView, buffer));
+                        return;
+                    }
                 }
-
-                _projectFiles[path] = file = new ProjectItem(entry);
             }
 
-            return file.Entry;
-        }
-
-        class ProjectItem {
-            public readonly IProjectEntry Entry;
-            public bool ReportErrors;
-
-            public ProjectItem(IProjectEntry entry) {
-                Entry = entry;
+            BufferParser bufferParser;
+            if (!_viewBufferParserMap.TryGetValue(textView, out bufferParser)) {
+                return;
             }
+
+            bufferParser.AddBuffer(buffer);
         }
 
-        internal IProjectEntry AnalyzeFile(string path, bool reportErrors = true) {
+        public void RemoveBuffer(ITextView textView, ITextBuffer buffer) {
+            if (!_fullyLoaded) {
+                lock (_loadingDeltas) {
+                    if (!_fullyLoaded) {
+                        _loadingDeltas.Add(() => RemoveBuffer(textView, buffer));
+                        return;
+                    }
+                }
+            }
+
+            BufferParser bufferParser;
+            if (!_viewBufferParserMap.TryGetValue(textView, out bufferParser)) {
+                return;
+            }
+
+            bufferParser.RemoveBuffer(buffer);
+        }
+
+        public void AnalyzeFile(string path, bool reportErrors = true) {
+            if (!_fullyLoaded) {
+                lock (_loadingDeltas) {
+                    if (!_fullyLoaded) {
+                        _loadingDeltas.Add(() => AnalyzeFile(path, reportErrors));
+                        return;
+                    }
+                }
+            }
+
             ProjectItem item;
             if (!_projectFiles.TryGetValue(path, out item)) {
                 if (NodejsProjectNode.IsNodejsFile(path)) {
@@ -386,12 +307,13 @@ namespace Microsoft.NodejsTools.Intellisense {
 
                 if (item != null) {
                     item.ReportErrors = reportErrors;
+                    item.Reloaded = true;
                     _projectFiles[path] = item;
                     // only parse the file if we need to report errors on it or if
                     // we're analyzing.s
                     if (reportErrors || _analysisQueue != null) {
-                        _queue.EnqueueFile(item.Entry, path);
-                    } else if(item is IJsProjectEntry) {
+                        EnqueueFile(item.Entry, path);
+                    } else if (item is IJsProjectEntry) {
                         // balance BeginParsingTree call...
                         ((IJsProjectEntry)item.Entry).UpdateTree(null, null);
                     }
@@ -407,16 +329,24 @@ namespace Microsoft.NodejsTools.Intellisense {
                     // Or it was just included in the project and we need to parse for reporting
                     // errors.
                     if (reportErrors || _analysisQueue != null) {
-                        _queue.EnqueueFile(item.Entry, path);
+                        EnqueueFile(item.Entry, path);
                     }
                 }
                 item.ReportErrors = reportErrors;
+                item.Reloaded = true;
             }
-
-            return item.Entry;
         }
 
-        internal void AddPackageJson(string path, string mainFile) {
+        public void AddPackageJson(string path, string mainFile) {
+            if (!_fullyLoaded) {
+                lock (_loadingDeltas) {
+                    if (!_fullyLoaded) {
+                        _loadingDeltas.Add(() => AddPackageJson(path, mainFile));
+                        return;
+                    }
+                }
+            }
+
             if (_analysisLevel != AnalysisLevel.None) {
                 _analysisQueue.Enqueue(
                     _jsAnalyzer.AddPackageJson(path, mainFile),
@@ -425,19 +355,11 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
         }
 
-        internal IProjectEntry GetEntryFromFile(string path) {
-            ProjectItem item;
-            if (_projectFiles.TryGetValue(path, out item)) {
-                return item.Entry;
-            }
-            return null;
-        }
-
         /// <summary>
         /// Gets a ExpressionAnalysis for the expression at the provided span.  If the span is in
         /// part of an identifier then the expression is extended to complete the identifier.
         /// </summary>
-        internal static ExpressionAnalysis AnalyzeExpression(ITextSnapshot snapshot, ITrackingSpan span, bool forCompletion = true) {
+        public static ExpressionAnalysis AnalyzeExpression(ITextSnapshot snapshot, ITrackingSpan span, bool forCompletion = true) {
             var buffer = snapshot.TextBuffer;
             ReverseExpressionParser parser = new ReverseExpressionParser(snapshot, buffer, span);
 
@@ -474,7 +396,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         /// <summary>
         /// Gets a CompletionList providing a list of possible members the user can dot through.
         /// </summary>
-        internal static CompletionAnalysis GetCompletions(ITextSnapshot snapshot, ITrackingSpan span, ITrackingPoint point) {
+        public static CompletionAnalysis GetCompletions(ITextSnapshot snapshot, ITrackingSpan span, ITrackingPoint point) {
             return TrySpecialCompletions(snapshot, span, point) ??
                 GetNormalCompletionContext(snapshot, span, point);
         }
@@ -482,7 +404,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         /// <summary>
         /// Gets a list of signatuers available for the expression at the provided location in the snapshot.
         /// </summary>
-        internal static SignatureAnalysis GetSignatures(ITextSnapshot snapshot, ITrackingSpan span) {
+        public static SignatureAnalysis GetSignatures(ITextSnapshot snapshot, ITrackingSpan span) {
             var buffer = snapshot.TextBuffer;
             ReverseExpressionParser parser = new ReverseExpressionParser(snapshot, buffer, span);
 
@@ -499,16 +421,6 @@ namespace Microsoft.NodejsTools.Intellisense {
 
             var text = new SnapshotSpan(exprRange.Value.Snapshot, new Span(exprRange.Value.Start, sigStart.Value.Position - exprRange.Value.Start)).GetText();
             var applicableSpan = parser.Snapshot.CreateTrackingSpan(exprRange.Value.Span, SpanTrackingMode.EdgeInclusive);
-#if FALSE
-            if (snapshot.TextBuffer.GetAnalyzer().ShouldEvaluateForCompletion(text)) {
-                var liveSigs = TryGetLiveSignatures(snapshot, paramIndex, text, applicableSpan, lastKeywordArg);
-                if (liveSigs != null) {
-                    return liveSigs;
-                }
-            }
-#endif
-
-            var start = Stopwatch.ElapsedMilliseconds;
 
             var analysisItem = buffer.GetProjectEntry();
             if (analysisItem != null) {
@@ -519,11 +431,6 @@ namespace Microsoft.NodejsTools.Intellisense {
                     IEnumerable<IOverloadResult> sigs;
                     lock (snapshot.TextBuffer.GetAnalyzer()) {
                         sigs = analysis.GetSignaturesByIndex(text, index);
-                    }
-                    var end = Stopwatch.ElapsedMilliseconds;
-
-                    if (/*Logging &&*/ (end - start) > CompletionAnalysis.TooMuchTime) {
-                        Trace.WriteLine(String.Format("{0} lookup time {1} for signatures", text, end - start));
                     }
 
                     var result = new List<ISignature>();
@@ -542,7 +449,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             return new SignatureAnalysis(text, paramIndex, new ISignature[0]);
         }
 
-        internal static int TranslateIndex(int index, ITextSnapshot fromSnapshot, ModuleAnalysis toAnalysisSnapshot) {
+        public static int TranslateIndex(int index, ITextSnapshot fromSnapshot, ModuleAnalysis toAnalysisSnapshot) {
             var snapshotCookie = toAnalysisSnapshot.AnalysisCookie as SnapshotCookie;
             // TODO: buffers differ in the REPL window case, in the future we should handle this better
             if (snapshotCookie != null &&
@@ -556,6 +463,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
             return index;
         }
+
 #if FALSE
         internal static MissingImportAnalysis GetMissingImports(ITextSnapshot snapshot, ITrackingSpan span) {
             ReverseExpressionParser parser = new ReverseExpressionParser(snapshot, snapshot.TextBuffer, span);
@@ -627,49 +535,32 @@ namespace Microsoft.NodejsTools.Intellisense {
         private static bool IsDefinition(IAnalysisVariable variable) {
             return variable.Type == VariableType.Definition;
         }
-
-        private static bool IsImplicitlyDefinedName(NameExpression nameExpr) {
-            return nameExpr.Name == "__all__" ||
-                nameExpr.Name == "__file__" ||
-                nameExpr.Name == "__doc__" ||
-                nameExpr.Name == "__name__";
-        }
 #endif
-        internal bool IsAnalyzing {
+
+        public bool IsAnalyzing {
             get {
-                return _queue.IsParsing || (_analysisQueue != null && _analysisQueue.IsAnalyzing);
+                return IsParsing || (_analysisQueue != null && _analysisQueue.IsAnalyzing);
             }
         }
 
-        internal void WaitForCompleteAnalysis(Func<int, bool> itemsLeftUpdated) {
+        public void WaitForCompleteAnalysis(Action<int> itemsLeftUpdated = null, CancellationToken token = default(CancellationToken)) {
             if (IsAnalyzing) {
                 while (IsAnalyzing) {
-                    QueueActivityEvent.WaitOne(100);
+                    _queueActivityEvent.WaitOne(100);
 
-                    int itemsLeft = _queue.ParsePending + (_analysisQueue != null ? _analysisQueue.AnalysisPending : 0);
+                    int itemsLeft = ParsePending + (_analysisQueue != null ? _analysisQueue.AnalysisPending : 0);
 
-                    if (!itemsLeftUpdated(itemsLeft)) {
+                    if (itemsLeftUpdated != null) {
+                        itemsLeftUpdated(itemsLeft);
+                    }
+                    if (token.IsCancellationRequested) {
                         break;
                     }
                 }
             } else {
-                itemsLeftUpdated(0);
-            }
-        }
-
-        internal AutoResetEvent QueueActivityEvent {
-            get {
-                return _queueActivityEvent;
-            }
-        }
-
-        /// <summary>
-        /// True if the project is an implicit project and it should model files on disk in addition
-        /// to files which are explicitly added.
-        /// </summary>
-        internal bool ImplicitProject {
-            get {
-                return _implicitProject;
+                if (itemsLeftUpdated != null) {
+                    itemsLeftUpdated(0);
+                }
             }
         }
 
@@ -679,33 +570,225 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
         }
 
-        internal JsAst ParseSnapshot(ITextSnapshot snapshot) {
-            var parser = CreateParser(
-                new SnapshotSpanSourceCodeReader(
-                    new SnapshotSpan(snapshot, 0, snapshot.Length)
-                ),
-                new ErrorSink()
-            );
-            return parser.Parse(_codeSettings);
+        public int MaxLogLength {
+            get {
+                if (_jsAnalyzer == null) {
+                    return 0;
+                }
+                return _jsAnalyzer.MaxLogLength;
+            }
+            set {
+                if (!_fullyLoaded) {
+                    lock (_loadingDeltas) {
+                        if (!_fullyLoaded) {
+                            _loadingDeltas.Add(() => MaxLogLength = value);
+                            return;
+                        }
+                    }
+                }
+
+                _jsAnalyzer.MaxLogLength = value;
+            }
         }
 
-        internal ITextSnapshot GetOpenSnapshot(IProjectEntry entry) {
+        public void DumpLog(TextWriter output, bool asCsv = false) {
+            if (_jsAnalyzer != null) {
+                _jsAnalyzer.DumpLog(output, asCsv);
+            } else {
+                output.WriteLine("Analysis loading...");
+            }
+        }
+
+        public void ReloadComplete() {
+            if (!_fullyLoaded) {
+                lock (_loadingDeltas) {
+                    if (!_fullyLoaded) {
+                        _loadingDeltas.Add(() => ReloadComplete());
+                        return;
+                    }
+                }
+            }
+
+            foreach (var item in _projectFiles) {
+                if (!item.Value.Reloaded) {
+                    UnloadFile(item.Value.Entry);
+                }
+            }
+        }
+
+        public void SwitchAnalyzers(VsProjectAnalyzer oldAnalyzer) {
+            lock (_viewBufferParserMap) {
+                // copy the Keys here as ReAnalyzeTextBuffers can mutuate the dictionary
+                foreach (var bufferParser in oldAnalyzer._viewBufferParserMap.Values.ToArray()) {
+                    ReAnalyzeTextBuffers(bufferParser);
+                }
+            }
+        }
+
+        #endregion
+
+        private static Lazy<TaskProvider> CreateDefaultTaskProvider() {
+            return new Lazy<TaskProvider>(() => {
+                var errorList = NodejsPackage.GetGlobalService(typeof(SVsErrorList)) as IVsTaskList;
+                var model = NodejsPackage.ComponentModel;
+                var errorProvider = model != null ? model.GetService<IErrorProviderFactory>() : null;
+                return new TaskProvider(errorList, errorProvider);
+            }, LazyThreadSafetyMode.ExecutionAndPublication);
+        }
+
+        private static Lazy<TaskProvider> TaskProvider {
+            get {
+                return _defaultTaskProvider;
+            }
+        }
+
+        /// <summary>
+        /// Creates a new ProjectEntry for the collection of buffers.
+        /// 
+        /// _openFiles must be locked when calling this function.
+        /// </summary>
+        private void ReAnalyzeTextBuffers(BufferParser bufferParser) {
+            ITextBuffer[] buffers = bufferParser.Buffers;
+            if (buffers.Length > 0) {
+                var projEntry = GetOrCreateProjectEntry(buffers[0], new SnapshotCookie(buffers[0].CurrentSnapshot));
+                foreach (var buffer in buffers) {
+                    buffer.Properties.RemoveProperty(typeof(IProjectEntry));
+                    buffer.Properties.AddProperty(typeof(IProjectEntry), projEntry);
+
+                    var classifier = buffer.GetNodejsClassifier();
+                    if (classifier != null) {
+                        classifier.NewVersion();
+                    }
+
+                    ConnectErrorList(projEntry, buffer);
+                }
+
+                bufferParser._currentProjEntry = projEntry;
+                bufferParser._parser = this;
+
+#if FALSE
+                // TODO: Add back for navigation bar support
+                foreach (var buffer in buffers) {
+                    // A buffer may have multiple DropDownBarClients, given one may open multiple CodeWindows
+                    // over a single buffer using Window/New Window
+                    List<DropDownBarClient> clients;
+                    if (buffer.Properties.TryGetProperty<List<DropDownBarClient>>(typeof(DropDownBarClient), out clients)) {
+                        foreach (var client in clients) {
+                            client.UpdateProjectEntry(projEntry);
+                        }
+                    }
+                }
+#endif
+
+                bufferParser.Requeue();
+            }
+        }
+
+        private void UnloadFile(IProjectEntry entry) {
+#if FALSE
+            // If we remove a Node.js module, reanalyze any other modules
+            // that referenced it.
+            var pyEntry = entry as IJsProjectEntry;
+            IJsProjectEntry[] reanalyzeEntries = null;
+            if (pyEntry != null && !string.IsNullOrEmpty(pyEntry.ModuleName)) {
+                reanalyzeEntries = _pyAnalyzer.GetEntriesThatImportModule(pyEntry.ModuleName, false).ToArray();
+            }
+#endif
+
+            ClearParserTasks(entry);
+            if (_analysisLevel != AnalysisLevel.None) {
+                _analysisQueue.Enqueue(_jsAnalyzer.RemoveModule(entry), AnalysisPriority.Normal);
+            }
+            ProjectItem removed;
+            _projectFiles.TryRemove(entry.FilePath, out removed);
+#if FALSE
+            if (reanalyzeEntries != null) {
+                foreach (var existing in reanalyzeEntries) {
+                    _analysisQueue.Enqueue(existing, AnalysisPriority.Normal);
+                }
+            }
+#endif
+        }
+
+        private static void ConnectErrorList(IProjectEntry projEntry, ITextBuffer buffer) {
+            TaskProvider.Value.AddBufferForErrorSource(projEntry, ParserTaskMoniker, buffer);
+        }
+
+        private static void DisconnectErrorList(IProjectEntry projEntry, ITextBuffer buffer) {
+            TaskProvider.Value.RemoveBufferForErrorSource(projEntry, ParserTaskMoniker, buffer);
+        }
+
+        private IProjectEntry GetOrCreateProjectEntry(ITextBuffer buffer, IAnalysisCookie analysisCookie) {
+            var replEval = buffer.GetReplEvaluator();
+            if (replEval != null) {
+                // We have a repl window, create an untracked module.
+                return _jsAnalyzer.AddModule(
+                    Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "repl" + Guid.NewGuid() + ".js"), 
+                    analysisCookie
+                );
+            }
+
+            string path = buffer.GetFilePath();
+            if (path == null) {
+                return null;
+            }
+
+            ProjectItem file;
+            IProjectEntry entry;
+            if (!_projectFiles.TryGetValue(path, out file)) {
+                if (buffer.ContentType.IsOfType(NodejsConstants.Nodejs)) {
+                    entry = _jsAnalyzer.AddModule(
+                        buffer.GetFilePath(),
+                        analysisCookie
+                    );
+                } else {
+                    return null;
+                }
+                
+                _projectFiles[path] = file = new ProjectItem(entry);
+            }
+
+            return file.Entry;
+        }
+
+        class ProjectItem {
+            public readonly IProjectEntry Entry;
+            public bool ReportErrors;
+            public bool Reloaded;
+
+            public ProjectItem(IProjectEntry entry) {
+                Entry = entry;
+            }
+        }
+
+        private ITextSnapshot GetOpenSnapshot(IProjectEntry entry) {
             if (entry == null) {
                 return null;
             }
 
-            lock (_openFiles) {
-                var item = _openFiles.FirstOrDefault(kv => kv.Value == entry);
-                if (item.Value == null) {
-                    return null;
+            IVsUIHierarchy hierarchy;
+            uint itemId;
+            IVsWindowFrame frame;
+            if (VsShellUtilities.IsDocumentOpen(
+                NodejsPackage.Instance,
+                entry.FilePath,
+                Guid.Empty,
+                out hierarchy,
+                out itemId,
+                out frame
+            )) {
+                var view = VsShellUtilities.GetTextView(frame);
+                if (view != null) {
+                    var factService = NodejsPackage.ComponentModel.GetService<IVsEditorAdaptersFactoryService>();
+                    var wpfView = factService.GetWpfTextView(view);
+                    return wpfView.TextBuffer.CurrentSnapshot;
                 }
-                var document = item.Key.Document;
-
-                return document != null ? document.TextBuffer.CurrentSnapshot : null;
             }
+
+            return null;
         }
 
-        internal void ParseFile(IProjectEntry entry, string filename, Stream content) {
+        private void ParseFile(IProjectEntry entry, string filename, Stream content) {
             IJsProjectEntry jsEntry;
             IExternalProjectEntry externalEntry;
 
@@ -755,7 +838,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
         }
 
-        internal void ParseBuffers(BufferParser bufferParser, params ITextSnapshot[] snapshots) {
+        private void ParseBuffers(BufferParser bufferParser, params ITextSnapshot[] snapshots) {
             IProjectEntry entry = bufferParser._currentProjEntry;
 
             IJsProjectEntry jsProjEntry = entry as IJsProjectEntry;
@@ -929,164 +1012,6 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         #region Implementation Details
 
-        private static Stopwatch _stopwatch = MakeStopWatch();
-
-        internal static Stopwatch Stopwatch {
-            get {
-                return _stopwatch;
-            }
-        }
-
-#if FALSE
-        private static SignatureAnalysis TryGetLiveSignatures(ITextSnapshot snapshot, int paramIndex, string text, ITrackingSpan applicableSpan, string lastKeywordArg) {
-            IReplEvaluator eval;
-            IPythonReplIntellisense dlrEval;
-            if (snapshot.TextBuffer.Properties.TryGetProperty<IReplEvaluator>(typeof(IReplEvaluator), out eval) &&
-                (dlrEval = eval as IPythonReplIntellisense) != null) {
-                if (text.EndsWith("(")) {
-                    text = text.Substring(0, text.Length - 1);
-                }
-                var liveSigs = dlrEval.GetSignatureDocumentation(text);
-
-                if (liveSigs != null && liveSigs.Length > 0) {
-                    return new SignatureAnalysis(text, paramIndex, GetLiveSignatures(text, liveSigs, paramIndex, applicableSpan, lastKeywordArg), lastKeywordArg);
-                }
-            }
-            return null;
-        }
-
-        private static ISignature[] GetLiveSignatures(string text, ICollection<OverloadDoc> liveSigs, int paramIndex, ITrackingSpan span, string lastKeywordArg) {
-            ISignature[] res = new ISignature[liveSigs.Count];
-            int i = 0;
-            foreach (var sig in liveSigs) {
-                res[i++] = new PythonSignature(
-                    span,
-                    new LiveOverloadResult(text, sig.Documentation, sig.Parameters),
-                    paramIndex,
-                    lastKeywordArg
-                );
-            }
-            return res;
-        }
-
-        class LiveOverloadResult : IOverloadResult {
-            private readonly string _name, _doc;
-            private readonly ParameterResult[] _parameters;
-
-            public LiveOverloadResult(string name, string documentation, ParameterResult[] parameters) {
-                _name = name;
-                _doc = documentation;
-                _parameters = parameters;
-            }
-
-            #region IOverloadResult Members
-
-            public string Name {
-                get { return _name; }
-            }
-
-            public string Documentation {
-                get { return _doc; }
-            }
-
-            public ParameterResult[] Parameters {
-                get { return _parameters; }
-            }
-
-            #endregion
-        }
-
-        internal bool ShouldEvaluateForCompletion(string source) {
-            if (PythonToolsPackage.Instance != null) {
-                switch (PythonToolsPackage.Instance.InteractiveOptionsPage.GetOptions(_interpreterFactory).ReplIntellisenseMode) {
-                    case ReplIntellisenseMode.AlwaysEvaluate: return true;
-                    case ReplIntellisenseMode.NeverEvaluate: return false;
-                    case ReplIntellisenseMode.DontEvaluateCalls:
-                        var parser = Parser.CreateParser(new StringReader(source), _interpreterFactory.GetLanguageVersion());
-
-                        var stmt = parser.ParseSingleStatement();
-                        var exprWalker = new ExprWalker();
-
-                        stmt.Walk(exprWalker);
-                        return exprWalker.ShouldExecute;
-                    default: throw new InvalidOperationException();
-                }
-            }
-            return false;
-        }
-
-        class ExprWalker : PythonWalker {
-            public bool ShouldExecute = true;
-
-            public override bool Walk(CallExpression node) {
-                ShouldExecute = false;
-                return base.Walk(node);
-            }
-        }
-
-        private static CompletionAnalysis TrySpecialCompletions(ITextSnapshot snapshot, ITrackingSpan span, ITrackingPoint point, CompletionOptions options) {
-            var snapSpan = span.GetSpan(snapshot);
-            var buffer = snapshot.TextBuffer;
-            var classifier = buffer.GetPythonClassifier();
-            if (classifier == null) {
-                return null;
-            }
-            var start = snapSpan.Start;
-
-            var parser = new ReverseExpressionParser(snapshot, buffer, span);
-            if (parser.IsInGrouping()) {
-                var range = parser.GetExpressionRange(nesting: 1);
-                if (range != null) {
-                    start = range.Value.Start;
-                }
-            }
-
-            var tokens = classifier.GetClassificationSpans(new SnapshotSpan(start.GetContainingLine().Start, snapSpan.Start));
-            if (tokens.Count > 0) {
-                // Check for context-sensitive intellisense
-                var lastClass = tokens[tokens.Count - 1];
-
-                if (lastClass.ClassificationType == classifier.Provider.Comment) {
-                    // No completions in comments
-                    return CompletionAnalysis.EmptyCompletionContext;
-                } else if (lastClass.ClassificationType == classifier.Provider.StringLiteral) {
-                    // String completion
-                    if (lastClass.Span.Start.GetContainingLine().LineNumber == lastClass.Span.End.GetContainingLine().LineNumber) {
-                        return new StringLiteralCompletionList(span, buffer, options);
-                    } else {
-                        // multi-line string, no string completions.
-                        return CompletionAnalysis.EmptyCompletionContext;
-                    }
-                } else if (lastClass.ClassificationType == classifier.Provider.Operator &&
-                    lastClass.Span.GetText() == "@") {
-
-                    return new DecoratorCompletionAnalysis(span, buffer, options);
-                } else if (CompletionAnalysis.IsKeyword(lastClass, "raise") || CompletionAnalysis.IsKeyword(lastClass, "except")) {
-                    return new ExceptionCompletionAnalysis(span, buffer, options);
-                } else if (CompletionAnalysis.IsKeyword(lastClass, "def")) {
-                    return new OverrideCompletionAnalysis(span, buffer, options);
-                }
-
-                // Import completions
-                var first = tokens[0];
-                if (CompletionAnalysis.IsKeyword(first, "import")) {
-                    return ImportCompletionAnalysis.Make(tokens, span, buffer, options);
-                } else if (CompletionAnalysis.IsKeyword(first, "from")) {
-                    return FromImportCompletionAnalysis.Make(tokens, span, buffer, options);
-                }
-                return null;
-            } else if ((tokens = classifier.GetClassificationSpans(snapSpan.Start.GetContainingLine().ExtentIncludingLineBreak)).Count > 0 &&
-               tokens[0].ClassificationType == classifier.Provider.StringLiteral) {
-                // multi-line string, no string completions.
-                return CompletionAnalysis.EmptyCompletionContext;
-            } else if (snapshot.IsReplBufferWithCommand()) {
-                return CompletionAnalysis.EmptyCompletionContext;
-            }
-
-            return null;
-        }
-#endif
-
         private static CompletionAnalysis TrySpecialCompletions(ITextSnapshot snapshot, ITrackingSpan span, ITrackingPoint point) {
             var snapSpan = span.GetSpan(snapshot);
             var buffer = snapshot.TextBuffer;
@@ -1162,46 +1087,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             return res;
         }
 
-        internal void UnloadFile(IProjectEntry entry) {
-            if (entry != null) {
-                // If we remove a Node.js module, reanalyze any other modules
-                // that referenced it.
-#if FALSE
-                var pyEntry = entry as IJsProjectEntry;
-                IJsProjectEntry[] reanalyzeEntries = null;
-                if (pyEntry != null && !string.IsNullOrEmpty(pyEntry.ModuleName)) {
-                    reanalyzeEntries = _pyAnalyzer.GetEntriesThatImportModule(pyEntry.ModuleName, false).ToArray();
-                }
-#endif
-
-                ClearParserTasks(entry);
-                if (_analysisLevel != AnalysisLevel.None) {
-                    _analysisQueue.Enqueue(_jsAnalyzer.RemoveModule(entry), AnalysisPriority.Normal);
-                }
-                ProjectItem removed;
-                _projectFiles.TryRemove(entry.FilePath, out removed);
-#if FALSE
-                if (reanalyzeEntries != null) {
-                    foreach (var existing in reanalyzeEntries) {
-                        _analysisQueue.Enqueue(existing, AnalysisPriority.Normal);
-                    }
-                }
-#endif
-            }
-        }
-
-        internal void RemoveErrors(IProjectEntry entry, bool suppressUpdate) {
-            if (entry != null && entry.FilePath != null) {
-                if (_taskProvider.IsValueCreated) {
-                    // _taskProvider may not be created if we've never opened a Node.js file and
-                    // none of the project files have errors
-                    //_taskProvider.Value.Clear(entry.FilePath, !suppressUpdate);
-                }
-                OnWarningRemoved(entry.FilePath);
-                OnErrorRemoved(entry.FilePath);
-            }
-        }
-
+        
         private void OnWarningAdded(string path) {
             var evt = WarningAdded;
             if (evt != null) {
@@ -1230,12 +1116,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
         }
 
-        internal EventHandler<FileEventArgs> WarningAdded;
-        internal EventHandler<FileEventArgs> WarningRemoved;
-        internal EventHandler<FileEventArgs> ErrorAdded;
-        internal EventHandler<FileEventArgs> ErrorRemoved;
-
-        internal void ClearParserTasks(IProjectEntry entry) {
+        private void ClearParserTasks(IProjectEntry entry) {
             if (entry != null) {
                 if (TaskProvider.IsValueCreated) {
                     // TaskProvider may not be created if we've never opened a
@@ -1243,22 +1124,13 @@ namespace Microsoft.NodejsTools.Intellisense {
                     TaskProvider.Value.Clear(entry, ParserTaskMoniker);
                 }
                 bool changed;
-                lock (_hasParseErrors) {                    
+                lock (_hasParseErrors) {
                     changed = _hasParseErrors.Remove(entry);
                 }
 
                 if (changed) {
                     OnShouldWarnOnLaunchChanged(entry);
                 }
-            }
-        }
-
-        internal void ClearAllTasks() {
-            if (TaskProvider.IsValueCreated) {
-                TaskProvider.Value.ClearAll();
-            }
-            lock (_hasParseErrors) {
-                _hasParseErrors.Clear();
             }
         }
 
@@ -1283,7 +1155,6 @@ namespace Microsoft.NodejsTools.Intellisense {
             if (TaskProvider.IsValueCreated) {
                 foreach (var file in _projectFiles.Values) {
                     TaskProvider.Value.Clear(file.Entry, ParserTaskMoniker);
-                    TaskProvider.Value.Clear(file.Entry, UnresolvedImportMoniker);
                 }
             }
 
@@ -1292,7 +1163,104 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
         }
 
-        internal void SaveAnalysis() {
+        #endregion
+
+        #region Cached Analysis
+
+        private bool LoadCachedAnalysis(string projectDir, AnalysisLimits limits) {
+            string analysisDb = GetAnalysisPath();
+            if (File.Exists(analysisDb) && _analysisLevel != AnalysisLevel.None) {
+                FileStream stream = null;
+                bool disposeStream = true;
+                try {
+                    stream = new FileStream(analysisDb, FileMode.Open);
+                    byte[] header = new byte[DbHeader.Length];
+                    stream.Read(header, 0, header.Length);
+                    if (DbHeader.SequenceEqual(header)) {
+                        var statusbar = (IVsStatusbar)NodejsPackage.GetGlobalService(typeof(SVsStatusbar));
+                        if (statusbar != null) {
+                            statusbar.SetText(SR.GetString(SR.StatusAnalysisLoading));
+                        }
+
+                        Task.Run(() => {
+                            try {
+                                using (new DebugTimer("LoadAnalysis")) {
+                                    var serializer = new AnalysisSerializer();
+                                    var analyzer = (JsAnalyzer)serializer.Deserialize(stream);
+                                    AnalysisQueue queue;
+                                    if (analyzer.Limits.Equals(limits)) {
+                                        queue = new AnalysisQueue(this, serializer, stream);
+                                        foreach (var entry in analyzer.AllModules) {
+                                            _projectFiles[entry.FilePath] = new ProjectItem(entry);
+                                        }
+                                        _reparseDateTime = new FileInfo(analysisDb).LastWriteTime;
+
+                                        _analysisQueue = queue;
+                                        _jsAnalyzer = analyzer;
+
+                                        if (statusbar != null) {
+                                            statusbar.SetText(SR.GetString(SR.StatusAnalysisLoaded));
+                                        }
+                                    }
+                                }
+                            } catch (InvalidOperationException) {
+                                // corrupt or invalid DB
+                                if (statusbar != null) {
+                                    statusbar.SetText(SR.GetString(SR.StatusAnalysisLoadFailed));
+                                }
+                            } catch (Exception e) {
+                                Debug.Fail(String.Format("Unexpected exception while loading analysis: {0}", e));
+                                // bug in deserialization
+                                if (statusbar != null) {
+                                    statusbar.SetText(SR.GetString(SR.StatusAnalysisLoadFailed));
+                                }
+                            } finally {
+                                stream.Dispose();
+
+                                // apply any changes 
+                                lock (_loadingDeltas) {
+                                    if (_jsAnalyzer == null) {
+                                        // we failed to load the cached analysis, create a new
+                                        // analyzer now...
+                                        CreateNewAnalyzer(LoadLimits());
+                                    }
+
+                                    _fullyLoaded = true;
+                                    foreach (var delta in _loadingDeltas) {
+                                        delta();
+                                    }
+                                }
+                            }
+                        }).HandleAllExceptions(SR.GetString(SR.NodejsToolsForVisualStudio)).DoNotWait();
+                        disposeStream = false;
+                        return true;
+                    }
+                } catch (IOException) {
+                } finally {
+                    if (stream != null && disposeStream) {
+                        stream.Dispose();
+                    }
+                }
+            }
+            return false;
+        }
+
+        private static byte[] DbHeader {
+            get {
+                if (_dbHeader == null) {
+                    _dbHeader = new byte[] { (byte)'J', (byte)'S', (byte)'A', (byte)'N' }
+                        .Concat(JsAnalyzer.SerializationVersion)
+                        .ToArray();
+                }
+                return _dbHeader;
+            }
+        }
+
+        private string GetAnalysisPath() {
+            return Path.Combine(_projectDir, ".ntvs_analysis.dat");
+        }
+
+        private void SaveAnalysis() {
             if (_projectDir == null || _analysisLevel == AnalysisLevel.None) {
                 return;
             }
@@ -1340,7 +1308,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         private const string AnalysisLimitsKey = @"Software\Microsoft\NodejsTools\" + AssemblyVersionInfo.VSVersion +
     @"\Analysis\Project";
 
-        public AnalysisLimits LoadLimits() {
+        private AnalysisLimits LoadLimits() {
             AnalysisLimits defaults = null;
 
             if (NodejsPackage.Instance != null) {
@@ -1377,7 +1345,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         /// <param name="defaults">
         /// The default analysis limits if they're not available in the regkey.
         /// </param>
-        public static AnalysisLimits LoadLimitsFromStorage(RegistryKey key, AnalysisLimits defaults) {
+        private static AnalysisLimits LoadLimitsFromStorage(RegistryKey key, AnalysisLimits defaults) {
             AnalysisLimits limits = new AnalysisLimits();
 
             limits.ReturnTypes = GetSetting(key, ReturnTypesId) ?? defaults.ReturnTypes;

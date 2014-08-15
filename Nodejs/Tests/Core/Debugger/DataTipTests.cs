@@ -33,8 +33,8 @@ namespace NodejsTests.Debugger.FileNameMapping {
 
             var analyzer = new VsProjectAnalyzer();
             buffer.AddProperty(typeof(VsProjectAnalyzer), analyzer);
-            var monitoredBuffer = analyzer.MonitorTextBuffer(view, buffer);
-            analyzer.WaitForCompleteAnalysis(_ => true);
+            analyzer.MonitorTextView(view, new[] { buffer });
+            analyzer.WaitForCompleteAnalysis();
 
             var m = Regex.Match(input, selectionRegex);
             Assert.IsTrue(m.Success);

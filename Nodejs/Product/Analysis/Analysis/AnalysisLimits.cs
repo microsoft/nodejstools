@@ -30,6 +30,17 @@ namespace Microsoft.NodejsTools.Analysis {
             MergedArgumentTypes = 30;
         }
 
+        public static AnalysisLimits MakeLowAnalysisLimits() {
+            return new AnalysisLimits() {
+                ReturnTypes = 1,
+                AssignedTypes = 1,
+                DictKeyTypes = 1,
+                DictValueTypes = 1,
+                IndexTypes = 1,
+                InstanceMembers = 1
+            };
+        }
+
         /// <summary>
         /// The number of types in a return value at which to start combining
         /// similar types.

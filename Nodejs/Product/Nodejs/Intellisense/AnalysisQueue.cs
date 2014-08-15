@@ -23,233 +23,223 @@ using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Microsoft.NodejsTools.Intellisense {
-    /// <summary>
-    /// Provides a single threaded analysis queue.  Items can be enqueued into the
-    /// analysis at various priorities.  
-    /// </summary>
-    sealed class AnalysisQueue : IDisposable {
-        private readonly Thread _workThread;
-        private readonly AutoResetEvent _workEvent;
-        private readonly VsProjectAnalyzer _analyzer;
-        private readonly object _queueLock = new object();
-        private readonly List<IAnalyzable>[] _queue;
-        private readonly HashSet<IGroupableAnalysisProject> _enqueuedGroups;
-        [NonSerialized]
-        private DateTime _lastSave;
-        private TaskScheduler _scheduler;
-        private CancellationTokenSource _cancel;
-        private bool _isAnalyzing;
-        private int _analysisPending;
-        private static readonly TimeSpan _SaveAnalysisTime = TimeSpan.FromMinutes(15);
+    sealed partial class VsProjectAnalyzer {
+        /// <summary>
+        /// Provides a single threaded analysis queue.  Items can be enqueued into the
+        /// analysis at various priorities.  
+        /// </summary>
+        sealed class AnalysisQueue : IDisposable {
+            private readonly Thread _workThread;
+            private readonly AutoResetEvent _workEvent;
+            private readonly VsProjectAnalyzer _analyzer;
+            private readonly object _queueLock = new object();
+            private readonly List<IAnalyzable>[] _queue;
+            private readonly HashSet<IGroupableAnalysisProject> _enqueuedGroups;
+            [NonSerialized]
+            private DateTime _lastSave;
+            private CancellationTokenSource _cancel;
+            private bool _isAnalyzing;
+            private int _analysisPending;
+            private static readonly TimeSpan _SaveAnalysisTime = TimeSpan.FromMinutes(15);
 
-        private const int PriorityCount = (int)AnalysisPriority.High + 1;
+            private const int PriorityCount = (int)AnalysisPriority.High + 1;
 
-        internal AnalysisQueue(VsProjectAnalyzer analyzer, AnalysisSerializer serializer = null, Stream stream = null) {
-            _workEvent = new AutoResetEvent(false);
-            _cancel = new CancellationTokenSource();
-            _analyzer = analyzer;
+            internal AnalysisQueue(VsProjectAnalyzer analyzer, AnalysisSerializer serializer = null, Stream stream = null) {
+                _workEvent = new AutoResetEvent(false);
+                _cancel = new CancellationTokenSource();
+                _analyzer = analyzer;
 
-            if (serializer != null && stream != null) {
-                // must be kept in sync with Serialize
-                _queue = (List<IAnalyzable>[])serializer.Deserialize(stream);
-                _enqueuedGroups = (HashSet<IGroupableAnalysisProject>)serializer.Deserialize(stream);
-                // we're using the cached analysis, don't re-save for another 15 minutes
-                _lastSave = DateTime.Now;
-            } else {
-                _queue = new List<IAnalyzable>[PriorityCount];
-                for (int i = 0; i < PriorityCount; i++) {
-                    _queue[i] = new List<IAnalyzable>();
+                if (serializer != null && stream != null) {
+                    // must be kept in sync with Serialize
+                    _queue = (List<IAnalyzable>[])serializer.Deserialize(stream);
+                    _enqueuedGroups = (HashSet<IGroupableAnalysisProject>)serializer.Deserialize(stream);
+                    // we're using the cached analysis, don't re-save for another 15 minutes
+                    _lastSave = DateTime.Now;
+                } else {
+                    _queue = new List<IAnalyzable>[PriorityCount];
+                    for (int i = 0; i < PriorityCount; i++) {
+                        _queue[i] = new List<IAnalyzable>();
+                    }
+                    _enqueuedGroups = new HashSet<IGroupableAnalysisProject>();
+                    // save the analysis once it's ready, but give us a little time to be
+                    // initialized and start processing stuff...
+                    _lastSave = DateTime.Now - _SaveAnalysisTime + TimeSpan.FromSeconds(10);
                 }
-                _enqueuedGroups = new HashSet<IGroupableAnalysisProject>();
-                // save the analysis once it's ready, but give us a little time to be
-                // initialized and start processing stuff...
-                _lastSave = DateTime.Now - _SaveAnalysisTime + TimeSpan.FromSeconds(10);
+
+                _workThread = new Thread(Worker);
+                _workThread.Name = "Node.js Analysis Queue";
+                _workThread.Priority = ThreadPriority.BelowNormal;
+                _workThread.IsBackground = true;
+
+                // start the thread, wait for our synchronization context to be created
+                using (AutoResetEvent threadStarted = new AutoResetEvent(false)) {
+                    _workThread.Start(threadStarted);
+                    threadStarted.WaitOne();
+                }
+
+                foreach (var priority in _queue) {
+                    if (priority.Count > 0) {
+                        _workEvent.Set();
+                    }
+                }
             }
 
-            _workThread = new Thread(Worker);
-            _workThread.Name = "Node.js Analysis Queue";
-            _workThread.Priority = ThreadPriority.BelowNormal;
-            _workThread.IsBackground = true;
-            
-            // start the thread, wait for our synchronization context to be created
-            using (AutoResetEvent threadStarted = new AutoResetEvent(false)) {
-                _workThread.Start(threadStarted);
-                threadStarted.WaitOne();
+            public void Serialize(AnalysisSerializer serializer, Stream stream) {
+                // must be kept in sync with constructor deserialization
+                serializer.Serialize(stream, _queue);
+                serializer.Serialize(stream, _enqueuedGroups);
             }
 
-            foreach (var priority in _queue) {
-                if (priority.Count > 0) {
+            public void Enqueue(IAnalyzable item, AnalysisPriority priority) {
+                int iPri = (int)priority;
+
+                if (iPri < 0 || iPri > _queue.Length) {
+                    throw new ArgumentException("priority");
+                }
+
+                lock (_queueLock) {
+                    // see if we have the item in the queue anywhere...
+                    for (int i = 0; i < _queue.Length; i++) {
+                        if (_queue[i].Remove(item)) {
+                            Interlocked.Decrement(ref _analysisPending);
+
+                            AnalysisPriority oldPri = (AnalysisPriority)i;
+
+                            if (oldPri > priority) {
+                                // if it was at a higher priority then our current
+                                // priority go ahead and raise the new entry to our
+                                // old priority
+                                priority = oldPri;
+                            }
+
+                            break;
+                        }
+                    }
+
+                    // enqueue the work item
+                    Interlocked.Increment(ref _analysisPending);
+                    if (priority == AnalysisPriority.High) {
+                        // always try and process high pri items immediately
+                        _queue[iPri].Insert(0, item);
+                    } else {
+                        _queue[iPri].Add(item);
+                    }
                     _workEvent.Set();
                 }
             }
-        }
 
-        public void Serialize(AnalysisSerializer serializer, Stream stream) {
-            // must be kept in sync with constructor deserialization
-            serializer.Serialize(stream, _queue);
-            serializer.Serialize(stream, _enqueuedGroups);
-        }
-
-        public TaskScheduler Scheduler {
-            get {
-                return _scheduler;
-            }
-        }
-
-        public void Enqueue(IAnalyzable item, AnalysisPriority priority) {
-            int iPri = (int)priority;
-
-            if (iPri < 0 || iPri > _queue.Length) {
-                throw new ArgumentException("priority");
+            public void Stop() {
+                _cancel.Cancel();
+                if (_workThread.IsAlive) {
+                    _workEvent.Set();
+                    _workThread.Join();
+                }
             }
 
-            lock (_queueLock) {
-                // see if we have the item in the queue anywhere...
-                for (int i = 0; i < _queue.Length; i++) {
-                    if (_queue[i].Remove(item)) {
-                        Interlocked.Decrement(ref _analysisPending);
-
-                        AnalysisPriority oldPri = (AnalysisPriority)i;
-
-                        if (oldPri > priority) {
-                            // if it was at a higher priority then our current
-                            // priority go ahead and raise the new entry to our
-                            // old priority
-                            priority = oldPri;
-                        }
-
-                        break;
+            public bool IsAnalyzing {
+                get {
+                    lock (_queueLock) {
+                        return _isAnalyzing || _analysisPending > 0;
                     }
                 }
-
-                // enqueue the work item
-                Interlocked.Increment(ref _analysisPending);
-                if (priority == AnalysisPriority.High) {
-                    // always try and process high pri items immediately
-                    _queue[iPri].Insert(0, item);
-                } else {
-                    _queue[iPri].Add(item);
-                }
-                _workEvent.Set();
             }
-        }
 
-        public void Stop() {
-            _cancel.Cancel();
-            if (_workThread.IsAlive) {
-                _workEvent.Set();
-                _workThread.Join();
-            }
-        }
-
-        public bool IsAnalyzing {
-            get {
-                lock (_queueLock) {
-                    return _isAnalyzing || _analysisPending > 0;
+            public int AnalysisPending {
+                get {
+                    return _analysisPending;
                 }
             }
-        }
 
-        public int AnalysisPending {
-            get {
-                return _analysisPending;
-            }
-        }
+            #region IDisposable Members
 
-        #region IDisposable Members
-
-        void IDisposable.Dispose() {
-            Stop();
-        }
-
-        #endregion
-
-        private IAnalyzable GetNextItem(out AnalysisPriority priority) {
-            for (int i = PriorityCount - 1; i >= 0; i--) {
-                if (_queue[i].Count > 0) {
-                    var res = _queue[i][0];
-                    _queue[i].RemoveAt(0);
-                    Interlocked.Decrement(ref _analysisPending);
-                    priority = (AnalysisPriority)i;
-                    return res;
-                }
-            }
-            priority = AnalysisPriority.None;
-            return null;
-        }
-
-        private void Worker(object threadStarted) {
-            try {
-                SynchronizationContext.SetSynchronizationContext(new AnalysisSynchronizationContext(this));
-                _scheduler = TaskScheduler.FromCurrentSynchronizationContext();
-            } finally {
-                ((AutoResetEvent)threadStarted).Set();
-            }
-
-            bool analyzedAnything = false;
-            while (!_cancel.IsCancellationRequested) {
-                IAnalyzable workItem;
-
-                AnalysisPriority pri;
-                lock (_queueLock) {
-                    workItem = GetNextItem(out pri);
-                    _isAnalyzing = true;
-                }
-                if (workItem != null) {
-                    analyzedAnything = true;
-                    var groupable = workItem as IGroupableAnalysisProjectEntry;
-                    if (groupable != null) {
-                        bool added = _enqueuedGroups.Add(groupable.AnalysisGroup);
-                        if (added) {
-                            Enqueue(new GroupAnalysis(groupable.AnalysisGroup, this), pri);
-                        }
-
-                        groupable.Analyze(_cancel.Token, true);
-                    } else {
-                        workItem.Analyze(_cancel.Token);
-                    }
-                } else {
-                    if (analyzedAnything && (DateTime.Now - _lastSave) > _SaveAnalysisTime) {
-                        var statusbar = (IVsStatusbar)NodejsPackage.GetGlobalService(typeof(SVsStatusbar));
-                        if (statusbar != null) {
-                            statusbar.SetText(SR.GetString(SR.StatusAnalysisSaving));
-                        }
-
-                        _analyzer.SaveAnalysis();
-                        _lastSave = DateTime.Now;
-
-                        if (statusbar != null) {
-                            statusbar.SetText(SR.GetString(SR.StatusAnalysisSaved));
-                        }
-                    }
-
-                    _isAnalyzing = false;
-                    WaitHandle.SignalAndWait(
-                        _analyzer.QueueActivityEvent,
-                        _workEvent
-                    );
-                }   
-            }
-            _isAnalyzing = false;
-        }
-
-        sealed class GroupAnalysis : IAnalyzable {
-            private readonly IGroupableAnalysisProject _project;
-            private readonly AnalysisQueue _queue;
-
-            public GroupAnalysis(IGroupableAnalysisProject project, AnalysisQueue queue) {
-                _project = project;
-                _queue = queue;
-            }
-
-            #region IAnalyzable Members
-
-            public void Analyze(CancellationToken cancel) {
-                _queue._enqueuedGroups.Remove(_project);
-                _project.AnalyzeQueuedEntries(cancel);
+            void IDisposable.Dispose() {
+                Stop();
             }
 
             #endregion
+
+            private IAnalyzable GetNextItem(out AnalysisPriority priority) {
+                for (int i = PriorityCount - 1; i >= 0; i--) {
+                    if (_queue[i].Count > 0) {
+                        var res = _queue[i][0];
+                        _queue[i].RemoveAt(0);
+                        Interlocked.Decrement(ref _analysisPending);
+                        priority = (AnalysisPriority)i;
+                        return res;
+                    }
+                }
+                priority = AnalysisPriority.None;
+                return null;
+            }
+
+            private void Worker(object threadStarted) {
+                ((AutoResetEvent)threadStarted).Set();
+
+                bool analyzedAnything = false;
+                while (!_cancel.IsCancellationRequested) {
+                    IAnalyzable workItem;
+
+                    AnalysisPriority pri;
+                    lock (_queueLock) {
+                        workItem = GetNextItem(out pri);
+                        _isAnalyzing = true;
+                    }
+                    if (workItem != null) {
+                        analyzedAnything = true;
+                        var groupable = workItem as IGroupableAnalysisProjectEntry;
+                        if (groupable != null) {
+                            bool added = _enqueuedGroups.Add(groupable.AnalysisGroup);
+                            if (added) {
+                                Enqueue(new GroupAnalysis(groupable.AnalysisGroup, this), pri);
+                            }
+
+                            groupable.Analyze(_cancel.Token, true);
+                        } else {
+                            workItem.Analyze(_cancel.Token);
+                        }
+                    } else {
+                        if (analyzedAnything && (DateTime.Now - _lastSave) > _SaveAnalysisTime) {
+                            var statusbar = (IVsStatusbar)NodejsPackage.GetGlobalService(typeof(SVsStatusbar));
+                            if (statusbar != null) {
+                                statusbar.SetText(SR.GetString(SR.StatusAnalysisSaving));
+                            }
+
+                            _analyzer.SaveAnalysis();
+                            _lastSave = DateTime.Now;
+
+                            if (statusbar != null) {
+                                statusbar.SetText(SR.GetString(SR.StatusAnalysisSaved));
+                            }
+                        }
+
+                        _isAnalyzing = false;
+                        WaitHandle.SignalAndWait(
+                            _analyzer._queueActivityEvent,
+                            _workEvent
+                        );
+                    }
+                }
+                _isAnalyzing = false;
+            }
+
+            sealed class GroupAnalysis : IAnalyzable {
+                private readonly IGroupableAnalysisProject _project;
+                private readonly AnalysisQueue _queue;
+
+                public GroupAnalysis(IGroupableAnalysisProject project, AnalysisQueue queue) {
+                    _project = project;
+                    _queue = queue;
+                }
+
+                #region IAnalyzable Members
+
+                public void Analyze(CancellationToken cancel) {
+                    _queue._enqueuedGroups.Remove(_project);
+                    _project.AnalyzeQueuedEntries(cancel);
+                }
+
+                #endregion
+            }
         }
     }
 }

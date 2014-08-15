@@ -145,17 +145,6 @@ namespace AnalysisDriver {
             }
         }
 
-        private static AnalysisLimits MakeLowAnalysisLimits() {
-            return new AnalysisLimits() {
-                ReturnTypes = 1,
-                AssignedTypes = 1,
-                DictKeyTypes = 1,
-                DictValueTypes = 1,
-                IndexTypes = 1,
-                InstanceMembers = 1
-            };
-        }
-
         private void RunOne(string[] packages, int runOrder) {
             string testDir = PrepareDirectory(packages);
             string packageId = string.Join(", ", packages);
@@ -175,8 +164,8 @@ namespace AnalysisDriver {
             long parserWorkingSet = 0;
             sw.Start();
             var analyzer = Analysis.Analyze(
-                testDir, 
-                _lowAnalysis ? MakeLowAnalysisLimits() : null,
+                testDir,
+                _lowAnalysis ? AnalysisLimits.MakeLowAnalysisLimits() : null,
                 () => {
                     for (int i = 0; i < 3; i++) {
                         GC.Collect(GC.MaxGeneration);
