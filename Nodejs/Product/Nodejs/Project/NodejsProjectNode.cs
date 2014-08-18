@@ -753,5 +753,22 @@ namespace Microsoft.NodejsTools.Project {
             }
             base.Dispose(disposing);
         }
+
+        internal override async void BuildAsync(uint vsopts, string config, VisualStudio.Shell.Interop.IVsOutputWindowPane output, string target, Action<MSBuildResult, string> uiThreadCallback) {
+            try {
+                await CheckForLongPaths();
+            } catch (Exception) {
+                uiThreadCallback(MSBuildResult.Failed, target);
+                return;
+            }
+
+            // BuildAsync can throw on the sync path before invoking the callback. If it does, we must still invoke the callback here,
+            // because by this time there's no other way to propagate the error to the caller.
+            try {
+                base.BuildAsync(vsopts, config, output, target, uiThreadCallback);
+            } catch (Exception) {
+                uiThreadCallback(MSBuildResult.Failed, target);
+            }
+        }
     }
 }
