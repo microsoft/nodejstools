@@ -21,14 +21,14 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Intellisense;
+using Microsoft.NodejsTools.ProjectWizard;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudioTools.Project.Automation;
 using MSBuild = Microsoft.Build.Evaluation;
 
-
 namespace Microsoft.NodejsTools.Project {
-    class NodejsProjectNode : CommonProjectNode, VsWebSite.VSWebSite, Microsoft.NodejsTools.ProjectWizard.INodePackageModulesCommands {
+    class NodejsProjectNode : CommonProjectNode, VsWebSite.VSWebSite, INodePackageModulesCommands {
         private VsProjectAnalyzer _analyzer;
         private readonly HashSet<string> _warningFiles = new HashSet<string>();
         private readonly HashSet<string> _errorFiles = new HashSet<string>();
@@ -543,7 +543,7 @@ namespace Microsoft.NodejsTools.Project {
 
         #endregion
 
-        public Task InstallMissingModules() {
+        Task INodePackageModulesCommands.InstallMissingModulesAsync() {
             //Fire off the command to update the missing modules
             //  through NPM
             return ModulesNode.InstallMissingModules();

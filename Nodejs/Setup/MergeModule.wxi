@@ -45,10 +45,10 @@
             <Directory Id="Dir_$(var.key)ItemTemplates_CloudService" Name="CloudService">
                 <Directory Id="Dir_$(var.key)ItemTemplates_CloudService_NETFramework4" Name="NETFramework4">
                     <Directory Id="Dir_$(var.key)ItemTemplates_CloudService_NETFramework4_WebRole" Name="Web Role">
-                        <Directory Id="Dir_$(var.key)ItemTemplates_CloudService_WebRole" Name="JavaScript" />
+                        <Directory Id="Dir_$(var.key)ItemTemplates_CloudService_WebRole" Name="Node.js" />
                     </Directory>
                     <Directory Id="Dir_$(var.key)ItemTemplates_CloudService_NETFramework4_WorkerRole" Name="Worker Role">
-                        <Directory Id="Dir_$(var.key)ItemTemplates_CloudService_WorkerRole" Name="JavaScript" />
+                        <Directory Id="Dir_$(var.key)ItemTemplates_CloudService_WorkerRole" Name="Node.js" />
                     </Directory>
                 </Directory>
             </Directory>

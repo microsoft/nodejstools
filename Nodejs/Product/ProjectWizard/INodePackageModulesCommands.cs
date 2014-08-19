@@ -15,14 +15,13 @@
 using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.ProjectWizard {
-    
     /// <summary>
     /// Provides access to NPM commands
     /// </summary>
-    internal interface INodePackageModulesCommands {
+    public interface INodePackageModulesCommands {
         /// <summary>
         /// Triggers installation of missing node package modules (npm)
         /// </summary>
-        Task InstallMissingModules();
+        Task InstallMissingModulesAsync();
     }
 }

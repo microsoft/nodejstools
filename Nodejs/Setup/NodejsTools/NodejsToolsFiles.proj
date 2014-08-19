@@ -73,15 +73,30 @@
                                   ProjectTemplates\JavaScript\Node.js\1033\AddWebSiteNodejsWebApp.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\AddWebSiteStarterExpressApp.zip;
                                   ProjectTemplates\TypeScript\Node.js\1033\TypeScriptAzureExpressApp.zip;
+                                  ProjectTemplates\JavaScript\Node.js\1033\TypeScriptAzureExpressWebRole.zip;
                                   ProjectTemplates\TypeScript\Node.js\1033\TypeScriptAzureStarterExpressApp.zip;
                                   ProjectTemplates\TypeScript\Node.js\1033\TypeScriptAzureWebApp.zip;
+                                  ProjectTemplates\JavaScript\Node.js\1033\TypeScriptAzureWebRole.zip;
                                   ProjectTemplates\TypeScript\Node.js\1033\TypeScriptConsoleApp.zip;
                                   ProjectTemplates\TypeScript\Node.js\1033\TypeScriptExpressApp.zip;
                                   ProjectTemplates\TypeScript\Node.js\1033\TypeScriptStarterExpressApp.zip;
                                   ProjectTemplates\TypeScript\Node.js\1033\TypeScriptWebApp.zip;
                                   ProjectTemplates\TypeScript\Node.js\1033\TypeScriptFromExistingCode.zip;
-                                  ProjectTemplates\TypeScript\Node.js\1033\TypeScriptAzureNodejsWorker.zip"/>
+                                  ProjectTemplates\TypeScript\Node.js\1033\TypeScriptAzureNodejsWorker.zip;
+                                  ProjectTemplates\JavaScript\Node.js\1033\TypeScriptAzureNodejsWorkerRole.zip;
+                                  ProjectTemplates\JavaScript\Node.js\1033\CloudService.zip"/>
 
+        <File Include="ItemTemplates\CloudService\NETFramework4\Web Role\Node.js\CloudServiceWebRole.zip;
+                       ItemTemplates\CloudService\NETFramework4\Web Role\Node.js\CloudServiceExpressWebRole.zip;
+                       ItemTemplates\CloudService\NETFramework4\Web Role\Node.js\CloudServiceTypeScriptWebRole.zip;
+                       ItemTemplates\CloudService\NETFramework4\Web Role\Node.js\CloudServiceTypeScriptExpressWebRole.zip">
+          <InstallDirectory>ItemTemplates_CloudService_WebRole</InstallDirectory>
+        </File>
+
+        <File Include="ItemTemplates\CloudService\NETFramework4\Worker Role\Node.js\CloudServiceWorkerRole.zip;
+                       ItemTemplates\CloudService\NETFramework4\Worker Role\Node.js\CloudServiceTypeScriptWorkerRole.zip">
+          <InstallDirectory>ItemTemplates_CloudService_WorkerRole</InstallDirectory>
+        </File>
 
         <!--Unit test framework support files-->
         <File Include="TestFrameworks\find_tests.js;

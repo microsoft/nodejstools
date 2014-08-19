@@ -312,7 +312,7 @@ if (-not $skipclean) {
     if (Test-Path $outdir) {
         Write-Output "Cleaning previous release in $outdir"
         rmdir -Recurse -Force $outdir -EA 0
-        while (Test-Path $outdir) {
+        while ((Test-Path $outdir -EA 0) -or -not $?) {
             Write-Output "Failed to clean release. Retrying in five seconds. (Press Ctrl+C to abort)"
             Sleep -Seconds 5
             rmdir -Recurse -Force $outdir -EA 0

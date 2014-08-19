@@ -46,7 +46,7 @@ Results of this operation are available in the Output window.",
             );
 
             if (shouldDoInstall == DialogResult.Yes) {
-                ((INodePackageModulesCommands)project.Object).InstallMissingModules();
+                var t = ((INodePackageModulesCommands)project.Object).InstallMissingModulesAsync();
             }
 
         }

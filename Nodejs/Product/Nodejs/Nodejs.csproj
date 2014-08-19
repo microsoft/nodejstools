@@ -663,6 +663,39 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ZipProject Include="ProjectTemplates\CloudService\CloudService.ccproj" />
+    <ZipProject Include="ProjectTemplates\CloudService\ServiceConfiguration.Cloud.cscfg" />
+    <ZipProject Include="ProjectTemplates\CloudService\ServiceConfiguration.Local.cscfg" />
+    <ZipProject Include="ProjectTemplates\CloudService\ServiceDefinition.csdef" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\ChangeConfig.ps1" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\download.ps1" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\iisnode.yml" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\index.jade" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\layout.jade" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\node.cmd" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\package.json" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\README.md" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\setup_web.cmd" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\style.styl" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\TypeScriptExpressApp.njsproj" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\Web.config" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\Web.Debug.config" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\download.ps1" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\node.cmd" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\package.json" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\README.md" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\setup_worker.cmd" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\Worker.njsproj" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\ChangeConfig.ps1" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\download.ps1" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\iisnode.yml" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\node.cmd" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\package.json" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\README.md" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\setup_web.cmd" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\TypeScriptWebApp.njsproj" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\Web.config" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\Web.Debug.config" />
     <None Include="Theme\contrast.vstheme">
       <SubType>Designer</SubType>
     </None>
@@ -930,6 +963,14 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteStarterExpressApp\respond.min.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteStarterExpressApp\user.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\Preview.png" />
+    <ZipProject Include="ProjectTemplates\CloudService\cloudservice.ico" />
+    <ZipProject Include="ProjectTemplates\CloudService\CloudService.vstemplate" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\Preview.png" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\TypeScriptExpressApp.vstemplate" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\Preview.png" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\Worker.vstemplate" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\Preview.png" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\TypeScriptWebApp.vstemplate" />
     <Content Include="Scripts\Typings\node\node.d.ts">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -1285,6 +1326,30 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <_WebRoleZipItem Include="Templates\Files\CloudServiceWebRole\WebRole.vstemplate" />
+    <_WebRoleZipItem Include="Templates\Files\CloudServiceWebRole\roletemplatedata.xml" />
+    <_WebRoleZipItem Include="Templates\Files\CloudServiceTypeScriptWebRole\roletemplatedata.xml" />
+    <_WebRoleZipItem Include="Templates\Files\CloudServiceTypeScriptWebRole\TypeScriptWebRole.vstemplate" />
+    <_WebRoleZipItem Include="Templates\Files\CloudServiceExpressWebRole\ExpressWebRole.vstemplate" />
+    <_WebRoleZipItem Include="Templates\Files\CloudServiceExpressWebRole\roletemplatedata.xml" />
+    <_WebRoleZipItem Include="Templates\Files\CloudServiceTypeScriptExpressWebRole\roletemplatedata.xml" />
+    <_WebRoleZipItem Include="Templates\Files\CloudServiceTypeScriptExpressWebRole\TypeScriptExpressWebRole.vstemplate" />
+    <_WorkerRoleZipItem Include="Templates\Files\CloudServiceTypeScriptWorkerRole\roletemplatedata.xml" />
+    <_WorkerRoleZipItem Include="Templates\Files\CloudServiceTypeScriptWorkerRole\TypeScriptWorkerRole.vstemplate" />
+    <_WorkerRoleZipItem Include="Templates\Files\CloudServiceWorkerRole\roletemplatedata.xml" />
+    <_WorkerRoleZipItem Include="Templates\Files\CloudServiceWorkerRole\WorkerRole.vstemplate" />
+    <ZipItem Include="@(_WebRoleZipItem)">
+      <OutputSubPath>NETFramework4\Web Role\Node.js</OutputSubPath>
+      <Language>CloudService</Language>
+      <Visible>false</Visible>
+    </ZipItem>
+    <ZipItem Include="@(_WorkerRoleZipItem)">
+      <OutputSubPath>NETFramework4\Worker Role\Node.js</OutputSubPath>
+      <Language>CloudService</Language>
+      <Visible>false</Visible>
+    </ZipItem>
+  </ItemGroup>
+  <ItemGroup>
     <Resource Include="..\Icons\JScript.ico">
       <Link>Resources\Icons\JScript.ico</Link>
     </Resource>
@@ -1407,6 +1472,17 @@
   <ItemGroup>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\stylus.d.ts" />
   </ItemGroup>
+  <ItemGroup>
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\app.ts" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\express.d.ts" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\index.ts" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\stylus.d.ts" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\user.ts" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\server.ts" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\startup.ts" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\server.ts" />
+  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <!--
     To specify a different registry root to register your package, uncomment the TargetRegistryRoot

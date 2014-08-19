@@ -1,0 +1,28 @@
+<VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+  <TemplateData>
+    <Name>Blank Azure Node.js Worker Role</Name>
+    <Description>An empty Node.js worker role for Microsoft Azure.</Description>
+    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="413" />
+    <ProjectType>JavaScript</ProjectType>
+    <TemplateID>Microsoft.JavaScript.TypeScriptAzureNodejsWorker</TemplateID>
+    <Hidden>true</Hidden>
+    <SortOrder>150</SortOrder>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>NodejsWorker</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
+    <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
+    <PreviewImage>Preview.png</PreviewImage>
+  </TemplateData>
+  <TemplateContent>
+    <Project File="Worker.njsproj" ReplaceParameters="true">
+      <ProjectItem>server.ts</ProjectItem>
+      <ProjectItem OpenInEditor="true">startup.ts</ProjectItem>
+      <ProjectItem>download.ps1</ProjectItem>
+      <ProjectItem>setup_worker.cmd</ProjectItem>
+      <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
+      <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
+      <ProjectItem>node.cmd</ProjectItem>
+    </Project>
+  </TemplateContent>
+</VSTemplate>

@@ -751,6 +751,7 @@ namespace Microsoft.NodejsTools {
                                     updateFileOnDisk = false;
                                 } catch (ArgumentException) {
                                 } catch (InvalidOperationException) {
+                                } catch (COMException) {
                                 } finally {
                                     Marshal.Release(pDocData);
                                 }
