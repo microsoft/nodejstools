@@ -183,7 +183,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
                 using (var sh = server.WaitForSession<ICompletionSession>()) {
                     var session = sh.Session;
-                    Assert.IsTrue(session.CompletionSets[0].Completions.Select(x => x.InsertionText).Contains("big"));
+                    AssertUtil.ContainsAtLeast(session.CompletionSets[0].Completions.Select(x => x.InsertionText), "big");
                 }
             }
         }
@@ -207,7 +207,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
                 using (var sh = server.WaitForSession<ICompletionSession>()) {
                     var session = sh.Session;
-                    Assert.IsTrue(session.CompletionSets[0].Completions.Select(x => x.InsertionText).Contains("big"));
+                    AssertUtil.ContainsAtLeast(session.CompletionSets[0].Completions.Select(x => x.InsertionText), "big");
                 }
 
                 server.MoveCaret(5, 2);
@@ -216,7 +216,53 @@ namespace Microsoft.Nodejs.Tests.UI {
 
                 using (var sh = server.WaitForSession<ICompletionSession>()) {
                     var session = sh.Session;
-                    Assert.IsTrue(session.CompletionSets[0].Completions.Select(x => x.InsertionText).Contains("big"));
+                    AssertUtil.ContainsAtLeast(session.CompletionSets[0].Completions.Select(x => x.InsertionText), "big");
+                }
+            }
+        }
+
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/1144
+        /// </summary>
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void IntellisenseAfterSingleLineComment() {
+            var project = Project("IntellisenseAfterSingleCommentTest",
+                Compile("server", "'blah'//blah\r\n")
+            );
+
+            using (var solution = project.Generate().ToVs()) {
+                var server = solution.OpenItem("IntellisenseAfterSingleCommentTest", "server.js");
+
+                server.MoveCaret(2, 1);
+                Keyboard.Type(".");
+
+                using (var sh = server.WaitForSession<ICompletionSession>()) {
+                    var session = sh.Session;
+                    AssertUtil.ContainsAtLeast(session.CompletionSets[0].Completions.Select(x => x.InsertionText), "big");
+                }
+            }
+        }
+
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/1144
+        /// </summary>
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void IntellisenseAfterMultiLineComment() {
+            var project = Project("IntellisenseAfterMultiCommentTest",
+                Compile("server", "'blah'/*blah*/")
+            );
+
+            using (var solution = project.Generate().ToVs()) {
+                var server = solution.OpenItem("IntellisenseAfterMultiCommentTest", "server.js");
+
+                server.MoveCaret(1, 15);
+                Keyboard.Type(".");
+
+                using (var sh = server.WaitForSession<ICompletionSession>()) {
+                    var session = sh.Session;
+                    AssertUtil.ContainsAtLeast(session.CompletionSets[0].Completions.Select(x => x.InsertionText), "big");
                 }
             }
         }

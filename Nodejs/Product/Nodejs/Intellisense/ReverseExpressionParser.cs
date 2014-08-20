@@ -331,7 +331,9 @@ namespace Microsoft.NodejsTools.Intellisense {
                             paramIndex++;
                         }
                     } else if (token.ClassificationType == Classifier.Provider.Comment) {
-                        return null;
+                        // Do not update start - if we bail out on the next token we see, we don't want to
+                        // count the comment as part of the expression, either.
+                        continue;
                     } else if (!lastTokenWasCommaOrOperator) {
                         break;
                     } else {
@@ -361,7 +363,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 );
             }
 
-            return _span.GetSpan(_snapshot);
+            return null;
         }
 
         private static bool IsAssignmentOperator(string text) {
