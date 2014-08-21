@@ -132,8 +132,10 @@ namespace Microsoft.NodejsTools.Repl {
                     null,
                     false,
                     npmReplRedirector,
-                    quoteArgs: false)){
-                        await process;
+                    quoteArgs: false,
+                    outputEncoding: Encoding.UTF8 // npm uses UTF-8 regardless of locale if its output is redirected
+            )){
+                await process;
             }
 
             if (npmReplRedirector.HasErrors) {
@@ -181,8 +183,7 @@ namespace Microsoft.NodejsTools.Repl {
             }
             public bool HasErrors { get; set; }
 
-            public override void WriteLine(string line) {
-                string decodedString = Encoding.UTF8.GetString(Console.OutputEncoding.GetBytes(line));
+            public override void WriteLine(string decodedString) {
                 var substring = string.Empty;
                 string outputString = string.Empty;
 

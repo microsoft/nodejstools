@@ -85,7 +85,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 null,
                 false,
                 redirector,
-                quoteArgs: false
+                quoteArgs: false,
+                outputEncoding: Encoding.UTF8 // npm uses UTF-8 regardless of locale if its output is redirected
             )) {
                 var whnd = process.WaitHandle;
                 if (whnd == null) {
@@ -126,8 +127,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             private string AppendToBuffer(StringBuilder buffer, string data) {
                 if (data != null) {
                     lock (_owner._bufferLock) {
-                        data = Encoding.UTF8.GetString(Console.OutputEncoding.GetBytes(data)) + Environment.NewLine;
-                        buffer.Append(data);
+                        buffer.Append(data + Environment.NewLine);
                     }
                 }
                 return data;
