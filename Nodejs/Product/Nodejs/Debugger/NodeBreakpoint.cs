@@ -25,6 +25,7 @@ namespace Microsoft.NodejsTools.Debugger {
         private readonly FilePosition _position;
         private readonly NodeDebugger _process;
         private readonly FilePosition _target;
+        private bool _deleted;
 
         public NodeBreakpoint(NodeDebugger process, FilePosition position, bool enabled, BreakOn breakOn, string condition)
             : this(process, position, position, enabled, breakOn, condition) {
@@ -61,6 +62,11 @@ namespace Microsoft.NodejsTools.Debugger {
 
         public bool Enabled {
             get { return _enabled; }
+        }
+
+        public bool Deleted {
+            get { return _deleted; }
+            set { _deleted = value;  }
         }
 
         public BreakOn BreakOn {

@@ -29,12 +29,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private readonly BreakpointManager _bpManager;
         private readonly IDebugBreakpointRequest2 _bpRequest;
         private readonly List<AD7BreakpointErrorEvent> _breakpointErrors = new List<AD7BreakpointErrorEvent>();
-        private readonly bool _deleted;
         private readonly AD7Engine _engine;
         private BP_REQUEST_INFO _bpRequestInfo;
         private NodeBreakpoint _breakpoint;
         private string _documentName;
-        private bool _enabled;
+        private bool _enabled, _deleted;
 
         public AD7PendingBreakpoint(IDebugBreakpointRequest2 pBpRequest, AD7Engine engine, BreakpointManager bpManager) {
             _bpRequest = pBpRequest;
@@ -115,6 +114,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // Deletes this pending breakpoint and all breakpoints bound from it.
         int IDebugPendingBreakpoint2.Delete() {
             ClearBreakpointBindingResults();
+            _deleted = true;
             return VSConstants.S_OK;
         }
 
@@ -235,6 +235,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 }
 
                 _bpManager.RemovePendingBreakpoint(_breakpoint);
+                _breakpoint.Deleted = true;
                 _breakpoint = null;
             }
 

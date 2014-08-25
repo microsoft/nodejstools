@@ -633,6 +633,13 @@ namespace Microsoft.NodejsTools.Debugger {
                     await RemoveBreakpointAsync(breakpointBinding, cancellationToken).ConfigureAwait(false);
 
                     NodeBreakpoint breakpoint = breakpointBinding.Breakpoint;
+
+                    // If this breakpoint has been deleted, then do not try to rebind it after removing it from the list,
+                    // and do not treat this binding as hit.
+                    if (breakpoint.Deleted) {
+                        continue;
+                    }
+
                     SetBreakpointCommand result = await SetBreakpointAsync(breakpoint, cancellationToken: cancellationToken).ConfigureAwait(false);
 
                     // Treat rebound breakpoint binding as fully bound
