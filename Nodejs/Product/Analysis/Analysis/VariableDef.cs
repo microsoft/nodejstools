@@ -576,37 +576,37 @@ namespace Microsoft.NodejsTools.Analysis {
                     // Don't add references to ephemeral values...  If they
                     // gain types we'll re-enqueue and the reference will be
                     // added then.
-                    deps.AddReference(new EncodedLocation(node));
+                    deps.AddReference(node.EncodedSpan);
                 }
                 deps.AddDependentUnit(unit);
             }
         }
 
-        public bool AddReference(EncodedLocation location, ProjectEntry module) {
+        public bool AddReference(EncodedSpan location, ProjectEntry module) {
             return GetDependentItems(module).AddReference(location);
         }
 
-        public bool AddAssignment(EncodedLocation location, ProjectEntry entry) {
+        public bool AddAssignment(EncodedSpan location, ProjectEntry entry) {
             return GetDependentItems(entry).AddAssignment(location);
         }
 
         public bool AddAssignment(Node node, AnalysisUnit unit) {
             if (!unit.ForEval) {
                 return AddAssignment(
-                    new EncodedLocation(node), 
+                    node.EncodedSpan, 
                     unit.DeclaringModuleEnvironment.ProjectEntry
                 );
             }
             return false;
         }
 
-        public IEnumerable<KeyValuePair<ProjectEntry, EncodedLocation>> References {
+        public IEnumerable<KeyValuePair<ProjectEntry, EncodedSpan>> References {
             get {
                 if (_dependencies.Count != 0) {
                     foreach (var keyValue in _dependencies) {
                         if (keyValue.Value.References != null && keyValue.Key.AnalysisVersion == keyValue.Value.Version) {
                             foreach (var reference in keyValue.Value.References) {
-                                yield return new KeyValuePair<ProjectEntry, EncodedLocation>(keyValue.Key, reference);
+                                yield return new KeyValuePair<ProjectEntry, EncodedSpan>(keyValue.Key, reference);
                             }
                         }
                     }
@@ -614,13 +614,13 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        public IEnumerable<KeyValuePair<ProjectEntry, EncodedLocation>> Definitions {
+        public IEnumerable<KeyValuePair<ProjectEntry, EncodedSpan>> Definitions {
             get {
                 if (_dependencies.Count != 0) {
                     foreach (var keyValue in _dependencies) {
                         if (keyValue.Value.Assignments != null && keyValue.Key.AnalysisVersion == keyValue.Value.Version) {
                             foreach (var reference in keyValue.Value.Assignments) {
-                                yield return new KeyValuePair<ProjectEntry, EncodedLocation>(keyValue.Key, reference);
+                                yield return new KeyValuePair<ProjectEntry, EncodedSpan>(keyValue.Key, reference);
                             }
                         }
                     }

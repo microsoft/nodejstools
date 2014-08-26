@@ -130,7 +130,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                     _references = new ReferenceDict();
                 }
                 _references.GetReferences(unit.DeclaringModuleEnvironment.ProjectEntry)
-                    .AddReference(new EncodedLocation(node));
+                    .AddReference(node.EncodedSpan);
             }
         }
 

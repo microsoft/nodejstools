@@ -532,8 +532,12 @@ namespace Microsoft.NodejsTools.Analysis {
 #endif
             if (Object.ReferenceEquals(x, y)) {
                 return true;
+            } else if (x == null) {
+                return y == null;
+            } else if (y == null || x.Value == null || y.Value == null) {
+                return false;
             }
-            return (x == null) ? (y == null) : x.Value.UnionEquals(y.Value, Strength);
+            return x.Value.UnionEquals(y.Value, Strength);
         }
 
         public int GetHashCode(AnalysisProxy obj) {

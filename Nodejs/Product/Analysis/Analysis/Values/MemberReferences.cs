@@ -51,28 +51,28 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     class ReferenceList : IReferenceable {
         public readonly int Version;
         public readonly ProjectEntry Project;
-        public ISet<EncodedLocation> References;
+        public ISet<EncodedSpan> References;
 
         public ReferenceList(ProjectEntry project) {
             Version = project.AnalysisVersion;
             Project = project;
         }
 
-        public void AddReference(EncodedLocation location) {
+        public void AddReference(EncodedSpan location) {
             HashSetExtensions.AddValue(ref References, location);
         }
 
         #region IReferenceable Members
 
-        public IEnumerable<KeyValuePair<ProjectEntry, EncodedLocation>> Definitions {
+        public IEnumerable<KeyValuePair<ProjectEntry, EncodedSpan>> Definitions {
             get { yield break; }
         }
 
-        IEnumerable<KeyValuePair<ProjectEntry, EncodedLocation>> IReferenceable.References {
+        IEnumerable<KeyValuePair<ProjectEntry, EncodedSpan>> IReferenceable.References {
             get {
                 if (References != null) {
                     foreach (var location in References) {
-                        yield return new KeyValuePair<ProjectEntry, EncodedLocation>(Project, location);
+                        yield return new KeyValuePair<ProjectEntry, EncodedSpan>(Project, location);
                     }
                 }
             }

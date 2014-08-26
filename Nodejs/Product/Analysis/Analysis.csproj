@@ -196,7 +196,7 @@
     <Compile Include="Analysis\Validation.cs" />
     <Compile Include="Analysis\Values\BooleanValue.cs" />
     <Compile Include="Analysis\Deque.cs" />
-    <Compile Include="Analysis\EncodedLocation.cs" />
+    <Compile Include="Analysis\EncodedSpanExtensions.cs" />
     <Compile Include="Analysis\ExportedMemberInfo.cs" />
     <Compile Include="Analysis\FileCookie.cs" />
     <Compile Include="Analysis\GetMemberOptions.cs" />

@@ -592,22 +592,22 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             OverflowedBigTime
         }
 
-        public IEnumerable<KeyValuePair<ProjectEntry, EncodedLocation>> Definitions {
+        public IEnumerable<KeyValuePair<ProjectEntry, EncodedSpan>> Definitions {
             get {
-                yield return new KeyValuePair<ProjectEntry, EncodedLocation>(
+                yield return new KeyValuePair<ProjectEntry, EncodedSpan>(
                     ProjectEntry,
-                    new EncodedLocation(_funcObject)
+                    _funcObject.EncodedSpan
                 );
             }
         }
 
-        public new IEnumerable<KeyValuePair<ProjectEntry, EncodedLocation>> References {
+        public new IEnumerable<KeyValuePair<ProjectEntry, EncodedSpan>> References {
             get {
                 if (_references != null) {
                     foreach (var keyValue in _references) {
                         if (keyValue.Value.References != null) {
                             foreach (var loc in keyValue.Value.References) {
-                                yield return new KeyValuePair<ProjectEntry, EncodedLocation>(
+                                yield return new KeyValuePair<ProjectEntry, EncodedSpan>(
                                     keyValue.Key,
                                     loc
                                 );

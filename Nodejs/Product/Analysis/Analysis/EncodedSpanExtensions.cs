@@ -12,21 +12,18 @@
  *
  * ***************************************************************************/
 
-using System.Collections.Generic;
+using System;
 using Microsoft.NodejsTools.Parsing;
 
-namespace Microsoft.NodejsTools.Analysis.Analyzer {
-    interface IReferenceableContainer {
-        IEnumerable<IReferenceable> GetDefinitions(string name);
-    }
-
-    interface IReferenceable {
-        IEnumerable<KeyValuePair<ProjectEntry, EncodedSpan>> Definitions {
-            get;
-        }
-        IEnumerable<KeyValuePair<ProjectEntry, EncodedSpan>> References {
-            get;
+namespace Microsoft.NodejsTools.Analysis {
+    public static class EncodedSpanExtensions {
+        internal static LocationInfo GetLocationInfo(this EncodedSpan span, ProjectEntry project) {
+            var location = project.Tree.IndexToLocation(span.GetStartIndex(project.Tree.LocationResolver));
+            return new LocationInfo(
+                project,
+                location.Line,
+                location.Column
+            );
         }
     }
-
 }
