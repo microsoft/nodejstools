@@ -190,8 +190,11 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
             for (int attempt = 0; attempt < 2; attempt++) {
                 if (_forceDownload || !File.Exists(filename)) {
+                    OnOutputLogged(String.Format("Downloading package cache to {0}", filename));
                     Uri registry = null;
-                    using (var proc = ProcessOutput.RunHiddenAndCapture(GetPathToNpm(), "config", "get", "registry")) {
+                    string pathToNpm = GetPathToNpm();
+                    OnOutputLogged(String.Format("Path to npm: {0}", pathToNpm));
+                    using (var proc = ProcessOutput.RunHiddenAndCapture(pathToNpm, "config", "get", "registry")) {
                         if (await proc == 0) {
                             registry = proc.StandardOutputLines
                                 .Select(s => {
@@ -208,25 +211,33 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
                 try {
                     if (File.Exists(filename)) {
+                        var fileInfo = new FileInfo(filename);
+                        OnOutputLogged(String.Format("Reading {0} bytes from {1} ({2})", fileInfo.Length, filename, fileInfo.LastWriteTime));
+                        
                         using (var reader = new StreamReader(filename)) {
                             newResults = await Task.Run(() => ParseResultsFromReader(reader));
                         }
                     }
                     break;
-                } catch (Exception) {
+                } catch (Exception ex) {
                     // assume the results are corrupted and try again...
+                    OnOutputLogged(ex.ToString());
+                    OnOutputLogged(String.Format("Deleting {0}", filename));
                     File.Delete(filename);
-                    continue;
                 }
             }
 
             if (newResults == null || !newResults.Any()) {
-                throw new NpmCatalogEmptyException(Resources.ErrNpmCatalogEmpty);
+                var ex = new NpmCatalogEmptyException(Resources.ErrNpmCatalogEmpty);
+                OnOutputLogged(ex.ToString());
+                throw ex;
             }
 
             LastRefreshed = File.GetLastWriteTime(filename);
             Results = new ReadOnlyCollection<IPackage>(newResults);
             PopulateByName(newResults);
+
+            OnOutputLogged(String.Format("Last refreshed: {0}\nNumber of Results: {1}", LastRefreshed, newResults.LongCount()));
 
             return true;
         }

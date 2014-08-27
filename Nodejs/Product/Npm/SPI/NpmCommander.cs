@@ -92,7 +92,9 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             RegisterLogEvents(_command);
             bool success = await _command.ExecuteAsync();
             UnregisterLogEvents(_command);
-            _npmController.Refresh();
+            if (refreshNpmController) {
+                _npmController.Refresh();                
+            }
             return success;
         }
 
