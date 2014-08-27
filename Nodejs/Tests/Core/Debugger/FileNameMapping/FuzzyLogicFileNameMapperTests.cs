@@ -24,7 +24,7 @@ namespace NodejsTests.Debugger.FileNameMapping {
         public void GetLocalFileNameForBuiltInModuleTests() {
             // Arrange
             const string remoteFileName = "node.js";
-            var localFiles = new List<string>();
+            var localFiles = new List<string> { @"c:\path\to\project\app.js" };
             var fileNameMapper = new FuzzyLogicFileNameMapper(localFiles);
 
             // Act
