@@ -780,8 +780,11 @@ namespace Microsoft.NodejsTools.Intellisense {
                 var view = VsShellUtilities.GetTextView(frame);
                 if (view != null) {
                     var factService = NodejsPackage.ComponentModel.GetService<IVsEditorAdaptersFactoryService>();
-                    var wpfView = factService.GetWpfTextView(view);
-                    return wpfView.TextBuffer.CurrentSnapshot;
+                    try {
+                        var wpfView = factService.GetWpfTextView(view);
+                        return wpfView.TextBuffer.CurrentSnapshot;
+                    } catch (System.Runtime.InteropServices.ExternalException) {
+                    }
                 }
             }
 
