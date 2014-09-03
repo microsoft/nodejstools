@@ -302,7 +302,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 return result;
             } catch (Exception) {
                 // TODO: log exception
-                return new[] { new SimpleOverloadResult(new ParameterResult[0], "Unknown", "IntellisenseError_Sigs") };
+                return new[] { new SimpleOverloadResult("Unknown", "IntellisenseError_Sigs", new ParameterResult[0]) };
             }
         }
 

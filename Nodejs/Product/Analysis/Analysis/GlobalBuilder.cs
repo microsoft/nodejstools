@@ -416,8 +416,32 @@ All other strings are considered decimal.", isOptional:true)
         private BuiltinFunctionValue DateFunction() {
             var builtinEntry = _analyzer._builtinEntry;
 
-            return new BuiltinFunctionValue(builtinEntry, "Date", createPrototype: false) { 
-                Member("prototype", 
+            return new BuiltinFunctionValue(builtinEntry, "Date", 
+                new[] { 
+                    new SimpleOverloadResult(
+                        "Date", 
+                        "Creates a new date from milliseconds specified in UTC starting at January 1, 1970", 
+                        "milliseconds"
+                    ),
+                    new SimpleOverloadResult(
+                        "Date", 
+                        "Creates a new date from the specified string", 
+                        "dateString"
+                    ),
+                    new SimpleOverloadResult(
+                        "Date", 
+                        "Creates a new date", 
+                        "year",
+                        "month",
+                        "day",
+                        "hours",
+                        "minutes",
+                        "seconds",
+                        "milliseconds"
+                    )
+                },
+                createPrototype: false) { 
+                Member("prototype",
                     new BuiltinObjectValue(builtinEntry) {
                         BuiltinFunction("constructor"),
                         ReturningFunction(
@@ -668,6 +692,22 @@ All other strings are considered decimal.", isOptional:true)
                         BuiltinFunction("toUTCString"),
                         BuiltinFunction("valueOf"),
                     }
+                ),
+                ReturningFunction(
+                    "UTC",
+                    _analyzer._zeroIntValue,
+                    "Returns the number of milliseconds between midnight, January 1, 1970 Universal Coordinated Time (UTC) (or GMT) and the specified date."
+                ),
+                ReturningFunction(
+                    "parse",
+                    _analyzer._zeroIntValue,
+                    "Parses a string containing a date, and returns the number of milliseconds between that date and midnight, January 1, 1970.",
+                    new ParameterResult("dateVal", "A string containing a date")
+                ),
+                ReturningFunction(
+                    "now",
+                    _analyzer._zeroIntValue,
+                    "Returns the number of milliseconds between midnight, January 1, 1970, and the current date and time."
                 )
             };
         }

@@ -66,7 +66,7 @@ namespace Microsoft.NodejsTools.Analysis {
             foreach (var module in _all["modules"]) {
                 var moduleName = FixModuleName((string)module["name"]);
                 var exports = exportsTable[moduleName];
-                Dictionary<string, CallDelegate> specialMethods;
+                Dictionary<string, FunctionSpecializer> specialMethods;
                 _moduleSpecializations.TryGetValue(moduleName, out specialMethods);
 
                 if (module.ContainsKey("methods")) {
@@ -85,7 +85,7 @@ namespace Microsoft.NodejsTools.Analysis {
 
         }
 
-        private void GenerateMethod(ExpandoValue exports, Dictionary<string, CallDelegate> specialMethods, dynamic method) {
+        private void GenerateMethod(ExpandoValue exports, Dictionary<string, FunctionSpecializer> specialMethods, dynamic method) {
             string methodName = (string)method["name"];
             /*
             string body = null;
@@ -115,13 +115,12 @@ namespace Microsoft.NodejsTools.Analysis {
 
             foreach (var sig in method["signatures"]) {
                 BuiltinFunctionValue function;
-                CallDelegate specialMethod;
+                FunctionSpecializer specialMethod;
                 if (specialMethods != null &&
                     specialMethods.TryGetValue(methodName, out specialMethod)) {
-                    function = new SpecializedFunctionValue(
+                    function = specialMethod.Specialize(
                         exports.ProjectEntry,
                         methodName,
-                        specialMethod,
                         ParseDocumentation((string)method["desc"]),
                         GetParameters(sig["params"])
                     );
@@ -159,7 +158,7 @@ namespace Microsoft.NodejsTools.Analysis {
                     var parameters = GetParameters(sig["params"]);
                     var doc = ParseDocumentation((string)sig["desc"]);
 
-                    overloads.Add(new SimpleOverloadResult(parameters, fixedClassName, doc));
+                    overloads.Add(new SimpleOverloadResult(fixedClassName, doc, parameters));
                 }
             }
             BuiltinFunctionValue klassValue = new ClassBuiltinFunctionValue(
@@ -174,7 +173,7 @@ namespace Microsoft.NodejsTools.Analysis {
 
             if (klass.ContainsKey("methods")) {
                 var prototype = (PrototypeValue)klassValue.Descriptors["prototype"].Values.Types.First().Value;
-                Dictionary<string, CallDelegate> classSpecializations;
+                Dictionary<string, FunctionSpecializer> classSpecializations;
                 _classSpecializations.TryGetValue(className, out classSpecializations);
                 foreach (var method in klass["methods"]) {
                     GenerateMethod(

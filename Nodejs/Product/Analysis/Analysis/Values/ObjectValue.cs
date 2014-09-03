@@ -233,7 +233,6 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             get {
                 StringBuilder res = new StringBuilder();
                 res.Append(ObjectDescription);
-                res.Append(' ');
 
                 if (Descriptors != null) {
                     var names = Descriptors
@@ -259,7 +258,6 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                         }
                     }
                 }
-                res.AppendLine();
                 return res.ToString();
             }
         }

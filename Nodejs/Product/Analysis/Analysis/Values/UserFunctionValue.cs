@@ -243,11 +243,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                     ).ToArray();
                 }
 
-                yield return new SimpleOverloadResult(
-                    parameterResults,
-                    FunctionObject.Name ?? "<anonymous function>",
-                    Documentation
-                );
+                yield return new SimpleOverloadResult(FunctionObject.Name ?? "<anonymous function>", Documentation, parameterResults);
             }
         }
 

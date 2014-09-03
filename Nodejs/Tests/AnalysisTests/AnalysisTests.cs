@@ -938,7 +938,7 @@ var x = keys({'abc':42});
 ");
             AssertUtil.ContainsExactly(
                 analysis.GetDescriptionByIndex("x", 0),
-                "Array object \r\n"
+                "Array object"
             );
         }
 
@@ -986,6 +986,33 @@ var x = global.Infinity";
                 analysis.GetTypeIdsByIndex("x", code.Length),
                 BuiltinTypeId.Number
             );
+        }
+
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/1077
+        /// </summary>
+        [TestMethod, Priority(0)]
+        public void TestNodejsPathMembers() {
+            string code = @"
+var path = require('path');
+var join = path.join('a', 'b');
+var normalize = path.normalize('/foo/quox/..');
+var resolve = path.resolve('/foo/quox', '/tmp/file');
+var relative = path.relative('/foo/quox', '/foo/q2');
+var dirname = path.dirname('/tmp/foo.txt');
+var basename = path.basename('/tmp/foo.txt');
+var extname = path.extname('/tmp/foo.txt');
+";
+
+            var analysis = ProcessText(code);
+
+            AssertUtil.ContainsExactly(analysis.GetTypeIdsByIndex("join", code.Length), BuiltinTypeId.String);
+            AssertUtil.ContainsExactly(analysis.GetTypeIdsByIndex("normalize", code.Length), BuiltinTypeId.String);
+            AssertUtil.ContainsExactly(analysis.GetTypeIdsByIndex("resolve", code.Length), BuiltinTypeId.String);
+            AssertUtil.ContainsExactly(analysis.GetTypeIdsByIndex("relative", code.Length), BuiltinTypeId.String);
+            AssertUtil.ContainsExactly(analysis.GetTypeIdsByIndex("dirname", code.Length), BuiltinTypeId.String);
+            AssertUtil.ContainsExactly(analysis.GetTypeIdsByIndex("basename", code.Length), BuiltinTypeId.String);
+            AssertUtil.ContainsExactly(analysis.GetTypeIdsByIndex("extname", code.Length), BuiltinTypeId.String);
         }
 
 
@@ -1405,6 +1432,62 @@ var y = abc()('abc');
                     testCase.TypeId
                 );
             }
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestDateTime() {
+            var code = @"var d = Date;
+";
+
+            var analysis = ProcessText(code);
+
+            AssertUtil.ContainsAtLeast(
+                analysis.GetMembersByIndex("d", code.Length).Select(x => x.Completion),
+                "UTC",
+                "now",
+                "parse"
+            );
+
+            AssertUtil.ContainsAtLeast(
+                GetSignatures(analysis, "d", code.Length),
+                "milliseconds object",
+                "dateString object",
+                "year object, month object, day object, hours object, minutes object, seconds object, milliseconds object"
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestDescriptions() {
+            var code = @"var n = 1;
+var b = true;
+var s = 'str';
+var f = function() { }
+var f1 = function f() { }
+var f2 = function f(a, b) { }
+var f3 = function f() { return 42; }
+var f4 = function f() { return 42; return true; }
+var bf = Math.max;
+var nu = null;
+var o = {};
+var o1 = {abc:42};
+var undef = undefined;
+";
+
+            var analysis = ProcessText(code);
+
+            AssertUtil.ContainsExactly(analysis.GetDescriptionByIndex("n", code.Length), "number");
+            AssertUtil.ContainsExactly(analysis.GetDescriptionByIndex("b", code.Length), "boolean");
+            AssertUtil.ContainsExactly(analysis.GetDescriptionByIndex("s", code.Length), "string");
+            AssertUtil.ContainsExactly(analysis.GetDescriptionByIndex("f", code.Length), "function <anonymous>()");
+            AssertUtil.ContainsExactly(analysis.GetDescriptionByIndex("f1", code.Length), "function f()");
+            AssertUtil.ContainsExactly(analysis.GetDescriptionByIndex("f2", code.Length), "function f(a, b)");
+            AssertUtil.ContainsExactly(analysis.GetDescriptionByIndex("f3", code.Length), "function f() -> number");
+            AssertUtil.ContainsExactly(analysis.GetDescriptionByIndex("f4", code.Length), "function f() -> number, boolean");
+            AssertUtil.ContainsExactly(analysis.GetDescriptionByIndex("nu", code.Length), "null");
+            AssertUtil.ContainsExactly(analysis.GetDescriptionByIndex("bf", code.Length), "built-in function max");
+            AssertUtil.ContainsExactly(analysis.GetDescriptionByIndex("o", code.Length), "object");
+            AssertUtil.ContainsExactly(analysis.GetDescriptionByIndex("o1", code.Length), "object\r\nContains: abc");
+            AssertUtil.ContainsExactly(analysis.GetDescriptionByIndex("undef", code.Length), "undefined");                
         }
 
         [TestMethod, Priority(0)]

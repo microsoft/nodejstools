@@ -33,6 +33,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
         }
 
+        public override string Description {
+            get {
+                return "boolean";
+            }
+        }
+
         public override BuiltinTypeId TypeId {
             get {
                 return BuiltinTypeId.Boolean;

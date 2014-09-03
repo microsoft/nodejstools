@@ -22,25 +22,95 @@ using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis {
     partial class NodejsModuleBuilder {
-        private static Dictionary<string, Dictionary<string, CallDelegate>> _moduleSpecializations = new Dictionary<string, Dictionary<string, CallDelegate>>() { 
+        private static Dictionary<string, Dictionary<string, FunctionSpecializer>> _moduleSpecializations = new Dictionary<string, Dictionary<string, FunctionSpecializer>>() { 
             { 
                 "util", 
-                new Dictionary<string, CallDelegate>() {
-                    { "inherits", UtilInherits }
+                new Dictionary<string, FunctionSpecializer>() {
+                    { "inherits", new CallableFunctionSpecializer(UtilInherits) }
+                }
+            },
+            {
+                "path",
+                new Dictionary<string, FunctionSpecializer>() {
+                    { "resolve", ReturnValueFunctionSpecializer.String },
+                    { "normalize", ReturnValueFunctionSpecializer.String },
+                    { "join", ReturnValueFunctionSpecializer.String },
+                    { "relative", ReturnValueFunctionSpecializer.String },
+                    { "dirname", ReturnValueFunctionSpecializer.String },
+                    { "basename", ReturnValueFunctionSpecializer.String },
+                    { "extname", ReturnValueFunctionSpecializer.String },
+                }
+            },
+            {
+                "fs",
+                new Dictionary<string, FunctionSpecializer>() {
+                    { "existsSync", ReturnValueFunctionSpecializer.Boolean }
                 }
             }
         };
 
-        private static Dictionary<string, Dictionary<string, CallDelegate>> _classSpecializations = new Dictionary<string, Dictionary<string, CallDelegate>>() { 
+        private static Dictionary<string, Dictionary<string, FunctionSpecializer>> _classSpecializations = new Dictionary<string, Dictionary<string, FunctionSpecializer>>() { 
             { 
                 "events.EventEmitter", 
-                new Dictionary<string, CallDelegate>() {
-                    { "addListener", EventEmitterAddListener },
-                    { "on", EventEmitterAddListener },
-                    { "emit", EventEmitterEmit }
+                new Dictionary<string, FunctionSpecializer>() {
+                    { "addListener", new CallableFunctionSpecializer(EventEmitterAddListener) },
+                    { "on", new CallableFunctionSpecializer(EventEmitterAddListener) },
+                    { "emit", new CallableFunctionSpecializer(EventEmitterEmit) }
                 }
             }
         };
+
+        abstract class FunctionSpecializer {
+            public abstract FunctionValue Specialize(ProjectEntry projectEntry, string name, string doc, ParameterResult[] parameters);
+        }
+
+        class CallableFunctionSpecializer : FunctionSpecializer {
+            private readonly CallDelegate _delegate;
+
+            public CallableFunctionSpecializer(CallDelegate callDelegate) {
+                _delegate = callDelegate;
+            }
+
+            public override FunctionValue Specialize(ProjectEntry projectEntry, string name, string doc, ParameterResult[] parameters) {
+                return new SpecializedFunctionValue(
+                    projectEntry,
+                    name,
+                    _delegate,
+                    doc,
+                    parameters
+                );
+            }
+        }
+
+        abstract class ReturnValueFunctionSpecializer : FunctionSpecializer {
+            public static ReturnValueFunctionSpecializer String = new StringSpecializer();
+            public static ReturnValueFunctionSpecializer Boolean = new BooleanSpecializer();
+
+            public override FunctionValue Specialize(ProjectEntry projectEntry, string name, string doc, ParameterResult[] parameters) {
+                return new ReturningFunctionValue(
+                    projectEntry,
+                    name,
+                    GetReturnValue(projectEntry.Analyzer),
+                    doc,
+                    true,
+                    parameters
+                );
+            }
+
+            public abstract IAnalysisSet GetReturnValue(JsAnalyzer analyzer);
+
+            class StringSpecializer : ReturnValueFunctionSpecializer {
+                public override IAnalysisSet GetReturnValue(JsAnalyzer analyzer) {
+                    return analyzer._emptyStringValue.SelfSet;
+                }
+            }
+
+            class BooleanSpecializer : ReturnValueFunctionSpecializer {
+                public override IAnalysisSet GetReturnValue(JsAnalyzer analyzer) {
+                    return analyzer._trueInst.SelfSet;
+                }
+            }
+        }
 
         private static IAnalysisSet UtilInherits(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             // function inherits(ctor, superCtor)

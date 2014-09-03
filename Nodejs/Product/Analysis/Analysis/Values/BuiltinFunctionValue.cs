@@ -38,7 +38,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             string documentation = null,
             bool createPrototype = true,
             params ParameterResult[] signature)
-            : this(projectEntry, name, new[] { new SimpleOverloadResult(signature, name, documentation) }, documentation, createPrototype) {
+            : this(projectEntry, name, new[] { new SimpleOverloadResult(name, documentation, signature) }, documentation, createPrototype) {
         }
 
         public BuiltinFunctionValue(ProjectEntry projectEntry,
