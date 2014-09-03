@@ -151,12 +151,23 @@ namespace Microsoft.NodejsTools.Analysis {
         private void GenerateClass(ObjectValue exports, dynamic klass) {
             string className = (string)klass["name"];
 
-            BuiltinFunctionValue klassValue = new BuiltinFunctionValue(
+            List<OverloadResult> overloads = new List<OverloadResult>();
+            var fixedClassName = FixClassName(className);
+            dynamic signatures;
+            if (klass.TryGetValue("signatures", out signatures)) {
+                foreach (var sig in signatures) {
+                    var parameters = GetParameters(sig["params"]);
+                    var doc = ParseDocumentation((string)sig["desc"]);
+
+                    overloads.Add(new SimpleOverloadResult(parameters, fixedClassName, doc));
+                }
+            }
+            BuiltinFunctionValue klassValue = new ClassBuiltinFunctionValue(
                 exports.ProjectEntry,
-                FixClassName(className),
+                fixedClassName,
+                overloads.ToArray(),
                 ParseDocumentation((string)klass["desc"]),
                 true
-                // TODO: Signature?
             );
 
             exports.Add(klassValue);

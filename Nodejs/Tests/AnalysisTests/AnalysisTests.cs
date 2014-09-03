@@ -877,6 +877,50 @@ var x = g.abc;
             );
         }
 
+        /// <summary>
+        /// We don't allow assignment to most built-in members that
+        /// are defined by JavaScript
+        /// </summary>
+        [TestMethod, Priority(0)]
+        public void TestImmutableObjects() {
+            string code = @"
+global.Infinity = 'abc'
+var x = global.Infinity";
+            var analysis = ProcessText(code);
+
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", code.Length),
+                BuiltinTypeId.Number
+            );
+        }
+
+
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/1077
+        /// </summary>
+        [TestMethod, Priority(0)]
+        public void TestNodejsBufferInstanceMembers() {
+            string code = @"
+var buf1 = new require('buffer').Buffer(42);
+var buf2 = require('buffer').Buffer(42);";
+            var analysis = ProcessText(code);
+
+            AssertUtil.ContainsAtLeast(
+                analysis.GetMembersByIndex("buf1", code.Length).Select(x => x.Completion),
+                "write",
+                "copy",
+                "toJSON",
+                "slice"
+            );
+            AssertUtil.ContainsAtLeast(
+                analysis.GetMembersByIndex("buf2", code.Length).Select(x => x.Completion),
+                "write",
+                "copy",
+                "toJSON",
+                "slice"
+            );
+        }
+
         [TestMethod, Priority(0)]
         public void TestNodejsCreateFunctions() {
             var code = @"var x = require('http').createServer(null, null);

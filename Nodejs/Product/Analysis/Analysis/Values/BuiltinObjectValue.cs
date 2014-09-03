@@ -37,7 +37,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 
         public override bool IsMutable(string name) {
-            return _immutableMembers.Contains(name);
+            return !_immutableMembers.Contains(name);
         }
     }
 }

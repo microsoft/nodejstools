@@ -29,7 +29,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     [Serializable]
     internal class BuiltinFunctionValue : FunctionValue {
         private readonly string _name;
-        private readonly ParameterResult[] _signature;
+        private readonly OverloadResult[] _overloads;
         private readonly string _documentation;
         private readonly HashSet<string> _immutableMembers = new HashSet<string>();
 
@@ -38,10 +38,18 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             string documentation = null,
             bool createPrototype = true,
             params ParameterResult[] signature)
+            : this(projectEntry, name, new[] { new SimpleOverloadResult(signature, name, documentation) }, documentation, createPrototype) {
+        }
+
+        public BuiltinFunctionValue(ProjectEntry projectEntry,
+            string name,
+            OverloadResult[] overloads,
+            string documentation = null,
+            bool createPrototype = true)
             : base(projectEntry, createPrototype, name) {
             _name = name;
             _documentation = documentation;
-            _signature = signature;
+            _overloads = overloads;
 
             Add("length", projectEntry.Analyzer.GetConstant(1.0).Proxy);
             Add("name", projectEntry.Analyzer.GetConstant(name).Proxy);
@@ -62,18 +70,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 
         public override bool IsMutable(string name) {
-            return _immutableMembers.Contains(name);
+            return !_immutableMembers.Contains(name);
         }
 
         public override IEnumerable<OverloadResult> Overloads {
             get {
-                return new[] {
-                    new SimpleOverloadResult(
-                        _signature,
-                        _name,
-                        _documentation
-                    )
-                };
+                return _overloads;
             }
         }
 
@@ -97,7 +99,30 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     }
 
     /// <summary>
-    /// Represents a functoin not backed by user code which returns a known
+    /// Represents a function which is the constructor function for a
+    /// Node.js class.  These functions can be called with or without
+    /// new and always return their instance value.
+    /// </summary>
+    internal class ClassBuiltinFunctionValue : BuiltinFunctionValue {
+        public ClassBuiltinFunctionValue(ProjectEntry projectEntry,
+            string name,
+            OverloadResult[] overloads,
+            string documentation = null,
+            bool createPrototype = true)
+            : base(projectEntry, name, overloads, documentation, createPrototype) {
+        }
+
+        public override IAnalysisSet Construct(Node node, AnalysisUnit unit, IAnalysisSet[] args) {
+            return _instance.Proxy;
+        }
+
+        public override IAnalysisSet Call(Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            return _instance.Proxy;
+        }
+    }
+
+    /// <summary>
+    /// Represents a function not backed by user code which returns a known
     /// set of types.
     /// </summary>
     [Serializable]
