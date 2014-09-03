@@ -13,13 +13,8 @@
  * ***************************************************************************/
 
 using System;
-using System.ComponentModel;
-using System.Globalization;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Windows;
-using System.Windows.Media;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.Project;
 

@@ -80,6 +80,15 @@ namespace Microsoft.NodejsTools.NpmUI {
             e.Handled = true;
         }
 
+        private void OpenHomepageCommand_Executed(object sender, ExecutedRoutedEventArgs e) {
+            _vm.OpenHomepage(e.Parameter as PackageCatalogEntryViewModel);
+        }
+
+        private void OpenHomepageCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e) {
+            e.CanExecute = _vm.CanOpenHomepage(e.Parameter as PackageCatalogEntryViewModel);
+            e.Handled = true;
+        }
+
         private void FilterTextBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e) {
             if ((e.NewValue as bool?) ?? false) {
                 ((UIElement)sender).Focus();
@@ -133,13 +142,6 @@ namespace Microsoft.NodejsTools.NpmUI {
             _outputWindow.Show();
             if (_outputWindow.WindowState == WindowState.Minimized) {
                 _outputWindow.WindowState = WindowState.Normal;
-            }
-        }
-
-        private void HomepageLink_Click(object sender, RoutedEventArgs e) {
-            var homepageLink = (string)HomepageLink.Content;
-            if (!string.IsNullOrEmpty(homepageLink)) {
-                Process.Start(homepageLink);
             }
         }
 

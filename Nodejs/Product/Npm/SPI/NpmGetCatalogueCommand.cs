@@ -237,7 +237,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             Results = new ReadOnlyCollection<IPackage>(newResults);
             PopulateByName(newResults);
 
-            OnOutputLogged(String.Format("Last refreshed: {0}\nNumber of Results: {1}", LastRefreshed, newResults.LongCount()));
+            OnOutputLogged(String.Format("Current Time: {0}\nLast Refreshed: {1}\nNumber of Results: {2}", DateTime.Now, LastRefreshed, newResults.LongCount()));
 
             return true;
         }
