@@ -53,6 +53,43 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             return res;
         }
 
+        class MergedPropertyDescriptor : IPropertyDescriptor {
+            private readonly InheritsPrototypeValue _instance;
+            private readonly string _name;
+
+            public MergedPropertyDescriptor(InheritsPrototypeValue instance, string name) {
+                _instance = instance;
+                _name = name;
+            }
+
+            public IAnalysisSet GetValue(Node node, AnalysisUnit unit, ProjectEntry declaringScope, IAnalysisSet @this, bool addRef) {
+                IAnalysisSet res = AnalysisSet.Empty;
+                foreach (var prototype in _instance._prototypes) {
+                    if (prototype.Value.Push()) {
+                        try {
+                            var value = prototype.Value.GetProperty(node, unit, _name);
+                            if (value != null) {
+                                res = res.Union(value.GetValue(node, unit, declaringScope, @this, addRef));
+                            }
+                        } finally {
+                            prototype.Value.Pop();
+                        }
+                    }
+                }
+                return res;
+            }
+        }
+
+        internal override IPropertyDescriptor GetProperty(Node node, AnalysisUnit unit, string name) {
+            if (_prototypes.Count == 0) {
+                return null;
+            } else if (_prototypes.Count == 1) {
+                return _prototypes.First().Value.GetProperty(node, unit, name);
+            }
+
+            return new MergedPropertyDescriptor(this, name);
+        }
+
         internal override Dictionary<string, IAnalysisSet> GetAllMembers(ProjectEntry accessor) {
             var res = base.GetAllMembers(accessor);
             foreach (var value in _prototypes) {

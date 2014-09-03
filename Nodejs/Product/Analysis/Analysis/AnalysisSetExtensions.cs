@@ -144,15 +144,6 @@ namespace Microsoft.NodejsTools.Analysis {
             return res;
         }
 
-        internal static AnalysisProxy GetUnionType(this IAnalysisSet types) {
-            var union = AnalysisSet.CreateUnion(types, UnionComparer.Instances[0]);
-            AnalysisProxy type = null;
-            if (union.Count == 2) {
-                type = union.FirstOrDefault(t => t.Value.GetConstantValue() != null);
-            }
-            return type ?? union.FirstOrDefault();
-        }
-
         /// <summary>
         /// Returns true if the set contains no or only the object type
         /// </summary>

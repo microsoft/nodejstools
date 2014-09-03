@@ -98,7 +98,7 @@ namespace Microsoft.NodejsTools.Analysis {
                     ExpandoValue expando = @thisArg.Value as ExpandoValue;
                     if (expando != null) {
                         foreach (var arg in args[0]) {
-                            var strValue = arg.Value.GetConstantValueAsString();
+                            var strValue = arg.Value.GetStringValue();
                             if (strValue != null) {
                                 var key = new EventListenerKey(strValue);
                                 VariableDef events;
@@ -126,7 +126,7 @@ namespace Microsoft.NodejsTools.Analysis {
                     ExpandoValue expando = @thisArg.Value as ExpandoValue;
                     if (expando != null) {
                         foreach (var arg in args[0]) {
-                            var strValue = arg.Value.GetConstantValueAsString();
+                            var strValue = arg.Value.GetStringValue();
                             if (strValue != null) {
                                 VariableDef events;
                                 if (expando.TryGetMetadata<VariableDef>(new EventListenerKey(strValue), out events)) {

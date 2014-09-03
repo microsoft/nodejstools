@@ -19,13 +19,14 @@ using Microsoft.NodejsTools.Parsing;
 namespace Microsoft.NodejsTools.Analysis.Values {
     [Serializable]
     class ArrayValue : ObjectValue {
-        private IAnalysisSet _unionType;        // all types that have been seen
+        private TypedDef _unionType;        // all types that have been seen
         private TypedDef[] _indexTypes;     // types for known indices
         private readonly Node _node;
 
         public ArrayValue(TypedDef[] indexTypes, ProjectEntry entry, Node node)
             : base(entry, entry.Analyzer._arrayFunction) {
             _indexTypes = indexTypes;
+            _unionType = new TypedDef();
             _node = node;
             entry.Analyzer.AnalysisValueCreated(typeof(ArrayValue));
         }
@@ -44,22 +45,37 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 
         public override IAnalysisSet GetIndex(Node node, AnalysisUnit unit, IAnalysisSet index) {
-            int? constIndex = GetConstantIndex(index);
+            double? constIndex = GetConstantIndex(index);
 
             if (constIndex != null && constIndex.Value < IndexTypes.Length) {
                 // TODO: Warn if outside known index and no appends?
-                IndexTypes[constIndex.Value].AddDependency(unit);
-                return IndexTypes[constIndex.Value].GetTypes(unit, ProjectEntry);
+                IndexTypes[(int)constIndex.Value].AddDependency(unit);
+                return IndexTypes[(int)constIndex.Value].GetTypes(unit, ProjectEntry);
             }
 
-            if (IndexTypes.Length == 0) {
-                IndexTypes = new[] { new TypedDef() };
+            _unionType.AddDependency(unit);
+            return _unionType.GetTypes(unit, ProjectEntry);
+        }
+
+        public override void SetIndex(Node node, AnalysisUnit unit, IAnalysisSet index, IAnalysisSet value) {
+            double? constIndex = GetConstantIndex(index);
+
+            if (constIndex != null && constIndex.Value < IndexTypes.Length) {
+                // TODO: Warn if outside known index and no appends?
+                IndexTypes[(int)constIndex.Value].AddTypes(unit, value, declaringScope: ProjectEntry);
             }
 
-            IndexTypes[0].AddDependency(unit);
+            _unionType.AddTypes(unit, value, declaringScope: ProjectEntry);
 
-            EnsureUnionType();
-            return UnionType;
+            base.SetIndex(node, unit, index, value);
+        }
+
+        public void PushValue(Node node, AnalysisUnit unit, IAnalysisSet value) {
+            _unionType.AddTypes(unit, value, true, ProjectEntry);
+        }
+
+        public IAnalysisSet PopValue(Node node, AnalysisUnit unit) {
+            return _unionType.GetTypes(unit, ProjectEntry);
         }
 
         public override string ObjectDescription {
@@ -68,68 +84,31 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
         }
 
-        public IAnalysisSet UnionType {
-            get {
-                EnsureUnionType();
-                return _unionType;
-            }
-            set { _unionType = value; }
-        }
-
         public TypedDef[] IndexTypes {
             get { return _indexTypes; }
             set { _indexTypes = value; }
         }
 
-        protected void EnsureUnionType() {
-            if (_unionType == null) {
-                IAnalysisSet unionType = AnalysisSet.EmptyUnion;
-                if (Push()) {
-                    try {
-                        foreach (var set in _indexTypes) {
-                            unionType = unionType.Union(set.TypesNoCopy);
-                        }
-                    } finally {
-                        Pop();
-                    }
-                }
-                _unionType = unionType;
-            }
-        }
-
-        internal static int? GetConstantIndex(IAnalysisSet index) {
-            int? constIndex = null;
+        internal static double? GetConstantIndex(IAnalysisSet index) {
+            double? constIndex = null;
             int typeCount = 0;
             foreach (var type in index) {
-                object constValue = type.Value.GetConstantValue();
-                if (constValue != null && constValue is int) {
-                    constIndex = (int)constValue;
-                }
-
+                constIndex = type.Value.GetNumberValue();
                 typeCount++;
             }
-            if (typeCount != 1) {
+            if (typeCount != 1 ||
+                (constIndex != null && (constIndex % 1) != 0)) {
                 constIndex = null;
             }
             return constIndex;
         }
 
-        internal bool AddTypes(AnalysisUnit unit, IAnalysisSet[] types) {
-            if (_indexTypes.Length < types.Length) {
-                _indexTypes = _indexTypes.Concat(TypedDef.Generator).Take(types.Length).ToArray();
-            }
+        internal void AddTypes(AnalysisUnit unit, int index, IAnalysisSet types) {
+            _indexTypes[index].MakeUnionStrongerIfMoreThan(ProjectState.Limits.IndexTypes, types);
+            _indexTypes[index].AddTypes(unit, types, declaringScope: DeclaringModule);
 
-            bool added = false;
-            for (int i = 0; i < types.Length; i++) {
-                added |= _indexTypes[i].MakeUnionStrongerIfMoreThan(ProjectState.Limits.IndexTypes, types[i]);
-                added |= _indexTypes[i].AddTypes(unit, types[i], declaringScope: DeclaringModule);
-            }
-
-            if (added) {
-                _unionType = null;
-            }
-
-            return added;
+            _unionType.MakeUnionStrongerIfMoreThan(ProjectState.Limits.IndexTypes, types);
+            _unionType.AddTypes(unit, types, declaringScope: DeclaringModule);
         }
 
         internal override bool UnionEquals(AnalysisValue av, int strength) {
@@ -161,6 +140,5 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
             return base.UnionMergeTypes(av, strength);
         }
-
     }
 }

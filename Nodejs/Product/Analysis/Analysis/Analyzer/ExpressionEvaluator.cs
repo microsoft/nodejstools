@@ -299,10 +299,10 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 var lhs = ee.EvaluateMaybeNull(binOp.Operand1);
                 var rhs = ee.EvaluateMaybeNull(binOp.Operand2);
                 foreach (var left in lhs) {
-                    var leftStr = left.Value.GetConstantValueAsString();
+                    var leftStr = left.Value.GetStringValue();
                     if (leftStr != null) {
                         foreach (var right in rhs) {
-                            var rightStr = right.Value.GetConstantValueAsString();
+                            var rightStr = right.Value.GetStringValue();
                             if (rightStr != null) {
                                 res = res.Union(
                                     ee._unit.Analyzer.Modules.RequireModule(
@@ -485,31 +485,45 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
 
         private IAnalysisSet MakeArrayValue(ExpressionEvaluator ee, Node node) {
-            var sequence = (ArrayValue)ee.Scope.GlobalEnvironment.GetOrMakeNodeValue(
-                NodeEnvironmentKind.ArrayValue,
-                node, x => {
-                return new ArrayValue(
-                    TypedDef.EmptyArray,
+            int maxArrayLiterals = _unit.Analyzer.Limits.MaxArrayLiterals;
+
+            IAnalysisSet value;
+            var array = (ArrayLiteral)node;
+            ArrayValue arrValue;
+            if (!ee.Scope.GlobalEnvironment.TryGetNodeValue(NodeEnvironmentKind.ArrayValue, node, out value)) {
+                TypedDef[] elements = TypedDef.EmptyArray;
+
+                if (array.Elements.Length > maxArrayLiterals) {
+                    // probably some generated object literal, simplify it's analysis
+                    elements = new TypedDef[] { new TypedDef() };
+                } else if(array.Elements.Length != 0) {
+                    elements = TypedDef.Generator.Take(array.Elements.Length).ToArray();
+                }
+
+                arrValue = new ArrayValue(
+                    elements,
                     _unit.ProjectEntry,
                     node
-                ).SelfSet;
-            }).First().Value;
-            var array = (ArrayLiteral)node;
-            if (array.Elements.Length >= 50) {
-                // probably some generated object literal, ignore it
-                // for the post part.
-                sequence.AddTypes(ee._unit, new[] { Evaluate(array.Elements.First()) });
+                );
+
+                ee.Scope.GlobalEnvironment.AddNodeValue(
+                    NodeEnvironmentKind.ArrayValue,
+                    node,
+                    arrValue.SelfSet
+                );
             } else {
-                var seqItems = ((ArrayLiteral)node).Elements;
-                var indexValues = new IAnalysisSet[seqItems.Length];
-
-
-                for (int i = 0; i < seqItems.Length; i++) {
-                    indexValues[i] = Evaluate(seqItems[i]);
-                }
-                sequence.AddTypes(ee._unit, indexValues);
+                arrValue = (ArrayValue)((AnalysisProxy)value).Value;
             }
-            return sequence.SelfSet;
+
+            for (int i = 0; i < arrValue.IndexTypes.Length; i++) {
+                arrValue.AddTypes(
+                    ee._unit,
+                    i,
+                    Evaluate(array.Elements[i])
+                );
+            }
+
+            return arrValue.SelfSet;
         }
 
         #endregion

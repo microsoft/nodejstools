@@ -79,34 +79,14 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 
         public override IAnalysisSet Get(Node node, AnalysisUnit unit, string name, bool addRef = true) {
-            if (_descriptors == null) {
-                _descriptors = new AnalysisDictionary<string, PropertyDescriptor>();
+            var desc = GetProperty(node, unit, name);
+            IAnalysisSet res;
+            if (desc != null) {
+                res = desc.GetValue(node, unit, ProjectEntry, SelfSet, addRef);
+            } else {
+                res = AnalysisSet.Empty;
             }
-            PropertyDescriptor desc;
-            if (!_descriptors.TryGetValue(name, out desc)) {
-                _descriptors[name] = desc = new PropertyDescriptor();
-            }
-            if (desc.Values == null) {
-                desc.Values = new EphemeralVariableDef();
-            }
-
-            if (IsMutable(name)) {
-                desc.Values.AddDependency(unit);
-            }
-
-            // Don't add references to ephemeral values...  If they
-            // gain types we'll re-enqueue and the reference will be
-            // added then.
-            if (addRef && !desc.Values.IsEphemeral) {
-                desc.Values.AddReference(node, unit);
-            }
-
-            var res = desc.Values.GetTypes(unit, ProjectEntry);
-
-            if (desc.Get != null) {
-                res = res.Union(desc.Get.GetTypesNoCopy(unit, ProjectEntry).Call(node, unit, AnalysisSet.Empty, ExpressionEvaluator.EmptySets));
-            }
-
+            
             if (_next != null && _next.Push()) {
                 try {
                     res = res.Union(_next.Get(node, unit, name, addRef));
@@ -115,6 +95,26 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 }
             }
             return res;
+        }
+
+        internal override IPropertyDescriptor GetProperty(Node node, AnalysisUnit unit, string name) {
+            if (_descriptors == null) {
+                _descriptors = new AnalysisDictionary<string, PropertyDescriptor>();
+            }
+            
+            PropertyDescriptor desc;
+            if (!_descriptors.TryGetValue(name, out desc)) {
+                _descriptors[name] = desc = new PropertyDescriptor();
+            }
+
+            if (IsMutable(name)) {
+                if (desc.Values == null) {
+                    desc.Values = new EphemeralVariableDef();
+                }
+                desc.Values.AddDependency(unit);
+            }
+
+            return desc;
         }
 
         public virtual bool IsMutable(string name) {
@@ -196,7 +196,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         public override void SetIndex(Node node, AnalysisUnit unit, IAnalysisSet index, IAnalysisSet value) {
             foreach (var type in index) {
                 string strValue;
-                if ((strValue = type.Value.GetConstantValueAsString()) != null) {
+                if ((strValue = type.Value.GetStringValue()) != null) {
                     // x = {}; x['abc'] = 42; should be available as x.abc
                     SetMember(node, unit, strValue, value);
                 }
@@ -209,7 +209,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             var res = _keysAndValues.GetValueType(index);
             foreach (var value in index) {
                 string strValue;
-                if ((strValue = value.Value.GetConstantValueAsString()) != null) {
+                if ((strValue = value.Value.GetStringValue()) != null) {
                     res = res.Union(Get(node, unit, strValue));
                 }
             }
@@ -534,7 +534,32 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     /// We don't currently track anything like writable/enumerable/configurable.
     /// </summary>
     [Serializable]
-    class PropertyDescriptor {
+    class PropertyDescriptor : IPropertyDescriptor {
         public VariableDef Values, Get, Set;
+
+        public IAnalysisSet GetValue(Node node, AnalysisUnit unit, ProjectEntry declaringScope, IAnalysisSet @this, bool addRef) {
+            if (Values == null) {
+                Values = new EphemeralVariableDef();
+            }
+
+            // Don't add references to ephemeral values...  If they
+            // gain types we'll re-enqueue and the reference will be
+            // added then.
+            if (addRef && !Values.IsEphemeral) {
+                Values.AddReference(node, unit);
+            }
+
+            var res = Values.GetTypes(unit, declaringScope);
+
+            if (Get != null) {
+                res = res.Union(Get.GetTypesNoCopy(unit, declaringScope).Call(node, unit, @this, ExpressionEvaluator.EmptySets));
+            }
+
+            return res;
+        }
+    }
+
+    interface IPropertyDescriptor {
+        IAnalysisSet GetValue(Node node, AnalysisUnit unit, ProjectEntry declaringScope, IAnalysisSet @this, bool addRef);
     }
 }

@@ -15,7 +15,7 @@
 using System;
 namespace Microsoft.NodejsTools.Analysis.Values {
     [Serializable]
-    class StringValue : NonObjectValue {
+    sealed class StringValue : NonObjectValue {
         internal readonly string _value;
         private readonly JsAnalyzer _analyzer;
 
@@ -30,10 +30,6 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             get {
                 return "string";
             }
-        }
-
-        public override object GetConstantValue() {
-            return _value;
         }
 
         public override BuiltinTypeId TypeId {

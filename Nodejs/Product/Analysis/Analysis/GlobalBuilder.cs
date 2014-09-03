@@ -262,12 +262,14 @@ All other strings are considered decimal.", isOptional:true)
                             Parameter("callbackfn", "A function that accepts up to three arguments. The map method calls the callbackfn function one time for each element in the array."),
                             Parameter("thisArg", "An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.")
                         ),
-                        BuiltinFunction(
+                        SpecializedFunction(
                             "pop",
+                            ArrayPopFunction,
                             "Removes the last element from an array and returns it"
-                        ),
-                        BuiltinFunction(
+                        ),                        
+                        SpecializedFunction(
                             "push",
+                            ArrayPushFunction,
                             "Appends new elements to an array, and returns the new length of the array.",
                             Parameter("item", "New element of the Array."),
                             Parameter("item...",  "New element of the Array.", isOptional: true)
@@ -292,8 +294,9 @@ All other strings are considered decimal.", isOptional:true)
                             "shift", 
                             "Removes the first element from an array and returns it."
                         ),
-                        BuiltinFunction(
+                        SpecializedFunction(
                             "slice",
+                            ArraySliceFunction,
                             "Returns a section of an array.",
                             Parameter("start", "The beginning of the specified portion of the array.", isOptional: true),
                             Parameter("end", "end The end of the specified portion of the array.", isOptional: true)
@@ -330,6 +333,44 @@ All other strings are considered decimal.", isOptional:true)
                 ),
                 new ReturningFunctionValue(builtinEntry, "isArray", _analyzer._falseInst.Proxy)
             };
+        }
+
+        private static IAnalysisSet ArrayPushFunction(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            if (args.Length >= 1 && @this != null) {                
+                foreach (var thisValue in @this) {
+                    ArrayValue arr = thisValue.Value as ArrayValue;
+                    if (arr != null) {
+                        arr.PushValue(node, unit, args[0]);
+                    }
+                }
+            }
+            return unit.Analyzer._zeroIntValue.SelfSet;
+        }
+
+        private static IAnalysisSet ArrayPopFunction(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            IAnalysisSet res = AnalysisSet.Empty;
+            if (@this != null) {
+                foreach (var thisValue in @this) {
+                    ArrayValue arr = thisValue.Value as ArrayValue;
+                    if (arr != null) {
+                        res = res.Union(arr.PopValue(node, unit));
+                    }
+                }
+            }
+            return res;
+        }
+
+        private static IAnalysisSet ArraySliceFunction(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            IAnalysisSet res = AnalysisSet.Empty;
+            if (args.Length >= 1 && @this != null) {
+                foreach (var thisValue in @this) {
+                    ArrayValue arr = thisValue.Value as ArrayValue;
+                    if (arr != null) {
+                        res = res.Add(thisValue);
+                    }
+                }
+            }
+            return res;
         }
 
         private static IAnalysisSet ArrayForEach(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
@@ -1066,7 +1107,7 @@ on that object, and are not inherited from the object's prototype. The propertie
                     ExpandoValue expando = thisVal.Value as ExpandoValue;
                     if (expando != null) {
                         foreach (var name in args[0]) {
-                            var nameStr = name.Value.GetConstantValueAsString();
+                            var nameStr = name.Value.GetStringValue();
                             if (nameStr != null) {
                                 expando.DefineSetter(unit, nameStr, args[1]);
                             }
@@ -1083,7 +1124,7 @@ on that object, and are not inherited from the object's prototype. The propertie
                     ExpandoValue expando = thisVal.Value as ExpandoValue;
                     if (expando != null) {
                         foreach (var name in args[0]) {
-                            var nameStr = name.Value.GetConstantValueAsString();
+                            var nameStr = name.Value.GetStringValue();
                             if (nameStr != null) {
                                 expando.DefineGetter(unit, nameStr, args[1]);
                                 // call the function w/ our this arg...
@@ -1103,7 +1144,7 @@ on that object, and are not inherited from the object's prototype. The propertie
                     ExpandoValue expando = obj.Value as ExpandoValue;
                     if (expando != null) {
                         foreach (var name in args[1]) {
-                            string propName = name.Value.GetConstantValueAsString();
+                            string propName = name.Value.GetStringValue();
                             if (propName != null) {
                                 foreach (var desc in args[2]) {
                                     expando.AddProperty(node, unit, propName, desc.Value);
@@ -1153,7 +1194,7 @@ on that object, and are not inherited from the object's prototype. The propertie
             IAnalysisSet res = AnalysisSet.Empty;
             if (args.Length > 0) {
                 foreach (var arg in args[0]) {
-                    var moduleName = arg.Value.GetConstantValueAsString();
+                    var moduleName = arg.Value.GetStringValue();
                     if (moduleName != null) {
                         res = res.Union(
                             unit.Analyzer.Modules.RequireModule(

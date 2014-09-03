@@ -202,6 +202,100 @@ arr.forEach(f);
         }
 
         [TestMethod, Priority(0)]
+        public void TestArrayPush() {
+            string code = @"
+var arr = [];
+arr.push(42);
+var x = arr[0];
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", code.Length),
+                BuiltinTypeId.Number
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestArrayPop() {
+            string code = @"
+var arr = [];
+arr.push(42);
+var x = arr.pop();
+
+var arr2 = ['abc'];
+var y = arr2.pop();
+
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", code.Length),
+                BuiltinTypeId.Number
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("y", code.Length),
+                BuiltinTypeId.String
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestArraySetIndex() {
+            string code = @"
+var arr = [];
+arr[0] = 42;
+var x = arr[0];
+
+var arr2 = [undefined, 42];
+arr2[0] = 'abc';
+var y = arr2[0];
+
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", code.Length),
+                BuiltinTypeId.Number
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("y", code.Length),
+                BuiltinTypeId.String,
+                BuiltinTypeId.Undefined
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestArraySlice() {
+            string code = @"
+var arr = [1,2,3];
+var x = arr.slice(1,2)[0];
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", code.Length),
+                BuiltinTypeId.Number
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestPrototypeGetter() {
+            string code = @"
+function MyObject() {
+}
+
+MyObject.prototype.__defineGetter__('myprop', function(){  
+	return this.abc;
+});
+
+var x = new MyObject();
+x.abc = 42;
+var y = x.myprop;";
+
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("y", code.Length),
+                BuiltinTypeId.Number
+            );
+        }
+
+        [TestMethod, Priority(0)]
         public void TestThisFlows() {
             string code = @"
 function f() {

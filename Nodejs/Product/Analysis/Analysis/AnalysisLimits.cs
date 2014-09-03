@@ -28,6 +28,7 @@ namespace Microsoft.NodejsTools.Analysis {
             IndexTypes = 30;
             AssignedTypes = 100;
             MergedArgumentTypes = 30;
+            MaxArrayLiterals = 50;
         }
 
         public static AnalysisLimits MakeLowAnalysisLimits() {
@@ -86,6 +87,12 @@ namespace Microsoft.NodejsTools.Analysis {
         /// </summary>
         public int MergedArgumentTypes { get; set; }
 
+        /// <summary>
+        /// The maximum number of elements an array literal can contain before
+        /// simplifying the analysis.
+        /// </summary>
+        public int MaxArrayLiterals { get; set; }
+
         public override bool Equals(object obj) {
             AnalysisLimits other = obj as AnalysisLimits;
             if (other != null) {
@@ -96,7 +103,8 @@ namespace Microsoft.NodejsTools.Analysis {
                     other.DictValueTypes == DictValueTypes &&
                     other.IndexTypes == IndexTypes &&
                     other.AssignedTypes == AssignedTypes &&
-                    other.MergedArgumentTypes == MergedArgumentTypes;
+                    other.MergedArgumentTypes == MergedArgumentTypes &&
+                    other.MaxArrayLiterals == MaxArrayLiterals;
             }
             return false;
         }
@@ -109,7 +117,8 @@ namespace Microsoft.NodejsTools.Analysis {
                 DictValueTypes +
                 IndexTypes +
                 AssignedTypes +
-                MergedArgumentTypes;
+                MergedArgumentTypes +
+                MaxArrayLiterals;
         }
     }
 }
