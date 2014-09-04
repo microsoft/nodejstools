@@ -58,16 +58,33 @@ namespace Microsoft.NodejsTools.Intellisense {
         /// </summary>
         /// <param name="filename"></param>
         private void EnqueueFile(IProjectEntry projEntry, string filename) {
+            // get the current snapshot from the UI thread
+            TextReader reader = null;
+            ITextSnapshot snapshot = GetOpenSnapshot(projEntry);
+            IAnalysisCookie cookie = null;
+            if (snapshot != null) {
+                cookie = new SnapshotCookie(snapshot);
+                reader = new SnapshotSpanSourceCodeReader(new SnapshotSpan(snapshot, 0, snapshot.Length));
+            }
+
             EnqueWorker(() => {
                 for (int i = 0; i < 10; i++) {
                     try {
-                        if (!File.Exists(filename)) {
-                            break;
+                        if (reader == null) {
+                            if (!File.Exists(filename)) {
+                                break;
+                            }
+
+                            cookie = new FileCookie(filename);
+                            reader = new StreamReader(
+                                new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete)
+                            );
                         }
-                        using (var reader = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete)) {
-                            ParseFile(projEntry, filename, reader);
-                            return;
+
+                        using (reader) {
+                            ParseFile(projEntry, filename, reader, cookie);
                         }
+                        return;
                     } catch (IOException) {
                         // file being copied, try again...
                         Thread.Sleep(100);

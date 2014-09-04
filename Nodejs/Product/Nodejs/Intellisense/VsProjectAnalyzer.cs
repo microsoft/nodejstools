@@ -780,39 +780,22 @@ namespace Microsoft.NodejsTools.Intellisense {
                 var view = VsShellUtilities.GetTextView(frame);
                 if (view != null) {
                     var factService = NodejsPackage.ComponentModel.GetService<IVsEditorAdaptersFactoryService>();
-                    try {
-                        var wpfView = factService.GetWpfTextView(view);
-                        return wpfView.TextBuffer.CurrentSnapshot;
-                    } catch (System.Runtime.InteropServices.ExternalException) {
-                    }
+                    var wpfView = factService.GetWpfTextView(view);
+                    return wpfView.TextBuffer.CurrentSnapshot;
                 }
             }
 
             return null;
         }
 
-        private void ParseFile(IProjectEntry entry, string filename, Stream content) {
+        private void ParseFile(IProjectEntry entry, string filename, TextReader reader, IAnalysisCookie cookie) {
             IJsProjectEntry jsEntry;
             IExternalProjectEntry externalEntry;
 
-            TextReader reader = null;
-            ITextSnapshot snapshot = GetOpenSnapshot(entry);
-            IAnalysisCookie cookie;
-            if (snapshot != null) {
-                cookie = new SnapshotCookie(snapshot);
-                reader = new SnapshotSpanSourceCodeReader(new SnapshotSpan(snapshot, 0, snapshot.Length));
-            } else {
-                cookie = new FileCookie(filename);
-            }
-            
             if ((jsEntry = entry as IJsProjectEntry) != null) {
                 JsAst ast;
                 CollectingErrorSink errorSink;
-                if (reader != null) {
-                    ParseNodejsCode(reader, out ast, out errorSink);
-                } else {
-                    ParseNodejsCode(content, out ast, out errorSink);
-                }
+                ParseNodejsCode(reader, out ast, out errorSink);
 
                 if (ast != null) {
                     jsEntry.UpdateTree(ast, cookie);
@@ -824,7 +807,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 if (!_projectFiles.TryGetValue(filename, out item) || item.ReportErrors) {
                     // update squiggles for the buffer. snapshot may be null if we
                     // are analyzing a file that is not open
-                    UpdateErrorsAndWarnings(entry, snapshot, errorSink);
+                    UpdateErrorsAndWarnings(entry, GetSnapshot(reader), errorSink);
                 } else {
                     TaskProvider.Value.Clear(entry, ParserTaskMoniker);
                 }
@@ -834,11 +817,19 @@ namespace Microsoft.NodejsTools.Intellisense {
                     _analysisQueue.Enqueue(jsEntry, AnalysisPriority.Normal);
                 }
             } else if ((externalEntry = entry as IExternalProjectEntry) != null) {
-                externalEntry.ParseContent(reader ?? new StreamReader(content), cookie);
+                externalEntry.ParseContent(reader ?? reader, cookie);
                 if (_analysisLevel != AnalysisLevel.None) {
                     _analysisQueue.Enqueue(entry, AnalysisPriority.Normal);
                 }
             }
+        }
+
+        private static ITextSnapshot GetSnapshot(TextReader reader) {
+            SnapshotSpanSourceCodeReader snapshotReader = reader as SnapshotSpanSourceCodeReader;
+            if (snapshotReader != null) {
+                return snapshotReader.Snapshot;
+            }
+            return null;
         }
 
         private void ParseBuffers(BufferParser bufferParser, params ITextSnapshot[] snapshots) {
@@ -908,25 +899,6 @@ namespace Microsoft.NodejsTools.Intellisense {
                     jsProjEntry.GetTreeAndCookie(out prevTree, out prevCookie);
                     jsProjEntry.UpdateTree(prevTree, prevCookie);
                 }
-            }
-        }
-
-        private void ParseNodejsCode(Stream content, out JsAst ast, out CollectingErrorSink errorSink) {
-            ast = null;
-            errorSink = new CollectingErrorSink();
-
-            try {
-                ast = CreateParser(new StreamReader(content), errorSink).Parse(_codeSettings);
-            } catch (Exception e) {
-                if (e.IsCriticalException()) {
-                    throw;
-                }
-                FileStream stream = content as FileStream;
-                string file = "";
-                if (stream != null) {
-                    file = stream.Name + Environment.NewLine + Environment.NewLine;
-                }
-                Debug.Assert(false, String.Format(file + "Failure in JavaScript parser: {0}", e.ToString()));
             }
         }
 
