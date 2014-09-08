@@ -28,7 +28,7 @@ namespace Microsoft.NodejsTools.Editor.ShowBraces {
         private readonly ITextView _view;
         private readonly ITextBuffer _sourceBuffer;
         private SnapshotPoint? _currentChar;
-        private static readonly TextMarkerTag blueTextMarkerTag = new TextMarkerTag("blue");
+        private static readonly TextMarkerTag _tag = new TextMarkerTag("Brace Matching (Rectangle)");
 
         /// <summary>
         ///  Brace pairs that are matched on.
@@ -83,8 +83,8 @@ namespace Microsoft.NodejsTools.Editor.ShowBraces {
                 _braceList.TryGetValue(currentText = currentChar.GetChar(), out closeChar)) {
                 // The value is an opening brace, which is the *next/current* character, we will find the closing character.
                 if (BraceMatchingTagger.FindMatchingCloseChar(currentChar, currentText, closeChar, _view.TextViewLines.Count, out pairSpan) == true) {
-                    yield return new TagSpan<TextMarkerTag>(new SnapshotSpan(currentChar, 1), blueTextMarkerTag);
-                    yield return new TagSpan<TextMarkerTag>(pairSpan, blueTextMarkerTag);
+                    yield return new TagSpan<TextMarkerTag>(new SnapshotSpan(currentChar, 1), _tag);
+                    yield return new TagSpan<TextMarkerTag>(pairSpan, _tag);
                 }
             } else if (currentChar.Snapshot.Length > 1 &&
                 lastChar.Position < currentChar.Snapshot.Length &&
@@ -94,8 +94,8 @@ namespace Microsoft.NodejsTools.Editor.ShowBraces {
                            where n.Value.Equals(lastText)
                            select n.Key;
                 if (BraceMatchingTagger.FindMatchingOpenChar(lastChar, open.Single(), lastText, _view.TextViewLines.Count, out pairSpan) == true) {
-                    yield return new TagSpan<TextMarkerTag>(new SnapshotSpan(lastChar, 1), blueTextMarkerTag);
-                    yield return new TagSpan<TextMarkerTag>(pairSpan, blueTextMarkerTag);
+                    yield return new TagSpan<TextMarkerTag>(new SnapshotSpan(lastChar, 1), _tag);
+                    yield return new TagSpan<TextMarkerTag>(pairSpan, _tag);
                 }
             }
         }
