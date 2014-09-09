@@ -53,7 +53,7 @@ namespace Microsoft.VisualStudioTools.Project {
         private static ImageList _imageList;
         private ProjectDocumentsListenerForStartupFileUpdates _projectDocListenerForStartupFileUpdates;
         private int _imageOffset;
-        private FileSystemWatcher _watcher, _attributesWatcher;
+        private FileWatcher _watcher, _attributesWatcher;
         private int _suppressFileWatcherCount;
         private bool _isRefreshing;
         private bool _showingAllFiles;
@@ -63,7 +63,7 @@ namespace Microsoft.VisualStudioTools.Project {
         private Queue<FileSystemChange> _fileSystemChanges = new Queue<FileSystemChange>();
         private object _fileSystemChangesLock = new object();
         private MSBuild.Project _userBuildProject;
-        private readonly Dictionary<string, FileSystemWatcher> _symlinkWatchers = new Dictionary<string, FileSystemWatcher>();
+        private readonly Dictionary<string, FileWatcher> _symlinkWatchers = new Dictionary<string, FileWatcher>();
         private DiskMerger _currentMerger;
 #if DEV11_OR_LATER
         private IVsHierarchyItemManager _hierarchyManager;
@@ -442,8 +442,8 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
-        private FileSystemWatcher CreateFileSystemWatcher(string dir) {
-            var watcher = new FileSystemWatcher(dir);
+        private FileWatcher CreateFileSystemWatcher(string dir) {
+            var watcher = new FileWatcher(dir);
             watcher.IncludeSubdirectories = true;
             watcher.Created += new FileSystemEventHandler(FileExistanceChanged);
             watcher.Deleted += new FileSystemEventHandler(FileExistanceChanged);
@@ -458,8 +458,8 @@ namespace Microsoft.VisualStudioTools.Project {
             return watcher;
         }
 
-        private FileSystemWatcher CreateAttributesWatcher(string dir) {
-            var watcher = new FileSystemWatcher(dir);
+        private FileWatcher CreateAttributesWatcher(string dir) {
+            var watcher = new FileWatcher(dir);
             watcher.IncludeSubdirectories = true;
             watcher.NotifyFilter = NotifyFilters.Attributes;
             watcher.Changed += FileAttributesChanged;
@@ -477,7 +477,7 @@ namespace Microsoft.VisualStudioTools.Project {
             lock (_fileSystemChanges) {
                 _fileSystemChanges.Clear(); // none of the other changes matter now, we'll rescan the world
                 _currentMerger = null;  // abort any current merge now that we have a new one
-                _fileSystemChanges.Enqueue(new FileSystemChange(this, WatcherChangeTypes.All, null, watcher: sender as FileSystemWatcher));
+                _fileSystemChanges.Enqueue(new FileSystemChange(this, WatcherChangeTypes.All, null, watcher: sender as FileWatcher));
                 TriggerIdle();
             }
         }
@@ -597,9 +597,9 @@ namespace Microsoft.VisualStudioTools.Project {
             private readonly string _initialDir;
             private readonly Stack<DirState> _remainingDirs = new Stack<DirState>();
             private readonly CommonProjectNode _project;
-            private readonly FileSystemWatcher _watcher;
+            private readonly FileWatcher _watcher;
 
-            public DiskMerger(CommonProjectNode project, HierarchyNode parent, string dir, FileSystemWatcher watcher = null) {
+            public DiskMerger(CommonProjectNode project, HierarchyNode parent, string dir, FileWatcher watcher = null) {
                 _project = project;
                 _initialDir = dir;
                 _remainingDirs.Push(new DirState(dir, parent));
@@ -939,7 +939,7 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
         internal bool TryDeactivateSymLinkWatcher(HierarchyNode child) {
-            FileSystemWatcher watcher;
+            FileWatcher watcher;
             if (_symlinkWatchers.TryGetValue(child.Url, out watcher)) {
                 _symlinkWatchers.Remove(child.Url);
                 watcher.EnableRaisingEvents = false;
@@ -1010,9 +1010,9 @@ namespace Microsoft.VisualStudioTools.Project {
             internal readonly WatcherChangeTypes _type;
             private readonly string _path;
             private readonly bool _isRename;
-            internal readonly FileSystemWatcher _watcher;
+            internal readonly FileWatcher _watcher;
 
-            public FileSystemChange(CommonProjectNode node, WatcherChangeTypes changeType, string path, bool isRename = false, FileSystemWatcher watcher = null) {
+            public FileSystemChange(CommonProjectNode node, WatcherChangeTypes changeType, string path, bool isRename = false, FileWatcher watcher = null) {
                 _project = node;
                 _type = changeType;
                 _path = path;
