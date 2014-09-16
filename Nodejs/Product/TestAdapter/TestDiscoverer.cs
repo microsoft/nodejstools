@@ -46,7 +46,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
             using (var buildEngine = new MSBuild.ProjectCollection()) {
                 try {
-                    // Load all the test containers passed in (.pyproj msbuild files)
+                    // Load all the test containers passed in (.njsproj msbuild files)
                     foreach (string source in sources) {
                         buildEngine.LoadProject(source);
                     }
@@ -101,9 +101,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 logger.SendMessage(TestMessageLevel.Error, String.Format("Node.exe was not found.  Please install Node.js before running tests."));
                 return;
             }
-            //TODO
-            // string files = string.Join(";", testItems.GetValues(null));
-            //logger.SendMessage(TestMessageLevel.Informational, String.Format("Processing {0}", files));
+
             int testCount = 0;
             foreach (string testFx in testItems.Keys) {
                 TestFrameworks.TestFramework testFramework = GetTestFrameworkObject(testFx);
@@ -112,22 +110,25 @@ namespace Microsoft.NodejsTools.TestAdapter {
                     continue;
                 }
 
+                string files = string.Join(";", testItems.GetValues(testFx));
+                logger.SendMessage(TestMessageLevel.Informational, String.Format("Processing: {0}", files));
+
                 List<TestFrameworks.NodejsTestInfo> discoveredTestCases = testFramework.FindTests(testItems.GetValues(testFx), nodeExePath, logger, projectHome);
                 testCount += discoveredTestCases.Count;
                 foreach (TestFrameworks.NodejsTestInfo discoveredTest in discoveredTestCases) {
                     string qualifiedName = discoveredTest.FullyQualifiedName;
-                    logger.SendMessage(TestMessageLevel.Informational, String.Format("Creating TestCase:{0}", qualifiedName));
+                    logger.SendMessage(TestMessageLevel.Informational, String.Format("  " /*indent*/ + "Creating TestCase:{0}", qualifiedName));
                     discoverySink.SendTestCase(new TestCase(qualifiedName, TestExecutor.ExecutorUri, projSource) {
                         CodeFilePath = discoveredTest.ModulePath,
                         LineNumber = 0,
                         DisplayName = discoveredTest.TestName
                     });
                 }
+                logger.SendMessage(TestMessageLevel.Informational, string.Format("Processing finished for framework of {0}", testFx));
             }
             if (testCount == 0) {
                 logger.SendMessage(TestMessageLevel.Warning, String.Format("Discovered 0 testcases."));
             }
-            //logger.SendMessage(TestMessageLevel.Informational, String.Format("Processing Finished {0}", files));
         }
 
         private TestFrameworks.TestFramework GetTestFrameworkObject(string testFramework) {
