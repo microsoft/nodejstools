@@ -75,6 +75,11 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         public virtual async Task<bool> ExecuteAsync() {
             OnCommandStarted();
+            try {
+                GetPathToNpm();
+            } catch (NpmNotFoundException) {
+                return false;
+            }
             var wasCancelled = false;
             var redirector = new NpmCommandRedirector(this);
             redirector.WriteLine(string.Format("====Executing command 'npm {0}'====\r\n\r\n", Arguments));

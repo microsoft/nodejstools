@@ -210,7 +210,9 @@ namespace Microsoft.NodejsTools.Project {
                 _npmController.ErrorLogged += NpmController_ErrorLogged;
                 _npmController.ExceptionLogged += NpmController_ExceptionLogged;
                 _npmController.CommandCompleted += NpmController_CommandCompleted;
-                ReloadModules();
+                try {
+                    ReloadModules();
+                } catch (NpmNotFoundException) { }
             }
             return _npmController;
         }
