@@ -1,18 +1,23 @@
 var fs = require('fs');
 
 var find_tests = function (testFileList, discoverResultFile) {
-  var testFiles = testFileList.split(';');
   var testList = [];
-  for (var i = 0; i < testFiles.length; i++) {
-    var testCases = require(testFiles[i]);
+  testFileList.split(';').forEach(function (testFile) {
+    var testCases;
+    try {
+      testCases = require(testFile);
+    } catch (ex) {
+      console.error(ex);
+    }
     for (var test in testCases) {
       testList.push({
         test: test,
         suite: '',
-        file: testFiles[i]
+        file: testFile
       });
     }
-  }
+  });
+
   var fd = fs.openSync(discoverResultFile, 'w');
   fs.writeSync(fd, JSON.stringify(testList));
   fs.closeSync(fd);

@@ -37,7 +37,7 @@ var find_tests = function (testFileList, discoverResultFile, projectFolder) {
       getTestList(mocha.suite, testFile);
     } catch (e) {
       //we would like continue discover other files, so swallow, log and continue;
-      console.log('catch discover error:' + e);
+      console.error('catch discover error:' + e);
     }
   });
 
@@ -51,8 +51,8 @@ var run_tests = function (testName, testFile, workingFolder, projectFolder) {
   var Mocha = new require(projectFolder + '\\node_modules\\mocha');
   var mocha = new Mocha();
   mocha.ui('tdd');
-  //default at 2 sec might be too short (TODO: make it configuable)
-  mocha.suite.timeout(3000000);
+  //set timeout to 10 minutes, becasue the default of 2 sec might be too short (TODO: make it configuable)
+  mocha.suite.timeout(600000);
   if (testName) {
     mocha.grep(testName);
   }
