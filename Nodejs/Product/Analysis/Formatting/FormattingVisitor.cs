@@ -327,7 +327,7 @@ namespace Microsoft.NodejsTools.Formatting {
                 );
             }
 
-            if (node.ParameterDeclarations.Length > 0) {
+            if (node.ParameterDeclarations != null && node.ParameterDeclarations.Length > 0) {
                 ReplaceFollowingWhiteSpace(
                     node.ParameterStart + 1,
                     _options.SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis ? " " : ""
