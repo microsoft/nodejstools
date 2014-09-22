@@ -19,6 +19,8 @@ using System.Text;
 using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Analysis.Values;
 using Microsoft.NodejsTools.Parsing;
+using System.IO;
+using System.Diagnostics;
 
 namespace Microsoft.NodejsTools.Analysis {
     partial class NodejsModuleBuilder {
@@ -37,14 +39,15 @@ namespace Microsoft.NodejsTools.Analysis {
                     { "join", ReturnValueFunctionSpecializer.String },
                     { "relative", ReturnValueFunctionSpecializer.String },
                     { "dirname", ReturnValueFunctionSpecializer.String },
-                    { "basename", ReturnValueFunctionSpecializer.String },
+                    { "basename", new CallableFunctionSpecializer(FsBasename) },
                     { "extname", ReturnValueFunctionSpecializer.String },
-                }
+            }
             },
             {
                 "fs",
                 new Dictionary<string, FunctionSpecializer>() {
-                    { "existsSync", ReturnValueFunctionSpecializer.Boolean }
+                    { "existsSync", ReturnValueFunctionSpecializer.Boolean },
+                    { "readdirSync", new CallableFunctionSpecializer(FsReadDirSync) },
                 }
             }
         };
@@ -77,6 +80,7 @@ namespace Microsoft.NodejsTools.Analysis {
                     name,
                     _delegate,
                     doc,
+                    null,
                     parameters
                 );
             }
@@ -92,7 +96,6 @@ namespace Microsoft.NodejsTools.Analysis {
                     name,
                     GetReturnValue(projectEntry.Analyzer),
                     doc,
-                    true,
                     parameters
                 );
             }
@@ -110,6 +113,105 @@ namespace Microsoft.NodejsTools.Analysis {
                     return analyzer._trueInst.SelfSet;
                 }
             }
+        }
+
+
+        internal class ReadDirSyncArrayValue : ArrayValue {
+            private readonly HashSet<string> _readDirs = new HashSet<string>();
+            private static char[] InvalidPathChars = Path.GetInvalidPathChars();
+
+            public ReadDirSyncArrayValue(ProjectEntry projectEntry, Node node)
+                : base(new[] { new TypedDef() }, projectEntry, node) {
+            }
+
+            public void AddDirectoryMembers(AnalysisUnit unit, string path) {
+                
+                if (!String.IsNullOrWhiteSpace(path) &&
+                    path.IndexOfAny(InvalidPathChars) == -1 && 
+                    _readDirs.Add(path) &&
+                    Directory.Exists(path)) {
+                        string trimmed = path.Trim();
+                        if (trimmed != "." && trimmed != "/") {
+                            var files = Directory.GetFiles(path);
+
+                            foreach (var file in files) {
+                                IndexTypes[0].AddTypes(
+                                    unit,
+                                    unit.Analyzer.GetConstant(Path.GetFileName(file)).SelfSet
+                                );
+                            }
+                        }
+                }
+            }
+
+            public override void ForEach(Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+                // for this for each we want to process the un-merged values so that we
+                // get the best results instead of merging all of the strings together.
+                foreach (var value in IndexTypes[0].GetTypes(unit, ProjectEntry)) {
+                    args[0].Call(
+                        node,
+                        unit,
+                        null,
+                        new IAnalysisSet[] { 
+                            value, 
+                            AnalysisSet.Empty, 
+                            @this 
+                        }
+                    );
+                }
+            }
+        }
+
+        private static IAnalysisSet FsBasename(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            CallNode call = (CallNode)node;
+            IAnalysisSet res = AnalysisSet.Empty;
+            if (call.Arguments.Length == 2) {
+                foreach (var extArg in args[1]) {
+                    var strExt = extArg.Value.GetStringValue();
+                    if (strExt != null) {
+                        foreach (var nameArg in args[0]) {
+                            string name = nameArg.Value.GetStringValue();
+                            if (name != null) {
+                                string oldName = name;
+                                if (name.EndsWith(strExt, StringComparison.OrdinalIgnoreCase)) {
+                                    name = name.Substring(0, name.Length - strExt.Length);
+                                }
+                                res = res.Union(unit.Analyzer.GetConstant(name).Proxy);
+                            }
+                        }
+                    }
+                }
+            }
+            if (res.Count == 0) {
+                return unit.Analyzer._emptyStringValue.SelfSet;
+            }
+            return res;
+        }
+
+        private static IAnalysisSet FsReadDirSync(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            CallNode call = (CallNode)node;
+            if (call.Arguments.Length == 1) {
+                var ee = new ExpressionEvaluator(unit);
+                IAnalysisSet arraySet;
+                ReadDirSyncArrayValue array;
+                if (!unit.GetDeclaringModuleEnvironment().TryGetNodeValue(NodeEnvironmentKind.ArrayValue, call, out arraySet)) {
+                    array = new ReadDirSyncArrayValue(
+                        unit.ProjectEntry,
+                        node
+                    );
+                    arraySet = array.SelfSet;
+                    unit.GetDeclaringModuleEnvironment().AddNodeValue(NodeEnvironmentKind.ArrayValue, call, arraySet);
+                } else {
+                    array = (ReadDirSyncArrayValue)arraySet.First().Value;
+                }
+
+                foreach (var path in ee.MergeStringLiterals(call.Arguments[0])) {
+                    array.AddDirectoryMembers(unit, path);
+                }
+
+                return array.SelfSet;
+            }
+            return AnalysisSet.Empty;
         }
 
         private static IAnalysisSet UtilInherits(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
@@ -164,25 +266,27 @@ namespace Microsoft.NodejsTools.Analysis {
         /// </summary>
         private static IAnalysisSet EventEmitterAddListener(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             if (args.Length >= 2 && args[1].Count > 0) {
-                foreach (var thisArg in @this) {
-                    ExpandoValue expando = @thisArg.Value as ExpandoValue;
-                    if (expando != null) {
-                        foreach (var arg in args[0]) {
-                            var strValue = arg.Value.GetStringValue();
-                            if (strValue != null) {
-                                var key = new EventListenerKey(strValue);
-                                VariableDef events;
-                                if (!expando.TryGetMetadata(key, out events)) {
-                                    expando.SetMetadata(key, events = new VariableDef());
-                                }
+                if (@this != null) {
+                    foreach (var thisArg in @this) {
+                        ExpandoValue expando = @thisArg.Value as ExpandoValue;
+                        if (expando != null) {
+                            foreach (var arg in args[0]) {
+                                var strValue = arg.Value.GetStringValue();
+                                if (strValue != null) {
+                                    var key = new EventListenerKey(strValue);
+                                    VariableDef events;
+                                    if (!expando.TryGetMetadata(key, out events)) {
+                                        expando.SetMetadata(key, events = new VariableDef());
+                                    }
 
-                                events.AddTypes(unit, args[1]);
+                                    events.AddTypes(unit, args[1]);
+                                }
                             }
                         }
                     }
                 }
             }
-            return @this;
+            return @this ?? AnalysisSet.Empty;
         }
 
         /// <summary>
@@ -192,16 +296,19 @@ namespace Microsoft.NodejsTools.Analysis {
         /// </summary>
         private static IAnalysisSet EventEmitterEmit(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             if (args.Length >= 1) {
-                foreach (var thisArg in @this) {
-                    ExpandoValue expando = @thisArg.Value as ExpandoValue;
-                    if (expando != null) {
-                        foreach (var arg in args[0]) {
-                            var strValue = arg.Value.GetStringValue();
-                            if (strValue != null) {
-                                VariableDef events;
-                                if (expando.TryGetMetadata<VariableDef>(new EventListenerKey(strValue), out events)) {
-                                    foreach (var type in events.GetTypesNoCopy(unit)) {
-                                        type.Call(node, unit, @this, args.Skip(1).ToArray());
+                if (@this != null) {
+                    foreach (var thisArg in @this) {
+                        ExpandoValue expando = @thisArg.Value as ExpandoValue;
+                        if (expando != null) {
+                            Debug.Assert(args[0].Count < 100);
+                            foreach (var arg in args[0]) {
+                                var strValue = arg.Value.GetStringValue();
+                                if (strValue != null) {
+                                    VariableDef events;
+                                    if (expando.TryGetMetadata<VariableDef>(new EventListenerKey(strValue), out events)) {
+                                        foreach (var type in events.GetTypesNoCopy(unit)) {
+                                            type.Call(node, unit, @this, args.Skip(1).ToArray());
+                                        }
                                     }
                                 }
                             }

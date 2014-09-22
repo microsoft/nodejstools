@@ -203,10 +203,14 @@ namespace Microsoft.NodejsTools.Analysis {
             return null;
         }
 
+        internal virtual Dictionary<string, IAnalysisSet> GetOwnProperties(ProjectEntry accessor) {
+            return new Dictionary<string, IAnalysisSet>();
+        }
+
         /// <summary>
         /// Implements the internal [[Prototype]] property
         /// </summary>
-        public virtual IAnalysisSet GetPrototype(Node node, AnalysisUnit unit) {
+        internal virtual IAnalysisSet GetPrototype(ProjectEntry accessor) {
             return null;
         }
 

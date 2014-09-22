@@ -24,11 +24,11 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         private readonly Node _node;
 
         public ArrayValue(TypedDef[] indexTypes, ProjectEntry entry, Node node)
-            : base(entry, entry.Analyzer._arrayFunction) {
+            : base(entry, entry.Analyzer._arrayPrototype) {
             _indexTypes = indexTypes;
             _unionType = new TypedDef();
             _node = node;
-            entry.Analyzer.AnalysisValueCreated(typeof(ArrayValue));
+            entry.Analyzer.AnalysisValueCreated(GetType());
         }
 
         public override string ToString() {
@@ -40,8 +40,25 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             );
         }
 
+        public virtual void ForEach(Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            for (int i = 0; i < IndexTypes.Length; i++) {
+                foreach (var indexType in IndexTypes) {
+                    args[0].Call(
+                        node,
+                        unit,
+                        @this,
+                        new IAnalysisSet[] { 
+                            indexType.GetTypes(unit, ProjectEntry), 
+                            AnalysisSet.Empty, 
+                            @this ?? AnalysisSet.Empty
+                        }
+                    );
+                }
+            }
+        }
+
         public override IAnalysisSet GetEnumerationValues(Node node, AnalysisUnit unit) {
-            return this.ProjectState._emptyStringValue.SelfSet;
+            return this.ProjectState._zeroIntValue.SelfSet;
         }
 
         public override IAnalysisSet GetIndex(Node node, AnalysisUnit unit, IAnalysisSet index) {

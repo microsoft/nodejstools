@@ -157,6 +157,18 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         /// </summary>
         ArrayValue,
         /// <summary>
+        /// The value stored is an ArrayValue instance.
+        /// 
+        /// This is used to key unique values for "new Array()" calls
+        /// </summary>
+        ArrayCall,
+        /// <summary>
+        /// The value stored is an ObjectLiteralValue instance.
+        /// 
+        /// This is used to key unique values for "new Object()" calls.
+        /// </summary>
+        ObjectCall,
+        /// <summary>
         /// The value stored is a Function.
         /// 
         /// This is used to key unique values for function objects.
@@ -167,6 +179,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         /// 
         /// This is used to key unique values for util.inherits calls
         /// </summary>
-        InheritsPrototypeValue
+        InheritsPrototypeValue,
     }
 }

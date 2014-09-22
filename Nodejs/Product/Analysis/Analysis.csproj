@@ -236,6 +236,7 @@
     <Compile Include="Analysis\SetOfTwo.cs" />
     <Compile Include="Analysis\SingleDict.cs" />
     <Compile Include="Analysis\Values\ObjectLiteralValue.cs" />
+    <Compile Include="Analysis\Values\PropertyDescriptorValue.cs" />
     <Compile Include="Analysis\Values\PrototypeValue.cs" />
     <Compile Include="Analysis\Values\SpecializedUserFunctionValue.cs" />
     <Compile Include="Analysis\Values\StringValue.cs" />

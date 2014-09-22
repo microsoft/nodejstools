@@ -296,6 +296,110 @@ var y = x.myprop;";
         }
 
         [TestMethod, Priority(0)]
+        public void TestFunctionDefineGetter() {
+            string code = @"function f() {
+}
+
+f.__defineGetter__('abc', function() { return 42; })
+
+var x = f.abc;";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", code.Length),
+                BuiltinTypeId.Number
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestFunctionPrototypeLookup() {
+            string code = @"function f() {
+}
+
+Object.prototype.xyz = function() { return this.prop; }
+f.prop = 42
+var y = f.xyz;
+var x = f.xyz();
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("y", code.Length),
+                BuiltinTypeId.Function
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", code.Length),
+                BuiltinTypeId.Number
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestProtoSetCorrectly() {
+            string code = @"function f() { }
+f.prototype.abc = 42
+var x = (new f()).__proto__.abc;
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", code.Length),
+                BuiltinTypeId.Number
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestInfiniteDescriptors() {
+            string code = @"x = {abc:42}
+
+function f(x) {
+    a = Object.getOwnPropertyDescriptor(x, 'abc')
+    Object.defineProperty(x, 'abc', a)
+    f(a)
+}
+
+f(x)
+";
+            var analysis = ProcessText(code);
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestCopyDescriptor() {
+            string code = @"x = {abc:42}
+
+desc = Object.getOwnPropertyDescriptor(x, 'abc')
+y = {}
+Object.defineProperty(y, 'abc', desc)
+z = y.abc;
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("z", 0),
+                BuiltinTypeId.Number
+            ); 
+        }
+
+        /// <summary>
+        /// Currently failing because object literal {value: copied[propName]} gets merged resulting in shared types
+        /// </summary>
+        [TestMethod, Priority(0)]
+        public void FailingTestDefinePropertyLoop() {
+            string code = @"
+var o = {};
+var copied = {num:42, str:'100'};
+for(var propName in copied) {
+    Object.defineProperty(o, propName, {value: copied[propName]});
+}
+";
+
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("o.num", code.Length),
+                BuiltinTypeId.Number
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("o.str", code.Length),
+                BuiltinTypeId.String
+            );
+        }
+
+        [TestMethod, Priority(0)]
         public void TestThisFlows() {
             string code = @"
 function f() {
@@ -866,21 +970,43 @@ var x = abcdefg;
             );
         }
 
-        [TestMethod, Priority(2)]
-        public void Failing_TestForInLoop() {
-            var analysis = ProcessText("for(var x in [1,2,3]) { }");
+        [TestMethod, Priority(1)]
+        public void TestConstructor() {
+            var code = @"function f() {
+	this.abc = 42;
+}
+
+var inst = new f()
+var x = inst.abc
+var y = new inst.constructor()
+var z = y.abc";
+
+            var analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
                 analysis.GetTypeIdsByIndex("x", 0),
-                BuiltinTypeId.String
+                BuiltinTypeId.Number
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("z", 0),
+                BuiltinTypeId.Number
             );
         }
 
         [TestMethod, Priority(2)]
-        public void Failing_TestForInLoop2() {
-            var analysis = ProcessText("for(x in [1,2,3]) { }");
+        public void TestForInLoop() {
+            var analysis = ProcessText("for(var x in ['a','b','c']) { }");
             AssertUtil.ContainsExactly(
                 analysis.GetTypeIdsByIndex("x", 0),
-                BuiltinTypeId.String
+                BuiltinTypeId.Number
+            );
+        }
+
+        [TestMethod, Priority(2)]
+        public void FailingTestForInLoop2() {
+            var analysis = ProcessText("for(x in ['a','b','c']) { }");
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", 0),
+                BuiltinTypeId.Number
             );
         }
 
@@ -922,6 +1048,80 @@ var x = new f().bar;
 ");
             AssertUtil.ContainsExactly(
                 analysis.GetTypeIdsByIndex("x", 0)
+            );
+        }
+
+        /// <summary>
+        /// This shouldn't stack overflow...
+        /// </summary>
+        [TestMethod, Priority(0)]
+        public void TestRecursiveForEach() {
+            var analysis = ProcessText(@"
+var x = [null];
+x[0] = x.forEach;
+x.forEach(x.forEach);
+");
+        }
+
+        /// <summary>
+        /// Array instances created via array constructor should be unique
+        /// </summary>
+        [TestMethod, Priority(0)]
+        public void TestNewArrayUnique() {
+            var analysis = ProcessText(@"
+var arr1 = new Array(5);
+var arr2 = new Array(10);
+arr1.foo = 42;
+arr2.foo = 'abc';
+");
+
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("arr1.foo", 0),
+                BuiltinTypeId.Number
+            );
+
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("arr2.foo", 0),
+                BuiltinTypeId.String
+            );
+        }
+
+        /// <summary>
+        /// Array instances created via array constructor should be unique
+        /// </summary>
+        [TestMethod, Priority(0)]
+        public void TestNewObjectUnique() {
+            var analysis = ProcessText(@"
+var obj1 = new Object(5);
+var obj2 = new Object(10);
+obj1.foo = 42;
+obj2.foo = 'abc';
+");
+
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("obj1.foo", 0),
+                BuiltinTypeId.Number
+            );
+
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("obj2.foo", 0),
+                BuiltinTypeId.String
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestObjectInstanceNoPrototype() {
+            var analysis = ProcessText(@"
+var x = new Object().prototype;
+var y = {}.prototype;
+");
+
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", 0)
+            );
+
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("y", 0)
             );
         }
 

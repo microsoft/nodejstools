@@ -19,31 +19,33 @@ using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Values {
     [Serializable]
-    internal class FunctionValue : ExpandoValue {
+    internal class FunctionValue : ObjectValue {
         internal readonly InstanceValue _instance;
         internal ReferenceDict _references;
 
-        internal FunctionValue(ProjectEntry projectEntry, bool createPrototype = true, string name = null)
-            : base(projectEntry) {
-            _instance = new InstanceValue(ProjectEntry, this, description: "instance of " + name);
-            if (createPrototype) {
+        internal FunctionValue(ProjectEntry projectEntry, ExpandoValue prototype = null, string name = null)
+            : base(projectEntry, projectEntry.Analyzer._functionPrototype) {
+            if (prototype == null) {
                 string description = null;
 #if DEBUG
                 if (String.IsNullOrWhiteSpace(Name ?? name)) {
                     if (AnalysisUnit != null) {
                         var loc = Locations.First();
                         description = "prototype object of " + AnalysisUnit.FullName + " " + loc.FilePath + "(" + loc.Column + ")";
-                    } else {
+                    }
+                    else {
                         description = "prototype object of <unknown objects>";
                     }
-                } else {
+                }
+                else {
                     description = "prototype object of " + (Name ?? name);
                 }
 #endif
-                var prototype = new PrototypeValue(ProjectEntry, _instance, description: description);
-                Add("prototype", prototype.Proxy);
-                prototype.Add("constructor", this.Proxy);
+                prototype = new PrototypeValue(ProjectEntry, this, description: description);
             }
+            Add("prototype", prototype.Proxy);
+            prototype.Add("constructor", this.Proxy);
+            _instance = new InstanceValue(ProjectEntry, prototype, name);
         }
 
         public virtual IAnalysisSet ReturnTypes {
@@ -56,6 +58,13 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             get {
                 return _instance.SelfSet;
             }
+        }
+
+        public override void SetMember(Node node, AnalysisUnit unit, string name, IAnalysisSet value) {
+            if (name == "prototype") {
+                _instance.SetMember(node, unit, "__proto__", value);
+            }
+            base.SetMember(node, unit, name, value);
         }
 
         public override IAnalysisSet Construct(Node node, AnalysisUnit unit, IAnalysisSet[] args) {

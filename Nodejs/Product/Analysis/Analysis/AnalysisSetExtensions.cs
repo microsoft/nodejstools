@@ -71,7 +71,6 @@ namespace Microsoft.NodejsTools.Analysis {
             var res = AnalysisSet.Empty;
             foreach (var ns in self) {
                 var call = ns.Value.Call(node, unit, @this, args);
-                Debug.Assert(call != null);
 
                 res = res.Union(call);
             }

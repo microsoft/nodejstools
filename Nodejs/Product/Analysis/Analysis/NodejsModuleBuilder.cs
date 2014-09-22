@@ -101,7 +101,7 @@ namespace Microsoft.NodejsTools.Analysis {
             ObjectValue returnValue = null;
             if (methodName.StartsWith("create") && methodName.Length > 6) {
                 string klassName = methodName.Substring(6);
-                PropertyDescriptor propDesc;
+                PropertyDescriptorValue propDesc;
                 if (exports.Descriptors.TryGetValue(klassName, out propDesc) && propDesc.Values != null) {
                     var types = propDesc.Values.Types;
                     if (types != null && types.Count == 1) {
@@ -130,7 +130,6 @@ namespace Microsoft.NodejsTools.Analysis {
                         methodName,
                         returnValue.SelfSet,
                         ParseDocumentation((string)method["desc"]),
-                        true,
                         GetParameters(sig["params"])
                     );
                 } else {
@@ -138,7 +137,7 @@ namespace Microsoft.NodejsTools.Analysis {
                         exports.ProjectEntry,
                         methodName,
                         ParseDocumentation((string)method["desc"]),
-                        true,
+                        null,
                         GetParameters(sig["params"])
                     );
                 }
@@ -165,8 +164,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 exports.ProjectEntry,
                 fixedClassName,
                 overloads.ToArray(),
-                ParseDocumentation((string)klass["desc"]),
-                true
+                ParseDocumentation((string)klass["desc"])
             );
 
             exports.Add(klassValue);
@@ -198,7 +196,6 @@ namespace Microsoft.NodejsTools.Analysis {
             string name = FixClassName((string)klass["name"]);
             ObjectValue value = new BuiltinObjectValue(
                 exports.ProjectEntry,
-                null,
                 ParseDocumentation((string)klass["desc"])
             );
 

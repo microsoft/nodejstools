@@ -227,7 +227,7 @@ namespace Microsoft.NodejsTools.Analysis {
 
         internal ExportsValue InitNodejsVariables() {
             var filename = _analyzer.GetConstant(_filePath);
-            var dirName = _analyzer.GetConstant("");
+            var dirName = _analyzer.GetConstant(String.IsNullOrWhiteSpace(_filePath) ? "" : Path.GetDirectoryName(_filePath), alwaysCache: true);
             var module = _module = new ModuleValue(_filePath, _moduleRecord);
             var exports = new ExportsValue(_filePath, this);
             module.Add("exports", exports.Proxy);

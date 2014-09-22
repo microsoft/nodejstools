@@ -78,6 +78,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 }
                 return res;
             }
+
+            public bool IsEphemeral {
+                get {
+                    return true;
+                }
+            }
         }
 
         internal override IPropertyDescriptor GetProperty(Node node, AnalysisUnit unit, string name) {

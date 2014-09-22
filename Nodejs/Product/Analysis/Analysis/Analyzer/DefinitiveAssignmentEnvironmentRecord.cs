@@ -61,9 +61,10 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         internal override void ReplaceVariable(string name, VariableDef def) {
             if (_name != name) {
-                throw new InvalidOperationException("Replacing variable " + name);
+                Parent.ReplaceVariable(name, def);
+            } else {
+                _variable = def;
             }
-            _variable = def;
         }
 
         public override bool TryGetVariable(string name, out VariableDef variable) {

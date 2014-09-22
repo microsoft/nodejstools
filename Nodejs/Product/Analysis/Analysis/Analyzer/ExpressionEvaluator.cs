@@ -274,52 +274,37 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 IAnalysisSet targetRefs = ee.EvaluateReference(node, n, out @this);
 
                 foreach (var target in targetRefs) {
-                    if (target.Value == ee._unit.Analyzer._requireFunc && n.Arguments.Length == 1) {
-                        // we care a lot about require analysis and people do some pretty
-                        // crazy dynamic things for require calls.  If we let our normal
-                        // analysis and specialized function handle it we won't get things
-                        // like handling './' + somePath.  So we'll go ahead and handle
-                        // some special cases here...
-                        if (IsSpecialRequire(ee, node, n, ref res)) {
-                            continue;
-                        }
-                    }
-                    
                     res = res.Union(target.Call(node, ee._unit, @this, argTypes));
-                    
                 }
-
             }
             return res;
         }
 
-        private static bool IsSpecialRequire(ExpressionEvaluator ee, Node node, CallNode n, ref IAnalysisSet res) {
-            BinaryOperator binOp = n.Arguments[0] as BinaryOperator;
+        /// <summary>
+        /// Evaluates strings and produces the combined literal value.  We usually cannot do this
+        /// because we need to make sure that we're not constantly introducing new string literals
+        /// into the evaluation system.  Otherwise a recursive concatencating function could
+        /// cause an infinite analysis.  But in special situations, such as analyzing require calls,
+        /// where we know the value doesn't get introduced into the analysis system we want to get the 
+        /// fully evaluated string literals.
+        /// </summary>
+        public IEnumerable<string> MergeStringLiterals(Expression node) {
+            BinaryOperator binOp = node as BinaryOperator;
             if (binOp != null && binOp.OperatorToken == JSToken.Plus) {
-                var lhs = ee.EvaluateMaybeNull(binOp.Operand1);
-                var rhs = ee.EvaluateMaybeNull(binOp.Operand2);
-                foreach (var left in lhs) {
-                    var leftStr = left.Value.GetStringValue();
-                    if (leftStr != null) {
-                        foreach (var right in rhs) {
-                            var rightStr = right.Value.GetStringValue();
-                            if (rightStr != null) {
-                                res = res.Union(
-                                    ee._unit.Analyzer.Modules.RequireModule(
-                                        node,
-                                        ee._unit,
-                                        leftStr + rightStr,
-                                        ee._unit.DeclaringModuleEnvironment.Name
-                                    )
-                                );
-                            }
-                        }
+                foreach (var left in MergeStringLiterals(binOp.Operand1)) {
+                    foreach (var right in MergeStringLiterals(binOp.Operand2)) {
+                        yield return left + right;
                     }
                 }
-
-                return true;
+                yield break;
             }
-            return false;
+
+            foreach (var value in EvaluateMaybeNull(node)) {
+                var strValue = value.Value.GetStringValue();
+                if (strValue != null) {
+                    yield return strValue;
+                }
+            }
         }
 
         private IAnalysisSet EvaluateReference(Node node, CallNode n, out IAnalysisSet baseValue) {

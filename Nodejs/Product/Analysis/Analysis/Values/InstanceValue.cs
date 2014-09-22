@@ -17,16 +17,18 @@ using System;
 namespace Microsoft.NodejsTools.Analysis.Values {
     [Serializable]
     class InstanceValue : ObjectValue {
-        public InstanceValue(ProjectEntry projectEntry, FunctionValue creator, string description = null)
-            : base(projectEntry, creator, description) {
+        private readonly string _name;
+
+        public InstanceValue(ProjectEntry projectEntry, AnalysisValue prototype, string name = null)
+            : base(projectEntry, prototype, "instance of " + name) {
+            _name = name;
             projectEntry.Analyzer.AnalysisValueCreated(typeof(InstanceValue));
         }
 
         public override string ObjectDescription {
             get {
-                var name = _creator.Name;
-                if (name != null) {
-                    return name + " object";
+                if (_name != null) {
+                    return _name + " object";
                 }
 
                 return base.ObjectDescription;

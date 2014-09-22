@@ -64,7 +64,7 @@ namespace Microsoft.NodejsTools.Analysis {
         /// Enqueues any nodes which depend upon this type into the provided analysis queue for
         /// further analysis.
         /// </summary>
-        public void EnqueueDependents(ProjectEntry assigner = null, ProjectEntry declaringScope = null) {
+        public virtual void EnqueueDependents(ProjectEntry assigner = null, ProjectEntry declaringScope = null) {
             bool hasOldValues = false;
             foreach (var keyValue in _dependencies) {
                 if (keyValue.Key.AnalysisVersion == keyValue.Value.Version) {
@@ -108,6 +108,30 @@ namespace Microsoft.NodejsTools.Analysis {
     class DependentData : DependentData<DependencyInfo> {
         protected override DependencyInfo NewDefinition(int version) {
             return new DependencyInfo(version);
+        }
+    }
+
+    /// <summary>
+    /// A variable which is used locally and does not enqueue when written to.
+    /// 
+    /// Needs to be used in conjunction with a real variable that does the enqueuing.
+    /// 
+    /// This allows tempoarary specialization of a variable when analyzing a function
+    /// body so that we only see unique values and provide a more precise analysis.  An
+    /// example of this is:
+    /// 
+    /// var o = {};
+    /// var copied = {num:42, str:'100'};
+    /// for(var propName in copied) {
+    ///     Object.defineProperty(o, propName, {value: copied[propName]});
+    /// }
+    /// 
+    /// Where propName ends up only having the current value during analysis rather
+    /// then merging values together.
+    /// </summary>
+    [Serializable]
+    class LocalNonEnqueingVariableDef : VariableDef {
+        public override void EnqueueDependents(ProjectEntry assigner = null, ProjectEntry declaringScope = null) {
         }
     }
 

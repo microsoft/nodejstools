@@ -31,7 +31,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         private const int MaximumCallCount = 5;
 
         public UserFunctionValue(FunctionObject node, AnalysisUnit declUnit, EnvironmentRecord declScope, bool isNested = false)
-            : base(declUnit.ProjectEntry, true, node.Name ?? node.NameGuess) {
+            : base(declUnit.ProjectEntry, null, node.Name ?? node.NameGuess) {
             ReturnValue = new VariableDef();
             _funcObject = node;
             _analysisUnit = new FunctionAnalysisUnit(this, declUnit, declScope, ProjectEntry);
@@ -251,18 +251,13 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             // if the arguments are complex then we'll do a merged analysis, otherwise we'll analyze
             // this set of arguments independently.
             bool skipDeepAnalysis = false;
+            if (@this != null) {
+                skipDeepAnalysis |= CheckTooManyValues(unit, @this);
+            }
+
             for (int i = 0; i < args.Length; i++) {
-                int argCount = args[i].Count;
-                if (argCount <= 1) {
-                    continue;
-                }
-                foreach (var arg in args) {
-                    if (arg == unit.Analyzer._undefined || arg == unit.Analyzer._nullInst) {
-                        argCount--;
-                    }
-                }
-                if (argCount > 1) {
-                    skipDeepAnalysis = true;
+                skipDeepAnalysis |= CheckTooManyValues(unit, args[i]);
+                if (skipDeepAnalysis) {
                     break;
                 }
             }
@@ -325,6 +320,22 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 callInfo.ReturnValue.AddDependency(unit);
                 return callInfo.ReturnValue.GetTypes(unit, ProjectEntry);
             }
+        }
+
+        private bool CheckTooManyValues(AnalysisUnit unit, IAnalysisSet @this) {
+            int argCount = @this.Count;
+            if (argCount > 1) {
+                foreach (var arg in @this) {
+                    if (arg.Value == unit.Analyzer._undefined || arg.Value == unit.Analyzer._nullInst) {
+                        argCount--;
+                    }
+                }
+                if (argCount > 1) {
+                    _overflowed = OverflowState.OverflowedBigTime;
+                    return true;
+                }
+            }
+            return false;
         }
 
 

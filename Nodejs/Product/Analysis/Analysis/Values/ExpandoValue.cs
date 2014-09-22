@@ -29,7 +29,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         private readonly ProjectEntry _projectEntry;
         private readonly int _declVersion;
         internal readonly DependentKeyValue _keysAndValues;
-        private AnalysisDictionary<string, PropertyDescriptor> _descriptors;
+        private AnalysisDictionary<string, PropertyDescriptorValue> _descriptors;
         private Dictionary<object, object> _metadata;
         private AnalysisValue _next;
 
@@ -98,13 +98,11 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 
         internal override IPropertyDescriptor GetProperty(Node node, AnalysisUnit unit, string name) {
-            if (_descriptors == null) {
-                _descriptors = new AnalysisDictionary<string, PropertyDescriptor>();
-            }
+            EnsureDescriptors();
             
-            PropertyDescriptor desc;
+            PropertyDescriptorValue desc;
             if (!_descriptors.TryGetValue(name, out desc)) {
-                _descriptors[name] = desc = new PropertyDescriptor();
+                _descriptors[name] = desc = new PropertyDescriptorValue(ProjectEntry);
             }
 
             if (IsMutable(name)) {
@@ -126,10 +124,10 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 
         protected bool SetMemberWorker(Node node, AnalysisUnit unit, string name, IAnalysisSet value) {
-            PropertyDescriptor desc;
+            PropertyDescriptorValue desc;
             if (_descriptors != null && _descriptors.TryGetValue(name, out desc)) {
-                if (desc.Set != null) {
-                    desc.Set.GetTypesNoCopy(unit, ProjectEntry).Call(
+                if (desc.Setter != null) {
+                    desc.Setter.GetTypesNoCopy(unit, ProjectEntry).Call(
                         node,
                         unit,
                         AnalysisSet.Empty,
@@ -159,7 +157,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             if (_descriptors != null) {
                 foreach (var kvp in _descriptors) {
                     var key = kvp.Key;
-                    if (key == "prototype") {
+                    if (key == "prototype" || key == "__proto__") {
                         // including prototype can cause things to explode, and it's not
                         // enumerable anyway...  This should be replaced w/ more general
                         // support for non-enumerable properties.
@@ -173,8 +171,8 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                         }
                     }
 
-                    if (kvp.Value.Get != null) {
-                        foreach (var value in kvp.Value.Get.GetTypesNoCopy(unit, ProjectEntry)) {
+                    if (kvp.Value.Getter != null) {
+                        foreach (var value in kvp.Value.Getter.GetTypesNoCopy(unit, ProjectEntry)) {
                             res = res.Add(ProjectState.GetConstant(kvp.Key).Proxy);
                         }
                     }
@@ -184,7 +182,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 
         protected VariableDef GetValuesDef(string name) {
-            PropertyDescriptor desc = GetDescriptor(name);
+            var desc = GetDescriptor(name);
 
             VariableDef def = desc.Values;
             if (def == null) {
@@ -206,7 +204,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         public override IAnalysisSet GetIndex(Node node, AnalysisUnit unit, IAnalysisSet index) {
             _keysAndValues.AddDependency(unit);
-            var res = _keysAndValues.GetValueType(index);
+            var res = _keysAndValues.GetValueType(index, unit, ProjectEntry);
             foreach (var value in index) {
                 string strValue;
                 if ((strValue = value.Value.GetStringValue()) != null) {
@@ -263,6 +261,10 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 
         internal override Dictionary<string, IAnalysisSet> GetAllMembers(ProjectEntry accessor) {
+            return GetOwnProperties(accessor);
+        }
+
+        internal override Dictionary<string, IAnalysisSet> GetOwnProperties(ProjectEntry accessor) {
             if (_descriptors == null || _descriptors.Count == 0) {
                 return new Dictionary<string, IAnalysisSet>();
             }
@@ -271,18 +273,18 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             foreach (var kvp in _descriptors) {
                 var key = kvp.Key;
                 if (kvp.Value.Values != null) {
-                    var types = kvp.Value.Values.GetTypesNoCopy(accessor, ProjectEntry);
-                    kvp.Value.Values.ClearOldValues();
+                    //kvp.Value.Values.ClearOldValues();
                     if (kvp.Value.Values.VariableStillExists) {
-                        if (types.Count != 0 || 
+                        var types = kvp.Value.Values.GetTypesNoCopy(accessor, ProjectEntry);
+                        if (types.Count != 0 ||
                             kvp.Value.Values.TypesNoCopy.Count == 0) {
-                                MergeTypes(res, key, types);
+                            MergeTypes(res, key, types);
                         }
                     }
                 }
 
-                if (kvp.Value.Get != null) {
-                    foreach (var value in kvp.Value.Get.GetTypesNoCopy(accessor, ProjectEntry)) {
+                if (kvp.Value.Getter != null) {
+                    foreach (var value in kvp.Value.Getter.GetTypesNoCopy(accessor, ProjectEntry)) {
                         FunctionValue userFunc = value.Value as FunctionValue;
                         if (userFunc != null) {
                             MergeTypes(res, key, userFunc.ReturnTypes);
@@ -290,7 +292,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                     }
                 }
 
-                if (kvp.Value.Set != null) {
+                if (kvp.Value.Setter != null) {
                     MergeTypes(res, key, AnalysisSet.Empty);
                 }
             }
@@ -314,7 +316,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         /// Adds a member from the built-in module.
         /// </summary>
         public virtual VariableDef Add(string name, IAnalysisSet value) {
-            PropertyDescriptor desc = GetDescriptor(name);
+            var desc = GetDescriptor(name);
 
             VariableDef def = desc.Values;
             if (def == null) {
@@ -338,49 +340,57 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 
         public virtual void AddProperty(MemberAddInfo member) {
-            PropertyDescriptor desc = GetDescriptor(member.Name);
+            var desc = GetDescriptor(member.Name);
 
-            VariableDef def = desc.Get;
+            VariableDef def = desc.Getter;
             if (def == null) {
-                desc.Get = def = new VariableDef();
+                desc.Getter = def = new VariableDef();
             }
 
             def.AddTypes(ProjectState._builtinEntry, new ReturningFunctionValue(ProjectEntry, member.Name, member.Value.Proxy).Proxy);
         }
 
         public void AddProperty(Node node, AnalysisUnit unit, string name, AnalysisValue value) {
-            PropertyDescriptor desc = GetDescriptor(name);
+            var desc = GetDescriptor(name);
+
+            var descValue = value.Get(node, unit, "value", false);
+            if (descValue.Count > 0) {
+                if (desc.Values == null) {
+                    desc.Values = new VariableDef();
+                }
+                desc.Values.AddTypes(unit, descValue, declaringScope: DeclaringModule);
+            }
 
             var get = value.Get(node, unit, "get", false);
             if (get.Count > 0) {
-                if (desc.Get == null) {
-                    desc.Get = new VariableDef();
+                if (desc.Getter == null) {
+                    desc.Getter = new VariableDef();
                 }
-                desc.Get.AddTypes(unit, get, declaringScope: DeclaringModule);
+                desc.Getter.AddTypes(unit, get, declaringScope: DeclaringModule);
             }
 
             var set = value.Get(node, unit, "set", false);
             if (set.Count > 0) {
-                if (desc.Set == null) {
-                    desc.Set = new VariableDef();
+                if (desc.Setter == null) {
+                    desc.Setter = new VariableDef();
                 }
-                desc.Set.AddTypes(unit, set, declaringScope: DeclaringModule);
+                desc.Setter.AddTypes(unit, set, declaringScope: DeclaringModule);
             }
         }
 
-        private PropertyDescriptor GetDescriptor(string name) {
+        private PropertyDescriptorValue GetDescriptor(string name) {
             EnsureDescriptors();
 
-            PropertyDescriptor desc;
+            PropertyDescriptorValue desc;
             if (!_descriptors.TryGetValue(name, out desc)) {
-                _descriptors[name] = desc = new PropertyDescriptor();
+                _descriptors[name] = desc = new PropertyDescriptorValue(ProjectEntry);
             }
             return desc;
         }
 
         private void EnsureDescriptors() {
             if (_descriptors == null) {
-                _descriptors = new AnalysisDictionary<string, PropertyDescriptor>();
+                _descriptors = new AnalysisDictionary<string, PropertyDescriptorValue>();
             }
         }
 
@@ -393,7 +403,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
         }
 
-        public AnalysisDictionary<string, PropertyDescriptor> Descriptors {
+        public AnalysisDictionary<string, PropertyDescriptorValue> Descriptors {
             get {
                 return _descriptors;
             }
@@ -461,21 +471,21 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         #region IReferenceableContainer Members
 
         public virtual IEnumerable<IReferenceable> GetDefinitions(string name) {
-            PropertyDescriptor desc;
+            PropertyDescriptorValue desc;
             if (_descriptors != null && _descriptors.TryGetValue(name, out desc)) {
                 if (desc.Values != null) {
                     yield return desc.Values;
                 }
 
-                if (desc.Get != null) {
-                    foreach (var type in desc.Get.Types) {
+                if (desc.Getter != null) {
+                    foreach (var type in desc.Getter.Types) {
                         var func = type.Value as IReferenceable;
                         if (func != null) {
                             yield return func;
                         }
                     }
-                } else if (desc.Set != null) {
-                    foreach (var type in desc.Set.Types) {
+                } else if (desc.Setter != null) {
+                    foreach (var type in desc.Setter.Types) {
                         var func = type.Value as IReferenceable;
                         if (func != null) {
                             yield return func;
@@ -499,67 +509,35 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         internal void DefineSetter(AnalysisUnit unit, string nameStr, IAnalysisSet analysisSet) {
             EnsureDescriptors();
 
-            PropertyDescriptor propDesc;
+            PropertyDescriptorValue propDesc;
             if (!_descriptors.TryGetValue(nameStr, out propDesc)) {
-                _descriptors[nameStr] = propDesc = new PropertyDescriptor();
+                _descriptors[nameStr] = propDesc = new PropertyDescriptorValue(ProjectEntry);
             }
 
-            if (propDesc.Set == null) {
-                propDesc.Set = new VariableDef();
+            if (propDesc.Setter == null) {
+                propDesc.Setter = new VariableDef();
             }
-            propDesc.Set.AddTypes(unit, analysisSet, declaringScope: DeclaringModule);
+            propDesc.Setter.AddTypes(unit, analysisSet, declaringScope: DeclaringModule);
         }
 
         internal void DefineGetter(AnalysisUnit unit, string nameStr, IAnalysisSet analysisSet) {
             EnsureDescriptors();
-            PropertyDescriptor propDesc;
+            PropertyDescriptorValue propDesc;
             if (!_descriptors.TryGetValue(nameStr, out propDesc)) {
-                _descriptors[nameStr] = propDesc = new PropertyDescriptor();
+                _descriptors[nameStr] = propDesc = new PropertyDescriptorValue(ProjectEntry);
             }
 
-            if (propDesc.Get == null) {
-                propDesc.Get = new VariableDef();
+            if (propDesc.Getter == null) {
+                propDesc.Getter = new VariableDef();
             }
-            propDesc.Get.AddTypes(unit, analysisSet, declaringScope: DeclaringModule);
-        }
-    }
-
-    /// <summary>
-    /// Represents the descriptor state for a given property.
-    /// 
-    /// We track all of Values, Get, Set and merge them together,
-    /// so if a property is changing between the two we'll see
-    /// the union.
-    /// 
-    /// We don't currently track anything like writable/enumerable/configurable.
-    /// </summary>
-    [Serializable]
-    class PropertyDescriptor : IPropertyDescriptor {
-        public VariableDef Values, Get, Set;
-
-        public IAnalysisSet GetValue(Node node, AnalysisUnit unit, ProjectEntry declaringScope, IAnalysisSet @this, bool addRef) {
-            if (Values == null) {
-                Values = new EphemeralVariableDef();
-            }
-
-            // Don't add references to ephemeral values...  If they
-            // gain types we'll re-enqueue and the reference will be
-            // added then.
-            if (addRef && !Values.IsEphemeral) {
-                Values.AddReference(node, unit);
-            }
-
-            var res = Values.GetTypes(unit, declaringScope);
-
-            if (Get != null) {
-                res = res.Union(Get.GetTypesNoCopy(unit, declaringScope).Call(node, unit, @this, ExpressionEvaluator.EmptySets));
-            }
-
-            return res;
+            propDesc.Getter.AddTypes(unit, analysisSet, declaringScope: DeclaringModule);
         }
     }
 
     interface IPropertyDescriptor {
         IAnalysisSet GetValue(Node node, AnalysisUnit unit, ProjectEntry declaringScope, IAnalysisSet @this, bool addRef);
+        bool IsEphemeral {
+            get;
+        }
     }
 }

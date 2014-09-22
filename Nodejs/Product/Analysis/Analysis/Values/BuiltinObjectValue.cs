@@ -22,8 +22,8 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     class BuiltinObjectValue : ObjectValue {
         private readonly HashSet<string> _immutableMembers = new HashSet<string>();
 
-        public BuiltinObjectValue(ProjectEntry projectEntry, FunctionValue creator = null, string description = null)
-            : base(projectEntry, creator, description) {
+        public BuiltinObjectValue(ProjectEntry projectEntry, string description = null)
+            : base(projectEntry, null, description) {
         }
 
         public override VariableDef Add(string name, IAnalysisSet value) {
@@ -38,6 +38,18 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         public override bool IsMutable(string name) {
             return !_immutableMembers.Contains(name);
+        }
+    }
+
+    [Serializable]
+    class BuiltinObjectPrototypeValue : BuiltinObjectValue {
+
+        public BuiltinObjectPrototypeValue(ProjectEntry projectEntry, string description = null)
+            : base(projectEntry, description) {
+        }
+
+        public override string ToString() {
+            return "<Standard Object prototype>";
         }
     }
 }
