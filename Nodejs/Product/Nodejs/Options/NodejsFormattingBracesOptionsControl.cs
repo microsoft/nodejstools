@@ -17,20 +17,18 @@ using System.Windows.Forms;
 
 namespace Microsoft.NodejsTools.Options {
     public partial class NodejsFormattingBracesOptionsControl : UserControl {
-        private bool _loading = true;
-
         public NodejsFormattingBracesOptionsControl() {
             InitializeComponent();
-            _newLineForControlBlocks.Checked = NodejsPackage.Instance.FormattingBracesOptionsPage.BraceOnNewLineForControlBlocks;
-            _newLineForFunctions.Checked = NodejsPackage.Instance.FormattingBracesOptionsPage.BraceOnNewLineForFunctions;
-            _loading = false;
         }
 
-        private void CheckedChanged(object sender, EventArgs e) {
-            if (!_loading) {
-                NodejsPackage.Instance.FormattingBracesOptionsPage.BraceOnNewLineForControlBlocks = _newLineForControlBlocks.Checked;
-                NodejsPackage.Instance.FormattingBracesOptionsPage.BraceOnNewLineForFunctions = _newLineForFunctions.Checked;
-            }
+        internal void SyncPageWithControlSettings(NodejsFormattingBracesOptionsPage page) {
+            page.BraceOnNewLineForControlBlocks = _newLineForControlBlocks.Checked;
+            page.BraceOnNewLineForFunctions = _newLineForFunctions.Checked;
+        }
+
+        internal void SyncControlWithPageSettings(NodejsFormattingBracesOptionsPage page) {
+            _newLineForControlBlocks.Checked = page.BraceOnNewLineForControlBlocks;
+            _newLineForFunctions.Checked = page.BraceOnNewLineForFunctions;
         }
     }
 }

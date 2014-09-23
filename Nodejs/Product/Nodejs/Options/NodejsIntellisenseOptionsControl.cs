@@ -84,5 +84,17 @@ namespace Microsoft.NodejsTools.Options {
                 _completionCommittedBy.Text = value;
             }
         }
+
+        internal void SyncPageWithControlSettings(NodejsIntellisenseOptionsPage page) {
+            page.AnalysisLevel = AnalysisLevel;
+            page.AnalysisLogMax = AnalysisLogMaximum;
+            page.CompletionCommittedBy = CompletionCommittedBy;
+        }
+
+        internal void SyncControlWithPageSettings(NodejsIntellisenseOptionsPage page) {
+            AnalysisLevel = page.AnalysisLevel;
+            AnalysisLogMaximum = page.AnalysisLogMax;
+            CompletionCommittedBy = page.CompletionCommittedBy;
+        }
     }
 }

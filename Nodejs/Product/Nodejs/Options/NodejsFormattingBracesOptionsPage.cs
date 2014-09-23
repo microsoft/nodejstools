@@ -29,7 +29,9 @@ namespace Microsoft.NodejsTools.Options {
             get {
                 if (_window == null) {
                     _window = new NodejsFormattingBracesOptionsControl();
+                    LoadSettingsFromStorage();
                 }
+
                 return _window;
             }
         }
@@ -51,11 +53,23 @@ namespace Microsoft.NodejsTools.Options {
         private const string BraceOnNewLineForControlBlocksSetting = "BraceOnNewLineForControlBlocks";
 
         public override void LoadSettingsFromStorage(){
+            // Load settings from storage.
             BraceOnNewLineForFunctions = LoadBool(BraceOnNewLineForFunctionsSetting) ?? false;
             BraceOnNewLineForControlBlocks = LoadBool(BraceOnNewLineForControlBlocksSetting) ?? false;
+
+            // Synchronize UI with backing properties.
+            if (_window != null) {
+                _window.SyncControlWithPageSettings(this);
+            }
         }
 
         public override void SaveSettingsToStorage() {
+            // Synchronize backing properties with UI.
+            if (_window != null) {
+                _window.SyncPageWithControlSettings(this);
+            }
+
+            // Save settings.
             SaveBool(BraceOnNewLineForFunctionsSetting, BraceOnNewLineForFunctions);
             SaveBool(BraceOnNewLineForControlBlocksSetting, BraceOnNewLineForControlBlocks);
         }

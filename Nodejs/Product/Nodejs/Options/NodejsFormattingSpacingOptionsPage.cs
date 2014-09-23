@@ -29,6 +29,7 @@ namespace Microsoft.NodejsTools.Options {
             get {
                 if (_window == null) {
                     _window = new NodejsFormattingSpacingOptionsControl();
+                    LoadSettingsFromStorage();
                 }
                 return _window;
             }
@@ -59,15 +60,27 @@ namespace Microsoft.NodejsTools.Options {
         private const string SpaceAfterOpeningAndBeforeClosingNonEmptyParensSetting = "SpaceAfterOpeningAndBeforeClosingNonEmptyParens";
 
         public override void LoadSettingsFromStorage() {
+            // Load settings from storage.
             SpaceAfterComma = LoadBool(SpaceAfterCommaSetting) ?? true;
             SpaceAfterSemicolonInFor = LoadBool(SpaceAfterSemicolonInForSetting) ?? true;
             SpaceBeforeAndAfterBinaryOperator = LoadBool(SpaceBeforeAndAfterBinaryOperatorSetting) ?? true;
             SpaceAfterKeywordsInControlFlow = LoadBool(SpaceAfterKeywordsInControlFlowSetting) ?? true;
             SpaceAfterFunctionKeywordForAnonymousFunctions = LoadBool(SpaceAfterFunctionKeywordForAnonymousFunctionsSetting) ?? true;
             SpaceAfterOpeningAndBeforeClosingNonEmptyParens = LoadBool(SpaceAfterOpeningAndBeforeClosingNonEmptyParensSetting) ?? false;
+
+            // Synchronize UI with backing properties.
+            if (_window != null) {
+                _window.SyncControlWithPageSettings(this);
+            }
         }
 
         public override void SaveSettingsToStorage() {
+            // Synchronize backing properties with UI.
+            if (_window != null) {
+                _window.SyncPageWithControlSettings(this);
+            }
+            
+            // Save settings.
             SaveBool(SpaceAfterCommaSetting, SpaceAfterComma);
             SaveBool(SpaceAfterSemicolonInForSetting, SpaceAfterSemicolonInFor);
             SaveBool(SpaceBeforeAndAfterBinaryOperatorSetting, SpaceBeforeAndAfterBinaryOperator);

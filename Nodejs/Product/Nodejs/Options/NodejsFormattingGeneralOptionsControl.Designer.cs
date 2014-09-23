@@ -80,7 +80,6 @@
             this._formatOnPaste.TabIndex = 3;
             this._formatOnPaste.Text = "Format on &paste";
             this._formatOnPaste.UseVisualStyleBackColor = true;
-            this._formatOnPaste.CheckedChanged += new System.EventHandler(this.CheckedChanged);
             // 
             // _formatOnCloseBrace
             // 
@@ -91,7 +90,6 @@
             this._formatOnCloseBrace.TabIndex = 2;
             this._formatOnCloseBrace.Text = "Format completed &block on }";
             this._formatOnCloseBrace.UseVisualStyleBackColor = true;
-            this._formatOnCloseBrace.CheckedChanged += new System.EventHandler(this.CheckedChanged);
             // 
             // _formatOnSemicolon
             // 
@@ -102,7 +100,6 @@
             this._formatOnSemicolon.TabIndex = 1;
             this._formatOnSemicolon.Text = "Format completed &statement on ;";
             this._formatOnSemicolon.UseVisualStyleBackColor = true;
-            this._formatOnSemicolon.CheckedChanged += new System.EventHandler(this.CheckedChanged);
             // 
             // _formatOnEnter
             // 
@@ -113,7 +110,6 @@
             this._formatOnEnter.TabIndex = 0;
             this._formatOnEnter.Text = "Format completed line on &Enter";
             this._formatOnEnter.UseVisualStyleBackColor = true;
-            this._formatOnEnter.CheckedChanged += new System.EventHandler(this.CheckedChanged);
             // 
             // NodejsFormattingGeneralOptionsControl
             // 
@@ -139,6 +135,5 @@
         private System.Windows.Forms.CheckBox _formatOnCloseBrace;
         private System.Windows.Forms.CheckBox _formatOnSemicolon;
         private System.Windows.Forms.CheckBox _formatOnEnter;
-
     }
 }
