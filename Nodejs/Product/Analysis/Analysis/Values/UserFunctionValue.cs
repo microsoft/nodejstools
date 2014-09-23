@@ -89,11 +89,8 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 var result = new StringBuilder();
                 {
                     result.Append("function ");
-                    if (FunctionObject.Name != null) {
-                        result.Append(FunctionObject.Name);
-                    } else {
-                        result.Append("<anonymous>");
-                    }
+                    var name = FunctionObject.Name ?? FunctionObject.NameGuess ?? "<anonymous>";
+                    result.Append(name);
                     result.Append("(");
                     AddParameterString(result);
                     result.Append(")");
@@ -243,7 +240,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                     ).ToArray();
                 }
 
-                yield return new SimpleOverloadResult(FunctionObject.Name ?? "<anonymous function>", Documentation, parameterResults);
+                yield return new SimpleOverloadResult(FunctionObject.Name ?? FunctionObject.NameGuess ?? "<anonymous function>", Documentation, parameterResults);
             }
         }
 

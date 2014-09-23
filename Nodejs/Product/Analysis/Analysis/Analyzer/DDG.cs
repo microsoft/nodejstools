@@ -169,35 +169,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             return false;
         }
 
-        //public override bool Walk(ForIn node) {
-        //    var coll = _eval.Evaluate(node.Collection);
-        //    var variable = node.Variable as Var;
-        //    var lookupVar = node.Variable as ExpressionStatement;
-        //    foreach (var value in coll) {
-        //        if (value.Value is ExportsValue) 
-        //        {
-        //            var values = value.GetEnumerationValues(node, _unit);
-        //            if (values.Count < 20) {
-        //                Debug.WriteLine(String.Format("Enumerating: {1} {0}", value, values.Count));
-        //                if (variable != null) {
-        //                    _eval.Scope.AssignVariable(
-        //                        variable.First().Name,
-        //                        node,
-        //                        _unit,
-        //                        values
-        //                    );
-        //                } else if (lookupVar != null) {
-        //                    //_eval.AssignTo(node, lookupVar.Expression, values);
-        //                }
-        //            }
-        //        }
-        //    }
-
-        //    node.Body.Walk(this);
-
-        //    return false;
-        //}
-
         public override bool Walk(ForIn node) {
             var coll = _eval.Evaluate(node.Collection);
             var variable = node.Variable as Var;
@@ -209,43 +180,31 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 bool walkedBody = false;
                 if (coll.Count == 1) {
                     foreach (var value in coll) {
-                        //if (value.Value is FunctionValue) {
-                        //    continue;
-                        //}
                         var values = value.GetEnumerationValues(node, _unit);
                         if (values.Count < 50) {
-                            //bool nonStringValue = false;
-                            //foreach (var individualValue in values) {
-                            //    if (!(individualValue.Value is StringValue)) {
-                            //        nonStringValue = true;
-                            //        break;
-                            //    }
-                            //}
-                            //if (!nonStringValue) {
-                                walkedBody = true;
-                                Debug.WriteLine(String.Format("Enumerating: {1} {0}", value, values.Count));
+                            walkedBody = true;
+                            Debug.WriteLine(String.Format("Enumerating: {1} {0}", value, values.Count));
 
-                                foreach (var individualValue in values) {
-                                    var newVar = new LocalNonEnqueingVariableDef();
-                                    _eval.Scope.ReplaceVariable(variable.First().Name, newVar);
+                            foreach (var individualValue in values) {
+                                var newVar = new LocalNonEnqueingVariableDef();
+                                _eval.Scope.ReplaceVariable(variable.First().Name, newVar);
 
-                                    _eval.Scope.AssignVariable(
-                                        varName,
-                                        node,
-                                        _unit,
-                                        individualValue
-                                    );
-                                    node.Body.Walk(this);
-                                    prevVar.AddTypes(
-                                        _unit,
-                                        newVar.GetTypesNoCopy(
-                                            _unit.ProjectEntry,
-                                            _unit.ProjectEntry
-                                        )
-                                    );
-                                }
+                                _eval.Scope.AssignVariable(
+                                    varName,
+                                    node,
+                                    _unit,
+                                    individualValue
+                                );
+                                node.Body.Walk(this);
+                                prevVar.AddTypes(
+                                    _unit,
+                                    newVar.GetTypesNoCopy(
+                                        _unit.ProjectEntry,
+                                        _unit.ProjectEntry
+                                    )
+                                );
                             }
-                        //}
+                        }
                     }
                 }
 

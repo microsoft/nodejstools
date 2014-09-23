@@ -26,13 +26,383 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
     /// </summary>
     internal partial class OverviewWalker {
         private static ExpectedLookup ObjectLookup = new ExpectedLookup("Object");
-        private static Dictionary<string, FunctionSpecialization> _specializations = new Dictionary<string, FunctionSpecialization>() { 
-            { "merge", MergeSpecialization() },
-            { "copy", CopySpecialization() },
-            { "create", CreateSpecialization() },
-            { "keys", ObjectKeysSpecialization() },
-            { "setProto", SetProtoSpecialization() },
+        private static Dictionary<string, FunctionSpecialization[]> _specializations = new Dictionary<string, FunctionSpecialization[]>() { 
+            { "merge", new[] { MergeSpecialization() } },
+            { "copy", new[] { CopySpecialization() }},
+            { "create", new[] { CreateSpecialization() }},
+            { "keys", new[] { ObjectKeysSpecialization() }},
+            { "setProto", new[] { SetProtoSpecialization() } },
+            { "extend", new[] { BackboneExtendSpecialization(), UnderscoreExtendSpecialization() } },
         };
+
+        /// <summary>
+        /// function extend(protoProps, staticProps) {
+        ///   var parent = this;
+        ///   var child;
+        ///   
+        ///   if (protoProps && _.has(protoProps, 'constructor')) {
+        ///     child = protoProps.constructor;
+        ///   } else {
+        ///     child = function(){ return parent.apply(this, arguments); };
+        ///   }
+        ///
+        ///   _.extend(child, parent, staticProps);
+        ///   
+        ///   var Surrogate = function(){ this.constructor = child; };
+        ///   Surrogate.prototype = parent.prototype;
+        ///   child.prototype = new Surrogate;
+        ///
+        ///   if (protoProps) _.extend(child.prototype, protoProps);
+        ///
+        ///   child.__super__ = parent.prototype;
+        ///
+        ///   return child;
+        /// };
+        /// </summary>
+        /// <returns></returns>
+        private static FunctionSpecialization BackboneExtendSpecialization() {
+            var protoProps = new ExpectedParameter(0);
+            var staticProps = new ExpectedParameter(1);
+            var parentVar = new ExpectedVariableDeclaration(new ExpectedNode(typeof(ThisLiteral)));
+            var childVar = new ExpectedVariableDeclaration();
+            var underscore = new ExpectedLookup("_");
+            var thisNode = new ExpectedNode(typeof(ThisLiteral));
+            var surrogate = new ExpectedVariableDeclaration(
+                new ExpectedFunctionExpr(
+                    new ExpectedNode(
+                        typeof(Block),
+                        new ExpectedNode(
+                            typeof(ExpressionStatement),
+                            new ExpectedBinary(
+                                JSToken.Assign,
+                                new ExpectedMember(
+                                    thisNode,
+                                    "constructor"
+                                ),
+                                childVar.Variable
+                            )
+                        )
+                    )
+                )
+            );
+
+            return new FunctionSpecialization(
+                BackboneExtendSpecializationImpl,
+                false,
+                parentVar,
+                childVar,
+                new ExpectedNode(
+                    typeof(IfNode),
+                    new ExpectedBinary(
+                        JSToken.LogicalAnd,
+                        protoProps,
+                        new ExpectedCall(
+                            new ExpectedMember(underscore, "has"),
+                            protoProps,
+                            new ExpectedConstant("constructor")
+                        )
+                    ),
+                    new ExpectedNode(
+                        typeof(Block),
+                        new ExpectedNode(
+                            typeof(ExpressionStatement),
+                            new ExpectedBinary(
+                                JSToken.Assign,
+                                childVar.Variable,
+                                new ExpectedMember(
+                                    protoProps,
+                                    "constructor"
+                                )
+                            )
+                        )
+                    ),
+                    new ExpectedNode(
+                        typeof(Block),
+                        new ExpectedNode(
+                            typeof(ExpressionStatement),
+                            new ExpectedBinary(
+                                JSToken.Assign,
+                                childVar.Variable,
+                                new ExpectedFunctionExpr(
+                                    new ExpectedNode(
+                                        typeof(Block),
+                                        new ExpectedNode(
+                                            typeof(ReturnNode),
+                                            new ExpectedCall(
+                                                new ExpectedMember(parentVar.Variable, "apply"),
+                                                thisNode,
+                                                new ExpectedLookup("arguments")
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                ),
+                new ExpectedNode(
+                    typeof(ExpressionStatement),
+                    new ExpectedCall(
+                        new ExpectedMember(underscore, "extend"),
+                        childVar.Variable,
+                        parentVar.Variable,
+                        staticProps
+                    )
+                ),
+                surrogate,
+                new ExpectedNode(
+                    typeof(ExpressionStatement),
+                    new ExpectedBinary(
+                        JSToken.Assign,
+                        new ExpectedMember(surrogate.Variable, "prototype"),
+                        new ExpectedMember(parentVar.Variable, "prototype")
+                    )
+                ),
+                new ExpectedNode(
+                    typeof(ExpressionStatement),
+                    new ExpectedBinary(
+                        JSToken.Assign,
+                        new ExpectedMember(childVar.Variable, "prototype"),
+                        new ExpectedNew(surrogate.Variable)
+                    )
+                ),
+                new ExpectedNode(
+                    typeof(IfNode),
+                    protoProps,
+                    new ExpectedNode(
+                        typeof(Block),
+                        new ExpectedNode(
+                            typeof(ExpressionStatement),
+                            new ExpectedCall(
+                                new ExpectedMember(underscore, "extend"),
+                                new ExpectedMember(childVar.Variable, "prototype"),
+                                protoProps
+                            )
+                        )
+                    )
+                ),
+                new ExpectedNode(
+                    typeof(ExpressionStatement),
+                    new ExpectedBinary(
+                        JSToken.Assign,
+                        new ExpectedMember(childVar.Variable, "__super__"),
+                        new ExpectedMember(parentVar.Variable, "prototype")
+                    )
+                ),
+                new ExpectedNode(
+                    typeof(ReturnNode),
+                    childVar.Variable
+                )
+            );
+        }
+
+        internal class BackboneExtendFunctionValue : FunctionValue {
+            internal readonly PrototypeValue _prototype;
+
+            public BackboneExtendFunctionValue(ProjectEntry declaringEntry) :
+                base(declaringEntry) {
+                _prototype = (PrototypeValue)Descriptors["prototype"].Values.TypesNoCopy.First().Value;
+            }
+        }
+
+        private static IAnalysisSet BackboneExtendSpecializationImpl(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            IAnalysisSet res = AnalysisSet.Empty;
+            BackboneExtendFunctionValue value;
+            if (!unit._env.GlobalEnvironment.TryGetNodeValue(NodeEnvironmentKind.ExtendCall, node, out res)) {
+                value = new BackboneExtendFunctionValue(
+                    unit.ProjectEntry
+                );
+                res = value.SelfSet;
+                unit._env.GlobalEnvironment.AddNodeValue(
+                    NodeEnvironmentKind.ExtendCall, 
+                    node, 
+                    value.SelfSet
+                );
+            } else {
+                value = (BackboneExtendFunctionValue)res.First().Value;
+            }
+
+            if (@this != null) {
+                value._instance.SetMember(
+                    node,
+                    unit,
+                    "__proto__",
+                    @this.Construct(node, unit, args)
+                );
+            }
+
+            if (args.Length > 0) {
+                foreach (var protoProps in args[0]) {
+                    ExpandoValue expandoProto = protoProps.Value as ExpandoValue;
+                    if (expandoProto != null) {
+                        value._prototype.AddLinkedValue(unit, expandoProto);
+                    }
+                }
+            }
+
+            if (args.Length > 1) {
+                foreach (var protoProps in args[1]) {
+                    ExpandoValue expandoProto = protoProps.Value as ExpandoValue;
+                    if (expandoProto != null) {
+                        value.AddLinkedValue(unit, expandoProto);
+                    }
+                }
+            }
+
+            return res;
+        }
+
+        /// <summary>
+        /// function(obj) {
+        ///    if (!_.isObject(obj)) return obj;
+        ///    var source, prop;
+        ///    for (var i = 1, length = arguments.length; i < length; i++) {
+        ///      source = arguments[i];
+        ///      for (prop in source) {
+        ///        if (hasOwnProperty.call(source, prop)) {
+        ///            obj[prop] = source[prop];
+        ///        }
+        ///      }
+        ///    }
+        ///    return obj;
+        ///  };
+        ///
+        /// </summary>
+        /// <returns></returns>
+        private static FunctionSpecialization UnderscoreExtendSpecialization() {
+            var objParam = new ExpectedParameter(0);
+            var sourceVar = new ExpectedVariableDeclaration();
+            var propVar = new ExpectedVariableDeclaration();
+            var iVar = new ExpectedVariableDeclaration(new ExpectedConstant(1.0));
+            var arguments = new ExpectedLookup("arguments");
+            var lengthVar = new ExpectedVariableDeclaration(new ExpectedMember(arguments, "length"));
+            var retNode = new ExpectedNode(typeof(ReturnNode), objParam);
+
+            return new FunctionSpecialization(
+                ExtendSpecializationImpl,
+                false,
+                new ExpectedNode(
+                    typeof(IfNode),
+                    new ExpectedUnary(
+                        JSToken.LogicalNot,
+                        new ExpectedCall(
+                            new ExpectedMember(
+                                new ExpectedLookup("_"),
+                                "isObject"
+                            ),
+                            objParam
+                        )
+                    ),
+                    new ExpectedNode(
+                        typeof(Block),
+                        retNode
+                    )
+                ),
+                new ExpectedVar(
+                    sourceVar,
+                    propVar
+                ),
+                new ExpectedNode(
+                    typeof(ForNode),
+                    new ExpectedVar(
+                        iVar,
+                        lengthVar
+                    ),
+                    new ExpectedBinary(
+                        JSToken.LessThan,
+                        iVar.Variable,
+                        lengthVar.Variable
+                    ),
+                    new ExpectedUnary(
+                        JSToken.Increment,
+                        iVar.Variable
+                    ),
+                    new ExpectedNode(
+                        typeof(Block),
+                        new ExpectedNode(
+                            typeof(ExpressionStatement),
+                            new ExpectedBinary(
+                                JSToken.Assign,
+                                sourceVar.Variable,
+                                new ExpectedIndex(
+                                    arguments,
+                                    iVar.Variable
+                                )
+                            )
+                        ),
+                        new ExpectedNode(
+                            typeof(ForIn),
+                            new ExpectedNode(
+                                typeof(ExpressionStatement),
+                                propVar.Variable
+                            ),
+                            sourceVar.Variable,
+                            new ExpectedNode(
+                                typeof(Block),
+                                new ExpectedNode(
+                                    typeof(IfNode),
+                                    new ExpectedCall(
+                                        new ExpectedMember(
+                                            new ExpectedLookup("hasOwnProperty"),
+                                            "call"
+                                        ),
+                                        sourceVar.Variable,
+                                        propVar.Variable
+                                    ),
+                                    new ExpectedNode(
+                                        typeof(Block),
+                                        new ExpectedNode(
+                                            typeof(ExpressionStatement),
+                                            new ExpectedBinary(
+                                                JSToken.Assign,
+                                                new ExpectedIndex(
+                                                    objParam,
+                                                    propVar.Variable
+                                                ),
+                                                new ExpectedIndex(
+                                                    sourceVar.Variable,
+                                                    propVar.Variable
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                ),
+                retNode
+            );
+        }
+
+        private static IAnalysisSet ExtendSpecializationImpl(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            if (args.Length >= 1) {
+                var obj = args[0];
+                if (args.Length >= 2) {
+                    foreach (var targetValue in obj) {
+                        var target = targetValue.Value as ExpandoValue;
+                        if (target == null || target is BuiltinObjectPrototypeValue) {
+                            continue;
+                        }
+
+                        for (int i = 1; i < args.Length; i++) {
+                            var curArg = args[i];
+
+                            foreach (var sourceValue in curArg) {
+                                var source = sourceValue.Value as ExpandoValue;
+                                if (source == null) {
+                                    continue;
+                                }
+
+                                target.AddLinkedValue(unit, source);
+                            }
+                        }
+                    }
+                }
+                return obj;
+            }
+            return AnalysisSet.Empty;
+        }
 
         /// <summary>
         /// function setProto(obj, proto) {
@@ -351,7 +721,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                             continue;
                         }
 
-                        target.AddLinkedValue(source);
+                        target.AddLinkedValue(unit, source);
                     }
                 }
 
@@ -428,6 +798,41 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                     // lack of matches...
                     return false;
                 }
+            }
+        }
+
+        class ExpectedVar : ExpectedChild {
+            private readonly ExpectedVariableDeclaration[] _decls;
+
+            public ExpectedVar(params ExpectedVariableDeclaration[] decls) {
+                _decls = decls;
+            }
+
+            public override bool IsMatch(MatchState state, Node node) {
+                if (node.GetType() != typeof(Var)) {
+                    return NoMatch;
+                }
+
+                Var var = (Var)node;
+                if (var.Count != _decls.Length) {
+                    return NoMatch;
+                }
+
+                for (int i = 0; i < _decls.Length; i++) {
+                    var decl = _decls[i];
+
+                    if (var[i].Initializer != null) {
+                        if (decl.Initializer == null ||
+                            !decl.Initializer.IsMatch(state, var[i].Initializer)) {
+                            return NoMatch;
+                        }
+                    } else if (decl.Initializer != null) {
+                        return NoMatch;
+                    }
+                    state[decl] = var[i].VariableField;
+                }
+
+                return true;
             }
         }
 
@@ -681,7 +1086,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         class ExpectedConstant : ExpectedChild {
             public readonly object Value;
 
-            public ExpectedConstant(string value) {
+            public ExpectedConstant(object value) {
                 Value = value;
             }
 

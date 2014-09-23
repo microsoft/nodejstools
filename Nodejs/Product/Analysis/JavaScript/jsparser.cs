@@ -830,6 +830,10 @@ namespace Microsoft.NodejsTools.Parsing
                             span = span.UpdateWith(GetSpan(assignmentExpr));
                         }
                     }
+
+                    if (assignmentExpr is FunctionExpression) {
+                        ((FunctionExpression)assignmentExpr).Function.NameGuess = variableName;
+                    }
                 }
             }
             catch (RecoveryTokenException exc)
@@ -3688,6 +3692,14 @@ namespace Microsoft.NodejsTools.Parsing
                                     Value = value
                                 };
 
+                                FunctionExpression functionExpr = value as FunctionExpression;
+                                if (functionExpr != null) {
+                                    string fieldName = field.Value as string;
+                                    if (fieldName != null) {
+                                        functionExpr.Function.NameGuess = fieldName;
+                                    }
+                                }
+
                                 propertyList.Add(property);
 
                                 if (JSToken.RightCurly == _curToken) {
@@ -4149,9 +4161,14 @@ namespace Microsoft.NodejsTools.Parsing
             switch (token)
             {
                 case JSToken.Assign:
-                    if (operand1 is Member && 
+                    if (operand1 is Member &&
                         operand2 is FunctionExpression) {
                         ((FunctionExpression)operand2).Function.NameGuess = ((Member)operand1).Name;
+                    }
+                    
+                    if (operand1 is Lookup && 
+                        operand2 is FunctionExpression) {
+                        ((FunctionExpression)operand2).Function.NameGuess = ((Lookup)operand1).Name;
                     }
                     // fall through
                     goto case JSToken.BitwiseAnd;

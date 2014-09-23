@@ -94,10 +94,12 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             var matches = new Dictionary<AnalysisProxy, List<KeyValuePair<AnalysisProxy, IAnalysisSet>>>(cmp);
             foreach (var keyValue in KeyValues) {
                 List<KeyValuePair<AnalysisProxy, IAnalysisSet>> values;
-                if (!matches.TryGetValue(keyValue.Key, out values)) {
-                    values = matches[keyValue.Key] = new List<KeyValuePair<AnalysisProxy, IAnalysisSet>>();
+                if (keyValue.Key.Value != null) {
+                    if (!matches.TryGetValue(keyValue.Key, out values)) {
+                        values = matches[keyValue.Key] = new List<KeyValuePair<AnalysisProxy, IAnalysisSet>>();
+                    }
+                    values.Add(keyValue);
                 }
-                values.Add(keyValue);
             }
 
             KeyValues = new AnalysisDictionary<AnalysisProxy, IAnalysisSet>(cmp);

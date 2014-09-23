@@ -203,10 +203,25 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 node,
                 out value)) {
                 var objectInfo = (ObjectLiteralValue)value.First().Value;
-                if (n.Properties.Length > 50) {
-                    // probably some generated object literal, ignore it
-                    // for the post part.
-                    AssignProperty(ee, node, objectInfo, n.Properties.First());
+                int maxProperties = ee._unit.Analyzer.Limits.MaxObjectLiteralProperties;
+                if (n.Properties.Length > maxProperties) {
+                    int nonFunctionCount = 0;
+                    foreach (var prop in n.Properties) {
+                        FunctionExpression func = prop.Value as FunctionExpression;
+                        if (func == null) {
+                            nonFunctionCount++;
+                        }
+                    }
+
+                    if (nonFunctionCount > maxProperties) {
+                        // probably some generated object literal, ignore it
+                        // for the post part.
+                        AssignProperty(ee, node, objectInfo, n.Properties.First());
+                    } else {
+                        foreach (var x in n.Properties) {
+                            AssignProperty(ee, node, objectInfo, x);
+                        }
+                    }
                 } else {
                     foreach (var x in n.Properties) {
                         AssignProperty(ee, node, objectInfo, x);

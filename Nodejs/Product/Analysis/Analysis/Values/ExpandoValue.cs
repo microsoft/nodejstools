@@ -31,7 +31,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         internal readonly DependentKeyValue _keysAndValues;
         private AnalysisDictionary<string, PropertyDescriptorValue> _descriptors;
         private Dictionary<object, object> _metadata;
-        private AnalysisValue _next;
+        private TypedDef _linkedValues;
 
         internal ExpandoValue(ProjectEntry projectEntry) : base(projectEntry) {
             _projectEntry = projectEntry;
@@ -87,13 +87,6 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 res = AnalysisSet.Empty;
             }
             
-            if (_next != null && _next.Push()) {
-                try {
-                    res = res.Union(_next.Get(node, unit, name, addRef));
-                } finally {
-                    _next.Pop();
-                }
-            }
             return res;
         }
 
@@ -112,7 +105,56 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 desc.Values.AddDependency(unit);
             }
 
+            if (_linkedValues != null) {
+                foreach (var link in _linkedValues.GetTypes(unit, DeclaringModule)) {
+                    ExpandoValue expando = link.Value as ExpandoValue;
+                    if (expando._descriptors != null && expando._descriptors.ContainsKey(name)) {
+                        return new MergedPropertyDescriptor(
+                            this,
+                            desc,
+                            name
+                        );
+                    }
+                }
+            }
+
             return desc;
+        }
+
+        [Serializable]
+        internal class MergedPropertyDescriptor : IPropertyDescriptor {
+            private readonly ExpandoValue _instance;
+            private readonly string _name;
+            private readonly PropertyDescriptorValue _propDesc;
+
+            public MergedPropertyDescriptor(ExpandoValue instance, PropertyDescriptorValue propDesc, string name) {
+                _instance = instance;
+                _propDesc = propDesc;
+                _name = name;
+            }
+
+            public IAnalysisSet GetValue(Node node, AnalysisUnit unit, ProjectEntry declaringScope, IAnalysisSet @this, bool addRef) {
+                IAnalysisSet res = _propDesc.GetValue(node, unit, declaringScope, @this, addRef);
+                foreach (var prototype in _instance._linkedValues.GetTypes(unit, declaringScope)) {
+                    if (prototype.Value.Push()) {
+                        try {
+                            var value = prototype.Value.GetProperty(node, unit, _name);
+                            if (value != null) {
+                                res = res.Union(value.GetValue(node, unit, declaringScope, @this, addRef));
+                            }
+                        } finally {
+                            prototype.Value.Pop();
+                        }
+                    }
+                }
+                return res;
+            }
+
+            public bool IsEphemeral {
+                get {
+                    return true;
+                }
+            }
         }
 
         public virtual bool IsMutable(string name) {
@@ -297,8 +339,16 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 }
             }
 
-            if (_next != null) {
-                MergeDictionaries(res, _next.GetAllMembers(accessor));
+            if (_linkedValues != null) {
+                foreach (var linkedValue in _linkedValues.GetTypesNoCopy(accessor, ProjectEntry)) {
+                    if (linkedValue.Value.Push()) {
+                        try {
+                            MergeDictionaries(res, linkedValue.Value.GetAllMembers(accessor));
+                        } finally {
+                            linkedValue.Value.Pop();
+                        }
+                    }
+                }
             }
 
             return res;
@@ -415,59 +465,13 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         /// changes.
         /// </summary>
         /// <param name="source"></param>
-        public void AddLinkedValue(AnalysisValue source) {
-            if (_next == null) {
-                _next = source;
-            } else if (_next != source) {
-                if (_next is LinkedAnalysisList) {
-                    ((LinkedAnalysisList)_next).AddLink(source);
-                } else {
-                    _next = new LinkedAnalysisList(_next, source);
-                }
+        public void AddLinkedValue(AnalysisUnit unit, ExpandoValue source) {
+            if (_linkedValues == null) {
+                _linkedValues = new TypedDef();
             }
+            _linkedValues.AddTypes(unit, source.SelfSet);
         }
-
-        [Serializable]
-        internal class LinkedAnalysisList : AnalysisValue, IReferenceableContainer {
-            private readonly HashSet<AnalysisValue> _values;
-
-            public LinkedAnalysisList(AnalysisValue one, AnalysisValue two)
-                : base(one.DeclaringModule) {
-                _values = new HashSet<AnalysisValue>() { one, two };
-            }
-
-            public override IAnalysisSet Get(Node node, AnalysisUnit unit, string name, bool addRef = true) {
-                var res = AnalysisSet.Empty;
-                foreach (var value in _values) {
-                    res = res.Union(value.Get(node, unit, name));
-                }
-                return res;
-            }
-
-            internal override Dictionary<string, IAnalysisSet> GetAllMembers(ProjectEntry accessor) {
-                var res = new Dictionary<string, IAnalysisSet>();
-                foreach (var value in _values) {
-                    ExpandoValue.MergeDictionaries(res, value.GetAllMembers(accessor));
-                }
-                return res;
-            }
-
-            internal void AddLink(AnalysisValue source) {
-                _values.Add(source);
-            }
-
-            public IEnumerable<IReferenceable> GetDefinitions(string name) {
-                foreach (var value in _values) {
-                    IReferenceableContainer refContainer = value as IReferenceableContainer;
-                    if (refContainer != null) {
-                        foreach (var result in refContainer.GetDefinitions(name)) {
-                            yield return result;
-                        }
-                    }
-                }
-            }
-        }
-
+        
         #region IReferenceableContainer Members
 
         public virtual IEnumerable<IReferenceable> GetDefinitions(string name) {
@@ -494,11 +498,13 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 }
             }
 
-            if (_next != null) {
-                IReferenceableContainer nextRef = _next as IReferenceableContainer;
-                if (nextRef != null) {
-                    foreach (var value in nextRef.GetDefinitions(name)) {
-                        yield return value;
+            if (_linkedValues != null) {
+                foreach (var value in _linkedValues.GetTypesNoCopy()) {
+                    IReferenceableContainer refContainer = value.Value as IReferenceableContainer;
+                    if (refContainer != null) {
+                        foreach (var result in refContainer.GetDefinitions(name)) {
+                            yield return result;
+                        }
                     }
                 }
             }

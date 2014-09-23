@@ -541,7 +541,7 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         public int GetHashCode(AnalysisProxy obj) {
-            return (obj == null) ? 0 : obj.Value.UnionHashCode(Strength);
+            return (obj == null || obj.Value == null) ? 0 : obj.Value.UnionHashCode(Strength);
         }
 
         public AnalysisProxy MergeTypes(AnalysisProxy x, AnalysisProxy y, out bool wasChanged) {

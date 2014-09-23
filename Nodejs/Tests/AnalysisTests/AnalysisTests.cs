@@ -933,6 +933,82 @@ var x = abcdefg;
         }
 
         [TestMethod, Priority(0)]
+        public void TestSpecializedExtend() {
+            var code = @"function extend(obj) {
+    if (!_.isObject(obj)) return obj;
+    var source, prop;
+    for (var i = 1, length = arguments.length; i < length; i++) {
+      source = arguments[i];
+      for (prop in source) {
+        if (hasOwnProperty.call(source, prop)) {
+            obj[prop] = source[prop];
+        }
+      }
+    }
+    return obj;
+  };
+
+
+var x = {};
+extend(x, {abc:42});
+";
+
+
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x.abc", code.Length),
+                BuiltinTypeId.Number
+            );
+
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestBackboneExtend() {
+            var code = @"function extend(protoProps, staticProps) {
+    var parent = this;
+    var child;
+                           
+    if (protoProps && _.has(protoProps, 'constructor')) {
+        child = protoProps.constructor;
+    } else {
+        child = function(){ return parent.apply(this, arguments); };
+    }
+
+    _.extend(child, parent, staticProps);
+                           
+    var Surrogate = function(){ this.constructor = child; };
+    Surrogate.prototype = parent.prototype;
+    child.prototype = new Surrogate;
+
+    if (protoProps) _.extend(child.prototype, protoProps);
+
+    child.__super__ = parent.prototype;
+
+    return child;
+    };
+
+function Model() {
+    this.modelAttr = 'foo';
+}
+
+Model.extend = extend
+var myclass = Model.extend({extAttr:function() { return 42; }});
+var myinst = new myclass();
+";
+
+
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("myinst.extAttr", code.Length),
+                BuiltinTypeId.Function
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("myinst.modelAttr", code.Length),
+                BuiltinTypeId.String
+            );
+        }
+
+        [TestMethod, Priority(0)]
         public void TestObjectLiteral() {
             string code = "x = {abc:42};";
             var analysis = ProcessText(code);
@@ -1678,7 +1754,7 @@ var undef = undefined;
             AssertUtil.ContainsExactly(analysis.GetDescriptionByIndex("n", code.Length), "number");
             AssertUtil.ContainsExactly(analysis.GetDescriptionByIndex("b", code.Length), "boolean");
             AssertUtil.ContainsExactly(analysis.GetDescriptionByIndex("s", code.Length), "string");
-            AssertUtil.ContainsExactly(analysis.GetDescriptionByIndex("f", code.Length), "function <anonymous>()");
+            AssertUtil.ContainsExactly(analysis.GetDescriptionByIndex("f", code.Length), "function f()");
             AssertUtil.ContainsExactly(analysis.GetDescriptionByIndex("f1", code.Length), "function f()");
             AssertUtil.ContainsExactly(analysis.GetDescriptionByIndex("f2", code.Length), "function f(a, b)");
             AssertUtil.ContainsExactly(analysis.GetDescriptionByIndex("f3", code.Length), "function f() -> number");

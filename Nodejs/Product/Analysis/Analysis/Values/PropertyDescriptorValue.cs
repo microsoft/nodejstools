@@ -12,12 +12,9 @@
  *
  * ***************************************************************************/
 
+using System;
 using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Parsing;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Microsoft.NodejsTools.Analysis.Values {
     /// <summary>
@@ -79,9 +76,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         public bool IsEphemeral {
             get {
-                return Values == null ||
-                    (Values is EphemeralVariableDef &&
-                    Values.IsEphemeral);
+                return Values == null || Values.IsEphemeral;
             }
         }
 

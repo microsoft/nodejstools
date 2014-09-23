@@ -326,9 +326,15 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
 
 
-            if (this != ProjectState._objectPrototype) {
-                foreach (var res in ProjectState._objectPrototype.GetDefinitions(name)) {
-                    yield return res;
+            if (Push()) {
+                try {
+                    if (this != ProjectState._objectPrototype) {
+                        foreach (var res in ProjectState._objectPrototype.GetDefinitions(name)) {
+                            yield return res;
+                        }
+                    }
+                } finally {
+                    Pop();
                 }
             }
         }

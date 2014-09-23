@@ -53,7 +53,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             return res;
         }
 
-        class MergedPropertyDescriptor : IPropertyDescriptor {
+        new class MergedPropertyDescriptor : IPropertyDescriptor {
             private readonly InheritsPrototypeValue _instance;
             private readonly string _name;
 

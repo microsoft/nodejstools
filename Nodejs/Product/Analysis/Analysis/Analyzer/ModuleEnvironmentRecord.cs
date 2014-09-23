@@ -169,6 +169,13 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         /// </summary>
         ObjectCall,
         /// <summary>
+        /// The value stored is a BackboneExtendFunctionValue instance.
+        /// 
+        /// This is used to key unique values for Backbone.*.extend() calls
+        /// which set up the inheritance hierarchy in a special/dynamic way
+        /// </summary>
+        ExtendCall,
+        /// <summary>
         /// The value stored is a Function.
         /// 
         /// This is used to key unique values for function objects.

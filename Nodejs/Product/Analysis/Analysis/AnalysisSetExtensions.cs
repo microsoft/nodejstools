@@ -71,8 +71,25 @@ namespace Microsoft.NodejsTools.Analysis {
             var res = AnalysisSet.Empty;
             foreach (var ns in self) {
                 var call = ns.Value.Call(node, unit, @this, args);
+                Debug.Assert(call != null);
 
                 res = res.Union(call);
+            }
+
+            return res;
+        }
+
+        /// <summary>
+        /// Performs a call operation propagating the argument types into any
+        /// user defined functions or classes and returns the set of types which
+        /// result from the call.
+        /// </summary>
+        public static IAnalysisSet Construct(this IAnalysisSet self, Node node, AnalysisUnit unit, IAnalysisSet[] args) {
+            var res = AnalysisSet.Empty;
+            foreach (var ns in self) {
+                var construct = ns.Value.Construct(node, unit, args);
+
+                res = res.Union(construct);
             }
 
             return res;
