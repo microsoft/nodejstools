@@ -70,6 +70,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         private readonly CodeSettings _codeSettings = new CodeSettings();
         private readonly string _projectDir;
         private readonly AnalysisLevel _analysisLevel;
+        private bool _saveToDisk;
         private readonly object _contentsLock = new object();
         private readonly HashSet<IProjectEntry> _hasParseErrors = new HashSet<IProjectEntry>();
         private DateTime? _reparseDateTime;
@@ -97,8 +98,10 @@ namespace Microsoft.NodejsTools.Intellisense {
             _projectFiles = new ConcurrentDictionary<string, ProjectItem>(StringComparer.OrdinalIgnoreCase);
             if (NodejsPackage.Instance != null) {
                 _analysisLevel = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel;
+                _saveToDisk = NodejsPackage.Instance.IntellisenseOptionsPage.SaveToDisk;
             } else {
                 _analysisLevel = AnalysisLevel.High;
+                _saveToDisk = true;
             }
 
             var limits = LoadLimits();
@@ -110,6 +113,10 @@ namespace Microsoft.NodejsTools.Intellisense {
             } else {
                 _implicitProject = true;
                 CreateNewAnalyzer(limits);
+            }
+
+            if (!_saveToDisk) {
+                DeleteAnalysis();
             }
 
             _userCount = 1;
@@ -147,6 +154,19 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         #region Public API
+
+        public bool SaveToDisk {
+            get { return _saveToDisk; }
+
+            set {
+                _saveToDisk = value;
+                if (!_saveToDisk) {
+                    DeleteAnalysis();
+                } else {
+                    _analysisQueue.ResetLastSaveTime();
+                }
+            }
+        }
 
         public AnalysisLevel AnalysisLevel {
             get { return _analysisLevel; }
@@ -1235,8 +1255,17 @@ namespace Microsoft.NodejsTools.Intellisense {
             return Path.Combine(_projectDir, ".ntvs_analysis.dat");
         }
 
+        private void DeleteAnalysis() {
+            try {
+                var path = GetAnalysisPath();
+                File.Delete(path);
+            } catch (IOException) {
+            } catch (UnauthorizedAccessException) {
+            }
+        }
+
         private void SaveAnalysis() {
-            if (_projectDir == null || _analysisLevel == AnalysisLevel.None) {
+            if (_projectDir == null || !_saveToDisk) {
                 return;
             }
 

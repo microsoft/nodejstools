@@ -280,6 +280,7 @@ namespace Microsoft.NodejsTools.Project {
         public override int InitializeForOuter(string filename, string location, string name, uint flags, ref Guid iid, out IntPtr projectPointer, out int canceled) {
             NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevelChanged += IntellisenseOptionsPageAnalysisLevelChanged;
             NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMaximumChanged += AnalysisLogMaximumChanged;
+            NodejsPackage.Instance.IntellisenseOptionsPage.SaveToDiskChanged += IntellisenseOptionsPageSaveToDiskChanged;
 
             return base.InitializeForOuter(filename, location, name, flags, ref iid, out projectPointer, out canceled);
         }
@@ -364,7 +365,15 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private void AnalysisLogMaximumChanged(object sender, EventArgs e) {
-            _analyzer.MaxLogLength = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMax;
+            if (_analyzer != null) {
+                _analyzer.MaxLogLength = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMax;
+            }
+        }
+
+        private void IntellisenseOptionsPageSaveToDiskChanged(object sender, EventArgs e) {
+            if (_analyzer != null) {
+                _analyzer.SaveToDisk = NodejsPackage.Instance.IntellisenseOptionsPage.SaveToDisk;
+            }
         }
 
         protected override void RaiseProjectPropertyChanged(string propertyName, string oldValue, string newValue) {
@@ -748,6 +757,7 @@ namespace Microsoft.NodejsTools.Project {
                     _analyzer = null;
                 }
 
+                NodejsPackage.Instance.IntellisenseOptionsPage.SaveToDiskChanged -= IntellisenseOptionsPageSaveToDiskChanged;
                 NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevelChanged -= IntellisenseOptionsPageAnalysisLevelChanged;
                 NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMaximumChanged -= AnalysisLogMaximumChanged;
             }

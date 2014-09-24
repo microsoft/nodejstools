@@ -240,6 +240,12 @@ namespace Microsoft.NodejsTools.Intellisense {
 
                 #endregion
             }
+
+            internal void ResetLastSaveTime() {
+                //Set the last save time to a value in the past beyond the timespan between saves
+                //  The next edit will trigger a save
+                _lastSave = DateTime.Now - _SaveAnalysisTime - TimeSpan.FromMinutes(30);
+            }
         }
     }
 }

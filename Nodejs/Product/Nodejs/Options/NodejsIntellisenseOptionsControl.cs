@@ -23,6 +23,19 @@ namespace Microsoft.NodejsTools.Options {
             InitializeComponent();
         }
 
+        internal bool SaveToDisk {
+            get {
+                return _saveToDiskEnabledRadioButton.Checked;
+            }
+            set {
+                if (value == true) {
+                    _saveToDiskEnabledRadioButton.Checked = true;
+                } else {
+                    _saveToDiskDisabledRadioButton.Checked = true;
+                }
+            }
+        }
+
         internal AnalysisLevel AnalysisLevel {
             get {
                 if (_fullIntelliSenseRadioButton.Checked) {
@@ -89,12 +102,14 @@ namespace Microsoft.NodejsTools.Options {
             page.AnalysisLevel = AnalysisLevel;
             page.AnalysisLogMax = AnalysisLogMaximum;
             page.CompletionCommittedBy = CompletionCommittedBy;
+            page.SaveToDisk = SaveToDisk;
         }
 
         internal void SyncControlWithPageSettings(NodejsIntellisenseOptionsPage page) {
             AnalysisLevel = page.AnalysisLevel;
             AnalysisLogMaximum = page.AnalysisLogMax;
             CompletionCommittedBy = page.CompletionCommittedBy;
+            SaveToDisk = page.SaveToDisk;
         }
     }
 }

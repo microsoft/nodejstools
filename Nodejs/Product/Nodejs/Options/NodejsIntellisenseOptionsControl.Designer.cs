@@ -27,12 +27,16 @@
             System.Windows.Forms.ToolTip toolTip;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NodejsIntellisenseOptionsControl));
             System.Windows.Forms.GroupBox intellisenseLevelGroupBox;
+            System.Windows.Forms.GroupBox saveToDiskGroupBox;
             this._fullIntelliSenseRadioButton = new System.Windows.Forms.RadioButton();
             this._limitedIntelliSenseRadioButton = new System.Windows.Forms.RadioButton();
             this._noIntelliSenseRadioButton = new System.Windows.Forms.RadioButton();
+            this._saveToDiskDisabledRadioButton = new System.Windows.Forms.RadioButton();
+            this._saveToDiskEnabledRadioButton = new System.Windows.Forms.RadioButton();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this._analysisLogMax = new System.Windows.Forms.ComboBox();
             this._analysisLogMaxLabel = new System.Windows.Forms.Label();
+            this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this._selectionInCompletionListGroupBox = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
@@ -40,8 +44,11 @@
             this._completionCommittedByLabel = new System.Windows.Forms.Label();
             toolTip = new System.Windows.Forms.ToolTip(this.components);
             intellisenseLevelGroupBox = new System.Windows.Forms.GroupBox();
+            saveToDiskGroupBox = new System.Windows.Forms.GroupBox();
             intellisenseLevelGroupBox.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
+            saveToDiskGroupBox.SuspendLayout();
+            this.tableLayoutPanel4.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this._selectionInCompletionListGroupBox.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
@@ -70,6 +77,22 @@
             this._noIntelliSenseRadioButton.TabStop = true;
             toolTip.SetToolTip(this._noIntelliSenseRadioButton, resources.GetString("_noIntelliSenseRadioButton.ToolTip"));
             this._noIntelliSenseRadioButton.UseVisualStyleBackColor = true;
+            // 
+            // _saveToDiskDisabledRadioButton
+            // 
+            resources.ApplyResources(this._saveToDiskDisabledRadioButton, "_saveToDiskDisabledRadioButton");
+            this._saveToDiskDisabledRadioButton.Name = "_saveToDiskDisabledRadioButton";
+            this._saveToDiskDisabledRadioButton.TabStop = true;
+            toolTip.SetToolTip(this._saveToDiskDisabledRadioButton, resources.GetString("_saveToDiskDisabledRadioButton.ToolTip"));
+            this._saveToDiskDisabledRadioButton.UseVisualStyleBackColor = true;
+            // 
+            // _saveToDiskEnabledRadioButton
+            // 
+            resources.ApplyResources(this._saveToDiskEnabledRadioButton, "_saveToDiskEnabledRadioButton");
+            this._saveToDiskEnabledRadioButton.Name = "_saveToDiskEnabledRadioButton";
+            this._saveToDiskEnabledRadioButton.TabStop = true;
+            toolTip.SetToolTip(this._saveToDiskEnabledRadioButton, resources.GetString("_saveToDiskEnabledRadioButton.ToolTip"));
+            this._saveToDiskEnabledRadioButton.UseVisualStyleBackColor = true;
             // 
             // intellisenseLevelGroupBox
             // 
@@ -105,10 +128,25 @@
             resources.ApplyResources(this._analysisLogMaxLabel, "_analysisLogMaxLabel");
             this._analysisLogMaxLabel.Name = "_analysisLogMaxLabel";
             // 
+            // saveToDiskGroupBox
+            // 
+            resources.ApplyResources(saveToDiskGroupBox, "saveToDiskGroupBox");
+            saveToDiskGroupBox.Controls.Add(this.tableLayoutPanel4);
+            saveToDiskGroupBox.Name = "saveToDiskGroupBox";
+            saveToDiskGroupBox.TabStop = false;
+            // 
+            // tableLayoutPanel4
+            // 
+            resources.ApplyResources(this.tableLayoutPanel4, "tableLayoutPanel4");
+            this.tableLayoutPanel4.Controls.Add(this._saveToDiskDisabledRadioButton, 0, 1);
+            this.tableLayoutPanel4.Controls.Add(this._saveToDiskEnabledRadioButton, 0, 0);
+            this.tableLayoutPanel4.Name = "tableLayoutPanel4";
+            // 
             // tableLayoutPanel1
             // 
             resources.ApplyResources(this.tableLayoutPanel1, "tableLayoutPanel1");
-            this.tableLayoutPanel1.Controls.Add(this._selectionInCompletionListGroupBox, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this._selectionInCompletionListGroupBox, 0, 2);
+            this.tableLayoutPanel1.Controls.Add(saveToDiskGroupBox, 0, 1);
             this.tableLayoutPanel1.Controls.Add(intellisenseLevelGroupBox, 0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             // 
@@ -146,6 +184,10 @@
             intellisenseLevelGroupBox.PerformLayout();
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel2.PerformLayout();
+            saveToDiskGroupBox.ResumeLayout(false);
+            saveToDiskGroupBox.PerformLayout();
+            this.tableLayoutPanel4.ResumeLayout(false);
+            this.tableLayoutPanel4.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this._selectionInCompletionListGroupBox.ResumeLayout(false);
@@ -170,6 +212,9 @@
         private System.Windows.Forms.Label _completionCommittedByLabel;
         private System.Windows.Forms.Label _analysisLogMaxLabel;
         private System.Windows.Forms.ComboBox _analysisLogMax;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
+        private System.Windows.Forms.RadioButton _saveToDiskDisabledRadioButton;
+        private System.Windows.Forms.RadioButton _saveToDiskEnabledRadioButton;
 
     }
 }

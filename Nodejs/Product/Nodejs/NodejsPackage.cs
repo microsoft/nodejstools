@@ -680,10 +680,15 @@ namespace Microsoft.NodejsTools {
                     _analyzer = new VsProjectAnalyzer();
                     LogLooseFileAnalysisLevel();
                     _analyzer.MaxLogLength = IntellisenseOptionsPage.AnalysisLogMax;
-                    IntellisenseOptionsPage.AnalysisLevelChanged += IntellisenseOptionsPageAnalysisLevelChanged;                    
+                    IntellisenseOptionsPage.AnalysisLevelChanged += IntellisenseOptionsPageAnalysisLevelChanged;
+                    IntellisenseOptionsPage.SaveToDiskChanged += IntellisenseOptionsPageSaveToDiskChanged;
                 }
                 return _analyzer;
             }
+        }
+
+        private void IntellisenseOptionsPageSaveToDiskChanged(object sender, EventArgs e) {
+            _analyzer.SaveToDisk = IntellisenseOptionsPage.SaveToDisk;
         }
 
         private void IntellisenseOptionsPageAnalysisLevelChanged(object sender, EventArgs e) {
