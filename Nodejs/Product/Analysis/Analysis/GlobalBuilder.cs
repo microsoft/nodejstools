@@ -19,6 +19,7 @@ using System.Text;
 using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Analysis.Values;
 using Microsoft.NodejsTools.Parsing;
+using System.Globalization;
 
 namespace Microsoft.NodejsTools.Analysis {
     /// <summary>
@@ -1169,13 +1170,40 @@ on that object, and are not inherited from the object's prototype. The propertie
                     "Returns a value that indicates whether new properties can be added to an object.",
                     Parameter("o", "Object to test.")
                 ),
-                BuiltinFunction(
+                SpecializedFunction(
                     "keys",
+                    ObjectKeys,
                     "Returns the names of the enumerable properties and methods of an object.",
                     Parameter("o", "Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.")
                 ),
-                BuiltinFunction("is"),
+                ReturningFunction("is", _analyzer._trueInst),
             };
+        }
+
+        private static IAnalysisSet ObjectKeys(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            ArrayValue arrValue;
+            IAnalysisSet value;
+            if (!unit._env.GlobalEnvironment.TryGetNodeValue(NodeEnvironmentKind.ObjectKeysArray, node, out value)) {
+                arrValue = new ArrayValue(
+                    new[] { new TypedDef() },
+                    unit.ProjectEntry,
+                    node
+                );
+                unit._env.GlobalEnvironment.AddNodeValue(NodeEnvironmentKind.ObjectKeysArray, node, arrValue.SelfSet);
+            } else {
+                arrValue = (ArrayValue)value.First().Value;
+            }
+
+            IAnalysisSet res = AnalysisSet.Empty;
+            if (args.Length >= 1) {
+                if (args[0].Count < unit.Analyzer.Limits.MaxObjectKeysTypes) {
+                    arrValue.IndexTypes[0].AddTypes(
+                        unit,
+                        args[0].GetEnumerationValues(node, unit)
+                    );
+                }
+            }
+            return arrValue.SelfSet;
         }
 
         private static IAnalysisSet DefineSetter(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
@@ -1562,16 +1590,18 @@ on that object, and are not inherited from the object's prototype. The propertie
                         "toLocaleUpperCase",
                         "Returns a string where all alphabetic characters have been converted to uppercase, taking into account the host environment's current locale."
                     ),
-                    BuiltinFunction(
+                    SpecializedFunction(
                         "toLowerCase",
+                        StringToLowerCase,
                         "Converts all the alphabetic characters in a string to lowercase."
                     ),
                     BuiltinFunction(
                         "toString",
                         "Returns a string representation of a string."
                     ),
-                    BuiltinFunction(
+                    SpecializedFunction(
                         "toUpperCase",
+                        StringToUpperCase,
                         "Converts all the alphabetic characters in a string to uppercase."
                     ),
                     BuiltinFunction(
@@ -1593,6 +1623,38 @@ on that object, and are not inherited from the object's prototype. The propertie
             return new BuiltinFunctionValue(builtinEntry, "String", null, prototype) { 
                 ReturningFunction("fromCharCode", _analyzer.GetConstant("")),
             };
+        }
+
+        private static IAnalysisSet StringToUpperCase(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            IAnalysisSet res = AnalysisSet.Empty;
+            if (@this != null) {
+                foreach (var arg in @this) {
+                    StringValue str = arg.Value as StringValue;
+                    if (str != null) {
+                        res = res.Union(unit.Analyzer.GetConstant(str._value.ToUpper(CultureInfo.CurrentCulture)).SelfSet);
+                    }
+                }
+            }
+            if (res.Count == 0) {
+                return unit.Analyzer._emptyStringValue.SelfSet;
+            }
+            return res;
+        }
+
+        private static IAnalysisSet StringToLowerCase(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            IAnalysisSet res = AnalysisSet.Empty;
+            if (@this != null) {
+                foreach (var arg in @this) {
+                    StringValue str = arg.Value as StringValue;
+                    if (str != null) {
+                        res = res.Union(unit.Analyzer.GetConstant(str._value.ToLower(CultureInfo.CurrentCulture)).SelfSet);
+                    }
+                }
+            }
+            if (res.Count == 0) {
+                return unit.Analyzer._emptyStringValue.SelfSet;
+            }
+            return res;
         }
 
         #region Building Helpers

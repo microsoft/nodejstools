@@ -80,7 +80,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         [ThreadStatic]
         private static Dictionary<AnalysisValue, int> _hitCount;
 
-        private static bool PushProtoLookup(AnalysisValue value){
+        internal static bool PushProtoLookup(AnalysisValue value){
             if (_hitCount == null) {
                 _hitCount = new Dictionary<AnalysisValue, int>();
             }
@@ -95,7 +95,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             return false;
         }
 
-        private static void PopProtoLookup(AnalysisValue value) {
+        internal static void PopProtoLookup(AnalysisValue value) {
             int count = _hitCount[value];
             if (count == 1) {
                 _hitCount.Remove(value);

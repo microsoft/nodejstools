@@ -1009,6 +1009,82 @@ var myinst = new myclass();
         }
 
         [TestMethod, Priority(0)]
+        public void TestLodashAssign() {
+            var code = @"
+var assign = function(object, source, guard) {
+     var index, iterable = object, result = iterable;
+     if (!iterable) return result;
+     var args = arguments,
+         argsIndex = 0,
+         argsLength = typeof guard == 'number' ? 2 : args.length;
+     if (argsLength > 3 && typeof args[argsLength - 2] == 'function') {
+       var callback = baseCreateCallback(args[--argsLength - 1], args[argsLength--], 2);
+     } else if (argsLength > 2 && typeof args[argsLength - 1] == 'function') {
+       callback = args[--argsLength];
+     }
+     while (++argsIndex < argsLength) {
+       iterable = args[argsIndex];
+       if (iterable && objectTypes[typeof iterable]) {
+         var ownIndex = -1,
+             ownProps = objectTypes[typeof iterable] && keys(iterable),
+             length = ownProps ? ownProps.length : 0;
+         
+         while (++ownIndex < length) {
+           index = ownProps[ownIndex];
+           result[index] = callback ? callback(result[index], iterable[index]) : iterable[index];
+         }
+       }
+     }
+     return result
+   };
+
+
+var x = {abc:42}
+var y = {}
+assign(y, x);
+var z = y.abc;
+
+";
+
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("z", code.Length),
+                BuiltinTypeId.Number
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestObjectKeys() {
+            var code = @"
+var foo = {};
+
+var attrs = {
+    num: 42,
+    str: 'abc'
+};
+Object.keys(attrs).forEach(function(key) {
+    var attr = foo[key] = {};
+    attr.value = attrs[key];
+});
+
+var num = foo.num.value;
+var str = foo.str.value;
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("num", code.Length),
+                BuiltinTypeId.Number,
+                BuiltinTypeId.String
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("str", code.Length),
+                BuiltinTypeId.Number,
+                BuiltinTypeId.String
+            );
+        }
+
+
+        [TestMethod, Priority(0)]
         public void TestObjectLiteral() {
             string code = "x = {abc:42};";
             var analysis = ProcessText(code);
@@ -1245,6 +1321,166 @@ var x = g.abc;
                 analysis.GetTypeIdsByIndex("x", 0),
                 BuiltinTypeId.Number
             );
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestMergeSpecialization2() {
+            var analysis = ProcessText(@"function merge (to, from) {
+  var keys = Object.keys(from)
+    , i = keys.length
+    , key
+
+  while (i--) {
+    key = keys[i];
+    if ('undefined' === typeof to[key]) {
+      to[key] = from[key];
+    } else {
+      if (exports.isObject(from[key])) {
+        merge(to[key], from[key]);
+      } else {
+        to[key] = from[key];
+      }
+    }
+  }
+}
+
+
+function f() {
+}
+
+f.abc = 42
+
+function g() {
+}
+
+merge(g, f)
+var x = g.abc;
+");
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", 0),
+                BuiltinTypeId.Number
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestMergeCloneSpecialization2() {
+            var analysis = ProcessText(@"function mergeClone (to, from) {
+  var keys = Object.keys(from)
+    , i = keys.length
+    , key
+
+  while (i--) {
+    key = keys[i];
+    if ('undefined' === typeof to[key]) {
+      // make sure to retain key order here because of a bug handling the $each
+      // operator in mongodb 2.4.4
+      to[key] = clone(from[key], { retainKeyOrder : 1});
+    } else {
+      if (exports.isObject(from[key])) {
+        mergeClone(to[key], from[key]);
+      } else {
+        // make sure to retain key order here because of a bug handling the
+        // $each operator in mongodb 2.4.4
+        to[key] = clone(from[key], { retainKeyOrder : 1});
+      }
+    }
+  }
+}
+
+
+function f() {
+}
+
+f.abc = 42
+
+function g() {
+}
+
+mergeClone(g, f)
+var x = g.abc;
+");
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", 0),
+                BuiltinTypeId.Number
+            );
+        }
+
+
+        [TestMethod, Priority(0)]
+        public void TestCloneSpecialization() {
+            var analysis = ProcessText(@"function clone (obj) {
+  if (obj === undefined || obj === null)
+    return obj;
+
+  return null;
+}
+
+var x = clone({abc:42})
+var y = x.abc;
+");
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("y", 0),
+                BuiltinTypeId.Number
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestWrapFunctionSpecialization() {
+            var code = @"function wrapfunction(fn, message) {
+  if (typeof fn !== 'function') {
+    throw new TypeError('argument fn must be a function')
+  }
+
+  var args = createArgumentsString(fn.length)
+  var deprecate = this
+  var stack = getStack()
+  var site = callSiteLocation(stack[1])
+
+  site.name = fn.name
+
+  var deprecatedfn = eval('(function (' + args + ') {\n'
+    + '""use strict""\n'
+    + 'log.call(deprecate, message, site)\n'
+    + 'return fn.apply(this, arguments)\n'
+    + '})')
+
+  return deprecatedfn
+}
+
+function f(a) {
+    return a;
+}
+
+wrapped = wrapfunction(f, 'hello');
+var res = wrapped(42);
+";
+
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("res", code.Length),
+                BuiltinTypeId.Number
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestStringCasing() {
+            string code = @"
+var x = {};
+['upper'].forEach(function f(attr) { x[attr.toUpperCase()] = 42; });
+['LOWER'].forEach(function f(attr) { x[attr.toLowerCase()] = 'abc'; })
+";
+
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x.UPPER", code.Length),
+                BuiltinTypeId.Number
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x.lower", code.Length),
+                BuiltinTypeId.String
+            );
+            AssertUtil.ContainsExactly(analysis.GetTypeIdsByIndex("x.upper", code.Length));
+            AssertUtil.ContainsExactly(analysis.GetTypeIdsByIndex("x.LOWER", code.Length));
         }
 
         /// <summary>

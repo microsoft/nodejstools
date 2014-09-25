@@ -135,18 +135,22 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
             public IAnalysisSet GetValue(Node node, AnalysisUnit unit, ProjectEntry declaringScope, IAnalysisSet @this, bool addRef) {
                 IAnalysisSet res = _propDesc.GetValue(node, unit, declaringScope, @this, addRef);
-                foreach (var prototype in _instance._linkedValues.GetTypes(unit, declaringScope)) {
-                    if (prototype.Value.Push()) {
-                        try {
+                var types = _instance._linkedValues.GetTypes(unit, declaringScope);
+                try {
+                    foreach (var prototype in types) {
+                        if (ObjectValue.PushProtoLookup(prototype.Value)) {
                             var value = prototype.Value.GetProperty(node, unit, _name);
                             if (value != null) {
                                 res = res.Union(value.GetValue(node, unit, declaringScope, @this, addRef));
                             }
-                        } finally {
-                            prototype.Value.Pop();
                         }
                     }
+                } finally {
+                    foreach (var prototype in types) {
+                        ObjectValue.PopProtoLookup(prototype.Value);
+                    }
                 }
+
                 return res;
             }
 
@@ -471,7 +475,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
             _linkedValues.AddTypes(unit, source.SelfSet);
         }
-        
+
         #region IReferenceableContainer Members
 
         public virtual IEnumerable<IReferenceable> GetDefinitions(string name) {

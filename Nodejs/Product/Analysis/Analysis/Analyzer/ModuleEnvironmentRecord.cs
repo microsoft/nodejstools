@@ -169,6 +169,12 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         /// </summary>
         ObjectCall,
         /// <summary>
+        /// The value stored is an ArrayValue instance.
+        /// 
+        /// This is used to key unique values for "Object.keys" calls.
+        /// </summary>
+        ObjectKeysArray,
+        /// <summary>
         /// The value stored is a BackboneExtendFunctionValue instance.
         /// 
         /// This is used to key unique values for Backbone.*.extend() calls

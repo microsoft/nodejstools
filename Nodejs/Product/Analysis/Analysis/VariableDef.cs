@@ -168,12 +168,16 @@ namespace Microsoft.NodejsTools.Analysis {
             } else if (!LockedVariableDefs.TryGetValue(this, out dummy)) {
                 Debug.Fail("locking variable defs");
                 LockedVariableDefs.Add(this, LockedVariableDefsValue);
+#if DEBUG
                 // The remainder of this block logs diagnostic information to
                 // allow the VariableDef to be identified.
                 int total = 0;
                 var typeCounts = new Dictionary<string, int>();
                 JsAnalyzer analyzer = null;
                 foreach (var type in TypesNoCopy) {
+                    if (type.Value == null) {
+                        continue;
+                    }
                     if (analyzer == null && type.Value.DeclaringModule != null) {
                         analyzer = type.Value.DeclaringModule.Analysis.ProjectState;
                     }
@@ -194,6 +198,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 if (analyzer != null) {
                     analyzer.Log.ExceedsTypeLimit(GetType().Name, total, string.Join(", ", typeCountList));
                 }
+#endif
             }
         }
 

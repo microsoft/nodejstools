@@ -300,7 +300,6 @@ namespace Microsoft.NodejsTools.Analysis {
                     foreach (var thisArg in @this) {
                         ExpandoValue expando = @thisArg.Value as ExpandoValue;
                         if (expando != null) {
-                            Debug.Assert(args[0].Count < 100);
                             foreach (var arg in args[0]) {
                                 var strValue = arg.Value.GetStringValue();
                                 if (strValue != null) {

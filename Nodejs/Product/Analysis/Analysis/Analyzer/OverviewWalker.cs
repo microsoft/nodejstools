@@ -251,23 +251,22 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         private UserFunctionValue CreateUserFunction(FunctionObject node, AnalysisUnit outerUnit) {
             UserFunctionValue func = null;
-            FunctionSpecialization[] specializations;
+            BaseSpecialization[] specializations;
             var funcName = node.Name ?? node.NameGuess;
             if (funcName != null &&
                 _specializations.TryGetValue(funcName, out specializations)) {
-                    foreach (var specialization in specializations) {
-                        MatchState state = new MatchState(node);
-                        if (specialization.Body.IsMatch(state, node.Body)) {
-                            func = new SpecializedUserFunctionValue(
-                                specialization.Specialization,
-                                node,
-                                outerUnit,
-                                _scope,
-                                specialization.CallBase
-                            );
-                            break;
-                        }
+                foreach (var specialization in specializations) {
+                    if (specialization.IsMatch(node)) {
+                        func = new SpecializedUserFunctionValue(
+                            specialization.Specialization,
+                            node,
+                            outerUnit,
+                            _scope,
+                            specialization.CallBase
+                        );
+                        break;
                     }
+                }
             }
 
             if (func == null) {
