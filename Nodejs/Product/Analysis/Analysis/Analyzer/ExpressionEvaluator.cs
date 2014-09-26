@@ -405,7 +405,8 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                     return rhs;
             }
 
-            return ee.Evaluate(n.Operand1).Union(ee.Evaluate(n.Operand2));
+            return ee.Evaluate(n.Operand1)
+                .BinaryOperation(n, ee._unit, ee.Evaluate(n.Operand2));
         }
 
 #if FALSE
@@ -445,7 +446,19 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             if (left is Lookup) {
                 var l = (Lookup)left;
                 if (l.Name != null) {
-                    Scope.AssignVariable(
+                    var assignScope = Scope;
+                    if (l.VariableField != null) {
+                        foreach (var scope in Scope.EnumerateTowardsGlobal) {
+                            if(scope.ContainsVariable(l.Name) ||
+                                (scope is DeclarativeEnvironmentRecord &&
+                                ((DeclarativeEnvironmentRecord)scope).Node == l.VariableField.Scope)) {
+                                assignScope = scope;
+                                break;
+                            }
+                        }
+                    }
+
+                    assignScope.AssignVariable(
                         l.Name,
                         l,
                         _unit,

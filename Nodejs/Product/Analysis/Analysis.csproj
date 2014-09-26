@@ -195,6 +195,7 @@
     <Compile Include="Analysis\IDetachableProxy.cs" />
     <Compile Include="Analysis\NodejsModuleBuilder.Specializations.cs" />
     <Compile Include="Analysis\Validation.cs" />
+    <Compile Include="Analysis\Values\ArgumentsValue.cs" />
     <Compile Include="Analysis\Values\BooleanValue.cs" />
     <Compile Include="Analysis\Deque.cs" />
     <Compile Include="Analysis\EncodedSpanExtensions.cs" />

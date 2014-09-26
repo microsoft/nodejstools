@@ -223,6 +223,10 @@ namespace Microsoft.NodejsTools.Analysis {
         public virtual void AugmentAssign(BinaryOperator node, AnalysisUnit unit, IAnalysisSet value) {
         }
 
+        public virtual IAnalysisSet BinaryOperation(BinaryOperator node, AnalysisUnit unit, IAnalysisSet value) {
+            return SelfSet.Union(value);
+        }
+
         public virtual IAnalysisSet GetEnumerationValues(Node node, AnalysisUnit unit) {
             return AnalysisSet.Empty;
         }

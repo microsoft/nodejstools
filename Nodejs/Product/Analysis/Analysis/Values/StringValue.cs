@@ -13,6 +13,8 @@
  * ***************************************************************************/
 
 using System;
+using Microsoft.NodejsTools.Parsing;
+
 namespace Microsoft.NodejsTools.Analysis.Values {
     [Serializable]
     sealed class StringValue : NonObjectValue {
@@ -24,6 +26,13 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             _value = value;
             _analyzer = javaScriptAnalyzer;
             javaScriptAnalyzer.AnalysisValueCreated(typeof(StringValue));
+        }
+
+        public override IAnalysisSet BinaryOperation(BinaryOperator node, AnalysisUnit unit, IAnalysisSet value) {
+            if (node.OperatorToken == JSToken.Plus) {
+                return _analyzer._emptyStringValue.SelfSet;
+            }
+            return base.BinaryOperation(node, unit, value);
         }
 
         public override string Description {

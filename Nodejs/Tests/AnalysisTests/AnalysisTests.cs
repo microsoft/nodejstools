@@ -139,6 +139,59 @@ f({def:'abc'});
             );
         }
 
+        [TestMethod, Priority(0)]
+        public void TestArguments() {
+            string code = @"
+function f() {
+    return arguments[0];
+}
+
+function g() {
+    return arguments[1];
+}
+
+var x = f(0);
+var y = f(0, 'abc');
+var z = g('abc', 0);
+";
+            var analysis = ProcessText(code);
+
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", 0),
+                BuiltinTypeId.Number
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("y", 0),
+                BuiltinTypeId.Number
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("z", 0),
+                BuiltinTypeId.Number
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestAssignmentScope() {
+            string code = @"
+var rjs;
+function f() {
+    rjs = 42;
+}
+
+function g() {
+    return rjs;
+}
+
+x = g();";
+            var analysis = ProcessText(code);
+
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", 0),
+                BuiltinTypeId.Number
+            );
+
+        }
+
 
         [TestMethod, Priority(0)]
         public void TestPrimitiveMembers() {

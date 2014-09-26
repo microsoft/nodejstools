@@ -25,10 +25,14 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     class UserFunctionValue : FunctionValue, IReferenceable {
         private readonly FunctionObject _funcObject;
         private readonly FunctionAnalysisUnit _analysisUnit;
+        public readonly ArgumentsValue Arguments;
+        public readonly VariableDef ArgumentsVariable;
+        public CallArgs _curArgs;
         public VariableDef ReturnValue;
         internal Dictionary<CallArgs, CallInfo> _allCalls;
         private OverflowState _overflowed;
         private const int MaximumCallCount = 5;
+        
 
         public UserFunctionValue(FunctionObject node, AnalysisUnit declUnit, EnvironmentRecord declScope, bool isNested = false)
             : base(declUnit.ProjectEntry, null, node.Name ?? node.NameGuess) {
@@ -37,6 +41,14 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             _analysisUnit = new FunctionAnalysisUnit(this, declUnit, declScope, ProjectEntry);
 
             declUnit.Analyzer.AnalysisValueCreated(typeof(UserFunctionValue));
+            var argsWalker = new ArgumentsWalker();
+            FunctionObject.Body.Walk(argsWalker);
+
+            if (argsWalker.UsesArguments) {
+                Arguments = new ArgumentsValue(this);
+                ArgumentsVariable = new VariableDef();
+                ArgumentsVariable.AddTypes(_analysisUnit, Arguments.SelfSet);
+            }
         }
 
         public override IAnalysisSet ReturnTypes {
@@ -232,9 +244,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                         )
                     ).ToArray();
 
-                var argsWalker = new ArgumentsWalker();
-                FunctionObject.Body.Walk(argsWalker);
-                if (argsWalker.UsesArguments) {
+                if (Arguments != null) {
                     parameterResults = parameterResults.Concat(
                         new[] { new ParameterResult("...") }
                     ).ToArray();

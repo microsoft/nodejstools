@@ -47,6 +47,7 @@ using Microsoft.NodejsTools.Parsing;
 [assembly: AnalysisSerializationSupportedType(typeof(StringValue))]
 [assembly: AnalysisSerializationSupportedType(typeof(NumberValue))]
 [assembly: AnalysisSerializationSupportedType(typeof(ArrayValue))]
+[assembly: AnalysisSerializationSupportedType(typeof(ArgumentsValue))]
 [assembly: AnalysisSerializationSupportedType(typeof(InheritsPrototypeValue))]
 [assembly: AnalysisSerializationSupportedType(typeof(ObjectLiteralValue))]
 [assembly: AnalysisSerializationSupportedType(typeof(OverviewWalker.ObjectLiteralKey))]

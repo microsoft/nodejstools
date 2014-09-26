@@ -161,6 +161,18 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         /// <summary>
+        /// Performs the specified operation on the value.
+        /// </summary>
+        public static IAnalysisSet BinaryOperation(this IAnalysisSet self, BinaryOperator node, AnalysisUnit unit, IAnalysisSet value) {
+            var res = AnalysisSet.Empty;
+            foreach (var ns in self) {
+                res = res.Union(ns.Value.BinaryOperation(node, unit, value));
+            }
+
+            return res;
+        }
+
+        /// <summary>
         /// Returns true if the set contains no or only the object type
         /// </summary>
         internal static bool IsObjectOrUnknown(this IAnalysisSet res) {

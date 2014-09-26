@@ -72,6 +72,11 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
 
         internal override void AnalyzeWorker(DDG ddg, CancellationToken cancel) {
+            if (Function.ArgumentsVariable != null &&
+                !ddg.Scope.ContainsVariable("arguments")) {
+                ddg.Scope.AddVariable("arguments", Function.ArgumentsVariable);
+            }
+
             // Set the scope to within the function
             ddg.Scope = Environment;
 
