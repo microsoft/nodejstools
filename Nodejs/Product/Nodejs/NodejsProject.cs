@@ -919,8 +919,8 @@ namespace Microsoft.NodejsTools {
       <Variable name=""RUNTIMEID"" value=""node"" />
       <Variable name=""RUNTIMEURL"" value=""http://az413943.vo.msecnd.net/node/0.10.21.exe;http://nodertncu.blob.core.windows.net/iisnode/0.1.21.exe"" />
     </Environment>
-  </Task>
-</Startup>", roleType.ToLowerInvariant()));
+  </Task>{1}
+</Startup>", roleType.ToLowerInvariant(), isWorker ? @"<Task commandLine=""node.cmd .\startup.js"" executionContext=""elevated"" />" : string.Empty));
 
             if (isWorker) {
                 var runtime = role.SelectSingleNode("sd:Runtime", ns);
@@ -936,9 +936,6 @@ namespace Microsoft.NodejsTools {
 
                 runtime.ReplaceSelf(@"<Runtime>
   <Environment>
-    <Variable name=""PORT"">
-      <RoleInstanceValue xpath=""/RoleEnvironment/CurrentInstance/Endpoints/Endpoint[@name='HttpIn']/@port"" />
-    </Variable>
     <Variable name=""EMULATED"">
       <RoleInstanceValue xpath=""/RoleEnvironment/Deployment/@emulated"" />
     </Variable>
