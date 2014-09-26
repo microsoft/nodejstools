@@ -45,9 +45,9 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             Arguments = "search";
             _forceDownload = forceDownload;
             LastRefreshed = DateTime.MinValue;
-        }
+       }
 
-        internal static List<IPackage> ParseResultsFromReader(TextReader reader) {
+        internal List<IPackage> ParseResultsFromReader(TextReader reader) {
             var builder = new NodeModuleBuilder();
             var results = new List<IPackage>();
             using (var jsonReader = new Newtonsoft.Json.JsonTextReader(reader)) {
@@ -88,13 +88,13 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
                         AddAuthor(builder, module["author"]);
 
-                        var homepage = module["homepage"];
-                        builder.Homepage = (string)homepage;
-                        
+                        AddHomepage(builder, module["homepage"]);
 
                         results.Add(builder.Build());
                     } catch (InvalidOperationException) {
                         // Occurs if a JValue appears where we expect JProperty
+                    } catch (ArgumentException) {
+                        OnOutputLogged(string.Format("Parsing error - Cannot display package {0}", builder.Name));
                     } finally {
                         builder.Reset();
                     }
@@ -102,6 +102,19 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             }
 
             return results;
+        }
+
+        private static void AddHomepage(NodeModuleBuilder builder, JToken homepage) {
+            JArray homepageArray;
+            string homepageString;
+
+            if ((homepageArray = homepage as JArray) != null) {
+                foreach (var subHomepage in homepageArray) {
+                    AddHomepage(builder, subHomepage);
+                }
+            } else if (!string.IsNullOrEmpty(homepageString = (string)homepage)) {
+                builder.AddHomepage(homepageString);
+            }
         }
 
         private static void AddAuthor(NodeModuleBuilder builder, JToken author) {

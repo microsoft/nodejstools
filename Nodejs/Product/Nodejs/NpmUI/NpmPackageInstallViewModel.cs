@@ -349,14 +349,13 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
         }
 
-        internal bool CanOpenHomepage(PackageCatalogEntryViewModel packageCatalogEntryViewModel) {
-            return packageCatalogEntryViewModel != null && !string.IsNullOrEmpty(packageCatalogEntryViewModel.Homepage);
+        internal bool CanOpenHomepage(string homepage) {
+            return !string.IsNullOrEmpty(homepage);
         }
 
-        internal void OpenHomepage(PackageCatalogEntryViewModel packageCatalogEntryViewModel) {
-            var homepageLink = packageCatalogEntryViewModel.Homepage;
-            if (!string.IsNullOrEmpty(homepageLink)) {
-                Process.Start(homepageLink);
+        internal void OpenHomepage(string homepage) {
+            if (!string.IsNullOrEmpty(homepage)) {
+                Process.Start(homepage);
             }
         }
 

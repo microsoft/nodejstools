@@ -126,9 +126,8 @@ namespace NpmTests {
             out IDictionary<string, IPackage> byName) {
             IList<IPackage> target = new List<IPackage>();
 
-            using (var reader = GetCatalogueReader(filename))
-            {
-                target = Task.Run(() => NpmGetCatalogueCommand.ParseResultsFromReader(reader)).Result;
+            using (var reader = GetCatalogueReader(filename)) {
+                target = Task.Run(() => new NpmGetCatalogueCommand(string.Empty, false).ParseResultsFromReader(reader)).Result;
             }
 
             //  Do this after because package names can be split across multiple

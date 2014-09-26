@@ -58,19 +58,24 @@
                                     <TextBlock Margin="0" FontWeight="Bold" xml:space="preserve">Author: </TextBlock>
                                     <TextBlock Text="{Binding Path=Author, Mode=OneWay}"/>
                                 </StackPanel>
-
+                                
                                 <StackPanel Margin="0 4 0 4" x:Name="HomepageBlock"
-                                    Visibility="{Binding HomepageVisibility}"
+                                    Visibility="{Binding HomepagesVisibility}"
                                     Orientation="Horizontal">
                                     <TextBlock Margin="0" FontWeight="Bold" xml:space="preserve">Homepage: </TextBlock>
-                                    <Button x:Name="HomepageLink" Style="{StaticResource NavigationButton}"
-                                    Content="{Binding Path=Homepage, Mode=OneWay}"
-                                    Command="{x:Static npmUi:NpmPackageInstallViewModel.OpenHomepageCommand}"
-                                            CommandParameter="{Binding}"
-
-                                    KeyboardNavigation.IsTabStop="False"
-                                    Margin="0"
-                                    Padding="0"/>
+                                    <ItemsControl ItemsSource="{Binding Path=Homepages, Mode=OneWay}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Button Style="{StaticResource NavigationButton}"
+                                                        Content="{Binding Mode=OneWay}"
+                                                        Command="{x:Static npmUi:NpmPackageInstallViewModel.OpenHomepageCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        KeyboardNavigation.IsTabStop="False"
+                                                        Margin="0"
+                                                        Padding="0"/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
                                 </StackPanel>
 
                                 <TextBlock Margin="0 4 0 4" TextWrapping="Wrap" x:Name="DescriptionBlock" Visibility="{Binding Path=DescriptionVisibility, Mode=OneWay}">

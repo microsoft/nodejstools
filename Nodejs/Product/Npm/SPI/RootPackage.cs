@@ -13,6 +13,7 @@
  * ***************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.CSharp.RuntimeBinder;
 
@@ -61,7 +62,7 @@ The following error was reported:
             get { return null == PackageJson ? null : PackageJson.Description; }
         }
 
-        public string Homepage {
+        public IEnumerable<string> Homepages {
             get { return null == PackageJson ? null : PackageJson.Homepage; }
         }
 

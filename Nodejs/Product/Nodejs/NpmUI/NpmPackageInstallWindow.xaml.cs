@@ -81,11 +81,11 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
 
         private void OpenHomepageCommand_Executed(object sender, ExecutedRoutedEventArgs e) {
-            _vm.OpenHomepage(e.Parameter as PackageCatalogEntryViewModel);
+            _vm.OpenHomepage(e.Parameter as string);
         }
 
         private void OpenHomepageCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e) {
-            e.CanExecute = _vm.CanOpenHomepage(e.Parameter as PackageCatalogEntryViewModel);
+            e.CanExecute = _vm.CanOpenHomepage(e.Parameter as string);
             e.Handled = true;
         }
 

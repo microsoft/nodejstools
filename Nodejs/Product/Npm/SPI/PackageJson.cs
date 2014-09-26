@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using System.Collections.Generic;
 using Microsoft.CSharp.RuntimeBinder;
 using Newtonsoft.Json.Linq;
 
@@ -176,9 +177,7 @@ The following error occurred:
 
         public IKeywords Keywords { get; private set; }
 
-        public string Homepage {
-            get { return null == _package.homepage ? null : _package.homepage.ToString(); }
-        }
+        public IEnumerable<string> Homepage { get; private set; }
 
         public IBugs Bugs {
             get {
