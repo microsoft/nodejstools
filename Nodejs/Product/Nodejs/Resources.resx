@@ -452,7 +452,7 @@
     <value>Specifies the port used to communicate with the debugger</value>
   </data>
   <data name="EnvironmentVariables" xml:space="preserve">
-    <value>Specifies environment variables to be set in the spawned process in the form NAME=value;NAME1=value</value>
+    <value>Specifies environment variables to be set in the spawned process in the form:&#10;&#10;NAME1=value1&#10;NAME2=value2&#10;...</value>
   </data>
   <data name="DebuggerConnectionClosed" xml:space="preserve">
     <value>Debugger connection was closed.</value>
@@ -562,5 +562,8 @@ You will need to restart Visual Studio after installation.</value>
   </data>
   <data name="ErrorNoDte" xml:space="preserve">
     <value>Unable to start wizard: no automation object available.</value>
+  </data>
+  <data name="UpgradedEnvironmentVariables" xml:space="preserve">
+    <value>Replaced &lt;EnvironmentVariables&gt; property with &lt;Environment&gt;. This project will no longer work with NTVS 1.0 beta 2 or below.</value>
   </data>
 </root>

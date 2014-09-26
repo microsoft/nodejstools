@@ -313,9 +313,9 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private IEnumerable<KeyValuePair<string, string>> GetEnvironmentVariables() {
-            var envVars = _project.GetProjectProperty(NodejsConstants.EnvironmentVariables);
+            var envVars = _project.GetProjectProperty(NodejsConstants.Environment);
             if (envVars != null) {
-                foreach (var envVar in envVars.Split(';')) {
+                foreach (var envVar in envVars.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)) {
                     var nameValue = envVar.Split(new[] { '=' }, 2);
                     if (nameValue.Length == 2) {
                         yield return new KeyValuePair<string, string>(nameValue[0], nameValue[1]);

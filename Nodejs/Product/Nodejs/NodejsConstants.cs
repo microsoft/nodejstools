@@ -27,6 +27,7 @@ namespace Microsoft.NodejsTools {
         public const string Nodejs = "Node.js";
 
         public const string DebuggerPort = "DebuggerPort";
+        public const string Environment = "Environment";
         public const string EnvironmentVariables = "EnvironmentVariables";
         public const string LaunchUrl = "LaunchUrl";
         public const string NodeExePath = "NodeExePath";

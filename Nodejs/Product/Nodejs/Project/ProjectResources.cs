@@ -165,6 +165,7 @@ namespace Microsoft.NodejsTools.Project {
         internal const string StatusAnalysisSaving = "StatusAnalysisSaving";
         internal const string TestFramework = "TestFramework";
         internal const string TestFrameworkDescription = "TestFrameworkDescription";
+        internal const string UpgradedEnvironmentVariables = "UpgradedEnvironmentVariables";
         internal const string WorkingDirInvalidOrMissing = "WorkingDirInvalidOrMissing";
         internal const string WorkingDirToolTip = "WorkingDirToolTip";
 
