@@ -64,7 +64,7 @@ namespace Microsoft.NodejsTools.Profiling {
         internal static string NodeProjectGuid = "{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}";
         internal const string PerformanceFileFilter = "Performance Report Files|*.vspx;*.vsps";
         private AutomationProfiling _profilingAutomation;
-        private static OleMenuCommand _stopCommand, _startCommand, _startWizard, _startProfiling;
+        private static OleMenuCommand _stopCommand, _startCommand, _startWizard, _startProfiling, _startCommandCtx;
         internal const string PerfFileType = ".njsperf";
         
         /// <summary>
@@ -119,6 +119,13 @@ namespace Microsoft.NodejsTools.Profiling {
 
                 menuCommandID = new CommandID(Guids.NodejsProfilingCmdSet, (int)PkgCmdIDList.cmdidStartProfiling);
                 oleMenuItem = _startCommand = new OleMenuCommand(StartProfiling, menuCommandID);
+                oleMenuItem.BeforeQueryStatus += IsProfilingActiveAndSessionsExist;
+                mcs.AddCommand(oleMenuItem);
+                
+                // Exec is handled by the Performance Explorer node, but we want to handle QueryStatus here to disable
+                // the command when another profiling session is running.
+                menuCommandID = new CommandID(Guids.NodejsProfilingCmdSet, (int)PkgCmdIDList.cmdidPerfCtxStartProfiling);
+                oleMenuItem = _startCommandCtx = new OleMenuCommand(null, menuCommandID);
                 oleMenuItem.BeforeQueryStatus += IsProfilingActiveAndSessionsExist;
                 mcs.AddCommand(oleMenuItem);
 
@@ -442,6 +449,7 @@ namespace Microsoft.NodejsTools.Profiling {
                 _profilingProcess = null;
                 _stopCommand.Enabled = false;
                 _startCommand.Enabled = true;
+                _startCommandCtx.Enabled = true;
                 if (openReport && File.Exists(outPath)) {
                     dte.ItemOperations.OpenFile(outPath);
                 }
@@ -453,6 +461,7 @@ namespace Microsoft.NodejsTools.Profiling {
             _profilingProcess = process;
             _stopCommand.Enabled = true;
             _startCommand.Enabled = false;
+            _startCommandCtx.Enabled = false;
         }
 
         /// <summary>
