@@ -166,14 +166,16 @@ namespace Microsoft.VisualStudioTools.Project {
             get {
                 if (!this.ExcludeNodeFromScc) {
                     IVsSccManager2 sccManager = this.ProjectMgr.Site.GetService(typeof(SVsSccManager)) as IVsSccManager2;
-
                     if (sccManager != null) {
-                        VsStateIcon[] statIcons = new VsStateIcon[1] { VsStateIcon.STATEICON_NOSTATEICON };
-                        uint[] sccStatus = new uint[1] { 0 };
-                        // Get the glyph from the scc manager. Note that it will fail in command line
-                        // scenarios.
-                        if (ErrorHandler.Succeeded(sccManager.GetSccGlyph(1, new string[] { this.GetMkDocument() }, statIcons, sccStatus))) {
-                            return statIcons[0];
+                        string mkDocument = this.GetMkDocument();
+                        if (!string.IsNullOrEmpty(mkDocument)) {
+                            VsStateIcon[] statIcons = new VsStateIcon[1] { VsStateIcon.STATEICON_NOSTATEICON };
+                            uint[] sccStatus = new uint[1] { 0 };
+                            // Get the glyph from the scc manager. Note that it will fail in command line
+                            // scenarios.
+                            if (ErrorHandler.Succeeded(sccManager.GetSccGlyph(1, new string[] { mkDocument }, statIcons, sccStatus))) {
+                                return statIcons[0];
+                            }
                         }
                     }
                 }
