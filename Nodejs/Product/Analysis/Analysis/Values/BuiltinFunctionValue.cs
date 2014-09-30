@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.NodejsTools.Parsing;
+using Microsoft.NodejsTools.Analysis.Analyzer;
 
 
 namespace Microsoft.NodejsTools.Analysis.Values {
@@ -174,6 +175,89 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         public override IAnalysisSet Call(Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             return _func(this, node, unit, @this, args);
         }
+    }
+
+    [Serializable]
+    class CallbackArgInfo {
+        public readonly string Module, Member;
+
+        public CallbackArgInfo(string module, string member) {
+            Module = module;
+            Member = member;
+        }
+    }
+
+    [Serializable]
+    internal class LazyPropertyFunctionValue : BuiltinFunctionValue {
+        private readonly string _module;
+        private IAnalysisSet _retValue;
+
+        public LazyPropertyFunctionValue(ProjectEntry projectEntry, string name, string module)
+            : base(projectEntry, name, "", null) {
+            _module = module;
+        }
+
+        public override IAnalysisSet Call(Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            if (_retValue == null) {
+                string moduleName = _module;
+                string memberName = Name;
+
+                _retValue = ResolveMember(node, unit, moduleName, memberName);
+            }
+            return _retValue;
+        }
+
+        internal static IAnalysisSet ResolveMember(Node node, AnalysisUnit unit, string moduleName, string memberName) {
+            var module = unit.ProjectEntry.Analyzer.Modules.RequireModule(node, unit, moduleName);
+            return module.Get(node, unit, memberName, false);
+        }
+
+        public override IAnalysisSet ReturnTypes {
+            get {
+                return _retValue;
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// Specialized function for functions which take a function for a callback
+    /// such as http.createServer.
+    /// 
+    /// Performs a call back to the function so that the types are propagated.
+    /// </summary>
+    [Serializable]
+    internal class CallbackReturningFunctionValue : ReturningFunctionValue {
+        private readonly CallbackArgInfo[] _args;
+        private readonly IAnalysisSet[] _types;
+        private readonly int _index;
+
+        public CallbackReturningFunctionValue(ProjectEntry projectEntry, string name, IAnalysisSet retValue, int callbackArg, CallbackArgInfo[] args, string documentation = null, params ParameterResult[] signature)
+            : base(projectEntry, name, retValue, documentation, signature) {
+            _index = callbackArg;
+            _args = args;
+            _types = new IAnalysisSet[_args.Length];
+        }
+
+        public override IAnalysisSet Call(Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            if (_index < args.Length) {
+                IAnalysisSet[] callbackArgs = new IAnalysisSet[_args.Length];
+                for (int i = 0; i < _args.Length; i++) {
+                    if (_types[i] == null) {
+                        _types[i] = LazyPropertyFunctionValue.ResolveMember(
+                            node,
+                            unit,
+                            _args[i].Module,
+                            _args[i].Member
+                        ).Call(node, unit, null, ExpressionEvaluator.EmptySets);
+                    }
+                    callbackArgs[i] = _types[i];
+                }
+                args[_index].Call(node, unit, null, callbackArgs);
+            }
+
+            return base.Call(node, unit, @this, args);
+        }    
     }
 
     /// <summary>

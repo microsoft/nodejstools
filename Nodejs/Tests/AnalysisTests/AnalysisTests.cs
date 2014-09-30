@@ -192,6 +192,29 @@ x = g();";
 
         }
 
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/987
+        /// </summary>
+        [TestMethod, Priority(0)]
+        public void TestMembersListsInvalidIdentifier() {
+            string code = @"
+var x = {};
+x['./foo/quox.js'] = 42;
+var z = x['./foo/quox.js'];
+";
+            var analysis = ProcessText(code);
+
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("z", code.Length),
+                BuiltinTypeId.Number
+            );
+
+            AssertUtil.DoesntContain(
+                analysis.GetMembersByIndex("x", code.Length).Select(x => x.Completion),
+                "./foo/quox.js"
+            );
+        }
+
 
         [TestMethod, Priority(0)]
         public void TestPrimitiveMembers() {
@@ -1551,6 +1574,143 @@ var x = global.Infinity";
                 analysis.GetTypeIdsByIndex("x", code.Length),
                 BuiltinTypeId.Number
             );
+        }
+
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/1039
+        /// </summary>
+        [TestMethod, Priority(0)]
+        public void TestNodejsCallbacks() {
+            string code = @"
+var http = require('http');
+var https = require('https');
+var net = require('net');
+http.createServer(function (req, res) {
+    // 1
+});
+http.get({}, function (res) {
+    // 2
+});
+http.request({}, function (res) {
+    // 3
+});
+https.createServer(function (req, res) {
+    // 4
+});
+https.get({}, function (res) {
+    // 5
+});
+https.request({}, function (res) {
+    // 6
+});
+net.createServer(function(c) {
+    // 7
+});
+net.connect('', function(c) {
+    // 8
+});
+net.connect('', function(c) {
+    // 9
+});
+";
+
+            var analysis = ProcessText(code);
+
+            AssertUtil.ContainsAtLeast(
+                analysis.GetMembersByIndex("req", code.IndexOf("// 1")).Select(x => x.Completion), 
+                "abort",
+                "setTimeout",
+                "setNoDelay"
+            );
+            AssertUtil.ContainsAtLeast(
+                analysis.GetMembersByIndex("res", code.IndexOf("// 1")).Select(x => x.Completion),
+                "writeHead",
+                "end",
+                "removeHeader",
+                "addTrailers",
+                "writeContinue"
+            );
+
+            AssertUtil.ContainsAtLeast(
+                analysis.GetMembersByIndex("res", code.IndexOf("// 2")).Select(x => x.Completion),
+                "httpVersion",
+                "headers",
+                "trailers",
+                "method"
+            );
+            AssertUtil.ContainsAtLeast(
+                analysis.GetMembersByIndex("res", code.IndexOf("// 3")).Select(x => x.Completion),
+                "httpVersion",
+                "headers",
+                "trailers",
+                "method"
+            );
+
+            AssertUtil.ContainsAtLeast(
+                analysis.GetMembersByIndex("req", code.IndexOf("// 4")).Select(x => x.Completion),
+                "abort",
+                "setTimeout",
+                "setNoDelay"
+            );
+            AssertUtil.ContainsAtLeast(
+                analysis.GetMembersByIndex("res", code.IndexOf("// 4")).Select(x => x.Completion),
+                "writeHead",
+                "end",
+                "removeHeader",
+                "addTrailers",
+                "writeContinue"
+            );
+
+            AssertUtil.ContainsAtLeast(
+                analysis.GetMembersByIndex("res", code.IndexOf("// 5")).Select(x => x.Completion),
+                "httpVersion",
+                "headers",
+                "trailers",
+                "method"
+            );
+            AssertUtil.ContainsAtLeast(
+                analysis.GetMembersByIndex("res", code.IndexOf("// 6")).Select(x => x.Completion),
+                "httpVersion",
+                "headers",
+                "trailers",
+                "method"
+            );
+
+            AssertUtil.ContainsAtLeast(
+                analysis.GetMembersByIndex("c", code.IndexOf("// 7")).Select(x => x.Completion),
+                "connect",
+                "bufferSize"
+            );
+            AssertUtil.ContainsAtLeast(
+               analysis.GetMembersByIndex("c", code.IndexOf("// 8")).Select(x => x.Completion),
+               "connect",
+               "bufferSize"
+           );
+            AssertUtil.ContainsAtLeast(
+               analysis.GetMembersByIndex("c", code.IndexOf("// 9")).Select(x => x.Completion),
+               "connect",
+               "bufferSize"
+           );
+        }
+
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/914
+        /// </summary>
+        [TestMethod, Priority(0)]
+        public void TestNodejsSpecializations() {
+            string code = @"
+var pid = process.pid;
+var platform = process.platform;
+var maxTickDepth = process.maxTickDepth;
+var title = process.title;
+";
+
+            var analysis = ProcessText(code);
+
+            AssertUtil.ContainsExactly(analysis.GetTypeIdsByIndex("pid", code.Length), BuiltinTypeId.Number);
+            AssertUtil.ContainsExactly(analysis.GetTypeIdsByIndex("platform", code.Length), BuiltinTypeId.String);
+            AssertUtil.ContainsExactly(analysis.GetTypeIdsByIndex("maxTickDepth", code.Length), BuiltinTypeId.Number);
+            AssertUtil.ContainsExactly(analysis.GetTypeIdsByIndex("title", code.Length), BuiltinTypeId.String); 
         }
 
         /// <summary>

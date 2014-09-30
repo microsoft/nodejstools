@@ -147,6 +147,16 @@ console.log(err);
             }
         }
 
+        [TestMethod, Priority(0)]
+        public void TestFormatAfterBadFor() {
+            TestCode(@"function g() { 
+ for(int i = 0; i<1000000; i++) { 
+ }",
+   @"function g() {
+    for (int i = 0; i < 1000000; i++) { 
+    }");
+        }
+
         /// <summary>
         /// https://nodejstools.codeplex.com/workitem/1204
         /// </summary>

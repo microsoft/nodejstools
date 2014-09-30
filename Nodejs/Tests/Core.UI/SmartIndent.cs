@@ -38,12 +38,33 @@ namespace Microsoft.Nodejs.Tests.UI {
         }        
     }
 
-}")
+}"),
+          Compile("Bug1198", @"if (true)
+    if (true)
+        if (true)
+            return;
+")
         );
 
         [ClassInitialize]
         public static void DoDeployment(TestContext context) {
             AssertListener.Initialize();
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void SmartIndentBug1198() {
+            using (var solution = BasicProject.Generate().ToVs()) {
+                var doc = solution.OpenItem("AutoIndent", "Bug1198.js");
+                doc.Invoke(() => doc.TextView.Caret.MoveTo(doc.TextView.TextViewLines[4]));
+                Keyboard.Type(System.Windows.Input.Key.End);
+                Keyboard.Type(" ");
+                Assert.AreEqual(
+                    9,
+                    doc.TextView.Caret.Position.BufferPosition.GetContainingLine().Length
+                );
+            }
+
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
@@ -113,7 +134,7 @@ else if (true)
                 },
                 new { 
                     Typed = "while(true)\r42\r100",
-                    Expected = @"while(true)
+                    Expected = @"while (true)
     42
 100"              
                 },
@@ -168,7 +189,7 @@ bar""
                     Typed = "if (true) {\r/*foo\rbar*/\r\b}",
                     Expected = @"if (true) {
     /*foo
-bar*/
+     * bar*/
 }"
                 },
                 // auto dedent after return

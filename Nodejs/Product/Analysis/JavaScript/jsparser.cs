@@ -1290,7 +1290,7 @@ namespace Microsoft.NodejsTools.Parsing
 
                         if (JSToken.RightParenthesis != _curToken)
                         {
-                            ReportError(JSError.NoRightParenthesis);
+                            ReportError(JSError.NoRightParenthesis, true);
                         }
                         headerEnd = _curSpan.End;
 

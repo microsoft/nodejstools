@@ -318,6 +318,13 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             var res = new Dictionary<string, IAnalysisSet>();
             foreach (var kvp in _descriptors) {
                 var key = kvp.Key;
+                if (!JSScanner.IsValidIdentifier(key)) {
+                    // https://nodejstools.codeplex.com/workitem/987
+                    // for intellisense purposes we don't report invalid identifiers, but we can
+                    // end up with these from indexing with constant strings.
+                    continue;
+                }
+
                 if (kvp.Value.Values != null) {
                     //kvp.Value.Values.ClearOldValues();
                     if (kvp.Value.Values.VariableStillExists) {
@@ -401,7 +408,13 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 desc.Getter = def = new VariableDef();
             }
 
-            def.AddTypes(ProjectState._builtinEntry, new ReturningFunctionValue(ProjectEntry, member.Name, member.Value.Proxy).Proxy);
+            FunctionValue func;
+            if (member.Value is LazyPropertyFunctionValue) {
+                func = member.Value as LazyPropertyFunctionValue;
+            } else {
+                func = new ReturningFunctionValue(ProjectEntry, member.Name, member.Value.Proxy);
+            }
+            def.AddTypes(ProjectState._builtinEntry, func.Proxy);
         }
 
         public void AddProperty(Node node, AnalysisUnit unit, string name, AnalysisValue value) {

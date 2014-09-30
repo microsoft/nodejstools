@@ -25,6 +25,77 @@ using System.Diagnostics;
 namespace Microsoft.NodejsTools.Analysis {
     partial class NodejsModuleBuilder {
         private static Dictionary<string, Dictionary<string, FunctionSpecializer>> _moduleSpecializations = new Dictionary<string, Dictionary<string, FunctionSpecializer>>() { 
+            {
+                "http",
+                new Dictionary<string, FunctionSpecializer>() {
+                    { "createServer", 
+                       new CallbackFunctionSpecializer(
+                           0,
+                           new CallbackArgInfo("http", "ClientRequest"),
+                           new CallbackArgInfo("http", "ServerResponse")
+                        ) 
+                    },
+                    { "request", 
+                       new CallbackFunctionSpecializer(
+                           1,
+                           new CallbackArgInfo("http", "IncomingMessage")
+                        ) 
+                    },
+                    { "get", 
+                       new CallbackFunctionSpecializer(
+                           1,
+                           new CallbackArgInfo("http", "IncomingMessage")
+                        ) 
+                    }
+                }
+            },
+            {
+                "https",
+                new Dictionary<string, FunctionSpecializer>() {
+                    { "createServer", 
+                       new CallbackFunctionSpecializer(
+                           0,
+                           new CallbackArgInfo("http", "ClientRequest"),
+                           new CallbackArgInfo("http", "ServerResponse")
+                        ) 
+                    },
+                    { "request", 
+                       new CallbackFunctionSpecializer(
+                           1,
+                           new CallbackArgInfo("http", "IncomingMessage")
+                        ) 
+                    },
+                    { "get", 
+                       new CallbackFunctionSpecializer(
+                           1,
+                           new CallbackArgInfo("http", "IncomingMessage")
+                        ) 
+                    }
+                }
+            },
+            {
+                "net",
+                new Dictionary<string, FunctionSpecializer>() {
+                    {  "createServer", 
+                        new CallbackFunctionSpecializer(
+                           0,
+                           new CallbackArgInfo("net", "Socket")
+                        ) 
+                    },
+                    { "connect", 
+                       new CallbackFunctionSpecializer(
+                           1,
+                           new CallbackArgInfo("net", "Socket")
+                        ) 
+                    },
+                    { "createConnection", 
+                       new CallbackFunctionSpecializer(
+                           1,
+                           new CallbackArgInfo("net", "Socket")
+                        ) 
+                    }
+                }
+            },
             { 
                 "util", 
                 new Dictionary<string, FunctionSpecializer>() {
@@ -52,6 +123,18 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         };
 
+        private static Dictionary<string, Dictionary<string, PropertySpecializer>> _propertySpecializations = new Dictionary<string, Dictionary<string, PropertySpecializer>>() { 
+            { 
+                "process", 
+                new Dictionary<string, PropertySpecializer>() {
+                    { "platform", new ConstantSpecializer("win32") },
+                    { "pid", ConstantSpecializer.Number },
+                    { "maxTickDepth", ConstantSpecializer.Number },
+                    { "title", ConstantSpecializer.String }
+                }
+            },
+        };
+
         private static Dictionary<string, Dictionary<string, FunctionSpecializer>> _classSpecializations = new Dictionary<string, Dictionary<string, FunctionSpecializer>>() { 
             { 
                 "events.EventEmitter", 
@@ -63,8 +146,28 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         };
 
+        abstract class PropertySpecializer {
+            public abstract AnalysisValue Specialize(ProjectEntry projectEntry, string name);
+        }
+
+        class ConstantSpecializer : PropertySpecializer {
+            private readonly object _value;
+            public static ConstantSpecializer Number = new ConstantSpecializer(0.0);
+            public static ConstantSpecializer String = new ConstantSpecializer("");
+
+            public ConstantSpecializer(object value) {
+                _value = value;
+            }
+
+            public static ConstantSpecializer Instance = new ConstantSpecializer("");
+
+            public override AnalysisValue Specialize(ProjectEntry projectEntry, string name) {
+                return projectEntry.Analyzer.GetConstant(_value);
+            }
+        }
+
         abstract class FunctionSpecializer {
-            public abstract FunctionValue Specialize(ProjectEntry projectEntry, string name, string doc, ParameterResult[] parameters);
+            public abstract FunctionValue Specialize(ProjectEntry projectEntry, string name, string doc, AnalysisValue returnValue, ParameterResult[] parameters);
         }
 
         class CallableFunctionSpecializer : FunctionSpecializer {
@@ -74,7 +177,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 _delegate = callDelegate;
             }
 
-            public override FunctionValue Specialize(ProjectEntry projectEntry, string name, string doc, ParameterResult[] parameters) {
+            public override FunctionValue Specialize(ProjectEntry projectEntry, string name, string doc, AnalysisValue returnValue, ParameterResult[] parameters) {
                 return new SpecializedFunctionValue(
                     projectEntry,
                     name,
@@ -86,11 +189,33 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
+        class CallbackFunctionSpecializer : FunctionSpecializer {
+            private readonly int _index;
+            private readonly CallbackArgInfo[] _args;
+            
+            public CallbackFunctionSpecializer(int argIndex, params CallbackArgInfo[] args) {
+                _index = argIndex;
+                _args = args;
+            }
+
+            public override FunctionValue Specialize(ProjectEntry projectEntry, string name, string doc, AnalysisValue returnValue, ParameterResult[] parameters) {
+                return new CallbackReturningFunctionValue(
+                    projectEntry,
+                    name,
+                    returnValue != null ? returnValue.SelfSet : AnalysisSet.Empty,
+                    _index,
+                    _args,
+                    doc,
+                    parameters
+                );
+            }
+        }
+
         abstract class ReturnValueFunctionSpecializer : FunctionSpecializer {
             public static ReturnValueFunctionSpecializer String = new StringSpecializer();
             public static ReturnValueFunctionSpecializer Boolean = new BooleanSpecializer();
 
-            public override FunctionValue Specialize(ProjectEntry projectEntry, string name, string doc, ParameterResult[] parameters) {
+            public override FunctionValue Specialize(ProjectEntry projectEntry, string name, string doc, AnalysisValue returnValue, ParameterResult[] parameters) {
                 return new ReturningFunctionValue(
                     projectEntry,
                     name,
