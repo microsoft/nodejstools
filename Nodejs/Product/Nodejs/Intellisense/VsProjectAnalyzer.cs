@@ -221,7 +221,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             BufferParser bufferParser;
             lock (_viewBufferParserMap) {
                 bufferParser = EnqueueBuffer(projEntry, buffer);
-                
+
                 _viewBufferParserMap[textView] = bufferParser;
             }
 
@@ -743,7 +743,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             if (replEval != null) {
                 // We have a repl window, create an untracked module.
                 return _jsAnalyzer.AddModule(
-                    Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "repl" + Guid.NewGuid() + ".js"), 
+                    Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "repl" + Guid.NewGuid() + ".js"),
                     analysisCookie
                 );
             }
@@ -764,7 +764,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 } else {
                     return null;
                 }
-                
+
                 _projectFiles[path] = file = new ProjectItem(entry);
             }
 
@@ -931,8 +931,8 @@ namespace Microsoft.NodejsTools.Intellisense {
             ast = null;
             errorSink = new CollectingErrorSink();
 
-            var parser = CreateParser(content, errorSink);            
-            ast = ParseOneFile(ast, parser);            
+            var parser = CreateParser(content, errorSink);
+            ast = ParseOneFile(ast, parser);
         }
 
         private JsAst ParseOneFile(JsAst ast, JSParser parser) {
@@ -1082,7 +1082,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             return res;
         }
 
-        
+
         private void OnWarningAdded(string path) {
             var evt = WarningAdded;
             if (evt != null) {
@@ -1256,7 +1256,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         private void DeleteAnalysis() {
-            if (_projectDir != null) {
+            if (!_implicitProject && _projectDir != null) {
                 try {
                     var path = GetAnalysisPath();
                     File.Delete(path);
@@ -1267,7 +1267,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         private void SaveAnalysis() {
-            if (_projectDir == null || !_saveToDisk) {
+            if (_implicitProject || _projectDir == null || !_saveToDisk) {
                 return;
             }
 
@@ -1282,7 +1282,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                     }
                     using (FileStream fs = new FileStream(tempPath, FileMode.Create)) {
                         new FileInfo(tempPath).Attributes |= FileAttributes.Hidden;
-                        fs.Write(DbHeader, 0, DbHeader.Length);                        
+                        fs.Write(DbHeader, 0, DbHeader.Length);
                         try {
                             var serializer = new AnalysisSerializer();
                             serializer.Serialize(fs, _jsAnalyzer);
