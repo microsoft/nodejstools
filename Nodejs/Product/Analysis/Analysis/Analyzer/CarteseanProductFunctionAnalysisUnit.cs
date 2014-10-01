@@ -145,13 +145,10 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
             var originalThis = funcScope._this;
             funcScope._this = _this;
-            if (_callArgs.This != null) {
-                _this.AddTypes(this, _callArgs.This, false);
-            }
-
             function._curArgs = args;
+
             // Propagate the call types into the variables...
-            AddArgumentTypes(funcScope, args.Args);
+            AddArgumentTypes(funcScope, _callArgs.This, args.Args);
 
             var unifiedReturn = function.ReturnValue;
             function.ReturnValue = _returnValue;
@@ -165,6 +162,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 funcScope._this = originalThis;
                 function.ReturnValue = unifiedReturn;
                 function.ReturnValue.AddTypes(this, _returnValue.GetTypesNoCopy(this), false);
+                _this.CopyTo(originalThis);
 
                 // restore the locals, merging types back into the shared...
                 foreach (var variable in _specializedLocals) {

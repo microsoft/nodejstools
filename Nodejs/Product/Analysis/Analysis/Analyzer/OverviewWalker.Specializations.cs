@@ -556,19 +556,23 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             }
 
             if (args.Length > 0) {
-                foreach (var protoProps in args[0]) {
-                    ExpandoValue expandoProto = protoProps.Value as ExpandoValue;
-                    if (expandoProto != null) {
-                        value._prototype.AddLinkedValue(unit, expandoProto);
+                if (args[0].Count < unit.Analyzer.Limits.MaxMergeTypes) {
+                    foreach (var protoProps in args[0]) {
+                        ExpandoValue expandoProto = protoProps.Value as ExpandoValue;
+                        if (expandoProto != null) {
+                            value._prototype.AddLinkedValue(unit, expandoProto);
+                        }
                     }
                 }
             }
 
             if (args.Length > 1) {
-                foreach (var protoProps in args[1]) {
-                    ExpandoValue expandoProto = protoProps.Value as ExpandoValue;
-                    if (expandoProto != null) {
-                        value.AddLinkedValue(unit, expandoProto);
+                if (args[1].Count < unit.Analyzer.Limits.MaxMergeTypes) {
+                    foreach (var protoProps in args[1]) {
+                        ExpandoValue expandoProto = protoProps.Value as ExpandoValue;
+                        if (expandoProto != null) {
+                            value.AddLinkedValue(unit, expandoProto);
+                        }
                     }
                 }
             }
@@ -712,13 +716,15 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                         for (int i = 1; i < args.Length; i++) {
                             var curArg = args[i];
 
-                            foreach (var sourceValue in curArg) {
-                                var source = sourceValue.Value as ExpandoValue;
-                                if (source == null) {
-                                    continue;
-                                }
+                            if (curArg.Count < unit.Analyzer.Limits.MaxMergeTypes) {
+                                foreach (var sourceValue in curArg) {
+                                    var source = sourceValue.Value as ExpandoValue;
+                                    if (source == null) {
+                                        continue;
+                                    }
 
-                                target.AddLinkedValue(unit, source);
+                                    target.AddLinkedValue(unit, source);
+                                }
                             }
                         }
                     }
@@ -1267,13 +1273,15 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                     if (target == null) {
                         continue;
                     }
-                    foreach (var sourceValue in args[1]) {
-                        var source = sourceValue.Value as ExpandoValue;
-                        if (source == null) {
-                            continue;
-                        }
+                    if (args[1].Count < unit.Analyzer.Limits.MaxMergeTypes) {
+                        foreach (var sourceValue in args[1]) {
+                            var source = sourceValue.Value as ExpandoValue;
+                            if (source == null) {
+                                continue;
+                            }
 
-                        target.AddLinkedValue(unit, source);
+                            target.AddLinkedValue(unit, source);
+                        }
                     }
                 }
 

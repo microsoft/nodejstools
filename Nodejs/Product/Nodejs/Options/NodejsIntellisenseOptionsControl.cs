@@ -70,7 +70,7 @@ namespace Microsoft.NodejsTools.Options {
                 if (Int32.TryParse(_analysisLogMax.Text, out max)) {
                     return max;
                 }
-                return 100;
+                return 0;
             }
             set {
                 if (value == 0) {

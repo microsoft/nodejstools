@@ -262,10 +262,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 skipDeepAnalysis |= CheckTooManyValues(unit, @this);
             }
 
-            for (int i = 0; i < args.Length; i++) {
-                skipDeepAnalysis |= CheckTooManyValues(unit, args[i]);
-                if (skipDeepAnalysis) {
-                    break;
+            if (!skipDeepAnalysis) {
+                for (int i = 0; i < args.Length; i++) {
+                    skipDeepAnalysis |= CheckTooManyValues(unit, args[i]);
+                    if (skipDeepAnalysis) {
+                        break;
+                    }
                 }
             }
 
@@ -273,6 +275,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 // start merging all arguments into a single call analysis                
                 if (_analysisUnit.AddArgumentTypes(
                     (FunctionEnvironmentRecord)_analysisUnit._env,
+                    @this,
                     args,
                     _analysisUnit.Analyzer.Limits.MergedArgumentTypes
                 )) {

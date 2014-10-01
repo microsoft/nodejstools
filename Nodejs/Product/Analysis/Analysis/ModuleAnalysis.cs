@@ -89,7 +89,7 @@ namespace Microsoft.NodejsTools.Analysis {
 
         internal IEnumerable<AnalysisVariable> ReferencablesToVariables(IEnumerable<IReferenceable> defs) {
             foreach (var def in defs) {
-                foreach (var res in VariableTransformer.ScopeToVariables.ToVariables(_unit, def)) {
+                foreach (var res in VariableTransformer.OtherToVariables.ToVariables(_unit, def)) {
                     yield return res;
                 }
             }

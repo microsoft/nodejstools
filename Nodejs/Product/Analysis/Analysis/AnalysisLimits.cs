@@ -31,6 +31,7 @@ namespace Microsoft.NodejsTools.Analysis {
             MaxArrayLiterals = 50;
             MaxObjectLiteralProperties = 50;
             MaxObjectKeysTypes = 5;
+            MaxMergeTypes = 5;
         }
 
         public static AnalysisLimits MakeLowAnalysisLimits() {
@@ -103,6 +104,11 @@ namespace Microsoft.NodejsTools.Analysis {
 
         public int MaxObjectKeysTypes { get; set; }
 
+        /// <summary>
+        /// Gets the maximum number of types which can be merged at once.
+        /// </summary>
+        public int MaxMergeTypes { get; set; }
+
         public override bool Equals(object obj) {
             AnalysisLimits other = obj as AnalysisLimits;
             if (other != null) {
@@ -116,7 +122,8 @@ namespace Microsoft.NodejsTools.Analysis {
                     other.MergedArgumentTypes == MergedArgumentTypes &&
                     other.MaxArrayLiterals == MaxArrayLiterals &&
                     other.MaxObjectLiteralProperties == MaxObjectLiteralProperties &&
-                    other.MaxObjectKeysTypes == MaxObjectKeysTypes;
+                    other.MaxObjectKeysTypes == MaxObjectKeysTypes &&
+                    other.MaxMergeTypes == MaxMergeTypes;
             }
             return false;
         }
@@ -132,7 +139,8 @@ namespace Microsoft.NodejsTools.Analysis {
                 MergedArgumentTypes +
                 MaxArrayLiterals +
                 MaxObjectLiteralProperties +
-                MaxObjectKeysTypes;
+                MaxObjectKeysTypes +
+                MaxMergeTypes;
         }
     }
 }

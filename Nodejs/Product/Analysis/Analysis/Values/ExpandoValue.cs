@@ -516,7 +516,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
 
             if (_linkedValues != null) {
-                foreach (var value in _linkedValues.GetTypesNoCopy()) {
+                foreach (var value in _linkedValues.TypesNoCopy) {
                     IReferenceableContainer refContainer = value.Value as IReferenceableContainer;
                     if (refContainer != null) {
                         foreach (var result in refContainer.GetDefinitions(name)) {

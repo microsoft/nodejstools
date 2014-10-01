@@ -494,6 +494,34 @@ var x = new f().value;
             ); 
         }
 
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/931
+        /// 
+        /// This needs to flow when our function call analysis exceeds our limits.
+        /// </summary>
+        [TestMethod, Priority(0)]
+        public void TestThisFlows2() {
+            string code = @"
+var app = {};
+app.init = function() {
+    this.defaultInit();
+}
+
+app.defaultInit = function() {
+    this.foo = 42;
+}
+
+app.init()
+
+var x = app.foo;
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", 0),
+                BuiltinTypeId.Number
+            );
+        }
+        
         [TestMethod, Priority(0)]
         public void TestThisPassedAndReturned() {
             string code = @"function X(csv) {
@@ -560,6 +588,25 @@ var x = {};
                 analysis.GetVariablesByIndex("x.should", code.Length)
                     .Select(x => x.Location.Line + ", " + x.Location.Column + ", " + x.Type),
                 "2, 79, Definition"
+            );
+        }
+
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/1097
+        /// </summary>
+        [TestMethod, Priority(0)]
+        public void TestAttributeGotoDef() {
+            string code = @"
+var x = {}; 
+x.abc = 42; 
+x.abc
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsAtLeast(
+                analysis.GetVariablesByIndex("x.abc", code.Length)
+                    .Select(x => x.Location.Line + ", " + x.Location.Column + ", " + x.Type),
+                "3, 1, Definition",
+                "4, 1, Reference"
             );
         }
 

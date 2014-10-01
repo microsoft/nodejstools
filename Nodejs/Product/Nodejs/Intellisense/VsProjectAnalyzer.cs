@@ -1256,11 +1256,13 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         private void DeleteAnalysis() {
-            try {
-                var path = GetAnalysisPath();
-                File.Delete(path);
-            } catch (IOException) {
-            } catch (UnauthorizedAccessException) {
+            if (_projectDir != null) {
+                try {
+                    var path = GetAnalysisPath();
+                    File.Delete(path);
+                } catch (IOException) {
+                } catch (UnauthorizedAccessException) {
+                }
             }
         }
 

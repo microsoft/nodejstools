@@ -95,7 +95,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             }
         }
 
-        public bool AddArgumentTypes(FunctionEnvironmentRecord funcScope, IAnalysisSet[] arguments, int typeLimit = Int32.MaxValue) {
+        public bool AddArgumentTypes(FunctionEnvironmentRecord funcScope, IAnalysisSet @this, IAnalysisSet[] arguments, int typeLimit = Int32.MaxValue) {
             bool added = false;
             if (Ast.ParameterDeclarations != null) {
                 for (int i = 0; i < Ast.ParameterDeclarations.Length && i < arguments.Length; i++) {
@@ -105,6 +105,13 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                     }
                     
                     added |= variable.AddTypes(this, arguments[i], false);
+                }
+            }
+
+            if (@this != null) {
+                added |= funcScope._this.AddTypes(this, @this, false);
+                if (typeLimit != Int32.MaxValue) {
+                    added |= funcScope._this.MakeUnionStrongerIfMoreThan(typeLimit, @this);
                 }
             }
             return added;
