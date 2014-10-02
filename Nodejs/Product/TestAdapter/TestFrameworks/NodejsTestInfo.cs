@@ -27,11 +27,13 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
             TestFramework = parts[2];
         }
 
-        public NodejsTestInfo(string modulePath, string testName, string modulaName, string testFramework)
+        public NodejsTestInfo(string modulePath, string testName, string moduleName, string testFramework, int line, int column)
         {
             ModulePath = modulePath;
             TestName = testName;
             TestFramework = testFramework;
+            SourceLine = line;
+            SourceColumn = column;
         }
 
         public string FullyQualifiedName {
@@ -44,5 +46,9 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
         public string TestName { get; private set; }
 
         public string TestFramework { get; private set; }
+
+        public int SourceLine { get; private set; }
+
+        public int SourceColumn { get; private set; }
     }
 }

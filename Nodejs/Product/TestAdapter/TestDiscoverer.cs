@@ -102,7 +102,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                                     logger.SendMessage(TestMessageLevel.Informational, String.Format("Creating TestCase:{0}", qualifiedName));
                                     var testCase = new TestCase(qualifiedName, TestExecutor.ExecutorUri, projSource) {
                                         CodeFilePath = testFileAbsolutePath,
-                                        LineNumber = 0,
+                                        LineNumber = discoveredTest.SourceLine,
                                         DisplayName = discoveredTest.TestName
                                     };
                                     discoverySink.SendTestCase(testCase);

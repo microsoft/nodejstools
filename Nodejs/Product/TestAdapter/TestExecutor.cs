@@ -91,7 +91,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
             // No VS instance just means no debugging, but everything else is
             // okay.
             using (var app = VisualStudioApp.FromCommandLineArgs(Environment.GetCommandLineArgs())) {
-                // .pyproj file path -> project settings
+                // .njsproj file path -> project settings
                 var sourceToSettings = new Dictionary<string, NodejsProjectSettings>();
 
                 foreach (var test in tests) {

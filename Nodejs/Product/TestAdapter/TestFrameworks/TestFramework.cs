@@ -81,7 +81,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
             List<DiscoveredTest> discoveredTests = (List<DiscoveredTest>)JsonConvert.DeserializeObject(testInfo, typeof(List<DiscoveredTest>));
             if (discoveredTests != null) {
                 foreach (DiscoveredTest discoveredTest in discoveredTests) {
-                    NodejsTestInfo test = new NodejsTestInfo(testFile, discoveredTest.Test, discoveredTest.Suite, Name);
+                    NodejsTestInfo test = new NodejsTestInfo(testFile, discoveredTest.Test, discoveredTest.Suite, Name, discoveredTest.Line, discoveredTest.Column);
                     testCases.Add(test);
                 }
             }
@@ -110,7 +110,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
 
         private string EvaluateJavaScript(string nodeExePath, string testFile, string discoverResultFile, IMessageLogger logger, string workingDirectory) {
             workingDirectory = workingDirectory.TrimEnd(new char['\\']);
-            string arguments = WrapWithQuot(_findTestsScriptFile)
+            string arguments = "--expose_debug_as=dbg " + WrapWithQuot(_findTestsScriptFile)
                 + " " + Name +
                 " " + WrapWithQuot(testFile) +
                 " " + WrapWithQuot(discoverResultFile) +
@@ -156,6 +156,8 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
         private class DiscoveredTest {
             public string Test { get; set; }
             public string Suite { get; set; }
+            public int Line { get; set; }
+            public int Column { get; set; }
         }
     }
 }

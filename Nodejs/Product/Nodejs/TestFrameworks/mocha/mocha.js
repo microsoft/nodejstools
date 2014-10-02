@@ -16,7 +16,9 @@ var find_tests = function (testFile, discoverResultFile, projectFolder) {
                 suite.tests.forEach(function (t, i, testArray) {
                     testList.push({
                         test: t.fullTitle(),
-                        suite: suite.fullTitle()
+                        suite: suite.fullTitle(),
+                        line: 0,
+                        column: 0
                     });
                 });
             }
