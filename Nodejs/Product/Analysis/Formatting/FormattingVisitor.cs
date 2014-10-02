@@ -184,9 +184,9 @@ namespace Microsoft.NodejsTools.Formatting {
         public override bool Walk(TryNode node) {
             ReplacePreceedingIncludingNewLines(
                 node.TryBlock.GetStartIndex(
-                _tree.LocationResolver), 
+                _tree.LocationResolver),
                 GetFlowControlBraceInsertion(
-                    node.GetStartIndex(_tree.LocationResolver) + "try".Length, 
+                    node.GetStartIndex(_tree.LocationResolver) + "try".Length,
                     false
                 )
             );
@@ -209,7 +209,7 @@ namespace Microsoft.NodejsTools.Formatting {
                 );
 
                 ReplacePreceedingIncludingNewLines(
-                    node.CatchBlock.GetStartIndex(_tree.LocationResolver), 
+                    node.CatchBlock.GetStartIndex(_tree.LocationResolver),
                     GetFlowControlBraceInsertion(node.CatchParameter.GetEndIndex(_tree.LocationResolver), true)
                 );
                 WalkBlock(node.CatchBlock);
@@ -220,7 +220,7 @@ namespace Microsoft.NodejsTools.Formatting {
                     ReplacePreceedingWhiteSpace(node.FinallyStart, " ", _closeBrace);
                 }
                 ReplacePreceedingIncludingNewLines(
-                    node.FinallyBlock.GetStartIndex(_tree.LocationResolver), 
+                    node.FinallyBlock.GetStartIndex(_tree.LocationResolver),
                     GetFlowControlBraceInsertion(node.FinallyStart + "finally".Length, false)
                 );
                 WalkBlock(node.FinallyBlock);
@@ -544,7 +544,9 @@ namespace Microsoft.NodejsTools.Formatting {
                 _options.SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis ? " " : ""
             );
 
-            node.Operand.Walk(this);
+            if (node.Operand != null) {
+                node.Operand.Walk(this);
+            }
 
             ReplacePreceedingWhiteSpace(
                 node.GetEndIndex(_tree.LocationResolver) - 1,
@@ -622,7 +624,7 @@ namespace Microsoft.NodejsTools.Formatting {
                 if (node.OperatorToken == JSToken.Void ||
                     node.OperatorToken == JSToken.TypeOf ||
                     node.OperatorToken == JSToken.Delete) {
-                        ReplacePreceedingWhiteSpace(node.Operand.GetStartIndex(_tree.LocationResolver), " ");
+                    ReplacePreceedingWhiteSpace(node.Operand.GetStartIndex(_tree.LocationResolver), " ");
                 } else {
                     ReplacePreceedingWhiteSpace(node.Operand.GetStartIndex(_tree.LocationResolver), "");
                 }
@@ -877,7 +879,12 @@ namespace Microsoft.NodejsTools.Formatting {
         private bool FixStatementIndentation(int prevStart, int end) {
             bool newlines = false;
             int newLine;
-            while ((newLine = _code.IndexOfAny(_newlines, prevStart, end - prevStart)) != -1) {
+            // It should never be the case that end is before the previous start.  If this happens our spans are not in
+            // the correct order.  This likely points to an issue with the parser.  We will catch it here to avoid crashes,
+            Debug.Assert(end - prevStart >= 0,
+                "Before looping through characters, we have specified the end point before the start point.  " +
+                "We can't look at a negative range to find the index of newlines.");
+            while (end - prevStart >= 0 && (newLine = _code.IndexOfAny(_newlines, prevStart, end - prevStart)) != -1) {
                 bool endsInSingleLineComment;
                 int startTerminatingWhiteSpace, whiteSpaceCount;
                 ParseEndOfLine(prevStart, false, out endsInSingleLineComment, out startTerminatingWhiteSpace, out whiteSpaceCount);
@@ -895,6 +902,9 @@ namespace Microsoft.NodejsTools.Formatting {
                     prevStart = newLine + 2;
                 }
                 ReplaceFollowingWhiteSpace(prevStart, GetIndentation());
+                Debug.Assert(end - prevStart >= 0,
+                    "While looping through characters, we have specified the end point before the start point.  " +
+                    "We can't look at a negative range to find the index of newlines.");
             }
             return newlines;
         }

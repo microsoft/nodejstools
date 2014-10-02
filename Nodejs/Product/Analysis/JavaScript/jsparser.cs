@@ -3935,7 +3935,20 @@ namespace Microsoft.NodejsTools.Parsing
                                 m_noSkipTokenSet.Remove(NoSkipTokenSet.s_ParenToken);
                             }
 
-                            expression = new CallNode(CombineWithCurrentSpan(expression.EncodedSpan))
+                            EncodedSpan callSpan = expression.EncodedSpan;                          
+                            if (!m_useCurrentForNext) {
+                                // If we said don't use current for next, we can just combine 
+                                // with the current span. For instance, if there is already a right paren.
+                                callSpan = CombineWithCurrentSpan(callSpan);
+                            } else if (args.Count > 0) {
+                                // If we have args left after parsing the expression list, append to the last arg span.
+                                callSpan = CombineWithOtherSpan(
+                                    callSpan,
+                                    args[args.Count - 1].EncodedSpan
+                                );
+                            }
+
+                            expression = new CallNode(callSpan)
                                 {
                                     Function = expression,
                                     Arguments = ToArray(args),
