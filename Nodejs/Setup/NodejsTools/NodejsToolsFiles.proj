@@ -9,7 +9,8 @@
     <ItemGroup>
         <!-- Registration files -->
         <File Include="$(ObjDir)\extension.vsixmanifest" />
-        <File Include="Microsoft.NodejsTools.pkgdef" />
+        <File Include="Microsoft.NodejsTools.pkgdef;
+                       Microsoft.NodejsTools.theme.pkgdef" />
 
         <!-- Core extension -->
         <File Include="Microsoft.NodejsTools.dll" />
