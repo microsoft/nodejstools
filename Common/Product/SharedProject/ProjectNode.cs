@@ -318,6 +318,11 @@ namespace Microsoft.VisualStudioTools.Project {
         public abstract string ProjectType {
             get;
         }
+
+        internal abstract string IssueTrackerUrl {
+            get;
+        }
+
         #endregion
 
         #region virtual properties
@@ -545,6 +550,20 @@ namespace Microsoft.VisualStudioTools.Project {
             }
             set {
                 this.showProjectInSolutionPage = value;
+            }
+        }
+
+        /// <summary>
+        /// A space separated list of the project's capabilities.
+        /// </summary>
+        /// <remarks>
+        /// These may be used by extensions to check whether they support this
+        /// project type. In general, this should only contain fundamental
+        /// properties of the project, such as the language name.
+        /// </remarks>
+        protected virtual string ProjectCapabilities {
+            get {
+                return null;
             }
         }
 
@@ -970,6 +989,17 @@ namespace Microsoft.VisualStudioTools.Project {
                 default:
                     break;
             }
+
+#if DEV11_OR_LATER
+            switch ((__VSHPROPID5)propId) {
+                case __VSHPROPID5.VSHPROPID_ProjectCapabilities:
+                    var caps = ProjectCapabilities;
+                    if (!string.IsNullOrEmpty(caps)) {
+                        return caps;
+                    }
+                    break;
+            }
+#endif
 
             return base.GetProperty(propId);
         }
@@ -5721,17 +5751,18 @@ If the files in the existing folder have the same names as files in the folder y
                 return;
             }
 
+            bool wasExpanded = ParentHierarchy != null && parent.GetIsExpanded();
+
             foreach (IVsHierarchyEvents sink in _hierarchyEventSinks) {
-                bool wasExpanded = parent.GetIsExpanded();
                 int result = sink.OnInvalidateItems(parent.HierarchyId);
 
                 if (ErrorHandler.Failed(result) && result != VSConstants.E_NOTIMPL) {
                     ErrorHandler.ThrowOnFailure(result);
                 }
+            }
 
-                if (wasExpanded) {
-                    parent.ExpandItem(EXPANDFLAGS.EXPF_ExpandFolder);
-                }
+            if (wasExpanded) {
+                parent.ExpandItem(EXPANDFLAGS.EXPF_ExpandFolder);
             }
         }
 

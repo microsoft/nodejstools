@@ -542,6 +542,11 @@ try {
         Write-Output "Copying source files"
         robocopy /s . $outdir\Sources /xd Python Layouts TestResults Binaries Servicing obj | Out-Null
     }
+    
+    if ($signedbuild) {
+        start_virus_scan "NTVS$spacename" "ntvscore" $outdir
+    }
+    
     $successful = $true
 } finally {
     if ($asmverfileBackedUp) {

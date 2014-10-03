@@ -26,6 +26,8 @@ namespace Microsoft.NodejsTools {
         public const string CSS = "CSS";
         public const string Nodejs = "Node.js";
 
+        public const string IssueTrackerUrl = "https://go.microsoft.com/fwlink/?LinkId=507637";
+
         public const string DebuggerPort = "DebuggerPort";
         public const string Environment = "Environment";
         public const string EnvironmentVariables = "EnvironmentVariables";

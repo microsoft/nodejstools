@@ -36,10 +36,10 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var project = solution.WaitForItem("AddNewTypeScriptItem", "server.js");
                 AutomationWrapper.Select(project);
 
-                var dialog = solution.App.OpenDialogWithDteExecuteCommand("Project.AddNewItem");
-                var newItem = new NewItemDialog(AutomationElement.FromHandle(dialog));
-                newItem.FileName = "NewTSFile.ts";
-                newItem.ClickOK();
+                using (var newItem = NewItemDialog.FromDte(solution.App)) {
+                    newItem.FileName = "NewTSFile.ts";
+                    newItem.OK();
+                }
 
                 using (AutoResetEvent buildDone = new AutoResetEvent(false)) {
                     solution.App.Dte.Events.BuildEvents.OnBuildDone += (sender, args) => {

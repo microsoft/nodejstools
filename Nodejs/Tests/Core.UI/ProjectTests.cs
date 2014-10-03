@@ -340,11 +340,10 @@ http.createServer(function (req, res) {
             var openFile = OpenProjectItem("server.js", out window);
 
             using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
-                var dialog = app.OpenDialogWithDteExecuteCommand("Project.AddNewItem");
-
-                var newItem = new NewItemDialog(AutomationElement.FromHandle(dialog));
-                newItem.FileName = "NewJSFile.js";
-                newItem.ClickOK();
+                using (var newItem = NewItemDialog.FromDte(app)) {
+                    newItem.FileName = "NewJSFile.js";
+                    newItem.OK();
+                }
 
                 System.Threading.Thread.Sleep(250);
 

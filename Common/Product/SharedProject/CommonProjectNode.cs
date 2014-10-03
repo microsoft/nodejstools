@@ -53,7 +53,7 @@ namespace Microsoft.VisualStudioTools.Project {
         private static ImageList _imageList;
         private ProjectDocumentsListenerForStartupFileUpdates _projectDocListenerForStartupFileUpdates;
         private int _imageOffset;
-        private FileWatcher _watcher, _attributesWatcher;
+        private FileSystemWatcher _watcher, _attributesWatcher;
         private int _suppressFileWatcherCount;
         private bool _isRefreshing;
         private bool _showingAllFiles;
@@ -63,7 +63,7 @@ namespace Microsoft.VisualStudioTools.Project {
         private Queue<FileSystemChange> _fileSystemChanges = new Queue<FileSystemChange>();
         private object _fileSystemChangesLock = new object();
         private MSBuild.Project _userBuildProject;
-        private readonly Dictionary<string, FileWatcher> _symlinkWatchers = new Dictionary<string, FileWatcher>();
+        private readonly Dictionary<string, FileSystemWatcher> _symlinkWatchers = new Dictionary<string, FileSystemWatcher>();
         private DiskMerger _currentMerger;
 #if DEV11_OR_LATER
         private IVsHierarchyItemManager _hierarchyManager;
@@ -325,7 +325,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// 
         /// Returns true if the publish was succeessfully started, false if the project is not configured for publishing
         /// </summary>
-        public bool Publish(PublishProjectOptions publishOptions, bool async) {
+        public virtual bool Publish(PublishProjectOptions publishOptions, bool async) {
             string publishUrl = publishOptions.DestinationUrl ?? GetProjectProperty(CommonConstants.PublishUrl);
             bool found = false;
             if (!String.IsNullOrWhiteSpace(publishUrl)) {
@@ -442,9 +442,13 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
-        private FileWatcher CreateFileSystemWatcher(string dir) {
-            var watcher = new FileWatcher(dir);
-            watcher.IncludeSubdirectories = true;
+        private FileSystemWatcher CreateFileSystemWatcher(string dir) {
+            var watcher = new FileSystemWatcher(dir) {
+                InternalBufferSize = 1024 * 4,  // 4k is minimum buffer size
+                IncludeSubdirectories = true
+            };
+
+            // Set Event Handlers
             watcher.Created += new FileSystemEventHandler(FileExistanceChanged);
             watcher.Deleted += new FileSystemEventHandler(FileExistanceChanged);
             watcher.Renamed += new RenamedEventHandler(FileNameChanged);
@@ -453,19 +457,27 @@ namespace Microsoft.VisualStudioTools.Project {
             watcher.Renamed += FileContentsChanged;
 #endif
             watcher.Error += WatcherError;
+
+            // Delay setting EnableRaisingEvents until everything else is initialized.
             watcher.EnableRaisingEvents = true;
-            watcher.InternalBufferSize = 1024 * 4;  // 4k is minimum buffer size
+
             return watcher;
         }
 
-        private FileWatcher CreateAttributesWatcher(string dir) {
-            var watcher = new FileWatcher(dir);
-            watcher.IncludeSubdirectories = true;
-            watcher.NotifyFilter = NotifyFilters.Attributes;
+        private FileSystemWatcher CreateAttributesWatcher(string dir) {
+            var watcher = new FileSystemWatcher(dir) {
+                IncludeSubdirectories = true,
+                NotifyFilter = NotifyFilters.Attributes,
+                InternalBufferSize = 1024 * 4, // 4k is minimum buffer size
+            };
+
+            // Set Event Handlers
             watcher.Changed += FileAttributesChanged;
             watcher.Error += WatcherError;
+
+            // Delay setting EnableRaisingEvents until everything else is initialized.
             watcher.EnableRaisingEvents = true;
-            watcher.InternalBufferSize = 1024 * 4;  // 4k is minimum buffer size
+
             return watcher;
         }
 
@@ -889,16 +901,16 @@ namespace Microsoft.VisualStudioTools.Project {
             }
 
             try {
-                lock (_fileSystemChanges) {
-                    // we just generate a delete and creation here - we're just updating the hierarchy
-                    // either changing icons or updating the non-project elements, so we don't need to
-                    // generate rename events or anything like that.  This saves us from having to 
-                    // handle updating the hierarchy in a special way for renames.
-                    if (NoPendingFileSystemRescan()) {
-                        _fileSystemChanges.Enqueue(new FileSystemChange(this, WatcherChangeTypes.Deleted, e.OldFullPath, true));
-                        _fileSystemChanges.Enqueue(new FileSystemChange(this, WatcherChangeTypes.Created, e.FullPath, true));
-                        TriggerIdle();
-                    }
+            lock (_fileSystemChanges) {
+                // we just generate a delete and creation here - we're just updating the hierarchy
+                // either changing icons or updating the non-project elements, so we don't need to
+                // generate rename events or anything like that.  This saves us from having to 
+                // handle updating the hierarchy in a special way for renames.
+                if (NoPendingFileSystemRescan()) {
+                    _fileSystemChanges.Enqueue(new FileSystemChange(this, WatcherChangeTypes.Deleted, e.OldFullPath, true));
+                    _fileSystemChanges.Enqueue(new FileSystemChange(this, WatcherChangeTypes.Created, e.FullPath, true));
+                    TriggerIdle();
+                }
                 }
             } catch (PathTooLongException) {
                 // A rename event can be reported for a path that's too long, and then access to RenamedEventArgs
@@ -939,7 +951,7 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
         internal bool TryDeactivateSymLinkWatcher(HierarchyNode child) {
-            FileWatcher watcher;
+            FileSystemWatcher watcher;
             if (_symlinkWatchers.TryGetValue(child.Url, out watcher)) {
                 _symlinkWatchers.Remove(child.Url);
                 watcher.EnableRaisingEvents = false;

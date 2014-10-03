@@ -63,7 +63,7 @@ namespace ProfilingUITests {
             });
             var dialog = app.WaitForDialog(task);
             if (dialog != IntPtr.Zero) {
-                SavePerfFile(saveDirectory, dialog);
+                SavePerfFile(saveDirectory, app, dialog);
                 try {
                     task.Wait(TimeSpan.FromSeconds(5.0));
                     Assert.Fail("Task did not fault");
@@ -74,22 +74,23 @@ namespace ProfilingUITests {
             return session;
         }
 
-        private static string SavePerfFile(string saveDirectory, IntPtr dialog) {
-            var saveDialog = new SaveDialog(dialog);
+        private static string SavePerfFile(string saveDirectory, VisualStudioApp app, IntPtr? dialog = null) {
+            string destName;
+            using (var saveDialog = new SaveDialog(app, AutomationElement.FromHandle(dialog ?? app.WaitForDialog()))) {
+                var originalDestName = Path.Combine(saveDirectory, Path.GetFileName(saveDialog.FileName));
+                destName = originalDestName;
 
-            var originalDestName = Path.Combine(saveDirectory, Path.GetFileName(saveDialog.FileName));
-            var destName = originalDestName;
+                while (File.Exists(destName)) {
+                    destName = string.Format("{0} {1}{2}",
+                        Path.GetFileNameWithoutExtension(originalDestName),
+                        Guid.NewGuid(),
+                        Path.GetExtension(originalDestName)
+                    );
+                }
 
-            while (File.Exists(destName)) {
-                destName = string.Format("{0} {1}{2}",
-                    Path.GetFileNameWithoutExtension(originalDestName),
-                    Guid.NewGuid(),
-                    Path.GetExtension(originalDestName)
-                );
+                saveDialog.FileName = destName;
+                saveDialog.Save();
             }
-
-            saveDialog.FileName = destName;
-            saveDialog.Save();
             return destName;
         }
 
@@ -290,7 +291,7 @@ namespace ProfilingUITests {
                         Mouse.MoveTo(perf.GetClickablePoint());
                         Mouse.Click(System.Windows.Input.MouseButton.Right);
                         Keyboard.Type("S");
-                        savedFile = SavePerfFile(TestData.GetPath(@"TestData\NodejsProfileTest"), app.WaitForDialog());
+                        savedFile = SavePerfFile(TestData.GetPath(@"TestData\NodejsProfileTest"), app);
 
                         var item = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *", "Reports");
                         AutomationElement child = null;
@@ -367,8 +368,8 @@ namespace ProfilingUITests {
                         Mouse.MoveTo(perf.GetClickablePoint());
                         Mouse.Click(System.Windows.Input.MouseButton.Right);
                         Keyboard.Type("S");
-                        SavePerfFile(TestData.GetPath(@"TestData\NodejsProfileTest"), app.WaitForDialog());
-                        SavePerfFile(TestData.GetPath(@"TestData\NodejsProfileTest"), app.WaitForDialog());
+                        SavePerfFile(TestData.GetPath(@"TestData\NodejsProfileTest"), app);
+                        SavePerfFile(TestData.GetPath(@"TestData\NodejsProfileTest"), app);
 
                         var item = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance1 *", "Reports");
                         AutomationElement child = null;
@@ -444,8 +445,8 @@ namespace ProfilingUITests {
                         Mouse.MoveTo(perf.GetClickablePoint());
                         Mouse.Click(System.Windows.Input.MouseButton.Right);
                         Keyboard.Type("S");
-                        SavePerfFile(TestData.GetPath(@"TestData\NodejsProfileTest"), app.WaitForDialog());
-                        SavePerfFile(TestData.GetPath(@"TestData\NodejsProfileTest"), app.WaitForDialog());
+                        SavePerfFile(TestData.GetPath(@"TestData\NodejsProfileTest"), app);
+                        SavePerfFile(TestData.GetPath(@"TestData\NodejsProfileTest"), app);
 
                         var item = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *", "Reports");
                         AutomationElement child = null;

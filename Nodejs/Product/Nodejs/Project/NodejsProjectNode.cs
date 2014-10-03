@@ -107,6 +107,10 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
+        internal override string IssueTrackerUrl {
+            get { return NodejsConstants.IssueTrackerUrl; }
+        }
+
         protected override void FinishProjectCreation(string sourceFolder, string destFolder) {
             foreach (MSBuild.ProjectItem item in this.BuildProject.Items) {
                 if (String.Equals(Path.GetExtension(item.EvaluatedInclude), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {

@@ -84,8 +84,9 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     );
 
                     // paste again, we should get the replace prompts...
-                    var dialog = new OverwriteFileDialog(solution.App.WaitForDialog());
-                    dialog.Cancel();
+                    using (var dialog = OverwriteFileDialog.Wait(solution.App)) {
+                        dialog.Cancel();
+                    }
 
                     // https://pytools.codeplex.com/workitem/1154
                     // and we shouldn't get a second dialog after cancelling...
@@ -250,7 +251,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
                     copier(folderNode, serverCopy);
 
-                    VisualStudioApp.CheckMessageBox("The filename is too long.");
+                    // Depending on VS version/update, the message may be:
+                    //  "The filename is too long."
+                    //  "The filename or extension is too long."
+                    VisualStudioApp.CheckMessageBox(" filename ", " is too long.");
                 }
             }
         }
@@ -304,7 +308,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
                     mover(folderNode, serverCopy);
 
-                    VisualStudioApp.CheckMessageBox("The filename is too long.");
+                    // Depending on VS version/update, the message may be:
+                    //  "The filename is too long."
+                    //  "The filename or extension is too long."
+                    VisualStudioApp.CheckMessageBox(" filename ", " is too long.");
                 }
             }
         }
@@ -533,7 +540,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
 
         /// <summary>
-        /// Move a file to a location where a file with the name now already exists.  We should get an overwrite
+        /// Move a file to a location where A file with the same name now already exists.  We should get an overwrite
         /// dialog, and after answering yes to overwrite the file should be moved.
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
@@ -556,8 +563,9 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         solution.WaitForItem("DragDropCopyCutPaste", "MoveDupFilename", "Fob", "server" + projectType.CodeExtension)
                     );
 
-                    var dialog = new OverwriteFileDialog(solution.App.WaitForDialog());
-                    dialog.Yes();
+                    using (var dialog = OverwriteFileDialog.Wait(solution.App)) {
+                        dialog.Yes();
+                    }
 
                     solution.AssertFileExists("DragDropCopyCutPaste", "MoveDupFilename", "server" + projectType.CodeExtension);
                     solution.AssertFileDoesntExist("DragDropCopyCutPaste", "MoveDupFilename", "Fob", "server" + projectType.CodeExtension);
@@ -845,9 +853,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         solution.WaitForItem("DragDropCopyCutPaste", "CopyDuplicateFolderName")
                     );
 
-                    var dialog = new OverwriteFileDialog(solution.App.WaitForDialog());
-                    Assert.IsTrue(dialog.Text.Contains("This folder already contains a folder called 'CopyDuplicateFolderName'"), "wrong text in overwrite dialog");
-                    dialog.No();
+                    using (var dialog = OverwriteFileDialog.Wait(solution.App)) {
+                        AssertUtil.Contains(dialog.Text, "This folder already contains a folder called 'CopyDuplicateFolderName'");
+                        dialog.No();
+                    }
 
                     solution.AssertFileDoesntExist("DragDropCopyCutPaste", "CopyDuplicateFolderNameTarget", "CopyDuplicateFolderName", "server" + projectType.CodeExtension);
                 }
@@ -950,9 +959,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         solution.WaitForItem("DragDropCopyCutPaste", "quox.txt")
                     );
 
-                    var dialog = new OverwriteFileDialog(solution.App.WaitForDialog());
-                    Assert.IsTrue(dialog.Text.Contains("A file with the name 'quox.txt' already exists."), "wrong text");
-                    dialog.Yes();
+                    using (var dialog = OverwriteFileDialog.Wait(solution.App)) {
+                        AssertUtil.Contains(dialog.Text, "A file with the same name 'quox.txt' already exists.");
+                        dialog.Yes();
+                    }
 
                     solution.AssertFileExists("DragDropCopyCutPaste", "B", "quox.txt");
                     solution.AssertFileDoesntExist("DragDropCopyCutPaste", "quox.txt");
@@ -1003,10 +1013,11 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         solution.WaitForItem("DragDropCopyCutPaste", "quox.txt")
                     );
 
-                    var dialog = new OverwriteFileDialog(solution.App.WaitForDialog());
-                    Assert.IsTrue(dialog.Text.Contains("A file with the name 'quox.txt' already exists."), "wrong text");
-                    dialog.AllItems = true;
-                    dialog.Yes();
+                    using (var dialog = OverwriteFileDialog.Wait(solution.App)) {
+                        AssertUtil.Contains(dialog.Text, "A file with the same name 'quox.txt' already exists.");
+                        dialog.AllItems = true;
+                        dialog.Yes();
+                    }
 
                     solution.AssertFileExists("DragDropCopyCutPaste", "B", "quox.txt");
                     solution.AssertFileDoesntExist("DragDropCopyCutPaste", "quox.txt");
@@ -1056,9 +1067,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         solution.WaitForItem("DragDropCopyCutPaste", "quox.txt")
                     );
 
-                    var dialog = new OverwriteFileDialog(solution.App.WaitForDialog());
-                    Assert.IsTrue(dialog.Text.Contains("A file with the name 'quox.txt' already exists."), "wrong text");
-                    dialog.No();
+                    using (var dialog = OverwriteFileDialog.Wait(solution.App)) {
+                        AssertUtil.Contains(dialog.Text, "A file with the same name 'quox.txt' already exists.");
+                        dialog.No();
+                    }
 
                     solution.AssertFileExists("DragDropCopyCutPaste", "B", "quox.txt");
                     // one of the fils should still exist...
@@ -1114,15 +1126,17 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         solution.WaitForItem("DragDropCopyCutPaste", "quox.txt")
                     );
 
-                    var dialog = new OverwriteFileDialog(solution.App.WaitForDialog());
-                    Assert.IsTrue(dialog.Text.Contains("A file with the name 'quox.txt' already exists."), "wrong text");                    
-                    dialog.No();
+                    using (var dialog = OverwriteFileDialog.Wait(solution.App)) {
+                        AssertUtil.Contains(dialog.Text, "A file with the same name 'quox.txt' already exists.");
+                        dialog.No();
+                    }
 
                     System.Threading.Thread.Sleep(1000);
 
-                    dialog = new OverwriteFileDialog(solution.App.WaitForDialog());
-                    Assert.IsTrue(dialog.Text.Contains("A file with the name 'quox.txt' already exists."), "wrong text");
-                    dialog.No();
+                    using (var dialog = OverwriteFileDialog.Wait(solution.App)) {
+                        AssertUtil.Contains(dialog.Text, "A file with the same name 'quox.txt' already exists.");
+                        dialog.No();
+                    }
 
                     solution.AssertFileExists("DragDropCopyCutPaste", "B", "quox.txt");
                     int totalCount = solution.Project.ProjectItems.Item("A").ProjectItems.Count +
@@ -1176,10 +1190,11 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         solution.WaitForItem("DragDropCopyCutPaste", "quox.txt")
                     );
 
-                    var dialog = new OverwriteFileDialog(solution.App.WaitForDialog());
-                    Assert.IsTrue(dialog.Text.Contains("A file with the name 'quox.txt' already exists."), "wrong text");
-                    dialog.AllItems = true;
-                    dialog.No();
+                    using (var dialog = OverwriteFileDialog.Wait(solution.App)) {
+                        AssertUtil.Contains(dialog.Text, "A file with the same name 'quox.txt' already exists.");
+                        dialog.AllItems = true;
+                        dialog.No();
+                    }
 
                     solution.App.WaitForDialogDismissed();
 
@@ -1236,9 +1251,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         solution.WaitForItem("DragDropCopyCutPaste", "quox.txt")
                     );
 
-                    var dialog = new OverwriteFileDialog(solution.App.WaitForDialog());
-                    Assert.IsTrue(dialog.Text.Contains("A file with the name 'quox.txt' already exists."), "wrong text");
-                    dialog.Cancel();
+                    using (var dialog = OverwriteFileDialog.Wait(solution.App)) {
+                        AssertUtil.Contains(dialog.Text, "A file with the same name 'quox.txt' already exists.");
+                        dialog.Cancel();
+                    }
 
                     solution.App.WaitForDialogDismissed();
 
@@ -1369,9 +1385,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         );
                     }
 
-                    var dialog = new OverwriteFileDialog(solution.App.WaitForDialog());
-                    Assert.IsTrue(dialog.Text.Contains("A file with the name 'DragTwiceAndOverwrite.cs' already exists."), "wrong text");
-                    dialog.Yes();
+                    using (var dialog = OverwriteFileDialog.Wait(solution.App)) {
+                        AssertUtil.Contains(dialog.Text, "A file with the same name 'DragTwiceAndOverwrite.cs' already exists.");
+                        dialog.Yes();
+                    }
 
                     solution.AssertFileExists("DragDropCopyCutPaste", "DragTwiceAndOverwrite.cs");
                     solution.AssertFileDoesntExist("DragDropCopyCutPaste", "DragTwiceAndOverwrite - Copy.cs");
@@ -1468,6 +1485,41 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             }
         }
 
+        /// <summary>
+        /// Cannot move folder with contents in solution explorer
+        /// 
+        /// http://pytools.codeplex.com/workitem/2609
+        /// </summary>
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void MoveFolderWithContents() {
+            foreach (var projectType in ProjectTypes) {
+                var testDef = new ProjectDefinition("FolderWithContentsProj",
+                    projectType,
+                    ItemGroup(
+                        Folder("A"),
+                        Folder("A\\B"),
+                        Content("A\\B\\File.txt", ""),
+                        Folder("C")
+                    )
+                );
+
+                using (var solution = testDef.Generate().ToVs()) {
+                    MoveByKeyboard(
+                        solution.FindItem("FolderWithContentsProj", "C"),
+                        solution.FindItem("FolderWithContentsProj", "A", "B")
+                    );
+
+                    solution.AssertFolderExists("FolderWithContentsProj", "A");
+                    solution.AssertFolderDoesntExist("FolderWithContentsProj", "A", "B");
+                    solution.AssertFileDoesntExist("FolderWithContentsProj", "A", "B", "File.txt");
+                    solution.AssertFolderExists("FolderWithContentsProj", "C");
+                    solution.AssertFolderExists("FolderWithContentsProj", "C", "B");
+                    solution.AssertFileExists("FolderWithContentsProj", "C", "B", "File.txt");
+                }
+            }
+        }
+
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
         public void MoveProjectToSolutionFolderKeyboard() {
@@ -1555,6 +1607,50 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             }
         }
 
+        [TestMethod, Priority(2), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void CopyFileFromFolderToLinkedFolderKeyboard() {
+            CopyFileFromFolderToLinkedFolder(CopyByKeyboard);
+        }
+
+        [TestMethod, Priority(2), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void CopyFileFromFolderToLinkedFolderMouse() {
+            CopyFileFromFolderToLinkedFolder(CopyByMouse);
+        }
+
+        /// <summary>
+        /// Copy item from folder to a symbolic link of that folder.  Expect a copy to be made.
+        /// NOTE: Because of symbolic link creation, this test must be run as administrator.
+        /// </summary>
+        private void CopyFileFromFolderToLinkedFolder(MoveDelegate copier) {
+            foreach (var projectType in ProjectTypes) {
+                var projectDefs = new[] {
+                    new ProjectDefinition("MoveLinkedFolder",
+                        projectType,
+                        ItemGroup(
+                            Folder("Folder"),
+                            Content("Folder\\FileInFolder.txt", "File inside of linked folder..."),
+                            SymbolicLink("FolderLink", "Folder")
+                        )
+                    )
+                };
+
+                using (var solution = SolutionFile.Generate("MoveLinkedFolder", projectDefs).ToVs()) {
+                    copier(
+                        solution.FindItem("MoveLinkedFolder", "FolderLink"),
+                        solution.FindItem("MoveLinkedFolder", "Folder", "FileInFolder.txt"));
+
+                    // Verify that after the dialog our files are still present.
+                    solution.AssertFileExists("MoveLinkedFolder", "FolderLink", "FileInFolder.txt");
+                    solution.AssertFileExists("MoveLinkedFolder", "Folder", "FileInFolder.txt");
+
+                    // Verify the copies were made.
+                    solution.AssertFileExists("MoveLinkedFolder", "FolderLink", "FileInFolder - Copy.txt");
+                    solution.AssertFileExists("MoveLinkedFolder", "Folder", "FileInFolder - Copy.txt");
+                }
+            }
+        }
 
         internal delegate void MoveDelegate(AutomationElement destination, params AutomationElement[] source);
 

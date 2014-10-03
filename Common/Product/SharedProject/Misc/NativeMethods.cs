@@ -13,7 +13,10 @@
  * ***************************************************************************/
 
 using System;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -668,7 +671,7 @@ namespace Microsoft.VisualStudioTools.Project {
         public const ushort CF_HDROP = 15; // winuser.h
         public const uint MK_CONTROL = 0x0008; //winuser.h
         public const uint MK_SHIFT = 0x0004;
-        public const int MAX_PATH = 260; // windef.h
+        public const int MAX_PATH = 260; // windef.h	
         public const int MAX_FOLDER_PATH = MAX_PATH - 12;   // folders need to allow 8.3 filenames, so MAX_PATH - 12
 
         /// <summary>
@@ -887,6 +890,51 @@ namespace Microsoft.VisualStudioTools.Project {
             public string lpProvider;
         }
 
+        [DllImport(ExternDll.Kernel32, EntryPoint = "GetFinalPathNameByHandleW", CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern int GetFinalPathNameByHandle(IntPtr handle, [In, Out] StringBuilder path, int bufLen, int flags);
+
+        [DllImport(ExternDll.Kernel32, EntryPoint = "CreateFileW", CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern SafeFileHandle CreateFile(
+            string lpFileName,
+            int dwDesiredAccess,
+            [MarshalAs(UnmanagedType.U4)] FileShare dwShareMode,
+            IntPtr SecurityAttributes,
+            [MarshalAs(UnmanagedType.U4)] FileMode dwCreationDisposition,
+            int dwFlagsAndAttributes,
+            IntPtr hTemplateFile);
+
+        /// <summary>
+        /// Given a directory, actual or symbolic, return the actual directory path.
+        /// </summary>
+        /// <param name="symlink">DirectoryInfo object for the suspected symlink.</param>
+        /// <returns>A string of the actual path.</returns>
+        internal static string GetAbsolutePathToDirectory(string symlink) {
+            const int FILE_FLAG_BACKUP_SEMANTICS = 0x02000000;
+            const int DEVICE_QUERY_ACCESS = 0;
+
+            SafeFileHandle directoryHandle = CreateFile(
+                symlink,
+                DEVICE_QUERY_ACCESS,
+                FileShare.Write,
+                System.IntPtr.Zero,
+                FileMode.Open,
+                FILE_FLAG_BACKUP_SEMANTICS,
+                System.IntPtr.Zero);
+            if (directoryHandle.IsInvalid) {
+                Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
+            }
+
+            StringBuilder path = new StringBuilder(512);
+            int pathSize = GetFinalPathNameByHandle(directoryHandle.DangerousGetHandle(), path, path.Capacity, 0);
+            if (pathSize < 0) {
+                Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
+            }
+
+            // UNC Paths will start with \\?\.  Remove this if present as this isn't really expected on a path.
+            var pathString = path.ToString();
+            return pathString.StartsWith(@"\\?\") ? pathString.Substring(4) : pathString;
+        }
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern IntPtr FindFirstFile(string lpFileName, out WIN32_FIND_DATA lpFindFileData);
 
@@ -905,7 +953,6 @@ namespace Microsoft.VisualStudioTools.Project {
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         internal static extern bool MoveFile(String src, String dst);
     }
-
 
     internal class CredUI {
         private const string advapi32Dll = "advapi32.dll";
