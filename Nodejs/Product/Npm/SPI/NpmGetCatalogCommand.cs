@@ -96,7 +96,10 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     } catch (InvalidOperationException) {
                         // Occurs if a JValue appears where we expect JProperty
                     } catch (ArgumentException) {
-                        OnOutputLogged(string.Format("Parsing error - Cannot display package {0}", builder.Name));
+                        OnOutputLogged(string.Format("Parsing error (package {0})", builder.Name));
+                        if (!string.IsNullOrEmpty(builder.Name)) {
+                            results.Add(builder.Build());
+                        }
                     } finally {
                         builder.Reset();
                     }
