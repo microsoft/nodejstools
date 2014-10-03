@@ -37,7 +37,11 @@ The following error was reported:
                     rbe);
             }
 
-            Modules = new NodeModules(this, showMissingDevOptionalSubPackages);
+            try {
+                Modules = new NodeModules(this, showMissingDevOptionalSubPackages);
+            }  catch (PathTooLongException) {
+                // otherwise we fail to create it completely...
+            }
         }
 
         public IPackageJson PackageJson { get; private set; }
@@ -63,7 +67,7 @@ The following error was reported:
         }
 
         public IEnumerable<string> Homepages {
-            get { return null == PackageJson ? null : PackageJson.Homepage; }
+            get { return null == PackageJson ? null : PackageJson.Homepages; }
         }
 
         public string Path { get; private set; }

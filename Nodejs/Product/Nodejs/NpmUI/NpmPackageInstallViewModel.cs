@@ -176,7 +176,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             controller.ExceptionLogged += _executeViewModel.commander_ExceptionLogged;
             _executeViewModel.SetCancellableSafe(false);
             try {
-                _allPackages = await controller.GetRepositoryCatalogueAsync(forceRefresh);
+                _allPackages = await controller.GetRepositoryCatalogAsync(forceRefresh);
                 IsCatalogEmpty = false;
                 showList = true;
             } catch (NpmNotFoundException) {
@@ -266,13 +266,11 @@ namespace Microsoft.NodejsTools.NpmUI {
                     globalPackages = controller.GlobalPackages;
                 }
 
-                if (rootPackage != null && globalPackages != null) {
-                    newItems.AddRange(filtered.Select(package => new ReadOnlyPackageCatalogEntryViewModel(
-                        package,
-                        rootPackage != null ? rootPackage.Modules[package.Name] : null,
-                        globalPackages != null ? globalPackages.Modules[package.Name] : null
-                        )));
-                }
+                newItems.AddRange(filtered.Select(package => new ReadOnlyPackageCatalogEntryViewModel(
+                    package,
+                    rootPackage != null ? rootPackage.Modules[package.Name] : null,
+                    globalPackages != null ? globalPackages.Modules[package.Name] : null
+                    )));
             }
 
             _dispatcher.BeginInvoke((Action)(() => {

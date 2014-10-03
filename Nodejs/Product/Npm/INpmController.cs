@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Npm {
-    public interface INpmController : INpmLogSource {
+    public interface INpmController : INpmLogSource, IDisposable {
         event EventHandler StartingRefresh;
         void Refresh();
         event EventHandler FinishedRefresh;
@@ -25,7 +25,7 @@ namespace Microsoft.NodejsTools.Npm {
         IGlobalPackages GlobalPackages { get; }
         INpmCommander CreateNpmCommander();
 
-        Task<IPackageCatalog> GetRepositoryCatalogueAsync(bool forceDownload);
+        Task<IPackageCatalog> GetRepositoryCatalogAsync(bool forceDownload);
         IPackageCatalog MostRecentlyLoadedCatalog { get; }
 
         string ListBaseDirectory { get; }

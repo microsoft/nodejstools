@@ -59,7 +59,7 @@ namespace AnalysisDriver {
 
             _jsonResults.Append("[");
 
-            _npmController = NpmControllerFactory.Create(packagePath);
+            _npmController = NpmControllerFactory.Create(packagePath, string.Empty);
             _npmController.OutputLogged += NpmControllerOutputLogged;
             _npmController.ErrorLogged += NpmControllerErrorLogged;
             _npmController.Refresh();

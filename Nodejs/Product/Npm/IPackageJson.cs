@@ -22,7 +22,7 @@ namespace Microsoft.NodejsTools.Npm {
         IPerson Author { get; }
         string Description { get; }
         IKeywords Keywords { get; }
-        IEnumerable<string> Homepage { get; }
+        IHomepages Homepages { get; }
         IBugs Bugs { get; }
         ILicenses Licenses { get; }
         IFiles Files { get; }

@@ -26,6 +26,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             _package = package;
 
             InitKeywords();
+            InitHomepages();
             InitLicenses();
             InitFiles();
             InitMan();
@@ -55,6 +56,17 @@ The following error occurred:
             } catch (RuntimeBinderException rbe) {
                 WrapRuntimeBinderExceptionAndRethrow(
                     "keywords",
+                    rbe);
+            }
+        }
+
+        private void InitHomepages() {
+            try {
+                Homepages = new Homepages(_package);
+            }
+            catch (RuntimeBinderException rbe) {
+                WrapRuntimeBinderExceptionAndRethrow(
+                    "homepage",
                     rbe);
             }
         }
@@ -177,7 +189,7 @@ The following error occurred:
 
         public IKeywords Keywords { get; private set; }
 
-        public IEnumerable<string> Homepage { get; private set; }
+        public IHomepages Homepages { get; private set; }
 
         public IBugs Bugs {
             get {

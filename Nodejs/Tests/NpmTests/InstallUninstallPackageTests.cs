@@ -23,7 +23,7 @@ namespace NpmTests {
         [TestMethod, Priority(0)]
         public void TestAddPackageToSimplePackageJsonThenUninstall() {
             var rootDir = CreateRootPackage(PkgSimple);
-            var controller = NpmControllerFactory.Create(rootDir);
+            var controller = NpmControllerFactory.Create(rootDir, string.Empty);
             controller.Refresh();
             var rootPackage = controller.RootPackage;
             Assert.IsNotNull(rootPackage, "Root package with no dependencies should not be null.");
@@ -75,7 +75,7 @@ namespace NpmTests {
         public void TestAddPackageNoPackageJsonThenUninstall() {
             var rootDir = CreateRootPackage(PkgSimple);
             File.Delete(Path.Combine(rootDir, "package.json"));
-            var controller = NpmControllerFactory.Create(rootDir);
+            var controller = NpmControllerFactory.Create(rootDir, string.Empty);
             controller.Refresh();
             var rootPackage = controller.RootPackage;
             Assert.IsNotNull(rootPackage, "Root package with no dependencies should not be null.");
@@ -126,7 +126,7 @@ namespace NpmTests {
         [TestMethod, Priority(0)]
         public void TestAddPackageNoSavePackageJsonThenUninstall() {
             var rootDir = CreateRootPackage(PkgSimple);
-            var controller = NpmControllerFactory.Create(rootDir);
+            var controller = NpmControllerFactory.Create(rootDir, string.Empty);
             controller.Refresh();
             var rootPackage = controller.RootPackage;
             Assert.IsNotNull(rootPackage, "Root package with no dependencies should not be null.");
