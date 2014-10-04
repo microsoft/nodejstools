@@ -69,30 +69,6 @@
     </ItemGroup>
 
     <Copy
-		  SourceFiles="@(Compile->'$(QualifiedProjectHome)%(RelativeDir)%(Filename)%(Extension)')"
-		  DestinationFiles="@(Compile->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension)')"
-		  SkipUnchangedFiles="true">
-      <Output TaskParameter="DestinationFiles" ItemName="FileWrites"/>
-    </Copy>
-    <Copy
-      SourceFiles="@(Include->'$(QualifiedProjectHome)%(RelativeDir)%(Filename)%(Extension)')"
-      DestinationFiles="@(Include->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension)')"
-      SkipUnchangedFiles="true">
-      <Output TaskParameter="DestinationFiles" ItemName="FileWrites"/>
-    </Copy>
-    <Copy
-      SourceFiles="@(Content->'$(QualifiedProjectHome)%(RelativeDir)%(Filename)%(Extension)')"
-      DestinationFiles="@(Content->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension)')"
-      SkipUnchangedFiles="true">
-      <Output TaskParameter="DestinationFiles" ItemName="FileWrites"/>
-    </Copy>
-    <Copy
-      SourceFiles="@(NodeModulesContent)"
-      DestinationFiles="@(NodeModulesContent->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension)')"
-      SkipUnchangedFiles="true">
-      <Output TaskParameter="DestinationFiles" ItemName="FileWrites"/>
-    </Copy>
-    <Copy
       SourceFiles="@(NodejsAzureDeploymentFile)"
       DestinationFolder="$(IntermediateOutputPath)\bin"
       SkipUnchangedFiles="true">
