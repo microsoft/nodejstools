@@ -12,12 +12,12 @@
  *
  * ***************************************************************************/
 
-namespace Microsoft.NodejsTools.Debugger {
-    class JavaScriptSourceMapInfo {
-        public readonly string[] Lines;
-        public readonly SourceMap Map;
+namespace Microsoft.NodejsTools.SourceMapping {
+    internal class JavaScriptSourceMapInfo {
+        internal readonly string[] Lines;
+        internal readonly SourceMap Map;
 
-        public JavaScriptSourceMapInfo(SourceMap map, string[] lines) {
+        internal JavaScriptSourceMapInfo(SourceMap map, string[] lines) {
             Map = map;
             Lines = lines;
         }

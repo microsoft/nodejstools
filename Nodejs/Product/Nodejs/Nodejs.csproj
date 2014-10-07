@@ -339,10 +339,11 @@
     <Compile Include="Debugger\Communication\TcpNetworkClient.cs" />
     <Compile Include="Debugger\ExceptionHitTreatment.cs" />
     <Compile Include="Debugger\ExceptionHandler.cs" />
-    <Compile Include="Debugger\JavaScriptSourceMapInfo.cs" />
+    <Compile Include="SourceMapping\FunctionInfo.cs" />
+    <Compile Include="SourceMapping\JavaScriptSourceMapInfo.cs" />
     <Compile Include="Debugger\NodeConstants.cs" />
     <Compile Include="Debugger\Serialization\NodeSetValueVariable.cs" />
-    <Compile Include="Debugger\SourceMapper.cs" />
+    <Compile Include="SourceMapping\SourceMapper.cs" />
     <Compile Include="Debugger\SteppingKind.cs" />
     <Compile Include="Project\NodejsFileNodeProperties.cs" />
     <Compile Include="Jade\JadeEditorFactory.cs" />
@@ -561,7 +562,7 @@
     <Compile Include="Repl\VsNodejsReplSite.cs" />
     <Compile Include="SmartIndent.cs" />
     <Compile Include="SmartIndentProvider.cs" />
-    <Compile Include="SourceMap.cs" />
+    <Compile Include="SourceMapping\SourceMap.cs" />
     <Compile Include="TestFrameworks\TestFrameworkDirectories.cs" />
     <Compile Include="VsMenus.cs" />
     <Compile Include="AzureSolutionListener.cs" />
@@ -1055,6 +1056,10 @@
     </ZipItem>
     <ZipItem Include="Templates\Files\UnitTest\UnitTest.js" />
     <Content Include="TestFrameworks\find_tests.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="TestFrameworks\Jasmine\jasmine.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>

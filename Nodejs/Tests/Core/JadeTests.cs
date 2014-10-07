@@ -153,17 +153,10 @@ namespace NodejsTests {
             TokenizeFile<JadeToken, JadeTokenType>(path, new JadeTokenizer(null), _regenerateBaselineFiles);
         }
 
-        static public string LoadFileAsString(string name) {
-            StreamReader sr = new StreamReader(name);
-            string s = sr.ReadToEnd();
-            sr.Close();
-            return s;
-        }
-
         static public string LoadFile(string language, string subfolder, string fileName) {
             var filePath = GetTestFilesPath(language, subfolder);
 
-            return LoadFileAsString(filePath + "\\" + fileName);
+            return File.ReadAllText(filePath + "\\" + fileName);
         }
 
         static public string GetTestFilesPath(string language, string subfolder = null) {
@@ -193,7 +186,7 @@ namespace NodejsTests {
 
         static void TokenizeFile<TokenClass, TokenType>(string fileName, ITokenizer<TokenClass> tokenizer, bool regenerateBaselineFiles) where TokenClass : IToken<TokenType> {
             string baselineFile = fileName + ".tokens";
-            string text = LoadFileAsString(fileName);
+            string text = File.ReadAllText(fileName);
 
             var tokens = tokenizer.Tokenize(new TextStream(text), 0, text.Length);
             var actual = WriteTokens<TokenClass, TokenType>(tokens);

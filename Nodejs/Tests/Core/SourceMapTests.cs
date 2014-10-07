@@ -20,6 +20,7 @@ using System.Windows.Threading;
 using System.Xml.Linq;
 using Microsoft.NodejsTools;
 using Microsoft.NodejsTools.Project.ImportWizard;
+using Microsoft.NodejsTools.SourceMapping;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
 using TestUtilities.Nodejs;
@@ -94,7 +95,7 @@ namespace NodejsTests {
                 new { Line = -1, Name = "", Filename = "" },
             };
             for (int i = 0; i < testCases.Length; i++) {
-                SourceMapping mapping;
+                SourceMapInfo mapping;
                 if (map.TryMapLine(i, out mapping)) {
                     Assert.AreEqual(testCases[i].Filename, mapping.FileName);
                     Assert.AreEqual(testCases[i].Name, mapping.Name);
@@ -128,7 +129,7 @@ namespace NodejsTests {
             };
             for (int i = 0; i < testCases.Length; i++) {
                 Console.WriteLine("{0} {1}", testCases[i].InLine, testCases[i].InColumn);
-                SourceMapping mapping;
+                SourceMapInfo mapping;
                 if (map.TryMapPoint(testCases[i].InLine, testCases[i].InColumn, out mapping)) {
                     Assert.AreEqual(testCases[i].Filename, mapping.FileName);
                     Assert.AreEqual(testCases[i].Name, mapping.Name);

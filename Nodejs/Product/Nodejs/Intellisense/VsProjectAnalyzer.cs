@@ -436,7 +436,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             bool isParameterName;
             var exprRange = parser.GetExpressionRange(1, out paramIndex, out sigStart, out lastKeywordArg, out isParameterName, forSignatureHelp: true);
             if (exprRange == null || sigStart == null) {
-                return new SignatureAnalysis("", 0, new ISignature[0]);
+                return new SignatureAnalysis(String.Empty, 0, new ISignature[0]);
             }
 
             var text = new SnapshotSpan(exprRange.Value.Snapshot, new Span(exprRange.Value.Start, sigStart.Value.Position - exprRange.Value.Start)).GetText();

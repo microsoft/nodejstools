@@ -40,7 +40,7 @@ namespace Microsoft.NodejsTools.Analysis {
             JsAnalyzer analyzer = _analyzer;
             var builtinEntry = analyzer._builtinEntry;
 
-            var stringValue = _analyzer.GetConstant("");
+            var stringValue = _analyzer.GetConstant(String.Empty);
             var boolValue = _analyzer.GetConstant(true);
             var doubleValue = _analyzer.GetConstant(0.0);
             AnalysisValue numberPrototype, stringPrototype, booleanPrototype, functionPrototype;
@@ -1621,7 +1621,7 @@ on that object, and are not inherited from the object's prototype. The propertie
             stringPrototype = prototype;
 
             return new BuiltinFunctionValue(builtinEntry, "String", null, prototype) { 
-                ReturningFunction("fromCharCode", _analyzer.GetConstant("")),
+                ReturningFunction("fromCharCode", _analyzer.GetConstant(String.Empty)),
             };
         }
 

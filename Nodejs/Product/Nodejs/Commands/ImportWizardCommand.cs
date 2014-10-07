@@ -64,7 +64,7 @@ namespace Microsoft.NodejsTools.Commands {
                                     SR.ProductName
                                 );
                             } else {
-                                string exName = "";
+                                string exName = String.Empty;
                                 if (ex.InnerException != null) {
                                     exName = "(" + ex.InnerException.GetType().Name + ") ";
                                 }
@@ -80,7 +80,7 @@ namespace Microsoft.NodejsTools.Commands {
                         if (File.Exists(path)) {
                             object outRef = null, pathRef = "\"" + path + "\"";
                             NodejsPackage.Instance.DTE.Commands.Raise(VSConstants.GUID_VSStandardCommandSet97.ToString("B"), (int)VSConstants.VSStd97CmdID.OpenProject, ref pathRef, ref outRef);
-                            statusBar.SetText("");
+                            statusBar.SetText(String.Empty);
                         } else {
                             statusBar.SetText("An error occurred and your project was not created.");
                         }

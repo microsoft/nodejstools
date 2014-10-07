@@ -68,26 +68,16 @@ namespace NodejsTests {
         }
 
         public static void CompareFiles(string baselineFile, string actual, bool regenerateBaseline) {
-            StreamWriter sw = null;
-            StreamReader sr = null;
-
             try {
                 if (regenerateBaseline) {
                     if (File.Exists(baselineFile))
                         File.SetAttributes(baselineFile, FileAttributes.Normal);
 
-                    sw = new StreamWriter(baselineFile);
-                    sw.Write(actual);
-                    sw.Close();
-                    sw.Dispose();
-                    sw = null;
+                    File.WriteAllText(baselineFile, actual);                    
                 } else {
-                    sr = new StreamReader(baselineFile);
-                    string expected = sr.ReadToEnd();
-                    sr.Close();
-                    sr.Dispose();
-                    sr = null;
-
+                    string expected;
+                    expected = File.ReadAllText(baselineFile);
+                    
                     string baseLine, newLine;
                     int line = CompareLines(expected, actual, out baseLine, out newLine);
 
@@ -97,16 +87,6 @@ namespace NodejsTests {
                 }
             } catch (AssertFailedException ex) {
                 Assert.Fail(string.Format("Test {0} has thrown an exception: {1}", baselineFile.Substring(baselineFile.LastIndexOf('\\') + 1), ex.Message));
-            } finally {
-                if (sr != null) {
-                    sr.Close();
-                    sr.Dispose();
-                }
-
-                if (sw != null) {
-                    sw.Close();
-                    sw.Dispose();
-                }
             }
         }
     }

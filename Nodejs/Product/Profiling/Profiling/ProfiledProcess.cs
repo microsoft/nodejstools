@@ -138,7 +138,7 @@ namespace Microsoft.NodejsTools.Profiling {
                                 Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                                 "Microsoft.NodejsTools.NodeLogConverter.exe"
                             ),
-                            (_justMyCode ? "/jmc " : "") + 
+                            (_justMyCode ? "/jmc " : String.Empty) + 
                             "\"" + v8log + "\" " +
                             "\"" + filename + "\" " +
                             "\"" + _process.StartTime.ToString() + "\" " +

@@ -132,7 +132,7 @@ namespace Microsoft.NodejsTools.Project {
             set {
                 // TextBox requires \r\n for line separators, but XML can have either \n or \r\n, and we should treat those equally.
                 // (It will always have \r\n when we write it out, but users can edit it by other means.)
-                _envVars.Text = lfToCrLfRegex.Replace(value ?? "", "\r\n");
+                _envVars.Text = lfToCrLfRegex.Replace(value ?? String.Empty, "\r\n");
             }
         }
 

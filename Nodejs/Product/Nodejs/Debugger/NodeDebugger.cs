@@ -25,6 +25,7 @@ using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.NodejsTools.Debugger.Communication;
 using Microsoft.NodejsTools.Debugger.Events;
 using Microsoft.NodejsTools.Debugger.Serialization;
+using Microsoft.NodejsTools.SourceMapping;
 
 namespace Microsoft.NodejsTools.Debugger {
     /// <summary>
@@ -776,7 +777,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
                 // Map file position to original, if required
                 if (module.JavaScriptFileName != module.FileName) {
-                    SourceMapping mapping = SourceMapper.MapToOriginal(module.JavaScriptFileName, line, column);
+                    SourceMapInfo mapping = SourceMapper.MapToOriginal(module.JavaScriptFileName, line, column);
                     if (mapping != null) {
                         line = mapping.Line;
                         column = mapping.Column;
@@ -997,7 +998,7 @@ namespace Microsoft.NodejsTools.Debugger {
             var position = new FilePosition(breakpoint.Position.FileName, line, column);
             FilePosition target = position;
 
-            SourceMapping mapping = SourceMapper.MapToOriginal(breakpoint.Position.FileName, line, column);
+            SourceMapInfo mapping = SourceMapper.MapToOriginal(breakpoint.Position.FileName, line, column);
             if (mapping != null) {
                 target = new FilePosition(breakpoint.Target.FileName, mapping.Line, mapping.Column);
             }
@@ -1203,7 +1204,7 @@ namespace Microsoft.NodejsTools.Debugger {
             javaScriptFileName = FileNameMapper.GetLocalFileName(javaScriptFileName);
 
             // Try to get mapping for JS file
-            SourceMapping mapping = SourceMapper.MapToOriginal(javaScriptFileName, 0);
+            SourceMapInfo mapping = SourceMapper.MapToOriginal(javaScriptFileName, 0);
             if (mapping == null) {
                 module = new NodeModule(module.Id, javaScriptFileName);
             } else {

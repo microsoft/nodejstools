@@ -713,7 +713,7 @@ namespace Microsoft.NodejsTools.Project {
                     bool isDirectory = (wfd.dwFileAttributes & NativeMethods.FILE_ATTRIBUTE_DIRECTORY) != 0;
 
                     string childPath = path;
-                    if (childPath != "") {
+                    if (childPath != String.Empty) {
                         childPath += "\\";
                     }
                     childPath += wfd.cFileName;

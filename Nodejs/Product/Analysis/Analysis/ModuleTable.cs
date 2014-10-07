@@ -33,7 +33,7 @@ namespace Microsoft.NodejsTools.Analysis {
     [Serializable]
     class ModuleTable {
         private readonly Dictionary<string, ModuleTree> _modulesByFilename = new Dictionary<string, ModuleTree>(StringComparer.OrdinalIgnoreCase);
-        private readonly ModuleTree _modules = new ModuleTree(null, "");
+        private readonly ModuleTree _modules = new ModuleTree(null, String.Empty);
         private readonly object _lock = new object();
         [ThreadStatic]
         private static HashSet<ModuleRecursion> _recursionCheck;

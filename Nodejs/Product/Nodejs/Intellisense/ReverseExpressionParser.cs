@@ -12,11 +12,12 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.VisualStudio.Language.StandardClassification;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
-using System.Diagnostics;
 using Microsoft.NodejsTools.Classifier;
 
 namespace Microsoft.NodejsTools.Intellisense {
@@ -343,7 +344,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                             if (paramIndex == 0) {
                                 lastKeywordArg = text;
                             } else {
-                                lastKeywordArg = "";
+                                lastKeywordArg = String.Empty;
                             }
                         }
                         lastTokenWasCommaOrOperator = false;

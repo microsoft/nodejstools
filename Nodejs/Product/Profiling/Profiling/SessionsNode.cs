@@ -76,7 +76,7 @@ namespace Microsoft.NodejsTools.Profiling {
             string newFilename = newBaseName + NodejsProfilingPackage.PerfFileType;
             // add directory name back if present...
             string dirName = Path.GetDirectoryName(filename);
-            if (dirName != "") {
+            if (!String.IsNullOrEmpty(dirName)) {
                 newFilename = Path.Combine(dirName, newFilename);
             }
             filename = newFilename;

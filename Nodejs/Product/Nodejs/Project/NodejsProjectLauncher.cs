@@ -115,7 +115,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private string GetFullArguments(string file, bool includeNodeArgs = true) {
-            string res = "";
+            string res = String.Empty;
             if (includeNodeArgs) {
                 var nodeArgs = _project.GetProjectProperty(NodejsConstants.NodeExeArguments);
                 if (!String.IsNullOrWhiteSpace(nodeArgs)) {

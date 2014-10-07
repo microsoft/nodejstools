@@ -108,7 +108,7 @@ namespace ProfilingUITests {
                     interpreterPath,
                     filename,
                     directory,
-                    "",
+                    String.Empty,
                     openReport
                 ),
                 directory
@@ -1038,7 +1038,7 @@ namespace ProfilingUITests {
                         NodeExePath,
                         TestData.GetPath(@"TestData\NodejsProfileTest\program.js"),
                         TestData.GetPath(@"TestData\NodejsProfileTest"),
-                        "",
+                        String.Empty,
                         false
                     );
 
@@ -1085,7 +1085,7 @@ namespace ProfilingUITests {
                         NodeExePath,
                         TestData.GetPath(@"TestData\NodejsProfileTest\infiniteProfile.js"),
                         TestData.GetPath(@"TestData\NodejsProfileTest"),
-                        "",
+                        String.Empty,
                         false
                     );
 
@@ -1123,7 +1123,7 @@ namespace ProfilingUITests {
                         NodeExePath,
                         TestData.GetPath(@"TestData\NodejsProfileTest\infiniteProfile.js"),
                         TestData.GetPath(@"TestData\NodejsProfileTest"),
-                        "",
+                        String.Empty,
                         false
                     );
 
@@ -1213,7 +1213,7 @@ namespace ProfilingUITests {
                                 NodeExePath,
                                         TestData.GetPath(@"TestData\NodejsProfileTest\program.js"),
                                         TestData.GetPath(@"TestData\NodejsProfileTest"),
-                                        "",
+                                        String.Empty,
                                         false
                                     );
 
@@ -1278,7 +1278,7 @@ namespace ProfilingUITests {
                                 NodeExePath,
                                 TestData.GetPath(@"TestData\NodejsProfileTest\program.js"),
                                 TestData.GetPath(@"TestData\NodejsProfileTest"),
-                                "",
+                                String.Empty,
                                 false
                             );
 
@@ -1366,7 +1366,7 @@ namespace ProfilingUITests {
                         NodeExePath,
                         TestData.GetPath(@"TestData\NodejsProfileTest\program.js"),
                         TestData.GetPath(@"TestData\NodejsProfileTest"),
-                        "",
+                        String.Empty,
                         false
                     );
                     try {
@@ -1404,7 +1404,7 @@ namespace ProfilingUITests {
                         NodeExePath,
                         TestData.GetPath(@"TestData\NodejsProfileTest\JustMyCode.js"),
                         TestData.GetPath(@"TestData\NodejsProfileTest"),
-                        "",
+                        String.Empty,
                         false
                     );
                     try {
@@ -1439,7 +1439,7 @@ namespace ProfilingUITests {
                         NodeExePath,
                         TestData.GetPath(@"TestData\NodejsProfileTest\JustMyCode.js"),
                         TestData.GetPath(@"TestData\NodejsProfileTest"),
-                        "",
+                        String.Empty,
                         false
                     );
                     try {

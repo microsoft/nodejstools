@@ -122,7 +122,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
             processStartInfo.RedirectStandardError = true;
             processStartInfo.RedirectStandardOutput = true;
 
-            string stdout = "";
+            string stdout = String.Empty;
             try {
                 using (var process = Process.Start(processStartInfo)) {
 

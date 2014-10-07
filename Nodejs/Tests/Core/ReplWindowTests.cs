@@ -29,10 +29,12 @@ namespace NodejsTests {
         public static void DoDeployment(TestContext context) {
             AssertListener.Initialize();
             if (!File.Exists("visualstudio_nodejs_repl.js")) {
-                File.WriteAllText(
-                    "visualstudio_nodejs_repl.js",
-                    new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("NodejsTests.visualstudio_nodejs_repl.js")).ReadToEnd()
-                );
+                using (StreamReader reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("NodejsTests.visualstudio_nodejs_repl.js"))) {
+                    File.WriteAllText(
+                        "visualstudio_nodejs_repl.js",
+                        reader.ReadToEnd()
+                    );
+                }
             }
         }
 
@@ -273,7 +275,7 @@ undefined";
                 Assert.AreEqual("undefined", window.Output);
                 res = eval.ExecuteText("a");
                 Assert.IsTrue(res.Wait(10000));
-                Assert.AreEqual("undefined1", window.Output);                
+                Assert.AreEqual("undefined1", window.Output);
             }
         }
 
@@ -493,7 +495,7 @@ undefined";
                 };
                 mockWindow.ClearScreen();
                 var redirector = new NpmReplCommand.NpmReplRedirector(mockWindow);
-                
+
                 redirector.WriteLine("npm The sky is at a stable equilibrium");
                 var expectedInfoLine =
                     NpmReplCommand.NpmReplRedirector.NormalAnsiColor + "npm The sky is at a stable equilibrium" +

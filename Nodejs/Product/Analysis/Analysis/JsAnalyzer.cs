@@ -61,7 +61,7 @@ namespace Microsoft.NodejsTools.Analysis {
         public JsAnalyzer(AnalysisLimits limits = null) {
             _modules = new ModuleTable();
             _itemCache = new Dictionary<object, AnalysisValue>();
-            _builtinEntry = new ProjectEntry(this, "", null);
+            _builtinEntry = new ProjectEntry(this, String.Empty, null);
 
             Limits = limits ?? new AnalysisLimits();
 
@@ -72,7 +72,7 @@ namespace Microsoft.NodejsTools.Analysis {
             _falseInst = new BooleanValue(false, this);
             _undefined = new UndefinedValue(this);
 
-            _emptyStringValue = GetConstant("");
+            _emptyStringValue = GetConstant(String.Empty);
             _zeroIntValue = GetConstant(0.0);
 
             var globals = GlobalBuilder.MakeGlobal(this);

@@ -10,9 +10,10 @@ var find_tests = function (testFile, discoverResultFile) {
             try {
                 var funcDetails = dbg.Debug.findFunctionSourceLocation(testCases[test]);
                 if (funcDetails != undefined) {
-                    //v8 is 0 based line numbers, The editor is 1 based
+                    //v8 is 0 based line numbers, editor is 1 based
                     line = parseInt(funcDetails.line) + 1;
-                    column = parseInt(funcDetails.column) + 1;
+                    //v8 and editor are both 1 based column numbers, no adjustment necessary
+                    column = parseInt(funcDetails.column);
                 }
             } catch(e) {
                 //If we take an exception mapping the source line, simply fallback to unknown source map 

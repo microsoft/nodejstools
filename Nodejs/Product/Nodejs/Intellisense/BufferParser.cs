@@ -254,7 +254,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             private static bool IncludesTextChanges(TextContentChangedEventArgs e) {
                 bool mixedChanges = false;
                 foreach (var change in e.Changes) {
-                    if (change.OldText != "" || change.NewText != Environment.NewLine) {
+                    if (change.OldText != String.Empty || change.NewText != Environment.NewLine) {
                         mixedChanges = true;
                         break;
                     }

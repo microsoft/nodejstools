@@ -310,7 +310,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
                         if (curParam < sig.Parameters.Count) {
                             sig.SetCurrentParameter(sig.Parameters[curParam]);
-                        } else if (sigs.LastKeywordArgument == "") {
+                        } else if (sigs.LastKeywordArgument == String.Empty) {
                             sig.SetCurrentParameter(null);
                         } else {
                             CommaFindBestSignature(curParam, sigs.LastKeywordArgument);
@@ -466,7 +466,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                     if (_activeSession.SelectedCompletionSet.SelectionStatus.IsSelected) {
                         var completion = _activeSession.SelectedCompletionSet.SelectionStatus.Completion;
 
-                        string committedBy = "";
+                        string committedBy = String.Empty;
                         if (_activeSession.SelectedCompletionSet.Moniker == CompletionSource.NodejsRequireCompletionSetMoniker) {
                             if (completion.InsertionText.StartsWith("'")) { // require(
                                 committedBy = ")";

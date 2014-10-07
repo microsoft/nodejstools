@@ -30,7 +30,7 @@ namespace Microsoft.VisualStudioTools {
 
         public override void Register(RegistrationContext context) {
             using (var engineKey = context.CreateKey("Projects\\" + _id + "\\Filters\\" + _name)) {
-                engineKey.SetValue("", _filter);
+                engineKey.SetValue(String.Empty, _filter);
                 engineKey.SetValue("SortPriority", _sortPriority);
             }
         }

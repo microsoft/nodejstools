@@ -396,7 +396,7 @@ namespace Microsoft.NodejsTools.Profiling {
             RunProfiler(
                 session, 
                 runTarget.InterpreterPath, 
-                "",             // interpreter args
+                String.Empty,             // interpreter args
                 runTarget.Script, 
                 runTarget.Arguments, 
                 runTarget.WorkingDirectory, 

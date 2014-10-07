@@ -21,7 +21,7 @@ namespace Microsoft.NodejsTools.Npm {
             bool saveToPackageJson = true,
             string otherArguments = "") 
         {
-            string dependencyArguments = string.Empty;
+            string dependencyArguments = "";
             if (global) {
                 dependencyArguments = "-g";
             } else if (saveToPackageJson) {

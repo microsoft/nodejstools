@@ -64,7 +64,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 memberResult.Completion,
                 () => memberResult.Documentation,
                 () => service.GetGlyph(GetGlyphGroup(memberResult), StandardGlyphItem.GlyphItemPublic),
-                ""
+                String.Empty
             );
         }
 

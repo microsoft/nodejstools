@@ -741,12 +741,13 @@ namespace AnalysisDriver {
 
         public void Dispose() {
             if (_htmlLogger != null) {
-                var template = new StreamReader(GetType().Assembly.GetManifestResourceStream("NodejsTests.template.html")).ReadToEnd();
+                using (var reader = new StreamReader(GetType().Assembly.GetManifestResourceStream("NodejsTests.template.html"))) {
+                    var template = reader.ReadToEnd();
+                    _jsonResults.AppendLine("]");
+                    template = template.Replace("// INSERT DATA HERE", "var data = " + _jsonResults.ToString());
 
-                _jsonResults.AppendLine("]");
-                template = template.Replace("// INSERT DATA HERE", "var data = " + _jsonResults.ToString());
-
-                _htmlLogger.Write(template);
+                    _htmlLogger.Write(template);
+                }
             }
         }
     }

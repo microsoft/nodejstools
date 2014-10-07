@@ -32,21 +32,13 @@ namespace NpmTests {
         }
 
         protected string LoadStringFromResource(string manifestResourceName) {
-            using (
-                var reader =
-                    new StreamReader(
-                        typeof(AbstractPackageJsonTests).Assembly.GetManifestResourceStream(
-                            manifestResourceName))) {
+            using (var reader = new StreamReader(typeof(AbstractPackageJsonTests).Assembly.GetManifestResourceStream(manifestResourceName))) {
                 return reader.ReadToEnd();
             }
         }
 
         protected IPackageJson LoadFromResource(string manifestResourceName) {
-            using (
-                var reader =
-                    new StreamReader(
-                        typeof(AbstractPackageJsonTests).Assembly.GetManifestResourceStream(
-                            manifestResourceName))) {
+            using (var reader = new StreamReader(typeof(AbstractPackageJsonTests).Assembly.GetManifestResourceStream(manifestResourceName))) {
                 return LoadFrom(reader);
             }
         }

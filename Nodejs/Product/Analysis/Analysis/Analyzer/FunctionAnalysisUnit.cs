@@ -118,7 +118,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
 
         public override string ToString() {
-            string parameters = "";
+            string parameters = String.Empty;
             if(Ast.ParameterDeclarations != null) {
                 parameters = string.Join(", ", 
                     Ast.ParameterDeclarations.Select(p => Environment.GetVariable(p.Name).GetTypesNoCopy(this).ToString()));

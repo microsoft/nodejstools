@@ -13,6 +13,7 @@
  * ***************************************************************************/
 
 using System;
+using System.ComponentModel.Composition;
 using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.NodejsTools.Project;
@@ -37,6 +38,10 @@ namespace Microsoft.NodejsTools {
     /// </summary>    
     [Guid(Guids.NodejsEditorFactoryString)]
     class NodejsEditorFactory : IVsEditorFactory {
+
+        [Export, Name(NodejsConstants.Nodejs), BaseDefinition("text")]
+        internal static ContentTypeDefinition ContentTypeDefinition = null;
+        
         private NodejsPackage _package;
         private ServiceProvider _serviceProvider;
         private readonly bool _promptEncodingOnLoad;

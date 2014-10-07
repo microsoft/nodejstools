@@ -552,7 +552,7 @@ namespace Microsoft.NodejsTools {
                         (uint)__VSSPECIFICEDITORFLAGS.VSSPECIFICEDITOR_DoOpen :
                         0,
                     ref ourEditor,
-                    "",
+                    String.Empty,
                     ref view,
                     pResult
                 );

@@ -24,6 +24,8 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudioTools;
 
+using Microsoft.NodejsTools.SourceMapping;
+
 namespace Microsoft.NodejsTools.TestAdapter {
     [FileExtension(NodejsConstants.NodejsProjectExtension)]
     [DefaultExecutorUri(TestExecutor.ExecutorUriString)]
@@ -81,11 +83,12 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
                             string fileAbsolutePath = CommonUtils.GetAbsoluteFilePath(projectHome, item.EvaluatedInclude);
                             string testFileAbsolutePath = fileAbsolutePath;
-
+                            bool typeScriptTest = false;
                             if (Path.GetExtension(fileAbsolutePath).Equals(NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
                                 //We're dealing with TypeScript
                                 //Switch to the underlying js file
-                                fileAbsolutePath = fileAbsolutePath.Substring(0, fileAbsolutePath.Length - 3) + ".js";
+                                fileAbsolutePath = fileAbsolutePath.Substring(0, fileAbsolutePath.Length - 3) + NodejsConstants.JavaScriptExtension;
+                                typeScriptTest = true;
                             } else if (!Path.GetExtension(fileAbsolutePath).Equals(NodejsConstants.JavaScriptExtension, StringComparison.OrdinalIgnoreCase)) {
                                 continue;
                             }
@@ -100,11 +103,20 @@ namespace Microsoft.NodejsTools.TestAdapter {
                                 foreach (var discoveredTest in discoveredTestCases) {
                                     string qualifiedName = discoveredTest.FullyQualifiedName;
                                     logger.SendMessage(TestMessageLevel.Informational, String.Format("Creating TestCase:{0}", qualifiedName));
+                                    FunctionInformation fi = null;
+                                    if (typeScriptTest) {
+                                        fi = SourceMapper.MaybeMap(new FunctionInformation(String.Empty,
+                                                                                                    discoveredTest.TestName, 
+                                                                                                    discoveredTest.SourceLine, 
+                                                                                                    fileAbsolutePath));                                        
+                                    }
+
                                     var testCase = new TestCase(qualifiedName, TestExecutor.ExecutorUri, projSource) {
                                         CodeFilePath = testFileAbsolutePath,
-                                        LineNumber = discoveredTest.SourceLine,
+                                        LineNumber = (fi != null && fi.LineNumber.HasValue) ? fi.LineNumber.Value : discoveredTest.SourceLine,
                                         DisplayName = discoveredTest.TestName
-                                    };
+                                    };                                    
+                                    
                                     discoverySink.SendTestCase(testCase);
                                 }
                             }

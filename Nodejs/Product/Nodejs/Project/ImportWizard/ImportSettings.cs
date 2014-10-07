@@ -263,9 +263,9 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
             writer.WriteElementString("ProjectView", "ShowAllFiles");
 
             if (CommonUtils.IsValidPath(startupFile)) {
-                writer.WriteElementString("StartupFile", Path.GetFileNameWithoutExtension(startupFile) + ".js");
+                writer.WriteElementString("StartupFile", Path.GetFileNameWithoutExtension(startupFile) + NodejsConstants.JavaScriptExtension);
             } else {
-                writer.WriteElementString("StartupFile", "");
+                writer.WriteElementString("StartupFile", String.Empty);
             }
             writer.WriteElementString("WorkingDirectory", ".");
             writer.WriteElementString("OutputPath", ".");

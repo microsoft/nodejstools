@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.Collections.Generic;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.NodejsTools.Analysis.Values;
@@ -29,7 +30,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         private readonly int _index;
         private readonly VsProjectAnalyzer _analyzer;
         private readonly ITextSnapshot _snapshot;
-        public static readonly ExpressionAnalysis Empty = new ExpressionAnalysis(null, "", null, 0, null, null);
+        public static readonly ExpressionAnalysis Empty = new ExpressionAnalysis(null, String.Empty, null, 0, null, null);
 
         internal ExpressionAnalysis(VsProjectAnalyzer analyzer, string expression, ModuleAnalysis analysis, int index, ITrackingSpan span, ITextSnapshot snapshot) {
             _expr = expression;

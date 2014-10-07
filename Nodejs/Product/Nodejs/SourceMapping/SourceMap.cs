@@ -20,11 +20,11 @@ using System.IO;
 using System.Linq;
 using System.Web.Script.Serialization;
 
-namespace Microsoft.NodejsTools {
+namespace Microsoft.NodejsTools.SourceMapping {
     /// <summary>
     /// Reads a V3 source map as documented at https://docs.google.com/document/d/1U1RGAehQwRypUTovF1KRlpiOFze0b-_2gc6fAH0KY0k/edit?hl=en_US&pli=1&pli=1
     /// </summary>
-    class SourceMap {
+    internal class SourceMap {
         private readonly Dictionary<string, object> _mapInfo;
         private readonly LineInfo[] _lines;
         private readonly string[] _names, _sources;
@@ -56,7 +56,7 @@ namespace Microsoft.NodejsTools {
         /// if the file is not supported or invalid.
         /// </summary>
         /// <param name="input"></param>
-        public SourceMap(TextReader input) {
+        internal SourceMap(TextReader input) {
             var serializer = new JavaScriptSerializer();
             _mapInfo = serializer.Deserialize<Dictionary<string, object>>(input.ReadToEnd());
             if (Version != 3) {
@@ -185,7 +185,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         /// Version number of the source map.
         /// </summary>
-        public int Version {
+        internal int Version {
             get {
                 return GetValue("version", -1);
             }
@@ -194,9 +194,9 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         /// Filename of the generated code
         /// </summary>
-        public string File {
+        internal string File {
             get {
-                return GetValue("file", "");
+                return GetValue("file", String.Empty);
             }
         }
 
@@ -206,14 +206,14 @@ namespace Microsoft.NodejsTools {
         /// </summary>
         private string SourceRoot {
             get {
-                return GetValue("sourceRoot", "");
+                return GetValue("sourceRoot", String.Empty);
             }
         }
 
         /// <summary>
         /// All of the filenames that were combined.
         /// </summary>
-        public ReadOnlyCollection<string> Sources {
+        internal ReadOnlyCollection<string> Sources {
             get {
                 return new ReadOnlyCollection<string>(_sources);
             }
@@ -222,7 +222,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         /// All of the variable/method names that appear in the code
         /// </summary>
-        public ReadOnlyCollection<string> Names {
+        internal ReadOnlyCollection<string> Names {
             get {
                 return new ReadOnlyCollection<string>(_names);
             }
@@ -231,13 +231,13 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         /// Maps a location in the generated code into a location in the source code.
         /// </summary>
-        public bool TryMapPoint(int lineNo, int columnNo, out SourceMapping res) {
+        internal bool TryMapPoint(int lineNo, int columnNo, out SourceMapInfo res) {
             if (lineNo < _lines.Length) {
                 var line = _lines[lineNo];
                 for (int i = line.Segments.Length - 1; i >= 0; i--) {
                     if (line.Segments[i].GeneratedColumn <= columnNo) {
                         // we map to this column
-                        res = new SourceMapping(
+                        res = new SourceMapInfo(
                             line.Segments[i].OriginalLine,
                             line.Segments[i].OriginalColumn,
                             line.Segments[i].SourceIndex < Sources.Count ? Sources[line.Segments[i].SourceIndex] : null,
@@ -248,7 +248,7 @@ namespace Microsoft.NodejsTools {
                 }
                 if (line.Segments.Length > 0) {
                     // we map to this column
-                    res = new SourceMapping(
+                    res = new SourceMapInfo(
                         line.Segments[0].OriginalLine,
                         line.Segments[0].OriginalColumn,
                         line.Segments[0].SourceIndex < Sources.Count ? Sources[line.Segments[0].SourceIndex] : null,
@@ -257,18 +257,18 @@ namespace Microsoft.NodejsTools {
                     return true;
                 }
             }
-            res = default(SourceMapping);
+            res = default(SourceMapInfo);
             return false;
         }
 
         /// <summary>
         /// Maps a location in the generated code into a location in the source code.
         /// </summary>
-        public bool TryMapLine(int lineNo, out SourceMapping res) {
+        internal bool TryMapLine(int lineNo, out SourceMapInfo res) {
             if (lineNo < _lines.Length) {
                 var line = _lines[lineNo];
                 if (line.Segments.Length > 0) {
-                    res = new SourceMapping(
+                    res = new SourceMapInfo(
                         line.Segments[0].OriginalLine,
                         0,
                         Sources[line.Segments[0].SourceIndex],
@@ -279,14 +279,14 @@ namespace Microsoft.NodejsTools {
                     return true;
                 }
             }
-            res = default(SourceMapping);
+            res = default(SourceMapInfo);
             return false;
         }
 
         /// <summary>
         /// Maps a location in the source code into the generated code.
         /// </summary>
-        public bool TryMapPointBack(int lineNo, int columnNo, out SourceMapping res) {
+        internal bool TryMapPointBack(int lineNo, int columnNo, out SourceMapInfo res) {
             int? firstBestLine = null, secondBestLine = null;
             for (int i = 0; i < _lines.Length; i++) {
                 var line = _lines[i];
@@ -296,7 +296,7 @@ namespace Microsoft.NodejsTools {
                         if (segment.OriginalColumn <= columnNo) {
                             originalColumn = segment.OriginalColumn;
                         } else if (originalColumn != null) {
-                            res = new SourceMapping(
+                            res = new SourceMapInfo(
                                 i,
                                 columnNo - originalColumn.Value,
                                 File,
@@ -321,13 +321,13 @@ namespace Microsoft.NodejsTools {
                         }
                     } else if (segment.OriginalLine > lineNo && firstBestLine != null) {
                         // not a perfect matching on column (e.g. requested 0, mapping starts at 4)
-                        res = new SourceMapping(secondBestLine ?? firstBestLine.Value, 0, File, null);
+                        res = new SourceMapInfo(secondBestLine ?? firstBestLine.Value, 0, File, null);
                         return true;
                     }
                 }
             }
 
-            res = default(SourceMapping);
+            res = default(SourceMapInfo);
             return false;
         }
 
@@ -357,14 +357,14 @@ namespace Microsoft.NodejsTools {
             }
         }
 
-        public struct SegmentInfo {
-            public readonly int GeneratedColumn;
-            public readonly int SourceIndex;
-            public readonly int OriginalLine;
-            public readonly int OriginalColumn;
-            public readonly int OriginalName;
+        internal struct SegmentInfo {
+            internal readonly int GeneratedColumn;
+            internal readonly int SourceIndex;
+            internal readonly int OriginalLine;
+            internal readonly int OriginalColumn;
+            internal readonly int OriginalName;
 
-            public SegmentInfo(int generatedColumn, int sourceIndex, int originalLine, int originalColumn, int originalName) {
+            internal SegmentInfo(int generatedColumn, int sourceIndex, int originalLine, int originalColumn, int originalName) {
                 GeneratedColumn = generatedColumn;
                 SourceIndex = sourceIndex;
                 OriginalLine = originalLine;
@@ -374,11 +374,11 @@ namespace Microsoft.NodejsTools {
         }
     }
 
-    public class SourceMapping {
-        public readonly int Line, Column;
-        public readonly string FileName, Name;
+    internal class SourceMapInfo {
+        internal readonly int Line, Column;
+        internal readonly string FileName, Name;
 
-        internal SourceMapping(int line, int column, string filename, string name) {
+        internal SourceMapInfo(int line, int column, string filename, string name) {
             Line = line;
             Column = column;
             FileName = filename;

@@ -49,10 +49,12 @@ namespace NodejsTests {
         private static void ExtractResource(string file) {
             //if (!File.Exists(file)) 
             {
-                File.WriteAllText(
-                    file,
-                    new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("NodejsTests." + file)).ReadToEnd()
-                );
+                using (StreamReader reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("NodejsTests." + file))) {
+                    File.WriteAllText(
+                        file,
+                        reader.ReadToEnd()
+                    );
+                }
             }
         }
 
