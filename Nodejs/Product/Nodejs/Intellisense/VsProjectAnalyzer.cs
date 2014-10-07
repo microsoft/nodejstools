@@ -162,7 +162,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 _saveToDisk = value;
                 if (!_saveToDisk) {
                     DeleteAnalysis();
-                } else {
+                } else if (_analysisQueue != null) {                    
                     _analysisQueue.ResetLastSaveTime();
                 }
             }
