@@ -51,26 +51,73 @@
     <Compile Include="SemverVersionTestHelper.cs" />
     <Compile Include="SemverVersionTests.cs" />
     <Compile Include="TemporaryFileManager.cs" />
+    <Compile Include="TestUtilities\AssertListener.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\fresh_package.json" />
+    <EmbeddedResource Include="TestData\fresh_package.json" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Common\Tests\Utilities\TestUtilities.csproj">
-      <Project>{d092d54e-ff29-4d32-9aee-4ef704c92f67}</Project>
-      <Name>TestUtilities</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Product\Npm\Npm.csproj">
       <Project>{e5ef4b0a-ab41-4b98-8fa8-98d6348003a8}</Project>
       <Name>Npm</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Utilities.Nodejs\TestUtilities.Nodejs.csproj">
-      <Project>{9e395ba3-765e-4f35-a520-19f1c323d625}</Project>
-      <Name>TestUtilities.Nodejs</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="TestData\NpmSearchData\packagecache.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestData\NpmPackageJsonData\fresh_package.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestData\NpmPackageJsonData\fresh_package_doublecolon.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestData\NpmPackageJsonData\fresh_package_doublecomma.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestData\NpmPackageJsonData\fresh_package_duplicateproperty.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestData\NpmPackageJsonData\fresh_package_leadingbrace.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestData\NpmPackageJsonData\fresh_package_leadingletter.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestData\NpmPackageJsonData\fresh_package_leadingsquarebrace.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestData\NpmPackageJsonData\fresh_package_missingcolon.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestData\NpmPackageJsonData\fresh_package_missingcomma.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestData\NpmPackageJsonData\fresh_package_missingleadingbrace.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestData\NpmPackageJsonData\fresh_package_missingleadinglistbrace.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestData\NpmPackageJsonData\fresh_package_missingleadingpropnamequote.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestData\NpmPackageJsonData\fresh_package_missingonepropnamequote.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestData\NpmPackageJsonData\fresh_package_missingpropnamequotes.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestData\NpmPackageJsonData\fresh_package_missingtrailingbrace.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestData\NpmPackageJsonData\fresh_package_missingtrailinglistbrace.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestData\NpmPackageJsonData\fresh_package_unescapedquote.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="..\TestProjectAfter.settings" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

@@ -96,7 +96,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     } catch (InvalidOperationException) {
                         // Occurs if a JValue appears where we expect JProperty
                     } catch (ArgumentException) {
-                        OnOutputLogged(string.Format("Parsing error (package {0})", builder.Name));
+                        OnOutputLogged(string.Format(Resources.ParsingError, builder.Name));
                         if (!string.IsNullOrEmpty(builder.Name)) {
                             results.Add(builder.Build());
                         }
@@ -200,10 +200,10 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
             for (int attempt = 0; attempt < 2; attempt++) {
                 if (_forceDownload || !File.Exists(filename)) {
-                    OnOutputLogged(String.Format("Downloading package cache to {0}", filename));
+                    OnOutputLogged(String.Format(Resources.InfoPackageCacheWriteLocation, filename));
                     Uri registry = null;
                     string pathToNpm = GetPathToNpm();
-                    OnOutputLogged(String.Format("Path to npm: {0}", pathToNpm));
+                    OnOutputLogged(String.Format(Resources.InfoNpmPathLocation, pathToNpm));
                     using (var proc = ProcessOutput.RunHiddenAndCapture(pathToNpm, "config", "get", "registry")) {
                         if (await proc == 0) {
                             registry = proc.StandardOutputLines
@@ -222,7 +222,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 try {
                     if (File.Exists(filename)) {
                         var fileInfo = new FileInfo(filename);
-                        OnOutputLogged(String.Format("Reading {0} bytes from {1} ({2})", fileInfo.Length, filename, fileInfo.LastWriteTime));
+                        OnOutputLogged(String.Format(Resources.InfoReadingBytesFromPackageCache, fileInfo.Length, filename, fileInfo.LastWriteTime));
                         
                         using (var reader = new StreamReader(filename)) {
                             newResults = await Task.Run(() => ParseResultsFromReader(reader));
@@ -232,7 +232,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 } catch (Exception ex) {
                     // assume the results are corrupted and try again...
                     OnOutputLogged(ex.ToString());
-                    OnOutputLogged(String.Format("Deleting {0}", filename));
+                    OnOutputLogged(String.Format(Resources.InfoDeletingFile, filename));
                     File.Delete(filename);
                 }
             }
@@ -247,7 +247,9 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             Results = new ReadOnlyCollection<IPackage>(newResults);
             PopulateByName(newResults);
 
-            OnOutputLogged(String.Format("Current Time: {0}\nLast Refreshed: {1}\nNumber of Results: {2}", DateTime.Now, LastRefreshed, newResults.LongCount()));
+            OnOutputLogged(String.Format(Resources.InfoCurrentTime, DateTime.Now));
+            OnOutputLogged(String.Format(Resources.InfoLastRefreshed, LastRefreshed));
+            OnOutputLogged(String.Format(Resources.InfoNumberOfResults, newResults.LongCount()));
 
             return true;
         }
