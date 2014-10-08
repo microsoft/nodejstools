@@ -21,7 +21,7 @@ using System.Text;
 namespace Microsoft.NodejsTools.Parsing
 {
     [Serializable]
-    public sealed class WithNode : Statement
+    internal sealed class WithNode : Statement
     {
         private Expression m_withObject;
         private Block m_body;

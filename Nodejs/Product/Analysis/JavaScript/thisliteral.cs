@@ -18,7 +18,7 @@ using System;
 namespace Microsoft.NodejsTools.Parsing
 {
     [Serializable]
-    public sealed class ThisLiteral : Expression
+    internal sealed class ThisLiteral : Expression
     {
 
         public ThisLiteral(EncodedSpan span)

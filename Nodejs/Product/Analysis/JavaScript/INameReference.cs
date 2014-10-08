@@ -22,7 +22,7 @@ using System.Text;
 
 namespace Microsoft.NodejsTools.Parsing
 {
-    public interface INameReference
+    internal interface INameReference
     {
         JSVariableField VariableField { get; }
         string Name { get; }

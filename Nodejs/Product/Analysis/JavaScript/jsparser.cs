@@ -29,7 +29,7 @@ namespace Microsoft.NodejsTools.Parsing
     /// Class used to parse JavaScript source code into an abstract syntax tree.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
-    public class JSParser
+    internal class JSParser
     {
         private const int c_MaxSkippedTokenNumber = 50;
 
@@ -4483,7 +4483,7 @@ namespace Microsoft.NodejsTools.Parsing
 #if !SILVERLIGHT
     [Serializable]
 #endif
-    public class ParserException : Exception
+    internal class ParserException : Exception
     {
         private static string s_errorMsg = JScript.JSParserException;
 
@@ -4499,7 +4499,7 @@ namespace Microsoft.NodejsTools.Parsing
 #if !SILVERLIGHT
     [Serializable]
 #endif
-    public class UnexpectedTokenException : ParserException
+    internal class UnexpectedTokenException : ParserException
     {
         public UnexpectedTokenException() : base() { }
         public UnexpectedTokenException(string message) : base(message) { }
@@ -4512,7 +4512,7 @@ namespace Microsoft.NodejsTools.Parsing
 #if !SILVERLIGHT
     [Serializable]
 #endif
-    public class EndOfFileException : ParserException
+    internal class EndOfFileException : ParserException
     {
         public EndOfFileException() : base() { }
         public EndOfFileException(string message) : base(message) { }

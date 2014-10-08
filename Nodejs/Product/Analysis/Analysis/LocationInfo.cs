@@ -16,7 +16,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Microsoft.NodejsTools.Analysis {
-    public class LocationInfo : IEquatable<LocationInfo> {
+    internal class LocationInfo : IEquatable<LocationInfo> {
         private readonly int _line, _column;
         internal readonly ProjectEntry _entry;
         internal static LocationInfo[] Empty = new LocationInfo[0];

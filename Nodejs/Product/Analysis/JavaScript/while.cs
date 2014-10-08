@@ -21,7 +21,7 @@ using System.Text;
 namespace Microsoft.NodejsTools.Parsing
 {
     [Serializable]
-    public sealed class WhileNode : IterationStatement
+    internal sealed class WhileNode : IterationStatement
     {
         private Expression m_condition;
 

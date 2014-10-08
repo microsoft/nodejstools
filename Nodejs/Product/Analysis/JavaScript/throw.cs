@@ -21,7 +21,7 @@ using System.Text;
 namespace Microsoft.NodejsTools.Parsing
 {
     [Serializable]
-    public sealed class ThrowNode : Statement
+    internal sealed class ThrowNode : Statement
     {
         private Expression m_operand;
 

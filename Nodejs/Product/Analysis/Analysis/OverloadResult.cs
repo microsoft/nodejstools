@@ -19,7 +19,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Analysis {
-    public class OverloadResult : IOverloadResult {
+    internal class OverloadResult : IOverloadResult {
         private readonly ParameterResult[] _parameters;
         private readonly string _name;
 

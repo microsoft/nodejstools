@@ -21,7 +21,7 @@ using System.Reflection;
 
 namespace Microsoft.NodejsTools.Parsing
 {
-    public abstract class ActivationObject
+    internal abstract class ActivationObject
     {
         private bool m_useStrict;//= false;
         private readonly ErrorSink _errorSink;

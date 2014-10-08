@@ -21,7 +21,7 @@ using System.Diagnostics;
 namespace Microsoft.NodejsTools.Parsing
 {
     [Serializable]
-    public class UnaryOperator : Expression
+    internal class UnaryOperator : Expression
     {
         private Expression m_operand;
 

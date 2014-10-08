@@ -22,7 +22,7 @@ using System.Text;
 
 namespace Microsoft.NodejsTools.Parsing {
     [Serializable]
-    public sealed class FunctionObject : Statement, INameDeclaration {
+    internal sealed class FunctionObject : Statement, INameDeclaration {
         private Block m_body;
         private ParameterDeclaration[] m_parameters;
         public FunctionObject(EncodedSpan functionSpan)

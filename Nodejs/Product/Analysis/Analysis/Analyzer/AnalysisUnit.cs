@@ -32,7 +32,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// AnalysisUnit's will be re-enqueued.  This proceeds until we reach a fixed point.
     /// </summary>
     [Serializable]
-    public class AnalysisUnit : ISet<AnalysisUnit> {
+    internal class AnalysisUnit : ISet<AnalysisUnit> {
         /// <summary>
         /// The AST which will be analyzed when this node is analyzed
         /// </summary>

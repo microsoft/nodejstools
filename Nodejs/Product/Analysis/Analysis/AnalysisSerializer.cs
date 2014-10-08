@@ -28,7 +28,7 @@ using Microsoft.NodejsTools.Parsing;
 using LinqExpr = System.Linq.Expressions.Expression;
 
 namespace Microsoft.NodejsTools.Analysis {
-    public class AnalysisSerializer {
+    internal class AnalysisSerializer {
         private readonly List<object> _memoDict = new List<object>();
         private readonly Dictionary<object, int> _reverseMemo = new Dictionary<object, int>(new ReferenceComparer<object>());
         private readonly Dictionary<string, int> _stringMemo = new Dictionary<string, int>();

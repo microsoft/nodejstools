@@ -27,7 +27,7 @@ namespace Microsoft.NodejsTools.Parsing {
     /// Abstract syntax tree node
     /// </summary>
     [Serializable]
-    public abstract class Node {
+    internal abstract class Node {
         // this is used in the child enumeration for nodes that don't have any children
         private static readonly IEnumerable<Node> s_emptyChildrenCollection = new Node[0];
 

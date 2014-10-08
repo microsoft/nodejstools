@@ -28,7 +28,7 @@ namespace Microsoft.NodejsTools.Parsing
     /// use a templated Dictionary to aproximate a hashed set.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class HashSet<T> : IEnumerable<T>, ICollection<T>
+    internal class HashSet<T> : IEnumerable<T>, ICollection<T>
     {
         private Dictionary<T,T> m_table;
 

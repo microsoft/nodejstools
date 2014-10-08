@@ -21,7 +21,7 @@ using System.Text;
 namespace Microsoft.NodejsTools.Parsing
 {
     [Serializable]
-    public sealed class TryNode : Statement
+    internal sealed class TryNode : Statement
     {
         private Block m_tryBlock;
         private Block m_catchBlock;

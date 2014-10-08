@@ -22,7 +22,7 @@ using System.Text;
 
 namespace Microsoft.NodejsTools.Parsing
 {
-    public interface INameDeclaration
+    internal interface INameDeclaration
     {
         string Name { get; }
         IndexSpan GetNameSpan(LocationResolver resolver);

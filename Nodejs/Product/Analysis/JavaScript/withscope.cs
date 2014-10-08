@@ -18,7 +18,7 @@ using System.Reflection;
 
 namespace Microsoft.NodejsTools.Parsing
 {
-    public sealed class WithScope : BlockScope
+    internal sealed class WithScope : BlockScope
     {
         public WithScope(Statement node, ActivationObject parent, ErrorSink errorSink)
             : base(node, parent, errorSink)

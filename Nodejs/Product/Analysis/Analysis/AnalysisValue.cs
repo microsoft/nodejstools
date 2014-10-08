@@ -28,7 +28,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// analysis values include top-level code, classes, and functions.
     /// </summary>
     [Serializable]
-    public class AnalysisValue : IEnumerable {
+    internal class AnalysisValue : IEnumerable {
         [ThreadStatic]
         private static HashSet<AnalysisValue> _processing;
         private readonly AnalysisProxy _proxy;

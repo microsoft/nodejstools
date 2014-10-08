@@ -23,7 +23,7 @@ namespace Microsoft.NodejsTools.Intellisense {
     /// <summary>
     /// Provides the results of analyzing a simple expression.  Returned from Analysis.AnalyzeExpression.
     /// </summary>
-    public class ExpressionAnalysis {
+    internal class ExpressionAnalysis {
         private readonly string _expr;
         private readonly ModuleAnalysis _analysis;
         private readonly ITrackingSpan _span;

@@ -20,7 +20,7 @@ using System.Reflection;
 namespace Microsoft.NodejsTools.Parsing
 {
 
-    public sealed class CatchScope : BlockScope
+    internal sealed class CatchScope : BlockScope
     {
         public ParameterDeclaration CatchParameter { get; private set; }
 

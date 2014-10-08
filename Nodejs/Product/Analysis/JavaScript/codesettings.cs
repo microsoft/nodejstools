@@ -36,7 +36,7 @@ namespace Microsoft.NodejsTools.Parsing
     /// <summary>
     /// Object used to store code settings for JavaScript parsing, minification, and output
     /// </summary>
-    public class CodeSettings
+    internal class CodeSettings
     {
         /// <summary>
         /// Instantiate a CodeSettings object with the default settings

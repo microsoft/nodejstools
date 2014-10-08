@@ -22,7 +22,7 @@ using System.Text;
 namespace Microsoft.NodejsTools.Parsing
 {
     [Serializable]
-    public class EmptyStatement : Statement
+    internal class EmptyStatement : Statement
     {
         public EmptyStatement(EncodedSpan context)
             : base(context)

@@ -16,7 +16,7 @@ using System;
 using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis {
-    public static class EncodedSpanExtensions {
+    internal static class EncodedSpanExtensions {
         internal static LocationInfo GetLocationInfo(this EncodedSpan span, ProjectEntry project) {
             var location = project.Tree.IndexToLocation(span.GetStartIndex(project.Tree.LocationResolver));
             return new LocationInfo(

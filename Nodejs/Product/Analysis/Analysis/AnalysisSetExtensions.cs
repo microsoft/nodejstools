@@ -22,7 +22,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// Provides operations which can be performed in bulk over a set of 
     /// analysis values, which results in a new analysis set.
     /// </summary>
-    public static class AnalysisSetExtensions {
+    internal static class AnalysisSetExtensions {
         /// <summary>
         /// Performs a GetMember operation for the given name and returns the
         /// types of variables which are associated with that name.

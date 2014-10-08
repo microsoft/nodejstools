@@ -36,7 +36,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// Performs analysis of multiple JavaScript code files and enables interrogation of the resulting analysis.
     /// </summary>
     [Serializable]
-    public partial class JsAnalyzer : IGroupableAnalysisProject, IDeserializeInitialization {
+    internal partial class JsAnalyzer : IGroupableAnalysisProject, IDeserializeInitialization {
         private readonly ModuleTable _modules;
         internal readonly ProjectEntry _builtinEntry;
         private Dictionary<object, AnalysisValue> _itemCache;

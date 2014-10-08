@@ -23,7 +23,7 @@ namespace Microsoft.NodejsTools.Parsing
     using System.Text;
 
     [Serializable]
-    public abstract class IterationStatement : Statement
+    internal abstract class IterationStatement : Statement
     {
         private Block m_body;
 

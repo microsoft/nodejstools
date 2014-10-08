@@ -21,7 +21,7 @@ namespace Microsoft.NodejsTools.Parsing {
     /// Stores the location of a span of text in a source file.
     /// </summary>
     [Serializable]
-    public struct SourceSpan {
+    internal struct SourceSpan {
         private readonly SourceLocation _start;
         private readonly SourceLocation _end;
 

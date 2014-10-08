@@ -21,7 +21,7 @@ using System.Text;
 namespace Microsoft.NodejsTools.Parsing
 {
     [Serializable]
-    public sealed class ForNode : IterationStatement
+    internal sealed class ForNode : IterationStatement
     {
         private Statement m_initializer;
         private Expression m_condition;

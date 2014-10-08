@@ -20,7 +20,7 @@ using System.Text;
 namespace Microsoft.NodejsTools.Parsing
 {
     [Serializable]
-    public sealed class GetterSetter : ObjectLiteralField
+    internal sealed class GetterSetter : ObjectLiteralField
     {
         public bool IsGetter { get; set; }
 

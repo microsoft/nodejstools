@@ -28,7 +28,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// <see cref="AnalysisSet" /> does not implement this interface, but
     /// provides factory and extension methods.
     /// </summary>
-    public interface IAnalysisSet : IEnumerable<AnalysisProxy> {
+    internal interface IAnalysisSet : IEnumerable<AnalysisProxy> {
         IAnalysisSet Add(AnalysisProxy item, out bool wasChanged);
         IAnalysisSet Union(IEnumerable<AnalysisProxy> items, out bool wasChanged);
         IAnalysisSet Clone();
@@ -43,14 +43,14 @@ namespace Microsoft.NodejsTools.Analysis {
     /// Marker interface to indicate that an analysis set is a read-only copy on write
     /// analysis set.
     /// </summary>
-    public interface IImmutableAnalysisSet : IAnalysisSet {
+    internal interface IImmutableAnalysisSet : IAnalysisSet {
     }
 
     /// <summary>
     /// Provides factory and extension methods for objects implementing
     /// <see cref="IAnalysisSet" />.
     /// </summary>
-    public static class AnalysisSet {
+    internal static class AnalysisSet {
         /// <summary>
         /// An empty set that does not combine types. This object is immutable
         /// and can be used without cloning.

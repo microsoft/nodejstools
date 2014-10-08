@@ -20,7 +20,7 @@ using System.Text;
 namespace Microsoft.NodejsTools.Parsing
 {
     [Serializable]
-    public sealed class ContinueNode : Statement
+    internal sealed class ContinueNode : Statement
     {
         public int NestLevel { get; set; }
 

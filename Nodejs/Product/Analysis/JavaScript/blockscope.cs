@@ -19,7 +19,7 @@ using System.Reflection;
 
 namespace Microsoft.NodejsTools.Parsing
 {
-    public class BlockScope : ActivationObject
+    internal class BlockScope : ActivationObject
     {
         public BlockScope(Statement node, ActivationObject parent, ErrorSink errorSink)
             : base(node, parent, errorSink)

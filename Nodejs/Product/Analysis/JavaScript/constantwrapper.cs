@@ -22,7 +22,7 @@ using System.Text.RegularExpressions;
 namespace Microsoft.NodejsTools.Parsing
 {
     [Serializable]
-    public class ConstantWrapper : Expression
+    internal class ConstantWrapper : Expression
     {
         // this is a regular expression that we'll use to strip a leading "0x" from
         // a string if we are trying to parse it into a number. also removes the leading
@@ -97,7 +97,7 @@ namespace Microsoft.NodejsTools.Parsing
     }
 
     [Serializable]
-    public class InvalidNumericErrorValue {
+    internal class InvalidNumericErrorValue {
         private readonly string _code;
 
         public InvalidNumericErrorValue(string code) {

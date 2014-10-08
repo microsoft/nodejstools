@@ -19,7 +19,7 @@ using Microsoft.Win32;
 
 namespace Microsoft.NodejsTools.Analysis {
     [Serializable]
-    public class AnalysisLimits {
+    internal class AnalysisLimits {
         public AnalysisLimits() {
             ReturnTypes = 20;
             InstanceMembers = 50;

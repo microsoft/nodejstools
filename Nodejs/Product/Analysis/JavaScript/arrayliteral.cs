@@ -22,7 +22,7 @@ using System.Text;
 namespace Microsoft.NodejsTools.Parsing
 {
     [Serializable]
-    public sealed class ArrayLiteral : Expression
+    internal sealed class ArrayLiteral : Expression
     {
         private Expression[] _elements;
 

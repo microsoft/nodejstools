@@ -14,7 +14,7 @@
 
 namespace Microsoft.NodejsTools.Formatting {
 
-    public sealed class FormattingOptions {
+    internal sealed class FormattingOptions {
         public int? SpacesPerIndent { get; set; }
         public string NewLine { get; set; }
         public bool OpenBracesOnNewLineForControl { get; set; }

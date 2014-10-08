@@ -19,7 +19,7 @@ namespace Microsoft.NodejsTools.Classifier {
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes")] // TODO: fix
     [Serializable]
-    public struct TokenInfo : IEquatable<TokenInfo> {
+    internal struct TokenInfo : IEquatable<TokenInfo> {
         private TokenCategory _category;
         private TokenTriggers _trigger;
         private SourceSpan _span;

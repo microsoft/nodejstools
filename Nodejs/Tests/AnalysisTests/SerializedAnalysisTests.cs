@@ -17,8 +17,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AnalysisTests {
     [TestClass]
-    public class SerializedAnalysisTests : AnalysisTests {
-        public override ModuleAnalysis ProcessText(string text) {
+    internal class SerializedAnalysisTests : AnalysisTests {
+        internal override ModuleAnalysis ProcessText(string text) {
             return SerializationTests.RoundTrip(ProcessOneText(text));
         }
     }

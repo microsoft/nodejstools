@@ -19,7 +19,7 @@ using System.Text;
 using Microsoft.NodejsTools.Analysis.Values;
 
 namespace Microsoft.NodejsTools.Analysis {
-    public struct MemberResult {
+    internal struct MemberResult {
         private readonly string _name;
         private string _completion;
         private readonly Func<IEnumerable<AnalysisValue>> _vars;

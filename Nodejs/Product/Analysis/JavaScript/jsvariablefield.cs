@@ -39,7 +39,7 @@ namespace Microsoft.NodejsTools.Parsing
     }
 
     [Serializable]
-    public class JSVariableField
+    internal class JSVariableField
     {
         private Statement _scope;
         public string Name { get; private set; }

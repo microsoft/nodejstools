@@ -21,7 +21,7 @@ namespace Microsoft.NodejsTools.Intellisense {
     /// <summary>
     /// Compares various types of completions.
     /// </summary>
-    public class CompletionComparer : IEqualityComparer<MemberResult>, IComparer<MemberResult>, IComparer<Completion>, IComparer<string> {
+    internal class CompletionComparer : IEqualityComparer<MemberResult>, IComparer<MemberResult>, IComparer<Completion>, IComparer<string> {
         /// <summary>
         /// A CompletionComparer that sorts names beginning with underscores to
         /// the end of the list.

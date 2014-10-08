@@ -22,7 +22,7 @@ using System.Text;
 namespace Microsoft.NodejsTools.Parsing
 {
     [Serializable]
-    public class CommaOperator : Expression
+    internal class CommaOperator : Expression
     {
         private Expression[] _expressions;
 

@@ -23,7 +23,7 @@ using System.Text;
 
 namespace Microsoft.NodejsTools.Parsing
 {
-    public sealed class JSScanner
+    internal sealed class JSScanner
     {
         #region static fields
 
@@ -1915,7 +1915,7 @@ namespace Microsoft.NodejsTools.Parsing
         }
     }
 
-    public class ErrorEventArgs : EventArgs {
+    internal class ErrorEventArgs : EventArgs {
         public readonly JScriptException Error;
 
         public ErrorEventArgs(JScriptException errorEx) {

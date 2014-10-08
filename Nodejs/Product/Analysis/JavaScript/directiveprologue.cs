@@ -21,7 +21,7 @@ using System.Text;
 namespace Microsoft.NodejsTools.Parsing
 {
     [Serializable]
-    public class DirectivePrologue : ConstantWrapper
+    internal class DirectivePrologue : ConstantWrapper
     {
         public DirectivePrologue(string value, EncodedSpan span)
             : base(value, span) {

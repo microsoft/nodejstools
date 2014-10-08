@@ -18,7 +18,7 @@ using Microsoft.NodejsTools.Analysis;
 
 namespace Microsoft.NodejsTools.Parsing {
     [Serializable]
-    public class JsAst : Statement {
+    internal class JsAst : Statement {
         private Block _block;
         private readonly LocationResolver _locationResolver;
 

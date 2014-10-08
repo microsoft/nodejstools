@@ -2441,11 +2441,11 @@ exports.f = f;
 #endif
 
 
-        public virtual ModuleAnalysis ProcessText(string text) {
+        internal virtual ModuleAnalysis ProcessText(string text) {
             return ProcessOneText(text);
         }
 
-        public static ModuleAnalysis ProcessOneText(string text) {
+        internal static ModuleAnalysis ProcessOneText(string text) {
             var sourceUnit = Analysis.GetSourceUnit(text);
             var state = new JsAnalyzer();
             var entry = state.AddModule("fob.js", null);

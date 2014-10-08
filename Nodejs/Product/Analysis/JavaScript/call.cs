@@ -21,7 +21,7 @@ using System.Text;
 namespace Microsoft.NodejsTools.Parsing
 {
     [Serializable]
-    public sealed class CallNode : Expression
+    internal sealed class CallNode : Expression
     {
         private Expression m_function;
         private Expression[] m_arguments;

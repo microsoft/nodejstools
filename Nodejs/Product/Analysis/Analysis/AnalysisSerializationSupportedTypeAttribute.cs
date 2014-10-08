@@ -193,7 +193,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// This type is also required for types used in generic constructs.
     /// </summary>
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
-    sealed class AnalysisSerializationSupportedTypeAttribute : Attribute {
+    internal sealed class AnalysisSerializationSupportedTypeAttribute : Attribute {
         private readonly Type _type;
         private static readonly Type[] _allowedTypes = GetAllowedTypes();
         private static readonly Dictionary<Type, int> _allowedTypeIndexes = MakeAllowedTypesIndexes();

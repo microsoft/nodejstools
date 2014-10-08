@@ -17,7 +17,7 @@ using System.Collections.Generic;
 
 namespace Microsoft.NodejsTools.Analysis {
     [Serializable]
-    public class ParameterResult : IEquatable<ParameterResult> {
+    internal class ParameterResult : IEquatable<ParameterResult> {
         public string Name { get; private set; }
         public string Documentation { get; private set; }
         public string Type { get; private set; }

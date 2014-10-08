@@ -19,7 +19,7 @@ using System.Text;
 
 namespace Microsoft.NodejsTools.Parsing
 {
-    public class ContextError
+    internal class ContextError
     {
         // error information properties
         public bool IsError { get; protected set; }

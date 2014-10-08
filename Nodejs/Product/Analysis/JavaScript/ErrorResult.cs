@@ -13,7 +13,7 @@
  * ***************************************************************************/
 
 namespace Microsoft.NodejsTools.Parsing {
-    public class ErrorResult {
+    internal class ErrorResult {
         private readonly string _message;
         private readonly SourceSpan _span;
         private readonly JSError _errorCode;

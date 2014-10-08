@@ -21,7 +21,7 @@ using System.Reflection;
 
 namespace Microsoft.NodejsTools.Parsing
 {
-    public sealed class GlobalScope : ActivationObject
+    internal sealed class GlobalScope : ActivationObject
     {
         private HashSet<string> m_globalProperties;
         private HashSet<string> m_globalFunctions;
