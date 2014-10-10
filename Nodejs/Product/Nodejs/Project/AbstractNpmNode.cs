@@ -15,6 +15,7 @@ namespace Microsoft.NodejsTools.Project {
         protected AbstractNpmNode(NodejsProjectNode root)
             : base(root) {
             _projectNode = root;
+            ExcludeNodeFromScc = true;
         }
 
         public override Guid ItemTypeGuid {

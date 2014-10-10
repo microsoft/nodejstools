@@ -71,8 +71,6 @@ namespace Microsoft.NodejsTools.Project {
 
         public NodeModulesNode(NodejsProjectNode root)
             : base(root) {
-            ExcludeNodeFromScc = true;
-
             CreateNpmController();
 
             _globalModulesNode = new GlobalModulesNode(root, this);
