@@ -70,7 +70,7 @@
 
     <Copy
       SourceFiles="@(NodejsAzureDeploymentFile)"
-      DestinationFolder="$(IntermediateOutputPath)\bin"
+      DestinationFolder="bin"
       SkipUnchangedFiles="true">
       <Output TaskParameter="DestinationFiles" ItemName="FileWrites"/>
       <Output TaskParameter="DestinationFiles" ItemName="FilesCopiedToIntermediate"/>

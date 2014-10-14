@@ -189,7 +189,11 @@ namespace Microsoft.NodejsTools.Analysis {
                 return;
             }
 
-            _unit = new AnalysisUnit(tree, EnvironmentRecord);
+            if (String.Equals(Path.GetFileName(FilePath), "gruntfile.js", StringComparison.OrdinalIgnoreCase)) {
+                _unit = new GruntfileAnalysisUnit(tree, EnvironmentRecord);
+            } else {
+                _unit = new AnalysisUnit(tree, EnvironmentRecord);
+            }
             _moduleDeps.EnqueueDependents();
 
             if (EnvironmentRecord.HasChildren) {

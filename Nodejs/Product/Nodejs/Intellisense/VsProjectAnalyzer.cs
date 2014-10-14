@@ -21,6 +21,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security;
 using System.Threading;
+using System.Web.Script.Serialization;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.NodejsTools.Classifier;
 using Microsoft.NodejsTools.Options;
@@ -259,8 +260,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                     TaskProvider.Value.ClearErrorSource(bufferParser._currentProjEntry, ParserTaskMoniker);
 
                     if (_implicitProject) {
-                        // remove the file from the error list
-                        TaskProvider.Value.Clear(bufferParser._currentProjEntry, ParserTaskMoniker);
+                        UnloadFile(bufferParser._currentProjEntry);
                     }
                 }
             }
@@ -303,10 +303,14 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         public void AnalyzeFile(string path, bool reportErrors = true) {
+            AnalyzeFile(path, reportErrors, null);
+        }
+
+        private void AnalyzeFile(string path, bool reportErrors, ProjectItem originatingItem) {
             if (!_fullyLoaded) {
                 lock (_loadingDeltas) {
                     if (!_fullyLoaded) {
-                        _loadingDeltas.Add(() => AnalyzeFile(path, reportErrors));
+                        _loadingDeltas.Add(() => AnalyzeFile(path, reportErrors, originatingItem));
                         return;
                     }
                 }
@@ -314,29 +318,25 @@ namespace Microsoft.NodejsTools.Intellisense {
 
             ProjectItem item;
             if (!_projectFiles.TryGetValue(path, out item)) {
-                if (NodejsProjectNode.IsNodejsFile(path)) {
-                    var pyEntry = _jsAnalyzer.AddModule(
-                        path,
-                        null
-                    );
+                var pyEntry = _jsAnalyzer.AddModule(
+                    path,
+                    null
+                );
 
-                    pyEntry.BeginParsingTree();
+                pyEntry.BeginParsingTree();
 
-                    item = new ProjectItem(pyEntry);
-                }
+                item = new ProjectItem(pyEntry);
 
-                if (item != null) {
-                    item.ReportErrors = reportErrors;
-                    item.Reloaded = true;
-                    _projectFiles[path] = item;
-                    // only parse the file if we need to report errors on it or if
-                    // we're analyzing.s
-                    if (reportErrors || _analysisQueue != null) {
-                        EnqueueFile(item.Entry, path);
-                    } else if (item is IJsProjectEntry) {
-                        // balance BeginParsingTree call...
-                        ((IJsProjectEntry)item.Entry).UpdateTree(null, null);
-                    }
+                item.ReportErrors = reportErrors;
+                item.Reloaded = true;
+                _projectFiles[path] = item;
+                // only parse the file if we need to report errors on it or if
+                // we're analyzing.s
+                if (reportErrors || _analysisQueue != null) {
+                    EnqueueFile(item.Entry, path);
+                } else if (item is IJsProjectEntry) {
+                    // balance BeginParsingTree call...
+                    ((IJsProjectEntry)item.Entry).UpdateTree(null, null);
                 }
             } else {
                 if (!reportErrors) {
@@ -354,6 +354,46 @@ namespace Microsoft.NodejsTools.Intellisense {
                 }
                 item.ReportErrors = reportErrors;
                 item.Reloaded = true;
+            }
+
+            if (_implicitProject) {
+                if (originatingItem != null) {
+                    // file was loaded as part of analysis of a collection of files...
+                    item.ImplicitLoadCount += 1;
+                    if (originatingItem.LoadedItems == null) {
+                        originatingItem.LoadedItems = new List<ProjectItem>();
+                    }
+                    originatingItem.LoadedItems.Add(item);
+                } else {
+                    originatingItem.ExplicitlyLoaded = true;
+                }
+            }
+        }
+
+        public void AddPackageJson(string packageJsonPath) {
+            string fileContents = null;
+            for (int i = 0; i < 10; i++) {
+                try {
+                    fileContents = File.ReadAllText(packageJsonPath);
+                    break;
+                } catch {
+                    Thread.Sleep(100);
+                }
+            }
+
+            if (fileContents != null) {
+                JavaScriptSerializer serializer = new JavaScriptSerializer();
+                Dictionary<string, object> json;
+                try {
+                    json = serializer.Deserialize<Dictionary<string, object>>(fileContents);
+                } catch {
+                    return;
+                }
+
+                object mainFile;
+                if (json != null && json.TryGetValue("main", out mainFile) && mainFile is string) {
+                    AddPackageJson(packageJsonPath, (string)mainFile);
+                }
             }
         }
 
@@ -715,6 +755,28 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
 #endif
 
+            if (_implicitProject) {
+                ProjectItem item;
+                if (_projectFiles.TryGetValue(entry.FilePath, out item)) {
+                    if (item.LoadedItems != null) {
+                        // unload any items we brought in..
+                        foreach (var implicitItem in item.LoadedItems) {
+                            implicitItem.ImplicitLoadCount--;
+                            if (implicitItem.ImplicitLoadCount == 0) {
+                                _analysisQueue.Enqueue(_jsAnalyzer.RemoveModule(implicitItem.Entry), AnalysisPriority.Normal);
+                                ProjectItem implicitRemoved;
+                                _projectFiles.TryRemove(implicitItem.Entry.FilePath, out implicitRemoved);
+                            }
+                        }
+                    }
+                    item.ExplicitlyLoaded = false;
+                    if (item.ImplicitLoadCount != 0) {
+                        // we were also implicitly loaded, so leave us implicitly loaded...
+                        return;
+                    }
+                }
+            }
+
             ClearParserTasks(entry);
             if (_analysisLevel != AnalysisLevel.None) {
                 _analysisQueue.Enqueue(_jsAnalyzer.RemoveModule(entry), AnalysisPriority.Normal);
@@ -768,13 +830,112 @@ namespace Microsoft.NodejsTools.Intellisense {
                 _projectFiles[path] = file = new ProjectItem(entry);
             }
 
+            if (_implicitProject) {
+                QueueDirectoryAnalysis(path, file);
+            }
+
             return file.Entry;
+        }
+
+        private void QueueDirectoryAnalysis(string path, ProjectItem originatingItem) {
+            ThreadPool.QueueUserWorkItem(x => { lock (_contentsLock) { AnalyzeDirectory(CommonUtils.NormalizeDirectoryPath(Path.GetDirectoryName(path)), originatingItem); } });
+        }
+
+        /// <summary>
+        /// Analyzes a complete directory including all of the contained files and packages.
+        /// </summary>
+        /// <param name="dir">Directory to analyze.</param>
+        /// <param name="onFileAnalyzed">If specified, this callback is invoked for every <see cref="IProjectEntry"/>
+        /// that is analyzed while analyzing this directory.</param>
+        /// <remarks>The callback may be invoked on a thread different from the one that this function was originally invoked on.</remarks>
+        private void AnalyzeDirectory(string dir, ProjectItem originatingItem) {
+            _analysisQueue.Enqueue(new AddDirectoryAnalysis(dir, this, originatingItem), AnalysisPriority.High);
+        }
+
+        class AddDirectoryAnalysis : IAnalyzable {
+            private readonly string _dir;
+            private readonly VsProjectAnalyzer _analyzer;
+            private readonly ProjectItem _originatingItem;
+
+            public AddDirectoryAnalysis(string dir, VsProjectAnalyzer analyzer, ProjectItem originatingItem) {
+                _dir = dir;
+                _analyzer = analyzer;
+                _originatingItem = originatingItem;
+            }
+
+            #region IAnalyzable Members
+
+            public void Analyze(CancellationToken cancel) {
+                if (cancel.IsCancellationRequested) {
+                    return;
+                }
+
+                AnalyzeDirectoryWorker(_dir, true, cancel);
+            }
+
+            #endregion
+
+            private void AnalyzeDirectoryWorker(string dir, bool addDir, CancellationToken cancel) {
+                if (_analyzer._jsAnalyzer == null) {
+                    // We aren't able to analyze code.
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(dir)) {
+                    Debug.Assert(false, "Unexpected empty dir");
+                    return;
+                }
+
+                if (addDir) {
+                    lock (_analyzer._contentsLock) {
+                        _analyzer._jsAnalyzer.AddAnalysisDirectory(dir);
+                    }
+                }
+
+                try {
+                    var filenames = Directory.GetFiles(dir, "package.json", SearchOption.AllDirectories);
+                    foreach (string filename in filenames) {
+                        if (cancel.IsCancellationRequested) {
+                            break;
+                        }
+                        _analyzer.AddPackageJson(filename);
+                    }
+                } catch (IOException) {
+                    // We want to handle DirectoryNotFound, DriveNotFound, PathTooLong
+                } catch (UnauthorizedAccessException) {
+                }
+
+                try {
+                    var filenames = Directory.GetFiles(dir, "*.js", SearchOption.AllDirectories);
+                    foreach (string filename in filenames) {
+                        if (cancel.IsCancellationRequested) {
+                            break;
+                        }
+                        _analyzer.AnalyzeFile(filename, reportErrors: false, originatingItem: _originatingItem);
+                    }
+                } catch (IOException) {
+                    // We want to handle DirectoryNotFound, DriveNotFound, PathTooLong
+                } catch (UnauthorizedAccessException) {
+                }
+            }
         }
 
         class ProjectItem {
             public readonly IProjectEntry Entry;
             public bool ReportErrors;
             public bool Reloaded;
+            /// <summary>
+            /// Number of items which have implicitly loaded this item in the implicit project.
+            /// </summary>
+            public int ImplicitLoadCount;
+            /// <summary>
+            /// True if this file has been explicitly loaded (possibly in addition to being implicitly loaded)
+            /// </summary>
+            public bool ExplicitlyLoaded;
+            /// <summary>
+            /// The items which this item has implicitly loaded.
+            /// </summary>
+            public List<ProjectItem> LoadedItems;
 
             public ProjectItem(IProjectEntry entry) {
                 Entry = entry;

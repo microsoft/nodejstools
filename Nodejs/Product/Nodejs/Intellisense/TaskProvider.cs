@@ -733,9 +733,9 @@ namespace Microsoft.NodejsTools.Intellisense {
             try {
                 if (Span.Start.Line == 1 && Span.Start.Column == 1 && Span.Start.Index != 0) {
                     // we have just an absolute index, use that to naviagte
-                    NodejsPackage.NavigateTo(SourceFile, Guid.Empty, Span.Start.Index);
+                    NodejsPackage.NavigateTo(SourceFile, Span.Start.Index);
                 } else {
-                    NodejsPackage.NavigateTo(SourceFile, Guid.Empty, Span.Start.Line - 1, Span.Start.Column - 1);
+                    NodejsPackage.NavigateTo(SourceFile, Span.Start.Line - 1, Span.Start.Column - 1);
                 }
                 return VSConstants.S_OK;
             } catch (DirectoryNotFoundException) {
@@ -746,8 +746,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                         continue;
                     }
                     var ext = Path.GetExtension(path);
-                    if (string.Equals(ext, ".zip", StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(ext, ".egg", StringComparison.OrdinalIgnoreCase)) {
+                    if (string.Equals(ext, ".zip", StringComparison.OrdinalIgnoreCase)) {
                         MessageBox.Show(
                             "Opening source files contained in .zip archives is not supported",
                             "Cannot open file",

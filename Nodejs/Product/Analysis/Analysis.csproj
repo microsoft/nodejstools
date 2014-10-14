@@ -164,6 +164,7 @@
     <Compile Include="Analysis\AnalysisHashSet.cs" />
     <Compile Include="Analysis\AnalysisSerializationSupportedTypeAttribute.cs" />
     <Compile Include="Analysis\AnalysisValueExtensions.cs" />
+    <Compile Include="Analysis\Analyzer\GruntfileAnalysisUnit.cs" />
     <Compile Include="Analysis\IAnalysisSerializeAsNull.cs" />
     <Compile Include="Analysis\AnalysisSerializer.cs" />
     <Compile Include="Analysis\AnalysisLimits.cs" />

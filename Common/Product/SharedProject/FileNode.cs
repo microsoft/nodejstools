@@ -701,6 +701,7 @@ namespace Microsoft.VisualStudioTools.Project {
                 renamedNode.Parent = newParent;
             }
 
+            UpdateCaption();
             ProjectMgr.ReDrawNode(renamedNode, UIHierarchyElement.Caption);
 
             renamedNode.ProjectMgr.ExtensibilityEventsDispatcher.FireItemRenamed(this, oldFileName);

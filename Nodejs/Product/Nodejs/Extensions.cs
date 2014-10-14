@@ -271,7 +271,6 @@ namespace Microsoft.NodejsTools {
         internal static void GotoSource(this LocationInfo location) {
             NodejsPackage.NavigateTo(
                 location.FilePath,
-                Guid.Empty,
                 location.Line - 1,
                 location.Column - 1
             );            

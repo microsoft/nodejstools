@@ -521,12 +521,13 @@ namespace Microsoft.NodejsTools {
             Guid ourEditor = typeof(NodejsEditorFactory).GUID;
             Guid view = Guid.Empty;
             IVsWindowFrame frame;
-            int hr = ((IVsProject3)_innerVsHierarchy).ReopenItem(
+            int hr = ((IVsProject3)_innerVsHierarchy).OpenItemWithSpecific(
                 selectionItemId,
+                0,
                 ref ourEditor,
                 null,
                 ref view,
-                new IntPtr(-1),
+                IntPtr.Zero,
                 out frame
             );
             if (frame != null && ErrorHandler.Succeeded(hr)) {
@@ -578,17 +579,18 @@ namespace Microsoft.NodejsTools {
 
         public int OpenItem(uint itemid, ref Guid rguidLogicalView, IntPtr punkDocDataExisting, out IVsWindowFrame ppWindowFrame) {
             if (_innerProject3 != null && IsJavaScriptFile(GetItemName(_innerVsHierarchy, itemid))) {
-                // force HTML files opened w/o an editor type to be opened w/ our editor factory.
-                Guid ourEditor = typeof(NodejsEditorFactory).GUID;
+                // force .js files opened w/o an editor type to be opened w/ our editor factory.
+                Guid guid = typeof(NodejsEditorFactory).GUID;
                 Guid view = Guid.Empty;
-                int hr = ((IVsProject3)_innerVsHierarchy).ReopenItem(
+                int hr = _innerProject3.OpenItemWithSpecific(
                     itemid,
-                    ref ourEditor,
+                    0,
+                    ref guid,
                     null,
-                    ref view,
-                    new IntPtr(-1),
+                    rguidLogicalView,
+                    punkDocDataExisting,
                     out ppWindowFrame
-                );
+                ); 
                 return hr;
             }
 
@@ -610,14 +612,13 @@ namespace Microsoft.NodejsTools {
         public int ReopenItem(uint itemid, ref Guid rguidEditorType, string pszPhysicalView, ref Guid rguidLogicalView, IntPtr punkDocDataExisting, out IVsWindowFrame ppWindowFrame) {
             if (_innerProject3 != null) {
                 if (IsJavaScriptFile(GetItemName(_innerVsHierarchy, itemid))) {
-                    // force HTML files opened w/o an editor type to be opened w/ our editor factory.
+                    // force .js files opened w/o an editor type to be opened w/ our editor factory.
                     Guid guid = Guids.NodejsEditorFactory;
-                    return _innerProject3.OpenItemWithSpecific(
+                    return _innerProject3.ReopenItem(
                         itemid,
-                        0,
                         ref guid,
-                        null,
-                        rguidLogicalView,
+                        pszPhysicalView,
+                        ref rguidLogicalView,
                         punkDocDataExisting,
                         out ppWindowFrame
                     );

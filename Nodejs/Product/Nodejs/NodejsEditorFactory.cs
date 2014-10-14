@@ -224,6 +224,32 @@ namespace Microsoft.NodejsTools {
             return textLines;
         }
 
+        protected void InitializeLanguageService(IVsTextLines textLines, Guid langSid) {
+            IVsUserData userData = textLines as IVsUserData;
+            if (userData != null) {
+                if (langSid != Guid.Empty) {
+                    Guid vsCoreSid = Guids.DefaultLangaugeService;
+                    Guid currentSid;
+                    ErrorHandler.ThrowOnFailure(textLines.GetLanguageServiceID(out currentSid));
+                    // If the language service is set to the default SID, then
+                    // set it to our language
+                    if (currentSid == vsCoreSid) {
+                        ErrorHandler.ThrowOnFailure(textLines.SetLanguageServiceID(ref langSid));
+                    } else if (currentSid != langSid) {
+                        // Some other language service has it, so return VS_E_INCOMPATIBLEDOCDATA
+                        throw new COMException("Incompatible doc data", VSConstants.VS_E_INCOMPATIBLEDOCDATA);
+                    }
+
+                    Guid bufferDetectLang = VSConstants.VsTextBufferUserDataGuid.VsBufferDetectLangSID_guid;
+                    ErrorHandler.ThrowOnFailure(userData.SetData(ref bufferDetectLang, false));
+                }
+            }
+        }
+
+        private void InitializeLanguageService(IVsTextLines textLines) {
+            InitializeLanguageService(textLines, typeof(NodejsEditorFactory).GUID);
+        }
+
         private IntPtr CreateDocumentView(string documentMoniker, string physicalView, IVsHierarchy hierarchy, uint itemid, IVsTextLines textLines, bool createdDocData, out string editorCaption, out Guid cmdUI) {
             //Init out params
             editorCaption = string.Empty;
@@ -268,6 +294,8 @@ namespace Microsoft.NodejsTools {
                 // exists and is initialized.
                 bufferEventListener.OnLoadCompleted(0);
             }
+
+            InitializeLanguageService(textLines);
 
             cmdUI = VSConstants.GUID_TextEditorFactory;
 
