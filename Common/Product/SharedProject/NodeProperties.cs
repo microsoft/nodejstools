@@ -365,7 +365,7 @@ namespace Microsoft.VisualStudioTools.Project {
             get {
                 var publish = this.HierarchyNode.ItemNode.GetMetadata("Publish");
                 if (String.IsNullOrEmpty(publish)) {
-                    if (this.HierarchyNode.ItemNode.ItemTypeName == "Compile") {
+                    if (this.HierarchyNode.ItemNode.ItemTypeName == ProjectFileConstants.Compile) {
                         return true;
                     }
                     return false;
@@ -380,7 +380,7 @@ namespace Microsoft.VisualStudioTools.Project {
         [Browsable(false)]
         public bool ShouldSerializePublish() {
             // If compile, default should be true, else the default is false.
-            if (HierarchyNode.ItemNode.ItemTypeName == "Compile") {
+            if (HierarchyNode.ItemNode.ItemTypeName == ProjectFileConstants.Compile) {
                 return !Publish;
             }
             return Publish;
@@ -389,7 +389,7 @@ namespace Microsoft.VisualStudioTools.Project {
         [Browsable(false)]
         public void ResetPublish() {
             // If compile, default should be true, else the default is false.
-            if (HierarchyNode.ItemNode.ItemTypeName == "Compile") {
+            if (HierarchyNode.ItemNode.ItemTypeName == ProjectFileConstants.Compile) {
                 Publish = true;
             }
             Publish = false;
@@ -495,11 +495,11 @@ namespace Microsoft.VisualStudioTools.Project {
             if (destinationType == typeof(string)) {
                 switch ((prjBuildAction)value) {
                     case prjBuildAction.prjBuildActionCompile:
-                        return "Compile";
+                        return ProjectFileConstants.Compile;
                     case prjBuildAction.prjBuildActionContent:
-                        return "Content";
+                        return ProjectFileConstants.Content;
                     case prjBuildAction.prjBuildActionNone:
-                        return "None";
+                        return ProjectFileConstants.None;
                 }
             }
             return base.ConvertTo(context, culture, value, destinationType);
@@ -508,11 +508,11 @@ namespace Microsoft.VisualStudioTools.Project {
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value) {
             if (value is string) {
                 string strVal = (string)value;
-                if (strVal.Equals("Compile", StringComparison.OrdinalIgnoreCase)) {
+                if (strVal.Equals(ProjectFileConstants.Compile, StringComparison.OrdinalIgnoreCase)) {
                     return prjBuildAction.prjBuildActionCompile;
-                } else if (strVal.Equals("Content", StringComparison.OrdinalIgnoreCase)) {
+                } else if (strVal.Equals(ProjectFileConstants.Content, StringComparison.OrdinalIgnoreCase)) {
                     return prjBuildAction.prjBuildActionContent;
-                } else if (strVal.Equals("None", StringComparison.OrdinalIgnoreCase)) {
+                } else if (strVal.Equals(ProjectFileConstants.None, StringComparison.OrdinalIgnoreCase)) {
                     return prjBuildAction.prjBuildActionNone;
                 }
             }
@@ -563,7 +563,7 @@ namespace Microsoft.VisualStudioTools.Project {
             if (nodeProps != null) {
                 itemNames = nodeProps.HierarchyNode.ProjectMgr.GetAvailableItemNames();
             } else {
-                itemNames = new[] { "None", "Compile", "Content" };
+                itemNames = new[] { ProjectFileConstants.None, ProjectFileConstants.Compile, ProjectFileConstants.Content };
             }
             return new StandardValuesCollection(itemNames.ToArray());
         }

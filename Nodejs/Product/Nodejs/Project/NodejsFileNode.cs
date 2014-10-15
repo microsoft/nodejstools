@@ -38,20 +38,29 @@ namespace Microsoft.NodejsTools.Project {
                 root.Analyzer.AnalyzeFile(Url, !IsNonMemberItem);
                 root._requireCompletionCache.Clear();
             }
+
+            ItemNode.ItemTypeChanged += ItemNode_ItemTypeChanged;
         }
 
         internal bool ShouldAnalyze {
             get {
-                return !IsNonMemberItem || ProjectMgr.IncludeNodejsFile(this);
+                // We analyze if we are a member item or the file is included
+                // Also, it should either be marked as compile or not have an item type name (value is null for node_modules
+                return (!IsNonMemberItem || ProjectMgr.IncludeNodejsFile(this))
+                    && (ItemNode.ItemTypeName == ProjectFileConstants.Compile || string.IsNullOrEmpty(ItemNode.ItemTypeName));
+
             }
         }
 
         internal override int IncludeInProject(bool includeChildren) {
+            // On an include, a file is marked as Compile.  There is no reason to check whether to Analyze.  We should.
             ProjectMgr.Analyzer.AnalyzeFile(Url, true);
             return base.IncludeInProject(includeChildren);
         }
 
         internal override int ExcludeFromProject() {
+            // Analyze on removing from a project so we have the most up to date sources for this.
+            // Don't report errors since the file won't remain part of the project. This removes the errors from the list.
             ProjectMgr.Analyzer.AnalyzeFile(Url, false);
             return base.ExcludeFromProject();
         }
@@ -101,6 +110,12 @@ namespace Microsoft.NodejsTools.Project {
                 }
             }
             return base.QueryStatusOnNode(guidCmdGroup, cmd, pCmdText, ref result);
+        }
+
+        private void ItemNode_ItemTypeChanged(object sender, EventArgs e) {
+            // item type node was changed...
+            // if we have changed the type from compile to anything else, we should scrub
+            ProjectMgr.Analyzer.AnalyzeFile(Url, ShouldAnalyze);
         }
 
         private void CloseWatcher() {

@@ -517,10 +517,28 @@ namespace Microsoft.NodejsTools {
             return typeGuid;
         }
 
+        private static EnvDTE.ProjectItem GetExtensionObject(IVsHierarchy hierarchy, uint itemId) {
+            object project;
+
+            ErrorHandler.ThrowOnFailure(
+                hierarchy.GetProperty(
+                    itemId,
+                    (int)__VSHPROPID.VSHPROPID_ExtObject,
+                    out project
+                )
+            );
+
+            return (project as EnvDTE.ProjectItem);
+        }
+
         private int OpenWithNodejsEditor(uint selectionItemId) {
-            Guid ourEditor = typeof(NodejsEditorFactory).GUID;
+            // If the item type of this file is not compile, we don't actually want to open with Nodejs and should instead use the default.
+            var itemType = GetExtensionObject(_innerVsHierarchy, selectionItemId).Properties.Item("ItemType").Value;
+            Guid ourEditor = (string)itemType == ProjectFileConstants.Compile ? Guids.NodejsEditorFactory : Guid.Empty;
+            
             Guid view = Guid.Empty;
             IVsWindowFrame frame;
+
             int hr = ((IVsProject3)_innerVsHierarchy).OpenItemWithSpecific(
                 selectionItemId,
                 0,
@@ -590,7 +608,7 @@ namespace Microsoft.NodejsTools {
                     rguidLogicalView,
                     punkDocDataExisting,
                     out ppWindowFrame
-                ); 
+                );
                 return hr;
             }
 
@@ -613,7 +631,10 @@ namespace Microsoft.NodejsTools {
             if (_innerProject3 != null) {
                 if (IsJavaScriptFile(GetItemName(_innerVsHierarchy, itemid))) {
                     // force .js files opened w/o an editor type to be opened w/ our editor factory.
-                    Guid guid = Guids.NodejsEditorFactory;
+                    // If the item type of this file is not compile, we don't actually want to open with Nodejs and should instead use the default.
+                    var itemType = GetExtensionObject(_innerVsHierarchy, itemid).Properties.Item("ItemType").Value;
+                    Guid guid = (string)itemType == ProjectFileConstants.Compile ? Guids.NodejsEditorFactory : Guid.Empty;
+
                     return _innerProject3.ReopenItem(
                         itemid,
                         ref guid,

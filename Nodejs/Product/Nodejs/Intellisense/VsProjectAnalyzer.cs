@@ -348,7 +348,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                     // this file was written to since our cached analysis was saved, reload it.
                     // Or it was just included in the project and we need to parse for reporting
                     // errors.
-                    if (reportErrors || _analysisQueue != null) {
+                    if (_analysisQueue != null) {
                         EnqueueFile(item.Entry, path);
                     }
                 }
