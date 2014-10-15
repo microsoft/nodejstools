@@ -88,6 +88,7 @@ using Microsoft.NodejsTools.Parsing;
 [assembly: AnalysisSerializationSupportedType(typeof(AnalysisSetOneUnion))]
 [assembly: AnalysisSerializationSupportedType(typeof(AnalysisSetTwoUnion))]
 [assembly: AnalysisSerializationSupportedType(typeof(AnalysisUnit))]
+[assembly: AnalysisSerializationSupportedType(typeof(GruntfileAnalysisUnit))]
 [assembly: AnalysisSerializationSupportedType(typeof(EvalAnalysisUnit))]
 [assembly: AnalysisSerializationSupportedType(typeof(FunctionAnalysisUnit))]
 [assembly: AnalysisSerializationSupportedType(typeof(CartesianProductFunctionAnalysisUnit))]

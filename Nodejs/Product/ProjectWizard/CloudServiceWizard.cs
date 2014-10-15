@@ -33,6 +33,8 @@ namespace Microsoft.NodejsTools.ProjectWizard {
         const string AzureToolsDownload = "https://go.microsoft.com/fwlink/p/?linkid=323511";
 #elif DEV12
         const string AzureToolsDownload = "https://go.microsoft.com/fwlink/p/?linkid=323510";
+#elif DEV14
+        const string AzureToolsDownload = "http://go.microsoft.com/fwlink/?LinkID=517353";
 #else
 #error Unsupported VS version
 #endif

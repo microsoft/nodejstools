@@ -27,6 +27,8 @@ namespace Microsoft.VisualStudioTools {
         const string VSVersion = "11.0";
 #elif DEV12
         const string VSVersion = "12.0";
+#elif DEV14
+        const string VSVersion = "14.0";
 #else
 #error Unrecognized VS Version.
 #endif
