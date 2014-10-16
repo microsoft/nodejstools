@@ -77,6 +77,9 @@ namespace Microsoft.NodejsTools.Parsing
 
         public bool IsEndOfFile { get { return _currentPosition >= _source.Length; } }
 
+        // Whether the current multiline comment is a doclet.
+        public bool IsDoclet { get; private set; }
+
         internal string Identifier
         {
             get
@@ -190,6 +193,7 @@ namespace Microsoft.NodejsTools.Parsing
             _tokenStartIndex = _currentPosition;
 
             _identifier.Length = 0;
+            IsDoclet = false;
 
             if (_state.UnterminatedComment && !IsEndOfFile) {
                 SkipMultilineComment();
@@ -1460,6 +1464,10 @@ namespace Microsoft.NodejsTools.Parsing
 
         private void SkipMultilineComment()
         {
+            if (GetChar(_currentPosition + 1) == '*' && GetChar(_currentPosition + 2) != '*') {
+                IsDoclet = true;
+            }
+
             for (; ; )
             {
                 char c = GetChar(_currentPosition);

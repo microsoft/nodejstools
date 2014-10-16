@@ -673,6 +673,62 @@ abc(abc);
         }
 
         [TestMethod, Priority(0)]
+        public void TestJSDoc() {
+            string code = @"
+/** Documentation for f.
+  * 
+  * Just a paragraph. It shouldn't show up anywhere.
+  *
+  * @param  a   Documentation for a.
+  * 
+  * Another paragraph that won't show up anywhere. This one has a {@link}.
+  *
+  * @arg    b   Documentation for b.
+  *             It spans multiple lines.
+  * @param  c   Documentation for c. It has a {@link} in it.
+  * @arg   [d]  Documentation for d. It is an optional parameter.
+  * @argument [e=123]
+  * Documentation for e. It has a default value.
+  *
+  * @see Not a parameter!
+  */
+function f(a, b, c, d, e) {}
+
+/** Documentation for g. */
+var g = function() {}
+
+var h;
+/** Documentation for h. */
+h = function() {}
+";
+            var analysis = ProcessText(code);
+
+            var f = analysis.GetSignaturesByIndex("f", code.Length).Single();
+            string fExpected =
+                @"Documentation for f.
+
+Just a paragraph. It shouldn't show up anywhere.
+
+@param  a   Documentation for a.
+
+Another paragraph that won't show up anywhere. This one has a {@link}.
+
+@arg    b   Documentation for b. It spans multiple lines.
+@param  c   Documentation for c. It has a {@link} in it.
+@arg   [d]  Documentation for d. It is an optional parameter.
+@argument [e=123] Documentation for e. It has a default value.
+
+@see Not a parameter!";
+            Assert.AreEqual(fExpected, f.Documentation);
+
+            var g = analysis.GetSignaturesByIndex("g", code.Length).Single();
+            Assert.AreEqual("Documentation for g.", g.Documentation);
+
+            var h = analysis.GetSignaturesByIndex("h", code.Length).Single();
+            Assert.AreEqual("Documentation for h.", h.Documentation);
+        }
+
+        [TestMethod, Priority(0)]
         public void TestStringMembers() {
             string code = @"
 var x = 'abc';

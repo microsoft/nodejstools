@@ -266,5 +266,104 @@ namespace Microsoft.Nodejs.Tests.UI {
                 }
             }
         }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void JSDocTest() {
+            var project = Project("JSDocTest",
+                Compile("app", @"
+/** Documentation for f.
+  * 
+  * Just a paragraph. It shouldn't show up anywhere.
+  *
+  * @param  a   Documentation for a.
+  * 
+  * Another paragraph that won't show up anywhere. This one has a {@link}.
+  *
+  * @arg    b   Documentation for b.
+  *             It spans multiple lines.
+  * @param  c   Documentation for c. It has a {@link} in it.
+  * @arg   [d]  Documentation for d. It is an optional parameter.
+  * @argument [e=123]
+  * Documentation for e. It has a default value.
+  *
+  * @see Not a parameter!
+  */
+function f(a, b, c, d, e) {}
+
+/** Documentation for g. */
+var g = function() {}
+
+var h;
+/** Documentation for h. */
+h = function() {}
+                ")
+            );
+
+            using (var solution = project.Generate().ToVs()) {
+                var editor = solution.OpenItem("JSDocTest", "app.js");
+
+                // Go to end of file
+                Keyboard.PressAndRelease(Key.End, Key.LeftCtrl);
+
+                // function f()
+                Keyboard.Type("f(");
+                using (var sh = editor.WaitForSession<ISignatureHelpSession>()) {
+                    var session = sh.Session;
+                    Assert.AreEqual("Documentation for f.\r\n...", session.SelectedSignature.Documentation);
+                }
+                Keyboard.Backspace();
+                Keyboard.Backspace();
+
+                // var g = function()
+                Keyboard.Type("g(");
+                using (var sh = editor.WaitForSession<ISignatureHelpSession>()) {
+                    var session = sh.Session;
+                    Assert.AreEqual("Documentation for g.", session.SelectedSignature.Documentation);
+                }
+                Keyboard.Backspace();
+                Keyboard.Backspace();
+
+                // h = function()
+                Keyboard.Type("h(");
+                using (var sh = editor.WaitForSession<ISignatureHelpSession>()) {
+                    var session = sh.Session;
+                    Assert.AreEqual("Documentation for h.", session.SelectedSignature.Documentation);
+                }
+                Keyboard.Backspace();
+                Keyboard.Backspace();
+
+                // @param parsing
+                Keyboard.Type("f(");
+                using (var sh = editor.WaitForSession<ISignatureHelpSession>()) {
+                    var session = sh.Session;
+                    Assert.AreEqual("f(a, b, c, d?, e? = 123)", session.SelectedSignature.Content);
+
+                    Keyboard.Type("a");
+                    Assert.AreEqual("a", session.SelectedSignature.CurrentParameter.Name);
+                    Assert.AreEqual("Documentation for a.", session.SelectedSignature.CurrentParameter.Documentation);
+
+                    Keyboard.Type(", b");
+                    Assert.AreEqual("b", session.SelectedSignature.CurrentParameter.Name);
+                    Assert.AreEqual("Documentation for b. It spans multiple lines.", session.SelectedSignature.CurrentParameter.Documentation);
+
+                    Keyboard.Type(", c");
+                    Assert.AreEqual("c", session.SelectedSignature.CurrentParameter.Name);
+                    Assert.AreEqual("Documentation for c. It has a {@link} in it.", session.SelectedSignature.CurrentParameter.Documentation);
+
+                    Keyboard.Type(", d");
+                    Assert.AreEqual("d", session.SelectedSignature.CurrentParameter.Name);
+                    Assert.AreEqual("Documentation for d. It is an optional parameter.", session.SelectedSignature.CurrentParameter.Documentation);
+
+                    Keyboard.Type(", e");
+                    Assert.AreEqual("e", session.SelectedSignature.CurrentParameter.Name);
+                    Assert.AreEqual("Documentation for e. It has a default value.", session.SelectedSignature.CurrentParameter.Documentation);
+                }
+                Keyboard.Backspace();
+                Keyboard.Backspace();
+
+            }
+        }
+
     }
 }

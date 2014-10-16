@@ -23,12 +23,12 @@ namespace Microsoft.NodejsTools.Intellisense {
         private readonly string _documentation;
         private readonly Span _locus, _ppLocus;
 
-        public NodejsParameter(ISignature signature, ParameterResult param, Span locus, Span ppLocus) {
+        public NodejsParameter(ISignature signature, ParameterResult param, Span locus, Span ppLocus, string documentation = null) {
             _signature = signature;
             _param = param;
             _locus = locus;
             _ppLocus = ppLocus;
-            _documentation = _param.Documentation.LimitLines(15, stopAtFirstBlankLine: true);
+            _documentation = (documentation ?? _param.Documentation).LimitLines(15, stopAtFirstBlankLine: true);
         }
 
         public string Documentation {

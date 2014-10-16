@@ -32,7 +32,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         internal Dictionary<CallArgs, CallInfo> _allCalls;
         private OverflowState _overflowed;
         private const int MaximumCallCount = 5;
-        
+
 
         public UserFunctionValue(FunctionObject node, AnalysisUnit declUnit, EnvironmentRecord declScope, bool isNested = false)
             : base(declUnit.ProjectEntry, null, node.Name ?? node.NameGuess) {
@@ -65,12 +65,47 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         public override string Documentation {
             get {
-#if FALSE
-                if (FunctionObject.Body != null) {
-                    return FunctionObject.Body.Documentation.TrimDocumentation();
+                string doclet = FunctionObject.Doclet;
+                if (doclet == null || doclet.Length < 4) {
+                    return "";
                 }
-#endif
-                return "";
+
+                // Strip /* and */ and normalize line endings
+                doclet = doclet.Substring(2, doclet.Length - 4).Replace("\r\n", "\n");
+
+                // Split into lines, trim whitespace, and remove * at the beginning of every line.
+                var lines = doclet.Split('\n').Select(s => s.TrimStart().TrimStart('*').Trim());
+
+                var sb = new StringBuilder(doclet.Length);
+                bool bol = true;
+                foreach (var line in lines) {
+                    if (line == "") {
+                        // Blank line is a paragraph separator - keep it, but fold any adjacent blank lines into one.
+                        if (!bol) {
+                            sb.AppendLine();
+                            sb.AppendLine();
+                            bol = true;
+                        }
+                    } else if (line.StartsWith("@")) {
+                        // @tag also begins a new paragraph, but no blank line is inserted to separate it from the previous one.
+                        if (bol) {
+                            bol = false;
+                        } else {
+                            sb.AppendLine();
+                        }
+                        sb.Append(line);
+                    } else {
+                        // Adjacent lines are concatenated into a single paragraph, with newlines replaced by spaces.
+                        if (bol) {
+                            bol = false;
+                        } else {
+                            sb.Append(' ');
+                        }
+                        sb.Append(line);
+                    }
+                }
+
+                return sb.ToString().Trim();
             }
         }
 
@@ -397,7 +432,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                     return true;
                 }
             }
-            
+
             return base.UnionEquals(av, strength);
         }
 
@@ -405,7 +440,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             if (strength >= FunctionMergeStrength) {
                 return ProjectState._functionPrototype.GetHashCode();
             }
-            
+
             return base.UnionHashCode(strength);
         }
 

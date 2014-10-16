@@ -25,6 +25,7 @@ namespace Microsoft.NodejsTools.Parsing {
     internal sealed class FunctionObject : Statement, INameDeclaration {
         private Block m_body;
         private ParameterDeclaration[] m_parameters;
+
         public FunctionObject(EncodedSpan functionSpan)
             : base(functionSpan) {
         }
@@ -62,6 +63,8 @@ namespace Microsoft.NodejsTools.Parsing {
         public string Name { get; set; }
 
         public string NameGuess { get; set; }
+
+        public string Doclet { get; set; }
 
         // TODO: NameIndex?
         public IndexSpan NameSpan {

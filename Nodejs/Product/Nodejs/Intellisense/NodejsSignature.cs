@@ -15,6 +15,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
@@ -35,6 +36,8 @@ namespace Microsoft.NodejsTools.Intellisense {
                 paramIndex = Int32.MaxValue;
             }
 
+            string documentation = overload.Documentation;
+
             var content = new StringBuilder(overload.Name);
             var ppContent = new StringBuilder(overload.Name);
             content.Append('(');
@@ -51,17 +54,40 @@ namespace Microsoft.NodejsTools.Intellisense {
                     start = content.Length;
                 }
 
+                // Try to locate and parse the corresponding @param in the doclet.
+                string docRegex =
+                    // @param, @arg or @argument, and optional {type}
+                    (@"@(param|arg|argument) (\s+|\s*\{(?<Type>.*?)\}\s*)" + 
+                    // Either just name by itself, or [name] if it's optional, or [name=value] if defaulted.
+                     @"(?<IsOptional>\[\s*)? {{VariableName}} (?(IsOptional)\s*(=\s*(?<DefaultValue>.*?)\s*)?\])" +
+                    // Associated docstring. Ends at the end of doclet, or at the next non-inline @tag, or at the next empty line (paragraph break).
+                     @"\s* (?<Documentation>.*?) \s* ($|\r\n\r\n|(?<!\{)@)" 
+                    ).Replace("{{VariableName}}", param.Name);
+                var m = Regex.Match(documentation, docRegex, RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.ExplicitCapture);
+
                 content.Append(param.Name);
                 ppContent.Append(param.Name);
-                if (param.IsOptional) {
+                if (param.IsOptional || m.Groups["IsOptional"].Success) {
                     content.Append("?");
                     ppContent.Append("?");
                 }
+
+                string type = null;
                 if (!string.IsNullOrEmpty(param.Type) && param.Type != "object") {
+                    type = param.Type;
+                } else if (m.Groups["Type"].Success) {
+                    type = m.Groups["Type"].Value;
+                }
+                if (type != null) {
                     content.Append(": ");
-                    content.Append(param.Type);
+                    content.Append(type);
                     ppContent.Append(": ");
-                    ppContent.Append(param.Type);
+                    ppContent.Append(type);
+                }
+
+                if (m.Groups["DefaultValue"].Success && m.Groups["DefaultValue"].Length > 0) {
+                    content.Append(" = ");
+                    content.Append(m.Groups["DefaultValue"].Value);
                 }
 
                 var paramSpan = new Span(start, content.Length - start);
@@ -73,7 +99,12 @@ namespace Microsoft.NodejsTools.Intellisense {
                     paramIndex = i;
                 }
 
-                parameters[i] = new NodejsParameter(this, param, paramSpan, ppParamSpan);
+                string paramDoc = null;
+                if (m.Groups["Documentation"].Success) {
+                    paramDoc = m.Groups["Documentation"].Value.Replace("\r\n", " ");
+                }
+
+                parameters[i] = new NodejsParameter(this, param, paramSpan, ppParamSpan, paramDoc);
             }
             content.Append(')');
             ppContent.Append(')');

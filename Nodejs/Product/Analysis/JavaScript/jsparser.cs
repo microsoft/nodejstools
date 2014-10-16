@@ -63,7 +63,11 @@ namespace Microsoft.NodejsTools.Parsing
         private int m_severity;
         private JSToken _curToken;
         private IndexSpan _curSpan;
+        private string _curDoclet;
         private GlobalScope _globalScope;
+
+        // Doclet associated with a given expression. It's not stored directly on the Expression object to conserve memory.
+        private readonly Dictionary<Expression, string> _doclets = new Dictionary<Expression, string>();
 
         /// <summary>
         /// Creates an instance of the JSParser class that can be used to parse the given source code.
@@ -657,6 +661,8 @@ namespace Microsoft.NodejsTools.Parsing
         //---------------------------------------------------------------------------------------
         private Statement ParseVariableStatement()
         {
+            string curDoclet = _curDoclet;
+
             // create the appropriate statement: var- or const-statement
             Declaration decl;
             if (_curToken == JSToken.Var)
@@ -691,7 +697,7 @@ namespace Microsoft.NodejsTools.Parsing
                 m_noSkipTokenSet.Add(NoSkipTokenSet.s_EndOfLineToken);
                 try
                 {
-                    identInit = ParseIdentifierInitializer(JSToken.None);
+                    identInit = ParseIdentifierInitializer(JSToken.None, curDoclet);
                 }
                 catch (RecoveryTokenException exc)
                 {
@@ -711,6 +717,7 @@ namespace Microsoft.NodejsTools.Parsing
                 finally
                 {
                     m_noSkipTokenSet.Remove(NoSkipTokenSet.s_EndOfLineToken);
+                    curDoclet = null;
                 }
 
                 if (identInit != null)
@@ -761,7 +768,7 @@ namespace Microsoft.NodejsTools.Parsing
         //  inToken is JSToken.In whenever the potential expression that initialize a variable
         //  cannot contain an 'in', as in the for statement. inToken is JSToken.None otherwise
         //---------------------------------------------------------------------------------------
-        private VariableDeclaration ParseIdentifierInitializer(JSToken inToken)
+        private VariableDeclaration ParseIdentifierInitializer(JSToken inToken, string doclet = null)
         {
             string variableName = null;
             Expression assignmentExpr = null;
@@ -831,8 +838,12 @@ namespace Microsoft.NodejsTools.Parsing
                         }
                     }
 
-                    if (assignmentExpr is FunctionExpression) {
-                        ((FunctionExpression)assignmentExpr).Function.NameGuess = variableName;
+                    var funExpr = assignmentExpr as FunctionExpression;
+                    if (funExpr != null) {
+                        funExpr.Function.NameGuess = variableName;
+                        if (funExpr.Function.Doclet == null) {
+                            funExpr.Function.Doclet = doclet;
+                        }
                     }
                 }
             }
@@ -2605,6 +2616,8 @@ namespace Microsoft.NodejsTools.Parsing
             bool inExpression = (functionType == FunctionType.Expression);
             IndexSpan paramsSpan = new IndexSpan();
 
+            string doclet = _curDoclet;
+
             GetNextToken();
 
             // get the function name or make an anonymous function if in expression "position"
@@ -2909,7 +2922,8 @@ namespace Microsoft.NodejsTools.Parsing
                     Name = name != null ? name.Name : null,
                     ParameterDeclarations = ToArray(formalParameters),
                     ParametersSpan = paramsSpan,
-                    Body = body
+                    Body = body,
+                    Doclet = doclet
                 };
         }
 
@@ -3166,7 +3180,7 @@ namespace Microsoft.NodejsTools.Parsing
                 while (opsStack.Peek() != JSToken.None)
                 {
                     // pop the top two term and the top operator, combine them into a new term,
-                    // and push the results back onto the term stacck
+                    // and push the results back onto the term stack
                     Expression operand2 = termStack.Pop();
                     Expression operand1 = termStack.Pop();
                     expr = CreateExpressionNode(opsStack.Pop(), operand1, operand2);
@@ -3207,6 +3221,8 @@ namespace Microsoft.NodejsTools.Parsing
             bool dummy = false;
             IndexSpan exprSpan = _curSpan;
             Expression expr = null;
+
+            string doclet = _curDoclet;
 
             Expression ast = null;
             switch (_curToken)
@@ -3256,6 +3272,10 @@ namespace Microsoft.NodejsTools.Parsing
                     }
                     ast = ParsePostfixExpression(ast, out isLeftHandSideExpr);
                     break;
+            }
+
+            if (doclet != null) {
+                _doclets[ast] = doclet;
             }
 
             return ast;
@@ -3323,7 +3343,6 @@ namespace Microsoft.NodejsTools.Parsing
             Expression ast = null;
             bool skipToken = true;
             List<IndexSpan> newSpans = null;
-
 
             // new expression
             while (JSToken.New == _curToken)
@@ -3781,8 +3800,10 @@ namespace Microsoft.NodejsTools.Parsing
         private FunctionExpression ParseFunctionExpression(FunctionType functionType = FunctionType.Expression)
         {
             var span = _curSpan;
+            string doclet = _curDoclet;
             try {
                 var function = ParseFunction(functionType, _curSpan);
+                function.Doclet = doclet;
                 var functionExpr = new FunctionExpression(function.EncodedSpan);
                 functionExpr.Function = function;
                 return functionExpr;
@@ -4173,18 +4194,29 @@ namespace Microsoft.NodejsTools.Parsing
             IndexSpan span = GetSpan(operand1).CombineWith(GetSpan(operand2));
             switch (token)
             {
-                case JSToken.Assign:
-                    if (operand1 is Member &&
-                        operand2 is FunctionExpression) {
-                        ((FunctionExpression)operand2).Function.NameGuess = ((Member)operand1).Name;
+                case JSToken.Assign: {
+                        var funcExpr = operand2 as FunctionExpression;
+                        if (funcExpr != null) {
+                            var member = operand1 as Member;
+                            if (member != null) {
+                                funcExpr.Function.NameGuess = member.Name;
+                            }
+
+                            var lookup = operand1 as Lookup;
+                            if (lookup != null) {
+                                funcExpr.Function.NameGuess = lookup.Name;
+                            }
+
+                            if (funcExpr.Function.Doclet == null) {
+                                string doclet;
+                                if (_doclets.TryGetValue(operand1, out doclet)) {
+                                    funcExpr.Function.Doclet = doclet;
+                                }
+                            }
+                        }
+
+                        goto case JSToken.BitwiseAnd;
                     }
-                    
-                    if (operand1 is Lookup && 
-                        operand2 is FunctionExpression) {
-                        ((FunctionExpression)operand2).Function.NameGuess = ((Lookup)operand1).Name;
-                    }
-                    // fall through
-                    goto case JSToken.BitwiseAnd;
                 case JSToken.BitwiseAnd:
                 case JSToken.BitwiseAndAssign:
                 case JSToken.BitwiseOr:
@@ -4218,14 +4250,22 @@ namespace Microsoft.NodejsTools.Parsing
                 case JSToken.StrictEqual:
                 case JSToken.StrictNotEqual:
                 case JSToken.UnsignedRightShift:
-                case JSToken.UnsignedRightShiftAssign:
-                    // regular binary operator
-                    return new BinaryOperator(EncodeSpan(span))
-                        {
+                case JSToken.UnsignedRightShiftAssign: {
+                        // regular binary operator
+                        var result = new BinaryOperator(EncodeSpan(span)) {
                             Operand1 = operand1,
                             Operand2 = operand2,
-                            OperatorToken = token
+                            OperatorToken = token,
                         };
+
+                        // propagate doclet from LHS to the entire expression
+                        string doclet;
+                        if (_doclets.TryGetValue(operand1, out doclet)) {
+                            _doclets[result] = doclet;
+                        }
+
+                        return result;
+                    }
 
                 case JSToken.Comma:
                     // use the special comma-operator class derived from binary operator.
@@ -4252,6 +4292,8 @@ namespace Microsoft.NodejsTools.Parsing
         private void GetNextToken()
         {
             JSToken curToken;
+            string curDoclet;
+
             if (m_useCurrentForNext)
             {
                 // we just want to keep using the current token.
@@ -4259,7 +4301,7 @@ namespace Microsoft.NodejsTools.Parsing
                 // give up and grab the next token from the scanner anyway
                 m_useCurrentForNext = false;
                 if (m_breakRecursion++ > 10) {
-                    curToken = ScanNextToken();
+                    curToken = ScanNextToken(out curDoclet);
                 } else {
                     return;
                 }
@@ -4271,16 +4313,18 @@ namespace Microsoft.NodejsTools.Parsing
 
                 // the scanner reuses the same context object for performance,
                 // so if we ever mean to hold onto it later, we need to clone it.
-                curToken = ScanNextToken();
+                curToken = ScanNextToken(out curDoclet);
             }
 
             _curToken = curToken;
             _curSpan = m_scanner.CurrentSpan;
+            _curDoclet = curDoclet;
         }
 
-        private JSToken ScanNextToken()
+        private JSToken ScanNextToken(out string doclet)
         {
             m_foundEndOfLine = false;
+            doclet = null;
 
             var nextToken = m_scanner.ScanNextToken(false);
             while (nextToken == JSToken.WhiteSpace
@@ -4292,6 +4336,10 @@ namespace Microsoft.NodejsTools.Parsing
                 if (nextToken == JSToken.EndOfLine)
                 {
                     m_foundEndOfLine = true;
+                }
+
+                if (m_scanner.IsDoclet) {
+                    doclet = m_scanner.Identifier;
                 }
 
                 nextToken = m_scanner.ScanNextToken(false);
