@@ -12,13 +12,15 @@ namespace Microsoft.NodejsTools.Intellisense {
         private readonly ITextSnapshot _snapshot;
         private readonly ITrackingSpan _applicableSpan;
         private readonly ITextBuffer _textBuffer;
+        private readonly GetMemberOptions _options;
 
-        public NormalCompletionAnalysis(VsProjectAnalyzer vsProjectAnalyzer, ITextSnapshot snapshot, VisualStudio.Text.ITrackingSpan applicableSpan, VisualStudio.Text.ITextBuffer textBuffer)
+        public NormalCompletionAnalysis(VsProjectAnalyzer vsProjectAnalyzer, ITextSnapshot snapshot, VisualStudio.Text.ITrackingSpan applicableSpan, VisualStudio.Text.ITextBuffer textBuffer, GetMemberOptions options)
             : base(applicableSpan, textBuffer) {
             _analyzer = vsProjectAnalyzer;
             _snapshot = snapshot;
             _applicableSpan = applicableSpan;
             _textBuffer = textBuffer;
+            _options = options;
         }
 
         public override CompletionSet GetCompletions(IGlyphService glyphService) {
@@ -36,7 +38,8 @@ namespace Microsoft.NodejsTools.Intellisense {
                             Span.GetEndPoint(_snapshot).Position,
                             _snapshot,
                             analysis
-                        )
+                        ),
+                        _options
                     );
                 }
             } else if (analysis != null) {
@@ -45,7 +48,8 @@ namespace Microsoft.NodejsTools.Intellisense {
                         Span.GetStartPoint(_snapshot).Position,
                         _snapshot,
                         analysis
-                    )
+                    ),
+                    _options
                 );
             }
 

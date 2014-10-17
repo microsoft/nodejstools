@@ -30,6 +30,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         private readonly int _declVersion;
         internal readonly DependentKeyValue _keysAndValues;
         private AnalysisDictionary<string, PropertyDescriptorValue> _descriptors;
+        private DependentData _descriptorDependencies;
         private Dictionary<object, object> _metadata;
         private TypedDef _linkedValues;
 
@@ -96,6 +97,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             PropertyDescriptorValue desc;
             if (!_descriptors.TryGetValue(name, out desc)) {
                 _descriptors[name] = desc = new PropertyDescriptorValue(ProjectEntry);
+                _descriptorDependencies.EnqueueDependents();
             }
 
             if (IsMutable(name)) {
@@ -451,6 +453,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             PropertyDescriptorValue desc;
             if (!_descriptors.TryGetValue(name, out desc)) {
                 _descriptors[name] = desc = new PropertyDescriptorValue(ProjectEntry);
+                _descriptorDependencies.EnqueueDependents();
             }
             return desc;
         }
@@ -458,7 +461,14 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         private void EnsureDescriptors() {
             if (_descriptors == null) {
                 _descriptors = new AnalysisDictionary<string, PropertyDescriptorValue>();
+                _descriptorDependencies = new DependentData();
             }
+        }
+
+        public void AddDescriptorDependency(AnalysisUnit unit) {
+            EnsureDescriptors();
+
+            _descriptorDependencies.AddDependency(unit);
         }
 
         protected static void MergeTypes(Dictionary<string, IAnalysisSet> res, string key, IEnumerable<AnalysisProxy> types) {
@@ -554,6 +564,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             PropertyDescriptorValue propDesc;
             if (!_descriptors.TryGetValue(nameStr, out propDesc)) {
                 _descriptors[nameStr] = propDesc = new PropertyDescriptorValue(ProjectEntry);
+                _descriptorDependencies.EnqueueDependents();
             }
 
             if (propDesc.Getter == null) {

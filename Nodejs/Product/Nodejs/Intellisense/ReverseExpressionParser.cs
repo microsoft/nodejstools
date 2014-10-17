@@ -431,19 +431,35 @@ namespace Microsoft.NodejsTools.Intellisense {
             // We assume that groupings are correctly matched and keep a simple
             // nesting count.
             int nesting = 0;
+            bool maybeFunction = false, maybeParams = false;
             foreach (var token in this) {
                 if (token == null) {
                     continue;
                 }
 
                 if (token.IsCloseGrouping()) {
-                    nesting++;
+                    if (++nesting == 0 && maybeFunction) {
+                        if (token.Span.GetText() == ")") {
+                            maybeParams = true;
+                        } else {
+                            maybeFunction = false;
+                        }
+                    }
                 } else if (token.IsOpenGrouping()) {
                     if (nesting-- == 0) {
-                        return true;
+                        if (token.Span.GetText() != "{") {
+                            if (maybeParams && token.Span.GetText() == "(") {
+                                maybeFunction = maybeParams = false;
+                            } else {
+                                // might be an object literal, might be a function...
+                                return true;
+                            }
+                        } else {
+                            maybeFunction = true;
+                        }
                     }
                 } else if (token.ClassificationType.IsOfType(PredefinedClassificationTypeNames.Keyword) &&
-                    _stmtKeywords.Contains(token.Span.GetText())) {
+                    _stmtKeywords.Contains(token.Span.GetText()) || token.Span.GetText() == "function") {
                     return false;
                 }
             }

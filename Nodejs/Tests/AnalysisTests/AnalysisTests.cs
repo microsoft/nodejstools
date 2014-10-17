@@ -952,6 +952,52 @@ x = f.abc;
             );
         }
 
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/1197
+        /// 
+        /// defineProperties needs to take a dependency on the properties
+        /// object it's reading from, and when a new property is created
+        /// we need to enqueue the callers.
+        /// </summary>
+        [TestMethod, Priority(0)]
+        public void TestDefinePropertiesDependencies() {
+            string code = @"
+var x =  {};
+var properties = function() {
+    var ret = {};
+    ret['one'] = 1;
+    ret['two'] = 2;
+    ret['three'] = 3;
+
+    return ret;
+}();
+
+function createProperties() {
+    var ret = {};
+    
+    Object.keys(properties).forEach(
+        function(item) {
+            ret[item] = { get: function() { return item; } }
+        }
+    );
+
+    return ret;
+}
+
+Object.defineProperties(x, createProperties());
+
+";
+
+            var analysis = ProcessText(code);
+
+            AssertUtil.ContainsAtLeast(
+                analysis.GetMembersByIndex("x", code.Length).Select(x => x.Name),
+                "one",
+                "two",
+                "three"
+            );
+        }
+
         [TestMethod, Priority(0)]
         public void TestFunctionExpression() {
             string code = @"

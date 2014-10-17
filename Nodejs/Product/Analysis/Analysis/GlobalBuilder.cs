@@ -1307,7 +1307,9 @@ on that object, and are not inherited from the object's prototype. The propertie
                     if (target != null) {
                         foreach (var properties in args[1]) {
                             ExpandoValue propsObj = properties.Value as ExpandoValue;
-                            if (propsObj != null && propsObj.Descriptors != null) {
+                            if (propsObj != null) {
+                                propsObj.AddDescriptorDependency(unit);
+
                                 foreach (var propName in propsObj.Descriptors.Keys) {
                                     var definingProperty = propsObj.Get(node, unit, propName);
                                     foreach (var propValue in definingProperty) {

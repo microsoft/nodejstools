@@ -1211,21 +1211,18 @@ namespace Microsoft.NodejsTools.Intellisense {
                 return CompletionAnalysis.EmptyCompletionContext;
             }
 
-#if FALSE
+            GetMemberOptions options = GetMemberOptions.IncludeExpressionKeywords | GetMemberOptions.IncludeStatementKeywords;
             var parser = new ReverseExpressionParser(snapshot, snapshot.TextBuffer, applicableSpan);
-#endif
-#if FALSE
             if (parser.IsInGrouping()) {
-                options = options.Clone();
-                options.IncludeStatementKeywords = false;
+                options &= ~GetMemberOptions.IncludeStatementKeywords;
             }
-#endif
 
             return new NormalCompletionAnalysis(
                 snapshot.TextBuffer.GetAnalyzer(),
                 snapshot,
                 applicableSpan,
-                snapshot.TextBuffer
+                snapshot.TextBuffer,
+                options
             );
         }
 
