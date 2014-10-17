@@ -440,6 +440,44 @@ label:
         }
 
         [TestMethod, Priority(0)]
+        public void TestYield() {
+            TestCode(
+@"function *f() {
+    yield
+}",
+@"function *f() {
+    yield
+}"
+);
+
+            TestCode(
+@"function *f() {
+    yield  
+}",
+@"function *f() {
+    yield
+}"
+);
+            TestCode(
+@"function *f() {
+    yield   42
+}",
+@"function *f() {
+    yield 42
+}"
+);
+
+            TestCode(
+@"function *f() {
+    yield   42;
+}",
+@"function *f() {
+    yield 42;
+}"
+);
+        }
+
+        [TestMethod, Priority(0)]
         public void TestThrow() {
             TestCode(
 @"function f() {

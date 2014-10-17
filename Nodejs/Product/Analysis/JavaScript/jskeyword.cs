@@ -51,30 +51,6 @@ namespace Microsoft.NodejsTools.Parsing
             return false;
         }*/
 
-        internal static string CanBeIdentifier(JSToken keyword)
-        {
-            switch (keyword)
-            {
-                // always allowed
-                case JSToken.Get: return "get";
-                case JSToken.Set: return "set";
-
-                // not in strict mode
-                case JSToken.Implements: return "implements";
-                case JSToken.Interface: return "interface";
-                case JSToken.Let: return "let";
-                case JSToken.Package: return "package";
-                case JSToken.Private: return "private";
-                case JSToken.Protected: return "protected";
-                case JSToken.Public: return "public";
-                case JSToken.Static: return "static";
-                case JSToken.Yield: return "yield";
-
-                // no other tokens can be identifiers
-                default: return null;
-            }
-        }
-
         internal JSToken GetKeyword(string source, int startPosition, int wordLength)
         {
             JSKeyword keyword = this;

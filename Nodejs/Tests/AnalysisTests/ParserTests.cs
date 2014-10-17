@@ -762,6 +762,294 @@ function get() {
         }
 
         [TestMethod, Priority(0)]
+        public void TestGenerators() {
+            string code = @"
+function *x() {
+    yield 1;
+}";
+            CheckAst(
+                ParseCode(code),
+                CheckBlock(
+                    CheckFunctionObject(
+                        "x",
+                        CheckBlock(
+                            CheckExprStmt(
+                                CheckYieldExpr(
+                                    One
+                                )
+                            )
+                        ),
+                        true
+                    )
+                )
+            );
+
+            code = @"
+function *x() {
+    yield *1;
+}";
+            CheckAst(
+                ParseCode(code),
+                CheckBlock(
+                    CheckFunctionObject(
+                        "x",
+                        CheckBlock(
+                            CheckExprStmt(
+                                CheckYieldExpr(
+                                    One,
+                                    true
+                                )
+                            )
+                        ),
+                        true
+                    )
+                )
+            );
+
+            code = @"
+function *x() {
+    yield 1 + 2;
+}";
+            CheckAst(
+                ParseCode(code),
+                CheckBlock(
+                    CheckFunctionObject(
+                        "x",
+                        CheckBlock(
+                            CheckExprStmt(
+                                CheckYieldExpr(
+                                    CheckBinary(
+                                        JSToken.Plus,
+                                        One,
+                                        Two
+                                    )
+                                )
+                            )
+                        ),
+                        true
+                    )
+                )
+            );
+
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestYieldMember() {
+            string code = @"
+function *x() {
+    abc.yield;
+}";
+            CheckAst(
+                ParseCode(code),
+                CheckBlock(
+                    CheckFunctionObject(
+                        "x",
+                        CheckBlock(
+                            CheckExprStmt(
+                                CheckMember(
+                                    "yield",
+                                    CheckLookup("abc")
+                                )
+                            )
+                        ),
+                        true
+                    )
+                )
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void WarningYieldNoSemicolon() {
+            var code = @"
+function *x() {
+    yield 4 4
+}
+";
+
+            CheckAst(
+                ParseCode(
+                    code,
+                    true,
+                    new ErrorInfo(JSError.NoSemicolon, true, new IndexSpan(31, 1))
+                ),
+                CheckBlock(
+                    CheckFunctionObject(
+                        "x",
+                        CheckBlock(
+                            CheckExprStmt(CheckYieldExpr(Four)),
+                            CheckExprStmt(Four)
+                        ),
+                        true
+                    )
+                )
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void ErrorYieldVar() {
+            var code = @"
+function *x() {
+    var yield;
+}
+";
+
+            CheckAst(
+                ParseCode(
+                    code,
+                    true,
+                    new ErrorInfo(JSError.NoIdentifier, true, new IndexSpan(27, 5))
+                ),
+                CheckBlock(
+                    CheckFunctionObject(
+                        "x",
+                        CheckBlock(
+                            CheckVar(CheckVarDecl("yield"))
+                        ),
+                        true
+                    )
+                )
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void ErrorYieldLabel() {
+            var code = @"
+function *x() {
+    while(true) {
+        continue yield;
+    }
+}
+";
+
+            CheckAst(
+                ParseCode(
+                    code,
+                    true,
+                    new ErrorInfo(JSError.NoSemicolon, true, new IndexSpan(55, 5))
+                ),
+                CheckBlock(
+                    CheckFunctionObject(
+                        "x",
+                        CheckBlock(
+                            CheckWhileStmt(
+                                True,
+                                CheckBlock(
+                                    CheckContinue(),
+                                    CheckExprStmt(CheckYieldExpr(null))
+                                )
+                            )
+                        ),
+                        true
+                    )
+                )
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void WarningYieldSemiColonInsertion() {
+            var code = @"
+function *x() {
+    yield 4
+    4
+}
+";
+
+            CheckAst(
+                ParseCode(
+                    code,
+                    true,
+                    new ErrorInfo(JSError.SemicolonInsertion, false, new IndexSpan(30, 0))
+                ),
+                CheckBlock(
+                    CheckFunctionObject(
+                        "x",
+                        CheckBlock(
+                            CheckExprStmt(CheckYieldExpr(Four)),
+                            CheckExprStmt(Four)
+                        ),
+                        true
+                    )
+                )
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void RecoveryYieldBadOperand() {
+            var code = @"
+function *x() {
+    yield foo.'abc'
+}";
+
+            CheckAst(
+                ParseCode(
+                    code,
+                    new ErrorInfo(JSError.NoIdentifier, true, new IndexSpan(33, 5))
+                ),
+                CheckBlock(
+                    CheckFunctionObject(
+                        "x",
+                        CheckBlock(
+                            CheckExprStmt(
+                                CheckYieldExpr(
+                                    CheckLookup("foo")
+                                )
+                            )
+                        ),
+                        true
+                    )
+                )
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void RecoverYieldBadOperand2() {
+            var code = @"
+function *x() {
+    yield else
+}
+";
+
+            CheckAst(
+                ParseCode(
+                    code,
+                    new ErrorInfo(JSError.ExpressionExpected, true, new IndexSpan(29, 4))
+                ),
+                CheckBlock(
+                    CheckFunctionObject(
+                        "x",
+                        CheckBlock(
+                            CheckExprStmt(CheckYieldExpr(null))
+                        ),
+                        true
+                    )
+                )
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void RecoveryYieldBadOperand3() {
+            var code = @"
+function *x() {
+    yield else function
+}";
+
+            CheckAst(
+                ParseCode(
+                    code,
+                    new ErrorInfo(JSError.ExpressionExpected, true, new IndexSpan(29, 4)),
+                    new ErrorInfo(JSError.SyntaxError, true, new IndexSpan(44, 1))
+                ),
+                CheckBlock(
+                    CheckFunctionObject(
+                        "x",
+                        CheckBlock(CheckExprStmt(CheckYieldExpr(null))),
+                        true
+                    )
+                )
+            );
+        }
+
+        [TestMethod, Priority(0)]
         public void ErrorTryCatchNoTryOrFinally() {
             const string code = @"
 try {
@@ -4652,6 +4940,24 @@ do {
             };
         }
 
+        private static Action<Expression> CheckYieldExpr(Action<Expression> operand) {
+            return CheckYieldExpr(operand, false);
+        }
+
+        private static Action<Expression> CheckYieldExpr(Action<Expression> operand, bool isYieldFrom) {
+            return expr => {
+                Assert.AreEqual(typeof(YieldExpression), expr.GetType());
+
+                var yield = (YieldExpression)expr;
+                if (operand != null) {
+                    operand(yield.Operand);
+                } else {
+                    Assert.IsNull(yield.Operand);
+                }
+                Assert.AreEqual(isYieldFrom, yield.YieldFrom);
+            };
+        }
+
         private static Action<Statement> CheckExprStmt(Action<Expression> expr) {
             return stmt => {
                 Assert.AreEqual(typeof(ExpressionStatement), stmt.GetType());
@@ -4852,11 +5158,16 @@ do {
         }
 
         private Action<Statement> CheckFunctionObject(string name, Action<Statement> body, params Action<ParameterDeclaration>[] args) {
+            return CheckFunctionObject(name, body, false, args);
+        }
+
+        private Action<Statement> CheckFunctionObject(string name, Action<Statement> body, bool isGenerator, params Action<ParameterDeclaration>[] args) {
             return stmt => {
                 Assert.AreEqual(typeof(FunctionObject), stmt.GetType());
 
                 var func = (FunctionObject)stmt;
                 Assert.AreEqual(name, func.Name);
+                Assert.AreEqual(isGenerator, func.IsGenerator);
 
                 body(func.Body);
                 if (func.ParameterDeclarations != null) {

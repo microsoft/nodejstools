@@ -825,11 +825,15 @@ The this object of the bound function is associated with the specified object, a
 
         private static IAnalysisSet ApplyFunction(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             var res = AnalysisSet.Empty;
-            if (@this != null && args.Length > 0) {                
+            if (@this != null && args.Length > 0) {
                 foreach (var value in @this) {
-                    // TODO: We should support flowing through the arguments.  That requires supporting
-                    // arguments as well as unpacking the values in args[1]
-                    res = res.Union(value.Call(node, unit, args[0], ExpressionEvaluator.EmptySets));
+                    if (args.Length > 1) {
+                        foreach (var arg in args[1]) {
+                            res = res.Union(value.Call(node, unit, args[0], arg.Value.GetIndices(node, unit)));
+                        }
+                    } else {
+                        res = res.Union(value.Call(node, unit, args[0], ExpressionEvaluator.EmptySets));
+                    }
                 }
             }
             return res;

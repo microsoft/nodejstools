@@ -8,6 +8,7 @@ var fs = require('fs');
 var util = require('util');
 
 var assemblies = [
+    'AnalysisDriver',
     'DebuggerTests',
     'DebuggerUITests',
     'JSAnalysisTests',

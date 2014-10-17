@@ -482,6 +482,15 @@ namespace Microsoft.NodejsTools.Formatting {
             return false;
         }
 
+        public override bool Walk(YieldExpression node) {
+            if (node.Operand != null) {
+                ReplaceFollowingWhiteSpace(node.GetStartIndex(_tree.LocationResolver) + "yield".Length, " ");
+                node.Operand.Walk(this);
+            }
+            RemoveSemiColonWhiteSpace(node.GetEndIndex(_tree.LocationResolver));
+            return false;
+        }
+
         public override bool Walk(ExpressionStatement node) {
             node.Expression.Walk(this);
             RemoveSemiColonWhiteSpace(node.GetEndIndex(_tree.LocationResolver));

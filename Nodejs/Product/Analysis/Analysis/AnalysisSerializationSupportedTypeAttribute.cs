@@ -100,6 +100,7 @@ using Microsoft.NodejsTools.Parsing;
 [assembly: AnalysisSerializationSupportedType(typeof(LocalNonEnqueingVariableDef))]
 [assembly: AnalysisSerializationSupportedType(typeof(TypedDef))]
 [assembly: AnalysisSerializationSupportedType(typeof(DependentData))]
+[assembly: AnalysisSerializationSupportedType(typeof(KeyValueDependencyInfo))]
 [assembly: AnalysisSerializationSupportedType(typeof(ParameterResult))]
 [assembly: AnalysisSerializationSupportedType(typeof(TypedDependencyInfo))]
 [assembly: AnalysisSerializationSupportedType(typeof(ReferenceableDependencyInfo))]
@@ -180,9 +181,9 @@ using Microsoft.NodejsTools.Parsing;
 [assembly: AnalysisSerializationSupportedType(typeof(UnaryOperator))]
 [assembly: AnalysisSerializationSupportedType(typeof(WhileNode))]
 [assembly: AnalysisSerializationSupportedType(typeof(WithNode))]
+[assembly: AnalysisSerializationSupportedType(typeof(YieldExpression))]
 [assembly: AnalysisSerializationSupportedType(typeof(NodejsModuleBuilder.EventListenerKey))]
 [assembly: AnalysisSerializationSupportedType(typeof(NodejsModuleBuilder.ReadDirSyncArrayValue))]
-[assembly: AnalysisSerializationSupportedType(typeof(KeyValueDependencyInfo))]
 [assembly: AnalysisSerializationSupportedType(typeof(AnalysisLimits))]
 
 namespace Microsoft.NodejsTools.Analysis {

@@ -1,5 +1,6 @@
 Windows Registry Editor Version 5.00
 
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\StrongName\Verification\AnalysisDriver,B03F5F7F11D50A3A]
 [-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\StrongName\Verification\DebuggerTests,B03F5F7F11D50A3A]
 [-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\StrongName\Verification\DebuggerUITests,B03F5F7F11D50A3A]
 [-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\StrongName\Verification\JSAnalysisTests,B03F5F7F11D50A3A]

@@ -303,7 +303,7 @@
     <Compile Include="JavaScript\INameReference.cs" />
     <Compile Include="JavaScript\LocationResolver.cs" />
     <Compile Include="JavaScript\IterationStatement.cs" />
-    <Compile Include="JavaScript\IVisitor.cs" />
+    <Compile Include="JavaScript\AstVisitor.cs" />
     <Compile Include="JavaScript\JsAst.cs" />
     <Compile Include="JavaScript\JScript.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -345,6 +345,7 @@
     <Compile Include="JavaScript\while.cs" />
     <Compile Include="JavaScript\with.cs" />
     <Compile Include="JavaScript\withscope.cs" />
+    <Compile Include="JavaScript\yield.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

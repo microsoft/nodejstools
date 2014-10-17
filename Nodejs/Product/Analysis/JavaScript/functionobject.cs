@@ -78,6 +78,7 @@ namespace Microsoft.NodejsTools.Parsing {
 
         public IndexSpan ParametersSpan { get; set; }
         public bool IsExpression { get; set; }
+        public bool IsGenerator { get; set; }
 
         public int ParameterStart {
             get {

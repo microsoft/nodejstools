@@ -244,6 +244,10 @@ namespace Microsoft.NodejsTools.Analysis {
         public virtual void SetIndex(Node node, AnalysisUnit unit, IAnalysisSet index, IAnalysisSet value) {
         }
 
+        internal virtual IAnalysisSet[] GetIndices(Node node, AnalysisUnit unit) {
+            return ExpressionEvaluator.EmptySets;
+        }
+
         public virtual BuiltinTypeId TypeId {
             get {
                 return BuiltinTypeId.Unknown;

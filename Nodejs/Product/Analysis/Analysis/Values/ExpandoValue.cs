@@ -517,10 +517,16 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
             if (_linkedValues != null) {
                 foreach (var value in _linkedValues.TypesNoCopy) {
-                    IReferenceableContainer refContainer = value.Value as IReferenceableContainer;
-                    if (refContainer != null) {
-                        foreach (var result in refContainer.GetDefinitions(name)) {
-                            yield return result;
+                    if (value.Value.Push()) {
+                        try {
+                            IReferenceableContainer refContainer = value.Value as IReferenceableContainer;
+                            if (refContainer != null) {
+                                foreach (var result in refContainer.GetDefinitions(name)) {
+                                    yield return result;
+                                }
+                            }
+                        } finally {
+                            value.Value.Pop();
                         }
                     }
                 }

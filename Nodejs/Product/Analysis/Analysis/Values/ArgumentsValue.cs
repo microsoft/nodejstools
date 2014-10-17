@@ -16,6 +16,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.NodejsTools.Analysis.Analyzer;
+using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Values {
     class ArgumentsValue : AnalysisValue {
@@ -40,6 +42,28 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 }
             }
             return res;
+        }
+
+        internal override IAnalysisSet[] GetIndices(Node node, AnalysisUnit unit) {
+            if (_function._curArgs != null) {
+                return _function._curArgs.Args;
+            }
+
+            var function = _function.FunctionObject;
+            if (function.ParameterDeclarations != null) {
+                IAnalysisSet[] res = new IAnalysisSet[function.ParameterDeclarations.Length];
+                for (int i = 0; i < res.Length; i++) {
+                    VariableDef var;
+                    if (_function.AnalysisUnit._env.TryGetVariable(function.ParameterDeclarations[i].Name, out var)) {
+                        res[i] = var.GetTypes(unit, DeclaringModule);
+                    } else {
+                        res[i] = AnalysisSet.Empty;
+                    }
+                }
+                return res;
+            }
+
+            return ExpressionEvaluator.EmptySets;
         }
     }
 }
