@@ -17,24 +17,22 @@ using System.Windows.Forms;
 
 namespace Microsoft.NodejsTools.Options {
     public partial class NodejsFormattingGeneralOptionsControl : UserControl {
-        private bool _loading = true;
-
         public NodejsFormattingGeneralOptionsControl() {
             InitializeComponent();
-            _formatOnCloseBrace.Checked = NodejsPackage.Instance.FormattingGeneralOptionsPage.FormatOnCloseBrace;
-            _formatOnEnter.Checked = NodejsPackage.Instance.FormattingGeneralOptionsPage.FormatOnEnter;
-            _formatOnPaste.Checked = NodejsPackage.Instance.FormattingGeneralOptionsPage.FormatOnPaste;
-            _formatOnSemicolon.Checked = NodejsPackage.Instance.FormattingGeneralOptionsPage.FormatOnSemiColon;
-            _loading = false;
         }
 
-        private void CheckedChanged(object sender, EventArgs e) {
-            if (!_loading) {
-                NodejsPackage.Instance.FormattingGeneralOptionsPage.FormatOnCloseBrace = _formatOnCloseBrace.Checked;
-                NodejsPackage.Instance.FormattingGeneralOptionsPage.FormatOnEnter = _formatOnEnter.Checked;
-                NodejsPackage.Instance.FormattingGeneralOptionsPage.FormatOnPaste = _formatOnPaste.Checked;
-                NodejsPackage.Instance.FormattingGeneralOptionsPage.FormatOnSemiColon = _formatOnSemicolon.Checked;
-            }
+        internal void SyncControlWithPageSettings(NodejsFormattingGeneralOptionsPage page) {
+            _formatOnCloseBrace.Checked = page.FormatOnCloseBrace;
+            _formatOnEnter.Checked = page.FormatOnEnter;
+            _formatOnPaste.Checked = page.FormatOnPaste;
+            _formatOnSemicolon.Checked = page.FormatOnSemiColon;
+        }
+
+        internal void SyncPageWithControlSettings(NodejsFormattingGeneralOptionsPage page) {
+            page.FormatOnCloseBrace = _formatOnCloseBrace.Checked;
+            page.FormatOnEnter = _formatOnEnter.Checked;
+            page.FormatOnPaste = _formatOnPaste.Checked;
+            page.FormatOnSemiColon = _formatOnSemicolon.Checked;
         }
     }
 }

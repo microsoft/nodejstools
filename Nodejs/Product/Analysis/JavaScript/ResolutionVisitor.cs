@@ -27,7 +27,7 @@ namespace Microsoft.NodejsTools.Parsing
     /// Traverse the tree to build up scope lexically-declared names, var-declared names,
     /// and lookups, then resolve everything.
     /// </summary>
-    public sealed class ResolutionVisitor : AstVisitor
+    internal sealed class ResolutionVisitor : AstVisitor
     {
         /// <summary>depth level of with-statements, needed so we can treat decls within with-scopes specially</summary>
         private int m_withDepth;

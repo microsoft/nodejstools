@@ -298,7 +298,7 @@ namespace TestUtilities.UI {
 
         public void WithStandardInputPrompt(string prompt, Action<string> action) {
             if ((bool)ReplWindow.GetOptionValue(ReplOptions.DisplayPromptInMargin)) {
-                action("");
+                action(String.Empty);
                 return;
             }
 

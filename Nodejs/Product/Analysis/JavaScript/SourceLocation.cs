@@ -10,7 +10,7 @@ namespace Microsoft.NodejsTools.Parsing
     /// Represents a location in source code.
     /// </summary>
     [Serializable]
-    public struct SourceLocation
+    internal struct SourceLocation
     {
         // TODO: remove index
         private readonly int _index;

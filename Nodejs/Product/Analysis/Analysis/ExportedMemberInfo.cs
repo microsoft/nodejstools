@@ -17,7 +17,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// <summary>
     /// Provides information about a value exported from a module.
     /// </summary>
-    public struct ExportedMemberInfo {
+    internal struct ExportedMemberInfo {
         private readonly string _name;
         private readonly bool _isDefinedInModule;
 

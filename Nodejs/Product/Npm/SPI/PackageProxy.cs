@@ -30,7 +30,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         public string Description { get; internal set; }
 
-        public string Homepage { get; internal set; }
+        public IEnumerable<string> Homepages { get; internal set; }
 
         public string Path { get; internal set; }
 

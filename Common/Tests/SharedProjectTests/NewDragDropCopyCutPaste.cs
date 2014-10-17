@@ -79,11 +79,11 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         private void MoveExcludedFolder(MoveDelegate mover) {
             foreach (var projectType in ProjectTypes) {
-                var testDef = new ProjectDefinition("MoveExcludedFolder", 
-                    projectType, 
+                var testDef = new ProjectDefinition("MoveExcludedFolder",
+                    projectType,
                     PropertyGroup(
                         Property("ProjectView", "ShowAllFiles")
-                    ), 
+                    ),
                     ItemGroup(
                         Folder("Fob", isExcluded: true),
                         Folder("Fob\\Oar", isExcluded: true),
@@ -116,13 +116,13 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
 
         private void MoveExcludedItemToFolder(MoveDelegate mover) {
-            
+
             foreach (var projectType in ProjectTypes) {
-                var testDef = new ProjectDefinition("MoveExcludedItemToFolder", 
-                    projectType, 
+                var testDef = new ProjectDefinition("MoveExcludedItemToFolder",
+                    projectType,
                     PropertyGroup(
                         Property("ProjectView", "ShowAllFiles")
-                    ), 
+                    ),
                     ItemGroup(
                         Folder("Folder"),
                         Compile("codefile", isExcluded: true)
@@ -138,7 +138,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     solution.AssertFileDoesntExist("MoveExcludedItemToFolder", "codefile" + projectType.CodeExtension);
                     solution.AssertFileExists("MoveExcludedItemToFolder", "Folder", "codefile" + projectType.CodeExtension);
                     Assert.IsTrue(solution.Project.GetIsFolderExpanded("Folder"));
-                    
+
                 }
             }
         }
@@ -175,8 +175,9 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         solution.FindItem("MoveDuplicateFileName", "textfile.txt")
                     );
 
-                    var dialog = new OverwriteFileDialog(solution.App.WaitForDialog());
-                    dialog.No();
+                    using (var dialog = OverwriteFileDialog.Wait(solution.App)) {
+                        dialog.No();
+                    }
 
                     solution.App.WaitForDialogDismissed();
 
@@ -223,13 +224,15 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         solution.FindItem("MoveDuplicateFileName", "textfile2.txt")
                     );
 
-                    var dialog = new OverwriteFileDialog(solution.App.WaitForDialog());
-                    dialog.No();
+                    using (var dialog = OverwriteFileDialog.Wait(solution.App)) {
+                        dialog.No();
+                    }
 
                     System.Threading.Thread.Sleep(1000);
 
-                    dialog = new OverwriteFileDialog(solution.App.WaitForDialog());
-                    dialog.Yes();
+                    using (var dialog = OverwriteFileDialog.Wait(solution.App)) {
+                        dialog.Yes();
+                    }
 
                     solution.App.WaitForDialogDismissed();
 
@@ -287,13 +290,15 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         item2
                     );
 
-                    var dialog = new OverwriteFileDialog(solution.App.WaitForDialog());
-                    dialog.No();
+                    using (var dialog = OverwriteFileDialog.Wait(solution.App)) {
+                        dialog.No();
+                    }
 
                     System.Threading.Thread.Sleep(1000);
 
-                    dialog = new OverwriteFileDialog(solution.App.WaitForDialog());
-                    dialog.Yes();
+                    using (var dialog = OverwriteFileDialog.Wait(solution.App)) {
+                        dialog.Yes();
+                    }
 
                     solution.App.WaitForDialogDismissed();
 
@@ -346,8 +351,9 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         solution.FindItem("MoveDuplicateFileName1", "textfile.txt")
                     );
 
-                    var dialog = new OverwriteFileDialog(solution.App.WaitForDialog());
-                    dialog.No();
+                    using (var dialog = OverwriteFileDialog.Wait(solution.App)) {
+                        dialog.No();
+                    }
 
                     solution.App.WaitForDialogDismissed();
 
@@ -410,6 +416,65 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             }
         }
 
+        [TestMethod, Priority(2), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void MoveFileFromFolderToLinkedFolderKeyboard() {
+            MoveFileFromFolderToLinkedFolder(MoveByKeyboard);
+        }
+
+        [TestMethod, Priority(2), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void MoveFileFromFolderToLinkedFolderMouse() {
+            MoveFileFromFolderToLinkedFolder(MoveByMouse);
+        }
+
+        /// <summary>
+        /// Move item to a folder that has a symbolic link.  Verify we cannot move 
+        /// ourselves to ourselves and that moves are reflected in both the folder and its symbolic link.
+        /// NOTE: Because of symbolic link creation, this test must be run as administrator.
+        /// </summary>
+        private void MoveFileFromFolderToLinkedFolder(MoveDelegate mover) {
+            foreach (var projectType in ProjectTypes) {
+                var projectDefs = new[] {
+                    new ProjectDefinition("MoveLinkedFolder",
+                        projectType,
+                        ItemGroup(
+                            Content("textfile.txt", "text file contents"),
+                            Folder("Folder"),
+                            Content("Folder\\FileInFolder.txt", "File inside of linked folder..."),
+                            SymbolicLink("FolderLink", "Folder")
+                        )
+                    )
+                };
+
+                using (var solution = SolutionFile.Generate("MoveLinkedFolder", projectDefs).ToVs()) {
+                    mover(
+                        solution.FindItem("MoveLinkedFolder", "FolderLink"),
+                        solution.FindItem("MoveLinkedFolder", "Folder", "FileInFolder.txt")
+                    );
+
+                    // Say okay to the error that pops up since we can't move to ourselves.
+                    solution.App.WaitForDialog();
+                    Keyboard.Type(Key.Enter);
+
+                    solution.App.WaitForDialogDismissed();
+
+                    // Verify that after the dialog our files are still present.
+                    solution.AssertFileExists("MoveLinkedFolder", "FolderLink", "FileInFolder.txt");
+                    solution.AssertFileExists("MoveLinkedFolder", "Folder", "FileInFolder.txt");
+
+                    // Now move the text file in the root.  Expect it to move and be in both.
+                    mover(
+                        solution.FindItem("MoveLinkedFolder", "FolderLink"),
+                        solution.FindItem("MoveLinkedFolder", "textfile.txt")
+                    );
+
+                    solution.AssertFileExists("MoveLinkedFolder", "FolderLink", "textfile.txt");
+                    solution.AssertFileExists("MoveLinkedFolder", "Folder", "textfile.txt");
+                }
+            }
+        }
+
         /// <summary>
         /// Selects the provided items with the mouse preparing for a drag and drop
         /// </summary>
@@ -452,7 +517,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             for (int i = 1; i < source.Length; i++) {
                 AutomationWrapper.AddToSelection(source[i]);
             }
-            
+
             Keyboard.ControlX();
 
             AutomationWrapper.Select(destination);

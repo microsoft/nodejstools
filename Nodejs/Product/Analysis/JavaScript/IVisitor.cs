@@ -15,7 +15,7 @@
 // limitations under the License.
 
 namespace Microsoft.NodejsTools.Parsing {
-    public class AstVisitor {
+    internal class AstVisitor {
         public virtual bool Walk(ArrayLiteral node) { return true; }
         public virtual bool Walk(BinaryOperator node) { return true; }
         public virtual bool Walk(CommaOperator node) { return true; }

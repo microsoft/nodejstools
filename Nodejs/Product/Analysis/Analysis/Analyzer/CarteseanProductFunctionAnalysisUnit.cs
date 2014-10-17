@@ -1,4 +1,18 @@
-﻿using System;
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -131,12 +145,10 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
             var originalThis = funcScope._this;
             funcScope._this = _this;
-            if (_callArgs.This != null) {
-                _this.AddTypes(this, _callArgs.This, false);
-            }
+            function._curArgs = args;
 
             // Propagate the call types into the variables...
-            AddArgumentTypes(funcScope, args.Args);
+            AddArgumentTypes(funcScope, _callArgs.This, args.Args);
 
             var unifiedReturn = function.ReturnValue;
             function.ReturnValue = _returnValue;
@@ -146,9 +158,11 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             try {
                 base.AnalyzeWorker(ddg, cancel);
             } finally {
+                function._curArgs = null;
                 funcScope._this = originalThis;
                 function.ReturnValue = unifiedReturn;
                 function.ReturnValue.AddTypes(this, _returnValue.GetTypesNoCopy(this), false);
+                _this.CopyTo(originalThis);
 
                 // restore the locals, merging types back into the shared...
                 foreach (var variable in _specializedLocals) {

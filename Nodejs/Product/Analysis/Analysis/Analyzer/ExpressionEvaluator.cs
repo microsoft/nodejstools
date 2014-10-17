@@ -203,10 +203,25 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 node,
                 out value)) {
                 var objectInfo = (ObjectLiteralValue)value.First().Value;
-                if (n.Properties.Length > 50) {
-                    // probably some generated object literal, ignore it
-                    // for the post part.
-                    AssignProperty(ee, node, objectInfo, n.Properties.First());
+                int maxProperties = ee._unit.Analyzer.Limits.MaxObjectLiteralProperties;
+                if (n.Properties.Length > maxProperties) {
+                    int nonFunctionCount = 0;
+                    foreach (var prop in n.Properties) {
+                        FunctionExpression func = prop.Value as FunctionExpression;
+                        if (func == null) {
+                            nonFunctionCount++;
+                        }
+                    }
+
+                    if (nonFunctionCount > maxProperties) {
+                        // probably some generated object literal, ignore it
+                        // for the post part.
+                        AssignProperty(ee, node, objectInfo, n.Properties.First());
+                    } else {
+                        foreach (var x in n.Properties) {
+                            AssignProperty(ee, node, objectInfo, x);
+                        }
+                    }
                 } else {
                     foreach (var x in n.Properties) {
                         AssignProperty(ee, node, objectInfo, x);
@@ -274,52 +289,37 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 IAnalysisSet targetRefs = ee.EvaluateReference(node, n, out @this);
 
                 foreach (var target in targetRefs) {
-                    if (target.Value == ee._unit.Analyzer._requireFunc && n.Arguments.Length == 1) {
-                        // we care a lot about require analysis and people do some pretty
-                        // crazy dynamic things for require calls.  If we let our normal
-                        // analysis and specialized function handle it we won't get things
-                        // like handling './' + somePath.  So we'll go ahead and handle
-                        // some special cases here...
-                        if (IsSpecialRequire(ee, node, n, ref res)) {
-                            continue;
-                        }
-                    }
-                    
                     res = res.Union(target.Call(node, ee._unit, @this, argTypes));
-                    
                 }
-
             }
             return res;
         }
 
-        private static bool IsSpecialRequire(ExpressionEvaluator ee, Node node, CallNode n, ref IAnalysisSet res) {
-            BinaryOperator binOp = n.Arguments[0] as BinaryOperator;
+        /// <summary>
+        /// Evaluates strings and produces the combined literal value.  We usually cannot do this
+        /// because we need to make sure that we're not constantly introducing new string literals
+        /// into the evaluation system.  Otherwise a recursive concatencating function could
+        /// cause an infinite analysis.  But in special situations, such as analyzing require calls,
+        /// where we know the value doesn't get introduced into the analysis system we want to get the 
+        /// fully evaluated string literals.
+        /// </summary>
+        public IEnumerable<string> MergeStringLiterals(Expression node) {
+            BinaryOperator binOp = node as BinaryOperator;
             if (binOp != null && binOp.OperatorToken == JSToken.Plus) {
-                var lhs = ee.EvaluateMaybeNull(binOp.Operand1);
-                var rhs = ee.EvaluateMaybeNull(binOp.Operand2);
-                foreach (var left in lhs) {
-                    var leftStr = left.Value.GetConstantValueAsString();
-                    if (leftStr != null) {
-                        foreach (var right in rhs) {
-                            var rightStr = right.Value.GetConstantValueAsString();
-                            if (rightStr != null) {
-                                res = res.Union(
-                                    ee._unit.Analyzer.Modules.RequireModule(
-                                        node,
-                                        ee._unit,
-                                        leftStr + rightStr,
-                                        ee._unit.DeclaringModuleEnvironment.Name
-                                    )
-                                );
-                            }
-                        }
+                foreach (var left in MergeStringLiterals(binOp.Operand1)) {
+                    foreach (var right in MergeStringLiterals(binOp.Operand2)) {
+                        yield return left + right;
                     }
                 }
-
-                return true;
+                yield break;
             }
-            return false;
+
+            foreach (var value in EvaluateMaybeNull(node)) {
+                var strValue = value.Value.GetStringValue();
+                if (strValue != null) {
+                    yield return strValue;
+                }
+            }
         }
 
         private IAnalysisSet EvaluateReference(Node node, CallNode n, out IAnalysisSet baseValue) {
@@ -405,7 +405,8 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                     return rhs;
             }
 
-            return ee.Evaluate(n.Operand1).Union(ee.Evaluate(n.Operand2));
+            return ee.Evaluate(n.Operand1)
+                .BinaryOperation(n, ee._unit, ee.Evaluate(n.Operand2));
         }
 
 #if FALSE
@@ -445,7 +446,19 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             if (left is Lookup) {
                 var l = (Lookup)left;
                 if (l.Name != null) {
-                    Scope.AssignVariable(
+                    var assignScope = Scope;
+                    if (l.VariableField != null) {
+                        foreach (var scope in Scope.EnumerateTowardsGlobal) {
+                            if(scope.ContainsVariable(l.Name) ||
+                                (scope is DeclarativeEnvironmentRecord &&
+                                ((DeclarativeEnvironmentRecord)scope).Node == l.VariableField.Scope)) {
+                                assignScope = scope;
+                                break;
+                            }
+                        }
+                    }
+
+                    assignScope.AssignVariable(
                         l.Name,
                         l,
                         _unit,
@@ -485,31 +498,45 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
 
         private IAnalysisSet MakeArrayValue(ExpressionEvaluator ee, Node node) {
-            var sequence = (ArrayValue)ee.Scope.GlobalEnvironment.GetOrMakeNodeValue(
-                NodeEnvironmentKind.ArrayValue,
-                node, x => {
-                return new ArrayValue(
-                    TypedDef.EmptyArray,
+            int maxArrayLiterals = _unit.Analyzer.Limits.MaxArrayLiterals;
+
+            IAnalysisSet value;
+            var array = (ArrayLiteral)node;
+            ArrayValue arrValue;
+            if (!ee.Scope.GlobalEnvironment.TryGetNodeValue(NodeEnvironmentKind.ArrayValue, node, out value)) {
+                TypedDef[] elements = TypedDef.EmptyArray;
+
+                if (array.Elements.Length > maxArrayLiterals) {
+                    // probably some generated object literal, simplify it's analysis
+                    elements = new TypedDef[] { new TypedDef() };
+                } else if(array.Elements.Length != 0) {
+                    elements = TypedDef.Generator.Take(array.Elements.Length).ToArray();
+                }
+
+                arrValue = new ArrayValue(
+                    elements,
                     _unit.ProjectEntry,
                     node
-                ).SelfSet;
-            }).First().Value;
-            var array = (ArrayLiteral)node;
-            if (array.Elements.Length >= 50) {
-                // probably some generated object literal, ignore it
-                // for the post part.
-                sequence.AddTypes(ee._unit, new[] { Evaluate(array.Elements.First()) });
+                );
+
+                ee.Scope.GlobalEnvironment.AddNodeValue(
+                    NodeEnvironmentKind.ArrayValue,
+                    node,
+                    arrValue.SelfSet
+                );
             } else {
-                var seqItems = ((ArrayLiteral)node).Elements;
-                var indexValues = new IAnalysisSet[seqItems.Length];
-
-
-                for (int i = 0; i < seqItems.Length; i++) {
-                    indexValues[i] = Evaluate(seqItems[i]);
-                }
-                sequence.AddTypes(ee._unit, indexValues);
+                arrValue = (ArrayValue)((AnalysisProxy)value).Value;
             }
-            return sequence.SelfSet;
+
+            for (int i = 0; i < arrValue.IndexTypes.Length; i++) {
+                arrValue.AddTypes(
+                    ee._unit,
+                    i,
+                    Evaluate(array.Elements[i])
+                );
+            }
+
+            return arrValue.SelfSet;
         }
 
         #endregion

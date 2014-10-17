@@ -21,6 +21,7 @@ namespace Microsoft.NodejsTools.Options {
         private NodejsIntellisenseOptionsControl _window;
         private AnalysisLevel _level;
         private int _analysisLogMax;
+        private bool _saveToDisk;
         private string _completionCommittedBy;
 
         public NodejsIntellisenseOptionsPage()
@@ -30,14 +31,25 @@ namespace Microsoft.NodejsTools.Options {
         // replace the default UI of the dialog page w/ our own UI.
         protected override System.Windows.Forms.IWin32Window Window {
             get {
-                EnsureWindow();
+                if (_window == null) {
+                    _window = new NodejsIntellisenseOptionsControl();
+                    LoadSettingsFromStorage();
+                }
                 return _window;
             }
         }
 
-        private void EnsureWindow() {
-            if (_window == null) {
-                _window = new NodejsIntellisenseOptionsControl();
+        internal bool SaveToDisk {
+            get { return _saveToDisk; }
+            set {
+                var oldState = _saveToDisk;
+                _saveToDisk = value;
+                if (oldState != _saveToDisk) {
+                    var changed = SaveToDiskChanged;
+                    if (changed != null) {
+                        changed(this, EventArgs.Empty);
+                    }
+                }
             }
         }
 
@@ -92,6 +104,7 @@ namespace Microsoft.NodejsTools.Options {
         public event EventHandler<EventArgs> AnalysisLevelChanged;
         public event EventHandler<EventArgs> AnalysisLogMaximumChanged;
         public event EventHandler<EventArgs> CompletionCommittedByChanged;
+        public event EventHandler<EventArgs> SaveToDiskChanged;
 
         /// <summary>
         /// Resets settings back to their defaults. This should be followed by
@@ -106,27 +119,33 @@ namespace Microsoft.NodejsTools.Options {
         private const string AnalysisLevelSetting = "AnalysisLevel";
         private const string AnalysisLogMaximumSetting = "AnalysisLogMaximum";
         private const string CompletionCommittedBySetting = "CompletionCommittedBy";
+        private const string SaveToDiskSetting = "SaveToDisk";
 
         public override void LoadSettingsFromStorage() {
+            // Load settings from storage.
             AnalysisLevel = LoadEnum<AnalysisLevel>(AnalysisLevelSetting) ?? AnalysisLevel.High;
             AnalysisLogMax = LoadInt(AnalysisLogMaximumSetting) ?? 100;
+            SaveToDisk = LoadBool(SaveToDiskSetting) ?? true;
             CompletionCommittedBy = LoadString(CompletionCommittedBySetting) ?? NodejsConstants.DefaultIntellisenseCompletionCommittedBy;
-            EnsureWindow();
 
-            _window.AnalysisLevel = AnalysisLevel;
-            _window.AnalysisLogMaximum = AnalysisLogMax;
-            _window.CompletionCommittedBy = CompletionCommittedBy;
+            // Synchronize UI with backing properties.
+            if (_window != null) {
+                _window.SyncControlWithPageSettings(this);
+            }
         }
 
         public override void SaveSettingsToStorage() {
-            AnalysisLevel = _window.AnalysisLevel;
+            // Synchronize backing properties with UI.
+            if (_window != null) {
+                _window.SyncPageWithControlSettings(this);
+            }
+
+            // Save settings.
             SaveEnum(AnalysisLevelSetting, AnalysisLevel);
-
-            AnalysisLogMax = _window.AnalysisLogMaximum;
             SaveInt(AnalysisLogMaximumSetting, AnalysisLogMax);
-
-            CompletionCommittedBy = _window.CompletionCommittedBy;
             SaveString(CompletionCommittedBySetting, CompletionCommittedBy);
+            SaveBool(SaveToDiskSetting, SaveToDisk);
+
         }
     }
 }

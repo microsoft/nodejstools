@@ -36,7 +36,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// Performs analysis of multiple JavaScript code files and enables interrogation of the resulting analysis.
     /// </summary>
     [Serializable]
-    public partial class JsAnalyzer : IGroupableAnalysisProject, IDeserializeInitialization {
+    internal partial class JsAnalyzer : IGroupableAnalysisProject, IDeserializeInitialization {
         private readonly ModuleTable _modules;
         internal readonly ProjectEntry _builtinEntry;
         private Dictionary<object, AnalysisValue> _itemCache;
@@ -47,9 +47,9 @@ namespace Microsoft.NodejsTools.Analysis {
         internal readonly UndefinedValue _undefined;
         internal readonly ObjectValue _globalObject, _objectPrototype, _immutableObject;
         internal readonly FunctionValue _arrayFunction;
-        internal readonly AnalysisValue _numberPrototype, _stringPrototype, _booleanPrototype, _functionPrototype;
+        internal readonly AnalysisValue _numberPrototype, _stringPrototype, _booleanPrototype, _functionPrototype, _arrayPrototype;
         internal readonly AnalysisValue _emptyStringValue, _zeroIntValue;
-        internal readonly BuiltinFunctionValue _requireFunc;
+        internal readonly BuiltinFunctionValue _requireFunc, _objectGetOwnPropertyDescriptor;
         private readonly Deque<AnalysisUnit> _queue;
         private readonly HashSet<string> _analysisDirs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private AnalysisLimits _limits;
@@ -61,7 +61,7 @@ namespace Microsoft.NodejsTools.Analysis {
         public JsAnalyzer(AnalysisLimits limits = null) {
             _modules = new ModuleTable();
             _itemCache = new Dictionary<object, AnalysisValue>();
-            _builtinEntry = new ProjectEntry(this, "", null);
+            _builtinEntry = new ProjectEntry(this, String.Empty, null);
 
             Limits = limits ?? new AnalysisLimits();
 
@@ -72,7 +72,7 @@ namespace Microsoft.NodejsTools.Analysis {
             _falseInst = new BooleanValue(false, this);
             _undefined = new UndefinedValue(this);
 
-            _emptyStringValue = GetConstant("");
+            _emptyStringValue = GetConstant(String.Empty);
             _zeroIntValue = GetConstant(0.0);
 
             var globals = GlobalBuilder.MakeGlobal(this);
@@ -84,6 +84,8 @@ namespace Microsoft.NodejsTools.Analysis {
             _arrayFunction = globals.ArrayFunction;
             _objectPrototype = globals.ObjectPrototype;
             _requireFunc = globals.RequireFunction;
+            _arrayPrototype = globals.ArrayPrototype;
+            _objectGetOwnPropertyDescriptor = globals.ObjectGetOwnPropertyDescriptor;
             _immutableObject = new ImmutableObjectValue(_builtinEntry);
 
             var allJson = Path.Combine(
@@ -283,7 +285,7 @@ namespace Microsoft.NodejsTools.Analysis {
             return GetConstant(attr);
         }
 
-        internal AnalysisValue GetConstant(object attr) {
+        internal AnalysisValue GetConstant(object attr, bool alwaysCache = false) {
             if (attr == null) {
                 return _nullInst;
             }
@@ -305,7 +307,7 @@ namespace Microsoft.NodejsTools.Analysis {
                     }
                 case TypeCode.String:
                     var strValue = (string)attr;
-                    if (DontCacheString(strValue)) {
+                    if (!alwaysCache && DontCacheString(strValue)) {
                         Debug.Assert(_emptyStringValue != null);
                         return _emptyStringValue;
                     }

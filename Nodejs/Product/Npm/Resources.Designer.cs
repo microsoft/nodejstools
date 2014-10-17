@@ -61,11 +61,128 @@ namespace Microsoft.NodejsTools.Npm {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot retrieve license from empty license collection..
+        /// </summary>
+        internal static string CannotRetrieveLicenseEmptyCollection {
+            get {
+                return ResourceManager.GetString("CannotRetrieveLicenseEmptyCollection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot retrieve license for index less than 0..
+        /// </summary>
+        internal static string CannotRetrieveLicenseInvalidIndex {
+            get {
+                return ResourceManager.GetString("CannotRetrieveLicenseInvalidIndex", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error executing npm - unable to start the npm process.
+        /// </summary>
+        internal static string ErrCannotStartNpm {
+            get {
+                return ResourceManager.GetString("ErrCannotStartNpm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unable to retrieve npm catalog: the web service may be unavailable..
         /// </summary>
         internal static string ErrNpmCatalogEmpty {
             get {
                 return ResourceManager.GetString("ErrNpmCatalogEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Executing command &apos;npm {0}&apos;.
+        /// </summary>
+        internal static string ExecutingCommand {
+            get {
+                return ResourceManager.GetString("ExecutingCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Current Time: {0}.
+        /// </summary>
+        internal static string InfoCurrentTime {
+            get {
+                return ResourceManager.GetString("InfoCurrentTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deleting {0}.
+        /// </summary>
+        internal static string InfoDeletingFile {
+            get {
+                return ResourceManager.GetString("InfoDeletingFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Last Refreshed: {0}.
+        /// </summary>
+        internal static string InfoLastRefreshed {
+            get {
+                return ResourceManager.GetString("InfoLastRefreshed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Path to npm: {0}.
+        /// </summary>
+        internal static string InfoNpmPathLocation {
+            get {
+                return ResourceManager.GetString("InfoNpmPathLocation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Number of Results: {0}.
+        /// </summary>
+        internal static string InfoNumberOfResults {
+            get {
+                return ResourceManager.GetString("InfoNumberOfResults", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Downloading package cache to {0}.
+        /// </summary>
+        internal static string InfoPackageCacheWriteLocation {
+            get {
+                return ResourceManager.GetString("InfoPackageCacheWriteLocation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reading {0} bytes from {1} ({2}).
+        /// </summary>
+        internal static string InfoReadingBytesFromPackageCache {
+            get {
+                return ResourceManager.GetString("InfoReadingBytesFromPackageCache", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to npm command cancelled.
+        /// </summary>
+        internal static string NpmCommandCancelled {
+            get {
+                return ResourceManager.GetString("NpmCommandCancelled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to npm command completed with exit code {0}.
+        /// </summary>
+        internal static string NpmCommandCompletedWithExitCode {
+            get {
+                return ResourceManager.GetString("NpmCommandCompletedWithExitCode", resourceCulture);
             }
         }
         
@@ -102,6 +219,15 @@ namespace Microsoft.NodejsTools.Npm {
         internal static string PackagesDownloadStarting {
             get {
                 return ResourceManager.GetString("PackagesDownloadStarting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Parsing error (package {0}).
+        /// </summary>
+        internal static string ParsingError {
+            get {
+                return ResourceManager.GetString("ParsingError", resourceCulture);
             }
         }
     }

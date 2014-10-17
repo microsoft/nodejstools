@@ -25,18 +25,30 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     class UserFunctionValue : FunctionValue, IReferenceable {
         private readonly FunctionObject _funcObject;
         private readonly FunctionAnalysisUnit _analysisUnit;
+        public readonly ArgumentsValue Arguments;
+        public readonly VariableDef ArgumentsVariable;
+        public CallArgs _curArgs;
         public VariableDef ReturnValue;
         internal Dictionary<CallArgs, CallInfo> _allCalls;
         private OverflowState _overflowed;
         private const int MaximumCallCount = 5;
+        
 
         public UserFunctionValue(FunctionObject node, AnalysisUnit declUnit, EnvironmentRecord declScope, bool isNested = false)
-            : base(declUnit.ProjectEntry, true, node.Name ?? node.NameGuess) {
+            : base(declUnit.ProjectEntry, null, node.Name ?? node.NameGuess) {
             ReturnValue = new VariableDef();
             _funcObject = node;
             _analysisUnit = new FunctionAnalysisUnit(this, declUnit, declScope, ProjectEntry);
 
             declUnit.Analyzer.AnalysisValueCreated(typeof(UserFunctionValue));
+            var argsWalker = new ArgumentsWalker();
+            FunctionObject.Body.Walk(argsWalker);
+
+            if (argsWalker.UsesArguments) {
+                Arguments = new ArgumentsValue(this);
+                ArgumentsVariable = new VariableDef();
+                ArgumentsVariable.AddTypes(_analysisUnit, Arguments.SelfSet);
+            }
         }
 
         public override IAnalysisSet ReturnTypes {
@@ -89,11 +101,8 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 var result = new StringBuilder();
                 {
                     result.Append("function ");
-                    if (FunctionObject.Name != null) {
-                        result.Append(FunctionObject.Name);
-                    } else {
-                        result.Append("<anonymous>");
-                    }
+                    var name = FunctionObject.Name ?? FunctionObject.NameGuess ?? "<anonymous>";
+                    result.Append(name);
                     result.Append("(");
                     AddParameterString(result);
                     result.Append(")");
@@ -235,19 +244,13 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                         )
                     ).ToArray();
 
-                var argsWalker = new ArgumentsWalker();
-                FunctionObject.Body.Walk(argsWalker);
-                if (argsWalker.UsesArguments) {
+                if (Arguments != null) {
                     parameterResults = parameterResults.Concat(
                         new[] { new ParameterResult("...") }
                     ).ToArray();
                 }
 
-                yield return new SimpleOverloadResult(
-                    parameterResults,
-                    FunctionObject.Name ?? "<anonymous function>",
-                    Documentation
-                );
+                yield return new SimpleOverloadResult(FunctionObject.Name ?? FunctionObject.NameGuess ?? "<anonymous function>", Documentation, parameterResults);
             }
         }
 
@@ -255,19 +258,16 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             // if the arguments are complex then we'll do a merged analysis, otherwise we'll analyze
             // this set of arguments independently.
             bool skipDeepAnalysis = false;
-            for (int i = 0; i < args.Length; i++) {
-                int argCount = args[i].Count;
-                if (argCount <= 1) {
-                    continue;
-                }
-                foreach (var arg in args) {
-                    if (arg == unit.Analyzer._undefined || arg == unit.Analyzer._nullInst) {
-                        argCount--;
+            if (@this != null) {
+                skipDeepAnalysis |= CheckTooManyValues(unit, @this);
+            }
+
+            if (!skipDeepAnalysis) {
+                for (int i = 0; i < args.Length; i++) {
+                    skipDeepAnalysis |= CheckTooManyValues(unit, args[i]);
+                    if (skipDeepAnalysis) {
+                        break;
                     }
-                }
-                if (argCount > 1) {
-                    skipDeepAnalysis = true;
-                    break;
                 }
             }
 
@@ -275,6 +275,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 // start merging all arguments into a single call analysis                
                 if (_analysisUnit.AddArgumentTypes(
                     (FunctionEnvironmentRecord)_analysisUnit._env,
+                    @this,
                     args,
                     _analysisUnit.Analyzer.Limits.MergedArgumentTypes
                 )) {
@@ -329,6 +330,22 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 callInfo.ReturnValue.AddDependency(unit);
                 return callInfo.ReturnValue.GetTypes(unit, ProjectEntry);
             }
+        }
+
+        private bool CheckTooManyValues(AnalysisUnit unit, IAnalysisSet @this) {
+            int argCount = @this.Count;
+            if (argCount > 1) {
+                foreach (var arg in @this) {
+                    if (arg.Value == unit.Analyzer._undefined || arg.Value == unit.Analyzer._nullInst) {
+                        argCount--;
+                    }
+                }
+                if (argCount > 1) {
+                    _overflowed = OverflowState.OverflowedBigTime;
+                    return true;
+                }
+            }
+            return false;
         }
 
 
@@ -592,22 +609,22 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             OverflowedBigTime
         }
 
-        public IEnumerable<KeyValuePair<ProjectEntry, EncodedLocation>> Definitions {
+        public IEnumerable<KeyValuePair<ProjectEntry, EncodedSpan>> Definitions {
             get {
-                yield return new KeyValuePair<ProjectEntry, EncodedLocation>(
+                yield return new KeyValuePair<ProjectEntry, EncodedSpan>(
                     ProjectEntry,
-                    new EncodedLocation(_funcObject)
+                    _funcObject.EncodedSpan
                 );
             }
         }
 
-        public new IEnumerable<KeyValuePair<ProjectEntry, EncodedLocation>> References {
+        public new IEnumerable<KeyValuePair<ProjectEntry, EncodedSpan>> References {
             get {
                 if (_references != null) {
                     foreach (var keyValue in _references) {
                         if (keyValue.Value.References != null) {
                             foreach (var loc in keyValue.Value.References) {
-                                yield return new KeyValuePair<ProjectEntry, EncodedLocation>(
+                                yield return new KeyValuePair<ProjectEntry, EncodedSpan>(
                                     keyValue.Key,
                                     loc
                                 );

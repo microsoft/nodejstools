@@ -15,7 +15,7 @@
 using System;
 
 namespace Microsoft.NodejsTools.Analysis {
-    static class AnalysisExtensions {
+    internal static class AnalysisExtensions {
         /// <summary>
         /// Removes all trailing white space including new lines, tabs, and form feeds.
         /// </summary>

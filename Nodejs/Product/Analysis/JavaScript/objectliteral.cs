@@ -21,7 +21,7 @@ using System.Text;
 namespace Microsoft.NodejsTools.Parsing
 {
     [Serializable]
-    public sealed class ObjectLiteral : Expression
+    internal sealed class ObjectLiteral : Expression
     {
         private ObjectLiteralProperty[] m_properties;
 

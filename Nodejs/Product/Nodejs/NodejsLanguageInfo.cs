@@ -45,7 +45,7 @@ namespace Microsoft.NodejsTools {
         public int GetFileExtensions(out string pbstrExtensions) {
             // This is the same extension the language service was
             // registered as supporting.
-            pbstrExtensions = NodejsConstants.FileExtension;
+            pbstrExtensions = NodejsConstants.JavaScriptExtension;
             return VSConstants.S_OK;
         }
 

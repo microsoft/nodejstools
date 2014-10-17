@@ -1,0 +1,28 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+      <_SourceMappingFilesLocation Condition="$(_SourceMappingFilesLocation) == ''">$(BuildRoot)\Nodejs\Product\Nodejs\SourceMapping</_SourceMappingFilesLocation>
+      <_ConstantsFileLocation Condition="$(_ConstantsFileLocation) == ''">$(BuildRoot)\Nodejs\Product\Nodejs</_ConstantsFileLocation>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(_SourceMappingFilesLocation)\FunctionInfo.cs">
+      <Link>SourceMapping\FunctionInfo.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
+    <Compile Include="$(_SourceMappingFilesLocation)\JavaScriptSourceMapInfo.cs">
+      <Link>SourceMapping\JavaScriptSourceMapInfo.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
+    <Compile Include="$(_SourceMappingFilesLocation)\SourceMap.cs">
+      <Link>SourceMapping\SourceMap.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
+    <Compile Include="$(_SourceMappingFilesLocation)\SourceMapper.cs">
+      <Link>SourceMapping\SourceMapper.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
+    <Compile Include="$(_ConstantsFileLocation)\NodejsConstants.cs">
+      <Link>NodejsConstants.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
+  </ItemGroup>
+</Project>

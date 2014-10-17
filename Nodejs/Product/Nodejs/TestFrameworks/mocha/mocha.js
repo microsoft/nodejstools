@@ -1,13 +1,11 @@
 ﻿var fs = require('fs');
 
 var find_tests = function (testFileList, discoverResultFile, projectFolder) {
-  var Mocha;
-  try {
-    Mocha = require(projectFolder + '\\node_modules\\mocha');
-  } catch (ex) {
-    console.log("NTVS_ERROR:Failed to find Mocha package.  Mocha must be installed in the project locally.  Mocha can be installed locally with the npm manager via solution explorer or with \".npm install mocha\" via the Node.js interactive window.");
+  var Mocha = detectMocha(projectFolder);
+  if (!Mocha) {
     return;
   }
+
   function getTestList(suite, testFile) {
     if (suite) {
       if (suite.tests && suite.tests.length !== 0) {
@@ -15,7 +13,9 @@ var find_tests = function (testFileList, discoverResultFile, projectFolder) {
           testList.push({
             test: t.fullTitle(),
             suite: suite.fullTitle(),
-            file: testFile
+            file: testFile,
+            line: 0,
+            column: 0
           });
         });
       }
@@ -48,7 +48,11 @@ var find_tests = function (testFileList, discoverResultFile, projectFolder) {
 module.exports.find_tests = find_tests;
 
 var run_tests = function (testName, testFile, workingFolder, projectFolder) {
-  var Mocha = new require(projectFolder + '\\node_modules\\mocha');
+  var Mocha = detectMocha(projectFolder);
+  if (!Mocha) {
+    return;
+  }
+
   var mocha = new Mocha();
   mocha.ui('tdd');
   //set timeout to 10 minutes, becasue the default of 2 sec might be too short (TODO: make it configuable)
@@ -65,6 +69,16 @@ var run_tests = function (testName, testFile, workingFolder, projectFolder) {
 
 function exitLater(code) {
   process.on('exit', function () { process.exit(code); });
+}
+
+function detectMocha(projectFolder) {
+  try {
+    var Mocha = new require(projectFolder + '\\node_modules\\mocha');
+    return Mocha;
+  } catch (ex) {
+    console.log("NTVS_ERROR:Failed to find Mocha package.  Mocha must be installed in the project locally.  Mocha can be installed locally with the npm manager via solution explorer or with \".npm install mocha\" via the Node.js interactive window.");
+    return null;
+  }
 }
 
 module.exports.run_tests = run_tests;

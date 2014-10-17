@@ -21,7 +21,7 @@ using System.Text;
 namespace Microsoft.NodejsTools.Parsing
 {
     [Serializable]
-    public sealed class Block : Statement
+    internal sealed class Block : Statement
     {
         private Statement[] m_list;
         internal static readonly Statement[] EmptyStatements = new Statement[0];

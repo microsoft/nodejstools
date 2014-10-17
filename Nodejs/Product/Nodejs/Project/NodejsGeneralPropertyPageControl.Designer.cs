@@ -38,12 +38,12 @@
             this._launchUrl = new System.Windows.Forms.TextBox();
             this._launchUrlLabel = new System.Windows.Forms.Label();
             this._tooltip = new System.Windows.Forms.ToolTip(this.components);
+            this._envVars = new System.Windows.Forms.TextBox();
             this._browsePath = new System.Windows.Forms.Button();
             this._browseDirectory = new System.Windows.Forms.Button();
             this._nodeExeErrorProvider = new System.Windows.Forms.ErrorProvider(this.components);
             this._debuggerPortLabel = new System.Windows.Forms.Label();
             this._debuggerPort = new System.Windows.Forms.TextBox();
-            this._envVars = new System.Windows.Forms.TextBox();
             this._envVarsLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this._nodeExeErrorProvider)).BeginInit();
             this.SuspendLayout();
@@ -69,7 +69,7 @@
             // _startBrowser
             // 
             this._startBrowser.AutoSize = true;
-            this._startBrowser.Location = new System.Drawing.Point(17, 228);
+            this._startBrowser.Location = new System.Drawing.Point(17, 258);
             this._startBrowser.Name = "_startBrowser";
             this._startBrowser.Size = new System.Drawing.Size(161, 17);
             this._startBrowser.TabIndex = 18;
@@ -101,19 +101,19 @@
             // 
             // _nodejsPort
             // 
-            this._nodejsPort.Location = new System.Drawing.Point(135, 176);
+            this._nodejsPort.Location = new System.Drawing.Point(135, 150);
             this._nodejsPort.Name = "_nodejsPort";
             this._nodejsPort.Size = new System.Drawing.Size(105, 20);
-            this._nodejsPort.TabIndex = 15;
+            this._nodejsPort.TabIndex = 13;
             this._nodejsPort.TextChanged += new System.EventHandler(this.PortChanged);
             // 
             // _nodePortLabel
             // 
             this._nodePortLabel.AutoSize = true;
-            this._nodePortLabel.Location = new System.Drawing.Point(14, 179);
+            this._nodePortLabel.Location = new System.Drawing.Point(14, 153);
             this._nodePortLabel.Name = "_nodePortLabel";
             this._nodePortLabel.Size = new System.Drawing.Size(67, 13);
-            this._nodePortLabel.TabIndex = 14;
+            this._nodePortLabel.TabIndex = 12;
             this._nodePortLabel.Text = "Node.&js port:";
             // 
             // _scriptArgsLabel
@@ -173,6 +173,18 @@
             this._launchUrlLabel.TabIndex = 10;
             this._launchUrlLabel.Text = "Launch &URL:";
             // 
+            // _envVars
+            // 
+            this._envVars.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._envVars.Location = new System.Drawing.Point(135, 202);
+            this._envVars.Multiline = true;
+            this._envVars.Name = "_envVars";
+            this._envVars.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this._envVars.Size = new System.Drawing.Size(340, 50);
+            this._envVars.TabIndex = 17;
+            this._envVars.TextChanged += new System.EventHandler(this.Changed);
+            // 
             // _browsePath
             // 
             this._browsePath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -202,37 +214,27 @@
             // _debuggerPortLabel
             // 
             this._debuggerPortLabel.AutoSize = true;
-            this._debuggerPortLabel.Location = new System.Drawing.Point(14, 205);
+            this._debuggerPortLabel.Location = new System.Drawing.Point(14, 179);
             this._debuggerPortLabel.Name = "_debuggerPortLabel";
             this._debuggerPortLabel.Size = new System.Drawing.Size(78, 13);
-            this._debuggerPortLabel.TabIndex = 16;
+            this._debuggerPortLabel.TabIndex = 14;
             this._debuggerPortLabel.Text = "&Debugger port:";
             // 
             // _debuggerPort
             // 
-            this._debuggerPort.Location = new System.Drawing.Point(135, 202);
+            this._debuggerPort.Location = new System.Drawing.Point(135, 176);
             this._debuggerPort.Name = "_debuggerPort";
             this._debuggerPort.Size = new System.Drawing.Size(105, 20);
-            this._debuggerPort.TabIndex = 17;
+            this._debuggerPort.TabIndex = 15;
             this._debuggerPort.TextChanged += new System.EventHandler(this.PortChanged);
-            // 
-            // _envVars
-            // 
-            this._envVars.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._envVars.Location = new System.Drawing.Point(135, 150);
-            this._envVars.Name = "_envVars";
-            this._envVars.Size = new System.Drawing.Size(340, 20);
-            this._envVars.TabIndex = 13;
-            this._envVars.TextChanged += new System.EventHandler(this.Changed);
             // 
             // _envVarsLabel
             // 
             this._envVarsLabel.AutoSize = true;
-            this._envVarsLabel.Location = new System.Drawing.Point(14, 153);
+            this._envVarsLabel.Location = new System.Drawing.Point(14, 205);
             this._envVarsLabel.Name = "_envVarsLabel";
             this._envVarsLabel.Size = new System.Drawing.Size(115, 13);
-            this._envVarsLabel.TabIndex = 12;
+            this._envVarsLabel.TabIndex = 16;
             this._envVarsLabel.Text = "Environment &Variables:";
             // 
             // NodejsGeneralPropertyPageControl

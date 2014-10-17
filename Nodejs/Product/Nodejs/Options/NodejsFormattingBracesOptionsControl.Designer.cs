@@ -76,7 +76,6 @@
             this._newLineForControlBlocks.TabIndex = 1;
             this._newLineForControlBlocks.Text = "Place open brace on new line for &control blocks";
             this._newLineForControlBlocks.UseVisualStyleBackColor = true;
-            this._newLineForControlBlocks.CheckedChanged += new System.EventHandler(this.CheckedChanged);
             // 
             // _newLineAfterFunctions
             // 
@@ -87,7 +86,6 @@
             this._newLineForFunctions.TabIndex = 0;
             this._newLineForFunctions.Text = "Place open brace on new line after &functions";
             this._newLineForFunctions.UseVisualStyleBackColor = true;
-            this._newLineForFunctions.CheckedChanged += new System.EventHandler(this.CheckedChanged);
             // 
             // NodejsFormattingBracesOptionsControl
             // 

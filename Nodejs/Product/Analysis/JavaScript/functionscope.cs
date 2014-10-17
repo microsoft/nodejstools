@@ -20,7 +20,7 @@ using System.Reflection;
 
 namespace Microsoft.NodejsTools.Parsing
 {
-    public sealed class FunctionScope : ActivationObject
+    internal sealed class FunctionScope : ActivationObject
     {
         public FunctionObject FunctionObject { get; private set; }
 

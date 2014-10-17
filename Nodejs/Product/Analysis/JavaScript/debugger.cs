@@ -18,7 +18,7 @@ using System;
 namespace Microsoft.NodejsTools.Parsing
 {
     [Serializable]
-    public sealed class DebuggerNode : Statement
+    internal sealed class DebuggerNode : Statement
     {
 
         public DebuggerNode(EncodedSpan span)

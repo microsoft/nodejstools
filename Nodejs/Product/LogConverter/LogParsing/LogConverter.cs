@@ -24,8 +24,11 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.LogGeneration;
+
+using Microsoft.NodejsTools.SourceMapping;
 using NodeLogConverter;
 using NodeLogConverter.LogParsing;
+
 
 namespace Microsoft.NodejsTools.LogParsing {
     /// <summary>
@@ -62,6 +65,8 @@ namespace Microsoft.NodejsTools.LogParsing {
     /// Finally we zip up the resulting ETL file and save it under the filename requested.
     /// </summary>
     class LogConverter {
+        private static char[] _invalidPathChars = Path.GetInvalidPathChars();
+
         private readonly string _filename;
         private readonly string _outputFile;
         private readonly TimeSpan? _executionTime;
@@ -157,7 +162,7 @@ namespace Microsoft.NodejsTools.LogParsing {
                     processInfo.ProcessId = ProcessId;
                     processInfo.ParentId = 100;
 
-                    log.Trace(header, processInfo, Encoding.ASCII.GetBytes("node.exe"), "");
+                    log.Trace(header, processInfo, Encoding.ASCII.GetBytes("node.exe"), String.Empty);
 
                     //////////////////////////////////////
                     header = NewHeader();
@@ -205,7 +210,7 @@ namespace Microsoft.NodejsTools.LogParsing {
                         dllPath.Substring(0, dllPath.Length - 4) + ".pdb",  // path to PDB,
                         Guid.Empty,
                         0,
-                        ""
+                        String.Empty
                     );
 
                     while ((line = reader.ReadLine()) != null) {
@@ -245,7 +250,7 @@ namespace Microsoft.NodejsTools.LogParsing {
                                 }
 
                                 _codeAddresses[new AddressRange(startAddr, methodLoad.MethodSize)] = IsMyCode(funcInfo);
-                                log.Trace(header, methodLoad, funcInfo.Namespace, functionName, "" /* signature*/);
+                                log.Trace(header, methodLoad, funcInfo.Namespace, functionName, String.Empty /* signature*/);
 
                                 methodToken++;
                                 break;
@@ -316,7 +321,7 @@ namespace Microsoft.NodejsTools.LogParsing {
                     processInfo.ProcessId = ProcessId;
                     processInfo.ParentId = 100;
 
-                    log.Trace(header, processInfo, Encoding.ASCII.GetBytes("node.exe"), "");
+                    log.Trace(header, processInfo, Encoding.ASCII.GetBytes("node.exe"), String.Empty);
                 } finally {
                     log.Stop();
                 }
@@ -351,7 +356,7 @@ namespace Microsoft.NodejsTools.LogParsing {
 
         private static bool IsMyCode(FunctionInformation funcInfo) {
             return !String.IsNullOrWhiteSpace(funcInfo.Filename) &&
-                funcInfo.Filename.IndexOfAny(InvalidPathChars) == -1 &&
+                funcInfo.Filename.IndexOfAny(_invalidPathChars) == -1 &&
                 funcInfo.Filename.IndexOf("\\node_modules\\") == -1 &&
                 Path.IsPathRooted(funcInfo.Filename);
         }
@@ -400,22 +405,6 @@ namespace Microsoft.NodejsTools.LogParsing {
             return record;
         }
 
-        internal class FunctionInformation {
-            public readonly string Namespace;
-            public readonly string Function;
-            public readonly string Filename;
-            public readonly int? LineNumber;
-            public readonly bool IsRecompilation;
-
-            public FunctionInformation(string ns, string methodName, int? lineNo, string filename, bool isRecompilation) {
-                Namespace = ns;
-                Function = methodName;
-                LineNumber = lineNo;
-                Filename = filename;
-                IsRecompilation = isRecompilation;
-            }
-        }
-
         private HashSet<string> _allMethods = new HashSet<string>();
 
         internal FunctionInformation ExtractNamespaceAndMethodName(string method, string type = "LazyCompile") {
@@ -428,7 +417,7 @@ namespace Microsoft.NodejsTools.LogParsing {
 
         internal static FunctionInformation ExtractNamespaceAndMethodName(string method, bool isRecompilation, string type = "LazyCompile", Dictionary<string, SourceMap> sourceMaps = null) {
             string methodName = method;
-            string ns = "";
+            string ns = String.Empty;
             int? lineNo = null;
             string filename = null;
 
@@ -450,7 +439,7 @@ namespace Microsoft.NodejsTools.LogParsing {
                 if (type == "Function") {
                     fileTemp = fileTemp.Substring(fileTemp.IndexOf(' ') + 1);
                 }
-                return MaybeMap(new FunctionInformation(_topLevelModule, GetModuleName(method), 1, GetFileName(fileTemp), isRecompilation), sourceMaps);
+                return SourceMapper.MaybeMap(new FunctionInformation(_topLevelModule, GetModuleName(method), 1, GetFileName(fileTemp), isRecompilation), sourceMaps);
             }
 
             // " net.js:931"
@@ -484,7 +473,7 @@ namespace Microsoft.NodejsTools.LogParsing {
                 }
             }
 
-            return MaybeMap(new FunctionInformation(ns, methodName, lineNo, filename, isRecompilation), sourceMaps);
+            return SourceMapper.MaybeMap(new FunctionInformation(ns, methodName, lineNo, filename, isRecompilation), sourceMaps);
         }
 
         private static int FirstSpace(string method) {
@@ -501,56 +490,7 @@ namespace Microsoft.NodejsTools.LogParsing {
                 }
             }
             return -1;
-        }
-
-        private static char[] InvalidPathChars = Path.GetInvalidPathChars();
-
-        private static FunctionInformation MaybeMap(FunctionInformation funcInfo, Dictionary<string, SourceMap> sourceMaps) {
-            if (funcInfo.Filename != null &&
-                funcInfo.Filename.IndexOfAny(InvalidPathChars) == -1 &&
-                File.Exists(funcInfo.Filename) &&
-                File.Exists(funcInfo.Filename + ".map") && 
-                funcInfo.LineNumber != null) {
-                SourceMap map;
-                if (!sourceMaps.TryGetValue(funcInfo.Filename, out map)) {
-                    try {
-                        map = new SourceMap(new StreamReader(funcInfo.Filename + ".map"));
-                    } catch (InvalidOperationException) {
-                    } catch (FileNotFoundException) {
-                    } catch (DirectoryNotFoundException) {
-                    } catch (IOException) {
-                    }
-
-                    sourceMaps[funcInfo.Filename] = map;
-                }
-
-                SourceMapping mapping;
-                // We explicitly don't convert our 1 based line numbers into 0 based
-                // line numbers here.  V8 is giving us the starting line of the function,
-                // and TypeScript doesn't give the right name for the declaring name.
-                // But TypeScript also happens to always emit a newline after the {
-                // for a function definition, and we're always mapping line numbers from
-                // function definitions, so mapping line + 1 happens to work out for
-                // the time being.
-                if (map != null && map.TryMapLine(funcInfo.LineNumber.Value, out mapping)) {
-                    string filename = mapping.FileName;
-                    if (filename != null && !Path.IsPathRooted(filename)) {
-                        filename = Path.Combine(Path.GetDirectoryName(funcInfo.Filename), filename);
-                    }
-
-                    return new FunctionInformation(
-                        funcInfo.Namespace,
-                        mapping.Name ?? funcInfo.Function,
-                        mapping.Line + 1,
-                        filename ?? funcInfo.Filename,
-                        funcInfo.IsRecompilation
-                    );
-                }
-            }
-            return funcInfo;
-        }
-
-        private static char[] _invalidPathChars = Path.GetInvalidPathChars();
+        }       
 
         private static string GetModuleName(string method) {
             method = StripLine(method);

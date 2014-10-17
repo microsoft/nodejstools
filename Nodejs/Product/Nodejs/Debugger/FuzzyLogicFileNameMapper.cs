@@ -43,13 +43,20 @@ namespace Microsoft.NodejsTools.Debugger {
             ScriptTree curTree = _scripts;
 
             // Walk up the remote path, matching it against known local files.
+            int matchedCount = 0;
             foreach (string component in pathComponents.Reverse()) {
                 ScriptTree nextTree;
                 if (!curTree.Parents.TryGetValue(component, out nextTree)) {
                     // Can't walk up the local tree any further - this means that we're at the point at which local and remote
-                    // filesystems begin to differ, yet we have more than one candidate. The right one is the one that's closest
-                    // to that point (i.e. shortest path).
-                    //
+                    // filesystems begin to differ, yet we have more than one candidate.
+                    
+                    // If we haven't even matched the filename yet, then this is a module that is not a part of the project
+                    // (e.g. a built-in module), so we can't map it at all, and should just return it as is.
+                    if (matchedCount == 0) {
+                        return remoteFileName;
+                    }
+
+                    // Otherwise, the right candidate is the one that's closest to that point (i.e. shortest path).
                     // For example, if remote path is:
                     //      /wwwroot/bbb/ccc.js"
                     // and local files are:
@@ -66,6 +73,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 }
 
                 curTree = nextTree;
+                ++matchedCount;
             }
 
             return remoteFileName;

@@ -22,7 +22,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// Provides operations which can be performed in bulk over a set of 
     /// analysis values, which results in a new analysis set.
     /// </summary>
-    public static class AnalysisSetExtensions {
+    internal static class AnalysisSetExtensions {
         /// <summary>
         /// Performs a GetMember operation for the given name and returns the
         /// types of variables which are associated with that name.
@@ -74,6 +74,22 @@ namespace Microsoft.NodejsTools.Analysis {
                 Debug.Assert(call != null);
 
                 res = res.Union(call);
+            }
+
+            return res;
+        }
+
+        /// <summary>
+        /// Performs a call operation propagating the argument types into any
+        /// user defined functions or classes and returns the set of types which
+        /// result from the call.
+        /// </summary>
+        public static IAnalysisSet Construct(this IAnalysisSet self, Node node, AnalysisUnit unit, IAnalysisSet[] args) {
+            var res = AnalysisSet.Empty;
+            foreach (var ns in self) {
+                var construct = ns.Value.Construct(node, unit, args);
+
+                res = res.Union(construct);
             }
 
             return res;
@@ -144,13 +160,16 @@ namespace Microsoft.NodejsTools.Analysis {
             return res;
         }
 
-        internal static AnalysisProxy GetUnionType(this IAnalysisSet types) {
-            var union = AnalysisSet.CreateUnion(types, UnionComparer.Instances[0]);
-            AnalysisProxy type = null;
-            if (union.Count == 2) {
-                type = union.FirstOrDefault(t => t.Value.GetConstantValue() != null);
+        /// <summary>
+        /// Performs the specified operation on the value.
+        /// </summary>
+        public static IAnalysisSet BinaryOperation(this IAnalysisSet self, BinaryOperator node, AnalysisUnit unit, IAnalysisSet value) {
+            var res = AnalysisSet.Empty;
+            foreach (var ns in self) {
+                res = res.Union(ns.Value.BinaryOperation(node, unit, value));
             }
-            return type ?? union.FirstOrDefault();
+
+            return res;
         }
 
         /// <summary>

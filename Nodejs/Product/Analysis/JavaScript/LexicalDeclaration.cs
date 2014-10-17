@@ -24,7 +24,7 @@ namespace Microsoft.NodejsTools.Parsing
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Justification = "AST statement")]
     [Serializable]
-    public class LexicalDeclaration : Declaration
+    internal class LexicalDeclaration : Declaration
     {
         public JSToken StatementToken { get; set; }
 

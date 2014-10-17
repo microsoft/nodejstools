@@ -18,7 +18,7 @@ using System.Diagnostics;
 namespace Microsoft.NodejsTools.Parsing
 {
     [Serializable]
-    public abstract class Statement : Node
+    internal abstract class Statement : Node
     {
         protected Statement(EncodedSpan location)
             : base(location) {

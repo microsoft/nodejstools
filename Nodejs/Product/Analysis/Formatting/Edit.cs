@@ -14,7 +14,7 @@
 
 namespace Microsoft.NodejsTools.Formatting {
 
-    public sealed class Edit {
+    internal sealed class Edit {
         public readonly int Start, Length;
         public readonly string Text;
 

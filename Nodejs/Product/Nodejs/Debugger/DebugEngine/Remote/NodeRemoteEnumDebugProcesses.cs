@@ -48,7 +48,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
         // trying for as long as user clicks "Retry".
         private static NodeRemoteDebugProcess Connect(NodeRemoteDebugPort port, INetworkClientFactory networkClientFactory) {
             if (port.Uri.Fragment == "#ping=0") {
-                return new NodeRemoteDebugProcess(port, "node.exe", "", "");
+                return new NodeRemoteDebugProcess(port, "node.exe", String.Empty, String.Empty);
             }
 
             NodeRemoteDebugProcess process = null;
@@ -71,7 +71,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
                                 throw new DebuggerAlreadyAttachedException();
                             }
 
-                            process = new NodeRemoteDebugProcess(port, "node.exe", "", "");
+                            process = new NodeRemoteDebugProcess(port, "node.exe", String.Empty, String.Empty);
                             Debug.WriteLine("NodeRemoteEnumDebugProcesses ping successful.");
                             break;
                         } else {

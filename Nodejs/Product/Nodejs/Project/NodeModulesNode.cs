@@ -55,32 +55,23 @@ namespace Microsoft.NodejsTools.Project {
         private readonly LocalModulesNode _devModulesNode;
         private readonly LocalModulesNode _optionalModulesNode;
 
-        private readonly FileSystemWatcher _localWatcher;
-        private readonly FileSystemWatcher _globalWatcher;
-        private Timer _fileSystemWatcherTimer, _npmIdleTimer;
+        private Timer _npmIdleTimer;
         private INpmController _npmController;
         private int _npmCommandsExecuting;
         private bool _suppressCommands;
         private bool _firstHierarchyLoad = true;
 
-        private readonly object _fileBitsLock = new object();
         private readonly object _commandCountLock = new object();
 
         private bool _isDisposed;
 
         #endregion
 
-        #region Initialisation
+        #region Initialization
 
         public NodeModulesNode(NodejsProjectNode root)
             : base(root) {
-            ExcludeNodeFromScc = true;
-
             CreateNpmController();
-
-            _localWatcher = CreateModuleDirectoryWatcherIfDirectoryExists(_projectNode.ProjectHome);
-
-            _globalWatcher = CreateModuleDirectoryWatcherIfDirectoryExists(_npmController.ListBaseDirectory);
 
             _globalModulesNode = new GlobalModulesNode(root, this);
             AddChild(_globalModulesNode);
@@ -92,35 +83,6 @@ namespace Microsoft.NodejsTools.Project {
             AddChild(_optionalModulesNode);
         }
 
-        private FileSystemWatcher CreateModuleDirectoryWatcherIfDirectoryExists(string directory) {
-            if (!Directory.Exists(directory)) {
-                return null;
-            }
-
-            FileSystemWatcher watcher = null;
-            try {
-                watcher = new FileSystemWatcher(directory) {
-                    NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.CreationTime,
-                    IncludeSubdirectories = true
-                };
-
-                watcher.Changed += Watcher_Modified;
-                watcher.Created += Watcher_Modified;
-                watcher.Deleted += Watcher_Modified;
-                watcher.EnableRaisingEvents = true;
-            } catch (IOException) {
-                if (watcher != null) {
-                    watcher.Dispose();
-                }
-            } catch (ArgumentException ex) {
-                if (watcher != null) {
-                    watcher.Dispose();
-                }
-                Debug.WriteLine("Error starting FileSystemWatcher:\r\n{0}", ex);
-            }
-            return watcher;
-        }
-
         private void CheckNotDisposed() {
             if (_isDisposed) {
                 throw new ObjectDisposedException(
@@ -130,26 +92,7 @@ namespace Microsoft.NodejsTools.Project {
 
         protected override void Dispose(bool disposing) {
             if (!_isDisposed) {
-                lock (_fileBitsLock) {
-                    if (_localWatcher != null) {
-                        _localWatcher.Changed -= Watcher_Modified;
-                        _localWatcher.Created -= Watcher_Modified;
-                        _localWatcher.Deleted -= Watcher_Modified;
-                        _localWatcher.Dispose();
-                    }
-
-                    if (_globalWatcher != null) {
-                        _globalWatcher.Changed -= Watcher_Modified;
-                        _globalWatcher.Created -= Watcher_Modified;
-                        _globalWatcher.Deleted -= Watcher_Modified;
-                        _globalWatcher.Dispose();
-                    }
-                }
-
-                if (null != _fileSystemWatcherTimer) {
-                    _fileSystemWatcherTimer.Dispose();
-                    _fileSystemWatcherTimer = null;
-                }
+                _npmController.Dispose();
 
                 if (null != _npmIdleTimer) {
                     _npmIdleTimer.Dispose();
@@ -203,6 +146,12 @@ namespace Microsoft.NodejsTools.Project {
             if (null == _npmController) {
                 _npmController = NpmControllerFactory.Create(
                     _projectNode.ProjectHome,
+                    Path.Combine(
+                        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                        "Microsoft",
+                        "Node.js Tools",
+                        "packagecache.json"
+                    ),
                     false,
                     new NpmPathProvider(this));
                 _npmController.CommandStarted += NpmController_CommandStarted;
@@ -210,7 +159,6 @@ namespace Microsoft.NodejsTools.Project {
                 _npmController.ErrorLogged += NpmController_ErrorLogged;
                 _npmController.ExceptionLogged += NpmController_ExceptionLogged;
                 _npmController.CommandCompleted += NpmController_CommandCompleted;
-                ReloadModules();
             }
             return _npmController;
         }
@@ -435,69 +383,10 @@ namespace Microsoft.NodejsTools.Project {
 
         #region Updating module hierarchy
 
-        private void RestartFileSystemWatcherTimer() {
-            lock (_fileBitsLock) {
-                if (null != _fileSystemWatcherTimer) {
-                    _fileSystemWatcherTimer.Dispose();
-                }
-
-                _fileSystemWatcherTimer = new Timer(o => UpdateModulesFromTimer(), null, 1000, Timeout.Infinite);
-            }
-        }
-
-        private void Watcher_Modified(object sender, FileSystemEventArgs e) {
-            string path = e.FullPath;
-            if (!path.EndsWith(NodejsConstants.PackageJsonFile, StringComparison.OrdinalIgnoreCase) && path.IndexOf("\\node_modules", StringComparison.OrdinalIgnoreCase) == -1) {
-                return;
-            }
-
-            RestartFileSystemWatcherTimer();
-        }
-
         internal void ReloadHierarchySafe() {
             UIThread.InvokeAsync(ReloadHierarchy)
                 .HandleAllExceptions(SR.ProductName)
                 .DoNotWait();
-        }
-
-        private void UpdateModulesFromTimer() {
-            lock (_fileBitsLock) {
-                if (null != _fileSystemWatcherTimer) {
-                    _fileSystemWatcherTimer.Dispose();
-                    _fileSystemWatcherTimer = null;
-                }
-            }
-
-            ReloadModules();
-        }
-
-        private int _refreshRetryCount;
-
-        private void ReloadModules() {
-            var retry = false;
-            Exception ex = null;
-            try {
-                NpmController.Refresh();
-            } catch (PackageJsonException pje) {
-                retry = true;
-                ex = pje;
-            } catch (AggregateException ae) {
-                retry = true;
-                ex = ae;
-            } catch (FileLoadException fle) {
-                //  Fixes bug reported in work item 447 - just wait a bit and retry!
-                retry = true;
-                ex = fle;
-            }
-
-            if (retry) {
-                if (_refreshRetryCount < 5) {
-                    ++_refreshRetryCount;
-                    RestartFileSystemWatcherTimer();
-                } else {
-                    WriteNpmLogToOutputWindow(ErrorHelper.GetExceptionDetailsText(ex));
-                }
-            }
         }
 
         private void ReloadHierarchy() {

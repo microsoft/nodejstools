@@ -17,7 +17,7 @@
 namespace Microsoft.NodejsTools.Parsing 
 {
     
-    public sealed class Missing
+    internal sealed class Missing
     {
       // singleton implementation
       private static readonly Missing s_instance = new Missing();

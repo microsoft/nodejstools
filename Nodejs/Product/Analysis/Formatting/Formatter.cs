@@ -21,7 +21,7 @@ namespace Microsoft.NodejsTools.Formatting {
     /// <summary>
     /// Provides formatting for JavaScript code
     /// </summary>
-    public static class Formatter {
+    internal static class Formatter {
         /// <summary>
         /// Returns a list of edits which should be applied to the specified code.
         /// </summary>

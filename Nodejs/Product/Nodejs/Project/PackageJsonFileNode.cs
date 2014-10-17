@@ -56,30 +56,8 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         internal void AnalyzePackageJson(Intellisense.VsProjectAnalyzer analyzer) {
-            string fileContents = null;
-            for (int i = 0; i < 10; i++) {
-                try {
-                    fileContents = File.ReadAllText(Url);
-                    break;
-                } catch {
-                    Thread.Sleep(100);
-                }
-            }
-
-            if (fileContents != null) {
-                JavaScriptSerializer serializer = new JavaScriptSerializer();
-                Dictionary<string, object> json;
-                try {
-                    json = serializer.Deserialize<Dictionary<string, object>>(fileContents);
-                } catch {
-                    return;
-                }
-                
-                object mainFile;
-                if (json != null && json.TryGetValue("main", out mainFile) && mainFile is string) {
-                    analyzer.AddPackageJson(Url, (string)mainFile);
-                }
-            }
+            analyzer.AddPackageJson(Url);
         }
+
     }
 }

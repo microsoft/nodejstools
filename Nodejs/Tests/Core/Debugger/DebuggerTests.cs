@@ -109,7 +109,7 @@ namespace NodejsTests.Debugger {
         }
 
         private bool ChildrenMatch(ChildInfo curChild, NodeEvaluationResult curReceived) {
-            return curReceived.StringValue == curChild.ChildText && 
+            return curReceived.StringValue == curChild.ChildText &&
                 (curReceived.StringValue == curChild.Repr || curChild.Repr == null);
         }
 
@@ -734,9 +734,7 @@ namespace NodejsTests.Debugger {
                             module = thread.Frames[2].Module;
                             Assert.IsFalse(module.BuiltIn);
                             scriptText = await process.GetScriptTextAsync(module.Id);
-                            StreamReader streamReader = new StreamReader(module.FileName);
-                            var fileText = streamReader.ReadToEnd();
-                            streamReader.Close();
+                            string fileText = File.ReadAllText(module.FileName);                            
                             Assert.IsTrue(scriptText.Contains(fileText));
                         }
                     ),
@@ -1138,8 +1136,7 @@ namespace NodejsTests.Debugger {
             bool exceptionHit = false;
             try {
                 new BreakOn(BreakOnKind.Equal, 0);
-            }
-            catch (ArgumentException e) {
+            } catch (ArgumentException e) {
                 Assert.AreEqual("Invalid BreakOn count", e.Message);
                 exceptionHit = true;
             }
@@ -1147,8 +1144,7 @@ namespace NodejsTests.Debugger {
             exceptionHit = false;
             try {
                 new BreakOn(BreakOnKind.GreaterThanOrEqual, 0);
-            }
-            catch (ArgumentException e) {
+            } catch (ArgumentException e) {
                 Assert.AreEqual("Invalid BreakOn count", e.Message);
                 exceptionHit = true;
             }
@@ -1156,8 +1152,7 @@ namespace NodejsTests.Debugger {
             exceptionHit = false;
             try {
                 new BreakOn(BreakOnKind.Mod, 0);
-            }
-            catch (ArgumentException e) {
+            } catch (ArgumentException e) {
                 Assert.AreEqual("Invalid BreakOn count", e.Message);
                 exceptionHit = true;
             }
@@ -1919,8 +1914,7 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void TypeScript_Break_On_First_Line()
-        {
+        public void TypeScript_Break_On_First_Line() {
             TestDebuggerSteps(
                 "TypeScriptTest3.js",
                 new[] {

@@ -20,7 +20,7 @@ using System.Text;
 namespace Microsoft.NodejsTools.Parsing
 {
     [Serializable]
-    public sealed class Break : Statement
+    internal sealed class Break : Statement
     {
         public int NestLevel { get; set; }
 

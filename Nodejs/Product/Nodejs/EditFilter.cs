@@ -316,7 +316,7 @@ namespace Microsoft.NodejsTools {
             // ensure our library is loaded so find all references will go to our library
             //Package.GetGlobalService(typeof(IPythonLibraryManager));
 
-            if (provider.Expression != "") {
+            if (provider.Expression != String.Empty) {
                 var findSym = (IVsFindSymbol)NodejsPackage.GetGlobalService(typeof(SVsObjectSearch));
                 VSOBSEARCHCRITERIA2 searchCriteria = new VSOBSEARCHCRITERIA2();
                 searchCriteria.eSrchType = VSOBSEARCHTYPE.SO_ENTIREWORD;

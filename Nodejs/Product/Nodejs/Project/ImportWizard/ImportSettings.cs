@@ -263,9 +263,9 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
             writer.WriteElementString("ProjectView", "ShowAllFiles");
 
             if (CommonUtils.IsValidPath(startupFile)) {
-                writer.WriteElementString("StartupFile", Path.GetFileNameWithoutExtension(startupFile) + ".js");
+                writer.WriteElementString("StartupFile", Path.GetFileNameWithoutExtension(startupFile) + NodejsConstants.JavaScriptExtension);
             } else {
-                writer.WriteElementString("StartupFile", "");
+                writer.WriteElementString("StartupFile", String.Empty);
             }
             writer.WriteElementString("WorkingDirectory", ".");
             writer.WriteElementString("OutputPath", ".");
@@ -317,7 +317,7 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
             writer.WriteStartElement("ItemGroup");
             foreach (var file in EnumerateAllFiles(sourcePath, filters, excludeNodeModules)) {
                 var ext = Path.GetExtension(file);
-                if (NodejsConstants.FileExtension.Equals(ext, StringComparison.OrdinalIgnoreCase)) {
+                if (NodejsConstants.JavaScriptExtension.Equals(ext, StringComparison.OrdinalIgnoreCase)) {
                     writer.WriteStartElement("Compile");
                 } else if (NodejsConstants.TypeScriptExtension.Equals(ext, StringComparison.OrdinalIgnoreCase)) {
                     writer.WriteStartElement("TypeScriptCompile");

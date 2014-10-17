@@ -44,9 +44,6 @@ namespace Microsoft.NodejsTools.Intellisense {
         [Import]
         internal IClassifierAggregatorService _classifierAgg = null; // Set via MEF
 
-        readonly Dictionary<ITextView, Tuple<BufferParser, VsProjectAnalyzer>> _hookedCloseEvents =
-            new Dictionary<ITextView, Tuple<BufferParser, VsProjectAnalyzer>>();
-
         public IIntellisenseController TryCreateIntellisenseController(ITextView textView, IList<ITextBuffer> subjectBuffers) {
             IntellisenseController controller;
             if (!textView.Properties.TryGetProperty<IntellisenseController>(typeof(IntellisenseController), out controller)) {
@@ -55,36 +52,22 @@ namespace Microsoft.NodejsTools.Intellisense {
 
             var analyzer = textView.GetAnalyzer();
             if (analyzer != null) {
-                var buffer = subjectBuffers[0];
-
-                foreach (var subjBuf in subjectBuffers) {
-                    controller.PropagateAnalyzer(subjBuf);
-                }
-
-                var entry = analyzer.MonitorTextBuffer(textView, buffer);
-                _hookedCloseEvents[textView] = Tuple.Create(entry.BufferParser, analyzer);
+                analyzer.MonitorTextView(textView, subjectBuffers);
                 textView.Closed += TextView_Closed;
-
-                for (int i = 1; i < subjectBuffers.Count; i++) {
-                    entry.BufferParser.AddBuffer(subjectBuffers[i]);
-                }
-                controller.SetBufferParser(entry.BufferParser);
             }
             return controller;
         }
 
         private void TextView_Closed(object sender, EventArgs e) {
             var textView = sender as ITextView;
-            Tuple<BufferParser, VsProjectAnalyzer> tuple;
-            if (textView == null || !_hookedCloseEvents.TryGetValue(textView, out tuple)) {
+            if (textView == null) {
                 return;
             }
 
             textView.Closed -= TextView_Closed;
-            _hookedCloseEvents.Remove(textView);
-
-            if (tuple.Item1.AttachedViews == 0) {
-                tuple.Item2.StopMonitoringTextBuffer(tuple.Item1, textView);
+            var analyzer = textView.GetAnalyzer();
+            if (analyzer != null) {
+                analyzer.StopMonitoringTextView(textView);
             }
         }
 

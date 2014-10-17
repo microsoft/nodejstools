@@ -32,7 +32,9 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
     [Serializable]
     class DependentKeyValue : DependentData<KeyValueDependencyInfo> {
         private static Dictionary<AnalysisProxy, IAnalysisSet> EmptyDict = new Dictionary<AnalysisProxy, IAnalysisSet>();
+#if FALSE   // Currently unused but could come back
         private IAnalysisSet _allValues;
+#endif
 
         protected override KeyValueDependencyInfo NewDefinition(int version) {
             return new KeyValueDependencyInfo(version);
@@ -67,9 +69,11 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                     dependencies.KeyValues[key] = values;
                 }
 
+#if FALSE   // Currently unused but could come back
                 if (anyAdded) {
                     _allValues = null;
                 }
+#endif
                 if (anyAdded && enqueue) {
                     EnqueueDependents();
                 }
@@ -92,6 +96,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             }
         }
 
+#if FALSE   // Currently unused but could come back
         public IAnalysisSet AllValueTypes {
             get {
                 if (_allValues != null) {
@@ -112,23 +117,27 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 return res;
             }
         }
+#endif
 
-        public IAnalysisSet GetValueType(IAnalysisSet keyTypes) {
+        public IAnalysisSet GetValueType(IAnalysisSet keyTypes, AnalysisUnit accessor, ProjectEntry declaringScope) {
             var res = AnalysisSet.Empty;
             if (_dependencies.Count != 0) {
                 AnalysisProxy ns = keyTypes as AnalysisProxy;
-                foreach (var keyValue in _dependencies.Values) {
+                foreach (var keyValue in _dependencies) {
+                    if (!IsVisible(accessor.ProjectEntry, declaringScope, keyValue.Key)) {
+                        continue;
+                    }
                     IAnalysisSet union;
                     if (ns != null) {
                         // optimize for the case where we're just looking up
                         // a single AnalysisValue object which hasn't been copied into
                         // a set
-                        if (keyValue.KeyValues.TryGetValue(ns, out union)) {
+                        if (keyValue.Value.KeyValues.TryGetValue(ns, out union)) {
                             res = res.Union(union);
                         }
                     } else {
                         foreach (var keyType in keyTypes) {
-                            if (keyValue.KeyValues.TryGetValue(keyType, out union)) {
+                            if (keyValue.Value.KeyValues.TryGetValue(keyType, out union)) {
                                 res = res.Union(union);
                             }
                         }
@@ -136,16 +145,14 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 }
 
                 if (res == null || res.Count == 0) {
-                    // This isn't ideal, but it's the best we can do for now.  The problem is
-                    // that we are potentially returning AllValueTypes much too early.  We could
+                    // This isn't ideal, but it's the best we can do for now.  We could
                     // later receive a key which would satisfy getting this value type.  If that
-                    // happens we will re-analyze the code which is doing this get, but because
-                    // we've already returned AllValueTypes the code has been analyzed with
-                    // more types then it can really receive.  But currently we have no way
-                    // to either remove the types that were previously returned, and we have
-                    // no way to schedule the re-analysis of the code which is doing the get
-                    // after we've completed the analysis.  
-                    return AllValueTypes;
+                    // happens we will re-analyze the code which is doing this get.  But currently 
+                    // we have no way to either remove the types that were previously returned, and 
+                    // we have no way to schedule the re-analysis of the code which is doing the get
+                    // after we've completed the analysis.  So we simply don't return AllValueTypes
+                    // here.
+                    return AnalysisSet.Empty;
                 }
             }
 

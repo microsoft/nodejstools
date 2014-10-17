@@ -15,6 +15,7 @@ namespace Microsoft.NodejsTools.Project {
         protected AbstractNpmNode(NodejsProjectNode root)
             : base(root) {
             _projectNode = root;
+            ExcludeNodeFromScc = true;
         }
 
         public override Guid ItemTypeGuid {
@@ -63,7 +64,7 @@ namespace Microsoft.NodejsTools.Project {
                     continue;
                 }
 
-                if (modules.Any(
+                if (modules != null && modules.Any(
                     module =>
                         module.Name == dep.Package.Name
                         && module.Version == dep.Package.Version
@@ -83,20 +84,23 @@ namespace Microsoft.NodejsTools.Project {
                 ProjectMgr.OnItemDeleted(obsolete);
             }
 
-            foreach (var package in modules) {
-                DependencyNode child;
+            if (modules != null) {
+                foreach (var package in modules) {
+                    DependencyNode child;
 
-                if (recycle.ContainsKey(package.Name)) {
-                    child = recycle[package.Name];
-                    child.Package = package;
-                } else {
-                    child = new DependencyNode(_projectNode, parent as DependencyNode, package);
-                    parent.AddChild(child);
-                }
+                    if (recycle.ContainsKey(package.Name)) {
+                        child = recycle[package.Name];
+                        child.Package = package;
+                    }
+                    else {
+                        child = new DependencyNode(_projectNode, parent as DependencyNode, package);
+                        parent.AddChild(child);
+                    }
 
-                ReloadHierarchy(child, package.Modules);
-                if (ProjectMgr.ParentHierarchy != null) {
-                    child.ExpandItem(EXPANDFLAGS.EXPF_CollapseFolder);
+                    ReloadHierarchy(child, package.Modules);
+                    if (ProjectMgr.ParentHierarchy != null) {
+                        child.ExpandItem(EXPANDFLAGS.EXPF_CollapseFolder);
+                    }
                 }
             }
         }

@@ -26,13 +26,713 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
     /// </summary>
     internal partial class OverviewWalker {
         private static ExpectedLookup ObjectLookup = new ExpectedLookup("Object");
-        private static Dictionary<string, FunctionSpecialization> _specializations = new Dictionary<string, FunctionSpecialization>() { 
-            { "merge", MergeSpecialization() },
-            { "copy", CopySpecialization() },
-            { "create", CreateSpecialization() },
-            { "keys", ObjectKeysSpecialization() },
-            { "setProto", SetProtoSpecialization() },
+        private static Dictionary<string, BaseSpecialization[]> _specializations = new Dictionary<string, BaseSpecialization[]>() { 
+            { "merge", new[] { MergeSpecialization2(), MergeSpecialization() } },
+            { "mergeClone", new[] { MergeCloneSpecialization()  } },
+            { "copy", new[] { CopySpecialization() }},
+            { "clone", new[] { new CloneSpecialization(CloneSpecializationImpl) }},
+            { "create", new[] { CreateSpecialization() }},
+            { "keys", new[] { ObjectKeysSpecialization() }},
+            { "setProto", new[] { SetProtoSpecialization() } },
+            { "extend", new[] { BackboneExtendSpecialization(), UnderscoreExtendSpecialization() } },
+            { "wrapfunction", new[] { WrapFunctionSpecialization() } },
+            { "assign", new[] { AssignSpecialization() } }
         };
+
+        private static IAnalysisSet CloneSpecializationImpl(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            if (args.Length > 0) {
+                return args[0];
+            }
+
+            return AnalysisSet.Empty;            
+        }
+
+        /// <summary>
+        /// var assign = function(object, source, guard) {
+        ///      var index, iterable = object, result = iterable;
+        ///      if (!iterable) return result;
+        ///      var args = arguments,
+        ///          argsIndex = 0,
+        ///          argsLength = typeof guard == 'number' ? 2 : args.length;
+        ///      if (argsLength > 3 && typeof args[argsLength - 2] == 'function') {
+        ///        var callback = baseCreateCallback(args[--argsLength - 1], args[argsLength--], 2);
+        ///      } else if (argsLength > 2 && typeof args[argsLength - 1] == 'function') {
+        ///        callback = args[--argsLength];
+        ///      }
+        ///      while (++argsIndex < argsLength) {
+        ///        iterable = args[argsIndex];
+        ///        if (iterable && objectTypes[typeof iterable]) {
+        ///          var ownIndex = -1,
+        ///              ownProps = objectTypes[typeof iterable] && keys(iterable),
+        ///              length = ownProps ? ownProps.length : 0;
+        ///          
+        ///          while (++ownIndex < length) {
+        ///            index = ownProps[ownIndex];
+        ///            result[index] = callback ? callback(result[index], iterable[index]) : iterable[index];
+        ///          }
+        ///        }
+        ///      }
+        ///      return result
+        ///    };
+        ///
+        /// </summary>
+        private static PatternSpecialization AssignSpecialization() {
+            var object_ = new ExpectedParameter(0);
+            var source = new ExpectedParameter(1);
+            var guard = new ExpectedParameter(2);
+            var index = new ExpectedVariableDeclaration();
+            var iterable = new ExpectedVariableDeclaration(object_);
+            var result = new ExpectedVariableDeclaration(iterable.Variable);
+            var args = new ExpectedVariableDeclaration(new ExpectedLookup("arguments"));
+            var argsIndex = new ExpectedVariableDeclaration(new ExpectedConstant(0.0));
+            var argsLength = new ExpectedVariableDeclaration(AlwaysMatch.Instance);
+            var callback = new ExpectedVariableDeclaration(AlwaysMatch.Instance);
+            var objectTypes = new ExpectedLookup("objectTypes");
+            var ownIndex = new ExpectedVariableDeclaration(new ExpectedUnary(JSToken.Minus, new ExpectedConstant(1.0)));
+            var ownProps = new ExpectedVariableDeclaration(
+                new ExpectedBinary(
+                    JSToken.LogicalAnd,
+                    new ExpectedIndex(
+                        objectTypes,
+                        new ExpectedUnary(JSToken.TypeOf, iterable.Variable)
+                    ),
+                    new ExpectedCall(
+                        new ExpectedLookup("keys"),
+                        iterable.Variable
+                    )
+                )
+            );
+            var length = new ExpectedVariableDeclaration(
+                new ExpectedNode(
+                    typeof(Conditional),
+                    ownProps.Variable,
+                    new ExpectedMember(ownProps.Variable, "length"),
+                    new ExpectedConstant(0.0)
+                )
+            );
+
+            return new PatternSpecialization(
+                ExtendSpecializationImpl,
+                new ExpectedVar(index, iterable, result),
+                new ExpectedNode(
+                    typeof(IfNode),
+                    new ExpectedUnary(
+                        JSToken.LogicalNot,
+                        iterable.Variable
+                    ),
+                    new ExpectedNode(
+                        typeof(Block),
+                        new ExpectedNode(
+                            typeof(ReturnNode),
+                            result.Variable
+                        )
+                    )
+                ),
+                new ExpectedVar(args, argsIndex, argsLength),
+                new ExpectedNode(
+                    typeof(IfNode),
+                    new ExpectedBinary(
+                        JSToken.LogicalAnd,
+                        new ExpectedBinary(
+                            JSToken.GreaterThan,
+                            argsLength.Variable,
+                            new ExpectedConstant(3.0)
+                        ),
+                        new ExpectedBinary(
+                            JSToken.Equal,
+                            AlwaysMatch.Instance,
+                            new ExpectedConstant("function")
+                        )
+                    ),
+                    ExpectedBlock(callback),
+                    ExpectedBlock(
+                        new ExpectedNode(
+                            typeof(IfNode),
+                            new ExpectedBinary(
+                                JSToken.LogicalAnd,
+                                new ExpectedBinary(
+                                    JSToken.GreaterThan,
+                                    argsLength.Variable,
+                                    new ExpectedConstant(2.0)
+                                ),
+                                new ExpectedBinary(
+                                    JSToken.Equal,
+                                    AlwaysMatch.Instance,
+                                    new ExpectedConstant("function")
+                                )
+                            ),
+                            ExpectedBlock(
+                                new ExpectedNode(
+                                    typeof(ExpressionStatement),
+                                    new ExpectedBinary(
+                                        JSToken.Assign,
+                                        callback.Variable,
+                                        AlwaysMatch.Instance
+                                    )
+                                )
+                            )
+                        )
+                    )
+                ),
+                new ExpectedNode(
+                    typeof(WhileNode),
+                    new ExpectedBinary(
+                        JSToken.LessThan,
+                        new ExpectedUnary(
+                            JSToken.Increment,
+                            argsIndex.Variable
+                        ),
+                        argsLength.Variable
+                    ),
+                    ExpectedBlock(
+                        ExpectedExprStmt(
+                            ExpectedAssign(
+                                iterable.Variable, 
+                                new ExpectedIndex(args.Variable, argsIndex.Variable)
+                            )
+                        ),
+                        new ExpectedNode(
+                            typeof(IfNode),
+                            new ExpectedBinary(
+                                JSToken.LogicalAnd,
+                                iterable.Variable,
+                                new ExpectedIndex(
+                                    objectTypes, 
+                                    new ExpectedUnary(JSToken.TypeOf, iterable.Variable)
+                                )
+                            ),
+                            ExpectedBlock(
+                                new ExpectedVar(ownIndex, ownProps, length),
+                                new ExpectedNode(
+                                    typeof(WhileNode),
+                                    new ExpectedBinary(
+                                        JSToken.LessThan,
+                                        new ExpectedUnary(
+                                            JSToken.Increment,
+                                            ownIndex.Variable
+                                        ),
+                                        length.Variable
+                                    ),
+                                    ExpectedBlock(
+                                        ExpectedExprStmt(
+                                            ExpectedAssign(
+                                                index.Variable,
+                                                new ExpectedIndex(
+                                                    ownProps.Variable,
+                                                    ownIndex.Variable
+                                                )
+                                            )
+                                        ),
+                                        ExpectedExprStmt(
+                                            ExpectedAssign(
+                                                new ExpectedIndex(result.Variable, index.Variable),
+                                                new ExpectedNode(
+                                                    typeof(Conditional),
+                                                    callback.Variable,
+                                                    AlwaysMatch.Instance,
+                                                    new ExpectedIndex(iterable.Variable, index.Variable)
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                ),
+                new ExpectedNode(
+                    typeof(ReturnNode),
+                    result.Variable
+                )
+            );
+        }
+
+        private static IAnalysisSet AssignSpecializationImpl(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            return AnalysisSet.Empty;
+        }
+
+        private static ExpectedChild ExpectedAssign(ExpectedChild left, ExpectedChild right) {
+            return new ExpectedBinary(JSToken.Assign, left, right);
+        }
+
+
+        private static ExpectedChild ExpectedExprStmt(ExpectedChild expression) {
+            return new ExpectedNode(typeof(ExpressionStatement), expression);
+        }
+
+        private static ExpectedChild ExpectedBlock(params ExpectedChild[] expressions) {
+            return new ExpectedNode(typeof(Block), expressions);
+        }
+
+        /// <summary>
+        /// function wrapfunction(fn, message) {
+        ///  if (typeof fn !== 'function') {
+        ///    throw new TypeError('argument fn must be a function')
+        ///  }
+        ///
+        ///  var args = createArgumentsString(fn.length)
+        ///  var deprecate = this
+        ///  var stack = getStack()
+        ///  var site = callSiteLocation(stack[1])
+        ///
+        ///  site.name = fn.name
+        ///
+        ///  var deprecatedfn = eval('(function (' + args + ') {\n'
+        ///    + '"use strict"\n'
+        ///    + 'log.call(deprecate, message, site)\n'
+        ///    + 'return fn.apply(this, arguments)\n'
+        ///    + '})')
+        ///
+        ///  return deprecatedfn
+        ///}
+        /// </summary>
+        /// <returns></returns>
+        private static PatternSpecialization WrapFunctionSpecialization() {
+            var fn = new ExpectedParameter(0);
+            var message = new ExpectedParameter(1);
+            var args = new ExpectedVariableDeclaration(
+                new ExpectedCall(
+                    new ExpectedLookup("createArgumentsString"),
+                    new ExpectedMember(fn, "length")
+                )
+            );
+            var deprecate = new ExpectedVariableDeclaration(
+                new ExpectedNode(typeof(ThisLiteral))
+            );
+            var stack = new ExpectedVariableDeclaration(new ExpectedCall(new ExpectedLookup("getStack")));
+            var site = new ExpectedVariableDeclaration(
+                new ExpectedCall(
+                    new ExpectedLookup("callSiteLocation"),
+                    new ExpectedIndex(
+                        stack.Variable,
+                        new ExpectedConstant(1.0)
+                    )
+                )
+            );
+            var deprecatedfn = new ExpectedVariableDeclaration(
+                new ExpectedCall(
+                    new ExpectedLookup("eval"),
+                    AlwaysMatch.Instance
+                )
+            );
+
+            return new PatternSpecialization(
+                WrapFunctionSpecializationImpl,
+                new ExpectedNode(
+                    typeof(IfNode),
+                    new ExpectedBinary(
+                        JSToken.StrictNotEqual,
+                        new ExpectedUnary(
+                            JSToken.TypeOf,
+                            fn
+                        ),
+                        new ExpectedConstant("function")
+                    ),
+                    AlwaysMatch.Instance
+                ),
+                args,
+                deprecate,
+                stack,
+                site,
+                new ExpectedNode(
+                    typeof(ExpressionStatement),
+                    new ExpectedBinary(
+                        JSToken.Assign,
+                        new ExpectedMember(site.Variable, "name"),
+                        new ExpectedMember(fn, "name")
+                    )
+                ),
+                deprecatedfn,
+                new ExpectedNode(
+                    typeof(ReturnNode),
+                    deprecatedfn.Variable
+                )
+            );
+        }
+
+        private static IAnalysisSet WrapFunctionSpecializationImpl(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            // just return the original unwrapped function for intellisense purposes...
+            if (args.Length >= 1) {
+                return args[0];
+            }
+            return AnalysisSet.Empty;
+        }
+
+
+        /// <summary>
+        /// function extend(protoProps, staticProps) {
+        ///   var parent = this;
+        ///   var child;
+        ///   
+        ///   if (protoProps && _.has(protoProps, 'constructor')) {
+        ///     child = protoProps.constructor;
+        ///   } else {
+        ///     child = function(){ return parent.apply(this, arguments); };
+        ///   }
+        ///
+        ///   _.extend(child, parent, staticProps);
+        ///   
+        ///   var Surrogate = function(){ this.constructor = child; };
+        ///   Surrogate.prototype = parent.prototype;
+        ///   child.prototype = new Surrogate;
+        ///
+        ///   if (protoProps) _.extend(child.prototype, protoProps);
+        ///
+        ///   child.__super__ = parent.prototype;
+        ///
+        ///   return child;
+        /// };
+        /// </summary>
+        /// <returns></returns>
+        private static PatternSpecialization BackboneExtendSpecialization() {
+            var protoProps = new ExpectedParameter(0);
+            var staticProps = new ExpectedParameter(1);
+            var parentVar = new ExpectedVariableDeclaration(new ExpectedNode(typeof(ThisLiteral)));
+            var childVar = new ExpectedVariableDeclaration();
+            var underscore = new ExpectedLookup("_");
+            var thisNode = new ExpectedNode(typeof(ThisLiteral));
+            var surrogate = new ExpectedVariableDeclaration(
+                new ExpectedFunctionExpr(
+                    new ExpectedNode(
+                        typeof(Block),
+                        new ExpectedNode(
+                            typeof(ExpressionStatement),
+                            new ExpectedBinary(
+                                JSToken.Assign,
+                                new ExpectedMember(
+                                    thisNode,
+                                    "constructor"
+                                ),
+                                childVar.Variable
+                            )
+                        )
+                    )
+                )
+            );
+
+            return new PatternSpecialization(
+                BackboneExtendSpecializationImpl,
+                false,
+                parentVar,
+                childVar,
+                new ExpectedNode(
+                    typeof(IfNode),
+                    new ExpectedBinary(
+                        JSToken.LogicalAnd,
+                        protoProps,
+                        new ExpectedCall(
+                            new ExpectedMember(underscore, "has"),
+                            protoProps,
+                            new ExpectedConstant("constructor")
+                        )
+                    ),
+                    new ExpectedNode(
+                        typeof(Block),
+                        new ExpectedNode(
+                            typeof(ExpressionStatement),
+                            new ExpectedBinary(
+                                JSToken.Assign,
+                                childVar.Variable,
+                                new ExpectedMember(
+                                    protoProps,
+                                    "constructor"
+                                )
+                            )
+                        )
+                    ),
+                    new ExpectedNode(
+                        typeof(Block),
+                        new ExpectedNode(
+                            typeof(ExpressionStatement),
+                            new ExpectedBinary(
+                                JSToken.Assign,
+                                childVar.Variable,
+                                new ExpectedFunctionExpr(
+                                    new ExpectedNode(
+                                        typeof(Block),
+                                        new ExpectedNode(
+                                            typeof(ReturnNode),
+                                            new ExpectedCall(
+                                                new ExpectedMember(parentVar.Variable, "apply"),
+                                                thisNode,
+                                                new ExpectedLookup("arguments")
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                ),
+                new ExpectedNode(
+                    typeof(ExpressionStatement),
+                    new ExpectedCall(
+                        new ExpectedMember(underscore, "extend"),
+                        childVar.Variable,
+                        parentVar.Variable,
+                        staticProps
+                    )
+                ),
+                surrogate,
+                new ExpectedNode(
+                    typeof(ExpressionStatement),
+                    new ExpectedBinary(
+                        JSToken.Assign,
+                        new ExpectedMember(surrogate.Variable, "prototype"),
+                        new ExpectedMember(parentVar.Variable, "prototype")
+                    )
+                ),
+                new ExpectedNode(
+                    typeof(ExpressionStatement),
+                    new ExpectedBinary(
+                        JSToken.Assign,
+                        new ExpectedMember(childVar.Variable, "prototype"),
+                        new ExpectedNew(surrogate.Variable)
+                    )
+                ),
+                new ExpectedNode(
+                    typeof(IfNode),
+                    protoProps,
+                    new ExpectedNode(
+                        typeof(Block),
+                        new ExpectedNode(
+                            typeof(ExpressionStatement),
+                            new ExpectedCall(
+                                new ExpectedMember(underscore, "extend"),
+                                new ExpectedMember(childVar.Variable, "prototype"),
+                                protoProps
+                            )
+                        )
+                    )
+                ),
+                new ExpectedNode(
+                    typeof(ExpressionStatement),
+                    new ExpectedBinary(
+                        JSToken.Assign,
+                        new ExpectedMember(childVar.Variable, "__super__"),
+                        new ExpectedMember(parentVar.Variable, "prototype")
+                    )
+                ),
+                new ExpectedNode(
+                    typeof(ReturnNode),
+                    childVar.Variable
+                )
+            );
+        }
+
+        internal class BackboneExtendFunctionValue : FunctionValue {
+            internal readonly PrototypeValue _prototype;
+
+            public BackboneExtendFunctionValue(ProjectEntry declaringEntry) :
+                base(declaringEntry) {
+                _prototype = (PrototypeValue)Descriptors["prototype"].Values.TypesNoCopy.First().Value;
+            }
+        }
+
+        private static IAnalysisSet BackboneExtendSpecializationImpl(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            IAnalysisSet res = AnalysisSet.Empty;
+            BackboneExtendFunctionValue value;
+            if (!unit._env.GlobalEnvironment.TryGetNodeValue(NodeEnvironmentKind.ExtendCall, node, out res)) {
+                value = new BackboneExtendFunctionValue(
+                    unit.ProjectEntry
+                );
+                res = value.SelfSet;
+                unit._env.GlobalEnvironment.AddNodeValue(
+                    NodeEnvironmentKind.ExtendCall, 
+                    node, 
+                    value.SelfSet
+                );
+            } else {
+                value = (BackboneExtendFunctionValue)res.First().Value;
+            }
+
+            if (@this != null) {
+                value._instance.SetMember(
+                    node,
+                    unit,
+                    "__proto__",
+                    @this.Construct(node, unit, args)
+                );
+            }
+
+            if (args.Length > 0) {
+                if (args[0].Count < unit.Analyzer.Limits.MaxMergeTypes) {
+                    foreach (var protoProps in args[0]) {
+                        ExpandoValue expandoProto = protoProps.Value as ExpandoValue;
+                        if (expandoProto != null) {
+                            value._prototype.AddLinkedValue(unit, expandoProto);
+                        }
+                    }
+                }
+            }
+
+            if (args.Length > 1) {
+                if (args[1].Count < unit.Analyzer.Limits.MaxMergeTypes) {
+                    foreach (var protoProps in args[1]) {
+                        ExpandoValue expandoProto = protoProps.Value as ExpandoValue;
+                        if (expandoProto != null) {
+                            value.AddLinkedValue(unit, expandoProto);
+                        }
+                    }
+                }
+            }
+
+            return res;
+        }
+
+        /// <summary>
+        /// function(obj) {
+        ///    if (!_.isObject(obj)) return obj;
+        ///    var source, prop;
+        ///    for (var i = 1, length = arguments.length; i < length; i++) {
+        ///      source = arguments[i];
+        ///      for (prop in source) {
+        ///        if (hasOwnProperty.call(source, prop)) {
+        ///            obj[prop] = source[prop];
+        ///        }
+        ///      }
+        ///    }
+        ///    return obj;
+        ///  };
+        ///
+        /// </summary>
+        /// <returns></returns>
+        private static PatternSpecialization UnderscoreExtendSpecialization() {
+            var objParam = new ExpectedParameter(0);
+            var sourceVar = new ExpectedVariableDeclaration();
+            var propVar = new ExpectedVariableDeclaration();
+            var iVar = new ExpectedVariableDeclaration(new ExpectedConstant(1.0));
+            var arguments = new ExpectedLookup("arguments");
+            var lengthVar = new ExpectedVariableDeclaration(new ExpectedMember(arguments, "length"));
+            var retNode = new ExpectedNode(typeof(ReturnNode), objParam);
+
+            return new PatternSpecialization(
+                ExtendSpecializationImpl,
+                false,
+                new ExpectedNode(
+                    typeof(IfNode),
+                    new ExpectedUnary(
+                        JSToken.LogicalNot,
+                        new ExpectedCall(
+                            new ExpectedMember(
+                                new ExpectedLookup("_"),
+                                "isObject"
+                            ),
+                            objParam
+                        )
+                    ),
+                    new ExpectedNode(
+                        typeof(Block),
+                        retNode
+                    )
+                ),
+                new ExpectedVar(
+                    sourceVar,
+                    propVar
+                ),
+                new ExpectedNode(
+                    typeof(ForNode),
+                    new ExpectedVar(
+                        iVar,
+                        lengthVar
+                    ),
+                    new ExpectedBinary(
+                        JSToken.LessThan,
+                        iVar.Variable,
+                        lengthVar.Variable
+                    ),
+                    new ExpectedUnary(
+                        JSToken.Increment,
+                        iVar.Variable
+                    ),
+                    new ExpectedNode(
+                        typeof(Block),
+                        new ExpectedNode(
+                            typeof(ExpressionStatement),
+                            new ExpectedBinary(
+                                JSToken.Assign,
+                                sourceVar.Variable,
+                                new ExpectedIndex(
+                                    arguments,
+                                    iVar.Variable
+                                )
+                            )
+                        ),
+                        new ExpectedNode(
+                            typeof(ForIn),
+                            new ExpectedNode(
+                                typeof(ExpressionStatement),
+                                propVar.Variable
+                            ),
+                            sourceVar.Variable,
+                            new ExpectedNode(
+                                typeof(Block),
+                                new ExpectedNode(
+                                    typeof(IfNode),
+                                    new ExpectedCall(
+                                        new ExpectedMember(
+                                            new ExpectedLookup("hasOwnProperty"),
+                                            "call"
+                                        ),
+                                        sourceVar.Variable,
+                                        propVar.Variable
+                                    ),
+                                    new ExpectedNode(
+                                        typeof(Block),
+                                        new ExpectedNode(
+                                            typeof(ExpressionStatement),
+                                            new ExpectedBinary(
+                                                JSToken.Assign,
+                                                new ExpectedIndex(
+                                                    objParam,
+                                                    propVar.Variable
+                                                ),
+                                                new ExpectedIndex(
+                                                    sourceVar.Variable,
+                                                    propVar.Variable
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                ),
+                retNode
+            );
+        }
+
+        private static IAnalysisSet ExtendSpecializationImpl(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            if (args.Length >= 1) {
+                var obj = args[0];
+                if (args.Length >= 2) {
+                    foreach (var targetValue in obj) {
+                        var target = targetValue.Value as ExpandoValue;
+                        if (target == null || target is BuiltinObjectPrototypeValue) {
+                            continue;
+                        }
+
+                        for (int i = 1; i < args.Length; i++) {
+                            var curArg = args[i];
+
+                            if (curArg.Count < unit.Analyzer.Limits.MaxMergeTypes) {
+                                foreach (var sourceValue in curArg) {
+                                    var source = sourceValue.Value as ExpandoValue;
+                                    if (source == null) {
+                                        continue;
+                                    }
+
+                                    target.AddLinkedValue(unit, source);
+                                }
+                            }
+                        }
+                    }
+                }
+                return obj;
+            }
+            return AnalysisSet.Empty;
+        }
 
         /// <summary>
         /// function setProto(obj, proto) {
@@ -45,7 +745,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         /// This specialization exists to avoid type merging when calling this function
         /// which results in an explosion of analysis.
         /// </summary>
-        private static FunctionSpecialization SetProtoSpecialization() {
+        private static PatternSpecialization SetProtoSpecialization() {
             var objParam = new ExpectedParameter(0);
             var protoParam = new ExpectedParameter(1);
             var objectSetPrototypeOf = new ExpectedMember(
@@ -54,7 +754,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 );
 
 
-            return new FunctionSpecialization(
+            return new PatternSpecialization(
                 SetProtoSpecializationImpl,
                 false,
                 new ExpectedNode(
@@ -110,14 +810,14 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         ///   return a
         /// }        
         /// </summary>
-        private static FunctionSpecialization ObjectKeysSpecialization() {
+        private static PatternSpecialization ObjectKeysSpecialization() {
             var oParam = new ExpectedParameter(0);
             var aVar = new ExpectedVariableDeclaration(ExpectedArrayLiteral.Empty);
 
             var iVar = new ExpectedVariableDeclaration(null);
 
 
-            return new FunctionSpecialization(
+            return new PatternSpecialization(
                 ObjectKeysSpecializationImpl,
                 false,
                 aVar,                
@@ -172,11 +872,11 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         ///    F.prototype = o;
         ///    return new F();
         ///}
-        private static FunctionSpecialization CreateSpecialization() {
+        private static PatternSpecialization CreateSpecialization() {
             var oParam = new ExpectedParameter(0);
             var fLookup = new ExpectedFlexibleLookup();
 
-            return new FunctionSpecialization(
+            return new PatternSpecialization(
                 CreateSpecializationImpl,
                 false,
                 new ExpectedNode(
@@ -216,12 +916,12 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         ///  })
         ///  return o
         ///}
-        private static FunctionSpecialization CopySpecialization() {
+        private static PatternSpecialization CopySpecialization() {
             var objParam = new ExpectedParameter(0);
             var iParam = new ExpectedParameter(0);
             var oVar = new ExpectedVariableDeclaration(ExpectedObjectLiteral.Empty);
 
-            return new FunctionSpecialization(
+            return new PatternSpecialization(
                 CopySpecializationImpl,
                 false,
                 oVar,
@@ -288,11 +988,11 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         ///     return a;
         /// }
         /// </summary>
-        private static FunctionSpecialization MergeSpecialization() {
+        private static PatternSpecialization MergeSpecialization() {
             var targetParam = new ExpectedParameter(0);
             var sourceParam = new ExpectedParameter(1);
             var keyVar = new ExpectedVariableDeclaration();
-            return new FunctionSpecialization(
+            return new PatternSpecialization(
                 MergeSpecializationImpl,
                 false,
                 new ExpectedNode(
@@ -338,6 +1038,234 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             );
         }
 
+        /// <summary>
+        /// Matches:
+        /// 
+        /// function merge (to, from) {
+        ///  var keys = Object.keys(from)
+        ///    , i = keys.length
+        ///    , key
+        ///
+        ///  while (i--) {
+        ///    key = keys[i];
+        ///    if ('undefined' === typeof to[key]) {
+        ///      to[key] = from[key];
+        ///    } else {
+        ///      if (exports.isObject(from[key])) {
+        ///        merge(to[key], from[key]);
+        ///      } else {
+        ///        to[key] = from[key];
+        ///      }
+        ///    }
+        ///  }
+        ///}
+        /// </summary>
+        private static PatternSpecialization MergeSpecialization2() {
+            var toParam = new ExpectedParameter(0);
+            var fromParam = new ExpectedParameter(1);
+            var keysVar = new ExpectedVariableDeclaration(
+                new ExpectedCall(
+                    new ExpectedMember(new ExpectedLookup("Object"), "keys"),
+                    fromParam
+                )
+            );
+            var iVar = new ExpectedVariableDeclaration(
+                new ExpectedMember(keysVar.Variable, "length")
+            );
+            var keyVar = new ExpectedVariableDeclaration();
+
+            var copyProp = ExpectedExprStmt(
+                    ExpectedAssign(
+                        new ExpectedIndex(
+                            toParam,
+                            keyVar.Variable
+                        ),
+                        new ExpectedIndex(
+                            fromParam,
+                            keyVar.Variable
+                        )
+                    )
+                );
+
+            return new PatternSpecialization(
+                MergeSpecializationImpl,
+                false,
+                new ExpectedVar(keysVar, iVar, keyVar),
+                new ExpectedNode(
+                    typeof(WhileNode),
+                    new ExpectedUnary(JSToken.Decrement, iVar.Variable),
+                    ExpectedBlock(
+                        ExpectedExprStmt(
+                            ExpectedAssign(
+                                keyVar.Variable,
+                                new ExpectedIndex(keysVar.Variable, iVar.Variable)
+                            )
+                        ),
+
+                        new ExpectedNode(
+                            typeof(IfNode),
+                            new ExpectedBinary(
+                                JSToken.StrictEqual,
+                                new ExpectedConstant("undefined"),
+                                new ExpectedUnary(
+                                    JSToken.TypeOf,
+                                    new ExpectedIndex(toParam, keyVar.Variable)
+                                )
+                            ),
+                            ExpectedBlock(copyProp),
+                            ExpectedBlock(
+                                new ExpectedNode(
+                                    typeof(IfNode),
+                                    new ExpectedCall(
+                                        new ExpectedMember(
+                                            AlwaysMatch.Instance,
+                                            "isObject"
+                                        ),
+                                        new ExpectedIndex(
+                                            fromParam,
+                                            keyVar.Variable
+                                        )
+                                    ),
+                                    ExpectedBlock(
+                                        ExpectedExprStmt(
+                                            new ExpectedCall(
+                                                new ExpectedLookup("merge"),
+                                                new ExpectedIndex(
+                                                    toParam,
+                                                    keyVar.Variable
+                                                ),
+                                                new ExpectedIndex(
+                                                    fromParam,
+                                                    keyVar.Variable
+                                                )
+                                            )                
+                                        )
+                                    ),
+                                    ExpectedBlock(copyProp)
+                                )
+                            )
+                        )
+                    )
+                )
+            );
+        }
+
+        /// <summary>
+        /// Matches:
+        /// 
+        /// function merge (to, from) {
+        ///  var keys = Object.keys(from)
+        ///    , i = keys.length
+        ///    , key
+        ///
+        ///  while (i--) {
+        ///    key = keys[i];
+        ///    if ('undefined' === typeof to[key]) {
+        ///      to[key] = clone(from[key], {retainKeyOrder:1});
+        ///    } else {
+        ///      if (exports.isObject(from[key])) {
+        ///        mergeClone(to[key], from[key]);
+        ///      } else {
+        ///        to[key] = clone(from[key], {retainKeyOrder: 1});
+        ///      }
+        ///    }
+        ///  }
+        ///}
+        /// </summary>
+        private static PatternSpecialization MergeCloneSpecialization() {
+            var toParam = new ExpectedParameter(0);
+            var fromParam = new ExpectedParameter(1);
+            var keysVar = new ExpectedVariableDeclaration(
+                new ExpectedCall(
+                    new ExpectedMember(new ExpectedLookup("Object"), "keys"),
+                    fromParam
+                )
+            );
+            var iVar = new ExpectedVariableDeclaration(
+                new ExpectedMember(keysVar.Variable, "length")
+            );
+            var keyVar = new ExpectedVariableDeclaration();
+
+            var copyProp = ExpectedExprStmt(
+                    ExpectedAssign(
+                        new ExpectedIndex(
+                            toParam,
+                            keyVar.Variable
+                        ),
+                        new ExpectedCall(
+                            new ExpectedLookup("clone"),
+                            new ExpectedIndex(
+                                fromParam,
+                                keyVar.Variable
+                            ),
+                            AlwaysMatch.Instance
+                        )
+                    )
+                );
+
+            return new PatternSpecialization(
+                MergeSpecializationImpl,
+                false,
+                new ExpectedVar(keysVar, iVar, keyVar),
+                new ExpectedNode(
+                    typeof(WhileNode),
+                    new ExpectedUnary(JSToken.Decrement, iVar.Variable),
+                    ExpectedBlock(
+                        ExpectedExprStmt(
+                            ExpectedAssign(
+                                keyVar.Variable,
+                                new ExpectedIndex(keysVar.Variable, iVar.Variable)
+                            )
+                        ),
+
+                        new ExpectedNode(
+                            typeof(IfNode),
+                            new ExpectedBinary(
+                                JSToken.StrictEqual,
+                                new ExpectedConstant("undefined"),
+                                new ExpectedUnary(
+                                    JSToken.TypeOf,
+                                    new ExpectedIndex(toParam, keyVar.Variable)
+                                )
+                            ),
+                            ExpectedBlock(copyProp),
+                            ExpectedBlock(
+                                new ExpectedNode(
+                                    typeof(IfNode),
+                                    new ExpectedCall(
+                                        new ExpectedMember(
+                                            AlwaysMatch.Instance,
+                                            "isObject"
+                                        ),
+                                        new ExpectedIndex(
+                                            fromParam,
+                                            keyVar.Variable
+                                        )
+                                    ),
+                                    ExpectedBlock(
+                                        ExpectedExprStmt(
+                                            new ExpectedCall(
+                                                new ExpectedLookup("mergeClone"),
+                                                new ExpectedIndex(
+                                                    toParam,
+                                                    keyVar.Variable
+                                                ),
+                                                new ExpectedIndex(
+                                                    fromParam,
+                                                    keyVar.Variable
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    ExpectedBlock(copyProp)
+                                )
+                            )
+                        )
+                    )
+                )
+            );
+        }
+
         private static IAnalysisSet MergeSpecializationImpl(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             if (args.Length >= 2) {
                 foreach (var targetValue in args[0]) {
@@ -345,13 +1273,15 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                     if (target == null) {
                         continue;
                     }
-                    foreach (var sourceValue in args[1]) {
-                        var source = sourceValue.Value as ExpandoValue;
-                        if (source == null) {
-                            continue;
-                        }
+                    if (args[1].Count < unit.Analyzer.Limits.MaxMergeTypes) {
+                        foreach (var sourceValue in args[1]) {
+                            var source = sourceValue.Value as ExpandoValue;
+                            if (source == null) {
+                                continue;
+                            }
 
-                        target.AddLinkedValue(source);
+                            target.AddLinkedValue(unit, source);
+                        }
                     }
                 }
 
@@ -400,22 +1330,81 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             }
         }
 
-        class FunctionSpecialization {
-            public readonly ExpectedChild Body;
+        abstract class BaseSpecialization {
             public readonly CallDelegate Specialization;
             public readonly bool CallBase;
 
-            public FunctionSpecialization(CallDelegate specialization, params ExpectedChild[] children)
+            public BaseSpecialization(CallDelegate specialization) {
+                Specialization = specialization;
+                CallBase = true;
+            }
+
+            public BaseSpecialization(CallDelegate specialization, bool callBase) {
+                Specialization = specialization;
+                CallBase = callBase;
+            }
+
+            public abstract bool IsMatch(FunctionObject node);
+        }
+
+        class PatternSpecialization : BaseSpecialization {
+            public readonly ExpectedChild Body;
+
+            public PatternSpecialization(CallDelegate specialization, params ExpectedChild[] children)
                 : this(specialization, true, children) {
             }
 
-            public FunctionSpecialization(CallDelegate specialization, bool callBase, params ExpectedChild[] children) {
-                Specialization = specialization;
-                CallBase = callBase;
+            public PatternSpecialization(CallDelegate specialization, bool callBase, params ExpectedChild[] children)
+                : base(specialization, callBase) {
                 Body = new ExpectedNode(
                     typeof(Block),
                     children
                 );
+            }
+
+            public override bool IsMatch(FunctionObject node) {
+                MatchState state = new MatchState(node);
+
+                return Body.IsMatch(state, node.Body);
+            }
+        }
+        
+        /// <summary>
+        /// Identifies methods which are likely to clone their inputs.  These are
+        /// methods named clone that return their first parameter.
+        /// </summary>
+        class CloneSpecialization : BaseSpecialization {
+            public CloneSpecialization(CallDelegate specialization)
+                : base(specialization, false) {
+            }
+
+            class CloneVisitor : AstVisitor {
+                private JSVariableField _clonedVar;
+                public bool ReturnsClonedVar;
+
+                public CloneVisitor(JSVariableField variable) {
+                    _clonedVar = variable;
+                }
+
+                public override bool Walk(ReturnNode node) {
+                    if (node.Operand is Lookup &&
+                        ((Lookup)node.Operand).VariableField == _clonedVar) {
+                        ReturnsClonedVar = true;
+                        return false;
+                    }
+
+                    return base.Walk(node);
+                }
+            }
+
+            public override bool IsMatch(FunctionObject node) {
+                if (node.ParameterDeclarations != null &&
+                    node.ParameterDeclarations.Length >= 1) {
+                    var visitor = new CloneVisitor(node.ParameterDeclarations[0].VariableField);
+                    node.Walk(visitor);
+                    return visitor.ReturnsClonedVar;
+                }
+                return false;
             }
         }
 
@@ -428,6 +1417,41 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                     // lack of matches...
                     return false;
                 }
+            }
+        }
+
+        class ExpectedVar : ExpectedChild {
+            private readonly ExpectedVariableDeclaration[] _decls;
+
+            public ExpectedVar(params ExpectedVariableDeclaration[] decls) {
+                _decls = decls;
+            }
+
+            public override bool IsMatch(MatchState state, Node node) {
+                if (node.GetType() != typeof(Var)) {
+                    return NoMatch;
+                }
+
+                Var var = (Var)node;
+                if (var.Count != _decls.Length) {
+                    return NoMatch;
+                }
+
+                for (int i = 0; i < _decls.Length; i++) {
+                    var decl = _decls[i];
+
+                    if (var[i].Initializer != null) {
+                        if (decl.Initializer == null ||
+                            !decl.Initializer.IsMatch(state, var[i].Initializer)) {
+                            return NoMatch;
+                        }
+                    } else if (decl.Initializer != null) {
+                        return NoMatch;
+                    }
+                    state[decl] = var[i].VariableField;
+                }
+
+                return true;
             }
         }
 
@@ -586,6 +1610,14 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             }
         }
 
+        class AlwaysMatch : ExpectedChild {
+            public static AlwaysMatch Instance = new AlwaysMatch();
+
+            public override bool IsMatch(MatchState state, Node node) {
+                return true;
+            }
+        }
+
         class ExpectedBinary : ExpectedChild {
             public readonly JSToken Token;
             public readonly ExpectedChild Left, Right;
@@ -681,7 +1713,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         class ExpectedConstant : ExpectedChild {
             public readonly object Value;
 
-            public ExpectedConstant(string value) {
+            public ExpectedConstant(object value) {
                 Value = value;
             }
 

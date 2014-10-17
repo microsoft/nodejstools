@@ -19,7 +19,7 @@ namespace Microsoft.NodejsTools.Parsing {
     /// <summary>
     /// Represents a JavaScript token with a span.
     /// </summary>
-    public class TokenWithSpan {
+    internal class TokenWithSpan {
         private readonly int _start, _end;
         private readonly JSToken _token;
         private readonly LocationResolver _indexResolver;

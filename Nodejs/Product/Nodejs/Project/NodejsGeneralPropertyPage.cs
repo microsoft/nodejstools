@@ -58,7 +58,7 @@ namespace Microsoft.NodejsTools.Project {
             Project.SetProjectProperty(CommonConstants.WorkingDirectory, _control.WorkingDirectory);
             Project.SetProjectProperty(NodejsConstants.LaunchUrl, _control.LaunchUrl);
             Project.SetProjectProperty(NodejsConstants.DebuggerPort, _control.DebuggerPort);
-            Project.SetProjectProperty(NodejsConstants.EnvironmentVariables, _control.EnvironmentVariables);
+            Project.SetProjectProperty(NodejsConstants.Environment, _control.Environment);
             IsDirty = false;
         }
 
@@ -72,7 +72,7 @@ namespace Microsoft.NodejsTools.Project {
                 _control.LaunchUrl = Project.GetProjectProperty(NodejsConstants.LaunchUrl);
                 _control.NodejsPort = Project.GetProjectProperty(NodejsConstants.NodejsPort);
                 _control.DebuggerPort = Project.GetProjectProperty(NodejsConstants.DebuggerPort);
-                _control.EnvironmentVariables = Project.GetProjectProperty(NodejsConstants.EnvironmentVariables);
+                _control.Environment = Project.GetProjectProperty(NodejsConstants.Environment);
                 bool startWebBrowser;
                 if (!Boolean.TryParse(Project.GetProjectProperty(NodejsConstants.StartWebBrowser), out startWebBrowser)) {
                     startWebBrowser = true;

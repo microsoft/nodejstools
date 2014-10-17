@@ -252,11 +252,12 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var projectNode = solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder");
                 AutomationWrapper.Select(projectNode);
 
-                var dialog = AddExistingFolder(app);
-                Assert.AreEqual(dialog.Address.ToLower(), Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder").ToLower());
+                using (var dialog = SelectFolderDialog.AddExistingFolder(app)) {
+                    Assert.AreEqual(dialog.Address.ToLower(), Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder").ToLower());
 
-                dialog.FolderName = Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder\TestFolder");
-                dialog.SelectFolder();
+                    dialog.FolderName = Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder\TestFolder");
+                    dialog.SelectFolder();
+                }
 
                 Assert.AreNotEqual(solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder", "TestFolder"), null);
                 Assert.AreNotEqual(solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder", "TestFolder", "TestFile.txt"), null);
@@ -264,11 +265,11 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var subFolderNode = solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder", "SubFolder");
                 AutomationWrapper.Select(subFolderNode);
 
-                dialog = AddExistingFolder(app);
-
-                Assert.AreEqual(dialog.Address.ToLower(), Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder\SubFolder").ToLower());
-                dialog.FolderName = Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder\SubFolder\TestFolder2");
-                dialog.SelectFolder();
+                using (var dialog = SelectFolderDialog.AddExistingFolder(app)) {
+                    Assert.AreEqual(dialog.Address.ToLower(), Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder\SubFolder").ToLower());
+                    dialog.FolderName = Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder\SubFolder\TestFolder2");
+                    dialog.SelectFolder();
+                }
 
                 Assert.AreNotEqual(solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder", "SubFolder", "TestFolder2"), null);
             }
@@ -284,11 +285,12 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var projectNode = solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder");
                 AutomationWrapper.Select(projectNode);
 
-                var dialog = AddExistingFolder(app);
-                Assert.AreEqual(dialog.Address.ToLower(), Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder").ToLower());
+                using (var dialog = SelectFolderDialog.AddExistingFolder(app)) {
+                    Assert.AreEqual(dialog.Address.ToLower(), Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder").ToLower());
 
-                dialog.FolderName = Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder");
-                dialog.SelectFolder();
+                    dialog.FolderName = Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder");
+                    dialog.SelectFolder();
+                }
 
                 VisualStudioApp.CheckMessageBox("Cannot add folder 'AddExistingFolder' as a child or decedent of self.");
             }
@@ -330,20 +332,15 @@ namespace Microsoft.Nodejs.Tests.UI {
                 projectNode = solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder");
                 AutomationWrapper.Select(projectNode);
 
-                var addDialog = AddExistingFolder(app);
-                Assert.AreEqual(addDialog.Address.ToLower(), Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder").ToLower());
+                using (var addDialog = SelectFolderDialog.AddExistingFolder(app)) {
+                    Assert.AreEqual(addDialog.Address.ToLower(), Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder").ToLower());
 
-                addDialog.FolderName = Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder\TestFolder");
-                addDialog.SelectFolder();
+                    addDialog.FolderName = Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder\TestFolder");
+                    addDialog.SelectFolder();
+                }
 
                 Assert.AreNotEqual(solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder", "TestFolder"), null);
             }
-        }
-
-        private static SelectFolderDialog AddExistingFolder(VisualStudioApp app) {
-            var hWnd = app.OpenDialogWithDteExecuteCommand("ProjectandSolutionContextMenus.Project.Add.Existingfolder");
-            var dialog = new SelectFolderDialog(hWnd);
-            return dialog;
         }
 
         /// <summary>

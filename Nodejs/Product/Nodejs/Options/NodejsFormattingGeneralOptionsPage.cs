@@ -29,6 +29,7 @@ namespace Microsoft.NodejsTools.Options {
             get {
                 if (_window == null) {
                     _window = new NodejsFormattingGeneralOptionsControl();
+                    LoadSettingsFromStorage();
                 }
                 return _window;
             }
@@ -54,13 +55,25 @@ namespace Microsoft.NodejsTools.Options {
         private const string FormatOnPasteSetting = "FormatOnPaste";
 
         public override void LoadSettingsFromStorage(){
+            // Load settings from storage.
             FormatOnEnter = LoadBool(FormatOnEnterSetting) ?? true;
             FormatOnSemiColon = LoadBool(FormatOnSemiColonSetting) ?? true;
             FormatOnCloseBrace = LoadBool(FormatOnCloseBraceSetting) ?? true;
             FormatOnPaste = LoadBool(FormatOnPasteSetting) ?? true;
+
+            // Synchronize UI with backing properties.
+            if (_window != null) {
+                _window.SyncControlWithPageSettings(this);
+            }
         }
 
         public override void SaveSettingsToStorage() {
+            // Synchronize backing properties with UI.
+            if (_window != null) {
+                _window.SyncPageWithControlSettings(this);
+            }
+            
+            // Save settings.
             SaveBool(FormatOnEnterSetting, FormatOnEnter);
             SaveBool(FormatOnSemiColonSetting, FormatOnSemiColon);
             SaveBool(FormatOnCloseBraceSetting, FormatOnCloseBrace);

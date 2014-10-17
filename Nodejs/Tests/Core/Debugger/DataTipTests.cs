@@ -33,8 +33,8 @@ namespace NodejsTests.Debugger.FileNameMapping {
 
             var analyzer = new VsProjectAnalyzer();
             buffer.AddProperty(typeof(VsProjectAnalyzer), analyzer);
-            var monitoredBuffer = analyzer.MonitorTextBuffer(view, buffer);
-            analyzer.WaitForCompleteAnalysis(_ => true);
+            analyzer.MonitorTextView(view, new[] { buffer });
+            analyzer.WaitForCompleteAnalysis();
 
             var m = Regex.Match(input, selectionRegex);
             Assert.IsTrue(m.Success);
@@ -131,6 +131,26 @@ namespace NodejsTests.Debugger.FileNameMapping {
             DataTipTest(code, @"(?=y)", null);
             DataTipTest(code, @"(?<=2)", null);
             DataTipTest(code, @"(?=z)", null);
+        }
+
+        [TestMethod, Priority(0), TestCategory("Debugging")]
+        public void DataTipSingleLineComment() {
+            const string code = "/*a*/b/*c*/.d";
+
+            DataTipTest(code, @"(?=a)", null);
+            DataTipTest(code, @"(?=b)", "b");
+            DataTipTest(code, @"(?=c)", "b/*c*/");
+            DataTipTest(code, @"(?=d)", "b/*c*/.d");
+        }
+
+        [TestMethod, Priority(0), TestCategory("Debugging")]
+        public void DataTipMultiLineComment() {
+            const string code = "//a\r\nb//c\r\n.d";
+
+            DataTipTest(code, @"(?=a)", null);
+            DataTipTest(code, @"(?=b)", "b");
+            DataTipTest(code, @"(?=c)", "b//c");
+            DataTipTest(code, @"(?=d)", "b//c\r\n.d");
         }
     }
 }

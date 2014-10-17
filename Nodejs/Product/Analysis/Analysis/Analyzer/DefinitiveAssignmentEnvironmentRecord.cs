@@ -40,10 +40,12 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
                 // and then assign it to our parent declarative environment so that
                 // it can be read from locations where it's not definitely assigned.
-                var declScope = GetDeclarativeEnvironment();
-                if (declScope != null) {
-                    declScope.AssignVariable(name, location, unit, values);
+                EnvironmentRecord declScope = GetDeclarativeEnvironment();
+                while (declScope.Parent != null &&
+                    (!declScope.ContainsVariable(name) || declScope is DeclarativeEnvironmentRecord)) {
+                    declScope = declScope.Parent;
                 }
+                declScope.AssignVariable(name, location, unit, values);
 
                 return res;
             }
@@ -61,9 +63,10 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
         internal override void ReplaceVariable(string name, VariableDef def) {
             if (_name != name) {
-                throw new InvalidOperationException("Replacing variable " + name);
+                Parent.ReplaceVariable(name, def);
+            } else {
+                _variable = def;
             }
-            _variable = def;
         }
 
         public override bool TryGetVariable(string name, out VariableDef variable) {

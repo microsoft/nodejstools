@@ -17,29 +17,29 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.Npm.SPI;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TestUtilities;
-using TestUtilities.Nodejs;
+using NpmTests.TestUtilities;
 
 namespace NpmTests {
 
     [TestClass]
+    [DeploymentItem(@"TestData\NpmSearchData\", "NpmSearchData")]
     public class NpmSearchTests {
 
-        private const string FilenameOriginal = "packagecache.json";
+        private const string PackageCacheFilename = "packagecache.json";
 
         [ClassInitialize]
         public static void Init(TestContext context) {
             AssertListener.Initialize();
-            NodejsTestData.Deploy();
         }
 
         private TextReader GetCatalogueReader(string filename) {
-            return new StreamReader(TestData.GetPath(@"TestData\NpmSearchData\" + filename));
+            return new StreamReader(string.Format(@"NpmSearchData\{0}", filename));
         }
 
         private void CheckPackage(
@@ -126,9 +126,8 @@ namespace NpmTests {
             out IDictionary<string, IPackage> byName) {
             IList<IPackage> target = new List<IPackage>();
 
-            using (var reader = GetCatalogueReader(filename))
-            {
-                target = Task.Run(() => NpmGetCatalogueCommand.ParseResultsFromReader(reader)).Result;
+            using (var reader = GetCatalogueReader(filename)) {
+                target = Task.Run(() => new NpmGetCatalogCommand(string.Empty, null, false).ParseResultsFromReader(reader)).Result;
             }
 
             //  Do this after because package names can be split across multiple
@@ -146,18 +145,11 @@ namespace NpmTests {
             IDictionary<string, IPackage> byName;
             return new MockPackageCatalog(GetTestPackageList(filename, out byName));
         }
-
-        [TestMethod, Priority(0)]
-        public void NpmPre143_CheckListAndDictByNameSameSize() {
-            IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(FilenameOriginal, out byName);
-            Assert.AreEqual(target.Count, byName.Count, "Number of packages should be same in list and dictionary.");
-        }
         
         [TestMethod, Priority(0)]
-        public void NpmPre143_CheckPackageWithBuildPreReleaseInfo() {
+        public void CheckPackageWithBuildPreReleaseInfo() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(FilenameOriginal, out byName);
+            var target = GetTestPackageList(PackageCacheFilename, out byName);
             CheckPackage(
                 target,
                 byName,
@@ -234,35 +226,35 @@ namespace NpmTests {
         [TestMethod, Priority(0)]
         public void CheckNonZeroPackageVersionsExist() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(FilenameOriginal, out byName);
+            var target = GetTestPackageList(PackageCacheFilename, out byName);
             CheckSensibleNumberOfNonZeroVersions(target);
         }
 
         [TestMethod, Priority(0)]
         public void CheckCorrectPackageCount() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(FilenameOriginal, out byName);
+            var target = GetTestPackageList(PackageCacheFilename, out byName);
             Assert.AreEqual(89924, target.Count, "Unexpected package count in catalogue list.");
         }
 
         [TestMethod, Priority(0)]
         public void CheckNoDuplicatePackages() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(FilenameOriginal, out byName);
+            var target = GetTestPackageList(PackageCacheFilename, out byName);
             CheckOnlyOneOfEachPackage(target);
         }
 
         [TestMethod, Priority(0)]
         public void CheckListAndDictByNameSameSize() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(FilenameOriginal, out byName);
+            var target = GetTestPackageList(PackageCacheFilename, out byName);
             Assert.AreEqual(target.Count, byName.Count, "Number of packages should be same in list and dictionary.");
         }
         
         [TestMethod, Priority(0)]
         public void CheckFirstPackageInCatalog() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(FilenameOriginal, out byName);
+            var target = GetTestPackageList(PackageCacheFilename, out byName);
             CheckPackage(
                 target,
                 byName,
@@ -278,7 +270,7 @@ namespace NpmTests {
         [TestMethod, Priority(0)]
         public void CheckLastPackageInCatalog_zzz() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(FilenameOriginal, out byName);
+            var target = GetTestPackageList(PackageCacheFilename, out byName);
             CheckPackage(
                 target,
                 byName,
@@ -294,7 +286,7 @@ namespace NpmTests {
         [TestMethod, Priority(0)]
         public void CheckPackageEqualsInDescription() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(FilenameOriginal, out byName);
+            var target = GetTestPackageList(PackageCacheFilename, out byName);
             CheckPackage(
                 target,
                 byName,
@@ -310,7 +302,7 @@ namespace NpmTests {
         [TestMethod, Priority(0)]
         public void CheckPackageNoDescriptionAuthorVersion() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(FilenameOriginal, out byName);
+            var target = GetTestPackageList(PackageCacheFilename, out byName);
 
             CheckPackage(
                 target,
@@ -327,7 +319,7 @@ namespace NpmTests {
         [TestMethod, Priority(0)]
         public void CheckPackageNoVersion() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(FilenameOriginal, out byName);
+            var target = GetTestPackageList(PackageCacheFilename, out byName);
 
             CheckPackage(
                 target,
@@ -344,7 +336,7 @@ namespace NpmTests {
         [TestMethod, Priority(0)]
         public void CheckPackageNoDescription() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(FilenameOriginal, out byName);
+            var target = GetTestPackageList(PackageCacheFilename, out byName);
 
             CheckPackage(
                 target,
@@ -359,7 +351,7 @@ namespace NpmTests {
         }
 
         private IList<IPackage> GetFilteredPackageList(string filterString) {
-            var catalog = GetTestPackageCatalog(FilenameOriginal);
+            var catalog = GetTestPackageCatalog(PackageCacheFilename);
             var filter = PackageCatalogFilterFactory.Create(catalog);
             return filter.Filter(filterString);
         }

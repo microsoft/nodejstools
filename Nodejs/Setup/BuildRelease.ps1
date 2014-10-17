@@ -312,7 +312,7 @@ if (-not $skipclean) {
     if (Test-Path $outdir) {
         Write-Output "Cleaning previous release in $outdir"
         rmdir -Recurse -Force $outdir -EA 0
-        while (Test-Path $outdir) {
+        while ((Test-Path $outdir -EA 0) -or -not $?) {
             Write-Output "Failed to clean release. Retrying in five seconds. (Press Ctrl+C to abort)"
             Sleep -Seconds 5
             rmdir -Recurse -Force $outdir -EA 0
@@ -542,6 +542,11 @@ try {
         Write-Output "Copying source files"
         robocopy /s . $outdir\Sources /xd Python Layouts TestResults Binaries Servicing obj | Out-Null
     }
+    
+    if ($signedbuild) {
+        start_virus_scan "NTVS$spacename" "ntvscore" $outdir
+    }
+    
     $successful = $true
 } finally {
     if ($asmverfileBackedUp) {

@@ -13,9 +13,11 @@
  * ***************************************************************************/
 
 using System;
+using Microsoft.NodejsTools.Parsing;
+
 namespace Microsoft.NodejsTools.Analysis.Values {
     [Serializable]
-    class StringValue : NonObjectValue {
+    sealed class StringValue : NonObjectValue {
         internal readonly string _value;
         private readonly JsAnalyzer _analyzer;
 
@@ -26,14 +28,17 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             javaScriptAnalyzer.AnalysisValueCreated(typeof(StringValue));
         }
 
+        public override IAnalysisSet BinaryOperation(BinaryOperator node, AnalysisUnit unit, IAnalysisSet value) {
+            if (node.OperatorToken == JSToken.Plus) {
+                return _analyzer._emptyStringValue.SelfSet;
+            }
+            return base.BinaryOperation(node, unit, value);
+        }
+
         public override string Description {
             get {
                 return "string";
             }
-        }
-
-        public override object GetConstantValue() {
-            return _value;
         }
 
         public override BuiltinTypeId TypeId {

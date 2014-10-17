@@ -42,7 +42,13 @@ namespace Microsoft.NodejsTools.Options {
 
         // replace the default UI of the dialog page w/ our own UI.
         protected override IWin32Window Window {
-            get { return _window ?? (_window = new NodejsGeneralOptionsControl()); }
+            get {
+                if (_window == null) {
+                    _window = new NodejsGeneralOptionsControl();
+                    LoadSettingsFromStorage();
+                }
+                return _window;
+            }
         }
 
         /// <summary>
@@ -124,6 +130,7 @@ namespace Microsoft.NodejsTools.Options {
         }
 
         public override void LoadSettingsFromStorage() {
+            // Load settings from storage.
             ShowOutputWindowWhenExecutingNpm = LoadBool(ShowOutputWindowRunningNpm) ?? true;
             _surveyNewsCheck = LoadEnum<SurveyNewsPolicy>(SurveyNewsCheckSetting) ?? SurveyNewsPolicy.CheckOnceWeek;
             _surveyNewsLastCheck = LoadDateTime(SurveyNewsLastCheckSetting) ?? DateTime.MinValue;
@@ -133,9 +140,20 @@ namespace Microsoft.NodejsTools.Options {
             WaitOnNormalExit = LoadBool(WaitOnNormalExitSetting) ?? false;
             EditAndContinue = LoadBool(EditAndContinueSetting) ?? true;
             CheckForLongPaths = LoadBool(CheckForLongPathsSetting) ?? true;
+
+            // Synchronize UI with backing properties.
+            if (_window != null) {
+                _window.SyncControlWithPageSettings(this);
+            }
         }
 
         public override void SaveSettingsToStorage() {
+            // Synchronize backing properties with UI.
+            if (_window != null) {
+                _window.SyncPageWithControlSettings(this);
+            }
+
+            // Save settings.
             SaveBool(ShowOutputWindowRunningNpm, ShowOutputWindowWhenExecutingNpm);
             SaveEnum(SurveyNewsCheckSetting, _surveyNewsCheck);
             SaveDateTime(SurveyNewsLastCheckSetting, _surveyNewsLastCheck);

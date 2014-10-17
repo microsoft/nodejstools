@@ -40,7 +40,7 @@ namespace Microsoft.NodejsTools.Parsing
     using System.Globalization;
     using System.Linq;
 
-    public static class AjaxMinExtensions
+    internal static class AjaxMinExtensions
     {
         public static string FormatInvariant(this string format, params object[] args)
         {

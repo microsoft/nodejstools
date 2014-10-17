@@ -13,13 +13,9 @@
  * ***************************************************************************/
 
 using System;
-using System.ComponentModel;
-using System.Globalization;
+using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Windows;
-using System.Windows.Media;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.Project;
 
@@ -29,7 +25,7 @@ namespace Microsoft.NodejsTools.NpmUI {
         private readonly SemverVersion? _version;
         private readonly string _author;
         private readonly string _description;
-        private readonly string _homepage;
+        private readonly List<string> _homepages;
         private readonly string _keywords;
 
         private readonly SemverVersion? _localVersion, _globalVersion;
@@ -39,7 +35,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             SemverVersion? version,
             string author,
             string description,
-            string homepage,
+            IEnumerable<string> homepages,
             string keywords,
             SemverVersion? localVersion,
             SemverVersion? globalVersion
@@ -48,7 +44,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             _version = version;
             _author = author;
             _description = description;
-            _homepage = homepage;
+            _homepages = homepages.ToList();
             _keywords = keywords;
             _localVersion = localVersion;
             _globalVersion = globalVersion;
@@ -74,10 +70,10 @@ namespace Microsoft.NodejsTools.NpmUI {
 
         public Visibility DescriptionVisibility { get { return string.IsNullOrEmpty(_description) ? Visibility.Collapsed : Visibility.Visible; } }
 
-        public string Homepage { get { return _homepage; } }
+        public IEnumerable<string> Homepages { get { return _homepages; } }
 
-        public Visibility HomepageVisibility { 
-            get { return string.IsNullOrEmpty(_homepage) ? Visibility.Collapsed : Visibility.Visible; } 
+        public Visibility HomepagesVisibility { 
+            get { return _homepages.Any() ? Visibility.Visible : Visibility.Collapsed; } 
         }
         
         public string Keywords { 
@@ -120,7 +116,7 @@ namespace Microsoft.NodejsTools.NpmUI {
                 package.Version,
                 package.Author == null ? string.Empty : package.Author.ToString(),
                 package.Description ?? string.Empty,
-                package.Homepage ?? string.Empty,
+                package.Homepages,
                 (package.Keywords != null && package.Keywords.Any())
                     ? string.Join(", ", package.Keywords)
                     : SR.GetString(SR.NoKeywordsInPackage),

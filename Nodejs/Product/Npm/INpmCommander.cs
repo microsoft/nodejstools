@@ -68,7 +68,7 @@ namespace Microsoft.NodejsTools.Npm {
 
         Task<bool> UninstallGlobalPackageAsync(string packageName);
 
-        Task<IPackageCatalog> GetCatalogueAsync(bool forceDownload);
+        Task<IPackageCatalog> GetCatalogAsync(bool forceDownload);
 
         Task<bool> UpdatePackagesAsync();
 

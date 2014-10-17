@@ -22,7 +22,7 @@ namespace Microsoft.NodejsTools.Parsing {
     /// resolved via a LocationResolver instance.
     /// </summary>
     [Serializable]
-    public struct EncodedSpan : IEquatable<EncodedSpan> {
+    internal struct EncodedSpan : IEquatable<EncodedSpan> {
         internal readonly int Span;
         private const int _offsetBits = 16;
         private const int _lengthBits = 15;

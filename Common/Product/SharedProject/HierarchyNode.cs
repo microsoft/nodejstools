@@ -166,14 +166,16 @@ namespace Microsoft.VisualStudioTools.Project {
             get {
                 if (!this.ExcludeNodeFromScc) {
                     IVsSccManager2 sccManager = this.ProjectMgr.Site.GetService(typeof(SVsSccManager)) as IVsSccManager2;
-
                     if (sccManager != null) {
-                        VsStateIcon[] statIcons = new VsStateIcon[1] { VsStateIcon.STATEICON_NOSTATEICON };
-                        uint[] sccStatus = new uint[1] { 0 };
-                        // Get the glyph from the scc manager. Note that it will fail in command line
-                        // scenarios.
-                        if (ErrorHandler.Succeeded(sccManager.GetSccGlyph(1, new string[] { this.GetMkDocument() }, statIcons, sccStatus))) {
-                            return statIcons[0];
+                        string mkDocument = this.GetMkDocument();
+                        if (!string.IsNullOrEmpty(mkDocument)) {
+                            VsStateIcon[] statIcons = new VsStateIcon[1] { VsStateIcon.STATEICON_NOSTATEICON };
+                            uint[] sccStatus = new uint[1] { 0 };
+                            // Get the glyph from the scc manager. Note that it will fail in command line
+                            // scenarios.
+                            if (ErrorHandler.Succeeded(sccManager.GetSccGlyph(1, new string[] { mkDocument }, statIcons, sccStatus))) {
+                                return statIcons[0];
+                            }
                         }
                     }
                 }
@@ -1319,10 +1321,6 @@ namespace Microsoft.VisualStudioTools.Project {
                         return this.ExcludeFromProjectWithProgress();
                     case VsCommands2K.INCLUDEINPROJECT:
                         return this.IncludeInProjectWithProgress(true);
-                    case VsCommands2K.CopyFullPathName:
-                        System.Windows.Clipboard.SetText(Url);
-                        return VSConstants.S_OK;
-
                 }
             } else if (cmdGroup == ProjectMgr.SharedCommandGuid) {
                 switch ((SharedCommands)cmd) {
@@ -1335,6 +1333,9 @@ namespace Microsoft.VisualStudioTools.Project {
                         );
                         psi.WorkingDirectory = FullPathToChildren;
                         Process.Start(psi);
+                        return VSConstants.S_OK;
+                    case SharedCommands.CopyFullPath:
+                        System.Windows.Clipboard.SetText(Url);
                         return VSConstants.S_OK;
                 }
             }
@@ -1380,17 +1381,17 @@ namespace Microsoft.VisualStudioTools.Project {
                             result |= QueryStatusResult.NOTSUPPORTED | QueryStatusResult.INVISIBLE;
                         }
                         return VSConstants.S_OK;
-                    case VsCommands2K.CopyFullPathName:
-                        if (this is IDiskBasedNode || this is ProjectNode) {
-                            result |= QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
-                            return VSConstants.S_OK;
-                        }
-                        break;
                 }
             } else if (cmdGroup == ProjectMgr.SharedCommandGuid) {
                 switch ((SharedCommands)cmd) {
                     case SharedCommands.OpenCommandPromptHere:
                         if (CanOpenCommandPrompt) {
+                            result |= QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
+                            return VSConstants.S_OK;
+                        }
+                        break;
+                    case SharedCommands.CopyFullPath:
+                        if (this is IDiskBasedNode || this is ProjectNode) {
                             result |= QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
                             return VSConstants.S_OK;
                         }

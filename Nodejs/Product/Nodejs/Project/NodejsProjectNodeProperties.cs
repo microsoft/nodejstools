@@ -60,7 +60,7 @@ namespace Microsoft.NodejsTools.Project {
                 return UIThread.Invoke(() => {
                     var res = this.Node.ProjectMgr.GetProjectProperty(NodejsConstants.NodeExePath, true);
                     if (String.IsNullOrWhiteSpace(res)) {
-                        return Nodejs.NodeExePath ?? "";
+                        return Nodejs.NodeExePath ?? String.Empty;
                     }
                     return res;
                 });
@@ -119,7 +119,7 @@ namespace Microsoft.NodejsTools.Project {
             }
             set {
                 UIThread.Invoke(() => {
-                    Node.ProjectMgr.SetProjectProperty(NodejsConstants.NodejsPort, value != null ? value.ToString() : "");
+                    Node.ProjectMgr.SetProjectProperty(NodejsConstants.NodejsPort, value != null ? value.ToString() : String.Empty);
                 });
             }
         }

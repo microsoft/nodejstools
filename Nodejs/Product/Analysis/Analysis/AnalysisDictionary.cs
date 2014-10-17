@@ -407,7 +407,7 @@ namespace Microsoft.NodejsTools.Analysis {
             return new AnalysisDictionaryEnumerator(this);
         }
 
-        public struct AnalysisDictionaryEnumerator : IEnumerator<KeyValuePair<TKey, TValue>> {
+        internal struct AnalysisDictionaryEnumerator : IEnumerator<KeyValuePair<TKey, TValue>> {
             private readonly Bucket[] _buckets;
             private int _curBucket;
             private KeyValuePair<TKey, TValue> _curValue;
@@ -581,7 +581,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// Holdes the marker object for values removed from our AnalysisDictionary.
     /// Hoisted to a non-generic class for perf reasons.
     /// </summary>
-    class AnalysisDictionaryRemovedValue {
+    internal class AnalysisDictionaryRemovedValue {
         public static readonly object Instance = new object();
     }
 }

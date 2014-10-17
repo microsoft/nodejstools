@@ -17,6 +17,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Microsoft.VisualStudioTools.Project;
 
@@ -122,12 +123,16 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        public string EnvironmentVariables {
+        private static Regex lfToCrLfRegex = new Regex(@"(?<!\r)\n");
+
+        public string Environment {
             get {
                 return _envVars.Text;
             }
             set {
-                _envVars.Text = value;
+                // TextBox requires \r\n for line separators, but XML can have either \n or \r\n, and we should treat those equally.
+                // (It will always have \r\n when we write it out, but users can edit it by other means.)
+                _envVars.Text = lfToCrLfRegex.Replace(value ?? String.Empty, "\r\n");
             }
         }
 

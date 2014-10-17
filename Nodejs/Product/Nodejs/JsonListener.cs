@@ -76,7 +76,7 @@ namespace Microsoft.NodejsTools {
                             }
                         }
 
-                        string body = "";
+                        string body = String.Empty;
                         string contentLen;
                         if (headers.TryGetValue("Content-Length", out contentLen)) {
                             int lengthRemaining = Int32.Parse(contentLen);

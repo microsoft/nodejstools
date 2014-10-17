@@ -17,7 +17,7 @@ using System;
 namespace Microsoft.NodejsTools.Parsing
 {
     [Serializable]
-    public class FunctionExpression : Expression
+    internal class FunctionExpression : Expression
     {
         private FunctionObject _function;
 

@@ -19,28 +19,325 @@ using System.Text;
 using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Analysis.Values;
 using Microsoft.NodejsTools.Parsing;
+using System.IO;
+using System.Diagnostics;
 
 namespace Microsoft.NodejsTools.Analysis {
     partial class NodejsModuleBuilder {
-        private static Dictionary<string, Dictionary<string, CallDelegate>> _moduleSpecializations = new Dictionary<string, Dictionary<string, CallDelegate>>() { 
+        private static Dictionary<string, Dictionary<string, FunctionSpecializer>> _moduleSpecializations = new Dictionary<string, Dictionary<string, FunctionSpecializer>>() { 
+            {
+                "http",
+                new Dictionary<string, FunctionSpecializer>() {
+                    { "createServer", 
+                       new CallbackFunctionSpecializer(
+                           0,
+                           new CallbackArgInfo("http", "ClientRequest"),
+                           new CallbackArgInfo("http", "ServerResponse")
+                        ) 
+                    },
+                    { "request", 
+                       new CallbackFunctionSpecializer(
+                           1,
+                           new CallbackArgInfo("http", "IncomingMessage")
+                        ) 
+                    },
+                    { "get", 
+                       new CallbackFunctionSpecializer(
+                           1,
+                           new CallbackArgInfo("http", "IncomingMessage")
+                        ) 
+                    }
+                }
+            },
+            {
+                "https",
+                new Dictionary<string, FunctionSpecializer>() {
+                    { "createServer", 
+                       new CallbackFunctionSpecializer(
+                           0,
+                           new CallbackArgInfo("http", "ClientRequest"),
+                           new CallbackArgInfo("http", "ServerResponse")
+                        ) 
+                    },
+                    { "request", 
+                       new CallbackFunctionSpecializer(
+                           1,
+                           new CallbackArgInfo("http", "IncomingMessage")
+                        ) 
+                    },
+                    { "get", 
+                       new CallbackFunctionSpecializer(
+                           1,
+                           new CallbackArgInfo("http", "IncomingMessage")
+                        ) 
+                    }
+                }
+            },
+            {
+                "net",
+                new Dictionary<string, FunctionSpecializer>() {
+                    {  "createServer", 
+                        new CallbackFunctionSpecializer(
+                           0,
+                           new CallbackArgInfo("net", "Socket")
+                        ) 
+                    },
+                    { "connect", 
+                       new CallbackFunctionSpecializer(
+                           1,
+                           new CallbackArgInfo("net", "Socket")
+                        ) 
+                    },
+                    { "createConnection", 
+                       new CallbackFunctionSpecializer(
+                           1,
+                           new CallbackArgInfo("net", "Socket")
+                        ) 
+                    }
+                }
+            },
             { 
                 "util", 
-                new Dictionary<string, CallDelegate>() {
-                    { "inherits", UtilInherits }
+                new Dictionary<string, FunctionSpecializer>() {
+                    { "inherits", new CallableFunctionSpecializer(UtilInherits) }
+                }
+            },
+            {
+                "path",
+                new Dictionary<string, FunctionSpecializer>() {
+                    { "resolve", ReturnValueFunctionSpecializer.String },
+                    { "normalize", ReturnValueFunctionSpecializer.String },
+                    { "join", ReturnValueFunctionSpecializer.String },
+                    { "relative", ReturnValueFunctionSpecializer.String },
+                    { "dirname", ReturnValueFunctionSpecializer.String },
+                    { "basename", new CallableFunctionSpecializer(FsBasename) },
+                    { "extname", ReturnValueFunctionSpecializer.String },
+            }
+            },
+            {
+                "fs",
+                new Dictionary<string, FunctionSpecializer>() {
+                    { "existsSync", ReturnValueFunctionSpecializer.Boolean },
+                    { "readdirSync", new CallableFunctionSpecializer(FsReadDirSync) },
                 }
             }
         };
 
-        private static Dictionary<string, Dictionary<string, CallDelegate>> _classSpecializations = new Dictionary<string, Dictionary<string, CallDelegate>>() { 
+        private static Dictionary<string, Dictionary<string, PropertySpecializer>> _propertySpecializations = new Dictionary<string, Dictionary<string, PropertySpecializer>>() { 
+            { 
+                "process", 
+                new Dictionary<string, PropertySpecializer>() {
+                    { "platform", new ConstantSpecializer("win32") },
+                    { "pid", ConstantSpecializer.Number },
+                    { "maxTickDepth", ConstantSpecializer.Number },
+                    { "title", ConstantSpecializer.String }
+                }
+            },
+        };
+
+        private static Dictionary<string, Dictionary<string, FunctionSpecializer>> _classSpecializations = new Dictionary<string, Dictionary<string, FunctionSpecializer>>() { 
             { 
                 "events.EventEmitter", 
-                new Dictionary<string, CallDelegate>() {
-                    { "addListener", EventEmitterAddListener },
-                    { "on", EventEmitterAddListener },
-                    { "emit", EventEmitterEmit }
+                new Dictionary<string, FunctionSpecializer>() {
+                    { "addListener", new CallableFunctionSpecializer(EventEmitterAddListener) },
+                    { "on", new CallableFunctionSpecializer(EventEmitterAddListener) },
+                    { "emit", new CallableFunctionSpecializer(EventEmitterEmit) }
                 }
             }
         };
+
+        abstract class PropertySpecializer {
+            public abstract AnalysisValue Specialize(ProjectEntry projectEntry, string name);
+        }
+
+        class ConstantSpecializer : PropertySpecializer {
+            private readonly object _value;
+            public static ConstantSpecializer Number = new ConstantSpecializer(0.0);
+            public static ConstantSpecializer String = new ConstantSpecializer("");
+
+            public ConstantSpecializer(object value) {
+                _value = value;
+            }
+
+            public static ConstantSpecializer Instance = new ConstantSpecializer("");
+
+            public override AnalysisValue Specialize(ProjectEntry projectEntry, string name) {
+                return projectEntry.Analyzer.GetConstant(_value);
+            }
+        }
+
+        abstract class FunctionSpecializer {
+            public abstract FunctionValue Specialize(ProjectEntry projectEntry, string name, string doc, AnalysisValue returnValue, ParameterResult[] parameters);
+        }
+
+        class CallableFunctionSpecializer : FunctionSpecializer {
+            private readonly CallDelegate _delegate;
+
+            public CallableFunctionSpecializer(CallDelegate callDelegate) {
+                _delegate = callDelegate;
+            }
+
+            public override FunctionValue Specialize(ProjectEntry projectEntry, string name, string doc, AnalysisValue returnValue, ParameterResult[] parameters) {
+                return new SpecializedFunctionValue(
+                    projectEntry,
+                    name,
+                    _delegate,
+                    doc,
+                    null,
+                    parameters
+                );
+            }
+        }
+
+        class CallbackFunctionSpecializer : FunctionSpecializer {
+            private readonly int _index;
+            private readonly CallbackArgInfo[] _args;
+            
+            public CallbackFunctionSpecializer(int argIndex, params CallbackArgInfo[] args) {
+                _index = argIndex;
+                _args = args;
+            }
+
+            public override FunctionValue Specialize(ProjectEntry projectEntry, string name, string doc, AnalysisValue returnValue, ParameterResult[] parameters) {
+                return new CallbackReturningFunctionValue(
+                    projectEntry,
+                    name,
+                    returnValue != null ? returnValue.SelfSet : AnalysisSet.Empty,
+                    _index,
+                    _args,
+                    doc,
+                    parameters
+                );
+            }
+        }
+
+        abstract class ReturnValueFunctionSpecializer : FunctionSpecializer {
+            public static ReturnValueFunctionSpecializer String = new StringSpecializer();
+            public static ReturnValueFunctionSpecializer Boolean = new BooleanSpecializer();
+
+            public override FunctionValue Specialize(ProjectEntry projectEntry, string name, string doc, AnalysisValue returnValue, ParameterResult[] parameters) {
+                return new ReturningFunctionValue(
+                    projectEntry,
+                    name,
+                    GetReturnValue(projectEntry.Analyzer),
+                    doc,
+                    parameters
+                );
+            }
+
+            public abstract IAnalysisSet GetReturnValue(JsAnalyzer analyzer);
+
+            class StringSpecializer : ReturnValueFunctionSpecializer {
+                public override IAnalysisSet GetReturnValue(JsAnalyzer analyzer) {
+                    return analyzer._emptyStringValue.SelfSet;
+                }
+            }
+
+            class BooleanSpecializer : ReturnValueFunctionSpecializer {
+                public override IAnalysisSet GetReturnValue(JsAnalyzer analyzer) {
+                    return analyzer._trueInst.SelfSet;
+                }
+            }
+        }
+
+
+        internal class ReadDirSyncArrayValue : ArrayValue {
+            private readonly HashSet<string> _readDirs = new HashSet<string>();
+            private static char[] InvalidPathChars = Path.GetInvalidPathChars();
+
+            public ReadDirSyncArrayValue(ProjectEntry projectEntry, Node node)
+                : base(new[] { new TypedDef() }, projectEntry, node) {
+            }
+
+            public void AddDirectoryMembers(AnalysisUnit unit, string path) {
+                
+                if (!String.IsNullOrWhiteSpace(path) &&
+                    path.IndexOfAny(InvalidPathChars) == -1 && 
+                    _readDirs.Add(path) &&
+                    Directory.Exists(path)) {
+                        string trimmed = path.Trim();
+                        if (trimmed != "." && trimmed != "/") {
+                            var files = Directory.GetFiles(path);
+
+                            foreach (var file in files) {
+                                IndexTypes[0].AddTypes(
+                                    unit,
+                                    unit.Analyzer.GetConstant(Path.GetFileName(file)).SelfSet
+                                );
+                            }
+                        }
+                }
+            }
+
+            public override void ForEach(Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+                // for this for each we want to process the un-merged values so that we
+                // get the best results instead of merging all of the strings together.
+                foreach (var value in IndexTypes[0].GetTypes(unit, ProjectEntry)) {
+                    args[0].Call(
+                        node,
+                        unit,
+                        null,
+                        new IAnalysisSet[] { 
+                            value, 
+                            AnalysisSet.Empty, 
+                            @this 
+                        }
+                    );
+                }
+            }
+        }
+
+        private static IAnalysisSet FsBasename(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            CallNode call = (CallNode)node;
+            IAnalysisSet res = AnalysisSet.Empty;
+            if (call.Arguments.Length == 2) {
+                foreach (var extArg in args[1]) {
+                    var strExt = extArg.Value.GetStringValue();
+                    if (strExt != null) {
+                        foreach (var nameArg in args[0]) {
+                            string name = nameArg.Value.GetStringValue();
+                            if (name != null) {
+                                string oldName = name;
+                                if (name.EndsWith(strExt, StringComparison.OrdinalIgnoreCase)) {
+                                    name = name.Substring(0, name.Length - strExt.Length);
+                                }
+                                res = res.Union(unit.Analyzer.GetConstant(name).Proxy);
+                            }
+                        }
+                    }
+                }
+            }
+            if (res.Count == 0) {
+                return unit.Analyzer._emptyStringValue.SelfSet;
+            }
+            return res;
+        }
+
+        private static IAnalysisSet FsReadDirSync(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            CallNode call = (CallNode)node;
+            if (call.Arguments.Length == 1) {
+                var ee = new ExpressionEvaluator(unit);
+                IAnalysisSet arraySet;
+                ReadDirSyncArrayValue array;
+                if (!unit.GetDeclaringModuleEnvironment().TryGetNodeValue(NodeEnvironmentKind.ArrayValue, call, out arraySet)) {
+                    array = new ReadDirSyncArrayValue(
+                        unit.ProjectEntry,
+                        node
+                    );
+                    arraySet = array.SelfSet;
+                    unit.GetDeclaringModuleEnvironment().AddNodeValue(NodeEnvironmentKind.ArrayValue, call, arraySet);
+                } else {
+                    array = (ReadDirSyncArrayValue)arraySet.First().Value;
+                }
+
+                foreach (var path in ee.MergeStringLiterals(call.Arguments[0])) {
+                    array.AddDirectoryMembers(unit, path);
+                }
+
+                return array.SelfSet;
+            }
+            return AnalysisSet.Empty;
+        }
 
         private static IAnalysisSet UtilInherits(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             // function inherits(ctor, superCtor)
@@ -94,25 +391,27 @@ namespace Microsoft.NodejsTools.Analysis {
         /// </summary>
         private static IAnalysisSet EventEmitterAddListener(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             if (args.Length >= 2 && args[1].Count > 0) {
-                foreach (var thisArg in @this) {
-                    ExpandoValue expando = @thisArg.Value as ExpandoValue;
-                    if (expando != null) {
-                        foreach (var arg in args[0]) {
-                            var strValue = arg.Value.GetConstantValueAsString();
-                            if (strValue != null) {
-                                var key = new EventListenerKey(strValue);
-                                VariableDef events;
-                                if (!expando.TryGetMetadata(key, out events)) {
-                                    expando.SetMetadata(key, events = new VariableDef());
-                                }
+                if (@this != null) {
+                    foreach (var thisArg in @this) {
+                        ExpandoValue expando = @thisArg.Value as ExpandoValue;
+                        if (expando != null) {
+                            foreach (var arg in args[0]) {
+                                var strValue = arg.Value.GetStringValue();
+                                if (strValue != null) {
+                                    var key = new EventListenerKey(strValue);
+                                    VariableDef events;
+                                    if (!expando.TryGetMetadata(key, out events)) {
+                                        expando.SetMetadata(key, events = new VariableDef());
+                                    }
 
-                                events.AddTypes(unit, args[1]);
+                                    events.AddTypes(unit, args[1]);
+                                }
                             }
                         }
                     }
                 }
             }
-            return @this;
+            return @this ?? AnalysisSet.Empty;
         }
 
         /// <summary>
@@ -122,16 +421,18 @@ namespace Microsoft.NodejsTools.Analysis {
         /// </summary>
         private static IAnalysisSet EventEmitterEmit(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             if (args.Length >= 1) {
-                foreach (var thisArg in @this) {
-                    ExpandoValue expando = @thisArg.Value as ExpandoValue;
-                    if (expando != null) {
-                        foreach (var arg in args[0]) {
-                            var strValue = arg.Value.GetConstantValueAsString();
-                            if (strValue != null) {
-                                VariableDef events;
-                                if (expando.TryGetMetadata<VariableDef>(new EventListenerKey(strValue), out events)) {
-                                    foreach (var type in events.GetTypesNoCopy(unit)) {
-                                        type.Call(node, unit, @this, args.Skip(1).ToArray());
+                if (@this != null) {
+                    foreach (var thisArg in @this) {
+                        ExpandoValue expando = @thisArg.Value as ExpandoValue;
+                        if (expando != null) {
+                            foreach (var arg in args[0]) {
+                                var strValue = arg.Value.GetStringValue();
+                                if (strValue != null) {
+                                    VariableDef events;
+                                    if (expando.TryGetMetadata<VariableDef>(new EventListenerKey(strValue), out events)) {
+                                        foreach (var type in events.GetTypesNoCopy(unit)) {
+                                            type.Call(node, unit, @this, args.Skip(1).ToArray());
+                                        }
                                     }
                                 }
                             }

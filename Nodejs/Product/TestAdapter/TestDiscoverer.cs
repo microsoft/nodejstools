@@ -25,8 +25,10 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudioTools;
 
+using Microsoft.NodejsTools.SourceMapping;
+
 namespace Microsoft.NodejsTools.TestAdapter {
-    [FileExtension(".njsproj")]
+    [FileExtension(NodejsConstants.NodejsProjectExtension)]
     [DefaultExecutorUri(TestExecutor.ExecutorUriString)]
     class TestDiscoverer : ITestDiscoverer {
         public TestDiscoverer() {
@@ -55,7 +57,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
                         var projectHome = Path.GetFullPath(Path.Combine(proj.DirectoryPath, "."));
 
-                        NameValueCollection testItems = new NameValueCollection(StringComparer.OrdinalIgnoreCase);
+                        Dictionary<string, List<TestFileEntry>> testItems = new Dictionary<string,List<TestFileEntry>>(StringComparer.OrdinalIgnoreCase);
                         // Provide all files to the test analyzer
                         foreach (var item in proj.Items.Where(item => item.ItemType == "Compile" || item.ItemType == "TypeScriptCompile")) {
 
@@ -65,15 +67,20 @@ namespace Microsoft.NodejsTools.TestAdapter {
                                 continue;
                             }
                             string fileAbsolutePath = CommonUtils.GetAbsoluteFilePath(projectHome, item.EvaluatedInclude);
-
+                            bool typeScriptTest = false;
                             if (Path.GetExtension(fileAbsolutePath).Equals(NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
                                 //We're dealing with TypeScript, switch to the underlying js file
                                 fileAbsolutePath = fileAbsolutePath.Substring(0, fileAbsolutePath.Length - 3) + ".js";
+                                typeScriptTest = true;
                             } else if (!Path.GetExtension(fileAbsolutePath).Equals(".js", StringComparison.OrdinalIgnoreCase)) {
                                 continue;
                             }
-
-                            testItems.Add(value, fileAbsolutePath);
+                            List<TestFileEntry> fileList;
+                            if (!testItems.TryGetValue(value, out fileList)){
+                                fileList = new List<TestFileEntry>();
+                                testItems.Add(value, fileList);
+                            }
+                            fileList.Add(new TestFileEntry(fileAbsolutePath,typeScriptTest));
                         }
 
                         //Debug.Fail("Before Discover");
@@ -87,7 +94,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
             }
         }
 
-        private void DiscoverTests(NameValueCollection testItems, MSBuild.Project proj, ITestCaseDiscoverySink discoverySink, IMessageLogger logger) {
+        private void DiscoverTests(Dictionary<string, List<TestFileEntry>> testItems, MSBuild.Project proj, ITestCaseDiscoverySink discoverySink, IMessageLogger logger) {
             List<TestFrameworks.NodejsTestInfo> result = new List<TestFrameworks.NodejsTestInfo>();
             var projectHome = Path.GetFullPath(Path.Combine(proj.DirectoryPath, "."));
             var projSource = ((MSBuild.Project)proj).FullPath;
@@ -110,19 +117,32 @@ namespace Microsoft.NodejsTools.TestAdapter {
                     continue;
                 }
 
-                string files = string.Join(";", testItems.GetValues(testFx));
+                List<TestFileEntry> fileList = testItems[testFx];
+                string files = string.Join(";", fileList.Select(p=>p.File));
                 logger.SendMessage(TestMessageLevel.Informational, String.Format("Processing: {0}", files));
 
-                List<TestFrameworks.NodejsTestInfo> discoveredTestCases = testFramework.FindTests(testItems.GetValues(testFx), nodeExePath, logger, projectHome);
+                List<TestFrameworks.NodejsTestInfo> discoveredTestCases = testFramework.FindTests(fileList.Select(p => p.File), nodeExePath, logger, projectHome);
                 testCount += discoveredTestCases.Count;
                 foreach (TestFrameworks.NodejsTestInfo discoveredTest in discoveredTestCases) {
                     string qualifiedName = discoveredTest.FullyQualifiedName;
                     logger.SendMessage(TestMessageLevel.Informational, String.Format("  " /*indent*/ + "Creating TestCase:{0}", qualifiedName));
-                    discoverySink.SendTestCase(new TestCase(qualifiedName, TestExecutor.ExecutorUri, projSource) {
-                        CodeFilePath = discoveredTest.ModulePath,
-                        LineNumber = 0,
-                        DisplayName = discoveredTest.TestName
-                    });
+                    //figure out the test source info such as line number
+                    string filePath = discoveredTest.ModulePath;
+                    TestFileEntry entry = fileList.Find(p => p.File.Equals(filePath, StringComparison.OrdinalIgnoreCase));
+                    FunctionInformation fi = null;
+                    if (entry.IsTypeScriptTest) {
+                        fi = SourceMapper.MaybeMap(new FunctionInformation(String.Empty,
+                                                                           discoveredTest.TestName,
+                                                                           discoveredTest.SourceLine,
+                                                                           entry.File));
+                    }
+                    discoverySink.SendTestCase(
+                        new TestCase(qualifiedName, TestExecutor.ExecutorUri, projSource) {
+                            CodeFilePath = filePath,
+                            LineNumber = (fi != null && fi.LineNumber.HasValue) ? fi.LineNumber.Value : discoveredTest.SourceLine,
+                            DisplayName = discoveredTest.TestName
+                        });                                    
+
                 }
                 logger.SendMessage(TestMessageLevel.Informational, string.Format("Processing finished for framework of {0}", testFx));
             }
@@ -143,6 +163,16 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 buildEngine.UnloadProject(buildProject);
             }
             return buildEngine.LoadProject(fullProjectPath);
+        }
+
+        private class TestFileEntry {
+            public string File { get; set; }
+            public bool IsTypeScriptTest { get; set; }
+
+            public TestFileEntry(string file, bool isTypeScriptTest) {
+                File = file;
+                IsTypeScriptTest = isTypeScriptTest;
+            }
         }
     }
 }

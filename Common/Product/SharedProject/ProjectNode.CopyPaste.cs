@@ -15,6 +15,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -820,7 +821,9 @@ namespace Microsoft.VisualStudioTools.Project {
                     // Send OnItemRenamed for the folder now, after all of the children have been renamed
                     Project.Tracker.OnItemRenamed(SourceFolder, NewFolderPath, VSRENAMEFILEFLAGS.VSRENAMEFILEFLAGS_Directory);
 
-                    sourceFolder.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
+                    if (sourceFolder != null && Project.ParentHierarchy != null) {
+                        sourceFolder.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
+                    }
                 }
             }
 
@@ -931,6 +934,46 @@ namespace Microsoft.VisualStudioTools.Project {
                     return null;
                 }
 
+                // Check that the source and destination paths aren't the same since we can't move an item to itself.
+                // If they are in fact the same location, throw an error that copy/move will not work correctly.
+                if (DropEffect == DropEffect.Move && !CommonUtils.IsSamePath(Path.GetDirectoryName(moniker), Path.GetDirectoryName(targetFolder))) {
+                    try {
+                        string sourceLinkTarget = NativeMethods.GetAbsolutePathToDirectory(Path.GetDirectoryName(moniker));
+                        string destinationLinkTarget = null;
+
+                        // if the directory doesn't exist, just skip this.  We will create it later.
+                        if (Directory.Exists(targetFolder)) {
+                            try {
+                                destinationLinkTarget = NativeMethods.GetAbsolutePathToDirectory(targetFolder);
+                            } catch (FileNotFoundException) {
+                                // This can occur if the user had a symlink'd directory and deleted the backing directory.
+                                VsShellUtilities.ShowMessageBox(
+                                            Project.Site,
+                                            String.Format(
+                                                "Unable to find the destination folder."),
+                                            null,
+                                            OLEMSGICON.OLEMSGICON_CRITICAL,
+                                            OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                                            OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+                                return null;
+                            }
+                        }
+
+                        // If the paths are the same, we can't really move the file...
+                        if (destinationLinkTarget != null && CommonUtils.IsSamePath(sourceLinkTarget, destinationLinkTarget)) {
+                            CannotMoveSameLocation(moniker);
+                            return null;
+                        }
+                    } catch (Exception e) {
+                        if (e.IsCriticalException()) {
+                            throw;
+                        }
+                        TaskDialog.ForException(Project.Site, e, String.Empty, Project.IssueTrackerUrl).ShowModal();
+                        return null;
+                    }
+                }
+
+                // Begin the move operation now that we are past pre-checks.
                 string newPath = Path.Combine(targetFolder, Path.GetFileName(moniker));
                 var existingChild = Project.FindNodeByFullPath(moniker);
                 if (existingChild != null && existingChild.IsLinkFile) {
@@ -948,7 +991,10 @@ namespace Microsoft.VisualStudioTools.Project {
                                 OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
                         return null;
                     }
-                } else if (File.Exists(newPath) && CommonUtils.IsSamePath(newPath, moniker)) {
+                } else if (File.Exists(newPath) &&  
+                    CommonUtils.IsSamePath(
+                        NativeMethods.GetAbsolutePathToDirectory(newPath), 
+                        NativeMethods.GetAbsolutePathToDirectory(moniker))) {
                     newPath = GetCopyName(newPath);
                 }
 

@@ -90,7 +90,6 @@
             this._surveyNewsCheckCombo.Name = "_surveyNewsCheckCombo";
             this._surveyNewsCheckCombo.Size = new System.Drawing.Size(240, 21);
             this._surveyNewsCheckCombo.TabIndex = 7;
-            this._surveyNewsCheckCombo.SelectedIndexChanged += new System.EventHandler(this._surveyNewsCheckCombo_SelectedIndexChanged);
             // 
             // _topOptionsPanel
             // 
@@ -114,7 +113,6 @@
             this._editAndContinue.TabIndex = 3;
             this._editAndContinue.Text = "Enable &Edit and Continue";
             this._editAndContinue.UseVisualStyleBackColor = true;
-            this._editAndContinue.CheckedChanged += new System.EventHandler(this._editAndContinue_CheckedChanged);
             // 
             // _waitOnNormalExit
             // 
@@ -125,7 +123,6 @@
             this._waitOnNormalExit.TabIndex = 2;
             this._waitOnNormalExit.Text = "Wai&t for input when process exits normally";
             this._waitOnNormalExit.UseVisualStyleBackColor = true;
-            this._waitOnNormalExit.CheckedChanged += new System.EventHandler(this._waitOnNormalExit_CheckedChanged);
             // 
             // _waitOnAbnormalExit
             // 
@@ -136,7 +133,6 @@
             this._waitOnAbnormalExit.TabIndex = 1;
             this._waitOnAbnormalExit.Text = "&Wait for input when process exits abnormally";
             this._waitOnAbnormalExit.UseVisualStyleBackColor = true;
-            this._waitOnAbnormalExit.CheckedChanged += new System.EventHandler(this._waitOnAbnormalExit_CheckedChanged);
             // 
             // _showOutputWhenRunningNpm
             // 
@@ -147,7 +143,6 @@
             this._showOutputWhenRunningNpm.TabIndex = 0;
             this._showOutputWhenRunningNpm.Text = "Show Output window when executing &npm";
             this._showOutputWhenRunningNpm.UseVisualStyleBackColor = true;
-            this._showOutputWhenRunningNpm.CheckedChanged += new System.EventHandler(this._showOutputWhenRunningNpm_CheckedChanged);
             // 
             // _checkForLongPaths
             // 
@@ -158,7 +153,6 @@
             this._checkForLongPaths.TabIndex = 4;
             this._checkForLongPaths.Text = "Check for paths that exceed the &MAX_PATH length limit";
             this._checkForLongPaths.UseVisualStyleBackColor = true;
-            this._checkForLongPaths.CheckedChanged += new System.EventHandler(this._checkForLongPaths_CheckedChanged);
             // 
             // NodejsGeneralOptionsControl
             // 

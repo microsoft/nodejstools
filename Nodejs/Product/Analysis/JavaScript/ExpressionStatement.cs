@@ -17,7 +17,7 @@ using System.Collections.Generic;
 
 namespace Microsoft.NodejsTools.Parsing {
     [Serializable]
-    public class ExpressionStatement : Statement {
+    internal class ExpressionStatement : Statement {
         private Expression _expression;
 
         public ExpressionStatement(EncodedSpan location)

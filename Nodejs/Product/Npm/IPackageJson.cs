@@ -12,6 +12,8 @@
  *
  * ***************************************************************************/
 
+using System.Collections.Generic;
+
 namespace Microsoft.NodejsTools.Npm {
     public interface IPackageJson {
         string Name { get; }
@@ -20,7 +22,7 @@ namespace Microsoft.NodejsTools.Npm {
         IPerson Author { get; }
         string Description { get; }
         IKeywords Keywords { get; }
-        string Homepage { get; }
+        IHomepages Homepages { get; }
         IBugs Bugs { get; }
         ILicenses Licenses { get; }
         IFiles Files { get; }

@@ -12,7 +12,6 @@
     Width="700"
     MinWidth="600"
     WindowStartupLocation="CenterOwner"
-    ShowInTaskbar="False"
     Background="{DynamicResource {x:Static wpf:Controls.BackgroundKey}}"
     ResizeMode="CanResizeWithGrip">
     <!-- Theming -->
@@ -28,16 +27,79 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-            <ResourceDictionary.MergedDictionaries>
 
+            <wpf:ComparisonConverter x:Key="ValueGreaterThanZeroConverter"
+                                     IfTrue="{x:Static Visibility.Hidden}"
+                                     IfFalse="{x:Static Visibility.Visible}"
+                                     Operator="GreaterThan"
+                                     SecondOperand="0" />
+
+            <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/Microsoft.NodejsTools;component/SharedProject/Wpf/Controls.xaml" />
                 <ResourceDictionary>
                     <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource {x:Type ListViewItem}}">
                         <Setter Property="HorizontalAlignment" Value="Stretch" />
                     </Style>
 
+                    <DataTemplate x:Key="PackageInfoTemplate">
+                        <Grid>
+                            <StackPanel Name="PackageInfo">
+                                <TextBlock Margin="0">
+                                    <Run Text="{Binding Path=Name, Mode=OneWay}" FontSize="15pt" FontWeight="Bold" />
+                                    <Run Text="{Binding Path=Version, Mode=OneWay}" />
+                                </TextBlock>
+
+                                <TextBlock Margin="0 4 0 4"
+                                           Text="{Binding Keywords, Mode=OneWay}"
+                                           TextWrapping="Wrap"
+                                           Opacity="0.5" />
+
+                                <StackPanel Orientation="Horizontal" Margin="0 4 0 4" x:Name="AuthorBlock" Visibility="{Binding Path=AuthorVisibility, Mode=OneWay}">
+                                    <TextBlock Margin="0" FontWeight="Bold" xml:space="preserve">Author: </TextBlock>
+                                    <TextBlock Text="{Binding Path=Author, Mode=OneWay}"/>
+                                </StackPanel>
+                                
+                                <StackPanel Margin="0 4 0 4" x:Name="HomepageBlock"
+                                    Visibility="{Binding HomepagesVisibility}"
+                                    Orientation="Horizontal">
+                                    <TextBlock Margin="0" FontWeight="Bold" xml:space="preserve">Homepage: </TextBlock>
+                                    <ItemsControl ItemsSource="{Binding Path=Homepages, Mode=OneWay}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Button Style="{StaticResource NavigationButton}"
+                                                        Content="{Binding Mode=OneWay}"
+                                                        Command="{x:Static npmUi:NpmPackageInstallViewModel.OpenHomepageCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        KeyboardNavigation.IsTabStop="False"
+                                                        Margin="0"
+                                                        Padding="0"/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+
+                                <TextBlock Margin="0 4 0 4" TextWrapping="Wrap" x:Name="DescriptionBlock" Visibility="{Binding Path=DescriptionVisibility, Mode=OneWay}">
+                                    <Run FontWeight="Bold" xml:space="preserve">Description: </Run>
+                                    <Run Text="{Binding Path=Description, Mode=OneWay}"/>
+                                </TextBlock>
+                            </StackPanel>
+                            
+                            <TextBlock x:Name="NoPackageSelectedText" FontSize="15pt" Visibility="Hidden">(no package selected)</TextBlock>
+                        </Grid>
+
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding}" Value="{x:Null}">
+                                <DataTrigger.Setters>
+                                    <Setter TargetName="PackageInfo" Property="Visibility" Value="Hidden" />
+                                    <Setter TargetName="NoPackageSelectedText" Property="Visibility" Value="Visible" />
+                                </DataTrigger.Setters>
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+
+                    </DataTemplate>
+
                     <DataTemplate DataType="{x:Type npmUi:ReadOnlyPackageCatalogEntryViewModel}">
-                    <Grid>
+                        <Grid>
                             <Grid.InputBindings>
                                 <MouseBinding Gesture="LeftDoubleClick"
                                               Command="{x:Static npmUi:NpmPackageInstallViewModel.InstallCommand}"
@@ -214,6 +276,9 @@
         <CommandBinding Command="{x:Static npmUi:NpmPackageInstallViewModel.RefreshCatalogCommand}"
                         Executed="RefreshCatalogCommand_Executed"
                         CanExecute="RefreshCatalogCommand_CanExecute" />
+        <CommandBinding Command="{x:Static npmUi:NpmPackageInstallViewModel.OpenHomepageCommand}"
+                        Executed="OpenHomepageCommand_Executed"
+                        CanExecute="OpenHomepageCommand_CanExecute" />
     </Window.CommandBindings>
 
     <Grid VerticalAlignment="Stretch"
@@ -292,6 +357,10 @@
                           ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                           MinHeight="0"
                           KeyboardNavigation.TabIndex="1" />
+            <TextBlock Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+                       Visibility="{Binding Path=FilteredPackages.Count, Converter={StaticResource ValueGreaterThanZeroConverter}}">
+                No results found.
+            </TextBlock>
 
             <Grid Grid.Row="2" VerticalAlignment="Top" Margin="0 4 0 0">
                 <Grid.ColumnDefinitions>
@@ -322,42 +391,9 @@
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel Name="PackageInfo">
-                        <TextBlock Margin="0">
-                            <Run FontSize="15pt" FontWeight="Bold" Text="{Binding Path=SelectedPackage.Name, Mode=OneWay}"/>
-                            <Run Text="{Binding Path=SelectedPackage.Version, Mode=OneWay}"/>
-                        </TextBlock>
-
-                        <TextBlock Margin="0 4 0 4"
-                            Text="{Binding SelectedPackage.Keywords, Mode=OneWay}"
-                            TextWrapping="Wrap"
-                            Opacity="0.5" />
-
-                        <StackPanel Orientation="Horizontal" Margin="0 4 0 4" x:Name="AuthorBlock" Visibility="{Binding SelectedPackage.AuthorVisibility, Mode=OneWay}">
-                            <TextBlock Margin="0" FontWeight="Bold">Author:</TextBlock>
-                            <TextBlock Text="{Binding Path=SelectedPackage.Author, Mode=OneWay}"/>
-                        </StackPanel>
-
-                        <StackPanel Margin="0 4 0 4" x:Name="HomepageBlock"
-                                    Visibility="{Binding SelectedPackage.HomepageVisibility}"
-                                    Orientation="Horizontal">
-                            <TextBlock Margin="0" FontWeight="Bold" xml:space="preserve">Homepage: </TextBlock>
-                            <Button x:Name="HomepageLink" Style="{StaticResource NavigationButton}"
-                                    Content="{Binding Path=SelectedPackage.Homepage, Mode=OneWay}"
-                                    Click="HomepageLink_Click"
-                                    KeyboardNavigation.IsTabStop="False"
-                                    Margin="0"
-                                    Padding="0"/>
-                        </StackPanel>
-
-                        <TextBlock Margin="0 4 0 4" TextWrapping="Wrap" x:Name="DescriptionBlock" Visibility="{Binding SelectedPackage.DescriptionVisibility, Mode=OneWay}">
-                             <Run FontWeight="Bold">Description:</Run>
-                            <Run Text="{Binding Path=SelectedPackage.Description, Mode=OneWay}"/>
-                        </TextBlock>
-
-                    </StackPanel>
-                </ScrollViewer>
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              Content="{Binding Path=SelectedPackage}"
+                              ContentTemplate="{StaticResource PackageInfoTemplate}" />
 
                 <StackPanel Grid.Row="1"
                         Orientation="Vertical"

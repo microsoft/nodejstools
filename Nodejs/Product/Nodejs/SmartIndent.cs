@@ -130,6 +130,7 @@ namespace Microsoft.NodejsTools {
 
                 while (tokenStack.Count > 0) {
                     var token = tokenStack.Pop();
+                    bool didDedent = false;
                     if (token == null) {
                         current.NeedsUpdate = true;
                     } else if (IsOpenGrouping(token)) {
@@ -190,6 +191,7 @@ namespace Microsoft.NodejsTools {
                             DedentTo = current.DedentTo - _editorOptions.GetTabSize(),
                             WasDoKeyword = current.WasDoKeyword
                         };
+                        didDedent = true;
                     } else if (current.NeedsUpdate) {
                         var line2 = token.Span.Start.GetContainingLine();
                         current = new LineInfo {
@@ -197,7 +199,7 @@ namespace Microsoft.NodejsTools {
                         };
                     }
 
-                    if (token != null && _dedentKeywords.Contains(token.Span.GetText())) {     // dedent after some statements
+                    if (!didDedent && token != null && _dedentKeywords.Contains(token.Span.GetText())) {     // dedent after some statements
                         current.ShouldDedentAfter = true;
                     }
                 }

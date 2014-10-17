@@ -156,7 +156,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         int IDebugThread100.GetThreadDisplayName(out string name) {
             // Not necessary to implement in the debug engine. Instead
             // it is implemented in the SDM, which calls GetThreadProperties100()
-            name = "";
+            name = String.Empty;
             return VSConstants.E_NOTIMPL;
         }
 

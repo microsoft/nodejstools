@@ -258,7 +258,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         private void GenerateProperties(dynamic properties, int indentation, Func<string, string> specializer) {
             foreach (var prop in properties) {
-                string desc = "";
+                string desc = String.Empty;
                 
                 if (prop.ContainsKey("desc")) {
                     desc = prop["desc"];
@@ -270,7 +270,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                     _output.AppendLine();
                 }
 
-                string textRaw = "";
+                string textRaw = String.Empty;
                 if (prop.ContainsKey("textRaw")) {
                     textRaw = prop["textRaw"];
                 }
@@ -548,13 +548,13 @@ namespace Microsoft.NodejsTools.Intellisense {
         private static string LimitDescription(string desc) {
             int newLine;
             if ((newLine = desc.IndexOf('\n')) != -1) {
-                return desc.Substring(0, newLine).Replace("<p>", "").Replace("</p>", "") + " ...";
+                return desc.Substring(0, newLine).Replace("<p>", String.Empty).Replace("</p>", "") + " ...";
             }
-            return desc.Replace("<p>", "").Replace("</p>", "");
+            return desc.Replace("<p>", String.Empty).Replace("</p>", String.Empty);
         }
 
         private string FixClassName(string name) {
-            name = name.Replace(" ", "");
+            name = name.Replace(" ", String.Empty);
             int dot;
             if ((dot = name.IndexOf('.')) != -1) {
                 return name.Substring(dot + 1);

@@ -15,6 +15,6 @@
 using System;
 
 namespace Microsoft.NodejsTools.Analysis {
-    public interface IAnalysisSerializeAsNull {
+    internal interface IAnalysisSerializeAsNull {
     }
 }

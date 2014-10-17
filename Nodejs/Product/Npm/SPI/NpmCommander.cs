@@ -92,7 +92,9 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             RegisterLogEvents(_command);
             bool success = await _command.ExecuteAsync();
             UnregisterLogEvents(_command);
-            _npmController.Refresh();
+            if (refreshNpmController) {
+                _npmController.Refresh();                
+            }
             return success;
         }
 
@@ -169,14 +171,15 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             return await UninstallPackageAsync(packageName, true);
         }
 
-        public async Task<IPackageCatalog> GetCatalogueAsync(bool forceDownload) {
-            _command = new NpmGetCatalogueCommand(
+        public async Task<IPackageCatalog> GetCatalogAsync(bool forceDownload) {
+            _command = new NpmGetCatalogCommand(
                 _npmController.FullPathToRootPackageDirectory,
+                _npmController.CachePath,
                 forceDownload,
                 _npmController.PathToNpm,
                 _npmController.UseFallbackIfNpmNotFound);
             await DoCommandExecute(false);
-            return (_command as NpmGetCatalogueCommand).Catalog;
+            return (_command as NpmGetCatalogCommand).Catalog;
         }
 
         public async Task<bool> UpdatePackagesAsync() {

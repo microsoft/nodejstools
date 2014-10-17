@@ -79,11 +79,6 @@
       <Culture>1033</Culture>
       <OutputSubPath>Node.js</OutputSubPath>
     </ZipProject>
-    <MultiProjectZipProject>
-      <Language>JavaScript</Language>
-      <Culture>1033</Culture>
-      <OutputSubPath>Node.js</OutputSubPath>
-    </MultiProjectZipProject>
     <ZipItem>
       <Language>JavaScript</Language>
     </ZipItem>
@@ -274,7 +269,7 @@
     <Compile Include="Editor\EditorExtensions.cs" />
     <Compile Include="Intellisense\AnalysisPriority.cs" />
     <Compile Include="Intellisense\AnalysisQueue.cs" />
-    <Compile Include="Intellisense\AnalysisSynchronizationContext.cs" />
+    <Compile Include="Intellisense\BufferParser.cs" />
     <Compile Include="Intellisense\CollectingErrorSink.cs" />
     <Compile Include="Intellisense\CompletionAnalysis.cs" />
     <Compile Include="Intellisense\CompletionComparer.cs" />
@@ -286,7 +281,6 @@
     <Compile Include="Intellisense\IContentTypeMetadata.cs" />
     <Compile Include="Intellisense\IntellisenseController.cs" />
     <Compile Include="Intellisense\IntellisenseControllerProvider.cs" />
-    <Compile Include="Intellisense\MonitoredBufferResult.cs" />
     <Compile Include="Intellisense\NodejsParameter.cs" />
     <Compile Include="Intellisense\NodejsSignature.cs" />
     <Compile Include="Intellisense\NormalCompletionAnalysis.cs" />
@@ -326,6 +320,7 @@
     <Compile Include="Options\NodejsIntellisenseOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Project\AzureToolsContracts.cs" />
     <Compile Include="Project\DependencyNodeProperties.cs" />
     <Compile Include="Project\LocalModulesNode.cs" />
     <Compile Include="Project\NodejsProjectImageName.cs" />
@@ -344,10 +339,11 @@
     <Compile Include="Debugger\Communication\TcpNetworkClient.cs" />
     <Compile Include="Debugger\ExceptionHitTreatment.cs" />
     <Compile Include="Debugger\ExceptionHandler.cs" />
-    <Compile Include="Debugger\JavaScriptSourceMapInfo.cs" />
+    <Compile Include="SourceMapping\FunctionInfo.cs" />
+    <Compile Include="SourceMapping\JavaScriptSourceMapInfo.cs" />
     <Compile Include="Debugger\NodeConstants.cs" />
     <Compile Include="Debugger\Serialization\NodeSetValueVariable.cs" />
-    <Compile Include="Debugger\SourceMapper.cs" />
+    <Compile Include="SourceMapping\SourceMapper.cs" />
     <Compile Include="Debugger\SteppingKind.cs" />
     <Compile Include="Project\NodejsFileNodeProperties.cs" />
     <Compile Include="Jade\JadeEditorFactory.cs" />
@@ -566,7 +562,7 @@
     <Compile Include="Repl\VsNodejsReplSite.cs" />
     <Compile Include="SmartIndent.cs" />
     <Compile Include="SmartIndentProvider.cs" />
-    <Compile Include="SourceMap.cs" />
+    <Compile Include="SourceMapping\SourceMap.cs" />
     <Compile Include="TestFrameworks\TestFrameworkDirectories.cs" />
     <Compile Include="VsMenus.cs" />
     <Compile Include="AzureSolutionListener.cs" />
@@ -668,6 +664,46 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ZipProject Include="ProjectTemplates\CloudService\CloudService.ccproj" />
+    <ZipProject Include="ProjectTemplates\CloudService\ServiceConfiguration.Cloud.cscfg" />
+    <ZipProject Include="ProjectTemplates\CloudService\ServiceConfiguration.Local.cscfg" />
+    <ZipProject Include="ProjectTemplates\CloudService\ServiceDefinition.csdef" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\ChangeConfig.ps1" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\download.ps1" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\iisnode.yml" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\index.jade" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\layout.jade" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\node.cmd" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\package.json" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\README.md" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\setup_web.cmd" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\style.styl" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\TypeScriptExpressApp.njsproj" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\Web.config" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\Web.Debug.config" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\download.ps1" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\node.cmd" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\package.json" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\README.md" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\setup_worker.cmd" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\Worker.njsproj" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\ChangeConfig.ps1" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\download.ps1" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\iisnode.yml" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\node.cmd" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\package.json" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\README.md" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\setup_web.cmd" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\TypeScriptWebApp.njsproj" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\Web.config" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\Web.Debug.config" />
+    <None Include="Theme\contrast.vstheme">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Theme\dark.vstheme">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Theme\make_theme_pkgdef.py" />
     <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\AddWebSiteExpressApp.njsproj">
       <SubType>Designer</SubType>
     </ZipProject>
@@ -928,6 +964,14 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteStarterExpressApp\respond.min.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteStarterExpressApp\user.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\Preview.png" />
+    <ZipProject Include="ProjectTemplates\CloudService\cloudservice.ico" />
+    <ZipProject Include="ProjectTemplates\CloudService\CloudService.vstemplate" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\Preview.png" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\TypeScriptExpressApp.vstemplate" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\Preview.png" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\Worker.vstemplate" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\Preview.png" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\TypeScriptWebApp.vstemplate" />
     <Content Include="Scripts\Typings\node\node.d.ts">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -988,34 +1032,20 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteStarterExpressApp\package.json" />
     <ZipProject Include="ProjectTemplates\AddWebSiteStarterExpressApp\README.md" />
     <ZipProject Include="ProjectTemplates\AddWebSiteStarterExpressApp\style.styl" />
-    <None Include="ProjectTemplates\AzureNodejsWorker\project.root" />
-    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Worker\Worker.njsproj">
+    <ZipProject Include="ProjectTemplates\AzureNodejsWorker\Worker.njsproj">
       <SubType>Designer</SubType>
-    </MultiProjectZipProject>
-    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\AzureNodejsWorker.vstemplate">
+    </ZipProject>
+    <ZipProject Include="ProjectTemplates\AzureNodejsWorker\Preview.png" />
+    <ZipProject Include="ProjectTemplates\AzureNodejsWorker\server.js" />
+    <ZipProject Include="ProjectTemplates\AzureNodejsWorker\startup.js" />
+    <ZipProject Include="ProjectTemplates\AzureNodejsWorker\Worker.vstemplate">
       <SubType>Designer</SubType>
-    </MultiProjectZipProject>
-    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Preview.png" />
-    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Worker\server.js" />
-    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Worker\startup.js" />
-    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Cloud\Cloud.vstemplate">
-      <SubType>Designer</SubType>
-    </MultiProjectZipProject>
-    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Worker\Worker.vstemplate">
-      <SubType>Designer</SubType>
-    </MultiProjectZipProject>
-    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Worker\download.ps1" />
-    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Worker\node.cmd" />
-    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Worker\package.json" />
-    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Worker\README.md" />
-    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Worker\setup_worker.cmd" />
-    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Cloud\diagnostics.wadcfg" />
-    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Cloud\ServiceConfiguration.Cloud.cscfg" />
-    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Cloud\ServiceConfiguration.Local.cscfg" />
-    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Cloud\ServiceDefinition.csdef" />
-    <MultiProjectZipProject Include="ProjectTemplates\AzureNodejsWorker\Cloud\Cloud.ccproj">
-      <SubType>Designer</SubType>
-    </MultiProjectZipProject>
+    </ZipProject>
+    <ZipProject Include="ProjectTemplates\AzureNodejsWorker\download.ps1" />
+    <ZipProject Include="ProjectTemplates\AzureNodejsWorker\node.cmd" />
+    <ZipProject Include="ProjectTemplates\AzureNodejsWorker\package.json" />
+    <ZipProject Include="ProjectTemplates\AzureNodejsWorker\README.md" />
+    <ZipProject Include="ProjectTemplates\AzureNodejsWorker\setup_worker.cmd" />
     <ZipItem Include="Templates\Files\MochaUnitTest\UnitTest.vstemplate">
       <SubType>Designer</SubType>
     </ZipItem>
@@ -1026,6 +1056,10 @@
     </ZipItem>
     <ZipItem Include="Templates\Files\UnitTest\UnitTest.js" />
     <Content Include="TestFrameworks\find_tests.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="TestFrameworks\Jasmine\jasmine.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
@@ -1048,6 +1082,8 @@
     <ZipItem Include="Templates\Files\TypeScriptUnitTest\UnitTest.vstemplate">
       <SubType>Designer</SubType>
     </ZipItem>
+    <None Include="Theme\Microsoft.NodejsTools.theme.v11.0.pkgdef" />
+    <None Include="Theme\Microsoft.NodejsTools.theme.v12.0.pkgdef" />
     <Content Include="VSTemplateStore.pkgdef">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -1231,28 +1267,15 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Web.Debug.config" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Web.config" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\iisnode.yml" />
-    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\AzureNodejsWorker.vstemplate">
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Preview.png" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\server.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\startup.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Worker.njsproj">
       <SubType>Designer</SubType>
-    </TypeScriptMultiProjectZipProject>
-    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Cloud\Cloud.vstemplate">
+    </TypeScriptProject>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Worker.vstemplate">
       <SubType>Designer</SubType>
-    </TypeScriptMultiProjectZipProject>
-    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Preview.png" />
-    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Worker\server.ts" />
-    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Worker\startup.ts" />
-    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Worker\Worker.njsproj">
-      <SubType>Designer</SubType>
-    </TypeScriptMultiProjectZipProject>
-    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Worker\Worker.vstemplate">
-      <SubType>Designer</SubType>
-    </TypeScriptMultiProjectZipProject>
-    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Cloud\Cloud.ccproj">
-      <SubType>Designer</SubType>
-    </TypeScriptMultiProjectZipProject>
-    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Cloud\diagnostics.wadcfg" />
-    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Cloud\ServiceConfiguration.Cloud.cscfg" />
-    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Cloud\ServiceConfiguration.Local.cscfg" />
-    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Cloud\ServiceDefinition.csdef" />
+    </TypeScriptProject>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptStarterExpressApp\about.jade" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptStarterExpressApp\contact.jade" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptStarterExpressApp\glyphicons-halflings-regular.eot" />
@@ -1281,12 +1304,11 @@
     <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\node.cmd" />
     <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\download.ps1" />
     <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\ChangeConfig.ps1" />
-    <None Include="ProjectTemplates\TypeScriptAzureNodejsWorker\project.root" />
-    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Worker\download.ps1" />
-    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Worker\node.cmd" />
-    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Worker\package.json" />
-    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Worker\README.md" />
-    <TypeScriptMultiProjectZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Worker\setup_worker.cmd" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\download.ps1" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\node.cmd" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\package.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\README.md" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\setup_worker.cmd" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\about.jade" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\contact.jade" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\glyphicons-halflings-regular.eot" />
@@ -1307,6 +1329,30 @@
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <_WebRoleZipItem Include="Templates\Files\CloudServiceWebRole\WebRole.vstemplate" />
+    <_WebRoleZipItem Include="Templates\Files\CloudServiceWebRole\roletemplatedata.xml" />
+    <_WebRoleZipItem Include="Templates\Files\CloudServiceTypeScriptWebRole\roletemplatedata.xml" />
+    <_WebRoleZipItem Include="Templates\Files\CloudServiceTypeScriptWebRole\TypeScriptWebRole.vstemplate" />
+    <_WebRoleZipItem Include="Templates\Files\CloudServiceExpressWebRole\ExpressWebRole.vstemplate" />
+    <_WebRoleZipItem Include="Templates\Files\CloudServiceExpressWebRole\roletemplatedata.xml" />
+    <_WebRoleZipItem Include="Templates\Files\CloudServiceTypeScriptExpressWebRole\roletemplatedata.xml" />
+    <_WebRoleZipItem Include="Templates\Files\CloudServiceTypeScriptExpressWebRole\TypeScriptExpressWebRole.vstemplate" />
+    <_WorkerRoleZipItem Include="Templates\Files\CloudServiceTypeScriptWorkerRole\roletemplatedata.xml" />
+    <_WorkerRoleZipItem Include="Templates\Files\CloudServiceTypeScriptWorkerRole\TypeScriptWorkerRole.vstemplate" />
+    <_WorkerRoleZipItem Include="Templates\Files\CloudServiceWorkerRole\roletemplatedata.xml" />
+    <_WorkerRoleZipItem Include="Templates\Files\CloudServiceWorkerRole\WorkerRole.vstemplate" />
+    <ZipItem Include="@(_WebRoleZipItem)">
+      <OutputSubPath>NETFramework4\Web Role\Node.js</OutputSubPath>
+      <Language>CloudService</Language>
+      <Visible>false</Visible>
+    </ZipItem>
+    <ZipItem Include="@(_WorkerRoleZipItem)">
+      <OutputSubPath>NETFramework4\Worker Role\Node.js</OutputSubPath>
+      <Language>CloudService</Language>
+      <Visible>false</Visible>
+    </ZipItem>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="..\Icons\JScript.ico">
@@ -1431,6 +1477,17 @@
   <ItemGroup>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\stylus.d.ts" />
   </ItemGroup>
+  <ItemGroup>
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\app.ts" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\express.d.ts" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\index.ts" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\stylus.d.ts" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\user.ts" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\server.ts" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\startup.ts" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\server.ts" />
+  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <!--
     To specify a different registry root to register your package, uncomment the TargetRegistryRoot
@@ -1457,18 +1514,22 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <Target Name="TransformTypeScriptProjects" BeforeTargets="MainResourcesGeneration;TransformMultiProjectZipProject">
+  <Target Name="TransformTypeScriptProjects" BeforeTargets="MainResourcesGeneration">
     <ItemGroup>
       <ZipProject Include="@(TypeScriptProject)">
         <Language>TypeScript</Language>
         <Culture>1033</Culture>
         <OutputSubPath>Node.js</OutputSubPath>
       </ZipProject>
-      <MultiProjectZipProject Include="@(TypeScriptMultiProjectZipProject)">
-        <Language>TypeScript</Language>
-        <Culture>1033</Culture>
-        <OutputSubPath>Node.js</OutputSubPath>
-      </MultiProjectZipProject>
+    </ItemGroup>
+  </Target>
+  <Target Name="DeployThemePkgdef" AfterTargets="CopyPkgDef" Inputs="Theme\Microsoft.NodejsTools.theme.v$(VSTarget).pkgdef" Outputs="$(OutputPath)Microsoft.NodejsTools.theme.pkgdef">
+    <Copy SourceFiles="Theme\Microsoft.NodejsTools.theme.v$(VSTarget).pkgdef" DestinationFiles="$(OutputPath)Microsoft.NodejsTools.theme.pkgdef" OverwriteReadOnlyFiles="true" />
+    <ItemGroup>
+      <VSIXSourceItem Include="$(OutputPath)Microsoft.NodejsTools.theme.pkgdef">
+        <VSIXSubPath>
+        </VSIXSubPath>
+      </VSIXSourceItem>
     </ItemGroup>
   </Target>
 </Project>

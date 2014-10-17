@@ -27,6 +27,7 @@ namespace Microsoft.NodejsTools.Npm {
         private readonly StringBuilder _authorBuff = new StringBuilder();
         private readonly StringBuilder _publishDateTime = new StringBuilder();
         private List<string> _keywords = new List<string>();
+        private List<string> _homepages = new List<string>();
 
         public NodeModuleBuilder() {
         }
@@ -42,6 +43,7 @@ namespace Microsoft.NodejsTools.Npm {
             //  because they're passed by reference.
             _dependencies = new List<IPackage>();
             _keywords = new List<string>();
+            _homepages = new List<string>();
 
             _descriptionBuff.Length = 0;
             _authorBuff.Length = 0;
@@ -66,7 +68,15 @@ namespace Microsoft.NodejsTools.Npm {
 
         public SemverVersion Version { get; set; }
 
-        public string Homepage { get; set; }
+        public IEnumerable<string> Homepages {
+            get {
+                return _homepages;
+            }
+        }
+
+        public void AddHomepage(string homepage) {
+            _homepages.Add(homepage);
+        }
 
         public void AppendToDescription(string text) {
             _descriptionBuff.Append(text);
@@ -125,7 +135,7 @@ namespace Microsoft.NodejsTools.Npm {
             proxy.Name = Name;
             proxy.Version = Version;
             proxy.Description = Description;
-            proxy.Homepage = Homepage;
+            proxy.Homepages = Homepages;
             proxy.PublishDateTimeString = PublishDateTimeString;
             proxy.RequestedVersionRange = RequestedVersionRange;
             proxy.Flags = Flags;

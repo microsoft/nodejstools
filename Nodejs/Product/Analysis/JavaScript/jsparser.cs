@@ -29,7 +29,7 @@ namespace Microsoft.NodejsTools.Parsing
     /// Class used to parse JavaScript source code into an abstract syntax tree.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
-    public class JSParser
+    internal class JSParser
     {
         private const int c_MaxSkippedTokenNumber = 50;
 
@@ -830,6 +830,10 @@ namespace Microsoft.NodejsTools.Parsing
                             span = span.UpdateWith(GetSpan(assignmentExpr));
                         }
                     }
+
+                    if (assignmentExpr is FunctionExpression) {
+                        ((FunctionExpression)assignmentExpr).Function.NameGuess = variableName;
+                    }
                 }
             }
             catch (RecoveryTokenException exc)
@@ -1286,7 +1290,7 @@ namespace Microsoft.NodejsTools.Parsing
 
                         if (JSToken.RightParenthesis != _curToken)
                         {
-                            ReportError(JSError.NoRightParenthesis);
+                            ReportError(JSError.NoRightParenthesis, true);
                         }
                         headerEnd = _curSpan.End;
 
@@ -3688,6 +3692,14 @@ namespace Microsoft.NodejsTools.Parsing
                                     Value = value
                                 };
 
+                                FunctionExpression functionExpr = value as FunctionExpression;
+                                if (functionExpr != null) {
+                                    string fieldName = field.Value as string;
+                                    if (fieldName != null) {
+                                        functionExpr.Function.NameGuess = fieldName;
+                                    }
+                                }
+
                                 propertyList.Add(property);
 
                                 if (JSToken.RightCurly == _curToken) {
@@ -3923,7 +3935,20 @@ namespace Microsoft.NodejsTools.Parsing
                                 m_noSkipTokenSet.Remove(NoSkipTokenSet.s_ParenToken);
                             }
 
-                            expression = new CallNode(CombineWithCurrentSpan(expression.EncodedSpan))
+                            EncodedSpan callSpan = expression.EncodedSpan;                          
+                            if (!m_useCurrentForNext) {
+                                // If we said don't use current for next, we can just combine 
+                                // with the current span. For instance, if there is already a right paren.
+                                callSpan = CombineWithCurrentSpan(callSpan);
+                            } else if (args.Count > 0) {
+                                // If we have args left after parsing the expression list, append to the last arg span.
+                                callSpan = CombineWithOtherSpan(
+                                    callSpan,
+                                    args[args.Count - 1].EncodedSpan
+                                );
+                            }
+
+                            expression = new CallNode(callSpan)
                                 {
                                     Function = expression,
                                     Arguments = ToArray(args),
@@ -4149,9 +4174,14 @@ namespace Microsoft.NodejsTools.Parsing
             switch (token)
             {
                 case JSToken.Assign:
-                    if (operand1 is Member && 
+                    if (operand1 is Member &&
                         operand2 is FunctionExpression) {
                         ((FunctionExpression)operand2).Function.NameGuess = ((Member)operand1).Name;
+                    }
+                    
+                    if (operand1 is Lookup && 
+                        operand2 is FunctionExpression) {
+                        ((FunctionExpression)operand2).Function.NameGuess = ((Lookup)operand1).Name;
                     }
                     // fall through
                     goto case JSToken.BitwiseAnd;
@@ -4453,7 +4483,7 @@ namespace Microsoft.NodejsTools.Parsing
 #if !SILVERLIGHT
     [Serializable]
 #endif
-    public class ParserException : Exception
+    internal class ParserException : Exception
     {
         private static string s_errorMsg = JScript.JSParserException;
 
@@ -4469,7 +4499,7 @@ namespace Microsoft.NodejsTools.Parsing
 #if !SILVERLIGHT
     [Serializable]
 #endif
-    public class UnexpectedTokenException : ParserException
+    internal class UnexpectedTokenException : ParserException
     {
         public UnexpectedTokenException() : base() { }
         public UnexpectedTokenException(string message) : base(message) { }
@@ -4482,7 +4512,7 @@ namespace Microsoft.NodejsTools.Parsing
 #if !SILVERLIGHT
     [Serializable]
 #endif
-    public class EndOfFileException : ParserException
+    internal class EndOfFileException : ParserException
     {
         public EndOfFileException() : base() { }
         public EndOfFileException(string message) : base(message) { }

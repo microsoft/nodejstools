@@ -18,7 +18,7 @@ using System;
 namespace Microsoft.NodejsTools.Parsing
 {
     [Serializable]
-    public sealed class ParameterDeclaration : Statement, INameDeclaration
+    internal sealed class ParameterDeclaration : Statement, INameDeclaration
     {
         public string Name
         {

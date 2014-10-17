@@ -61,17 +61,4 @@
       <ZipProject Include="@(TransformedZipProject->'%(RootDir)%(Directory)%(Filename)')" />
     </ItemGroup>
   </Target>
-  <Target Name="TransformMultiProjectZipProject" BeforeTargets="MainResourcesGeneration"
-          Inputs="@(MultiProjectZipProject)"
-          Outputs="@(MultiProjectZipProject->'$(ZipIntermediatePath)$([System.IO.Path]::GetFileName($([MSBuild]::GetDirectoryNameOfFileAbove(`%(FullPath)`, project.root)))).zip')">
-    <!-- Supports ziping up a new project template which contains multiple projects.  The project template needs to contain
-         a project.root file which indicates the root of the project file.  It can then have a directory hierarchy (needed for
-         multiple vstemplate files) below the project which ZipProject doesn't support -->
-    <ItemGroup>
-      <_ZipProject Include="@(MultiProjectZipProject)" Condition="'@(MultiProjectZipProject)' != ''">
-        <ZipFile>$(ZipIntermediatePath)$([System.IO.Path]::GetFileName($([MSBuild]::GetDirectoryNameOfFileAbove('%(MultiProjectZipProject.FullPath)', project.root)))).zip</ZipFile>
-        <RootPath>$([MSBuild]::MakeRelative($(MSBuildProjectDirectory), $([MSBuild]::GetDirectoryNameOfFileAbove('%(MultiProjectZipProject.FullPath)', project.root))))</RootPath>
-      </_ZipProject>
-    </ItemGroup>
-  </Target>
 </Project>

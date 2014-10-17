@@ -33,7 +33,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
             try {
                 Text = (string)value["text"];
             } catch (ArgumentException) {
-                Text = "";
+                Text = String.Empty;
             }
             Attributes = NodePropertyAttributes.None;
             Type = NodePropertyType.Normal;

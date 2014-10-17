@@ -82,7 +82,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
             List<DiscoveredTest> discoveredTests = (List<DiscoveredTest>)JsonConvert.DeserializeObject(testInfo, typeof(List<DiscoveredTest>));
             if (discoveredTests != null) {
                 foreach (DiscoveredTest discoveredTest in discoveredTests) {
-                    NodejsTestInfo test = new NodejsTestInfo(discoveredTest.File, discoveredTest.Test, Name);
+                    NodejsTestInfo test = new NodejsTestInfo(discoveredTest.File, discoveredTest.Test, Name, discoveredTest.Line, discoveredTest.Column);
                     testCases.Add(test);
                 }
             }
@@ -111,7 +111,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
 
         private string EvaluateJavaScript(string nodeExePath, string testFile, string discoverResultFile, IMessageLogger logger, string workingDirectory) {
             workingDirectory = workingDirectory.TrimEnd(new char['\\']);
-            string arguments = WrapWithQuot(_findTestsScriptFile)
+            string arguments = "--expose_debug_as=dbg " + WrapWithQuot(_findTestsScriptFile)
                 + " " + Name +
                 " " + WrapWithQuot(testFile) +
                 " " + WrapWithQuot(discoverResultFile) +
@@ -123,7 +123,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
             processStartInfo.RedirectStandardError = true;
             processStartInfo.RedirectStandardOutput = true;
 
-            string stdout = "";
+            string stdout = String.Empty;
             try {
                 using (var process = Process.Start(processStartInfo)) {
 
@@ -158,6 +158,8 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
             public string Test { get; set; }
             public string Suite { get; set; }
             public string File { get; set; }
+            public int Line { get; set; }
+            public int Column { get; set; }
         }
     }
 }

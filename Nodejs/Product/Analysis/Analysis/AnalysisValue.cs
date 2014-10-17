@@ -28,7 +28,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// analysis values include top-level code, classes, and functions.
     /// </summary>
     [Serializable]
-    public class AnalysisValue : IEnumerable {
+    internal class AnalysisValue : IEnumerable {
         [ThreadStatic]
         private static HashSet<AnalysisValue> _processing;
         private readonly AnalysisProxy _proxy;
@@ -134,32 +134,6 @@ namespace Microsoft.NodejsTools.Analysis {
             return new Dictionary<string, IAnalysisSet>();
         }
         
-        /// <summary>
-        /// Gets the constant value that this object represents, if it's a constant.
-        /// 
-        /// Returns Type.Missing if the value is not constant (because it returns null
-        /// if the type is None).
-        /// </summary>
-        /// <returns></returns>
-        public virtual object GetConstantValue() {
-            return Type.Missing;
-        }
-
-        /// <summary>
-        /// Returns the constant value as a string.  This returns a string if the constant
-        /// value is either a unicode or ASCII string.
-        /// </summary>
-        public string GetConstantValueAsString() {
-            var constName = GetConstantValue();
-            if (constName != null) {
-                string unicodeName = constName as string;
-                if (unicodeName != null) {
-                    return unicodeName;
-                } 
-            }
-            return null;
-        }
-
         internal virtual ProjectEntry DeclaringModule {
             get {
                 return null;
@@ -222,6 +196,24 @@ namespace Microsoft.NodejsTools.Analysis {
             return AnalysisSet.Empty;
         }
 
+        /// <summary>
+        /// Implements the internal [[GetProperty]] method.
+        /// </summary>
+        internal virtual IPropertyDescriptor GetProperty(Node node, AnalysisUnit unit, string name) {
+            return null;
+        }
+
+        internal virtual Dictionary<string, IAnalysisSet> GetOwnProperties(ProjectEntry accessor) {
+            return new Dictionary<string, IAnalysisSet>();
+        }
+
+        /// <summary>
+        /// Implements the internal [[Prototype]] property
+        /// </summary>
+        internal virtual IAnalysisSet GetPrototype(ProjectEntry accessor) {
+            return null;
+        }
+
         public virtual void SetMember(Node node, AnalysisUnit unit, string name, IAnalysisSet value) {
         }
 
@@ -229,6 +221,10 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         public virtual void AugmentAssign(BinaryOperator node, AnalysisUnit unit, IAnalysisSet value) {
+        }
+
+        public virtual IAnalysisSet BinaryOperation(BinaryOperator node, AnalysisUnit unit, IAnalysisSet value) {
+            return SelfSet.Union(value);
         }
 
         public virtual IAnalysisSet GetEnumerationValues(Node node, AnalysisUnit unit) {

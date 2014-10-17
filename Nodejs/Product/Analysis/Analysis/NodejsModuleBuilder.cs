@@ -28,11 +28,14 @@ namespace Microsoft.NodejsTools.Analysis {
         private readonly dynamic _all;
         //private readonly string _filename;
         private readonly JsAnalyzer _analyzer;
+        private readonly LazyPropertyFunctionValue _readableStream, _writableStream;
         private Dictionary<string, string> _moduleDocs = new Dictionary<string, string>();
 
         public NodejsModuleBuilder(string filename, JsAnalyzer analyzer) {
             _all = _serializer.DeserializeObject(File.ReadAllText(filename));
             _analyzer = analyzer;
+            _readableStream = new LazyPropertyFunctionValue(_analyzer._builtinEntry, "readable", "stream");
+            _writableStream = new LazyPropertyFunctionValue(_analyzer._builtinEntry, "writable", "stream");
         }
 
         public static void Build(string filename, JsAnalyzer analyzer) {
@@ -61,12 +64,20 @@ namespace Microsoft.NodejsTools.Analysis {
                         GenerateClass(exports, klass);
                     }
                 }
+
+                if (module.ContainsKey("properties")) {
+                    foreach (var property in module["properties"]) {
+                        if (property.ContainsKey("methods")) {
+                            GenerateClass(exports, property);
+                        }
+                    }
+                }
             }
 
             foreach (var module in _all["modules"]) {
                 var moduleName = FixModuleName((string)module["name"]);
                 var exports = exportsTable[moduleName];
-                Dictionary<string, CallDelegate> specialMethods;
+                Dictionary<string, FunctionSpecializer> specialMethods;
                 _moduleSpecializations.TryGetValue(moduleName, out specialMethods);
 
                 if (module.ContainsKey("methods")) {
@@ -74,6 +85,7 @@ namespace Microsoft.NodejsTools.Analysis {
                         GenerateMethod(exports, specialMethods, method);
                     }
                 }
+
             }
 
             foreach (var misc in _all["miscs"]) {
@@ -85,23 +97,13 @@ namespace Microsoft.NodejsTools.Analysis {
 
         }
 
-        private void GenerateMethod(ExpandoValue exports, Dictionary<string, CallDelegate> specialMethods, dynamic method) {
+        private void GenerateMethod(ExpandoValue exports, Dictionary<string, FunctionSpecializer> specialMethods, dynamic method) {
             string methodName = (string)method["name"];
-            /*
-            string body = null;
-            if (name == "path" && method["name"] is string) {
-                switch ((string)method["name"]) {
-                    case "relative": body = ReferenceCode.PathRelativeBody; break;
-                    case "normalize": body = ReferenceCode.PathNormalizeBody; break;
-                    case "resolve": body = ReferenceCode.PathResolveBody; break;
-                    case "join": body = ReferenceCode.PathJoinBody; break;
-                }
-            }*/
-            //GenerateMethod(name, method, indentation + 1, body);
+
             ObjectValue returnValue = null;
             if (methodName.StartsWith("create") && methodName.Length > 6) {
                 string klassName = methodName.Substring(6);
-                PropertyDescriptor propDesc;
+                PropertyDescriptorValue propDesc;
                 if (exports.Descriptors.TryGetValue(klassName, out propDesc) && propDesc.Values != null) {
                     var types = propDesc.Values.Types;
                     if (types != null && types.Count == 1) {
@@ -115,14 +117,14 @@ namespace Microsoft.NodejsTools.Analysis {
 
             foreach (var sig in method["signatures"]) {
                 BuiltinFunctionValue function;
-                CallDelegate specialMethod;
+                FunctionSpecializer specialMethod;
                 if (specialMethods != null &&
                     specialMethods.TryGetValue(methodName, out specialMethod)) {
-                    function = new SpecializedFunctionValue(
+                    function = specialMethod.Specialize(
                         exports.ProjectEntry,
                         methodName,
-                        specialMethod,
                         ParseDocumentation((string)method["desc"]),
+                        returnValue,
                         GetParameters(sig["params"])
                     );
                 } else if (returnValue != null) {
@@ -131,7 +133,6 @@ namespace Microsoft.NodejsTools.Analysis {
                         methodName,
                         returnValue.SelfSet,
                         ParseDocumentation((string)method["desc"]),
-                        true,
                         GetParameters(sig["params"])
                     );
                 } else {
@@ -139,7 +140,7 @@ namespace Microsoft.NodejsTools.Analysis {
                         exports.ProjectEntry,
                         methodName,
                         ParseDocumentation((string)method["desc"]),
-                        true,
+                        null,
                         GetParameters(sig["params"])
                     );
                 }
@@ -151,19 +152,29 @@ namespace Microsoft.NodejsTools.Analysis {
         private void GenerateClass(ObjectValue exports, dynamic klass) {
             string className = (string)klass["name"];
 
-            BuiltinFunctionValue klassValue = new BuiltinFunctionValue(
+            List<OverloadResult> overloads = new List<OverloadResult>();
+            var fixedClassName = FixClassName(className);
+            dynamic signatures;
+            if (klass.TryGetValue("signatures", out signatures)) {
+                foreach (var sig in signatures) {
+                    var parameters = GetParameters(sig["params"]);
+                    var doc = ParseDocumentation((string)sig["desc"]);
+
+                    overloads.Add(new SimpleOverloadResult(fixedClassName, doc, parameters));
+                }
+            }
+            BuiltinFunctionValue klassValue = new ClassBuiltinFunctionValue(
                 exports.ProjectEntry,
-                FixClassName(className),
-                ParseDocumentation((string)klass["desc"]),
-                true
-                // TODO: Signature?
+                fixedClassName,
+                overloads.ToArray(),
+                ParseDocumentation((string)klass["desc"])
             );
 
             exports.Add(klassValue);
 
             if (klass.ContainsKey("methods")) {
                 var prototype = (PrototypeValue)klassValue.Descriptors["prototype"].Values.Types.First().Value;
-                Dictionary<string, CallDelegate> classSpecializations;
+                Dictionary<string, FunctionSpecializer> classSpecializations;
                 _classSpecializations.TryGetValue(className, out classSpecializations);
                 foreach (var method in klass["methods"]) {
                     GenerateMethod(
@@ -182,13 +193,18 @@ namespace Microsoft.NodejsTools.Analysis {
                     );
                 }
             }
+
+            if (klass.ContainsKey("properties")) {
+                var prototype = (PrototypeValue)klassValue.Descriptors["prototype"].Values.Types.First().Value;
+
+                GenerateProperties(klass, prototype, null);
+            }
         }
 
         private void GenerateGlobal(ObjectValue exports, dynamic klass) {
             string name = FixClassName((string)klass["name"]);
             ObjectValue value = new BuiltinObjectValue(
                 exports.ProjectEntry,
-                null,
                 ParseDocumentation((string)klass["desc"])
             );
 
@@ -204,17 +220,60 @@ namespace Microsoft.NodejsTools.Analysis {
                 }
             }
 
+            Dictionary<string, PropertySpecializer> specializers;
+            _propertySpecializations.TryGetValue(name, out specializers);
+
+            GenerateProperties(klass, value, specializers);
+        }
+
+        private void GenerateProperties(dynamic klass, ObjectValue value, Dictionary<string, PropertySpecializer> specializers) {
             if (klass.ContainsKey("properties")) {
                 foreach (var prop in klass["properties"]) {
                     string propName = prop["name"];
                     string desc = ParseDocumentation(prop["desc"]);
 
+                    string textRaw = "";
+                    if (prop.ContainsKey("textRaw")) {
+                        textRaw = prop["textRaw"];
+                    }
+
+                    PropertySpecializer specializer;
+                    AnalysisValue propValue = null;
+                    if (specializers != null &&
+                        specializers.TryGetValue(propName, out specializer)) {
+                        propValue = specializer.Specialize(value.ProjectEntry, propName);
+                    } else if (desc.IndexOf("<code>Boolean</code>") != -1) {
+                        propValue = value.ProjectEntry.Analyzer._trueInst;
+                    } else if (desc.IndexOf("<code>Number</code>") != -1) {
+                        propValue = value.ProjectEntry.Analyzer._zeroIntValue;
+                    } else if (desc.IndexOf("<code>Readable Stream</code>") != -1) {
+                        propValue = _readableStream;
+                    } else if (desc.IndexOf("<code>Writable Stream</code>") != -1 || textRaw == "process.stderr") {
+                        propValue = _writableStream;
+                    } else if (!String.IsNullOrWhiteSpace(textRaw)) {
+                        int start, end;
+                        if ((start = textRaw.IndexOf('{')) != -1 && (end = textRaw.IndexOf('}')) != -1 &&
+                            start < end) {
+                            string typeName = textRaw.Substring(start, end - start);
+                            switch (typeName) {
+                                case "Boolean":
+                                    propValue = value.ProjectEntry.Analyzer._trueInst;
+                                    break;
+                                case "Number":
+                                    propValue = value.ProjectEntry.Analyzer._zeroIntValue;
+                                    break;
+                            }
+                        }
+                    }
+
+                    if (propValue == null) {
+                        propValue = new BuiltinObjectValue(value.ProjectEntry);
+                    }
+
                     value.Add(
                         new MemberAddInfo(
                             propName,
-                            new BuiltinObjectValue(
-                                exports.ProjectEntry
-                            ),
+                            propValue,
                             desc,
                             true
                         )
@@ -245,17 +304,6 @@ namespace Microsoft.NodejsTools.Analysis {
             return res.ToArray();
         }
 
-#if FALSE
-        public void Build(JsAnalyzer analyzer) {
-            var generator = new NodeReferenceGenerator();
-            var js = generator.GenerateJavaScript();
-            
-            File.WriteAllText("all.js", File.ReadAllText("IntellisenseHeader.js") + js);
-
-            var cs = generator.GenerateCSharp();
-            File.WriteAllText("modules.cs", cs);
-        }
-#endif
 
         private void GenerateModuleDocs() {
             foreach (var module in _all["modules"]) {
@@ -348,171 +396,6 @@ namespace Microsoft.NodejsTools.Analysis {
             string modName = FixModuleName(module["name"]);
 
             GenerateModuleWorker(module, indentation, modName);
-        }
-
-
-        private void GenerateModuleWorker(dynamic module, int indentation, string name) {
-            _output.Append(' ', indentation * 4);
-            _output.AppendFormat("function {0}() {{", name);
-            _output.AppendLine();
-
-            if (module.ContainsKey("desc")) {
-                _output.Append(' ', (indentation + 1) * 4);
-                _output.AppendFormat("/// <summary>{0}</summary>", FixDescription(module["desc"]));
-                _output.AppendLine();
-            }
-
-            if (module.ContainsKey("methods")) {
-                foreach (var method in module["methods"]) {
-                    string body = null;
-                    if (name == "path" && method["name"] is string) {
-                        switch ((string)method["name"]) {
-                            case "relative": body = ReferenceCode.PathRelativeBody; break;
-                            case "normalize": body = ReferenceCode.PathNormalizeBody; break;
-                            case "resolve": body = ReferenceCode.PathResolveBody; break;
-                            case "join": body = ReferenceCode.PathJoinBody; break;
-                        }
-                    }
-                    GenerateMethod(name, method, indentation + 1, body);
-                }
-            }
-
-            if (module.ContainsKey("events")) {
-                GenerateEvents(module["events"], indentation + 1);
-            }
-
-            if (module.ContainsKey("classes")) {
-                foreach (var klass in module["classes"]) {
-                    GenerateClass(name, klass, indentation + 1);
-                }
-            }
-
-            if (module.ContainsKey("properties")) {
-                Func<string, string> specializer;
-                PropertySpecializations.TryGetValue(name, out specializer);
-                GenerateProperties(module["properties"], indentation + 1, specializer);
-            }
-
-            _output.AppendFormat("}}", name);
-        }
-
-        private Dictionary<string, Func<string, string>> PropertySpecializations = MakePropertySpecializations();
-
-        private static Dictionary<string, Func<string, string>> MakePropertySpecializations() {
-            return new Dictionary<string, Func<string, string>>() {
-                { "__process", ProcessPropertySpecialization }
-            };
-        }
-
-        private static string ProcessPropertySpecialization(string propertyName) {
-            switch (propertyName) {
-                case "env":
-                    return "{}";
-                case "versions":
-                    return "{node: '0.10.0', v8: '3.14.5.8'}";
-                case "pid":
-                    return "0";
-                case "title":
-                    return "''";
-                case "platform":
-                    return "'win32'";
-                case "maxTickDepth":
-                    return "1000";
-                case "argv":
-                    return "[ 'node.exe' ]";
-
-            }
-            return null;
-        }
-
-        private void GenerateClass(string modName, dynamic klass, int indentation) {
-            string className = FixClassName(klass["name"]);
-            _output.Append(' ', indentation * 4);
-            _output.AppendFormat("function _{0}() {{", className);
-            _output.AppendLine();
-
-            if (klass.ContainsKey("methods")) {
-                foreach (var method in klass["methods"]) {
-                    GenerateMethod(modName + "." + className, method, indentation + 1);
-                }
-            }
-
-            if (klass.ContainsKey("events")) {
-                GenerateEvents(klass["events"], indentation + 1);
-            }
-
-            if (klass.ContainsKey("properties")) {
-                GenerateProperties(klass["properties"], indentation + 1, null);
-            }
-
-            _output.Append(' ', indentation * 4);
-            _output.AppendLine("}");
-
-            _output.AppendLine();
-            _output.AppendFormat("this.{0} = function() {{", className);
-            _output.AppendLine();
-            _output.AppendFormat("return new _{0}();", className);
-            _output.AppendLine();
-            _output.AppendLine("}");
-        }
-
-        private void GenerateProperties(dynamic properties, int indentation, Func<string, string> specializer) {
-            foreach (var prop in properties) {
-                string desc = "";
-                
-                if (prop.ContainsKey("desc")) {
-                    desc = prop["desc"];
-
-                    _output.Append(' ', indentation * 4);
-                    _output.AppendFormat("/// <field name='{0}'>{1}</field>",
-                        prop["name"],
-                        FixDescription(desc));
-                    _output.AppendLine();
-                }
-
-                string textRaw = "";
-                if (prop.ContainsKey("textRaw")) {
-                    textRaw = prop["textRaw"];
-                }
-
-                _output.Append(' ', indentation * 4);
-                AnalysisValue value = null;
-                if (desc.IndexOf("<code>Boolean</code>") != -1) {
-                    value = "true";
-                } else if (desc.IndexOf("<code>Number</code>") != -1) {
-                    value = "0";
-                } else if (desc.IndexOf("<code>Readable Stream</code>") != -1) {
-                    value = "require('stream').Readable()";
-                } else if (desc.IndexOf("<code>Writable Stream</code>") != -1 || textRaw == "process.stderr") {
-                    value = "require('stream').Writable()";
-                } else if (!String.IsNullOrWhiteSpace(textRaw)) {
-                    int start, end;
-                    if ((start = textRaw.IndexOf('{')) != -1 && (end = textRaw.IndexOf('}')) != -1 &&
-                        start < end) {
-                        string typeName = textRaw.Substring(start, end - start);
-                        switch (typeName) {
-                            case "Boolean":
-                                value = "true";
-                                break;
-                            case "Number":
-                                value = "0";
-                                break;
-                        }
-                    }
-                }
-
-                if (value == null) {
-                    if (specializer != null) {
-                        value = specializer(prop["name"]) ?? "undefined";
-                    }
-
-                    if (value == null) {
-                        value = "undefined";
-                    }
-                }
-                _output.AppendFormat("this.{0} = {1};", prop["name"], value);
-                _output.AppendLine();
-            }
         }
 
         private void GenerateEvents(dynamic events, int indentation) {

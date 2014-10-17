@@ -189,7 +189,11 @@ namespace Microsoft.NodejsTools.Analysis {
                 return;
             }
 
-            _unit = new AnalysisUnit(tree, EnvironmentRecord);
+            if (String.Equals(Path.GetFileName(FilePath), "gruntfile.js", StringComparison.OrdinalIgnoreCase)) {
+                _unit = new GruntfileAnalysisUnit(tree, EnvironmentRecord);
+            } else {
+                _unit = new AnalysisUnit(tree, EnvironmentRecord);
+            }
             _moduleDeps.EnqueueDependents();
 
             if (EnvironmentRecord.HasChildren) {
@@ -227,7 +231,7 @@ namespace Microsoft.NodejsTools.Analysis {
 
         internal ExportsValue InitNodejsVariables() {
             var filename = _analyzer.GetConstant(_filePath);
-            var dirName = _analyzer.GetConstant("");
+            var dirName = _analyzer.GetConstant(String.IsNullOrWhiteSpace(_filePath) ? "" : Path.GetDirectoryName(_filePath), alwaysCache: true);
             var module = _module = new ModuleValue(_filePath, _moduleRecord);
             var exports = new ExportsValue(_filePath, this);
             module.Add("exports", exports.Proxy);
@@ -320,7 +324,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// <summary>
     /// Represents a unit of work which can be analyzed.
     /// </summary>
-    public interface IAnalyzable {
+    internal interface IAnalyzable {
         void Analyze(CancellationToken cancel);
     }
 
@@ -328,7 +332,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// Represents a file which is capable of being analyzed.  Can be cast to other project entry types
     /// for more functionality.  See also IJsProjectEntry and IXamlProjectEntry.
     /// </summary>
-    public interface IProjectEntry : IAnalyzable {
+    internal interface IProjectEntry : IAnalyzable {
         /// <summary>
         /// Returns true if the project entry has been parsed and analyzed.
         /// </summary>
@@ -371,7 +375,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// files which it supports analyzing.  Provides the ParseContent method which
     /// is called when the parse queue is ready to update the file contents.
     /// </summary>
-    public interface IExternalProjectEntry : IProjectEntry {
+    internal interface IExternalProjectEntry : IProjectEntry {
         void ParseContent(TextReader content, IAnalysisCookie fileCookie);
     }
 
@@ -383,7 +387,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// by looking at the identity of the AnalysGroup object).  Then you call AnalyzeQueuedEntries on the
     /// group.
     /// </summary>
-    public interface IGroupableAnalysisProjectEntry {
+    internal interface IGroupableAnalysisProjectEntry {
         /// <summary>
         /// Analyzes this project entry optionally just adding it to the queue shared by the project.
         /// </summary>
@@ -398,11 +402,11 @@ namespace Microsoft.NodejsTools.Analysis {
     /// Represents a project which can support more efficent analysis of individual items via
     /// analyzing them together.
     /// </summary>
-    public interface IGroupableAnalysisProject {
+    internal interface IGroupableAnalysisProject {
         void AnalyzeQueuedEntries(CancellationToken cancel);
     }
 
-    public interface IJsProjectEntry : IGroupableAnalysisProjectEntry, IProjectEntry {
+    internal interface IJsProjectEntry : IGroupableAnalysisProjectEntry, IProjectEntry {
         /// <summary>
         /// Returns the last parsed AST.
         /// </summary>

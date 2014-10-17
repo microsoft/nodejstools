@@ -25,6 +25,7 @@ Features in Depth
 	* [wiki:"Azure Cloud Service - Web Role and Worker Role" AzureCloudService]
 * [wiki:"Test Explorer" TestExplorer]
 	* [wiki:"Extensibility" TestFrameworkExtensibility]
+* [wiki:"Pre and Post Build Actions (running grunt on build)" PreAndPostBuildActions]
 
 Release Notes
 -------------

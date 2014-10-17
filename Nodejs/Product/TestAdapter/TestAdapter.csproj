@@ -111,6 +111,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
@@ -182,6 +183,7 @@
       </VSIXSourceItem>
     </ItemGroup>
   </Target>
+  <Import Project="$(BuildRoot)\Nodejs\Product\Nodejs\SourceMapping\SourceMapping.proj" />
   <Import Project="..\ProjectAfter.settings" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

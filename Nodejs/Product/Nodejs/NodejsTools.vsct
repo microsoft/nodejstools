@@ -109,6 +109,16 @@
         </Strings>
       </Button>
 
+      <Button guid="guidNodeToolsCmdSet" id="cmdidCopyFullPath" priority="0x0610" type="Button">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_FOLDER_EXPLORE" />
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Copy F&amp;ull Path</ButtonText>
+          <ToolTipText>Copy Full Path</ToolTipText>
+        </Strings>
+      </Button>
+
       <Button guid="guidNodeToolsCmdSet" id="cmdidReplWindow" priority="0x7f00" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
         <Icon guid="guidReplImage" id="1"/>
@@ -254,13 +264,13 @@
     <CommandPlacement guid="guidNodeToolsCmdSet" id="CodeFileGroup" priority="0x600">
       <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_ITEMNODE"/>
     </CommandPlacement>
-    <CommandPlacement guid="guidVSStd2K" id="cmdidCopyFullPathName" priority="0x0610">
-      <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_FOLDER_EXPLORE" />
-    </CommandPlacement>
-    <CommandPlacement guid="guidVSStd2K" id="cmdidCopyFullPathName" priority="0x0601">
+    <CommandPlacement guid="guidNodeToolsCmdSet" id="cmdidCopyFullPath" priority="0x0200">
       <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJECT_EXPLORE"/>
     </CommandPlacement>
     <CommandPlacement guid="guidVSStd2K" id="cmdidCopyFullPathName" priority="0x0602">
+      <Parent guid="guidNodeToolsCmdSet" id="CodeFileGroup"/>
+    </CommandPlacement>
+    <CommandPlacement guid="guidNodeToolsCmdSet" id="cmdidCopyFullPath" priority="0x0602">
       <Parent guid="guidNodeToolsCmdSet" id="CodeFileGroup"/>
     </CommandPlacement>
     <CommandPlacement guid="guidNodeToolsCmdSet" id="cmdidOpenCommandPromptHere" priority="0x600">
@@ -312,6 +322,7 @@
       <!-- Shared commands, defined in CommonConstants.cs -->
       <IDSymbol name="cmdidAddExistingFolder" value="0x10001" />
       <IDSymbol name="cmdidOpenCommandPromptHere" value="0x10002" />
+      <IDSymbol name="cmdidCopyFullPath" value="0x10003" />
       
       <!-- Groups -->
       <IDSymbol name="ToolsMenuItemsGroup" value="0x1010" />

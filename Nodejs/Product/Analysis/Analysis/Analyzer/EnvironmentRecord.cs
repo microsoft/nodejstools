@@ -196,7 +196,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                     .Select(g => new { Description = g.Key, Count = g.Distinct().Count() })                    
                     .ToArray();
                 Array.Sort(distinctTypes, (x, y) => x.Description.CompareTo(y.Description));
-                string extra = "";
+                string extra = String.Empty;
                 if (types.Count >= 20) {
                     extra = "**20+**";
                 } else if (types.Count >= 10) {

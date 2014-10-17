@@ -191,7 +191,7 @@ namespace Microsoft.NodejsTools.Profiling {
                 target,
                 pszMkDocument
             );
-            pbstrEditorCaption = "";
+            pbstrEditorCaption = String.Empty;
             return VSConstants.S_OK;
         }
 

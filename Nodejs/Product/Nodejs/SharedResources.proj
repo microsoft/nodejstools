@@ -21,7 +21,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="$(_NodejsFilesLocation)\Resources.resx">
       <Link>NodejsProject\Resources.resx</Link>
-      <ManifestResourceName>Microsoft.NodejsTools.Project</ManifestResourceName>
+      <ManifestResourceName>Microsoft.NodejsTools.Resources</ManifestResourceName>
       <Visible>true</Visible>
     </EmbeddedResource>
   </ItemGroup>

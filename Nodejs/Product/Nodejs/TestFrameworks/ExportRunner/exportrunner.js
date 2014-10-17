@@ -10,10 +10,27 @@ var find_tests = function (testFileList, discoverResultFile) {
       console.error(ex);
     }
     for (var test in testCases) {
+      var line = 0;
+      var column = 0;
+      if (dbg != undefined) {
+        try {
+          var funcDetails = dbg.Debug.findFunctionSourceLocation(testCases[test]);
+          if (funcDetails != undefined) {
+            //v8 is 0 based line numbers, editor is 1 based
+            line = parseInt(funcDetails.line) + 1;
+            //v8 and editor are both 1 based column numbers, no adjustment necessary
+            column = parseInt(funcDetails.column);
+          }
+        } catch (e) {
+          //If we take an exception mapping the source line, simply fallback to unknown source map 
+        }
+      }
       testList.push({
         test: test,
         suite: '',
-        file: testFile
+        file: testFile,
+        line: line,
+        column: column
       });
     }
   });

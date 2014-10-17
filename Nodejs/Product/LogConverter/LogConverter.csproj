@@ -84,9 +84,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Nodejs\SourceMap.cs">
-      <Link>LogParsing\SourceMap.cs</Link>
-    </Compile>
     <Compile Include="EtlNativeMethods.cs" />
     <Compile Include="LogParsing\ITraceEvent.cs" />
     <Compile Include="LogParsing\ITraceEventCallback.cs" />
@@ -99,6 +96,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <Import Project="$(BuildRoot)\Nodejs\Product\Nodejs\SourceMapping\SourceMapping.proj" />
   <Import Project="..\ProjectAfter.settings" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -14,8 +14,7 @@ namespace TestAdapterTests {
             string testFramework = "mocha";
 
             //Act
-            NodejsTestInfo testInfo = new NodejsTestInfo(testFile, testName, testFramework);
-
+            NodejsTestInfo testInfo = new NodejsTestInfo(testFile, testName, testFramework, 0, 0);
             //Assert
             string expected = testFile + "::" + testName + "::" + testFramework;
             Assert.AreEqual(expected, testInfo.FullyQualifiedName);

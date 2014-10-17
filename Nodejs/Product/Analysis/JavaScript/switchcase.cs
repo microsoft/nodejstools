@@ -21,7 +21,7 @@ using System.Text;
 namespace Microsoft.NodejsTools.Parsing
 {
     [Serializable]
-    public sealed class SwitchCase : Statement
+    internal sealed class SwitchCase : Statement
     {
         private Expression m_caseValue;
         private Block m_statements;

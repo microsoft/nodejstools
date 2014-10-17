@@ -12,6 +12,8 @@
  *
  * ***************************************************************************/
 
+using System.Collections.Generic;
+
 namespace Microsoft.NodejsTools.Npm {
     public interface IRootPackage {
         INodeModules Modules { get; }
@@ -22,7 +24,7 @@ namespace Microsoft.NodejsTools.Npm {
         SemverVersion Version { get; }
         IPerson Author { get; }
         string Description { get; }
-        string Homepage { get; }
+        IEnumerable<string> Homepages { get; }
 
         string Path { get; }
     }

@@ -28,7 +28,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// <see cref="AnalysisSet" /> does not implement this interface, but
     /// provides factory and extension methods.
     /// </summary>
-    public interface IAnalysisSet : IEnumerable<AnalysisProxy> {
+    internal interface IAnalysisSet : IEnumerable<AnalysisProxy> {
         IAnalysisSet Add(AnalysisProxy item, out bool wasChanged);
         IAnalysisSet Union(IEnumerable<AnalysisProxy> items, out bool wasChanged);
         IAnalysisSet Clone();
@@ -43,14 +43,14 @@ namespace Microsoft.NodejsTools.Analysis {
     /// Marker interface to indicate that an analysis set is a read-only copy on write
     /// analysis set.
     /// </summary>
-    public interface IImmutableAnalysisSet : IAnalysisSet {
+    internal interface IImmutableAnalysisSet : IAnalysisSet {
     }
 
     /// <summary>
     /// Provides factory and extension methods for objects implementing
     /// <see cref="IAnalysisSet" />.
     /// </summary>
-    public static class AnalysisSet {
+    internal static class AnalysisSet {
         /// <summary>
         /// An empty set that does not combine types. This object is immutable
         /// and can be used without cloning.
@@ -532,12 +532,16 @@ namespace Microsoft.NodejsTools.Analysis {
 #endif
             if (Object.ReferenceEquals(x, y)) {
                 return true;
+            } else if (x == null) {
+                return y == null;
+            } else if (y == null || x.Value == null || y.Value == null) {
+                return false;
             }
-            return (x == null) ? (y == null) : x.Value.UnionEquals(y.Value, Strength);
+            return x.Value.UnionEquals(y.Value, Strength);
         }
 
         public int GetHashCode(AnalysisProxy obj) {
-            return (obj == null) ? 0 : obj.Value.UnionHashCode(Strength);
+            return (obj == null || obj.Value == null) ? 0 : obj.Value.UnionHashCode(Strength);
         }
 
         public AnalysisProxy MergeTypes(AnalysisProxy x, AnalysisProxy y, out bool wasChanged) {

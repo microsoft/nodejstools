@@ -23,7 +23,7 @@ namespace Microsoft.NodejsTools.Parsing
     /// Implementation of parenthetical '(' expr ')' operators
     /// </summary>
     [Serializable]
-    public class GroupingOperator : Expression
+    internal class GroupingOperator : Expression
     {
         private Expression m_operand;
 

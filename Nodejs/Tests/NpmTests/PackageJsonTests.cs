@@ -110,7 +110,7 @@ namespace NpmTests {
        ""package"",
        ""example"" 
    ],
-   ""homepage"": ""http://www.mypackagehomepage.com/"",
+   ""homepage"": [""http://www.mypackagehomepage.com/""],
    ""maintainers"": [
        {
            ""name"": ""Bill Smith"",
@@ -256,15 +256,27 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestReadNoHomepageNull() {
+        public void TestReadNoHomepageEmpty() {
             var pkg = LoadFrom(PkgSimple);
-            Assert.IsNull(pkg.Homepage, "Homepage should be null.");
+            Assert.AreEqual(0, pkg.Homepages.Count, "Homepage should be empty.");
         }
 
         [TestMethod, Priority(0)]
-        public void TestReadHomepage() {
+        public void TestReadHomepageCompliant() {
             var pkg = LoadFrom(PkgLargeCompliant);
-            Assert.AreEqual("http://www.mypackagehomepage.com/", pkg.Homepage, "Homepage mismatch.");
+            CheckStringArrayContents(
+                pkg.Homepages,
+                1,
+                new[] { "http://www.mypackagehomepage.com/" });
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestReadHomepageNonCompliant() {
+            var pkg = LoadFrom(PkgLargeNonCompliant);
+            CheckStringArrayContents(
+                pkg.Homepages,
+                1,
+                new[] { "http://www.mypackagehomepage.com/" });
         }
 
         [TestMethod, Priority(0)]

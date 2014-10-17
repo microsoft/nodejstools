@@ -173,26 +173,65 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             var coll = _eval.Evaluate(node.Collection);
             var variable = node.Variable as Var;
             var lookupVar = node.Variable as ExpressionStatement;
-            foreach (var value in coll) {
-                if (value.Value is ExportsValue) {
-                    var values = value.GetEnumerationValues(node, _unit);
-                    if (values.Count < 20) {
-                        Debug.WriteLine(String.Format("Enumerating: {1} {0}", value, values.Count));
-                        if (variable != null) {
-                            _eval.Scope.AssignVariable(
-                                variable.First().Name,
-                                node,
-                                _unit,
-                                values
-                            );
-                        } else if (lookupVar != null) {
-                            //_eval.AssignTo(node, lookupVar.Expression, values);
+            if (variable != null) {
+                string varName = variable.First().Name;
+                Debug.Assert(_eval.Scope.ContainsVariable(varName));
+                var prevVar = _eval.Scope.GetVariable(varName);
+                bool walkedBody = false;
+                if (coll.Count == 1) {
+                    foreach (var value in coll) {
+                        var values = value.GetEnumerationValues(node, _unit);
+                        if (values.Count < 50) {
+                            walkedBody = true;
+                            Debug.WriteLine(String.Format("Enumerating: {1} {0}", value, values.Count));
+
+                            foreach (var individualValue in values) {
+                                var newVar = new LocalNonEnqueingVariableDef();
+                                _eval.Scope.ReplaceVariable(variable.First().Name, newVar);
+
+                                _eval.Scope.AssignVariable(
+                                    varName,
+                                    node,
+                                    _unit,
+                                    individualValue
+                                );
+                                node.Body.Walk(this);
+                                prevVar.AddTypes(
+                                    _unit,
+                                    newVar.GetTypesNoCopy(
+                                        _unit.ProjectEntry,
+                                        _unit.ProjectEntry
+                                    )
+                                );
+                            }
                         }
                     }
                 }
+
+                if (!walkedBody) {
+                    foreach (var value in coll) {
+                        var values = value.GetEnumerationValues(node, _unit);
+                        prevVar.AddTypes(
+                            _unit,
+                            values
+                        );
+                    }
+
+                    // we replace the variable here so that we analyze w/ empty
+                    // types, but we do the assignment so users get completions against
+                    // anything in the for body.
+                    var newVar = new LocalNonEnqueingVariableDef();
+                    _eval.Scope.ReplaceVariable(variable.First().Name, newVar);
+
+                    node.Body.Walk(this);
+                }
+
+                _eval.Scope.ReplaceVariable(varName, prevVar);
+            } else if (lookupVar != null) {
+                // TODO: _eval.AssignTo(node, lookupVar.Expression, values);
+                node.Body.Walk(this);
             }
-                       
-            node.Body.Walk(this);
+
 
             return false;
         }

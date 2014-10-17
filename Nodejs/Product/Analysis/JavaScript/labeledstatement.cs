@@ -21,7 +21,7 @@ using System.Text;
 namespace Microsoft.NodejsTools.Parsing
 {
     [Serializable]
-    public sealed class LabeledStatement : Statement
+    internal sealed class LabeledStatement : Statement
     {
         private Statement m_statement;
 

@@ -21,7 +21,7 @@ using System.Text;
 namespace Microsoft.NodejsTools.Parsing
 {
     [Serializable]
-    public sealed class Member : Expression
+    internal sealed class Member : Expression
     {
         private Expression m_root;
 

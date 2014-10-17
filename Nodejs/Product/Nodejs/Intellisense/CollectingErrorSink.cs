@@ -16,7 +16,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Microsoft.NodejsTools.Parsing {
-    class CollectingErrorSink : ErrorSink {
+    internal class CollectingErrorSink : ErrorSink {
         private readonly List<ErrorResult> _errors = new List<ErrorResult>();
         private readonly List<ErrorResult> _warnings = new List<ErrorResult>();
 

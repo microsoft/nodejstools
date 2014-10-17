@@ -24,9 +24,11 @@ using EnvDTE80;
 using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudioTools;
+using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 using Task = System.Threading.Tasks.Task;
 
 namespace TestUtilities.UI {
@@ -39,6 +41,7 @@ namespace TestUtilities.UI {
         private AzureCloudServiceActivityLog _azureActivityLog;
         private IntPtr _mainWindowHandle;
         private readonly DTE _dte;
+        private IServiceProvider _provider;
         private List<Action> _onDispose;
         private bool _isDisposed, _skipCloseAll;
 
@@ -109,14 +112,22 @@ namespace TestUtilities.UI {
             }
         }
 
-        public T GetService<T>(Type type = null) {
-            System.IServiceProvider sp;
-            if (_dte == null) {
-                sp = VsIdeTestHostContext.ServiceProvider;
-            } else {
-                sp = new Microsoft.VisualStudio.Shell.ServiceProvider((Microsoft.VisualStudio.OLE.Interop.IServiceProvider)_dte);
+        public IServiceProvider ServiceProvider {
+            get {
+                if (_provider == null) {
+                    if (_dte == null) {
+                        _provider = VsIdeTestHostContext.ServiceProvider;
+                    } else {
+                        _provider = new ServiceProvider((IOleServiceProvider)_dte);
+                        OnDispose(() => ((ServiceProvider)_provider).Dispose());
+                    }
+                }
+                return _provider;
             }
-            return (T)sp.GetService(type ?? typeof(T));
+        }
+
+        public T GetService<T>(Type type = null) {
+            return (T)ServiceProvider.GetService(type ?? typeof(T));
         }
 
         /// <summary>
@@ -179,7 +190,17 @@ namespace TestUtilities.UI {
                 Console.WriteLine("Successfully executed command {0} {1}", commandName, commandArgs);
             });
 
-            if (!task.Wait(timeout)) {
+            bool timedOut = false;
+            try {
+                timedOut = !task.Wait(timeout);
+            } catch (AggregateException ae) {
+                foreach (var ex in ae.InnerExceptions) {
+                    Console.WriteLine(ex.ToString());
+                }
+                throw;
+            }
+
+            if (timedOut) {
                 string msg = String.Format("Command {0} failed to execute in specified timeout", commandName);
                 Console.WriteLine(msg);
                 DumpVS();
@@ -228,8 +249,7 @@ namespace TestUtilities.UI {
         }
 
         public SaveDialog SaveAs() {
-            var dialog = OpenDialogWithDteExecuteCommand("File.SaveSelectedItemsAs");
-            return new SaveDialog(dialog);
+            return SaveDialog.FromDte(this);
         }
 
         /// <summary>
@@ -349,6 +369,10 @@ namespace TestUtilities.UI {
 
             while (foundWindow != 0) {
                 IVsUIShell uiShell = GetService<IVsUIShell>(typeof(IVsUIShell));
+                if (uiShell == null) {
+                    return;
+                }
+                
                 IntPtr hwnd;
                 uiShell.GetDialogOwnerHwnd(out hwnd);
 
@@ -427,13 +451,13 @@ namespace TestUtilities.UI {
 
             int timeout = task == null ? 10000 : 60000;
 
-            while (timeout > 0 && hwnd == originalHwnd && (task == null || !task.IsCompleted)) {
+            while (timeout > 0 && hwnd == originalHwnd && (task == null || !(task.IsFaulted || task.IsCanceled))) {
                 timeout -= 500;
                 System.Threading.Thread.Sleep(500);
                 uiShell.GetDialogOwnerHwnd(out hwnd);
             }
 
-            if (task != null && task.IsFaulted) {
+            if (task != null && (task.IsFaulted || task.IsCanceled)) {
                 return IntPtr.Zero;
             }
 
@@ -519,14 +543,15 @@ namespace TestUtilities.UI {
             Console.WriteLine("Ending dialog: ");
             AutomationWrapper.DumpElement(AutomationElement.FromHandle(hwnd));
             Console.WriteLine("--------");
-            StringBuilder title = new StringBuilder(4096);
-            Assert.AreNotEqual(NativeMethods.GetDlgItemText(hwnd, dlgField, title, title.Capacity), (uint)0);
+            try {
+                StringBuilder title = new StringBuilder(4096);
+                Assert.AreNotEqual(NativeMethods.GetDlgItemText(hwnd, dlgField, title, title.Capacity), (uint)0);
 
-            string t = title.ToString();
-            foreach (string expected in text) {
-                Assert.IsTrue(t.Contains(expected), string.Format("Did not find '{0}' in '{1}'", expected, t));
+                string t = title.ToString();
+                AssertUtil.Contains(t, text);
+            } finally {
+                NativeMethods.EndDialog(hwnd, buttonId);
             }
-            NativeMethods.EndDialog(hwnd, buttonId);
         }
 
         /// <summary>
@@ -690,16 +715,6 @@ namespace TestUtilities.UI {
             }
             res.Append("Host");
             return res.ToString();
-        }
-
-        public void MoveCurrentFileToProject(string projectName) {
-            var dialog = OpenDialogWithDteExecuteCommand("file.ProjectPickerMoveInto");
-
-            var chooseDialog = new ChooseLocationDialog(dialog);
-            chooseDialog.FindProject(projectName);
-            chooseDialog.ClickOK();
-
-            WaitForDialogDismissed();
         }
 
         public DTE Dte {

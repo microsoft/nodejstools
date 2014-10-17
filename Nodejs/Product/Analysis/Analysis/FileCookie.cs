@@ -19,7 +19,7 @@ using System.IO.Compression;
 
 namespace Microsoft.NodejsTools.Analysis {
     [Serializable]
-    public class FileCookie : IAnalysisCookie {
+    internal class FileCookie : IAnalysisCookie {
         private readonly string _path;
         private string[] _allLines;
 

@@ -17,7 +17,7 @@ using System.Collections.Generic;
 
 namespace Microsoft.NodejsTools.Parsing {
     [Serializable]
-    public class LocationResolver {
+    internal class LocationResolver {
         private readonly List<int> _newLineLocations;
         private readonly SourceLocation _initialLocation;
         internal List<IndexSpan> _spans;

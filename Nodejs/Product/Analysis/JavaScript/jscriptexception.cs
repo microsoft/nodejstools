@@ -42,7 +42,7 @@ namespace Microsoft.NodejsTools.Parsing
 #if !SILVERLIGHT
     [Serializable]
 #endif
-    public class JScriptException : Exception
+    internal class JScriptException : Exception
     {
         #region private fields
 
@@ -311,7 +311,7 @@ namespace Microsoft.NodejsTools.Parsing
         #endregion
     }
 
-    public class JScriptExceptionEventArgs : EventArgs
+    internal class JScriptExceptionEventArgs : EventArgs
     {
         /// <summary>
         /// The JavaScript error information being fired

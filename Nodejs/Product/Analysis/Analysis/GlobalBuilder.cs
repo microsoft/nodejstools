@@ -1,10 +1,25 @@
-﻿using System;
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Analysis.Values;
 using Microsoft.NodejsTools.Parsing;
+using System.Globalization;
 
 namespace Microsoft.NodejsTools.Analysis {
     /// <summary>
@@ -25,16 +40,18 @@ namespace Microsoft.NodejsTools.Analysis {
             JsAnalyzer analyzer = _analyzer;
             var builtinEntry = analyzer._builtinEntry;
 
-            var stringValue = _analyzer.GetConstant("");
+            var stringValue = _analyzer.GetConstant(String.Empty);
             var boolValue = _analyzer.GetConstant(true);
             var doubleValue = _analyzer.GetConstant(0.0);
             AnalysisValue numberPrototype, stringPrototype, booleanPrototype, functionPrototype;
+            ExpandoValue arrayPrototype;
             FunctionValue arrayFunction;
             ObjectValue objectPrototype;
             BuiltinFunctionValue requireFunc;
+            BuiltinFunctionValue getOwnPropertyDescriptor;
 
             var globalObject = new GlobalValue(builtinEntry) {
-                (arrayFunction = ArrayFunction()),
+                (arrayFunction = ArrayFunction(out arrayPrototype)),
                 BooleanFunction(out booleanPrototype),
                 DateFunction(),
                 ErrorFunction(),
@@ -45,7 +62,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 Member("Math", MakeMathObject()),
                 Member("Infinity", analyzer.GetConstant(double.NaN)),
                 NumberFunction(out numberPrototype),
-                ObjectFunction(out objectPrototype),
+                ObjectFunction(out objectPrototype, out getOwnPropertyDescriptor),
                 ErrorFunction("RangeError"),
                 ErrorFunction("ReferenceError"),
                 RegExpFunction(),
@@ -194,16 +211,21 @@ All other strings are considered decimal.", isOptional:true)
                 functionPrototype,
                 arrayFunction,
                 objectPrototype,
-                requireFunc
+                requireFunc,
+                arrayPrototype,
+                getOwnPropertyDescriptor
             );
         }
 
-        private BuiltinFunctionValue ArrayFunction() {
+        private BuiltinFunctionValue ArrayFunction(out ExpandoValue arrayPrototype) {
             var builtinEntry = _analyzer._builtinEntry;
 
-            return new BuiltinFunctionValue(builtinEntry, "Array", createPrototype:false) { 
-                Member("prototype", 
-                    new BuiltinObjectValue(builtinEntry) {
+            return new SpecializedFunctionValue(
+                builtinEntry,
+                "Array",
+                NewArray,
+                null,
+                arrayPrototype = new BuiltinObjectValue(builtinEntry) {
                         BuiltinFunction(
                             "concat",
                             "Combines two or more arrays.",
@@ -262,12 +284,14 @@ All other strings are considered decimal.", isOptional:true)
                             Parameter("callbackfn", "A function that accepts up to three arguments. The map method calls the callbackfn function one time for each element in the array."),
                             Parameter("thisArg", "An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.")
                         ),
-                        BuiltinFunction(
+                        SpecializedFunction(
                             "pop",
+                            ArrayPopFunction,
                             "Removes the last element from an array and returns it"
-                        ),
-                        BuiltinFunction(
+                        ),                        
+                        SpecializedFunction(
                             "push",
+                            ArrayPushFunction,
                             "Appends new elements to an array, and returns the new length of the array.",
                             Parameter("item", "New element of the Array."),
                             Parameter("item...",  "New element of the Array.", isOptional: true)
@@ -292,8 +316,9 @@ All other strings are considered decimal.", isOptional:true)
                             "shift", 
                             "Removes the first element from an array and returns it."
                         ),
-                        BuiltinFunction(
+                        SpecializedFunction(
                             "slice",
+                            ArraySliceFunction,
                             "Returns a section of an array.",
                             Parameter("start", "The beginning of the specified portion of the array.", isOptional: true),
                             Parameter("end", "end The end of the specified portion of the array.", isOptional: true)
@@ -326,32 +351,97 @@ All other strings are considered decimal.", isOptional:true)
                             "Inserts new elements at the start of an array.",
                             Parameter("item...", "Element to insert at the start of the Array.")
                         ),
-                    }
-                ),
+                }) { 
                 new ReturningFunctionValue(builtinEntry, "isArray", _analyzer._falseInst.Proxy)
             };
         }
 
-        private static IAnalysisSet ArrayForEach(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
-            if (args.Length >= 1) {
-                foreach (var value in @this) {
-                    ArrayValue arr = value.Value as ArrayValue;
+        private static IAnalysisSet NewArray(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            IAnalysisSet value;
+            if (!unit._env.GlobalEnvironment.TryGetNodeValue(NodeEnvironmentKind.ArrayCall, node, out value)) {
+                var arrValue = new ArrayValue(
+                    new[] { new TypedDef() },
+                    unit.ProjectEntry,
+                    node
+                );
+                value = arrValue.SelfSet;
+                unit._env.GlobalEnvironment.AddNodeValue(NodeEnvironmentKind.ArrayCall, node, arrValue.SelfSet);
+            }
+
+            return value;
+        }
+
+        private static IAnalysisSet NewObject(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            IAnalysisSet value;
+            if (!unit._env.GlobalEnvironment.TryGetNodeValue(NodeEnvironmentKind.ObjectCall, node, out value)) {
+                var objValue = new ObjectLiteralValue(
+                    unit.ProjectEntry,
+                    node
+                );
+                value = objValue.SelfSet;
+                unit._env.GlobalEnvironment.AddNodeValue(NodeEnvironmentKind.ObjectCall, node, objValue.SelfSet);
+            }
+
+            return value;
+        }
+
+
+        private static IAnalysisSet ArrayPushFunction(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            if (args.Length >= 1 && @this != null) {                
+                foreach (var thisValue in @this) {
+                    ArrayValue arr = thisValue.Value as ArrayValue;
                     if (arr != null) {
-                        for (int i = 0; i < arr.IndexTypes.Length; i++) {
-                            foreach (var indexType in arr.IndexTypes) {
-                                args[0].Call(
-                                    node, 
-                                    unit, 
-                                    null, 
-                                    new IAnalysisSet[] { 
-                                        indexType.GetTypes(unit, arr.ProjectEntry), 
-                                        AnalysisSet.Empty, 
-                                        @this 
-                                    }
-                                );
+                        arr.PushValue(node, unit, args[0]);
+                    }
+                }
+            }
+            return unit.Analyzer._zeroIntValue.SelfSet;
+        }
+
+        private static IAnalysisSet ArrayPopFunction(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            IAnalysisSet res = AnalysisSet.Empty;
+            if (@this != null) {
+                foreach (var thisValue in @this) {
+                    ArrayValue arr = thisValue.Value as ArrayValue;
+                    if (arr != null) {
+                        res = res.Union(arr.PopValue(node, unit));
+                    }
+                }
+            }
+            return res;
+        }
+
+        private static IAnalysisSet ArraySliceFunction(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            IAnalysisSet res = AnalysisSet.Empty;
+            if (args.Length >= 1 && @this != null) {
+                foreach (var thisValue in @this) {
+                    ArrayValue arr = thisValue.Value as ArrayValue;
+                    if (arr != null) {
+                        res = res.Add(thisValue);
+                    }
+                }
+            }
+            return res;
+        }
+
+        [ThreadStatic]
+        private static bool _inForEach;
+
+        private static IAnalysisSet ArrayForEach(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            // prevent Array.forEach from calling Array.forEach recursively
+            if (!_inForEach) {
+                try {
+                    _inForEach = true;
+                    if (args.Length >= 1 && @this != null) {
+                        foreach (var value in @this) {
+                            ArrayValue arr = value.Value as ArrayValue;
+                            if (arr != null) {
+                                arr.ForEach(node, unit, @this, args);
                             }
                         }
                     }
+                } finally {
+                    _inForEach = false;
                 }
             }
             return unit.Analyzer._undefined.Proxy;
@@ -359,24 +449,45 @@ All other strings are considered decimal.", isOptional:true)
 
         private BuiltinFunctionValue BooleanFunction(out AnalysisValue booleanPrototype) {
             var builtinEntry = _analyzer._builtinEntry;
-            var prototype = Member("prototype",
-                new BuiltinObjectValue(builtinEntry) {
+            var prototype = new BuiltinObjectValue(builtinEntry) {
                     BuiltinFunction("constructor"),
                     ReturningFunction("toString", _analyzer._emptyStringValue),
                     BuiltinFunction("valueOf"),
-                }
-            );
-            booleanPrototype = prototype.Value;
-            return new BuiltinFunctionValue(builtinEntry, "Boolean", createPrototype: false) { 
-                prototype
             };
+            booleanPrototype = prototype;
+            return new BuiltinFunctionValue(builtinEntry, "Boolean", null, prototype);
         }
 
         private BuiltinFunctionValue DateFunction() {
             var builtinEntry = _analyzer._builtinEntry;
 
-            return new BuiltinFunctionValue(builtinEntry, "Date", createPrototype: false) { 
-                Member("prototype", 
+            return new BuiltinFunctionValue(
+                builtinEntry, 
+                "Date",
+                new[] { 
+                    new SimpleOverloadResult(
+                        "Date", 
+                        "Creates a new date from milliseconds specified in UTC starting at January 1, 1970", 
+                        "milliseconds"
+                    ),
+                    new SimpleOverloadResult(
+                        "Date", 
+                        "Creates a new date from the specified string", 
+                        "dateString"
+                    ),
+                    new SimpleOverloadResult(
+                        "Date", 
+                        "Creates a new date", 
+                        "year",
+                        "month",
+                        "day",
+                        "hours",
+                        "minutes",
+                        "seconds",
+                        "milliseconds"
+                    )
+                },
+                null,
                     new BuiltinObjectValue(builtinEntry) {
                         BuiltinFunction("constructor"),
                         ReturningFunction(
@@ -626,7 +737,22 @@ All other strings are considered decimal.", isOptional:true)
 
                         BuiltinFunction("toUTCString"),
                         BuiltinFunction("valueOf"),
-                    }
+                }) { 
+                ReturningFunction(
+                    "UTC",
+                    _analyzer._zeroIntValue,
+                    "Returns the number of milliseconds between midnight, January 1, 1970 Universal Coordinated Time (UTC) (or GMT) and the specified date."
+                ),
+                ReturningFunction(
+                    "parse",
+                    _analyzer._zeroIntValue,
+                    "Parses a string containing a date, and returns the number of milliseconds between that date and midnight, January 1, 1970.",
+                    new ParameterResult("dateVal", "A string containing a date")
+                ),
+                ReturningFunction(
+                    "now",
+                    _analyzer._zeroIntValue,
+                    "Returns the number of milliseconds between midnight, January 1, 1970, and the current date and time."
                 )
             };
         }
@@ -634,15 +760,16 @@ All other strings are considered decimal.", isOptional:true)
         private BuiltinFunctionValue ErrorFunction() {
             var builtinEntry = _analyzer._builtinEntry;
 
-            return new BuiltinFunctionValue(builtinEntry, "Error", createPrototype: false) { 
-                Member("prototype", 
+            return new BuiltinFunctionValue(
+                builtinEntry, 
+                "Error", 
+                null, 
                     new BuiltinObjectValue(builtinEntry) {
                         BuiltinFunction("constructor"),
                         BuiltinProperty("message", _analyzer._emptyStringValue),
                         BuiltinProperty("name", _analyzer._emptyStringValue),
                         ReturningFunction("toString", _analyzer._emptyStringValue),
-                    }
-                ),
+                }) { 
                 new BuiltinFunctionValue(builtinEntry, "captureStackTrace"),
                 Member("stackTraceLimit", _analyzer.GetConstant(10.0))
             };
@@ -651,8 +778,10 @@ All other strings are considered decimal.", isOptional:true)
         private BuiltinFunctionValue ErrorFunction(string errorName) {
             var builtinEntry = _analyzer._builtinEntry;
 
-            return new BuiltinFunctionValue(builtinEntry, errorName, createPrototype: false) { 
-                Member("prototype", 
+            return new BuiltinFunctionValue(
+                builtinEntry, 
+                errorName, 
+                null, 
                     new BuiltinObjectValue(builtinEntry) {
                         BuiltinFunction("arguments"),
                         BuiltinFunction("constructor"),
@@ -660,14 +789,12 @@ All other strings are considered decimal.", isOptional:true)
                         BuiltinFunction("stack"),
                         BuiltinFunction("type"),
                     }
-                )
-            };
+            );
         }
 
         private BuiltinFunctionValue FunctionFunction(out AnalysisValue functionPrototype) {
             var builtinEntry = _analyzer._builtinEntry;
-            var prototype = Member("prototype",
-                new ReturningConstructingFunctionValue(builtinEntry, "Empty", _analyzer._undefined.Proxy, null) {
+            var prototype = new ReturningConstructingFunctionValue(builtinEntry, "Empty", _analyzer._undefined.Proxy, null) {
                     SpecializedFunction(
                         "apply",
                         ApplyFunction,
@@ -691,12 +818,9 @@ The this object of the bound function is associated with the specified object, a
                     ),
                     BuiltinFunction("constructor"),
                     ReturningFunction("toString", _analyzer._emptyStringValue),
-                }
-            );
-            functionPrototype = prototype.Value;
-            return new BuiltinFunctionValue(builtinEntry, "Function", createPrototype: false) { 
-                prototype
             };
+            functionPrototype = prototype;
+            return new BuiltinFunctionValue(builtinEntry, "Function", null, prototype);
         }
 
         private static IAnalysisSet ApplyFunction(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
@@ -866,8 +990,7 @@ For example, the absolute value of -5 is the same as the absolute value of 5.",
         private BuiltinFunctionValue NumberFunction(out AnalysisValue numberPrototype) {
             var builtinEntry = _analyzer._builtinEntry;
 
-            var prototype = Member("prototype",
-                new BuiltinObjectValue(builtinEntry) {
+            var prototype = new BuiltinObjectValue(builtinEntry) {
                     BuiltinFunction("constructor"),
                     ReturningFunction(
                         "toExponential",
@@ -892,12 +1015,10 @@ For example, the absolute value of -5 is the same as the absolute value of 5.",
                         Parameter("radix", "Specifies a radix for converting numeric values to strings. This value is only used for numbers.", isOptional: true)
                     ),
                     BuiltinFunction("valueOf"),
-                }
-            );
-            numberPrototype = prototype.Value;
+            };
+            numberPrototype = prototype;
 
-            return new BuiltinFunctionValue(builtinEntry, "Number", createPrototype: false) { 
-                prototype,
+            return new BuiltinFunctionValue(builtinEntry, "Number", null, prototype) { 
                 Member("length", _analyzer.GetConstant(1.0)),
                 Member("name", _analyzer.GetConstant("Number")),
                 Member("arguments", _analyzer._nullInst),
@@ -920,19 +1041,10 @@ For example, the absolute value of -5 is the same as the absolute value of 5.",
             };
         }
 
-        private static readonly string[] _immutableObjectFields = new string[] { 
-            "create",
-            "defineProperty",
-            "defineProperties",
-            "getPrototypeOf",
-            "getOwnPropertyDescriptor",
-            "getOwnPropertyNames",
-        };
-
-        private BuiltinFunctionValue ObjectFunction(out ObjectValue objectPrototype) {
+        private BuiltinFunctionValue ObjectFunction(out ObjectValue objectPrototype, out BuiltinFunctionValue getOwnPropertyDescriptor) {
             var builtinEntry = _analyzer._builtinEntry;
 
-            objectPrototype = new BuiltinObjectValue(builtinEntry) {
+            objectPrototype = new BuiltinObjectPrototypeValue(builtinEntry) {
                 SpecializedFunction(
                     "__defineGetter__",
                     DefineGetter,
@@ -977,19 +1089,26 @@ For example, the absolute value of -5 is the same as the absolute value of 5.",
                 ),   
             };
 
-            return new BuiltinFunctionValue(builtinEntry, "Object", createPrototype: false) { 
-                Member("prototype", objectPrototype),
+            getOwnPropertyDescriptor = SpecializedFunction(
+                "getOwnPropertyDescriptor",
+                GetOwnPropertyDescriptor,
+                @"Gets the own property descriptor of the specified object. 
+An own property descriptor is one that is defined directly on the object and is not inherited from the object's prototype. ",
+                Parameter("o", "Object that contains the property."),
+                Parameter("p", "Name of the property.")
+            );
+
+            return new SpecializedFunctionValue(
+                builtinEntry, 
+                "Object", 
+                NewObject,
+                null,
+                objectPrototype) { 
                 BuiltinFunction(
                     "getPrototypeOf",
                     "Returns the prototype of an object."
                 ),
-                BuiltinFunction(
-                    "getOwnPropertyDescriptor",
-                    @"Gets the own property descriptor of the specified object. 
-An own property descriptor is one that is defined directly on the object and is not inherited from the object's prototype. ",
-                    Parameter("o", "Object that contains the property."),
-                    Parameter("p", "Name of the property.")
-                ),
+                getOwnPropertyDescriptor,
                 BuiltinFunction(
                     "getOwnPropertyNames",
                     @"Returns the names of the own properties of an object. The own properties of an object are those that are defined directly 
@@ -1051,13 +1170,40 @@ on that object, and are not inherited from the object's prototype. The propertie
                     "Returns a value that indicates whether new properties can be added to an object.",
                     Parameter("o", "Object to test.")
                 ),
-                BuiltinFunction(
+                SpecializedFunction(
                     "keys",
+                    ObjectKeys,
                     "Returns the names of the enumerable properties and methods of an object.",
                     Parameter("o", "Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.")
                 ),
-                BuiltinFunction("is"),
+                ReturningFunction("is", _analyzer._trueInst),
             };
+        }
+
+        private static IAnalysisSet ObjectKeys(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            ArrayValue arrValue;
+            IAnalysisSet value;
+            if (!unit._env.GlobalEnvironment.TryGetNodeValue(NodeEnvironmentKind.ObjectKeysArray, node, out value)) {
+                arrValue = new ArrayValue(
+                    new[] { new TypedDef() },
+                    unit.ProjectEntry,
+                    node
+                );
+                unit._env.GlobalEnvironment.AddNodeValue(NodeEnvironmentKind.ObjectKeysArray, node, arrValue.SelfSet);
+            } else {
+                arrValue = (ArrayValue)value.First().Value;
+            }
+
+            IAnalysisSet res = AnalysisSet.Empty;
+            if (args.Length >= 1) {
+                if (args[0].Count < unit.Analyzer.Limits.MaxObjectKeysTypes) {
+                    arrValue.IndexTypes[0].AddTypes(
+                        unit,
+                        args[0].GetEnumerationValues(node, unit)
+                    );
+                }
+            }
+            return arrValue.SelfSet;
         }
 
         private static IAnalysisSet DefineSetter(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
@@ -1066,7 +1212,7 @@ on that object, and are not inherited from the object's prototype. The propertie
                     ExpandoValue expando = thisVal.Value as ExpandoValue;
                     if (expando != null) {
                         foreach (var name in args[0]) {
-                            var nameStr = name.Value.GetConstantValueAsString();
+                            var nameStr = name.Value.GetStringValue();
                             if (nameStr != null) {
                                 expando.DefineSetter(unit, nameStr, args[1]);
                             }
@@ -1083,7 +1229,7 @@ on that object, and are not inherited from the object's prototype. The propertie
                     ExpandoValue expando = thisVal.Value as ExpandoValue;
                     if (expando != null) {
                         foreach (var name in args[0]) {
-                            var nameStr = name.Value.GetConstantValueAsString();
+                            var nameStr = name.Value.GetStringValue();
                             if (nameStr != null) {
                                 expando.DefineGetter(unit, nameStr, args[1]);
                                 // call the function w/ our this arg...
@@ -1096,14 +1242,44 @@ on that object, and are not inherited from the object's prototype. The propertie
             return unit.Analyzer._undefined.Proxy;
         }
 
+        private static IAnalysisSet GetOwnPropertyDescriptor(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            // Object.getOwnPropertyDescriptor(object, name)
+            // returns an object like:
+            //  {
+            //      get:<function>,
+            //      set:<function>,
+            //      value:<object>,
+            //      writable: boolean,
+            //      enumerable: boolean,
+            //      configurable: boolean
+            // }
+            if (args.Length >= 2) {
+                IAnalysisSet res = AnalysisSet.Empty;
+                foreach (var nameValue in args[1]) {
+                    string nameStr = nameValue.Value.GetStringValue();
+                    if (nameStr != null) {
+                        foreach (var value in args[0]) {
+                            var propDesc = value.Value.GetProperty(node, unit, nameStr) as PropertyDescriptorValue;
+                            if (propDesc != null) {
+                                res = res.Union(propDesc.SelfSet);
+                            }
+                        }
+                    }
+                }
+                return res;
+            }
+            return AnalysisSet.Empty;
+        }
+
         private static IAnalysisSet DefineProperty(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             // object, name, property desc
+
             if (args.Length >= 3) {
                 foreach (var obj in args[0]) {
                     ExpandoValue expando = obj.Value as ExpandoValue;
                     if (expando != null) {
                         foreach (var name in args[1]) {
-                            string propName = name.Value.GetConstantValueAsString();
+                            string propName = name.Value.GetStringValue();
                             if (propName != null) {
                                 foreach (var desc in args[2]) {
                                     expando.AddProperty(node, unit, propName, desc.Value);
@@ -1129,7 +1305,8 @@ on that object, and are not inherited from the object's prototype. The propertie
                             ExpandoValue propsObj = properties.Value as ExpandoValue;
                             if (propsObj != null && propsObj.Descriptors != null) {
                                 foreach (var propName in propsObj.Descriptors.Keys) {
-                                    foreach (var propValue in propsObj.Get(node, unit, propName)) {
+                                    var definingProperty = propsObj.Get(node, unit, propName);
+                                    foreach (var propValue in definingProperty) {
                                         target.AddProperty(
                                             node,
                                             unit,
@@ -1150,10 +1327,20 @@ on that object, and are not inherited from the object's prototype. The propertie
         }
 
         private static IAnalysisSet Require(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            CallNode call = (CallNode)node;
             IAnalysisSet res = AnalysisSet.Empty;
+            // we care a lot about require analysis and people do some pretty
+            // crazy dynamic things for require calls.  If we let our normal
+            // analysis and specialized function handle it we won't get things
+            // like handling './' + somePath.  So we'll go ahead and handle
+            // some special cases here...
+            if (IsSpecialRequire(unit, call, ref res)) {
+                return res;
+            }
+
             if (args.Length > 0) {
                 foreach (var arg in args[0]) {
-                    var moduleName = arg.Value.GetConstantValueAsString();
+                    var moduleName = arg.Value.GetStringValue();
                     if (moduleName != null) {
                         res = res.Union(
                             unit.Analyzer.Modules.RequireModule(
@@ -1169,11 +1356,34 @@ on that object, and are not inherited from the object's prototype. The propertie
             return res;
         }
 
+        private static bool IsSpecialRequire(AnalysisUnit unit, CallNode n, ref IAnalysisSet res) {
+            bool hitLiteral = false;
+            if (n.Arguments.Length == 1) {
+                var ee = new ExpressionEvaluator(unit);
+
+                foreach (var name in ee.MergeStringLiterals(n.Arguments[0])) {
+                    hitLiteral = true;
+                    res = res.Union(
+                        unit.Analyzer.Modules.RequireModule(
+                            n,
+                            unit,
+                            name,
+                            unit.DeclaringModuleEnvironment.Name
+                        )
+                    );
+                }
+            }
+
+            return hitLiteral;
+        }
+       
         private BuiltinFunctionValue RegExpFunction() {
             var builtinEntry = _analyzer._builtinEntry;
 
-            return new BuiltinFunctionValue(builtinEntry, "RegExp", createPrototype: false) { 
-                Member("prototype", 
+            return new BuiltinFunctionValue(
+                builtinEntry, 
+                "RegExp", 
+                null,
                     new BuiltinObjectValue(builtinEntry) {
                         BuiltinFunction("compile"),   
                         BuiltinFunction("constructor"),   
@@ -1194,8 +1404,7 @@ on that object, and are not inherited from the object's prototype. The propertie
                             Parameter("string", "String on which to perform the search.")
                         ),  
                         ReturningFunction("toString", _analyzer._emptyStringValue) 
-                    }
-                ),
+                }) { 
 // TODO:   input: [Getter/Setter],
 //  lastMatch: [Getter/Setter],
 //  lastParen: [Getter/Setter],
@@ -1233,8 +1442,7 @@ on that object, and are not inherited from the object's prototype. The propertie
 
         private BuiltinFunctionValue StringFunction(out AnalysisValue stringPrototype) {
             var builtinEntry = _analyzer._builtinEntry;
-            var prototype = Member("prototype",
-                new BuiltinObjectValue(builtinEntry) {
+            var prototype = new BuiltinObjectValue(builtinEntry) {
                     ReturningFunction(
                         "anchor",
                         _analyzer._emptyStringValue,
@@ -1382,16 +1590,18 @@ on that object, and are not inherited from the object's prototype. The propertie
                         "toLocaleUpperCase",
                         "Returns a string where all alphabetic characters have been converted to uppercase, taking into account the host environment's current locale."
                     ),
-                    BuiltinFunction(
+                    SpecializedFunction(
                         "toLowerCase",
+                        StringToLowerCase,
                         "Converts all the alphabetic characters in a string to lowercase."
                     ),
                     BuiltinFunction(
                         "toString",
                         "Returns a string representation of a string."
                     ),
-                    BuiltinFunction(
+                    SpecializedFunction(
                         "toUpperCase",
+                        StringToUpperCase,
                         "Converts all the alphabetic characters in a string to uppercase."
                     ),
                     BuiltinFunction(
@@ -1407,14 +1617,44 @@ on that object, and are not inherited from the object's prototype. The propertie
                         "Removes the trailing white space and line terminator characters from a string."
                     ),
                     BuiltinFunction("valueOf"),
-                }
-            );
-            stringPrototype = prototype.Value;
-
-            return new BuiltinFunctionValue(builtinEntry, "String", createPrototype: false) { 
-                prototype,
-                ReturningFunction("fromCharCode", _analyzer.GetConstant("")),
             };
+            stringPrototype = prototype;
+
+            return new BuiltinFunctionValue(builtinEntry, "String", null, prototype) { 
+                ReturningFunction("fromCharCode", _analyzer.GetConstant(String.Empty)),
+            };
+        }
+
+        private static IAnalysisSet StringToUpperCase(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            IAnalysisSet res = AnalysisSet.Empty;
+            if (@this != null) {
+                foreach (var arg in @this) {
+                    StringValue str = arg.Value as StringValue;
+                    if (str != null) {
+                        res = res.Union(unit.Analyzer.GetConstant(str._value.ToUpper(CultureInfo.CurrentCulture)).SelfSet);
+                    }
+                }
+            }
+            if (res.Count == 0) {
+                return unit.Analyzer._emptyStringValue.SelfSet;
+            }
+            return res;
+        }
+
+        private static IAnalysisSet StringToLowerCase(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            IAnalysisSet res = AnalysisSet.Empty;
+            if (@this != null) {
+                foreach (var arg in @this) {
+                    StringValue str = arg.Value as StringValue;
+                    if (str != null) {
+                        res = res.Union(unit.Analyzer.GetConstant(str._value.ToLower(CultureInfo.CurrentCulture)).SelfSet);
+                    }
+                }
+            }
+            if (res.Count == 0) {
+                return unit.Analyzer._emptyStringValue.SelfSet;
+            }
+            return res;
         }
 
         #region Building Helpers
@@ -1428,15 +1668,15 @@ on that object, and are not inherited from the object's prototype. The propertie
         }
 
         private BuiltinFunctionValue BuiltinFunction(string name, string documentation = null, params ParameterResult[] signature) {
-            return new BuiltinFunctionValue(_analyzer._builtinEntry, name, documentation, true, signature);
+            return new BuiltinFunctionValue(_analyzer._builtinEntry, name, documentation, null, signature);
         }
 
         private BuiltinFunctionValue ReturningFunction(string name, AnalysisValue value, string documentation = null, params ParameterResult[] parameters) {
-            return new ReturningFunctionValue(_analyzer._builtinEntry, name, value.Proxy, documentation, true, parameters);
+            return new ReturningFunctionValue(_analyzer._builtinEntry, name, value.Proxy, documentation, parameters);
         }
 
         private BuiltinFunctionValue SpecializedFunction(string name, CallDelegate value, string documentation = null, params ParameterResult[] parameters) {
-            return new SpecializedFunctionValue(_analyzer._builtinEntry, name, value, documentation, parameters);
+            return new SpecializedFunctionValue(_analyzer._builtinEntry, name, value, documentation, null, parameters);
         }
 
         private MemberAddInfo BuiltinProperty(string name, AnalysisValue propertyType, string documentation = null) {
@@ -1454,8 +1694,10 @@ on that object, and are not inherited from the object's prototype. The propertie
             FunctionPrototype;
         public readonly FunctionValue ArrayFunction;
         public readonly BuiltinFunctionValue RequireFunction;
+        public readonly ExpandoValue ArrayPrototype;
+        public readonly BuiltinFunctionValue ObjectGetOwnPropertyDescriptor;
 
-        public Globals(ObjectValue globalObject, AnalysisValue numberPrototype, AnalysisValue stringPrototype, AnalysisValue booleanPrototype, AnalysisValue functionPrototype, FunctionValue arrayFunction, ObjectValue objectPrototype, BuiltinFunctionValue requireFunction) {
+        public Globals(ObjectValue globalObject, AnalysisValue numberPrototype, AnalysisValue stringPrototype, AnalysisValue booleanPrototype, AnalysisValue functionPrototype, FunctionValue arrayFunction, ObjectValue objectPrototype, BuiltinFunctionValue requireFunction, ExpandoValue arrayPrototype, BuiltinFunctionValue objectGetOwnPropertyDescriptor) {
             GlobalObject = globalObject;
             NumberPrototype = numberPrototype;
             StringPrototype = stringPrototype;
@@ -1464,6 +1706,8 @@ on that object, and are not inherited from the object's prototype. The propertie
             ArrayFunction = arrayFunction;
             ObjectPrototype = objectPrototype;
             RequireFunction = requireFunction;
+            ArrayPrototype = arrayPrototype;
+            ObjectGetOwnPropertyDescriptor = objectGetOwnPropertyDescriptor;
         }
     }
 }

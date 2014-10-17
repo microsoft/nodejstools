@@ -19,11 +19,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Analysis {
-    public class OverloadResult : IOverloadResult {
+    internal class OverloadResult : IOverloadResult {
         private readonly ParameterResult[] _parameters;
         private readonly string _name;
 
-        public OverloadResult(ParameterResult[] parameters, string name) {
+        public OverloadResult(string name, params ParameterResult[] parameters) {
             _parameters = parameters;
             _name = name;
         }
@@ -41,9 +41,13 @@ namespace Microsoft.NodejsTools.Analysis {
 
     class SimpleOverloadResult : OverloadResult {
         private readonly string _documentation;
-        public SimpleOverloadResult(ParameterResult[] parameters, string name, string documentation)
-            : base(parameters, name) {
+        public SimpleOverloadResult(string name, string documentation, params ParameterResult[] parameters)
+            : base(name, parameters) {
             _documentation = documentation;
+        }
+
+        public SimpleOverloadResult(string name, string documentation, params string[] parameters)
+            : this(name, documentation, parameters.Select(x => new ParameterResult(x)).ToArray()) {
         }
 
         public override string Documentation {

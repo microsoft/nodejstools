@@ -87,6 +87,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AzureTests.cs" />
     <Compile Include="BaselineCompare.cs" />
     <Compile Include="MultiLineCommentTests.cs" />
     <Compile Include="CommentBlockTests.cs" />
@@ -127,6 +128,7 @@
     <Compile Include="LauncherTests.cs" />
     <Compile Include="Mocks\MockNodeVariable.cs" />
     <Compile Include="Debugger\Serialization\NodeVariablesFactoryTests.cs" />
+    <Compile Include="ProjectUpgradeTests.cs" />
     <Compile Include="ReferenceCodeTests.cs" />
     <Compile Include="ReplWindowTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

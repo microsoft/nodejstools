@@ -12,13 +12,23 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.ExceptionServices;
+using System.Threading;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace TestUtilities {
     public class AssertListener : TraceListener {
+        private readonly SynchronizationContext _testContext;
+
+        private AssertListener() {
+            _testContext = SynchronizationContext.Current;
+        }
+
         public override string Name {
             get { return "AssertListener"; }
             set { }
@@ -28,6 +38,22 @@ namespace TestUtilities {
             if (null == Debug.Listeners["AssertListener"]) {
                 Debug.Listeners.Add(new AssertListener());
                 Debug.Listeners.Remove("Default");
+
+                AppDomain.CurrentDomain.FirstChanceException += CurrentDomain_FirstChanceException;
+            }
+        }
+
+        static void CurrentDomain_FirstChanceException(object sender, FirstChanceExceptionEventArgs e) {
+            if (e.Exception is NullReferenceException || e.Exception is ObjectDisposedException) {
+                // Exclude safe handle messages because they are noisy
+                if (!e.Exception.Message.Contains("Safe handle has been closed")) {
+                    var log = new EventLog("Application");
+                    log.Source = "Application Error";
+                    log.WriteEntry(
+                        "First-chance exception: " + e.Exception.ToString(),
+                        EventLogEntryType.Warning
+                    );
+                }
             }
         }
 
@@ -77,7 +103,11 @@ namespace TestUtilities {
                 Debugger.Break();
             }
 
-            Assert.Fail(message);
+            if (_testContext != null && _testContext != SynchronizationContext.Current) {
+                _testContext.Post(_ => Assert.Fail(message), null);
+            } else {
+                Assert.Fail(message);
+            }
         }
 
         public override void WriteLine(string message) {

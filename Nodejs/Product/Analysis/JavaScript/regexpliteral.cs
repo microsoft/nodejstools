@@ -21,7 +21,7 @@ using System.Text.RegularExpressions;
 namespace Microsoft.NodejsTools.Parsing
 {
     [Serializable]
-    public sealed class RegExpLiteral : Expression
+    internal sealed class RegExpLiteral : Expression
     {
         public string Pattern { get; set; }
         public string PatternSwitches { get; set; }

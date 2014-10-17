@@ -21,7 +21,7 @@ using System.Text;
 namespace Microsoft.NodejsTools.Parsing
 {
     [Serializable]
-    public sealed class ReturnNode : Statement
+    internal sealed class ReturnNode : Statement
     {
         private Expression m_operand;
         public Expression Operand

@@ -16,7 +16,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("Node.js Tools for Visual Studio, Interactive Window")]
+[assembly: AssemblyTitle("Node.js Tools for Visual Studio - Interactive Window")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 

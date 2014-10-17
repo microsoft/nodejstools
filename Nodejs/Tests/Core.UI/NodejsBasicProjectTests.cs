@@ -36,10 +36,10 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var project = solution.WaitForItem("AddNewTypeScriptItem", "server.js");
                 AutomationWrapper.Select(project);
 
-                var dialog = solution.App.OpenDialogWithDteExecuteCommand("Project.AddNewItem");
-                var newItem = new NewItemDialog(AutomationElement.FromHandle(dialog));
-                newItem.FileName = "NewTSFile.ts";
-                newItem.ClickOK();
+                using (var newItem = NewItemDialog.FromDte(solution.App)) {
+                    newItem.FileName = "NewTSFile.ts";
+                    newItem.OK();
+                }
 
                 using (AutoResetEvent buildDone = new AutoResetEvent(false)) {
                     solution.App.Dte.Events.BuildEvents.OnBuildDone += (sender, args) => {
@@ -124,13 +124,13 @@ while(true) {{
             var filename = Path.Combine(TestData.GetTempPath(), Path.GetRandomFileName());
             Console.WriteLine("Temp file is: {0}", filename);
             var code = String.Format(@"
-require('fs').writeFileSync('{0}', process.env.fob);
+require('fs').writeFileSync('{0}', process.env.fob + process.env.bar + process.env.baz);
 while(true) {{
 }}", filename.Replace("\\", "\\\\"));
 
             var project = Project("EnvironmentVariables",
                 Compile("server", code),
-                Property(NodejsConstants.EnvironmentVariables, "fob=100"),
+                Property(NodejsConstants.Environment, "fob=1\nbar=2;3\r\nbaz=4"),
                 Property(CommonConstants.StartupFile, "server.js")
             );
 
@@ -141,12 +141,12 @@ while(true) {{
                 for (int i = 0; i < 10 && !File.Exists(filename); i++) {
                     System.Threading.Thread.Sleep(1000);
                 }
-                Assert.IsTrue(File.Exists(filename), "debugger port not written out");
+                Assert.IsTrue(File.Exists(filename), "environment variables not written out");
                 solution.App.Dte.ExecuteCommand("Debug.StopDebugging");
 
                 Assert.AreEqual(
                     File.ReadAllText(filename),
-                    "100"
+                    "12;34"
                 );
             }
         }
@@ -157,12 +157,12 @@ while(true) {{
             var filename = Path.Combine(TestData.GetTempPath(), Path.GetRandomFileName());
             Console.WriteLine("Temp file is: {0}", filename);
             var code = String.Format(@"
-require('fs').writeFileSync('{0}', process.env.fob);
+require('fs').writeFileSync('{0}', process.env.fob + process.env.bar + process.env.baz);
 ", filename.Replace("\\", "\\\\"));
 
             var project = Project("EnvironmentVariables",
                 Compile("server", code),
-                Property(NodejsConstants.EnvironmentVariables, "fob=123"),
+                Property(NodejsConstants.Environment, "fob=1\nbar=2;3\r\nbaz=4"),
                 Property(CommonConstants.StartupFile, "server.js")
             );
 
@@ -172,11 +172,11 @@ require('fs').writeFileSync('{0}', process.env.fob);
                 for (int i = 0; i < 10 && !File.Exists(filename); i++) {
                     System.Threading.Thread.Sleep(1000);
                 }
-                Assert.IsTrue(File.Exists(filename), "debugger port not written out");
+                Assert.IsTrue(File.Exists(filename), "environment variables not written out");
 
                 Assert.AreEqual(
                     File.ReadAllText(filename),
-                    "123"
+                    "12;34"
                 );
             }
         }
@@ -188,7 +188,7 @@ require('fs').writeFileSync('{0}', process.env.fob);
 
             var project = Project("ProjectProperties",
                 Compile("server"),
-                Property(NodejsConstants.EnvironmentVariables, "fob=123"),
+                Property(NodejsConstants.Environment, "fob=1\r\nbar=2;3\nbaz=4"),
                 Property(NodejsConstants.DebuggerPort, "1234"),
                 Property(CommonConstants.StartupFile, "server.js")
             );
@@ -217,16 +217,21 @@ require('fs').writeFileSync('{0}', process.env.fob);
                 );
 
                 Assert.AreEqual(debuggerPort.Value, "1234");
-                Assert.AreEqual(envVars.Value, "fob=123");
+                Assert.AreEqual(envVars.Value, "fob=1\r\nbar=2;3\r\nbaz=4");
 
                 debuggerPort.Value = "2468";
-                envVars.Value = "baz=246";
+
+                // Multi-line text box does not support setting value via automation.
+                envVars.SetFocus();
+                Keyboard.ControlA();
+                Keyboard.Backspace();
+                Keyboard.Type("fob=0\nbar=0;0\nbaz=0");
 
                 solution.App.Dte.ExecuteCommand("File.SaveAll");
 
                 var projFile = File.ReadAllText(solution.Project.FullName);
                 Assert.AreNotEqual(-1, projFile.IndexOf("<DebuggerPort>2468</DebuggerPort>"));
-                Assert.AreNotEqual(-1, projFile.IndexOf("<EnvironmentVariables>baz=246</EnvironmentVariables>"));
+                Assert.AreNotEqual(-1, projFile.IndexOf("<Environment>fob=0\r\nbar=0;0\r\nbaz=0</Environment>"));
             }
         }
     }

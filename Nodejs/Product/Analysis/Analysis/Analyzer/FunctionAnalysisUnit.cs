@@ -72,6 +72,11 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
 
         internal override void AnalyzeWorker(DDG ddg, CancellationToken cancel) {
+            if (Function.ArgumentsVariable != null &&
+                !ddg.Scope.ContainsVariable("arguments")) {
+                ddg.Scope.AddVariable("arguments", Function.ArgumentsVariable);
+            }
+
             // Set the scope to within the function
             ddg.Scope = Environment;
 
@@ -90,7 +95,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             }
         }
 
-        public bool AddArgumentTypes(FunctionEnvironmentRecord funcScope, IAnalysisSet[] arguments, int typeLimit = Int32.MaxValue) {
+        public bool AddArgumentTypes(FunctionEnvironmentRecord funcScope, IAnalysisSet @this, IAnalysisSet[] arguments, int typeLimit = Int32.MaxValue) {
             bool added = false;
             if (Ast.ParameterDeclarations != null) {
                 for (int i = 0; i < Ast.ParameterDeclarations.Length && i < arguments.Length; i++) {
@@ -102,11 +107,18 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                     added |= variable.AddTypes(this, arguments[i], false);
                 }
             }
+
+            if (@this != null) {
+                added |= funcScope._this.AddTypes(this, @this, false);
+                if (typeLimit != Int32.MaxValue) {
+                    added |= funcScope._this.MakeUnionStrongerIfMoreThan(typeLimit, @this);
+                }
+            }
             return added;
         }
 
         public override string ToString() {
-            string parameters = "";
+            string parameters = String.Empty;
             if(Ast.ParameterDeclarations != null) {
                 parameters = string.Join(", ", 
                     Ast.ParameterDeclarations.Select(p => Environment.GetVariable(p.Name).GetTypesNoCopy(this).ToString()));

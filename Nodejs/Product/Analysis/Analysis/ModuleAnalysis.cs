@@ -31,7 +31,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// Can be queried for various information about the resulting analysis.
     /// </summary>
     [Serializable]
-    public sealed class ModuleAnalysis {
+    internal sealed class ModuleAnalysis {
         private readonly AnalysisUnit _unit;
         private readonly ModuleEnvironmentRecord _scope;
         private readonly IAnalysisCookie _cookie;
@@ -89,7 +89,7 @@ namespace Microsoft.NodejsTools.Analysis {
 
         internal IEnumerable<AnalysisVariable> ReferencablesToVariables(IEnumerable<IReferenceable> defs) {
             foreach (var def in defs) {
-                foreach (var res in VariableTransformer.ScopeToVariables.ToVariables(_unit, def)) {
+                foreach (var res in VariableTransformer.OtherToVariables.ToVariables(_unit, def)) {
                     yield return res;
                 }
             }
@@ -302,7 +302,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 return result;
             } catch (Exception) {
                 // TODO: log exception
-                return new[] { new SimpleOverloadResult(new ParameterResult[0], "Unknown", "IntellisenseError_Sigs") };
+                return new[] { new SimpleOverloadResult("Unknown", "IntellisenseError_Sigs", new ParameterResult[0]) };
             }
         }
 

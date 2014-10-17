@@ -19,7 +19,7 @@ using Microsoft.Win32;
 
 namespace Microsoft.NodejsTools.Analysis {
     [Serializable]
-    public class AnalysisLimits {
+    internal class AnalysisLimits {
         public AnalysisLimits() {
             ReturnTypes = 20;
             InstanceMembers = 50;
@@ -28,6 +28,21 @@ namespace Microsoft.NodejsTools.Analysis {
             IndexTypes = 30;
             AssignedTypes = 100;
             MergedArgumentTypes = 30;
+            MaxArrayLiterals = 50;
+            MaxObjectLiteralProperties = 50;
+            MaxObjectKeysTypes = 5;
+            MaxMergeTypes = 5;
+        }
+
+        public static AnalysisLimits MakeLowAnalysisLimits() {
+            return new AnalysisLimits() {
+                ReturnTypes = 1,
+                AssignedTypes = 1,
+                DictKeyTypes = 1,
+                DictValueTypes = 1,
+                IndexTypes = 1,
+                InstanceMembers = 1
+            };
         }
 
         /// <summary>
@@ -75,6 +90,25 @@ namespace Microsoft.NodejsTools.Analysis {
         /// </summary>
         public int MergedArgumentTypes { get; set; }
 
+        /// <summary>
+        /// The maximum number of elements an array literal can contain before
+        /// simplifying the analysis.
+        /// </summary>
+        public int MaxArrayLiterals { get; set; }
+
+        /// <summary>
+        /// The maximum number of elements an object literal can contain
+        /// before simplifying the analysis.
+        /// </summary>
+        public int MaxObjectLiteralProperties { get; set; }
+
+        public int MaxObjectKeysTypes { get; set; }
+
+        /// <summary>
+        /// Gets the maximum number of types which can be merged at once.
+        /// </summary>
+        public int MaxMergeTypes { get; set; }
+
         public override bool Equals(object obj) {
             AnalysisLimits other = obj as AnalysisLimits;
             if (other != null) {
@@ -85,7 +119,11 @@ namespace Microsoft.NodejsTools.Analysis {
                     other.DictValueTypes == DictValueTypes &&
                     other.IndexTypes == IndexTypes &&
                     other.AssignedTypes == AssignedTypes &&
-                    other.MergedArgumentTypes == MergedArgumentTypes;
+                    other.MergedArgumentTypes == MergedArgumentTypes &&
+                    other.MaxArrayLiterals == MaxArrayLiterals &&
+                    other.MaxObjectLiteralProperties == MaxObjectLiteralProperties &&
+                    other.MaxObjectKeysTypes == MaxObjectKeysTypes &&
+                    other.MaxMergeTypes == MaxMergeTypes;
             }
             return false;
         }
@@ -98,7 +136,11 @@ namespace Microsoft.NodejsTools.Analysis {
                 DictValueTypes +
                 IndexTypes +
                 AssignedTypes +
-                MergedArgumentTypes;
+                MergedArgumentTypes +
+                MaxArrayLiterals +
+                MaxObjectLiteralProperties +
+                MaxObjectKeysTypes +
+                MaxMergeTypes;
         }
     }
 }

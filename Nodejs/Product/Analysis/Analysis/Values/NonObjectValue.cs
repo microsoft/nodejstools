@@ -39,6 +39,14 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             return Prototype.Get(node, unit, name);
         }
 
+        internal override IPropertyDescriptor GetProperty(Node node, AnalysisUnit unit, string name) {
+            return Prototype.GetProperty(node, unit, name);
+        }
+
+        internal override Dictionary<string, IAnalysisSet> GetOwnProperties(ProjectEntry accessor) {
+            return Prototype.GetOwnProperties(accessor);
+        }
+
         public IEnumerable<IReferenceable> GetDefinitions(string name) {
             var proto = Prototype as IReferenceableContainer;
             if (proto != null) {

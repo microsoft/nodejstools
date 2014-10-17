@@ -163,6 +163,8 @@
     <Compile Include="Analysis\AnalysisExtensions.cs" />
     <Compile Include="Analysis\AnalysisHashSet.cs" />
     <Compile Include="Analysis\AnalysisSerializationSupportedTypeAttribute.cs" />
+    <Compile Include="Analysis\AnalysisValueExtensions.cs" />
+    <Compile Include="Analysis\Analyzer\GruntfileAnalysisUnit.cs" />
     <Compile Include="Analysis\IAnalysisSerializeAsNull.cs" />
     <Compile Include="Analysis\AnalysisSerializer.cs" />
     <Compile Include="Analysis\AnalysisLimits.cs" />
@@ -194,9 +196,10 @@
     <Compile Include="Analysis\IDetachableProxy.cs" />
     <Compile Include="Analysis\NodejsModuleBuilder.Specializations.cs" />
     <Compile Include="Analysis\Validation.cs" />
+    <Compile Include="Analysis\Values\ArgumentsValue.cs" />
     <Compile Include="Analysis\Values\BooleanValue.cs" />
     <Compile Include="Analysis\Deque.cs" />
-    <Compile Include="Analysis\EncodedLocation.cs" />
+    <Compile Include="Analysis\EncodedSpanExtensions.cs" />
     <Compile Include="Analysis\ExportedMemberInfo.cs" />
     <Compile Include="Analysis\FileCookie.cs" />
     <Compile Include="Analysis\GetMemberOptions.cs" />
@@ -235,6 +238,7 @@
     <Compile Include="Analysis\SetOfTwo.cs" />
     <Compile Include="Analysis\SingleDict.cs" />
     <Compile Include="Analysis\Values\ObjectLiteralValue.cs" />
+    <Compile Include="Analysis\Values\PropertyDescriptorValue.cs" />
     <Compile Include="Analysis\Values\PrototypeValue.cs" />
     <Compile Include="Analysis\Values\SpecializedUserFunctionValue.cs" />
     <Compile Include="Analysis\Values\StringValue.cs" />

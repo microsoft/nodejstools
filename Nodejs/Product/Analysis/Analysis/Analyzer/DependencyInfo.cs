@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Analyzer {
     /// <summary>
@@ -93,10 +94,12 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             var matches = new Dictionary<AnalysisProxy, List<KeyValuePair<AnalysisProxy, IAnalysisSet>>>(cmp);
             foreach (var keyValue in KeyValues) {
                 List<KeyValuePair<AnalysisProxy, IAnalysisSet>> values;
-                if (!matches.TryGetValue(keyValue.Key, out values)) {
-                    values = matches[keyValue.Key] = new List<KeyValuePair<AnalysisProxy, IAnalysisSet>>();
+                if (keyValue.Key.Value != null) {
+                    if (!matches.TryGetValue(keyValue.Key, out values)) {
+                        values = matches[keyValue.Key] = new List<KeyValuePair<AnalysisProxy, IAnalysisSet>>();
+                    }
+                    values.Add(keyValue);
                 }
-                values.Add(keyValue);
             }
 
             KeyValues = new AnalysisDictionary<AnalysisProxy, IAnalysisSet>(cmp);
@@ -173,7 +176,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
 
     [Serializable]
     internal class ReferenceableDependencyInfo : TypedDependencyInfo {
-        public ISet<EncodedLocation> _references, _assignments;
+        public ISet<EncodedSpan> _references, _assignments;
 
         public ReferenceableDependencyInfo(int version)
             : base(version) { }
@@ -182,21 +185,21 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             : base(version, emptySet) {
         }
 
-        public bool AddReference(EncodedLocation location) {
+        public bool AddReference(EncodedSpan location) {
             return HashSetExtensions.AddValue(ref _references, location);
         }
 
-        public IEnumerable<EncodedLocation> References {
+        public IEnumerable<EncodedSpan> References {
             get {
                 return _references;
             }
         }
 
-        public bool AddAssignment(EncodedLocation location) {
+        public bool AddAssignment(EncodedSpan location) {
             return HashSetExtensions.AddValue(ref _assignments, location);
         }
 
-        public IEnumerable<EncodedLocation> Assignments {
+        public IEnumerable<EncodedSpan> Assignments {
             get {
                 return _assignments;
             }

@@ -132,6 +132,8 @@ console.log(err);
                 new { Before = "while (true) {    \r\n    break ;\r\n}", After = "while (true) {    \r\n    break;\r\n}" },
                 new { Before = "while (true) {    \r\n    continue ;\r\n}", After = "while (true) {    \r\n    continue;\r\n}" },
                 new { Before = "var x=1,y=2;", After = "var x = 1, y = 2;" },
+                // https://nodejstools.codeplex.com/workitem/1346
+                new { Before = "while(true){\r\nconsole.log('hello';)\r\n}", After = "while(true){\r\nconsole.log('hello';)\r\n}"}
             };
 
             foreach (var test in testCode) {
@@ -145,6 +147,16 @@ console.log(err);
                     expected
                 );
             }
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestFormatAfterBadFor() {
+            TestCode(@"function g() { 
+ for(int i = 0; i<1000000; i++) { 
+ }",
+   @"function g() {
+    for (int i = 0; i < 1000000; i++) { 
+    }");
         }
 
         /// <summary>
@@ -250,6 +262,8 @@ console.log(err);
                 new { Before = "try {\r\nabc\r\n}finally{\r\nabc\r\n!", After = "try {\r\n    abc\r\n} finally {\r\n    abc\r\n}" },
                 new { Before = "{\r\n    break;\r\n!", After = "{\r\n    break;\r\n}" },
                 new { Before = "{\r\n    break ;\r\n!", After = "{\r\n    break;\r\n}" },
+                // https://nodejstools.codeplex.com/workitem/1346
+                new { Before = "module.exports = {\r\n    f: function () { console!\r\n}", After = "module.exports = {\r\n    f: function () { console }\r\n}" },
             };
 
             foreach (var test in testCode) {

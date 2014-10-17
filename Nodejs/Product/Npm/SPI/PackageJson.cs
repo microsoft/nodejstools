@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using System.Collections.Generic;
 using Microsoft.CSharp.RuntimeBinder;
 using Newtonsoft.Json.Linq;
 
@@ -25,6 +26,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             _package = package;
 
             InitKeywords();
+            InitHomepages();
             InitLicenses();
             InitFiles();
             InitMan();
@@ -54,6 +56,17 @@ The following error occurred:
             } catch (RuntimeBinderException rbe) {
                 WrapRuntimeBinderExceptionAndRethrow(
                     "keywords",
+                    rbe);
+            }
+        }
+
+        private void InitHomepages() {
+            try {
+                Homepages = new Homepages(_package);
+            }
+            catch (RuntimeBinderException rbe) {
+                WrapRuntimeBinderExceptionAndRethrow(
+                    "homepage",
                     rbe);
             }
         }
@@ -176,9 +189,7 @@ The following error occurred:
 
         public IKeywords Keywords { get; private set; }
 
-        public string Homepage {
-            get { return null == _package.homepage ? null : _package.homepage.ToString(); }
-        }
+        public IHomepages Homepages { get; private set; }
 
         public IBugs Bugs {
             get {

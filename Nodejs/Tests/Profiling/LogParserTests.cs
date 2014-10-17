@@ -105,7 +105,7 @@ namespace ProfilerTests {
             AssertExpectedFileInfo(
                 "native array.js",
                 "<top-level module code>",
-                "native array.js",
+                "native array",
                 "native array.js",
                 1,
                 "Script"
@@ -114,7 +114,7 @@ namespace ProfilerTests {
             AssertExpectedFileInfo(
                 @" C:\Users\dinov\visual studio 2012\Projects\NodeApp17\NodeApp17\server.js:1",
                 "<top-level module code>",
-                "server.js",
+                "server",
                 @"C:\Users\dinov\visual studio 2012\Projects\NodeApp17\NodeApp17\server.js",
                 1,
                 "Function"
@@ -122,7 +122,7 @@ namespace ProfilerTests {
             AssertExpectedFileInfo(
                 @"C:\Users\dinov\visual studio 2012\Projects\NodeApp17\NodeApp17\server.js",
                 "<top-level module code>",
-                "server.js",
+                "server",
                 @"C:\Users\dinov\visual studio 2012\Projects\NodeApp17\NodeApp17\server.js",
                 1,
                 "Script"

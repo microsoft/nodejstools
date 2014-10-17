@@ -42,7 +42,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         public ILicense this[int index] {
             get {
                 if (index < 0) {
-                    throw new IndexOutOfRangeException("Cannot retrieve license for index less than 0.");
+                    throw new IndexOutOfRangeException(Resources.CannotRetrieveLicenseInvalidIndex);
                 }
 
                 if (index == 0 && _package.license != null) {
@@ -51,7 +51,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
                 var json = _package.licenses;
                 if (null == json) {
-                    throw new IndexOutOfRangeException("Cannot retrieve license from empty license collection.");
+                    throw new IndexOutOfRangeException(Resources.CannotRetrieveLicenseEmptyCollection);
                 }
 
                 var lic = json[index];

@@ -6,7 +6,7 @@ using Microsoft.Ajax.Utilities;
 using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Parsing {
-    public class ErrorSink {
+    internal class ErrorSink {
         private Dictionary<string, string> m_reportedVariables;
 
         public virtual void ReportUndefined(Lookup lookup) {

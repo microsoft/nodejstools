@@ -13,6 +13,7 @@
  * ***************************************************************************/
 
 using System.Collections.Generic;
+using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Analyzer {
     interface IReferenceableContainer {
@@ -20,10 +21,10 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
     }
 
     interface IReferenceable {
-        IEnumerable<KeyValuePair<ProjectEntry, EncodedLocation>> Definitions {
+        IEnumerable<KeyValuePair<ProjectEntry, EncodedSpan>> Definitions {
             get;
         }
-        IEnumerable<KeyValuePair<ProjectEntry, EncodedLocation>> References {
+        IEnumerable<KeyValuePair<ProjectEntry, EncodedSpan>> References {
             get;
         }
     }

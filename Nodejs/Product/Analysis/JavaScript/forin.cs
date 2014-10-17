@@ -21,7 +21,7 @@ using System.Text;
 namespace Microsoft.NodejsTools.Parsing
 {
     [Serializable]
-    public sealed class ForIn : IterationStatement
+    internal sealed class ForIn : IterationStatement
     {
         private Statement m_variable;
         private Expression m_collection;

@@ -1,0 +1,10 @@
+{
+  "name": "WebRole1",
+  "version": "0.0.0",
+  "description": "WebRole1",
+  "main": "server.js",
+  "author": {
+    "name": "stevdo",
+    "email": ""
+  }
+}

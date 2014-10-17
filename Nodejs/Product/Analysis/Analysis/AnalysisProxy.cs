@@ -26,7 +26,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// state around.
     /// </summary>
     [Serializable]
-    public sealed class AnalysisProxy : IDetachableProxy, IImmutableAnalysisSet {
+    internal sealed class AnalysisProxy : IDetachableProxy, IImmutableAnalysisSet {
         private AnalysisValue _value;
 
         public AnalysisProxy(AnalysisValue value) {

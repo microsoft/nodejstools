@@ -15,18 +15,15 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Threading;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.Project;
-using Microsoft.VisualStudioTools.Wpf;
-using Microsoft.Windows.Design.Host;
 
 namespace Microsoft.NodejsTools.NpmUI {
     internal class NpmPackageInstallViewModel : INotifyPropertyChanged {
@@ -38,14 +35,11 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
 
         public static readonly ICommand InstallCommand = new RoutedCommand();
+        public static readonly ICommand OpenHomepageCommand = new RoutedCommand();
         public static readonly ICommand RefreshCatalogCommand = new RoutedCommand();
         
         private INpmController _npmController;
-
-        private string _lastCatalogUpdateTimeMessage = string.Empty;
-        private Color _lastCatalogUpdateTimeColor = SystemColors.WindowTextColor;
-        private FontWeight _lastCatalogUpdateFontWeight = FontWeights.Normal;
-
+        
         private bool _isLoadingCatalog;
         private IPackageCatalog _allPackages;
         private readonly object _filteredPackagesLock = new object();
@@ -68,7 +62,7 @@ namespace Microsoft.NodejsTools.NpmUI {
 
         private readonly Dispatcher _dispatcher;
 
-        private NpmOutputViewModel _executeViewModel;
+        private readonly NpmOutputViewModel _executeViewModel;
         
         public NpmPackageInstallViewModel(
             NpmOutputViewModel executeViewModel,
@@ -111,16 +105,6 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
 
         #region Catalog control and refresh
-
-        public string LastCatalogUpdateTimeMessage {
-            get { return _lastCatalogUpdateTimeMessage; }
-            private set {
-                _lastCatalogUpdateTimeMessage = value;
-                OnPropertyChanged();
-            }
-        }
-
-
         public bool IsLoadingCatalog {
             get { return _isLoadingCatalog; }
             private set {
@@ -192,7 +176,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             controller.ExceptionLogged += _executeViewModel.commander_ExceptionLogged;
             _executeViewModel.SetCancellableSafe(false);
             try {
-                _allPackages = await controller.GetRepositoryCatalogueAsync(forceRefresh);
+                _allPackages = await controller.GetRepositoryCatalogAsync(forceRefresh);
                 IsCatalogEmpty = false;
                 showList = true;
             } catch (NpmNotFoundException) {
@@ -268,7 +252,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             if (_allPackages == null) {
                 return;
             }
-            List<PackageCatalogEntryViewModel> newItems = null;
+            var newItems = new List<PackageCatalogEntryViewModel>();
 
             var filterText = _filterText;
             var filtered = PackageCatalogFilterFactory.Create(_allPackages).Filter(filterText);
@@ -282,23 +266,17 @@ namespace Microsoft.NodejsTools.NpmUI {
                     globalPackages = controller.GlobalPackages;
                 }
 
-                newItems = new List<PackageCatalogEntryViewModel>();
-
-                if (rootPackage != null && globalPackages != null) {
                 newItems.AddRange(filtered.Select(package => new ReadOnlyPackageCatalogEntryViewModel(
                     package,
                     rootPackage != null ? rootPackage.Modules[package.Name] : null,
                     globalPackages != null ? globalPackages.Modules[package.Name] : null
-                )));
-            }
+                    )));
             }
 
             _dispatcher.BeginInvoke((Action)(() => {
-                if (newItems != null) {
-                    lock (_filteredPackagesLock) {
-                        FilteredPackages = newItems;
-                        _currentFilter = filterText;
-                    }
+                lock (_filteredPackagesLock) {
+                    FilteredPackages = newItems;
+                    _currentFilter = filterText;
                 }
                 SelectedPackage = FilteredPackages.FirstOrDefault();
 
@@ -316,21 +294,6 @@ namespace Microsoft.NodejsTools.NpmUI {
                 OnPropertyChanged();
             }
         }
-
-        private static string GetFilterStringPortion(string source) {
-            if (string.IsNullOrEmpty(source)) {
-                return source;
-            }
-
-            for (int index = 0, size = source.Length; index < size; ++index) {
-                if (char.IsWhiteSpace(source[index])) {
-                    return index == 0 ? string.Empty : source.Substring(0, index);
-                }
-            }
-
-            return source;
-        }
-
 
         public Visibility FilterControlsVisibility {
             get { return LoadingCatalogControlVisibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible; }
@@ -384,6 +347,16 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
         }
 
+        internal bool CanOpenHomepage(string homepage) {
+            return !string.IsNullOrEmpty(homepage);
+        }
+
+        internal void OpenHomepage(string homepage) {
+            if (!string.IsNullOrEmpty(homepage)) {
+                Process.Start(homepage);
+            }
+        }
+
         public string Arguments {
             get { return _arguments; }
             set {
@@ -407,10 +380,6 @@ namespace Microsoft.NodejsTools.NpmUI {
                 OnPropertyChanged();
             }
         }
-
-        #endregion
-
-        #region Dialog control
 
         #endregion
     }

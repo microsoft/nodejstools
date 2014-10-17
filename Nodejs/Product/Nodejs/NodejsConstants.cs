@@ -12,57 +12,55 @@
  *
  * ***************************************************************************/
 
-using System.ComponentModel.Composition;
-using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Utilities;
-
 namespace Microsoft.NodejsTools {
-    class NodejsConstants {
-        public const string FileExtension = ".js";
-        public const string TypeScriptExtension = ".ts";
+    internal class NodejsConstants {
+        internal const string JavaScriptExtension = ".js";
+        internal const string TypeScriptExtension = ".ts";
+        internal const string MapExtension = ".map";
+        internal const string NodejsProjectExtension = ".njsproj";
 
-        public const string JavaScript = "JavaScript";
-        public const string CSS = "CSS";
-        public const string Nodejs = "Node.js";
+        internal const string JavaScript = "JavaScript";
+        internal const string CSS = "CSS";
+        internal const string Nodejs = "Node.js";
 
-        public const string DebuggerPort = "DebuggerPort";
-        public const string EnvironmentVariables = "EnvironmentVariables";
-        public const string LaunchUrl = "LaunchUrl";
-        public const string NodeExePath = "NodeExePath";
-        public const string NodeExeArguments = "NodeExeArguments";
-        public const string NodejsPort = "NodejsPort";
-        public const string ProjectFileFilter = "Node.js Project File (*.njsproj)\n*.njsproj\nAll Files (*.*)\n*.*\n";
-        public const string ScriptArguments = "ScriptArguments";
-        public const string StartWebBrowser = "StartWebBrowser";
+        internal const string IssueTrackerUrl = "https://go.microsoft.com/fwlink/?LinkId=507637";
 
-        public const string NodeModulesFolder = "node_modules";
-        public const string AnalysisIgnoredDirectories = "AnalysisIgnoredDirectories";
-        public const string DefaultIntellisenseCompletionCommittedBy = "{}[]().,:;+-*/%&|^!~=<>?@#'\"\\";
+        internal const string DebuggerPort = "DebuggerPort";
+        internal const string Environment = "Environment";
+        internal const string EnvironmentVariables = "EnvironmentVariables";
+        internal const string LaunchUrl = "LaunchUrl";
+        internal const string NodeExePath = "NodeExePath";
+        internal const string NodeExeArguments = "NodeExeArguments";
+        internal const string NodejsPort = "NodejsPort";
+        internal const string ProjectFileFilter = "Node.js Project File (*.njsproj)\n*.njsproj\nAll Files (*.*)\n*.*\n";
+        internal const string ScriptArguments = "ScriptArguments";
+        internal const string StartWebBrowser = "StartWebBrowser";
+
+        internal const string NodeModulesFolder = "node_modules";
+        internal const string AnalysisIgnoredDirectories = "AnalysisIgnoredDirectories";
+        internal const string DefaultIntellisenseCompletionCommittedBy = "{}[]().,:;+-*/%&|^!~=<>?@#'\"\\";
 
         /// <summary>
         /// The name of the package.json file
         /// </summary>
-        public const string PackageJsonFile = "package.json";
-        public const string PackageJsonMainFileKey = "main";
-        public const string DefaultPackageMainFile = "index.js";
+        internal const string PackageJsonFile = "package.json";
+        internal const string PackageJsonMainFileKey = "main";
+        internal const string DefaultPackageMainFile = "index.js";
 
-        public const string BaseRegistryKey = "NodejsTools";
+        internal const string BaseRegistryKey = "NodejsTools";
 
-        public const string NodejsHiddenUserModule = "nodejs_tools_for_visual_studio_hidden_usermodule_";
-        public const string NodejsHiddenUserModuleInstance = "nodejs_tools_for_visual_studio_hidden_module_instance_";
+        internal const string NodejsHiddenUserModule = "nodejs_tools_for_visual_studio_hidden_usermodule_";
+        internal const string NodejsHiddenUserModuleInstance = "nodejs_tools_for_visual_studio_hidden_module_instance_";
 
-        public const string TypeScriptCfgProperty = "CfgPropertyPagesGuidsAddTypeScript";
+        internal const string TypeScriptCfgProperty = "CfgPropertyPagesGuidsAddTypeScript";
 
-        public const ushort DefaultDebuggerPort = 5858;
+        internal const ushort DefaultDebuggerPort = 5858;
 
-        [Export, Name(Nodejs), BaseDefinition("text")]
-        internal static ContentTypeDefinition ContentTypeDefinition = null;
-
-        public const string TypeScriptCompileItemType = "TypeScriptCompile";
-        public const string EnableTypeScript = "EnableTypeScript";
-        public const string TypeScriptSourceMap = "TypeScriptSourceMap";
-        public const string TypeScriptModuleKind = "TypeScriptModuleKind";
-        public const string CommonJSModuleKind = "CommonJS";
-        public const string TypeScript = "TypeScript";
+        internal const string TypeScriptCompileItemType = "TypeScriptCompile";
+        internal const string EnableTypeScript = "EnableTypeScript";
+        internal const string TypeScriptSourceMap = "TypeScriptSourceMap";
+        internal const string TypeScriptModuleKind = "TypeScriptModuleKind";
+        internal const string CommonJSModuleKind = "CommonJS";
+        internal const string TypeScript = "TypeScript";
     }
 }

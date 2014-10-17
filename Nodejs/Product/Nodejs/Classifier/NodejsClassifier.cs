@@ -187,8 +187,14 @@ namespace Microsoft.NodejsTools.Classifier {
                             length += GetTrailingMultiLineTokens(JSScanner, snapshot, token.Category, currentLine, state);
                         }
 
-                        var multiStrSpan = new Span(SnapshotSpanToSpan(snapshot, startToken, validPrevLine).Start, length);
-                        classifications.Add(new ClassificationSpan(new SnapshotSpan(snapshot, multiStrSpan), type));
+                        var tokenSpan = new Span(SnapshotSpanToSpan(snapshot, startToken, validPrevLine).Start, length);
+                        var intersection = span.Intersection(tokenSpan);
+
+                        if ((intersection != null && intersection.Value.Length > 0) ||
+                            (span.Length == 0 && tokenSpan.Contains(span.Start)) // handle zero-length spans
+                        ) { 
+                            classifications.Add(new ClassificationSpan(new SnapshotSpan(snapshot, tokenSpan), type));
+                        }
                     } else {
                         var classification = ClassifyToken(span, token, currentLine);
 

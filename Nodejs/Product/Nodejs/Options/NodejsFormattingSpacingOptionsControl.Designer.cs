@@ -86,7 +86,6 @@
             this._nonEmptyParenthesis.TabIndex = 5;
             this._nonEmptyParenthesis.Text = "Insert spaces after opening and before closing non-empty &parenthesis";
             this._nonEmptyParenthesis.UseVisualStyleBackColor = true;
-            this._nonEmptyParenthesis.CheckedChanged += new System.EventHandler(this.CheckedChanged);
             // 
             // _spaceAfterFunction
             // 
@@ -97,7 +96,6 @@
             this._spaceAfterFunction.TabIndex = 4;
             this._spaceAfterFunction.Text = "Insert spaces after function keyword &for anonymous functions";
             this._spaceAfterFunction.UseVisualStyleBackColor = true;
-            this._spaceAfterFunction.CheckedChanged += new System.EventHandler(this.CheckedChanged);
             // 
             // _spacesAfterKeywordsInControlFlow
             // 
@@ -108,7 +106,6 @@
             this._spacesAfterKeywordsInControlFlow.TabIndex = 3;
             this._spacesAfterKeywordsInControlFlow.Text = "Insert spaces after &keywords in control flow statements";
             this._spacesAfterKeywordsInControlFlow.UseVisualStyleBackColor = true;
-            this._spacesAfterKeywordsInControlFlow.CheckedChanged += new System.EventHandler(this.CheckedChanged);
             // 
             // _binaryOperators
             // 
@@ -119,7 +116,6 @@
             this._binaryOperators.TabIndex = 2;
             this._binaryOperators.Text = "Insert spaces before and after binary operators";
             this._binaryOperators.UseVisualStyleBackColor = true;
-            this._binaryOperators.CheckedChanged += new System.EventHandler(this.CheckedChanged);
             // 
             // _afterSemicolonFor
             // 
@@ -130,7 +126,6 @@
             this._afterSemicolonFor.TabIndex = 1;
             this._afterSemicolonFor.Text = "Insert spaces after &semicolon in \'for\' statements";
             this._afterSemicolonFor.UseVisualStyleBackColor = true;
-            this._afterSemicolonFor.CheckedChanged += new System.EventHandler(this.CheckedChanged);
             // 
             // _afterCommaDelimiter
             // 
@@ -141,7 +136,6 @@
             this._spaceAfterCommaDelimiter.TabIndex = 0;
             this._spaceAfterCommaDelimiter.Text = "Insert spaces after comma &delimiter";
             this._spaceAfterCommaDelimiter.UseVisualStyleBackColor = true;
-            this._spaceAfterCommaDelimiter.CheckedChanged += new System.EventHandler(this.CheckedChanged);
             // 
             // _topOptionsPanel
             // 

@@ -19,22 +19,16 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Web.Script.Serialization;
 using Microsoft.NodejsTools.Intellisense;
-using Microsoft.NodejsTools.Repl;
-using Microsoft.VisualStudio;
+using Microsoft.NodejsTools.ProjectWizard;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudioTools.Project.Automation;
 using MSBuild = Microsoft.Build.Evaluation;
 
-
 namespace Microsoft.NodejsTools.Project {
-    class NodejsProjectNode : CommonProjectNode, VsWebSite.VSWebSite, Microsoft.NodejsTools.ProjectWizard.INodePackageModulesCommands {
+    class NodejsProjectNode : CommonProjectNode, VsWebSite.VSWebSite, INodePackageModulesCommands {
         private VsProjectAnalyzer _analyzer;
         private readonly HashSet<string> _warningFiles = new HashSet<string>();
         private readonly HashSet<string> _errorFiles = new HashSet<string>();
@@ -113,6 +107,10 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
+        internal override string IssueTrackerUrl {
+            get { return NodejsConstants.IssueTrackerUrl; }
+        }
+
         protected override void FinishProjectCreation(string sourceFolder, string destFolder) {
             foreach (MSBuild.ProjectItem item in this.BuildProject.Items) {
                 if (String.Equals(Path.GetExtension(item.EvaluatedInclude), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
@@ -167,7 +165,7 @@ namespace Microsoft.NodejsTools.Project {
         internal static bool IsNodejsFile(string strFileName) {
             var ext = Path.GetExtension(strFileName);
 
-            return String.Equals(ext, NodejsConstants.FileExtension, StringComparison.OrdinalIgnoreCase);
+            return String.Equals(ext, NodejsConstants.JavaScriptExtension, StringComparison.OrdinalIgnoreCase);
         }
 
         internal override string GetItemType(string filename) {
@@ -194,7 +192,7 @@ namespace Microsoft.NodejsTools.Project {
 
         public override string[] CodeFileExtensions {
             get {
-                return new[] { NodejsConstants.FileExtension };
+                return new[] { NodejsConstants.JavaScriptExtension };
             }
         }
 
@@ -280,12 +278,13 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override bool IsCodeFile(string fileName) {
-            return Path.GetExtension(fileName).Equals(NodejsConstants.FileExtension, StringComparison.OrdinalIgnoreCase);
+            return Path.GetExtension(fileName).Equals(NodejsConstants.JavaScriptExtension, StringComparison.OrdinalIgnoreCase);
         }
 
         public override int InitializeForOuter(string filename, string location, string name, uint flags, ref Guid iid, out IntPtr projectPointer, out int canceled) {
             NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevelChanged += IntellisenseOptionsPageAnalysisLevelChanged;
             NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMaximumChanged += AnalysisLogMaximumChanged;
+            NodejsPackage.Instance.IntellisenseOptionsPage.SaveToDiskChanged += IntellisenseOptionsPageSaveToDiskChanged;
 
             return base.InitializeForOuter(filename, location, name, flags, ref iid, out projectPointer, out canceled);
         }
@@ -298,7 +297,7 @@ namespace Microsoft.NodejsTools.Project {
                     _analyzer.Dispose();
                 }
                 _analyzer = new VsProjectAnalyzer(ProjectHome);
-                _analyzer.Project.MaxLogLength = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMax;
+                _analyzer.MaxLogLength = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMax;
                 LogAnalysisLevel();
 
                 base.Reload();
@@ -310,14 +309,7 @@ namespace Microsoft.NodejsTools.Project {
 
                 // scan for files which were loaded from cached analysis but no longer
                 // exist and remove them.
-                foreach (var module in _analyzer.Project.AllModules) {
-                    if (Path.IsPathRooted(module.FilePath)) {   // ignore built-in modules
-                        var treeNode = FindNodeByFullPath(module.FilePath);
-                        if (treeNode == null) {
-                            _analyzer.UnloadFile(module);
-                        }
-                    }
-                }
+                _analyzer.ReloadComplete();
 
                 var ignoredPaths = GetProjectProperty(NodejsConstants.AnalysisIgnoredDirectories);
 
@@ -372,12 +364,20 @@ namespace Microsoft.NodejsTools.Project {
                 }
             }
             _analyzer = analyzer;
-            _analyzer.Project.MaxLogLength = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMax;
+            _analyzer.MaxLogLength = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMax;
             LogAnalysisLevel();
         }
 
         private void AnalysisLogMaximumChanged(object sender, EventArgs e) {
-            _analyzer.Project.MaxLogLength = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMax;
+            if (_analyzer != null) {
+                _analyzer.MaxLogLength = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMax;
+            }
+        }
+
+        private void IntellisenseOptionsPageSaveToDiskChanged(object sender, EventArgs e) {
+            if (_analyzer != null) {
+                _analyzer.SaveToDisk = NodejsPackage.Instance.IntellisenseOptionsPage.SaveToDisk;
+            }
         }
 
         protected override void RaiseProjectPropertyChanged(string propertyName, string oldValue, string newValue) {
@@ -386,8 +386,8 @@ namespace Microsoft.NodejsTools.Project {
             var propPage = GeneralPropertyPageControl;
             if (propPage != null) {
                 switch (propertyName) {
-                    case NodejsConstants.EnvironmentVariables:
-                        propPage.EnvironmentVariables = newValue;
+                    case NodejsConstants.Environment:
+                        propPage.Environment = newValue;
                         break;
                     case NodejsConstants.DebuggerPort:
                         propPage.DebuggerPort = newValue;
@@ -556,7 +556,7 @@ namespace Microsoft.NodejsTools.Project {
 
         #endregion
 
-        public Task InstallMissingModules() {
+        Task INodePackageModulesCommands.InstallMissingModulesAsync() {
             //Fire off the command to update the missing modules
             //  through NPM
             return ModulesNode.InstallMissingModules();
@@ -713,7 +713,7 @@ namespace Microsoft.NodejsTools.Project {
                     bool isDirectory = (wfd.dwFileAttributes & NativeMethods.FILE_ATTRIBUTE_DIRECTORY) != 0;
 
                     string childPath = path;
-                    if (childPath != "") {
+                    if (childPath != String.Empty) {
                         childPath += "\\";
                     }
                     childPath += wfd.cFileName;
@@ -761,10 +761,28 @@ namespace Microsoft.NodejsTools.Project {
                     _analyzer = null;
                 }
 
+                NodejsPackage.Instance.IntellisenseOptionsPage.SaveToDiskChanged -= IntellisenseOptionsPageSaveToDiskChanged;
                 NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevelChanged -= IntellisenseOptionsPageAnalysisLevelChanged;
                 NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMaximumChanged -= AnalysisLogMaximumChanged;
             }
             base.Dispose(disposing);
+        }
+
+        internal override async void BuildAsync(uint vsopts, string config, VisualStudio.Shell.Interop.IVsOutputWindowPane output, string target, Action<MSBuildResult, string> uiThreadCallback) {
+            try {
+                await CheckForLongPaths();
+            } catch (Exception) {
+                uiThreadCallback(MSBuildResult.Failed, target);
+                return;
+            }
+
+            // BuildAsync can throw on the sync path before invoking the callback. If it does, we must still invoke the callback here,
+            // because by this time there's no other way to propagate the error to the caller.
+            try {
+                base.BuildAsync(vsopts, config, output, target, uiThreadCallback);
+            } catch (Exception) {
+                uiThreadCallback(MSBuildResult.Failed, target);
+            }
         }
     }
 }

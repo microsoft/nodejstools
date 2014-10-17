@@ -28,7 +28,7 @@ namespace Microsoft.NodejsTools.Parsing
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Justification="AST statement")]
     [Serializable]
-    public class ConstStatement : Declaration
+    internal class ConstStatement : Declaration
     {
         public ConstStatement(EncodedSpan span)
             : base(span)

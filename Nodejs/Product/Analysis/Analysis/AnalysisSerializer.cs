@@ -28,7 +28,7 @@ using Microsoft.NodejsTools.Parsing;
 using LinqExpr = System.Linq.Expressions.Expression;
 
 namespace Microsoft.NodejsTools.Analysis {
-    public class AnalysisSerializer {
+    internal class AnalysisSerializer {
         private readonly List<object> _memoDict = new List<object>();
         private readonly Dictionary<object, int> _reverseMemo = new Dictionary<object, int>(new ReferenceComparer<object>());
         private readonly Dictionary<string, int> _stringMemo = new Dictionary<string, int>();
@@ -196,15 +196,6 @@ namespace Microsoft.NodejsTools.Analysis {
                     case SerializationType.IndexSpan:
                         nextAssign.Assign(new IndexSpan(reader.ReadInt32(), reader.ReadInt32()));
                         continue;
-                    case SerializationType.EncodedLocation: {
-                            var tempNextAssign = nextAssign;
-                            stack.Push(new DeserializationFrame(newValue => {
-                                Node node = newValue as Node;
-                                EncodedLocation loc = new EncodedLocation((Node)node);
-                                tempNextAssign.Assign(loc);
-                            }));
-                            continue;
-                        }
                     case SerializationType.EncodedSpan:
                         nextAssign.Assign(new EncodedSpan(reader.ReadInt32()));
                         continue;
@@ -668,11 +659,6 @@ namespace Microsoft.NodejsTools.Analysis {
             writer.Write(((IndexSpan)value).Length);
         }
 
-        private static void SerializeEncodedLocation(object value, AnalysisSerializer serializer, Stack<object> stack, BinaryWriter writer) {
-            writer.Write((byte)SerializationType.EncodedLocation);
-            stack.Push(((EncodedLocation)value).Location);
-        }
-
         private static void SerializeEncodedSpan(object value, AnalysisSerializer serializer, Stack<object> stack, BinaryWriter writer) {
             writer.Write((byte)SerializationType.EncodedSpan);
             writer.Write(((EncodedSpan)value).Span);
@@ -698,11 +684,10 @@ namespace Microsoft.NodejsTools.Analysis {
                 { typeof(int), SerializeInt },
                 { typeof(long), SerializeLong },
                 { typeof(IndexSpan), SerializeIndexSpan },
-                { typeof(EncodedLocation), SerializeEncodedLocation },
                 { typeof(EncodedSpan), SerializeEncodedSpan },
                 { typeof(HashSet<string>), SerializeHashSet<string> },
                 { typeof(AnalysisHashSet), SerializeAnalysisHashSet },
-                { typeof(HashSet<EncodedLocation>), SerializeHashSet<EncodedLocation> },
+                { typeof(HashSet<EncodedSpan>), SerializeHashSet<EncodedSpan> },
                 { typeof(AnalysisSetEmptyObject), new SimpleTypeSerializer(SerializationType.EmptyAnalysisSet).Serialize },
                 { typeof(Microsoft.NodejsTools.Parsing.Missing), new SimpleTypeSerializer(SerializationType.MissingValue).Serialize },
                 { typeof(ObjectComparer), new SimpleTypeSerializer(SerializationType.ObjectComparer).Serialize },
@@ -1127,7 +1112,6 @@ namespace Microsoft.NodejsTools.Analysis {
             OrdinalComparer,
             ObjectEqualityComparer,
             IndexSpan,
-            EncodedLocation,
             EncodedSpan,
         }
 

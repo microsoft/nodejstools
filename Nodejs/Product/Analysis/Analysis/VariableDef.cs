@@ -64,7 +64,7 @@ namespace Microsoft.NodejsTools.Analysis {
         /// Enqueues any nodes which depend upon this type into the provided analysis queue for
         /// further analysis.
         /// </summary>
-        public void EnqueueDependents(ProjectEntry assigner = null, ProjectEntry declaringScope = null) {
+        public virtual void EnqueueDependents(ProjectEntry assigner = null, ProjectEntry declaringScope = null) {
             bool hasOldValues = false;
             foreach (var keyValue in _dependencies) {
                 if (keyValue.Key.AnalysisVersion == keyValue.Value.Version) {
@@ -111,6 +111,30 @@ namespace Microsoft.NodejsTools.Analysis {
         }
     }
 
+    /// <summary>
+    /// A variable which is used locally and does not enqueue when written to.
+    /// 
+    /// Needs to be used in conjunction with a real variable that does the enqueuing.
+    /// 
+    /// This allows tempoarary specialization of a variable when analyzing a function
+    /// body so that we only see unique values and provide a more precise analysis.  An
+    /// example of this is:
+    /// 
+    /// var o = {};
+    /// var copied = {num:42, str:'100'};
+    /// for(var propName in copied) {
+    ///     Object.defineProperty(o, propName, {value: copied[propName]});
+    /// }
+    /// 
+    /// Where propName ends up only having the current value during analysis rather
+    /// then merging values together.
+    /// </summary>
+    [Serializable]
+    class LocalNonEnqueingVariableDef : VariableDef {
+        public override void EnqueueDependents(ProjectEntry assigner = null, ProjectEntry declaringScope = null) {
+        }
+    }
+
     [Serializable]
 
     abstract class TypedDef<T> : DependentData<T> where T : TypedDependencyInfo {
@@ -144,12 +168,16 @@ namespace Microsoft.NodejsTools.Analysis {
             } else if (!LockedVariableDefs.TryGetValue(this, out dummy)) {
                 Debug.Fail("locking variable defs");
                 LockedVariableDefs.Add(this, LockedVariableDefsValue);
+#if DEBUG
                 // The remainder of this block logs diagnostic information to
                 // allow the VariableDef to be identified.
                 int total = 0;
                 var typeCounts = new Dictionary<string, int>();
                 JsAnalyzer analyzer = null;
                 foreach (var type in TypesNoCopy) {
+                    if (type.Value == null) {
+                        continue;
+                    }
                     if (analyzer == null && type.Value.DeclaringModule != null) {
                         analyzer = type.Value.DeclaringModule.Analysis.ProjectState;
                     }
@@ -170,6 +198,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 if (analyzer != null) {
                     analyzer.Log.ExceedsTypeLimit(GetType().Name, total, string.Join(", ", typeCountList));
                 }
+#endif
             }
         }
 
@@ -576,37 +605,37 @@ namespace Microsoft.NodejsTools.Analysis {
                     // Don't add references to ephemeral values...  If they
                     // gain types we'll re-enqueue and the reference will be
                     // added then.
-                    deps.AddReference(new EncodedLocation(node));
+                    deps.AddReference(node.EncodedSpan);
                 }
                 deps.AddDependentUnit(unit);
             }
         }
 
-        public bool AddReference(EncodedLocation location, ProjectEntry module) {
+        public bool AddReference(EncodedSpan location, ProjectEntry module) {
             return GetDependentItems(module).AddReference(location);
         }
 
-        public bool AddAssignment(EncodedLocation location, ProjectEntry entry) {
+        public bool AddAssignment(EncodedSpan location, ProjectEntry entry) {
             return GetDependentItems(entry).AddAssignment(location);
         }
 
         public bool AddAssignment(Node node, AnalysisUnit unit) {
             if (!unit.ForEval) {
                 return AddAssignment(
-                    new EncodedLocation(node), 
+                    node.EncodedSpan, 
                     unit.DeclaringModuleEnvironment.ProjectEntry
                 );
             }
             return false;
         }
 
-        public IEnumerable<KeyValuePair<ProjectEntry, EncodedLocation>> References {
+        public IEnumerable<KeyValuePair<ProjectEntry, EncodedSpan>> References {
             get {
                 if (_dependencies.Count != 0) {
                     foreach (var keyValue in _dependencies) {
                         if (keyValue.Value.References != null && keyValue.Key.AnalysisVersion == keyValue.Value.Version) {
                             foreach (var reference in keyValue.Value.References) {
-                                yield return new KeyValuePair<ProjectEntry, EncodedLocation>(keyValue.Key, reference);
+                                yield return new KeyValuePair<ProjectEntry, EncodedSpan>(keyValue.Key, reference);
                             }
                         }
                     }
@@ -614,13 +643,13 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        public IEnumerable<KeyValuePair<ProjectEntry, EncodedLocation>> Definitions {
+        public IEnumerable<KeyValuePair<ProjectEntry, EncodedSpan>> Definitions {
             get {
                 if (_dependencies.Count != 0) {
                     foreach (var keyValue in _dependencies) {
                         if (keyValue.Value.Assignments != null && keyValue.Key.AnalysisVersion == keyValue.Value.Version) {
                             foreach (var reference in keyValue.Value.Assignments) {
-                                yield return new KeyValuePair<ProjectEntry, EncodedLocation>(keyValue.Key, reference);
+                                yield return new KeyValuePair<ProjectEntry, EncodedSpan>(keyValue.Key, reference);
                             }
                         }
                     }

@@ -13,7 +13,7 @@
  * ***************************************************************************/
 
 namespace Microsoft.NodejsTools.Analysis {
-    public interface IAnalysisVariable {
+    internal interface IAnalysisVariable {
         /// <summary>
         /// Returns the location of where the variable is defined.
         /// </summary>

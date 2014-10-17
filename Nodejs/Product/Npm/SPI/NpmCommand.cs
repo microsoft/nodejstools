@@ -75,9 +75,16 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         public virtual async Task<bool> ExecuteAsync() {
             OnCommandStarted();
+            try {
+                GetPathToNpm();
+            } catch (NpmNotFoundException) {
+                return false;
+            }
             var wasCancelled = false;
             var redirector = new NpmCommandRedirector(this);
-            redirector.WriteLine(string.Format("====Executing command 'npm {0}'====\r\n\r\n", Arguments));
+            redirector.WriteLine(
+                string.Format("===={0}====\r\n\r\n",
+                string.Format(Resources.ExecutingCommand, Arguments)));
             using (var process = ProcessOutput.Run(
                 GetPathToNpm(),
                 new [] { Arguments },
@@ -85,28 +92,31 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 null,
                 false,
                 redirector,
-                quoteArgs: false
+                quoteArgs: false,
+                outputEncoding: Encoding.UTF8 // npm uses UTF-8 regardless of locale if its output is redirected
             )) {
                 var whnd = process.WaitHandle;
                 if (whnd == null) {
                     // Process failed to start, and any exception message has
                     // already been sent through the redirectory
-                    redirector.WriteErrorLine("Error executing npm - unable to start the npm process");
+                    redirector.WriteErrorLine(Resources.ErrCannotStartNpm);
                 } else {
                     var handles = new [] { _cancellation, whnd };
                     var i = await Task.Run(() => WaitHandle.WaitAny(handles));
                     if (i == 0) {
                         wasCancelled = true;
                         process.Kill();
-                        redirector.WriteErrorLine("\r\n====npm command cancelled====\r\n\r\n");
+                        redirector.WriteErrorLine(string.Format(
+                            "\r\n===={0}====\r\n\r\n",
+                            Resources.NpmCommandCancelled));
                         _cancellation.Reset();
                     } else {
                         Debug.Assert(process.ExitCode.HasValue, "npm process has not really exited");
                         process.Wait();
                         redirector.WriteLine(string.Format(
-                            "\r\n====npm command completed with exit code {0}====\r\n\r\n",
-                            process.ExitCode ?? -1
-                        ));
+                            "\r\n===={0}====\r\n\r\n",
+                            string.Format(Resources.NpmCommandCompletedWithExitCode, process.ExitCode ?? -1)
+                            ));
                     }
                 }
             }
@@ -126,8 +136,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             private string AppendToBuffer(StringBuilder buffer, string data) {
                 if (data != null) {
                     lock (_owner._bufferLock) {
-                        data = Encoding.UTF8.GetString(Console.OutputEncoding.GetBytes(data)) + Environment.NewLine;
-                        buffer.Append(data);
+                        buffer.Append(data + Environment.NewLine);
                     }
                 }
                 return data;

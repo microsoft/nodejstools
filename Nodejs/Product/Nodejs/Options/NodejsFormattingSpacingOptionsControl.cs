@@ -17,28 +17,26 @@ using System.Windows.Forms;
 
 namespace Microsoft.NodejsTools.Options {
     public partial class NodejsFormattingSpacingOptionsControl : UserControl {
-        private bool _loading = true;
-
         public NodejsFormattingSpacingOptionsControl() {
             InitializeComponent();
-            _spaceAfterCommaDelimiter.Checked = NodejsPackage.Instance.FormattingSpacingOptionsPage.SpaceAfterComma;
-            _spaceAfterFunction.Checked = NodejsPackage.Instance.FormattingSpacingOptionsPage.SpaceAfterFunctionKeywordForAnonymousFunctions;
-            _spacesAfterKeywordsInControlFlow.Checked = NodejsPackage.Instance.FormattingSpacingOptionsPage.SpaceAfterKeywordsInControlFlow;
-            _nonEmptyParenthesis.Checked = NodejsPackage.Instance.FormattingSpacingOptionsPage.SpaceAfterOpeningAndBeforeClosingNonEmptyParens;
-            _afterSemicolonFor.Checked = NodejsPackage.Instance.FormattingSpacingOptionsPage.SpaceAfterSemicolonInFor;
-            _binaryOperators.Checked = NodejsPackage.Instance.FormattingSpacingOptionsPage.SpaceBeforeAndAfterBinaryOperator;
-            _loading = false;
         }
 
-        private void CheckedChanged(object sender, EventArgs e) {
-            if (!_loading) {
-                NodejsPackage.Instance.FormattingSpacingOptionsPage.SpaceAfterComma = _spaceAfterCommaDelimiter.Checked;
-                NodejsPackage.Instance.FormattingSpacingOptionsPage.SpaceAfterFunctionKeywordForAnonymousFunctions = _spaceAfterFunction.Checked;
-                NodejsPackage.Instance.FormattingSpacingOptionsPage.SpaceAfterKeywordsInControlFlow = _spacesAfterKeywordsInControlFlow.Checked;
-                NodejsPackage.Instance.FormattingSpacingOptionsPage.SpaceAfterOpeningAndBeforeClosingNonEmptyParens = _nonEmptyParenthesis.Checked;
-                NodejsPackage.Instance.FormattingSpacingOptionsPage.SpaceAfterSemicolonInFor = _afterSemicolonFor.Checked;
-                NodejsPackage.Instance.FormattingSpacingOptionsPage.SpaceBeforeAndAfterBinaryOperator = _binaryOperators.Checked;
-            }
+        internal void SyncControlWithPageSettings(NodejsFormattingSpacingOptionsPage page) {
+            _spaceAfterCommaDelimiter.Checked = page.SpaceAfterComma;
+            _spaceAfterFunction.Checked = page.SpaceAfterFunctionKeywordForAnonymousFunctions;
+            _spacesAfterKeywordsInControlFlow.Checked = page.SpaceAfterKeywordsInControlFlow;
+            _nonEmptyParenthesis.Checked = page.SpaceAfterOpeningAndBeforeClosingNonEmptyParens;
+            _afterSemicolonFor.Checked = page.SpaceAfterSemicolonInFor;
+            _binaryOperators.Checked = page.SpaceBeforeAndAfterBinaryOperator;
+        }
+
+        internal void SyncPageWithControlSettings(NodejsFormattingSpacingOptionsPage page) {
+            page.SpaceAfterComma = _spaceAfterCommaDelimiter.Checked;
+            page.SpaceAfterFunctionKeywordForAnonymousFunctions = _spaceAfterFunction.Checked;
+            page.SpaceAfterKeywordsInControlFlow = _spacesAfterKeywordsInControlFlow.Checked;
+            page.SpaceAfterOpeningAndBeforeClosingNonEmptyParens = _nonEmptyParenthesis.Checked;
+            page.SpaceAfterSemicolonInFor = _afterSemicolonFor.Checked;
+            page.SpaceBeforeAndAfterBinaryOperator = _binaryOperators.Checked;
         }
     }
 }

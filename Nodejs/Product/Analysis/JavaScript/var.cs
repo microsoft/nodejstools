@@ -25,7 +25,7 @@ namespace Microsoft.NodejsTools.Parsing
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Justification = "AST statement")]
     [Serializable]
-    public sealed class Var : Declaration
+    internal sealed class Var : Declaration
     {
         public Var(EncodedSpan span)
             : base(span)

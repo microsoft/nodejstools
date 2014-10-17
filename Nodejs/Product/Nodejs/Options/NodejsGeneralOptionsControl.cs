@@ -24,65 +24,57 @@ namespace Microsoft.NodejsTools.Options {
 
         public NodejsGeneralOptionsControl() {
             InitializeComponent();
-
-            _showOutputWhenRunningNpm.Checked = NodejsPackage.Instance.GeneralOptionsPage.ShowOutputWindowWhenExecutingNpm;
-
-            switch (NodejsPackage.Instance.GeneralOptionsPage.SurveyNewsCheck) {
-                case SurveyNewsPolicy.Disabled:
-                    _surveyNewsCheckCombo.SelectedIndex = SurveyNewsNeverIndex;
-                    break;
-                case SurveyNewsPolicy.CheckOnceDay:
-                    _surveyNewsCheckCombo.SelectedIndex = SurveyNewsOnceDayIndex;
-                    break;
-                case SurveyNewsPolicy.CheckOnceWeek:
-                    _surveyNewsCheckCombo.SelectedIndex = SurveyNewsOnceWeekIndex;
-                    break;
-                case SurveyNewsPolicy.CheckOnceMonth:
-                    _surveyNewsCheckCombo.SelectedIndex = SurveyNewsOnceMonthIndex;
-                    break;
-            }
-            _waitOnAbnormalExit.Checked = NodejsPackage.Instance.GeneralOptionsPage.WaitOnAbnormalExit;
-            _waitOnNormalExit.Checked = NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit;
-            _editAndContinue.Checked = NodejsPackage.Instance.GeneralOptionsPage.EditAndContinue;
-            _checkForLongPaths.Checked = NodejsPackage.Instance.GeneralOptionsPage.CheckForLongPaths;
         }
 
-        private void _surveyNewsCheckCombo_SelectedIndexChanged(object sender, EventArgs e) {
-            switch (_surveyNewsCheckCombo.SelectedIndex) {
-                case SurveyNewsNeverIndex:
-                    NodejsPackage.Instance.GeneralOptionsPage.SurveyNewsCheck = SurveyNewsPolicy.Disabled;
-                    break;
-                case SurveyNewsOnceDayIndex:
-                    NodejsPackage.Instance.GeneralOptionsPage.SurveyNewsCheck = SurveyNewsPolicy.CheckOnceDay;
-                    break;
-                case SurveyNewsOnceWeekIndex:
-                    NodejsPackage.Instance.GeneralOptionsPage.SurveyNewsCheck = SurveyNewsPolicy.CheckOnceWeek;
-                    break;
-                case SurveyNewsOnceMonthIndex:
-                    NodejsPackage.Instance.GeneralOptionsPage.SurveyNewsCheck = SurveyNewsPolicy.CheckOnceMonth;
-                    break;
+        internal SurveyNewsPolicy SurveyNewsCheckCombo {
+            get {
+                switch (_surveyNewsCheckCombo.SelectedIndex) {
+                    case SurveyNewsNeverIndex:
+                        return SurveyNewsPolicy.Disabled;
+                    case SurveyNewsOnceDayIndex:
+                        return SurveyNewsPolicy.CheckOnceDay;
+                    case SurveyNewsOnceWeekIndex:
+                        return SurveyNewsPolicy.CheckOnceWeek;
+                    case SurveyNewsOnceMonthIndex:
+                        return SurveyNewsPolicy.CheckOnceMonth;
+                    default:
+                        return SurveyNewsPolicy.Disabled;
+                }
+            }
+            set {
+                switch (value) {
+                    case SurveyNewsPolicy.Disabled:
+                        _surveyNewsCheckCombo.SelectedIndex = SurveyNewsNeverIndex;
+                        break;
+                    case SurveyNewsPolicy.CheckOnceDay:
+                        _surveyNewsCheckCombo.SelectedIndex = SurveyNewsOnceDayIndex;
+                        break;
+                    case SurveyNewsPolicy.CheckOnceWeek:
+                        _surveyNewsCheckCombo.SelectedIndex = SurveyNewsOnceWeekIndex;
+                        break;
+                    case SurveyNewsPolicy.CheckOnceMonth:
+                        _surveyNewsCheckCombo.SelectedIndex = SurveyNewsOnceMonthIndex;
+                        break;
+                }
             }
         }
 
-        private void _showOutputWhenRunningNpm_CheckedChanged(object sender, EventArgs e) {
-            NodejsPackage.Instance.GeneralOptionsPage.ShowOutputWindowWhenExecutingNpm =
-                _showOutputWhenRunningNpm.Checked;
+        internal void SyncControlWithPageSettings(NodejsGeneralOptionsPage page) {
+            _showOutputWhenRunningNpm.Checked = page.ShowOutputWindowWhenExecutingNpm;
+            SurveyNewsCheckCombo = page.SurveyNewsCheck;
+            _waitOnAbnormalExit.Checked = page.WaitOnAbnormalExit;
+            _waitOnNormalExit.Checked = page.WaitOnNormalExit;
+            _editAndContinue.Checked = page.EditAndContinue;
+            _checkForLongPaths.Checked = page.CheckForLongPaths;
         }
 
-        private void _waitOnAbnormalExit_CheckedChanged(object sender, EventArgs e) {
-            NodejsPackage.Instance.GeneralOptionsPage.WaitOnAbnormalExit = _waitOnAbnormalExit.Checked;
-        }
-
-        private void _waitOnNormalExit_CheckedChanged(object sender, EventArgs e) {
-            NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit = _waitOnNormalExit.Checked;
-        }
-
-        private void _editAndContinue_CheckedChanged(object sender, EventArgs e) {
-            NodejsPackage.Instance.GeneralOptionsPage.EditAndContinue = _editAndContinue.Checked;
-        }
-
-        private void _checkForLongPaths_CheckedChanged(object sender, EventArgs e) {
-            NodejsPackage.Instance.GeneralOptionsPage.CheckForLongPaths = _checkForLongPaths.Checked;
+        internal void SyncPageWithControlSettings(NodejsGeneralOptionsPage page) {
+            page.ShowOutputWindowWhenExecutingNpm = _showOutputWhenRunningNpm.Checked;
+            page.SurveyNewsCheck = SurveyNewsCheckCombo;
+            page.WaitOnAbnormalExit = _waitOnAbnormalExit.Checked;
+            page.WaitOnNormalExit = _waitOnNormalExit.Checked;
+            page.EditAndContinue = _editAndContinue.Checked;
+            page.CheckForLongPaths = _checkForLongPaths.Checked;
         }
     }
 }

@@ -97,7 +97,7 @@ namespace Microsoft.NodejsTools.Commands {
                     }
                     var njsProj = project.GetNodejsProject();
                     if (njsProj != null) {
-                        var jsAnalyzer = njsProj.Analyzer.Project;
+                        var jsAnalyzer = njsProj.Analyzer;
                         res.AppendLine("Analysis Log: ");
                         
                         using (StringWriter writer = new StringWriter(res)) {
@@ -149,7 +149,7 @@ namespace Microsoft.NodejsTools.Commands {
             res.AppendLine(String.Format("Analysis Level: {0}", NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel.ToString()));
             res.AppendLine();
             if(NodejsPackage.Instance._analyzer != null) {
-                var jsAnalyzer = NodejsPackage.Instance._analyzer.Project;
+                var jsAnalyzer = NodejsPackage.Instance._analyzer;
                 res.AppendLine("Default Analysis Log: ");
 
                 using (StringWriter writer = new StringWriter(res)) {

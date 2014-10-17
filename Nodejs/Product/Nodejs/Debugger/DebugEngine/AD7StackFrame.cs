@@ -306,7 +306,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             out IDebugExpression2 ppExpr,
             out string pbstrError,
             out uint pichError) {
-            pbstrError = "";
+            pbstrError = String.Empty;
             pichError = 0;
 
             IEnumerable<NodeEvaluationResult> evaluationResults = _stackFrame.Locals.Union(_stackFrame.Parameters);

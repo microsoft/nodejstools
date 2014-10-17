@@ -20,26 +20,20 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TestUtilities;
-using TestUtilities.Nodejs;
 
 namespace NpmTests {
     [TestClass]
+    [DeploymentItem(@"TestData\NpmPackageJsonData\", "NpmPackageJsonData")]
     public class ProblematicPackageJsonTests : AbstractPackageJsonTests {
-
-        [ClassInitialize]
-        public static void Init(TestContext context) {
-            NodejsTestData.Deploy();
-        }
 
         [TestMethod, Priority(0)]
         public void TestFreshPackageJsonParseFromResource() {
-            var pkg = LoadFromResource("NpmTests.Resources.fresh_package.json");
+            var pkg = LoadFromResource("NpmTests.TestData.fresh_package.json");
             Assert.IsNotNull(pkg, "Fresh package should not be null.");
         }
 
         private void TestParseFromFile(string filename) {
-            string file = TestData.GetPath(@"TestData\NpmPackageJsonData\" + filename);
+            string file = string.Format(@"NpmPackageJsonData\{0}", filename);
             var pkg = LoadFromFile(file);
             Assert.IsNotNull(
                 pkg,
@@ -201,7 +195,7 @@ namespace NpmTests {
 
         [TestMethod, Priority(0)]
         public void VeryEvilRandom1CharCorruptionTest() {
-            var original = LoadStringFromResource("NpmTests.Resources.fresh_package.json");
+            var original = LoadStringFromResource("NpmTests.TestData.fresh_package.json");
             var buff = new StringBuilder();
             var generator = new Random();
 
@@ -232,7 +226,7 @@ Exception message: {3}", (int)ch, index, buff, ex.Message),
 
         [TestMethod, Priority(0)]
         public void VeryEvilRandom1CharInsertionTest() {
-            var original = LoadStringFromResource("NpmTests.Resources.fresh_package.json");
+            var original = LoadStringFromResource("NpmTests.TestData.fresh_package.json");
             var buff = new StringBuilder();
             var generator = new Random();
 

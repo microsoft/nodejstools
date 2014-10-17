@@ -76,6 +76,8 @@ namespace Microsoft.NodejsTools {
     [ProvideBraceCompletion(NodejsConstants.Nodejs)]
     [ProvideEditorExtension2(typeof(NodejsEditorFactory), NodeJsFileType, 50, "*:1", ProjectGuid = "{78D985FC-2CA0-4D08-9B6B-35ACD5E5294A}", NameResourceID = 102, DefaultName = "server", TemplateDir = ".\\NullPath")]
     [ProvideEditorExtension2(typeof(NodejsEditorFactoryPromptForEncoding), NodeJsFileType, 50, "*:1", ProjectGuid = "{78D985FC-2CA0-4D08-9B6B-35ACD5E5294A}", NameResourceID = 113, DefaultName = "server")]
+    [ProvideEditorLogicalView(typeof(NodejsEditorFactory), VSConstants.LOGVIEWID.TextView_string)]
+    [ProvideEditorLogicalView(typeof(NodejsEditorFactoryPromptForEncoding), VSConstants.LOGVIEWID.TextView_string)]
     [ProvideProjectItem(typeof(BaseNodeProjectFactory), NodejsConstants.Nodejs, "FileTemplates\\NewItem", 0)]
     [ProvideLanguageTemplates("{349C5851-65DF-11DA-9384-00065B846F21}", NodejsConstants.JavaScript, Guids.NodejsPackageString, "Web", "Node.js Project Templates", "{" + Guids.NodejsBaseProjectFactoryString + "}", ".js", NodejsConstants.Nodejs, "{" + Guids.NodejsBaseProjectFactoryString + "}")]
     [ProvideTextEditorAutomation(NodejsConstants.Nodejs, 106, 102, ProfileMigrationType.PassThrough)]
@@ -211,7 +213,7 @@ namespace Microsoft.NodejsTools {
 
         private void IntellisenseOptionsPage_AnalysisLogMaximumChanged(object sender, EventArgs e) {
             if (_analyzer != null) {
-                _analyzer.Project.MaxLogLength = IntellisenseOptionsPage.AnalysisLogMax;
+                _analyzer.MaxLogLength = IntellisenseOptionsPage.AnalysisLogMax;
             }
         }
 
@@ -349,7 +351,7 @@ namespace Microsoft.NodejsTools {
         public override bool IsRecognizedFile(string filename) {
             var ext = Path.GetExtension(filename);
 
-            return String.Equals(ext, NodejsConstants.FileExtension, StringComparison.OrdinalIgnoreCase);
+            return String.Equals(ext, NodejsConstants.JavaScriptExtension, StringComparison.OrdinalIgnoreCase);
         }
 
         internal new object GetService(Type serviceType) {
@@ -652,23 +654,12 @@ namespace Microsoft.NodejsTools {
             }
         }
 
-        internal static void NavigateTo(string filename, Guid docViewGuidType, int line, int col) {
-            VsUtilities.NavigateTo(Instance, filename, docViewGuidType, line, col);
+        internal static void NavigateTo(string filename, int line, int col) {
+            VsUtilities.NavigateTo(Instance, filename, NodejsProjectNode.IsNodejsFile(filename) ? typeof(NodejsEditorFactory).GUID : Guid.Empty, line, col);
         }
 
-        internal static void NavigateTo(string filename, Guid docViewGuidType, int pos) {
-            IVsTextView viewAdapter;
-            IVsWindowFrame pWindowFrame;
-            VsUtilities.OpenDocument(Instance, filename, out viewAdapter, out pWindowFrame);
-
-            ErrorHandler.ThrowOnFailure(pWindowFrame.Show());
-
-            // Set the cursor at the beginning of the declaration.          
-            int line, col;
-            ErrorHandler.ThrowOnFailure(viewAdapter.GetLineAndColumn(pos, out line, out col));
-            ErrorHandler.ThrowOnFailure(viewAdapter.SetCaretPos(line, col));
-            // Make sure that the text is visible.
-            viewAdapter.CenterLines(line, 1);
+        internal static void NavigateTo(string filename, int pos) {
+            VsUtilities.NavigateTo(Instance, filename, NodejsProjectNode.IsNodejsFile(filename) ? typeof(NodejsEditorFactory).GUID : Guid.Empty, pos);
         }
 
         /// <summary>
@@ -679,16 +670,24 @@ namespace Microsoft.NodejsTools {
                 if (_analyzer == null) {
                     _analyzer = new VsProjectAnalyzer();
                     LogLooseFileAnalysisLevel();
-                    _analyzer.Project.MaxLogLength = IntellisenseOptionsPage.AnalysisLogMax;
-                    IntellisenseOptionsPage.AnalysisLevelChanged += IntellisenseOptionsPageAnalysisLevelChanged;                    
+                    _analyzer.MaxLogLength = IntellisenseOptionsPage.AnalysisLogMax;
+                    IntellisenseOptionsPage.AnalysisLevelChanged += IntellisenseOptionsPageAnalysisLevelChanged;
+                    IntellisenseOptionsPage.SaveToDiskChanged += IntellisenseOptionsPageSaveToDiskChanged;
                 }
                 return _analyzer;
             }
         }
 
+        private void IntellisenseOptionsPageSaveToDiskChanged(object sender, EventArgs e) {
+            _analyzer.SaveToDisk = IntellisenseOptionsPage.SaveToDisk;
+        }
+
         private void IntellisenseOptionsPageAnalysisLevelChanged(object sender, EventArgs e) {
             var analyzer = new VsProjectAnalyzer();
             analyzer.SwitchAnalyzers(_analyzer);
+            if (_analyzer.RemoveUser()) {
+                _analyzer.Dispose();
+            }
             _analyzer = analyzer;
             LogLooseFileAnalysisLevel();
         }

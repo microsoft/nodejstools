@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.NodejsTools.Parsing;
+using Microsoft.NodejsTools.Analysis.Analyzer;
 
 
 namespace Microsoft.NodejsTools.Analysis.Values {
@@ -29,19 +30,27 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     [Serializable]
     internal class BuiltinFunctionValue : FunctionValue {
         private readonly string _name;
-        private readonly ParameterResult[] _signature;
+        private readonly OverloadResult[] _overloads;
         private readonly string _documentation;
         private readonly HashSet<string> _immutableMembers = new HashSet<string>();
 
         public BuiltinFunctionValue(ProjectEntry projectEntry,
             string name,
             string documentation = null,
-            bool createPrototype = true,
+            ExpandoValue prototype = null,
             params ParameterResult[] signature)
-            : base(projectEntry, createPrototype, name) {
+            : this(projectEntry, name, new[] { new SimpleOverloadResult(name, documentation, signature) }, documentation, prototype) {
+        }
+
+        public BuiltinFunctionValue(ProjectEntry projectEntry,
+            string name,
+            OverloadResult[] overloads,
+            string documentation = null,
+            ExpandoValue prototype = null)
+            : base(projectEntry, prototype, name) {
             _name = name;
             _documentation = documentation;
-            _signature = signature;
+            _overloads = overloads;
 
             Add("length", projectEntry.Analyzer.GetConstant(1.0).Proxy);
             Add("name", projectEntry.Analyzer.GetConstant(name).Proxy);
@@ -62,18 +71,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         }
 
         public override bool IsMutable(string name) {
-            return _immutableMembers.Contains(name);
+            return !_immutableMembers.Contains(name);
         }
 
         public override IEnumerable<OverloadResult> Overloads {
             get {
-                return new[] {
-                    new SimpleOverloadResult(
-                        _signature,
-                        _name,
-                        _documentation
-                    )
-                };
+                return _overloads;
             }
         }
 
@@ -97,15 +100,37 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     }
 
     /// <summary>
-    /// Represents a functoin not backed by user code which returns a known
+    /// Represents a function which is the constructor function for a
+    /// Node.js class.  These functions can be called with or without
+    /// new and always return their instance value.
+    /// </summary>
+    internal class ClassBuiltinFunctionValue : BuiltinFunctionValue {
+        public ClassBuiltinFunctionValue(ProjectEntry projectEntry,
+            string name,
+            OverloadResult[] overloads,
+            string documentation = null)
+            : base(projectEntry, name, overloads, documentation) {
+        }
+
+        public override IAnalysisSet Construct(Node node, AnalysisUnit unit, IAnalysisSet[] args) {
+            return _instance.Proxy;
+        }
+
+        public override IAnalysisSet Call(Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            return _instance.Proxy;
+        }
+    }
+
+    /// <summary>
+    /// Represents a function not backed by user code which returns a known
     /// set of types.
     /// </summary>
     [Serializable]
     internal class ReturningFunctionValue : BuiltinFunctionValue {
         private readonly IAnalysisSet _retValue;
 
-        public ReturningFunctionValue(ProjectEntry projectEntry, string name, IAnalysisSet retValue, string documentation = null, bool createPrototype = true, params ParameterResult[] signature)
-            : base(projectEntry, name, documentation, createPrototype, signature) {
+        public ReturningFunctionValue(ProjectEntry projectEntry, string name, IAnalysisSet retValue, string documentation = null, params ParameterResult[] signature)
+            : base(projectEntry, name, documentation, null, signature) {
             _retValue = retValue;
         }
 
@@ -124,8 +149,8 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     internal class ReturningConstructingFunctionValue : BuiltinFunctionValue {
         private readonly IAnalysisSet _retValue;
 
-        public ReturningConstructingFunctionValue(ProjectEntry projectEntry, string name, IAnalysisSet retValue, string documentation = null, bool createPrototype = true, params ParameterResult[] signature)
-            : base(projectEntry, name, documentation, createPrototype, signature) {
+        public ReturningConstructingFunctionValue(ProjectEntry projectEntry, string name, IAnalysisSet retValue, string documentation = null, params ParameterResult[] signature)
+            : base(projectEntry, name, documentation, null, signature) {
             _retValue = retValue;
         }
 
@@ -142,14 +167,97 @@ namespace Microsoft.NodejsTools.Analysis.Values {
     internal class SpecializedFunctionValue : BuiltinFunctionValue {
         private readonly CallDelegate _func;
 
-        public SpecializedFunctionValue(ProjectEntry projectEntry, string name, CallDelegate func, string documentation = null, params ParameterResult[] signature)
-            : base(projectEntry, name, documentation, true, signature) {
+        public SpecializedFunctionValue(ProjectEntry projectEntry, string name, CallDelegate func, string documentation = null, ExpandoValue prototype = null, params ParameterResult[] signature)
+            : base(projectEntry, name, documentation, prototype, signature) {
             _func = func;
         }
 
         public override IAnalysisSet Call(Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             return _func(this, node, unit, @this, args);
         }
+    }
+
+    [Serializable]
+    class CallbackArgInfo {
+        public readonly string Module, Member;
+
+        public CallbackArgInfo(string module, string member) {
+            Module = module;
+            Member = member;
+        }
+    }
+
+    [Serializable]
+    internal class LazyPropertyFunctionValue : BuiltinFunctionValue {
+        private readonly string _module;
+        private IAnalysisSet _retValue;
+
+        public LazyPropertyFunctionValue(ProjectEntry projectEntry, string name, string module)
+            : base(projectEntry, name, "", null) {
+            _module = module;
+        }
+
+        public override IAnalysisSet Call(Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            if (_retValue == null) {
+                string moduleName = _module;
+                string memberName = Name;
+
+                _retValue = ResolveMember(node, unit, moduleName, memberName);
+            }
+            return _retValue;
+        }
+
+        internal static IAnalysisSet ResolveMember(Node node, AnalysisUnit unit, string moduleName, string memberName) {
+            var module = unit.ProjectEntry.Analyzer.Modules.RequireModule(node, unit, moduleName);
+            return module.Get(node, unit, memberName, false);
+        }
+
+        public override IAnalysisSet ReturnTypes {
+            get {
+                return _retValue;
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// Specialized function for functions which take a function for a callback
+    /// such as http.createServer.
+    /// 
+    /// Performs a call back to the function so that the types are propagated.
+    /// </summary>
+    [Serializable]
+    internal class CallbackReturningFunctionValue : ReturningFunctionValue {
+        private readonly CallbackArgInfo[] _args;
+        private readonly IAnalysisSet[] _types;
+        private readonly int _index;
+
+        public CallbackReturningFunctionValue(ProjectEntry projectEntry, string name, IAnalysisSet retValue, int callbackArg, CallbackArgInfo[] args, string documentation = null, params ParameterResult[] signature)
+            : base(projectEntry, name, retValue, documentation, signature) {
+            _index = callbackArg;
+            _args = args;
+            _types = new IAnalysisSet[_args.Length];
+        }
+
+        public override IAnalysisSet Call(Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            if (_index < args.Length) {
+                IAnalysisSet[] callbackArgs = new IAnalysisSet[_args.Length];
+                for (int i = 0; i < _args.Length; i++) {
+                    if (_types[i] == null) {
+                        _types[i] = LazyPropertyFunctionValue.ResolveMember(
+                            node,
+                            unit,
+                            _args[i].Module,
+                            _args[i].Member
+                        ).Call(node, unit, null, ExpressionEvaluator.EmptySets);
+                    }
+                    callbackArgs[i] = _types[i];
+                }
+                args[_index].Call(node, unit, null, callbackArgs);
+            }
+
+            return base.Call(node, unit, @this, args);
+        }    
     }
 
     /// <summary>

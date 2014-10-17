@@ -19,11 +19,11 @@ using Microsoft.NodejsTools.Analysis.Analyzer;
 namespace Microsoft.NodejsTools.Analysis.Values {
     [Serializable]
     class PrototypeValue : ObjectValue {
-        private readonly InstanceValue _instance;
+        private readonly FunctionValue _function;
 
-        public PrototypeValue(ProjectEntry projectEntry, InstanceValue instance, string description = null)
+        public PrototypeValue(ProjectEntry projectEntry, FunctionValue function, string description = null)
             : base(projectEntry, description: description) {
-            _instance = instance;
+            _function = function;
             projectEntry.Analyzer.AnalysisValueCreated(typeof(PrototypeValue));
         }
 
@@ -35,7 +35,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         public override string Name {
             get {
-                return _instance._creator.Name;
+                return _function.Name;
             }
         }
 
@@ -54,7 +54,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
                 if (userFunc != null) {
                     var env = (FunctionEnvironmentRecord)(userFunc.AnalysisUnit._env);
 
-                    env._this.AddTypes(unit, _instance.SelfSet, declaringScope: DeclaringModule);
+                    env._this.AddTypes(unit, _function._instance.SelfSet, declaringScope: DeclaringModule);
                 }
             }
             base.SetMember(node, unit, name, value);

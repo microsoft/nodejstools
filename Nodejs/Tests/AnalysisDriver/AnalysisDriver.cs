@@ -59,7 +59,7 @@ namespace AnalysisDriver {
 
             _jsonResults.Append("[");
 
-            _npmController = NpmControllerFactory.Create(packagePath);
+            _npmController = NpmControllerFactory.Create(packagePath, string.Empty);
             _npmController.OutputLogged += NpmControllerOutputLogged;
             _npmController.ErrorLogged += NpmControllerErrorLogged;
             _npmController.Refresh();
@@ -145,17 +145,6 @@ namespace AnalysisDriver {
             }
         }
 
-        private static AnalysisLimits MakeLowAnalysisLimits() {
-            return new AnalysisLimits() {
-                ReturnTypes = 1,
-                AssignedTypes = 1,
-                DictKeyTypes = 1,
-                DictValueTypes = 1,
-                IndexTypes = 1,
-                InstanceMembers = 1
-            };
-        }
-
         private void RunOne(string[] packages, int runOrder) {
             string testDir = PrepareDirectory(packages);
             string packageId = string.Join(", ", packages);
@@ -175,8 +164,8 @@ namespace AnalysisDriver {
             long parserWorkingSet = 0;
             sw.Start();
             var analyzer = Analysis.Analyze(
-                testDir, 
-                _lowAnalysis ? MakeLowAnalysisLimits() : null,
+                testDir,
+                _lowAnalysis ? AnalysisLimits.MakeLowAnalysisLimits() : null,
                 () => {
                     for (int i = 0; i < 3; i++) {
                         GC.Collect(GC.MaxGeneration);
@@ -240,7 +229,9 @@ namespace AnalysisDriver {
                 Console.ReadLine();
             }
             GC.KeepAlive(analyzer);
-
+#if DEBUG
+            Console.WriteLine(analyzer.GetAnalysisStats());
+#endif
             if (_cleanup) {
                 Directory.Delete(testDir, true);
             } else {
@@ -750,12 +741,13 @@ namespace AnalysisDriver {
 
         public void Dispose() {
             if (_htmlLogger != null) {
-                var template = new StreamReader(GetType().Assembly.GetManifestResourceStream("NodejsTests.template.html")).ReadToEnd();
+                using (var reader = new StreamReader(GetType().Assembly.GetManifestResourceStream("NodejsTests.template.html"))) {
+                    var template = reader.ReadToEnd();
+                    _jsonResults.AppendLine("]");
+                    template = template.Replace("// INSERT DATA HERE", "var data = " + _jsonResults.ToString());
 
-                _jsonResults.AppendLine("]");
-                template = template.Replace("// INSERT DATA HERE", "var data = " + _jsonResults.ToString());
-
-                _htmlLogger.Write(template);
+                    _htmlLogger.Write(template);
+                }
             }
         }
     }

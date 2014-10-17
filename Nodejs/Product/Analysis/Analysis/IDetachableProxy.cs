@@ -24,7 +24,7 @@ namespace Microsoft.NodejsTools.Analysis {
         }
     }
 
-    public static class DetachableProxy {
+    internal static class DetachableProxy {
         public static bool IsAlive(object value) {
             IDetachableProxy detachable = value as IDetachableProxy;
             if (detachable == null) {

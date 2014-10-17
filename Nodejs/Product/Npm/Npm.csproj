@@ -69,6 +69,7 @@
     <Compile Include="..\..\..\Common\Product\SharedProject\ProcessOutput.cs">
       <Link>ProcessOutput.cs</Link>
     </Compile>
+    <Compile Include="IHomepages.cs" />
     <Compile Include="NpmArgumentBuilder.cs" />
     <Compile Include="NpmHelpers.cs" />
     <Compile Include="SemverVersionComparer.cs" />
@@ -112,6 +113,7 @@
     <Compile Include="NpmLogEventArgs.cs" />
     <Compile Include="NpmNotFoundException.cs" />
     <Compile Include="SPI\GenericNpmCommand.cs" />
+    <Compile Include="SPI\Homepages.cs" />
     <Compile Include="SPI\NpmSearchRegexComparer.cs" />
     <Compile Include="SPI\NpmSearchFilterStringComparer.cs" />
     <Compile Include="PackageCatalogFilterFactory.cs" />
@@ -130,7 +132,7 @@
     <Compile Include="ScriptName.cs" />
     <Compile Include="SPI\AbstractNpmLogSource.cs" />
     <Compile Include="SPI\NpmCommander.cs" />
-    <Compile Include="SPI\NpmGetCatalogueCommand.cs" />
+    <Compile Include="SPI\NpmGetCatalogCommand.cs" />
     <Compile Include="SPI\PackageCatalogFilter.cs" />
     <Compile Include="SemverVersion.cs" />
     <Compile Include="SemverVersionFormatException.cs" />

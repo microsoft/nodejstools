@@ -17,7 +17,7 @@ namespace Microsoft.NodejsTools.Analysis {
     /// Used to track information about where the analysis came from and
     /// get back the original content.
     /// </summary>
-    public interface IAnalysisCookie {
+    internal interface IAnalysisCookie {
         string GetLine(int lineNo);
     }
 }

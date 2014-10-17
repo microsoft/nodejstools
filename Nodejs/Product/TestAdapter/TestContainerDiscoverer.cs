@@ -45,7 +45,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
             : this(serviceProvider,
                    new SolutionEventsListener(serviceProvider),
                    new TestFilesUpdateWatcher(),
-                   new TestFileAddRemoveListener(serviceProvider,Guids.NodejsBaseProjectFactory),
+                   new TestFileAddRemoveListener(serviceProvider, Guids.NodejsBaseProjectFactory),
                     operationState) { }
 
         public TestContainerDiscoverer(IServiceProvider serviceProvider,
@@ -137,18 +137,17 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
         public static object GetPropertyValue(int propid, uint itemId, IVsHierarchy vsHierarchy) {
             if (itemId == VSConstants.VSITEMID_NIL) {
-                return null;            
+                return null;
             }
 
             object o;
             if (ErrorHandler.Succeeded(vsHierarchy.GetProperty(itemId, propid, out o))) {
                 return o;
             }
-            return null;            
+            return null;
         }
 
         internal static bool IsValidTestFramework(string testFramework) {
-            //TODO - Add support for testFrameworks
             return !String.IsNullOrWhiteSpace(testFramework);
         }
 
@@ -162,13 +161,13 @@ namespace Microsoft.NodejsTools.TestAdapter {
             //  If we are then switch the test container to the underlying js file
             //
             if (NodejsConstants.TypeScriptExtension.Equals(testCaseFileExtension, StringComparison.OrdinalIgnoreCase)) {
-                testCaseFile = testCaseFile.Substring(0,testCaseFile.Length -3) + NodejsConstants.FileExtension;
+                testCaseFile = testCaseFile.Substring(0, testCaseFile.Length - 3) + NodejsConstants.JavaScriptExtension;
                 if (!File.Exists(testCaseFile)) {
                     //Ignore the file for now.  On the next build event the typescript compiler will generate the file
                     //  at that point this function gets invoked again on the .ts file and we'll see the newly created .js file
                     return false;
                 }
-            }else if(!".js".Equals(testCaseFileExtension, StringComparison.OrdinalIgnoreCase)) {
+            } else if (!NodejsConstants.JavaScriptExtension.Equals(testCaseFileExtension, StringComparison.OrdinalIgnoreCase)) {
                 return false;
             }
 
@@ -178,7 +177,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 //Don't look for tests in it.
                 return false;
             }
-            uint itemId; 
+            uint itemId;
             ErrorHandler.Succeeded(((IVsHierarchy)project).ParseCanonicalName(pathToFile, out itemId));
 
             return IsTestFile(itemId, project);
@@ -211,10 +210,10 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
                 return IsValidTestFramework((string)testFile.Value);
             } catch (ArgumentException) {
-                //If we can't retrieve the property then consider this not to be a Test file
+                //If we fail to retrieve the property then this isn't a test file
             }
             return false;
-            
+
         }
 
         private void OperationStateChanged(object sender, OperationStateChangedEventArgs e) {
@@ -290,7 +289,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
         public IEnumerable<ITestContainer> GetTestContainers(IVsProject project) {
             if (!project.IsTestProject(Guids.NodejsBaseProjectFactory)) {
                 if (EqtTrace.IsVerboseEnabled) {
-                    EqtTrace.Verbose("TestContainerDiscoverer: Ignoring project {0} as it is not a test project.", project.GetProjectName());
+                    EqtTrace.Verbose("TestContainerDiscoverer: Ignoring project {0} as it is not a Node.js project.", project.GetProjectName());
                 }
 
                 yield break;
@@ -351,13 +350,13 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 return false;
             }
 
-            if (pathToItem.IndexOf("\\node_modules\\",StringComparison.OrdinalIgnoreCase) >= 0) {
+            if (pathToItem.IndexOf("\\node_modules\\", StringComparison.OrdinalIgnoreCase) >= 0) {
                 return false;
             }
 
             //Setting/updating "TestFramework" property on a file item will cause metedata change in the project file,
             //so we need to re-discover when file change happens. 
-            if (pathToItem.EndsWith(".njsproj", StringComparison.OrdinalIgnoreCase)) {
+            if (pathToItem.EndsWith(NodejsConstants.NodejsProjectExtension, StringComparison.OrdinalIgnoreCase)) {
                 return true;
             }
 

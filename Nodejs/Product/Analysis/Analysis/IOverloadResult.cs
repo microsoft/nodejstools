@@ -13,7 +13,7 @@
  * ***************************************************************************/
 
 namespace Microsoft.NodejsTools.Analysis {
-    public interface IOverloadResult {
+    internal interface IOverloadResult {
         string Name { get; }
         string Documentation { get; }
         ParameterResult[] Parameters { get; }

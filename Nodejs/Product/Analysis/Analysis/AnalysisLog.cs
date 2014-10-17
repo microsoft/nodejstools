@@ -118,7 +118,7 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        class AnalysisUnitWrapper {
+        internal class AnalysisUnitWrapper {
             private readonly WeakReference _unit;
 
             public AnalysisUnitWrapper(AnalysisUnit unit) {
