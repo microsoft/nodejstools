@@ -7,7 +7,8 @@
         mc:Ignorable="d"
         Background="{DynamicResource {x:Static wpf:Controls.BackgroundKey}}"
         TextElement.Foreground="{DynamicResource {x:Static wpf:Controls.ForegroundKey}}"
-        Height="300" Width="500" Title="npm install Output">
+        Height="300" Width="500" Title="npm install Output"
+        MinHeight="100" MinWidth="200">
     <!-- Theming -->
     <Window.Resources>
         <ResourceDictionary Source="pack://application:,,,/Microsoft.NodejsTools;component/SharedProject/Wpf/Controls.xaml" />

@@ -19,10 +19,14 @@ namespace Microsoft.NodejsTools.Npm.SPI {
     internal abstract class AbstractNpmSearchComparer : IComparer<IPackage> {
 
         protected int CompareBasedOnKeywords(IPackage x, IPackage y) {
-            return string.Compare(
-                string.Join(", ", x.Keywords),
-                string.Join(", ", y.Keywords),
-                StringComparison.CurrentCulture);
+            if (x.Keywords != null && y.Keywords != null) {
+                return string.Compare(
+                    string.Join(", ", x.Keywords),
+                    string.Join(", ", y.Keywords),
+                    StringComparison.CurrentCulture);
+            }
+
+            return 0;
         }
 
         public abstract int Compare(IPackage x, IPackage y);

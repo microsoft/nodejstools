@@ -335,8 +335,9 @@
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="5*"/>
-                <ColumnDefinition Width="7*"/>
+                <ColumnDefinition Width="5*" MinWidth="100"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="7*" MinWidth="100"/>
             </Grid.ColumnDefinitions>
 
             <TextBox Grid.Column="0" Grid.Row="0"
@@ -362,6 +363,8 @@
                 No results found.
             </TextBlock>
 
+            <GridSplitter Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Width="2" VerticalAlignment="Stretch" HorizontalAlignment="Center" ShowsPreview="True"></GridSplitter>
+            
             <Grid Grid.Row="2" VerticalAlignment="Top" Margin="0 4 0 0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -386,7 +389,7 @@
                         xml:space="preserve">Refresh</Button>
             </Grid>
 
-            <Grid Grid.Column="1" Grid.RowSpan="2" Margin="8 0 0 0" >
+            <Grid Grid.Column="2" Grid.RowSpan="2" Margin="8 0 0 0" >
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="auto"/>

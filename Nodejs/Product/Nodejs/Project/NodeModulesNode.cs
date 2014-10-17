@@ -14,19 +14,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading;
-using System.Windows;
-using System.Windows.Forms;
-using System.Windows.Media;
-using EnvDTE;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.NpmUI;
 using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
@@ -146,12 +139,7 @@ namespace Microsoft.NodejsTools.Project {
             if (null == _npmController) {
                 _npmController = NpmControllerFactory.Create(
                     _projectNode.ProjectHome,
-                    Path.Combine(
-                        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                        "Microsoft",
-                        "Node.js Tools",
-                        "packagecache.json"
-                    ),
+                    NodejsPackage.Instance.NpmOptionsPage.NpmCachePath,
                     false,
                     new NpmPathProvider(this));
                 _npmController.CommandStarted += NpmController_CommandStarted;
@@ -216,7 +204,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private void ConditionallyShowNpmOutputPane() {
-            if (NodejsPackage.Instance.GeneralOptionsPage.ShowOutputWindowWhenExecutingNpm) {
+            if (NodejsPackage.Instance.NpmOptionsPage.ShowOutputWindowWhenExecutingNpm) {
                 var pane = GetNpmOutputPane();
                 if (null != pane) {
                     pane.ShowAndActivate();

@@ -12,49 +12,42 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.Text;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal class Person : IPerson {
-        private static readonly Regex RegexPerson = new Regex(
-            "^"
-            + "(?<name>[^<]+)"
-            + "(<(?<email>[^>]+)>)?"
-            + "(\\s*\\((?<url>[^\\)])\\))?"
-            + "$",
-            RegexOptions.IgnoreCase | RegexOptions.Singleline);
+
+        [JsonConstructor]
+        private Person() {
+            // Enables Json deserialization
+        }
 
         public Person(string source) {
             InitFromString(source);
         }
 
         private void InitFromString(string source) {
-            var matches = RegexPerson.Matches(source);
-            if (matches.Count != 1) {
+            try {
+                var jObject = JObject.Parse(source);
+                Name = (string)jObject["name"];
+                Email = (string)jObject["email"];
+                Url = (string)jObject["url"];
+            } catch (Exception) {
                 Name = source;
-            } else {
-                var match = matches[0];
-                var group = match.Groups["name"];
-                if (group.Success) {
-                    Name = group.Value;
-                }
-
-                group = match.Groups["email"];
-                if (group.Success) {
-                    Email = group.Value;
-                }
-
-                group = match.Groups["url"];
-                if (group.Success) {
-                    Url = group.Value;
-                }
             }
         }
 
+        [JsonProperty]
         public string Name { get; private set; }
+
+        [JsonProperty]
         public string Email { get; private set; }
+
+        [JsonProperty]
         public string Url { get; private set; }
 
         public override string ToString() {

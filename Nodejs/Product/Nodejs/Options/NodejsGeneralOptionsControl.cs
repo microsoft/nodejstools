@@ -60,7 +60,6 @@ namespace Microsoft.NodejsTools.Options {
         }
 
         internal void SyncControlWithPageSettings(NodejsGeneralOptionsPage page) {
-            _showOutputWhenRunningNpm.Checked = page.ShowOutputWindowWhenExecutingNpm;
             SurveyNewsCheckCombo = page.SurveyNewsCheck;
             _waitOnAbnormalExit.Checked = page.WaitOnAbnormalExit;
             _waitOnNormalExit.Checked = page.WaitOnNormalExit;
@@ -69,7 +68,6 @@ namespace Microsoft.NodejsTools.Options {
         }
 
         internal void SyncPageWithControlSettings(NodejsGeneralOptionsPage page) {
-            page.ShowOutputWindowWhenExecutingNpm = _showOutputWhenRunningNpm.Checked;
             page.SurveyNewsCheck = SurveyNewsCheckCombo;
             page.WaitOnAbnormalExit = _waitOnAbnormalExit.Checked;
             page.WaitOnNormalExit = _waitOnNormalExit.Checked;

@@ -218,6 +218,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     commander.ExceptionLogged -= exHandler;
                 }
                 if (null != ex) {
+                    OnOutputLogged(ex.ToString());
                     throw ex;
                 }
             }

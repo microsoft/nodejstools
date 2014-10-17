@@ -21,7 +21,6 @@ namespace Microsoft.NodejsTools.Options {
     public class NodejsGeneralOptionsPage : NodejsDialogPage {
         private const string DefaultSurveyNewsFeedUrl = "http://go.microsoft.com/fwlink/?LinkId=328027";
         private const string DefaultSurveyNewsIndexUrl = "http://go.microsoft.com/fwlink/?LinkId=328029";
-        private const string ShowOutputWindowRunningNpm = "ShowOutputWindowRunningNpm";
         private const string SurveyNewsCheckSetting = "SurveyNewsCheck";
         private const string SurveyNewsLastCheckSetting = "SurveyNewsLastCheck";
         private const string SurveyNewsFeedUrlSetting = "SurveyNewsFeedUrl";
@@ -118,7 +117,6 @@ namespace Microsoft.NodejsTools.Options {
         /// values.
         /// </summary>
         public override void ResetSettings() {
-            ShowOutputWindowWhenExecutingNpm = true;
             _surveyNewsCheck = SurveyNewsPolicy.CheckOnceWeek;
             _surveyNewsLastCheck = DateTime.MinValue;
             _surveyNewsFeedUrl = DefaultSurveyNewsFeedUrl;
@@ -131,7 +129,6 @@ namespace Microsoft.NodejsTools.Options {
 
         public override void LoadSettingsFromStorage() {
             // Load settings from storage.
-            ShowOutputWindowWhenExecutingNpm = LoadBool(ShowOutputWindowRunningNpm) ?? true;
             _surveyNewsCheck = LoadEnum<SurveyNewsPolicy>(SurveyNewsCheckSetting) ?? SurveyNewsPolicy.CheckOnceWeek;
             _surveyNewsLastCheck = LoadDateTime(SurveyNewsLastCheckSetting) ?? DateTime.MinValue;
             _surveyNewsFeedUrl = LoadString(SurveyNewsFeedUrlSetting) ?? DefaultSurveyNewsFeedUrl;
@@ -154,7 +151,6 @@ namespace Microsoft.NodejsTools.Options {
             }
 
             // Save settings.
-            SaveBool(ShowOutputWindowRunningNpm, ShowOutputWindowWhenExecutingNpm);
             SaveEnum(SurveyNewsCheckSetting, _surveyNewsCheck);
             SaveDateTime(SurveyNewsLastCheckSetting, _surveyNewsLastCheck);
             SaveBool(WaitOnNormalExitSetting, WaitOnNormalExit);

@@ -138,6 +138,9 @@
   <data name="115" xml:space="preserve">
     <value>General</value>
   </data>
+  <data name="116" xml:space="preserve">
+    <value>Npm</value>
+  </data>
   <data name="3007" xml:space="preserve">
     <value>JavaScript file</value>
   </data>

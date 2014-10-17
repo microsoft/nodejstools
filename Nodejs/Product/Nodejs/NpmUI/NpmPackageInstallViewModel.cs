@@ -169,8 +169,6 @@ namespace Microsoft.NodejsTools.NpmUI {
 
             LastRefreshedMessage = LastRefreshedMessageProvider.RefreshInProgress;
 
-            bool showList = false;
-
             var controller = _npmController;
             controller.ErrorLogged += _executeViewModel.commander_ErrorLogged;
             controller.ExceptionLogged += _executeViewModel.commander_ExceptionLogged;
@@ -178,25 +176,24 @@ namespace Microsoft.NodejsTools.NpmUI {
             try {
                 _allPackages = await controller.GetRepositoryCatalogAsync(forceRefresh);
                 IsCatalogEmpty = false;
-                showList = true;
             } catch (NpmNotFoundException) {
-                LoadingCatalogMessage = SR.GetString(SR.CatalogLoadingNoNpm);
+                LastRefreshedMessage = LastRefreshedMessageProvider.NpmNotFound;
             } catch (NpmCatalogEmptyException) {
                 IsCatalogEmpty = true;
-                showList = true;
+                LastRefreshedMessage = new LastRefreshedMessageProvider(DateTime.Now);
+            } catch (Exception) {
+                LastRefreshedMessage = LastRefreshedMessageProvider.RefreshFailed;
             } finally {
+                IsLoadingCatalog = false;
                 controller.ErrorLogged -= _executeViewModel.commander_ErrorLogged;
                 controller.ExceptionLogged -= _executeViewModel.commander_ExceptionLogged;
                 _executeViewModel.SetCancellableSafe(true);
             }
 
-            IsLoadingCatalog = false;
-
-            if (showList) {
-                LoadingCatalogControlVisibility = Visibility.Collapsed;
-                FilteredCatalogListVisibility = Visibility.Visible;
-                StartFilter();
-            }
+            // We want to show the catalog regardless of whether an exception was thrown so that the user has the chance to refresh it.
+            LoadingCatalogControlVisibility = Visibility.Collapsed;
+            FilteredCatalogListVisibility = Visibility.Visible;
+            StartFilter();
         }
 
         public void LoadCatalog() {

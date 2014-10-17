@@ -41,7 +41,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     continue;
                 }
 
-                if (package.Keywords.Any(keyword => keyword.ToLower().Contains(filterString))) {
+                var keywords = package.Keywords;
+                if (null != keywords && package.Keywords.Any(keyword => keyword.ToLower().Contains(filterString))) {
                     target.Add(package);
                 }
             }

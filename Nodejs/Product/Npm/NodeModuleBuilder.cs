@@ -140,7 +140,6 @@ namespace Microsoft.NodejsTools.Npm {
             proxy.RequestedVersionRange = RequestedVersionRange;
             proxy.Flags = Flags;
 
-            _keywords.Sort();
             proxy.Keywords = _keywords;
 
             var modules = new NodeModulesProxy();

@@ -179,7 +179,7 @@ The following error occurred:
         public IPerson Author {
             get {
                 var author = _package.author;
-                return null == author ? null : new Person(author);
+                return null == author ? null : new Person(author.ToString());
             }
         }
 

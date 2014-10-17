@@ -22,12 +22,15 @@ using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.NodejsTools.Npm.SQLiteTables;
 using Microsoft.VisualStudioTools.Project;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SQLite;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal class NpmGetCatalogCommand : NpmCommand, IPackageCatalog {
-        private IDictionary<string, IPackage> _byName = new Dictionary<string, IPackage>(); 
+        private IDictionary<string, IPackage> _byName = new Dictionary<string, IPackage>();
         private readonly bool _forceDownload;
         private string _cachePath;
 
@@ -47,66 +50,108 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             Arguments = "search";
             _forceDownload = forceDownload;
             LastRefreshed = DateTime.MinValue;
-       }
+        }
 
-        internal List<IPackage> ParseResultsFromReader(TextReader reader) {
-            var builder = new NodeModuleBuilder();
-            var results = new List<IPackage>();
-            using (var jsonReader = new Newtonsoft.Json.JsonTextReader(reader)) {
-                var token = JObject.ReadFrom(jsonReader);
-                foreach (var module in token.Values()) {
-                    try {
-                        builder.Name = (string)module["name"];
-                        if (string.IsNullOrEmpty(builder.Name)) {
-                            continue;
-                        }
+        internal void ParseResultsAndAddToDatabase(TextReader reader, string dbFilename) {
 
-                        builder.AppendToDescription((string)module["description"] ?? string.Empty);
+            using (var db = new SQLiteConnection(dbFilename)) {
 
-                        var time = module["time"];
-                        if (time != null) {
-                            builder.AppendToDate((string)time["modified"]);
-                        }
+                db.RunInTransaction(() => {
+                    db.CreateTable<CatalogEntry>();
+                    db.CreateTable<DbVersion>();
+                });
 
-                        var versions = module["versions"];
-                        if (versions != null) {
-                            var latestVersion = versions
-                                .OfType<JProperty>()
-                                .Where(v => (string)v == "latest")
-                                .Select(v => v.Name)
-                                .FirstOrDefault();
+                db.RunInTransaction(() => {
+                    using (var jsonReader = new Newtonsoft.Json.JsonTextReader(reader)) {
+                        var token = JObject.ReadFrom(jsonReader);
 
-                            if (!string.IsNullOrEmpty(latestVersion)) {
-                                builder.Version = SemverVersion.Parse(latestVersion);
+                        db.InsertOrReplace(new DbVersion() {
+                            Id = 1,
+                            Revision = long.Parse((string)token["_updated"]),
+                            UpdatedOn = DateTime.Now
+                        });
+
+                        var builder = new NodeModuleBuilder();
+
+                        foreach (var module in token.Values()) {
+                            try {
+                                builder.Name = (string)module["name"];
+                                if (string.IsNullOrEmpty(builder.Name)) {
+                                    continue;
+                                }
+
+                                builder.AppendToDescription((string)module["description"] ?? string.Empty);
+
+                                var time = module["time"];
+                                if (time != null) {
+                                    builder.AppendToDate((string)time["modified"]);
+                                }
+
+                                var distTags = module["dist-tags"];
+                                if (distTags != null) {
+                                    var latestVersion = distTags
+                                        .OfType<JProperty>()
+                                        .Where(v => (string)v.Name == "latest")
+                                        .Select(v => (string)v.Value)
+                                        .FirstOrDefault();
+
+                                    if (!string.IsNullOrEmpty(latestVersion)) {
+                                        builder.Version = SemverVersion.Parse(latestVersion);
+                                    }
+                                }
+
+                                AddKeywords(builder, module["keywords"]);
+
+                                AddAuthor(builder, module["author"]);
+
+                                AddHomepage(builder, module["homepage"]);
+
+                                var package = builder.Build();
+
+                                db.InsertOrReplace(new CatalogEntry() {
+                                    Name = builder.Name,
+                                    Description = builder.Description,
+                                    Author = JsonConvert.SerializeObject(package.Author),
+                                    Version = JsonConvert.SerializeObject(package.Version),
+                                    Keywords = JsonConvert.SerializeObject(package.Keywords),
+                                    Homepage = JsonConvert.SerializeObject(package.Homepages),
+                                    PublishDateTimeString = package.PublishDateTimeString
+                                });
+                            } catch (InvalidOperationException) {
+                                // Occurs if a JValue appears where we expect JProperty
+                            } catch (ArgumentException) {
+                                OnOutputLogged(string.Format(Resources.ParsingError, builder.Name));
+                                if (!string.IsNullOrEmpty(builder.Name)) {
+                                    var package = builder.Build();
+                                    db.InsertOrReplace(new CatalogEntry() {
+                                        Name = package.Name,
+                                        Description = package.Description,
+                                        Author = JsonConvert.SerializeObject(package.Author),
+                                        Version = JsonConvert.SerializeObject(package.Version),
+                                        Keywords = JsonConvert.SerializeObject(package.Keywords),
+                                        Homepage = JsonConvert.SerializeObject(package.Homepages)
+                                    });
+                                }
+                            } finally {
+                                builder.Reset();
                             }
                         }
-
-                        var keywords = module["keywords"];
-                        if (keywords != null) {
-                            foreach (var keyword in keywords.Select(v => (string)v)) {
-                                builder.AddKeyword(keyword);
-                            }
-                        }
-
-                        AddAuthor(builder, module["author"]);
-
-                        AddHomepage(builder, module["homepage"]);
-
-                        results.Add(builder.Build());
-                    } catch (InvalidOperationException) {
-                        // Occurs if a JValue appears where we expect JProperty
-                    } catch (ArgumentException) {
-                        OnOutputLogged(string.Format(Resources.ParsingError, builder.Name));
-                        if (!string.IsNullOrEmpty(builder.Name)) {
-                            results.Add(builder.Build());
-                        }
-                    } finally {
-                        builder.Reset();
                     }
+                });
+            }
+        }
+
+        private static void AddKeywords(NodeModuleBuilder builder, JToken keywords) {
+            if (keywords != null) {
+                foreach (var keyword in keywords.Select(v => (string)v)) {
+                    builder.AddKeyword(keyword);
                 }
             }
+        }
 
-            return results;
+        private static string GetJsonStringFromToken(JToken token) {
+            string keywords = token != null ? token.ToString() : null;
+            return keywords;
         }
 
         private static void AddHomepage(NodeModuleBuilder builder, JToken homepage) {
@@ -143,12 +188,24 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             }
         }
 
-        private async Task UpdateCache(Uri registry, string filename) {
+        private async Task<string> DownloadPackageJsonCache(Uri registry, string cachePath, long refreshStartKey = 0) {
             registry = registry ?? new Uri("https://registry.npmjs.org/");
 
+            string relativeUri, filename;
+            if (refreshStartKey > 0) {
+                relativeUri = String.Format("/-/all/since?stale=update_after&startkey={0}", refreshStartKey);
+                filename = Path.Combine(cachePath, "since_packages.json");
+            }  else {
+                relativeUri = "/-/all";
+                filename = Path.Combine(cachePath, "all_packages.json");
+            }
+
+            OnOutputLogged(string.Format(Resources.InfoPackageCacheWriteLocation, filename));
+
+
             Uri packageUri;
-            if (!Uri.TryCreate(registry, "/-/all", out packageUri)) {
-                return;
+            if (!Uri.TryCreate(registry, relativeUri, out packageUri)) {
+                return null;
             }
 
             Directory.CreateDirectory(Path.GetDirectoryName(filename));
@@ -192,66 +249,127 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 }
                 OnOutputLogged(Resources.PackagesDownloadComplete);
             }
+
+            return filename;
         }
 
         public override async Task<bool> ExecuteAsync() {
-            var filename = CachePath;
-            List<IPackage> newResults = null;
+            var dbFilename = Path.Combine(CachePath, "packagecache.sqlite");
 
-            for (int attempt = 0; attempt < 2; attempt++) {
-                if (_forceDownload || !File.Exists(filename)) {
-                    OnOutputLogged(String.Format(Resources.InfoPackageCacheWriteLocation, filename));
-                    Uri registry = null;
-                    string pathToNpm = GetPathToNpm();
-                    OnOutputLogged(String.Format(Resources.InfoNpmPathLocation, pathToNpm));
-                    using (var proc = ProcessOutput.RunHiddenAndCapture(pathToNpm, "config", "get", "registry")) {
-                        if (await proc == 0) {
-                            registry = proc.StandardOutputLines
-                                .Select(s => {
-                                    Uri u;
-                                    return Uri.TryCreate(s, UriKind.Absolute, out u) ? u : null;
-                                })
-                                .FirstOrDefault(u => u != null);
-                        }
-                    }
+            string filename = null;
 
-                    await UpdateCache(registry, filename);
-                }
+            List<IPackage> results = null;
+            bool catalogUpdated = false;
 
+            // Wait until file is downloaded/parsed if another download is already in session.
+            // Allows user to open multiple npm windows and show progress bar without file-in-use errors. 
+            // Loops for five minutes, and only when IOException occurs.
+            for (int secondsDelay = 0; secondsDelay < 300; secondsDelay += 10) {
 
                 try {
-                    if (File.Exists(filename)) {
-                        var fileInfo = new FileInfo(filename);
-                        OnOutputLogged(String.Format(Resources.InfoReadingBytesFromPackageCache, fileInfo.Length, filename, fileInfo.LastWriteTime));
-                        
-                        using (var reader = new StreamReader(filename)) {
-                            newResults = await Task.Run(() => ParseResultsFromReader(reader));
+                    if (!File.Exists(dbFilename)) {
+                        filename = await UpdatePackageCache();
+                        catalogUpdated = true;
+                    } else if (_forceDownload) {
+                        DbVersion version;
+                        using (var db = new SQLiteConnection(dbFilename)) {
+                            version = db.Table<DbVersion>().First();
                         }
+
+                        filename = await UpdatePackageCache(version.Revision);
+                        catalogUpdated = true;
                     }
+
+                    try {
+                        if (catalogUpdated) {
+                            var fileInfo = new FileInfo(filename);
+                            OnOutputLogged(String.Format(Resources.InfoReadingBytesFromPackageCache, fileInfo.Length, filename, fileInfo.LastWriteTime));
+
+                            using (var reader = new StreamReader(filename)) {
+                                await Task.Run(() => ParseResultsAndAddToDatabase(reader, dbFilename));
+                            }
+                        }
+                    } catch (Exception ex) {
+                        // assume the results are corrupted...
+                        OnOutputLogged(ex.ToString());
+                    }
+
+                    results = await Task.Run(() => ReadResultsFromDatabase(dbFilename));
                     break;
+
+                } catch (IOException) {
+                    // file is being downloaded
                 } catch (Exception ex) {
-                    // assume the results are corrupted and try again...
+                    // assume the results are corrupted
                     OnOutputLogged(ex.ToString());
-                    OnOutputLogged(String.Format(Resources.InfoDeletingFile, filename));
-                    File.Delete(filename);
+                    break;
                 }
+                await Task.Delay(TimeSpan.FromSeconds(secondsDelay));
             }
 
-            if (newResults == null || !newResults.Any()) {
+            if (results == null || !results.Any()) {
                 var ex = new NpmCatalogEmptyException(Resources.ErrNpmCatalogEmpty);
                 OnOutputLogged(ex.ToString());
                 throw ex;
             }
 
-            LastRefreshed = File.GetLastWriteTime(filename);
-            Results = new ReadOnlyCollection<IPackage>(newResults);
-            PopulateByName(newResults);
+            LastRefreshed = File.GetLastWriteTime(dbFilename);
+            Results = new ReadOnlyCollection<IPackage>(results);
+            PopulateByName(results);
 
             OnOutputLogged(String.Format(Resources.InfoCurrentTime, DateTime.Now));
             OnOutputLogged(String.Format(Resources.InfoLastRefreshed, LastRefreshed));
-            OnOutputLogged(String.Format(Resources.InfoNumberOfResults, newResults.LongCount()));
+            OnOutputLogged(String.Format(Resources.InfoNumberOfResults, Results.LongCount()));
 
             return true;
+        }
+
+        internal static List<IPackage> ReadResultsFromDatabase(string cacheFile) {
+            // TODO: we shouldn't be loading all results from the database into memory.
+            // We should query the database instead. https://nodejstools.codeplex.com/workitem/1438
+            var results = new List<IPackage>();
+            using (var db = new SQLiteConnection(cacheFile)) {
+                db.RunInTransaction(() => {
+                    var enumerator = db.Table<CatalogEntry>().OrderBy(x => x.Name, StringComparer.OrdinalIgnoreCase).GetEnumerator();
+                    while (enumerator.MoveNext()) {
+                        var package = new PackageProxy();
+                        CatalogEntry entry = enumerator.Current;
+
+                        package.Name = entry.Name;
+                        package.Description = entry.Description;
+                        package.Author = JsonConvert.DeserializeObject<Person>(entry.Author);
+                        package.Keywords = JsonConvert.DeserializeObject<IEnumerable<string>>(entry.Keywords) ?? new List<string>();
+                        package.Version = JsonConvert.DeserializeObject<SemverVersion>(entry.Version);
+                        package.Homepages = JsonConvert.DeserializeObject<IEnumerable<string>>(entry.Homepage) ?? new List<string>();
+                        package.PublishDateTimeString = entry.PublishDateTimeString;
+
+                        results.Add(package);
+                    }
+                });
+            }
+            return results;
+        }
+
+        private async Task<string> UpdatePackageCache(long refreshStartKey = 0) {
+            string filename;
+            Uri registry = null;
+            string pathToNpm = GetPathToNpm();
+            OnOutputLogged(String.Format(Resources.InfoNpmPathLocation, pathToNpm));
+
+            using (var proc = ProcessOutput.RunHiddenAndCapture(pathToNpm, "config", "get", "registry")) {
+                if (await proc == 0) {
+                    registry = proc.StandardOutputLines
+                        .Select(s => {
+                            Uri u;
+                            return Uri.TryCreate(s, UriKind.Absolute, out u) ? u : null;
+                        })
+                        .FirstOrDefault(u => u != null);
+                }
+            }
+
+            filename = await DownloadPackageJsonCache(registry, CachePath, refreshStartKey);
+
+            return filename;
         }
 
         private void PopulateByName(IEnumerable<IPackage> source) {

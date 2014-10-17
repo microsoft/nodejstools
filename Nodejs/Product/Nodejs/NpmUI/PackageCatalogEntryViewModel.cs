@@ -44,7 +44,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             _version = version;
             _author = author;
             _description = description;
-            _homepages = homepages.ToList();
+            _homepages = homepages != null ? homepages.ToList() : new List<string>();
             _keywords = keywords;
             _localVersion = localVersion;
             _globalVersion = globalVersion;

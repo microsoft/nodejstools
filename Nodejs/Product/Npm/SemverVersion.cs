@@ -15,6 +15,7 @@
 using System;
 using System.Text;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 
 namespace Microsoft.NodejsTools.Npm {
     /// <summary>
@@ -76,15 +77,6 @@ namespace Microsoft.NodejsTools.Npm {
         //  classy package for that. He saw fit to give his package a version number of 0.3.130506190513602.
         //  Wait! What?!? Does that mean there have been 130506190513601 previous patch releases of classy 0.3?
         //  No. No it doesn't. It means he can't read the semver spec.
-        private ulong _major;
-        private ulong _minor;
-        private ulong _patch;
-
-        //  N.B. Both of these are series of dot separated identifiers, but since we don't really particularly
-        //  care about them at the moment, can defer comparisons to semver, and won't need to do anything beyond
-        //  let the user specify a value, I've just implemented them as strings.
-        private string _preReleaseVersion;
-        private string _buildMetadata;
 
         private static bool IsValidOptionalFragment(string optional) {
             return string.IsNullOrEmpty(optional) || RegexOptionalFragment.IsMatch(optional);
@@ -95,7 +87,7 @@ namespace Microsoft.NodejsTools.Npm {
             ulong minor,
             ulong patch,
             string preReleaseVersion = null,
-            string buildMetadata = null) {
+            string buildMetadata = null) : this() {
             if (!IsValidOptionalFragment(preReleaseVersion)) {
                 throw new ArgumentException(
                     string.Format(
@@ -112,39 +104,38 @@ namespace Microsoft.NodejsTools.Npm {
                     "buildMetadata");
             }
 
-            _major = major;
-            _minor = minor;
-            _patch = patch;
-            _preReleaseVersion = preReleaseVersion;
-            _buildMetadata = buildMetadata;
+            Major = major;
+            Minor = minor;
+            Patch = patch;
+            PreReleaseVersion = preReleaseVersion;
+            BuildMetadata = buildMetadata;
         }
 
-        public ulong Major {
-            get { return _major; }
-        }
+        [JsonProperty]
+        public ulong Major { get; private set; }
 
-        public ulong Minor {
-            get { return _minor; }
-        }
+        [JsonProperty]
+        public ulong Minor { get; private set; }
 
-        public ulong Patch {
-            get { return _patch; }
-        }
+        [JsonProperty]
+        public ulong Patch { get; private set; }
+        
+
+        //  N.B. Both PreReleaseVersion and BuildMetadata are series of dot separated identifiers, but since we don't really particularly
+        //  care about them at the moment, can defer comparisons to semver, and won't need to do anything beyond
+        //  let the user specify a value, I've just implemented them as strings.
+        [JsonProperty]
+        public string PreReleaseVersion { get; private set; }
+
+        [JsonProperty]
+        public string BuildMetadata { get; private set; }
 
         public bool HasPreReleaseVersion {
             get { return !string.IsNullOrEmpty(PreReleaseVersion); }
         }
 
-        public string PreReleaseVersion {
-            get { return _preReleaseVersion; }
-        }
-
         public bool HasBuildMetadata {
             get { return !string.IsNullOrEmpty(BuildMetadata); }
-        }
-
-        public string BuildMetadata {
-            get { return _buildMetadata; }
         }
 
         public override string ToString() {

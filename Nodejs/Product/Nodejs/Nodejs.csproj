@@ -311,6 +311,15 @@
     </Compile>
     <Compile Include="NpmUI\PackageCatalogEntryViewModel.cs" />
     <Compile Include="Options\AnalysisLevel.cs" />
+    <Compile Include="Options\NodejsNpmOptionsPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Options\NodejsNpmOptionsControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Options\NodejsNpmOptionsControl.Designer.cs">
+      <DependentUpon>NodejsNpmOptionsControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Options\NodejsIntellisenseOptionsControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -637,6 +646,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Commands\DiagnosticsForm.resx">
       <DependentUpon>DiagnosticsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.resx">
+      <DependentUpon>NodejsNpmOptionsControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Options\NodejsIntellisenseOptionsControl.resx">
       <DependentUpon>NodejsIntellisenseOptionsControl.cs</DependentUpon>

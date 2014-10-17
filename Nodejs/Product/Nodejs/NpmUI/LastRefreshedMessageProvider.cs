@@ -27,6 +27,11 @@ namespace Microsoft.NodejsTools.NpmUI {
             Description = SR.GetString(SR.PackageCatalogRefreshing)
         };
 
+        public static readonly LastRefreshedMessageProvider NpmNotFound = new LastRefreshedMessageProvider {
+            Days = int.MaxValue,
+            Description = "npm not installed"
+        };
+
         private LastRefreshedMessageProvider() { }
 
         public LastRefreshedMessageProvider(DateTime lastRefreshTime) {

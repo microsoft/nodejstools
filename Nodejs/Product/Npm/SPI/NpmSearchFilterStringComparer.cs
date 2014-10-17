@@ -24,15 +24,15 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         private int GetExactKeywordMatchCount(IPackage source) {
-            return source.Keywords.Count(keyword => keyword.ToLower() == _filterString);
+            return source.Keywords == null ? 0 : source.Keywords.Count(keyword => keyword.ToLower() == _filterString);
         }
 
         private int GetStartsWithMatchCount(IPackage source) {
-            return source.Keywords.Count(keyword => keyword.ToLower().StartsWith(_filterString));
+            return source.Keywords == null ? 0 : source.Keywords.Count(keyword => keyword.ToLower().StartsWith(_filterString));
         }
 
         private int GetPartialKeywordMatchCount(IPackage source) {
-            return source.Keywords.Count(keyword => keyword.ToLower().Contains(_filterString));
+            return source.Keywords == null ? 0 : source.Keywords.Count(keyword => keyword.ToLower().Contains(_filterString));
         }
 
         private new int CompareBasedOnKeywords(IPackage x, IPackage y) {
