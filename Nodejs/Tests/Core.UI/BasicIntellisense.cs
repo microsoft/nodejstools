@@ -276,6 +276,7 @@ namespace Microsoft.Nodejs.Tests.UI {
   * 
   * Just a paragraph. It shouldn't show up anywhere.
   *
+  * @param [x.y] Doesn't match any parameter in the list.
   * @param  a   Documentation for a.
   * 
   * Another paragraph that won't show up anywhere. This one has a {@link}.
@@ -284,8 +285,9 @@ namespace Microsoft.Nodejs.Tests.UI {
   *             It spans multiple lines.
   * @param  c   Documentation for c. It has a {@link} in it.
   * @arg   [d]  Documentation for d. It is an optional parameter.
-  * @argument [e=123]
-  * Documentation for e. It has a default value.
+  * @arg {string} [x.y] This does not match any declared parameter and should not show up anywhere.
+  * @argument {number} [e=123]
+  * Documentation for e. It has a default value and a type.
   *
   * @see Not a parameter!
   */
@@ -337,7 +339,7 @@ h = function() {}
                 Keyboard.Type("f(");
                 using (var sh = editor.WaitForSession<ISignatureHelpSession>()) {
                     var session = sh.Session;
-                    Assert.AreEqual("f(a, b, c, d?, e? = 123)", session.SelectedSignature.Content);
+                    Assert.AreEqual("f(a, b, c, d?, e?: number = 123)", session.SelectedSignature.Content);
 
                     Keyboard.Type("a");
                     Assert.AreEqual("a", session.SelectedSignature.CurrentParameter.Name);
@@ -357,7 +359,7 @@ h = function() {}
 
                     Keyboard.Type(", e");
                     Assert.AreEqual("e", session.SelectedSignature.CurrentParameter.Name);
-                    Assert.AreEqual("Documentation for e. It has a default value.", session.SelectedSignature.CurrentParameter.Documentation);
+                    Assert.AreEqual("Documentation for e. It has a default value and a type.", session.SelectedSignature.CurrentParameter.Documentation);
                 }
                 Keyboard.Backspace();
                 Keyboard.Backspace();

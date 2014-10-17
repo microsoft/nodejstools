@@ -57,7 +57,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 // Try to locate and parse the corresponding @param in the doclet.
                 string docRegex =
                     // @param, @arg or @argument, and optional {type}
-                    (@"@(param|arg|argument) (\s+|\s*\{(?<Type>.*?)\}\s*)" + 
+                    (@"@(param|arg|argument) (\s+|\s*\{(?<Type>[^}]*?)\}\s*)" + 
                     // Either just name by itself, or [name] if it's optional, or [name=value] if defaulted.
                      @"(?<IsOptional>\[\s*)? {{VariableName}} (?(IsOptional)\s*(=\s*(?<DefaultValue>.*?)\s*)?\])" +
                     // Associated docstring. Ends at the end of doclet, or at the next non-inline @tag, or at the next empty line (paragraph break).
