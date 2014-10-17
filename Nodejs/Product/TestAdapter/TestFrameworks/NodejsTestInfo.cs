@@ -27,7 +27,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
             TestFramework = parts[2];
         }
 
-        public NodejsTestInfo(string modulePath, string testName, string moduleName, string testFramework, int line, int column)
+        public NodejsTestInfo(string modulePath, string testName, string testFramework, int line, int column)
         {
             ModulePath = modulePath;
             TestName = testName;

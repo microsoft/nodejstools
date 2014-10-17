@@ -61,7 +61,7 @@ namespace TestAdapterTests {
 
         public TestCase TestCase {
             get {
-                var expectedFullyQualifiedName = new NodejsTestInfo(RelativeClassFilePath, MethodName, "", TestFrameworkDirectories.ExportRunnerFramework, 0, 0).FullyQualifiedName;
+                var expectedFullyQualifiedName = new NodejsTestInfo(RelativeClassFilePath, MethodName, TestFrameworkDirectories.ExportRunnerFramework, 0, 0).FullyQualifiedName;
                 var tc = new TestCase(expectedFullyQualifiedName, new Uri(TestExecutor.ExecutorUriString), this.ProjectFilePath);
                 tc.CodeFilePath = SourceCodeFilePath;
                 tc.LineNumber = SourceCodeLineNumber;

@@ -37,7 +37,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
         }
 
         public string Name { get; private set; }
-        public List<NodejsTestInfo> FindTests(string testFile,
+        public List<NodejsTestInfo> FindTests(IEnumerable<string> testFiles,
             string nodeExe,
             IMessageLogger logger, 
             string workingDirectory) {
@@ -45,7 +45,8 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
             string testInfo = string.Empty;
             string discoverResultFile = Path.GetTempFileName();
             try {
-                string stdout = EvaluateJavaScript(nodeExe, testFile, discoverResultFile, logger, workingDirectory);
+
+                string stdout = EvaluateJavaScript(nodeExe, string.Join(";", testFiles), discoverResultFile, logger, workingDirectory);
                 if (!String.IsNullOrWhiteSpace(stdout)) {
                     IEnumerable<String> stdoutLines = stdout.Split(new string[] {Environment.NewLine},
                         StringSplitOptions.RemoveEmptyEntries).Where(s => s.StartsWith("NTVS_ERROR:")).Select(s => s.Trim().Remove(0,11));
@@ -81,7 +82,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
             List<DiscoveredTest> discoveredTests = (List<DiscoveredTest>)JsonConvert.DeserializeObject(testInfo, typeof(List<DiscoveredTest>));
             if (discoveredTests != null) {
                 foreach (DiscoveredTest discoveredTest in discoveredTests) {
-                    NodejsTestInfo test = new NodejsTestInfo(testFile, discoveredTest.Test, discoveredTest.Suite, Name, discoveredTest.Line, discoveredTest.Column);
+                    NodejsTestInfo test = new NodejsTestInfo(discoveredTest.File, discoveredTest.Test, Name, discoveredTest.Line, discoveredTest.Column);
                     testCases.Add(test);
                 }
             }
@@ -156,6 +157,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
         private class DiscoveredTest {
             public string Test { get; set; }
             public string Suite { get; set; }
+            public string File { get; set; }
             public int Line { get; set; }
             public int Column { get; set; }
         }
