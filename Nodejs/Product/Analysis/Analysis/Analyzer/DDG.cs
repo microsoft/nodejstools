@@ -32,9 +32,9 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             _analyzer = analyzer;
         }
 
-        public void Analyze(Deque<AnalysisUnit> queue, CancellationToken cancel) {
+        public int Analyze(Deque<AnalysisUnit> queue, CancellationToken cancel) {
             if (cancel.IsCancellationRequested) {
-                return;
+                return 0;
             }
             // Including a marker at the end of the queue allows us to see in
             // the log how frequently the queue empties.
@@ -45,6 +45,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 queue.Append(endOfQueueMarker);
             }
 
+            HashSet<Node> analyzedItems = new HashSet<Node>();
             while (queue.Count > 0 && !cancel.IsCancellationRequested) {
                 _unit = queue.PopLeft();
 
@@ -58,6 +59,10 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                     continue;
                 }
 
+                if (_unit.Ast != null) {
+                    analyzedItems.Add(_unit.Ast);
+                }
+
                 _analyzer.Log.Dequeue(queue, _unit);
 
                 _unit.IsInQueue = false;
@@ -68,6 +73,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             if (cancel.IsCancellationRequested) {
                 _analyzer.Log.Cancelled(queue);
             }
+            return analyzedItems.Count;
         }
 
         public void SetCurrentUnit(AnalysisUnit unit) {

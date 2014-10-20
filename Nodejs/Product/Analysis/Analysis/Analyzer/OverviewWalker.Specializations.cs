@@ -28,6 +28,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         private static ExpectedLookup ObjectLookup = new ExpectedLookup("Object");
         private static Dictionary<string, BaseSpecialization[]> _specializations = new Dictionary<string, BaseSpecialization[]>() { 
             { "merge", new[] { MergeSpecialization2(), MergeSpecialization() } },
+            { "exports", new[] { MergeSpecialization() } }, // utils-merge 1.0
             { "mergeClone", new[] { MergeCloneSpecialization()  } },
             { "copy", new[] { CopySpecialization() }},
             { "clone", new[] { new CloneSpecialization(CloneSpecializationImpl) }},

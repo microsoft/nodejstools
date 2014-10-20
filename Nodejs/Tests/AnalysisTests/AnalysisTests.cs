@@ -635,6 +635,32 @@ x = x.abc;
             );
         }
 
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/949
+        /// </summary>
+        [TestMethod, Priority(0)]
+        public void TestDefinitiveAssignmentScoping2() {
+            string code = @"
+a = b = c = 2;
+a
+b
+c
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("a", code.Length),
+                BuiltinTypeId.Number
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("b", code.Length),
+                BuiltinTypeId.Number
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("c", code.Length),
+                BuiltinTypeId.Number
+            );
+        }
+
         [TestMethod, Priority(0)]
         public void TestSignatureHelp() {
             string code = @"
@@ -2526,6 +2552,34 @@ exports.f = f;
 
             AssertUtil.ContainsExactly(
                 entries["mymod.js"].Analysis.GetTypeIdsByIndex("f().abc", 0),
+                BuiltinTypeId.String
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestExportsLocation() {
+            var server = @"var mymod = require('./mymod.js');";
+            var entries = Analysis.Analyze(
+                new AnalysisFile("server.js", server),
+                new AnalysisFile("mymod.js", @"")
+            );
+
+            entries["server.js"].Analyze(default(CancellationToken));
+
+            AssertUtil.ContainsExactly(
+                entries["server.js"].Analysis.GetVariablesByIndex("mymod", server.Length).Select(x => x.Type + x.Location.FilePath),
+                "Definition" + "server.js",
+                "Value" + "mymod.js",
+                "Reference" + "server.js"
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestBadString() {
+            var code = "var x = '\uD83D';";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", code.Length),
                 BuiltinTypeId.String
             );
         }

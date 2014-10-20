@@ -21,6 +21,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.Serialization;
+using System.Text;
 using Microsoft.NodejsTools.Analysis.AnalysisSetDetails;
 using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Analysis.Values;
@@ -623,7 +624,11 @@ namespace Microsoft.NodejsTools.Analysis {
                 // save the string in the normal memo so deserialization is simplified
                 memoId = serializer._stringMemo[str] = serializer._reverseMemo[str] = serializer._reverseMemo.Count;
                 writer.Write((byte)SerializationType.String);
-                writer.Write((string)value);
+                try {
+                    writer.Write((string)value);
+                } catch (EncoderFallbackException) {
+                    writer.Write("");
+                }
             } else {
                 writer.Write((byte)SerializationType.ObjectReference);
                 writer.Write(memoId);

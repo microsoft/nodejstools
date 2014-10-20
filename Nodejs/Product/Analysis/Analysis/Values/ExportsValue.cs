@@ -13,6 +13,7 @@
  * ***************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Microsoft.NodejsTools.Analysis.Values {
@@ -40,6 +41,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
         public override string ObjectDescription {
             get {
                 return "exports from " + Path.GetFileName(_name);
+            }
+        }
+
+        public override IEnumerable<LocationInfo> Locations {
+            get {
+                return new[] { new LocationInfo(ProjectEntry, 1, 1) };
             }
         }
     }

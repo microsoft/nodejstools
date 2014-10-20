@@ -174,7 +174,9 @@ namespace Microsoft.NodejsTools.Intellisense {
 
             private void Worker(object threadStarted) {
                 ((AutoResetEvent)threadStarted).Set();
-
+                Stopwatch watch = new Stopwatch();
+                watch.Start();
+                long startTime = watch.ElapsedMilliseconds;
                 bool analyzedAnything = false;
                 while (!_cancel.IsCancellationRequested) {
                     IAnalyzable workItem;
@@ -198,17 +200,31 @@ namespace Microsoft.NodejsTools.Intellisense {
                             workItem.Analyze(_cancel.Token);
                         }
                     } else {
-                        if (analyzedAnything && (DateTime.Now - _lastSave) > _SaveAnalysisTime) {
+                        string statsMessage = null;
+                        if (_analyzer._jsAnalyzer != null) {
+                            int count = _analyzer._jsAnalyzer.GetAndClearAnalysisCount();
+                            if (count != 0) {
+                                var elapsedTime = TimeSpan.FromMilliseconds(watch.ElapsedMilliseconds - startTime);
+                                statsMessage = SR.GetString(SR.StatusAnalysisUpToDate, count, FormatTime(elapsedTime));
+                            }
+                        }
+
+                        if (_analyzer._saveToDisk && analyzedAnything && (DateTime.Now - _lastSave) > _SaveAnalysisTime) {
                             var statusbar = (IVsStatusbar)NodejsPackage.GetGlobalService(typeof(SVsStatusbar));
                             if (statusbar != null) {
-                                statusbar.SetText(SR.GetString(SR.StatusAnalysisSaving));
+                                statusbar.SetText(SR.GetString(SR.StatusAnalysisSaving) + " " + statsMessage);
                             }
 
                             _analyzer.SaveAnalysis();
                             _lastSave = DateTime.Now;
 
                             if (statusbar != null) {
-                                statusbar.SetText(SR.GetString(SR.StatusAnalysisSaved));
+                                statusbar.SetText(SR.GetString(SR.StatusAnalysisSaved) + " " + statsMessage);
+                            }
+                        } else if(statsMessage != null) {
+                            var statusbar = (IVsStatusbar)NodejsPackage.GetGlobalService(typeof(SVsStatusbar));
+                            if (statusbar != null) {
+                                statusbar.SetText(statsMessage);
                             }
                         }
 
@@ -217,9 +233,19 @@ namespace Microsoft.NodejsTools.Intellisense {
                             _analyzer._queueActivityEvent,
                             _workEvent
                         );
+                        startTime = watch.ElapsedMilliseconds;
                     }
                 }
                 _isAnalyzing = false;
+            }
+
+            private static string FormatTime(TimeSpan elapsedTime) {
+                if (elapsedTime.TotalMilliseconds < 1000) {
+                    return elapsedTime.TotalMilliseconds + " " + SR.GetString(SR.Milliseconds);
+                } else if (elapsedTime.TotalSeconds < 60) {
+                    return elapsedTime.TotalSeconds + " " + SR.GetString(SR.Seconds);
+                }
+                return elapsedTime.ToString("g");
             }
 
             sealed class GroupAnalysis : IAnalyzable {

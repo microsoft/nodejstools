@@ -57,6 +57,7 @@ namespace Microsoft.NodejsTools.Project {
         internal const string LongPathShowPathsExceedingTheLimit = "LongPathShowPathsExceedingTheLimit";
         internal const string LongPathWarningText = "LongPathWarningText";
         internal const string LongPathWarningTitle = "LongPathWarningTitle";
+        internal const string Milliseconds = "Milliseconds";
         internal const string NewVersionNo = "NewVersionNo";
         internal const string NewVersionNotApplicableSubpackage = "NewVersionNotApplicableSubpackage";
         internal const string NewVersionPackageCatalogNotRetrieved = "NewVersionPackageCatalogNotRetrieved";
@@ -157,12 +158,14 @@ namespace Microsoft.NodejsTools.Project {
         internal const string ReplInitializationMessage = "ReplInitializationMessage";
         internal const string RequestedVersionRangeNone = "RequestedVersionRangeNone";
         internal const string ScriptArgumentsToolTip = "ScriptArgumentsToolTip";
+        internal const string Seconds = "Seconds";
         internal const string StartBrowserToolTip = "StartBrowserToolTip";
         internal const string StatusAnalysisLoaded = "StatusAnalysisLoaded";
         internal const string StatusAnalysisLoadFailed = "StatusAnalysisLoadFailed";
         internal const string StatusAnalysisLoading = "StatusAnalysisLoading";
         internal const string StatusAnalysisSaved = "StatusAnalysisSaved";
         internal const string StatusAnalysisSaving = "StatusAnalysisSaving";
+        internal const string StatusAnalysisUpToDate = "StatusAnalysisUpToDate";
         internal const string TestFramework = "TestFramework";
         internal const string TestFrameworkDescription = "TestFrameworkDescription";
         internal const string UpgradedEnvironmentVariables = "UpgradedEnvironmentVariables";

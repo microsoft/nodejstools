@@ -400,9 +400,17 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                     }
                     return rightValue;
                 case JSToken.Assign:
-                    var rhs = ee.Evaluate(n.Operand2);
-                    ee.AssignTo(n, n.Operand1, rhs);
-                    return rhs;
+                    EnvironmentRecord newEnv;
+                    if (ee.Scope.GlobalEnvironment.TryGetNodeEnvironment(n, out newEnv)) {
+                        var res = ee.Evaluate(n.Operand2);
+                        ee.Scope = newEnv;
+                        ee.AssignTo(n, n.Operand1, res);
+                        return res;
+                    } else {
+                        var rhs = ee.Evaluate(n.Operand2);
+                        ee.AssignTo(n, n.Operand1, rhs);
+                        return rhs;
+                    }
             }
 
             return ee.Evaluate(n.Operand1)

@@ -53,6 +53,7 @@ namespace Microsoft.NodejsTools.Analysis {
         private readonly Deque<AnalysisUnit> _queue;
         private readonly HashSet<string> _analysisDirs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private AnalysisLimits _limits;
+        private int _analysisCount;
         private static byte[] _serializationVersion;
 #if DEBUG
         private static Dictionary<object, int> _analysisCreationCount = new Dictionary<object, int>();
@@ -365,10 +366,16 @@ namespace Microsoft.NodejsTools.Analysis {
             if (cancel.IsCancellationRequested) {
                 return;
             }
-            new DDG(this).Analyze(Queue, cancel);
+            _analysisCount += new DDG(this).Analyze(Queue, cancel);
         }
 
         #endregion
+
+        public int GetAndClearAnalysisCount() {
+            // thread safety doesn't matter, just using interlocked
+            // as it's simpler than a temp.
+            return Interlocked.Exchange(ref _analysisCount, 0);
+        }
 
         /// <summary>
         /// Adds a directory to the list of directories being analyzed.
