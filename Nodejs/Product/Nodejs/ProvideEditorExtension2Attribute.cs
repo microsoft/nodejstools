@@ -63,7 +63,7 @@ namespace Microsoft.NodejsTools {
             _extension = extension;
             _priority = priority;
             _project = Guid.Empty;
-            _templateDir = "";
+            _templateDir = "./NullPath";
             _resId = 0;
             _editorFactoryNotify = false;
             _extensions = extensions;
