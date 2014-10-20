@@ -204,7 +204,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
                 _retValue = ResolveMember(node, unit, moduleName, memberName);
             }
-            return _retValue;
+            return _retValue ?? AnalysisSet.Empty;
         }
 
         internal static IAnalysisSet ResolveMember(Node node, AnalysisUnit unit, string moduleName, string memberName) {
@@ -214,7 +214,7 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         public override IAnalysisSet ReturnTypes {
             get {
-                return _retValue;
+                return _retValue ?? AnalysisSet.Empty;
             }
         }
     }

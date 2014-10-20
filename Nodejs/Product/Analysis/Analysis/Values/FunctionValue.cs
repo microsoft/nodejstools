@@ -60,6 +60,12 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
         }
 
+        public override string ShortDescription {
+            get {
+                return "function";
+            }
+        }
+
         public override void SetMember(Node node, AnalysisUnit unit, string name, IAnalysisSet value) {
             if (name == "prototype") {
                 _instance.SetMember(node, unit, "__proto__", value);

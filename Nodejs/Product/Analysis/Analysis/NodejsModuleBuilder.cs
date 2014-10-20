@@ -314,6 +314,8 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
+        private static char[] _newlines = new[] { '\r', '\n' };
+
         private static string ParseDocumentation(string desc) {
             StringBuilder output = new StringBuilder();
             var reader = XmlReader.Create(
@@ -322,6 +324,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 )
             );
 
+            string text = null;
             while (reader.Read()) {
                 switch (reader.NodeType) {
                     case XmlNodeType.Element:
@@ -332,7 +335,7 @@ namespace Microsoft.NodejsTools.Analysis {
                         }
                         break;
                     case XmlNodeType.Text:
-                        var text = reader.Value;
+                        text = reader.Value;
                         output.Append(text);
                         break;
                     case XmlNodeType.EndElement:
@@ -345,8 +348,12 @@ namespace Microsoft.NodejsTools.Analysis {
                             case "h4":
                             case "h5":
                             case "pre":
-                            case "code":
                                 output.Append("\r\n");
+                                break;
+                            case "code":
+                                if (text != null && text.IndexOfAny(_newlines) != -1) {
+                                    output.Append("\r\n");
+                                }
                                 break;
                         }
                         break;

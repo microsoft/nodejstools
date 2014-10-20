@@ -183,8 +183,6 @@ namespace Microsoft.NodejsTools.Intellisense {
                     lastToken = enumerator.Current;
                 }
 
-                int currentParamAtLastColon = -1;   // used to track the current param index at this last colon, before we hit a lambda.
-                SnapshotSpan? startAtLastToken = null;
                 bool lastNewLine = false;
                 // Walk backwards over the tokens in the current line
                 do {
@@ -247,7 +245,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                         nestingChanged = true;
                         lastTokenWasCommaOrOperator = true;
                         lastTokenWasKeywordArgAssignment = false;
-                    } else if ((token.ClassificationType == Classifier.Provider.Keyword && 
+                    } else if ((token.ClassificationType == Classifier.Provider.Keyword &&
                                 text != "this" && text != "get" && text != "set" && text != "delete") ||
                                token.ClassificationType == Classifier.Provider.Operator) {
                         if (forCompletion && text == "new") {
@@ -259,29 +257,14 @@ namespace Microsoft.NodejsTools.Intellisense {
 
                         lastTokenWasKeywordArgAssignment = false;
 
-                        if (token.ClassificationType == Classifier.Provider.Keyword && text == "lambda") {
-                            if (currentParamAtLastColon != -1) {
-                                paramIndex = currentParamAtLastColon;
-                                currentParamAtLastColon = -1;
-                            } else {
-                                // fabcd(lambda a, b, c[PARAMINFO]
-                                // We have to be the 1st param.
-                                paramIndex = 0;
-                            }
-                        }
-
-                        if (text == ":") {
-                            startAtLastToken = start;
-                            currentParamAtLastColon = paramIndex;
-                        }
-
                         if (nesting == 0 && otherNesting == 0) {
                             if (start == null) {
                                 // http://pytools.codeplex.com/workitem/560
                                 // yield_value = 42
-                                // def f():
+                                // function *f() {
                                 //     yield<ctrl-space>
                                 //     yield <ctrl-space>
+                                // }
                                 // 
                                 // If we're next to the keyword, just return the keyword.
                                 // If we're after the keyword, return the span of the text proceeding
@@ -301,15 +284,12 @@ namespace Microsoft.NodejsTools.Intellisense {
                                 return null;
                             } else if ((nestingChanged || forCompletion) && token.ClassificationType == Classifier.Provider.Keyword && text == "function") {
                                 return null;
-                            }                            
+                            }
                             break;
                         } else if ((token.ClassificationType == Classifier.Provider.Keyword &&
                             _stmtKeywords.Contains(text)) ||
                             (token.ClassificationType == Classifier.Provider.Operator && IsAssignmentOperator(text))) {
-                            if (isSigHelp && text == "=") {
-                                // keyword argument allowed in signatures
-                                lastTokenWasKeywordArgAssignment = lastTokenWasCommaOrOperator = true;
-                            } else if (start == null || (nestingChanged && nesting != 0)) {
+                            if (start == null || (nestingChanged && nesting != 0)) {
                                 return null;
                             } else {
                                 break;

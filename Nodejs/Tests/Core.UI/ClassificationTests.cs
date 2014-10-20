@@ -117,6 +117,117 @@ x = $abc;";
             );
         }
 
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void IdentifierKeywords() {
+            var code = @"var x = app.get;
+var x = app.get();
+var x = app.get;
+var x = app.
+    get;
+
+var x = app. /* comment */
+    get;
+
+var x = app. // comment
+    get;
+
+function static() {
+}
+
+function /* blah */ static() {
+}
+
+function *static() {
+}
+
+function * static() {
+}
+
+function /*blah*/ * /*blah*/ static() {
+}";
+
+            VerifyClassifications(
+                code,
+                new Classification("keyword", 0, 3, "var"),
+                new Classification("identifier", 4, 5, "x"),
+                new Classification("Node.js operator", 6, 7, "="),
+                new Classification("identifier", 8, 11, "app"),
+                new Classification("Node.js dot", 11, 12, "."),
+                new Classification("identifier", 12, 15, "get"),
+                new Classification("Node.js operator", 15, 16, ";"),
+                new Classification("keyword", 18, 21, "var"),
+                new Classification("identifier", 22, 23, "x"),
+                new Classification("Node.js operator", 24, 25, "="),
+                new Classification("identifier", 26, 29, "app"),
+                new Classification("Node.js dot", 29, 30, "."),
+                new Classification("identifier", 30, 33, "get"),
+                new Classification("Node.js grouping", 33, 35, "()"),
+                new Classification("Node.js operator", 35, 36, ";"),
+                new Classification("keyword", 38, 41, "var"),
+                new Classification("identifier", 42, 43, "x"),
+                new Classification("Node.js operator", 44, 45, "="),
+                new Classification("identifier", 46, 49, "app"),
+                new Classification("Node.js dot", 49, 50, "."),
+                new Classification("identifier", 50, 53, "get"),
+                new Classification("Node.js operator", 53, 54, ";"),
+                new Classification("keyword", 56, 59, "var"),
+                new Classification("identifier", 60, 61, "x"),
+                new Classification("Node.js operator", 62, 63, "="),
+                new Classification("identifier", 64, 67, "app"),
+                new Classification("Node.js dot", 67, 68, "."),
+                new Classification("identifier", 74, 77, "get"),
+                new Classification("Node.js operator", 77, 78, ";"),
+                new Classification("keyword", 82, 85, "var"),
+                new Classification("identifier", 86, 87, "x"),
+                new Classification("Node.js operator", 88, 89, "="),
+                new Classification("identifier", 90, 93, "app"),
+                new Classification("Node.js dot", 93, 94, "."),
+                new Classification("comment", 95, 108, "/* comment */"),
+                new Classification("identifier", 114, 117, "get"),
+                new Classification("Node.js operator", 117, 118, ";"),
+                new Classification("keyword", 122, 125, "var"),
+                new Classification("identifier", 126, 127, "x"),
+                new Classification("Node.js operator", 128, 129, "="),
+                new Classification("identifier", 130, 133, "app"),
+                new Classification("Node.js dot", 133, 134, "."),
+                new Classification("comment", 135, 145, "// comment"),
+                new Classification("identifier", 151, 154, "get"),
+                new Classification("Node.js operator", 154, 155, ";"),
+                new Classification("keyword", 159, 167, "function"),
+                new Classification("identifier", 168, 174, "static"),
+                new Classification("Node.js grouping", 174, 176, "()"),
+                new Classification("Node.js grouping", 177, 178, "{"),
+                new Classification("Node.js grouping", 180, 181, "}"),
+                new Classification("keyword", 185, 193, "function"),
+                new Classification("comment", 194, 204, "/* blah */"),
+                new Classification("identifier", 205, 211, "static"),
+                new Classification("Node.js grouping", 211, 213, "()"),
+                new Classification("Node.js grouping", 214, 215, "{"),
+                new Classification("Node.js grouping", 217, 218, "}"),
+                new Classification("keyword", 222, 230, "function"),
+                new Classification("Node.js operator", 231, 232, "*"),
+                new Classification("identifier", 232, 238, "static"),
+                new Classification("Node.js grouping", 238, 240, "()"),
+                new Classification("Node.js grouping", 241, 242, "{"),
+                new Classification("Node.js grouping", 244, 245, "}"),
+                new Classification("keyword", 249, 257, "function"),
+                new Classification("Node.js operator", 258, 259, "*"),
+                new Classification("identifier", 260, 266, "static"),
+                new Classification("Node.js grouping", 266, 268, "()"),
+                new Classification("Node.js grouping", 269, 270, "{"),
+                new Classification("Node.js grouping", 272, 273, "}"),
+                new Classification("keyword", 277, 285, "function"),
+                new Classification("comment", 286, 294, "/*blah*/"),
+                new Classification("Node.js operator", 295, 296, "*"),
+                new Classification("comment", 297, 305, "/*blah*/"),
+                new Classification("identifier", 306, 312, "static"),
+                new Classification("Node.js grouping", 312, 314, "()"),
+                new Classification("Node.js grouping", 315, 316, "{"),
+                new Classification("Node.js grouping", 318, 319, "}")
+            );
+        }
+
         private static void VerifyClassifications(string code, params Classification[] expected) {
             using (var solution = Project(
                 "Classifications", Compile("server", code)).Generate().ToVs()) {

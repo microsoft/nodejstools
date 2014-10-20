@@ -29,7 +29,6 @@
             System.Windows.Forms.GroupBox intellisenseLevelGroupBox;
             System.Windows.Forms.GroupBox saveToDiskGroupBox;
             this._fullIntelliSenseRadioButton = new System.Windows.Forms.RadioButton();
-            this._limitedIntelliSenseRadioButton = new System.Windows.Forms.RadioButton();
             this._noIntelliSenseRadioButton = new System.Windows.Forms.RadioButton();
             this._saveToDiskDisabledRadioButton = new System.Windows.Forms.RadioButton();
             this._saveToDiskEnabledRadioButton = new System.Windows.Forms.RadioButton();
@@ -61,14 +60,6 @@
             this._fullIntelliSenseRadioButton.TabStop = true;
             toolTip.SetToolTip(this._fullIntelliSenseRadioButton, resources.GetString("_fullIntelliSenseRadioButton.ToolTip"));
             this._fullIntelliSenseRadioButton.UseVisualStyleBackColor = true;
-            // 
-            // _limitedIntelliSenseRadioButton
-            // 
-            resources.ApplyResources(this._limitedIntelliSenseRadioButton, "_limitedIntelliSenseRadioButton");
-            this._limitedIntelliSenseRadioButton.Name = "_limitedIntelliSenseRadioButton";
-            this._limitedIntelliSenseRadioButton.TabStop = true;
-            toolTip.SetToolTip(this._limitedIntelliSenseRadioButton, resources.GetString("_limitedIntelliSenseRadioButton.ToolTip"));
-            this._limitedIntelliSenseRadioButton.UseVisualStyleBackColor = true;
             // 
             // _noIntelliSenseRadioButton
             // 
@@ -106,7 +97,6 @@
             resources.ApplyResources(this.tableLayoutPanel2, "tableLayoutPanel2");
             this.tableLayoutPanel2.Controls.Add(this._analysisLogMax, 1, 3);
             this.tableLayoutPanel2.Controls.Add(this._noIntelliSenseRadioButton, 0, 2);
-            this.tableLayoutPanel2.Controls.Add(this._limitedIntelliSenseRadioButton, 0, 1);
             this.tableLayoutPanel2.Controls.Add(this._fullIntelliSenseRadioButton, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this._analysisLogMaxLabel, 0, 3);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
@@ -205,7 +195,6 @@
         private System.Windows.Forms.GroupBox _selectionInCompletionListGroupBox;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private System.Windows.Forms.RadioButton _noIntelliSenseRadioButton;
-        private System.Windows.Forms.RadioButton _limitedIntelliSenseRadioButton;
         private System.Windows.Forms.RadioButton _fullIntelliSenseRadioButton;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
         private System.Windows.Forms.TextBox _completionCommittedBy;

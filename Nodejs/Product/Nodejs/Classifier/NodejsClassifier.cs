@@ -146,6 +146,27 @@ namespace Microsoft.NodejsTools.Classifier {
             int currentLine = _tokenCache.IndexOfPreviousTokenization(firstLine, 0, out lineTokenization) + 1;
             object state = lineTokenization.State;
 
+            // track the previous 2 tokens to adjust our classifications of keywords
+            // when they shouldn't be displayed as keywords...
+            TokenInfo? prevToken = null, prevPrevToken = null;
+
+            // initialize the previous tokens so we can handle things like:
+            //      foo.
+            //          get()
+            // even if we're called on the line for get()
+            int prevLine = currentLine - 1;
+            while (prevLine >= 0 && prevToken == null) {
+                LineTokenization prevLineTokenization = GetPreviousTokenization(JSScanner, snapshot, firstLine, prevLine);
+                for (int i = prevLineTokenization.Tokens.Length - 1; i >= 0 && prevToken == null; i--) {
+                    var tempToken = prevLineTokenization.Tokens[i];
+                    if (IsValidPreviousToken(ref tempToken)) {
+                        prevToken = prevPrevToken;
+                        prevPrevToken = tempToken;
+                    }
+                }
+                prevLine--;
+            }
+
             while (currentLine <= lastLine) {
                 if (!_tokenCache.TryGetTokenization(currentLine, out lineTokenization)) {
                     lineTokenization = TokenizeLine(JSScanner, snapshot, state, currentLine);
@@ -192,20 +213,81 @@ namespace Microsoft.NodejsTools.Classifier {
 
                         if ((intersection != null && intersection.Value.Length > 0) ||
                             (span.Length == 0 && tokenSpan.Contains(span.Start)) // handle zero-length spans
-                        ) { 
+                        ) {
                             classifications.Add(new ClassificationSpan(new SnapshotSpan(snapshot, tokenSpan), type));
                         }
                     } else {
-                        var classification = ClassifyToken(span, token, currentLine);
+                        ClassificationSpan classification = null;
+                        if (token.Category == TokenCategory.Keyword) {
+                            // check and see if we're not really a keyword...
+                            if (IsKeywordInIdentifierContext(snapshot, prevToken, prevPrevToken, token, currentLine)) {
+                                classification = GetClassificationSpan(
+                                    span,
+                                    token,
+                                    currentLine,
+                                    CategoryMap[TokenCategory.Identifier]
+                                );
+                            }
+                        }
+                        if (classification == null) {
+                            classification = ClassifyToken(span, token, currentLine);
+                        }
 
                         if (classification != null) {
                             classifications.Add(classification);
                         }
                     }
+
+                    if (IsValidPreviousToken(ref token)) {
+                        prevPrevToken = prevToken;
+                        prevToken = token;
+                    }
                 }
 
                 currentLine++;
             }
+        }
+
+        private static bool IsValidPreviousToken(ref TokenInfo token) {
+            return token.Category != TokenCategory.Comment &&
+                   token.Category != TokenCategory.LineComment &&
+                   token.Category != TokenCategory.None;
+        }
+
+        private static bool IsKeywordInIdentifierContext(ITextSnapshot snapshot, TokenInfo? prevToken, TokenInfo? prevPrevToken, TokenInfo token, int lineNumber) {
+            if (prevToken != null) {
+                var prevValue = prevToken.Value;
+                if (prevValue.Category == TokenCategory.Operator &&
+                    prevValue.Trigger == TokenTriggers.MemberSelect) {
+                    // https://nodejstools.codeplex.com/workitem/967
+                    // member.get
+                    return true;
+                }
+                
+                if (prevValue.Category == TokenCategory.Keyword &&
+                    snapshot.GetText(SnapshotSpanToSpan(snapshot, prevValue, lineNumber)) == "function") {
+                    // https://nodejstools.codeplex.com/workitem/976
+                    // function static() { }
+                    return true;
+                }
+
+                if (prevPrevToken != null && prevValue.Category == TokenCategory.Operator) {
+                    var prevSpan = SnapshotSpanToSpan(snapshot, prevValue, lineNumber);
+                    if (snapshot.GetText(prevSpan) == "*") {
+                        var prevPrevValue = prevPrevToken.Value;
+                        var prevPrevSpan = SnapshotSpanToSpan(snapshot, prevPrevValue, lineNumber);
+                        if (snapshot.GetText(prevPrevSpan) == "function") {
+                            // https://nodejstools.codeplex.com/workitem/976
+                            // This time with a generator function...
+                            // function *static() { }
+                            return true;
+                        }
+                    }
+                }
+            }
+            
+
+            return false;
         }
 
         private int GetLeadingMultiLineTokens(JSScanner JSScanner, ITextSnapshot snapshot, TokenCategory tokenCategory, int firstLine, int currentLine, out int validPrevLine, ref TokenInfo startToken) {
@@ -214,24 +296,7 @@ namespace Microsoft.NodejsTools.Classifier {
             int length = 0;
 
             while (prevLine >= 0) {
-                LineTokenization prevLineTokenization;
-                if (!_tokenCache.TryGetTokenization(prevLine, out prevLineTokenization)) {
-                    LineTokenization lineTokenizationTemp;
-                    int currentLineTemp = _tokenCache.IndexOfPreviousTokenization(firstLine, 0, out lineTokenizationTemp) + 1;
-                    object stateTemp = lineTokenizationTemp.State;
-
-                    while (currentLineTemp <= snapshot.LineCount) {
-                        if (!_tokenCache.TryGetTokenization(currentLineTemp, out lineTokenizationTemp)) {
-                            lineTokenizationTemp = TokenizeLine(JSScanner, snapshot, stateTemp, currentLineTemp);
-                            _tokenCache[currentLineTemp] = lineTokenizationTemp;
-                        }
-
-                        stateTemp = lineTokenizationTemp.State;
-                    }
-
-                    prevLineTokenization = TokenizeLine(JSScanner, snapshot, stateTemp, prevLine);
-                    _tokenCache[prevLine] = prevLineTokenization;
-                }
+                LineTokenization prevLineTokenization = GetPreviousTokenization(JSScanner, snapshot, firstLine, prevLine);
 
                 if (prevLineTokenization.Tokens.Length != 0) {
                     if (prevLineTokenization.Tokens[prevLineTokenization.Tokens.Length - 1].Category != tokenCategory) {
@@ -253,6 +318,28 @@ namespace Microsoft.NodejsTools.Classifier {
                 }
             }
             return length;
+        }
+
+        private LineTokenization GetPreviousTokenization(JSScanner JSScanner, ITextSnapshot snapshot, int firstLine, int prevLine) {
+            LineTokenization prevLineTokenization;
+            if (!_tokenCache.TryGetTokenization(prevLine, out prevLineTokenization)) {
+                LineTokenization lineTokenizationTemp;
+                int currentLineTemp = _tokenCache.IndexOfPreviousTokenization(firstLine, 0, out lineTokenizationTemp) + 1;
+                object stateTemp = lineTokenizationTemp.State;
+
+                while (currentLineTemp <= snapshot.LineCount) {
+                    if (!_tokenCache.TryGetTokenization(currentLineTemp, out lineTokenizationTemp)) {
+                        lineTokenizationTemp = TokenizeLine(JSScanner, snapshot, stateTemp, currentLineTemp);
+                        _tokenCache[currentLineTemp] = lineTokenizationTemp;
+                    }
+
+                    stateTemp = lineTokenizationTemp.State;
+                }
+
+                prevLineTokenization = TokenizeLine(JSScanner, snapshot, stateTemp, prevLine);
+                _tokenCache[prevLine] = prevLineTokenization;
+            }
+            return prevLineTokenization;
         }
 
         private int GetTrailingMultiLineTokens(JSScanner JSScanner, ITextSnapshot snapshot, TokenCategory tokenCategory, int currentLine, object state) {
@@ -587,15 +674,20 @@ namespace Microsoft.NodejsTools.Classifier {
             }
 
             if (classification != null) {
-                var tokenSpan = SnapshotSpanToSpan(span.Snapshot, token, lineNumber);
-                var intersection = span.Intersection(tokenSpan);
-
-                if (intersection != null && intersection.Value.Length > 0 ||
-                    (span.Length == 0 && tokenSpan.Contains(span.Start))) { // handle zero-length spans which Intersect and Overlap won't return true on ever.
-                    return new ClassificationSpan(new SnapshotSpan(span.Snapshot, tokenSpan), classification);
-                }
+                return GetClassificationSpan(span, token, lineNumber, classification);
             }
 
+            return null;
+        }
+
+        private static ClassificationSpan GetClassificationSpan(SnapshotSpan span, TokenInfo token, int lineNumber, IClassificationType classification) {
+            var tokenSpan = SnapshotSpanToSpan(span.Snapshot, token, lineNumber);
+            var intersection = span.Intersection(tokenSpan);
+
+            if (intersection != null && intersection.Value.Length > 0 ||
+                (span.Length == 0 && tokenSpan.Contains(span.Start))) { // handle zero-length spans which Intersect and Overlap won't return true on ever.
+                return new ClassificationSpan(new SnapshotSpan(span.Snapshot, tokenSpan), classification);
+            }
             return null;
         }
 

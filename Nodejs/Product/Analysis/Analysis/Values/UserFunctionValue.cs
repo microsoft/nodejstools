@@ -150,12 +150,6 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             }
         }
 
-        public override string ShortDescription {
-            get {
-                return "function";
-            }
-        }
-
         private static void AppendDescription(StringBuilder result, AnalysisValue key) {
             result.Append(key.ShortDescription);
         }

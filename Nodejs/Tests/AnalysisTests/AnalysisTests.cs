@@ -1708,6 +1708,17 @@ var x = {};
             AssertUtil.ContainsExactly(analysis.GetTypeIdsByIndex("x.LOWER", code.Length));
         }
 
+        [TestMethod, Priority(0)]
+        public void TestBuiltinFunctionDocumentation() {
+            string code = @"
+var func = Object.defineProperties;
+";
+
+            var analysis = ProcessText(code);
+            var func = analysis.GetValuesByIndex("func", code.Length).First();
+            Assert.AreEqual(func.ShortDescription, "function");
+        }
+
         /// <summary>
         /// We don't allow assignment to most built-in members that
         /// are defined by JavaScript
