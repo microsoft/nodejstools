@@ -670,7 +670,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
 
             foreach (var item in _projectFiles) {
-                if (!item.Value.Reloaded) {
+                if (!item.Value.Reloaded && !item.Value.Entry.IsBuiltin) {
                     UnloadFile(item.Value.Entry);
                 }
             }
@@ -816,7 +816,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
 
             ProjectItem file;
-            IProjectEntry entry;
+            ProjectEntry entry;
             if (!_projectFiles.TryGetValue(path, out file)) {
                 if (buffer.ContentType.IsOfType(NodejsConstants.Nodejs)) {
                     entry = _jsAnalyzer.AddModule(
@@ -921,7 +921,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         class ProjectItem {
-            public readonly IProjectEntry Entry;
+            public readonly ProjectEntry Entry;
             public bool ReportErrors;
             public bool Reloaded;
             /// <summary>
@@ -937,7 +937,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             /// </summary>
             public List<ProjectItem> LoadedItems;
 
-            public ProjectItem(IProjectEntry entry) {
+            public ProjectItem(ProjectEntry entry) {
                 Entry = entry;
             }
         }

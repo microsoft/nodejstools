@@ -47,17 +47,19 @@ namespace Microsoft.NodejsTools.Analysis {
         private readonly List<AnalysisProxy> _proxies = new List<AnalysisProxy>();
         internal HashSet<ProjectEntry> _visibleEntries;
         private readonly DependentData _moduleDeps = new DependentData();
+        private readonly bool _isBuiltin;
 
         // we expect to have at most 1 waiter on updated project entries, so we attempt to share the event.
         private static ManualResetEventSlim _sharedWaitEvent = new ManualResetEventSlim(false);
 
-        internal ProjectEntry(JsAnalyzer analyzer, string filePath, IAnalysisCookie cookie) {
+        internal ProjectEntry(JsAnalyzer analyzer, string filePath, IAnalysisCookie cookie, bool isBuiltin = false) {
             _analyzer = analyzer;
             _filePath = filePath;
             _cookie = cookie;
             _moduleRecord = new ModuleEnvironmentRecord(this);
 
             _unit = new AnalysisUnit(_tree, EnvironmentRecord);
+            _isBuiltin = isBuiltin;
         }
 
         public AnalysisProxy WrapAnalysisValue(AnalysisValue value) {
@@ -68,6 +70,12 @@ namespace Microsoft.NodejsTools.Analysis {
 
         public event EventHandler<EventArgs> OnNewParseTree;
         public event EventHandler<EventArgs> OnNewAnalysis;
+
+        public bool IsBuiltin {
+            get {
+                return _isBuiltin;
+            }
+        }
 
         public void UpdateTree(JsAst newAst, IAnalysisCookie newCookie) {
             lock (this) {

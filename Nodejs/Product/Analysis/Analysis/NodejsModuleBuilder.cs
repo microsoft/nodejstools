@@ -47,7 +47,7 @@ namespace Microsoft.NodejsTools.Analysis {
             // run through and initialize all of the modules.
             foreach (var module in _all["modules"]) {
                 var moduleName = FixModuleName((string)module["name"]);
-                var entry = new ProjectEntry(_analyzer, "builtin:" + moduleName, null);
+                var entry = new ProjectEntry(_analyzer, "builtin:" + moduleName, null, true);
 
                 _analyzer.Modules.AddModule(moduleName, entry);
 

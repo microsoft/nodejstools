@@ -707,7 +707,7 @@ namespace Microsoft.VisualStudioTools.Project {
             renamedNode.ProjectMgr.ExtensibilityEventsDispatcher.FireItemRenamed(this, oldFileName);
 
             //Update the new document in the RDT.
-            DocumentManager.RenameDocument(renamedNode.ProjectMgr.Site, oldFileName, newFileName, ID);
+            DocumentManager.RenameDocument(renamedNode.ProjectMgr.Site, oldFileName, newFileName, renamedNode.ID);
 
             //Select the new node in the hierarchy
             renamedNode.ExpandItem(EXPANDFLAGS.EXPF_SelectItem);

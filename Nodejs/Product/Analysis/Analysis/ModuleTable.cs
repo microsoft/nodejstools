@@ -44,9 +44,9 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        public IEnumerable<IJsProjectEntry> Modules {
+        public IEnumerable<ProjectEntry> Modules {
             get {
-                List<IJsProjectEntry> res = new List<IJsProjectEntry>();
+                List<ProjectEntry> res = new List<ProjectEntry>();
                 lock (_lock) {
                     EnumerateChildren(res, _modules);
                 }
@@ -54,7 +54,7 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        private static void EnumerateChildren(List<IJsProjectEntry> res, ModuleTree cur) {
+        private static void EnumerateChildren(List<ProjectEntry> res, ModuleTree cur) {
             if (cur.ProjectEntry != null) {
                 res.Add(cur.ProjectEntry);
             }

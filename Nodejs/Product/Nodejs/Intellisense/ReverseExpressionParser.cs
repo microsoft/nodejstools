@@ -192,7 +192,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                         // new line
                         lastNewLine = true;
                         continue;
-                    } else if (lastNewLine && !lastTokenWasCommaOrOperator) {
+                    } else if (lastNewLine && !lastTokenWasCommaOrOperator && otherNesting == 0) {
                         break;
                     }
 

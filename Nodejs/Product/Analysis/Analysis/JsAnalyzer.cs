@@ -117,7 +117,7 @@ namespace Microsoft.NodejsTools.Analysis {
         /// <param name="filePath">The path to the file on disk</param>
         /// <param name="cookie">An application-specific identifier for the module</param>
         /// <returns></returns>
-        public IJsProjectEntry AddModule(string filePath, IAnalysisCookie cookie = null) {
+        public ProjectEntry AddModule(string filePath, IAnalysisCookie cookie = null) {
             var entry = new ProjectEntry(this, filePath, cookie);
 
             Modules.AddModule(filePath, entry);
@@ -193,7 +193,7 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        public IEnumerable<IJsProjectEntry> AllModules {
+        public IEnumerable<ProjectEntry> AllModules {
             get {
                 return Modules.Modules;
             }
