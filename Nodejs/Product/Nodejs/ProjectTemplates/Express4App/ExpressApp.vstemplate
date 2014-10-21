@@ -1,0 +1,45 @@
+<VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+  <TemplateData>
+    <Name>Basic Node.js Express 4 Application</Name>
+    <Description>A basic Node.js Express 4 application.</Description>
+    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="406" />
+    <ProjectType>JavaScript</ProjectType>
+    <TemplateID>Microsoft.JavaScript.ExpressApp</TemplateID>
+    <SortOrder>140</SortOrder>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>ExpressApp</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
+    <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
+    <PreviewImage>Preview.png</PreviewImage>
+  </TemplateData>
+  <TemplateContent>
+    <Project File="ExpressApp.njsproj" ReplaceParameters="true">
+      <Folder Name="public">
+        <Folder Name="images"/>
+        <Folder Name="javascripts"/>
+        <Folder Name="stylesheets">
+          <ProjectItem>style.styl</ProjectItem>
+        </Folder>
+      </Folder>
+      <Folder Name="routes">
+        <ProjectItem>index.js</ProjectItem>
+        <ProjectItem>users.js</ProjectItem>
+      </Folder>
+      <Folder Name="views">
+        <ProjectItem>index.jade</ProjectItem>
+        <ProjectItem>layout.jade</ProjectItem>
+      </Folder>
+      <Folder Name="bin">
+        <ProjectItem ReplaceParameters="true">www</ProjectItem>
+      </Folder>
+      <ProjectItem OpenInEditor="true">app.js</ProjectItem>
+      <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
+      <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
+    </Project>
+  </TemplateContent>
+  <WizardExtension>
+    <Assembly>Microsoft.NodejsTools.ProjectWizard, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</Assembly>
+    <FullClassName>Microsoft.NodejsTools.ProjectWizard.NpmWizardExtension</FullClassName>
+  </WizardExtension>
+</VSTemplate>
