@@ -58,6 +58,42 @@ console.log(err);
 
         }
 
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/1351
+        /// </summary>
+        [TestMethod, Priority(0)]
+        public void TestNestedFunctionAndArrayLiteral() {
+            TestCode(
+@"var a = require('a');
+a.mount('/', [
+pipe.static({ root: 'b' }),  
+pipe.proxy({
+'a': 1
+})
+]);",
+    @"var a = require('a');
+a.mount('/', [
+    pipe.static({ root: 'b' }),  
+    pipe.proxy({
+        'a': 1
+    })
+]);");
+
+            TestCode(
+@"switch (abc) {
+    case foo: function a() {
+    x = 42; y = 100;[1,
+        2, 3]
+    }
+}",
+    @"switch (abc) {
+    case foo: function a() {
+        x = 42; y = 100; [1,
+        2, 3]
+    }
+}");
+        }
+
         [TestMethod, Priority(0)]
         public void TestFormatAfterInvalidKey() {
             Assert.AreEqual(0, Formatter.GetEditsAfterKeystroke("function f  () { }", 0, ':').Length);

@@ -403,15 +403,29 @@ namespace Microsoft.NodejsTools.Formatting {
             return false;
         }
 
-        private bool ShouldIndentForChild(Statement parent, Statement block) {
+        private bool ShouldIndentForChild(Node parent, Node block) {
             // if the child is a block which has braces and starts on the
             // same line as our parent we don't want to indent, for example:
             // case foo: {
             //     code
             // }
-            return !(block is Block &&
-                ((Block)block).Braces != BraceState.None &&
-                !ContainsLineFeed(parent.GetStartIndex(_tree.LocationResolver), block.GetStartIndex(_tree.LocationResolver)));
+            if (block is Block) {
+                return ((Block)block).Braces == BraceState.None || 
+                    ContainsLineFeed(parent.GetStartIndex(_tree.LocationResolver), block.GetStartIndex(_tree.LocationResolver));
+            } else if (block is ExpressionStatement) {
+                return ShouldIndentForChild(parent, ((ExpressionStatement)block).Expression);
+            } else if (IsMultiLineBracketedNode(block)) {
+                return ContainsLineFeed(parent.GetStartIndex(_tree.LocationResolver), block.GetStartIndex(_tree.LocationResolver));
+            }
+
+            return true;
+        }
+
+        private static bool IsMultiLineBracketedNode(Node block) {
+            return block is ArrayLiteral ||
+                block is ObjectLiteral ||
+                block is FunctionExpression ||
+                block is FunctionObject;
         }
 
         public override bool Walk(Break node) {
@@ -547,6 +561,40 @@ namespace Microsoft.NodejsTools.Formatting {
             return false;
         }
 
+        public override bool Walk(ArrayLiteral node) {
+            if (node.Elements.Length == 0) {
+                ReplacePreceedingWhiteSpace(node.GetEndIndex(_tree.LocationResolver) - 1, "");
+            } else {
+                Indent();
+                // Only correct indentation if we're correcting it for every element...
+                // var x = [[1,2],
+                //          [...
+                //
+                // vs.
+                // var x = [
+                //              [1,2],
+                //              [2,3]
+                //
+                // If we fix up the 1st one we misalign the users indentation
+
+                bool firstElementOnNewLine = ContainsLineFeed(node.GetStartIndex(_tree.LocationResolver), node.Elements[0].GetStartIndex(_tree.LocationResolver));
+                foreach (var curExpr in node.Elements) {
+                    if (firstElementOnNewLine) {
+                        ReplacePreceedingWhiteSpace(curExpr.GetStartIndex(_tree.LocationResolver));
+                    }
+                    curExpr.Walk(this);
+                }
+                Dedent();
+
+                if (ContainsLineFeed(node.Elements[node.Elements.Length - 1].GetEndIndex(_tree.LocationResolver), node.GetEndIndex(_tree.LocationResolver))) {
+                    ReplacePreceedingIncludingNewLines(node.GetEndIndex(_tree.LocationResolver) - 1, ReplaceWith.InsertNewLineAndIndentation);
+                } else {
+                    ReplacePreceedingWhiteSpace(node.GetEndIndex(_tree.LocationResolver) - 1, "");
+                }
+            }
+            return false;
+        }
+
         public override bool Walk(GroupingOperator node) {
             ReplaceFollowingWhiteSpace(
                 node.GetStartIndex(_tree.LocationResolver) + 1,
@@ -554,7 +602,7 @@ namespace Microsoft.NodejsTools.Formatting {
             );
 
             if (node.Operand != null) {
-                node.Operand.Walk(this);
+            node.Operand.Walk(this);
             }
 
             ReplacePreceedingWhiteSpace(
@@ -586,30 +634,43 @@ namespace Microsoft.NodejsTools.Formatting {
                 );
             }
 
+            bool isMultiLine = ContainsLineFeed(node.GetStartIndex(_tree.LocationResolver), node.GetEndIndex(_tree.LocationResolver));
             if (node.Arguments != null && node.Arguments.Length > 0) {
-                ReplacePreceedingWhiteSpace(
+                ReplacePreceedingWhiteSpaceMaybeMultiline(
                     node.Arguments[0].GetStartIndex(_tree.LocationResolver),
-                    _options.SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis ? " " : "",
-                    _openParen
+                    '(',
+                    !_options.SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis
                 );
 
+                if (isMultiLine && ShouldIndentForChild(node, node.Arguments[0])) {
+                    Indent();
+                }
                 node.Arguments[0].Walk(this);
+                if (isMultiLine && ShouldIndentForChild(node, node.Arguments[0])) {
+                    Dedent();
+                }
 
                 for (int i = 1; i < node.Arguments.Length; i++) {
-                    ReplacePreceedingWhiteSpace(
+                    if (isMultiLine && ShouldIndentForChild(node, node.Arguments[i])) {
+                        Indent();
+                    }
+                    ReplacePreceedingWhiteSpaceMaybeMultiline(
                         node.Arguments[i].GetStartIndex(_tree.LocationResolver),
-                        _options.SpaceAfterComma ? " " : "",
-                        _comma
+                        ',',
+                        !_options.SpaceAfterComma
                     );
 
                     node.Arguments[i].Walk(this);
+                    if (isMultiLine && ShouldIndentForChild(node, node.Arguments[i])) {
+                        Dedent();
+                    }
                 }
             }
 
             if (!node.InBrackets) {
-                ReplacePreceedingWhiteSpace(
+                ReplacePreceedingWhiteSpaceMaybeMultiline(
                     node.GetEndIndex(_tree.LocationResolver) - 1,
-                    _options.SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis ? " " : ""
+                    empty: !_options.SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis
                 );
             }
 
@@ -1108,7 +1169,7 @@ namespace Microsoft.NodejsTools.Formatting {
         /// Replaces the preceeding whitespace updating it to one string if we hit a newline, or another string
         /// if we don't.
         /// </summary>
-        private bool ReplacePreceedingWhiteSpaceMaybeMultiline(int start, char replaceOn = '\0') {
+        private bool ReplacePreceedingWhiteSpaceMaybeMultiline(int start, char replaceOn = '\0', bool empty = false) {
             int codeIndex;
             for (codeIndex = start - 1; codeIndex >= 0; codeIndex--) {
                 if (_code[codeIndex] == ' ' || _code[codeIndex] == '\t') {
@@ -1118,7 +1179,7 @@ namespace Microsoft.NodejsTools.Formatting {
                     MaybeReplaceText(codeIndex + 1, start, GetIndentation());
                     return true;
                 } else if (replaceOn == 0 || _code[codeIndex] == replaceOn) {
-                    MaybeReplaceText(codeIndex + 1, start, " ");
+                    MaybeReplaceText(codeIndex + 1, start, empty ? "" : " ");
                     break;
                 } else {
                     break;
