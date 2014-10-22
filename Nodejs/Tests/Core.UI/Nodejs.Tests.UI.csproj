@@ -127,6 +127,7 @@
     <Compile Include="NodejsBasicProjectTests.cs" />
     <Compile Include="NpmUITests.cs" />
     <Compile Include="OptionHolder.cs" />
+    <Compile Include="OutliningTests.cs" />
     <Compile Include="ProjectPropertiesTests.cs" />
     <Compile Include="BraceCompletion.cs" />
     <Compile Include="SmartIndent.cs" />

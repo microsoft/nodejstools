@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Analysis.Values;
@@ -68,8 +67,25 @@ namespace Microsoft.NodejsTools.Analysis {
             return res;
         }
 
-        public event EventHandler<EventArgs> OnNewParseTree;
-        public event EventHandler<EventArgs> OnNewAnalysis;
+        [field:NonSerialized]
+        public event EventHandler<EventArgs> NewParseTree;
+
+        private void OnNewParseTree(object sender, EventArgs e) {
+            var handler = NewParseTree;
+            if (handler != null) {
+                handler(this, e);
+            }
+        }
+
+        [field:NonSerialized]
+        public event EventHandler<EventArgs> NewAnalysis;
+
+        private void OnNewAnalysis(object sender, EventArgs e) {
+            var handler = NewAnalysis;
+            if (handler != null) {
+                handler(this, e);
+            }
+        }
 
         public bool IsBuiltin {
             get {
@@ -99,10 +115,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 }
             }
 
-            var newParse = OnNewParseTree;
-            if (newParse != null) {
-                newParse(this, EventArgs.Empty);
-            }
+            OnNewParseTree(this, EventArgs.Empty);
         }
 
         public void GetTreeAndCookie(out JsAst tree, out IAnalysisCookie cookie) {
@@ -171,10 +184,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 Parse(enqueueOnly, cancel);
             }
 
-            var newAnalysis = OnNewAnalysis;
-            if (newAnalysis != null) {
-                newAnalysis(this, EventArgs.Empty);
-            }
+            OnNewAnalysis(this, EventArgs.Empty);
         }
 
         public int AnalysisVersion {
@@ -428,8 +438,9 @@ namespace Microsoft.NodejsTools.Analysis {
             get;
         }
 
-        event EventHandler<EventArgs> OnNewParseTree;
-        event EventHandler<EventArgs> OnNewAnalysis;
+        
+        event EventHandler<EventArgs> NewParseTree;
+        event EventHandler<EventArgs> NewAnalysis;
 
         /// <summary>
         /// Informs the project entry that a new tree will soon be available and will be provided by
