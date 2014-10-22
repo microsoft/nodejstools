@@ -267,9 +267,6 @@
     <CommandPlacement guid="guidNodeToolsCmdSet" id="cmdidCopyFullPath" priority="0x0200">
       <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJECT_EXPLORE"/>
     </CommandPlacement>
-    <CommandPlacement guid="guidVSStd2K" id="cmdidCopyFullPathName" priority="0x0602">
-      <Parent guid="guidNodeToolsCmdSet" id="CodeFileGroup"/>
-    </CommandPlacement>
     <CommandPlacement guid="guidNodeToolsCmdSet" id="cmdidCopyFullPath" priority="0x0602">
       <Parent guid="guidNodeToolsCmdSet" id="CodeFileGroup"/>
     </CommandPlacement>

@@ -20,8 +20,13 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Intellisense;
+using Microsoft.NodejsTools.Npm;
+using Microsoft.NodejsTools.Npm.SPI;
 using Microsoft.NodejsTools.ProjectWizard;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudioTools.Project.Automation;
@@ -783,6 +788,48 @@ namespace Microsoft.NodejsTools.Project {
             } catch (Exception) {
                 uiThreadCallback(MSBuildResult.Failed, target);
             }
+        }
+
+        protected override QueryStatusResult QueryStatusSelectionOnNodes(IList<HierarchyNode> selectedNodes, Guid cmdGroup, uint cmd, IntPtr pCmdText) {
+            if (cmdGroup == Guids.NodejsCmdSet) {
+                switch (cmd) {
+                    case PkgCmdId.cmdidNpmManageModules:
+                        if (IsCurrentStateASuppressCommandsMode()) {
+                            return QueryStatusResult.SUPPORTED;
+                        } else if (!ShowManageModulesCommandOnNode(selectedNodes)) {
+                            return QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED | QueryStatusResult.INVISIBLE;
+                        }
+                        return QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
+                }
+            }
+            return base.QueryStatusSelectionOnNodes(selectedNodes, cmdGroup, cmd, pCmdText);
+        }
+
+        protected override int ExecCommandThatDependsOnSelectedNodes(Guid cmdGroup, uint cmdId, uint cmdExecOpt, IntPtr vaIn, IntPtr vaOut, CommandOrigin commandOrigin, IList<HierarchyNode> selectedNodes, out bool handled) {
+            if (cmdGroup == Guids.NodejsCmdSet) {
+                switch (cmdId) {
+                    case PkgCmdId.cmdidNpmManageModules:
+                        if (!ShowManageModulesCommandOnNode(selectedNodes)) {
+                            ModulesNode.ManageModules();
+                            handled = true;
+                            return VSConstants.S_OK;
+                        }
+
+                        var node = selectedNodes[0] as AbstractNpmNode;
+                        if (node != null) {
+                            var abstractNpmNode = node;
+                            abstractNpmNode.ManageNpmModules();
+                            handled = true;
+                            return VSConstants.S_OK;
+                        }
+                        break;
+                }
+            }
+            return base.ExecCommandThatDependsOnSelectedNodes(cmdGroup, cmdId, cmdExecOpt, vaIn, vaOut, commandOrigin, selectedNodes, out handled);
+        }
+
+        private static bool ShowManageModulesCommandOnNode(IList<HierarchyNode> selectedNodes) {
+            return selectedNodes.Count == 1 && selectedNodes[0] is AbstractNpmNode;
         }
     }
 }

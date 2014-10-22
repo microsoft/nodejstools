@@ -32,10 +32,11 @@ namespace Microsoft.NodejsTools.NpmUI {
         private readonly NpmPackageInstallViewModel _vm;
         private NpmOutputWindow _outputWindow;
         
-        internal NpmPackageInstallWindow(INpmController controller, NpmOutputViewModel executeVm) {
+        internal NpmPackageInstallWindow(INpmController controller, NpmOutputViewModel executeVm, DependencyType dependencyType = DependencyType.Standard, bool isGlobal = false) {
             DataContext = _vm = new NpmPackageInstallViewModel(executeVm, Dispatcher);
             _vm.NpmController = controller;
             InitializeComponent();
+            DependencyComboBox.SelectedIndex = isGlobal ? (int)NpmPackageInstallViewModel.Indices.IndexGlobal : (int)dependencyType;
         }
 
         public void Dispose() {

@@ -27,7 +27,7 @@ using Microsoft.NodejsTools.Project;
 
 namespace Microsoft.NodejsTools.NpmUI {
     internal class NpmPackageInstallViewModel : INotifyPropertyChanged {
-        private enum Indices {
+        internal enum Indices {
             IndexStandard = 0,
             IndexDev = 1,
             IndexOptional = 2,

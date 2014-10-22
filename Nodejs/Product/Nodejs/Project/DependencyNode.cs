@@ -182,7 +182,6 @@ namespace Microsoft.NodejsTools.Project {
                         }
                         return VSConstants.S_OK;
 
-                    case PkgCmdId.cmdidNpmManageModules:
                     case PkgCmdId.cmdidNpmInstallModules:
                     case PkgCmdId.cmdidNpmUpdateModules:
                         result = QueryStatusResult.SUPPORTED | QueryStatusResult.INVISIBLE;

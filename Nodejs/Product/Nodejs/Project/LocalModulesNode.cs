@@ -36,12 +36,15 @@ namespace Microsoft.NodejsTools.Project {
         IEnumerable<IPackage> _packages = new List<IPackage>();
 
 
-        public LocalModulesNode(NodejsProjectNode root, NodeModulesNode parent, string caption, string virtualName)
+        public LocalModulesNode(NodejsProjectNode root, NodeModulesNode parent, string caption, string virtualName, DependencyType dependencyType)
             : base(root) {
             _parent = parent;
             _caption = caption;
             VirtualName = virtualName;
+            PackagesDependencyType = dependencyType;
         }
+
+        public DependencyType PackagesDependencyType { get; private set; }
 
         public string VirtualName { get; private set; }
 
@@ -71,12 +74,6 @@ namespace Microsoft.NodejsTools.Project {
         internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result) {
             if (cmdGroup == Guids.NodejsCmdSet) {
                 switch (cmd) {
-                    case PkgCmdId.cmdidNpmManageModules:
-                        result = _parent.IsCurrentStateASuppressCommandsMode()
-                            ? QueryStatusResult.SUPPORTED
-                            : QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
-                        return VSConstants.S_OK;
-
                     case PkgCmdId.cmdidNpmUpdateModules:
                         if (_parent.IsCurrentStateASuppressCommandsMode()) {
                             result = QueryStatusResult.SUPPORTED;
@@ -106,10 +103,6 @@ namespace Microsoft.NodejsTools.Project {
         internal override int ExecCommandOnNode(Guid cmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
             if (cmdGroup == Guids.NodejsCmdSet) {
                 switch (cmd) {
-                    case PkgCmdId.cmdidNpmManageModules:
-                        _parent.ManageModules();
-                        return VSConstants.S_OK;
-
                     case PkgCmdId.cmdidNpmUpdateModules:
                         var t = _parent.UpdateModules(AllChildren.ToList());
                         return VSConstants.S_OK;
@@ -117,6 +110,10 @@ namespace Microsoft.NodejsTools.Project {
             }
 
             return base.ExecCommandOnNode(cmdGroup, cmd, nCmdexecopt, pvaIn, pvaOut);
+        }
+
+        public override void ManageNpmModules() {
+            _parent.ManageModules(PackagesDependencyType);
         }
     }
 }

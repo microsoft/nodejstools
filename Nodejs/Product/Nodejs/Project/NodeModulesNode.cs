@@ -69,10 +69,10 @@ namespace Microsoft.NodejsTools.Project {
             _globalModulesNode = new GlobalModulesNode(root, this);
             AddChild(_globalModulesNode);
 
-            _devModulesNode = new LocalModulesNode(root, this, "dev", "DevelopmentModules");
+            _devModulesNode = new LocalModulesNode(root, this, "dev", "DevelopmentModules", DependencyType.Development);
             AddChild(_devModulesNode);
 
-            _optionalModulesNode = new LocalModulesNode(root, this, "optional", "OptionalModules");
+            _optionalModulesNode = new LocalModulesNode(root, this, "optional", "OptionalModules", DependencyType.Optional);
             AddChild(_optionalModulesNode);
         }
 
@@ -448,12 +448,6 @@ namespace Microsoft.NodejsTools.Project {
         internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result) {
             if (cmdGroup == Guids.NodejsCmdSet) {
                 switch (cmd) {
-                    case PkgCmdId.cmdidNpmManageModules:
-                        result = IsCurrentStateASuppressCommandsMode()
-                            ? QueryStatusResult.SUPPORTED
-                            : QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
-                        return VSConstants.S_OK;
-
                     case PkgCmdId.cmdidNpmInstallModules:
                         if (IsCurrentStateASuppressCommandsMode()) {
                             result = QueryStatusResult.SUPPORTED;
@@ -492,10 +486,6 @@ namespace Microsoft.NodejsTools.Project {
         internal override int ExecCommandOnNode(Guid cmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
             if (cmdGroup == Guids.NodejsCmdSet) {
                 switch (cmd) {
-                    case PkgCmdId.cmdidNpmManageModules:
-                        ManageModules();
-                        return VSConstants.S_OK;
-
                     case PkgCmdId.cmdidNpmInstallModules:
                         var t = InstallMissingModules();
                         return VSConstants.S_OK;
@@ -509,7 +499,7 @@ namespace Microsoft.NodejsTools.Project {
             return base.ExecCommandOnNode(cmdGroup, cmd, nCmdexecopt, pvaIn, pvaOut);
         }
 
-        public void ManageModules() {
+        public void ManageModules(DependencyType dependencyType = DependencyType.Standard, bool isGlobal = false) {
             CheckNotDisposed();
 
             if (NpmController.RootPackage == null) {
@@ -521,7 +511,7 @@ namespace Microsoft.NodejsTools.Project {
             }
 
             using (var executeVm = new NpmOutputViewModel(NpmController))
-            using (var manager = new NpmPackageInstallWindow(NpmController, executeVm)) {
+            using (var manager = new NpmPackageInstallWindow(NpmController, executeVm, dependencyType, isGlobal)) {
                 manager.Owner = System.Windows.Application.Current.MainWindow;
                 manager.ShowModal();
             }
@@ -695,5 +685,9 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         #endregion
+
+        public override void ManageNpmModules() {
+            ManageModules();
+        }
     }
 }

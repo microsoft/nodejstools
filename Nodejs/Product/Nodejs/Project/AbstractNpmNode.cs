@@ -18,6 +18,8 @@ namespace Microsoft.NodejsTools.Project {
             ExcludeNodeFromScc = true;
         }
 
+        #region HierarchyNode implementation
+
         public override Guid ItemTypeGuid {
             get { return VSConstants.GUID_ItemType_VirtualFolder; }
         }
@@ -25,8 +27,6 @@ namespace Microsoft.NodejsTools.Project {
         public override int MenuCommandId {
             get { return VsMenus.IDM_VS_CTXT_ITEMNODE; }
         }
-
-        #region HierarchyNode implementation
 
         /// <summary>
         /// Disable inline editing of Caption.
@@ -41,11 +41,13 @@ namespace Microsoft.NodejsTools.Project {
             return ProjectMgr.GetIconHandleByName(ProjectNode.ImageName.ReferenceFolder);
         }
 
-        #endregion
-
         protected override NodeProperties CreatePropertiesObject() {
             return new NpmNodeProperties(this);
         }
+
+        #endregion
+
+        public abstract void ManageNpmModules();
 
         protected void ReloadHierarchy(HierarchyNode parent, IEnumerable<IPackage> modules) {
             //  We're going to reuse nodes for which matching modules exist in the new set.

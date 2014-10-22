@@ -32,6 +32,7 @@ namespace Microsoft.NodejsTools.Options {
         internal void SyncControlWithPageSettings(NodejsNpmOptionsPage page) {
             _showOutputWhenRunningNpm.Checked = page.ShowOutputWindowWhenExecutingNpm;
             _npmCachePath = page.NpmCachePath;
+            _cacheClearedSuccessfully.Visible = false;
         }
 
         internal void SyncPageWithControlSettings(NodejsNpmOptionsPage page) {
