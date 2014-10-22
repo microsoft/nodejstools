@@ -33,7 +33,7 @@ namespace Microsoft.NodejsTools.SourceMapping {
             if (!_originalFileToSourceMap.TryGetValue(filename, out mapInfo)) {
                 if (File.Exists(filename)) {
                     string[] contents = File.ReadAllLines(filename);
-                    const string marker = "# SourceMapInfoURL=";
+                    const string marker = "# sourceMappingURL=";
                     int markerStart;
                     string markerLine = contents.Reverse().FirstOrDefault(x => x.IndexOf(marker, StringComparison.Ordinal) != -1);
                     if (markerLine != null && (markerStart = markerLine.IndexOf(marker, StringComparison.Ordinal)) != -1) {

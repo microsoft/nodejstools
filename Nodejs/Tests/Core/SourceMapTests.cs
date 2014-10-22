@@ -28,6 +28,12 @@ using TestUtilities.Nodejs;
 namespace NodejsTests {
     [TestClass]
     public class SourceMapTests {
+        [ClassInitialize]
+        public static void DoDeployment(TestContext context) {
+            AssertListener.Initialize();
+            NodejsTestData.Deploy();
+        }
+
         /// <summary>
         /// Sample code for mapping between:
         /// 
@@ -190,6 +196,22 @@ namespace NodejsTests {
                 Assert.Fail("Argument exception not raised");
             } catch (ArgumentException) {
             }
+        }
+
+        [TestMethod, Priority(0), TestCategory("Debugging")]
+        public void TestMapToOriginal() {
+            var mapper = new SourceMapper();
+            var mapInfo = mapper.MapToOriginal(TestData.GetPath(@"TestData\DebuggerProject\TypeScriptTest.js"), 1, 0);
+            Assert.AreEqual("TypeScriptTest.ts", mapInfo.FileName);
+        }
+
+        [TestMethod, Priority(0), TestCategory("Debugging")]
+        public void TestMapToJavaScript() {
+            var mapper = new SourceMapper();
+            string fileName;
+            int lineNo, columnNo;
+            Assert.IsTrue(mapper.MapToJavaScript(TestData.GetPath(@"TestData\DebuggerProject\TypeScriptTest.ts"), 1, 0, out fileName, out lineNo, out columnNo));
+            Assert.AreEqual(TestData.GetPath(@"TestData\DebuggerProject\TypeScriptTest.js"), fileName);
         }
     }
 }
