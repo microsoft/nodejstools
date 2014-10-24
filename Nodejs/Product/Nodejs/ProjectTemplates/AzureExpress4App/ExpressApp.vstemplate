@@ -2,7 +2,7 @@
   <TemplateData>
     <Name>Basic Azure Node.js Express 4 Application</Name>
     <Description>A basic Node.js Express 4 application for Microsoft Azure.</Description>
-    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="406" />
+    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="404" />
     <ProjectType>JavaScript</ProjectType>
     <TemplateID>Microsoft.JavaScript.ExpressApp</TemplateID>
     <SortOrder>150</SortOrder>

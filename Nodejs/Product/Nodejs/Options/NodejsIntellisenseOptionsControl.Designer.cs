@@ -104,13 +104,16 @@
             // _analysisLogMax
             // 
             resources.ApplyResources(this._analysisLogMax, "_analysisLogMax");
+            this._analysisLogMax.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._analysisLogMax.FormattingEnabled = true;
             this._analysisLogMax.Items.AddRange(new object[] {
             resources.GetString("_analysisLogMax.Items"),
             resources.GetString("_analysisLogMax.Items1"),
             resources.GetString("_analysisLogMax.Items2"),
             resources.GetString("_analysisLogMax.Items3"),
-            resources.GetString("_analysisLogMax.Items4")});
+            resources.GetString("_analysisLogMax.Items4"),
+            resources.GetString("_analysisLogMax.Items5"),
+            resources.GetString("_analysisLogMax.Items6")});
             this._analysisLogMax.Name = "_analysisLogMax";
             // 
             // _analysisLogMaxLabel

@@ -62,6 +62,10 @@ namespace Microsoft.NodejsTools.Options {
         internal int AnalysisLogMaximum {
             get {
                 int max;
+                // The Max Value is described by 'Max' instead of 'Int32.MaxValue'
+                if (_analysisLogMax.Text == "Max") {
+                    return Int32.MaxValue;
+                }
                 if (Int32.TryParse(_analysisLogMax.Text, out max)) {
                     return max;
                 }
@@ -72,7 +76,8 @@ namespace Microsoft.NodejsTools.Options {
                     _analysisLogMax.SelectedIndex = 0;
                     return;
                 }
-                string index = value.ToString();
+                // Handle case where value is the Max.
+                string index = value == Int32.MaxValue ? "Max" : value.ToString();
                 for (int i = 0; i < _analysisLogMax.Items.Count; i++) {
                     if (_analysisLogMax.Items[i].ToString() == index) {
                         _analysisLogMax.SelectedIndex = i;

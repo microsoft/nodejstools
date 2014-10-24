@@ -340,6 +340,12 @@
   <data name="_analysisLogMax.Items4" xml:space="preserve">
     <value>100000</value>
   </data>
+  <data name="_analysisLogMax.Items5" xml:space="preserve">
+    <value>1000000</value>
+  </data>
+  <data name="_analysisLogMax.Items6" xml:space="preserve">
+    <value>Max</value>
+  </data>
   <data name="_analysisLogMax.Location" type="System.Drawing.Point, System.Drawing">
     <value>145, 49</value>
   </data>
