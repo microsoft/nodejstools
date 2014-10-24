@@ -44,6 +44,7 @@
     <IntDir>$(IntermediateOutputPath)</IntDir>
 
     <SuppressCommonAssemblyMetadata Condition="'$(SuppressCommonAssemblyMetadata)' == ''">False</SuppressCommonAssemblyMetadata>
+    <SuppressCommonAssemblyVersionMetadata Condition="'$(SuppressCommonAssemblyVersionMetadata)' == ''">False</SuppressCommonAssemblyVersionMetadata>
   </PropertyGroup>
 
 

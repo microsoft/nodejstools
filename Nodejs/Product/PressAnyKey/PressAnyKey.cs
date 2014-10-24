@@ -29,7 +29,7 @@ namespace Microsoft.NodejsTools.PressAnyKey {
             Console.Title = args[2];
             var psi = new ProcessStartInfo(args[2], string.Join(" ", args.Skip(3).Select(arg => ProcessOutput.QuoteSingleArgument(arg))));
             psi.UseShellExecute = false;
-            
+
             var proc = Process.Start(psi);
             File.WriteAllText(args[1], proc.Id.ToString());
             proc.WaitForExit();

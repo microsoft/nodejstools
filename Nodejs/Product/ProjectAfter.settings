@@ -8,10 +8,17 @@
         <Compile Include="$(BuildRoot)\Nodejs\Product\AssemblyInfoCommon.cs">
           <Link>AssemblyInfoCommon.cs</Link>
         </Compile>
-        <Compile Include="$(BuildRoot)\Nodejs\Product\AssemblyVersion.cs">
-          <Link>AssemblyVersion.cs</Link>
-        </Compile>
       </ItemGroup>
+      <Choose>
+        <When Condition="'$(Language)' == 'C#' and !$(SuppressCommonAssemblyVersionMetadata)">
+          <ItemGroup>
+            <Compile Include="$(BuildRoot)\Nodejs\Product\AssemblyVersion.cs">
+              <Link>AssemblyVersion.cs</Link>
+            </Compile>
+          </ItemGroup>
+        </When>
+      </Choose>
+      
       <PropertyGroup>
         <TrackFileAccess>true</TrackFileAccess>             <!-- CHECK RELEVANCE -->
       </PropertyGroup>
