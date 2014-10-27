@@ -4041,13 +4041,13 @@ namespace Microsoft.NodejsTools.Parsing
                                                InBrackets = true
                                            };
                                     } else {
-                                        if (exc._partiallyComputedNode != null) {
-                                            args.Add((Expression)exc._partiallyComputedNode);
-                                        }
+                                        exc._partiallyComputedNode = expression;
                                     }
                                     throw;
                                 } else {
-                                    args.Add((Expression)exc._partiallyComputedNode);
+                                    if (exc._partiallyComputedNode != null) {
+                                        args.Add((Expression)exc._partiallyComputedNode);
+                                    }
                                 }
                             }
                             finally
