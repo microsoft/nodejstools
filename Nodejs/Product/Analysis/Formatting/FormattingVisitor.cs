@@ -658,7 +658,6 @@ namespace Microsoft.NodejsTools.Formatting {
 
             bool isMultiLine = ContainsLineFeed(node.GetStartIndex(_tree.LocationResolver), node.GetEndIndex(_tree.LocationResolver));
             if (node.Arguments != null && node.Arguments.Length > 0) {
-                // https://nodejstools.codeplex.com/workitem/1465 node.Arguments[0] is null.
                 Debug.Assert(node.Arguments[0] != null);
                 if (node.Arguments[0] != null) {
                     if (isMultiLine && ShouldIndentForChild(node, node.Arguments[0])) {
@@ -677,18 +676,21 @@ namespace Microsoft.NodejsTools.Formatting {
                     }
 
                     for (int i = 1; i < node.Arguments.Length; i++) {
-                        if (isMultiLine && ShouldIndentForChild(node, node.Arguments[i])) {
-                            Indent();
-                        }
+                        Debug.Assert(node.Arguments[i] != null);
+                        if (node.Arguments[i] != null) {
+                            if (isMultiLine && ShouldIndentForChild(node, node.Arguments[i])) {
+                                Indent();
+                            }
 
-                        ReplacePreceedingWhiteSpace(
-                            node.Arguments[i].GetStartIndex(_tree.LocationResolver),
-                            _options.SpaceAfterComma ? " " : string.Empty,
-                            _comma);
+                            ReplacePreceedingWhiteSpace(
+                                node.Arguments[i].GetStartIndex(_tree.LocationResolver),
+                                _options.SpaceAfterComma ? " " : string.Empty,
+                                _comma);
 
-                        node.Arguments[i].Walk(this);
-                        if (isMultiLine && ShouldIndentForChild(node, node.Arguments[i])) {
-                            Dedent();
+                            node.Arguments[i].Walk(this);
+                            if (isMultiLine && ShouldIndentForChild(node, node.Arguments[i])) {
+                                Dedent();
+                            }
                         }
                     }
                 }

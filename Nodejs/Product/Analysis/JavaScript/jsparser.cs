@@ -4041,7 +4041,9 @@ namespace Microsoft.NodejsTools.Parsing
                                                InBrackets = true
                                            };
                                     } else {
-                                        exc._partiallyComputedNode = expression;
+                                        if (exc._partiallyComputedNode != null) {
+                                            args.Add((Expression)exc._partiallyComputedNode);
+                                        }
                                     }
                                     throw;
                                 } else {
