@@ -610,6 +610,23 @@ x.abc
             );
         }
 
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/1464
+        /// </summary>
+        [TestMethod, Priority(0)]
+        public void TestBuiltinRequireGotoDef() {
+            string code = @"
+var assert = require('assert'); 
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsAtLeast(
+                analysis.GetVariablesByIndex("assert", code.Length)
+                    .Select(x => x.Location.Line + ", " + x.Location.Column + ", " + x.Type),
+                "2, 5, Definition", 
+                "2, 5, Reference"
+            );
+        }
+
         [TestMethod, Priority(0)]
         public void TestGlobals() {
             string code = @"

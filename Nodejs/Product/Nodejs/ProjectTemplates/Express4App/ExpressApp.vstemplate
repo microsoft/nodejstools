@@ -29,6 +29,7 @@
       <Folder Name="views">
         <ProjectItem>index.jade</ProjectItem>
         <ProjectItem>layout.jade</ProjectItem>
+        <ProjectItem>error.jade</ProjectItem>
       </Folder>
       <Folder Name="bin">
         <ProjectItem ReplaceParameters="true">www</ProjectItem>

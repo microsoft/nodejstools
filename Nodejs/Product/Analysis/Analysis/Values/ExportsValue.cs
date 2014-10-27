@@ -46,6 +46,9 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         public override IEnumerable<LocationInfo> Locations {
             get {
+                if (ProjectEntry.IsBuiltin) {
+                    return new LocationInfo[0];
+                }
                 return new[] { new LocationInfo(ProjectEntry, 1, 1) };
             }
         }
