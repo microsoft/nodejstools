@@ -13,14 +13,26 @@
  * ***************************************************************************/
 
 using System;
+using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
+
+#if DEBUG
 using Newtonsoft.Json.Linq;
+#endif
 
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal class Person : IPerson {
 
+    private static readonly Regex RegexPerson = new Regex(
+        "\"name\":\\s*\"(?<name>[^<]+?)\"" +
+        "[\\s,]*" +
+        "(\"email\":\\s*\"(?<email>[^<]+?)\")?" +
+        "[\\s,]*" +
+        "(\"url\":\\s*\"(?<url>[^<]+?)\")?",
+        RegexOptions.IgnoreCase | RegexOptions.Singleline);
+    
         [JsonConstructor]
         private Person() {
             // Enables Json deserialization
@@ -31,14 +43,39 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         private void InitFromString(string source) {
-            try {
-                var jObject = JObject.Parse(source);
-                Name = (string)jObject["name"];
-                Email = (string)jObject["email"];
-                Url = (string)jObject["url"];
-            } catch (Exception) {
+            if (source == null) {
+                Name = string.Empty;
+                return;
+            }
+
+            // We parse using a regex because JObject.Parse throws exceptions for malformatted json,
+            // and simply handling them causes performance issues.
+            var matches = RegexPerson.Matches(source);
+            if (matches.Count == 1) {
+                var match = matches[0];
+                var group = match.Groups["name"];
+                Name = group.Value;
+
+                group = match.Groups["email"];
+                Email = group.Value;
+
+                group = match.Groups["url"];
+                Url = group.Value;
+            } else {
                 Name = source;
             }
+
+#if DEBUG
+            // Verify we are parsing correctly
+            try {
+                var jObject = JObject.Parse(source);
+                Debug.Assert(((string)jObject["name"] ?? string.Empty) == Name, string.Format("Failed to parse name from {0}", source));
+                Debug.Assert(((string)jObject["email"] ?? string.Empty) == Email, string.Format("Failed to parse email from {0}", source));
+                Debug.Assert(((string)jObject["url"] ?? string.Empty) == Url, string.Format("Failed to parse url from {0}", source));
+            } catch (Exception) {
+                Debug.Assert(source == Name);
+            }
+#endif
         }
 
         [JsonProperty]
