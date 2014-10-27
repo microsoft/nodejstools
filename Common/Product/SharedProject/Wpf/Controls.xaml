@@ -57,6 +57,10 @@
         <Setter Property="FontFamily" Value="Segoe UI" />
         <Setter Property="Margin" Value="0" />
     </Style>
+    
+    <Style TargetType="{x:Type ScrollViewer}">
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.ForegroundKey}}"/>
+    </Style>
 
     <Style x:Key="BulletedLabel" TargetType="{x:Type Label}" BasedOn="{StaticResource {x:Type Label}}">
         <Setter Property="Padding" Value="1" />
