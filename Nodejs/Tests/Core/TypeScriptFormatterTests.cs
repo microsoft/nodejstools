@@ -28,7 +28,7 @@ using System.Web.Script.Serialization;
 
 namespace NodejsTests {
     [TestClass]
-    public sealed class FormattingTests {
+    public sealed class TypeScriptFormatterTests {
         private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer();
         private static readonly FormattingOptions Options = new FormattingOptions() {
             SpaceAfterComma = true,

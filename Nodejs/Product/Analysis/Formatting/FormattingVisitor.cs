@@ -34,7 +34,7 @@ namespace Microsoft.NodejsTools.Formatting {
         private static char[] _comma = new[] { ',' };
         private static char[] _openParen = new[] { '(' };
         private static char[] _closeBrace = new[] { '}' };
-
+        private static char[] _openBracket = new[] { '[' };
         public FormattingVisitor(string code, JsAst tree, FormattingOptions options = null, bool onEnter = false) {
             _code = code;
             _options = options ?? new FormattingOptions();
@@ -111,6 +111,7 @@ namespace Microsoft.NodejsTools.Formatting {
                     // vs
                     // if (foo) blah
 
+                    // TODO: https://nodejstools.codeplex.com/workitem/1475 causes a failure as our end < start.  Parser is failing and until fixed will cause a failure here.
                     bool multiLine = ContainsLineFeed(previousExpressionEnd, block.GetStartIndex(_tree.LocationResolver));
                     if (multiLine) {
                         // remove trailing whitespace at the end of this line
@@ -410,11 +411,17 @@ namespace Microsoft.NodejsTools.Formatting {
             //     code
             // }
             if (block is Block) {
-                return ((Block)block).Braces == BraceState.None || 
+                return ((Block)block).Braces == BraceState.None ||
                     ContainsLineFeed(parent.GetStartIndex(_tree.LocationResolver), block.GetStartIndex(_tree.LocationResolver));
             } else if (block is ExpressionStatement) {
                 return ShouldIndentForChild(parent, ((ExpressionStatement)block).Expression);
             } else if (IsMultiLineBracketedNode(block)) {
+                if (parent is CallNode && ((CallNode)parent).Arguments.Count() > 1) {
+                    // For indenting any child of call node we really are if the first argument is on the next line
+                    // or the same line as the parent.  For this case, we completely ignore the block argument itself.
+                    return ContainsLineFeed(parent.GetStartIndex(_tree.LocationResolver), ((CallNode)parent).Arguments[0].GetStartIndex(_tree.LocationResolver));
+                }
+
                 return ContainsLineFeed(parent.GetStartIndex(_tree.LocationResolver), block.GetStartIndex(_tree.LocationResolver));
             }
 
@@ -442,7 +449,7 @@ namespace Microsoft.NodejsTools.Formatting {
         /// <param name="endIndex"></param>
         private void RemoveSemiColonWhiteSpace(int endIndex) {
             if (_code[endIndex - 1] == ';') {
-                ReplacePreceedingWhiteSpace(endIndex - 1, "");
+                ReplacePreceedingWhiteSpaceMaybeMultiline(endIndex - 1, empty: true);
             }
         }
 
@@ -578,7 +585,22 @@ namespace Microsoft.NodejsTools.Formatting {
                 // If we fix up the 1st one we misalign the users indentation
 
                 bool firstElementOnNewLine = ContainsLineFeed(node.GetStartIndex(_tree.LocationResolver), node.Elements[0].GetStartIndex(_tree.LocationResolver));
-                foreach (var curExpr in node.Elements) {
+
+                for (int i = 0; i < node.Elements.Length; i++) {
+                    var curExpr = node.Elements[i];
+
+                    // Fix spacing of commas and '['
+                    if (i == 0) {
+                        // There should be no spacing between the [ and the first element
+                        ReplacePreceedingWhiteSpace(curExpr.GetStartIndex(_tree.LocationResolver), "", _openBracket);
+                    } else {
+                        ReplacePreceedingWhiteSpace(
+                            curExpr.GetStartIndex(_tree.LocationResolver),
+                            _options.SpaceAfterComma ? " " : string.Empty,
+                            _comma);
+                    }
+
+                    // if we have elements on separate lines but the first element has a line feed (separate from '[')
                     if (firstElementOnNewLine) {
                         ReplacePreceedingWhiteSpace(curExpr.GetStartIndex(_tree.LocationResolver));
                     }
@@ -602,7 +624,7 @@ namespace Microsoft.NodejsTools.Formatting {
             );
 
             if (node.Operand != null) {
-            node.Operand.Walk(this);
+                node.Operand.Walk(this);
             }
 
             ReplacePreceedingWhiteSpace(
@@ -636,33 +658,38 @@ namespace Microsoft.NodejsTools.Formatting {
 
             bool isMultiLine = ContainsLineFeed(node.GetStartIndex(_tree.LocationResolver), node.GetEndIndex(_tree.LocationResolver));
             if (node.Arguments != null && node.Arguments.Length > 0) {
-                ReplacePreceedingWhiteSpaceMaybeMultiline(
-                    node.Arguments[0].GetStartIndex(_tree.LocationResolver),
-                    '(',
-                    !_options.SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis
-                );
-
-                if (isMultiLine && ShouldIndentForChild(node, node.Arguments[0])) {
-                    Indent();
-                }
-                node.Arguments[0].Walk(this);
-                if (isMultiLine && ShouldIndentForChild(node, node.Arguments[0])) {
-                    Dedent();
-                }
-
-                for (int i = 1; i < node.Arguments.Length; i++) {
-                    if (isMultiLine && ShouldIndentForChild(node, node.Arguments[i])) {
+                // https://nodejstools.codeplex.com/workitem/1465 node.Arguments[0] is null.
+                Debug.Assert(node.Arguments[0] != null);
+                if (node.Arguments[0] != null) {
+                    if (isMultiLine && ShouldIndentForChild(node, node.Arguments[0])) {
                         Indent();
                     }
+
                     ReplacePreceedingWhiteSpaceMaybeMultiline(
-                        node.Arguments[i].GetStartIndex(_tree.LocationResolver),
-                        ',',
-                        !_options.SpaceAfterComma
+                        node.Arguments[0].GetStartIndex(_tree.LocationResolver),
+                        '(',
+                        !_options.SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis
                     );
 
-                    node.Arguments[i].Walk(this);
-                    if (isMultiLine && ShouldIndentForChild(node, node.Arguments[i])) {
+                    node.Arguments[0].Walk(this);
+                    if (isMultiLine && ShouldIndentForChild(node, node.Arguments[0])) {
                         Dedent();
+                    }
+
+                    for (int i = 1; i < node.Arguments.Length; i++) {
+                        if (isMultiLine && ShouldIndentForChild(node, node.Arguments[i])) {
+                            Indent();
+                        }
+
+                        ReplacePreceedingWhiteSpace(
+                            node.Arguments[i].GetStartIndex(_tree.LocationResolver),
+                            _options.SpaceAfterComma ? " " : string.Empty,
+                            _comma);
+
+                        node.Arguments[i].Walk(this);
+                        if (isMultiLine && ShouldIndentForChild(node, node.Arguments[i])) {
+                            Dedent();
+                        }
                     }
                 }
             }
@@ -731,6 +758,10 @@ namespace Microsoft.NodejsTools.Formatting {
         #region Formatting Infrastructure
 
         private bool ContainsLineFeed(int start, int end) {
+            Debug.Assert(start <= end, "ContainsLineFeed was given a start ({0}) greater than the end ({1})".FormatInvariant(start, end));
+            if (start > end) { // if our span is negative, we can't contain a line feed.
+                return false;
+            }
             return _code.IndexOfAny(_newlines, start, end - start) != -1;
         }
 

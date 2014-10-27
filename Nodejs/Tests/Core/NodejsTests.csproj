@@ -122,7 +122,7 @@
     <Compile Include="Debugger\Serialization\LookupVariableTests.cs" />
     <Compile Include="Debugger\Serialization\EvaluationVariableTests.cs" />
     <Compile Include="Debugger\Serialization\BacktraceVariableTests.cs" />
-    <Compile Include="FormattingTests.cs" />
+    <Compile Include="TypeScriptFormatterTests.cs" />
     <Compile Include="ImportWizardTests.cs" />
     <Compile Include="JadeTests.cs" />
     <Compile Include="LauncherTests.cs" />

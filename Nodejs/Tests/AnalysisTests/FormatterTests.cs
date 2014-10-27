@@ -18,6 +18,7 @@ using System.Text;
 using Microsoft.NodejsTools.Formatting;
 using Microsoft.NodejsTools.Parsing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using TestUtilities;
 
 namespace AnalysisTests {
     [TestClass]
@@ -39,6 +40,11 @@ namespace AnalysisTests {
             }
         }
 #endif
+
+        [ClassInitialize]
+        public static void ClassInititalize(TestContext context) {
+            AssertListener.Initialize();
+        }
 
         [TestMethod, Priority(0)]
         public void TestAnonymousFunction() {
@@ -140,7 +146,7 @@ a.mount('/', [
                 int enterIndex = code.IndexOf(';') + 2;
                 var lines = code.Split(new[] { "\r\n" }, StringSplitOptions.None);
                 int startIndex = 0, endIndex = lines[0].Length + lines[1].Length + ("\r\n".Length * 2);
-                for(int i = 1; i<lines.Length; i++) {
+                for (int i = 1; i < lines.Length; i++) {
                     if (enterIndex < endIndex) {
                         break;
                     }
@@ -186,6 +192,100 @@ a.mount('/', [
         }
 
         [TestMethod, Priority(0)]
+        public void TestSemicolonOnOwnLine() {
+            // https://nodejstools.codeplex.com/workitem/1473
+            TestCode(
+    @"function f() {
+    console.log('hi')
+;
+}",
+    @"function f() {
+    console.log('hi')
+    ;
+}");
+
+            TestCode(
+        @"function f() {
+    console.log('hi') // comment
+    ;
+}",
+        @"function f() {
+    console.log('hi') // comment
+    ;
+}");
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestFormattingFunctionAsArgumentToFunction() {
+            // Format dedenting first argument too much
+            // https://nodejstools.codeplex.com/workitem/1463
+            TestCode(
+    @"g(
+    function f(a, b, c) 
+    {
+        console.log('hi');
+        console.log('bar')
+    }
+)",
+    @"g(
+    function f(a, b, c) {
+        console.log('hi');
+        console.log('bar')
+    }
+)"
+  );
+            // Format indenting second argument function too much
+            // https://nodejstools.codeplex.com/workitem/1459
+            TestCode(
+    @"g(function () {
+    console.log('hi')
+}, function () {
+        console.log('toofar')
+    });",
+    @"g(function () {
+    console.log('hi')
+}, function () {
+    console.log('toofar')
+});");
+
+            TestCode(
+@"g(
+    function () {
+        console.log('hi')
+    }, function () {
+        console.log('hi2')
+    });",
+@"g(
+    function () {
+        console.log('hi')
+    }, function () {
+        console.log('hi2')
+    });");
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestArrayLiteral() {
+            var testCode = new[] { 
+                // https://nodejstools.codeplex.com/workitem/1474
+                new { Before = "function f() {\r\n    console.log('hi')\r\n    x = [1,2,3]\r\n}",
+                      After  = "function f() {\r\n    console.log('hi')\r\n    x = [1, 2, 3]\r\n}"},
+                new { Before = "function f() {\r\n    console.log('hi')\r\n    [1,2,3]\r\n}",
+                      After  = "function f() {\r\n    console.log('hi')\r\n    [1, 2, 3]\r\n}"},
+                new { Before = "g(\r\n    function f(a, b, c)\r\n    {\r\n        console.log('hi');\r\n        [1,2,3]\r\n    }\r\n)",
+                      After  = "g(\r\n    function f(a, b, c) {\r\n        console.log('hi');\r\n        [1, 2, 3]\r\n    }\r\n)"},
+                new { Before = "var x =[\r\n1, 2, 3\r\n    ]",
+                      After  = "var x = [\r\n    1, 2, 3\r\n]"},
+                // Test multiple lines stay aligned, but individual single line arrays fixed
+                new { Before = "function f() {\r\n    var x = [[1],\r\n             [2,   3],\r\n             [3,4,5]]\r\n}",
+                      After  = "function f() {\r\n    var x = [[1],\r\n             [2, 3],\r\n             [3, 4, 5]]\r\n}"},
+            };
+
+            foreach (var test in testCode) {
+                TestCode(test.Before, test.After);
+            }
+        }
+
+        [TestMethod, Priority(0)]
         public void TestFormatAfterBadFor() {
             TestCode(@"function g() { 
  for(int i = 0; i<1000000; i++) { 
@@ -193,6 +293,23 @@ a.mount('/', [
    @"function g() {
     for (int i = 0; i < 1000000; i++) { 
     }");
+            // TODO: Not sure on the formatting, but before there was an exception
+            // https://nodejstools.codeplex.com/workitem/1475 
+            TestCode(@"for {
+    x = 2}",
+   @"for {
+    x = 2}");
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestIndexingOnFollowingLine() {
+            // TODO (crwilcox): I am not set on the expected.  The issue we were having though was a crash (reference not set to instance)
+            // https://nodejstools.codeplex.com/workitem/1465
+            TestCode(
+    @"g()
+[]",
+    @"g()
+[]");
         }
 
         /// <summary>
@@ -1013,11 +1130,11 @@ x = function() {
 
                 options);
         }
-        
+
         [TestMethod, Priority(0)]
         public void TestNestedSwitch() {
-TestCode("switch (a){\r\n    case 1: x += 2;\r\n case   2  : \r\n     for (var i=0;i<10;i++)\r\ni  --;\r\n}\r\n",
-@"switch (a) {
+            TestCode("switch (a){\r\n    case 1: x += 2;\r\n case   2  : \r\n     for (var i=0;i<10;i++)\r\ni  --;\r\n}\r\n",
+            @"switch (a) {
     case 1: x += 2;
     case 2:
         for (var i = 0; i < 10; i++)
@@ -1110,7 +1227,7 @@ break;
         break;
 }");
 
-            
+
         }
 
         [TestMethod, Priority(0)]
@@ -1239,7 +1356,7 @@ break;
 
             TestCode(@"if(true)
 // test
-test;", 
+test;",
 @"if (true)
     // test
     test;");
@@ -1290,7 +1407,7 @@ return 1;
 {
 }");
 
-            
+
 
             TestCode(
 @"if(foo) // foo
@@ -1405,14 +1522,14 @@ return 1;
             );
 
             TestCode(
-                "switch (abc) {\r\n\t\tcase 42: break;\r\n}", 
+                "switch (abc) {\r\n\t\tcase 42: break;\r\n}",
                 "switch (abc) {\r\n  case 42: break;\r\n}",
                 options
             );
 
             options = new FormattingOptions() { SpacesPerIndent = 6 };
             TestCode(
-                "switch (abc) {\r\n\tcase 42: break;\r\n}", 
+                "switch (abc) {\r\n\tcase 42: break;\r\n}",
                 "switch (abc) {\r\n      case 42: break;\r\n}",
                 options
             );

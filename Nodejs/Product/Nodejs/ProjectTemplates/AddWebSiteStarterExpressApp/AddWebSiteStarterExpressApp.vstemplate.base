@@ -1,7 +1,7 @@
 <VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
   <TemplateData>
-    <Name>Starter Node.js Express Application</Name>
-    <Description>A project for creating an application using the Express web framework with the Jade template engine. It features sample pages that use the Twitter Bootstrap framework for responsive web design.</Description>
+    <Name>Starter Node.js Express 3 Application</Name>
+    <Description>A project for creating an application using the Express 3 web framework with the Jade template engine. It features sample pages that use the Twitter Bootstrap framework for responsive web design.</Description>
     <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="406" />
     <ProjectType>Web</ProjectType>
     <ProjectSubType>JavaScript</ProjectSubType>
