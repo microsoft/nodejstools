@@ -51,12 +51,15 @@
     <Compile Include="SemverVersionTestHelper.cs" />
     <Compile Include="SemverVersionTests.cs" />
     <Compile Include="TemporaryFileManager.cs" />
-    <Compile Include="TestUtilities\AssertListener.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="TestData\fresh_package.json" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Common\Tests\Utilities\TestUtilities.csproj">
+      <Project>{d092d54e-ff29-4d32-9aee-4ef704c92f67}</Project>
+      <Name>TestUtilities</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Product\Npm\Npm.csproj">
       <Project>{e5ef4b0a-ab41-4b98-8fa8-98d6348003a8}</Project>
       <Name>Npm</Name>

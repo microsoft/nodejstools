@@ -6,6 +6,7 @@
     xmlns:npmUi="clr-namespace:Microsoft.NodejsTools.NpmUI"
     xmlns:ui="clr-namespace:Microsoft.VisualStudioTools"
     xmlns:wpf="clr-namespace:Microsoft.VisualStudioTools.Wpf"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
     Title="Install New npm Packages"
     Height="500"
     MinHeight="500"
@@ -411,6 +412,7 @@
                             <RowDefinition/>
                             <RowDefinition/>
                             <RowDefinition/>
+                            <RowDefinition/>
                         </Grid.RowDefinitions>
 
                         <Grid.ColumnDefinitions>
@@ -418,7 +420,7 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
                         <Border Style="{StaticResource TooltipBorder}"
-                        Visibility="{Binding GlobalWarningVisibility}" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2">
+                        Visibility="{Binding GlobalWarningVisibility}" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2">
                             <TextBlock VerticalAlignment="Center" HorizontalAlignment="Stretch"
                                Foreground="{DynamicResource {x:Static wpf:Controls.TooltipTextKey}}" TextWrapping="Wrap">
                         <Run FontWeight="Bold">Warning:</Run> Global installs
@@ -427,8 +429,8 @@
                         </Border>
 
                         <TextBlock Grid.Row="1" FontWeight="Bold" Margin="0 4 0 4">Options</TextBlock>
-                        <Label Grid.Row="4" HorizontalAlignment="Right" VerticalAlignment="Center">Other npm arguments</Label>
-                        <TextBox x:Name="ArgumentsTextBox" Grid.Column="1" Grid.Row="4" HorizontalAlignment="Stretch" Text="{Binding Arguments}" Margin="4" TabIndex="5"/>
+                        <Label Grid.Row="5" HorizontalAlignment="Right" VerticalAlignment="Center">Other npm arguments</Label>
+                        <TextBox x:Name="ArgumentsTextBox" Grid.Column="1" Grid.Row="5" HorizontalAlignment="Stretch" Text="{Binding Arguments}" Margin="4" TabIndex="5"/>
                         <Label Grid.Row="3" HorizontalAlignment="Right" VerticalAlignment="Center">Add to package.json</Label>
                         <CheckBox x:Name="SaveToPackageJsonCheckbox" Grid.Column="1" Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Left" IsChecked="{Binding SaveToPackageJson}" Margin="4" TabIndex="4">(recommended)</CheckBox>
                         <Label Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center">Dependency type</Label>
@@ -446,7 +448,26 @@
                             <ComboBoxItem Tag="Opt">Optional</ComboBoxItem>
                             <ComboBoxItem Tag="Global">Global</ComboBoxItem>
                         </ComboBox>
-
+                        
+                        <Label Grid.Row="4" HorizontalAlignment="Right" VerticalAlignment="Center">Selected version</Label>
+                        <ComboBox Name="SelectedVersionComboBox"
+                                  Grid.Row="4"
+                                  Grid.Column="1"
+                                  SelectedItem="{Binding Path=SelectedVersion}"
+                                  SelectedIndex="0"
+                                  SelectionChanged="SelectedVersionComboBox_OnSelectionChanged"
+                                  Margin="4">
+                            <ComboBox.Resources>
+                                <CollectionViewSource x:Key="AvailableVersionViewSource"
+                                                      Source="{Binding Path=SelectedPackage.AvailableVersions, Mode=OneWay}"/>
+                            </ComboBox.Resources>
+                            <ComboBox.ItemsSource>
+                                <CompositeCollection>
+                                    <sys:String>(latest)</sys:String>
+                                    <CollectionContainer Collection="{Binding Source={StaticResource AvailableVersionViewSource}, Mode=OneWay}"/>
+                                </CompositeCollection>
+                            </ComboBox.ItemsSource>
+                        </ComboBox>
                     </Grid>
                     <StackPanel Orientation="Horizontal" Margin="0 8 0 0">
                         <Button x:Name="InstallButton" Margin="0 0 4 0"

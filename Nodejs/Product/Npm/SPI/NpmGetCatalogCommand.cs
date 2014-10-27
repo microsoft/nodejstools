@@ -18,8 +18,6 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Runtime.Remoting.Messaging;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm.SQLiteTables;
@@ -96,8 +94,13 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                                         .FirstOrDefault();
 
                                     if (!string.IsNullOrEmpty(latestVersion)) {
-                                        builder.Version = SemverVersion.Parse(latestVersion);
+                                        builder.LatestVersion = SemverVersion.Parse(latestVersion);
                                     }
+                                }
+
+                                var versions = module["versions"];
+                                if (versions != null) {
+                                    builder.AvailableVersions = GetVersions(versions);
                                 }
 
                                 AddKeywords(builder, module["keywords"]);
@@ -108,29 +111,14 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
                                 var package = builder.Build();
 
-                                db.InsertOrReplace(new CatalogEntry() {
-                                    Name = builder.Name,
-                                    Description = builder.Description,
-                                    Author = JsonConvert.SerializeObject(package.Author),
-                                    Version = JsonConvert.SerializeObject(package.Version),
-                                    Keywords = JsonConvert.SerializeObject(package.Keywords),
-                                    Homepage = JsonConvert.SerializeObject(package.Homepages),
-                                    PublishDateTimeString = package.PublishDateTimeString
-                                });
+                                InsertCatalogEntry(db, package);
                             } catch (InvalidOperationException) {
                                 // Occurs if a JValue appears where we expect JProperty
                             } catch (ArgumentException) {
                                 OnOutputLogged(string.Format(Resources.ParsingError, builder.Name));
                                 if (!string.IsNullOrEmpty(builder.Name)) {
                                     var package = builder.Build();
-                                    db.InsertOrReplace(new CatalogEntry() {
-                                        Name = package.Name,
-                                        Description = package.Description,
-                                        Author = JsonConvert.SerializeObject(package.Author),
-                                        Version = JsonConvert.SerializeObject(package.Version),
-                                        Keywords = JsonConvert.SerializeObject(package.Keywords),
-                                        Homepage = JsonConvert.SerializeObject(package.Homepages)
-                                    });
+                                    InsertCatalogEntry(db, package);
                                 }
                             } finally {
                                 builder.Reset();
@@ -139,6 +127,29 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     }
                 });
             }
+        }
+
+        private static void InsertCatalogEntry(SQLiteConnection db, IPackage package) {
+            db.InsertOrReplace(new CatalogEntry() {
+                Name = package.Name,
+                Description = package.Description,
+                Author = JsonConvert.SerializeObject(package.Author),
+                Version = JsonConvert.SerializeObject(package.Version),
+                AvailableVersions = JsonConvert.SerializeObject(package.AvailableVersions),
+                Keywords = JsonConvert.SerializeObject(package.Keywords),
+                Homepage = JsonConvert.SerializeObject(package.Homepages),
+                PublishDateTimeString = package.PublishDateTimeString
+            });
+        }
+
+        private IEnumerable<SemverVersion> GetVersions(JToken versionsToken) {
+            IEnumerable<string> versionStrings = versionsToken.OfType<JProperty>().Select(v=>(string)v.Name);
+            foreach (var versionString in versionStrings) {
+                if (!string.IsNullOrEmpty(versionString)) {
+                    yield return SemverVersion.Parse(versionString);
+                }
+            }
+
         }
 
         private static void AddKeywords(NodeModuleBuilder builder, JToken keywords) {
@@ -360,6 +371,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                         package.Author = JsonConvert.DeserializeObject<Person>(entry.Author);
                         package.Keywords = JsonConvert.DeserializeObject<IEnumerable<string>>(entry.Keywords) ?? new List<string>();
                         package.Version = JsonConvert.DeserializeObject<SemverVersion>(entry.Version);
+                        package.AvailableVersions = JsonConvert.DeserializeObject<IEnumerable<SemverVersion>>(entry.AvailableVersions);
                         package.Homepages = JsonConvert.DeserializeObject<IEnumerable<string>>(entry.Homepage) ?? new List<string>();
                         package.PublishDateTimeString = entry.PublishDateTimeString;
 

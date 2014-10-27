@@ -24,7 +24,7 @@ using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.Npm.SPI;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NpmTests.TestUtilities;
+using TestUtilities;
 
 namespace NpmTests {
 
@@ -53,6 +53,7 @@ namespace NpmTests {
             string expectedAuthor,
             string expectedPublishDateTime,
             SemverVersion expectedVersion,
+            IEnumerable<SemverVersion> expectedVersions,
             IEnumerable<string> expectedKeywords) {
 
             Assert.AreEqual(expectedName, package.Name, "Invalid name.");
@@ -62,27 +63,9 @@ namespace NpmTests {
             Assert.AreEqual(expectedPublishDateTime, package.PublishDateTimeString, "Invalid publish date/time.");
             Assert.AreEqual(expectedVersion, package.Version, "Invalid version.");
 
-            if (null == expectedKeywords) {
-                expectedKeywords = new List<string>();
-            }
-
-            var actual = new HashSet<string>();
-            foreach (var keyword in package.Keywords) {
-                actual.Add(keyword);
-            }
-
-            //  N.B. I don't check the *number* of keywords because some packages, for example
-            //  pdfkit-memory, have a keyword list like this: "pdf pdf writer pdf generator graphics document vector".
-            //  Clearly the author's intent is for the keywords to be:
-            //  "pdf", "pdf writer", "pdf generator", "graphics", "document", "vector".
-            //  However, either because the author misunderstands how keywords work, or because of
-            //  a bug in the way npm search reports keywords (for our purposes, it doesn't matter which),
-            //  what actually happens is the keyword "pdf" appears three times in the list.
-            foreach (var keyword in expectedKeywords) {
-                Assert.IsTrue(
-                    actual.Contains(keyword),
-                    string.Format("Missing keyword: {0}", keyword));
-            }
+            // Sometimes authors include duplicate keywords in the list
+            AssertUtil.ArrayEquals(package.Keywords.Distinct().ToList(), expectedKeywords.Distinct().ToList());
+            AssertUtil.ArrayEquals(package.AvailableVersions.ToList(), expectedVersions.ToList());
         }
 
         private void CheckPackage(
@@ -94,6 +77,7 @@ namespace NpmTests {
             string expectedAuthor,
             string expectedPublishDateTime,
             SemverVersion expectedVersion,
+            IEnumerable<SemverVersion> expectedVersions,
             IEnumerable<string> expectedKeywords) {
             CheckPackage(
                 packagesByName[expectedName],
@@ -102,6 +86,7 @@ namespace NpmTests {
                 expectedAuthor,
                 expectedPublishDateTime,
                 expectedVersion,
+                expectedVersions,
                 expectedKeywords);
 
             if (expectedIndex >= 0) {
@@ -121,6 +106,7 @@ namespace NpmTests {
                     expectedAuthor,
                     expectedPublishDateTime,
                     expectedVersion,
+                    expectedVersions,
                     expectedKeywords);
             }
         }
@@ -169,6 +155,10 @@ namespace NpmTests {
                 "Anis Kadri",
                 "07/08/2014 17:55:34",
                 SemverVersion.Parse("3.5.0-0.2.6"),
+                new[] {
+                    SemverVersion.Parse("3.5.0-0.2.6"),
+                    SemverVersion.Parse("3.5.0-0.2.4")
+                },
                 new[] { "cordova", "client", "cli" }
                 );
         }
@@ -196,6 +186,10 @@ namespace NpmTests {
                 "Anis Kadri",
                 "10/16/2014 18:05:13",
                 SemverVersion.Parse("4.0.0"),
+                new[] {
+                    SemverVersion.Parse("4.0.0"),
+                    SemverVersion.Parse("3.6.0-0.2.8"),
+                },
                 new[] { "cordova", "client", "cli"}
                 );
 
@@ -209,7 +203,10 @@ namespace NpmTests {
                 null,
                 "08/14/2014 19:46:24",
                 SemverVersion.Parse("0.1.3"),
-                new string[0]
+                new[] {
+                    SemverVersion.Parse("0.1.3")
+                },
+                Enumerable.Empty<string>()
                 );
 
         }
@@ -227,6 +224,11 @@ namespace NpmTests {
                 "Philipp Scheit",
                 "01/07/2014 10:57:58",
                 SemverVersion.Parse("1.3.0-517056d"),
+                new[] {
+                    SemverVersion.Parse("1.3.0-95847e2"),
+                    SemverVersion.Parse("1.3.0-517056d"),
+                    SemverVersion.Parse("1.4.0-e14fdf0")
+                },
                 new[] { "cms", "framework" });
         }
 
@@ -332,7 +334,10 @@ namespace NpmTests {
                 null,
                 "06/17/2014 06:38:43",
                 new SemverVersion(0, 0, 0),
-                new string[] { });
+                new[] {
+                    new SemverVersion(0, 0, 0)
+                },
+                Enumerable.Empty<string>());
         }
 
         [TestMethod, Priority(0)]
@@ -348,7 +353,10 @@ namespace NpmTests {
                 "zhanghao",
                 "01/02/2014 03:28:23",
                 new SemverVersion(1, 0, 0),
-                null);
+                new[] {
+                    new SemverVersion(1, 0, 0)
+                },
+                Enumerable.Empty<string>());
         }
 
         [TestMethod, Priority(0)]
@@ -364,7 +372,10 @@ namespace NpmTests {
                 "ELLIOTTCABLE",
                 "06/11/2013 22:48:35",
                 SemverVersion.Parse("1.0.0"),
-                null);
+                new[] {
+                    SemverVersion.Parse("1.0.0")
+                },
+                Enumerable.Empty<string>());
         }
 
         [TestMethod, Priority(0)]
@@ -380,25 +391,9 @@ namespace NpmTests {
                 null,
                 null,
                 "03/03/2014 16:52:16",
-                SemverVersion.Parse("0.0.0"),
-                null);
-        }
-
-        [TestMethod, Priority(0)]
-        public void CheckPackageNoVersion() {
-            IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(PackageCacheDatabaseFilename, out byName);
-
-            CheckPackage(
-                target,
-                byName,
-                56,
-                "2co",
-                "Module that will provide nodejs adapters for 2checkout API payment gateway",
-                "Aleksej Gordejev",
-                "04/21/2014 14:31:49",
-                SemverVersion.Parse("0.0.4"),
-                new[] { "payments", "2checkout", "adapter", "gateway" });
+                SemverVersion.UnknownVersion,
+                Enumerable.Empty<SemverVersion>(),
+                Enumerable.Empty<string>());
         }
 
         [TestMethod, Priority(0)]
@@ -415,7 +410,10 @@ namespace NpmTests {
                 "Subbu Allamaraju",
                 "01/03/2011 21:21:12",
                 SemverVersion.Parse("0.1.1"),
-                null);
+                new[] {
+                    SemverVersion.Parse("0.1.1")
+                },
+                Enumerable.Empty<string>());
         }
 
         private IList<IPackage> GetFilteredPackageList(string filterString) {

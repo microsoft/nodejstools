@@ -59,6 +59,7 @@ namespace Microsoft.NodejsTools.NpmUI {
         private readonly Timer _filterTimer;
         private string _arguments = string.Empty;
         private bool _saveToPackageJson = true;
+        private object _selectedVersion;
 
         private readonly Dispatcher _dispatcher;
 
@@ -250,6 +251,7 @@ namespace Microsoft.NodejsTools.NpmUI {
                 LastRefreshedMessage = LastRefreshedMessageProvider.RefreshFailed;
                 return;
             }
+
             var newItems = new List<PackageCatalogEntryViewModel>();
 
             var filterText = _filterText;
@@ -310,6 +312,14 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
         }
 
+        public object SelectedVersion {
+            get { return _selectedVersion; }
+            set {
+                _selectedVersion = value;
+                OnPropertyChanged();
+            }
+        }
+
         public Visibility GlobalWarningVisibility {
             get {
                 return Indices.IndexGlobal == (Indices) SelectedDependencyTypeIndex
@@ -340,8 +350,15 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
 
             if (!string.IsNullOrEmpty(package.Name)) {
+                var selectedVersion = SelectedVersion is SemverVersion ? ((SemverVersion)SelectedVersion).ToString(): string.Empty;
                 _executeViewModel.QueueCommand(
-                    NpmArgumentBuilder.GetNpmInstallArguments(package.Name, string.Empty, type, isGlobal, SaveToPackageJson, Arguments));
+                    NpmArgumentBuilder.GetNpmInstallArguments(
+                        package.Name, 
+                        selectedVersion, 
+                        type, 
+                        isGlobal, 
+                        SaveToPackageJson, 
+                        Arguments));
             }
         }
 

@@ -12,6 +12,7 @@
  *
  * ***************************************************************************/
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -29,6 +30,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         public string PublishDateTimeString { get { return null; } }
+
+        public IEnumerable<SemverVersion> AvailableVersions { get { throw new NotImplementedException(); } }
 
         public string RequestedVersionRange { get; internal set; }
 

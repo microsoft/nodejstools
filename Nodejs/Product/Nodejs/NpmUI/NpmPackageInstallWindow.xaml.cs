@@ -153,5 +153,11 @@ namespace Microsoft.NodejsTools.NpmUI {
             ArgumentsTextBox.Text = string.Empty;
             ArgumentsTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
         }
+
+        private void SelectedVersionComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e) {
+            if (this.SelectedVersionComboBox.SelectedIndex == -1) {
+                SelectedVersionComboBox.SelectedIndex = 0;
+            }
+        }
     }
 }

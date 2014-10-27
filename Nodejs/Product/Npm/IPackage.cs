@@ -23,6 +23,8 @@ namespace Microsoft.NodejsTools.Npm {
 
         IEnumerable<string> Keywords { get; }
 
+        IEnumerable<SemverVersion> AvailableVersions { get; }
+
         bool IsListedInParentPackageJson { get; }
 
         bool IsMissing { get; }

@@ -13,6 +13,7 @@
  * ***************************************************************************/
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
 using Microsoft.NodejsTools.Npm.SPI;
@@ -21,20 +22,28 @@ namespace Microsoft.NodejsTools.Npm {
     /// <summary>
     /// Mutable class for building immutable node module descriptions
     /// </summary>
-    public class NodeModuleBuilder {
+    internal class NodeModuleBuilder {
         private List<IPackage> _dependencies = new List<IPackage>();
         private readonly StringBuilder _descriptionBuff = new StringBuilder();
         private readonly StringBuilder _authorBuff = new StringBuilder();
         private readonly StringBuilder _publishDateTime = new StringBuilder();
         private List<string> _keywords = new List<string>();
         private List<string> _homepages = new List<string>();
+        private List<SemverVersion> _availableVersions = new List<SemverVersion>(); 
 
         public NodeModuleBuilder() {
+            Reset();
         }
 
         public void Reset() {
             Name = null;
-            Version = new SemverVersion();
+
+            // We should double check, but I believe that the package no longer exists when "latest" is not set.
+            // If that's the case, we should include an option to filter out those packages.
+            // https://nodejstools.codeplex.com/workitem/1452
+            LatestVersion = SemverVersion.UnknownVersion;
+            _availableVersions = new List<SemverVersion>();
+
             Flags = PackageFlags.None;
             RequestedVersionRange = null;
 
@@ -66,7 +75,12 @@ namespace Microsoft.NodejsTools.Npm {
 
         public string Name { get; set; }
 
-        public SemverVersion Version { get; set; }
+        public SemverVersion LatestVersion { get; set; }
+
+        public IEnumerable<SemverVersion> AvailableVersions {
+            get { return _availableVersions; }
+            set { _availableVersions = value != null ? value.ToList() : new List<SemverVersion>(); }
+        }
 
         public IEnumerable<string> Homepages {
             get {
@@ -130,17 +144,18 @@ namespace Microsoft.NodejsTools.Npm {
         }
 
         public IPackage Build() {
-            var proxy = new PackageProxy();
-            proxy.Author = Author;
-            proxy.Name = Name;
-            proxy.Version = Version;
-            proxy.Description = Description;
-            proxy.Homepages = Homepages;
-            proxy.PublishDateTimeString = PublishDateTimeString;
-            proxy.RequestedVersionRange = RequestedVersionRange;
-            proxy.Flags = Flags;
-
-            proxy.Keywords = _keywords;
+            var proxy = new PackageProxy {
+                Author = Author,
+                Name = Name,
+                Version = LatestVersion,
+                AvailableVersions = AvailableVersions,
+                Description = Description,
+                Homepages = Homepages,
+                PublishDateTimeString = PublishDateTimeString,
+                RequestedVersionRange = RequestedVersionRange,
+                Flags = Flags,
+                Keywords = _keywords
+            };
 
             var modules = new NodeModulesProxy();
             foreach (var dep in Dependencies) {

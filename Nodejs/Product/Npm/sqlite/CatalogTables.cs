@@ -24,12 +24,13 @@ namespace Microsoft.NodejsTools.Npm.SQLiteTables {
         [PrimaryKey, NotNull, Indexed]
         public string Name { get; set; }
 
-        [MaxLength(500)]
         public  string Description { get; set; }
 
         public  string Homepage { get; set; }
 
         public string Version { get; set; }
+
+        public string AvailableVersions { get; set; }
 
         public string Author { get; set; }
 

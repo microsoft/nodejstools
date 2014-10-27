@@ -23,6 +23,7 @@ namespace Microsoft.NodejsTools.NpmUI {
     abstract class PackageCatalogEntryViewModel {
         private readonly string _name;
         private readonly SemverVersion? _version;
+        private readonly List<SemverVersion> _availableVersions;
         private readonly string _author;
         private readonly string _description;
         private readonly List<string> _homepages;
@@ -33,6 +34,7 @@ namespace Microsoft.NodejsTools.NpmUI {
         protected PackageCatalogEntryViewModel(
             string name,
             SemverVersion? version,
+            IEnumerable<SemverVersion> availableVersions, 
             string author,
             string description,
             IEnumerable<string> homepages,
@@ -42,6 +44,7 @@ namespace Microsoft.NodejsTools.NpmUI {
         ) {
             _name = name;
             _version = version;
+            _availableVersions = availableVersions != null ? availableVersions.ToList() : new List<SemverVersion>();
             _author = author;
             _description = description;
             _homepages = homepages != null ? homepages.ToList() : new List<string>();
@@ -57,6 +60,10 @@ namespace Microsoft.NodejsTools.NpmUI {
         public string Version { 
             get { return ToString(_version); } 
         }
+
+        public IEnumerable<SemverVersion> AvailableVersions {
+            get { return _availableVersions; }
+        } 
 
         public string Author { 
             get { return _author; } 
@@ -114,6 +121,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             : base(
                 package.Name ?? string.Empty,
                 package.Version,
+                package.AvailableVersions,
                 package.Author == null ? string.Empty : package.Author.ToString(),
                 package.Description ?? string.Empty,
                 package.Homepages,
