@@ -546,13 +546,17 @@ namespace Microsoft.NodejsTools {
             Guid view = Guid.Empty;
             IVsWindowFrame frame;
 
+            // DOCDATAEXISTING_UNKNOWN http://msdn.microsoft.com/en-us/library/vstudio/bb139396(v=vs.110).aspx
+            // Force OpenStandardEditor to lookup if the document is currently open or not, and if it is.  If it's
+            // open in a different editor the user will be prompted to close it.
+            var docDataExistingUnknown = new IntPtr(-1);
             int hr = ((IVsProject3)_innerVsHierarchy).OpenItemWithSpecific(
                 selectionItemId,
                 0,
                 ref ourEditor,
                 null,
                 ref view,
-                IntPtr.Zero,
+                docDataExistingUnknown, 
                 out frame
             );
             if (frame != null && ErrorHandler.Succeeded(hr)) {
