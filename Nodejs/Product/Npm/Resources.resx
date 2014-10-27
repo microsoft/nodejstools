@@ -180,4 +180,15 @@
     <value>Parsing error (package {0})</value>
     <comment>args: package name</comment>
   </data>
+  <data name="FailedToDeleteFile" xml:space="preserve">
+    <value>Could not delete file {0} - try deleting it manually.</value>
+  </data>
+  <data name="DatabaseCorrupt" xml:space="preserve">
+    <value>Database is corrupt - deleting {0}. Try refreshing the catalog again to download and re-populate the package cache.</value>
+    <comment>args: filename</comment>
+  </data>
+  <data name="DownloadOrParsingFailed" xml:space="preserve">
+    <value>Download or parsing failed. Try refreshing the catalog again. Otherwise delete the package cache from {0} and try again.</value>
+    <comment>args: filename</comment>
+  </data>
 </root>

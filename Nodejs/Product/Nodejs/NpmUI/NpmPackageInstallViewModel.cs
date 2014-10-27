@@ -246,7 +246,8 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
 
         private void FilterTimer_Elapsed(object state) {
-            if (_allPackages == null) {
+            if (_allPackages == null || _allPackages.Results == null) {
+                LastRefreshedMessage = LastRefreshedMessageProvider.RefreshFailed;
                 return;
             }
             var newItems = new List<PackageCatalogEntryViewModel>();

@@ -79,6 +79,24 @@ namespace Microsoft.NodejsTools.Npm {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Database is corrupt - deleting {0}. Try refreshing the catalog again to download and re-populate the package cache..
+        /// </summary>
+        internal static string DatabaseCorrupt {
+            get {
+                return ResourceManager.GetString("DatabaseCorrupt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Download or parsing failed. Try refreshing the catalog again. Otherwise delete the package cache from {0} and try again..
+        /// </summary>
+        internal static string DownloadOrParsingFailed {
+            get {
+                return ResourceManager.GetString("DownloadOrParsingFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error executing npm - unable to start the npm process.
         /// </summary>
         internal static string ErrCannotStartNpm {
@@ -102,6 +120,15 @@ namespace Microsoft.NodejsTools.Npm {
         internal static string ExecutingCommand {
             get {
                 return ResourceManager.GetString("ExecutingCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not delete file {0} - try deleting it manually..
+        /// </summary>
+        internal static string FailedToDeleteFile {
+            get {
+                return ResourceManager.GetString("FailedToDeleteFile", resourceCulture);
             }
         }
         

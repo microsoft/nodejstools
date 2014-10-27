@@ -261,10 +261,15 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             List<IPackage> results = null;
             bool catalogUpdated = false;
 
-            // Wait until file is downloaded/parsed if another download is already in session.
-            // Allows user to open multiple npm windows and show progress bar without file-in-use errors. 
-            // Loops for five minutes, and only when IOException occurs.
-            for (int secondsDelay = 0; secondsDelay < 300; secondsDelay += 10) {
+            // Use a semaphore instead of a mutex because await may return to a thread other than the calling thread.
+            using (var semaphore = new Semaphore(1, 1, dbFilename.Replace('\\', '/'))) {
+                // Wait until file is downloaded/parsed if another download is already in session.
+                // Allows user to open multiple npm windows and show progress bar without file-in-use errors.
+                bool success = await Task.Run(() => semaphore.WaitOne(TimeSpan.FromMinutes(5)));
+                if (!success) {
+                    // Return immediately so that the user can explicitly decide to refresh on failure.
+                    return false;
+                }
 
                 try {
                     if (!File.Exists(dbFilename)) {
@@ -280,41 +285,40 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                         catalogUpdated = true;
                     }
 
-                    try {
-                        if (catalogUpdated) {
-                            var fileInfo = new FileInfo(filename);
-                            OnOutputLogged(String.Format(Resources.InfoReadingBytesFromPackageCache, fileInfo.Length, filename, fileInfo.LastWriteTime));
+                    if (catalogUpdated) {
+                        var fileInfo = new FileInfo(filename);
+                        OnOutputLogged(String.Format(Resources.InfoReadingBytesFromPackageCache, fileInfo.Length, filename, fileInfo.LastWriteTime));
 
-                            using (var reader = new StreamReader(filename)) {
-                                await Task.Run(() => ParseResultsAndAddToDatabase(reader, dbFilename));
-                            }
+                        using (var reader = new StreamReader(filename)) {
+                            await Task.Run(() => ParseResultsAndAddToDatabase(reader, dbFilename));
                         }
-                    } catch (Exception ex) {
-                        // assume the results are corrupted...
-                        OnOutputLogged(ex.ToString());
                     }
 
                     results = await Task.Run(() => ReadResultsFromDatabase(dbFilename));
-                    break;
 
-                } catch (IOException) {
-                    // file is being downloaded
                 } catch (Exception ex) {
+                    if (ex is StackOverflowException ||
+                        ex is OutOfMemoryException ||
+                        ex is ThreadAbortException ||
+                        ex is AccessViolationException) {
+                        throw;
+                    }
                     // assume the results are corrupted
                     OnOutputLogged(ex.ToString());
-                    break;
+                } finally {
+                    if (results == null) {
+                        OnOutputLogged(string.Format(Resources.DownloadOrParsingFailed, CachePath));
+                    } else if (!results.Any()) {
+                        // Database file exists, but is corrupt. Delete database, so that we can download the file next time arround.
+                        OnOutputLogged(string.Format(Resources.DatabaseCorrupt, dbFilename));
+                        SafeDeleteFile(dbFilename);
+                    }
+                    semaphore.Release(1);
                 }
-                await Task.Delay(TimeSpan.FromSeconds(secondsDelay));
-            }
-
-            if (results == null || !results.Any()) {
-                var ex = new NpmCatalogEmptyException(Resources.ErrNpmCatalogEmpty);
-                OnOutputLogged(ex.ToString());
-                throw ex;
             }
 
             LastRefreshed = File.GetLastWriteTime(dbFilename);
-            Results = new ReadOnlyCollection<IPackage>(results);
+            Results = new ReadOnlyCollection<IPackage>(results ?? new List<IPackage>());
             PopulateByName(results);
 
             OnOutputLogged(String.Format(Resources.InfoCurrentTime, DateTime.Now));
@@ -322,6 +326,22 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             OnOutputLogged(String.Format(Resources.InfoNumberOfResults, Results.LongCount()));
 
             return true;
+        }
+
+        private void SafeDeleteFile(string filename) {
+            try {
+                OnOutputLogged(string.Format(Resources.InfoDeletingFile, filename));
+                File.Delete(filename);
+            } catch (DirectoryNotFoundException) {
+                // File has already been deleted. Do nothing.
+            } catch (IOException exception) {
+                // files are in use or path is too long
+                OnOutputLogged(exception.Message);
+                OnOutputLogged(string.Format(Resources.FailedToDeleteFile, filename));
+            } catch (Exception exception) {
+                OnOutputLogged(exception.ToString());
+                OnOutputLogged(string.Format(Resources.FailedToDeleteFile, filename));
+            }
         }
 
         internal static List<IPackage> ReadResultsFromDatabase(string cacheFile) {
