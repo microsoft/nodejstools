@@ -1102,7 +1102,7 @@
       <SubType>Designer</SubType>
     </ZipProject>
     <ZipProject Include="ProjectTemplates\AzureNodejsWorker\Preview.png" />
-    <ZipProject Include="ProjectTemplates\AzureNodejsWorker\server.js" />
+    <ZipProject Include="ProjectTemplates\AzureNodejsWorker\worker.js" />
     <ZipProject Include="ProjectTemplates\AzureNodejsWorker\startup.js" />
     <ZipProject Include="ProjectTemplates\AzureNodejsWorker\Worker.vstemplate">
       <SubType>Designer</SubType>

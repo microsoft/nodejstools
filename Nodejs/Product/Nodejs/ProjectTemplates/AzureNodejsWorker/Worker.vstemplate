@@ -16,8 +16,8 @@
   </TemplateData>
   <TemplateContent>
     <Project File="Worker.njsproj" ReplaceParameters="true">
-      <ProjectItem>server.js</ProjectItem>
-      <ProjectItem OpenInEditor="true">startup.js</ProjectItem>
+      <ProjectItem>startup.js</ProjectItem>
+      <ProjectItem OpenInEditor="true">worker.js</ProjectItem>
       <ProjectItem>download.ps1</ProjectItem>
       <ProjectItem>setup_worker.cmd</ProjectItem>
       <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
