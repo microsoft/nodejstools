@@ -2035,7 +2035,13 @@ throw null;
 
 
         private static void TestCode(string code, string expected, FormattingOptions options = null) {
-            Assert.AreEqual(expected, FormatCode(code, options));
+            var firstFormat = FormatCode(code, options);
+            Assert.AreEqual(expected, firstFormat);
+
+            // a second call to format on a formatted code should have no changes
+            var secondFormat = FormatCode(firstFormat, options);
+            Assert.AreEqual(firstFormat, secondFormat, "First and Second call to format had different results...");
+
         }
 
         private static void TestCode(int position, char ch, string code, string expected, FormattingOptions options = null) {
