@@ -342,6 +342,7 @@
     <Compile Include="Project\AzureToolsContracts.cs" />
     <Compile Include="Project\DependencyNodeProperties.cs" />
     <Compile Include="Project\LocalModulesNode.cs" />
+    <Compile Include="Project\NodejsFolderNode.cs" />
     <Compile Include="Project\NodejsProjectImageName.cs" />
     <Compile Include="Project\NodejsTypeScriptFileNode.cs" />
     <Compile Include="Project\NodejsTypeScriptFileNodeProperties.cs" />

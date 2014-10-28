@@ -202,7 +202,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         protected internal override FolderNode CreateFolderNode(ProjectElement element) {
-            return new CommonFolderNode(this, element);
+            return new NodejsFolderNode(this, element);
         }
 
         public override CommonFileNode CreateCodeFileNode(ProjectElement item) {

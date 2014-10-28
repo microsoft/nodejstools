@@ -579,4 +579,19 @@ You will need to restart Visual Studio after installation.</value>
   <data name="StatusAnalysisUpToDate" xml:space="preserve">
     <value>Node.js code analysis is up to date, analyzed {0:N0} functions in {1}</value>
   </data>
+  <data name="IncludeNodeModulesCancelTitle" xml:space="preserve">
+    <value>Do nothing (recommended)</value>
+  </data>
+  <data name="IncludeNodeModulesContent" xml:space="preserve">
+    <value>Including 'node_modules' in your project is generally unnecessary, and may reduce Visual Studio's performance. You can continue to use and deploy packages from 'node_modules' without including it in your project.</value>
+  </data>
+  <data name="IncludeNodeModulesIncludeDescription" xml:space="preserve">
+    <value>This may be a long-running operation, during which Visual Studio will be unusable.</value>
+  </data>
+  <data name="IncludeNodeModulesIncludeTitle" xml:space="preserve">
+    <value>Include 'node_modules' folder in project</value>
+  </data>
+  <data name="IncludeNodeModulesInformation" xml:space="preserve">
+    <value>&lt;a href="http://go.microsoft.com/fwlink/?LinkID=518083"&gt;More Information&lt;/a&gt;</value>
+  </data>
 </root>

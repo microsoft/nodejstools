@@ -37,6 +37,11 @@ namespace Microsoft.NodejsTools.Project {
         internal const string DownloadAndInstall = "DownloadAndInstall";
         internal const string EnvironmentVariables = "EnvironmentVariables";
         internal const string ErrorNoDte = "ErrorNoDte";
+        internal const string IncludeNodeModulesCancelTitle = "IncludeNodeModulesCancelTitle";
+        internal const string IncludeNodeModulesContent = "IncludeNodeModulesContent";
+        internal const string IncludeNodeModulesIncludeDescription = "IncludeNodeModulesIncludeDescription";
+        internal const string IncludeNodeModulesIncludeTitle = "IncludeNodeModulesIncludeTitle";
+        internal const string IncludeNodeModulesInformation = "IncludeNodeModulesInformation";
         internal const string InvalidPortNumber = "InvalidPortNumber";
         internal const string LaunchUrlToolTip = "LaunchUrlToolTip";
         internal const string LinkStatusLinkedFromGlobal = "LinkStatusLinkedFromGlobal";
