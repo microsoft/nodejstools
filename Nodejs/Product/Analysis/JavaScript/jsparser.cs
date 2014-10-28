@@ -1256,45 +1256,53 @@ namespace Microsoft.NodejsTools.Parsing
                     m_noSkipTokenSet.Add(NoSkipTokenSet.s_BlockConditionNoSkipTokenSet);
                     try
                     {
+                        //  Find Initializer.  We need to check if we are at the end of the intializer.
                         if (JSToken.Semicolon != _curToken) {
-                            ReportError(JSError.NoSemicolon);
-                            if (JSToken.Colon == _curToken)
+                            ReportError(JSError.NoSemicolon, true);
+                            if (JSToken.Colon == _curToken) 
                             {
                                 m_noSkipTokenSet.Add(NoSkipTokenSet.s_VariableDeclNoSkipTokenSet);
-                                try
+                                try 
                                 {
                                     SkipTokensAndThrow();
-                                }
-                                catch (RecoveryTokenException)
+                                } 
+                                catch (RecoveryTokenException) 
                                 {
-                                    if (JSToken.Semicolon == _curToken)
+                                    if (JSToken.Semicolon == _curToken) 
                                     {
                                         m_useCurrentForNext = false;
-                                    }
-                                    else
+                                    } 
+                                    else 
                                     {
                                         throw;
                                     }
-                                }
-                                finally
+                                } 
+                                finally 
                                 {
                                     m_noSkipTokenSet.Remove(NoSkipTokenSet.s_VariableDeclNoSkipTokenSet);
                                 }
+                            } else {
+                                // we should try to advance to the end of the initializer.
+                                SkipToNextToken(NoSkipTokenSet.s_EndOfStatementNoSkipTokenSet);
                             }
                         }
 
+                        // Find Condition
                         GetNextToken();
                         if (JSToken.Semicolon != _curToken)
                         {
                             condOrColl = ParseExpression();
                             if (JSToken.Semicolon != _curToken)
                             {
-                                ReportError(JSError.NoSemicolon);
+                                ReportError(JSError.NoSemicolon, true);
+
+                                // we should try to advance to the end of the condition.
+                                SkipToNextToken(NoSkipTokenSet.s_EndOfStatementNoSkipTokenSet);
                             }
                         }
 
+                        // Find Incrementer
                         GetNextToken();
-
                         if (JSToken.RightParenthesis != _curToken)
                         {
                             increment = ParseExpression();
@@ -1305,13 +1313,16 @@ namespace Microsoft.NodejsTools.Parsing
                         {
                             missingRightParen = true;
                             ReportError(JSError.NoRightParenthesis, true);
+
+                            // we should try to advance to the end of the incrementer..
+                            SkipToNextToken(NoSkipTokenSet.s_BlockConditionNoSkipTokenSet);
                         }
                         headerEnd = _curSpan.End;
 
                         forSpan = forSpan.UpdateWith(_curSpan);
                         if (!missingRightParen) {
-                        GetNextToken();
-                    }
+                            GetNextToken();
+                        }
                     }
                     catch (RecoveryTokenException exc)
                     {
@@ -1390,6 +1401,29 @@ namespace Microsoft.NodejsTools.Parsing
             }
 
             return forNode;
+        }
+
+        //---------------------------------------------------------------------------------------
+        // SkipToNextToken
+        //
+        // Given a token list, we try to advance until we find one of these tokens.
+        // If we fail to find one, we throw.
+        //---------------------------------------------------------------------------------------
+        private void SkipToNextToken(JSToken[] tokenToAddToSet) {
+            // Try to find the end of this statment using the tokenset included to determine this.
+            try {
+                m_noSkipTokenSet.Add(tokenToAddToSet);
+                SkipTokensAndThrow();
+            } catch (RecoveryTokenException) {
+                // if this token we are on was in our list, we can use current for next
+                if(Array.Exists(tokenToAddToSet, (t) => t == _curToken)) {
+                    m_useCurrentForNext = false;
+                } else {
+                    throw;
+                }
+            } finally {
+                m_noSkipTokenSet.Remove(tokenToAddToSet);
+            }
         }
 
         //---------------------------------------------------------------------------------------
