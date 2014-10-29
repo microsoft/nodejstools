@@ -119,7 +119,17 @@ function end_sign_files {
         mkdir $outdir -EA 0 | Out-Null
         Write-Progress -Activity $activity -Completed
         Write-Output "Copying from $jobCompletionPath to $outdir"
-        copy -path $jobCompletionPath\* -dest $outdir -Force
+        $attemptedCopies = 0
+        while($attemptedCopies -lt 10) {
+            try {
+                copy -path $jobCompletionPath\* -dest $outdir -Force
+                break;
+            } catch [UnauthorizedAccessException] {
+                echo $_.UnauthorizedAccessException.Message
+                sleep 60
+                $attemptedCopies++
+            }
+        }
         if (-not $?) {
             Write-Output "Failed to copy $jobCompletionPath to $outdir"
         }
