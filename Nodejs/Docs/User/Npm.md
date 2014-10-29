@@ -20,7 +20,6 @@ The easiest way to open a command prompt in the correct location is to right-cli
 ![Open Command Prompt Here](Images/npm-open-command-prompt-here.png)
 
 ### .npm in the Node.js Interactive Window
- *New in NTVS 1.0 Beta 2*
 
 If you're addicted to the npm command line interface, you'll feel right at home with the ```.npm``` command in the Node.js Interactive Window <span class="menu">Tools</span> → <span class="menu">Node.js Tools</span> → <span class="menu">Node.js Interactive Window</span>. It does exactly what you would expect - run npm commands from the Interactive Window. For instance...
 
@@ -40,22 +39,29 @@ By default, npm will execute in your project's home directory. If you have multi
 *Known Issue:* the ```.npm``` command is currently unavailable for folders that do not have a package.json file. To initiate commands like npm init (which creates a package.json file,) simply right click your project's Solution Explorer node, and open up the command prompt. 
 
 ### Browsing/Installing new npm packages in the GUI
-*Refreshed in NTVS 1.0 Beta 2*
+*Refreshed in NTVS 1.0 Beta 3*
 
 If you don't know the exact command, want to browse through available packages in the npm registry, or simply prefer a <s>gooey</s> graphical user interface, right click on the Solution Explorer npm node, and select <span class="menu">Install New npm Packages...</span>
 
 ![Install Packages Context Menu](Images/npm-context-menu-install-packages.png)
 
-The first time you open the dialog, it'll start downloading the entire npm catalog. It's a 43MB+ download, so if you're impatient, you can close the dialog and wait for the download to complete (current status prints to Output Window).
+The first time you open the dialog, it'll start downloading the entire npm catalog. It's a 50MB+ download, so if you're impatient, you can close the dialog and wait for the download to complete while you perform other tasks (current status prints to the [npm log in the Output Window](#npm-log-in-output-window)).
 
 ![Install Packages GUI](Images/npm-loading-package-list.png)
 
+The package cache is now stored in a database, so so future refreshes are iterative. If you've tried to refresh a couple times with no luck, we suggest clearing your cache first by navigating to <span class="menu">Tools</span> → <span class="menu">Options</span>Options> → <span class="menu">Node.js Tools</span> → <span class="menu">Npm</span>.
+
+![npm Options Dialog](Images/npm-options-dialog.png)
+
+Otherwise, take a look at the [npm log in the Output Window](#npm-log-in-output-window) for more detail about what went wrong.
 
 Once the catalog finishes loading, search for a package, specify options, and install. For instance, if you'd like to install azure, approximately version 0.8, and list it in your devDependencies in package.json:
 
 - **Dependency type:** Development
 - **Add to package.json:** Yes (if you uncheck this, it will be installed as a standard dependency instead because there is no concept of devDependencies without package.json. Similarly, this flag will be ignored if you select the ```global``` dependency type)
-- **Other npm arguments:** ```@~0.8```
+- **Version:** latest (alternatively select a version if the version you want is in the list - only versions as recommended by dist-tags are available.)
+- **Other npm arguments:** ```@~0.8``` (we'll honor your version-related arguments here, so long as Version is specified to be ```latest```)
+
 
 The corresponding npm command is:
 
@@ -72,7 +78,7 @@ If the status indicator in the lower left hand corner indicates an error and/or 
 ![npm install Details](Images/npm-install-executing-details.png)
 
 
-Note that npm will continue running in the background when you close the dialog (npm output will be printed to the Output Window.)
+Note that npm will continue running in the background when you close the dialog (npm output will be printed to the [npm log in the Output Window](#npm-log-in-output-window).)
 
 
 ### Managing Installed Packages in Solution Explorer
@@ -130,6 +136,8 @@ If you've already installed some packages you'll have seen that we capture and d
 
 	![npm Log](Images/npm-log.png)
 
+
+This is handy for debugging your own npm-related issues (and helping us debug ours.)
 
 ### Happy package-managing!
 Comments, compliments, complaints? We'd love to hear your feedback - please file an [issue](https://nodejstools.codeplex.com/workitem/list/basic), comment below, or post on the [forums](https://nodejstools.codeplex.com/discussions).
