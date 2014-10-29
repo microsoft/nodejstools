@@ -11,7 +11,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>$guid1$</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>server.js</StartupFile>
+    <StartupFile>worker.js</StartupFile>
     <SearchPath></SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -31,7 +31,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="server.js" />
+    <Compile Include="worker.js" />
     <Compile Include="startup.js" />
     <Content Include="download.ps1" />
     <Content Include="setup_worker.cmd" />
