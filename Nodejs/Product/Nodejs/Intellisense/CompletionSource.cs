@@ -86,7 +86,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             );
 
             var completions = provider.GetCompletions(_glyphService);
-            if (completions != null) {
+            if (completions != null && completions.Completions.Count > 0) {
                 completionSets.Add(completions);
             }
         }
@@ -124,23 +124,20 @@ namespace Microsoft.NodejsTools.Intellisense {
                 // else it's require(
             }
 
-            var completions = GenerateBuiltinCompletions(doubleQuote);
-            completions.AddRange(GetProjectCompletions(doubleQuote));
-            completions.Sort(CompletionSorter);
-
-            completionSets.Add(
-                new CompletionSet(
-                    NodejsRequireCompletionSetMoniker,
-                    "Node.js require",
-                    _textBuffer.CurrentSnapshot.CreateTrackingSpan(
-                        triggerPoint,
-                        length,
-                        SpanTrackingMode.EdgeInclusive
-                    ),
-                    completions,
-                    null
-                )
+            var buffer = _textBuffer;
+            var textBuffer = _textBuffer;
+            var span = GetApplicableSpan(session, textBuffer);
+            var provider = VsProjectAnalyzer.GetRequireCompletions(
+                _textBuffer.CurrentSnapshot,
+                span,
+                session.GetTriggerPoint(buffer),
+                doubleQuote
             );
+
+            var completions = provider.GetCompletions(_glyphService);
+            if (completions != null && completions.Completions.Count > 0) {
+                completionSets.Add(completions);
+            }
         }
 
         /// <summary>
@@ -225,18 +222,6 @@ namespace Microsoft.NodejsTools.Intellisense {
             return null;
         }
 
-        private int CompletionSorter(Completion x, Completion y) {
-            if (x.DisplayText.StartsWith(".")) {
-                if (y.DisplayText.StartsWith(".")) {
-                    return String.Compare(x.DisplayText, y.DisplayText);
-                }
-                return 1;
-            } else if (y.DisplayText.StartsWith(".")) {
-                return -1;
-            }
-            return String.Compare(x.DisplayText, y.DisplayText);
-        }
-
         /// <summary>
         /// Checks if we are at a require statement where we can offer completions.
         /// 
@@ -273,170 +258,15 @@ namespace Microsoft.NodejsTools.Intellisense {
                         tokenText.EndsWith(";") || // f(x); has ); displayed as a single token
                         _allowRequireTokens.Contains(tokenText) || // require after a token which starts an expression
                         (tokenText.All(IsIdentifierChar) && !_keywords.Contains(tokenText));    // require after anything else that isn't a statement like keyword 
-                                                                                                //      (including identifiers which are on the previous line)
+                    //      (including identifiers which are on the previous line)
                 }
             }
-            
+
             return atRequire;
         }
 
         internal static bool IsIdentifierChar(char ch) {
             return ch == '_' || (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9') || ch == '$';
-        }
-
-        // TODO: require completions should move into the analyzer
-        private IEnumerable<Completion> GetProjectCompletions(bool? doubleQuote) {
-            var filePath = _textBuffer.GetFilePath();
-
-            var rdt = _serviceProvider.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
-            IVsHierarchy hierarchy;
-            uint itemId;
-            IntPtr punk = IntPtr.Zero;
-            uint cookie;
-            int hr;
-            CompletionInfo[] res = null;
-            try {
-                hr = rdt.FindAndLockDocument((uint)_VSRDTFLAGS.RDT_NoLock, filePath, out hierarchy, out itemId, out punk, out cookie);
-                if (ErrorHandler.Succeeded(hr) && hierarchy != null) {
-                    var dteProj = hierarchy.GetProject();
-                    if (dteProj != null) {
-                        var nodeProj = dteProj.GetNodeProject();
-                        if (nodeProj != null) {
-                            // file is open in our project, we can provide completions...
-                            var node = nodeProj.FindNodeByFullPath(filePath) as FileNode;
-                            Debug.Assert(node != null);
-
-                            if (!nodeProj._requireCompletionCache.TryGetCompletions(node, out res)) {
-                                List<CompletionInfo> completions = new List<CompletionInfo>();
-
-                                GetParentNodeModules(nodeProj, node.Parent, completions);
-                                GetPeerAndChildModules(nodeProj, node, completions);
-
-                                nodeProj._requireCompletionCache.CacheCompletions(node, res = completions.ToArray());
-                            }
-                        }
-                    }
-                }
-            } finally {
-                if (punk != IntPtr.Zero) {
-                    Marshal.Release(punk);
-                }
-            }
-            if (res != null) {
-                return res.Select(x => x.ToCompletion(doubleQuote));
-            }
-            return Enumerable.Empty<Completion>();
-        }
-
-        private void GetParentNodeModules(NodejsProjectNode nodeProj, HierarchyNode parent, List<CompletionInfo> projectCompletions) {
-            do {
-                var modulesFolder = parent.FindImmediateChildByName(NodejsConstants.NodeModulesFolder);
-                if (modulesFolder != null) {
-                    GetParentNodeModules(nodeProj, modulesFolder, parent, projectCompletions);
-                }
-                parent = parent.Parent;
-            } while (parent != null);
-        }
-
-        private void GetParentNodeModules(NodejsProjectNode nodeProj, HierarchyNode modulesFolder, HierarchyNode fromFolder, List<CompletionInfo> projectCompletions) {
-            for (HierarchyNode n = modulesFolder.FirstChild; n != null; n = n.NextSibling) {
-                FileNode file = n as FileNode;
-                if (file != null &&
-                    NodejsConstants.JavaScriptExtension.Equals(
-                        Path.GetExtension(file.Url),
-                        StringComparison.OrdinalIgnoreCase
-                    )) {
-                    projectCompletions.Add(                        
-                        MakeCompletion(
-                            nodeProj,
-                            file,
-                            MakeNodePath(fromFolder, file).Substring(NodejsConstants.NodeModulesFolder.Length + 1)
-                        )
-                    );
-                }
-
-                FolderNode folder = n as FolderNode;
-                if (folder != null) {
-                    if (folder.FindImmediateChildByName(NodejsConstants.PackageJsonFile) != null || 
-                        folder.FindImmediateChildByName(NodejsConstants.DefaultPackageMainFile) != null) {
-                        projectCompletions.Add(
-                            MakeCompletion(
-                                nodeProj,
-                                folder,
-                                MakeNodePath(fromFolder, folder).Substring(NodejsConstants.NodeModulesFolder.Length + 1)
-                            )
-                        );
-                        // we don't recurse here - you can pull out a random .js file from a package, 
-                        // but we don't include those in the available completions.
-                    } else if (!NodejsConstants.NodeModulesFolder.Equals(Path.GetFileName(folder.Url), StringComparison.OrdinalIgnoreCase)) {
-                        // recurse into folder and make available members...
-                        GetParentNodeModules(nodeProj, folder, fromFolder, projectCompletions);
-                    }
-                }
-            }
-        }
-
-        private static string MakeNodePath(HierarchyNode relativeTo, HierarchyNode node) {
-            return CommonUtils.CreateFriendlyFilePath(relativeTo.FullPathToChildren, CommonUtils.TrimEndSeparator(node.Url)).Replace("\\", "/");
-        }
-
-        private CompletionInfo MakeCompletion(NodejsProjectNode nodeProj, HierarchyNode node, string displayText) {
-            return new CompletionInfo(
-                displayText,
-                CommonUtils.CreateFriendlyFilePath(nodeProj.ProjectHome, node.Url) + " (in project)",
-                _glyphService.GetGlyph(StandardGlyphGroup.GlyphGroupModule, StandardGlyphItem.GlyphItemProtected)
-            );
-        }
-
-        /// <summary>
-        /// Finds available modules which are children of the folder where we're doing require
-        /// completions from.
-        /// </summary>
-        private void GetPeerAndChildModules(NodejsProjectNode nodeProj, HierarchyNode node, List<CompletionInfo> projectCompletions) {
-            var folder = node.Parent;
-            foreach (HierarchyNode child in EnumCodeFilesExcludingNodeModules(folder)) {
-                if (child == node) {
-                    // you can require yourself, but we don't show the completion
-                    continue;
-                }
-
-                projectCompletions.Add(
-                    MakeCompletion(
-                        nodeProj,
-                        child,
-                        "./" + MakeNodePath(folder, child)
-                    )
-                );
-            }
-        }
-
-        /// <summary>
-        /// Enumerates the available code files excluding node modules whih we handle specially.
-        /// </summary>
-        internal IEnumerable<HierarchyNode> EnumCodeFilesExcludingNodeModules(HierarchyNode node) {
-            for (HierarchyNode n = node.FirstChild; n != null; n = n.NextSibling) {
-                var fileNode = n as NodejsFileNode;
-                if (fileNode != null) {
-                    yield return fileNode;
-                }
-
-                var folder = n as FolderNode;
-                // exclude node_modules, you can do require('./node_modules/foo.js'), but no
-                // one does.
-                if (folder != null) {
-                    var folderName = Path.GetFileName(CommonUtils.TrimEndSeparator(folder.Url));
-                    if (!folderName.Equals(NodejsConstants.NodeModulesFolder, StringComparison.OrdinalIgnoreCase)) {
-                        if (folder.FindImmediateChildByName(NodejsConstants.PackageJsonFile) != null ||
-                            folder.FindImmediateChildByName(NodejsConstants.DefaultPackageMainFile) != null) {
-                            yield return folder;
-                        } 
-
-                        foreach (var childNode in EnumCodeFilesExcludingNodeModules(n)) {
-                            yield return childNode;
-                        }
-                    }
-                }
-            }
         }
 
         private static bool EatToken(IEnumerator<ClassificationSpan> classifications, string tokenText) {
@@ -473,23 +303,5 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         #endregion
-
-        private List<Completion> GenerateBuiltinCompletions(bool? doubleQuote) {
-            var modules = _nodejsModules.Keys.ToArray();
-
-            List<Completion> res = new List<Completion>();
-            foreach (var module in modules) {
-                res.Add(
-                    new Completion(
-                        module,
-                        CompletionInfo.GetInsertionQuote(doubleQuote, module),
-                        _nodejsModules[module],
-                        _glyphService.GetGlyph(StandardGlyphGroup.GlyphGroupModule, StandardGlyphItem.GlyphItemPublic),
-                        null
-                    )
-                );
-            }
-            return res;
-        }
     }
 }

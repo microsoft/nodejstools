@@ -34,6 +34,7 @@ namespace Microsoft.NodejsTools.Analysis {
     class ModuleTable {
         private readonly Dictionary<string, ModuleTree> _modulesByFilename = new Dictionary<string, ModuleTree>(StringComparer.OrdinalIgnoreCase);
         private readonly ModuleTree _modules = new ModuleTree(null, String.Empty);
+        private List<ProjectEntry> _builtins;
         private readonly object _lock = new object();
         [ThreadStatic]
         private static HashSet<ModuleRecursion> _recursionCheck;
@@ -51,6 +52,12 @@ namespace Microsoft.NodejsTools.Analysis {
                     EnumerateChildren(res, _modules);
                 }
                 return res;
+            }
+        }
+
+        public IEnumerable<ProjectEntry> BuiltinModules {
+            get {
+                return _builtins;
             }
         }
 
@@ -109,6 +116,14 @@ namespace Microsoft.NodejsTools.Analysis {
                 AddVisibility(tree, value, true);
 
                 value._enqueueModuleDependencies = true;
+
+                if (value.IsBuiltin) {
+                    //We found a new builtin, replace our current tree;
+                    if(_builtins == null){
+                        _builtins = new List<ProjectEntry>();
+                    }
+                    _builtins.Add(value);
+                }
             }
         }
 
@@ -131,7 +146,7 @@ namespace Microsoft.NodejsTools.Analysis {
             // My peers can see my assignments/I can see my peers assignments.  Update
             // ourselves and our peers so we can see each others writes.
             var curTree = tree;
-            while (curTree.Parent != null && curTree.Parent.Name != "node_modules") {
+            while (curTree.Parent != null && curTree.Parent.Name != AnalysisConstants.NodeModulesFolder) {
                 curTree = curTree.Parent;
             }
 
@@ -145,11 +160,11 @@ namespace Microsoft.NodejsTools.Analysis {
             // My parent and its peers can see my assignments.  Update existing parents
             // so they can see the newly added modules writes.
             if (curTree.Parent != null) {
-                Debug.Assert(curTree.Parent.Name == "node_modules");
+                Debug.Assert(curTree.Parent.Name == AnalysisConstants.NodeModulesFolder);
 
                 var grandParent = curTree.Parent.Parent;
                 if (grandParent != null) {
-                    while (grandParent.Parent != null && grandParent.Parent.Name != "node_modules") {
+                    while (grandParent.Parent != null && !String.Equals(grandParent.Parent.Name, AnalysisConstants.NodeModulesFolder, StringComparison.OrdinalIgnoreCase)) {
                         grandParent = grandParent.Parent;
                     }
                     if (grandParent.VisibleEntries == null) {
@@ -165,6 +180,11 @@ namespace Microsoft.NodejsTools.Analysis {
         /// 
         /// If declModule is null then only global imports will be resolved.
         /// </summary>
+        /// <param name="node"></param>
+        /// <param name="unit"></param>
+        /// <param name="moduleName">filename of the file user has required</param>
+        /// <param name="declModule">String to the fullpath of the filename we are currently analyzing</param>
+        /// <returns></returns>
         public IAnalysisSet RequireModule(Node node, AnalysisUnit unit, string moduleName, string declModule = null) {
             lock (_lock) {
                 ModuleTree moduleTree;
@@ -185,16 +205,16 @@ namespace Microsoft.NodejsTools.Analysis {
             if (moduleName.StartsWith("./") || moduleName.StartsWith("../")) {
                 // search relative to our declaring module.
                 return GetExports(
-                    node, 
-                    unit, 
-                    ResolveModule(relativeTo, unit, moduleName)
+                    node,
+                    unit,
+                    ResolveModule(relativeTo, moduleName, unit)
                 );
             } else {
                 // must be in node_modules, search in the current directory
                 // and up through our parents                
                 do {
-                    var nodeModules = relativeTo.GetChild("node_modules", unit);
-                    var curTree = ResolveModule(nodeModules, unit, moduleName);
+                    var nodeModules = relativeTo.GetChild(AnalysisConstants.NodeModulesFolder, unit);
+                    var curTree = ResolveModule(nodeModules, moduleName, unit);
 
                     if (curTree != null) {
                         return GetExports(node, unit, curTree);
@@ -206,7 +226,11 @@ namespace Microsoft.NodejsTools.Analysis {
             return AnalysisSet.Empty;
         }
 
-        private static ModuleTree ResolveModule(ModuleTree parentTree, AnalysisUnit unit, string relativeName) {
+        public static ModuleTree ResolveModule(ModuleTree parentTree, string relativeName) {
+            return ResolveModule(parentTree, relativeName, null);
+        }
+
+        private static ModuleTree ResolveModule(ModuleTree parentTree, string relativeName, AnalysisUnit unit) {
             ModuleTree curTree = parentTree;
             var components = ModuleTable.GetPathComponents(relativeName);
             for (int i = 0; i < components.Length; i++) {
@@ -225,13 +249,16 @@ namespace Microsoft.NodejsTools.Analysis {
 
                 ModuleTree nextTree;
                 if (i == components.Length - 1) {
+
                     nextTree = curTree.GetChild(comp + ".js", unit);
+
                     if (nextTree.ProjectEntry != null) {
                         return nextTree;
                     }
                 }
 
                 nextTree = curTree.GetChild(comp, unit);
+
                 if (nextTree.Children.Count > 0 || nextTree.ProjectEntry != null) {
                     curTree = nextTree;
                     continue;
@@ -258,7 +285,7 @@ namespace Microsoft.NodejsTools.Analysis {
                             "exports"
                         );
                     }
-                } else if(curTree.Parent != null) {
+                } else if (curTree.Parent != null) {
                     // No ModuleReference, this is a folder, check and see
                     // if we have the default package file (either index.js
                     // or the file specified in package.json)
@@ -269,8 +296,8 @@ namespace Microsoft.NodejsTools.Analysis {
                     if (_recursionCheck == null) {
                         _recursionCheck = new HashSet<ModuleRecursion>();
                     }
-                    
-                    var recCheck = new ModuleRecursion(curTree.DefaultPackage, curTree);                    
+
+                    var recCheck = new ModuleRecursion(curTree.DefaultPackage, curTree);
                     if (_recursionCheck.Add(recCheck)) {
                         try {
                             return RequireModule(
@@ -374,7 +401,9 @@ namespace Microsoft.NodejsTools.Analysis {
             if (!Children.TryGetValue(name, out tree)) {
                 Children[name] = tree = new ModuleTree(this, name);
             }
-            tree.AddDependency(unit);
+            if (unit != null) {
+                tree.AddDependency(unit);
+            }
             return tree;
         }
 

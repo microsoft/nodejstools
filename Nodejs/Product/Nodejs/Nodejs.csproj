@@ -287,6 +287,7 @@
     <Compile Include="Intellisense\ParseQueue.cs" />
     <Compile Include="Intellisense\QuickInfoSource.cs" />
     <Compile Include="Intellisense\QuickInfoSourceProvider.cs" />
+    <Compile Include="Intellisense\RequireCompletionAnalysis.cs" />
     <Compile Include="Intellisense\ReverseExpressionParser.cs" />
     <Compile Include="Intellisense\SignatureAnalysis.cs" />
     <Compile Include="Intellisense\SignatureHelpSource.cs" />
@@ -441,7 +442,6 @@
     <Compile Include="Intellisense\CompletionInfo.cs" />
     <Compile Include="Intellisense\CompletionSource.cs" />
     <Compile Include="Intellisense\CompletionSourceProvider.cs" />
-    <Compile Include="Intellisense\CompletionSource.Modules.cs" />
     <Compile Include="Intellisense\RequireCompletionCache.cs" />
     <Compile Include="Intellisense\TextViewCreationListener.cs" />
     <Compile Include="Jade\Classifier\IClassificationContextNameProvider.cs" />

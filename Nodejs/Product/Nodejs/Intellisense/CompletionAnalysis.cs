@@ -1,8 +1,25 @@
-﻿using System;
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.VisualStudio.Language.Intellisense;
+using Microsoft.VisualStudio.Language.StandardClassification;
 using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Classification;
 
 namespace Microsoft.NodejsTools.Intellisense {
     /// <summary>
@@ -51,5 +68,37 @@ namespace Microsoft.NodejsTools.Intellisense {
                 null;
         }
 
+        internal static StandardGlyphGroup GetGlyphGroup(MemberResult result) {
+            switch (result.MemberType) {
+                case JsMemberType.Function:
+                    return StandardGlyphGroup.GlyphGroupMethod;
+                case JsMemberType.Keyword:
+                    return StandardGlyphGroup.GlyphKeyword;
+                case JsMemberType.Module:
+                    return StandardGlyphGroup.GlyphGroupModule;
+                case JsMemberType.Multiple:
+                case JsMemberType.Object:
+                    return StandardGlyphGroup.GlyphGroupClass;
+                case JsMemberType.Boolean:
+                case JsMemberType.String:
+                case JsMemberType.Number:
+                    return StandardGlyphGroup.GlyphGroupValueType;
+                case JsMemberType.Undefined:
+                    return StandardGlyphGroup.GlyphGroupException;
+                case JsMemberType.Null:
+                    return StandardGlyphGroup.GlyphGroupConstant;
+                default:
+                    return StandardGlyphGroup.GlyphGroupUnknown;
+            }
+        }
+        
+        internal IEnumerable<MemberResult> GetModules() {
+            var analysis = GetAnalysisEntry();
+
+            if (analysis != null) {
+                return analysis.GetModules().Distinct(CompletionComparer.MemberEquality);
+            }
+            return Enumerable.Empty<MemberResult>();
+        }
     }
 }

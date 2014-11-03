@@ -22,23 +22,34 @@ namespace Microsoft.NodejsTools.Analysis {
     internal struct MemberResult {
         private readonly string _name;
         private string _completion;
+        private string _documentation;
         private readonly Func<IEnumerable<AnalysisValue>> _vars;
         private readonly Func<JsMemberType> _type;
 
         internal MemberResult(string name, IEnumerable<AnalysisValue> vars) {
+            _documentation = null;
             _name = _completion = name;
             _vars = () => vars;
             _type = null;
-            _type = GetMemberType;
+            _type = GetMemberType;            
         }
 
         public MemberResult(string name, JsMemberType type) {
             _name = _completion = name;
             _type = () => type;
             _vars = () => Empty;
+            _documentation = null;
+        }
+
+        public MemberResult(string name, string documentation, JsMemberType type) {
+            _name = _completion = name;
+            _documentation = documentation;
+            _type = () => type;
+            _vars = () => Empty;
         }
 
         internal MemberResult(string name, string completion, IEnumerable<AnalysisValue> vars, JsMemberType? type) {
+            _documentation = null;
             _name = name;
             _vars = () => vars;
             _completion = completion;
@@ -51,6 +62,7 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         internal MemberResult(string name, Func<IEnumerable<AnalysisValue>> vars, Func<JsMemberType> type) {
+            _documentation = null;
             _name = _completion = name;
             _vars = vars;
             _type = type;
@@ -72,6 +84,10 @@ namespace Microsoft.NodejsTools.Analysis {
 
         public string Documentation {
             get {
+                if (_documentation != null) {
+                    return _documentation;
+                }
+
                 var docSeen = new HashSet<string>();
                 var typeSeen = new HashSet<string>();
                 var docs = new List<string>();

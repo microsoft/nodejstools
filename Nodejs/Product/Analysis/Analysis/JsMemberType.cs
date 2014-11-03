@@ -32,7 +32,9 @@ namespace Microsoft.NodejsTools.Analysis {
         Number,
         String,
         Function,
-
+        /// <summary>
+        /// An instance of a built-in or user defined module
+        /// </summary>
         Module,
         Multiple,
         Keyword,

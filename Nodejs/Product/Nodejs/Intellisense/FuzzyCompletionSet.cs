@@ -166,17 +166,12 @@ namespace Microsoft.NodejsTools.Intellisense {
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        /// <param name="moniker">The unique, non-localized identifier for the
-        /// completion set.</param>
-        /// <param name="displayName">The localized name of the completion set.
-        /// </param>
-        /// <param name="applicableTo">The tracking span to which the
-        /// completions apply.</param>
+        /// <param name="moniker">The unique, non-localized identifier for the completion set.</param>
+        /// <param name="displayName">The localized name of the completion set.</param>
+        /// <param name="applicableTo">The tracking span to which the completions apply.</param>
         /// <param name="completions">The list of completions.</param>
-        /// <param name="options">The options to use for filtering and
-        /// selecting items.</param>
-        /// <param name="comparer">The comparer to use to order the provided
-        /// completions.</param>
+        /// <param name="options">The options to use for filtering and selecting items.</param>
+        /// <param name="comparer">The comparer to use to order the provided completions.</param>
         /// <param name="matchInsertionText">If true, matches user input against
         /// the insertion text; otherwise, uses the display text.</param>
         public FuzzyCompletionSet(

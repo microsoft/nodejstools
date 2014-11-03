@@ -159,6 +159,7 @@
     <Compile Include="..\..\..\Common\Product\SharedProject\DebugTimer.cs">
       <Link>DebugTimer.cs</Link>
     </Compile>
+    <Compile Include="AnalysisConstants.cs" />
     <Compile Include="Analysis\AnalysisDictionary.cs" />
     <Compile Include="Analysis\AnalysisExtensions.cs" />
     <Compile Include="Analysis\AnalysisHashSet.cs" />
@@ -210,6 +211,7 @@
     <Compile Include="Analysis\IEnumerableExtensions.cs" />
     <Compile Include="Analysis\IndexSpan.cs" />
     <Compile Include="Analysis\NodejsModuleBuilder.cs" />
+    <Compile Include="Analysis\Values\BuiltinModuleValue.cs" />
     <Compile Include="Analysis\Values\BuiltinObjectValue.cs" />
     <Compile Include="Analysis\Values\GlobalValue.cs" />
     <Compile Include="Analysis\Values\ImmutableObjectValue.cs" />
@@ -219,7 +221,7 @@
     <Compile Include="Analysis\BuiltinTypeId.cs" />
     <Compile Include="Analysis\Values\ExpandoValue.cs" />
     <Compile Include="Analysis\Values\ExportsValue.cs" />
-    <Compile Include="Analysis\NodejsMemberType.cs" />
+    <Compile Include="Analysis\JsMemberType.cs" />
     <Compile Include="Analysis\IOverloadResult.cs" />
     <Compile Include="Analysis\LocationInfo.cs" />
     <Compile Include="Analysis\MemberResult.cs" />

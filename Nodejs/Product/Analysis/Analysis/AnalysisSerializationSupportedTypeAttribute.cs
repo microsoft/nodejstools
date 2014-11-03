@@ -38,6 +38,7 @@ using Microsoft.NodejsTools.Parsing;
 [assembly: AnalysisSerializationSupportedType(typeof(UserFunctionValue.CallInfo))]
 [assembly: AnalysisSerializationSupportedType(typeof(ExpandoValue))]
 [assembly: AnalysisSerializationSupportedType(typeof(ObjectValue))]
+[assembly: AnalysisSerializationSupportedType(typeof(BuiltinModuleValue))]
 [assembly: AnalysisSerializationSupportedType(typeof(BuiltinObjectValue))]
 [assembly: AnalysisSerializationSupportedType(typeof(BuiltinObjectPrototypeValue))]
 [assembly: AnalysisSerializationSupportedType(typeof(NullValue))]

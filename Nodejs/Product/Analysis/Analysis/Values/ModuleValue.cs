@@ -14,11 +14,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Text;
 using Microsoft.NodejsTools.Analysis.Analyzer;
-using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Values {
     [Serializable]
@@ -66,11 +63,6 @@ namespace Microsoft.NodejsTools.Analysis.Values {
 
         public override string Documentation {
             get {
-#if FALSE
-                if (ProjectEntry.Tree != null && ProjectEntry.Tree.Body != null) {
-                    return ProjectEntry.Tree.Block.Documentation.TrimDocumentation() ?? String.Empty;
-                }
-#endif
                 return String.Empty;
             }
         }

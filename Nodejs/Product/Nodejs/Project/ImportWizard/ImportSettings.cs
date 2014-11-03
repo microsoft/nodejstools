@@ -311,8 +311,8 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
                     .Where(ShouldIncludeDirectory)
             );
             if (excludeNodeModules) {
-                folders.Remove("node_modules");
-                folders.RemoveWhere(folder => folder.StartsWith("node_modules\\", StringComparison.OrdinalIgnoreCase));
+                folders.Remove(NodejsConstants.NodeModulesFolder);
+                folders.RemoveWhere(folder => folder.StartsWith(NodejsConstants.NodeModulesFolder + "\\", StringComparison.OrdinalIgnoreCase));
             }
             writer.WriteStartElement("ItemGroup");
             foreach (var file in EnumerateAllFiles(sourcePath, filters, excludeNodeModules)) {

@@ -23,7 +23,7 @@ using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis {
     /// <summary>
-    /// Provides interactions to analysis a single file in a project and get the results back.
+    /// Provides interactions to analyze a single file in a project and get the results back.
     /// 
     /// To analyze a file the tree should be updated with a call to UpdateTree and then PreParse
     /// should be called on all files.  Finally Parse should then be called on all files.
@@ -67,7 +67,7 @@ namespace Microsoft.NodejsTools.Analysis {
             return res;
         }
 
-        [field:NonSerialized]
+        [field: NonSerialized]
         public event EventHandler<EventArgs> NewParseTree;
 
         private void OnNewParseTree(object sender, EventArgs e) {
@@ -77,7 +77,7 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-        [field:NonSerialized]
+        [field: NonSerialized]
         public event EventHandler<EventArgs> NewAnalysis;
 
         private void OnNewAnalysis(object sender, EventArgs e) {
@@ -242,23 +242,31 @@ namespace Microsoft.NodejsTools.Analysis {
 
             // publish the analysis now that it's complete
             _currentAnalysis = new ModuleAnalysis(
-                _unit, 
+                _unit,
                 ((ModuleEnvironmentRecord)_unit.Environment).CloneForPublish(),
                 cookie);
         }
 
-        internal ExportsValue InitNodejsVariables() {
+        internal ExportsValue InitNodejsVariables(string documentation) {
             var filename = _analyzer.GetConstant(_filePath);
             var dirName = _analyzer.GetConstant(String.IsNullOrWhiteSpace(_filePath) ? "" : Path.GetDirectoryName(_filePath), alwaysCache: true);
-            var module = _module = new ModuleValue(_filePath, _moduleRecord);
+            if (documentation == null) {
+                _module = new ModuleValue(_filePath, _moduleRecord);
+            } else {
+                _module = new BuiltinModuleValue(_filePath, documentation, _moduleRecord);
+            }
             var exports = new ExportsValue(_filePath, this);
-            module.Add("exports", exports.Proxy);
+            _module.Add("exports", exports.Proxy);
 
             EnvironmentRecord.GetOrAddVariable("__dirname").AddTypes(this, dirName.Proxy);
             EnvironmentRecord.GetOrAddVariable("__filename").AddTypes(this, filename.Proxy);
             EnvironmentRecord.GetOrAddVariable("exports").AddTypes(this, exports.Proxy);
-            EnvironmentRecord.GetOrAddVariable("module").AddTypes(this, module.Proxy);
+            EnvironmentRecord.GetOrAddVariable("module").AddTypes(this, _module.Proxy);
             return exports;
+        }
+
+        internal ExportsValue InitNodejsVariables() {
+            return InitNodejsVariables(null);
         }
 
         public ModuleEnvironmentRecord EnvironmentRecord {
@@ -300,6 +308,12 @@ namespace Microsoft.NodejsTools.Analysis {
         public ModuleValue GetModule(AnalysisUnit unit) {
             _moduleDeps.AddDependency(unit);
             return _module;
+        }
+
+        internal ModuleValue Module {
+            get {
+                return _module;
+            }
         }
 
         public string ModuleName {
@@ -438,7 +452,7 @@ namespace Microsoft.NodejsTools.Analysis {
             get;
         }
 
-        
+
         event EventHandler<EventArgs> NewParseTree;
         event EventHandler<EventArgs> NewAnalysis;
 

@@ -453,6 +453,22 @@ namespace Microsoft.NodejsTools.Intellisense {
             return ExpressionAnalysis.Empty;
         }
 
+        public static CompletionAnalysis GetRequireCompletions(ITextSnapshot snapshot, ITrackingSpan applicableSpan, ITrackingPoint point, bool? doubleQuote) {
+            var span = applicableSpan.GetSpan(snapshot);
+
+            if (IsSpaceCompletion(snapshot, point) && !IntellisenseController.ForceCompletions) {
+                return CompletionAnalysis.EmptyCompletionContext;
+            }
+
+            return new RequireCompletionAnalysis(
+                snapshot.TextBuffer.GetAnalyzer(),
+                snapshot,
+                applicableSpan,
+                snapshot.TextBuffer,
+                doubleQuote
+            );
+        }
+
         /// <summary>
         /// Gets a CompletionList providing a list of possible members the user can dot through.
         /// </summary>
@@ -1197,7 +1213,6 @@ namespace Microsoft.NodejsTools.Intellisense {
                     // String completion
                     return CompletionAnalysis.EmptyCompletionContext;
                 }
-
                 return null;
             }
 

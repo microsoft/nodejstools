@@ -1,4 +1,18 @@
-﻿using System;
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +21,7 @@ using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
 
 namespace Microsoft.NodejsTools.Intellisense {
-    class NormalCompletionAnalysis : CompletionAnalysis {
+    internal class NormalCompletionAnalysis : CompletionAnalysis {
         private readonly VsProjectAnalyzer _analyzer;
         private readonly ITextSnapshot _snapshot;
         private readonly ITrackingSpan _applicableSpan;
@@ -70,30 +84,6 @@ namespace Microsoft.NodejsTools.Intellisense {
                 () => service.GetGlyph(GetGlyphGroup(memberResult), StandardGlyphItem.GlyphItemPublic),
                 String.Empty
             );
-        }
-
-        private static StandardGlyphGroup GetGlyphGroup(MemberResult result) {
-            switch(result.MemberType) {
-                case JsMemberType.Function:
-                    return StandardGlyphGroup.GlyphGroupMethod;
-                case JsMemberType.Keyword:
-                    return StandardGlyphGroup.GlyphKeyword;
-                case JsMemberType.Module:
-                    return StandardGlyphGroup.GlyphGroupModule;
-                case JsMemberType.Multiple:
-                case JsMemberType.Object:
-                    return StandardGlyphGroup.GlyphGroupClass;
-                case JsMemberType.Boolean:
-                case JsMemberType.String:
-                case JsMemberType.Number:
-                    return StandardGlyphGroup.GlyphGroupValueType;
-                case JsMemberType.Undefined:
-                    return StandardGlyphGroup.GlyphGroupException;
-                case JsMemberType.Null:
-                    return StandardGlyphGroup.GlyphGroupConstant;
-                default:
-                    return StandardGlyphGroup.GlyphGroupUnknown;
-            }
         }
 
         private string FixupCompletionText(string exprText) {

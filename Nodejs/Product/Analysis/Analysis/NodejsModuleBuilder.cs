@@ -43,15 +43,16 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         public void Build() {
+
             Dictionary<string, ExportsValue> exportsTable = new Dictionary<string, ExportsValue>();
             // run through and initialize all of the modules.
             foreach (var module in _all["modules"]) {
                 var moduleName = FixModuleName((string)module["name"]);
-                var entry = new ProjectEntry(_analyzer, "builtin:" + moduleName, null, true);
-
+                var entry = new ProjectEntry(_analyzer, moduleName, null, true);
+                var documentation = ParseDocumentation(module["desc"]);
                 _analyzer.Modules.AddModule(moduleName, entry);
 
-                exportsTable[moduleName] = entry.InitNodejsVariables();
+                exportsTable[moduleName] = entry.InitNodejsVariables(documentation);
             }
 
             // next create all of the classes

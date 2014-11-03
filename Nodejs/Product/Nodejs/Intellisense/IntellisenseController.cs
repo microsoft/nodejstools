@@ -143,6 +143,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                             TriggerCompletionSession(false);
                         }
                         break;
+                    case '/':
                     case '\'':
                     case '"':
                         if (CompletionSource.ShouldTriggerRequireIntellisense(_textView.Caret.Position.BufferPosition, _classifier, true, true)) {
@@ -490,14 +491,19 @@ namespace Microsoft.NodejsTools.Intellisense {
                                 return VSConstants.S_OK;
                             }
                         }
-                    } else if (!IsIdentifierChar(ch)) {
+                    } else if (_activeSession.SelectedCompletionSet.Moniker.Equals(CompletionSource.NodejsRequireCompletionSetMoniker) && !IsRequireIdentifierChar(ch)) {
+                        _activeSession.Dismiss();
+                    } else if (!_activeSession.SelectedCompletionSet.Moniker.Equals(CompletionSource.NodejsRequireCompletionSetMoniker) && !IsIdentifierChar(ch)) {
                         _activeSession.Dismiss();
                     }
                 }
 
                 int res = _oldTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
 
-                HandleChar((char)(ushort)System.Runtime.InteropServices.Marshal.GetObjectForNativeVariant(pvaIn));
+                if (_activeSession == null || !_activeSession.SelectedCompletionSet.Moniker.Equals(CompletionSource.NodejsRequireCompletionSetMoniker)) {
+                    //Only process the char if we are not in a require completion
+                    HandleChar((char)(ushort)System.Runtime.InteropServices.Marshal.GetObjectForNativeVariant(pvaIn));
+                }
 
                 if (_activeSession != null && !_activeSession.IsDismissed) {
                     _activeSession.Filter();
@@ -602,6 +608,13 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
 
             return _oldTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+        }
+
+        private static bool IsRequireIdentifierChar(char ch) {
+            return ch == '_'
+                || ch == '.'
+                || ch == '/'
+                || (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9');
         }
 
         private static bool IsIdentifierChar(char ch) {

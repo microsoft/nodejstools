@@ -37,21 +37,5 @@ namespace Microsoft.NodejsTools.Intellisense {
             Description = description;
             Glyph = glyph;
         }
-
-        public Completion ToCompletion(bool? doubleQuote) {
-            return new Completion(
-                DisplayText,
-                GetInsertionQuote(doubleQuote, DisplayText),
-                Description,
-                Glyph,
-                null
-            );
-        }
-
-        internal static string GetInsertionQuote(bool? doubleQuote, string filename) {
-            return doubleQuote == null ?
-                "\'" + filename + "\'" :
-                doubleQuote.Value ? filename + "\"" : filename + "'";
-        }
     }
 }

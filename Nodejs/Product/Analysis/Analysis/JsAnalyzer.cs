@@ -198,7 +198,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 return Modules.Modules;
             }
         }
-
+        
         public AnalysisLimits Limits {
             get { return _limits; }
             set { _limits = value; }

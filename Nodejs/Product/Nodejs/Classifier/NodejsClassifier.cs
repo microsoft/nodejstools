@@ -263,7 +263,7 @@ namespace Microsoft.NodejsTools.Classifier {
                     // member.get
                     return true;
                 }
-                
+
                 if (prevValue.Category == TokenCategory.Keyword &&
                     snapshot.GetText(SnapshotSpanToSpan(snapshot, prevValue, lineNumber)) == "function") {
                     // https://nodejstools.codeplex.com/workitem/976
@@ -285,7 +285,7 @@ namespace Microsoft.NodejsTools.Classifier {
                     }
                 }
             }
-            
+
 
             return false;
         }

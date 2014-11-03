@@ -262,8 +262,7 @@ namespace Microsoft.NodejsTools.Analysis {
             if (expr == null) {
                 return new MemberResult[0];
             }
-            if (expr is ConstantWrapper && ((ConstantWrapper)expr).Value is int)
-            {
+            if (expr is ConstantWrapper && ((ConstantWrapper)expr).Value is int) {
                 // no completions on integer ., the user is typing a float
                 return new MemberResult[0];
             }
@@ -343,7 +342,7 @@ namespace Microsoft.NodejsTools.Analysis {
             if (options.ExpressionKeywords()) {
                 // keywords available in any context
                 keywords = _exprKeywords;
-            } else  {
+            } else {
                 keywords = Enumerable.Empty<string>();
             }
 
@@ -574,9 +573,9 @@ namespace Microsoft.NodejsTools.Analysis {
                             }
                         }
 
-                    lastStart = env.GetStart(parent);
+                        lastStart = env.GetStart(parent);
+                    }
                 }
-            }
             }
             return curEnv;
         }
@@ -609,7 +608,8 @@ namespace Microsoft.NodejsTools.Analysis {
                                 }
                                 newName.Append(", ");
                             }
-                            if (newName.Length > 200) break;
+                            if (newName.Length > 200)
+                                break;
                         }
                         // Restrict the entire completion string to 200 characters
                         if (newName.Length > 200) {
@@ -673,6 +673,83 @@ namespace Microsoft.NodejsTools.Analysis {
                 scope
             );
         }
+
+        internal IEnumerable<MemberResult> GetModules() {
+            //TODO - Handle require('../a/b/c.js'
+            
+            List<MemberResult> res = new List<MemberResult>();
+
+            //Add the builtIns
+            foreach (var m in ProjectState.Modules.BuiltinModules) {
+                res.Add(new MemberResult(
+                    m.ModuleName,
+                    m.Module.Documentation,
+                    JsMemberType.Module));
+            }
+
+            ModuleTree moduleTree = ProjectState.Modules.GetModuleTree(ModuleName);
+            if (moduleTree == null || moduleTree.Parent == null) {
+                return res;
+            }
+
+            ModuleTree parentMT = moduleTree.Parent;
+            //Walk up the tree looking for node_modules
+            do {
+                ModuleTree nodeModules;
+                if (parentMT.Children.TryGetValue(AnalysisConstants.NodeModulesFolder, out nodeModules)) {
+                    foreach (var child in GetChildrenExcludingNodeModules(nodeModules)) {
+                        var module = ModuleTable.ResolveModule(child.Parent, child.Name);
+                        if (module != null) {
+                            res.Add(MakeProjectMemberResult(module.Name));
+                        }
+                    }
+                }
+                parentMT = parentMT.Parent;
+            } while (parentMT != null);
+
+            foreach (var sibling in GetChildrenExcludingNodeModules(moduleTree.Parent)) {
+                if (sibling == moduleTree) {
+                    //Don't let us require ourself
+                    continue;
+                }
+                if (sibling.ProjectEntry != null) {
+                    res.Add(MakeProjectMemberResult("./" + sibling.Name));
+                } else {
+                    //We're looking at a folder include the children
+                    GetChildModules(res, sibling, "./" + sibling.Name + "/");
+                }
+            }
+            return res;
+        }
+
+        private MemberResult MakeProjectMemberResult(string module) {
+            return new MemberResult(
+                module,
+                module + " (in project)",
+                JsMemberType.Module);
+        }
+
+        private IEnumerable<ModuleTree> GetChildrenExcludingNodeModules(ModuleTree moduleTree) {
+            if (moduleTree == null) {
+                return Enumerable.Empty<ModuleTree>();
+            }
+            //Children.Values returns an IEnumerable
+            //  The process of resolving modules can lead us to add entries into the underlying array
+            //  doing so results in exceptions b/c the array has changed under the enumerable
+            //  To avoid this, we call .ToArray() to create a copy of the array locally which we then Enumerate
+            return moduleTree.Children.Values.ToArray().Where(mod => !String.Equals(mod.Name, AnalysisConstants.NodeModulesFolder, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private void GetChildModules(List<MemberResult> res, ModuleTree moduleTree, string projectRelative) {
+            foreach (var child in GetChildrenExcludingNodeModules(moduleTree)) {
+                Debug.Assert(child.Name != AnalysisConstants.NodeModulesFolder);
+                if (child.ProjectEntry == null) {
+                    GetChildModules(res, child, projectRelative + child.Name + "/");
+                } else {
+                    res.Add(MakeProjectMemberResult(projectRelative + child.Name));
+                }
+            }
+        }
     }
 
     class VariableTransformer {
@@ -706,7 +783,7 @@ namespace Microsoft.NodejsTools.Analysis {
             if (func != null &&
                 func.ProjectEntry.Tree != null &&
                 func.DeclaringVersion == func.ProjectEntry.AnalysisVersion) {
-                    var start = func.FunctionObject;
+                var start = func.FunctionObject;
 
                 yield return new AnalysisVariable(VariableType.Definition, func.ProjectEntry.Tree.ResolveLocation(func.ProjectEntry, start));
             }
