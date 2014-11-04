@@ -256,6 +256,47 @@ bar""
 #endif
         }
 
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        public void BraceCompletion_BasicTests() {
+#if DEV12_OR_LATER
+            var props = VsIdeTestHostContext.Dte.get_Properties("TextEditor", "Node.js");
+            bool? oldValue = null;
+            try {
+                oldValue = (bool)props.Item("BraceCompletion").Value;
+                props.Item("BraceCompletion").Value = true;
+#endif
+                var testCases = new[] {
+
+                // auto indent after return during brace completion
+                // https://nodejstools.codeplex.com/workitem/1466
+                new {
+                    Typed = "function myfunc(name){\rm();",
+                    Expected = "function myfunc(name){\r\n    m();\r\n}"
+                },
+            };
+
+                using (var solution = BasicProject.Generate().ToVs()) {
+                    foreach (var testCase in testCases) {
+                        Console.WriteLine("Typing  : {0}", testCase.Typed);
+                        Console.WriteLine("Expected: {0}", testCase.Expected);
+                        AutoIndentTest(
+                            solution,
+                            testCase.Typed,
+                            testCase.Expected
+                        );
+                    }
+                }
+#if DEV12_OR_LATER
+            } finally {
+                if (oldValue != null) {
+                    props.Item("BraceCompletion").Value = oldValue;
+                }
+            }
+#endif
+        }
+
         private static void AutoIndentTest(VisualStudioSolution solution, string typedText, string expectedText) {
             var doc = solution.OpenItem("AutoIndent", "server.js");
             doc.MoveCaret(1, 1);

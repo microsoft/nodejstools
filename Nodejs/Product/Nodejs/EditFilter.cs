@@ -100,8 +100,14 @@ namespace Microsoft.NodejsTools {
                             !_intellisenseStack.TopSession.IsDismissed) {
                             ((ICompletionSession)_intellisenseStack.TopSession).Commit();
                         } else {
+                            SnapshotPoint start, end;
+                            var startEndFound = GetStartAndEndOfCurrentLine(out start, out end);
+
                             hr = _next.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-                            FormatOnEnter();
+
+                            if (startEndFound) {
+                                FormatOnEnter(start, end);
+                            }
                             return hr;
                         }
                         return VSConstants.S_OK;
@@ -733,14 +739,18 @@ namespace Microsoft.NodejsTools {
 
         #region Formatting support
 
-        private FormattingOptions CreateFormattingOptions() {
+        private FormattingOptions CreateFormattingOptions(){
+            return CreateFormattingOptions(_editorOptions);
+        }
+
+        internal static FormattingOptions CreateFormattingOptions(IEditorOptions editorOptions) {
             FormattingOptions res = new FormattingOptions();
-            if (_editorOptions.IsConvertTabsToSpacesEnabled()) {
-                res.SpacesPerIndent = _editorOptions.GetIndentSize();
+            if (editorOptions.IsConvertTabsToSpacesEnabled()) {
+                res.SpacesPerIndent = editorOptions.GetIndentSize();
             } else {
                 res.SpacesPerIndent = null;
             }
-            res.NewLine = _editorOptions.GetNewLineCharacter();
+            res.NewLine = editorOptions.GetNewLineCharacter();
 
             res.SpaceAfterComma = NodejsPackage.Instance.FormattingSpacingOptionsPage.SpaceAfterComma;
             res.SpaceAfterSemiColonInFor = NodejsPackage.Instance.FormattingSpacingOptionsPage.SpaceAfterSemicolonInFor;
@@ -754,6 +764,7 @@ namespace Microsoft.NodejsTools {
 
             return res;
         }
+
         private void FormatSelection() {
             var insertionPoint = _textView.BufferGraph.MapDownToInsertionPoint(
                 _textView.Selection.Start.Position,
@@ -793,7 +804,29 @@ namespace Microsoft.NodejsTools {
             }
         }
 
-        private void FormatOnEnter() {
+        private bool GetStartAndEndOfCurrentLine(out SnapshotPoint start, out SnapshotPoint end) {
+            var insertionPoint = _textView.BufferGraph.MapDownToInsertionPoint(
+                    _textView.Caret.Position.BufferPosition,
+                    PointTrackingMode.Negative,
+                    x => x.ContentType.IsOfType(NodejsConstants.Nodejs)
+                );
+
+            if (insertionPoint != null) {
+                var buffer = insertionPoint.Value.Snapshot.TextBuffer;
+                var line = insertionPoint.Value.GetContainingLine();
+
+                start = buffer.CurrentSnapshot.GetLineFromLineNumber(line.LineNumber).Start;
+                end = line.End;
+
+                return true;
+            }
+
+            start = new SnapshotPoint();
+            end = new SnapshotPoint();
+            return false;
+        }
+
+        private void FormatOnEnter(SnapshotPoint start, SnapshotPoint end) {
             if (NodejsPackage.Instance.FormattingGeneralOptionsPage.FormatOnEnter) {
                 var insertionPoint = _textView.BufferGraph.MapDownToInsertionPoint(
                     _textView.Caret.Position.BufferPosition,
@@ -814,8 +847,8 @@ namespace Microsoft.NodejsTools {
                                 buffer,
                                 Formatter.GetEditsAfterEnter(
                                     buffer.CurrentSnapshot.GetText(),
-                                    buffer.CurrentSnapshot.GetLineFromLineNumber(line.LineNumber - 1).Start,
-                                    line.End,
+                                    start.TranslateTo(buffer.CurrentSnapshot, PointTrackingMode.Negative),
+                                    end.TranslateTo(buffer.CurrentSnapshot, PointTrackingMode.Positive),
                                     CreateFormattingOptions()
                                 )
                             );
