@@ -37,6 +37,10 @@ function _find_sdk_tool {
 function begin_sign_files {
     param($files, $outdir, $approvers, $projectName, $projectUrl, $jobDescription, $jobKeywords, $certificates, [switch] $delaysigned)
     
+    if ($files.Count -eq 0) {
+        return
+    }
+    
     if ($delaysigned) {
         # Ensure that all files are delay-signed
         # "sn -q -v ..." is true if the assembly has strong name and skip verification
@@ -44,7 +48,8 @@ function begin_sign_files {
         if (Test-Path alias:\sn) {
             $not_delay_signed = $files | %{ gi $_.path } | ?{ sn -q -v $_ }
             if ($not_delay_signed) {
-                Write-Error "Delay-signed check failed: $($not_delay_signed | %{ $_.Name })" -EA Stop
+                Throw "Delay-signed check failed: $($not_delay_signed | %{ $_.Name })
+You may need to skip strong name verification on this machine."
             }
         }
     }
@@ -115,6 +120,10 @@ Returning @{filecount=$($files.Count); outdir=$outdir}"
 function end_sign_files {
     param($jobs)
     
+    if ($jobs.Count -eq 0) {
+        return
+    }
+    
     foreach ($jobinfo in $jobs) {
         $job = $jobinfo.job
         if($job -eq $null) {
@@ -142,12 +151,32 @@ function end_sign_files {
         
         mkdir $outdir -EA 0 | Out-Null
         Write-Progress -Activity $activity -Completed
+
         Write-Output "Copying from $jobCompletionPath to $outdir"
-        copy -path $jobCompletionPath\* -dest $outdir -Force
-        if (-not $?) {
-            Write-Output "Failed to copy $jobCompletionPath to $outdir"
+        $retries = 9
+        $delay = 2
+        $copied = $null
+        while ($retries) {
+            try {
+                $copied = (Copy-Item -path $jobCompletionPath\* -dest $outdir -Force -PassThru)
+                break
+            } catch {
+                if ($retries -eq 0) {
+                    break
+                }
+                Write-Warning "Failed to copy - retrying in $delay seconds ($retries tries remaining)"
+                Sleep -seconds $delay
+                --$retries
+                $delay += $delay
+            }
         }
-        #Get rid of the MockSigned directory        
+        if (-not $copied) {
+            Throw "Failed to copy $jobCompletionPath to $outdir"
+        } else {
+            Write-Output "Copied $($copied.Count) files"
+        }
+
+        #Get rid of the MockSigned directory
         Remove-Item -Recurse $jobCompletionPath\*
         Remove-Item -Recurse $jobCompletionPath
 

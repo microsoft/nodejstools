@@ -21,13 +21,13 @@
     [Optional] The VS version to build for. If omitted, builds for all versions
     that are installed.
     
-    Valid values: "10.0", "11.0", "12.0", "14.0"
+    Valid values: "11.0", "12.0", "14.0"
 
 .Parameter name
     [Optional] A suffix to append to the name of the build.
     
-    Typical values: "Alpha", "RC1", "My Feature Name"
-    (Avoid: "RTM", "2.0")
+    Typical values: "2.1 Alpha", "1.5 RC1", "My Feature Name", "2014-02-11 Dev Build"
+    (Avoid: "RTM", "2.0 RTM")
 
 .Parameter release
     When specified:
@@ -45,7 +45,7 @@
 
 .Parameter internal
     When specified:
-    * `outdir` will default to \\pytools\release\Internal\$name if
+    * `outdir` will default to \\pytools\release\Nodejs\Internal\$name if
       unspecified
     * A build number is generated and appended to `outdir`
      - The build number includes an index
@@ -107,16 +107,21 @@
 
 #>
 [CmdletBinding()]
-param( [string] $outdir, [string] $vsTarget, [string] $name, [switch] $release, [switch] $internal, [switch] $mockrelease, [switch] $scorch, [switch] $skiptests, [switch] $skipclean, [switch] $skipcopy, [switch] $skipdebug,
+param(
+    [string] $outdir,
+    [string] $vsTarget,
+    [string] $name,
+    [switch] $release,
+    [switch] $internal,
+    [switch] $mockrelease,
+    [switch] $scorch,
+    [switch] $skiptests,
+    [switch] $skipclean,
+    [switch] $skipcopy,
+    [switch] $skipdebug,
+    [switch] $skipbuild,
     [switch] $dev
 )
-
-# This value is used to determine the most significant digit of the build number.
-$base_year = 2012
-# This value is used to automatically generate outdir for -release and -internal builds
-$base_outdir = "\\pytools\Release\Nodejs"
-
-$signedbuild = $release -or $mockrelease
 
 $buildroot = (Split-Path -Parent $MyInvocation.MyCommand.Definition)
 while ((Test-Path $buildroot) -and -not (Test-Path "$buildroot\build.root")) {
@@ -124,30 +129,152 @@ while ((Test-Path $buildroot) -and -not (Test-Path "$buildroot\build.root")) {
 }
 Write-Output "Build Root: $buildroot"
 
-if (-not (get-command msbuild -EA 0)) {
-    Write-Error -EA:Stop "
-    Visual Studio build tools are required."
+
+# This value is used to determine the most significant digit of the build number.
+$base_year = 2012
+# This value is used to automatically generate outdir for -release and -internal builds
+$base_outdir = "\\pytools\Release\Nodejs"
+
+# This file is parsed to find version information
+$version_file = gi "$buildroot\Nodejs\Product\AssemblyVersion.cs"
+
+$build_project = gi "$buildroot\Nodejs\dirs.proj"
+$setup_project = gi "$buildroot\Nodejs\Setup\setup.proj"
+
+# Project metadata
+$project_name = "Node.js Tools for Visual Studio"
+$project_url = "http://nodejstools.codeplex.com"
+$project_keywords = "NTVS; Visual Studio; Node.js"
+
+# These people are able to approve code signing operations
+$approvers = "smortaz", "dinov", "stevdo", "pminaev", "gilbertw", "huvalo", "jinglou", "sitani", "crwilcox"
+
+# These people are the contacts for the symbols uploaded to the symbol server
+$symbol_contacts = "$env:username;dinov;smortaz;gilbertw;jinglou"
+
+# This single person or DL is the contact for virus scan notifications
+$vcs_contact = "ntvscore"
+
+# These options are passed to all MSBuild processes
+$global_msbuild_options = @("/v:m", "/m", "/nologo")
+
+if ($skiptests) {
+    $global_msbuild_options += "/p:IncludeTests=false"
+} else {
+    $global_msbuild_options += "/p:IncludeTests=true"
 }
 
-if (-not $outdir -and -not $signedbuild) {
-    if ($internal) {
-        $outdir = "$base_outdir\Internal"
+if ($release -or $mockrelease) {
+    $global_msbuild_options += "/p:ReleaseBuild=true"
+}
+
+if (Test-Path Internal\Nodejs\VsLogger\VsLogger.csproj) {
+    $global_msbuild_options += "/p:IncludeVsLogger=true"
+}
+
+# This function is used to get options for each configuration
+#
+# $target contains the following members:
+#   VSTarget            e.g. 12.0
+#   VSName              e.g. VS 2013
+#   config              Name of the build configuration
+#   version             X.Y.Z.W installer version
+#   release_version     X.Y install version
+#   assembly_version    X.Y.Z assembly version
+#   logfile             Build log file
+#   destdir             Root directory of all outputs
+#   unsigned_bindir     Output directory for unsigned binaries
+#   unsigned_msidir     Output directory for unsigned installers
+#   symboldir           Output directory for debug symbols
+#   final_msidir        The directory where the final installers end up
+#
+# The following members are available if $release or $mockrelease
+#   signed_logfile      Rebuild log file (after signing)
+#   signed_bindir       Output directory for signed binaries
+#   signed_msidir       Output directory for signed installers
+#   signed_unsigned_msidir  Output directory for unsigned installers containing signed binaries
+function msbuild-options($target, $config) {
+    @(
+        "/p:VSTarget=$($target.VSTarget)",
+        "/p:VisualStudioVersion=$($target.VSTarget)",
+        "/p:CopyOutputsToPath=$($target.destdir)",
+        "/p:Configuration=$($target.config)",
+        "/p:Version=$($target.version)",
+        "/p:ReleaseVersion=$($target.release_version)"
+    )
+}
+
+# This function is invoked after each target is built.
+function after-build($buildroot, $target) {
+    Copy-Item -Force "$buildroot\Nodejs\Prerequisites\*.reg" $($target.destdir)
+}
+
+# This function is invoked after the entire build process but before scorching
+function after-build-all($buildroot, $outdir) {
+    if (-not $release) {
+        Copy-Item -Force "$buildroot\Nodejs\Prerequisites\*.reg" $outdir
     }
+}
+
+# Add product name mappings here
+#   {0} will be replaced by the major version preceded by a space
+#   {1} will be replaced by the build name preceded by a space
+#   {2} will be replaced by the VS name preceded by a space
+#   {3} will be replaced by the config ('Debug') marker preceded by a space
+$installer_names = @{
+    'NodejsToolsInstaller.msi'="NTVS{0}{1}{2}{3}.msi";
+}
+
+# Add list of files requiring signing here
+$managed_files = (
+    "Microsoft.NodejsTools.NodeLogConverter.exe", 
+    "Microsoft.NodejsTools.dll", 
+    "Microsoft.NodejsTools.Analysis.dll", 
+    "Microsoft.NodejsTools.InteractiveWindow.dll",
+    "Microsoft.NodejsTools.Profiling.dll",
+    "Microsoft.NodejsTools.ProjectWizard.dll",
+    "Microsoft.NodejsTools.WebRole.dll",
+    "Microsoft.NodejsTools.Npm.dll",
+    "Microsoft.NodejsTools.TestAdapter.dll",
+    "Microsoft.NodejsTools.PressAnyKey.exe",
+    "Microsoft.NodejsTools.VsLogger.dll"
+)
+
+$native_files = @()
+
+$supported_vs_versions = (
+    @{number="14.0"; name="VS 2015"},
+    @{number="12.0"; name="VS 2013"},
+    @{number="11.0"; name="VS 2012"}
+)
+
+# #############################################################################
+# #############################################################################
+#
+# The remainder of this file is product independent.
+#
+# #############################################################################
+# #############################################################################
+
+
+if (-not (Get-Command msbuild -EA 0)) {
+    Throw "Visual Studio build tools are required."
+}
+
+if (-not $outdir -and -not $release) {
     if (-not $outdir) {
-        Write-Error -EA:Stop "
-    Invalid output directory '$outdir'"
+        Throw "Invalid output directory '$outdir'"
     }
 }
 
 if ($dev) {
     if ($name) {
-        Write-Error -EA:Stop "
-    Cannot specify both -dev and -name"
+        Throw "Cannot specify both -dev and -name"
     }
     $name = "Dev {0:yyyy-MM-dd}" -f (Get-Date)
 }
 
-if ($name -eq "RTM") {
+if ($name -match "[0-9.]*\s*RTM") {
     $result = $host.ui.PromptForChoice(
         "Build Name",
         "'RTM' is not a recommended build name. Final releases should have a blank name.",
@@ -165,129 +292,98 @@ if ($name -eq "RTM") {
     }
 }
 
-$spacename = ""
-if ($name) {
-    $spacename = " $name"
-} elseif ($internal) {
-    Write-Error -EA:Stop "
-    '-name [build name]' must be specified when using '-internal'"
-}
-
+$signedbuild = $release -or $mockrelease
 if ($signedbuild) {
-    $signedbuildText = "true"
-    $approvers = "smortaz", "dinov", "stevdo", "pminaev", "gilbertw", "huvalo", "jinglou", "sitani", "crwilcox"
     $approvers = @($approvers | Where-Object {$_ -ne $env:USERNAME})
-    $symbol_contacts = "$env:username;dinov;smortaz;stevdo;gilbertw"
-    
-    $projectName = "Node.js Tools for Visual Studio"
-    $projectUrl = "http://nodejstools.codeplex.com"
-    $projectKeywords = "NTVS; Visual Studio; Node.js"
 
     Push-Location (Split-Path -Parent $MyInvocation.MyCommand.Definition)
     if ($mockrelease) {
         Set-Variable -Name DebugPreference -Value "Continue" -Scope "global"
-        Import-Module -force $buildroot\Common\Setup\ReleaseMockHelpers.psm1
+        Import-Module -Force $buildroot\Build\BuildReleaseMockHelpers.psm1
     } else {
-        Import-Module -force $buildroot\Common\Setup\ReleaseHelpers.psm1
+        Import-Module -Force $buildroot\Build\BuildReleaseHelpers.psm1
     }
     Pop-Location
-} else {
-    $signedbuildText = "false"
 }
 
-# Add new products here
-# $($_.name) is currently unused
-# $($_.msi) is the name of the built MSI
-# $($_.outname1)$(buildname) $(targetvs.name)$($_.outname2) is the name of the final MSI
-$products = @(
-    @{name="NodejsTools";
-      msi="NodejsToolsInstaller.msi";
-      signtag="";
-      outname1="NTVS"; outname2=".msi"
-    }
-)
 
-Push-Location $buildroot
-
-$asmverfileBackedUp = 0
-$asmverfile = Get-ChildItem Nodejs\Product\AssemblyVersion.cs
-# Force use of a backup if there are pending changes to $asmverfile
-$asmverfileUseBackup = 0
-if (-not (tf status $asmverfile /format:detailed | Select-String "There are no pending changes.")) {
-    Write-Output "$asmverfile has pending changes. Using backup instead of tf undo."
-    $asmverfileUseBackup = 1
+$spacename = ""
+if ($name) {
+    $spacename = " $name"
+    $global_msbuild_options += "/p:CustomBuildIdentifier=$name"
+} elseif ($internal) {
+    Throw "'-name [build name]' must be specified when using '-internal'"
 }
-$asmverfileIsReadOnly = $asmverfile.Attributes -band [io.fileattributes]::ReadOnly
 
-$releaseVersion = [regex]::Match((Get-Content $asmverfile), 'ReleaseVersion = "([0-9.]+)";').Groups[1].Value
-$fileVersion = [regex]::Match((Get-Content $asmverfile), 'FileVersion = "([0-9.]+)";').Groups[1].Value
 
-if ($signedbuild -and -not $outdir) {
-    $outdir = "$base_outdir\$fileVersion"
+$version_file_backed_up = 0
+# Force use of a backup if there are pending changes to $version_file
+$version_file_force_backup = 0
+if (-not (tf status $version_file /format:detailed | Select-String "There are no pending changes.")) {
+    Write-Output "$version_file has pending changes. Using backup instead of tf undo."
+    $version_file_force_backup = 1
+}
+$version_file_is_readonly = $version_file.Attributes -band [io.FileAttributes]::ReadOnly
+
+$assembly_version = [regex]::Match((Get-Content $version_file), 'ReleaseVersion = "([0-9.]+)";').Groups[1].Value
+$release_version = [regex]::Match((Get-Content $version_file), 'FileVersion = "([0-9.]+)";').Groups[1].Value
+
+if ($internal) {
+    $base_outdir = "$base_outdir\Internal\$name"
+} elseif ($release) {
+    $base_outdir = "$base_outdir\$release_version"
+}
+
+if (-not $outdir) {
+    $outdir = $base_outdir
 }
 
 $buildnumber = '{0}{1:MMdd}.{2:D2}' -f (((Get-Date).Year - $base_year), (Get-Date), 0)
-if ($signedbuild -or $internal) {
-    if ($internal) {
-        $outdirwithname = "$outdir\$name"
-    } else {
-        $outdirwithname = $outdir
-    }
+if ($release -or $mockrelease -or $internal) {
     for ($buildindex = 0; $buildindex -lt 10000; $buildindex += 1) {
         $buildnumber = '{0}{1:MMdd}.{2:D2}' -f (((Get-Date).Year - $base_year), (Get-Date), $buildindex)
-        if (-not (Test-Path $outdirwithname\$buildnumber)) {
+        if (-not (Test-Path $outdir\$buildnumber)) {
             break
         }
         $buildnumber = ''
     }
 }
 if (-not $buildnumber) {
-    Write-Error -EA:Stop "
-    Cannot create version number. Try another output folder."
+    Throw "Cannot create version number. Try another output folder."
 }
 if ([int]::Parse([regex]::Match($buildnumber, '^[0-9]+').Value) -ge 65535) {
-    Write-Error -EA:Stop "
-    Build number $buildnumber is invalid. Update `$base_year in this script.
-    (If the year is not yet $($base_year + 7) then something else has gone wrong.)"
+    Throw "Build number $buildnumber is invalid. Update `$base_year in this script.
+(If the year is not yet $($base_year + 7) then something else has gone wrong.)"
 }
 
-$version = "$fileVersion.$buildnumber"
+$version = "$release_version.$buildnumber"
 
-if ($internal) {
-    $outdir = "$outdir\$name\$buildnumber"
-} elseif ($signedbuild) {
+if ($internal -or $release -or $mockrelease) {
     $outdir = "$outdir\$buildnumber"
 }
 
-$supportedVersions = @{number="14.0"; name="VS 14"}, @{number="12.0"; name="VS 2013"}, @{number="11.0"; name="VS 2012"}
-$targetVersions = @()
+$target_versions = @()
 
-foreach ($targetVs in $supportedVersions) {
-    if (-not $vstarget -or ($vstarget -match $targetVs.number)) {
-        $vspath = Get-ItemProperty -Path "HKLM:\Software\Wow6432Node\Microsoft\VisualStudio\$($targetVs.number)" -EA 0
+foreach ($target_vs in $supported_vs_versions) {
+    if (-not $vstarget -or ($vstarget -match $target_vs.number)) {
+        $vspath = Get-ItemProperty -Path "HKLM:\Software\Wow6432Node\Microsoft\VisualStudio\$($target_vs.number)" -EA 0
         if (-not $vspath) {
-            $vspath = Get-ItemProperty -Path "HKLM:\Software\Microsoft\VisualStudio\$($targetVs.number)" -EA 0
+            $vspath = Get-ItemProperty -Path "HKLM:\Software\Microsoft\VisualStudio\$($target_vs.number)" -EA 0
         }
         if ($vspath -and $vspath.InstallDir -and (Test-Path -Path $vspath.InstallDir)) {
-            $targetVersions += $targetVs
+            $target_versions += $target_vs
         }
     }
 }
 
-if (-not $targetVersions) {
-    Write-Error -EA:Stop "
-    No supported versions of Visual Studio installed."
+if (-not $target_versions) {
+    Throw "No supported versions of Visual Studio installed."
 }
 
-if ($skipdebug -or $signedbuild) {
-    $targetConfigs = ("Release")
+if ($skipdebug -or $release) {
+    $target_configs = ("Release")
 } else {
-    $targetConfigs = ("Debug", "Release")
-}
-
-$target = "Rebuild"
-if ($skipclean) {
-    $target = "Build"
+    $target_configs = ("Debug", "Release")
 }
 
 Write-Output ""
@@ -298,271 +394,247 @@ if ($name) {
 }
 Write-Output "Output Dir: $outdir"
 if ($mockrelease) {
-    Write-Output "Auto-generated release outdir: $base_outdir\$fileVersion\$buildnumber"
+    Write-Output "Auto-generated release outdir: $base_outdir\$release_version\$buildnumber"
 }
 Write-Output ""
-Write-Output "Product version: $releaseversion.`$(VS version)"
+Write-Output "Product version: $assembly_version.`$(VS version)"
 Write-Output "File version: $version"
-foreach ($targetVs in $targetversions) {
-    Write-Output "Building for: $($targetVs.name)"
-}
+Write-Output "Building for $([String]::Join(", ", ($target_versions | % { $_.name })))"
+Write-Output ""
+Write-Output "============================================================"
 Write-Output ""
 
 if (-not $skipclean) {
-    if (Test-Path $outdir) {
+    if ((Test-Path $outdir) -and (Get-ChildItem $outdir)) {
         Write-Output "Cleaning previous release in $outdir"
-        rmdir -Recurse -Force $outdir -EA 0
-        while ((Test-Path $outdir -EA 0) -or -not $?) {
+        del -Recurse -Force $outdir\* -EA 0
+        while (Get-ChildItem $outdir) {
             Write-Output "Failed to clean release. Retrying in five seconds. (Press Ctrl+C to abort)"
             Sleep -Seconds 5
-            rmdir -Recurse -Force $outdir -EA 0
+            del -Recurse -Force $outdir\* -EA 0
         }
     }
-    mkdir $outdir -EA 0 | Out-Null
-    if (-not $?) {
-        Write-Error -EA:Stop "
-    Could not make output directory: $outdir"
+    if (-not (Test-Path $outdir)) {
+        mkdir $outdir -EA 0 | Out-Null
+        if (-not $?) {
+            Throw "Could not make output directory: $outdir"
+        }
     }
 }
 
 if ($scorch) {
-    tfpt scorch /noprompt
+    tfpt scorch $buildroot /noprompt
 }
 
 $failed_logs = @()
 
+Push-Location $buildroot
 try {
     $successful = $false
-    if ($asmverfileUseBackup -eq 0) {
-        tf edit $asmverfile
+    if (-not $version_file_force_backup) {
+        tf edit $version_file | Out-Null
     }
-    if ($asmverfileUseBackup -or $LASTEXITCODE -gt 0) {
+    if ($version_file_force_backup -or -not $?) {
         # running outside of MS
-        Copy-Item -force $asmverfile "$($asmverfile).bak"
-        $asmverfileBackedUp = 1
+        Copy-Item -Force $version_file "$($version_file).bak"
+        $version_file_backed_up = 1
     }
-    Set-ItemProperty $asmverfile -Name IsReadOnly -Value $false
-    (Get-Content $asmverfile) | %{ $_ -replace ' = "4100.00"', (' = "' + $buildnumber + '"') } | Set-Content $asmverfile
+    Set-ItemProperty $version_file -Name IsReadOnly -Value $false
+    (Get-Content $version_file) | %{ $_ -replace ' = "4100.00"', (' = "' + $buildnumber + '"') } | Set-Content $version_file
 
+    foreach ($config in $target_configs) {
+        # See the description near the msbuild_config function
+        $target_info = @($target_versions | %{ 
+            $i = @{
+                VSTarget=$($_.number);
+                VSName=$($_.name);
+                destdir=mkdir "$outdir\$($_.name)\$config" -Force;
+                logfile="$outdir\$($_.name)\BuildRelease.$config.$($_.number).log";
+                config=$config;
+                version=$version;
+                release_version=$release_version;
+            }
+            $i.unsigned_bindir = mkdir "$($i.destdir)\UnsignedBinaries" -Force;
+            $i.unsigned_msidir = mkdir "$($i.destdir)\UnsignedMsi" -Force;
+            $i.symboldir = mkdir "$($i.destdir)\Symbols" -Force
+            if ($signedBuild) {
+                $i.signed_bindir = mkdir "$($i.destdir)\SignedBinaries" -Force
+                $i.signed_unsigned_msidir = mkdir "$($i.destdir)\SignedBinariesUnsignedMsi" -Force
+                $i.signed_msidir = mkdir "$($i.destdir)\SignedMsi" -Force
+                $i.final_msidir = $i.signed_msidir
+                $i.signed_logfile = "$outdir\$($_.name)\BuildRelease_Signed.$config.$($_.number).log"
+            } else {
+                $i.final_msidir = $i.unsigned_msidir
+            }
+            $i
+        })
+        
+        foreach ($i in $target_info) {
+            if (-not $skipbuild) {
+                $target_msbuild_options = msbuild-options $i
+                if (-not $skipclean) {
+                    msbuild /t:Clean $global_msbuild_options $target_msbuild_options $build_project
+                }
+                msbuild $global_msbuild_options $target_msbuild_options /fl /flp:logfile=$($i.logfile) $build_project
 
-    foreach ($config in $targetConfigs) {
-        foreach ($targetVs in $targetVersions) {
-            $bindir = "Binaries\$config$($targetVs.number)"
-            $destdir = "$outdir\$($targetVs.name)\$config"
-            mkdir $destdir -EA 0 | Out-Null
-            $includeVsLogger = test-path Internal\Nodejs\VsLogger\VsLogger.csproj
-            
-            if (-not $skiptests)
-            {
-                msbuild /m /v:m /fl /flp:"Verbosity=n;LogFile=BuildRelease.$config.$($targetVs.number).tests.log" `
-                    /t:$target `
-                    /p:Configuration=$config `
-                    /p:WixVersion=$version `
-                    /p:WixReleaseVersion=$fileVersion `
-                    /p:VSTarget=$($targetVs.number) `
-                    /p:VisualStudioVersion=$($targetVs.number) `
-                    /p:"CustomBuildIdentifier=$name" `
-                    /p:ReleaseBuild=$signedbuildText `
-                    /p:DeployExtension=false `
-                    /p:DeployVSTemplates=false `
-                    Nodejs\Tests\dirs.proj
-                if ($LASTEXITCODE -gt 0) {
-                    Write-Error -EA:Continue "Test build failed: $config"
-                    $failed_logs += Get-Item "BuildRelease.$config.$($targetVs.number).tests.log"
+                if (-not $?) {
+                    Write-Error "Build failed: $($i.VSName) $config"
+                    $failed_logs += $i.logfile
                     continue
                 }
             }
             
-            msbuild /v:n /m /fl /flp:"Verbosity=d;LogFile=BuildRelease.$config.$($targetVs.number).log" `
-                /t:$target `
-                /p:Configuration=$config `
-                /p:WixVersion=$version `
-                /p:WixReleaseVersion=$fileVersion `
-                /p:VSTarget=$($targetVs.number) `
-                /p:VisualStudioVersion=$($targetVs.number) `
-                /p:"CustomBuildIdentifier=$name" `
-                /p:ReleaseBuild=$signedbuildText `
-                /p:IncludeVsLogger=$includeVsLogger `
-                /p:DeployExtension=false `
-                /p:DeployVSTemplates=false `
-                Nodejs\Setup\dirs.proj
-            if ($LASTEXITCODE -gt 0) {
-                Write-Error -EA:Continue "Build failed: $config"
-                $failed_logs += Get-Item "BuildRelease.$config.$($targetVs.number).log"
-                continue
-            }
-            
-            Copy-Item -force $bindir\en-us\*.msi $destdir\
-            Copy-Item -force Nodejs\Prerequisites\*.reg $destdir\
-            
-            mkdir $destdir\Symbols -EA 0 | Out-Null
-            Copy-Item -force -recurse $bindir\*.pdb $destdir\Symbols\
-            
-            mkdir $destdir\Binaries -EA 0 | Out-Null
-            Copy-Item -force -recurse $bindir\*.dll $destdir\Binaries\
-            Copy-Item -force -recurse $bindir\*.exe $destdir\Binaries\
-            Copy-Item -force -recurse $bindir\*.pkgdef $destdir\Binaries\
-            
-            mkdir $destdir\Binaries\ReplWindow -EA 0 | Out-Null
-            Copy-Item -force -recurse Nodejs\Product\InteractiveWindow\obj\Dev$($targetVs.number)\$config\extension.vsixmanifest $destdir\Binaries\InteractiveWindow
+            after-build $buildroot $i
         }
         
         ######################################################################
         ##  BEGIN SIGNING CODE
         ######################################################################
-        if ($signedbuild) {
+        if ($signedBuild) {
             $jobs = @()
             
-            Write-Output "Signing binaries..."
+            foreach ($i in $target_info) {
+                if ($i.logfile -in $failed_logs) {
+                    Write-Output "Skipping signing for $($i.VSName) because the build failed"
+                    continue
+                }
+                Write-Output "Submitting signing jobs for $($i.VSName)"
 
-            foreach ($targetVs in $targetVersions) {
-                $destdir = "$outdir\$($targetVs.name)\$config"
-
-
-                $managed_files = @((
-                    "Microsoft.NodejsTools.NodeLogConverter.exe", 
-                    "Microsoft.NodejsTools.dll", 
-                    "Microsoft.NodejsTools.Analysis.dll", 
-                    "Microsoft.NodejsTools.InteractiveWindow.dll",
-                    "Microsoft.NodejsTools.Profiling.dll",
-                    "Microsoft.NodejsTools.ProjectWizard.dll",
-                    "Microsoft.NodejsTools.WebRole.dll",
-                    "Microsoft.NodejsTools.Npm.dll",
-                    "Microsoft.NodejsTools.TestAdapter.dll",
-                    "Microsoft.NodejsTools.PressAnyKey.exe",
-                    "Microsoft.NodejsTools.VsLogger.dll"
-                    ) | ForEach {@{path="$destdir\Binaries\$_"; name=$projectName}})
-
-                Write-Output "Submitting signing job for $($targetVs.name)"
-
-                $jobs += begin_sign_files $managed_files "$destdir\SignedBinaries" $approvers `
-                    $projectName $projectUrl "$projectName $($targetVs.name) - managed code" $projectKeywords `
+                $jobs += begin_sign_files `
+                    @($managed_files | %{@{path="$($i.unsigned_bindir)\$_"; name=$project_name}} | ?{Test-Path $_.path}) `
+                    $i.signed_bindir $approvers `
+                    $project_name $project_url "$project_name $($i.VSName) - managed code" $project_keywords `
                     "authenticode;strongname" `
                     -delaysigned
+
+                $jobs += begin_sign_files `
+                    @($native_files | %{@{path="$($i.unsigned_bindir)\$_"; name=$project_name}} | ?{Test-Path $_.path}) `
+                    $i.signed_bindir $approvers `
+                    $project_name $project_url "$project_name $($i.VSName) - native code" $project_keywords `
+                    "authenticode" 
             }
             
             end_sign_files $jobs
-            Write-Output "Signing binaries Completed"
             
-            foreach ($targetVs in $targetVersions) {
-                $bindir = "Binaries\$config$($targetVs.number)"
-                $destdir = "$outdir\$($targetVs.name)\$config"
-
-                submit_symbols "NTVS$spacename" "$buildnumber $($targetvs.name)" "symbols" "$destdir\Symbols" $symbol_contacts
-                submit_symbols "NTVS$spacename" "$buildnumber $($targetvs.name)" "binaries" "$destdir\SignedBinaries" $symbol_contacts
-
-                #Copy the signed binaries back into the binaries directory
-                #  so that msi's are built with the signed binaries
-                Copy-Item "$destdir\SignedBinaries\*" $bindir -Recurse -Force
-
-                foreach ($cmd in (Get-Content "BuildRelease.$config.$($targetVs.number).log") | Select-String "light.exe.+-out") {
-                    $targetdir = [regex]::Match($cmd, 'Nodejs\\Setup\\([^\\]+)').Groups[1].Value
-
-                    Write-Output "Rebuilding MSI in $targetdir"
-
-                    try {
-                        Push-Location $buildroot\Nodejs\Setup\$targetdir
-                    } catch {
-                        Write-Error "Unable to cd to $targetdir to execute line $cmd"
-                        Write-Output "Enter directory name to cd to: "
-                        $targetDir = [Console]::ReadLine()
-                        Push-Location $targetdir
-                    }
-
-                    try {
-                        Invoke-Expression $cmd | Out-Null
-                    } finally {
-                        Pop-Location
-                    }
+            foreach ($i in $target_info) {
+                if ($i.logfile -in $failed_logs) {
+                    Write-Output "Skipping symbol submission for $($i.VSName) because the build failed"
+                    continue
                 }
+                submit_symbols "$project_name$spacename" "$buildnumber $($i.VSName)" "binaries" $i.signed_bindir $symbol_contacts
+                submit_symbols "$project_name$spacename" "$buildnumber $($i.VSName)" "symbols" $i.symboldir $symbol_contacts
 
-                mkdir $destdir\UnsignedMsi -EA 0 | Out-Null
-                mkdir $destdir\SignedBinariesUnsignedMsi -EA 0 | Out-Null
-                
-                Move-Item $destdir\*.msi $destdir\UnsignedMsi -Force
-                Move-Item $bindir\en-us\*.msi $destdir\SignedBinariesUnsignedMsi -Force
+                $target_msbuild_options = msbuild-options $i
+                msbuild $global_msbuild_options $target_msbuild_options `
+                    /fl /flp:logfile=$($i.signed_logfile) `
+                    /p:SignedBinariesPath=$($i.signed_bindir) `
+                    /p:RezipVSIXFiles=true `
+                    $setup_project
             }
-            
+
             $jobs = @()
-
-            Write-Output "Signing MSIs..."
-
-            foreach ($targetVs in $targetVersions) {
-                $destdir = "$outdir\$($targetVs.name)\$config"
-
-                $msi_files = @($products | 
-                    ForEach {@{
-                        path="$destdir\SignedBinariesUnsignedMsi\$($_.msi)";
-                        name="Node.js Tools for Visual Studio$($_.signtag)"
-                    }}
-                )
-
-                Write-Output "Submitting MSI signing job for $($targetVs.name)"
-
-                $jobs += begin_sign_files $msi_files $destdir $approvers `
-                    $projectName $projectUrl "$projectName $($targetVs.name) - installer" $projectKeywords `
-                    "authenticode"
-            }
             
-            end_sign_files $jobs
-            Write-Output "Signing MSIs Completed"
-            ######################################################################
-            ##  END SIGNING CODE
-            ######################################################################
-        }
-        
-        foreach ($targetVs in $targetVersions) {
-            $destdir = "$outdir\$($targetVs.name)\$config"
-            if ($config -match "debug") {
-                $config_mark = " Debug"
-            } else {
-                $config_mark = ""
-            }
-            
-            foreach ($product in $products) {
-                Copy-Item "$destdir\$($product.msi)" "$outdir\$($product.outname1)$spacename $($targetvs.name)$config_mark$($product.outname2)" -Force -EA:0
-                if (-not $?) {
-                    Write-Output "Failed to copy $destdir\$($product.msi)"
+            foreach ($i in $target_info) {
+                if ($i.logfile -in $failed_logs) {
+                    continue
+                }
+
+                $msi_files = @((Get-ChildItem "$($i.signed_unsigned_msidir)\*.msi") | %{ @{
+                    path="$_";
+                    name="$project_name - $($_.Name)"
+                }})
+
+                if ($msi_files.Count -gt 0) {
+                    Write-Output "Submitting MSI signing job for $($i.VSName)"
+
+                    $jobs += begin_sign_files $msi_files $i.signed_msidir $approvers `
+                        $project_name $project_url "$project_name $($i.VSName) - installer" $project_keywords `
+                        "authenticode"
+                }
+
+
+                $vsix_files = @((Get-ChildItem "$($i.signed_unsigned_msidir)\*.vsix") | %{ @{
+                    path="$_";
+                    name="$project_name - $($_.Name)"
+                }})
+
+                if ($vsix_files.Count -gt 0) {
+                    Write-Output "Submitting VSIX signing job for $($i.VSName)"
+
+                    $jobs += begin_sign_files $vsix_files $i.signed_msidir $approvers `
+                        $project_name $project_url "$project_name $($i.VSName) - VSIX" $project_keywords `
+                        "authenticode;opc"
                 }
             }
-        }
-    }
 
-    # If this is unsigned then copy the skipverification files to toplevel folder
-    if(-not $release) {
-        $bindir = "$outdir\$($targetVersions[0].name)\$($targetConfigs[0])"
-        Copy-Item "$bindir\*.reg" "$outdir\" -Force -EA:0
+            end_sign_files $jobs
+        }
+        ######################################################################
+        ##  END SIGNING CODE
+        ######################################################################
+        
+        $fmt = @{}
+        if ($release_version) { $fmt.release_version = " $release_version"} else { $fmt.release_version = "" }
+        if ($name) { $fmt.name = " $name" } else { $fmt.name = "" }
+        if ($config -match "debug") { $fmt.config = " Debug" } else { $fmt.config = "" }
+        
+        foreach ($i in $target_info) {
+            if ($i.logfile -in $failed_logs) {
+                continue
+            }
+            
+            if ($i.VSName) {$fmt.VSName = " $($i.VSName)"} else {$fmt.VSName = ""}
+            
+            Get-ChildItem "$($i.final_msidir)\*.msi", "$($i.final_msidir)\*.vsix" | `
+                ?{ $installer_names[$_.Name] } | `
+                %{ @{
+                    src=$_;
+                    dest="$outdir\" + ($installer_names[$_.Name] -f
+                        $fmt.release_version,
+                        $fmt.name,
+                        $fmt.VSName,
+                        $fmt.config
+                    ); 
+                } } | `
+                %{ Copy-Item $_.src $_.dest -Force -EA 0; $_ } | `
+                %{ "Copied $($_.src) -> $($_.dest)" }
+        }
     }
     
+    after-build-all $buildroot $outdir
+    
     if ($scorch) {
-        tfpt scorch /noprompt
+        tfpt scorch $buildroot /noprompt
     }
     
     if (-not $skipcopy) {
         Write-Output "Copying source files"
-        robocopy /s . $outdir\Sources /xd Python Layouts TestResults Binaries Servicing obj | Out-Null
+        robocopy /s . $outdir\Sources /xd BuildOutput TestResults | Out-Null
     }
     
     if ($signedbuild) {
-        start_virus_scan "NTVS$spacename" "ntvscore" $outdir
+        start_virus_scan "$project_name$spacename" $vcs_contact $outdir
     }
     
     $successful = $true
 } finally {
-    if ($asmverfileBackedUp) {
-        Move-Item "$($asmverfile).bak" $asmverfile -Force
-        if ($asmverfileIsReadOnly) {
-            Set-ItemProperty $asmverfile -Name IsReadOnly -Value $true
+    try {
+        if ($version_file_backed_up) {
+            Move-Item "$version_file.bak" $version_file -Force
+            if ($version_file_is_readonly) {
+                Set-ItemProperty $version_file -Name IsReadOnly -Value $true
+            }
+            Write-Output "Restored $version_file"
+        } elseif (-not $version_file_force_backup) {
+            tf undo /noprompt $version_file | Out-Null
         }
-    } elseif (-not $asmverfileUseBackup) {
-        tf undo /noprompt $asmverfile
+        
+        if (-not (Get-Content $version_file) -match ' = "4100.00"') {
+            Write-Error "Failed to undo $version_file"
+        }
+    } finally {
+        Pop-Location
     }
-    
-    if (-not (Get-Content $asmverfile) -match ' = "4100.00"') {
-        Write-Error "Failed to undo $asmverfile"
-    }
-    
-    Pop-Location
 }
 
 if ($successful) {
@@ -571,7 +643,7 @@ if ($successful) {
     Write-Output ""
     Write-Output "Installers were output to:"
     Write-Output "    $outdir"
-    if ($failed_logs.Count -ne 0) {
+    if ($failed_logs.Count -gt 0) {
         Write-Output ""
         Write-Warning "Some configurations failed to build."
         Write-Output "Review these log files for details:"

@@ -3,7 +3,7 @@
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
     <?include NodejsToolsInstallerVars.wxi ?>
 
-    <Product Id="$(var.InstallerGuid)" Name="$(var.ProductName)" Language="1033" Version="$(var.MsiVersion)" Manufacturer="Microsoft Corporation" UpgradeCode="$(var.InstallerUpgradeGuid)">
+    <Product Id="*" Name="$(var.ProductName)" Language="1033" Version="$(var.MsiVersion)" Manufacturer="Microsoft Corporation" UpgradeCode="$(var.InstallerUpgradeGuid)">
         <Package InstallerVersion="300" Compressed="yes" InstallScope="perMachine"  />
         <MajorUpgrade AllowDowngrades="no" AllowSameVersionUpgrades="yes"
                       DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
@@ -18,20 +18,20 @@
         <Property Id="INSTALLLEVEL" Value="1"/>
         
         <Property Id="ApplicationFolderName" Value="$(var.ProductName)" />
-        <Icon Id="AddRemoveProgramsIcon" SourceFile="$(var.TargetDir)NodeJS.ico"/>
+        <Icon Id="AddRemoveProgramsIcon" SourceFile="NodeJS.ico"/>
         <Property Id="ARPPRODUCTICON">AddRemoveProgramsIcon</Property>
 
-        <PropertyRef Id="VS2013_PRERELEASE"/>
+        <!-- Conditions for install -->
+        <PropertyRef Id="VS_PRERELEASE"/>
+        <Condition Message="!(loc.VSPrerelease)"> NOT VS_PRERELEASE OR Installed </Condition>
+        
         <PropertyRef Id="NETFRAMEWORK45"/>
+        <Condition Message="!(loc.NetFx45NotInstalled)"> NETFRAMEWORK45 OR Installed </Condition>
 
         <PropertyRef Id="VSINSTALLPATH"/>
         <PropertyRef Id="VWDINSTALLPATH"/>
         <PropertyRef Id="DEVENV_PATH"/>
         <PropertyRef Id="VWDEXPRESS_PATH"/>
-        
-        <!-- Conditions for install -->
-        <Condition Message="!(loc.VSPrerelease)"> NOT VS2013_PRERELEASE OR Installed </Condition>
-        <Condition Message="!(loc.NetFx45NotInstalled)"> NETFRAMEWORK45 OR Installed </Condition>
 
         <!-- At least one installation path means some version is installed. -->
         <Condition Message="!(loc.NoInstallPath)">

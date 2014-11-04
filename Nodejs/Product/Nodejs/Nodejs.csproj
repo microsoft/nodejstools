@@ -12,17 +12,6 @@
         <OldToolsVersion>4.0</OldToolsVersion>
       </PropertyGroup>
     </When>
-    <When Condition=" '$(VisualStudioVersion)'=='11.0'  Or '$(TargetVisualStudioVersion)'=='VS110' ">
-      <PropertyGroup>
-        <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
-        <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
-        <FileUpgradeFlags>
-        </FileUpgradeFlags>
-        <UpgradeBackupLocation>
-        </UpgradeBackupLocation>
-        <OldToolsVersion>4.0</OldToolsVersion>
-      </PropertyGroup>
-    </When>
     <When Condition=" '$(VisualStudioVersion)'=='12.0'  Or '$(TargetVisualStudioVersion)'=='VS120' ">
       <PropertyGroup>
         <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
@@ -34,20 +23,18 @@
         <OldToolsVersion>4.0</OldToolsVersion>
       </PropertyGroup>
     </When>
+    <When Condition=" '$(VisualStudioVersion)'=='11.0'  Or '$(TargetVisualStudioVersion)'=='VS110' ">
+      <PropertyGroup>
+        <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+        <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
+        <FileUpgradeFlags>
+        </FileUpgradeFlags>
+        <UpgradeBackupLocation>
+        </UpgradeBackupLocation>
+        <OldToolsVersion>4.0</OldToolsVersion>
+      </PropertyGroup>
+    </When>
   </Choose>
-  <PropertyGroup>
-    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
-    <SccProjectName>SAK</SccProjectName>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccProvider>SAK</SccProvider>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
-  </PropertyGroup>
-  <PropertyGroup>
-    <DelaySign>false</DelaySign>
-  </PropertyGroup>
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <Import Project="..\ProjectBefore.settings" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -59,9 +46,12 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Microsoft.NodejsTools</RootNamespace>
     <AssemblyName>Microsoft.NodejsTools</AssemblyName>
-    <SignAssembly>True</SignAssembly>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <CreateVsixContainer>true</CreateVsixContainer>
+    <UseVSSDK>true</UseVSSDK>
+    <RestorePackages>true</RestorePackages>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
     <StartAction>Program</StartAction>
     <StartProgram>$(DevEnvDir)devenv.exe</StartProgram>
     <StartArguments>/rootSuffix Exp /Log</StartArguments>
@@ -95,7 +85,6 @@
     <Reference Include="Microsoft.Build.Framework, Version=$(MicrosoftBuildAssemblyVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.Build.Tasks.$(MicrosoftBuildAssemblyVersionSuffix), Version=$(MicrosoftBuildAssemblyVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.Build.Utilities.$(MicrosoftBuildAssemblyVersionSuffix), Version=$(MicrosoftBuildAssemblyVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-    <Reference Include="Microsoft.Build.Utilities.Core, Version=$(MicrosoftBuildAssemblyVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.JScript" />
     <Reference Include="Microsoft.VisualStudio.ComponentModelHost, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
@@ -130,12 +119,9 @@
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.11.0" />
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0" />
     <Reference Include="Microsoft.VisualStudio.TextManager.Interop.8.0, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-    <Reference Include="Microsoft.Windows.Design.Host, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(DevEnvDir)PrivateAssemblies\Microsoft.Windows.Design.Host.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.VisualStudio.WindowsAzure.CommonAzureTools.Contracts">
       <SpecificVersion>False</SpecificVersion>
+      <Private>false</Private>
       <HintPath>$(DevEnvDir)Extensions\Microsoft\Windows Azure Tools\Common\Microsoft.VisualStudio.WindowsAzure.CommonAzureTools.Contracts.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -683,11 +669,11 @@
     <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.resx">
       <DependentUpon>NodejsGeneralPropertyPageControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="VSPackage.resx">
+    <ConditionalEmbeddedResource Include="VSPackage.resx">
       <MergeWithCTO>true</MergeWithCTO>
       <ManifestResourceName>VSPackage</ManifestResourceName>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
+    </ConditionalEmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ZipProject Include="ProjectTemplates\CloudService\CloudService.ccproj" />
@@ -1147,6 +1133,7 @@
     </ZipItem>
     <None Include="Theme\Microsoft.NodejsTools.theme.v11.0.pkgdef" />
     <None Include="Theme\Microsoft.NodejsTools.theme.v12.0.pkgdef" />
+    <None Include="Theme\Microsoft.NodejsTools.theme.v14.0.pkgdef" />
     <Content Include="VSTemplateStore.pkgdef">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -1475,6 +1462,7 @@
     <ProjectReference Include="..\Analysis\Analysis.csproj">
       <Project>{dfdb930e-1162-4514-a91d-c8595a807f13}</Project>
       <Name>Analysis</Name>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </ProjectReference>
     <ProjectReference Include="..\InteractiveWindow\InteractiveWindow.csproj">
       <Project>{24a3887f-da50-4989-8d6c-4a5b04d5d457}</Project>
@@ -1483,61 +1471,30 @@
     <ProjectReference Include="..\Npm\Npm.csproj">
       <Project>{e5ef4b0a-ab41-4b98-8fa8-98d6348003a8}</Project>
       <Name>Npm</Name>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </ProjectReference>
-    <ProjectReference Include="..\PressAnyKey\PressAnyKey.csproj">
-      <Project>{cb61d8bd-48dc-40f4-a4ba-5b68a10a7481}</Project>
-      <Name>PressAnyKey</Name>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
-    </ProjectReference>
+    <ProjectReference2 Include="..\PressAnyKey\PressAnyKey.csproj" />
     <ProjectReference Include="..\ProjectWizard\ProjectWizard.csproj">
       <Project>{dbc73df7-1b4c-48be-8b48-715297487e7a}</Project>
       <Name>ProjectWizard</Name>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
-    <ProjectReference Include="..\TestAdapter\TestAdapter.csproj">
-      <Project>{5085df35-3a32-4894-835e-e5a3956d4f57}</Project>
-      <Name>TestAdapter</Name>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
-    </ProjectReference>
+    <ProjectReference2 Include="..\TestAdapter\TestAdapter.csproj" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\server.ts" />
-  </ItemGroup>
-  <ItemGroup>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\app.ts" />
-  </ItemGroup>
-  <ItemGroup>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\express.d.ts" />
-  </ItemGroup>
-  <ItemGroup>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\index.ts" />
-  </ItemGroup>
-  <ItemGroup>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\user.ts" />
-  </ItemGroup>
-  <ItemGroup>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\stylus.d.ts" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\stylus.d.ts" />
-  </ItemGroup>
-  <ItemGroup>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptStarterExpressApp\express.d.ts" />
-  </ItemGroup>
-  <ItemGroup>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptStarterExpressApp\stylus.d.ts" />
-  </ItemGroup>
-  <ItemGroup>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\app.ts" />
-  </ItemGroup>
-  <ItemGroup>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\express.d.ts" />
-  </ItemGroup>
-  <ItemGroup>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\index.ts" />
-  </ItemGroup>
-  <ItemGroup>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\stylus.d.ts" />
   </ItemGroup>
   <ItemGroup>
@@ -1550,7 +1507,6 @@
     <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\startup.ts" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\server.ts" />
   </ItemGroup>
-  <ItemGroup />
   <PropertyGroup>
     <!--
     To specify a different registry root to register your package, uncomment the TargetRegistryRoot
@@ -1584,15 +1540,6 @@
         <Culture>1033</Culture>
         <OutputSubPath>Node.js</OutputSubPath>
       </ZipProject>
-    </ItemGroup>
-  </Target>
-  <Target Name="DeployThemePkgdef" AfterTargets="CopyPkgDef" Inputs="Theme\Microsoft.NodejsTools.theme.v$(VSTarget).pkgdef" Outputs="$(OutputPath)Microsoft.NodejsTools.theme.pkgdef">
-    <Copy SourceFiles="Theme\Microsoft.NodejsTools.theme.v$(VSTarget).pkgdef" DestinationFiles="$(OutputPath)Microsoft.NodejsTools.theme.pkgdef" OverwriteReadOnlyFiles="true" />
-    <ItemGroup>
-      <VSIXSourceItem Include="$(OutputPath)Microsoft.NodejsTools.theme.pkgdef">
-        <VSIXSubPath>
-        </VSIXSubPath>
-      </VSIXSourceItem>
     </ItemGroup>
   </Target>
 </Project>

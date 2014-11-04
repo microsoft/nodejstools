@@ -16,9 +16,13 @@
       $(DefineConstants);
       IncludeVsLogger=$(IncludeVsLogger)
     </DefineConstants>
-    <DefineConstants Condition="'$(CustomBuildIdentifier)' != ''">
+    <DefineConstants Condition="$(VSTarget) == '12.0'">
       $(DefineConstants);
-      CustomBuildIdentifier=$(CustomBuildIdentifier)
+      IncludeVWDExpress=12.0.30219.0;
+    </DefineConstants>
+    <DefineConstants Condition="$(VSTarget) == '14.0'">
+      $(DefineConstants);
+      IncludeVWDExpress=14.0.0.0;
     </DefineConstants>
   </PropertyGroup>
   <ItemGroup>
@@ -38,16 +42,12 @@
       <HintPath>WixNetFxExtension</HintPath>
       <Name>WixNetFxExtension</Name>
     </WixExtension>
-    <BindInputPaths Include="$(OutDir)">
-      <Visible>false</Visible>
-    </BindInputPaths>
-    <BindInputPaths Include="$(BuildRoot)\Nodejs\Product\NodejsTools">
-      <Visible>false</Visible>
-    </BindInputPaths>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="NodejsToolsInstaller.wxs" />
-    <Compile Include="LaunchConditions.wxs" />
+    <Compile Include="$(BuildRoot)\Common\Setup\LaunchConditions.wxs">
+      <Link>CommonLaunchConditions.wxs</Link>
+    </Compile>
     <Compile Include="Directories.wxs" />
     <Compile Include="UI.wxs" />
   </ItemGroup>
@@ -59,30 +59,18 @@
     <ProjectReference Include="..\InteractiveWindow\InteractiveWindow.wixproj">
       <Name>InteractiveWindow</Name>
       <Project>{C0D64130-C0E9-4CAB-99BC-68F62357F010}</Project>
-      <Private>True</Private>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLLOCATION</RefTargetDir>
     </ProjectReference>
     <ProjectReference Include="..\NodejsTools\NodejsTools.wixproj">
       <Name>NodejsTools</Name>
       <Project>{48D35916-497E-43A4-88A7-A829B7BF0EF1}</Project>
-      <Private>True</Private>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLLOCATION</RefTargetDir>
     </ProjectReference>
     <ProjectReference Include="..\Profiling\Profiling.wixproj">
       <Name>NodejsProfiler</Name>
       <Project>{C7D3FCEB-47DA-4539-8D20-6B9047BAC3F7}</Project>
-      <Private>True</Private>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLLOCATION</RefTargetDir>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Internal\Nodejs\VsLoggerSetup\VsLogger.wixproj" Condition="'$(IncludeVsLogger)' == 'True'">
+    <ProjectReference Include="$(BuildRoot)\Internal\Nodejs\VsLoggerSetup\VsLogger.wixproj" Condition="'$(IncludeVsLogger)' == 'True'">
       <Name>VsLoggerMsm</Name>
       <Project>{639BFC80-B31B-4D3F-9DF3-A65913000B4B}</Project>
-      <Private>True</Private>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLLOCATION</RefTargetDir>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -3,12 +3,10 @@
         <BuildRoot Condition="'$(BuildRoot)' == ''">$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), build.root))</BuildRoot>
 
         <TargetName>NodejsToolsFiles</TargetName>
-        <SourceDir>$(BuildRoot)\Nodejs\Product\Nodejs\</SourceDir>
-        <ObjDir>$(SourceDir)obj\Dev$(VSTarget)\$(Configuration)</ObjDir>
     </PropertyGroup>
     <ItemGroup>
         <!-- Registration files -->
-        <File Include="$(ObjDir)\extension.vsixmanifest" />
+        <File Include="Nodejs\extension.vsixmanifest" />
         <File Include="Microsoft.NodejsTools.pkgdef;
                        Microsoft.NodejsTools.theme.pkgdef" />
 

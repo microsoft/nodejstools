@@ -42,4 +42,3 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]  // Version is fixed so we can refer to it from .vstemplate files
-[assembly: AssemblyFileVersion("1.0.0.0")]

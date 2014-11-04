@@ -4,6 +4,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nodejs", "Product\Nodejs\Nodejs.csproj", "{32EC5259-98DA-40CA-9E2D-1B1B2E966F88}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5085DF35-3A32-4894-835E-E5A3956D4F57} = {5085DF35-3A32-4894-835E-E5A3956D4F57}
+		{CB61D8BD-48DC-40F4-A4BA-5B68A10A7481} = {CB61D8BD-48DC-40F4-A4BA-5B68A10A7481}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReferenceGenerator", "Product\ReferenceGenerator\ReferenceGenerator.csproj", "{81FBB417-19B2-4E70-857E-D4564B77AD8F}"
 EndProject
@@ -14,6 +18,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestUtilities.UI", "..\Common\Tests\Utilities.UI\TestUtilities.UI.csproj", "{E8150EBC-6B62-40BF-BF91-1DC60149B530}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Profiling", "Product\Profiling\Profiling.csproj", "{C42B194E-3333-45E8-BB26-D69D1A51EF0B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9A69745F-546D-40A0-8770-7E5B9ED0C82F} = {9A69745F-546D-40A0-8770-7E5B9ED0C82F}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProfilerTests", "Tests\Profiling\ProfilerTests.csproj", "{F18AF6F7-F534-44BE-B5DE-44D6EFFF947D}"
 EndProject

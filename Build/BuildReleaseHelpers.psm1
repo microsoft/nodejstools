@@ -43,6 +43,10 @@ function _find_sdk_tool {
 function begin_sign_files {
     param($files, $outdir, $approvers, $projectName, $projectUrl, $jobDescription, $jobKeywords, $certificates, [switch] $delaysigned)
     
+    if ($files.Count -eq 0) {
+        return
+    }
+    
     if ($delaysigned) {
         # Ensure that all files are delay-signed
         # "sn -q -v ..." is true if the assembly has strong name and skip verification
@@ -94,6 +98,10 @@ function begin_sign_files {
 function end_sign_files {
     param($jobs)
     
+    if ($jobs.Count -eq 0) {
+        return
+    }
+    
     foreach ($jobinfo in $jobs) {
         $job = $jobinfo.job
         if($job -eq $null) {
@@ -118,20 +126,29 @@ function end_sign_files {
         
         mkdir $outdir -EA 0 | Out-Null
         Write-Progress -Activity $activity -Completed
+        
         Write-Output "Copying from $jobCompletionPath to $outdir"
-        $attemptedCopies = 0
-        while($attemptedCopies -lt 10) {
+        $retries = 9
+        $delay = 2
+        $copied = $null
+        while ($retries) {
             try {
-                copy -path $jobCompletionPath\* -dest $outdir -Force
-                break;
-            } catch [UnauthorizedAccessException] {
-                echo $_.UnauthorizedAccessException.Message
-                sleep 60
-                $attemptedCopies++
+                $copied = (Copy-Item -path $jobCompletionPath\* -dest $outdir -Force -PassThru)
+                break
+            } catch {
+                if ($retries -eq 0) {
+                    break
+                }
+                Write-Warning "Failed to copy - retrying in $delay seconds ($retries tries remaining)"
+                Sleep -seconds $delay
+                --$retries
+                $delay += $delay
             }
         }
-        if (-not $?) {
-            Write-Output "Failed to copy $jobCompletionPath to $outdir"
+        if (-not $copied) {
+            Throw "Failed to copy $jobCompletionPath to $outdir"
+        } else {
+            Write-Output "Copied $($copied.Count) files"
         }
     }
 }

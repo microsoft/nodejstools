@@ -3,14 +3,12 @@
     <BuildRoot Condition="'$(BuildRoot)' == ''">$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), build.root))</BuildRoot>
 
     <TargetName>ProfilingFiles</TargetName>
-    <SourceDir>$(BuildRoot)\Nodejs\Product\Profiling\</SourceDir>
-    <ObjDir>$(SourceDir)obj\Dev$(VSTarget)\$(Configuration)</ObjDir>
   </PropertyGroup>
 
 
   <ItemGroup>
     <!-- Registration files -->
-    <File Include="$(ObjDir)\extension.vsixmanifest" />
+    <File Include="Profiling\extension.vsixmanifest" />
     <File Include="Microsoft.NodejsTools.Profiling.pkgdef" />
 
     <!-- Core extension -->
