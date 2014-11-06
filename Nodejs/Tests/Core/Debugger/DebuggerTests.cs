@@ -1932,6 +1932,36 @@ namespace NodejsTests.Debugger {
                 }
             );
         }
+
+        [TestMethod, Priority(0), TestCategory("Debugging")]
+        public void TypeScript_Inheiritance_BreakInClass() {
+            TestDebuggerSteps(
+                "TypeScriptInheritTest.js",
+                new[] {
+                    new TestStep(action: TestAction.AddBreakpoint, 
+                        targetBreakpoint: 7,
+                        targetBreakpointFile: "TypeScriptInheritApple.ts",
+                        expectFailure: true),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
+                    new TestStep(action: TestAction.ResumeThread, 
+                        expectedHitCount: 1, 
+                        targetBreakpoint: 7,
+                        targetBreakpointColumn: 0,
+                        targetBreakpointFile: "TypeScriptInheritApple.ts", 
+                        expectedBreakFunction: "TypeScriptInheritApple.constructor",
+                        expectedBreakpointHit: 7,
+                        expectReBind: true),
+                    new TestStep(action: TestAction.ResumeThread, 
+                        expectedHitCount: 2, 
+                        targetBreakpoint: 7,
+                        targetBreakpointColumn: 0,
+                        targetBreakpointFile: "TypeScriptInheritApple.ts", 
+                        expectedBreakFunction: "TypeScriptInheritApple.constructor",
+                        expectedBreakpointHit: 7),
+                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
+                }
+            );
+        }
         #endregion
     }
 }

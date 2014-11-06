@@ -126,7 +126,7 @@ namespace NodejsTests.Debugger {
             }
             string fullPath = Path.GetFullPath(filename);
             string dir = cwd ?? Path.GetFullPath(Path.GetDirectoryName(filename));
-            arguments = 
+            arguments =
                 (startBrokenAtEntryPoint ? "--debug-brk" : "--debug") +
                 " \"" + fullPath + "\"" +
                 (String.IsNullOrEmpty(arguments) ? "" : " " + arguments);
@@ -148,7 +148,7 @@ namespace NodejsTests.Debugger {
             string hostName = "localhost",
             ushort portNumber = 5858,
             int id = 0,
-            bool resumeOnProcessLoad = false){
+            bool resumeOnProcessLoad = false) {
             // Load process
             AutoResetEvent processLoaded = new AutoResetEvent(false);
             var process = new NodeDebugger(new UriBuilder { Scheme = "tcp", Host = hostName, Port = portNumber }.Uri, id);
@@ -253,13 +253,13 @@ namespace NodejsTests.Debugger {
             var frame = thread.Frames[frameIndex];
             NodeEvaluationResult evaluationResult = null;
             Exception exception = null;
-            
+
             try {
                 evaluationResult = frame.ExecuteTextAsync(expression).WaitAndUnwrapExceptions();
             } catch (Exception ex) {
                 exception = ex;
             }
-            
+
             if (expectedType != null) {
                 Assert.IsNotNull(evaluationResult);
                 Assert.AreEqual(expectedType, evaluationResult.TypeName);
@@ -363,6 +363,7 @@ namespace NodejsTests.Debugger {
             public string _condition;
             public bool _builtin;
             public bool _expectFailure;
+            public bool _expectReBind;
             public Action<NodeDebugger, NodeThread> _validation;
             public int? _expectedExitCode;
 
@@ -383,6 +384,7 @@ namespace NodejsTests.Debugger {
                 string condition = null,
                 bool builtin = false,
                 bool expectFailure = false,
+                bool expectReBind = false,
                 Action<NodeDebugger, NodeThread> validation = null,
                 int? expectedExitCode = null,
                 string expectedBreakFunction = null
@@ -403,6 +405,7 @@ namespace NodejsTests.Debugger {
                 _condition = condition;
                 _builtin = builtin;
                 _expectFailure = expectFailure;
+                _expectReBind = expectReBind;
                 _validation = validation;
                 _expectedExitCode = expectedExitCode;
                 _expectedBreakFunction = expectedBreakFunction;
@@ -655,6 +658,12 @@ namespace NodejsTests.Debugger {
                         Assert.IsNull(exception);
                         entryPointHit.Reset();
                     } else if (step._expectedBreakpointHit != null) {
+                        if (step._expectReBind) {
+                            AssertWaited(breakpointUnbound);
+                            AssertWaited(breakpointBound);
+                            breakpointUnbound.Reset();
+                            breakpointBound.Reset();
+                        }
                         AssertWaited(breakpointHit);
                         AssertNotSet(entryPointHit);
                         AssertNotSet(stepComplete);
@@ -685,14 +694,11 @@ namespace NodejsTests.Debugger {
 
                 if (step._expectedEntryPointHit != null) {
                     Assert.AreEqual(step._expectedEntryPointHit.Value, thread.Frames.First().Line);
-                }
-                else if (step._expectedBreakpointHit != null) {
+                } else if (step._expectedBreakpointHit != null) {
                     Assert.AreEqual(step._expectedBreakpointHit.Value, thread.Frames.First().Line);
-                }
-                else if (step._expectedStepComplete != null) {
+                } else if (step._expectedStepComplete != null) {
                     Assert.AreEqual(step._expectedStepComplete.Value, thread.Frames.First().Line);
-                }
-                else if (step._expectedExceptionRaised != null) {
+                } else if (step._expectedExceptionRaised != null) {
                     Assert.AreEqual(step._expectedExceptionRaised.TypeName, exception.TypeName);
                     Assert.AreEqual(step._expectedExceptionRaised.Description, exception.Description);
                     if (step._expectedExceptionRaised.LineNo != null) {

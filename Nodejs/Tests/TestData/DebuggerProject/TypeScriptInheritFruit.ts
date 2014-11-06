@@ -1,0 +1,4 @@
+﻿export class TypeScriptInheritFruit {
+    constructor() {
+    }
+}
