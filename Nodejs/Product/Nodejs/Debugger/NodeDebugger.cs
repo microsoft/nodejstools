@@ -1204,12 +1204,12 @@ namespace Microsoft.NodejsTools.Debugger {
             javaScriptFileName = FileNameMapper.GetLocalFileName(javaScriptFileName);
 
             // Try to get mapping for JS file
-            SourceMapInfo mapping = SourceMapper.MapToOriginal(javaScriptFileName, 0);
-            if (mapping == null) {
+            String originalFileName = SourceMapper.MapToOriginal(javaScriptFileName);
+            if (originalFileName == null) {
                 module = new NodeModule(module.Id, javaScriptFileName);
             } else {
                 string directoryName = Path.GetDirectoryName(javaScriptFileName) ?? string.Empty;
-                string fileName = Path.Combine(directoryName, Path.GetFileName(mapping.FileName) ?? string.Empty);
+                string fileName = Path.Combine(directoryName, Path.GetFileName(originalFileName) ?? string.Empty);
 
                 module = new NodeModule(module.Id, fileName, javaScriptFileName);
             }

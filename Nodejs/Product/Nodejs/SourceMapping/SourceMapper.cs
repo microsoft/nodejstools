@@ -25,10 +25,7 @@ namespace Microsoft.NodejsTools.SourceMapping {
         private readonly Dictionary<string, SourceMap> _generatedFileToSourceMap = new Dictionary<string, SourceMap>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, JavaScriptSourceMapInfo> _originalFileToSourceMap = new Dictionary<string, JavaScriptSourceMapInfo>(StringComparer.OrdinalIgnoreCase);
 
-        /// <summary>
-        /// Gets a source mapping for the given filename.  Line numbers are zero based.
-        /// </summary>
-        internal SourceMapInfo MapToOriginal(string filename, int line, int column = 0) {
+        private JavaScriptSourceMapInfo TryGetMapInfo(string filename) {
             JavaScriptSourceMapInfo mapInfo;
             if (!_originalFileToSourceMap.TryGetValue(filename, out mapInfo)) {
                 if (File.Exists(filename)) {
@@ -58,10 +55,33 @@ namespace Microsoft.NodejsTools.SourceMapping {
                         } catch (PathTooLongException) {
                         } catch (NotSupportedException) {
                         } catch (InvalidOperationException) {
-                        } 
+                        }
                     }
                 }
             }
+            return mapInfo;
+        }
+        
+        /// <summary>
+        /// Given a filename finds the original filename
+        /// </summary>
+        /// <param name="filename">the mapped filename</param>
+        /// <returns>The original filename
+        ///     null - if the file is not mapped
+        /// </returns>
+        internal string MapToOriginal(string filename) {
+            JavaScriptSourceMapInfo mapInfo = TryGetMapInfo(filename);
+            if (mapInfo != null && mapInfo.Map != null && mapInfo.Map.Sources.Count > 0) {
+                return mapInfo.Map.Sources[0];
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Gets a source mapping for the given filename.  Line numbers are zero based.
+        /// </summary>
+        internal SourceMapInfo MapToOriginal(string filename, int line, int column = 0) {
+            JavaScriptSourceMapInfo mapInfo = TryGetMapInfo(filename);
             if (mapInfo != null) {
                 SourceMapInfo mapping;
                 if (line < mapInfo.Lines.Length) {
