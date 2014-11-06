@@ -14,11 +14,7 @@
     <SystemComponent>false</SystemComponent>
     <SupportedProducts>
       <VisualStudio Version="11.0">
-        <Edition>Ultimate</Edition>
-        <Edition>Premium</Edition>
         <Edition>Pro</Edition>
-        <Edition>VSTS</Edition>
-        <Edition>VSTD</Edition>
         <Edition>VWDExpress</Edition>
       </VisualStudio>
     </SupportedProducts>
@@ -32,7 +28,7 @@
   <Content>
     <VsPackage>|%CurrentProject%;PkgdefProjectOutputGroup|</VsPackage>
     <MefComponent>|%CurrentProject%|</MefComponent>
-    <Assembly AssemblyName="NodejsTools.InteractiveWindow, Version=1.8.50330.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">|%CurrentProject%|</Assembly>
+    <Assembly AssemblyName="|%CurrentProject%;_GetAssemblyName|">|%CurrentProject%|</Assembly>
   </Content>
 
 </Vsix>
