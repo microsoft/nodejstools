@@ -1477,8 +1477,7 @@
     <ProjectReference Include="..\ProjectWizard\ProjectWizard.csproj">
       <Project>{dbc73df7-1b4c-48be-8b48-715297487e7a}</Project>
       <Name>ProjectWizard</Name>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </ProjectReference>
     <ProjectReference2 Include="..\TestAdapter\TestAdapter.csproj" />
   </ItemGroup>
