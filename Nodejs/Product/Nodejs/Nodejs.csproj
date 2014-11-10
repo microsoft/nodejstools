@@ -1012,7 +1012,7 @@
       <SubType>Designer</SubType>
     </ZipProject>
     <ZipProject Include="ProjectTemplates\Express4App\index.js" />
-    <Resource Include="ProjectTemplates\Express4App\Preview.png" />
+    <ZipProject Include="ProjectTemplates\Express4App\Preview.png" />
     <ZipProject Include="ProjectTemplates\Express4App\users.js" />
     <ZipProject Include="ProjectTemplates\Express4App\www" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\app.js" />
@@ -1023,7 +1023,7 @@
       <SubType>Designer</SubType>
     </ZipProject>
     <ZipProject Include="ProjectTemplates\AzureExpress4App\index.js" />
-    <Resource Include="ProjectTemplates\AzureExpress4App\Preview.png" />
+    <ZipProject Include="ProjectTemplates\AzureExpress4App\Preview.png" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\users.js" />
     <Content Include="Scripts\Typings\node\node.d.ts">
       <IncludeInVSIX>true</IncludeInVSIX>
