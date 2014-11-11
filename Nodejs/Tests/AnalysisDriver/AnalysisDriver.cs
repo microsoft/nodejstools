@@ -230,7 +230,7 @@ namespace AnalysisDriver {
             }
             GC.KeepAlive(analyzer);
 #if DEBUG
-            Console.WriteLine(analyzer.GetAnalysisStats());
+            //Console.WriteLine(analyzer.GetAnalysisStats());
 #endif
             if (_cleanup) {
                 Directory.Delete(testDir, true);

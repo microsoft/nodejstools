@@ -254,19 +254,44 @@ namespace Microsoft.NodejsTools.Analysis {
                 if (!String.IsNullOrWhiteSpace(path) &&
                     path.IndexOfAny(InvalidPathChars) == -1 && 
                     _readDirs.Add(path) &&
-                    Directory.Exists(path)) {
-                        string trimmed = path.Trim();
-                        if (trimmed != "." && trimmed != "/") {
-                            var files = Directory.GetFiles(path);
-
-                            foreach (var file in files) {
-                                IndexTypes[0].AddTypes(
-                                    unit,
-                                    unit.Analyzer.GetConstant(Path.GetFileName(file)).SelfSet
-                                );
-                            }
+                    Directory.Exists(Path.Combine(Path.GetDirectoryName(unit.ProjectEntry.FilePath), path))) {
+                    string trimmed = path.Trim();
+                    if (trimmed != "." && trimmed != "/") {
+                        string[] files;
+                        try {
+                            files = Directory.GetFiles(Path.Combine(Path.GetDirectoryName(unit.ProjectEntry.FilePath), path));
+                        } catch (IOException) {
+                            return;
+                        } catch (UnauthorizedAccessException) {
+                            return;
                         }
+
+                        if (IndexTypes.Length < files.Length) {
+                            var types = IndexTypes;
+                            Array.Resize(ref types, files.Length);
+                            IndexTypes = types;
+                                
+                        }
+                            
+                        for (int i = 0; i < files.Length; i++) {
+                            if (IndexTypes[i] == null) {
+                                IndexTypes[i] = new TypedDef();
+                            }
+                            IndexTypes[i].AddTypes(
+                                unit,
+                                unit.Analyzer.GetConstant(Path.GetFileName(files[i])).SelfSet
+                            );
+                        }
+                    }
                 }
+            }
+
+            public override IAnalysisSet GetEnumerationValues(Node node, AnalysisUnit unit) {
+                var res = (IAnalysisSet)unit.Analyzer._zeroIntValue.Proxy;
+                for (int i = 1; i < _readDirs.Count; i++) {
+                    res = res.Add(unit.Analyzer.GetConstant((double)i).Proxy);
+                }
+                return res;
             }
 
             public override void ForEach(Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {

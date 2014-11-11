@@ -313,7 +313,22 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 }
                 yield break;
             }
-
+            CallNode call = node as CallNode;
+            if (call != null && call.Arguments.Length == 2) {
+                var func = EvaluateMaybeNull(call.Function);
+                foreach (var targetFunc in func) {
+                    BuiltinFunctionValue bf = targetFunc.Value as BuiltinFunctionValue;
+                    if (bf != null &&
+                        bf.DeclaringModule.ModuleName == "path" && 
+                        bf.Name == "join") {
+                        foreach (var left in MergeStringLiterals(call.Arguments[0])) {
+                            foreach (var right in MergeStringLiterals(call.Arguments[1])) {
+                                yield return left + right;
+                            }
+                        }
+                    }
+                }
+            }
             foreach (var value in EvaluateMaybeNull(node)) {
                 var strValue = value.Value.GetStringValue();
                 if (strValue != null) {

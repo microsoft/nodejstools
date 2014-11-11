@@ -26,6 +26,7 @@ namespace Microsoft.NodejsTools.Parsing
     internal class YieldExpression  : Expression
     {
         private Expression m_operand;
+        private int _yieldFromIndex = -1;
 
         public Expression Operand
         {
@@ -42,8 +43,14 @@ namespace Microsoft.NodejsTools.Parsing
         }
 
         public bool YieldFrom {
-            get;
-            set;
+            get {
+                return _yieldFromIndex != -1;
+            }
+        }
+
+        public int YieldFromIndex {
+            get { return _yieldFromIndex;  }
+            set { _yieldFromIndex = value;  }
         }
 
         public override void Walk(AstVisitor visitor) {

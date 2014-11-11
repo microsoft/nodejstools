@@ -316,7 +316,18 @@ namespace Microsoft.NodejsTools.Formatting {
         }
 
         public override bool Walk(FunctionObject node) {
-            if (node.Name == null) {
+            if (node.IsGenerator) {
+                ReplaceFollowingWhiteSpace(
+                    node.GetStartIndex(_tree.LocationResolver) + "function".Length,
+                    ""
+                );
+                if (node.Name != null) {
+                    ReplaceFollowingWhiteSpace(
+                        node.GeneratorIndex + "*".Length,
+                        " "
+                    );
+                }
+            } else if (node.Name == null) {
                 ReplaceFollowingWhiteSpace(
                     node.GetStartIndex(_tree.LocationResolver) + "function".Length,
                     _options.SpaceAfterFunctionInAnonymousFunctions ? " " : ""
@@ -504,7 +515,12 @@ namespace Microsoft.NodejsTools.Formatting {
         }
 
         public override bool Walk(YieldExpression node) {
-            if (node.Operand != null) {
+            if (node.YieldFrom) {
+                ReplaceFollowingWhiteSpace(node.GetStartIndex(_tree.LocationResolver) + "yield".Length, "");
+                if (node.Operand != null) {
+                    ReplaceFollowingWhiteSpace(node.YieldFromIndex + "*".Length, " ");
+                }
+            } else if (node.Operand != null) {
                 ReplaceFollowingWhiteSpace(node.GetStartIndex(_tree.LocationResolver) + "yield".Length, " ");
                 node.Operand.Walk(this);
             }

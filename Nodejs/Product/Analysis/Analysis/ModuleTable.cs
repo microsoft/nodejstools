@@ -188,7 +188,8 @@ namespace Microsoft.NodejsTools.Analysis {
         public IAnalysisSet RequireModule(Node node, AnalysisUnit unit, string moduleName, string declModule = null) {
             lock (_lock) {
                 ModuleTree moduleTree;
-                if (TryGetValue(moduleName, out moduleTree)) {
+
+                if (TryGetValue(moduleName.Replace('/', '\\'), out moduleTree)) {
                     // exact filename match or built-in module
                     return GetExports(node, unit, moduleTree);
                 }

@@ -1969,7 +1969,7 @@ namespace Microsoft.NodejsTools.Parsing
             var yieldNode = new YieldExpression(EncodeCurrentSpan());
             GetNextToken();
             if (_curToken == JSToken.Multiply) {
-                yieldNode.YieldFrom = true;
+                yieldNode.YieldFromIndex = _curSpan.Start;
                 GetNextToken();
             }
 
@@ -2692,8 +2692,7 @@ namespace Microsoft.NodejsTools.Parsing
         //    Identifier, IdentifierList
         //---------------------------------------------------------------------------------------
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
-        private FunctionObject ParseFunction(FunctionType functionType, IndexSpan fncSpan)
-        {
+        private FunctionObject ParseFunction(FunctionType functionType, IndexSpan fncSpan) {
             List<ParameterDeclaration> formalParameters = null;
             Block body = null;
             bool inExpression = (functionType == FunctionType.Expression);
@@ -2702,208 +2701,208 @@ namespace Microsoft.NodejsTools.Parsing
             string doclet = _curDoclet;
 
             GetNextToken();
-            bool isGenerator = false;
+            int generatorIndex = -1;
             if (_curToken == JSToken.Multiply) {
-                isGenerator = true;
+                generatorIndex = _curSpan.Start;
                 GetNextToken();
             }
 
             bool wasInGenerator = _inGenerator;
             try {
-                _inGenerator = isGenerator;
+                _inGenerator = generatorIndex != -1;
                 // get the function name or make an anonymous function if in expression "position"
                 Lookup name = ParseBindingIdentifier();
                 if (name == null && !inExpression) {
-                        // if this isn't a function expression, then we need to throw an error because
-                        // function DECLARATIONS always need a valid identifier name
-                        ReportError(JSError.NoIdentifier, _curSpan, true);
+                    // if this isn't a function expression, then we need to throw an error because
+                    // function DECLARATIONS always need a valid identifier name
+                    ReportError(JSError.NoIdentifier, _curSpan, true);
 
-                        // BUT if the current token is a left paren, we don't want to use it as the name.
-                        // (fix for issue #14152)
+                    // BUT if the current token is a left paren, we don't want to use it as the name.
+                    // (fix for issue #14152)
                     if (_curToken != JSToken.LeftParenthesis && _curToken != JSToken.LeftCurly) {
                         string identifier = GetCode(_curSpan);
                         name = new Lookup(EncodeSpan(CurrentPositionSpan())) {
-                                    Name = identifier
-                                };
-                            GetNextToken();
-                        }
-                    }
-
-            // make a new state and save the old one
-            List<BlockType> blockType = m_blockType;
-            m_blockType = new List<BlockType>(16);
-            Dictionary<string, LabelInfo> labelTable = m_labelTable;
-            m_labelTable = new Dictionary<string, LabelInfo>();
-
-                try {
-                // get the formal parameters
-                    if (JSToken.LeftParenthesis != _curToken) {
-                    // we expect a left paren at this point for standard cross-browser support.
-                    // BUT -- some versions of IE allow an object property expression to be a function name, like window.onclick. 
-                    // we still want to throw the error, because it syntax errors on most browsers, but we still want to
-                    // be able to parse it and return the intended results. 
-                    // Skip to the open paren and use whatever is in-between as the function name. Doesn't matter that it's 
-                    // an invalid identifier; it won't be accessible as a valid field anyway.
-                    bool expandedIndentifier = false;
-                    while (_curToken != JSToken.LeftParenthesis
-                        && _curToken != JSToken.LeftCurly
-                        && _curToken != JSToken.Semicolon
-                            && _curToken != JSToken.EndOfFile) {
-                        if (name != null) {
-                            UpdateWithCurrentSpan(name);
-                        }
+                            Name = identifier
+                        };
                         GetNextToken();
-                        expandedIndentifier = true;
-                    }
-
-                    // if we actually expanded the identifier context, then we want to report that
-                    // the function name needs to be an identifier. Otherwise we didn't expand the 
-                    // name, so just report that we expected an open paren at this point.
-                        if (expandedIndentifier) {
-                        if (name != null) {
-                            name.Name = GetCode(GetSpan(name));
-                            m_errorSink.HandleError(JSError.FunctionNameMustBeIdentifier, GetSpan(name), m_scanner.LocationResolver);
-                        } else {
-                            m_errorSink.HandleError(JSError.FunctionNameMustBeIdentifier, CurrentPositionSpan(), m_scanner.LocationResolver);
-                        }
-                        } else {
-                        ReportError(JSError.NoLeftParenthesis, true);
                     }
                 }
 
+                // make a new state and save the old one
+                List<BlockType> blockType = m_blockType;
+                m_blockType = new List<BlockType>(16);
+                Dictionary<string, LabelInfo> labelTable = m_labelTable;
+                m_labelTable = new Dictionary<string, LabelInfo>();
+
+                try {
+                    // get the formal parameters
+                    if (JSToken.LeftParenthesis != _curToken) {
+                        // we expect a left paren at this point for standard cross-browser support.
+                        // BUT -- some versions of IE allow an object property expression to be a function name, like window.onclick. 
+                        // we still want to throw the error, because it syntax errors on most browsers, but we still want to
+                        // be able to parse it and return the intended results. 
+                        // Skip to the open paren and use whatever is in-between as the function name. Doesn't matter that it's 
+                        // an invalid identifier; it won't be accessible as a valid field anyway.
+                        bool expandedIndentifier = false;
+                        while (_curToken != JSToken.LeftParenthesis
+                            && _curToken != JSToken.LeftCurly
+                            && _curToken != JSToken.Semicolon
+                                && _curToken != JSToken.EndOfFile) {
+                            if (name != null) {
+                                UpdateWithCurrentSpan(name);
+                            }
+                            GetNextToken();
+                            expandedIndentifier = true;
+                        }
+
+                        // if we actually expanded the identifier context, then we want to report that
+                        // the function name needs to be an identifier. Otherwise we didn't expand the 
+                        // name, so just report that we expected an open paren at this point.
+                        if (expandedIndentifier) {
+                            if (name != null) {
+                                name.Name = GetCode(GetSpan(name));
+                                m_errorSink.HandleError(JSError.FunctionNameMustBeIdentifier, GetSpan(name), m_scanner.LocationResolver);
+                            } else {
+                                m_errorSink.HandleError(JSError.FunctionNameMustBeIdentifier, CurrentPositionSpan(), m_scanner.LocationResolver);
+                            }
+                        } else {
+                            ReportError(JSError.NoLeftParenthesis, true);
+                        }
+                    }
+
                     if (_curToken == JSToken.LeftParenthesis) {
-                    // create the parameter list
-                    formalParameters = new List<ParameterDeclaration>();
-                    paramsSpan = _curSpan;
+                        // create the parameter list
+                        formalParameters = new List<ParameterDeclaration>();
+                        paramsSpan = _curSpan;
 
-                    // skip the open paren
-                    GetNextToken();
+                        // skip the open paren
+                        GetNextToken();
 
-                    // create the list of arguments and update the context
+                        // create the list of arguments and update the context
                         while (JSToken.RightParenthesis != _curToken) {
-                        String id = null;
-                        m_noSkipTokenSet.Add(NoSkipTokenSet.s_FunctionDeclNoSkipTokenSet);
+                            String id = null;
+                            m_noSkipTokenSet.Add(NoSkipTokenSet.s_FunctionDeclNoSkipTokenSet);
                             try {
-                            ParameterDeclaration paramDecl = null;
+                                ParameterDeclaration paramDecl = null;
                                 if (JSToken.Identifier != _curToken && (id = CanBeIdentifier(_curToken)) == null) {
                                     if (JSToken.LeftCurly == _curToken) {
-                                    ReportError(JSError.NoRightParenthesis);
-                                    break;
+                                        ReportError(JSError.NoRightParenthesis);
+                                        break;
                                     } else if (JSToken.Comma == _curToken) {
-                                    // We're missing an argument (or previous argument was malformed and
-                                    // we skipped to the comma.)  Keep trying to parse the argument list --
-                                    // we will skip the comma below.
-                                    ReportError(JSError.SyntaxError, true);
+                                        // We're missing an argument (or previous argument was malformed and
+                                        // we skipped to the comma.)  Keep trying to parse the argument list --
+                                        // we will skip the comma below.
+                                        ReportError(JSError.SyntaxError, true);
                                     } else {
-                                    ReportError(JSError.SyntaxError, true);
-                                    SkipTokensAndThrow();
-                                }
+                                        ReportError(JSError.SyntaxError, true);
+                                        SkipTokensAndThrow();
+                                    }
                                 } else {
                                     if (null == id) {
-                                    id = m_scanner.Identifier;
-                                }
+                                        id = m_scanner.Identifier;
+                                    }
 
                                     paramDecl = new ParameterDeclaration(EncodeCurrentSpan()) {
                                         Name = id,
                                         Position = formalParameters.Count
                                     };
-                                paramsSpan = paramsSpan.UpdateWith(_curSpan);
-                                formalParameters.Add(paramDecl);
-                                GetNextToken();
-                            }
+                                    paramsSpan = paramsSpan.UpdateWith(_curSpan);
+                                    formalParameters.Add(paramDecl);
+                                    GetNextToken();
+                                }
 
-                            // got an arg, it should be either a ',' or ')'
+                                // got an arg, it should be either a ',' or ')'
                                 if (JSToken.RightParenthesis == _curToken) {
-                                paramsSpan = paramsSpan.UpdateWith(_curSpan);
-                                break;
-                                } else if (JSToken.Comma == _curToken) {
-                                // append the comma context as the terminator for the parameter
-                                } else {
-                                // deal with error in some "intelligent" way
-                                    if (JSToken.LeftCurly == _curToken) {
-                                    ReportError(JSError.NoRightParenthesis);
+                                    paramsSpan = paramsSpan.UpdateWith(_curSpan);
                                     break;
+                                } else if (JSToken.Comma == _curToken) {
+                                    // append the comma context as the terminator for the parameter
+                                } else {
+                                    // deal with error in some "intelligent" way
+                                    if (JSToken.LeftCurly == _curToken) {
+                                        ReportError(JSError.NoRightParenthesis);
+                                        break;
                                     } else {
                                         if (JSToken.Identifier == _curToken) {
-                                        // it's possible that the guy was writing the type in C/C++ style (i.e. int x)
-                                        ReportError(JSError.NoCommaOrTypeDefinitionError);
+                                            // it's possible that the guy was writing the type in C/C++ style (i.e. int x)
+                                            ReportError(JSError.NoCommaOrTypeDefinitionError);
                                         } else
-                                        ReportError(JSError.NoComma);
+                                            ReportError(JSError.NoComma);
+                                    }
                                 }
-                            }
 
-                            GetNextToken();
+                                GetNextToken();
                             } catch (RecoveryTokenException exc) {
-                            if (IndexOfToken(NoSkipTokenSet.s_FunctionDeclNoSkipTokenSet, exc) == -1)
-                                throw;
+                                if (IndexOfToken(NoSkipTokenSet.s_FunctionDeclNoSkipTokenSet, exc) == -1)
+                                    throw;
                             } finally {
-                            m_noSkipTokenSet.Remove(NoSkipTokenSet.s_FunctionDeclNoSkipTokenSet);
+                                m_noSkipTokenSet.Remove(NoSkipTokenSet.s_FunctionDeclNoSkipTokenSet);
+                            }
                         }
+
+                        fncSpan = fncSpan.UpdateWith(_curSpan);
+                        GetNextToken();
                     }
 
-                    fncSpan = fncSpan.UpdateWith(_curSpan);
-                    GetNextToken();
-                }
+                    // read the function body of non-abstract functions.
+                    if (JSToken.LeftCurly != _curToken)
+                        ReportError(JSError.NoLeftCurly, true);
 
-                // read the function body of non-abstract functions.
-                if (JSToken.LeftCurly != _curToken)
-                    ReportError(JSError.NoLeftCurly, true);
-
-                m_blockType.Add(BlockType.Block);
-                m_noSkipTokenSet.Add(NoSkipTokenSet.s_BlockNoSkipTokenSet);
-                m_noSkipTokenSet.Add(NoSkipTokenSet.s_StartStatementNoSkipTokenSet);
-                body = new Block(EncodeCurrentSpan());
-                List<Statement> statements = new List<Statement>();
-                body.Braces = BraceState.Start;
+                    m_blockType.Add(BlockType.Block);
+                    m_noSkipTokenSet.Add(NoSkipTokenSet.s_BlockNoSkipTokenSet);
+                    m_noSkipTokenSet.Add(NoSkipTokenSet.s_StartStatementNoSkipTokenSet);
+                    body = new Block(EncodeCurrentSpan());
+                    List<Statement> statements = new List<Statement>();
+                    body.Braces = BraceState.Start;
                     try {
-                    // parse the block locally to get the exact end of function
-                    GetNextToken();
+                        // parse the block locally to get the exact end of function
+                        GetNextToken();
 
-                    var possibleDirectivePrologue = true;
+                        var possibleDirectivePrologue = true;
                         while (JSToken.RightCurly != _curToken) {
                             try {
-                            // function body's are SourceElements (Statements + FunctionDeclarations)
-                            var statement = ParseStatement();
+                                // function body's are SourceElements (Statements + FunctionDeclarations)
+                                var statement = ParseStatement();
                                 if (possibleDirectivePrologue && !(statement is ReturnNode)) {
-                                var constantWrapper = Statement.GetExpression(statement) as ConstantWrapper;
+                                    var constantWrapper = Statement.GetExpression(statement) as ConstantWrapper;
                                     if (constantWrapper != null && constantWrapper.Value is string) {
-                                    // if it's already a directive prologues, we're good to go
+                                        // if it's already a directive prologues, we're good to go
                                         // make the statement a directive prologue instead of a constant wrapper
-                                    var exprStmt = new ExpressionStatement(statement.EncodedSpan);
-                                    exprStmt.Expression = new DirectivePrologue(constantWrapper.Value.ToString(), constantWrapper.EncodedSpan);
-                                    statement = exprStmt;
+                                        var exprStmt = new ExpressionStatement(statement.EncodedSpan);
+                                        exprStmt.Expression = new DirectivePrologue(constantWrapper.Value.ToString(), constantWrapper.EncodedSpan);
+                                        statement = exprStmt;
                                     } else {
-                                    // no longer considering constant wrappers
-                                    possibleDirectivePrologue = false;
+                                        // no longer considering constant wrappers
+                                        possibleDirectivePrologue = false;
+                                    }
                                 }
-                            }
-                            // add it to the body
-                            statements.Add(statement);
+                                // add it to the body
+                                statements.Add(statement);
                             } catch (RecoveryTokenException exc) {
                                 if (exc._partiallyComputedNode != null) {
-                                statements.Add(exc.PartiallyComputedStatement);
-                            }
-                            if (IndexOfToken(NoSkipTokenSet.s_StartStatementNoSkipTokenSet, exc) == -1) {
-                                body.Statements = statements.ToArray();
-                                throw;
+                                    statements.Add(exc.PartiallyComputedStatement);
+                                }
+                                if (IndexOfToken(NoSkipTokenSet.s_StartStatementNoSkipTokenSet, exc) == -1) {
+                                    body.Statements = statements.ToArray();
+                                    throw;
+                                }
                             }
                         }
-                    }
-                    body.Braces = BraceState.StartAndEnd;
-                    UpdateWithCurrentSpan(body);
-                    body.Statements = statements.ToArray();
-                    fncSpan = fncSpan.UpdateWith(_curSpan);
-                    } catch (EndOfFileException) {
-                    // if we get an EOF here, we never had a chance to find the closing curly-brace
-                    m_errorSink.HandleError(JSError.UnclosedFunction, fncSpan, m_scanner._locationResolver, true);
-                    body.Statements = statements.ToArray();
-                    UpdateWithCurrentSpan(body);
-                    fncSpan = fncSpan.UpdateWith(_curSpan);
-                    } catch (RecoveryTokenException exc) {
-                    fncSpan = fncSpan.UpdateWith(_curSpan);
-                        if (IndexOfToken(NoSkipTokenSet.s_BlockNoSkipTokenSet, exc) == -1) {
+                        body.Braces = BraceState.StartAndEnd;
                         UpdateWithCurrentSpan(body);
                         body.Statements = statements.ToArray();
+                        fncSpan = fncSpan.UpdateWith(_curSpan);
+                    } catch (EndOfFileException) {
+                        // if we get an EOF here, we never had a chance to find the closing curly-brace
+                        m_errorSink.HandleError(JSError.UnclosedFunction, fncSpan, m_scanner._locationResolver, true);
+                        body.Statements = statements.ToArray();
+                        UpdateWithCurrentSpan(body);
+                        fncSpan = fncSpan.UpdateWith(_curSpan);
+                    } catch (RecoveryTokenException exc) {
+                        fncSpan = fncSpan.UpdateWith(_curSpan);
+                        if (IndexOfToken(NoSkipTokenSet.s_BlockNoSkipTokenSet, exc) == -1) {
+                            UpdateWithCurrentSpan(body);
+                            body.Statements = statements.ToArray();
                             exc._partiallyComputedNode = new FunctionObject(EncodeSpan(fncSpan)) {
                                 FunctionType = (inExpression ? FunctionType.Expression : FunctionType.Declaration),
                                 NameSpan = name != null ? GetSpan(name) : default(IndexSpan),
@@ -2911,22 +2910,22 @@ namespace Microsoft.NodejsTools.Parsing
                                 ParameterDeclarations = ToArray(formalParameters),
                                 ParametersSpan = paramsSpan,
                                 Body = body,
-                                IsGenerator = isGenerator
+                                GeneratorIndex = generatorIndex
                             };
-                        throw;
-                    }
+                            throw;
+                        }
                     } finally {
-                    m_blockType.RemoveAt(m_blockType.Count - 1);
-                    m_noSkipTokenSet.Remove(NoSkipTokenSet.s_StartStatementNoSkipTokenSet);
-                    m_noSkipTokenSet.Remove(NoSkipTokenSet.s_BlockNoSkipTokenSet);
-                }
+                        m_blockType.RemoveAt(m_blockType.Count - 1);
+                        m_noSkipTokenSet.Remove(NoSkipTokenSet.s_StartStatementNoSkipTokenSet);
+                        m_noSkipTokenSet.Remove(NoSkipTokenSet.s_BlockNoSkipTokenSet);
+                    }
 
-                GetNextToken();
+                    GetNextToken();
                 } finally {
-                // restore state
-                m_blockType = blockType;
-                m_labelTable = labelTable;
-            }
+                    // restore state
+                    m_blockType = blockType;
+                    m_labelTable = labelTable;
+                }
 
                 return new FunctionObject(EncodeSpan(fncSpan)) {
                     FunctionType = functionType,
@@ -2936,7 +2935,7 @@ namespace Microsoft.NodejsTools.Parsing
                     ParametersSpan = paramsSpan,
                     Body = body,
                     Doclet = doclet,
-                    IsGenerator = isGenerator
+                    GeneratorIndex = generatorIndex
                 };
             } finally {
                 _inGenerator = wasInGenerator;

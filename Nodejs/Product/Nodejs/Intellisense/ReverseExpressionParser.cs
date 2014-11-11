@@ -289,7 +289,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                         } else if ((token.ClassificationType == Classifier.Provider.Keyword &&
                             _stmtKeywords.Contains(text)) ||
                             (token.ClassificationType == Classifier.Provider.Operator && IsAssignmentOperator(text))) {
-                            if (start == null || (nestingChanged && nesting != 0)) {
+                            if (start == null || (nestingChanged && nesting != 0 || otherNesting != 0)) {
                                 return null;
                             } else {
                                 break;

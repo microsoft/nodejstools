@@ -598,7 +598,7 @@ label:
 @"function *f() {
     yield
 }",
-@"function *f() {
+@"function* f() {
     yield
 }"
 );
@@ -607,7 +607,7 @@ label:
 @"function *f() {
     yield  
 }",
-@"function *f() {
+@"function* f() {
     yield
 }"
 );
@@ -615,7 +615,7 @@ label:
 @"function *f() {
     yield   42
 }",
-@"function *f() {
+@"function* f() {
     yield 42
 }"
 );
@@ -624,8 +624,26 @@ label:
 @"function *f() {
     yield   42;
 }",
-@"function *f() {
+@"function* f() {
     yield 42;
+}"
+);
+
+            TestCode(
+@"function * f() {
+    yield   42;
+}",
+@"function* f() {
+    yield 42;
+}"
+);
+
+            TestCode(
+@"function * f() {
+    yield  *  42;
+}",
+@"function* f() {
+    yield* 42;
 }"
 );
         }

@@ -25,6 +25,7 @@ namespace Microsoft.NodejsTools.Parsing {
     internal sealed class FunctionObject : Statement, INameDeclaration {
         private Block m_body;
         private ParameterDeclaration[] m_parameters;
+        private int _generatorIndex = -1;
 
         public FunctionObject(EncodedSpan functionSpan)
             : base(functionSpan) {
@@ -78,7 +79,12 @@ namespace Microsoft.NodejsTools.Parsing {
 
         public IndexSpan ParametersSpan { get; set; }
         public bool IsExpression { get; set; }
-        public bool IsGenerator { get; set; }
+        public bool IsGenerator { get { return _generatorIndex != -1; } }
+
+        public int GeneratorIndex {
+            get { return _generatorIndex; }
+            set { _generatorIndex = value; }
+        }
 
         public int ParameterStart {
             get {
