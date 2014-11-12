@@ -428,7 +428,7 @@ namespace Microsoft.NodejsTools.Formatting {
                 return ShouldIndentForChild(parent, ((ExpressionStatement)block).Expression);
             } else if (IsMultiLineBracketedNode(block)) {
                 if (parent is CallNode && ((CallNode)parent).Arguments.Count() > 1) {
-                    // For indenting any child of call node we really are if the first argument is on the next line
+                    // For indenting any child of call node we really care if the first argument is on the next line
                     // or the same line as the parent.  For this case, we completely ignore the block argument itself.
                     return ContainsLineFeed(parent.GetStartIndex(_tree.LocationResolver), ((CallNode)parent).Arguments[0].GetStartIndex(_tree.LocationResolver));
                 }
@@ -559,11 +559,11 @@ namespace Microsoft.NodejsTools.Formatting {
         }
 
         public override bool Walk(ObjectLiteral node) {
-            if (node.Properties.Length == 0) {
-                ReplacePreceedingWhiteSpace(node.GetEndIndex(_tree.LocationResolver) - 1, "");
-            } else {
+            bool isMultiLine = ContainsLineFeed(node.GetStartIndex(_tree.LocationResolver), node.GetEndIndex(_tree.LocationResolver));
+
+            // Body.
+            if (node.Properties.Length != 0) {
                 Indent();
-                bool isMultiLine = ContainsLineFeed(node.GetStartIndex(_tree.LocationResolver), node.GetEndIndex(_tree.LocationResolver));
                 if (node.Properties.Length > 0) {
                     if (isMultiLine) {
                         // multiline block statement, make sure the 1st statement
@@ -574,13 +574,17 @@ namespace Microsoft.NodejsTools.Formatting {
                     WalkStatements(node, node.Properties, isMultiLine);
                 }
                 Dedent();
-
-                if (isMultiLine) {
-                    ReplacePreceedingIncludingNewLines(node.GetEndIndex(_tree.LocationResolver) - 1, ReplaceWith.InsertNewLineAndIndentation);
-                } else {
-                    ReplacePreceedingWhiteSpace(node.GetEndIndex(_tree.LocationResolver) - 1, " ");
-                }
             }
+
+            // Format the indentation of the block along with whitespace.
+            if (isMultiLine) {
+                ReplacePreceedingIncludingNewLines(node.GetEndIndex(_tree.LocationResolver) - 1, ReplaceWith.InsertNewLineAndIndentation);
+            } else if (node.Properties.Length == 0) {
+                ReplacePreceedingWhiteSpace(node.GetEndIndex(_tree.LocationResolver) - 1, "");
+            } else {
+                ReplacePreceedingWhiteSpace(node.GetEndIndex(_tree.LocationResolver) - 1, " ");
+            }
+
             return false;
         }
 
@@ -672,8 +676,9 @@ namespace Microsoft.NodejsTools.Formatting {
                 );
             }
 
-            bool isMultiLine = ContainsLineFeed(node.GetStartIndex(_tree.LocationResolver), node.GetEndIndex(_tree.LocationResolver));
             if (node.Arguments != null && node.Arguments.Length > 0) {
+                bool isMultiLine = ContainsLineFeed(node.Function.GetEndIndex(_tree.LocationResolver), node.Arguments[0].GetStartIndex(_tree.LocationResolver));
+
                 Debug.Assert(node.Arguments[0] != null);
                 if (node.Arguments[0] != null) {
                     if (isMultiLine && ShouldIndentForChild(node, node.Arguments[0])) {

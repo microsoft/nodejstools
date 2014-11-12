@@ -3544,7 +3544,8 @@ namespace Microsoft.NodejsTools.Parsing
                                 {
                                     if (JSToken.RightBracket != _curToken)
                                     {
-                                        ReportError(JSError.NoRightBracket);
+                                        ReportError(JSError.NoRightBracket, true);
+                                        SkipToNextToken(NoSkipTokenSet.s_ArrayInitNoSkipTokenSet);
                                     }
 
                                     break;

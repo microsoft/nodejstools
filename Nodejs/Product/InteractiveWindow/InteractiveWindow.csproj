@@ -197,6 +197,12 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubpath>.</VSIXSubpath>
     </Content>
+    <Content Include="..\Icons\SystemRegisteredICO\NodeJS_200x.png">
+      <Link>NodeJS_200x.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <VSIXSubpath>.</VSIXSubpath>
+    </Content>
     <None Include="Theme\Microsoft.NodejsTools.InteractiveWindow.theme.v11.0.pkgdef" />
     <None Include="Theme\Microsoft.NodejsTools.InteractiveWindow.theme.v12.0.pkgdef" />
     <None Include="Theme\Microsoft.NodejsTools.InteractiveWindow.theme.v14.0.pkgdef" />

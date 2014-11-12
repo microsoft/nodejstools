@@ -1427,6 +1427,12 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubpath>.</VSIXSubpath>
     </Content>
+    <Content Include="..\Icons\SystemRegisteredICO\NodeJS_200x.png">
+      <Link>NodeJS_200x.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <VSIXSubpath>.</VSIXSubpath>
+    </Content>
     <Content Include="..\Icons\NodejsProject.ico">
       <Link>NodejsProject.ico</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

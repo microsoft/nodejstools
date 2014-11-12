@@ -10,7 +10,7 @@
     <Locale>1033</Locale>
     <InstalledByMsi>true</InstalledByMsi>
     <Icon>NodeJS.ico</Icon>
-    <PreviewImage>NodeJS.ico</PreviewImage>
+    <PreviewImage>NodeJS_200x.png</PreviewImage>
     <SystemComponent>false</SystemComponent>
     <SupportedProducts>
       <VisualStudio Version="11.0">

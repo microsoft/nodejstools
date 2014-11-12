@@ -35,6 +35,7 @@
         <!-- Resources -->
         <File Include="NodeJS.ico" />
         <File Include="NodejsProject.ico" />
+        <File Include="NodeJS_200x.png" />
 
         <!-- Templates -->
         <File Include="FileTemplates\NewItem\NewItems.vsdir;

@@ -278,6 +278,9 @@ a.mount('/', [
                 // Test multiple lines stay aligned, but individual single line arrays fixed
                 new { Before = "function f() {\r\n    var x = [[1],\r\n             [2,   3],\r\n             [3,4,5]]\r\n}",
                       After  = "function f() {\r\n    var x = [[1],\r\n             [2, 3],\r\n             [3, 4, 5]]\r\n}"},
+                // https://nodejstools.codeplex.com/workitem/1494 We shouldn't push the 3 & 4 together
+                new { Before = "var x = [1,2,3 4]",
+                      After  = "var x = [1, 2, 3 4]"},
             };
 
             foreach (var test in testCode) {
@@ -347,6 +350,18 @@ a.mount('/', [
             TestCode("a(b,c)", "a(b, c)");
             TestCode("a(b,  c)", "a(b, c)");
             TestCode("a(b, c )", "a(b, c)");
+            //https://nodejstools.codeplex.com/workitem/1525
+            TestCode(
+@"socket.on(""disconnect"", function () {
+    var a = 2;
+}).on('message', function () {
+    var b = 1;
+});",
+@"socket.on(""disconnect"", function () {
+    var a = 2;
+}).on('message', function () {
+    var b = 1;
+});");
         }
 
         [TestMethod, Priority(0)]
@@ -730,6 +745,17 @@ c: 42, d: 100}",
 @"x = { a: 42, b: 100 }"
             );
 
+            //https://nodejstools.codeplex.com/workitem/1525
+            TestCode(
+@"var a = function (test) {
+    return {
+    }
+}",
+@"var a = function (test) {
+    return {
+    }
+}"
+);
         }
 
         [TestMethod, Priority(0)]

@@ -17,6 +17,7 @@
       
     <!-- Resources -->
     <File Include="NodeJS.ico" />
+    <File Include="NodeJS_200x.png" />
   </ItemGroup>
 
   <Import Project="$(BuildRoot)\Nodejs\Setup\WixGenerator.targets"/>
