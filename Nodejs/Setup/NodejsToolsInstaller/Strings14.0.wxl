@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <WixLocalization Culture="en-us" xmlns="http://schemas.microsoft.com/wix/2006/localization">
     <String Id="ProductName">Node.js Tools</String>
-    <String Id="ForVisualStudio">for Visual Studio 14</String>
-    <String Id="VSProductName">Visual Studio 14</String>
-    <String Id="WDProductName">Visual Studio Express 14 for Desktop</String>
-    <String Id="VWDProductName">Visual Studio Express 14 for Web</String>
+    <String Id="ForVisualStudio">for Visual Studio 2015</String>
+    <String Id="VSProductName">Visual Studio 2015</String>
+    <String Id="WDProductName">Visual Studio Express 2015 for Desktop</String>
+    <String Id="VWDProductName">Visual Studio Express 2015 for Web</String>
 
     <String Id="ProductDescription">!(loc.ProductName) !(loc.ForVisualStudio)</String>
     <String Id="DowngradeErrorMessage">A newer version of !(loc.ProductDescription) is already installed.</String>
