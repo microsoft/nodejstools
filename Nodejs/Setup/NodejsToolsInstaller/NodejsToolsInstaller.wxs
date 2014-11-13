@@ -23,7 +23,7 @@
 
         <!-- Conditions for install -->
         <PropertyRef Id="VS_PRERELEASE"/>
-        <Condition Message="!(loc.VSPrerelease)"> NOT VS_PRERELEASE OR Installed </Condition>
+        <!-- <Condition Message="!(loc.VSPrerelease)"> NOT VS_PRERELEASE OR Installed </Condition> -->
         
         <PropertyRef Id="NETFRAMEWORK45"/>
         <Condition Message="!(loc.NetFx45NotInstalled)"> NETFRAMEWORK45 OR Installed </Condition>
