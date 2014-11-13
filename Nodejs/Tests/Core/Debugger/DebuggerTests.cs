@@ -1913,6 +1913,92 @@ namespace NodejsTests.Debugger {
             );
         }
 
+        /// <summary>
+        /// https://nodejstools.codeplex.com/workitem/1515
+        /// </summary>
+        [TestMethod, Priority(0), TestCategory("Debugging")]
+        public void TypeScript_Stepping_Basic_RedirectDir() {
+            TestDebuggerSteps(
+                "TypeScriptOut\\TypeScriptTest.js",
+                new[] {
+                    new TestStep(action: TestAction.AddBreakpoint, 
+                        targetBreakpoint: 1,
+                        targetBreakpointColumn: 43,
+                        targetBreakpointFile: "TypeScriptTest.ts"),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
+                    new TestStep(action: TestAction.ResumeThread, 
+                        expectedHitCount: 1, 
+                        targetBreakpoint: 1,
+                        targetBreakpointColumn: 43,
+                        targetBreakpointFile: "TypeScriptTest.ts", 
+                        expectedBreakFunction: "Greeter.constructor",
+                        expectedBreakpointHit: 1),
+                    new TestStep(action: TestAction.StepOut, expectedStepComplete: 8),
+                }
+            );
+
+            TestDebuggerSteps(
+                "TypeScriptOut\\TypeScriptTest.js",
+                new[] {
+                    new TestStep(action: TestAction.AddBreakpoint, 
+                        targetBreakpoint: 7, 
+                        targetBreakpointFile: "TypeScriptTest.ts"),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
+                    new TestStep(action: TestAction.ResumeThread, 
+                        expectedHitCount: 1, 
+                        targetBreakpoint: 7, 
+                        targetBreakpointFile: "TypeScriptTest.ts", 
+                        expectedBreakFunction: "Greeter",
+                        expectedBreakpointHit: 7),
+                    new TestStep(action: TestAction.StepInto, expectedStepComplete: 1),
+                }
+            );
+
+            TestDebuggerSteps(
+                "TypeScriptOut\\TypeScriptTest.js",
+                new[] {
+                    new TestStep(action: TestAction.AddBreakpoint, 
+                        targetBreakpoint: 7, 
+                        targetBreakpointFile: "TypeScriptTest.ts"),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
+                    new TestStep(action: TestAction.ResumeThread, 
+                        expectedHitCount: 1, 
+                        targetBreakpoint: 7, 
+                        targetBreakpointFile: "TypeScriptTest.ts", 
+                        expectedBreakFunction: "Greeter",
+                        expectedBreakpointHit: 7),
+                    new TestStep(action: TestAction.StepOver, expectedStepComplete: 8),
+                }
+            );
+
+            TestDebuggerSteps(
+                "TypeScriptOut\\TypeScriptTest.js",
+                new[] {
+                    new TestStep(action: TestAction.AddBreakpoint, targetBreakpoint: 3, targetBreakpointFile: "TypeScriptTest.ts"),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
+                    new TestStep(action: TestAction.ResumeThread, expectedHitCount: 1, targetBreakpoint: 3, targetBreakpointFile: "TypeScriptTest.ts", expectedBreakFunction: "Greeter.greet", expectedBreakpointHit: 3),
+                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
+                }
+            );
+
+            TestDebuggerSteps(
+                "TypeScriptOut\\TypeScriptTest.js",
+                new[] {
+                    new TestStep(action: TestAction.AddBreakpoint, 
+                        targetBreakpoint: 1, 
+                        targetBreakpointFile: "TypeScriptTest.ts"),
+                    new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
+                    new TestStep(action: TestAction.ResumeThread, 
+                        expectedHitCount: 1, 
+                        targetBreakpoint: 1, 
+                        targetBreakpointFile: "TypeScriptTest.ts", 
+                        expectedBreakFunction: "Greeter.constructor",
+                        expectedBreakpointHit: 1),
+                    new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
+                }
+            );
+        }
+
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TypeScript_Break_On_First_Line() {
             TestDebuggerSteps(

@@ -32,7 +32,7 @@ namespace NodejsTests.Debugger.Commands {
             var module = new NodeModule(moduleId, fileName);
             var breakOn = new BreakOn(BreakOnKind.Equal, 2);
             var position = new FilePosition(fileName, line, column);
-            var breakpoint = new NodeBreakpoint(null, null, position, true, breakOn, null);
+            var breakpoint = new NodeBreakpoint(null, position, true, breakOn, null);
 
             // Act
             var setBreakpointCommand = new SetBreakpointCommand(commandId, module, breakpoint, false, false);
@@ -57,7 +57,7 @@ namespace NodejsTests.Debugger.Commands {
             var module = new NodeModule(moduleId, fileName);
             var breakOn = new BreakOn(BreakOnKind.Equal, 2);
             var position = new FilePosition(fileName, line, column);
-            var breakpoint = new NodeBreakpoint(null, null, position, true, breakOn, null);
+            var breakpoint = new NodeBreakpoint(null, position, true, breakOn, null);
 
             // Act
             var setBreakpointCommand = new SetBreakpointCommand(commandId, module, breakpoint, false, false);
@@ -80,7 +80,7 @@ namespace NodejsTests.Debugger.Commands {
             const string fileName = @"module.js";
             var breakOn = new BreakOn(BreakOnKind.Equal, 2);
             var position = new FilePosition(fileName, line, column);
-            var breakpoint = new NodeBreakpoint(null, null, position, true, breakOn, null);
+            var breakpoint = new NodeBreakpoint(null, position, true, breakOn, null);
 
             // Act
             var setBreakpointCommand = new SetBreakpointCommand(commandId, null, breakpoint, false, true);
@@ -103,7 +103,7 @@ namespace NodejsTests.Debugger.Commands {
             const string fileName = @"c:\module.js";
             var breakOn = new BreakOn(BreakOnKind.Equal, 2);
             var position = new FilePosition(fileName, line, column);
-            var breakpoint = new NodeBreakpoint(null, null, position, true, breakOn, null);
+            var breakpoint = new NodeBreakpoint(null, position, true, breakOn, null);
 
             // Act
             var setBreakpointCommand = new SetBreakpointCommand(commandId, null, breakpoint, false, false);
@@ -128,7 +128,7 @@ namespace NodejsTests.Debugger.Commands {
             var module = new NodeModule(moduleId, fileName);
             var breakOn = new BreakOn(BreakOnKind.Equal, 2);
             var position = new FilePosition(fileName, line, column);
-            var breakpoint = new NodeBreakpoint(null, null, position, true, breakOn, null);
+            var breakpoint = new NodeBreakpoint(null, position, true, breakOn, null);
 
             // Act
             var setBreakpointCommand = new SetBreakpointCommand(commandId, module, breakpoint, true, false);
@@ -153,7 +153,7 @@ namespace NodejsTests.Debugger.Commands {
             var module = new NodeModule(moduleId, fileName);
             var breakOn = new BreakOn(BreakOnKind.Equal, 2);
             var position = new FilePosition(fileName, line, column);
-            var breakpoint = new NodeBreakpoint(null, null, position, true, breakOn, null);
+            var breakpoint = new NodeBreakpoint(null, position, true, breakOn, null);
             var setBreakpointCommand = new SetBreakpointCommand(commandId, module, breakpoint, false, false);
             JObject breakpointResponse = SerializationTestData.GetSetBreakpointResponse();
 

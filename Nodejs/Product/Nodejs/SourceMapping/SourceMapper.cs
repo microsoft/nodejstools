@@ -19,10 +19,11 @@ using System.IO;
 using System.Linq;
 
 using Microsoft.NodejsTools;
+using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.SourceMapping {
     internal class SourceMapper {
-        private readonly Dictionary<string, SourceMap> _generatedFileToSourceMap = new Dictionary<string, SourceMap>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, ReverseSourceMap> _generatedFileToSourceMap = new Dictionary<string, ReverseSourceMap>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, JavaScriptSourceMapInfo> _originalFileToSourceMap = new Dictionary<string, JavaScriptSourceMapInfo>(StringComparer.OrdinalIgnoreCase);
 
         private JavaScriptSourceMapInfo TryGetMapInfo(string filename) {
@@ -49,6 +50,10 @@ namespace Microsoft.NodejsTools.SourceMapping {
                                 using (StreamReader reader = new StreamReader(sourceMapFilename)) {
                                     var sourceMap = new SourceMap(reader);
                                     _originalFileToSourceMap[filename] = mapInfo = new JavaScriptSourceMapInfo(sourceMap, contents);
+                                    // clear all of our cached _generatedFileToSourceMap files...
+                                    foreach (var cachedInvalid in _generatedFileToSourceMap.Where(x => x.Value == null).Select(x => x.Key).ToArray()) {
+                                        _generatedFileToSourceMap.Remove(cachedInvalid);
+                                    }
                                 }
                             }
                         } catch (ArgumentException) {
@@ -112,13 +117,26 @@ namespace Microsoft.NodejsTools.SourceMapping {
             fileName = requestedFileName;
             lineNo = requestedLineNo;
             columnNo = requestedColumnNo;
-            SourceMap sourceMap = GetSourceMap(requestedFileName);
+            ReverseSourceMap sourceMap = GetReverseSourceMap(requestedFileName);
 
             if (sourceMap != null) {
                 SourceMapInfo result;
-                if (sourceMap.TryMapPointBack(requestedLineNo, requestedColumnNo, out result)) {
+                if (sourceMap.Mapping.TryMapPointBack(requestedLineNo, requestedColumnNo, out result)) {
                     lineNo = result.Line;
                     columnNo = result.Column;
+
+                    foreach (var source in sourceMap.Mapping.Sources) {
+                        // requestedFilename == projectdir\server.ts
+                        // sourceMap.JavaScriptFile == projectdir\out\server.js
+                        // source == ..\server.ts
+                        //
+                        var path = GetFileRelativeToFile(sourceMap.JavaScriptFile, source);
+                        if (CommonUtils.IsSamePath(path, requestedFileName)) {
+                            fileName = sourceMap.JavaScriptFile;
+                            return true;
+                        }
+                    }
+
                     try {
                         fileName = Path.Combine(Path.GetDirectoryName(fileName) ?? string.Empty, result.FileName);
                     } catch (ArgumentException) {
@@ -133,11 +151,41 @@ namespace Microsoft.NodejsTools.SourceMapping {
             return false;
         }
 
-        private SourceMap GetSourceMap(string fileName) {
-            SourceMap sourceMap;
+        private static string GetFileRelativeToFile(string relativeToFile, string newFileName) {
+            return Path.Combine(Path.GetDirectoryName(relativeToFile), newFileName.Replace('/', '\\'));
+        }
+
+        class ReverseSourceMap {
+            public readonly SourceMap Mapping;
+            public readonly string JavaScriptFile;
+
+            public ReverseSourceMap(SourceMap mapping, string javaScriptFile) {
+                Mapping = mapping;
+                JavaScriptFile = javaScriptFile;
+            }
+        }
+
+        /// <summary>
+        /// Given a generated filename gets the source map from the .js file
+        /// </summary>
+        private ReverseSourceMap GetReverseSourceMap(string fileName) {
+            ReverseSourceMap sourceMap;
             if (!_generatedFileToSourceMap.TryGetValue(fileName, out sourceMap)) {
                 // See if we are using source maps for this file.
+                foreach(var keyValue in _originalFileToSourceMap) {
+                    foreach (var source in keyValue.Value.Map.Sources) {
+                        var path = GetFileRelativeToFile(keyValue.Key, source);
+                        if (CommonUtils.IsSamePath(path, fileName)) {
+                            return _generatedFileToSourceMap[fileName] = new ReverseSourceMap(
+                                keyValue.Value.Map,
+                                keyValue.Key
+                            );
+                        }
+                    }
+                }
 
+                // Fallback to TypeScript specific logic...  This might be better for 
+                // try and look next to the .js file...
                 string extension;
                 try {
                     extension = Path.GetExtension(fileName);
@@ -147,11 +195,15 @@ namespace Microsoft.NodejsTools.SourceMapping {
 
                 if (!string.Equals(extension, NodejsConstants.JavaScriptExtension, StringComparison.OrdinalIgnoreCase)) {
                     string baseFile = fileName.Substring(0, fileName.Length - extension.Length);
-                    if (File.Exists(baseFile + NodejsConstants.JavaScriptExtension) && File.Exists(baseFile + NodejsConstants.JavaScriptExtension + NodejsConstants.MapExtension)) {
+                    string jsFile = baseFile + NodejsConstants.JavaScriptExtension;
+                    if (File.Exists(jsFile) && File.Exists(jsFile + NodejsConstants.MapExtension)) {
                         // we're using source maps...
                         try {
                             using (StreamReader reader = new StreamReader(baseFile + NodejsConstants.JavaScriptExtension + NodejsConstants.MapExtension)) {
-                                _generatedFileToSourceMap[fileName] = sourceMap = new SourceMap(reader);
+                                _generatedFileToSourceMap[fileName] = sourceMap = new ReverseSourceMap(
+                                    new SourceMap(reader),
+                                    jsFile
+                                );
                             }
                         } catch (NotSupportedException) {
                             _generatedFileToSourceMap[fileName] = null;

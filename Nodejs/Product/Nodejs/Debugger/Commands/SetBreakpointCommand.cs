@@ -17,6 +17,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.NodejsTools.SourceMapping;
 using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json.Linq;
 
@@ -25,22 +26,27 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
         private readonly Dictionary<string, object> _arguments;
         private readonly NodeBreakpoint _breakpoint;
         private readonly NodeModule _module;
+        private readonly SourceMapper _sourceMapper;
+        private readonly FilePosition _position;
 
-        public SetBreakpointCommand(int id, NodeModule module, NodeBreakpoint breakpoint, bool withoutPredicate, bool remote)
+        public SetBreakpointCommand(int id, NodeModule module, NodeBreakpoint breakpoint, bool withoutPredicate, bool remote, SourceMapper sourceMapper = null)
             : base(id, "setbreakpoint") {
             Utilities.ArgumentNotNull("breakpoint", breakpoint);
 
             _module = module;
             _breakpoint = breakpoint;
+            _sourceMapper = sourceMapper;
+
+            _position = breakpoint.GetPosition(_sourceMapper);
 
             // Zero based line numbers
-            int line = breakpoint.Position.Line;
+            int line = _position.Line;
 
             // Zero based column numbers
             // Special case column to avoid (line 0, column 0) which
             // Node (V8) treats specially for script loaded via require
             // Script wrapping process: https://github.com/joyent/node/blob/v0.10.26-release/src/node.js#L880
-            int column = _breakpoint.Position.Column;
+            int column = _position.Column;
             if (line == 0) {
                 column += NodeConstants.ScriptWrapBegin.Length;
             }
@@ -55,10 +61,10 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                 _arguments["target"] = _module.Id;
             } else if (remote) {
                 _arguments["type"] = "scriptRegExp";
-                _arguments["target"] = GetCaseInsensitiveRegex(_breakpoint.Position.FileName);
+                _arguments["target"] = GetCaseInsensitiveRegex(_position.FileName);
             } else {
                 _arguments["type"] = "script";
-                _arguments["target"] = _breakpoint.Position.FileName;
+                _arguments["target"] = _position.FileName;
             }
 
             if (!NodeBreakpointBinding.GetEngineEnabled(_breakpoint.Enabled, _breakpoint.BreakOn, 0)) {
@@ -109,8 +115,8 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                 var column = (int)location["column"];
                 Column = Line == 0 ? column - NodeConstants.ScriptWrapBegin.Length : column;
             } else {
-                Line = _breakpoint.Position.Line;
-                Column = _breakpoint.Position.Column;
+                Line = _position.Line;
+                Column = _position.Column;
             }
         }
 

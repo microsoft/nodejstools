@@ -26,6 +26,7 @@ using Microsoft.NodejsTools.Debugger.Communication;
 using Microsoft.NodejsTools.Debugger.Events;
 using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.NodejsTools.SourceMapping;
+using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.Debugger {
     /// <summary>
@@ -348,16 +349,6 @@ namespace Microsoft.NodejsTools.Debugger {
         public NodeBreakpoint AddBreakpoint(string fileName, int line, int column, bool enabled = true, BreakOn breakOn = new BreakOn(), string condition = null) {
             var target = new FilePosition(fileName, line, column);
 
-            // Checks whether source map is available
-            string javaScriptFileName;
-            int javaScriptLine;
-            int javaScriptColumn;
-
-            if (SourceMapper.MapToJavaScript(fileName, line, column, out javaScriptFileName, out javaScriptLine, out javaScriptColumn)) {
-                var position = new FilePosition(javaScriptFileName, javaScriptLine, javaScriptColumn);
-                return new NodeBreakpoint(this, target, position, enabled, breakOn, condition);
-            }
-
             return new NodeBreakpoint(this, target, enabled, breakOn, condition);
         }
 
@@ -540,6 +531,18 @@ namespace Microsoft.NodejsTools.Debugger {
             foreach (NodeModule module in modules) {
                 NodeModule newModule;
                 if (GetOrAddModule(module, out newModule)) {
+                    if (newModule.FileName != newModule.JavaScriptFileName) {
+                        foreach (var breakpoint in _breakpointBindings) {
+                            var target = breakpoint.Value.Breakpoint.Target;
+                            if (target.FileName == newModule.FileName) {
+                                // attempt to rebind the breakpoint
+                                DebuggerClient.RunWithRequestExceptionsHandled(async () => {
+                                    await breakpoint.Value.Breakpoint.BindAsync().WaitAsync(TimeSpan.FromSeconds(2));
+                                });
+                            }
+                        }
+                    }
+
                     moduleLoaded(this, new ModuleLoadedEventArgs(newModule));
                 }
             }
@@ -642,9 +645,9 @@ namespace Microsoft.NodejsTools.Debugger {
                     }
 
                     SetBreakpointCommand result = await SetBreakpointAsync(breakpoint, cancellationToken: cancellationToken).ConfigureAwait(false);
-
+                    
                     // Treat rebound breakpoint binding as fully bound
-                    NodeBreakpointBinding reboundbreakpointBinding = CreateBreakpointBinding(breakpoint, result.BreakpointId, result.ScriptId, result.Line, result.Column, true);
+                    NodeBreakpointBinding reboundbreakpointBinding = CreateBreakpointBinding(breakpoint, result.BreakpointId, result.ScriptId, breakpoint.GetPosition(SourceMapper).FileName, result.Line, result.Column, true);
                     HandleBindBreakpointSuccess(reboundbreakpointBinding, breakpoint);
 
                     // Handle invalid-line fixup (second bind matches current line)
@@ -953,8 +956,9 @@ namespace Microsoft.NodejsTools.Debugger {
         public async Task<NodeBreakpointBinding> BindBreakpointAsync(NodeBreakpoint breakpoint, CancellationToken cancellationToken = new CancellationToken()) {
             SetBreakpointCommand result = await SetBreakpointAsync(breakpoint, cancellationToken: cancellationToken).ConfigureAwait(false);
 
-            bool fullyBound = (result.ScriptId.HasValue && result.Line == breakpoint.Position.Line);
-            NodeBreakpointBinding breakpointBinding = CreateBreakpointBinding(breakpoint, result.BreakpointId, result.ScriptId, result.Line, result.Column, fullyBound);
+            var position = breakpoint.GetPosition(SourceMapper);
+            bool fullyBound = (result.ScriptId.HasValue && result.Line == position.Line);
+            NodeBreakpointBinding breakpointBinding = CreateBreakpointBinding(breakpoint, result.BreakpointId, result.ScriptId, position.FileName, result.Line, result.Column, fullyBound);
 
             // Fully bound (normal case)
             // Treat as success
@@ -969,8 +973,8 @@ namespace Microsoft.NodejsTools.Debugger {
                 await RemoveBreakpointAsync(breakpointBinding, cancellationToken).ConfigureAwait(false);
                 result = await SetBreakpointAsync(breakpoint, true, cancellationToken).ConfigureAwait(false);
 
-                Debug.Assert(!(result.ScriptId.HasValue && result.Line == breakpoint.Position.Line));
-                CreateBreakpointBinding(breakpoint, result.BreakpointId, result.ScriptId, result.Line, result.Column, false);
+                Debug.Assert(!(result.ScriptId.HasValue && result.Line == position.Line));
+                CreateBreakpointBinding(breakpoint, result.BreakpointId, result.ScriptId, position.FileName, result.Line, result.Column, false);
             }
 
             // Not fully bound, without predicate
@@ -988,17 +992,17 @@ namespace Microsoft.NodejsTools.Debugger {
             // Try to find module
             NodeModule module = GetModuleForFilePath(breakpoint.Target.FileName);
 
-            var setBreakpointCommand = new SetBreakpointCommand(CommandId, module, breakpoint, withoutPredicate, IsRemote);
+            var setBreakpointCommand = new SetBreakpointCommand(CommandId, module, breakpoint, withoutPredicate, IsRemote, SourceMapper);
             await TrySendRequestAsync(setBreakpointCommand, cancellationToken).ConfigureAwait(false);
 
             return setBreakpointCommand;
         }
 
-        private NodeBreakpointBinding CreateBreakpointBinding(NodeBreakpoint breakpoint, int breakpointId, int? scriptId, int line, int column, bool fullyBound) {
-            var position = new FilePosition(breakpoint.Position.FileName, line, column);
+        private NodeBreakpointBinding CreateBreakpointBinding(NodeBreakpoint breakpoint, int breakpointId, int? scriptId, string filename, int line, int column, bool fullyBound) {
+            var position = new FilePosition(filename, line, column);
             FilePosition target = position;
 
-            SourceMapInfo mapping = SourceMapper.MapToOriginal(breakpoint.Position.FileName, line, column);
+            SourceMapInfo mapping = SourceMapper.MapToOriginal(filename, line, column);
             if (mapping != null) {
                 target = new FilePosition(breakpoint.Target.FileName, mapping.Line, mapping.Column);
             }
@@ -1209,7 +1213,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 module = new NodeModule(module.Id, javaScriptFileName);
             } else {
                 string directoryName = Path.GetDirectoryName(javaScriptFileName) ?? string.Empty;
-                string fileName = Path.Combine(directoryName, Path.GetFileName(originalFileName) ?? string.Empty);
+                string fileName = CommonUtils.GetAbsoluteFilePath(directoryName, originalFileName.Replace('/', '\\'));
 
                 module = new NodeModule(module.Id, fileName, javaScriptFileName);
             }

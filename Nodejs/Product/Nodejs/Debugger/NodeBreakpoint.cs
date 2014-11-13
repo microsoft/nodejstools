@@ -15,6 +15,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.NodejsTools.SourceMapping;
 
 namespace Microsoft.NodejsTools.Debugger {
     sealed class NodeBreakpoint {
@@ -22,19 +23,13 @@ namespace Microsoft.NodejsTools.Debugger {
         private readonly BreakOn _breakOn;
         private readonly string _condition;
         private readonly bool _enabled;
-        private readonly FilePosition _position;
         private readonly NodeDebugger _process;
         private readonly FilePosition _target;
         private bool _deleted;
 
-        public NodeBreakpoint(NodeDebugger process, FilePosition position, bool enabled, BreakOn breakOn, string condition)
-            : this(process, position, position, enabled, breakOn, condition) {
-        }
-
-        public NodeBreakpoint(NodeDebugger process, FilePosition target, FilePosition position, bool enabled, BreakOn breakOn, string condition) {
+        public NodeBreakpoint(NodeDebugger process, FilePosition target, bool enabled, BreakOn breakOn, string condition) {
             _process = process;
             _target = target;
-            _position = position;
             _enabled = enabled;
             _breakOn = breakOn;
             _condition = condition;
@@ -53,11 +48,23 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         /// <summary>
-        /// The filename, line and column where the breakpoint is set. If source maps are in use
-        /// then this is position in the actual JavaScript file.
+        /// Gets the position in the target JavaScript file using the provided SourceMapper.
+        /// 
+        /// This translates the breakpoint from the location where the user set it (possibly
+        /// a TypeScript file) into the location where it lives in JavaScript code.
         /// </summary>
-        public FilePosition Position {
-            get { return _position; }
+        public FilePosition GetPosition(SourceMapper mapper) {
+            // Checks whether source map is available
+            string javaScriptFileName;
+            int javaScriptLine;
+            int javaScriptColumn;
+
+            if (mapper != null &&
+                mapper.MapToJavaScript(Target.FileName, Target.Line, Target.Column, out javaScriptFileName, out javaScriptLine, out javaScriptColumn)) {
+                return new FilePosition(javaScriptFileName, javaScriptLine, javaScriptColumn);
+            }
+
+            return Target;
         }
 
         public bool Enabled {
