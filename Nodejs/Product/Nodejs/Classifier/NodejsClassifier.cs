@@ -479,6 +479,8 @@ namespace Microsoft.NodejsTools.Classifier {
 
                 // ECMA strict reserved words
                 case JSToken.Implements:
+                case JSToken.In:
+                case JSToken.InstanceOf:
                 case JSToken.Interface:
                 case JSToken.Let:
                 case JSToken.Package:
@@ -601,9 +603,6 @@ namespace Microsoft.NodejsTools.Classifier {
                         TokenTriggers.None
                     );
 
-                case JSToken.InstanceOf:
-                case JSToken.In:
-                    break;
                 case JSToken.Comma:                          // :
                     return new TokenInfo(
                         GetSpan(context),
