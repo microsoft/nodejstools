@@ -328,6 +328,7 @@ a.mount('/', [
             TestCode("var x = foo()'", "var x = foo() '");
             TestCode("return 42'", "return 42 '");
             TestCode("continue'", "continue '");
+
             TestCode("break'", "break '");
             TestCode("throw 42'", "throw 42 '");
         }
@@ -338,6 +339,16 @@ a.mount('/', [
             TestCode("a .b", "a.b");
             TestCode("a. b", "a.b");
             TestCode(" a . b", "a.b");
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestInvalidMember() {
+            TestCode("x.42", "x.42");
+            TestCode("x3.42", "x3.42");
+            TestCode("x_.23", "x_.23");
+            TestCode("x23.42", "x23.42");
+            TestCode("x23.42m", "x23.42m");
+            TestCode("x23.\"hello\"", "x23.\"hello\"");
         }
 
         [TestMethod, Priority(0)]
@@ -1076,6 +1087,11 @@ c: 42, d: 100}",
 @"(x)",
         options
     );
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestArithmetic() {
+            TestCode("a+.0", "a + .0");
         }
 
         [TestMethod, Priority(0)]

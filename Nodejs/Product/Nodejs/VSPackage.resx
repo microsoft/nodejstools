@@ -313,4 +313,13 @@
   <data name="413" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>_BUILDROOT_\Nodejs\Product\Icons\NewProjectDialogIconsICO\TSWorker.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="414" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>_BUILDROOT_\Nodejs\Product\Icons\AddNewItemICO\CSS.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="415" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>_BUILDROOT_\Nodejs\Product\Icons\AddNewItemICO\HTML.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="416" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>_BUILDROOT_\Nodejs\Product\Icons\AddNewItemICO\xml.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

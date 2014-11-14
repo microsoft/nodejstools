@@ -4160,6 +4160,12 @@ namespace Microsoft.NodejsTools.Parsing
                                     newSpans.RemoveAt(newSpans.Count - 1);
                                 }
                             }
+                            if (_curToken == JSToken.NumericLiteral) {
+                                // This is an error case.  We shouldn't be here with numeric literals.
+                                // The code likely resembles x.42 which is invalid
+                                ReportError(JSError.NoIdentifier, true);
+                                SkipTokensAndThrow(expression);
+                            }
                             return expression;
                     }
                 }

@@ -66,7 +66,7 @@ namespace Microsoft.NodejsTools.Parsing
         Delete,
         Increment,                      // ++
         Decrement,                      // --
-        LogicalNot,     // !
+        LogicalNot,                     // !
         BitwiseNot,                     // ~
 
         FirstBinaryOperator,
