@@ -261,7 +261,7 @@ bar""
         [HostType("VSTestHost")]
         public void BraceCompletion_BasicTests() {
 #if DEV12_OR_LATER
-            var props = VsIdeTestHostContext.Dte.get_Properties("TextEditor", "Node.js");
+            var props = VSTestContext.DTE.get_Properties("TextEditor", "Node.js");
             bool? oldValue = null;
             try {
                 oldValue = (bool)props.Item("BraceCompletion").Value;
