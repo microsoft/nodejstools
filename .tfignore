@@ -1,5 +1,4 @@
 .hg
 .hgignore
-Binaries
+BuildOutput
 Python\TestResults
-VSPackage.xform.resx

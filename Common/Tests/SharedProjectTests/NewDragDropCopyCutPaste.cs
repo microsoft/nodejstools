@@ -17,7 +17,6 @@ using System.IO;
 using System.Linq;
 using System.Windows.Automation;
 using System.Windows.Input;
-using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
 using TestUtilities.SharedProject;
@@ -29,13 +28,13 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
     [TestClass]
     public class NewDragDropCopyCutPaste : SharedProjectTest {
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void MoveToMissingFolderKeyboard() {
             MoveToMissingFolder(MoveByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void MoveToMissingFolderMouse() {
             MoveToMissingFolder(MoveByMouse);
         }
@@ -66,13 +65,13 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void MoveExcludedFolderKeyboard() {
             MoveExcludedFolder(MoveByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void MoveExcludedFolderMouse() {
             MoveExcludedFolder(MoveByMouse);
         }
@@ -104,13 +103,13 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void MoveExcludedItemToFolderKeyboard() {
             MoveExcludedItemToFolder(MoveByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void MoveExcludedItemToFolderMouse() {
             MoveExcludedItemToFolder(MoveByMouse);
         }
@@ -144,13 +143,13 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void MoveDuplicateFileNameSkipMoveKeyboard() {
             MoveDuplicateFileNameSkipMove(MoveByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void MoveDuplicateFileNameSkipMoveMouse() {
             MoveDuplicateFileNameSkipMove(MoveByMouse);
         }
@@ -188,13 +187,13 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void MoveDuplicateFileNamesSkipOneKeyboard() {
             MoveDuplicateFileNamesSkipOne(MoveByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void MoveDuplicateFileNamesSkipOneMouse() {
             MoveDuplicateFileNamesSkipOne(MoveByMouse);
         }
@@ -245,13 +244,13 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VsTestHost")]
         public void MoveDuplicateFileNamesFoldersSkipOneKeyboard() {
             MoveDuplicateFileNamesFoldersSkipOne(MoveByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VsTestHost")]
         public void MoveDuplicateFileNamesFoldersSkipOneMouse() {
             MoveDuplicateFileNamesFoldersSkipOne(MoveByMouse);
         }
@@ -269,7 +268,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         Folder("Source"),
                         Content("Source\\textfile1.txt", "source1"),
                         Content("Source\\textfile2.txt", "source2"),
-
+                        
                         Folder("Target"),
                         Content("Target\\textfile1.txt", "target1"),
                         Content("Target\\textfile2.txt", "target2")
@@ -304,13 +303,13 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void MoveDuplicateFileNamesCrossProjectSkipOneKeyboard() {
             MoveDuplicateFileNamesCrossProjectSkipOne(MoveByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void MoveDuplicateFileNamesCrossProjectSkipOneMouse() {
             MoveDuplicateFileNamesCrossProjectSkipOne(MoveByMouse);
         }
@@ -370,13 +369,13 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void MoveDuplicateFileNameCrossProjectSkipMoveKeyboard() {
             MoveDuplicateFileNameCrossProjectSkipMove(MoveByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void MoveDuplicateFileNameCrossProjectSkipMoveMouse() {
             MoveDuplicateFileNameCrossProjectSkipMove(MoveByMouse);
         }
@@ -424,13 +423,13 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void MoveDuplicateFileNameCrossProjectCSharpSkipMoveKeyboard() {
             MoveDuplicateFileNameCrossProjectCSharpSkipMove(MoveByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void MoveDuplicateFileNameCrossProjectCSharpSkipMoveMouse() {
             MoveDuplicateFileNameCrossProjectCSharpSkipMove(MoveByMouse);
         }
@@ -476,13 +475,13 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
 
         [TestMethod, Priority(2), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void MoveFileFromFolderToLinkedFolderKeyboard() {
             MoveFileFromFolderToLinkedFolder(MoveByKeyboard);
         }
 
         [TestMethod, Priority(2), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void MoveFileFromFolderToLinkedFolderMouse() {
             MoveFileFromFolderToLinkedFolder(MoveByMouse);
         }

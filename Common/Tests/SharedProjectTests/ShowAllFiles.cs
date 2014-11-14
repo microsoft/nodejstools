@@ -16,8 +16,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
-using Microsoft.TC.TestHostAdapters;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudioTools.Project;
+using Microsoft.VisualStudioTools.VSTestHost;
 using TestUtilities;
 using TestUtilities.SharedProject;
 using TestUtilities.UI;
@@ -32,7 +35,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void ShowAllFilesToggle() {
             foreach (var projectType in ProjectTypes) {
                 var def = new ProjectDefinition(
@@ -55,7 +58,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void ShowAllFilesFilesAlwaysHidden() {
             foreach (var projectType in ProjectTypes) {
                 var def = MakeBasicProject(projectType);
@@ -68,7 +71,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void ShowAllFilesSymLinks() {
             foreach (var projectType in ProjectTypes) {
                 var def = new ProjectDefinition(
@@ -130,7 +133,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void ShowAllFilesLinked() {
             foreach (var projectType in ProjectTypes) {
                 var def = new ProjectDefinition(
@@ -171,7 +174,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void ShowAllFilesIncludeExclude() {
             foreach (var projectType in ProjectTypes) {
                 var def = new ProjectDefinition(
@@ -260,7 +263,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
                     // https://pytools.codeplex.com/workitem/1143
                     try {
-                        VsIdeTestHostContext.Dte.ExecuteCommand("Project.AddNewItem");
+                        solution.App.ExecuteCommand("Project.AddNewItem");
                         Assert.Fail("Added a new item on excluded node");
                     } catch (COMException) {
                     }
@@ -269,7 +272,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     Assert.IsNotNull(excludedFolderNode);
                     AutomationWrapper.Select(excludedFolderNode);
                     try {
-                        VsIdeTestHostContext.Dte.ExecuteCommand("Project.NewFolder");
+                        solution.App.ExecuteCommand("Project.NewFolder");
                         Assert.Fail("Added a new folder on excluded node");
                     } catch (COMException) {
                     }
@@ -369,7 +372,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void ShowAllFilesChanges() {
             foreach (var projectType in ProjectTypes) {
                 using (var solution = MakeBasicProject(projectType).Generate().ToVs()) {
@@ -453,7 +456,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void ShowAllFilesHiddenFiles() {
             foreach (var projectType in ProjectTypes) {
                 var def = new ProjectDefinition(
@@ -546,7 +549,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void ShowAllFilesOnPerUser() {
             foreach (var projectType in ProjectTypes) {
                 var solutionFile = SolutionFile.Generate("ShowAllFilesOnPerUser",
@@ -584,7 +587,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void ShowAllFilesOnPerProject() {
             foreach (var projectType in ProjectTypes) {
                 var def = new ProjectDefinition(
@@ -616,7 +619,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void ShowAllFilesOffPerUser() {
             foreach (var projectType in ProjectTypes) {
                 var solutionFile = SolutionFile.Generate("ShowAllFilesOffPerUser",
@@ -654,7 +657,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void ShowAllFilesOffPerProject() {
             foreach (var projectType in ProjectTypes) {
                 var def = new ProjectDefinition(
@@ -685,7 +688,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void ShowAllFilesDefault() {
             foreach (var projectType in ProjectTypes) {
                 var def = new ProjectDefinition(
@@ -722,7 +725,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// https://nodejstools.codeplex.com/workitem/240
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void ShowAllMoveNotInProject() {
             foreach (var projectType in ProjectTypes) {
                 var def = new ProjectDefinition(
@@ -776,12 +779,73 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
 
         /// <summary>
+        /// https://pytools.codeplex.com/workitem/1996
+        /// </summary>
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("VSTestHost")]
+        public void ShowAllExcludeSelected() {
+            foreach (var projectType in ProjectTypes) {
+                var def = new ProjectDefinition(
+                    "ShowAllExcludeSelected",
+                    projectType,
+                    ItemGroup(
+                        Folder("Folder"),
+                        Compile("Folder\\File1"),
+                        Compile("Folder\\File2")
+                    ),
+                    Property("ProjectView", "ProjectFiles")
+                );
+
+                using (var solution = def.Generate().ToVs()) {
+                    solution.WaitForItem("ShowAllExcludeSelected");
+
+                    var file = solution.WaitForItem("ShowAllExcludeSelected", "Folder", "File2" + projectType.CodeExtension);
+                    AutomationWrapper.Select(file);
+                    solution.App.Dte.ExecuteCommand("Project.ExcludeFromProject");
+
+                    solution.WaitForItemRemoved("ShowAllExcludeSelected", "Folder", "File2" + projectType.CodeExtension);
+
+                    Assert.AreEqual("File1" + projectType.CodeExtension, Path.GetFileName(GetSelectedItemName()));
+
+                    file = solution.WaitForItem("ShowAllExcludeSelected", "Folder", "File1" + projectType.CodeExtension);
+                    AutomationWrapper.Select(file);
+                    solution.App.Dte.ExecuteCommand("Project.ExcludeFromProject");
+                    solution.WaitForItemRemoved("ShowAllExcludeSelected", "Folder", "File1" + projectType.CodeExtension);
+
+                    Assert.AreEqual("Folder", Path.GetFileName(GetSelectedItemName().TrimEnd('\\')));
+                }
+            }
+        }
+
+        private static string GetSelectedItemName() {
+            var window = UIHierarchyUtilities.GetUIHierarchyWindow(
+                VSTestContext.ServiceProvider,
+                new Guid(ToolWindowGuids80.SolutionExplorer)
+            );
+            IntPtr hier;
+            uint itemid;
+            IVsMultiItemSelect select;
+            ErrorHandler.ThrowOnFailure(window.GetCurrentSelection(out hier, out itemid, out select));
+            Assert.AreNotEqual(IntPtr.Zero, hier);
+            Assert.IsNull(select);
+            try {
+                var obj = (IVsHierarchy)Marshal.GetObjectForIUnknown(hier);
+                string name;
+                ErrorHandler.ThrowOnFailure(obj.GetCanonicalName(itemid, out name));
+                return name;
+            } finally {
+                Marshal.Release(hier);
+            }
+        }
+
+
+        /// <summary>
         /// Creating & deleting files rapidly shouldn't leave a file hanging around
         /// 
         /// https://nodejstools.codeplex.com/workitem/380
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void ShowAllFilesRapidChanges() {
             foreach (var projectType in ProjectTypes) {
                 var def = new ProjectDefinition(
@@ -814,7 +878,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// present in solution explorer.
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void ShowAllFilesRapidChanges2() {
             foreach (var projectType in ProjectTypes) {
                 var def = new ProjectDefinition(
@@ -847,13 +911,13 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void ShowAllFilesCopyExcludedFolderWithItemByKeyboard() {
             ShowAllFilesCopyExcludedFolderWithItem(DragDropCopyCutPaste.CopyByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void ShowAllFilesCopyExcludedFolderWithItemByMouse() {
             ShowAllFilesCopyExcludedFolderWithItem(DragDropCopyCutPaste.CopyByMouse);
         }
@@ -888,6 +952,55 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     
                     Assert.IsNull(
                         solution.WaitForItemRemoved("CopyExcludedFolderWithItem", "NewFolder1", "NewFolder2")
+                    );
+                }
+            }
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("VSTestHost")]
+        public void ShowAllFilesMoveExcludedItemToExcludedFolderByKeyboard() {
+            ShowAllFilesMoveExcludedItemToExcludedFolder(DragDropCopyCutPaste.MoveByKeyboard);
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("VSTestHost")]
+        public void ShowAllFilesMoveExcludedItemToExcludedFolderByMouse() {
+            ShowAllFilesMoveExcludedItemToExcludedFolder(DragDropCopyCutPaste.MoveByMouse);
+        }
+
+        /// <summary>
+        /// https://pytools.codeplex.com/workitem/1909
+        /// </summary>
+        private void ShowAllFilesMoveExcludedItemToExcludedFolder(DragDropCopyCutPaste.MoveDelegate mover) {
+            foreach (var projectType in ProjectTypes) {
+                var def = new ProjectDefinition(
+                    "ShowAllFilesMoveExcludedItemToExcludedFolder",
+                    projectType,
+                    Property("ProjectView", "ShowAllFiles"),
+                    Folder("NewFolder1", isExcluded: true),
+                    Compile("server", isExcluded: true)
+                );
+
+                using (var solution = def.Generate().ToVs()) {
+                    var projectNode = solution.WaitForItem("ShowAllFilesMoveExcludedItemToExcludedFolder");
+                    AutomationWrapper.Select(projectNode);
+
+                    mover(
+                        solution.WaitForItem("ShowAllFilesMoveExcludedItemToExcludedFolder", "NewFolder1"),
+                        solution.WaitForItem("ShowAllFilesMoveExcludedItemToExcludedFolder", "server" + projectType.CodeExtension)
+                    );
+
+                    Assert.IsNotNull(
+                        solution.WaitForItem("ShowAllFilesMoveExcludedItemToExcludedFolder", "NewFolder1", "server" + projectType.CodeExtension)
+                    );
+                    solution.App.Dte.ExecuteCommand("Project.ShowAllFiles"); // stop showing all
+
+                    Assert.IsNull(
+                        solution.WaitForItemRemoved("ShowAllFilesMoveExcludedItemToExcludedFolder", "NewFolder1")
+                    );
+                    Assert.IsNull(
+                        solution.WaitForItemRemoved("ShowAllFilesMoveExcludedItemToExcludedFolder", "NewFolder1", "server" + projectType.CodeExtension)
                     );
                 }
             }

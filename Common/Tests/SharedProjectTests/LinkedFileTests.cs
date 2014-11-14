@@ -16,8 +16,8 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using EnvDTE;
-using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
 using TestUtilities.SharedProject;
@@ -76,13 +76,35 @@ namespace VisualStudioToolsUITests {
             );
         }
 
+        private static SolutionFile MultiProjectLinkedFiles(ProjectType projectType) {
+            return SolutionFile.Generate(
+                "MultiProjectLinkedFiles",
+                new ProjectDefinition(
+                    "LinkedFiles1",
+                    projectType,
+                    ItemGroup(
+                        Compile("..\\FileNotInProject1"),
+                        Compile("..\\FileNotInProject2")
+                    )
+                ),
+                new ProjectDefinition(
+                    "LinkedFiles2",
+                    projectType,
+                    ItemGroup(
+                        Compile("..\\FileNotInProject2", isMissing: true)
+                    )
+                )
+            );
+        }
+
+
         [ClassInitialize]
         public static void DoDeployment(TestContext context) {
             AssertListener.Initialize();
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void RenameLinkedNode() {
             foreach (var projectType in ProjectTypes) {
                 using (var solution = LinkedFiles(projectType).Generate().ToVs()) {
@@ -115,23 +137,21 @@ namespace VisualStudioToolsUITests {
                     try {
                         autoItem.Properties.Item("FileName").Value = "Fob";
                         Assert.Fail("Should have failed to rename");
-                    } catch (TargetInvocationException tie) {
-                        Assert.AreEqual(tie.InnerException.GetType(), typeof(InvalidOperationException));
+                    } catch (InvalidOperationException) {
                     }
 
-                    autoItem = solution.Project.ProjectItems.Item("ExplicitDir").Collection.Item("ExplicitLinkedFile" + projectType.CodeExtension);
+                    autoItem = solution.Project.ProjectItems.Item("ExplicitDir").ProjectItems.Item("ExplicitLinkedFile" + projectType.CodeExtension);
                     try {
                         autoItem.Properties.Item("FileName").Value = "Fob";
                         Assert.Fail("Should have failed to rename");
-                    } catch (TargetInvocationException tie) {
-                        Assert.AreEqual(tie.InnerException.GetType(), typeof(InvalidOperationException));
+                    } catch (InvalidOperationException) {
                     }
                 }
             }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void MoveLinkedNode() {
             foreach (var projectType in ProjectTypes) {
                 using (var solution = LinkedFiles(projectType).Generate().ToVs()) {
@@ -182,7 +202,61 @@ namespace VisualStudioToolsUITests {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
+        public void MultiProjectMove() {
+            foreach (var projectType in ProjectTypes) {
+                using (var solution = MultiProjectLinkedFiles(projectType).ToVs()) {
+
+                    var fileNode = solution.FindItem("LinkedFiles1", "FileNotInProject1" + projectType.CodeExtension);
+                    Assert.IsNotNull(fileNode, "projectNode");
+                    AutomationWrapper.Select(fileNode);
+
+                    solution.App.Dte.ExecuteCommand("Edit.Copy");
+
+                    var folderNode = solution.FindItem("LinkedFiles2");
+                    AutomationWrapper.Select(folderNode);
+
+                    solution.App.Dte.ExecuteCommand("Edit.Paste");
+
+                    // item should have moved
+                    var copiedFile = solution.WaitForItem("LinkedFiles2", "FileNotInProject1" + projectType.CodeExtension);
+                    Assert.IsNotNull(copiedFile, "movedLinkedFile");
+
+                    Assert.AreEqual(
+                        true,
+                        solution.App.GetProject("LinkedFiles2").ProjectItems.Item("FileNotInProject1" + projectType.CodeExtension).Properties.Item("IsLinkFile").Value
+                    );
+                }
+            }
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("VSTestHost")]
+        public void MultiProjectMoveExists2() {
+            foreach (var projectType in ProjectTypes) {
+                using (var solution = MultiProjectLinkedFiles(projectType).ToVs()) {
+
+                    var fileNode = solution.FindItem("LinkedFiles1", "FileNotInProject2" + projectType.CodeExtension);
+                    Assert.IsNotNull(fileNode, "projectNode");
+                    AutomationWrapper.Select(fileNode);
+
+                    solution.App.Dte.ExecuteCommand("Edit.Copy");
+
+                    var folderNode = solution.FindItem("LinkedFiles2");
+                    AutomationWrapper.Select(folderNode);
+
+                    ThreadPool.QueueUserWorkItem(x => solution.App.ExecuteCommand("Edit.Paste"));
+
+                    string path = Path.Combine(solution.Directory, "FileNotInProject2" + projectType.CodeExtension);
+                    VisualStudioApp.CheckMessageBox(String.Format("There is already a link to '{0}'. You cannot have more than one link to the same file in a project.", path));
+
+                    solution.App.WaitForDialogDismissed();
+                }
+            }
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("VSTestHost")]
         public void MoveLinkedNodeOpen() {
             foreach (var projectType in ProjectTypes) {
                 using (var solution = LinkedFiles(projectType).Generate().ToVs()) {
@@ -215,7 +289,7 @@ namespace VisualStudioToolsUITests {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void MoveLinkedNodeOpenEdited() {
             foreach (var projectType in ProjectTypes) {
                 using (var solution = LinkedFiles(projectType).Generate().ToVs()) {
@@ -257,7 +331,7 @@ namespace VisualStudioToolsUITests {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void MoveLinkedNodeFileExistsButNotInProject() {
             foreach (var projectType in ProjectTypes) {
                 using (var solution = LinkedFiles(projectType).Generate().ToVs()) {
@@ -278,14 +352,14 @@ namespace VisualStudioToolsUITests {
                     Assert.IsNotNull(fileNotInProject, "fileNotInProject");
 
                     // but it should be the linked file on disk outside of our project, not the file that exists on disk at the same location.
-                    var autoItem = solution.Project.ProjectItems.Item("FolderWithAFile").Collection.Item("FileNotInProject" + projectType.CodeExtension);
+                    var autoItem = solution.Project.ProjectItems.Item("FolderWithAFile").ProjectItems.Item("FileNotInProject" + projectType.CodeExtension);
                     Assert.AreEqual(Path.Combine(solution.Directory, "FileNotInProject" + projectType.CodeExtension), autoItem.Properties.Item("FullPath").Value);
                 }
             }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void DeleteLinkedNode() {
             foreach (var projectType in ProjectTypes) {
                 using (var solution = LinkedFiles(projectType).Generate().ToVs()) {
@@ -303,7 +377,7 @@ namespace VisualStudioToolsUITests {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void LinkedFileInProjectIgnored() {
             foreach (var projectType in ProjectTypes) {
                 using (var solution = LinkedFiles(projectType).Generate().ToVs()) {
@@ -315,7 +389,7 @@ namespace VisualStudioToolsUITests {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void SaveAsCreateLink() {
             foreach (var projectType in ProjectTypes) {
                 using (var solution = LinkedFiles(projectType).Generate().ToVs()) {
@@ -337,7 +411,7 @@ namespace VisualStudioToolsUITests {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void SaveAsCreateFile() {
             foreach (var projectType in ProjectTypes) {
                 using (var solution = LinkedFiles(projectType).Generate().ToVs()) {
@@ -358,7 +432,7 @@ namespace VisualStudioToolsUITests {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void SaveAsCreateFileNewDirectory() {
             foreach (var projectType in ProjectTypes) {
                 using (var solution = LinkedFiles(projectType).Generate().ToVs()) {
@@ -373,7 +447,7 @@ namespace VisualStudioToolsUITests {
                     autoItem.SaveAs(Path.Combine(solution.Directory, "LinkedFiles\\CreatedDirectory\\SaveAsCreateFileNewDirectory" + projectType.CodeExtension));
 
 
-                    autoItem = solution.Project.ProjectItems.Item("CreatedDirectory").Collection.Item("SaveAsCreateFileNewDirectory" + projectType.CodeExtension);
+                    autoItem = solution.Project.ProjectItems.Item("CreatedDirectory").ProjectItems.Item("SaveAsCreateFileNewDirectory" + projectType.CodeExtension);
                     isLinkFile = autoItem.Properties.Item("IsLinkFile").Value;
                     Assert.AreEqual(isLinkFile, false);
                 }
@@ -384,7 +458,7 @@ namespace VisualStudioToolsUITests {
         /// Adding a duplicate link to the same item
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void AddExistingItem() {
             foreach (var projectType in ProjectTypes) {
                 using (var solution = LinkedFiles(projectType).Generate().ToVs()) {
@@ -407,7 +481,7 @@ namespace VisualStudioToolsUITests {
         /// Adding a link to a folder which is already linked in somewhere else.
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void AddExistingItemAndItemIsAlreadyLinked() {
             foreach (var projectType in ProjectTypes) {
                 using (var solution = LinkedFiles(projectType).Generate().ToVs()) {
@@ -434,7 +508,7 @@ namespace VisualStudioToolsUITests {
         /// path).
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void AddExistingItemAndLinkAlreadyExists() {
             foreach (var projectType in ProjectTypes) {
                 using (var solution = LinkedFiles(projectType).Generate().ToVs()) {
@@ -457,7 +531,7 @@ namespace VisualStudioToolsUITests {
         /// Adding new linked item when file of same name exists (when the file only exists on disk)
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void AddExistingItemAndFileByNameExistsOnDiskButNotInProject() {
             foreach (var projectType in ProjectTypes) {
                 using (var solution = LinkedFiles(projectType).Generate().ToVs()) {
@@ -481,7 +555,7 @@ namespace VisualStudioToolsUITests {
         /// Adding new linked item when file of same name exists (both in the project and on disk)
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void AddExistingItemAndFileByNameExistsOnDiskAndInProject() {
             foreach (var projectType in ProjectTypes) {
                 using (var solution = LinkedFiles(projectType).Generate().ToVs()) {
@@ -505,7 +579,7 @@ namespace VisualStudioToolsUITests {
         /// Adding new linked item when file of same name exists (in the project, but not on disk)
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void AddExistingItemAndFileByNameExistsInProjectButNotOnDisk() {
             foreach (var projectType in ProjectTypes) {
                 using (var solution = LinkedFiles(projectType).Generate().ToVs()) {
@@ -529,7 +603,7 @@ namespace VisualStudioToolsUITests {
         /// Add Existing Item from.  We should add the file to the directory where it lives.
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void AddExistingItemAsLinkButFileExistsInProjectDirectory() {
             foreach (var projectType in ProjectTypes) {
                 using (var solution = LinkedFiles(projectType).Generate().ToVs()) {
@@ -552,7 +626,7 @@ namespace VisualStudioToolsUITests {
         /// Reaming the file name in the Link attribute is ignored.
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void RenamedLinkedFile() {
             foreach (var projectType in ProjectTypes) {
                 using (var solution = LinkedFiles(projectType).Generate().ToVs()) {
@@ -569,7 +643,7 @@ namespace VisualStudioToolsUITests {
         /// A link path outside of our project dir will result in the link being ignored.
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void BadLinkPath() {
             foreach (var projectType in ProjectTypes) {
                 using (var solution = LinkedFiles(projectType).Generate().ToVs()) {
@@ -586,7 +660,7 @@ namespace VisualStudioToolsUITests {
         /// A rooted link path is ignored.
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void RootedLinkIgnored() {
             foreach (var projectType in ProjectTypes) {
                 using (var solution = LinkedFiles(projectType).Generate().ToVs()) {
@@ -600,7 +674,7 @@ namespace VisualStudioToolsUITests {
         /// A rooted link path is ignored.
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void RootedIncludeIgnored() {
             foreach (var projectType in ProjectTypes) {
                 using (var solution = LinkedFiles(projectType).Generate().ToVs()) {

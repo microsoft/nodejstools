@@ -15,7 +15,6 @@
 using System;
 using System.Linq;
 using System.Windows;
-using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.Text;
@@ -32,7 +31,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// Make sure Ctrl-Space works
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void CtrlSpace() {
             var project = Project("CtrlSpace",
                 Compile("server", "var http = require('http');\r\nhttp.createS")
@@ -43,7 +42,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
                 server.MoveCaret(2, 13);
 
-                VsIdeTestHostContext.Dte.ExecuteCommand("Edit.CompleteWord");
+                solution.App.Dte.ExecuteCommand("Edit.CompleteWord");
 
                 server.WaitForText("var http = require('http');\r\nhttp.createServer");
             }
@@ -55,7 +54,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// Make sure we get intellisense for process.stdin
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void ProcessStdinIntellisense() {
             var project = Project("ProcessStdIn",
                 Compile("server", "var x = process.stdin;\r\n")
@@ -79,7 +78,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// Make sure reference path intellisense works
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void ReferenceIntellisense() {
             var project = Project("ReferenceIntellisense",
                 Compile("server", "/// <reference path=\"app.js\" />\r\nvar x = abc;\r\n"),
@@ -106,7 +105,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// which points at a folder should successfully pick up the intellisense.
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void NodeModulesPackageJsonFolder() {
             var project = Project("ReferenceIntellisense",
                 Compile("server", "require('mymod')"),
@@ -133,7 +132,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// https://nodejstools.codeplex.com/workitem/1203
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void SignaturesTest() {
             var project = Project("SignaturesTest",
                 Compile("server", "function f(a, b, c) { }\r\n\r\n")
@@ -168,7 +167,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// https://nodejstools.codeplex.com/workitem/1201
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void IntellisenseAfterNewLine() {
             var project = Project("NewLineTest",
                 Compile("server", "'blah'\r\n")
@@ -192,7 +191,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// https://nodejstools.codeplex.com/workitem/1201
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void IntellisenseAfterNewLine2() {
             var project = Project("NewLineTest",
                 Compile("server", "var x = 'abc';\r\n// foo\r\nx\r\nvar abc=42\r\nx")
@@ -225,7 +224,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// https://nodejstools.codeplex.com/workitem/1144
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void IntellisenseAfterSingleLineComment() {
             var project = Project("IntellisenseAfterSingleCommentTest",
                 Compile("server", "'blah'//blah\r\n")
@@ -248,7 +247,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// https://nodejstools.codeplex.com/workitem/1144
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void IntellisenseAfterMultiLineComment() {
             var project = Project("IntellisenseAfterMultiCommentTest",
                 Compile("server", "'blah'/*blah*/")
@@ -268,7 +267,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void JSDocTest() {
             var project = Project("JSDocTest",
                 Compile("app", @"

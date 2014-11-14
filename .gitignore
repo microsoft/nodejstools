@@ -109,7 +109,7 @@ UpgradeLog*.XML
 
 *.DotSetting.user
 
-Binaries/
+BuildOutput/
 VSPackage.xform.resx
 /Nodejs/Product/Nodejs/ProjectTemplates/AddWebSiteAzureExpressApp/AddWebSiteAzureExpressApp.vstemplate
 /Nodejs/Product/Nodejs/ProjectTemplates/AddWebSiteAzureNodejsApp/AddWebSiteAzureNodejsApp.vstemplate

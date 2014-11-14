@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
@@ -14,7 +13,7 @@ namespace Microsoft.Nodejs.Tests.UI {
     [TestClass]
     public class ClassificationTests : NodejsProjectTest {
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void ClassificationTest() {
             var code = @"""use-strict"";
 
@@ -118,7 +117,7 @@ x = $abc;";
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void IdentifierKeywords() {
             var code = @"var x = app.get;
 var x = app.get();

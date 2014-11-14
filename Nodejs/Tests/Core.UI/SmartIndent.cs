@@ -15,8 +15,8 @@
 using System;
 using System.Windows.Forms;
 using EnvDTE;
-using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudioTools.VSTestHost;
 using TestUtilities;
 using TestUtilities.SharedProject;
 using TestUtilities.UI;
@@ -25,8 +25,8 @@ namespace Microsoft.Nodejs.Tests.UI {
     [TestClass]
     public class SmartIndent : NodejsProjectTest {
         public static ProjectDefinition BasicProject = new ProjectDefinition(
-            "AutoIndent", 
-            NodejsProject, 
+            "AutoIndent",
+            NodejsProject,
             Compile("server", ""),
             Compile("Bug384", @"Foo.prototype.Bar = function (callback) {
 
@@ -52,7 +52,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void SmartIndentBug1198() {
             using (var solution = BasicProject.Generate().ToVs()) {
                 var doc = solution.OpenItem("AutoIndent", "Bug1198.js");
@@ -68,9 +68,9 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void SmartIndentBug384() {
-            using (var solution = BasicProject.Generate().ToVs()) {                
+            using (var solution = BasicProject.Generate().ToVs()) {
                 var doc = solution.OpenItem("AutoIndent", "Bug384.js");
                 doc.Invoke(() => doc.TextView.Caret.MoveTo(doc.TextView.TextViewLines[9]));
                 Keyboard.Type(System.Windows.Input.Key.End);
@@ -80,14 +80,14 @@ namespace Microsoft.Nodejs.Tests.UI {
                     doc.TextView.Caret.Position.BufferPosition.GetContainingLine().Length
                 );
             }
-            
+
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void SmartIndentBasic() {
 #if DEV12_OR_LATER
-            var props = VsIdeTestHostContext.Dte.get_Properties("TextEditor", "Node.js");
+            var props = VSTestContext.DTE.get_Properties("TextEditor", "Node.js");
             bool? oldValue = null;
             try {
                 oldValue = (bool)props.Item("BraceCompletion").Value;
@@ -258,7 +258,7 @@ bar""
 
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void BraceCompletion_BasicTests() {
 #if DEV12_OR_LATER
             var props = VsIdeTestHostContext.Dte.get_Properties("TextEditor", "Node.js");

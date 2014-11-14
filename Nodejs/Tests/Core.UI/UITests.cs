@@ -16,11 +16,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Threading;
-using System.Windows.Automation;
 using System.Windows.Input;
 using EnvDTE;
-using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
 using TestUtilities.Nodejs;
@@ -40,17 +37,18 @@ namespace Microsoft.Nodejs.Tests.UI {
 
 #if FALSE // Deferred projects currently aren't enabled
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void DeferredSaveWithDot() {
             // http://pytools.codeplex.com/workitem/623
             // enable deferred saving on projects
-            var props = VsIdeTestHostContext.Dte.get_Properties("Environment", "ProjectsAndSolution");
-            var prevValue = props.Item("SaveNewProjects").Value;
-            props.Item("SaveNewProjects").Value = false;
 
-            try {
+            using (var app = new VisualStudioApp()) {
+                var props = app.Dte.get_Properties("Environment", "ProjectsAndSolution");
+                var prevValue = props.Item("SaveNewProjects").Value;
+                props.Item("SaveNewProjects").Value = false;
+                app.OnDispose(() => props.Item("SaveNewProjects").Value = prevValue);
+
                 // now run the test
-                var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
                 var newProjDialog = app.FileNewProject();
 
                 newProjDialog.FocusLanguageNode("JavaScript");
@@ -76,36 +74,34 @@ namespace Microsoft.Nodejs.Tests.UI {
                 app.Dte.Solution.Close(false);
 
                 Directory.Delete(Path.GetDirectoryName(fullname), true);
-            } finally {
-                props.Item("SaveNewProjects").Value = prevValue;
             }
         }
 #endif
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void AbsolutePaths() {
             var proj = File.ReadAllText(TestData.GetPath(@"TestData\NodejsProjectData\AbsolutePath\AbsolutePath.njsproj"));
             proj = proj.Replace("[ABSPATH]", TestData.GetPath(@"TestData\NodejsProjectData\AbsolutePath"));
             File.WriteAllText(TestData.GetPath(@"TestData\NodejsProjectData\AbsolutePath\AbsolutePath.njsproj"), proj);
 
-            var project = BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\AbsolutePath.sln");
 
-            var app = new VisualStudioApp(VsIdeTestHostContext.Dte);
-            app.OpenSolutionExplorer();
-            var window = app.SolutionExplorerTreeView;
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\AbsolutePath.sln");
+                app.OpenSolutionExplorer();
+                var window = app.SolutionExplorerTreeView;
 
-            // find server.js, send copy & paste, verify copy of file is there
-            var programPy = window.WaitForItem("Solution 'AbsolutePath' (1 project)", "AbsolutePath", "server.js");
-            Assert.AreNotEqual(null, programPy);
+                // find server.js, send copy & paste, verify copy of file is there
+                var programPy = window.WaitForItem("Solution 'AbsolutePath' (1 project)", "AbsolutePath", "server.js");
+                Assert.AreNotEqual(null, programPy);
+            }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void MoveStartupFile() {
-            var project = BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\MoveStartupFile.sln");
-
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\MoveStartupFile.sln");
                 app.OpenSolutionExplorer();
                 var window = app.SolutionExplorerTreeView;
 
@@ -126,11 +122,11 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void CopyPasteFile() {
-            var project = BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
                 app.OpenSolutionExplorer();
                 var window = app.SolutionExplorerTreeView;
 
@@ -153,11 +149,11 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void DeleteFile() {
-            var project = BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\DeleteFile.sln");
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\DeleteFile.sln");
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
                 app.OpenSolutionExplorer();
                 var window = app.SolutionExplorerTreeView;
 
@@ -178,11 +174,11 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void AddNewFolder() {
-            var project = BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
                 app.OpenSolutionExplorer();
                 var window = app.SolutionExplorerTreeView;
 
@@ -211,11 +207,11 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// Adds a new folder which fits exactly w/ no space left in the path name
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void AddNewFolderLongPathBoundary() {
-            var project = OpenLongFileNameProject(24);
+            using (var app = new VisualStudioApp()) {
+                var project = OpenLongFileNameProject(app, 24);
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
                 app.OpenSolutionExplorer();
                 var window = app.SolutionExplorerTreeView;
 
@@ -243,11 +239,11 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// Adds a new folder with a path that's too long, typing a new path.
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void AddNewFolderLongPathTooLong() {
-            var project = OpenLongFileNameProject(24);
+            using (var app = new VisualStudioApp()) {
+                var project = OpenLongFileNameProject(app, 24);
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
                 app.OpenSolutionExplorer();
                 var window = app.SolutionExplorerTreeView;
 
@@ -270,11 +266,11 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// Adds a folder with a path that's too long using the default provided folder name.
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void AddNewFolderLongPathTooLongCancelEdit() {
-            var project = OpenLongFileNameProject(21);
+            using (var app = new VisualStudioApp()) {
+                var project = OpenLongFileNameProject(app, 21);
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
                 app.OpenSolutionExplorer();
                 var window = app.SolutionExplorerTreeView;
 
@@ -296,11 +292,11 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// Adds a folder with a path that's too long using the default provided folder name.
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void AddNewItemLongPathBoundary() {
-            var project = OpenLongFileNameProject(12);
+            using (var app = new VisualStudioApp()) {
+                var project = OpenLongFileNameProject(app, 12);
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
                 app.OpenSolutionExplorer();
                 var window = app.SolutionExplorerTreeView;
 
@@ -322,11 +318,11 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// Adds a folder with a path that's too long using the default provided folder name.
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void AddNewItemLongPathTooLong() {
-            var project = OpenLongFileNameProject(12);
+            using (var app = new VisualStudioApp()) {
+                var project = OpenLongFileNameProject(app, 12);
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
                 app.OpenSolutionExplorer();
                 var window = app.SolutionExplorerTreeView;
 
@@ -347,11 +343,11 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// Adds a folder with a path that's too long using the default provided folder name.
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void DeleteLockedFolder() {
-            var project = BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\DeleteLockedFolder.sln");
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\DeleteLockedFolder.sln");
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
                 app.OpenSolutionExplorer();
                 var window = app.SolutionExplorerTreeView;
 
@@ -382,7 +378,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        internal static Project OpenLongFileNameProject(int spaceRemaining = 30) {
+        internal static Project OpenLongFileNameProject(VisualStudioApp app, int spaceRemaining = 30) {
             string testDir = Path.Combine(Environment.CurrentDirectory, Guid.NewGuid().ToString());
             int targetPathLength = 260 - spaceRemaining - "\\LongFileNames\\".Length;
             testDir = testDir + new string('X', targetPathLength - testDir.Length);
@@ -391,33 +387,33 @@ namespace Microsoft.Nodejs.Tests.UI {
             Directory.CreateDirectory(testDir);
             File.Copy(@"TestData\NodejsProjectData\LongFileNames.sln", Path.Combine(testDir, "LongFileNames.sln"));
             File.Copy(@"TestData\NodejsProjectData\LFN.njsproj", Path.Combine(testDir, "LFN.njsproj"));
-            
+
             CopyDirectory(@"TestData\NodejsProjectData\LongFileNames", Path.Combine(testDir, "LongFileNames"));
 
-            return BasicProjectTests.OpenProject(Path.Combine(testDir, "LongFileNames.sln"));
+            return app.OpenProject(Path.Combine(testDir, "LongFileNames.sln"));
         }
 
         private static void CopyDirectory(string source, string dest) {
             Directory.CreateDirectory(dest);
 
-            foreach(var file in Directory.GetFiles(source)) {
-                var target  = Path.Combine(dest, Path.GetFileName(file));
+            foreach (var file in Directory.GetFiles(source)) {
+                var target = Path.Combine(dest, Path.GetFileName(file));
                 Console.WriteLine("Copying {0} to {1}", file, target);
                 File.Copy(file, target);
             }
 
-            foreach(var dir in Directory.GetDirectories(source)) {
+            foreach (var dir in Directory.GetDirectories(source)) {
                 Console.WriteLine("Copying dir {0} to {1}", dir, Path.Combine(dest, dir));
                 CopyDirectory(dir, Path.Combine(dest, dir));
             }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void AddNewFolderNested() {
-            var project = BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
                 app.OpenSolutionExplorer();
                 var window = app.SolutionExplorerTreeView;
 
@@ -460,11 +456,11 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void RenameProjectToExisting() {
-            var project = BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\RenameProjectTestUI.sln");
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\RenameProjectTestUI.sln");
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
                 app.OpenSolutionExplorer();
                 var window = app.SolutionExplorerTreeView;
 
@@ -500,11 +496,11 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void RenameItemsTest() {
-            var project = BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\RenameItemsTestUI.sln");
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\RenameItemsTestUI.sln");
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
                 app.OpenSolutionExplorer();
                 var window = app.SolutionExplorerTreeView;
 
@@ -572,11 +568,11 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void CrossProjectCopy() {
-            BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\HelloWorld2.sln", expectedProjects: 2);
+            using (var app = new VisualStudioApp()) {
+                app.OpenProject(@"TestData\NodejsProjectData\HelloWorld2.sln", expectedProjects: 2);
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
                 app.OpenSolutionExplorer();
                 var window = app.SolutionExplorerTreeView;
 
@@ -593,13 +589,13 @@ namespace Microsoft.Nodejs.Tests.UI {
                 Assert.AreNotEqual(null, window.WaitForItem("Solution 'HelloWorld2' (2 projects)", "HelloWorld", "TestFolder3"));
             }
         }
-        
-        [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
-        public void CrossProjectCutPaste() {
-            BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\HelloWorld2.sln", expectedProjects: 2);
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("VSTestHost")]
+        public void CrossProjectCutPaste() {
+            using (var app = new VisualStudioApp()) {
+                app.OpenProject(@"TestData\NodejsProjectData\HelloWorld2.sln", expectedProjects: 2);
+
                 app.OpenSolutionExplorer();
                 var window = app.SolutionExplorerTreeView;
 
@@ -619,11 +615,11 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void CutPaste() {
-            BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\HelloWorld2.sln", expectedProjects: 2);
+            using (var app = new VisualStudioApp()) {
+                app.OpenProject(@"TestData\NodejsProjectData\HelloWorld2.sln", expectedProjects: 2);
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
                 app.OpenSolutionExplorer();
                 var window = app.SolutionExplorerTreeView;
 
@@ -643,11 +639,11 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void CopyFolderOnToSelf() {
-            BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\HelloWorld2.sln", expectedProjects: 2);
+            using (var app = new VisualStudioApp()) {
+                app.OpenProject(@"TestData\NodejsProjectData\HelloWorld2.sln", expectedProjects: 2);
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
                 app.OpenSolutionExplorer();
                 var window = app.SolutionExplorerTreeView;
 
@@ -663,11 +659,11 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void DragDropTest() {
-            BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\DragDropTest.sln");
+            using (var app = new VisualStudioApp()) {
+                app.OpenProject(@"TestData\NodejsProjectData\DragDropTest.sln");
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
                 app.OpenSolutionExplorer();
                 var window = app.SolutionExplorerTreeView;
 
@@ -689,11 +685,11 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// Drag a file onto another file in the same directory, nothing should happen
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void DragDropFileToFileTest() {
-            BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\DragDropTest.sln");
+            using (var app = new VisualStudioApp()) {
+                app.OpenProject(@"TestData\NodejsProjectData\DragDropTest.sln");
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
                 app.OpenSolutionExplorer();
                 var window = app.SolutionExplorerTreeView;
 
@@ -716,11 +712,11 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// Drag a file onto it's containing folder, nothing should happen
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void DragDropFileToContainingFolderTest() {
-            BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\DragDropTest.sln");
+            using (var app = new VisualStudioApp()) {
+                app.OpenProject(@"TestData\NodejsProjectData\DragDropTest.sln");
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
                 app.OpenSolutionExplorer();
                 var window = app.SolutionExplorerTreeView;
 
@@ -739,11 +735,11 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void DragLeaveTest() {
-            BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\DragDropTest.sln");
+            using (var app = new VisualStudioApp()) {
+                app.OpenProject(@"TestData\NodejsProjectData\DragDropTest.sln");
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
                 app.OpenSolutionExplorer();
                 var window = app.SolutionExplorerTreeView;
 
@@ -768,11 +764,11 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void DragLeaveFolderTest() {
-            BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\DragDropTest.sln");
+            using (var app = new VisualStudioApp()) {
+                app.OpenProject(@"TestData\NodejsProjectData\DragDropTest.sln");
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
                 app.OpenSolutionExplorer();
                 var window = app.SolutionExplorerTreeView;
 
@@ -795,13 +791,13 @@ namespace Microsoft.Nodejs.Tests.UI {
                 Assert.AreNotEqual(null, window.FindItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder2", "SubFolder"));
             }
         }
-        
-        [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
-        public void MultiSelectCopyAndPaste() {
-            BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\MultiSelectCopyAndPaste.sln");
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("VSTestHost")]
+        public void MultiSelectCopyAndPaste() {
+            using (var app = new VisualStudioApp()) {
+                app.OpenProject(@"TestData\NodejsProjectData\MultiSelectCopyAndPaste.sln");
+
                 app.OpenSolutionExplorer();
                 var window = app.SolutionExplorerTreeView;
 
@@ -825,13 +821,12 @@ namespace Microsoft.Nodejs.Tests.UI {
                 Assert.AreNotEqual(null, window.WaitForItem("Solution 'MultiSelectCopyAndPaste' (1 project)", "MultiSelectCopyAndPaste", "server3 - Copy.js"));
             }
         }
-        
-        [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
-        public void TransferItem() {
-            var project = BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("VSTestHost")]
+        public void TransferItem() {
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
                 string filename, basename;
                 int i = 0;
@@ -861,10 +856,10 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void SaveAs() {
-            var project = BasicProjectTests.OpenProject(@"TestData\NodejsProjectData\SaveAsUI.sln");
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\SaveAsUI.sln");
 
                 app.OpenSolutionExplorer();
                 var solutionTree = app.SolutionExplorerTreeView;

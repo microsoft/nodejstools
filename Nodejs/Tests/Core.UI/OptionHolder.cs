@@ -13,7 +13,7 @@
  * ***************************************************************************/
 
 using System;
-using Microsoft.TC.TestHostAdapters;
+using Microsoft.VisualStudioTools.VSTestHost;
 
 namespace Microsoft.Nodejs.Tests.UI {
     class OptionHolder : IDisposable {
@@ -23,14 +23,14 @@ namespace Microsoft.Nodejs.Tests.UI {
         public OptionHolder(string category, string page, string option, object newValue) {
             _category = category;
             _page = page;
-            _option = option;            
-            var props = VsIdeTestHostContext.Dte.get_Properties(category, page);
+            _option = option;
+            var props = VSTestContext.DTE.get_Properties(category, page);
             _oldValue = props.Item(option).Value;
             props.Item(option).Value = newValue;
         }
 
         public void Dispose() {
-            var props = VsIdeTestHostContext.Dte.get_Properties(_category, _page);
+            var props = VSTestContext.DTE.get_Properties(_category, _page);
             props.Item(_option).Value = _oldValue;
         }
     }

@@ -19,7 +19,6 @@ using System.Threading;
 using System.Windows.Automation;
 using EnvDTE;
 using Microsoft.NodejsTools;
-using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudioTools;
@@ -30,7 +29,7 @@ namespace Microsoft.Nodejs.Tests.UI {
     [TestClass]
     public class NodejsBasicProjectTests : NodejsProjectTest {
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void AddNewTypeScriptItem() {
             using (var solution = Project("AddNewTypeScriptItem", Compile("server")).Generate().ToVs()) {
                 var project = solution.WaitForItem("AddNewTypeScriptItem", "server.js");
@@ -57,7 +56,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// https://nodejstools.codeplex.com/workitem/1195
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestExcludedErrors() {
             var project = Project("TestExcludedErrors",
                 Compile("server", "function f(a, b, c) { }\r\n\r\n"),
@@ -86,7 +85,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestDebuggerPort() {
             var filename = Path.Combine(TestData.GetTempPath(), Path.GetRandomFileName());
             Console.WriteLine("Temp file is: {0}", filename);
@@ -119,7 +118,7 @@ while(true) {{
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestEnvironmentVariables() {
             var filename = Path.Combine(TestData.GetTempPath(), Path.GetRandomFileName());
             Console.WriteLine("Temp file is: {0}", filename);
@@ -152,7 +151,7 @@ while(true) {{
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestEnvironmentVariablesNoDebugging() {
             var filename = Path.Combine(TestData.GetTempPath(), Path.GetRandomFileName());
             Console.WriteLine("Temp file is: {0}", filename);
@@ -182,7 +181,7 @@ require('fs').writeFileSync('{0}', process.env.fob + process.env.bar + process.e
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestProjectProperties() {
             var filename = Path.Combine(TestData.GetTempPath(), Path.GetRandomFileName());
 

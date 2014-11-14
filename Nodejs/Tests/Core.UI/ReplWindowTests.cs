@@ -18,7 +18,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Repl;
-using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.Text;
@@ -36,7 +35,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestErrorNewLine() {
             Test((app, window) => {
                 Keyboard.Type("abc\r");
@@ -47,7 +46,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestColorOutput() {
             Test((app, window) => {
                 Keyboard.Type("[1,2,3]\r");
@@ -79,7 +78,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestStdErrIsRed() {
             Test((app, window) => {
                 window.ReplWindow.Evaluator.ExecuteText("setTimeout(function () { not_a_fn(); }, 0);\r").Wait();
@@ -106,7 +105,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestCompletion() {
             Test((app, window) => {
                 Keyboard.Type("''.");
@@ -117,7 +116,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestNoSpecialCommandCompletion() {
             Test((app, window) => {
                 Keyboard.Type(".");
@@ -129,11 +128,11 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// Opens the interactive window, clears the screen.
         /// </summary>
         internal void Test(Action<NodejsVisualStudioApp, InteractiveWindow> body) {
-            using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+            using (var app = new NodejsVisualStudioApp()) {
                 app.SuppressCloseAllOnDispose();
 
                 const string interpreterDescription = "Node.js Interactive Window";
-                VsIdeTestHostContext.Dte.ExecuteCommand("View.Node.jsInteractiveWindow");
+                app.Dte.ExecuteCommand("View.Node.jsInteractiveWindow");
                 var interactive = app.GetInteractiveWindow(interpreterDescription);
                 if (interactive == null) {
                     Assert.Inconclusive("Need " + interpreterDescription);

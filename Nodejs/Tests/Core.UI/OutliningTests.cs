@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.NodejsTools;
-using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -47,7 +46,7 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0)]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void OutliningToplevelFunctionDefinitions() {
             OutlineTest(
                 "toplevel.js",
@@ -61,7 +60,7 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0)]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void OutliningNestedFunctionDefinitions() {
             OutlineTest("nested.js",
                 new ExpectedTag(25, 280, @" {
@@ -86,14 +85,14 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0)]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void OutliningBadInput() {
             // there should be no exceptions and no outlining when parsing a malformed for statement
             OutlineTest("broken.js");
         }
 
         private void OutlineTest(string filename, params ExpectedTag[] expected) {
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+            using (var app = new VisualStudioApp()) {
                 var prevOption = NodejsPackage.Instance.AdvancedEditorOptionsPage.EnterOutliningOnOpen;
                 try {
                     NodejsPackage.Instance.AdvancedEditorOptionsPage.EnterOutliningOnOpen = true;

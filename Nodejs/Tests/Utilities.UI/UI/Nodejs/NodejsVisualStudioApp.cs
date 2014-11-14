@@ -30,7 +30,7 @@ namespace TestUtilities.UI.Nodejs {
         public const string TypeScriptAzureWebAppTemplate = "Blank Azure Node.js Web Application";
         public const string JavascriptWebAppTemplate = "Blank Node.js Web Application";
 
-        public NodejsVisualStudioApp(DTE dte)
+        public NodejsVisualStudioApp(DTE dte = null)
             : base(dte) {
         }
 

@@ -17,7 +17,6 @@ using System.IO;
 using System.Linq;
 using EnvDTE;
 using Microsoft.NodejsTools;
-using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudioTools;
 using TestUtilities;
@@ -27,7 +26,7 @@ namespace Microsoft.Nodejs.Tests.UI {
     [TestClass]
     public class DebuggerUITests : NodejsProjectTest {
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Debugging UI")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestWaitOnExit() {
             foreach (var debug in new[] { false, true }) {
                 foreach (var exitCode in new[] { 0, 1 }) {
@@ -105,7 +104,7 @@ process.exit(" + exitCode + ");"),
         /// start (in this case -v is passed to display the version).  VS shouldn't crash.
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Debugging UI")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestNoDebugging() {
             var project = Project("NoDebugging",
                 Compile("server"),
@@ -136,7 +135,7 @@ process.exit(" + exitCode + ");"),
                         if (newProcesses.Length > 0) {
                             // we shouldn't have gotten into debug mode
                             Assert.AreEqual(
-                                VsIdeTestHostContext.Dte.Debugger.CurrentMode,
+                                solution.App.Dte.Debugger.CurrentMode,
                                 dbgDebugMode.dbgDesignMode
                             );
 

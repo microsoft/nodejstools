@@ -18,7 +18,6 @@ using System.Linq;
 using System.Threading;
 using System.Xml;
 using Microsoft.NodejsTools;
-using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -39,7 +38,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         private static void CloudProjectTest(string roleType, bool openServiceDefinition) {
             Assert.IsTrue(roleType == "Web" || roleType == "Worker", "Invalid roleType: " + roleType);
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte))
+            using (var app = new VisualStudioApp())
             using (FileUtils.Backup(TestData.GetPath(@"TestData\CloudProject\CloudProject\ServiceDefinition.csdef"))) {
                 app.OpenProject("TestData\\CloudProject.sln", expectedProjects: 3);
 
@@ -104,25 +103,25 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void UpdateWebRoleServiceDefinitionInVS() {
             CloudProjectTest("Web", false);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void UpdateWorkerRoleServiceDefinitionInVS() {
             CloudProjectTest("Worker", false);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void UpdateWebRoleServiceDefinitionInVSDocumentOpen() {
             CloudProjectTest("Web", true);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void UpdateWorkerRoleServiceDefinitionInVSDocumentOpen() {
             CloudProjectTest("Worker", true);
         }

@@ -14,7 +14,6 @@
 
 using System;
 using System.IO;
-using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
@@ -47,7 +46,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// Test the different brace completions ({, [, (, ', ").
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void BraceCompletionsBasic() {
             using (var solution = BasicProject.Generate().ToVs()) {
                 var server = solution.OpenItem("Require", "SomeFolder", "baz.js");
@@ -85,7 +84,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// Verify that within comments and literals we do not attempt brace completion.
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void BraceCompletionDoesNotOccurInCommentsOrLiterals() {
             using (var solution = BasicProject.Generate().ToVs()) {
                 var server = solution.OpenItem("Require", "SomeFolder", "baz.js");
@@ -107,7 +106,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// Verify that within a literal with an escaped quote we don't start a whole second completion session.
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void BraceCompletionTerminatesOnEscapedQuoteInLiteralAndDoesntStartAgain() {
             using (var solution = BasicProject.Generate().ToVs()) {
                 var server = solution.OpenItem("Require", "SomeFolder", "baz.js");

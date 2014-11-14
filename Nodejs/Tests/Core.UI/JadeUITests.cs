@@ -17,7 +17,6 @@ using System.IO;
 using System.Windows.Automation;
 using EnvDTE;
 using Microsoft.NodejsTools;
-using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudioTools;
 using TestUtilities;
@@ -27,7 +26,7 @@ namespace Microsoft.Nodejs.Tests.UI {
     [TestClass]
     public class JadeUITests : NodejsProjectTest {
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void InsertTabs() {
             using (new OptionHolder("TextEditor", "Jade", "InsertTabs", true)) {
                 using (var solution = Project("TabsSpaces", Content("quox.jade", "ul\r\n    li A\r\n    li B")).Generate().ToVs()) {
@@ -40,7 +39,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void InsertSpaces() {
             using (new OptionHolder("TextEditor", "Jade", "InsertTabs", false)) {
                 using (var solution = Project("TabsSpaces", Content("quox.jade", "ul\r\n    li A\r\n    li B")).Generate().ToVs()) {

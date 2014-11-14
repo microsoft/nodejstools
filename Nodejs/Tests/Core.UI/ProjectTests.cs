@@ -24,7 +24,6 @@ using EnvDTE;
 using Microsoft.NodejsTools;
 using Microsoft.NodejsTools.Project;
 using Microsoft.NodejsTools.Repl;
-using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
@@ -45,11 +44,11 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// https://nodejstools.codeplex.com/workitem/270
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestSnippetsDisabled() {
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+            using (var app = new VisualStudioApp()) {
                 Window window;
-                var openFile = OpenProjectItem("server.js", out window);
+                var openFile = OpenProjectItem(app, "server.js", out window);
 
                 openFile.MoveCaret(7, 1);
 
@@ -78,11 +77,11 @@ http.createServer(function (req, res) {
 
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestNoAutoFormattingEnter() {
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+            using (var app = new VisualStudioApp()) {
                 Window window;
-                var openFile = OpenProjectItem("server.js", out window);
+                var openFile = OpenProjectItem(app, "server.js", out window);
 
                 openFile.MoveCaret(8, 40);
                 Keyboard.Type("\r");
@@ -103,11 +102,11 @@ http.createServer(function (req, res) {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestNoAutoFormattingCloseFunction() {
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+            using (var app = new VisualStudioApp()) {
                 Window window;
-                var openFile = OpenProjectItem("server.js", out window);
+                var openFile = OpenProjectItem(app, "server.js", out window);
 
                 openFile.MoveCaret(8, 40);
                 Keyboard.Type("\rfunction f() { }");
@@ -129,11 +128,11 @@ http.createServer(function (req, res) {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestNoAutoFormattingPaste() {
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+            using (var app = new VisualStudioApp()) {
                 Window window;
-                var openFile = OpenProjectItem("server.js", out window);
+                var openFile = OpenProjectItem(app, "server.js", out window);
 
                 openFile.MoveCaret(8, 40);
                 openFile.Invoke(() => System.Windows.Clipboard.SetText("\r\n"));
@@ -155,12 +154,12 @@ http.createServer(function (req, res) {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestNoReferences() {
             Window window;
-            var openFile = OpenProjectItem("server.js", out window);
+            using (var app = new VisualStudioApp()) {
+                var openFile = OpenProjectItem(app, "server.js", out window);
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
                 app.OpenSolutionExplorer();
                 var solutionExplorer = app.SolutionExplorerTreeView;
                 solutionExplorer.WaitForItemRemoved("Solution 'NodeAppWithModule' (1 project)", "NodeAppWithModule", "References");
@@ -168,11 +167,11 @@ http.createServer(function (req, res) {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void GlobalIntellisense() {
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+            using (var app = new VisualStudioApp()) {
                 Window window;
-                var openFile = OpenProjectItem("server.js", out window);
+                var openFile = OpenProjectItem(app, "server.js", out window);
 
                 openFile.MoveCaret(6, 1);
 
@@ -187,7 +186,7 @@ http.createServer(function (req, res) {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void RequireIntellisenseExpanded() {
 
             var testCases = new[] {
@@ -232,11 +231,11 @@ http.createServer(function (req, res) {
             string curFile = null;
             Window window;
             EditorWindow openFile = null;
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+            using (var app = new VisualStudioApp()) {
 
                 foreach (var testCase in testCases) {
                     if (testCase.File != curFile) {
-                        openFile = OpenProjectItem(testCase.File, out window, @"TestData\RequireTestApp\RequireTestApp.sln");
+                        openFile = OpenProjectItem(app, testCase.File, out window, @"TestData\RequireTestApp\RequireTestApp.sln");
                         app.OpenSolutionExplorer();
                         app.SolutionExplorerTreeView.WaitForItem("Solution 'RequireTestApp' (1 project)", "RequireTestApp", "dup.js");
                         text = openFile.Text;
@@ -264,10 +263,10 @@ http.createServer(function (req, res) {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void GlobalIntellisenseProjectReload() {
             Window window;
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+            using (var app = new VisualStudioApp()) {
                 app.OpenProject(Path.GetFullPath(@"TestData\NodeAppWithModule2\NodeAppWithModule.sln"));
 
                 var projectName = "NodeAppWithModule";
@@ -280,7 +279,7 @@ http.createServer(function (req, res) {
 
                 System.Threading.Thread.Sleep(2000);
 
-                VsIdeTestHostContext.Dte.ExecuteCommand("Project.UnloadProject");
+                app.Dte.ExecuteCommand("Project.UnloadProject");
 
                 project = app.SolutionExplorerTreeView.WaitForItem(
                     "Solution '" + projectName + "' (0 projects)",
@@ -291,7 +290,7 @@ http.createServer(function (req, res) {
 
                 System.Threading.Thread.Sleep(2000);
 
-                VsIdeTestHostContext.Dte.ExecuteCommand("Project.ReloadProject");
+                app.Dte.ExecuteCommand("Project.ReloadProject");
 
                 Assert.IsNotNull(
                     app.SolutionExplorerTreeView.WaitForItem(
@@ -302,7 +301,7 @@ http.createServer(function (req, res) {
                     "project not reloaded"
                 );
 
-                var openFile = OpenItem("server.js", VsIdeTestHostContext.Dte.Solution.Projects.Item(1), out window);
+                var openFile = OpenItem(app, "server.js", app.Dte.Solution.Projects.Item(1), out window);
 
                 openFile.MoveCaret(6, 1);
                 Keyboard.Type("process.");
@@ -316,11 +315,11 @@ http.createServer(function (req, res) {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void UserModule() {
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+            using (var app = new VisualStudioApp()) {
                 Window window;
-                var openFile = OpenProjectItem("server.js", out window);
+                var openFile = OpenProjectItem(app, "server.js", out window);
 
                 openFile.MoveCaret(6, 1);
                 Keyboard.Type("mymod.");
@@ -334,12 +333,13 @@ http.createServer(function (req, res) {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void AddNewItem() {
             Window window;
-            var openFile = OpenProjectItem("server.js", out window);
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+            using (var app = new VisualStudioApp()) {
+                var openFile = OpenProjectItem(app, "server.js", out window);
+
                 using (var newItem = NewItemDialog.FromDte(app)) {
                     newItem.FileName = "NewJSFile.js";
                     newItem.OK();
@@ -353,16 +353,17 @@ http.createServer(function (req, res) {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void EnterCompletion() {
             Window window;
-            var openFile = OpenProjectItem("server.js", out window);
+            using (var app = new VisualStudioApp()) {
+                var openFile = OpenProjectItem(app, "server.js", out window);
 
-            openFile.MoveCaret(6, 1);
-            Keyboard.Type("http.");
-            System.Threading.Thread.Sleep(3000);
-            Keyboard.Type("Cli\r");
-            openFile.WaitForText(@"var http = require('http');
+                openFile.MoveCaret(6, 1);
+                Keyboard.Type("http.");
+                System.Threading.Thread.Sleep(3000);
+                Keyboard.Type("Cli\r");
+                openFile.WaitForText(@"var http = require('http');
 
 var port = process.env.port || 1337;
 var mymod = require('./mymod.js');
@@ -374,22 +375,25 @@ http.createServer(function (req, res) {
     res.end('Hello World\n');
 }).listen(port);
 ");
+            }
         }
 
         /// <summary>
         /// Tests completions against builtin node modules.
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void ModuleCompletions() {
             Window window;
-            var openFile = OpenProjectItem("intellisensemod.js", out window);
 
-            openFile.MoveCaret(3, 1);
-            Keyboard.Type("server.");
-            System.Threading.Thread.Sleep(3000);
-            Keyboard.Type("lis\r");
-            openFile.WaitForText(@"var http = require('http');
+            using (var app = new VisualStudioApp()) {
+                var openFile = OpenProjectItem(app, "intellisensemod.js", out window);
+
+                openFile.MoveCaret(3, 1);
+                Keyboard.Type("server.");
+                System.Threading.Thread.Sleep(3000);
+                Keyboard.Type("lis\r");
+                openFile.WaitForText(@"var http = require('http');
 var server = http.createServer(null); // server.listen
 server.listen
 
@@ -398,11 +402,11 @@ var sd = require('stringdecoder');  // sd.StringDecoder();
 
 ");
 
-            openFile.MoveCaret(6, 1);
-            Keyboard.Type("sd.");
-            System.Threading.Thread.Sleep(3000);
-            Keyboard.Type("Str\r");
-            openFile.WaitForText(@"var http = require('http');
+                openFile.MoveCaret(6, 1);
+                Keyboard.Type("sd.");
+                System.Threading.Thread.Sleep(3000);
+                Keyboard.Type("Str\r");
+                openFile.WaitForText(@"var http = require('http');
 var server = http.createServer(null); // server.listen
 server.listen
 
@@ -410,13 +414,13 @@ var sd = require('stringdecoder');  // sd.StringDecoder();
 sd.StringDecoder
 
 ");
-
+            }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestNewProject() {
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+            using (var app = new VisualStudioApp()) {
                 using (var newProjDialog = app.FileNewProject()) {
                     newProjDialog.FocusLanguageNode("JavaScript");
 
@@ -445,9 +449,9 @@ sd.StringDecoder
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestNewAzureProject() {
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+            using (var app = new VisualStudioApp()) {
                 using (var newProjDialog = app.FileNewProject()) {
                     newProjDialog.FocusLanguageNode("JavaScript");
 
@@ -475,10 +479,10 @@ sd.StringDecoder
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestAutomationProject() {
-            try {
-                var project = OpenProject();
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodeAppWithModule\NodeAppWithModule.sln");
 
                 Assert.AreEqual("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}", project.Kind.ToUpper());
                 // we don't yet expose a VSProject interface here, if we did we'd need tests for it, but it doesn't support
@@ -506,24 +510,20 @@ sd.StringDecoder
                     break;
                 }
 
-                Assert.AreEqual(VsIdeTestHostContext.Dte, project.ProjectItems.DTE);
+                Assert.AreEqual(app.Dte, project.ProjectItems.DTE);
                 Assert.AreEqual(project, project.ProjectItems.Parent);
                 Assert.AreEqual(null, project.ProjectItems.Kind);
 
                 AssertError<ArgumentException>(() => project.ProjectItems.Item(-1));
                 AssertError<ArgumentException>(() => project.ProjectItems.Item(0));
-            } finally {
-                VsIdeTestHostContext.Dte.Solution.Close();
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
             }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void SetAsStartupFile() {
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
-                var project = OpenProject();
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodeAppWithModule\NodeAppWithModule.sln");
 
                 // wait for new solution to load...
                 for (int i = 0; i < 40 && app.Dte.Solution.Projects.Count == 0; i++) {
@@ -559,13 +559,13 @@ sd.StringDecoder
             }
         }
 
-        private static EditorWindow OpenProjectItem(string startItem, out Window window, string projectName = @"TestData\NodeAppWithModule\NodeAppWithModule.sln") {
-            var project = OpenProject(projectName, startItem);
+        private static EditorWindow OpenProjectItem(VisualStudioApp app, string startItem, out Window window, string projectName = @"TestData\NodeAppWithModule\NodeAppWithModule.sln") {
+            var project = app.OpenProject(projectName, startItem);
 
-            return OpenItem(startItem, project, out window);
+            return OpenItem(app, startItem, project, out window);
         }
 
-        private static EditorWindow OpenItem(string startItem, Project project, out Window window) {
+        private static EditorWindow OpenItem(VisualStudioApp app, string startItem, Project project, out Window window) {
             EnvDTE.ProjectItem item = null;
             if (startItem.IndexOf('\\') != -1) {
                 var items = project.ProjectItems;
@@ -580,67 +580,22 @@ sd.StringDecoder
 
             Assert.IsNotNull(item);
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
-                app.SuppressCloseAllOnDispose();
-
-                window = item.Open();
-                window.Activate();
-                return app.GetDocument(item.Document.FullName);
-            }
-        }
-
-        internal static Project OpenProject(string projName = @"TestData\NodeAppWithModule\NodeAppWithModule.sln", string startItem = null, int expectedProjects = 1, string projectName = null, bool setStartupItem = true) {
-            string fullPath = TestData.GetPath(projName);
-            Assert.IsTrue(File.Exists(fullPath), "Cannot find " + fullPath);
-            VsIdeTestHostContext.Dte.Solution.Open(fullPath);
-
-            Assert.IsTrue(VsIdeTestHostContext.Dte.Solution.IsOpen, "The solution is not open");
-
-            int count = VsIdeTestHostContext.Dte.Solution.Projects.Count;
-            if (expectedProjects != count) {
-                // if we have other files open we can end up with a bonus project...
-                int i = 0;
-                foreach (EnvDTE.Project proj in VsIdeTestHostContext.Dte.Solution.Projects) {
-                    if (proj.Name != "Miscellaneous Files") {
-                        i++;
-                    }
-                }
-
-                Assert.IsTrue(i == expectedProjects, String.Format("Loading project resulted in wrong number of loaded projects, expected 1, received {0}", VsIdeTestHostContext.Dte.Solution.Projects.Count));
-            }
-
-            var iter = VsIdeTestHostContext.Dte.Solution.Projects.GetEnumerator();
-            iter.MoveNext();
-
-            Project project = (Project)iter.Current;
-
-            if (projectName != null) {
-                while (project.Name != projectName) {
-                    if (!iter.MoveNext()) {
-                        Assert.Fail("Failed to find project named " + projectName);
-                    }
-                    project = (Project)iter.Current;
-                }
-            }
-
-            if (startItem != null && setStartupItem) {
-                project.SetStartupFile(startItem);
-            }
-
-            return project;
+            window = item.Open();
+            window.Activate();
+            return app.GetDocument(item.Document.FullName);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestProjectProperties() {
             for (int mode = 0; mode < 2; mode++) {
-                using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                using (var app = new VisualStudioApp()) {
                     var testFile = Path.Combine(Path.GetTempPath(), "nodejstest.txt");
                     if (File.Exists(testFile)) {
                         File.Delete(testFile);
                     }
 
-                    var project = OpenProjectAndRun(@"TestData\NodejsProjectPropertiesTest\NodejsProjectPropertiesTest.sln", "server.js", true, debug: mode == 0);
+                    var project = OpenProjectAndRun(app, @"TestData\NodejsProjectPropertiesTest\NodejsProjectPropertiesTest.sln", "server.js", true, debug: mode == 0);
 
                     for (int i = 0; i < 30 && !File.Exists(testFile); i++) {
                         System.Threading.Thread.Sleep(250);
@@ -660,18 +615,18 @@ sd.StringDecoder
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestBrowserLaunch() {
             for (int mode = 0; mode < 2; mode++) {
                 var startingProcesses = System.Diagnostics.Process.GetProcessesByName("iexplore").Select(x => x.Id).ToSet();
 
-                using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+                using (var app = new VisualStudioApp()) {
                     var testFile = Path.Combine(Path.GetTempPath(), "nodejstest.txt");
                     if (File.Exists(testFile)) {
                         File.Delete(testFile);
                     }
 
-                    var project = OpenProjectAndRun(@"TestData\NodejsProjectPropertiesTest\NodejsProjectPropertiesTest.sln", "server2.js", true, debug: mode == 0);
+                    var project = OpenProjectAndRun(app, @"TestData\NodejsProjectPropertiesTest\NodejsProjectPropertiesTest.sln", "server2.js", true, debug: mode == 0);
 
                     for (int i = 0; i < 30 && !File.Exists(testFile); i++) {
                         System.Threading.Thread.Sleep(250);
@@ -698,13 +653,13 @@ sd.StringDecoder
             }
         }
 
-        internal static Project OpenProjectAndRun(string projName, string filename, bool setStartupItem = true, bool debug = true) {
-            var project = OpenProject(projName, filename, setStartupItem: setStartupItem);
+        internal static Project OpenProjectAndRun(VisualStudioApp app, string projName, string filename, bool setStartupItem = true, bool debug = true) {
+            var project = app.OpenProject(projName, filename, setStartupItem: setStartupItem);
 
             if (debug) {
-                VsIdeTestHostContext.Dte.ExecuteCommand("Debug.Start");
+                app.Dte.ExecuteCommand("Debug.Start");
             } else {
-                VsIdeTestHostContext.Dte.ExecuteCommand("Debug.StartWithoutDebugging");
+                app.Dte.ExecuteCommand("Debug.StartWithoutDebugging");
             }
 
             return project;
@@ -810,7 +765,7 @@ sd.StringDecoder
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestLongPathCheck() {
             string[] expectedLongPaths = {
                 @"node_modules\azure\node_modules\azure-common\node_modules\xml2js\node_modules\sax\test\trailing-attribute-no-value.js",
@@ -826,11 +781,11 @@ sd.StringDecoder
                     File.Copy(TestData.GetPath(@"TestData\HelloWorld\" + fileName), projectDir + "\\" + fileName);
                 }
 
-                using (var app = new NodejsVisualStudioApp(VsIdeTestHostContext.Dte)) {
+                using (var app = new NodejsVisualStudioApp()) {
                     try {
                         NodejsPackage.Instance.GeneralOptionsPage.CheckForLongPaths = true;
 
-                        var project = OpenProject(projectDir + "\\HelloWorld.sln");
+                        var project = app.OpenProject(projectDir + "\\HelloWorld.sln");
 
                         // Wait for new solution to load.
                         for (int i = 0; i < 40 && app.Dte.Solution.Projects.Count == 0; i++) {
@@ -838,7 +793,7 @@ sd.StringDecoder
                         }
 
                         const string interpreterDescription = "Node.js Interactive Window";
-                        VsIdeTestHostContext.Dte.ExecuteCommand("View.Node.jsInteractiveWindow");
+                        app.Dte.ExecuteCommand("View.Node.jsInteractiveWindow");
                         var interactive = app.GetInteractiveWindow(interpreterDescription);
                         if (interactive == null) {
                             Assert.Inconclusive("Need " + interpreterDescription);

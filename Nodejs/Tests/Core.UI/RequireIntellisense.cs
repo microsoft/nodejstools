@@ -14,7 +14,6 @@
 
 using System;
 using System.IO;
-using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
@@ -44,7 +43,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void InSubFolder() {
             using (var solution = BasicProject.Generate().ToVs()) {
                 var server = solution.OpenItem("Require", "SomeFolder", "baz.js");
@@ -79,7 +78,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void BasicRequireCompletions() {
             using (new OptionHolder("TextEditor", "Node.js", "BraceCompletion", false)) {
                 using (var solution = BasicProject.Generate().ToVs()) {
@@ -158,7 +157,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void BasicRequireCompletionsQuotes() {
             using (new OptionHolder("TextEditor", "Node.js", "BraceCompletion", false)) {
                 using (var solution = BasicProject.Generate().ToVs()) {
@@ -250,7 +249,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void BasicRequireCompletionsDoubleQuotes() {
             using (new OptionHolder("TextEditor", "Node.js", "BraceCompletion", false)) {
                 using (var solution = BasicProject.Generate().ToVs()) {
@@ -342,7 +341,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void RequireBuiltinModules() {
             using (var solution = BasicProject.Generate().ToVs()) {
                 var server = solution.OpenItem("Require", "server.js");
@@ -378,7 +377,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void CloseParenCommits() {
             using (var solution = BasicProject.Generate().ToVs()) {
                 var server = solution.OpenItem("Require", "server.js");
@@ -395,7 +394,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void UserModule() {
             using (new OptionHolder("TextEditor", "Node.js", "BraceCompletion", false)) {
                 using (var solution = BasicProject.Generate().ToVs()) {
@@ -414,7 +413,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void UserModuleInFolder() {
             using (new OptionHolder("TextEditor", "Node.js", "BraceCompletion", false)) {
                 using (var solution = BasicProject.Generate().ToVs()) {
@@ -433,7 +432,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void CloseQuoteDoesntCommit() {
             using (new OptionHolder("TextEditor", "Node.js", "BraceCompletion", false)) {
                 using (var solution = BasicProject.Generate().ToVs()) {
@@ -452,7 +451,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void RequireAfterOperator() {
             using (new OptionHolder("TextEditor", "Node.js", "BraceCompletion", false)) {
                 using (var solution = BasicProject.Generate().ToVs()) {
@@ -471,7 +470,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void RequireAfterOpenParen() {
             using (new OptionHolder("TextEditor", "Node.js", "BraceCompletion", false)) {
                 using (var solution = BasicProject.Generate().ToVs()) {
@@ -490,7 +489,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void RequireAfterComma() {
             using (var solution = BasicProject.Generate().ToVs()) {
                 var server = solution.OpenItem("Require", "server.js");
@@ -507,7 +506,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void RequireAfterAssignment() {
             using (var solution = BasicProject.Generate().ToVs()) {
                 var server = solution.OpenItem("Require", "server.js");
@@ -524,7 +523,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void RequireAfterReturn() {
             using (var solution = BasicProject.Generate().ToVs()) {
                 var server = solution.OpenItem("Require", "server.js");
@@ -541,7 +540,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void RequireAfterSemiColon() {
             using (var solution = BasicProject.Generate().ToVs()) {
                 var server = solution.OpenItem("Require", "server.js");
@@ -558,7 +557,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void RequireAfterKeywordNoCompletions() {
             using (new OptionHolder("TextEditor", "Node.js", "BraceCompletion", false)) {
 
@@ -573,7 +572,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void RequireAfterDotNoCompletions() {
             using (new OptionHolder("TextEditor", "Node.js", "BraceCompletion", false)) {
                 using (var solution = BasicProject.Generate().ToVs()) {
@@ -587,7 +586,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void RequireAfterContinuedMultiLineStringNoCompletions() {
             using (var solution = BasicProject.Generate().ToVs()) {
                 var server = solution.OpenItem("Require", "server.js");
@@ -604,7 +603,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// Make sure adding a module externally gets picked up
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void AddModuleExternally() {
             using (var solution = BasicProject.Generate().ToVs()) {
                 var server = solution.OpenItem("Require", "server.js");
@@ -635,7 +634,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// module when index.js is present.
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void SubmodulesFiles() {
             var project = Project("RequireSubmodules",
                 Compile("server", ""),
@@ -656,7 +655,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void SubmodulesFiles2() {
             var project = Project("RequireSubmodules",
                 Compile("server", ""),

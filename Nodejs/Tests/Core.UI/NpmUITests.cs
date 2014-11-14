@@ -27,7 +27,6 @@ using System.Windows.Threading;
 using Microsoft.NodejsTools;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.NpmUI;
-using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudioTools;
 using Moq;
@@ -41,9 +40,9 @@ namespace Microsoft.Nodejs.Tests.UI {
     [TestClass]
     public class NpmUITests : NodejsProjectTest {
         [TestMethod, Priority(0), TestCategory("Npm UI")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestNpmUIInitialization() {
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+            using (var app = new VisualStudioApp()) {
                 // Initialize call is required because NTVS does not autoload its package
                 // We may not be on UI thread, but Dev11 and Dev12 know how to sort that out.
                 UIThread.InitializeAndAlwaysInvokeToCurrentThread();
@@ -57,9 +56,9 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Npm UI")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestNpmUIArrowKeyBehavior() {
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+            using (var app = new VisualStudioApp()) {
                 UIThread.InitializeAndAlwaysInvokeToCurrentThread();
                 UIThread.Invoke(() => {
                     NpmPackageInstallWindow npmWindow = OpenNpmWindowAndWaitForReady();
@@ -102,9 +101,9 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Npm UI")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestNpmUITabKeyBehavior() {
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+            using (var app = new VisualStudioApp()) {
                 UIThread.InitializeAndAlwaysInvokeToCurrentThread();
                 UIThread.Invoke(() => {
                     NpmPackageInstallWindow npmWindow = OpenNpmWindowAndWaitForReady();

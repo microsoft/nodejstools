@@ -15,7 +15,6 @@
 using System;
 using System.IO;
 using System.Threading;
-using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
 using TestUtilities.Nodejs;
@@ -85,7 +84,7 @@ namespace AzurePublishingUITests {
             string textInResponse,
             int publishTimeout
         ) {
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+            using (var app = new VisualStudioApp()) {
                 CreateProject(
                     app,
                     languageName,
@@ -109,7 +108,7 @@ namespace AzurePublishingUITests {
         const int JavaScriptWebAppPublishTimeout = 2 * 60 * 1000;
 
         [TestMethod, Priority(0), TestCategory("Core"), Timeout(JavaScriptWebAppPublishTimeout)]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void JavaScriptWebAppPublish() {
             TestPublishToWebSite(
                 NodejsVisualStudioApp.JavaScriptTemplateLanguageName,
@@ -124,7 +123,7 @@ namespace AzurePublishingUITests {
         const int TypeScriptWebAppPublishTimeout = 2 * 60 * 1000;
 
         [TestMethod, Priority(0), TestCategory("Core"), Timeout(TypeScriptWebAppPublishTimeout)]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TypeScriptWebAppPublish() {
             TestPublishToWebSite(
                 NodejsVisualStudioApp.TypeScriptTemplateLanguageName,

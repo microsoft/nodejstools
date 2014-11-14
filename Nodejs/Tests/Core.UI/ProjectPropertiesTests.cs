@@ -12,7 +12,6 @@
  *
  * ***************************************************************************/
 
-using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
 using TestUtilities.UI;
@@ -26,13 +25,13 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void DirtyProperties() {
             using (var solution = Project("DirtyProperties").Generate().ToVs()) {
                 var proj = solution.FindItem("DirtyProperties");
                 AutomationWrapper.Select(proj);
                 solution.App.Dte.ExecuteCommand("ClassViewContextMenus.ClassViewMultiselectProjectreferencesItems.Properties");
-                var window = VsIdeTestHostContext.Dte.Windows.Item("DirtyProperties");
+                var window = solution.App.Dte.Windows.Item("DirtyProperties");
                 Assert.AreEqual(window.Caption, "DirtyProperties");
 
                 solution.Project.Properties.Item("NodejsPort").Value = 3000;

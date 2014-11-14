@@ -19,17 +19,12 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading;
 using System.Windows;
 using EnvDTE;
-using EnvDTE90;
-using EnvDTE90a;
-using Microsoft.TC.TestHostAdapters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
 using TestUtilities.Nodejs;
 using TestUtilities.UI;
-using VSLangProj;
 using MessageBoxButton = TestUtilities.UI.MessageBoxButton;
 using ST = System.Threading;
 
@@ -43,26 +38,26 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void LoadNodejsProject() {
-            string fullPath = Path.GetFullPath(@"TestData\NodejsProjectData\HelloWorld.sln");
-            Assert.IsTrue(File.Exists(fullPath), "Can't find project file");
-            VsIdeTestHostContext.Dte.Solution.Open(fullPath);
+            using (var app = new VisualStudioApp()) {
+                app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
-            Assert.IsTrue(VsIdeTestHostContext.Dte.Solution.IsOpen, "The solution is not open");
-            Assert.IsTrue(VsIdeTestHostContext.Dte.Solution.Projects.Count == 1, String.Format("Loading project resulted in wrong number of loaded projects, expected 1, received {0}", VsIdeTestHostContext.Dte.Solution.Projects.Count));
+                Assert.IsTrue(app.Dte.Solution.IsOpen, "The solution is not open");
+                Assert.IsTrue(app.Dte.Solution.Projects.Count == 1, String.Format("Loading project resulted in wrong number of loaded projects, expected 1, received {0}", app.Dte.Solution.Projects.Count));
 
-            var iter = VsIdeTestHostContext.Dte.Solution.Projects.GetEnumerator();
-            iter.MoveNext();
-            Project project = (Project)iter.Current;
-            Assert.AreEqual("HelloWorld.njsproj", Path.GetFileName(project.FileName), "Wrong project file name");
+                var iter = app.Dte.Solution.Projects.GetEnumerator();
+                iter.MoveNext();
+                Project project = (Project)iter.Current;
+                Assert.AreEqual("HelloWorld.njsproj", Path.GetFileName(project.FileName), "Wrong project file name");
+            }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void SaveProjectAs() {
-            try {
-                var project = OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
                 AssertError<ArgumentNullException>(() => project.SaveAs(null));
                 project.SaveAs(TestData.GetPath(@"TestData\NodejsProjectData\TempFile.njsproj"));
@@ -94,18 +89,14 @@ namespace Microsoft.Nodejs.Tests.UI {
                 if (couldSaveToC) {
                     Assert.Inconclusive("could save to C:\\");
                 }
-            } finally {
-                VsIdeTestHostContext.Dte.Solution.Close(false);
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
             }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void RenameProjectTest() {
-            try {
-                var project = OpenProject(@"TestData\NodejsProjectData\RenameProjectTest.sln");
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\RenameProjectTest.sln");
 
                 // try it another way...
                 project.Properties.Item("FileName").Value = "HelloWorld2.njsproj";
@@ -143,20 +134,15 @@ namespace Microsoft.Nodejs.Tests.UI {
                 } finally {
                     File.Delete(movePath);
                 }
-            } finally {
-                VsIdeTestHostContext.Dte.Solution.Close();
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
             }
 
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void ProjectAddFolder() {
-            try {
-                string fullPath = TestData.GetPath(@"TestData\NodejsProjectData\HelloWorld.sln");
-                var project = OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
                 var folder = project.ProjectItems.AddFolder("Test\\Folder\\Name");
                 var folder2 = project.ProjectItems.AddFolder("Test\\Folder\\Name2");
@@ -188,65 +174,58 @@ namespace Microsoft.Nodejs.Tests.UI {
                 folder.ExpandView();
 
                 folder.Delete();
-            } finally {
-                VsIdeTestHostContext.Dte.Solution.Close();
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
             }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void ProjectAddFolderThroughUI() {
-            try {
-                var project = OpenProject(@"TestData\NodejsProjectData\AddFolderExists.sln");
-                using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
-                    var solutionExplorer = app.SolutionExplorerTreeView;
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\AddFolderExists.sln");
 
-                    var solutionNode = solutionExplorer.FindItem("Solution 'AddFolderExists' (1 project)");
-                    var projectNode = solutionExplorer.FindItem("Solution 'AddFolderExists' (1 project)", "AddFolderExists");
+                var solutionExplorer = app.SolutionExplorerTreeView;
 
-                    ProjectNewFolderWithName(app, solutionNode, projectNode, "A");
+                var solutionNode = solutionExplorer.FindItem("Solution 'AddFolderExists' (1 project)");
+                var projectNode = solutionExplorer.FindItem("Solution 'AddFolderExists' (1 project)", "AddFolderExists");
 
-                    var folderA = project.ProjectItems.Item("A");
-                    var folderANode = solutionExplorer.WaitForItem("Solution 'AddFolderExists' (1 project)", "AddFolderExists", "A");
-                    Assert.IsNotNull(folderANode);
+                ProjectNewFolderWithName(app, solutionNode, projectNode, "A");
 
-                    Assert.AreEqual(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\"), folderA.Properties.Item("FullPath").Value);
-                    Assert.IsTrue(Directory.Exists(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\")));
+                var folderA = project.ProjectItems.Item("A");
+                var folderANode = solutionExplorer.WaitForItem("Solution 'AddFolderExists' (1 project)", "AddFolderExists", "A");
+                Assert.IsNotNull(folderANode);
 
-                    ProjectNewFolderWithName(app, solutionNode, folderANode, "B");
+                Assert.AreEqual(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\"), folderA.Properties.Item("FullPath").Value);
+                Assert.IsTrue(Directory.Exists(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\")));
 
-                    var folderB = folderA.ProjectItems.Item("B");
-                    var folderBNode = solutionExplorer.WaitForItem("Solution 'AddFolderExists' (1 project)", "AddFolderExists", "A", "B");
-                    Assert.IsNotNull(folderBNode);
+                ProjectNewFolderWithName(app, solutionNode, folderANode, "B");
 
-                    Assert.AreEqual(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\B\\"), folderB.Properties.Item("FullPath").Value);
-                    Assert.IsTrue(Directory.Exists(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\B\\")));
+                var folderB = folderA.ProjectItems.Item("B");
+                var folderBNode = solutionExplorer.WaitForItem("Solution 'AddFolderExists' (1 project)", "AddFolderExists", "A", "B");
+                Assert.IsNotNull(folderBNode);
 
-                    ProjectNewFolderWithName(app, solutionNode, folderBNode, "C");
+                Assert.AreEqual(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\B\\"), folderB.Properties.Item("FullPath").Value);
+                Assert.IsTrue(Directory.Exists(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\B\\")));
 
-                    var folderC = folderB.ProjectItems.Item("C");
-                    var folderCNode = solutionExplorer.WaitForItem("Solution 'AddFolderExists' (1 project)", "AddFolderExists", "A", "B", "C");
-                    Assert.IsNotNull(folderCNode);
+                ProjectNewFolderWithName(app, solutionNode, folderBNode, "C");
 
-                    // 817 & 836: Nested subfolders
-                    // Setting the wrong VirtualNodeName in FolderNode.FinishFolderAdd caused C's fullpath to be ...\AddFolderExists\B\C\
-                    // instead of ...\AddFolderExists\A\B\C\.
-                    Assert.AreEqual(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\B\\C\\"), folderC.Properties.Item("FullPath").Value);
-                    Assert.IsTrue(Directory.Exists(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\B\\C\\")));
-                }
-            } finally {
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
+                var folderC = folderB.ProjectItems.Item("C");
+                var folderCNode = solutionExplorer.WaitForItem("Solution 'AddFolderExists' (1 project)", "AddFolderExists", "A", "B", "C");
+                Assert.IsNotNull(folderCNode);
+
+                // 817 & 836: Nested subfolders
+                // Setting the wrong VirtualNodeName in FolderNode.FinishFolderAdd caused C's fullpath to be ...\AddFolderExists\B\C\
+                // instead of ...\AddFolderExists\A\B\C\.
+                Assert.AreEqual(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\B\\C\\"), folderC.Properties.Item("FullPath").Value);
+                Assert.IsTrue(Directory.Exists(TestData.GetPath("TestData\\NodejsProjectData\\AddFolderExists\\A\\B\\C\\")));
             }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestAddExistingFolder() {
-            var project = OpenProject(@"TestData\NodejsProjectData\AddExistingFolder.sln");
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\AddExistingFolder.sln");
+
                 var solutionExplorer = app.SolutionExplorerTreeView;
 
                 var projectNode = solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder");
@@ -276,10 +255,11 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestAddExistingFolderProject() {
-            var project = OpenProject(@"TestData\NodejsProjectData\AddExistingFolder.sln");
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\AddExistingFolder.sln");
+
                 var solutionExplorer = app.SolutionExplorerTreeView;
 
                 var projectNode = solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder");
@@ -297,13 +277,13 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestAddExistingFolderDebugging() {
-            var project = OpenProject(@"TestData\NodejsProjectData\AddExistingFolder.sln");
-            var window = project.ProjectItems.Item("server.js").Open();
-            window.Activate();
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\AddExistingFolder.sln");
+                var window = project.ProjectItems.Item("server.js").Open();
+                window.Activate();
 
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
                 var docWindow = app.GetDocument(window.Document.FullName);
 
                 var solutionExplorer = app.SolutionExplorerTreeView;
@@ -315,7 +295,7 @@ namespace Microsoft.Nodejs.Tests.UI {
                 AutomationWrapper.Select(projectNode);
 
                 try {
-                    VsIdeTestHostContext.Dte.ExecuteCommand("ProjectandSolutionContextMenus.Project.Add.Existingfolder");
+                    app.Dte.ExecuteCommand("ProjectandSolutionContextMenus.Project.Add.Existingfolder");
 
                     // try and dismiss the dialog if we successfully executed
                     try {
@@ -351,29 +331,24 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// 5) Enter to commit
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void ProjectAddAndRenameFolder() {
-            try {
-                var project = OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
-                using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
-                    var solutionExplorer = app.SolutionExplorerTreeView;
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
-                    var folder = project.ProjectItems.AddFolder("AddAndRenameFolder");
-                    var subfolderNode = solutionExplorer.FindItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "AddAndRenameFolder");
+                var solutionExplorer = app.SolutionExplorerTreeView;
 
-                    // rename it
-                    AutomationWrapper.Select(subfolderNode);
-                    Keyboard.Type(System.Windows.Input.Key.F2);
-                    Keyboard.Type("AddAndRenameFolderNewName");
-                    Keyboard.Type(System.Windows.Input.Key.Enter);
+                var folder = project.ProjectItems.AddFolder("AddAndRenameFolder");
+                var subfolderNode = solutionExplorer.FindItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "AddAndRenameFolder");
 
-                    subfolderNode = solutionExplorer.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "AddAndRenameFolderNewName");
-                    Assert.IsTrue(Directory.Exists(@"TestData\NodejsProjectData\HelloWorld\AddAndRenameFolderNewName"));
-                }
-            } finally {
-                VsIdeTestHostContext.Dte.Solution.Close();
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
+                // rename it
+                AutomationWrapper.Select(subfolderNode);
+                Keyboard.Type(System.Windows.Input.Key.F2);
+                Keyboard.Type("AddAndRenameFolderNewName");
+                Keyboard.Type(System.Windows.Input.Key.Enter);
+
+                subfolderNode = solutionExplorer.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "AddAndRenameFolderNewName");
+                Assert.IsTrue(Directory.Exists(@"TestData\NodejsProjectData\HelloWorld\AddAndRenameFolderNewName"));
             }
         }
 
@@ -384,56 +359,46 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// 4) Drag and drop nested folder onto project
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void ProjectAddAndMoveRenamedFolder() {
-            try {
-                var project = OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
-                using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
-                    var solutionExplorer = app.SolutionExplorerTreeView;
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
+                var solutionExplorer = app.SolutionExplorerTreeView;
 
-                    var folder = project.ProjectItems.AddFolder("AddAndMoveRenamedFolder\\AddAndMoveRenamedSubFolder");
-                    var subfolderNode = solutionExplorer.FindItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "AddAndMoveRenamedFolder", "AddAndMoveRenamedSubFolder");
+                var folder = project.ProjectItems.AddFolder("AddAndMoveRenamedFolder\\AddAndMoveRenamedSubFolder");
+                var subfolderNode = solutionExplorer.FindItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "AddAndMoveRenamedFolder", "AddAndMoveRenamedSubFolder");
 
-                    // rename it
-                    AutomationWrapper.Select(subfolderNode);
-                    Keyboard.Type(System.Windows.Input.Key.F2);
-                    Keyboard.Type("AddAndMoveRenamedNewName");
-                    Keyboard.Type(System.Windows.Input.Key.Enter);
+                // rename it
+                AutomationWrapper.Select(subfolderNode);
+                Keyboard.Type(System.Windows.Input.Key.F2);
+                Keyboard.Type("AddAndMoveRenamedNewName");
+                Keyboard.Type(System.Windows.Input.Key.Enter);
 
-                    subfolderNode = solutionExplorer.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "AddAndMoveRenamedFolder", "AddAndMoveRenamedNewName");
+                subfolderNode = solutionExplorer.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "AddAndMoveRenamedFolder", "AddAndMoveRenamedNewName");
 
-                    Assert.IsTrue(Directory.Exists(@"TestData\NodejsProjectData\HelloWorld\AddAndMoveRenamedFolder\AddAndMoveRenamedNewName"), "AddAndMoveRenamedFolder\\AddAndMoveRenamedNewName doesn't exist");
+                Assert.IsTrue(Directory.Exists(@"TestData\NodejsProjectData\HelloWorld\AddAndMoveRenamedFolder\AddAndMoveRenamedNewName"), "AddAndMoveRenamedFolder\\AddAndMoveRenamedNewName doesn't exist");
 
-                    AutomationWrapper.Select(subfolderNode);
-                    Keyboard.ControlX();
+                AutomationWrapper.Select(subfolderNode);
+                Keyboard.ControlX();
 
-                    var projNode = solutionExplorer.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld");
-                    AutomationWrapper.Select(projNode);
+                var projNode = solutionExplorer.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld");
+                AutomationWrapper.Select(projNode);
 
-                    Keyboard.ControlV();
+                Keyboard.ControlV();
 
-                    var movedNode = solutionExplorer.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "AddAndMoveRenamedNewName");
+                var movedNode = solutionExplorer.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "AddAndMoveRenamedNewName");
 
-                    Assert.IsTrue(Directory.Exists(@"TestData\NodejsProjectData\HelloWorld\AddAndMoveRenamedNewName"), "HelloWorld\\AddAndMoveRenamedNewName doesn't exist");
-                }
-            } finally {
-                VsIdeTestHostContext.Dte.Solution.Close();
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
+                Assert.IsTrue(Directory.Exists(@"TestData\NodejsProjectData\HelloWorld\AddAndMoveRenamedNewName"), "HelloWorld\\AddAndMoveRenamedNewName doesn't exist");
             }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void ProjectBuild() {
-            try {
-                var project = OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
-                VsIdeTestHostContext.Dte.Solution.SolutionBuild.Build(true);
-            } finally {
-                VsIdeTestHostContext.Dte.Solution.Close();
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
+                app.Dte.Solution.SolutionBuild.Build(true);
             }
         }
 
@@ -441,27 +406,23 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// https://nodejstools.codeplex.com/workitem/823
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void ProjectBuildWithProjFileSeparateFromSources() {
-            try {
-                var project = OpenProject(@"TestData\NodejsProjectData\HelloWorld3.sln");
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld3.sln");
 
-                VsIdeTestHostContext.Dte.Solution.SolutionBuild.Build(true);
-                Assert.AreEqual(0, VsIdeTestHostContext.Dte.Solution.SolutionBuild.LastBuildInfo, "Expected no build failures");
-            } finally {
-                VsIdeTestHostContext.Dte.Solution.Close();
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
+                app.Dte.Solution.SolutionBuild.Build(true);
+                Assert.AreEqual(0, app.Dte.Solution.SolutionBuild.LastBuildInfo, "Expected no build failures");
             }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void ProjectRenameAndDeleteItem() {
-            try {
-                var project = OpenProject(@"TestData\NodejsProjectData\RenameItemsTest.sln");
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\RenameItemsTest.sln");
 
-                VsIdeTestHostContext.Dte.Documents.CloseAll(vsSaveChanges.vsSaveChangesNo);
+                app.Dte.Documents.CloseAll(vsSaveChanges.vsSaveChangesNo);
 
                 // invalid renames
                 AssertError<InvalidOperationException>(() => project.ProjectItems.Item("ProgramX.js").Name = "");
@@ -527,18 +488,14 @@ namespace Microsoft.Nodejs.Tests.UI {
                 project.ProjectItems.Item("SubFolder").ProjectItems.Item("SubItem.js").Name = "NewSubItem.js";
 
                 project.ProjectItems.Item("ProgramDelete.js").Delete();
-            } finally {
-                VsIdeTestHostContext.Dte.Solution.Close();
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
             }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestAutomationProperties() {
-            try {
-                var project = OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
                 int propCount = 0;
                 foreach (Property prop in project.Properties) {
@@ -564,7 +521,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
                     Assert.AreEqual(intIndexValue, nameIndexValue);
                     Assert.AreEqual(intIndexValue, intIndexValue);
-                    Assert.AreEqual(VsIdeTestHostContext.Dte, project.Properties.Item(propCount + 1).DTE);
+                    Assert.AreEqual(app.Dte, project.Properties.Item(propCount + 1).DTE);
                     Assert.AreEqual(0, project.Properties.Item(propCount + 1).NumIndices);
                     Assert.AreNotEqual(null, project.Properties.Item(propCount + 1).Parent);
                     Assert.AreEqual(null, project.Properties.Item(propCount + 1).Application);
@@ -574,7 +531,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
                 Assert.AreEqual(propCount, project.Properties.Count);
 
-                Assert.AreEqual(project.Properties.DTE, VsIdeTestHostContext.Dte);
+                Assert.AreEqual(project.Properties.DTE, app.Dte);
 
                 Assert.AreEqual(project.Properties.Item("StartWebBrowser").Value.GetType(), typeof(bool));
                 Assert.IsTrue(project.Properties.Item("NodejsPort").Value == null || project.Properties.Item("NodejsPort").Value.GetType() == typeof(int));
@@ -600,18 +557,14 @@ namespace Microsoft.Nodejs.Tests.UI {
                     project.Properties.Item(value).Value = tmpValue;
                     Assert.AreEqual(project.Properties.Item(value).Value, tmpValue);
                 }
-            } finally {
-                VsIdeTestHostContext.Dte.Solution.Close();
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
             }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestAutomationProject() {
-            try {
-                var project = OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
                 Assert.AreEqual("{9092aa53-fb77-4645-b42d-1ccca6bd08bd}", project.Kind);
                 // we don't yet expose a VSProject interface here, if we did we'd need tests for it, but it doesn't support
@@ -639,75 +592,77 @@ namespace Microsoft.Nodejs.Tests.UI {
                     break;
                 }
 
-                Assert.AreEqual(VsIdeTestHostContext.Dte, project.ProjectItems.DTE);
+                Assert.AreEqual(app.Dte, project.ProjectItems.DTE);
                 Assert.AreEqual(project, project.ProjectItems.Parent);
                 Assert.AreEqual(null, project.ProjectItems.Kind);
 
                 AssertError<ArgumentException>(() => project.ProjectItems.Item(-1));
                 AssertError<ArgumentException>(() => project.ProjectItems.Item(0));
-            } finally {
-                VsIdeTestHostContext.Dte.Solution.Close();
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
             }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestProjectItemAutomation() {
-            var project = OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
-            var item = project.ProjectItems.Item("server.js");
-            Assert.AreEqual(null, item.ExtenderNames);
-            Assert.AreEqual(null, item.ExtenderCATID);
-            Assert.AreEqual(null, item.SubProject);
-            Assert.AreEqual("{6bb5f8ee-4483-11d3-8bcf-00c04f8ec28c}", item.Kind);
-            Assert.AreEqual(null, item.ConfigurationManager);
-            Assert.AreNotEqual(null, item.Collection.Item("server.js"));
-            AssertError<ArgumentOutOfRangeException>(() => item.get_FileNames(-1));
-            AssertNotImplemented(() => item.Saved = false);
+                var item = project.ProjectItems.Item("server.js");
+                Assert.AreEqual(null, item.ExtenderNames);
+                Assert.AreEqual(null, item.ExtenderCATID);
+                Assert.AreEqual(null, item.SubProject);
+                Assert.AreEqual("{6bb5f8ee-4483-11d3-8bcf-00c04f8ec28c}", item.Kind);
+                Assert.AreEqual(null, item.ConfigurationManager);
+                Assert.AreNotEqual(null, item.Collection.Item("server.js"));
+                AssertError<ArgumentOutOfRangeException>(() => item.get_FileNames(-1));
+                AssertNotImplemented(() => item.Saved = false);
 
 
-            AssertError<ArgumentException>(() => item.get_IsOpen("ThisIsNotTheGuidYoureLookingFor"));
-            AssertError<ArgumentException>(() => item.Open("ThisIsNotTheGuidYoureLookingFor"));
+                AssertError<ArgumentException>(() => item.get_IsOpen("ThisIsNotTheGuidYoureLookingFor"));
+                AssertError<ArgumentException>(() => item.Open("ThisIsNotTheGuidYoureLookingFor"));
+            }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void TestRelativePaths() {
             // link to outside file should show up as top-level item
-            var project = OpenProject(@"TestData\NodejsProjectData\RelativePaths.sln");
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\RelativePaths.sln");
 
-            var item = project.ProjectItems.Item("server.js");
-            Assert.IsNotNull(item);
+                var item = project.ProjectItems.Item("server.js");
+                Assert.IsNotNull(item);
+            }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void ProjectConfiguration() {
-            var project = OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
-            project.ConfigurationManager.AddConfigurationRow("NewConfig", "Debug", true);
-            project.ConfigurationManager.AddConfigurationRow("NewConfig2", "UnknownConfig", true);
+                project.ConfigurationManager.AddConfigurationRow("NewConfig", "Debug", true);
+                project.ConfigurationManager.AddConfigurationRow("NewConfig2", "UnknownConfig", true);
 
-            AssertError<ArgumentException>(() => project.ConfigurationManager.DeleteConfigurationRow(null));
-            project.ConfigurationManager.DeleteConfigurationRow("NewConfig");
-            project.ConfigurationManager.DeleteConfigurationRow("NewConfig2");
+                AssertError<ArgumentException>(() => project.ConfigurationManager.DeleteConfigurationRow(null));
+                project.ConfigurationManager.DeleteConfigurationRow("NewConfig");
+                project.ConfigurationManager.DeleteConfigurationRow("NewConfig2");
 
-            var debug = project.ConfigurationManager.Item("Debug", "Any CPU");
-            Assert.AreEqual(debug.IsBuildable, true);
+                var debug = project.ConfigurationManager.Item("Debug", "Any CPU");
+                Assert.AreEqual(debug.IsBuildable, true);
 
-            Assert.AreEqual("Any CPU", ((object[])project.ConfigurationManager.PlatformNames)[0]);
-            Assert.AreEqual("Any CPU", ((object[])project.ConfigurationManager.SupportedPlatforms)[0]);
+                Assert.AreEqual("Any CPU", ((object[])project.ConfigurationManager.PlatformNames)[0]);
+                Assert.AreEqual("Any CPU", ((object[])project.ConfigurationManager.SupportedPlatforms)[0]);
 
-            Assert.AreEqual(null, project.ConfigurationManager.ActiveConfiguration.Object);
+                Assert.AreEqual(null, project.ConfigurationManager.ActiveConfiguration.Object);
 
-            //var workingDir = project.ConfigurationManager.ActiveConfiguration.Properties.Item("WorkingDirectory");
-            //Assert.AreEqual(".", workingDir);
+                //var workingDir = project.ConfigurationManager.ActiveConfiguration.Properties.Item("WorkingDirectory");
+                //Assert.AreEqual(".", workingDir);
 
-            // not supported
-            AssertError<COMException>(() => project.ConfigurationManager.AddPlatform("NewPlatform", "Any CPU", false));
-            AssertError<COMException>(() => project.ConfigurationManager.DeletePlatform("NewPlatform"));
+                // not supported
+                AssertError<COMException>(() => project.ConfigurationManager.AddPlatform("NewPlatform", "Any CPU", false));
+                AssertError<COMException>(() => project.ConfigurationManager.DeletePlatform("NewPlatform"));
+            }
         }
 
         /// <summary>
@@ -715,13 +670,14 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// sure the completion info changes.
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void AddFolderExists() {
             Directory.CreateDirectory(TestData.GetPath(@"TestData\NodejsProjectData\\AddFolderExists\\X"));
             Directory.CreateDirectory(TestData.GetPath(@"TestData\NodejsProjectData\\AddFolderExists\\Y"));
 
-            var project = OpenProject(@"TestData\NodejsProjectData\AddFolderExists.sln");
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\AddFolderExists.sln");
+
                 var solutionExplorer = app.SolutionExplorerTreeView;
 
                 var solutionNode = solutionExplorer.FindItem("Solution 'AddFolderExists' (1 project)");
@@ -771,10 +727,10 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void AddFolderCopyAndPasteFile() {
-            var project = OpenProject(@"TestData\NodejsProjectData\AddFolderCopyAndPasteFile.sln");
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\AddFolderCopyAndPasteFile.sln");
                 var solutionExplorer = app.SolutionExplorerTreeView;
                 var solutionNode = solutionExplorer.FindItem("Solution 'AddFolderCopyAndPasteFile' (1 project)");
 
@@ -812,10 +768,10 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void CopyAndPasteFolder() {
-            var project = OpenProject(@"TestData\NodejsProjectData\CopyAndPasteFolder.sln");
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\CopyAndPasteFolder.sln");
                 var solutionExplorer = app.SolutionExplorerTreeView;
                 var solutionNode = solutionExplorer.FindItem("Solution 'CopyAndPasteFolder' (1 project)");
 
@@ -825,8 +781,8 @@ namespace Microsoft.Nodejs.Tests.UI {
 
                 // paste to project node, make sure the files are there
                 StringCollection paths = new StringCollection() {
-                Path.Combine(Directory.GetCurrentDirectory(), "TestData", "NodejsProjectData", "CopiedFiles")
-            };
+                    Path.Combine(Directory.GetCurrentDirectory(), "TestData", "NodejsProjectData", "CopiedFiles")
+                };
 
                 ToSTA(() => Clipboard.SetFileDropList(paths));
 
@@ -852,10 +808,10 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void CopyAndPasteEmptyFolder() {
-            var project = OpenProject(@"TestData\NodejsProjectData\CopyAndPasteFolder.sln");
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\CopyAndPasteFolder.sln");
                 var solutionExplorer = app.SolutionExplorerTreeView;
                 var solutionNode = solutionExplorer.FindItem("Solution 'CopyAndPasteFolder' (1 project)");
 
@@ -867,8 +823,8 @@ namespace Microsoft.Nodejs.Tests.UI {
                 Directory.CreateDirectory(emptyFolderName);
                 // paste to project node, make sure the files are there
                 StringCollection paths = new StringCollection() {
-                Path.Combine(Directory.GetCurrentDirectory(), emptyFolderName)
-            };
+                    Path.Combine(Directory.GetCurrentDirectory(), emptyFolderName)
+                };
 
                 ToSTA(() => Clipboard.SetFileDropList(paths));
 
@@ -902,11 +858,11 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// Verify we can copy a folder with multiple items in it.
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void CopyFolderWithMultipleItems() {
             // http://mpfproj10.codeplex.com/workitem/11618
-            var project = OpenProject(@"TestData\NodejsProjectData\FolderMultipleItems.sln");
-            using (var app = new VisualStudioApp(VsIdeTestHostContext.Dte)) {
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\NodejsProjectData\FolderMultipleItems.sln");
                 var solutionExplorer = app.SolutionExplorerTreeView;
                 var solutionNode = solutionExplorer.FindItem("Solution 'FolderMultipleItems' (1 project)");
 
@@ -927,21 +883,23 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("TC Dynamic"), DynamicHostType(typeof(VsIdeHostAdapter))]
+        [HostType("VSTestHost")]
         public void LoadProjectWithDuplicateItems() {
-            var solution = OpenProject(@"TestData\NodejsProjectData\DuplicateItems.sln");
+            using (var app = new VisualStudioApp()) {
+                var solution = app.OpenProject(@"TestData\NodejsProjectData\DuplicateItems.sln");
 
-            var itemCount = new Dictionary<string, int>();
+                var itemCount = new Dictionary<string, int>();
 
-            CountNames(itemCount, solution.ProjectItems);
+                CountNames(itemCount, solution.ProjectItems);
 
-            CountIs(itemCount, "A", 1);
-            CountIs(itemCount, "B", 1);
-            CountIs(itemCount, "a.js", 1);
-            CountIs(itemCount, "b.js", 1);
-            CountIs(itemCount, "server.js", 2);
-            CountIs(itemCount, "HelloWorld.njsproj", 1);
-            CountIs(itemCount, "HelloWorld.js", 0);     // not included because the actual name is server.js
+                CountIs(itemCount, "A", 1);
+                CountIs(itemCount, "B", 1);
+                CountIs(itemCount, "a.js", 1);
+                CountIs(itemCount, "b.js", 1);
+                CountIs(itemCount, "server.js", 2);
+                CountIs(itemCount, "HelloWorld.njsproj", 1);
+                CountIs(itemCount, "HelloWorld.js", 0);     // not included because the actual name is server.js
+            }
         }
 
         private static void CountIs(Dictionary<string, int> count, string key, int expected) {
@@ -1032,64 +990,6 @@ namespace Microsoft.Nodejs.Tests.UI {
                 action();
                 Assert.Fail();
             } catch (T) {
-            }
-        }
-
-        internal static Project OpenProject(string projName, string startItem = null, int expectedProjects = 1, string projectName = null, bool setStartupItem = true) {
-            string fullPath = TestData.GetPath(projName);
-            Assert.IsTrue(File.Exists(fullPath), "Cannot find " + fullPath);
-            VsIdeTestHostContext.Dte.Solution.Open(fullPath);
-
-            Assert.IsTrue(VsIdeTestHostContext.Dte.Solution.IsOpen, "The solution is not open");
-
-            int count = VsIdeTestHostContext.Dte.Solution.Projects.Count;
-            if (expectedProjects != count) {
-                // if we have other files open we can end up with a bonus project...
-                int i = 0;
-                foreach (EnvDTE.Project proj in VsIdeTestHostContext.Dte.Solution.Projects) {
-                    if (proj.Name != "Miscellaneous Files") {
-                        i++;
-                    }
-                }
-
-                Assert.IsTrue(i == expectedProjects, String.Format("Loading project resulted in wrong number of loaded projects, expected 1, received {0}", VsIdeTestHostContext.Dte.Solution.Projects.Count));
-            }
-
-            var iter = VsIdeTestHostContext.Dte.Solution.Projects.GetEnumerator();
-            iter.MoveNext();
-
-            Project project = (Project)iter.Current;
-            if (projectName != null) {
-                while (project.Name != projectName) {
-                    if (!iter.MoveNext()) {
-                        Assert.Fail("Failed to find project named " + projectName);
-                    }
-                    project = (Project)iter.Current;
-                }
-            }
-
-            if (startItem != null && setStartupItem) {
-                project.SetStartupFile(startItem);
-                for (var i = 0; i < 20; i++) {
-                    //Wait for the startupItem to be set before returning from the project creation
-                    if (((string)project.Properties.Item("StartupFile").Value) == startItem) {
-                        break;
-                    }
-                    System.Threading.Thread.Sleep(250);
-                }
-            }
-
-            DeleteAllBreakPoints();
-
-            return project;
-        }
-
-        private static void DeleteAllBreakPoints() {
-            var debug3 = (Debugger3)VsIdeTestHostContext.Dte.Debugger;
-            if (debug3.Breakpoints != null) {
-                foreach (var bp in debug3.Breakpoints) {
-                    ((Breakpoint3)bp).Delete();
-                }
             }
         }
     }
