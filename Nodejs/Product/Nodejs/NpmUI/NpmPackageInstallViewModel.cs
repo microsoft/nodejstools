@@ -262,10 +262,14 @@ namespace Microsoft.NodejsTools.NpmUI {
                 return;
             }
 
-            var newItems = new List<PackageCatalogEntryViewModel>();
-
             var filterText = _filterText.Trim();
-            var filtered = _allPackages.GetCatalogPackages(filterText);
+
+            IEnumerable<IPackage> filtered;
+            if (string.IsNullOrEmpty(_filterText)) {
+                filtered = Enumerable.Empty<IPackage>();
+            } else {
+                filtered = _allPackages.GetCatalogPackages(filterText);                
+            }
 
             if (filtered == null) {
                 // The database file must be in use. Display current results, but try again later.
@@ -274,6 +278,7 @@ namespace Microsoft.NodejsTools.NpmUI {
                 return;
             }
 
+            var newItems = new List<PackageCatalogEntryViewModel>();
             lock (_filteredPackagesLock) {
                 if (filterText != _filterText) {
                     return;
