@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
@@ -37,6 +38,7 @@ namespace Microsoft.NodejsTools.NpmUI {
         private readonly FlowDocument _output = new FlowDocument();
         private readonly Thread _worker;
         private QueuedNpmCommandInfo _currentCommand;
+        private readonly HashSet<string> _failedCommands = new HashSet<string>();
         private INpmCommander _commander;
         
         public NpmOutputViewModel(INpmController controller) {
@@ -263,6 +265,11 @@ namespace Microsoft.NodejsTools.NpmUI {
                     sub = sub.Length > 4 ? sub.Substring(4) : string.Empty;
                     if (sub.StartsWith("ERR!")) {
                         WithErrors = true;
+                        var arguments = _currentCommand.Arguments.Split(' ');
+                        if (arguments.Length >= 2) {
+                            _failedCommands.Add(arguments[1]);
+                        }
+
                         paragraph.Inlines.Add(new Run(sub.Substring(0, 4)) { Foreground = Brushes.Red });
                         sub = sub.Length > 4 ? sub.Substring(4) : string.Empty;
                     } else if (sub.StartsWith("WARN")) {
@@ -288,7 +295,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             Application.Current.Dispatcher.BeginInvoke(new Action(() => WriteLines(e.LogText, false)));
         }
 
-        private void commander_OutputLogged(object sender, NpmLogEventArgs e) {
+        internal void commander_OutputLogged(object sender, NpmLogEventArgs e) {
             Application.Current.Dispatcher.BeginInvoke(new Action(() => WriteLines(e.LogText, false)));
         }
 
@@ -303,6 +310,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
 
             string status;
+            string errorsInfo = _failedCommands.Aggregate((x, y) => x + ", " + y);
 
             if (executingCommand && null != command) {
                 var commandText = command.ToString();
@@ -310,16 +318,18 @@ namespace Microsoft.NodejsTools.NpmUI {
                     status = SR.GetString(
                         WithErrors ? SR.NpmStatusExecutingQueuedErrors : SR.NpmStatusExecutingQueued,
                         commandText,
-                        count
+                        count,
+                        errorsInfo
                     );
                 } else {
                     status = SR.GetString(
                         WithErrors ? SR.NpmStatusExecutingErrors : SR.NpmStatusExecuting,
-                        commandText
+                        commandText,
+                        errorsInfo
                     );
                 }
             } else {
-                status = SR.GetString(WithErrors ? SR.NpmStatusReadyWithErrors : SR.NpmStatusReady);
+                status = SR.GetString(WithErrors ? SR.NpmStatusReadyWithErrors : SR.NpmStatusReady, errorsInfo);
             }
 
             StatusText = status;

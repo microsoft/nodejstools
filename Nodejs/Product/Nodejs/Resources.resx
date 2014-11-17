@@ -428,7 +428,7 @@
     <value>Ready</value>
   </data>
   <data name="NpmStatusReadyWithErrors" xml:space="preserve">
-    <value>Ready - Last command(s) completed with errors</value>
+    <value>Ready - Command(s) completed with errors ({0})</value>
   </data>
   <data name="NpmStatusExecuting" xml:space="preserve">
     <value>Executing: {0}</value>
@@ -437,10 +437,10 @@
     <value>Executing: {0} ({1} command(s) queued)</value>
   </data>
   <data name="NpmStatusExecutingErrors" xml:space="preserve">
-    <value>Errors Encountered - Executing: {0}</value>
+    <value>Errors Encountered ({1}) - Executing: {0}</value>
   </data>
   <data name="NpmStatusExecutingQueuedErrors" xml:space="preserve">
-    <value>Errors Ecountered - Executing: {0} ({1} command(s) queued)</value>
+    <value>Errors Encountered ({2}) - Executing: {0} ({1} command(s) queued)</value>
   </data>
   <data name="TestFramework" xml:space="preserve">
     <value>Test Framework</value>

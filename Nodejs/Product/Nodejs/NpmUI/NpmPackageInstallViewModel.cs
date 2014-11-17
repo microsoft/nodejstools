@@ -173,6 +173,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             var controller = _npmController;
             controller.ErrorLogged += _executeViewModel.commander_ErrorLogged;
             controller.ExceptionLogged += _executeViewModel.commander_ExceptionLogged;
+            controller.OutputLogged += _executeViewModel.commander_OutputLogged;
             _executeViewModel.SetCancellableSafe(false);
             try {
                 _allPackages = await controller.GetRepositoryCatalogAsync(forceRefresh);
@@ -188,6 +189,7 @@ namespace Microsoft.NodejsTools.NpmUI {
                 IsLoadingCatalog = false;
                 controller.ErrorLogged -= _executeViewModel.commander_ErrorLogged;
                 controller.ExceptionLogged -= _executeViewModel.commander_ExceptionLogged;
+                controller.OutputLogged -= _executeViewModel.commander_OutputLogged;
                 _executeViewModel.SetCancellableSafe(true);
             }
 
