@@ -178,7 +178,7 @@ if (Test-Path Internal\Nodejs\VsLogger\VsLogger.csproj) {
 #   VSTarget            e.g. 12.0
 #   VSName              e.g. VS 2013
 #   config              Name of the build configuration
-#   version             X.Y.Z.W installer version
+#   msi_version         X.Y.Z.W installer version
 #   release_version     X.Y install version
 #   assembly_version    X.Y.Z assembly version
 #   logfile             Build log file
@@ -199,7 +199,7 @@ function msbuild-options($target, $config) {
         "/p:VisualStudioVersion=$($target.VSTarget)",
         "/p:CopyOutputsToPath=$($target.destdir)",
         "/p:Configuration=$($target.config)",
-        "/p:Version=$($target.version)",
+        "/p:MsiVersion=$($target.msi_version)",
         "/p:ReleaseVersion=$($target.release_version)"
     )
 }
@@ -356,7 +356,7 @@ if ([int]::Parse([regex]::Match($buildnumber, '^[0-9]+').Value) -ge 65535) {
 (If the year is not yet $($base_year + 7) then something else has gone wrong.)"
 }
 
-$version = "$release_version.$buildnumber"
+$msi_version = "$release_version.$buildnumber"
 
 if ($internal -or $release -or $mockrelease) {
     $outdir = "$outdir\$buildnumber"
@@ -398,7 +398,7 @@ if ($mockrelease) {
 }
 Write-Output ""
 Write-Output "Product version: $assembly_version.`$(VS version)"
-Write-Output "File version: $version"
+Write-Output "MSI version: $msi_version"
 Write-Output "Building for $([String]::Join(", ", ($target_versions | % { $_.name })))"
 Write-Output ""
 Write-Output "============================================================"
@@ -451,7 +451,7 @@ try {
                 destdir=mkdir "$outdir\$($_.name)\$config" -Force;
                 logfile="$outdir\$($_.name)\BuildRelease.$config.$($_.number).log";
                 config=$config;
-                version=$version;
+                msi_version=$msi_version;
                 release_version=$release_version;
             }
             $i.unsigned_bindir = mkdir "$($i.destdir)\UnsignedBinaries" -Force;
