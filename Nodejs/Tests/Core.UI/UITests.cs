@@ -16,8 +16,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Windows.Automation;
 using System.Windows.Input;
 using EnvDTE;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
 using TestUtilities.Nodejs;
@@ -145,6 +147,56 @@ namespace Microsoft.Nodejs.Tests.UI {
                 Keyboard.ControlV();
 
                 Assert.AreNotEqual(null, window.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "server - Copy (2).js"));
+            }
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("VSTestHost")]
+        public void CopyPasteRenameFile() {
+            using (var app = new VisualStudioApp()) {
+                var project = app.OpenProject(@"TestData\CopyPasteRenameProject\CopyPasteRenameProject.sln");    
+
+                app.OpenSolutionExplorer();
+                var window = app.SolutionExplorerTreeView;
+
+                var jsFile = window.WaitForItem("Solution 'CopyPasteRenameProject' (2 projects)", "CopyPasteRenameJavaScript", "app.js");
+
+                AutomationWrapper.Select(jsFile);
+
+                Keyboard.ControlC();
+                Keyboard.ControlV();
+                var copiedJsFile = window.WaitForItem("Solution 'CopyPasteRenameProject' (2 projects)", "CopyPasteRenameJavaScript", "app - Copy.js");
+                Assert.AreNotEqual(null, copiedJsFile);
+
+                AutomationWrapper.Select(copiedJsFile);
+
+                Keyboard.PressAndRelease(Key.F2);
+                System.Threading.Thread.Sleep(100);
+
+                Keyboard.Type("renamed");
+                Keyboard.PressAndRelease(Key.Enter);
+
+                Assert.AreNotEqual(null, window.WaitForItem("Solution 'CopyPasteRenameProject' (2 projects)", "CopyPasteRenameJavaScript", "renamed.js"));
+
+
+                var tsFile = window.WaitForItem("Solution 'CopyPasteRenameProject' (2 projects)", "CopyPasteRenameProjectTypeScript", "app.ts");
+
+                AutomationWrapper.Select(tsFile);
+
+                Keyboard.ControlC();
+                Keyboard.ControlV();
+                var copiedTsFile = window.WaitForItem("Solution 'CopyPasteRenameProject' (2 projects)", "CopyPasteRenameProjectTypeScript", "app - Copy.ts");
+                Assert.AreNotEqual(null, copiedTsFile);
+
+                AutomationWrapper.Select(copiedTsFile);
+
+                Keyboard.PressAndRelease(Key.F2);
+                System.Threading.Thread.Sleep(100);
+
+                Keyboard.Type("renamed");
+                Keyboard.PressAndRelease(Key.Enter);
+
+                Assert.AreNotEqual(null, window.WaitForItem("Solution 'CopyPasteRenameProject' (2 projects)", "CopyPasteRenameProjectTypeScript", "renamed.ts"));
             }
         }
 

@@ -1,0 +1,10 @@
+{
+  "name": "CopyPasteRenameProject",
+  "version": "0.0.0",
+  "description": "CopyPasteRenameProject",
+  "main": "app.js",
+  "author": {
+    "name": "sitani",
+    "email": ""
+  }
+}
