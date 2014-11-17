@@ -25,6 +25,7 @@ using Microsoft.NodejsTools.Intellisense;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.Npm.SPI;
 using Microsoft.NodejsTools.ProjectWizard;
+using Microsoft.NodejsTools.Repl;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudioTools;
@@ -790,8 +791,18 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        protected override QueryStatusResult QueryStatusSelectionOnNodes(IList<HierarchyNode> selectedNodes, Guid cmdGroup, uint cmd, IntPtr pCmdText) {
+        internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result) {
             if (cmdGroup == Guids.NodejsCmdSet) {
+                switch (cmd) {
+                    case PkgCmdId.cmdidReplWindow:
+                        return VSConstants.S_OK;
+                }
+            }
+            return base.QueryStatusOnNode(cmdGroup, cmd, pCmdText, ref result);
+        }
+
+        protected override QueryStatusResult QueryStatusSelectionOnNodes(IList<HierarchyNode> selectedNodes, Guid cmdGroup, uint cmd, IntPtr pCmdText) {
+            if (cmdGroup == Guids.NodejsNpmCmdSet) {
                 switch (cmd) {
                     case PkgCmdId.cmdidNpmManageModules:
                         if (IsCurrentStateASuppressCommandsMode()) {
@@ -805,8 +816,30 @@ namespace Microsoft.NodejsTools.Project {
             return base.QueryStatusSelectionOnNodes(selectedNodes, cmdGroup, cmd, pCmdText);
         }
 
-        protected override int ExecCommandThatDependsOnSelectedNodes(Guid cmdGroup, uint cmdId, uint cmdExecOpt, IntPtr vaIn, IntPtr vaOut, CommandOrigin commandOrigin, IList<HierarchyNode> selectedNodes, out bool handled) {
+        internal override int ExecCommandOnNode(Guid cmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
             if (cmdGroup == Guids.NodejsCmdSet) {
+                switch (cmd) {
+                    case PkgCmdId.cmdidReplWindow:
+                        NodejsPackage.Instance.OpenReplWindow();
+                        return VSConstants.S_OK;
+                }
+            } else if (cmdGroup == Guids.NodejsNpmCmdSet) {
+                if (string.IsNullOrEmpty(NpmHelpers.GetPathToNpm())) {
+                    Nodejs.ShowNodejsNotInstalled();
+                    return VSConstants.S_OK;
+                }
+            }
+            return base.ExecCommandOnNode(cmdGroup, cmd, nCmdexecopt, pvaIn, pvaOut);
+        }
+
+        protected override int ExecCommandThatDependsOnSelectedNodes(Guid cmdGroup, uint cmdId, uint cmdExecOpt, IntPtr vaIn, IntPtr vaOut, CommandOrigin commandOrigin, IList<HierarchyNode> selectedNodes, out bool handled) {
+            if (cmdGroup == Guids.NodejsNpmCmdSet) {
+                if (string.IsNullOrEmpty(NpmHelpers.GetPathToNpm())) {
+                    Nodejs.ShowNodejsNotInstalled();
+                    handled = true;
+                    return VSConstants.S_OK;
+                }
+
                 switch (cmdId) {
                     case PkgCmdId.cmdidNpmManageModules:
                         if (!ShowManageModulesCommandOnNode(selectedNodes)) {

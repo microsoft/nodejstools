@@ -21,49 +21,56 @@
          group as the part of a menu contained between two lines. The parent of a group 
          must be a menu. -->
     <Groups>
-        <!-- Our group of menu items which is displayed on Tools/NodeJS Tools/...  -->
-        <Group guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup" priority="0x0500">
-            <Parent guid="guidNodeToolsCmdSet" id="ToolsMenu"/>
-        </Group>
+      <!-- Our group of menu items which is displayed on Tools/NodeJS Tools/...  -->
+      <Group guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup" priority="0x0500">
+        <Parent guid="guidNodeToolsCmdSet" id="ToolsMenu"/>
+      </Group>
 
-        <!-- Group on normal project items -->
-        <Group guid="guidNodeToolsCmdSet" id="CodeFileGroup" priority="0x600">
-          <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_PROJECT"/>
-        </Group>
+      <!-- Group on normal project items -->
+      <Group guid="guidNodeToolsCmdSet" id="CodeFileGroup" priority="0x600">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_PROJECT"/>
+      </Group>
 
-        <!-- Our group of menu items which is displayed on Tools/NodeJS Tools/Remote Debugging Proxy/...  -->
-        <Group guid="guidNodeToolsCmdSet" id="RemoteDebugProxyGroup" priority="0x0500">
-            <Parent guid="guidNodeToolsCmdSet" id="RemoteDebugProxyMenu"/>
-        </Group>
+      <!-- Our group of menu items which is displayed on Tools/NodeJS Tools/Remote Debugging Proxy/...  -->
+      <Group guid="guidNodeToolsCmdSet" id="RemoteDebugProxyGroup" priority="0x0500">
+        <Parent guid="guidNodeToolsCmdSet" id="RemoteDebugProxyMenu"/>
+      </Group>
 
-        <Group guid="guidNodeToolsCmdSet" id="NpmInstallItemsGroup" priority="0x0700"></Group>
+      <Group guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJWIN_SCOPE" priority="0x0500">
+        <Parent guid="guidNodeToolsNpmCmdSet" id="NpmMenu"/>
+      </Group>
 
-        <Group guid="guidNodeToolsCmdSet" id="NpmUninstallItemsGroup" priority="0x0800"></Group>
+      <Group guid="guidNodeToolsNpmCmdSet" id="NpmGroup" priority="0x0600">
+        <Parent guid="guidNodeToolsNpmCmdSet" id="NpmMenu"/>
+      </Group>
+
+      <Group guid="guidSHLMainMenu" id="IDG_VS_MNUDES_PROPERTIES" priority="0x0700">
+        <Parent guid="guidNodeToolsNpmCmdSet" id="NpmMenu"/>
+      </Group>
     </Groups>
 
     <Menus>
-        <Menu guid="guidNodeToolsCmdSet" id="ToolsMenu" priority="0x8009" type="Menu">
-            <Parent guid="guidSHLMainMenu" id="IDG_VS_TOOLS_OTHER2"/>
-            <Strings>
-                <ButtonText>Node.&amp;js Tools</ButtonText>
-                <CommandName>Node.&amp;js Tools</CommandName>
-            </Strings>
-        </Menu>
-
-        <Menu guid="guidNodeToolsCmdSet" id="RemoteDebugProxyMenu" priority="0x0500" type="Menu">
-            <Parent guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup"/>
-            <Strings>
-                <ButtonText>&amp;Remote Debugging Proxy</ButtonText>
-                <CommandName>&amp;Remote Debugging Proxy</CommandName>
-            </Strings>
-        </Menu>
-
-      <!--<Menu guid="guidNodeToolsCmdSet" id="NpmMenu" priority="0x8100" type="Menu">
+      <Menu guid="guidNodeToolsCmdSet" id="ToolsMenu" priority="0x8009" type="Menu">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_TOOLS_OTHER2"/>
         <Strings>
-          <ButtonText>npm</ButtonText>
-          <CommandName>&amp;npm</CommandName>
+          <ButtonText>Node.&amp;js Tools</ButtonText>
+          <CommandName>Node.&amp;js Tools</CommandName>
         </Strings>
-      </Menu>-->
+      </Menu>
+
+      <Menu guid="guidNodeToolsCmdSet" id="RemoteDebugProxyMenu" priority="0x0500" type="Menu">
+        <Parent guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup"/>
+        <Strings>
+          <ButtonText>&amp;Remote Debugging Proxy</ButtonText>
+          <CommandName>&amp;Remote Debugging Proxy</CommandName>
+        </Strings>
+      </Menu>
+      <Menu guid="guidNodeToolsNpmCmdSet" id="NpmMenu" priority="0x0600" type="Context">
+        <Strings>
+          <ButtonText>&amp;Npm</ButtonText>
+          <CommandName>&amp;Npm</CommandName>
+        </Strings>
+      </Menu>
     </Menus>
 
     <!--Buttons section: buttons include both buttons on toolbars as well as individual menu items -->
@@ -81,7 +88,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>DefaultInvisible</CommandFlag>
         <Strings>
-          <CommandName>Set as Node.js Startup File</CommandName>          
+          <CommandName>Set as Node.js Startup File</CommandName>
           <ButtonText>S&amp;et as Node.js Startup File</ButtonText>
         </Strings>
       </Button>
@@ -122,6 +129,8 @@
       <Button guid="guidNodeToolsCmdSet" id="cmdidReplWindow" priority="0x7f00" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
         <Icon guid="guidReplImage" id="1"/>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>Node.js Interactive Window</CommandName>
           <ButtonText>Node.js Interactive Window</ButtonText>
@@ -152,8 +161,8 @@
         </Strings>
       </Button>
 
-      <Button guid="guidNodeToolsCmdSet" id="cmdidNpmManageModules" priority="0x8000" type="Button">
-        <Parent guid="guidNodeToolsCmdSet" id="CodeFileGroup" />
+      <Button guid="guidNodeToolsNpmCmdSet" id="cmdidNpmManageModules" priority="0x8000" type="Button">
+        <Parent guid="guidNodeToolsNpmCmdSet" id="NpmGroup" />
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
@@ -161,9 +170,9 @@
           <ButtonText>Install &amp;New npm Packages...</ButtonText>
         </Strings>
       </Button>
-      
-      <Button guid="guidNodeToolsCmdSet" id="cmdidNpmInstallModules" priority="0x8100" type="Button">
-        <Parent guid="guidNodeToolsCmdSet" id="CodeFileGroup" />
+
+      <Button guid="guidNodeToolsNpmCmdSet" id="cmdidNpmInstallModules" priority="0x8100" type="Button">
+        <Parent guid="guidNodeToolsNpmCmdSet" id="NpmGroup" />
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
@@ -172,8 +181,8 @@
         </Strings>
       </Button>
 
-      <Button guid="guidNodeToolsCmdSet" id="cmdidNpmUpdateModules" priority="0x8200" type="Button">
-        <Parent guid="guidNodeToolsCmdSet" id="CodeFileGroup" />
+      <Button guid="guidNodeToolsNpmCmdSet" id="cmdidNpmUpdateModules" priority="0x8200" type="Button">
+        <Parent guid="guidNodeToolsNpmCmdSet" id="NpmGroup" />
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
@@ -182,8 +191,8 @@
         </Strings>
       </Button>
 
-      <Button guid="guidNodeToolsCmdSet" id="cmdidNpmUninstallModule" priority="0x8300" type="Button">
-        <Parent guid="guidNodeToolsCmdSet" id="CodeFileGroup" />
+      <Button guid="guidNodeToolsNpmCmdSet" id="cmdidNpmUninstallModule" priority="0x8300" type="Button">
+        <Parent guid="guidNodeToolsNpmCmdSet" id="NpmGroup" />
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
@@ -192,8 +201,8 @@
         </Strings>
       </Button>
 
-      <Button guid="guidNodeToolsCmdSet" id="cmdidNpmInstallSingleMissingModule" priority="0x8170" type="Button">
-        <Parent guid="guidNodeToolsCmdSet" id="CodeFileGroup" />
+      <Button guid="guidNodeToolsNpmCmdSet" id="cmdidNpmInstallSingleMissingModule" priority="0x8170" type="Button">
+        <Parent guid="guidNodeToolsNpmCmdSet" id="NpmGroup" />
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
@@ -202,8 +211,8 @@
         </Strings>
       </Button>
 
-      <Button guid="guidNodeToolsCmdSet" id="cmdidNpmUpdateSingleModule" priority="0x8270" type="Button">
-        <Parent guid="guidNodeToolsCmdSet" id="CodeFileGroup" />
+      <Button guid="guidNodeToolsNpmCmdSet" id="cmdidNpmUpdateSingleModule" priority="0x8270" type="Button">
+        <Parent guid="guidNodeToolsNpmCmdSet" id="NpmGroup" />
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
@@ -270,6 +279,9 @@
     <CommandPlacement guid="guidNodeToolsCmdSet" id="cmdidCopyFullPath" priority="0x0602">
       <Parent guid="guidNodeToolsCmdSet" id="CodeFileGroup"/>
     </CommandPlacement>
+    <CommandPlacement guid="guidVSStd2K" id="cmdidExploreFolderInWindows" priority="0x0700">
+      <Parent guid="guidNodeToolsNpmCmdSet" id="NpmGroup"/>
+    </CommandPlacement>
     <CommandPlacement guid="guidNodeToolsCmdSet" id="cmdidOpenCommandPromptHere" priority="0x600">
       <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJECT_EXPLORE"/>
     </CommandPlacement>
@@ -280,20 +292,15 @@
     <CommandPlacement guid="guidNodeToolsCmdSet" id="cmdidReplWindow" priority="0x102">
       <Parent guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup"/>
     </CommandPlacement>
-    
-    <CommandPlacement guid="guidNodeToolsCmdSet" id="NpmInstallItemsGroup" priority="0x0700">
-      <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_PROJNODE" />
-    </CommandPlacement>
 
-    <CommandPlacement guid="guidNodeToolsCmdSet" id="NpmUninstallItemsGroup" priority="0x0700">
-      <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_PROJNODE" />
+    <CommandPlacement guid="guidNodeToolsCmdSet" id="cmdidReplWindow" priority="0x102">
+      <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJECT_EXPLORE"/>
     </CommandPlacement>
-    
   </CommandPlacements>
 
   <KeyBindings>
-    <KeyBinding guid="guidNodeToolsCmdSet" id="cmdidReplWindow" key1="K" mod1="Control"  key2="N" editor="guidVSStd97"/>
-    <KeyBinding guid="guidNodeToolsCmdSet" id="cmdidNpmManageModules" key1="K" mod1="Control" key2="P" editor="guidVSStd97"/>
+    <KeyBinding guid="guidNodeToolsCmdSet" id="cmdidReplWindow" key1="K" mod1="Control" key2="N" editor="guidVSStd97"/>
+    <KeyBinding guid="guidNodeToolsNpmCmdSet" id="cmdidNpmManageModules" key1="K" mod1="Control" key2="P" editor="guidVSStd97"/>
   </KeyBindings>
 
   <Symbols>
@@ -308,26 +315,18 @@
       <IDSymbol name="cmdidSurveyNews" value ="0x0204" />
       <IDSymbol name="cmdidImportWizard" value ="0x0205" />
       <IDSymbol name="cmdidOpenRemoteDebugDocumentation" value="0x0206" />
-      <IDSymbol name="cmdidNpmManageModules" value="0x0207" />
-      <IDSymbol name="cmdidNpmInstallModules" value="0x0208" />
-      <IDSymbol name="cmdidNpmUpdateModules" value="0x0209" />
-      <IDSymbol name="cmdidNpmUninstallModule" value="0x020A" />
-      <IDSymbol name="cmdidNpmInstallSingleMissingModule" value="0x020B" />
-      <IDSymbol name="cmdidNpmUpdateSingleModule" value="0x020C" />
-      <IDSymbol name="cmdidAzureExplorerAttachNodejsDebugger" value="0x020D" />
-      <IDSymbol name="cmdidDiagnostics" value="0x020E" />
+      <IDSymbol name="cmdidAzureExplorerAttachNodejsDebugger" value="0x0207" />
+      <IDSymbol name="cmdidDiagnostics" value="0x0208" />
 
       <!-- Shared commands, defined in CommonConstants.cs -->
       <IDSymbol name="cmdidAddExistingFolder" value="0x10001" />
       <IDSymbol name="cmdidOpenCommandPromptHere" value="0x10002" />
       <IDSymbol name="cmdidCopyFullPath" value="0x10003" />
-      
+
       <!-- Groups -->
       <IDSymbol name="ToolsMenuItemsGroup" value="0x1010" />
       <IDSymbol name="RemoteDebugProxyGroup" value="0x1011" />
       <IDSymbol name="CodeFileGroup" value="0x1012" />
-      <IDSymbol name="NpmInstallItemsGroup" value="0x1013" />
-      <IDSymbol name="NpmUninstallItemsGroup" value="0x1014" />
       <IDSymbol name="AzureExplorerCommandsGroup" value="0x1015" />
 
       <!-- Menus -->
@@ -335,6 +334,19 @@
       <IDSymbol name="RemoteDebugProxyMenu" value ="0x2002" />
     </GuidSymbol>
 
+    <GuidSymbol name="guidNodeToolsNpmCmdSet" value="{9F4B31B4-09AC-4937-A2E7-F4BC02BB7DBA}">
+      <IDSymbol name="cmdidNpmManageModules" value="0x0300" />
+      <IDSymbol name="cmdidNpmInstallModules" value="0x0301" />
+      <IDSymbol name="cmdidNpmUpdateModules" value="0x0302" />
+      <IDSymbol name="cmdidNpmUninstallModule" value="0x0303" />
+      <IDSymbol name="cmdidNpmInstallSingleMissingModule" value="0x0304" />
+      <IDSymbol name="cmdidNpmUpdateSingleModule" value="0x0305" />
+      
+      <IDSymbol name="NpmGroup" value="0x2010"/>
+
+      <IDSymbol name="NpmMenu" value="0x3000"/>
+    </GuidSymbol>
+      
     <GuidSymbol name="guidCommandPromptImage" value="{6CFD0EC5-3818-4439-AC50-71365BD2A756}" />
     <GuidSymbol name="guidReplImage" value="{31C0C4BE-487E-4CCB-BEA2-A2EE8D23EDBB}" />
 

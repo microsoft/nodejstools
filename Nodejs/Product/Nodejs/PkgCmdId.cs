@@ -27,16 +27,17 @@ namespace Microsoft.NodejsTools {
         public const int cmdidSurveyNews                    = 0x204;
         public const int cmdidImportWizard                  = 0x205;
         public const int cmdidOpenRemoteDebugDocumentation  = 0x206;
-        public const int cmdidNpmManageModules              = 0x207;
-        public const int cmdidNpmInstallModules             = 0x208;
-        public const int cmdidNpmUpdateModules              = 0x209;
-        public const int cmdidNpmUninstallModule            = 0x20A;
-        public const int cmdidNpmInstallSingleMissingModule = 0x20B;
-        public const int cmdidNpmUpdateSingleModule         = 0x20C;
-        public const int cmdidDiagnostics                   = 0x20E;
 
-        public const uint cmdidAzureExplorerAttachNodejsDebugger = 0x20D;
+        public const int cmdidDiagnostics = 0x208;
 
-        public const uint menuIdNPM = 0x1000;
+        public const uint cmdidAzureExplorerAttachNodejsDebugger = 0x207;
+
+        public const int cmdidNpmManageModules              = 0x300;
+        public const int cmdidNpmInstallModules             = 0x301;
+        public const int cmdidNpmUpdateModules              = 0x302;
+        public const int cmdidNpmUninstallModule            = 0x303;
+        public const int cmdidNpmInstallSingleMissingModule = 0x304;
+        public const int cmdidNpmUpdateSingleModule         = 0x305;
+        public const int menuIdNpm                          = 0x3000;
     }
 }

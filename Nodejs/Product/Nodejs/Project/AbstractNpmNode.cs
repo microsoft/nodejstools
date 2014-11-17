@@ -24,8 +24,12 @@ namespace Microsoft.NodejsTools.Project {
             get { return VSConstants.GUID_ItemType_VirtualFolder; }
         }
 
+        public override Guid MenuGroupId {
+            get { return Guids.NodejsNpmCmdSet; }
+        }
+
         public override int MenuCommandId {
-            get { return VsMenus.IDM_VS_CTXT_ITEMNODE; }
+            get { return PkgCmdId.menuIdNpm; }
         }
 
         /// <summary>

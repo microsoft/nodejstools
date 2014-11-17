@@ -53,7 +53,7 @@ namespace Microsoft.NodejsTools.Project {
         internal IGlobalPackages GlobalPackages { get; set; }
 
         internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result) {
-            if (cmdGroup == Guids.NodejsCmdSet) {
+            if (cmdGroup == Guids.NodejsNpmCmdSet) {
                 switch (cmd) {
                     case PkgCmdId.cmdidNpmUpdateModules:
                         if (_parent.IsCurrentStateASuppressCommandsMode()) {
@@ -80,7 +80,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         internal override int ExecCommandOnNode(Guid cmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
-            if (cmdGroup == Guids.NodejsCmdSet) {
+            if (cmdGroup == Guids.NodejsNpmCmdSet) {
                 switch (cmd) {
                     case PkgCmdId.cmdidNpmUpdateModules:
                         var t = _parent.UpdateModules(AllChildren.ToList());

@@ -446,7 +446,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result) {
-            if (cmdGroup == Guids.NodejsCmdSet) {
+            if (cmdGroup == Guids.NodejsNpmCmdSet) {
                 switch (cmd) {
                     case PkgCmdId.cmdidNpmInstallModules:
                         if (IsCurrentStateASuppressCommandsMode()) {
@@ -484,7 +484,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         internal override int ExecCommandOnNode(Guid cmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
-            if (cmdGroup == Guids.NodejsCmdSet) {
+            if (cmdGroup == Guids.NodejsNpmCmdSet) {
                 switch (cmd) {
                     case PkgCmdId.cmdidNpmInstallModules:
                         var t = InstallMissingModules();

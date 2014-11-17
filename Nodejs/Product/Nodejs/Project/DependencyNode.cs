@@ -116,8 +116,12 @@ namespace Microsoft.NodejsTools.Project {
             get { return VSConstants.GUID_ItemType_VirtualFolder; }
         }
 
+        public override Guid MenuGroupId {
+            get { return Guids.NodejsNpmCmdSet; }
+        }
+
         public override int MenuCommandId {
-            get { return VsMenus.IDM_VS_CTXT_ITEMNODE; }
+            get { return PkgCmdId.menuIdNpm; }
         }
 
         public override object GetIconHandle(bool open) {
@@ -155,7 +159,7 @@ namespace Microsoft.NodejsTools.Project {
             //  Latter condition is because it's only valid to carry out npm operations
             //  on top level dependencies of the user's project, not sub-dependencies.
             //  Performing operations on sub-dependencies would just break things.
-            if (cmdGroup == Guids.NodejsCmdSet && null == _parent) {
+            if (cmdGroup == Guids.NodejsNpmCmdSet && null == _parent) {
                 switch (cmd) {
                     case PkgCmdId.cmdidNpmInstallSingleMissingModule:
                         if (GetPropertiesObject().IsGlobalInstall) {
@@ -199,7 +203,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         internal override int ExecCommandOnNode(Guid cmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
-            if (cmdGroup == Guids.NodejsCmdSet && null == _parent) {
+            if (cmdGroup == Guids.NodejsNpmCmdSet && null == _parent) {
                 switch (cmd) {
                     case PkgCmdId.cmdidNpmInstallSingleMissingModule:
                         if (null != _projectNode.ModulesNode) {
