@@ -40,6 +40,6 @@ namespace Microsoft.NodejsTools.Npm {
         /// <returns>
         /// List of matching packages. If there are no matches an empty list is returned.
         /// </returns>
-        IList<IPackage> Filter(string filterString);  
+        IEnumerable<IPackage> Filter(string filterString);  
     }
 }

@@ -35,7 +35,7 @@ namespace NpmTests {
 
         private const string PackageCacheAllJsonFilename = "packagecache.json";
         private const string PackageCacheSinceJsonFilename = "since_packages.json";
-        private const string PackageCacheDatabaseFilename = @"NpmSearchData\packagecache.sqlite";
+        private const string PackageCacheDatabaseFilename = @"NpmSearchData\testpackagecache.sqlite";
 
         [ClassInitialize]
         public static void Init(TestContext context) {
@@ -116,7 +116,7 @@ namespace NpmTests {
             out IDictionary<string, IPackage> byName) {
             IList<IPackage> target = new List<IPackage>();
 
-            target = NpmGetCatalogCommand.ReadResultsFromDatabase(filename);
+            target = (new NpmGetCatalogCommand(string.Empty, Path.GetDirectoryName(filename), false)).GetCatalogPackages(string.Empty).ToList();
 
             //  Do this after because package names can be split across multiple
             //  lines and therefore may change after the IPackage is initially created.
@@ -136,7 +136,9 @@ namespace NpmTests {
 
         [TestMethod, Priority(0)]
         public void CheckDatabaseCreation() {
-            string databaseFilename = "packagecache_create.sqlite";
+            string databaseFilename = "packagecache.sqlite";
+            File.Copy(PackageCacheDatabaseFilename, databaseFilename);
+
             using (var reader = GetCatalogueReader(PackageCacheAllJsonFilename)) {
                 new NpmGetCatalogCommand(string.Empty, null, false).ParseResultsAndAddToDatabase(reader, databaseFilename);
             }
@@ -165,8 +167,8 @@ namespace NpmTests {
 
         [TestMethod, Priority(0)]
         public void CheckDatabaseUpdate() {
-            string databaseCopyFilename = "packagecache_update.sqlite";
-            File.Copy(PackageCacheDatabaseFilename, databaseCopyFilename);
+            string databaseCopyFilename = "packagecache.sqlite";
+            File.Copy(PackageCacheDatabaseFilename, databaseCopyFilename, true);
             using (var reader = GetCatalogueReader(PackageCacheSinceJsonFilename)) {
                 new NpmGetCatalogCommand(string.Empty, null, false).ParseResultsAndAddToDatabase(reader, databaseCopyFilename);
             }
@@ -417,9 +419,8 @@ namespace NpmTests {
         }
 
         private IList<IPackage> GetFilteredPackageList(string filterString) {
-            var catalog = GetTestPackageCatalog(PackageCacheDatabaseFilename);
-            var filter = PackageCatalogFilterFactory.Create(catalog);
-            return filter.Filter(filterString);
+            var filter = new DatabasePackageCatalogFilter(PackageCacheDatabaseFilename);
+            return filter.Filter(filterString).ToList();
         }
 
         [TestMethod, Priority(0)]

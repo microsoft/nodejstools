@@ -16,10 +16,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Microsoft.NodejsTools.Npm;
@@ -54,8 +56,8 @@ namespace Microsoft.NodejsTools.NpmUI {
         private Visibility _filteredCatalogListVisibility = Visibility.Visible;
         private int _selectedDependencyTypeIndex;
 
-        private string _currentFilter;
-        private string _filterText;
+        private string _currentFilter = string.Empty;
+        private string _filterText = string.Empty;
         private readonly Timer _filterTimer;
         private string _arguments = string.Empty;
         private bool _saveToPackageJson = true;
@@ -191,11 +193,16 @@ namespace Microsoft.NodejsTools.NpmUI {
                 controller.ExceptionLogged -= _executeViewModel.commander_ExceptionLogged;
                 controller.OutputLogged -= _executeViewModel.commander_OutputLogged;
                 _executeViewModel.SetCancellableSafe(true);
+
+                // The catalog refresh operation spawns many long-lived Gen 2 objects,
+                // so the garbage collector will take a while to get to them otherwise.
+                GC.Collect();
             }
 
             // We want to show the catalog regardless of whether an exception was thrown so that the user has the chance to refresh it.
             LoadingCatalogControlVisibility = Visibility.Collapsed;
             FilteredCatalogListVisibility = Visibility.Visible;
+
             StartFilter();
         }
 
@@ -237,6 +244,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             get { return _filterText; }
             set {
                 _filterText = value;
+                
                 if (_currentFilter != _filterText) {
                     StartFilter();
                 }
@@ -249,30 +257,43 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
 
         private void FilterTimer_Elapsed(object state) {
-            if (_allPackages == null || _allPackages.Results == null) {
+            if (_allPackages == null) {
                 LastRefreshedMessage = LastRefreshedMessageProvider.RefreshFailed;
                 return;
             }
 
             var newItems = new List<PackageCatalogEntryViewModel>();
 
-            var filterText = _filterText;
-            var filtered = PackageCatalogFilterFactory.Create(_allPackages).Filter(filterText);
+            var filterText = _filterText.Trim();
+            var filtered = _allPackages.GetCatalogPackages(filterText);
 
-            if (filtered.Any()) {
-                IRootPackage rootPackage = null;
-                IGlobalPackages globalPackages = null;
-                var controller = _npmController;
-                if (controller != null) {
-                    rootPackage = controller.RootPackage;
-                    globalPackages = controller.GlobalPackages;
+            if (filtered == null) {
+                // The database file must be in use. Display current results, but try again later.
+                LastRefreshedMessage = LastRefreshedMessageProvider.RefreshInProgress;
+                StartFilter();
+                return;
+            }
+
+            lock (_filteredPackagesLock) {
+                if (filterText != _filterText) {
+                    return;
                 }
 
-                newItems.AddRange(filtered.Select(package => new ReadOnlyPackageCatalogEntryViewModel(
-                    package,
-                    rootPackage != null ? rootPackage.Modules[package.Name] : null,
-                    globalPackages != null ? globalPackages.Modules[package.Name] : null
-                    )));
+                if (filtered.Any()) {
+                    IRootPackage rootPackage = null;
+                    IGlobalPackages globalPackages = null;
+                    var controller = _npmController;
+                    if (controller != null) {
+                        rootPackage = controller.RootPackage;
+                        globalPackages = controller.GlobalPackages;
+                    }
+
+                    newItems.AddRange(filtered.Select(package => new ReadOnlyPackageCatalogEntryViewModel(
+                        package,
+                        rootPackage != null ? rootPackage.Modules[package.Name] : null,
+                        globalPackages != null ? globalPackages.Modules[package.Name] : null
+                        )));
+                }
             }
 
             _dispatcher.BeginInvoke((Action)(() => {
@@ -287,6 +308,10 @@ namespace Microsoft.NodejsTools.NpmUI {
                     : new LastRefreshedMessageProvider(_allPackages.LastRefreshed);
                 CatalogControlVisibility = Visibility.Visible;
             }));
+
+            // The catalog refresh operation spawns many long-lived Gen 2 objects,
+            // so the garbage collector will take a while to get to them otherwise.
+            GC.Collect();
         }
 
         public LastRefreshedMessageProvider LastRefreshedMessage {

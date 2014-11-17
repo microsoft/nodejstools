@@ -14,22 +14,28 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.NodejsTools.Npm;
 
 namespace NpmTests {
     public class MockPackageCatalog : IPackageCatalog {
         private IDictionary<string, IPackage> _byName = new Dictionary<string, IPackage>();
+        private IList<IPackage> _results; 
  
         public MockPackageCatalog(IList<IPackage> results) {
-            Results = results;
+            _results = results;
             LastRefreshed = DateTime.Now;
 
             foreach (var package in results) {
                 _byName[package.Name] = package;
             }
         }
-        public IList<IPackage> Results { get; private set; }
+
         public DateTime LastRefreshed { get; private set; }
+
+        public IEnumerable<IPackage> GetCatalogPackages(string filterText) {
+            return _results;
+        }
 
         public IPackage this[string name] {
             get {
@@ -37,6 +43,10 @@ namespace NpmTests {
                 _byName.TryGetValue(name, out match);
                 return match;
             }
+        }
+
+        public long? ResultsCount {
+            get { return _results.LongCount(); }
         }
     }
 }

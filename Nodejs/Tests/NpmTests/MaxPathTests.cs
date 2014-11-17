@@ -55,8 +55,8 @@ namespace NpmTests {
                 commander.UninstallGlobalPackageAsync("yo").Wait();
             }
 
-            // Command has completed, but need to wait for all files/folders to be deleted. 
-            Thread.Sleep(3000);
+            // Command has completed, but need to wait for all files/folders to be deleted.
+            Thread.Sleep(5000);
 
             Assert.IsNotNull(controller.GlobalPackages, "Cannot retrieve global packages after uninstall");
             Assert.IsFalse(controller.GlobalPackages.Modules.Contains("yo"), "Global package failed to uninstall");

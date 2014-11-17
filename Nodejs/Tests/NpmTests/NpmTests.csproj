@@ -150,7 +150,7 @@
     <None Include="TestData\NpmPackageJsonData\fresh_package_unescapedquote.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestData\NpmSearchData\packagecache.sqlite">
+    <None Include="TestData\NpmSearchData\testpackagecache.sqlite">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="TestData\NpmSearchData\since_packages.json">

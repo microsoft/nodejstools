@@ -46,6 +46,7 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -64,6 +65,7 @@
       <Link>ProcessOutput.cs</Link>
     </Compile>
     <Compile Include="IHomepages.cs" />
+    <Compile Include="IPackageCatalogFilter.cs" />
     <Compile Include="NpmArgumentBuilder.cs" />
     <Compile Include="NpmHelpers.cs" />
     <Compile Include="SemverVersionComparer.cs" />
@@ -90,7 +92,6 @@
     <Compile Include="INpmPathProvider.cs" />
     <Compile Include="IPackage.cs" />
     <Compile Include="IPackageCatalog.cs" />
-    <Compile Include="IPackageCatalogFilter.cs" />
     <Compile Include="IPackageJson.cs" />
     <Compile Include="IPackageJsonSource.cs" />
     <Compile Include="IPerson.cs" />
@@ -110,7 +111,6 @@
     <Compile Include="SPI\Homepages.cs" />
     <Compile Include="SPI\NpmSearchRegexComparer.cs" />
     <Compile Include="SPI\NpmSearchFilterStringComparer.cs" />
-    <Compile Include="PackageCatalogFilterFactory.cs" />
     <Compile Include="PackageComparer.cs" />
     <Compile Include="PackageFlags.cs" />
     <Compile Include="PackageJsonException.cs" />
@@ -127,7 +127,6 @@
     <Compile Include="SPI\AbstractNpmLogSource.cs" />
     <Compile Include="SPI\NpmCommander.cs" />
     <Compile Include="SPI\NpmGetCatalogCommand.cs" />
-    <Compile Include="SPI\PackageCatalogFilter.cs" />
     <Compile Include="SemverVersion.cs" />
     <Compile Include="SemverVersionFormatException.cs" />
     <Compile Include="SPI\AbstractNodeModules.cs" />
@@ -150,6 +149,8 @@
     <Compile Include="SPI\NpmUninstallCommand.cs" />
     <Compile Include="SPI\NpmUpdateCommand.cs" />
     <Compile Include="SPI\Package.cs" />
+    <Compile Include="SPI\DatabasePackageCatalogFilter.cs" />
+    <Compile Include="SPI\PackageCatalogHelper.cs" />
     <Compile Include="SPI\PackageJson.cs" />
     <Compile Include="SPI\PackageProxy.cs" />
     <Compile Include="SPI\Person.cs" />
@@ -172,7 +173,6 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <Content Include="..\..\Common\SQLite\sqlite3.dll">
       <Link>sqlite3.dll</Link>

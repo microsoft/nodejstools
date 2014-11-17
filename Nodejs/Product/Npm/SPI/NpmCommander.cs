@@ -89,13 +89,19 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         private async Task<bool> DoCommandExecute(bool refreshNpmController) {
-            RegisterLogEvents(_command);
-            bool success = await _command.ExecuteAsync();
-            UnregisterLogEvents(_command);
-            if (refreshNpmController) {
-                _npmController.Refresh();                
+            try {
+                RegisterLogEvents(_command);
+                bool success = await _command.ExecuteAsync();
+                UnregisterLogEvents(_command);
+                if (refreshNpmController) {
+                    _npmController.Refresh();
+                }
+                return success;
+            } catch (Exception e) {
+                OnOutputLogged(e.ToString());
             }
-            return success;
+            return false;
+
         }
 
         public async Task<bool> Install() {

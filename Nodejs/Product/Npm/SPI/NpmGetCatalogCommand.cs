@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -31,6 +30,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         private IDictionary<string, IPackage> _byName = new Dictionary<string, IPackage>();
         private readonly bool _forceDownload;
         private string _cachePath;
+
+        private const int _databaseSchemaVersion = 2;
 
         public NpmGetCatalogCommand(
             string fullPathToRootPackageDirectory,
@@ -55,16 +56,15 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             using (var db = new SQLiteConnection(dbFilename)) {
 
                 db.RunInTransaction(() => {
-                    db.CreateTable<CatalogEntry>();
-                    db.CreateTable<DbVersion>();
+                    db.CreateCatalogTablesIfNotExists();
                 });
 
                 db.RunInTransaction(() => {
-                    using (var jsonReader = new Newtonsoft.Json.JsonTextReader(reader)) {
+                    using (var jsonReader = new JsonTextReader(reader)) {
                         var token = JObject.ReadFrom(jsonReader);
 
                         db.InsertOrReplace(new DbVersion() {
-                            Id = 1,
+                            Id = _databaseSchemaVersion,
                             Revision = long.Parse((string)token["_updated"]),
                             UpdatedOn = DateTime.Now
                         });
@@ -125,12 +125,15 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                             }
                         }
                     }
+
+                    // FTS doesn't support INSERT OR REPLACE. This is the most efficient way to bypass that limitation.
+                    db.Execute("DELETE FROM CatalogEntry WHERE docid NOT IN (SELECT MAX(docid) FROM CatalogEntry GROUP BY Name)");
                 });
             }
         }
 
         private static void InsertCatalogEntry(SQLiteConnection db, IPackage package) {
-            db.InsertOrReplace(new CatalogEntry() {
+            db.Insert(new CatalogEntry() {
                 Name = package.Name,
                 Description = package.Description,
                 Author = JsonConvert.SerializeObject(package.Author),
@@ -140,6 +143,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 Homepage = JsonConvert.SerializeObject(package.Homepages),
                 PublishDateTimeString = package.PublishDateTimeString
             });
+
         }
 
         private IEnumerable<SemverVersion> GetVersions(JToken versionsToken) {
@@ -197,6 +201,10 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             get {
                 return _cachePath;
             }
+        }
+
+        private string DatabaseCacheFilename {
+            get { return Path.Combine(CachePath, "packagecache.sqlite"); }
         }
 
         private async Task<string> DownloadPackageJsonCache(Uri registry, string cachePath, long refreshStartKey = 0) {
@@ -265,15 +273,14 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         public override async Task<bool> ExecuteAsync() {
-            var dbFilename = Path.Combine(CachePath, "packagecache.sqlite");
+            var dbFilename = DatabaseCacheFilename;
 
             string filename = null;
 
-            List<IPackage> results = null;
             bool catalogUpdated = false;
 
             // Use a semaphore instead of a mutex because await may return to a thread other than the calling thread.
-            using (var semaphore = new Semaphore(1, 1, dbFilename.Replace('\\', '/'))) {
+            using (var semaphore = GetDatabaseSemaphore()) {
                 // Wait until file is downloaded/parsed if another download is already in session.
                 // Allows user to open multiple npm windows and show progress bar without file-in-use errors.
                 bool success = await Task.Run(() => semaphore.WaitOne(TimeSpan.FromMinutes(5)));
@@ -286,14 +293,24 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     if (!File.Exists(dbFilename)) {
                         filename = await UpdatePackageCache();
                         catalogUpdated = true;
-                    } else if (_forceDownload) {
+                    } else {
                         DbVersion version;
                         using (var db = new SQLiteConnection(dbFilename)) {
-                            version = db.Table<DbVersion>().First();
+                            // prevent errors from occurring when table doesn't exist
+                            db.CreateCatalogTablesIfNotExists();
+                            version = db.Table<DbVersion>().FirstOrDefault();
                         }
 
-                        filename = await UpdatePackageCache(version.Revision);
-                        catalogUpdated = true;
+                        var correctDatabaseSchema = version != null && version.Id == _databaseSchemaVersion;
+                        if (!correctDatabaseSchema) {
+                            OnOutputLogged(Resources.InfoCatalogUpgrade);
+                            SafeDeleteFile(dbFilename);
+                            filename = await UpdatePackageCache();
+                            catalogUpdated = true;
+                        } else if (_forceDownload) {
+                            filename = await UpdatePackageCache(version.Revision);
+                            catalogUpdated = true;
+                        }
                     }
 
                     if (catalogUpdated) {
@@ -305,8 +322,10 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                         }
                     }
 
-                    results = await Task.Run(() => ReadResultsFromDatabase(dbFilename));
-
+                    using (var db = new SQLiteConnection(dbFilename)) {
+                        db.CreateCatalogTablesIfNotExists();
+                        ResultsCount = db.Table<CatalogEntry>().LongCount();
+                    }
                 } catch (Exception ex) {
                     if (ex is StackOverflowException ||
                         ex is OutOfMemoryException ||
@@ -317,29 +336,31 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     // assume the results are corrupted
                     OnOutputLogged(ex.ToString());
                 } finally {
-                    if (results == null) {
+                    if (ResultsCount == null) {
                         OnOutputLogged(string.Format(Resources.DownloadOrParsingFailed, CachePath));
-                    } else if (!results.Any()) {
+                        SafeDeleteFile(dbFilename);
+                    } else if (ResultsCount <= 0) {
                         // Database file exists, but is corrupt. Delete database, so that we can download the file next time arround.
                         OnOutputLogged(string.Format(Resources.DatabaseCorrupt, dbFilename));
                         SafeDeleteFile(dbFilename);
                     }
-                    semaphore.Release(1);
+
+                    semaphore.Release();
                 }
             }
 
             LastRefreshed = File.GetLastWriteTime(dbFilename);
-            Results = new ReadOnlyCollection<IPackage>(results ?? new List<IPackage>());
-            PopulateByName(results);
 
             OnOutputLogged(String.Format(Resources.InfoCurrentTime, DateTime.Now));
             OnOutputLogged(String.Format(Resources.InfoLastRefreshed, LastRefreshed));
-            OnOutputLogged(String.Format(Resources.InfoNumberOfResults, Results.LongCount()));
+            if (ResultsCount != null) {
+                OnOutputLogged(String.Format(Resources.InfoNumberOfResults, ResultsCount));
+            }
 
             return true;
         }
 
-        private void SafeDeleteFile(string filename) {
+        private bool SafeDeleteFile(string filename) {
             try {
                 OnOutputLogged(string.Format(Resources.InfoDeletingFile, filename));
                 File.Delete(filename);
@@ -349,37 +370,17 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 // files are in use or path is too long
                 OnOutputLogged(exception.Message);
                 OnOutputLogged(string.Format(Resources.FailedToDeleteFile, filename));
+                return false;
             } catch (Exception exception) {
                 OnOutputLogged(exception.ToString());
                 OnOutputLogged(string.Format(Resources.FailedToDeleteFile, filename));
+                return false;
             }
+            return true;
         }
 
-        internal static List<IPackage> ReadResultsFromDatabase(string cacheFile) {
-            // TODO: we shouldn't be loading all results from the database into memory.
-            // We should query the database instead. https://nodejstools.codeplex.com/workitem/1438
-            var results = new List<IPackage>();
-            using (var db = new SQLiteConnection(cacheFile)) {
-                db.RunInTransaction(() => {
-                    var enumerator = db.Table<CatalogEntry>().OrderBy(x => x.Name, StringComparer.OrdinalIgnoreCase).GetEnumerator();
-                    while (enumerator.MoveNext()) {
-                        var package = new PackageProxy();
-                        CatalogEntry entry = enumerator.Current;
-
-                        package.Name = entry.Name;
-                        package.Description = entry.Description;
-                        package.Author = JsonConvert.DeserializeObject<Person>(entry.Author);
-                        package.Keywords = JsonConvert.DeserializeObject<IEnumerable<string>>(entry.Keywords) ?? new List<string>();
-                        package.Version = JsonConvert.DeserializeObject<SemverVersion>(entry.Version);
-                        package.AvailableVersions = JsonConvert.DeserializeObject<IEnumerable<SemverVersion>>(entry.AvailableVersions);
-                        package.Homepages = JsonConvert.DeserializeObject<IEnumerable<string>>(entry.Homepage) ?? new List<string>();
-                        package.PublishDateTimeString = entry.PublishDateTimeString;
-
-                        results.Add(package);
-                    }
-                });
-            }
-            return results;
+        private Semaphore GetDatabaseSemaphore() {
+            return new Semaphore(1, 1, DatabaseCacheFilename.Replace('\\', '/'));
         }
 
         private async Task<string> UpdatePackageCache(long refreshStartKey = 0) {
@@ -404,31 +405,58 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             return filename;
         }
 
-        private void PopulateByName(IEnumerable<IPackage> source) {
-            var target = new Dictionary<string, IPackage>();
-            foreach (var package in source) {
-                target[package.Name] = package;
-            }
-            _byName = target;
-        }
-
         public DateTime LastRefreshed { get; private set; }
 
         public IPackageCatalog Catalog { get { return this; } }
 
-        public IPackage this[string name] {
-            get {
-                var temp = _byName;
-                if (null == temp) {
+        public IEnumerable<IPackage> GetCatalogPackages(string filterText) {
+            IEnumerable<IPackage> packages;
+             using (var semaphore = GetDatabaseSemaphore()) {
+                // Wait until file is downloaded/parsed if another download is already in session.
+                // Allows user to open multiple npm windows and show progress bar without file-in-use errors.
+                bool success = semaphore.WaitOne(10);
+                if (!success) {
+                    OnOutputLogged(Resources.ErrorCatalogInUse);
+                    // Return immediately so that the user can explicitly decide to refresh on failure.
                     return null;
                 }
 
-                IPackage match;
-                temp.TryGetValue(name, out match);
-                return match;
-            }
+                 try {
+                     packages = new DatabasePackageCatalogFilter(DatabaseCacheFilename).Filter(filterText);
+                 } catch (Exception e) {
+                     OnOutputLogged(e.ToString());
+                     throw;
+                 } finally {
+                     semaphore.Release();                     
+                 }
+             }
+            return packages;
         }
 
-        public IList<IPackage> Results { get; private set; }
+        public long? ResultsCount { get; private set; }
+
+        public IPackage this[string name] {
+            get {
+                IPackage package;
+                using (var semaphore = GetDatabaseSemaphore()) {
+                    // Wait until file is downloaded/parsed if another download is already in session.
+                    // Allows user to open multiple npm windows and show progress bar without file-in-use errors.
+                    bool success = semaphore.WaitOne(10);
+                    if (!success) {
+                        return null;
+                    }
+
+                    try {
+                        using (var db = new SQLiteConnection(DatabaseCacheFilename)) {
+                            package = db.Table<CatalogEntry>().FirstOrDefault(entry => entry.Name == name).ToPackage();
+                        }
+                    } finally {
+                        semaphore.Release();                        
+                    }
+                }
+
+                return package;
+            }
+        }
     }
 }

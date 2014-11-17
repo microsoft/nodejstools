@@ -46,7 +46,12 @@ namespace Microsoft.NodejsTools.NpmUI {
                 _outputWindow.Closing -= _outputWindow_Closing;
                 _outputWindow.Close();
             }
+            
             _vm.NpmController = null;
+
+            // The catalog refresh operation spawns many long-lived Gen 2 objects,
+            // so the garbage collector will take a while to get to them otherwise.
+            GC.Collect();
         }
 
         void _outputWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e) {

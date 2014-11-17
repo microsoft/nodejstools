@@ -20,8 +20,12 @@ using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Npm {
     public interface IPackageCatalog {
-        IList<IPackage> Results { get; }
         DateTime LastRefreshed { get; }
+
+        IEnumerable<IPackage> GetCatalogPackages(string filterText);
+
         IPackage this[string name] { get; }
+
+        long? ResultsCount { get; }
     }
 }

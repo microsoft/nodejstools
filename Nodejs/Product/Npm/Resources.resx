@@ -184,11 +184,17 @@
     <value>Could not delete file {0} - try deleting it manually.</value>
   </data>
   <data name="DatabaseCorrupt" xml:space="preserve">
-    <value>Database is corrupt - deleting {0}. Try refreshing the catalog again to download and re-populate the package cache.</value>
+    <value>Database is corrupt - deleting {0}. Try refreshing the catalog again. Otherwise restart Visual Studio, and try again.</value>
     <comment>args: filename</comment>
   </data>
   <data name="DownloadOrParsingFailed" xml:space="preserve">
-    <value>Download or parsing failed. Try refreshing the catalog again. Otherwise delete the package cache from {0} and try again.</value>
+    <value>Download or parsing failed - deleting {0}. Try refreshing the catalog again. Otherwise restart Visual Studio, and try again.</value>
     <comment>args: filename</comment>
+  </data>
+  <data name="ErrorCatalogInUse" xml:space="preserve">
+    <value>Package catalog cache file is in use. Verify you are not refreshing the catalog in multiple instances.</value>
+  </data>
+  <data name="InfoCatalogUpgrade" xml:space="preserve">
+    <value>Your package catalog database needs to be upgraded. Please wait while we execute a full refresh.</value>
   </data>
 </root>

@@ -79,7 +79,7 @@ namespace Microsoft.NodejsTools.Npm {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Database is corrupt - deleting {0}. Try refreshing the catalog again to download and re-populate the package cache..
+        ///   Looks up a localized string similar to Database is corrupt - deleting {0}. Try refreshing the catalog again. Otherwise restart Visual Studio, and try again..
         /// </summary>
         internal static string DatabaseCorrupt {
             get {
@@ -88,7 +88,7 @@ namespace Microsoft.NodejsTools.Npm {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Download or parsing failed. Try refreshing the catalog again. Otherwise delete the package cache from {0} and try again..
+        ///   Looks up a localized string similar to Download or parsing failed - deleting {0}. Try refreshing the catalog again. Otherwise restart Visual Studio, and try again..
         /// </summary>
         internal static string DownloadOrParsingFailed {
             get {
@@ -115,6 +115,15 @@ namespace Microsoft.NodejsTools.Npm {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Package catalog cache file is in use. Verify you are not refreshing the catalog in multiple instances..
+        /// </summary>
+        internal static string ErrorCatalogInUse {
+            get {
+                return ResourceManager.GetString("ErrorCatalogInUse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Executing command &apos;npm {0}&apos;.
         /// </summary>
         internal static string ExecutingCommand {
@@ -129,6 +138,15 @@ namespace Microsoft.NodejsTools.Npm {
         internal static string FailedToDeleteFile {
             get {
                 return ResourceManager.GetString("FailedToDeleteFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your package catalog database needs to be upgraded. Please wait while we execute a full refresh..
+        /// </summary>
+        internal static string InfoCatalogUpgrade {
+            get {
+                return ResourceManager.GetString("InfoCatalogUpgrade", resourceCulture);
             }
         }
         

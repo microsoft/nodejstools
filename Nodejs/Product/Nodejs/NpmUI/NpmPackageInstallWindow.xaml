@@ -28,6 +28,21 @@
                     </Setter.Value>
                 </Setter>
             </Style>
+            <VisualBrush x:Key="HelpTextBrush" TileMode="None" Stretch="None"  AlignmentX="Left" AlignmentY="Center">
+                <VisualBrush.Visual>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="7"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <!--Hacky, but the only way I could come up with to move the background text into the appropriate location.-->
+                        <TextBlock Visibility="Hidden">a</TextBlock>
+                        <TextBlock Grid.Column="1" FontStyle="Italic" Padding="0 7 0 0" Opacity="0.5">
+                            Search for packages
+                        </TextBlock>
+                    </Grid>
+                </VisualBrush.Visual>
+            </VisualBrush>
 
             <wpf:ComparisonConverter x:Key="ValueGreaterThanZeroConverter"
                                      IfTrue="{x:Static Visibility.Hidden}"
@@ -347,8 +362,22 @@
                              Height="24"
                              Text="{Binding FilterText,UpdateSourceTrigger=PropertyChanged}"
                              PreviewKeyDown="FilterTextBox_PreviewKeyDown"
-                             KeyboardNavigation.TabIndex="0"/>
-            <ContentControl Style="{StaticResource SearchStyle}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsTabStop="False" Focusable="False"/>
+                             KeyboardNavigation.TabIndex="0">
+
+                <TextBox.Style>
+                    <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                        <Style.Triggers>
+                            <Trigger Property="Text" Value="{x:Null}">
+                                <Setter Property="Background" Value="{StaticResource HelpTextBrush}"/>
+                            </Trigger>
+                            <Trigger Property="Text" Value="">
+                                <Setter Property="Background" Value="{StaticResource HelpTextBrush}"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBox.Style>
+            </TextBox>
+            <ContentControl Style="{StaticResource SearchStyle}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsTabStop="False" Focusable="False" />
             <ListView x:Name="_packageList"
                           Grid.Row="1"
                           ItemsSource="{Binding FilteredPackages}"

@@ -13,6 +13,7 @@
  * ***************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -21,10 +22,7 @@ using System.Threading.Tasks;
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal class NpmController : AbstractNpmLogSource, INpmController {
 
-        //  *Really* don't want to retrieve this more than once:
-        //  47,000 packages takes a while.
-        private static IPackageCatalog _sRepoCatalogue;
-
+        private IPackageCatalog _sRepoCatalog;
         private string _fullPathToRootPackageDirectory;
         private string _cachePath;
         private bool _showMissingDevOptionalSubPackages;
@@ -207,13 +205,14 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             //  we'll just have to hope and pray this doesn't happen concurrently. Worst
             //  case is we'll end up with two retrievals, one of which will be binned,
             //  which isn't the end of the world.
-            if (null == _sRepoCatalogue || _sRepoCatalogue.Results.Count == 0 || forceDownload) {
+            _sRepoCatalog = null;
+            if (null == _sRepoCatalog || _sRepoCatalog.ResultsCount == 0 || forceDownload) {
                 Exception ex = null;
                 using (var commander = CreateNpmCommander()) {
                     EventHandler<NpmExceptionEventArgs> exHandler = (sender, args) => { LogException(sender, args); ex = args.Exception; };
                     commander.ErrorLogged += LogError;
                     commander.ExceptionLogged += exHandler;
-                    _sRepoCatalogue = await commander.GetCatalogAsync(forceDownload);
+                    _sRepoCatalog = await commander.GetCatalogAsync(forceDownload);
                     commander.ErrorLogged -= LogError;
                     commander.ExceptionLogged -= exHandler;
                 }
@@ -222,13 +221,11 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     throw ex;
                 }
             }
-            return _sRepoCatalogue;
+            return _sRepoCatalog;
         }
 
         public IPackageCatalog MostRecentlyLoadedCatalog {
-            get {
-                return _sRepoCatalogue;
-            }
+            get { return _sRepoCatalog; }
         }
 
 
