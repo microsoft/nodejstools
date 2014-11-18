@@ -19,15 +19,12 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Intellisense;
 using Microsoft.NodejsTools.Npm;
-using Microsoft.NodejsTools.Npm.SPI;
 using Microsoft.NodejsTools.ProjectWizard;
-using Microsoft.NodejsTools.Repl;
 using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudioTools.Project.Automation;
@@ -58,15 +55,15 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private static string[] _excludedAvailableItems = new[] { 
-            "ApplicationDefinition", 
+        private static string[] _excludedAvailableItems = new[] {
+            "ApplicationDefinition",
             "Page",
             "Resource",
             "SplashScreen",
             "DesignData",
             "DesignDataWithDesignTimeCreatableTypes",
             "EntityDeploy",
-            "CodeAnalysisDictionary", 
+            "CodeAnalysisDictionary",
             "XamlAppDef"
         };
 
@@ -630,13 +627,19 @@ namespace Microsoft.NodejsTools.Project {
             public bool IsDirectory;
         }
 
+        private static readonly Regex _uninstallRegex = new Regex(@"\b(uninstall|rm)\b");
         private static readonly char[] _pathSeparators = { '\\', '/' };
         private bool _isCheckingForLongPaths;
 
-        public async Task CheckForLongPaths() {
+        public async Task CheckForLongPaths(string npmArguments = null) {
             if (_isCheckingForLongPaths || !NodejsPackage.Instance.GeneralOptionsPage.CheckForLongPaths) {
                 return;
             }
+
+            if (npmArguments != null && _uninstallRegex.IsMatch(npmArguments)) {
+                return;
+            }
+
             try {
                 _isCheckingForLongPaths = true;
                 TaskDialogButton dedupButton, ignoreButton, disableButton;
@@ -674,7 +677,7 @@ namespace Microsoft.NodejsTools.Project {
                     }
                 };
 
-            recheck:
+recheck:
 
                 var longPaths = await Task.Factory.StartNew(() =>
                     GetLongSubPaths(ProjectHome)

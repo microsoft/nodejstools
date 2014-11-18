@@ -349,22 +349,16 @@ namespace Microsoft.NodejsTools.Project {
 
             ForceUpdateStatusBarWithNpmActivitySafe(message);
 
-            RestartNpmIdleTimer();
+            StopNpmIdleTimer();
+            _npmIdleTimer = new Timer(
+                _ => UIThread.Invoke(() => _projectNode.CheckForLongPaths(e.Arguments).HandleAllExceptions(SR.ProductName).DoNotWait()),
+                null, 1000, Timeout.Infinite);
         }
 
         private void StopNpmIdleTimer() {
             if (null != _npmIdleTimer) {
                 _npmIdleTimer.Dispose();
             }
-        }
-
-        private void RestartNpmIdleTimer() {
-            StopNpmIdleTimer();
-            _npmIdleTimer = new Timer(CheckForLongPaths, null, 1000, Timeout.Infinite);
-        }
-
-        private void CheckForLongPaths(object state) {
-            UIThread.Invoke(() => _projectNode.CheckForLongPaths().HandleAllExceptions(SR.ProductName).DoNotWait());
         }
 
         #endregion

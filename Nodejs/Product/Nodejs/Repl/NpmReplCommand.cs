@@ -22,11 +22,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Microsoft.NodejsTools;
 using Microsoft.NodejsTools.Npm;
-using Microsoft.NodejsTools.Npm.SPI;
 using Microsoft.NodejsTools.Project;
-using Microsoft.NodejsTools.ProjectWizard;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -50,8 +47,7 @@ namespace Microsoft.NodejsTools.Repl {
             string npmArguments = arguments.TrimStart(' ', '\t');
 
             // Parse project name/directory in square brackets
-            if (npmArguments.StartsWith("["))
-            {
+            if (npmArguments.StartsWith("[")) {
                 var match = Regex.Match(npmArguments, @"(?:[[]\s*\""?\s*)(.*?)(?:\s*\""?\s*[]]\s*)");
                 projectPath = match.Groups[1].Value;
                 npmArguments = npmArguments.Substring(match.Length);
@@ -115,8 +111,8 @@ namespace Microsoft.NodejsTools.Repl {
 
             // In case someone copies filename
             string projectDirectoryPath = File.Exists(projectPath) ? Path.GetDirectoryName(projectPath) : projectPath;
-            
-            if (!isGlobalInstall && !(Directory.Exists(projectDirectoryPath) && File.Exists(Path.Combine(projectDirectoryPath, "package.json")))){
+
+            if (!isGlobalInstall && !(Directory.Exists(projectDirectoryPath) && File.Exists(Path.Combine(projectDirectoryPath, "package.json")))) {
                 window.WriteError("Please specify a valid Node.js project or project directory in solution. If solution contains multiple projects, specify target project using .npm [ProjectName or ProjectDir] <npm arguments>");
                 return ExecutionResult.Failure;
             }
@@ -134,19 +130,18 @@ namespace Microsoft.NodejsTools.Repl {
                     npmReplRedirector,
                     quoteArgs: false,
                     outputEncoding: Encoding.UTF8 // npm uses UTF-8 regardless of locale if its output is redirected
-            )){
+            )) {
                 await process;
             }
 
             if (npmReplRedirector.HasErrors) {
                 window.WriteError(SR.GetString(SR.NpmReplCommandCompletedWithErrors, arguments));
-            }
-            else {
+            } else {
                 window.WriteLine(SR.GetString(SR.NpmSuccessfullyCompleted, arguments));
             }
 
             if (nodejsProject != null) {
-                await nodejsProject.CheckForLongPaths();
+                await nodejsProject.CheckForLongPaths(npmArguments);
             }
 
             return ExecutionResult.Success;
@@ -167,7 +162,7 @@ namespace Microsoft.NodejsTools.Repl {
         #endregion
 
         internal class NpmReplRedirector : Redirector {
-            
+
             internal const string ErrorAnsiColor = "\x1b[31;1m";
             internal const string WarnAnsiColor = "\x1b[33;22m";
             internal const string NormalAnsiColor = "\x1b[39;49m";
