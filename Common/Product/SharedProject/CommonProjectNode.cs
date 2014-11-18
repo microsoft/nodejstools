@@ -1535,7 +1535,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// Returns resolved value of the current working directory property.
         /// </summary>
         public string GetWorkingDirectory() {
-            string workDir = GetProjectProperty(CommonConstants.WorkingDirectory, true);
+            string workDir = GetProjectProperty(CommonConstants.WorkingDirectory, resetCache: false);
 
             return CommonUtils.GetAbsoluteDirectoryPath(ProjectHome, workDir);
         }
@@ -1544,7 +1544,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// Returns resolved value of the startup file property.
         /// </summary>
         internal string GetStartupFile() {
-            string startupFile = GetProjectProperty(CommonConstants.StartupFile, true);
+            string startupFile = GetProjectProperty(CommonConstants.StartupFile, resetCache: false);
 
             if (string.IsNullOrEmpty(startupFile)) {
                 //No startup file is assigned

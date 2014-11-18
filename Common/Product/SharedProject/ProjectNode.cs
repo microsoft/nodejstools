@@ -616,7 +616,7 @@ namespace Microsoft.VisualStudioTools.Project {
                 if (projectHome == null) {
                     projectHome = CommonUtils.GetAbsoluteDirectoryPath(
                         this.ProjectFolder,
-                        this.GetProjectProperty(CommonConstants.ProjectHome, true));
+                        this.GetProjectProperty(CommonConstants.ProjectHome, resetCache: false));
                 }
 
                 Debug.Assert(projectHome != null, "ProjectHome should not be null");
@@ -1829,9 +1829,11 @@ namespace Microsoft.VisualStudioTools.Project {
                 options.TreatWarningsAsErrors = true;
             }
 
-            if (GetProjectProperty("WarningLevel", false) != null) {
+            var warningLevel = GetProjectProperty("WarningLevel", resetCache: false)
+
+            if (warningLevel != null) {
                 try {
-                    options.WarningLevel = Int32.Parse(GetProjectProperty("WarningLevel", false), CultureInfo.InvariantCulture);
+                    options.WarningLevel = Int32.Parse(warningLevel, CultureInfo.InvariantCulture);
                 } catch (ArgumentNullException e) {
                     Trace.WriteLine("Exception : " + e.Message);
                 } catch (ArgumentException e) {

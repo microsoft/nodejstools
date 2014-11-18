@@ -699,7 +699,12 @@ namespace Microsoft.NodejsTools.Intellisense {
         public void SwitchAnalyzers(VsProjectAnalyzer oldAnalyzer) {
             lock (_viewBufferParserMap) {
                 // copy the Keys here as ReAnalyzeTextBuffers can mutuate the dictionary
-                foreach (var bufferParser in oldAnalyzer._viewBufferParserMap.Values.ToArray()) {
+                BufferParser[] bufferParsers;
+                lock (oldAnalyzer._viewBufferParserMap) {
+                    bufferParsers = oldAnalyzer._viewBufferParserMap.Values.ToArray();
+                }
+
+                foreach (var bufferParser in bufferParsers) {
                     ReAnalyzeTextBuffers(bufferParser);
                 }
             }

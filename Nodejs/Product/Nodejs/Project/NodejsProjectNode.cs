@@ -244,7 +244,7 @@ namespace Microsoft.NodejsTools.Project {
         protected override Guid[] GetConfigurationDependentPropertyPages() {
             var res = base.GetConfigurationDependentPropertyPages();
 
-            var enableTs = GetProjectProperty(NodejsConstants.EnableTypeScript, false);
+            var enableTs = GetProjectProperty(NodejsConstants.EnableTypeScript, resetCache: false);
             bool fEnableTs;
             if (enableTs != null && Boolean.TryParse(enableTs, out fEnableTs) && fEnableTs) {
                 var typeScriptPages = GetProjectProperty(NodejsConstants.TypeScriptCfgProperty);
@@ -361,12 +361,16 @@ namespace Microsoft.NodejsTools.Project {
         }
         */
         private void IntellisenseOptionsPageAnalysisLevelChanged(object sender, EventArgs e) {
+
+            var oldAnalyzer = _analyzer;
+            _analyzer = null;
+
             var analyzer = new VsProjectAnalyzer(ProjectFolder);
             Reanalyze(this, analyzer);
-            if (_analyzer != null) {
-                analyzer.SwitchAnalyzers(_analyzer);
-                if (_analyzer.RemoveUser()) {
-                    _analyzer.Dispose();
+            if (oldAnalyzer != null) {
+                analyzer.SwitchAnalyzers(oldAnalyzer);
+                if (oldAnalyzer.RemoveUser()) {
+                    oldAnalyzer.Dispose();
                 }
             }
             _analyzer = analyzer;
