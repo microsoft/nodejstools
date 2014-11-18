@@ -1829,8 +1829,7 @@ namespace Microsoft.VisualStudioTools.Project {
                 options.TreatWarningsAsErrors = true;
             }
 
-            var warningLevel = GetProjectProperty("WarningLevel", resetCache: false)
-
+            var warningLevel = GetProjectProperty("WarningLevel", resetCache: false);
             if (warningLevel != null) {
                 try {
                     options.WarningLevel = Int32.Parse(warningLevel, CultureInfo.InvariantCulture);
