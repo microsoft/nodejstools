@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Module Id="InteractiveWindow" Language="1033" Version="1.0.0.0">
-        <Package Id="BF6BC19A-9714-42D9-B0B2-33823C19EA55" Manufacturer="Microsoft Corporation" InstallerVersion="200" />
+        <Package Id="BF6BC19A-9714-42D9-B0B2-33823C19EA55" Manufacturer="Microsoft Corporation" InstallerVersion="500" />
 
         <?include ..\MergeModule.wxi ?>
 

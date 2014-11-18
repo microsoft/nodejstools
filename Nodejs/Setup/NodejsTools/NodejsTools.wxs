@@ -3,7 +3,7 @@
     <?define InstallLocationName = "Node.js Tools for Visual Studio" ?>
 
     <Module Id="NodejsTools" Language="1033" Version="1.0.0.0">
-        <Package Id="590FDCAA-C383-4112-9D84-49FB1AFA060B" Manufacturer="Microsoft Corporation" InstallerVersion="200" />
+        <Package Id="590FDCAA-C383-4112-9D84-49FB1AFA060B" Manufacturer="Microsoft Corporation" InstallerVersion="500" />
 
         <?include ..\MergeModule.wxi ?>
 

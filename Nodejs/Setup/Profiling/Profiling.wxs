@@ -3,7 +3,7 @@
     <?define InstallLocationName = "NodejsProfiling" ?>
 
     <Module Id="Profiling" Language="1033" Version="1.0.0.0">
-        <Package Id="983F1847-97A1-4E6C-A7AF-C21762B00A75" Manufacturer="Microsoft Corporation" InstallerVersion="200" />
+        <Package Id="983F1847-97A1-4E6C-A7AF-C21762B00A75" Manufacturer="Microsoft Corporation" InstallerVersion="500" />
 
         <?include ..\MergeModule.wxi ?>
 

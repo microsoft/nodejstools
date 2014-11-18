@@ -4,7 +4,7 @@
     <?include NodejsToolsInstallerVars.wxi ?>
 
     <Product Id="*" Name="$(var.ProductName)" Language="1033" Version="$(var.MsiVersion)" Manufacturer="Microsoft Corporation" UpgradeCode="$(var.InstallerUpgradeGuid)">
-        <Package InstallerVersion="300" Compressed="yes" InstallScope="perMachine"  />
+        <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine"  />
         <MajorUpgrade AllowDowngrades="no" AllowSameVersionUpgrades="yes"
                       DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
 
@@ -150,7 +150,12 @@
         <InstallUISequence>
             <Show Dialog="CustomAdvancedWelcomeEulaDlg" Before="FindRelatedProducts">NOT Installed</Show>
             <Show Dialog="CustomFeaturesDlg" After="CostFinalize">NOT Installed AND EasyInstall=0</Show>
+            <Show Dialog="CustomExitDialog" OnExit="success" />
         </InstallUISequence>
+        
+        <AdminUISequence>
+          <Show Dialog="CustomExitDialog" OnExit="success" />
+        </AdminUISequence>
 
         <!-- Include the UI from UI.wxs -->
         <UIRef Id="UI_Default"/>
