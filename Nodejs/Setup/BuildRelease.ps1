@@ -222,7 +222,7 @@ function after-build-all($buildroot, $outdir) {
 #   {2} will be replaced by the VS name preceded by a space
 #   {3} will be replaced by the config ('Debug') marker preceded by a space
 $installer_names = @{
-    'NodejsToolsInstaller.msi'="NTVS{0}{1}{2}{3}.msi";
+    'NodejsToolsInstaller.msi'="NTVS{1}{2}{3}.msi";
 }
 
 # Add list of files requiring signing here
