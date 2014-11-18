@@ -310,7 +310,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
 
             string status;
-            string errorsInfo = _failedCommands.Aggregate((x, y) => x + ", " + y);
+            var errorsInfo = string.Join(", ", _failedCommands);
 
             if (executingCommand && null != command) {
                 var commandText = command.ToString();
