@@ -69,7 +69,11 @@ namespace Microsoft.NodejsTools.Intellisense {
         private readonly bool _implicitProject;
         private readonly AutoResetEvent _queueActivityEvent = new AutoResetEvent(false);
         private readonly CodeSettings _codeSettings = new CodeSettings();
-        private readonly string _projectDir;
+
+        /// <summary>
+        /// This is used for storing cached analysis and is not valid for locating source files.
+        /// </summary>
+        private readonly string _projectFileDir;
         private readonly AnalysisLevel _analysisLevel;
         private bool _saveToDisk;
         private readonly object _contentsLock = new object();
@@ -94,7 +98,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 #endif
 
         internal VsProjectAnalyzer(
-            string projectDir = null
+            string projectFileDir = null
         ) {
             _projectFiles = new ConcurrentDictionary<string, ProjectItem>(StringComparer.OrdinalIgnoreCase);
             if (NodejsPackage.Instance != null) {
@@ -106,9 +110,9 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
 
             var limits = LoadLimits();
-            if (projectDir != null) {
-                _projectDir = projectDir;
-                if (!LoadCachedAnalysis(projectDir, limits)) {
+            if (projectFileDir != null) {
+                _projectFileDir = projectFileDir;
+                if (!LoadCachedAnalysis(limits)) {
                     CreateNewAnalyzer(limits);
                 }
             } else {
@@ -163,7 +167,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 _saveToDisk = value;
                 if (!_saveToDisk) {
                     DeleteAnalysis();
-                } else if (_analysisQueue != null) {                    
+                } else if (_analysisQueue != null) {
                     _analysisQueue.ResetLastSaveTime();
                 }
             }
@@ -1335,7 +1339,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         #region Cached Analysis
 
-        private bool LoadCachedAnalysis(string projectDir, AnalysisLimits limits) {
+        private bool LoadCachedAnalysis(AnalysisLimits limits) {
             string analysisDb = GetAnalysisPath();
             if (File.Exists(analysisDb) && _analysisLevel != AnalysisLevel.None) {
                 FileStream stream = null;
@@ -1425,11 +1429,11 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         private string GetAnalysisPath() {
-            return Path.Combine(_projectDir, ".ntvs_analysis.dat");
+            return Path.Combine(_projectFileDir, ".ntvs_analysis.dat");
         }
 
         private void DeleteAnalysis() {
-            if (!_implicitProject && _projectDir != null) {
+            if (!_implicitProject && _projectFileDir != null) {
                 try {
                     var path = GetAnalysisPath();
                     File.Delete(path);
@@ -1440,7 +1444,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         private void SaveAnalysis() {
-            if (_implicitProject || _projectDir == null || !_saveToDisk) {
+            if (_implicitProject || _projectFileDir == null || !_saveToDisk) {
                 return;
             }
 
