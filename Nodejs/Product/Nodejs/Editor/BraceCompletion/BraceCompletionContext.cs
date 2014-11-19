@@ -84,15 +84,24 @@ namespace Microsoft.NodejsTools.Editor.BraceCompletion {
             var openCurlyLine = session.OpeningPoint.GetPoint(snapshot).GetContainingLine();
             var nextLineNumber = openCurlyLine.LineNumber + 1;
 
-            Debug.Assert(nextLineNumber < snapshot.LineCount,
-                "There are no lines after this brace completion's opening brace, no place to seek caret to.");
+            bool nextLineExists = nextLineNumber < snapshot.LineCount;
+            Debug.Assert(nextLineExists, "There are no lines after this brace completion's opening brace, no place to seek caret to.");
+            if (!nextLineExists) {
+                // Don't move the caret as we have somehow ended up without a line following our opening brace.
+                return;
+            }
 
             // Get indent for this line.
             ITextSnapshotLine nextLine = snapshot.GetLineFromLineNumber(nextLineNumber);
             var indentation = GetIndentationLevelForLine(session, nextLine);
             if (indentation > 0) {
-                session.SubjectBuffer.Delete(new Span(nextLine.Start, indentation));
-                MoveCaretTo(session.TextView, nextLine.End, indentation);
+                // before deleting, make sure this line is only whitespace.
+                bool lineIsWhitepace = string.IsNullOrWhiteSpace(nextLine.GetText());
+                Debug.Assert(lineIsWhitepace, "The line after the brace should be empty.");
+                if (lineIsWhitepace) {
+                    session.SubjectBuffer.Delete(nextLine.Extent);
+                    MoveCaretTo(session.TextView, nextLine.End, indentation);
+                }
             } else {
                 MoveCaretTo(session.TextView, nextLine.End);
             }

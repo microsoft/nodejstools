@@ -275,6 +275,19 @@ bar""
                     Typed = "function myfunc(name){\rm();",
                     Expected = "function myfunc(name){\r\n    m();\r\n}"
                 },
+                // https://nodejstools.codeplex.com/workitem/1560
+                new {
+                    Typed = "var a = function (test) {\rreturn {\rtest",
+                    Expected = "var a = function (test) {\r\n    return {\r\n        test\r\n    }\r\n}"
+                },
+                new {
+                    Typed = "var a = function (test) {\rreturn [\rtest",
+                    Expected = "var a = function (test) {\r\n    return [\r\n        test\r\n    ]\r\n}"
+                },
+                new {
+                    Typed = "var a = function (test) {\rreturn (\rtest",
+                    Expected = "var a = function (test) {\r\n    return (\r\n        test\r\n    )\r\n}"
+                },
             };
 
                 using (var solution = BasicProject.Generate().ToVs()) {

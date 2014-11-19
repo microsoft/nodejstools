@@ -3497,6 +3497,13 @@ namespace Microsoft.NodejsTools.Parsing
                         var groupingOp = new GroupingOperator(EncodeCurrentSpan());
                         ast = groupingOp;
                         GetNextToken();
+
+                        if (_curToken == JSToken.RightParenthesis) {
+                            // empty bodied grouping operator statement
+                            groupingOp.Operand = null;
+                            UpdateWithCurrentSpan(ast);
+                        }
+
                         m_noSkipTokenSet.Add(NoSkipTokenSet.s_ParenExpressionNoSkipToken);
                         try
                         {

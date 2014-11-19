@@ -767,6 +767,20 @@ c: 42, d: 100}",
     }
 }"
 );
+
+            //https://nodejstools.codeplex.com/workitem/1560
+            TestCode(
+@"var a = function (test) {
+    return {
+        
+    }
+}",
+@"var a = function (test) {
+    return {
+        
+    }
+}"
+);
         }
 
         [TestMethod, Priority(0)]

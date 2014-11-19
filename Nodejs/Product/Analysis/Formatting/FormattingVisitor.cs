@@ -564,21 +564,20 @@ namespace Microsoft.NodejsTools.Formatting {
             // Body.
             if (node.Properties.Length != 0) {
                 Indent();
-                if (node.Properties.Length > 0) {
-                    if (isMultiLine) {
-                        // multiline block statement, make sure the 1st statement
-                        // starts on a new line
-                        EnsureNewLineFollowing(node.GetStartIndex(_tree.LocationResolver) + "{".Length);
-                    }
-
-                    WalkStatements(node, node.Properties, isMultiLine);
+                if (isMultiLine) {
+                    // multiline block statement, make sure the 1st statement
+                    // starts on a new line
+                    EnsureNewLineFollowing(node.GetStartIndex(_tree.LocationResolver) + "{".Length);
                 }
+
+                WalkStatements(node, node.Properties, isMultiLine);
+
                 Dedent();
             }
 
             // Format the indentation of the block along with whitespace.
             if (isMultiLine) {
-                ReplacePreceedingIncludingNewLines(node.GetEndIndex(_tree.LocationResolver) - 1, ReplaceWith.InsertNewLineAndIndentation);
+                ReplacePreceedingIncludingNewLines(node.GetEndIndex(_tree.LocationResolver) - 1, ReplaceWith.InsertNewLineAndIndentation, replaceOnNewLine: true);
             } else if (node.Properties.Length == 0) {
                 ReplacePreceedingWhiteSpace(node.GetEndIndex(_tree.LocationResolver) - 1, "");
             } else {
@@ -590,7 +589,13 @@ namespace Microsoft.NodejsTools.Formatting {
 
         public override bool Walk(ArrayLiteral node) {
             if (node.Elements.Length == 0) {
-                ReplacePreceedingWhiteSpace(node.GetEndIndex(_tree.LocationResolver) - 1, "");
+                // If we have no body, format the closing bracket.
+                bool isMultiLine = ContainsLineFeed(node.GetStartIndex(_tree.LocationResolver), node.GetEndIndex(_tree.LocationResolver));
+                if (isMultiLine) {
+                    ReplacePreceedingIncludingNewLines(node.GetEndIndex(_tree.LocationResolver) - 1, ReplaceWith.InsertNewLineAndIndentation, replaceOnNewLine: true);
+                } else {
+                    ReplacePreceedingWhiteSpace(node.GetEndIndex(_tree.LocationResolver) - 1, "");
+                }
             } else {
                 Indent();
                 // Only correct indentation if we're correcting it for every element...
@@ -628,6 +633,7 @@ namespace Microsoft.NodejsTools.Formatting {
                 }
                 Dedent();
 
+                // Format Ending Brace
                 if (ContainsLineFeed(node.Elements[node.Elements.Length - 1].GetEndIndex(_tree.LocationResolver), node.GetEndIndex(_tree.LocationResolver))) {
                     ReplacePreceedingIncludingNewLines(node.GetEndIndex(_tree.LocationResolver) - 1, ReplaceWith.InsertNewLineAndIndentation);
                 } else {
@@ -647,10 +653,16 @@ namespace Microsoft.NodejsTools.Formatting {
                 node.Operand.Walk(this);
             }
 
-            ReplacePreceedingWhiteSpace(
-                node.GetEndIndex(_tree.LocationResolver) - 1,
-                _options.SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis ? " " : ""
-            );
+            // Format the indentation of the block along with whitespace.
+            bool isMultiLine = ContainsLineFeed(node.GetStartIndex(_tree.LocationResolver), node.GetEndIndex(_tree.LocationResolver));
+            if (isMultiLine) {
+                ReplacePreceedingIncludingNewLines(node.GetEndIndex(_tree.LocationResolver) - 1, ReplaceWith.InsertNewLineAndIndentation, replaceOnNewLine: true);
+            } else {
+                ReplacePreceedingWhiteSpace(
+                    node.GetEndIndex(_tree.LocationResolver) - 1,
+                    _options.SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis ? " " : ""
+                );
+            }
 
             return false;
         }
@@ -1109,11 +1121,18 @@ namespace Microsoft.NodejsTools.Formatting {
             }
         }
 
-        private void ReplacePreceedingIncludingNewLines(int start, ReplaceWith braceOnNewline) {
+        private void ReplacePreceedingIncludingNewLines(int start, ReplaceWith braceOnNewline, bool replaceOnNewLine = false) {
             int codeIndex;
             for (codeIndex = start - 1; codeIndex >= 0; codeIndex--) {
                 if (_code[codeIndex] == '\r' || _code[codeIndex] == '\n') {
                     // new lines are always ok to replace...
+                    if (replaceOnNewLine) {
+                        MaybeReplaceText(
+                           codeIndex + 1,
+                           start,
+                           GetIndentation());
+                        break;
+                    }
                     continue;
                 } else if (_code[codeIndex] == ' ' || _code[codeIndex] == '\t') {
                     // spaces are ok as long as we're not just trying to fix up newlines...
@@ -1203,6 +1222,7 @@ namespace Microsoft.NodejsTools.Formatting {
             int codeIndex;
             for (codeIndex = start - 1; codeIndex >= 0; codeIndex--) {
                 if (_code[codeIndex] == ' ' || _code[codeIndex] == '\t') {
+                    // spaces are ok as long as we're not just trying to fix up newlines...
                     continue;
                 } else if (abortTerminators != null && abortTerminators.Contains(_code[codeIndex])) {
                     break;
