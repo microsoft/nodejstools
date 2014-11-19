@@ -177,6 +177,8 @@
     <Content Include="..\..\Common\SQLite\sqlite3.dll">
       <Link>sqlite3.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>True</IncludeInVSIX>
+      <VSIXSubPath>.</VSIXSubPath>
     </Content>
   </ItemGroup>
   <Import Project="..\ProjectAfter.settings" />
