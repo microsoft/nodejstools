@@ -36,8 +36,8 @@ namespace Microsoft.NodejsTools.NpmUI {
 
         public LastRefreshedMessageProvider(DateTime lastRefreshTime) {
             if (lastRefreshTime == DateTime.MinValue) {
-                Days = -1;
-                Description = SR.GetString(SR.PackageCatalogRefreshNever);
+                Days = int.MaxValue;
+                Description = SR.GetString(SR.PackageCatalogRefreshFailed);
             } else {
                 Days = (int)(DateTime.Now.Date - lastRefreshTime.Date).TotalDays;
                 if (Days == 0) {

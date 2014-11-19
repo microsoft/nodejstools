@@ -30,13 +30,15 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         private IDictionary<string, IPackage> _byName = new Dictionary<string, IPackage>();
         private readonly bool _forceDownload;
         private string _cachePath;
+        private Uri _registryUrl;
 
-        private const int _databaseSchemaVersion = 2;
+        private const int _databaseSchemaVersion = 3;
 
         public NpmGetCatalogCommand(
             string fullPathToRootPackageDirectory,
             string cachePath,
             bool forceDownload,
+            string registryUrl = null,
             string pathToNpm = null,
             bool useFallbackIfNpmNotFound = true
         )
@@ -48,23 +50,23 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             _cachePath = cachePath;
             Arguments = "search";
             _forceDownload = forceDownload;
+            if (registryUrl != null) {
+                _registryUrl = new Uri(registryUrl);
+            }
             LastRefreshed = DateTime.MinValue;
         }
 
-        internal void ParseResultsAndAddToDatabase(TextReader reader, string dbFilename) {
+        internal void ParseResultsAndAddToDatabase(TextReader reader, string dbFilename, string registryUrl) {
+            Directory.CreateDirectory(Path.GetDirectoryName(dbFilename));
 
             using (var db = new SQLiteConnection(dbFilename)) {
-
                 db.RunInTransaction(() => {
-                    db.CreateCatalogTablesIfNotExists();
-                });
-
-                db.RunInTransaction(() => {
+                    db.CreateRegistryTableIfNotExists();
                     using (var jsonReader = new JsonTextReader(reader)) {
                         var token = JObject.ReadFrom(jsonReader);
 
-                        db.InsertOrReplace(new DbVersion() {
-                            Id = _databaseSchemaVersion,
+                        db.InsertOrReplace(new RegistryInfo() {
+                            RegistryUrl = registryUrl,
                             Revision = long.Parse((string)token["_updated"]),
                             UpdatedOn = DateTime.Now
                         });
@@ -203,13 +205,15 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             }
         }
 
-        private string DatabaseCacheFilename {
-            get { return Path.Combine(CachePath, "packagecache.sqlite"); }
+        internal const string RegistryCacheFilename = "registrycache.sqlite";
+
+        internal const string DatabaseCacheFilename = "packagecache.sqlite";
+
+        private string DatabaseCacheFilePath {
+            get { return Path.Combine(CachePath, DatabaseCacheFilename); }
         }
 
         private async Task<string> DownloadPackageJsonCache(Uri registry, string cachePath, long refreshStartKey = 0) {
-            registry = registry ?? new Uri("https://registry.npmjs.org/");
-
             string relativeUri, filename;
             if (refreshStartKey > 0) {
                 relativeUri = String.Format("/-/all/since?stale=update_after&startkey={0}", refreshStartKey);
@@ -272,12 +276,35 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             return filename;
         }
 
+
+        private async Task<Uri> GetRegistryUrl() {
+            using (var proc = ProcessOutput.Run(
+                GetPathToNpm(),
+                new List<string>() { "config", "get", "registry"},
+                FullPathToRootPackageDirectory,
+                null,
+                false,
+                null)) {
+                if (await proc == 0) {
+                    _registryUrl = proc.StandardOutputLines
+                        .Select(s => {
+                            Uri u;
+                            return Uri.TryCreate(s, UriKind.Absolute, out u) ? u : null;
+                        })
+                        .FirstOrDefault(u => u != null);
+                }
+            }
+            _registryUrl = _registryUrl ?? new Uri("https://registry.npmjs.org/");
+            return _registryUrl;
+        }
+
         public override async Task<bool> ExecuteAsync() {
-            var dbFilename = DatabaseCacheFilename;
-
-            string filename = null;
-
+            var dbFilename = DatabaseCacheFilePath;
             bool catalogUpdated = false;
+            string filename = null;
+            string registryCacheDirectory = null;
+            string registryCachePath = null;
+            string registryCacheFilePath = null;
 
             // Use a semaphore instead of a mutex because await may return to a thread other than the calling thread.
             using (var semaphore = GetDatabaseSemaphore()) {
@@ -289,28 +316,57 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     return false;
                 }
 
-                try {
-                    if (!File.Exists(dbFilename)) {
-                        filename = await UpdatePackageCache();
-                        catalogUpdated = true;
-                    } else {
-                        DbVersion version;
-                        using (var db = new SQLiteConnection(dbFilename)) {
-                            // prevent errors from occurring when table doesn't exist
-                            db.CreateCatalogTablesIfNotExists();
-                            version = db.Table<DbVersion>().FirstOrDefault();
-                        }
+                Uri registryUrl = await GetRegistryUrl();
+                OnOutputLogged(string.Format(Resources.InfoRegistryUrl, registryUrl));
 
-                        var correctDatabaseSchema = version != null && version.Id == _databaseSchemaVersion;
-                        if (!correctDatabaseSchema) {
-                            OnOutputLogged(Resources.InfoCatalogUpgrade);
-                            SafeDeleteFile(dbFilename);
-                            filename = await UpdatePackageCache();
-                            catalogUpdated = true;
-                        } else if (_forceDownload) {
-                            filename = await UpdatePackageCache(version.Revision);
-                            catalogUpdated = true;
+                try {
+                    DbVersion version = null;
+                    RegistryInfo registryInfo = null;
+                    RegistryFileMapping registryFileMapping = null;
+
+                    Directory.CreateDirectory(Path.GetDirectoryName(dbFilename));
+
+                    using (var db = new SQLiteConnection(dbFilename)) {
+                        // prevent errors from occurring when table doesn't exist
+                        db.CreateCatalogTableIfNotExists();
+                        version = db.Table<DbVersion>().FirstOrDefault();
+                        registryFileMapping = db.Table<RegistryFileMapping>().FirstOrDefault(info => info.RegistryUrl == registryUrl.ToString());
+                    }
+                        
+                    registryCacheDirectory = registryFileMapping != null ? registryFileMapping.DbFileLocation : Guid.NewGuid().ToString();
+                    registryCachePath = Path.Combine(CachePath, registryCacheDirectory);
+                    registryCacheFilePath = Path.Combine(registryCachePath, RegistryCacheFilename);
+
+                    Directory.CreateDirectory(Path.GetDirectoryName(registryCacheFilePath));
+                        
+                    if (File.Exists(registryCacheFilePath)) {
+                        using (var registryDb = new SQLiteConnection(registryCacheFilePath)) {
+                            // prevent errors from occurring when table doesn't exist
+                            registryDb.CreateRegistryTableIfNotExists();
+                            registryInfo = registryDb.Table<RegistryInfo>().FirstOrDefault();
                         }
+                    }
+
+                    bool correctDatabaseSchema = version != null && version.Id == _databaseSchemaVersion;
+                    bool incrementalUpdate = correctDatabaseSchema && _forceDownload && registryInfo != null && registryInfo.Revision > 0;
+                    bool fullUpdate = correctDatabaseSchema && (registryInfo == null || registryInfo.Revision <= 0);
+
+                    if (!correctDatabaseSchema) {
+                        OnOutputLogged(Resources.InfoCatalogUpgrade);
+                        SafeDeleteFolder(CachePath);
+
+                        CreateCatalogDatabaseAndInsertEntries(dbFilename, registryUrl, registryCacheDirectory);
+
+                        filename = await UpdatePackageCache(registryUrl, CachePath);
+                        catalogUpdated = true;
+                    } else if (incrementalUpdate) {
+                        filename = await UpdatePackageCache(registryUrl, registryCachePath, registryInfo.Revision);
+                        catalogUpdated = true;
+                    } else if (fullUpdate) {
+                        CreateCatalogDatabaseAndInsertEntries(dbFilename, registryUrl, registryCacheDirectory);
+
+                        filename = await UpdatePackageCache(registryUrl, registryCachePath);
+                        catalogUpdated = true;
                     }
 
                     if (catalogUpdated) {
@@ -318,12 +374,12 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                         OnOutputLogged(String.Format(Resources.InfoReadingBytesFromPackageCache, fileInfo.Length, filename, fileInfo.LastWriteTime));
 
                         using (var reader = new StreamReader(filename)) {
-                            await Task.Run(() => ParseResultsAndAddToDatabase(reader, dbFilename));
+                            await Task.Run(() => ParseResultsAndAddToDatabase(reader, registryCacheFilePath, registryUrl.ToString()));
                         }
                     }
 
-                    using (var db = new SQLiteConnection(dbFilename)) {
-                        db.CreateCatalogTablesIfNotExists();
+                    using (var db = new SQLiteConnection(registryCacheFilePath)) {
+                        db.CreateRegistryTableIfNotExists();
                         ResultsCount = db.Table<CatalogEntry>().LongCount();
                     }
                 } catch (Exception ex) {
@@ -335,21 +391,22 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     }
                     // assume the results are corrupted
                     OnOutputLogged(ex.ToString());
+                    throw;
                 } finally {
                     if (ResultsCount == null) {
                         OnOutputLogged(string.Format(Resources.DownloadOrParsingFailed, CachePath));
-                        SafeDeleteFile(dbFilename);
+                        SafeDeleteFolder(registryCacheDirectory);
                     } else if (ResultsCount <= 0) {
                         // Database file exists, but is corrupt. Delete database, so that we can download the file next time arround.
                         OnOutputLogged(string.Format(Resources.DatabaseCorrupt, dbFilename));
-                        SafeDeleteFile(dbFilename);
+                        SafeDeleteFolder(registryCacheDirectory);
                     }
 
                     semaphore.Release();
                 }
             }
 
-            LastRefreshed = File.GetLastWriteTime(dbFilename);
+            LastRefreshed = File.GetLastWriteTime(registryCacheFilePath);
 
             OnOutputLogged(String.Format(Resources.InfoCurrentTime, DateTime.Now));
             OnOutputLogged(String.Format(Resources.InfoLastRefreshed, LastRefreshed));
@@ -360,10 +417,28 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             return true;
         }
 
-        private bool SafeDeleteFile(string filename) {
+        internal void CreateCatalogDatabaseAndInsertEntries(string dbFilename, Uri registryUrl, string registryCacheDirectory) {
+            Directory.CreateDirectory(Path.GetDirectoryName(dbFilename));
+
+            using (var db = new SQLiteConnection(dbFilename)) {
+                // prevent errors from occurring when table doesn't exist
+                db.RunInTransaction(() => {
+                    db.CreateCatalogTableIfNotExists();
+                    db.InsertOrReplace(new DbVersion() {
+                        Id = _databaseSchemaVersion
+                    });
+                    db.InsertOrReplace(new RegistryFileMapping() {
+                        RegistryUrl = registryUrl.ToString(),
+                        DbFileLocation = registryCacheDirectory
+                    });
+                });
+            }
+        }
+
+        private bool SafeDeleteFolder(string filename) {
             try {
                 OnOutputLogged(string.Format(Resources.InfoDeletingFile, filename));
-                File.Delete(filename);
+                Directory.Delete(filename, true);
             } catch (DirectoryNotFoundException) {
                 // File has already been deleted. Do nothing.
             } catch (IOException exception) {
@@ -380,28 +455,14 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         private Semaphore GetDatabaseSemaphore() {
-            return new Semaphore(1, 1, DatabaseCacheFilename.Replace('\\', '/'));
+            return new Semaphore(1, 1, DatabaseCacheFilePath.Replace('\\', '/'));
         }
 
-        private async Task<string> UpdatePackageCache(long refreshStartKey = 0) {
-            string filename;
-            Uri registry = null;
+        private async Task<string> UpdatePackageCache(Uri registry, string cachePath, long refreshStartKey = 0) {
             string pathToNpm = GetPathToNpm();
             OnOutputLogged(String.Format(Resources.InfoNpmPathLocation, pathToNpm));
 
-            using (var proc = ProcessOutput.RunHiddenAndCapture(pathToNpm, "config", "get", "registry")) {
-                if (await proc == 0) {
-                    registry = proc.StandardOutputLines
-                        .Select(s => {
-                            Uri u;
-                            return Uri.TryCreate(s, UriKind.Absolute, out u) ? u : null;
-                        })
-                        .FirstOrDefault(u => u != null);
-                }
-            }
-
-            filename = await DownloadPackageJsonCache(registry, CachePath, refreshStartKey);
-
+            string filename = await DownloadPackageJsonCache(registry, cachePath, refreshStartKey);
             return filename;
         }
 
@@ -409,8 +470,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         public IPackageCatalog Catalog { get { return this; } }
 
-        public IEnumerable<IPackage> GetCatalogPackages(string filterText) {
-            IEnumerable<IPackage> packages;
+        public async Task<IEnumerable<IPackage>> GetCatalogPackagesAsync(string filterText) {
+            IEnumerable<IPackage> packages = null;
              using (var semaphore = GetDatabaseSemaphore()) {
                 // Wait until file is downloaded/parsed if another download is already in session.
                 // Allows user to open multiple npm windows and show progress bar without file-in-use errors.
@@ -422,7 +483,17 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 }
 
                  try {
-                     packages = new DatabasePackageCatalogFilter(DatabaseCacheFilename).Filter(filterText);
+                     var registryUrl = (await GetRegistryUrl()).ToString();
+                     RegistryFileMapping registryFileMapping = null;
+                     using (var db = new SQLiteConnection(DatabaseCacheFilePath)) {
+                        registryFileMapping = db.Table<RegistryFileMapping>().FirstOrDefault(info => info.RegistryUrl == registryUrl);
+                     }
+
+                     if (registryFileMapping != null) {
+                         string registryFileLocation = Path.Combine(CachePath, registryFileMapping.DbFileLocation, RegistryCacheFilename);
+
+                         packages = new DatabasePackageCatalogFilter(registryFileLocation).Filter(filterText);
+                     }
                  } catch (Exception e) {
                      OnOutputLogged(e.ToString());
                      throw;
@@ -447,7 +518,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     }
 
                     try {
-                        using (var db = new SQLiteConnection(DatabaseCacheFilename)) {
+                        using (var db = new SQLiteConnection(DatabaseCacheFilePath)) {
                             package = db.Table<CatalogEntry>().FirstOrDefault(entry => entry.Name == name).ToPackage();
                         }
                     } finally {

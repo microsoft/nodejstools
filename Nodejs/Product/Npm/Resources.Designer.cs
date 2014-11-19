@@ -214,6 +214,15 @@ namespace Microsoft.NodejsTools.Npm {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Registry url: {0}.
+        /// </summary>
+        internal static string InfoRegistryUrl {
+            get {
+                return ResourceManager.GetString("InfoRegistryUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to npm command cancelled.
         /// </summary>
         internal static string NpmCommandCancelled {

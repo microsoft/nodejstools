@@ -440,24 +440,9 @@ namespace Microsoft.Nodejs.Tests.UI {
             File.Copy(@"TestData\NodejsProjectData\LongFileNames.sln", Path.Combine(testDir, "LongFileNames.sln"));
             File.Copy(@"TestData\NodejsProjectData\LFN.njsproj", Path.Combine(testDir, "LFN.njsproj"));
 
-            CopyDirectory(@"TestData\NodejsProjectData\LongFileNames", Path.Combine(testDir, "LongFileNames"));
+            FileUtils.CopyDirectory(@"TestData\NodejsProjectData\LongFileNames", Path.Combine(testDir, "LongFileNames"));
 
             return app.OpenProject(Path.Combine(testDir, "LongFileNames.sln"));
-        }
-
-        private static void CopyDirectory(string source, string dest) {
-            Directory.CreateDirectory(dest);
-
-            foreach (var file in Directory.GetFiles(source)) {
-                var target = Path.Combine(dest, Path.GetFileName(file));
-                Console.WriteLine("Copying {0} to {1}", file, target);
-                File.Copy(file, target);
-            }
-
-            foreach (var dir in Directory.GetDirectories(source)) {
-                Console.WriteLine("Copying dir {0} to {1}", dir, Path.Combine(dest, dir));
-                CopyDirectory(dir, Path.Combine(dest, dir));
-            }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]

@@ -182,8 +182,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 _npmController.FullPathToRootPackageDirectory,
                 _npmController.CachePath,
                 forceDownload,
-                _npmController.PathToNpm,
-                _npmController.UseFallbackIfNpmNotFound);
+                pathToNpm:_npmController.PathToNpm,
+                useFallbackIfNpmNotFound:_npmController.UseFallbackIfNpmNotFound);
             await DoCommandExecute(false);
             return (_command as NpmGetCatalogCommand).Catalog;
         }

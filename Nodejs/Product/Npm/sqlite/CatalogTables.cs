@@ -21,7 +21,6 @@ using SQLite;
 
 namespace Microsoft.NodejsTools.Npm.SQLiteTables {
     public class CatalogEntry {
-        [PrimaryKey, NotNull, Indexed]
         public string Name { get; set; }
 
         public  string Description { get; set; }
@@ -40,9 +39,21 @@ namespace Microsoft.NodejsTools.Npm.SQLiteTables {
     }
 
     public class DbVersion {
-        [PrimaryKey]
-        [NotNull]
+        [PrimaryKey, NotNull]
         public int Id { get; set; }
+    }
+
+    public class RegistryFileMapping {
+        [PrimaryKey, NotNull, Indexed]
+        public string RegistryUrl { get; set; }
+
+        [NotNull, Unique]
+        public string DbFileLocation { get; set; }
+    }
+
+    public class RegistryInfo {
+        [PrimaryKey, NotNull, Indexed]
+        public string RegistryUrl { get; set; }
 
         [NotNull, Unique]
         public long Revision { get; set; }

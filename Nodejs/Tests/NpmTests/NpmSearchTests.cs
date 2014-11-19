@@ -14,13 +14,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.Npm.SPI;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -35,7 +31,9 @@ namespace NpmTests {
 
         private const string PackageCacheAllJsonFilename = "packagecache.json";
         private const string PackageCacheSinceJsonFilename = "since_packages.json";
-        private const string PackageCacheDatabaseFilename = @"NpmSearchData\testpackagecache.sqlite";
+        private const string PackageCacheDirectory = @"NpmSearchData\NpmCache";
+        private const string PackageCacheFilename = @"NpmSearchData\testpackagecache.sqlite";
+        private const string RegistryUrl = "http://registry.npmjs.org";
 
         [ClassInitialize]
         public static void Init(TestContext context) {
@@ -112,11 +110,11 @@ namespace NpmTests {
         }
 
         private IList<IPackage> GetTestPackageList(
-            string filename,
+            string cachePath,
             out IDictionary<string, IPackage> byName) {
             IList<IPackage> target = new List<IPackage>();
 
-            target = (new NpmGetCatalogCommand(string.Empty, Path.GetDirectoryName(filename), false)).GetCatalogPackages(string.Empty).ToList();
+            target = new NpmGetCatalogCommand(string.Empty, cachePath, false, RegistryUrl).GetCatalogPackagesAsync(string.Empty).GetAwaiter().GetResult().ToList();
 
             //  Do this after because package names can be split across multiple
             //  lines and therefore may change after the IPackage is initially created.
@@ -136,15 +134,26 @@ namespace NpmTests {
 
         [TestMethod, Priority(0)]
         public void CheckDatabaseCreation() {
-            string databaseFilename = "packagecache.sqlite";
-            File.Copy(PackageCacheDatabaseFilename, databaseFilename);
+            string databaseFilename = NpmGetCatalogCommand.DatabaseCacheFilename;
+            string registryFilename = NpmGetCatalogCommand.RegistryCacheFilename;
+            string cachePath = "CachePath";
+            string registryDirectory = "registry";
+
+            Uri registryUrl = new Uri(RegistryUrl);
+
+            string catalogDatabaseFilename = Path.Combine(cachePath, databaseFilename);
+            string registryDatabaseFilename = Path.Combine(cachePath, registryDirectory, registryFilename);
+            string relativeRegistryDatabaseFilename = Path.Combine(registryDirectory, registryFilename);
+
 
             using (var reader = GetCatalogueReader(PackageCacheAllJsonFilename)) {
-                new NpmGetCatalogCommand(string.Empty, null, false).ParseResultsAndAddToDatabase(reader, databaseFilename);
+                var getCatalogCommand = new NpmGetCatalogCommand(string.Empty, cachePath, false, RegistryUrl);
+                getCatalogCommand.CreateCatalogDatabaseAndInsertEntries(catalogDatabaseFilename, registryUrl, registryDirectory);
+                new NpmGetCatalogCommand(string.Empty, cachePath, false).ParseResultsAndAddToDatabase(reader, registryDatabaseFilename, registryUrl.ToString());
             }
 
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(databaseFilename, out byName);
+            var target = GetTestPackageList(cachePath, out byName);
 
             Assert.AreEqual(89924, target.Count);
 
@@ -167,14 +176,17 @@ namespace NpmTests {
 
         [TestMethod, Priority(0)]
         public void CheckDatabaseUpdate() {
-            string databaseCopyFilename = "packagecache.sqlite";
-            File.Copy(PackageCacheDatabaseFilename, databaseCopyFilename, true);
+            string cachePath = "NpmCacheUpdate";
+            string registryPath = Path.Combine(cachePath, "registry", NpmGetCatalogCommand.RegistryCacheFilename);
+
+            FileUtils.CopyDirectory(PackageCacheDirectory, cachePath);
+
             using (var reader = GetCatalogueReader(PackageCacheSinceJsonFilename)) {
-                new NpmGetCatalogCommand(string.Empty, null, false).ParseResultsAndAddToDatabase(reader, databaseCopyFilename);
+                new NpmGetCatalogCommand(string.Empty, cachePath, false).ParseResultsAndAddToDatabase(reader, registryPath, RegistryUrl);
             }
 
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(databaseCopyFilename, out byName);
+            var target = GetTestPackageList(cachePath, out byName);
 
             Assert.AreEqual(104627, target.Count);
 
@@ -216,7 +228,7 @@ namespace NpmTests {
         [TestMethod, Priority(0)]
         public void CheckPackageWithBuildPreReleaseInfo() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(PackageCacheDatabaseFilename, out byName);
+            var target = GetTestPackageList(PackageCacheDirectory, out byName);
             CheckPackage(
                 target,
                 byName,
@@ -298,35 +310,35 @@ namespace NpmTests {
         [TestMethod, Priority(0)]
         public void CheckNonZeroPackageVersionsExist() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(PackageCacheDatabaseFilename, out byName);
+            var target = GetTestPackageList(PackageCacheDirectory, out byName);
             CheckSensibleNumberOfNonZeroVersions(target);
         }
 
         [TestMethod, Priority(0)]
         public void CheckCorrectPackageCount() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(PackageCacheDatabaseFilename, out byName);
+            var target = GetTestPackageList(PackageCacheDirectory, out byName);
             Assert.AreEqual(89924, target.Count, "Unexpected package count in catalogue list.");
         }
 
         [TestMethod, Priority(0)]
         public void CheckNoDuplicatePackages() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(PackageCacheDatabaseFilename, out byName);
+            var target = GetTestPackageList(PackageCacheDirectory, out byName);
             CheckOnlyOneOfEachPackage(target);
         }
 
         [TestMethod, Priority(0)]
         public void CheckListAndDictByNameSameSize() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(PackageCacheDatabaseFilename, out byName);
+            var target = GetTestPackageList(PackageCacheDirectory, out byName);
             Assert.AreEqual(target.Count, byName.Count, "Number of packages should be same in list and dictionary.");
         }
         
         [TestMethod, Priority(0)]
         public void CheckFirstPackageInCatalog() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(PackageCacheDatabaseFilename, out byName);
+            var target = GetTestPackageList(PackageCacheDirectory, out byName);
             CheckPackage(
                 target,
                 byName,
@@ -345,7 +357,7 @@ namespace NpmTests {
         [TestMethod, Priority(0)]
         public void CheckLastPackageInCatalog_zzz() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(PackageCacheDatabaseFilename, out byName);
+            var target = GetTestPackageList(PackageCacheDirectory, out byName);
             CheckPackage(
                 target,
                 byName,
@@ -364,7 +376,7 @@ namespace NpmTests {
         [TestMethod, Priority(0)]
         public void CheckPackageEqualsInDescription() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(PackageCacheDatabaseFilename, out byName);
+            var target = GetTestPackageList(PackageCacheDirectory, out byName);
             CheckPackage(
                 target,
                 byName,
@@ -383,7 +395,7 @@ namespace NpmTests {
         [TestMethod, Priority(0)]
         public void CheckPackageNoDescriptionAuthorVersion() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(PackageCacheDatabaseFilename, out byName);
+            var target = GetTestPackageList(PackageCacheDirectory, out byName);
 
             CheckPackage(
                 target,
@@ -401,7 +413,7 @@ namespace NpmTests {
         [TestMethod, Priority(0)]
         public void CheckPackageNoDescription() {
             IDictionary<string, IPackage> byName;
-            var target = GetTestPackageList(PackageCacheDatabaseFilename, out byName);
+            var target = GetTestPackageList(PackageCacheDirectory, out byName);
 
             CheckPackage(
                 target,
@@ -419,7 +431,7 @@ namespace NpmTests {
         }
 
         private IList<IPackage> GetFilteredPackageList(string filterString) {
-            var filter = new DatabasePackageCatalogFilter(PackageCacheDatabaseFilename);
+            var filter = new DatabasePackageCatalogFilter(PackageCacheFilename);
             return filter.Filter(filterString).ToList();
         }
 

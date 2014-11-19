@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm;
 
 namespace NpmTests {
@@ -33,8 +34,8 @@ namespace NpmTests {
 
         public DateTime LastRefreshed { get; private set; }
 
-        public IEnumerable<IPackage> GetCatalogPackages(string filterText) {
-            return _results;
+        public Task<IEnumerable<IPackage>> GetCatalogPackagesAsync(string filterText) {
+            return Task.FromResult(_results.AsEnumerable());
         }
 
         public IPackage this[string name] {

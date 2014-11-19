@@ -22,7 +22,7 @@ namespace Microsoft.NodejsTools.Npm {
     public interface IPackageCatalog {
         DateTime LastRefreshed { get; }
 
-        IEnumerable<IPackage> GetCatalogPackages(string filterText);
+        Task<IEnumerable<IPackage>> GetCatalogPackagesAsync(string filterText);
 
         IPackage this[string name] { get; }
 

@@ -364,9 +364,6 @@
   <data name="PackageCatalogRefreshing" xml:space="preserve">
     <value>Currently refreshing</value>
   </data>
-  <data name="PackageCatalogRefreshNever" xml:space="preserve">
-    <value>Never</value>
-  </data>
   <data name="PackageCatalogRefresh0Days" xml:space="preserve">
     <value>Today at {0:t}</value>
   </data>

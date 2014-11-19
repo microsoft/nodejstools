@@ -141,7 +141,6 @@ namespace Microsoft.NodejsTools.Project {
         internal const string PackageCatalogRefresh6Months = "PackageCatalogRefresh6Months";
         internal const string PackageCatalogRefreshFailed = "PackageCatalogRefreshFailed";
         internal const string PackageCatalogRefreshing = "PackageCatalogRefreshing";
-        internal const string PackageCatalogRefreshNever = "PackageCatalogRefreshNever";
         internal const string PackageCount = "PackageCount";
         internal const string PackageInstallationGlobal = "PackageInstallationGlobal";
         internal const string PackageInstallationLocal = "PackageInstallationLocal";

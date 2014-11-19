@@ -184,9 +184,14 @@ namespace Microsoft.NodejsTools.NpmUI {
                 LastRefreshedMessage = LastRefreshedMessageProvider.NpmNotFound;
             } catch (NpmCatalogEmptyException) {
                 IsCatalogEmpty = true;
-                LastRefreshedMessage = new LastRefreshedMessageProvider(DateTime.Now);
-            } catch (Exception) {
+                LastRefreshedMessage = new LastRefreshedMessageProvider(_allPackages.LastRefreshed);
+            } catch (Exception ex) {
+                if (IsCriticalException(ex)) {
+                    throw;
+                }
+
                 LastRefreshedMessage = LastRefreshedMessageProvider.RefreshFailed;
+                IsCatalogEmpty = true;
             } finally {
                 IsLoadingCatalog = false;
                 controller.ErrorLogged -= _executeViewModel.commander_ErrorLogged;
@@ -204,6 +209,13 @@ namespace Microsoft.NodejsTools.NpmUI {
             FilteredCatalogListVisibility = Visibility.Visible;
 
             StartFilter();
+        }
+
+        private static bool IsCriticalException(Exception ex) {
+            return ex is StackOverflowException ||
+                   ex is OutOfMemoryException ||
+                   ex is ThreadAbortException ||
+                   ex is AccessViolationException;
         }
 
         public void LoadCatalog() {
@@ -256,7 +268,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             _filterTimer.Change(500, Timeout.Infinite);
         }
 
-        private void FilterTimer_Elapsed(object state) {
+        private async void FilterTimer_Elapsed(object state) {
             if (_allPackages == null) {
                 LastRefreshedMessage = LastRefreshedMessageProvider.RefreshFailed;
                 return;
@@ -268,7 +280,16 @@ namespace Microsoft.NodejsTools.NpmUI {
             if (string.IsNullOrEmpty(_filterText)) {
                 filtered = Enumerable.Empty<IPackage>();
             } else {
-                filtered = _allPackages.GetCatalogPackages(filterText);                
+                try {
+                    filtered = await _allPackages.GetCatalogPackagesAsync(filterText);
+                } catch (Exception ex) {
+                    LastRefreshedMessage = LastRefreshedMessageProvider.RefreshFailed;
+                    if (IsCriticalException(ex)) {
+                        throw;
+                    }
+                    StartFilter();
+                    return;
+                }      
             }
 
             if (filtered == null) {
@@ -279,33 +300,34 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
 
             var newItems = new List<PackageCatalogEntryViewModel>();
-            lock (_filteredPackagesLock) {
+            if (filterText != _filterText) {
+                return;
+            }
+
+            if (filtered.Any()) {
+                IRootPackage rootPackage = null;
+                IGlobalPackages globalPackages = null;
+                var controller = _npmController;
+                if (controller != null) {
+                    rootPackage = controller.RootPackage;
+                    globalPackages = controller.GlobalPackages;
+                }
+
+                newItems.AddRange(filtered.Select(package => new ReadOnlyPackageCatalogEntryViewModel(
+                    package,
+                    rootPackage != null ? rootPackage.Modules[package.Name] : null,
+                    globalPackages != null ? globalPackages.Modules[package.Name] : null
+                    )));
+            }
+
+            await _dispatcher.BeginInvoke((Action)(() => {
                 if (filterText != _filterText) {
                     return;
                 }
 
-                if (filtered.Any()) {
-                    IRootPackage rootPackage = null;
-                    IGlobalPackages globalPackages = null;
-                    var controller = _npmController;
-                    if (controller != null) {
-                        rootPackage = controller.RootPackage;
-                        globalPackages = controller.GlobalPackages;
-                    }
+                FilteredPackages = newItems;
+                _currentFilter = filterText;
 
-                    newItems.AddRange(filtered.Select(package => new ReadOnlyPackageCatalogEntryViewModel(
-                        package,
-                        rootPackage != null ? rootPackage.Modules[package.Name] : null,
-                        globalPackages != null ? globalPackages.Modules[package.Name] : null
-                        )));
-                }
-            }
-
-            _dispatcher.BeginInvoke((Action)(() => {
-                lock (_filteredPackagesLock) {
-                    FilteredPackages = newItems;
-                    _currentFilter = filterText;
-                }
                 SelectedPackage = FilteredPackages.FirstOrDefault();
 
                 LastRefreshedMessage = IsCatalogEmpty
