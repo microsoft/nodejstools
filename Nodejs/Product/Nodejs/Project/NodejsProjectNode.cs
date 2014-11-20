@@ -698,7 +698,9 @@ recheck:
                     taskDialog.Buttons.Remove(dedupButton);
                     goto recheck;
                 } else if (button == disableButton) {
-                    NodejsPackage.Instance.GeneralOptionsPage.CheckForLongPaths = false;
+                    var page = NodejsPackage.Instance.GeneralOptionsPage;
+                    page.CheckForLongPaths = false;
+                    page.SaveSettingsToStorage();
                 }
             } finally {
                 _isCheckingForLongPaths = false;
