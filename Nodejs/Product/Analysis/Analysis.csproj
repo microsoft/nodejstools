@@ -267,6 +267,7 @@
   <ItemGroup>
     <Content Include="all.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVsix>true</IncludeInVsix>
     </Content>
   </ItemGroup>
   <ItemGroup>

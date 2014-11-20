@@ -93,10 +93,12 @@ namespace Microsoft.NodejsTools.Analysis {
                 Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                 "all.json"
             );
-            
+
 
             if (File.Exists(allJson)) {
                 NodejsModuleBuilder.Build(allJson, this);
+            } else {
+                Debug.Fail("Could not find all.json");
             }
         }
 

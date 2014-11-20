@@ -34,7 +34,7 @@ namespace Microsoft.NodejsTools.Analysis {
     class ModuleTable {
         private readonly Dictionary<string, ModuleTree> _modulesByFilename = new Dictionary<string, ModuleTree>(StringComparer.OrdinalIgnoreCase);
         private readonly ModuleTree _modules = new ModuleTree(null, String.Empty);
-        private List<ProjectEntry> _builtins;
+        private readonly List<ProjectEntry> _builtins = new List<ProjectEntry>();
         private readonly object _lock = new object();
         [ThreadStatic]
         private static HashSet<ModuleRecursion> _recursionCheck;
@@ -119,9 +119,6 @@ namespace Microsoft.NodejsTools.Analysis {
 
                 if (value.IsBuiltin) {
                     //We found a new builtin, replace our current tree;
-                    if(_builtins == null){
-                        _builtins = new List<ProjectEntry>();
-                    }
                     _builtins.Add(value);
                 }
             }
