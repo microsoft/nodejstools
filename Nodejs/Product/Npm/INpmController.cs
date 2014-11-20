@@ -30,7 +30,7 @@ namespace Microsoft.NodejsTools.Npm {
         
         INpmCommander CreateNpmCommander();
 
-        Task<IPackageCatalog> GetRepositoryCatalogAsync(bool forceDownload);
+        Task<IPackageCatalog> GetRepositoryCatalogAsync(bool forceDownload, IProgress<string> progress);
 
         IPackageCatalog MostRecentlyLoadedCatalog { get; }
 

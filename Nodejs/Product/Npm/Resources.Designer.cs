@@ -241,7 +241,7 @@ namespace Microsoft.NodejsTools.Npm {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Download complete.
+        ///   Looks up a localized string similar to Download complete - updating database.
         /// </summary>
         internal static string PackagesDownloadComplete {
             get {

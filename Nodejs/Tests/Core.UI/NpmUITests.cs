@@ -171,7 +171,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             var rootPackage = new Mock<IRootPackage>();
             rootPackage.Setup(mock => mock.Modules).Returns((new Mock<INodeModules>()).Object);
 
-            npmControllerMock.Setup(mock => mock.GetRepositoryCatalogAsync(It.IsAny<bool>())).ReturnsAsync(new MockPackageCatalog(packageList));
+            npmControllerMock.Setup(mock => mock.GetRepositoryCatalogAsync(It.IsAny<bool>(), null)).ReturnsAsync(new MockPackageCatalog(packageList));
             npmControllerMock.Setup(mock => mock.GlobalPackages).Returns(globalPackages.Object);
             npmControllerMock.Setup(mock => mock.RootPackage).Returns(rootPackage.Object);
 

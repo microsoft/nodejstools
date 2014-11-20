@@ -52,6 +52,7 @@ namespace Microsoft.NodejsTools.NpmUI {
         private bool _isCatalogEmpty;
         private Visibility _catalogControlVisibility = Visibility.Collapsed;
         private string _catalogLoadingMessage = string.Empty;
+        private string _catalogLoadingProgressMessage = string.Empty;
         private Visibility _loadingCatalogControlVisibility = Visibility.Collapsed;
         private Visibility _filteredCatalogListVisibility = Visibility.Visible;
         private int _selectedDependencyTypeIndex;
@@ -145,6 +146,14 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
         }
 
+        public string LoadingCatalogProgressMessage {
+            get { return _catalogLoadingProgressMessage; }
+            private set {
+                _catalogLoadingProgressMessage = value;
+                OnPropertyChanged();
+            }
+        }
+
         public Visibility LoadingCatalogControlVisibility {
             get { return _loadingCatalogControlVisibility; }
             set {
@@ -178,7 +187,10 @@ namespace Microsoft.NodejsTools.NpmUI {
             controller.OutputLogged += _executeViewModel.commander_OutputLogged;
             _executeViewModel.SetCancellableSafe(false);
             try {
-                _allPackages = await controller.GetRepositoryCatalogAsync(forceRefresh);
+                _allPackages = await controller.GetRepositoryCatalogAsync(
+                    forceRefresh,
+                    new Progress<string>(msg => LoadingCatalogProgressMessage = msg)
+                );
                 IsCatalogEmpty = false;
             } catch (NpmNotFoundException) {
                 LastRefreshedMessage = LastRefreshedMessageProvider.NpmNotFound;

@@ -200,7 +200,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             OnCommandCompleted(e.Arguments, e.WithErrors, e.Cancelled);
         }
 
-        public async Task<IPackageCatalog> GetRepositoryCatalogAsync(bool forceDownload) {
+        public async Task<IPackageCatalog> GetRepositoryCatalogAsync(bool forceDownload, IProgress<string> progress) {
             //  This should really be thread-safe but await can't be inside a lock so
             //  we'll just have to hope and pray this doesn't happen concurrently. Worst
             //  case is we'll end up with two retrievals, one of which will be binned,
@@ -212,7 +212,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     EventHandler<NpmExceptionEventArgs> exHandler = (sender, args) => { LogException(sender, args); ex = args.Exception; };
                     commander.ErrorLogged += LogError;
                     commander.ExceptionLogged += exHandler;
-                    _sRepoCatalog = await commander.GetCatalogAsync(forceDownload);
+                    _sRepoCatalog = await commander.GetCatalogAsync(forceDownload, progress);
                     commander.ErrorLogged -= LogError;
                     commander.ExceptionLogged -= exHandler;
                 }

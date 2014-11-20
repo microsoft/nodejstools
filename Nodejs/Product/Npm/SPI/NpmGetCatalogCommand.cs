@@ -31,6 +31,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         private readonly bool _forceDownload;
         private string _cachePath;
         private Uri _registryUrl;
+        private IProgress<string> _progress;
 
         private const int _databaseSchemaVersion = 3;
 
@@ -40,7 +41,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             bool forceDownload,
             string registryUrl = null,
             string pathToNpm = null,
-            bool useFallbackIfNpmNotFound = true
+            bool useFallbackIfNpmNotFound = true,
+            IProgress<string> progress = null
         )
             : base(
                 fullPathToRootPackageDirectory,
@@ -54,6 +56,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 _registryUrl = new Uri(registryUrl);
             }
             LastRefreshed = DateTime.MinValue;
+            _progress = progress;
         }
 
         internal void ParseResultsAndAddToDatabase(TextReader reader, string dbFilename, string registryUrl) {
@@ -246,7 +249,11 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     totalLength = -1;
                 }
 
-                OnOutputLogged(string.Format(Resources.PackagesDownloadStarting, packageUri.AbsoluteUri));
+                var progress = string.Format(Resources.PackagesDownloadStarting, packageUri.AbsoluteUri);
+                OnOutputLogged(progress);
+                if (_progress != null) {
+                    _progress.Report(progress);
+                }
 
                 int bytesRead;
                 var buffer = new byte[4096];
@@ -254,16 +261,20 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     totalDownloaded += bytesRead;
                     if (totalDownloaded > nextNotification * ONE_MB) {
                         if (totalLength > 0) {
-                            OnOutputLogged(string.Format(
+                            progress = string.Format(
                                 Resources.PackagesDownloadedXOfYMB,
                                 nextNotification,
                                 totalLength / ONE_MB + 1
-                            ));
+                            );
                         } else {
-                            OnOutputLogged(string.Format(
+                            progress = string.Format(
                                 Resources.PackagesDownloadedXMB,
                                 nextNotification
-                            ));
+                            );
+                        }
+                        OnOutputLogged(progress);
+                        if (_progress != null) {
+                            _progress.Report(progress);
                         }
                         nextNotification += 1;
                     }
@@ -271,6 +282,9 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     await cache.WriteAsync(buffer, 0, bytesRead);
                 }
                 OnOutputLogged(Resources.PackagesDownloadComplete);
+                if (_progress != null) {
+                    _progress.Report(Resources.PackagesDownloadComplete);
+                }
             }
 
             return filename;

@@ -177,13 +177,14 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             return await UninstallPackageAsync(packageName, true);
         }
 
-        public async Task<IPackageCatalog> GetCatalogAsync(bool forceDownload) {
+        public async Task<IPackageCatalog> GetCatalogAsync(bool forceDownload, IProgress<string> progress) {
             _command = new NpmGetCatalogCommand(
                 _npmController.FullPathToRootPackageDirectory,
                 _npmController.CachePath,
                 forceDownload,
                 pathToNpm:_npmController.PathToNpm,
-                useFallbackIfNpmNotFound:_npmController.UseFallbackIfNpmNotFound);
+                useFallbackIfNpmNotFound:_npmController.UseFallbackIfNpmNotFound,
+                progress: progress);
             await DoCommandExecute(false);
             return (_command as NpmGetCatalogCommand).Catalog;
         }

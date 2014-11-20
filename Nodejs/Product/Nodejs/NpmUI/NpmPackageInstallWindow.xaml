@@ -521,21 +521,20 @@
         </Grid>
 
         <Grid Visibility="{Binding LoadingCatalogControlVisibility}">
-            <StackPanel 
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Center">
-
+            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Center">
                 <Label Content="{Binding LoadingCatalogMessage}"
-                           HorizontalAlignment="Center"
-                           HorizontalContentAlignment="Center" />
+                       HorizontalAlignment="Center"
+                       HorizontalContentAlignment="Center" />
 
-                <ProgressBar Height="16"
-                                 Margin="50, 4, 50, 4"
-                                 IsIndeterminate="True"
-                                 IsEnabled="{Binding IsLoadingCatalog}" />
+                <ProgressBar x:Name="_loadingProgress"
+                             Height="16"
+                             Margin="50, 4, 50, 4"
+                             IsIndeterminate="True"
+                             IsEnabled="{Binding IsLoadingCatalog}" />
+                <TextBlock Text="{Binding LoadingCatalogProgressMessage}"
+                           HorizontalAlignment="Center" />
             </StackPanel>
         </Grid>
-
     </Grid>
 
 </ui:DialogWindowVersioningWorkaround>
