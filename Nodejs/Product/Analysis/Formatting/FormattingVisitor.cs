@@ -129,8 +129,12 @@ namespace Microsoft.NodejsTools.Formatting {
                         Dedent();
                     }
                 } else {
-                    ReplacePreceedingIncludingNewLines(block.GetStartIndex(_tree.LocationResolver), GetFlowControlBraceInsertion(previousExpressionEnd, false));
-
+                    var blockStart = block.GetStartIndex(_tree.LocationResolver);
+                    if (_code[blockStart] == '{') {
+                        ReplacePreceedingIncludingNewLines(blockStart, GetFlowControlBraceInsertion(previousExpressionEnd, false, blockStart));
+                    } else {
+                        ReplacePreceedingIncludingNewLines(blockStart, GetFlowControlBraceInsertion(previousExpressionEnd, false, -1));
+                    }
                     WalkBlock(block);
                 }
             }
@@ -188,7 +192,8 @@ namespace Microsoft.NodejsTools.Formatting {
                 _tree.LocationResolver),
                 GetFlowControlBraceInsertion(
                     node.GetStartIndex(_tree.LocationResolver) + "try".Length,
-                    false
+                    false,
+                    node.TryBlock.GetStartIndex(_tree.LocationResolver)
                 )
             );
             WalkBlock(node.TryBlock);
@@ -211,7 +216,7 @@ namespace Microsoft.NodejsTools.Formatting {
 
                 ReplacePreceedingIncludingNewLines(
                     node.CatchBlock.GetStartIndex(_tree.LocationResolver),
-                    GetFlowControlBraceInsertion(node.CatchParameter.GetEndIndex(_tree.LocationResolver), true)
+                    GetFlowControlBraceInsertion(node.CatchParameter.GetEndIndex(_tree.LocationResolver), true, node.CatchBlock.GetStartIndex(_tree.LocationResolver))
                 );
                 WalkBlock(node.CatchBlock);
             }
@@ -222,7 +227,7 @@ namespace Microsoft.NodejsTools.Formatting {
                 }
                 ReplacePreceedingIncludingNewLines(
                     node.FinallyBlock.GetStartIndex(_tree.LocationResolver),
-                    GetFlowControlBraceInsertion(node.FinallyStart + "finally".Length, false)
+                    GetFlowControlBraceInsertion(node.FinallyStart + "finally".Length, false, node.FinallyBlock.GetStartIndex(_tree.LocationResolver))
                 );
                 WalkBlock(node.FinallyBlock);
             }
@@ -235,8 +240,7 @@ namespace Microsoft.NodejsTools.Formatting {
             EnsureSpacesAroundParenthesisedExpression(node.Expression);
             bool isMultiLine = false;
             if (node.BlockStart != -1) {
-                ReplacePreceedingIncludingNewLines(node.BlockStart, GetFlowControlBraceInsertion(node.Expression.GetEndIndex(_tree.LocationResolver), true));
-
+                ReplacePreceedingIncludingNewLines(node.BlockStart, GetFlowControlBraceInsertion(node.Expression.GetEndIndex(_tree.LocationResolver), true, node.BlockStart));
                 isMultiLine = ContainsLineFeed(node.BlockStart, node.GetEndIndex(_tree.LocationResolver));
             }
 
@@ -363,10 +367,7 @@ namespace Microsoft.NodejsTools.Formatting {
             if (!_onEnter) {
                 ReplacePreceedingIncludingNewLines(
                     node.Body.GetStartIndex(_tree.LocationResolver),
-                    _options.OpenBracesOnNewLineForFunctions || FollowedBySingleLineComment(node.ParameterEnd, false) ?
-                        ReplaceWith.InsertNewLineAndIndentation :
-                        ReplaceWith.InsertSpace
-                );
+                    GetFlowFunctionBraceInsertion(node.ParameterEnd, false, node.Body.GetStartIndex(_tree.LocationResolver)));
             }
 
             WalkBlock(node.Body);
@@ -655,7 +656,7 @@ namespace Microsoft.NodejsTools.Formatting {
 
             // Format the indentation of the block along with whitespace.
             bool isMultiLine = ContainsLineFeed(node.GetStartIndex(_tree.LocationResolver), node.GetEndIndex(_tree.LocationResolver));
-            if (isMultiLine) {
+            if (isMultiLine && node.Operand == null) {
                 ReplacePreceedingIncludingNewLines(node.GetEndIndex(_tree.LocationResolver) - 1, ReplaceWith.InsertNewLineAndIndentation, replaceOnNewLine: true);
             } else {
                 ReplacePreceedingWhiteSpace(
@@ -956,9 +957,10 @@ namespace Microsoft.NodejsTools.Formatting {
             Debug.Assert(block == null || block.Braces != BraceState.None);
             if (block != null && block.Braces != BraceState.None) {
                 bool isMultiLine = ContainsLineFeed(block.GetStartIndex(_tree.LocationResolver), block.GetEndIndex(_tree.LocationResolver));
-                if (block.Count > 0 && isMultiLine) {
+                bool isComment = FollowedBySingleLineComment(block.GetStartIndex(_tree.LocationResolver), false);
+                if (block.Count > 0 && isMultiLine && !isComment) {
                     // multiline block statement, make sure the 1st statement
-                    // starts on a new line
+                    // starts on a new line. If this is a comment it can stay on the same line as the brace
                     EnsureNewLineFollowing(block.GetStartIndex(_tree.LocationResolver) + "{".Length);
                 }
 
@@ -1160,17 +1162,46 @@ namespace Microsoft.NodejsTools.Formatting {
         /// Gets the brace insertion style for a control flow keyword which
         /// is followed by an expression and then the brace.
         /// </summary>
-        /// <returns></returns>
-        private ReplaceWith GetFlowControlBraceInsertion(int previousExpressionEnd, bool inParens) {
+        private ReplaceWith GetFlowControlBraceInsertion(int previousExpressionEnd, bool inParens, int openBraceLocation) {
+            return GetFlowBraceInsertion(previousExpressionEnd, inParens, openBraceLocation, _options.OpenBracesOnNewLineForControl);
+        }
+
+        /// <summary>
+        /// Gets the brace insertion style for a function.
+        /// </summary>
+        private ReplaceWith GetFlowFunctionBraceInsertion(int previousExpressionEnd, bool inParens, int openBraceLocation) {
+            return GetFlowBraceInsertion(previousExpressionEnd, inParens, openBraceLocation, _options.OpenBracesOnNewLineForFunctions);
+        }
+
+        /// <summary>
+        /// Gets the brace insertion style for a control flow keyword which
+        /// is followed by an expression and then the brace.
+        /// </summary>
+        /// <param name="previousExpressionEnd">The end of the parameters. Typically a ')' or ' '.</param>
+        /// <param name="inParens">are we in parens (usually false).</param>
+        /// <param name="openBraceLocation">The opening brace for this block.</param>
+        /// <param name="openBracesOnNewLine">The option for this node that says whether the brace goes on a new line.</param>
+        /// <returns>The replacement for whitespace.</returns>
+        private ReplaceWith GetFlowBraceInsertion(int previousExpressionEnd, bool inParens, int openBraceLocation, bool openBracesOnNewLine) {
             // By default we follow the option, but if we have code like:
 
             // if(x) // comment
             // {
+            
+            // does the line have a single line comment?
+            bool followedByCommentButNotOpenBrace = FollowedBySingleLineComment(previousExpressionEnd, inParens);
 
-            // Then we need to force/keep the brace on the next line with proper indentation
+            // does the line have the '{'
+            bool braceOnFollowingLine = true; // if we don't have the location, assume true.
+            if (openBraceLocation >= 0) {
+                var expressionEndLine = _tree.LocationResolver.IndexToLocation(previousExpressionEnd).Line;
+                var openBraceLine = _tree.LocationResolver.IndexToLocation(openBraceLocation).Line;
+                braceOnFollowingLine = expressionEndLine != openBraceLine;
+            }    
 
-            if (_options.OpenBracesOnNewLineForControl ||
-                FollowedBySingleLineComment(previousExpressionEnd, inParens)) {
+            // if the brace on new line option is set, or the first line has a comment but not the brace,
+            // we want the brace on the following line indented.
+            if (openBracesOnNewLine || (followedByCommentButNotOpenBrace && braceOnFollowingLine)) {
                 return ReplaceWith.InsertNewLineAndIndentation;
             }
 
