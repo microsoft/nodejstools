@@ -23,6 +23,7 @@ using Microsoft.NodejsTools.Npm.SQLiteTables;
 using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using SQLite;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
@@ -65,68 +66,82 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             using (var db = new SQLiteConnection(dbFilename)) {
                 db.RunInTransaction(() => {
                     db.CreateRegistryTableIfNotExists();
+
                     using (var jsonReader = new JsonTextReader(reader)) {
-                        var token = JObject.ReadFrom(jsonReader);
 
-                        db.InsertOrReplace(new RegistryInfo() {
-                            RegistryUrl = registryUrl,
-                            Revision = long.Parse((string)token["_updated"]),
-                            UpdatedOn = DateTime.Now
-                        });
+                        while (jsonReader.Read()) {
+                            if (JsonToken.PropertyName != jsonReader.TokenType) {
+                                continue;
+                            }
 
-                        var builder = new NodeModuleBuilder();
+                            if ((string)jsonReader.Value == "_updated") {
+                                jsonReader.Read();
+                                db.InsertOrReplace(new RegistryInfo() {
+                                    RegistryUrl = registryUrl,
+                                    Revision = (long)jsonReader.Value,
+                                    UpdatedOn = DateTime.Now
+                                });
+                                continue;
 
-                        foreach (var module in token.Values()) {
-                            try {
-                                builder.Name = (string)module["name"];
-                                if (string.IsNullOrEmpty(builder.Name)) {
-                                    continue;
-                                }
+                            }
 
-                                builder.AppendToDescription((string)module["description"] ?? string.Empty);
-
-                                var time = module["time"];
-                                if (time != null) {
-                                    builder.AppendToDate((string)time["modified"]);
-                                }
-
-                                var distTags = module["dist-tags"];
-                                if (distTags != null) {
-                                    var latestVersion = distTags
-                                        .OfType<JProperty>()
-                                        .Where(v => (string)v.Name == "latest")
-                                        .Select(v => (string)v.Value)
-                                        .FirstOrDefault();
-
-                                    if (!string.IsNullOrEmpty(latestVersion)) {
-                                        builder.LatestVersion = SemverVersion.Parse(latestVersion);
+                            var builder = new NodeModuleBuilder();
+                            var token = JToken.ReadFrom(jsonReader);
+                            var module = token.FirstOrDefault();
+                            while (module != null) {
+                                try {
+                                    builder.Name = (string)module["name"];
+                                    if (string.IsNullOrEmpty(builder.Name)) {
+                                        continue;
                                     }
-                                }
 
-                                var versions = module["versions"];
-                                if (versions != null) {
-                                    builder.AvailableVersions = GetVersions(versions);
-                                }
+                                    builder.AppendToDescription((string)module["description"] ?? string.Empty);
 
-                                AddKeywords(builder, module["keywords"]);
+                                    var time = module["time"];
+                                    if (time != null) {
+                                        builder.AppendToDate((string)time["modified"]);
+                                    }
 
-                                AddAuthor(builder, module["author"]);
+                                    var distTags = module["dist-tags"];
+                                    if (distTags != null) {
+                                        var latestVersion = distTags
+                                            .OfType<JProperty>()
+                                            .Where(v => (string)v.Name == "latest")
+                                            .Select(v => (string)v.Value)
+                                            .FirstOrDefault();
 
-                                AddHomepage(builder, module["homepage"]);
+                                        if (!string.IsNullOrEmpty(latestVersion)) {
+                                            builder.LatestVersion = SemverVersion.Parse(latestVersion);
+                                        }
+                                    }
 
-                                var package = builder.Build();
+                                    var versions = module["versions"];
+                                    if (versions != null) {
+                                        builder.AvailableVersions = GetVersions(versions);
+                                    }
 
-                                InsertCatalogEntry(db, package);
-                            } catch (InvalidOperationException) {
-                                // Occurs if a JValue appears where we expect JProperty
-                            } catch (ArgumentException) {
-                                OnOutputLogged(string.Format(Resources.ParsingError, builder.Name));
-                                if (!string.IsNullOrEmpty(builder.Name)) {
+                                    AddKeywords(builder, module["keywords"]);
+
+                                    AddAuthor(builder, module["author"]);
+
+                                    AddHomepage(builder, module["homepage"]);
+
                                     var package = builder.Build();
+
                                     InsertCatalogEntry(db, package);
+                                } catch (InvalidOperationException) {
+                                    // Occurs if a JValue appears where we expect JProperty
+                                } catch (ArgumentException) {
+                                    OnOutputLogged(string.Format(Resources.ParsingError, builder.Name));
+                                    if (!string.IsNullOrEmpty(builder.Name)) {
+                                        var package = builder.Build();
+                                        InsertCatalogEntry(db, package);
+                                    }
+                                } finally {
+                                    builder.Reset();
+                                    token = JToken.ReadFrom(jsonReader);
+                                    module = token.FirstOrDefault();
                                 }
-                            } finally {
-                                builder.Reset();
                             }
                         }
                     }
@@ -152,7 +167,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         private IEnumerable<SemverVersion> GetVersions(JToken versionsToken) {
-            IEnumerable<string> versionStrings = versionsToken.OfType<JProperty>().Select(v=>(string)v.Name);
+            IEnumerable<string> versionStrings = versionsToken.OfType<JProperty>().Select(v => (string)v.Name);
             foreach (var versionString in versionStrings) {
                 if (!string.IsNullOrEmpty(versionString)) {
                     yield return SemverVersion.Parse(versionString);
@@ -221,7 +236,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             if (refreshStartKey > 0) {
                 relativeUri = String.Format("/-/all/since?stale=update_after&startkey={0}", refreshStartKey);
                 filename = Path.Combine(cachePath, "since_packages.json");
-            }  else {
+            } else {
                 relativeUri = "/-/all";
                 filename = Path.Combine(cachePath, "all_packages.json");
             }
@@ -292,21 +307,20 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
 
         private async Task<Uri> GetRegistryUrl() {
-            using (var proc = ProcessOutput.Run(
-                GetPathToNpm(),
-                new List<string>() { "config", "get", "registry"},
-                FullPathToRootPackageDirectory,
+            var output = await NpmHelpers.ExecuteNpmCommandAsync(
                 null,
-                false,
-                null)) {
-                if (await proc == 0) {
-                    _registryUrl = proc.StandardOutputLines
-                        .Select(s => {
-                            Uri u;
-                            return Uri.TryCreate(s, UriKind.Absolute, out u) ? u : null;
-                        })
-                        .FirstOrDefault(u => u != null);
-                }
+                GetPathToNpm(),
+                FullPathToRootPackageDirectory,
+                new[] { "config", "get", "registry" },
+                null);
+
+            if (output != null) {
+                _registryUrl = output
+                    .Select(s => {
+                        Uri u;
+                        return Uri.TryCreate(s, UriKind.Absolute, out u) ? u : null;
+                    })
+                    .FirstOrDefault(u => u != null);
             }
             _registryUrl = _registryUrl ?? new Uri("https://registry.npmjs.org/");
             return _registryUrl;
@@ -346,13 +360,13 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                         version = db.Table<DbVersion>().FirstOrDefault();
                         registryFileMapping = db.Table<RegistryFileMapping>().FirstOrDefault(info => info.RegistryUrl == registryUrl.ToString());
                     }
-                        
+
                     registryCacheDirectory = registryFileMapping != null ? registryFileMapping.DbFileLocation : Guid.NewGuid().ToString();
                     registryCachePath = Path.Combine(CachePath, registryCacheDirectory);
                     registryCacheFilePath = Path.Combine(registryCachePath, RegistryCacheFilename);
 
                     Directory.CreateDirectory(Path.GetDirectoryName(registryCacheFilePath));
-                        
+
                     if (File.Exists(registryCacheFilePath)) {
                         using (var registryDb = new SQLiteConnection(registryCacheFilePath)) {
                             // prevent errors from occurring when table doesn't exist
@@ -394,7 +408,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
                     using (var db = new SQLiteConnection(registryCacheFilePath)) {
                         db.CreateRegistryTableIfNotExists();
-                        ResultsCount = db.Table<CatalogEntry>().LongCount();
+                        ResultsCount = db.Table<CatalogEntry>().Count();
                     }
                 } catch (Exception ex) {
                     if (ex is StackOverflowException ||
@@ -486,7 +500,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         public async Task<IEnumerable<IPackage>> GetCatalogPackagesAsync(string filterText) {
             IEnumerable<IPackage> packages = null;
-             using (var semaphore = GetDatabaseSemaphore()) {
+            using (var semaphore = GetDatabaseSemaphore()) {
                 // Wait until file is downloaded/parsed if another download is already in session.
                 // Allows user to open multiple npm windows and show progress bar without file-in-use errors.
                 bool success = semaphore.WaitOne(10);
@@ -496,25 +510,27 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     return null;
                 }
 
-                 try {
-                     var registryUrl = (await GetRegistryUrl()).ToString();
-                     RegistryFileMapping registryFileMapping = null;
-                     using (var db = new SQLiteConnection(DatabaseCacheFilePath)) {
+                try {
+                    var registryUrl = (await GetRegistryUrl()).ToString();
+                    RegistryFileMapping registryFileMapping = null;
+                    using (var db = new SQLiteConnection(DatabaseCacheFilePath)) {
                         registryFileMapping = db.Table<RegistryFileMapping>().FirstOrDefault(info => info.RegistryUrl == registryUrl);
-                     }
+                    }
 
-                     if (registryFileMapping != null) {
-                         string registryFileLocation = Path.Combine(CachePath, registryFileMapping.DbFileLocation, RegistryCacheFilename);
+                    if (registryFileMapping != null) {
+                        string registryFileLocation = Path.Combine(CachePath, registryFileMapping.DbFileLocation, RegistryCacheFilename);
 
-                         packages = new DatabasePackageCatalogFilter(registryFileLocation).Filter(filterText);
-                     }
-                 } catch (Exception e) {
-                     OnOutputLogged(e.ToString());
-                     throw;
-                 } finally {
-                     semaphore.Release();                     
-                 }
-             }
+
+                        var packagesEnumerable = new DatabasePackageCatalogFilter(registryFileLocation).Filter(filterText);
+                        packages = await Task.Run(() => packagesEnumerable.ToList());
+                    }
+                } catch (Exception e) {
+                    OnOutputLogged(e.ToString());
+                    throw;
+                } finally {
+                    semaphore.Release();
+                }
+            }
             return packages;
         }
 
@@ -536,7 +552,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                             package = db.Table<CatalogEntry>().FirstOrDefault(entry => entry.Name == name).ToPackage();
                         }
                     } finally {
-                        semaphore.Release();                        
+                        semaphore.Release();
                     }
                 }
 

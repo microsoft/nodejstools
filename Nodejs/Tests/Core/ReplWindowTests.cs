@@ -13,10 +13,14 @@
  * ***************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.NodejsTools;
+using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.Repl;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
@@ -483,6 +487,28 @@ undefined";
                 try {
                     Directory.Delete(testDir, true);
                 } catch (IOException) {
+                }
+            }
+        }
+
+        // https://nodejstools.codeplex.com/workitem/1575
+        [TestMethod, Priority(0), Timeout(180000)]
+        public async Task TestNpmReplCommandProcessExitSucceeds() {
+            var npmPath = NpmHelpers.GetPathToNpm();
+            using (var eval = ProjectlessEvaluator()) {
+                var mockWindow = new MockReplWindow(eval) {
+                    ShowAnsiCodes = true
+                };
+                mockWindow.ClearScreen();
+                var redirector = new NpmReplCommand.NpmReplRedirector(mockWindow);
+
+                for (int j = 0; j < 200; j++) {
+                    await NpmReplCommand.ExecuteNpmCommandAsync(
+                        redirector,
+                        npmPath,
+                        null,
+                        new[] {"config", "get", "registry"},
+                        null);
                 }
             }
         }

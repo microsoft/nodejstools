@@ -48,6 +48,7 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -166,6 +167,10 @@
     <ProjectReference Include="$(BuildRoot)\Nodejs\Tests\Utilities.UI\TestUtilities.UI.Nodejs.csproj">
       <Project>{a731c4c3-3741-4080-a946-c47574c1f3bf}</Project>
       <Name>TestUtilities.UI.Nodejs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Product\Npm\Npm.csproj">
+      <Project>{E5EF4B0A-AB41-4B98-8FA8-98D6348003A8}</Project>
+      <Name>Npm</Name>
     </ProjectReference>
     <ProjectReference Include="..\Utilities.Nodejs\TestUtilities.Nodejs.csproj">
       <Project>{9e395ba3-765e-4f35-a520-19f1c323d625}</Project>

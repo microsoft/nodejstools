@@ -21,6 +21,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.Project;
@@ -29,6 +30,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Project;
 using SR = Microsoft.NodejsTools.Project.SR;
+using Task = System.Threading.Tasks.Task;
 
 namespace Microsoft.NodejsTools.Repl {
 #if INTERACTIVE_WINDOW
@@ -111,7 +113,7 @@ namespace Microsoft.NodejsTools.Repl {
 
             // In case someone copies filename
             string projectDirectoryPath = File.Exists(projectPath) ? Path.GetDirectoryName(projectPath) : projectPath;
-
+            
             if (!isGlobalInstall && !(Directory.Exists(projectDirectoryPath) && File.Exists(Path.Combine(projectDirectoryPath, "package.json")))) {
                 window.WriteError("Please specify a valid Node.js project or project directory in solution. If solution contains multiple projects, specify target project using .npm [ProjectName or ProjectDir] <npm arguments>");
                 return ExecutionResult.Failure;
@@ -121,18 +123,12 @@ namespace Microsoft.NodejsTools.Repl {
                 _npmPath = NpmHelpers.GetPathToNpm();
             }
             var npmReplRedirector = new NpmReplRedirector(window);
-            using (var process = ProcessOutput.Run(
+               
+            await ExecuteNpmCommandAsync(npmReplRedirector,
                     _npmPath,
-                    new[] { npmArguments },
                     projectDirectoryPath,
-                    null,
-                    false,
-                    npmReplRedirector,
-                    quoteArgs: false,
-                    outputEncoding: Encoding.UTF8 // npm uses UTF-8 regardless of locale if its output is redirected
-            )) {
-                await process;
-            }
+                new[] { npmArguments },
+                null);
 
             if (npmReplRedirector.HasErrors) {
                 window.WriteError(SR.GetString(SR.NpmReplCommandCompletedWithErrors, arguments));
@@ -159,10 +155,66 @@ namespace Microsoft.NodejsTools.Repl {
             get { return null; }
         }
 
+        // TODO: This is duplicated from Npm project
+        // We should consider using InternalsVisibleTo to avoid code duplication
+        internal static async Task<IEnumerable<string>> ExecuteNpmCommandAsync(
+            Redirector redirector, 
+            string pathToNpm,
+            string executionDirectory,
+            string[] arguments,
+            ManualResetEvent cancellationResetEvent) {
+
+            IEnumerable<string> standardOutputLines = null;
+
+            using (var process = ProcessOutput.Run(
+                pathToNpm,
+                arguments,
+                executionDirectory,
+                null,
+                false,
+                redirector,
+                quoteArgs: false,
+                outputEncoding: Encoding.UTF8 // npm uses UTF-8 regardless of locale if its output is redirected
+                )) {
+                var whnd = process.WaitHandle;
+                if (whnd == null) {
+                    // Process failed to start, and any exception message has
+                    // already been sent through the redirector
+                    if (redirector != null) {
+                        redirector.WriteErrorLine("Error - cannot start npm");
+                    }
+                } else {
+                    var handles = cancellationResetEvent != null ? new[] { whnd, cancellationResetEvent } : new [] { whnd };
+                    var i = await Task.Run(() => WaitHandle.WaitAny(handles));
+                    if (i == 0) {
+                        Debug.Assert(process.ExitCode.HasValue, "npm process has not really exited");
+                        process.Wait();
+                        if (process.StandardOutputLines != null) {
+                            standardOutputLines = process.StandardOutputLines.ToList();                            
+                        }
+                    } else {
+                        process.Kill();
+                        if (redirector != null) {
+                            redirector.WriteErrorLine(string.Format(
+                            "\r\n===={0}====\r\n\r\n",
+                            "npm command cancelled"));
+                        }
+                        
+                        if (cancellationResetEvent != null) {
+                            cancellationResetEvent.Reset();
+                        }
+
+                        throw new OperationCanceledException();
+                    }
+                }
+            }
+            return standardOutputLines;
+        }
+
         #endregion
 
         internal class NpmReplRedirector : Redirector {
-
+            
             internal const string ErrorAnsiColor = "\x1b[31;1m";
             internal const string WarnAnsiColor = "\x1b[33;22m";
             internal const string NormalAnsiColor = "\x1b[39;49m";

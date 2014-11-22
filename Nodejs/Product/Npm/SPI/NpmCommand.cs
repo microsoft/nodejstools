@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -84,51 +85,27 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             } catch (NpmNotFoundException) {
                 return false;
             }
-            var wasCancelled = false;
             var redirector = new NpmCommandRedirector(this);
             redirector.WriteLine(
                 string.Format("===={0}====\r\n\r\n",
                 string.Format(Resources.ExecutingCommand, Arguments)));
-            using (var process = ProcessOutput.Run(
-                GetPathToNpm(),
-                new [] { Arguments },
-                _fullPathToRootPackageDirectory,
-                null,
-                false,
-                redirector,
-                quoteArgs: false,
-                outputEncoding: Encoding.UTF8 // npm uses UTF-8 regardless of locale if its output is redirected
-            )) {
-                var whnd = process.WaitHandle;
-                if (whnd == null) {
-                    // Process failed to start, and any exception message has
-                    // already been sent through the redirectory
-                    redirector.WriteErrorLine(Resources.ErrCannotStartNpm);
-                } else {
-                    var handles = new [] { _cancellation, whnd };
-                    var i = await Task.Run(() => WaitHandle.WaitAny(handles));
-                    if (i == 0) {
-                        wasCancelled = true;
-                        process.Kill();
-                        redirector.WriteErrorLine(string.Format(
-                            "\r\n===={0}====\r\n\r\n",
-                            Resources.NpmCommandCancelled));
-                        _cancellation.Reset();
-                    } else {
-                        Debug.Assert(process.ExitCode.HasValue, "npm process has not really exited");
-                        process.Wait();
-                        redirector.WriteLine(string.Format(
-                            "\r\n===={0}====\r\n\r\n",
-                            string.Format(Resources.NpmCommandCompletedWithExitCode, process.ExitCode ?? -1)
-                            ));
-                    }
-                }
+
+            var cancelled = false;
+            try {
+                await NpmHelpers.ExecuteNpmCommandAsync(
+                    redirector,
+                    GetPathToNpm(),
+                    _fullPathToRootPackageDirectory,
+                    new[] { Arguments },
+                    _cancellation);
+            } catch (OperationCanceledException) {
+                cancelled = true;
             }
-            OnCommandCompleted(Arguments, redirector.HasErrors, wasCancelled);
+            OnCommandCompleted(Arguments, redirector.HasErrors, cancelled);
             return !redirector.HasErrors;
         }
 
-        private class NpmCommandRedirector : Redirector {
+        internal class NpmCommandRedirector : Redirector {
             NpmCommand _owner;
             
             public NpmCommandRedirector(NpmCommand owner) {
