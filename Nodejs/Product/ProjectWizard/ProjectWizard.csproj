@@ -96,6 +96,7 @@
       <Link>TestFrameworkDirectories.cs</Link>
     </Compile>
     <Compile Include="CloudServiceWizard.cs" />
+    <Compile Include="NodejsPackageParametersExtension.cs" />
     <Compile Include="INodePackageModulesCommands.cs" />
     <Compile Include="ImportWizard.cs" />
     <Compile Include="NpmWizardExtension.cs" />

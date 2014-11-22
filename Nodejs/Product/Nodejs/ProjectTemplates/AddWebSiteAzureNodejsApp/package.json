@@ -1,5 +1,5 @@
 {
-  "name": "$safeprojectname$",
+  "name": "$npmsafeprojectname$",
   "version": "0.0.0",
   "description": "$projectname$",
   "main": "server.js",
