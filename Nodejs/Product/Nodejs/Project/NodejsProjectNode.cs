@@ -677,7 +677,7 @@ namespace Microsoft.NodejsTools.Project {
                     }
                 };
 
-recheck:
+            recheck:
 
                 var longPaths = await Task.Factory.StartNew(() =>
                     GetLongSubPaths(ProjectHome)
@@ -833,7 +833,9 @@ recheck:
                         return VSConstants.S_OK;
                 }
             } else if (cmdGroup == Guids.NodejsNpmCmdSet) {
-                if (string.IsNullOrEmpty(NpmHelpers.GetPathToNpm())) {
+                try {
+                    NpmHelpers.GetPathToNpm();
+                } catch (NpmNotFoundException) {
                     Nodejs.ShowNodejsNotInstalled();
                     return VSConstants.S_OK;
                 }
@@ -843,7 +845,9 @@ recheck:
 
         protected override int ExecCommandThatDependsOnSelectedNodes(Guid cmdGroup, uint cmdId, uint cmdExecOpt, IntPtr vaIn, IntPtr vaOut, CommandOrigin commandOrigin, IList<HierarchyNode> selectedNodes, out bool handled) {
             if (cmdGroup == Guids.NodejsNpmCmdSet) {
-                if (string.IsNullOrEmpty(NpmHelpers.GetPathToNpm())) {
+                try {
+                    NpmHelpers.GetPathToNpm();
+                } catch (NpmNotFoundException) {
                     Nodejs.ShowNodejsNotInstalled();
                     handled = true;
                     return VSConstants.S_OK;

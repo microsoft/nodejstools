@@ -322,4 +322,10 @@
   <data name="416" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>_BUILDROOT_\Nodejs\Product\Icons\AddNewItemICO\xml.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="417" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>_BUILDROOT_\Nodejs\Product\Icons\AddNewItemICO\JADEScript.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="418" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>_BUILDROOT_\Nodejs\Product\Icons\AddNewItemICO\StylusSheet.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

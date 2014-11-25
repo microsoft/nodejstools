@@ -120,7 +120,11 @@ namespace Microsoft.NodejsTools.Repl {
             }
 
             if (null == _npmPath || !File.Exists(_npmPath)) {
-                _npmPath = NpmHelpers.GetPathToNpm();
+                try {
+                    _npmPath = NpmHelpers.GetPathToNpm();
+                } catch (NpmNotFoundException) {
+                    Nodejs.ShowNodejsNotInstalled();
+                }
             }
             var npmReplRedirector = new NpmReplRedirector(window);
                
