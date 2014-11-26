@@ -28,7 +28,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
     internal abstract class NpmCommand : AbstractNpmLogSource {
         private readonly string _fullPathToRootPackageDirectory;
         private string _pathToNpm;
-        private readonly bool _useFallbackIfNpmNotFound;
         private readonly ManualResetEvent _cancellation;
         private readonly StringBuilder _output = new StringBuilder();
         private StringBuilder _error = new StringBuilder();
@@ -36,12 +35,9 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         protected NpmCommand(
             string fullPathToRootPackageDirectory,
-            string pathToNpm = null,
-            bool useFallbackIfNpmNotFound = true
-        ) {
+            string pathToNpm = null) {
             _fullPathToRootPackageDirectory = fullPathToRootPackageDirectory;
             _pathToNpm = pathToNpm;
-            _useFallbackIfNpmNotFound = useFallbackIfNpmNotFound;
             _cancellation = new ManualResetEvent(false);
         }
 
@@ -53,7 +49,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         protected string GetPathToNpm() {
             if (null == _pathToNpm || !File.Exists(_pathToNpm)) {
-                _pathToNpm = NpmHelpers.GetPathToNpm(_useFallbackIfNpmNotFound);
+                _pathToNpm = NpmHelpers.GetPathToNpm();
             }
             return _pathToNpm;
         }

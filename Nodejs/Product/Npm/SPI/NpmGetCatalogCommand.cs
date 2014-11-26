@@ -47,9 +47,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         )
             : base(
                 fullPathToRootPackageDirectory,
-                pathToNpm,
-                useFallbackIfNpmNotFound
-        ) {
+                pathToNpm) {
             _cachePath = cachePath;
             Arguments = "search";
             _forceDownload = forceDownload;

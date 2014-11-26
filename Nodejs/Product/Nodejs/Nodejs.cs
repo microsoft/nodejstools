@@ -21,64 +21,89 @@ using System.Windows.Forms;
 using Microsoft.Win32;
 #if !NO_WINDOWS
 using Microsoft.NodejsTools.Project;
+using System.Security;
 #endif
 
 namespace Microsoft.NodejsTools {
     public sealed class Nodejs {
+        private const string NodejsRegPath = "Software\\Node.js";
+        private const string InstallPath = "InstallPath";
+
         private static string _nodeExePath = null;
 
         public static string NodeExePath {
             get {
                 if (_nodeExePath == null) {
-                    //Fall back to a well known location if lookup fails
-                    string installPath = null;
-                    try {
-                        using (RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\Node.js")) {
-                            if (key != null) {
-                                string keyValue = (string)key.GetValue("InstallPath", installPath);
-                                installPath = String.IsNullOrEmpty(keyValue) ? installPath : keyValue;
-                            }
-                        }
-                    } catch (Exception) {
+                    _nodeExePath = GetPathToNodeExecutable();
+                }
+                return _nodeExePath;
+            }
+        }
+
+        public static string GetPathToNodeExecutable(string executable = "node.exe") {
+            // Attempt to find Node.js/NPM in the Registry. (Currrent User)
+            using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default))
+            using (var node = baseKey.OpenSubKey(NodejsRegPath)) {
+                if (node != null) {
+                    string key = (node.GetValue(InstallPath) as string) ?? string.Empty;
+                    var execPath = Path.Combine(key, executable);
+                    if (File.Exists(execPath)) {
+                        return execPath;
                     }
+                }
+            }
 
-                    if (installPath == null) {
-                        foreach (var dir in Environment.GetEnvironmentVariable("PATH").Split(Path.PathSeparator)) {
-                            if (File.Exists(Path.Combine(dir, "node.exe"))) {
-                                installPath = dir;
-                                break;
-                            }
-                        }
-
-                    }
-
-                    if (installPath == null) {
-                        string tempPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "nodejs");
-                        if (Directory.Exists(tempPath)) {
-                            installPath = tempPath;
-                        }
-                    }
-
-                    if (installPath == null) {
-                        var x86path = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
-                        if (!String.IsNullOrEmpty(x86path)) {
-                            string tempPath = Path.Combine(x86path, "nodejs");
-                            if (Directory.Exists(tempPath)) {
-                                installPath = tempPath;
-                            }
-                        }
-                    }
-
-                    if (installPath != null) {
-                        string path = Path.Combine(installPath, "node.exe");
-                        if (File.Exists(path)) {
-                            _nodeExePath = Path.Combine(installPath, "node.exe");
+            // Attempt to find Node.js/NPM in the Registry. (Local Machine x64)
+            if (Environment.Is64BitOperatingSystem) {
+                using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64))
+                using (var node64 = baseKey.OpenSubKey(NodejsRegPath)) {
+                    if (node64 != null) {
+                        string key = (node64.GetValue(InstallPath) as string) ?? string.Empty;
+                        var execPath = Path.Combine(key, executable);
+                        if (File.Exists(execPath)) {
+                            return execPath;
                         }
                     }
                 }
-
-                return _nodeExePath;
             }
+
+            // Attempt to find Node.js/NPM in the Registry. (Local Machine x86)
+            using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
+            using (var node = baseKey.OpenSubKey(NodejsRegPath)) {
+                if (node != null) {
+                    string key = (node.GetValue(InstallPath) as string) ?? string.Empty;
+                    var execPath = Path.Combine(key, executable);
+                    if (File.Exists(execPath)) {
+                        return execPath;
+                    }
+                }
+            }
+
+            // If we didn't find node.js in the registry we should look at the user's path.
+            foreach (var dir in Environment.GetEnvironmentVariable("PATH").Split(Path.PathSeparator)) {
+                var execPath = Path.Combine(dir, executable);
+                if (File.Exists(execPath)) {
+                    return execPath;
+                }
+            }
+
+            // It wasn't in the users path.  Check Program Files for the nodejs folder.
+            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "nodejs", executable);
+            if (File.Exists(path)) {
+                return path;
+            }
+
+            // It wasn't in the users path.  Check Program Files x86 for the nodejs folder.
+            var x86path = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+            if (!String.IsNullOrEmpty(x86path)) {
+                path = Path.Combine(x86path, "nodejs", executable);
+                if (File.Exists(path)) {
+                    return path;
+                }
+            }
+
+            // we didn't find the path.
+            return null;
         }
 
 #if !NO_WINDOWS
@@ -99,7 +124,7 @@ namespace Microsoft.NodejsTools {
         /// <returns></returns>
         public static bool CheckNodejsSupported(string path) {
             bool supported = true;
-            if (path != null && File.Exists(path) && 
+            if (path != null && File.Exists(path) &&
                 string.Compare(Path.GetFileName(path), "node.exe", StringComparison.OrdinalIgnoreCase) == 0) {
                 FileVersionInfo info = FileVersionInfo.GetVersionInfo(path);
                 if (info.FileMajorPart == 0) {
@@ -112,7 +137,7 @@ namespace Microsoft.NodejsTools {
                             MessageBoxIcon.Error
                         );
                         supported = false;
-                    } 
+                    }
                 }
             }
             return supported;

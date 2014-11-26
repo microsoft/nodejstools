@@ -21,7 +21,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             bool global = false,
             string pathToNpm = null,
             bool useFallbackIfNpmNotFound = true)
-            : base(fullPathToRootPackageDirectory, pathToNpm, useFallbackIfNpmNotFound) {
+            : base(fullPathToRootPackageDirectory, pathToNpm) {
             Arguments = global
                             ? string.Format("uninstall {0} --g", packageName)
                             : string.Format(

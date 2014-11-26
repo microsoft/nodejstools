@@ -107,8 +107,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         public async Task<bool> Install() {
             _command = new NpmInstallCommand(
                 _npmController.FullPathToRootPackageDirectory,
-                _npmController.PathToNpm,
-                _npmController.UseFallbackIfNpmNotFound);
+                _npmController.PathToNpm);
             return await DoCommandExecute(true);
         }
 
@@ -125,8 +124,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 type,
                 global,
                 saveToPackageJson,
-                _npmController.PathToNpm,
-                _npmController.UseFallbackIfNpmNotFound);
+                _npmController.PathToNpm);
             return await DoCommandExecute(true);
         }
 
@@ -164,8 +162,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 packageName,
                 GetDependencyType(packageName),
                 global,
-                _npmController.PathToNpm,
-                _npmController.UseFallbackIfNpmNotFound);
+                _npmController.PathToNpm);
             return await DoCommandExecute(true);
         }
 
@@ -183,7 +180,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 _npmController.CachePath,
                 forceDownload,
                 pathToNpm:_npmController.PathToNpm,
-                useFallbackIfNpmNotFound:_npmController.UseFallbackIfNpmNotFound,
                 progress: progress);
             await DoCommandExecute(false);
             return (_command as NpmGetCatalogCommand).Catalog;
@@ -198,8 +194,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 _npmController.FullPathToRootPackageDirectory,
                 packages,
                 global,
-                _npmController.PathToNpm,
-                _npmController.UseFallbackIfNpmNotFound);
+                _npmController.PathToNpm);
             return await DoCommandExecute(true);
         }
 
@@ -215,8 +210,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             _command = new GenericNpmCommand(
                 _npmController.FullPathToRootPackageDirectory,
                 arguments,
-                _npmController.PathToNpm,
-                _npmController.UseFallbackIfNpmNotFound);
+                _npmController.PathToNpm);
             return await DoCommandExecute(true);
         }
     }

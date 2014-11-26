@@ -20,7 +20,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools;
-using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.Repl;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
@@ -494,7 +493,7 @@ undefined";
         // https://nodejstools.codeplex.com/workitem/1575
         [TestMethod, Priority(0), Timeout(180000)]
         public async Task TestNpmReplCommandProcessExitSucceeds() {
-            var npmPath = NpmHelpers.GetPathToNpm();
+            var npmPath = Nodejs.GetPathToNodeExecutable("npm.cmd");
             using (var eval = ProjectlessEvaluator()) {
                 var mockWindow = new MockReplWindow(eval) {
                     ShowAnsiCodes = true

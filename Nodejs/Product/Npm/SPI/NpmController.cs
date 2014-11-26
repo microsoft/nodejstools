@@ -27,7 +27,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         private string _cachePath;
         private bool _showMissingDevOptionalSubPackages;
         private INpmPathProvider _npmPathProvider;
-        private bool _useFallbackIfNpmNotFound;
         private IRootPackage _rootPackage;
         private IGlobalPackages _globalPackage;
         private readonly object _lock = new object();
@@ -47,13 +46,11 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             string fullPathToRootPackageDirectory,
             string cachePath,
             bool showMissingDevOptionalSubPackages = false,
-            INpmPathProvider npmPathProvider = null,
-            bool useFallbackIfNpmNotFound = true) {
+            INpmPathProvider npmPathProvider = null) {
             _fullPathToRootPackageDirectory = fullPathToRootPackageDirectory;
             _cachePath = cachePath;
             _showMissingDevOptionalSubPackages = showMissingDevOptionalSubPackages;
             _npmPathProvider = npmPathProvider;
-            _useFallbackIfNpmNotFound = useFallbackIfNpmNotFound;
 
             _localWatcher = CreateModuleDirectoryWatcherIfDirectoryExists(_fullPathToRootPackageDirectory);
             _globalWatcher = CreateModuleDirectoryWatcherIfDirectoryExists(this.ListBaseDirectory);
@@ -74,10 +71,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         internal string CachePath {
             get { return _cachePath; }
-        }
-
-        internal bool UseFallbackIfNpmNotFound {
-            get { return _useFallbackIfNpmNotFound; }
         }
 
         public event EventHandler StartingRefresh;
@@ -117,8 +110,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                             _fullPathToRootPackageDirectory,
                             _showMissingDevOptionalSubPackages);
                 
-                var command = new NpmLsCommand(_fullPathToRootPackageDirectory, true, PathToNpm,
-                    _useFallbackIfNpmNotFound);
+                var command = new NpmLsCommand(_fullPathToRootPackageDirectory, true, PathToNpm);
 
                 GlobalPackages = (await command.ExecuteAsync())
                     ? RootPackageFactory.Create(command.ListBaseDirectory)
@@ -138,8 +130,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         public string ListBaseDirectory {
             get {
-                var command = new NpmLsCommand(_fullPathToRootPackageDirectory, true, PathToNpm,
-                    _useFallbackIfNpmNotFound);
+                var command = new NpmLsCommand(_fullPathToRootPackageDirectory, true, PathToNpm);
 
                 if (Task.Run(async () => { return await command.ExecuteAsync(); } ).Result) {
                     return command.ListBaseDirectory;

@@ -26,7 +26,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             bool global,
             string pathToNpm = null,
             bool useFallbackIfNpmNotFound = true)
-            : base(fullPathToRootPackageDirectory, pathToNpm, useFallbackIfNpmNotFound) {
+            : base(fullPathToRootPackageDirectory, pathToNpm) {
             var buff = new StringBuilder("update");
             if (global) {
                 buff.Append(" -g");

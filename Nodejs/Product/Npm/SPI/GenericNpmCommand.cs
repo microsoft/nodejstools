@@ -17,11 +17,9 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         public GenericNpmCommand(
             string fullPathToRootPackageDirectory,
             string arguments,
-            string pathToNpm = null,
-            bool useFallbackIfNpmNotFound = true) : base(
+            string pathToNpm = null) : base(
             fullPathToRootPackageDirectory,
-            pathToNpm,
-            useFallbackIfNpmNotFound) {
+            pathToNpm) {
             Arguments = arguments;
         }
     }

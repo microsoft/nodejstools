@@ -18,7 +18,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             string fullPathToRootPackageDirectory,
             string pathToNpm = null,
             bool useFallbackIfNpmNotFound = true)
-            : base(fullPathToRootPackageDirectory, pathToNpm, useFallbackIfNpmNotFound) {
+            : base(fullPathToRootPackageDirectory, pathToNpm) {
             Arguments = "install";
         }
 
@@ -31,7 +31,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             bool saveToPackageJson = true,
             string pathToNpm = null,
             bool useFallbackIfNpmNotFound = true)
-            : base(fullPathToRootPackageDirectory, pathToNpm, useFallbackIfNpmNotFound) {
+            : base(fullPathToRootPackageDirectory, pathToNpm) {
             Arguments = NpmArgumentBuilder.GetNpmInstallArguments(
                 packageName,
                 versionRange,

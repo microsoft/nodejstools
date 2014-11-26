@@ -51,6 +51,9 @@
   <PropertyGroup Condition=" '$(Platform)' == 'x86' ">
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);NO_WINDOWS</DefineConstants>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
@@ -99,6 +102,9 @@
     <Compile Include="IRootPackage.cs" />
     <Compile Include="IScript.cs" />
     <Compile Include="IScripts.cs" />
+    <Compile Include="..\Nodejs\Nodejs.cs">
+      <Link>Nodejs.cs</Link>
+    </Compile>
     <Compile Include="NodeModuleBuilder.cs" />
     <Compile Include="NpmCatalogEmptyException.cs" />
     <Compile Include="NpmCommandCompletedEventArgs.cs" />

@@ -27,7 +27,7 @@ namespace Microsoft.NodejsTools.Npm {
     public static class NpmHelpers {
 
         internal static async Task<IEnumerable<string>> ExecuteNpmCommandAsync(
-            Redirector redirector, 
+            Redirector redirector,
             string pathToNpm,
             string executionDirectory,
             string[] arguments,
@@ -53,14 +53,14 @@ namespace Microsoft.NodejsTools.Npm {
                         redirector.WriteErrorLine(Resources.ErrCannotStartNpm);
                     }
                 } else {
-                    var handles = cancellationResetEvent != null ? new[] { whnd, cancellationResetEvent } : new [] { whnd };
+                    var handles = cancellationResetEvent != null ? new[] { whnd, cancellationResetEvent } : new[] { whnd };
                     var i = await Task.Run(() => WaitHandle.WaitAny(handles));
                     if (i == 0) {
                         Debug.Assert(process.ExitCode.HasValue, "npm process has not really exited");
                         process.Wait();
 
                         if (process.StandardOutputLines != null) {
-                            standardOutputLines = process.StandardOutputLines.ToList();                            
+                            standardOutputLines = process.StandardOutputLines.ToList();
                         }
                         if (redirector != null) {
                             redirector.WriteLine(string.Format(
@@ -75,7 +75,7 @@ namespace Microsoft.NodejsTools.Npm {
                             "\r\n===={0}====\r\n\r\n",
                             Resources.NpmCommandCancelled));
                         }
-                        
+
                         if (cancellationResetEvent != null) {
                             cancellationResetEvent.Reset();
                         }
@@ -86,56 +86,21 @@ namespace Microsoft.NodejsTools.Npm {
             return standardOutputLines;
         }
 
+        public static string GetPathToNpm() {
+            string executable = "npm.cmd";
+            var path = Nodejs.GetPathToNodeExecutable(executable);
 
-        public static string GetPathToNpm(
-            bool useFallbackIfNpmNotFound = true) 
-        {
-            string pathToNpm = null;
-            if (useFallbackIfNpmNotFound) {
-                string match = null;
-
-                using (var key = Registry.CurrentUser.OpenSubKey("Software\\Node.js")) {
-                    if (key != null) {
-                        match = key.GetValue("InstallPath") as string;
-                        if (Directory.Exists(match)) {
-                            match = Path.Combine(match, "npm.cmd");
-                            if (!File.Exists(match)) {
-                                match = null;
-                            }
-                        }
-                    }
-                }
-
-                if (null == match) {
-                    foreach (var potential in Environment.GetEnvironmentVariable("path").Split(Path.PathSeparator)) {
-                        var path = Path.Combine(potential, "npm.cmd");
-                        if (File.Exists(path)) {
-                            if (null == match ||
-                                path.Contains(
-                                    string.Format(
-                                        "{0}nodejs{1}",
-                                        Path.DirectorySeparatorChar,
-                                        Path.DirectorySeparatorChar))) {
-                                match = path;
-                            }
-                        }
-                    }
-                }
-
-                if (null != match) {
-                    pathToNpm = match;
-                }
-            }
-
-            if (null == pathToNpm || !File.Exists(pathToNpm)) {
+            if (string.IsNullOrEmpty(path)) {
                 throw new NpmNotFoundException(
                     string.Format(
-                        "Cannot find npm.cmd at '{0}' nor on your system PATH. Ensure Node.js is installed.",
-                        pathToNpm ?? "(null)"
+                        "Cannot find {0} in the registry, your path, or under " +
+                        "program files in the nodejs folder.  Ensure Node.js is installed.",
+                        executable
                     )
                 );
             }
-            return pathToNpm;
+
+            return path;
         }
     }
 }

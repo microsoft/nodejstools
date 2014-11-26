@@ -26,8 +26,7 @@ namespace Microsoft.NodejsTools.Npm {
                 fullPathToRootPackageDirectory,
                 cachePath,
                 showMissingDevOptionalSubPackages,
-                npmPathProvider,
-                useFallbackIfNpmNotFound);
+                npmPathProvider);
         }
     }
 }
