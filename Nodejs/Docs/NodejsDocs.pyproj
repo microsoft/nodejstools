@@ -53,6 +53,7 @@
     <Content Include="User\codeplex.map" />
     <Content Include="User\Debugging.md" />
     <Content Include="User\Images\npm-options-dialog.png" />
+    <Content Include="User\PostInstallation.md" />
     <Content Include="User\PreAndPostBuildActions.md" />
     <Content Include="User\Documentation.md" />
     <Content Include="User\Editor.md" />

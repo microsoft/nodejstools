@@ -4,7 +4,8 @@ Node.js Tools for Visual Studio Documentation
 Getting Started
 ---------------
 
-[wiki:"NTVS Installation" Installation]
+* [wiki:"NTVS Installation" Installation]
+	* [wiki:"Install Node.js and get started with NTVS" PostInstallation]
 
 Overview video: [https://www.youtube.com/watch?v=W_1_UqUDx2s](https://www.youtube.com/watch?v=W_1_UqUDx2s)
 
