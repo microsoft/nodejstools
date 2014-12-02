@@ -4097,7 +4097,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     }
 
                     newChild.SetIsLinkFile(true);
-                    newChild.ItemNode.SetMetadata(ProjectFileConstants.Link, CommonUtils.CreateFriendlyFilePath(ProjectFolder, newFileName));
+                    newChild.ItemNode.SetMetadata(ProjectFileConstants.Link, CommonUtils.CreateFriendlyFilePath(ProjectHome, newFileName));
                     n.AddChild(newChild);
 
                     DocumentManager.RenameDocument(site, file, file, n.ID);
