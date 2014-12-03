@@ -1,11 +1,11 @@
-Publish to Azure Web Site using Git
-===================================
+Publish to Microsoft Azure Web Site using Git
+=============================================
 
 Visual Studio 2013 has integrated Git support, so it's easy to deploy to Azure using Git, no command-line necessary.
 
 **Note**: Git integration is also available for Visual Studio 2012 as an [extension](http://visualstudiogallery.msdn.microsoft.com/abafc7d6-dcaa-40f4-8a5e-d6724bdb980c) on the Visual Studio gallery.
 
-From the [Windows Azure portal](http://manage.windowsazure.com), create a new Web Site.
+From the [Azure portal](http://manage.windowsazure.com), create a new Web Site.
 
 ![Create Web Site](Images/AzureGitWebSiteCreate.png)
 
@@ -23,7 +23,7 @@ The **URL** to the repository can be copy/pasted from the portal.
 
 In Visual Studio, create a new Node.js project or load an existing project which isn't associated with source control.
 
-**Note**: Git deployment to Azure does not require the use of the Windows Azure project types.  You may want to use them anyway, as you get a default web.config which you can configure. If you Git deploy a project without a web.config, Windows Azure will detect that it's a Node.js application and use an appropriate web.config for it.
+**Note**: Git deployment to Azure does not require the use of the Azure project types.  You may want to use them anyway, as you get a default web.config which you can configure. If you Git deploy a project without a web.config, Azure will detect that it's a Node.js application and use an appropriate web.config for it.
 
 Select **File**->**Add to Source Control**.
 

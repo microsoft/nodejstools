@@ -1,9 +1,9 @@
-Publish to Azure Web Site using Web Deploy
-==========================================
+Publish to Microsoft Azure Web Site using Web Deploy
+====================================================
 
-This section describes how to use the **Publish** command to deploy your Node.js project to a Windows Azure Web Site.
+This section describes how to use the **Publish** command to deploy your Node.js project to an Azure Web Site.
 
-To use this functionality, make sure to create a Windows Azure project. Windows Azure project templates have additional functionality for deploying to Windows Azure. There is a web.config file which configures Node.js for running under IIS Node.
+To use this functionality, make sure to create an Azure project. Azure project templates have additional functionality for deploying to Azure. There is a web.config file which configures Node.js for running under IIS Node.
 
 Deployment will include all the files in your project.  Files in the node_modules folder are included automatically, even if they are not part of the project.
 
@@ -15,13 +15,13 @@ This will bring up the publish profile which will allow you to specify the web s
 
 ![Selecting a publish target](Images/AzureWebSitePublishTarget.png)
 
-The easiest way to do so is to select the web site from the picker by choosing the first option on the dialog above, and logging in using your Windows Azure credentials. This will open a new dialog that will provide a list of all web sites associated with your Windows Azure subscription, as well as the ability to create a new site.
+The easiest way to do so is to select the web site from the picker by choosing the first option on the dialog above, and logging in using your Azure credentials. This will open a new dialog that will provide a list of all web sites associated with your Azure subscription, as well as the ability to create a new site.
 
 ![Selecting a web site](Images/AzureWebSitePublishSelectSite.png)
 
 Alternatively, if you have a downloaded publish profile for your web site, you can use "Import" to use the corresponding publish settings without logging in.
 
-If you plan on debugging your published project directly on Windows Azure servers by using Node.js remote debugging, you need to publish the site in "Debug" configuration. This setting is separate from the current active solution configuration, and always defaults to "Release". To change it, open the "Settings" tab, and use the "Configuration" combo box:
+If you plan on debugging your published project directly on Azure servers by using Node.js remote debugging, you need to publish the site in "Debug" configuration. This setting is separate from the current active solution configuration, and always defaults to "Release". To change it, open the "Settings" tab, and use the "Configuration" combo box:
 
 ![Changing the publish configuration](Images/AzureWebSitePublishConfig.png)
 

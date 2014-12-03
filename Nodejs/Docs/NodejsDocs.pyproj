@@ -52,6 +52,8 @@
     <Content Include="User\AzureWebSiteWebDeploy.md" />
     <Content Include="User\codeplex.map" />
     <Content Include="User\Debugging.md" />
+    <Content Include="User\Images\AzureCloudServiceProject.png" />
+    <Content Include="User\Images\AzureCloudServiceWizard.png" />
     <Content Include="User\Images\npm-options-dialog.png" />
     <Content Include="User\PostInstallation.md" />
     <Content Include="User\PreAndPostBuildActions.md" />
@@ -59,15 +61,10 @@
     <Content Include="User\Editor.md" />
     <Content Include="User\Images\AzureCloudServiceActivityLog.png" />
     <Content Include="User\Images\AzureCloudServiceBrowser.png" />
-    <Content Include="User\Images\AzureCloudServiceWebRoleConvertCommand.png" />
     <Content Include="User\Images\AzureCloudServiceCreate.png" />
     <Content Include="User\Images\AzureCloudServicePublishCommand.png" />
     <Content Include="User\Images\AzureCloudServicePublishSettings.png" />
     <Content Include="User\Images\AzureCloudServicePublishSignIn.png" />
-    <Content Include="User\Images\AzureCloudServiceWebRoleNewProject.png" />
-    <Content Include="User\Images\AzureCloudServiceWebRoleSolutionExplorer.png" />
-    <Content Include="User\Images\AzureCloudServiceWorkerRoleNewProject.png" />
-    <Content Include="User\Images\AzureCloudServiceWorkerRoleSolutionExplorer.png" />
     <Content Include="User\Images\AzureGitAddToSC.png" />
     <Content Include="User\Images\AzureGitAfterCommit.png" />
     <Content Include="User\Images\AzureGitChooseSC.png" />
