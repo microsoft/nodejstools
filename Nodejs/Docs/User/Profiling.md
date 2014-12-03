@@ -74,8 +74,7 @@ This is the Summary view you will see first and it will give you a standard time
 
 - You can immediately see the hottest path in your code
 - You can also see which functions take the most time
-- Note that functions that were re-
-- ed are marked with "recompiled"
+- Note that functions that were re-JITed are marked with "recompiled"
 
 
 A useful initial view is “Functions”.  Here we see the three spin functions displayed.  If the functions called other function, you'd see the Inclusive/Exclusive amounts displayed as well (but see warning below):
@@ -112,6 +111,34 @@ Another is to use a filter expression and choose particular fields and values to
 Finally, you can compare reports from different runs to see how your code change affected performance.  Select Compare Reports and specify the two perf files.  You can selected which Tables, Columns and set a Threshold to filter the display:
 
 ![](Images/prof-compare-result.png) 
+
+
+## Using an existing V8 log:
+
+In the NTVS profiling installation folder:
+
+```
+C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\Extensions\Microsoft\Node.js Tools for Visual Studio - Profiling\1.0
+```
+
+There's a command-line utility `Microsoft.NodejsTools.NodeLogConverter.exe` that is used internally by NTVS to convert a V8 log into a Visual Studio profiling report (.vspx) file.
+
+Usage: `[/jmc] <v8.log path> <output.vspx path> [<start time> <execution time>]`
+
+- /jmc enables just my code option
+
+- Start time is actually unused, so you can pass anything (zero) for that parameter
+
+- Execution time is a non-zero value, in CLR TimeSpan format: `[-][d.]hh:mm:ss[.fffffff]`
+
+You can use this utility to create a profiling report from an existing v8.log file, then drag & drop the .vspx file into Visual Studio to view the profiling report.
+
+Example:
+
+```
+node --prof server.js
+Microsoft.NodejsTools.NodeLogConverter v8.log report.vspx 0 00:01:30
+```
 
 ## Caution about Profiling and Optimization:
 There are two points to keep in mind when Profiling node/V8:
