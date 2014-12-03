@@ -40,13 +40,6 @@ namespace Microsoft.NodejsTools.Project {
             _propPage = page;
         }
 
-        public bool HasErrors {
-            get {
-                return !String.IsNullOrEmpty(_nodeExeErrorProvider.GetError(_nodejsPort)) ||
-                       !String.IsNullOrEmpty(_nodeExeErrorProvider.GetError(_nodeExePath));
-            }
-        }
-
         private void AddToolTips() {
             _tooltip.SetToolTip(_nodeExePath, SR.GetString(SR.NodeExePathToolTip));
             _tooltip.SetToolTip(_nodeExeArguments, SR.GetString(SR.NodeExeArgumentsToolTip));
@@ -164,7 +157,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private void NodeExePathChanged(object sender, EventArgs e) {
-            if (String.IsNullOrEmpty(_nodeExePath.Text) || File.Exists(_nodeExePath.Text)) {
+            if (String.IsNullOrEmpty(_nodeExePath.Text) || _nodeExePath.Text.Contains("$(") || File.Exists(_nodeExePath.Text)) {
                 _nodeExeErrorProvider.SetError(_nodeExePath, String.Empty);
             } else {
                 _nodeExeErrorProvider.SetError(_nodeExePath, SR.GetString(SR.NodeExePathNotFound));
@@ -196,7 +189,8 @@ namespace Microsoft.NodejsTools.Project {
         private void PortChanged(object sender, EventArgs e) {
             var textSender = (TextBox)sender;
 
-            if (textSender.Text.Any(ch => !Char.IsDigit(ch))) {
+            if (!textSender.Text.Contains("$(") && 
+                textSender.Text.Any(ch => !Char.IsDigit(ch))) {
                 _nodeExeErrorProvider.SetError(textSender, SR.GetString(SR.InvalidPortNumber));
             } else {
                 _nodeExeErrorProvider.SetError(textSender, String.Empty);
@@ -205,7 +199,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private void WorkingDirTextChanged(object sender, EventArgs e) {
-            if (_workingDir.Text.IndexOfAny(Path.GetInvalidPathChars()) != -1 || !Directory.Exists(_workingDir.Text)) {
+            if (!_workingDir.Text.Contains("$(") && !Directory.Exists(_workingDir.Text)) {
                 _nodeExeErrorProvider.SetError(_workingDir, SR.GetString(SR.WorkingDirInvalidOrMissing));
             } else {
                 _nodeExeErrorProvider.SetError(_workingDir, String.Empty);

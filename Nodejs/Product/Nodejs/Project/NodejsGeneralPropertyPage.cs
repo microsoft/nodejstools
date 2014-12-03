@@ -46,10 +46,6 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
         public override void Apply() {
-            if (_control.HasErrors) {
-                throw CheckoutException.Canceled;
-            }
-
             Project.SetProjectProperty(NodejsConstants.NodeExePath, _control.NodeExePath);
             Project.SetProjectProperty(NodejsConstants.NodeExeArguments, _control.NodeExeArguments);
             Project.SetProjectProperty(NodejsConstants.ScriptArguments, _control.ScriptArguments);
@@ -65,16 +61,18 @@ namespace Microsoft.NodejsTools.Project {
         public override void LoadSettings() {
             Loading = true;
             try {
-                _control.NodeExeArguments = Project.GetProjectProperty(NodejsConstants.NodeExeArguments);
-                _control.NodeExePath = Project.GetProjectProperty(NodejsConstants.NodeExePath);
-                _control.ScriptArguments = Project.GetProjectProperty(NodejsConstants.ScriptArguments);
-                _control.WorkingDirectory = Project.GetProjectProperty(CommonConstants.WorkingDirectory);
-                _control.LaunchUrl = Project.GetProjectProperty(NodejsConstants.LaunchUrl);
-                _control.NodejsPort = Project.GetProjectProperty(NodejsConstants.NodejsPort);
-                _control.DebuggerPort = Project.GetProjectProperty(NodejsConstants.DebuggerPort);
-                _control.Environment = Project.GetProjectProperty(NodejsConstants.Environment);
+                _control.NodeExeArguments = Project.GetUnevaluatedProperty(NodejsConstants.NodeExeArguments);
+                _control.NodeExePath = Project.GetUnevaluatedProperty(NodejsConstants.NodeExePath);
+                _control.ScriptArguments = Project.GetUnevaluatedProperty(NodejsConstants.ScriptArguments);
+                _control.WorkingDirectory = Project.GetUnevaluatedProperty(CommonConstants.WorkingDirectory);
+                _control.LaunchUrl = Project.GetUnevaluatedProperty(NodejsConstants.LaunchUrl);
+                _control.NodejsPort = Project.GetUnevaluatedProperty(NodejsConstants.NodejsPort);
+                _control.DebuggerPort = Project.GetUnevaluatedProperty(NodejsConstants.DebuggerPort);
+                _control.Environment = Project.GetUnevaluatedProperty(NodejsConstants.Environment);
+                
+                // Attempt to parse the boolean.  If we fail, assume it is true.
                 bool startWebBrowser;
-                if (!Boolean.TryParse(Project.GetProjectProperty(NodejsConstants.StartWebBrowser), out startWebBrowser)) {
+                if (!Boolean.TryParse(Project.GetUnevaluatedProperty(NodejsConstants.StartWebBrowser), out startWebBrowser)) {
                     startWebBrowser = true;
                 }
                 _control.StartWebBrowser = startWebBrowser;
