@@ -15,7 +15,7 @@
     <VsTarget Condition="'$(VsTarget)' == ''">11.0</VsTarget>
     <DefineConstants>
       $(DefineConstants);
-      ProductSuffix=Profilling
+      ProductSuffix=Profiling
     </DefineConstants>
   </PropertyGroup>
   <ItemGroup>
