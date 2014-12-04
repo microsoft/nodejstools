@@ -56,8 +56,6 @@ namespace Microsoft.NodejsTools.Analysis {
             _filePath = filePath;
             _cookie = cookie;
             _moduleRecord = new ModuleEnvironmentRecord(this);
-
-            _unit = new AnalysisUnit(_tree, EnvironmentRecord);
             _isBuiltin = isBuiltin;
         }
 
@@ -331,7 +329,6 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-
         #region IProjectEntry2 Members
 
         public void RemovedFromProject() {
@@ -339,10 +336,6 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         #endregion
-
-        internal void Enqueue() {
-            _unit.Enqueue();
-        }
 
         internal bool IsVisible(ProjectEntry projectEntry) {
             return projectEntry == this || (_visibleEntries != null && _visibleEntries.Contains(projectEntry));

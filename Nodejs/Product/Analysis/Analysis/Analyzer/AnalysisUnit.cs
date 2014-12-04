@@ -66,7 +66,7 @@ namespace Microsoft.NodejsTools.Analysis {
             _env = environment;
             _id = Interlocked.Increment(ref _idCount);
 
-            if (environment != null) {
+            if (environment != null && !ForEval) {
                 ProjectEntry.Analyzer.Log.NewUnit(this);
             }
         }
