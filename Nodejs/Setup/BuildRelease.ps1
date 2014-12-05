@@ -380,7 +380,7 @@ if (-not $target_versions) {
     Throw "No supported versions of Visual Studio installed."
 }
 
-if ($skipdebug -or $release) {
+if ($skipdebug) {
     $target_configs = ("Release")
 } else {
     $target_configs = ("Debug", "Release")
