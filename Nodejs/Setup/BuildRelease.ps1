@@ -521,8 +521,8 @@ try {
                     Write-Output "Skipping symbol submission for $($i.VSName) because the build failed"
                     continue
                 }
-                submit_symbols "$project_name$spacename" "$buildnumber $($i.VSName)" "binaries" $i.signed_bindir $symbol_contacts
-                submit_symbols "$project_name$spacename" "$buildnumber $($i.VSName)" "symbols" $i.symboldir $symbol_contacts
+                submit_symbols "$project_name$spacename" "$buildnumber $($i.VSName) $config" "binaries" $i.signed_bindir $symbol_contacts
+                submit_symbols "$project_name$spacename" "$buildnumber $($i.VSName) $config" "symbols" $i.symboldir $symbol_contacts
 
                 $target_msbuild_options = msbuild-options $i
                 msbuild $global_msbuild_options $target_msbuild_options `

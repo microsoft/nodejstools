@@ -1,8 +1,10 @@
+$symbolJobs = @()
+
 function submit_symbols {
     param($buildname, $buildid, $filetype, $sourcedir, $contacts)
     
-    Write-Debug "*** Symbol Submission Text ***
-    BuildId=$buildid $filetype
+    $request = `
+    "BuildId=$buildid $filetype
     BuildLabPhone=7058786
     BuildRemark=$buildname
     ContactPeople=$contacts
@@ -11,6 +13,15 @@ function submit_symbols {
     Recursive=yes
     StatusMail=$contacts
     UserName=$env:username"
+
+    Write-Debug "*** Symbol Submission Text ***
+$request"
+
+    $ssiFile = "request_$($buildid)_$($filetype).txt"
+    if($script:symbolJobs.Contains($ssiFile)) {
+         throw "Symbol job already exists: $ssiFile"
+    }
+    $script:symbolJobs += $ssiFile
 }
 
 function _find_sdk_tool {
