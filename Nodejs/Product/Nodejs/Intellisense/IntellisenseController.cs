@@ -84,11 +84,11 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         public void ConnectSubjectBuffer(ITextBuffer subjectBuffer) {
-            _textView.GetAnalyzer().AddBuffer(_textView, subjectBuffer);
+            subjectBuffer.GetAnalyzer().AddBuffer(subjectBuffer);
         }
 
         public void DisconnectSubjectBuffer(ITextBuffer subjectBuffer) {
-            _textView.GetAnalyzer().RemoveBuffer(_textView, subjectBuffer);
+            subjectBuffer.GetAnalyzer().RemoveBuffer(subjectBuffer);
         }
 
         /// <summary>

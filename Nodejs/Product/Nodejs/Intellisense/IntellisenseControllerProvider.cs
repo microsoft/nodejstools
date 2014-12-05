@@ -50,25 +50,10 @@ namespace Microsoft.NodejsTools.Intellisense {
                 controller = new IntellisenseController(this, textView);
             }
 
-            var analyzer = textView.GetAnalyzer();
-            if (analyzer != null) {
-                analyzer.MonitorTextView(textView, subjectBuffers);
-                textView.Closed += TextView_Closed;
+            foreach (var buffer in subjectBuffers) {
+                buffer.GetAnalyzer().AddBuffer(buffer);
             }
             return controller;
-        }
-
-        private void TextView_Closed(object sender, EventArgs e) {
-            var textView = sender as ITextView;
-            if (textView == null) {
-                return;
-            }
-
-            textView.Closed -= TextView_Closed;
-            var analyzer = textView.GetAnalyzer();
-            if (analyzer != null) {
-                analyzer.StopMonitoringTextView(textView);
-            }
         }
 
         internal static IntellisenseController GetOrCreateController(IComponentModel model, ITextView textView) {

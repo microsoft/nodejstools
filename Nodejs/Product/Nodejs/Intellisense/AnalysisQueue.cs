@@ -40,31 +40,24 @@ namespace Microsoft.NodejsTools.Intellisense {
             private CancellationTokenSource _cancel;
             private bool _isAnalyzing;
             private int _analysisPending;
-            private static readonly TimeSpan _SaveAnalysisTime = TimeSpan.FromMinutes(15);
+            private static readonly TimeSpan _SaveAnalysisTime = TimeSpan.FromSeconds(5);
 
             private const int PriorityCount = (int)AnalysisPriority.High + 1;
 
-            internal AnalysisQueue(VsProjectAnalyzer analyzer, AnalysisSerializer serializer = null, Stream stream = null) {
+            internal AnalysisQueue(VsProjectAnalyzer analyzer) {
                 _workEvent = new AutoResetEvent(false);
                 _cancel = new CancellationTokenSource();
                 _analyzer = analyzer;
 
-                if (serializer != null && stream != null) {
-                    // must be kept in sync with Serialize
-                    _queue = (List<IAnalyzable>[])serializer.Deserialize(stream);
-                    _enqueuedGroups = (HashSet<IGroupableAnalysisProject>)serializer.Deserialize(stream);
-                    // we're using the cached analysis, don't re-save for another 15 minutes
-                    _lastSave = DateTime.Now;
-                } else {
-                    _queue = new List<IAnalyzable>[PriorityCount];
-                    for (int i = 0; i < PriorityCount; i++) {
-                        _queue[i] = new List<IAnalyzable>();
-                    }
-                    _enqueuedGroups = new HashSet<IGroupableAnalysisProject>();
-                    // save the analysis once it's ready, but give us a little time to be
-                    // initialized and start processing stuff...
-                    _lastSave = DateTime.Now - _SaveAnalysisTime + TimeSpan.FromSeconds(10);
+                // save the analysis once it's ready, but give us a little time to be
+                // initialized and start processing stuff...
+                _lastSave = DateTime.Now - _SaveAnalysisTime + TimeSpan.FromSeconds(10);
+
+                _queue = new List<IAnalyzable>[PriorityCount];
+                for (int i = 0; i < PriorityCount; i++) {
+                    _queue[i] = new List<IAnalyzable>();
                 }
+                _enqueuedGroups = new HashSet<IGroupableAnalysisProject>();
 
                 _workThread = new Thread(Worker);
                 _workThread.Name = "Node.js Analysis Queue";
@@ -76,18 +69,6 @@ namespace Microsoft.NodejsTools.Intellisense {
                     _workThread.Start(threadStarted);
                     threadStarted.WaitOne();
                 }
-
-                foreach (var priority in _queue) {
-                    if (priority.Count > 0) {
-                        _workEvent.Set();
-                    }
-                }
-            }
-
-            public void Serialize(AnalysisSerializer serializer, Stream stream) {
-                // must be kept in sync with constructor deserialization
-                serializer.Serialize(stream, _queue);
-                serializer.Serialize(stream, _enqueuedGroups);
             }
 
             public void Enqueue(IAnalyzable item, AnalysisPriority priority) {

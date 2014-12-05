@@ -1821,9 +1821,9 @@ net.connect('', function(c) {
 
             AssertUtil.ContainsAtLeast(
                 analysis.GetMembersByIndex("req", code.IndexOf("// 1")).Select(x => x.Completion), 
-                "abort",
-                "setTimeout",
-                "setNoDelay"
+                "socket",
+                "statusCode",
+                "url"
             );
             AssertUtil.ContainsAtLeast(
                 analysis.GetMembersByIndex("res", code.IndexOf("// 1")).Select(x => x.Completion),

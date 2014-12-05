@@ -31,7 +31,7 @@ namespace Microsoft.NodejsTools.Analysis {
                     { "createServer", 
                        new CallbackFunctionSpecializer(
                            0,
-                           new CallbackArgInfo("http", "ClientRequest"),
+                           new CallbackArgInfo("http", "IncomingMessage"),
                            new CallbackArgInfo("http", "ServerResponse")
                         ) 
                     },

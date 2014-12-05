@@ -29,6 +29,7 @@ using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudioTools.Project.Automation;
 using MSBuild = Microsoft.Build.Evaluation;
+using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
 
 namespace Microsoft.NodejsTools.Project {
     class NodejsProjectNode : CommonProjectNode, VsWebSite.VSWebSite, INodePackageModulesCommands {
@@ -190,7 +191,19 @@ namespace Microsoft.NodejsTools.Project {
                 }
             }
 
-            return base.DisableCmdInCurrentMode(commandGroup, command);
+            if (commandGroup == VSConstants.GUID_VSStandardCommandSet97) {
+                if (this.IsCurrentStateASuppressCommandsMode()) {
+                    switch ((VsCommands)command) {
+                        default:
+                            break;
+                        case VsCommands.UnloadProject:
+                            return true;
+                    }
+                }
+            }
+
+            // don't defer to base class, Node allows edits while debugging (adding new files, etc...)
+            return false;
         }
 
         public override string[] CodeFileExtensions {

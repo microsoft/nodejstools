@@ -63,12 +63,13 @@ namespace Microsoft.NodejsTools.Intellisense {
     /// </summary>
     sealed partial class VsProjectAnalyzer : IDisposable {
         private AnalysisQueue _analysisQueue;
-        private readonly Dictionary<ITextView, BufferParser> _viewBufferParserMap = new Dictionary<ITextView, BufferParser>();
+        private readonly HashSet<BufferParser> _viewBufferParserMap = new HashSet<BufferParser>();
         private readonly ConcurrentDictionary<string, ProjectItem> _projectFiles;
         private JsAnalyzer _jsAnalyzer;
         private readonly bool _implicitProject;
         private readonly AutoResetEvent _queueActivityEvent = new AutoResetEvent(false);
         private readonly CodeSettings _codeSettings = new CodeSettings();
+        private readonly Dictionary<IReplEvaluator, BufferParser> _replParsers = new Dictionary<IReplEvaluator, BufferParser>();
 
         /// <summary>
         /// This is used for storing cached analysis and is not valid for locating source files.
@@ -194,116 +195,93 @@ namespace Microsoft.NodejsTools.Intellisense {
         public EventHandler<FileEventArgs> ErrorAdded;
         public EventHandler<FileEventArgs> ErrorRemoved;
 
-        /// <summary>
-        /// Starts monitoring a buffer for changes so we will re-parse the buffer to update the analysis
-        /// as the text changes.
-        /// </summary>
-        public void MonitorTextView(ITextView textView, IList<ITextBuffer> buffers) {
-            Utilities.ArgumentNotNull("buffers", buffers);
-            if (buffers.Count == 0) {
-                throw new ArgumentException("must provide at least one buffer");
-            }
-
+        public void AddBuffer(ITextBuffer buffer) {
             if (!_fullyLoaded) {
                 lock (_loadingDeltas) {
                     if (!_fullyLoaded) {
-                        _loadingDeltas.Add(() => MonitorTextView(textView, buffers));
+                        _loadingDeltas.Add(() => AddBuffer(buffer));
                         return;
                     }
                 }
             }
 
-            var buffer = buffers.First();
+            IReplEvaluator replEval;
+            if (buffer.Properties.TryGetProperty<IReplEvaluator>(typeof(IReplEvaluator), out replEval)) {
+                BufferParser replParser;
+                if (_replParsers.TryGetValue(replEval, out replParser)) {
+                    replParser.AddBuffer(buffer);
+                    return;
+                }
+            }
 
             IProjectEntry projEntry = GetOrCreateProjectEntry(
                 buffer,
                 new SnapshotCookie(buffer.CurrentSnapshot)
             );
 
-            ConnectErrorList(projEntry, buffers.First());
+            ConnectErrorList(projEntry, buffer);
 
             // kick off initial processing on the buffer
-            BufferParser bufferParser;
+            BufferParser bufferParser = EnqueueBuffer(projEntry, buffer);
             lock (_viewBufferParserMap) {
-                bufferParser = EnqueueBuffer(projEntry, buffer);
-
-                _viewBufferParserMap[textView] = bufferParser;
+                _viewBufferParserMap.Add(bufferParser);
             }
 
-            for (int i = 1; i < buffers.Count; i++) {
-                bufferParser.AddBuffer(buffers[i]);
+            if (replEval != null) {
+                _replParsers[replEval] = bufferParser;
             }
         }
 
-        public void StopMonitoringTextView(ITextView textView) {
+        public void RemoveBuffer(ITextBuffer buffer) {
             if (!_fullyLoaded) {
                 lock (_loadingDeltas) {
                     if (!_fullyLoaded) {
-                        _loadingDeltas.Add(() => StopMonitoringTextView(textView));
+                        _loadingDeltas.Add(() => RemoveBuffer(buffer));
                         return;
                     }
                 }
             }
 
+            IReplEvaluator replEval;
+            if (buffer.Properties.TryGetProperty<IReplEvaluator>(typeof(IReplEvaluator), out replEval)) {
+                BufferParser replParser;
+                if (_replParsers.TryGetValue(replEval, out replParser)) {
+                    replParser.RemoveBuffer(buffer);
+                    if (replParser.Buffers.Length == 0) {
+                        ViewDetached(buffer, replParser);
+                    }
+
+                    return;
+                }
+            }
+
             BufferParser bufferParser;
-            if (!_viewBufferParserMap.TryGetValue(textView, out bufferParser)) {
+            if (!buffer.Properties.TryGetProperty<BufferParser>(typeof(BufferParser), out bufferParser)) { 
                 return;
             }
 
             if (--bufferParser.AttachedViews == 0) {
-                bufferParser.StopMonitoring();
-                lock (_viewBufferParserMap) {
-                    _viewBufferParserMap.Remove(textView);
-                }
+                ViewDetached(buffer, bufferParser);
+            }
+        }
+
+        private void ViewDetached(ITextBuffer buffer, BufferParser bufferParser) {
+            bufferParser.RemoveBuffer(buffer);
+            lock (_viewBufferParserMap) {
+                _viewBufferParserMap.Remove(bufferParser);
+            }
 
 #if FALSE
                 _unresolvedSquiggles.StopListening(bufferParser._currentProjEntry as IPythonProjectEntry);
 #endif
 
-                if (TaskProvider.IsValueCreated) {
-                    TaskProvider.Value.ClearErrorSource(bufferParser._currentProjEntry, ParserTaskMoniker);
+            if (TaskProvider.IsValueCreated) {
+                TaskProvider.Value.ClearErrorSource(bufferParser._currentProjEntry, ParserTaskMoniker);
 
-                    if (_implicitProject) {
-                        UnloadFile(bufferParser._currentProjEntry);
-                    }
+                if (_implicitProject) {
+                    UnloadFile(bufferParser._currentProjEntry);
                 }
             }
-        }
-
-        public void AddBuffer(ITextView textView, ITextBuffer buffer) {
-            if (!_fullyLoaded) {
-                lock (_loadingDeltas) {
-                    if (!_fullyLoaded) {
-                        _loadingDeltas.Add(() => AddBuffer(textView, buffer));
-                        return;
-                    }
-                }
-            }
-
-            BufferParser bufferParser;
-            if (!_viewBufferParserMap.TryGetValue(textView, out bufferParser)) {
-                return;
-            }
-
-            bufferParser.AddBuffer(buffer);
-        }
-
-        public void RemoveBuffer(ITextView textView, ITextBuffer buffer) {
-            if (!_fullyLoaded) {
-                lock (_loadingDeltas) {
-                    if (!_fullyLoaded) {
-                        _loadingDeltas.Add(() => RemoveBuffer(textView, buffer));
-                        return;
-                    }
-                }
-            }
-
-            BufferParser bufferParser;
-            if (!_viewBufferParserMap.TryGetValue(textView, out bufferParser)) {
-                return;
-            }
-
-            bufferParser.RemoveBuffer(buffer);
         }
 
         public void AnalyzeFile(string path, bool reportErrors = true) {
@@ -701,7 +679,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 // copy the Keys here as ReAnalyzeTextBuffers can mutuate the dictionary
                 BufferParser[] bufferParsers;
                 lock (oldAnalyzer._viewBufferParserMap) {
-                    bufferParsers = oldAnalyzer._viewBufferParserMap.Values.ToArray();
+                    bufferParsers = oldAnalyzer._viewBufferParserMap.ToArray();
                 }
 
                 foreach (var bufferParser in bufferParsers) {
@@ -1366,7 +1344,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                                     var analyzer = (JsAnalyzer)serializer.Deserialize(stream);
                                     AnalysisQueue queue;
                                     if (analyzer.Limits.Equals(limits)) {
-                                        queue = new AnalysisQueue(this, serializer, stream);
+                                        queue = new AnalysisQueue(this);
                                         foreach (var entry in analyzer.AllModules) {
                                             _projectFiles[entry.FilePath] = new ProjectItem(entry);
                                         }
@@ -1468,7 +1446,6 @@ namespace Microsoft.NodejsTools.Intellisense {
                         try {
                             var serializer = new AnalysisSerializer();
                             serializer.Serialize(fs, _jsAnalyzer);
-                            _analysisQueue.Serialize(serializer, fs);
                         } catch (Exception e) {
                             Debug.Fail("Failed to save analysis " + e);
                             failed = true;
