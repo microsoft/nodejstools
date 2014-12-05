@@ -54,6 +54,11 @@
     <Content Include="User\Debugging.md" />
     <Content Include="User\Images\AzureCloudServiceProject.png" />
     <Content Include="User\Images\AzureCloudServiceWizard.png" />
+    <Content Include="User\Images\InstallationBreakpoint.png" />
+    <Content Include="User\Images\InstallationBrowser.png" />
+    <Content Include="User\Images\InstallationDebugger.png" />
+    <Content Include="User\Images\InstallationNewProject.png" />
+    <Content Include="User\Images\InstallationNewProjectMenu.png" />
     <Content Include="User\Images\npm-options-dialog.png" />
     <Content Include="User\PostInstallation.md" />
     <Content Include="User\PreAndPostBuildActions.md" />

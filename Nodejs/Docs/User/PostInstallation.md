@@ -27,11 +27,37 @@ To learn more, see the documentation for [wiki:"Azure Deployment" AzureDeploymen
 
 Let's make sure everything installed OK
 ---------------------------------------
-We can do this validation using the Node.js Interactive Window.  The interactive window is part of NTVS and found at View->Other Windows->Node.js Interactive Window.
+We'll create a new Node.js project and verify that the debugger works.
+
+To create a project, select File->New->Project. If you are using Visual Studio Express for Web, it's File->New Project.
+
+![New Project](Images\InstallationNewProjectMenu.png)
+
+There are several project templates to choose from, including creating a project for your existing code.
+
+For now, we'll use the simplest web server template, which is Blank Node.js Web Application. Enter a project name and location and click OK. Note that for most Node.js projects, you will want to use a location with a short path to avoid MAX_PATH issues.
+
+![New Project](Images\InstallationNewProject.png)
+
+The project will be created, and server.js will open in the editor. Click in the margin (or press F9) to insert a breakpoint in the createServer callback.
+
+![Breakpoint](Images\InstallationBreakpoint.png)
+
+From the Debug menu, select Start Debugging (or press F5).
+
+A web browser will launch, and execution will break in the debugger. You can inspect variables in the Locals and Watch window, navigate the call stack, etc.
+
+![Debugger](Images\InstallationDebugger.png)
+
+Press F5 to continue, and you'll see the page rendered in the browser.
+
+![Browser](Images\InstallationBrowser.png)
+
+Now let's try the Node.js Interactive Window, which is found at View->Other Windows->Node.js Interactive Window.
 
 ![Node.js Interactive Window](Images\InstallationREPLCommand.png)
 
-Now that the interactive window is open, let's type some JavaScript. The interactive window supports everything you can do in code including require(). I'll keep it simple showing a variable and the location of the Node.js interpreter.
+The interactive window supports everything you can do in code including require(). The code in the screenshot defines a variable and displays the location of the Node.js interpreter.
 
 ![Node.js Interactive Window](Images\InstallationREPL.png)
 
