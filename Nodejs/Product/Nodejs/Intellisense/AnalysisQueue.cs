@@ -40,7 +40,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             private CancellationTokenSource _cancel;
             private bool _isAnalyzing;
             private int _analysisPending;
-            private static readonly TimeSpan _SaveAnalysisTime = TimeSpan.FromSeconds(5);
+            private static readonly TimeSpan _SaveAnalysisTime = TimeSpan.FromMinutes(15);
 
             private const int PriorityCount = (int)AnalysisPriority.High + 1;
 

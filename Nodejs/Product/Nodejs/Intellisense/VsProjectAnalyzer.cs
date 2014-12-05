@@ -63,7 +63,7 @@ namespace Microsoft.NodejsTools.Intellisense {
     /// </summary>
     sealed partial class VsProjectAnalyzer : IDisposable {
         private AnalysisQueue _analysisQueue;
-        private readonly HashSet<BufferParser> _viewBufferParserMap = new HashSet<BufferParser>();
+        private readonly HashSet<BufferParser> _activeBufferParsers = new HashSet<BufferParser>();
         private readonly ConcurrentDictionary<string, ProjectItem> _projectFiles;
         private JsAnalyzer _jsAnalyzer;
         private readonly bool _implicitProject;
@@ -223,8 +223,8 @@ namespace Microsoft.NodejsTools.Intellisense {
 
             // kick off initial processing on the buffer
             BufferParser bufferParser = EnqueueBuffer(projEntry, buffer);
-            lock (_viewBufferParserMap) {
-                _viewBufferParserMap.Add(bufferParser);
+            lock (_activeBufferParsers) {
+                _activeBufferParsers.Add(bufferParser);
             }
 
             if (replEval != null) {
@@ -267,8 +267,8 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         private void ViewDetached(ITextBuffer buffer, BufferParser bufferParser) {
             bufferParser.RemoveBuffer(buffer);
-            lock (_viewBufferParserMap) {
-                _viewBufferParserMap.Remove(bufferParser);
+            lock (_activeBufferParsers) {
+                _activeBufferParsers.Remove(bufferParser);
             }
 
 #if FALSE
@@ -675,11 +675,11 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         public void SwitchAnalyzers(VsProjectAnalyzer oldAnalyzer) {
-            lock (_viewBufferParserMap) {
+            lock (_activeBufferParsers) {
                 // copy the Keys here as ReAnalyzeTextBuffers can mutuate the dictionary
                 BufferParser[] bufferParsers;
-                lock (oldAnalyzer._viewBufferParserMap) {
-                    bufferParsers = oldAnalyzer._viewBufferParserMap.ToArray();
+                lock (oldAnalyzer._activeBufferParsers) {
+                    bufferParsers = oldAnalyzer._activeBufferParsers.ToArray();
                 }
 
                 foreach (var bufferParser in bufferParsers) {
