@@ -945,33 +945,6 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
         }
 
-        private ITextSnapshot GetOpenSnapshot(IProjectEntry entry) {
-            if (entry == null) {
-                return null;
-            }
-
-            IVsUIHierarchy hierarchy;
-            uint itemId;
-            IVsWindowFrame frame;
-            if (VsShellUtilities.IsDocumentOpen(
-                NodejsPackage.Instance,
-                entry.FilePath,
-                Guid.Empty,
-                out hierarchy,
-                out itemId,
-                out frame
-            )) {
-                var view = VsShellUtilities.GetTextView(frame);
-                if (view != null) {
-                    var factService = NodejsPackage.ComponentModel.GetService<IVsEditorAdaptersFactoryService>();
-                    var wpfView = factService.GetWpfTextView(view);
-                    return wpfView.TextBuffer.CurrentSnapshot;
-                }
-            }
-
-            return null;
-        }
-
         private void ParseFile(IProjectEntry entry, string filename, TextReader reader, IAnalysisCookie cookie) {
             IJsProjectEntry jsEntry;
             IExternalProjectEntry externalEntry;
