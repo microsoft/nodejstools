@@ -14,6 +14,7 @@
 
 using System;
 using System.IO;
+using System.Threading;
 
 namespace Microsoft.NodejsTools.Npm {
     public class FilePackageJsonSource : IPackageJsonSource {
@@ -22,14 +23,27 @@ namespace Microsoft.NodejsTools.Npm {
 
         public FilePackageJsonSource(string fullPathToFile) {
             if (File.Exists(fullPathToFile)) {
-                try {
-                    using (var fin = new FileStream(fullPathToFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
+                int retryInterval = 500;
+                int attempts = 5;
+
+                // populate _source with retries for recoverable errors.
+                while (--attempts >= 0) {
+                    try {
+                        using (var fin = new FileStream(fullPathToFile, FileMode.Open, FileAccess.Read, FileShare.Read))
                         using (var reader = new StreamReader(fin)) {
                             _source = new ReaderPackageJsonSource(reader);
+                            break;
                         }
+                    } catch (PackageJsonException pje) {
+                        WrapExceptionAndRethrow(fullPathToFile, pje);
+                    } catch (IOException) {
+                        if (attempts <= 0) { throw; }
+                    } catch (UnauthorizedAccessException) {
+                        if (attempts <= 0) { throw; }
                     }
-                } catch (PackageJsonException pje) {
-                    WrapExceptionAndRethrow(fullPathToFile, pje);
+
+                    Thread.Sleep(retryInterval);
+                    retryInterval *= 2; // exponential backoff
                 }
             }
         }
