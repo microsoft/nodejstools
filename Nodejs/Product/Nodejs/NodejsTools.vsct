@@ -129,11 +129,20 @@
       <Button guid="guidNodeToolsCmdSet" id="cmdidReplWindow" priority="0x7f00" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
         <Icon guid="guidReplImage" id="1"/>
-        <CommandFlag>DefaultInvisible</CommandFlag>
-        <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>Node.js Interactive Window</CommandName>
           <ButtonText>Node.js Interactive Window</ButtonText>
+        </Strings>
+      </Button>
+      
+      <Button guid="guidNodeToolsCmdSet" id="cmdidOpenReplWindow" priority="0x0600" type="Button">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJECT_BUILD"/>
+        <Icon guid="guidReplImage" id="1"/>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <CommandName>Open Node.js Interactive Window</CommandName>
+          <ButtonText>Open Node.js Interactive Window</ButtonText>
         </Strings>
       </Button>
 
@@ -288,13 +297,8 @@
     <CommandPlacement guid="guidNodeToolsCmdSet" id="CodeFileGroup" priority="0x600">
       <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_WEBITEMNODE"/>
     </CommandPlacement>
-
     <CommandPlacement guid="guidNodeToolsCmdSet" id="cmdidReplWindow" priority="0x102">
       <Parent guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup"/>
-    </CommandPlacement>
-
-    <CommandPlacement guid="guidNodeToolsCmdSet" id="cmdidReplWindow" priority="0x102">
-      <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJECT_EXPLORE"/>
     </CommandPlacement>
   </CommandPlacements>
 
@@ -309,7 +313,8 @@
 
     <!-- This is our command set GUID and associated commands -->
     <GuidSymbol name="guidNodeToolsCmdSet" value="{695e37e2-c6df-4e0a-8833-f688e4c65f1f}">
-      <IDSymbol name="cmdidReplWindow" value="0x0201" />
+      <IDSymbol name="cmdidReplWindow" value="0x200" />
+      <IDSymbol name="cmdidOpenReplWindow" value="0x201" />
       <IDSymbol name="cmdidOpenRemoteDebugProxyFolder" value="0x0202" />
       <IDSymbol name="cmdidSetAsNodejsStartupFile" value="0x0203" />
       <IDSymbol name="cmdidSurveyNews" value ="0x0204" />

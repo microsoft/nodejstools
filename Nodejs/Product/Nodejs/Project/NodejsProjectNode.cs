@@ -816,7 +816,8 @@ namespace Microsoft.NodejsTools.Project {
         internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result) {
             if (cmdGroup == Guids.NodejsCmdSet) {
                 switch (cmd) {
-                    case PkgCmdId.cmdidReplWindow:
+                    case PkgCmdId.cmdidOpenReplWindow:
+                        result = QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
                         return VSConstants.S_OK;
                 }
             }
@@ -841,7 +842,7 @@ namespace Microsoft.NodejsTools.Project {
         internal override int ExecCommandOnNode(Guid cmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
             if (cmdGroup == Guids.NodejsCmdSet) {
                 switch (cmd) {
-                    case PkgCmdId.cmdidReplWindow:
+                    case PkgCmdId.cmdidOpenReplWindow:
                         NodejsPackage.Instance.OpenReplWindow();
                         return VSConstants.S_OK;
                 }
