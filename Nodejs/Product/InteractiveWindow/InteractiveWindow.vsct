@@ -23,7 +23,8 @@
 
     <KeyBindings>
         <KeyBinding guid="guidReplWindowCmdSet" id="cmdidSmartExecute" key1="VK_RETURN" mod1="C" editor="guidReplWindow" />
-        <KeyBinding guid="guidReplWindowCmdSet" id="cmdidBreakRepl" key1="VK_CANCEL" mod1="C" editor="guidReplWindow" />
+        <!-- cmdidBreakRepl should not be visible until we implement command cancellation. https://nodejstools.codeplex.com/workitem/1609 -->
+        <!--<KeyBinding guid="guidReplWindowCmdSet" id="cmdidBreakRepl" key1="VK_CANCEL" mod1="C" editor="guidReplWindow" />-->
         <KeyBinding guid="guidReplWindowCmdSet" id="cmdidReplHistoryNext"  key1="VK_DOWN" mod1="Alt" editor="guidReplWindow" />
         <KeyBinding guid="guidReplWindowCmdSet" id="cmdidReplHistoryPrevious" key1="VK_UP" mod1="Alt" editor="guidReplWindow" />
         <KeyBinding guid="guidReplWindowCmdSet" id="cmdidBreakLine" key1="VK_RETURN" mod1="S" editor="guidReplWindow" />
@@ -103,7 +104,7 @@
               <CommandFlag>DynamicVisibility</CommandFlag>
           If you do not want an image next to your command, remove the Icon node or set it to <Icon guid="guidOfficeIcon" id="msotcidNoIcon" /> -->
 
-            <Button guid="guidReplWindowCmdSet" id="cmdidBreakRepl" priority="0x0300" type="Button">
+            <!--<Button guid="guidReplWindowCmdSet" id="cmdidBreakRepl" priority="0x0300" type="Button">
               <Parent guid="guidReplWindowCmdSet" id="ConsoleMenuGroup"/>
               <Icon guid="guidReplToolbarImages" id="bmpCancelEval" />
               <CommandFlag>DynamicVisibility</CommandFlag>
@@ -112,7 +113,7 @@
                     <CommandName>cmdidBreakRepl</CommandName>
                     <ButtonText>Cancel Execution</ButtonText>
                 </Strings>
-            </Button>
+            </Button>-->
 
             <Button guid="guidReplWindowCmdSet" id="cmdidResetRepl" priority="0x0300" type="Button">
                 <Parent guid="guidReplWindowCmdSet" id="ConsoleMenuGroup"/>
@@ -213,14 +214,14 @@
                 </Strings>
             </Button>
 
-            <Button guid="guidReplWindowCmdSet" id="cmdidBreakRepl" priority="0x0300" type="Button">
+            <!--<Button guid="guidReplWindowCmdSet" id="cmdidBreakRepl" priority="0x0300" type="Button">
                 <Parent guid="guidReplWindowCmdSet" id="replToolbarGroup"/>
                 <Icon guid="guidReplToolbarImages" id="bmpCancelEval" />
                 <Strings>
                     <CommandName>cmdidBreakRepl</CommandName>
                     <ButtonText>Cancel Execution</ButtonText>
                 </Strings>
-            </Button>
+            </Button>-->
         </Buttons>
 
         <Combos>
