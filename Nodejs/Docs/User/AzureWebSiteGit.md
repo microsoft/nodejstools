@@ -1,15 +1,15 @@
-Publish to Microsoft Azure Web Site using Git
-=============================================
+Publish to Microsoft Azure Website using Git
+============================================
 
 Visual Studio 2013 has integrated Git support, so it's easy to deploy to Azure using Git, no command-line necessary.
 
 **Note**: Git integration is also available for Visual Studio 2012 as an [extension](http://visualstudiogallery.msdn.microsoft.com/abafc7d6-dcaa-40f4-8a5e-d6724bdb980c) on the Visual Studio gallery.
 
-From the [Azure portal](http://manage.windowsazure.com), create a new Web Site.
+From the [Azure portal](http://manage.windowsazure.com), create a new Website.
 
-![Create Web Site](Images/AzureGitWebSiteCreate.png)
+![Create Website](Images/AzureGitWebSiteCreate.png)
 
-Click on the newly created Web Site, and choose **Set up deployment from source control**.
+Click on the newly created Website, and choose **Set up deployment from source control**.
 
 ![Set up deployment](Images/AzureGitWebSiteSetupDeployment.png)
 
@@ -43,7 +43,7 @@ From **Team Explorer**, click on the **Home** button on the toolbar. You may see
 
 Click on **Changes** to see your pending changes. Review the files that will be included in the commit, enter a comment and click **Commit**.
 
-**Note**: When using Git deployment, the node_modules are not checked in to the repository.  When Azure detects a new deployment, it will automatically npm install the modules specified in package.json.
+**Note**: When using Git, by default the node_modules are checked in to the repository. You can choose to exclude it from the repository. When Azure detects a new deployment, it will automatically npm install the modules specified in package.json on the Azure machine.
 
 ![Team Explorer Pending Changes](Images/AzureGitPendingChanges.png)
 
@@ -57,7 +57,7 @@ In the notification message, click **Sync** to bring up the **Unsynced Commits**
 
 Enter the URL for the Git repository, as displayed in the Azure Portal.  Click **Publish**.  Enter your credentials when prompted.
 
-The **Deployments** page for your Web Site will show the commit information.
+The **Deployments** page for your Website will show the commit information.
 
 ![Deployment History](Images/AzureGitDeploymentHistory.png)
 
