@@ -141,7 +141,7 @@ Microsoft.NodejsTools.NodeLogConverter v8.log report.vspx 0 00:01:30
 ```
 
 ## Caution about Profiling and Optimization:
-There are two points to keep in mind when Profiling node/V8:
+There are a few points to keep in mind when Profiling node/V8:
 
 - V8 performs various optimizations such as inlining, dead code elimination, code motion, re-JIT'ing, etc. that will strongly affect the profiler's accounting.  
 - Methods that don't do much work will not show up in the profiling report. 
