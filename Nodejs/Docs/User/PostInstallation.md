@@ -45,6 +45,10 @@ The project will be created, and server.js will open in the editor. Click in the
 
 From the Debug menu, select Start Debugging (or press F5).
 
+If this is the first time you use Node.js, you may see a warning from the Windows Firewall. Click allow access if you want to allow connections to/from other machines.
+
+![Windows Firewall](Images\InstallationWindowsFirewall.png)
+
 A web browser will launch, and execution will break in the debugger. You can inspect variables in the Locals and Watch window, navigate the call stack, etc.
 
 ![Debugger](Images\InstallationDebugger.png)

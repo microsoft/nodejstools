@@ -52,6 +52,14 @@
     <Content Include="User\AzureWebSiteWebDeploy.md" />
     <Content Include="User\codeplex.map" />
     <Content Include="User\Debugging.md" />
+    <Content Include="User\Images\InstallationWindowsFirewall.png" />
+    <Content Include="User\Images\ReplNpm.png" />
+    <Content Include="User\Images\ReplProjectContextMenu.png" />
+    <Content Include="User\Images\ReplWindow.png" />
+    <Content Include="User\Images\ReplWindowEdit1.png" />
+    <Content Include="User\Images\ReplWindowEdit2.png" />
+    <Content Include="User\Images\ReplWindowEdit3.png" />
+    <Content Include="User\REPL.md" />
     <Content Include="User\Images\AzureCloudServiceProject.png" />
     <Content Include="User\Images\AzureCloudServiceWizard.png" />
     <Content Include="User\Images\InstallationBreakpoint.png" />
