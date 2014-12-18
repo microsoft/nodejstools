@@ -35,14 +35,14 @@ namespace Microsoft.VisualStudio.Repl {
 
             if (string.IsNullOrWhiteSpace(arguments)) {
                 var curValue = (bool)window.GetOptionValue(ReplOptions.ShowOutput);
-                window.WriteLine("ECHO is " + curValue);
+                window.WriteLine("ECHO is " + (curValue ? "ON" : "OFF"));
                 return ExecutionResult.Succeeded;
             }
 
             if (arguments.Equals("on", System.StringComparison.InvariantCultureIgnoreCase)) {
                 window.SetOptionValue(ReplOptions.ShowOutput, true);
                 return ExecutionResult.Succeeded;
-            } else if(arguments.Equals("off",System.StringComparison.InvariantCultureIgnoreCase)) {
+            } else if (arguments.Equals("off", System.StringComparison.InvariantCultureIgnoreCase)) {
                 window.SetOptionValue(ReplOptions.ShowOutput, false);
                 return ExecutionResult.Succeeded;
             }
