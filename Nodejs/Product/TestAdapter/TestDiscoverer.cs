@@ -140,7 +140,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                     }
                     discoverySink.SendTestCase(
                         new TestCase(qualifiedName, TestExecutor.ExecutorUri, projSource) {
-                            CodeFilePath = filePath,
+                            CodeFilePath = (fi != null) ? fi.Filename : filePath,
                             LineNumber = (fi != null && fi.LineNumber.HasValue) ? fi.LineNumber.Value : discoveredTest.SourceLine,
                             DisplayName = discoveredTest.TestName
                         });                                    
