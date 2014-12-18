@@ -216,6 +216,9 @@
     <Compile Include="..\ReferenceGenerator\ReferenceCode.cs">
       <Link>Project\ReferenceCode.cs</Link>
     </Compile>
+    <Compile Include="..\TypeScript\TypeScriptHelpers.cs">
+      <Link>Project\TypeScriptHelpers.cs</Link>
+    </Compile>
     <Compile Include="Azure\WebSiteServiceShims.cs" />
     <Compile Include="ClassifierProviderMetadata.cs" />
     <Compile Include="Classifier\NodejsClassifier.cs" />

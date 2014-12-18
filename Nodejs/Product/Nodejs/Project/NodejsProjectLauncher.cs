@@ -35,7 +35,9 @@ using Microsoft.NodejsTools.Debugger.DebugEngine;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
+using Microsoft.NodejsTools.TypeScript;
 
 namespace Microsoft.NodejsTools.Project {
     class NodejsProjectLauncher : IProjectLauncher {
@@ -337,6 +339,10 @@ namespace Microsoft.NodejsTools.Project {
             string startupFile = _project.GetStartupFile();
             if (string.IsNullOrEmpty(startupFile)) {
                 throw new ApplicationException("No startup file is defined for the startup project.");
+            }
+
+            if (TypeScriptHelpers.IsTypeScriptFile(startupFile)) {
+                startupFile = TypeScriptHelpers.GetTypeScriptBackedJavaScriptFile(_project, startupFile);
             }
             return startupFile;
         }

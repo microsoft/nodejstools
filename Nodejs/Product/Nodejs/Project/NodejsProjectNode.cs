@@ -296,7 +296,9 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override bool IsCodeFile(string fileName) {
-            return Path.GetExtension(fileName).Equals(NodejsConstants.JavaScriptExtension, StringComparison.OrdinalIgnoreCase);
+            var ext = Path.GetExtension(fileName);
+            return ext.Equals(NodejsConstants.JavaScriptExtension, StringComparison.OrdinalIgnoreCase) ||
+                   ext.Equals(NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase);
         }
 
         public override int InitializeForOuter(string filename, string location, string name, uint flags, ref Guid iid, out IntPtr projectPointer, out int canceled) {

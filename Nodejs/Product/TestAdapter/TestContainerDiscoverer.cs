@@ -21,6 +21,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Microsoft.NodejsTools;
+using Microsoft.NodejsTools.TypeScript;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -156,29 +157,28 @@ namespace Microsoft.NodejsTools.TestAdapter {
         internal bool IsTestFile(string pathToFile) {
 
             string testCaseFile = pathToFile;
-            string testCaseFileExtension = Path.GetExtension(pathToFile);
-
-            //
-            //Check to see if we are dealing with a TypeScript file
-            //  If we are then switch the test container to the underlying js file
-            //
-            if (NodejsConstants.TypeScriptExtension.Equals(testCaseFileExtension, StringComparison.OrdinalIgnoreCase)) {
-                testCaseFile = testCaseFile.Substring(0, testCaseFile.Length - 3) + NodejsConstants.JavaScriptExtension;
-                if (!File.Exists(testCaseFile)) {
-                    //Ignore the file for now.  On the next build event the typescript compiler will generate the file
-                    //  at that point this function gets invoked again on the .ts file and we'll see the newly created .js file
-                    return false;
-                }
-            } else if (!NodejsConstants.JavaScriptExtension.Equals(testCaseFileExtension, StringComparison.OrdinalIgnoreCase)) {
-                return false;
-            }
-
             IVsProject project = GetTestProjectFromFile(pathToFile);
             if (null == project) {
                 //The file is not included in the project.  
                 //Don't look for tests in it.
                 return false;
             }
+
+            //
+            //Check to see if we are dealing with a TypeScript file
+            //  If we are then switch the test container to the underlying js file
+            //
+            if (TypeScriptHelpers.IsTypeScriptFile(pathToFile)) {
+                string jsFile = TypeScriptHelpers.GetTypeScriptBackedJavaScriptFile(project, pathToFile);
+                if (!File.Exists(jsFile)) {
+                    //Ignore the file for now.  On the next build event the typescript compiler will generate the file
+                    //  at that point this function gets invoked again on the .ts file and we'll see the newly created .js file
+                    return false;
+                }
+            } else if (!NodejsConstants.JavaScriptExtension.Equals(Path.GetExtension(pathToFile), StringComparison.OrdinalIgnoreCase)) {
+                return false;
+            }
+
             uint itemId;
             ErrorHandler.Succeeded(((IVsHierarchy)project).ParseCanonicalName(pathToFile, out itemId));
 

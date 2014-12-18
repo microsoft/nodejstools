@@ -131,6 +131,9 @@
     <Compile Include="..\Nodejs\TestFrameworks\TestFrameworkDirectories.cs">
       <Link>TestFrameworks\TestFrameworkDirectories.cs</Link>
     </Compile>
+    <Compile Include="..\TypeScript\TypeScriptHelpers.cs">
+      <Link>TypeScriptHelpers.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RunFromContextFileExtensions.cs" />
     <Compile Include="..\..\..\Common\Product\TestAdapter\ServiceProviderExtension.cs">
