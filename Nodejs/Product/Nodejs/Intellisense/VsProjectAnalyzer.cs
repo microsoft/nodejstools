@@ -28,17 +28,12 @@ using Microsoft.NodejsTools.Analysis;
 using Microsoft.NodejsTools.Classifier;
 using Microsoft.NodejsTools.Options;
 using Microsoft.NodejsTools.Parsing;
-using Microsoft.NodejsTools.Project;
 using Microsoft.NodejsTools.Repl;
-using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Language.Intellisense;
-using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Adornments;
-using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudioTools;
-using Microsoft.VisualStudioTools.Project;
 using Microsoft.Win32;
 using SR = Microsoft.NodejsTools.Project.SR;
 using Task = System.Threading.Tasks.Task;
@@ -437,7 +432,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             return ExpressionAnalysis.Empty;
         }
 
-        public static CompletionAnalysis GetRequireCompletions(ITextSnapshot snapshot, ITrackingSpan applicableSpan, ITrackingPoint point, bool? doubleQuote) {
+        public static CompletionAnalysis GetRequireCompletions(ITextSnapshot snapshot, ITrackingSpan applicableSpan, ITrackingPoint point, bool quote) {
             var span = applicableSpan.GetSpan(snapshot);
 
             if (IsSpaceCompletion(snapshot, point) && !IntellisenseController.ForceCompletions) {
@@ -449,7 +444,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 snapshot,
                 applicableSpan,
                 snapshot.TextBuffer,
-                doubleQuote
+                quote
             );
         }
 

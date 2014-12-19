@@ -16,11 +16,17 @@
 
 using System;
 using System.IO;
+using System.Windows.Input;
+using System.Windows.Threading;
+using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.Text.Operations;
+using Microsoft.VisualStudioTools;
 using TestUtilities;
 using TestUtilities.SharedProject;
 using TestUtilities.UI;
+using Keyboard = TestUtilities.UI.Keyboard;
 
 namespace Microsoft.Nodejs.Tests.UI {
     [TestClass]
@@ -165,7 +171,7 @@ namespace Microsoft.Nodejs.Tests.UI {
                 using (var solution = BasicProject.Generate().ToVs()) {
                     var server = solution.OpenItem("Require", "server.js");
                     Keyboard.Type("require('");
-
+                    
                     using (var completionSession = server.WaitForSession<ICompletionSession>()) {
                         Assert.AreEqual(1, completionSession.Session.CompletionSets.Count);
 
@@ -344,6 +350,122 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
+        public void RequireKeyboardCompletionBraceCompletionOff() {
+            using (new OptionHolder("TextEditor", "Node.js", "BraceCompletion", false)) {
+                using (var solution = BasicProject.Generate().ToVs()) {
+                
+                    var server = solution.OpenItem("Require", "server.js");
+                    Keyboard.Type("require(ad");
+                    WaitForCompletionSessionAndCommit(server);
+
+                    server.WaitForText("require('addons'");
+
+                    Keyboard.Backspace(20);
+
+                    Keyboard.Type("require('ad");
+                    WaitForCompletionSessionAndCommit(server);
+
+                    server.WaitForText("require('addons");
+
+                    Keyboard.Backspace(20);
+
+                    Keyboard.Type("require(\"ad");
+                    WaitForCompletionSessionAndCommit(server);
+
+                    server.WaitForText("require(\"addons");
+
+                    Keyboard.Backspace(20);
+
+                    TypeRequireStatementAndSelectModuleName(false, server);
+                    Keyboard.Type("ad");
+                    WaitForCompletionSessionAndCommit(server);
+
+                    server.WaitForText("require('addons')");
+
+                    Keyboard.PressAndRelease(Key.Right);
+                    Keyboard.PressAndRelease(Key.Right);
+                    Keyboard.Backspace(20);
+
+                    TypeRequireStatementAndSelectModuleName(true, server);
+                    Keyboard.Type("ad");
+                    WaitForCompletionSessionAndCommit(server);
+
+                    server.WaitForText("require(\"addons\")");
+                }
+            }
+        }
+
+        private static void TypeRequireStatementAndSelectModuleName(bool doubleQuotes, EditorWindow window) {
+            Keyboard.Type(string.Format("require({0}ab{0})", doubleQuotes ? "\"" : "'"));
+            window.MoveCaret(1, 10);
+            window.Select(1, 10, 2);
+            Keyboard.Type(Keyboard.CtrlSpace.ToString());
+        }
+
+        private static void WaitForCompletionSessionAndCommit(EditorWindow server) {
+            using (var completionSession = server.WaitForSession<ICompletionSession>()) {
+                UIThread.Invoke(() => { completionSession.Session.Commit(); });
+            }
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("VSTestHost")]
+        public void RequireKeyboardCompletionBraceCompletionOn() {
+            using (new OptionHolder("TextEditor", "Node.js", "BraceCompletion", true)) {
+                using (var solution = BasicProject.Generate().ToVs()) {
+
+                    var server = solution.OpenItem("Require", "server.js");
+                    Keyboard.Type("require(ad");
+                    WaitForCompletionSessionAndCommit(server);
+
+                    server.WaitForText("require('addons')");
+
+                    Keyboard.Type(")");
+                    server.WaitForText("require('addons')");
+
+                    Keyboard.Backspace(20);
+
+                    Keyboard.Type("require('ad");
+                    WaitForCompletionSessionAndCommit(server);
+
+                    server.WaitForText("require('addons')");
+
+                    Keyboard.Type("')");
+                    server.WaitForText("require('addons')");
+
+                    Keyboard.Backspace(20);
+
+                    Keyboard.Type("require(\"ad");
+                    WaitForCompletionSessionAndCommit(server);
+
+                    server.WaitForText("require(\"addons\")");
+
+                    Keyboard.Type("\")");
+                    server.WaitForText("require(\"addons\")");
+
+                    Keyboard.Backspace(20);
+
+                    TypeRequireStatementAndSelectModuleName(false, server);
+                    Keyboard.Type("ad");
+                    WaitForCompletionSessionAndCommit(server);
+
+                    server.WaitForText("require('addons')");
+
+                    Keyboard.PressAndRelease(Key.Right);
+                    Keyboard.PressAndRelease(Key.Right);
+                    Keyboard.Backspace(20);
+
+                    TypeRequireStatementAndSelectModuleName(true, server);
+                    Keyboard.Type("ad");
+                    WaitForCompletionSessionAndCommit(server);
+
+                    server.WaitForText("require(\"addons\")");
+                }
+            }
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("VSTestHost")]
         public void RequireBuiltinModules() {
             using (var solution = BasicProject.Generate().ToVs()) {
                 var server = solution.OpenItem("Require", "server.js");
@@ -446,7 +568,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
                         Keyboard.Type("ht')");
 
-                        server.WaitForText("require('http')");
+                        server.WaitForText("require('ht')");
                     }
                 }
             }
@@ -493,16 +615,18 @@ namespace Microsoft.Nodejs.Tests.UI {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void RequireAfterComma() {
-            using (var solution = BasicProject.Generate().ToVs()) {
-                var server = solution.OpenItem("Require", "server.js");
-                Keyboard.Type("f(a, require(");
+            using (new OptionHolder("TextEditor", "Node.js", "BraceCompletion", false)) {
+                using (var solution = BasicProject.Generate().ToVs()) {
+                    var server = solution.OpenItem("Require", "server.js");
+                    Keyboard.Type("f(a, require(");
 
-                using (var completionSession = server.WaitForSession<ICompletionSession>()) {
-                    Assert.AreEqual(1, completionSession.Session.CompletionSets.Count);
+                    using (var completionSession = server.WaitForSession<ICompletionSession>()) {
+                        Assert.AreEqual(1, completionSession.Session.CompletionSets.Count);
 
-                    Keyboard.Type("ht\t)");
+                        Keyboard.Type("ht\t)");
 
-                    server.WaitForText("f(a, require('http')");
+                        server.WaitForText("f(a, require('http')");
+                    }
                 }
             }
         }

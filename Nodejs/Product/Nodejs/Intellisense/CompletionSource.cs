@@ -16,20 +16,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using Microsoft.NodejsTools.Classifier;
-using Microsoft.NodejsTools.Project;
 using Microsoft.NodejsTools.Repl;
-using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Language.Intellisense;
-using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
-using Microsoft.VisualStudioTools;
-using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Intellisense {
     sealed partial class CompletionSource : ICompletionSource {
@@ -94,7 +86,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
         private void AugmentCompletionSessionForRequire(SnapshotPoint triggerPoint, ICompletionSession session, IList<CompletionSet> completionSets) {
             var classifications = EnumerateClassificationsInReverse(_classifier, triggerPoint);
-            bool? doubleQuote = null;
+            bool quote = false;
             int length = 0;
 
             // check which one of these we're doing:
@@ -119,7 +111,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                         )
                     ).First();
 
-                    doubleQuote = curText[0] == '"';
+                    quote = true;
                     triggerPoint -= (curText.Length - 1);
                     length = fullSpan.Span.Length - 1;
                 }
@@ -133,7 +125,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 _textBuffer.CurrentSnapshot,
                 span,
                 session.GetTriggerPoint(buffer),
-                doubleQuote
+                quote
             );
 
             var completions = provider.GetCompletions(_glyphService);

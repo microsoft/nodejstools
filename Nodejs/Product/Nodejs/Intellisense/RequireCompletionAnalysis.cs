@@ -15,14 +15,10 @@
 //*********************************************************//
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Classification;
 
 namespace Microsoft.NodejsTools.Intellisense {
     internal class RequireCompletionAnalysis : CompletionAnalysis {
@@ -30,26 +26,24 @@ namespace Microsoft.NodejsTools.Intellisense {
         private readonly ITextSnapshot _snapshot;
         private readonly ITrackingSpan _applicableSpan;
         private readonly ITextBuffer _textBuffer;
-        private readonly bool? _doubleQuote;
+        private readonly bool _quote;
 
-        public RequireCompletionAnalysis(VsProjectAnalyzer vsProjectAnalyzer, ITextSnapshot snapshot, VisualStudio.Text.ITrackingSpan applicableSpan, VisualStudio.Text.ITextBuffer textBuffer, bool? doubleQuote)
+        public RequireCompletionAnalysis(VsProjectAnalyzer vsProjectAnalyzer, ITextSnapshot snapshot, VisualStudio.Text.ITrackingSpan applicableSpan, VisualStudio.Text.ITextBuffer textBuffer, bool quote)
             : base(applicableSpan, textBuffer) {
             _analyzer = vsProjectAnalyzer;
             _snapshot = snapshot;
             _applicableSpan = applicableSpan;
             _textBuffer = textBuffer;
-            _doubleQuote = doubleQuote;
+            _quote = quote;
         }
 
-        private static string GetInsertionQuote(bool? doubleQuote, string filename) {
-            return doubleQuote == null ?
-                "\'" + filename + "\'" :
-                doubleQuote.Value ? filename + "\"" : filename + "'";
+        private static string GetInsertionQuote(bool quote, string filename) {
+            return quote ? filename : "\'" + filename + "\'";
         }
 
-        internal static DynamicallyVisibleCompletion JsCompletion(IGlyphService service, MemberResult memberResult, bool? doubleQuote) {
+        internal static DynamicallyVisibleCompletion JsCompletion(IGlyphService service, MemberResult memberResult, bool quote) {
             return new DynamicallyVisibleCompletion(memberResult.Name,
-                GetInsertionQuote(doubleQuote,memberResult.Completion),
+                GetInsertionQuote(quote, memberResult.Completion),
                 memberResult.Documentation,
                 service.GetGlyph(GetGlyphGroup(memberResult), StandardGlyphItem.GlyphItemPublic),
                 String.Empty
@@ -59,7 +53,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         public override CompletionSet GetCompletions(IGlyphService glyphService) {
             var text = PrecedingExpression;
 
-            var completions = GetModules().Select(m => JsCompletion(glyphService, m, _doubleQuote));
+            var completions = GetModules().Select(m => JsCompletion(glyphService, m, _quote));
 
             var res = new FuzzyCompletionSet(CompletionSource.NodejsRequireCompletionSetMoniker, "Node.js", Span, completions, CompletionComparer.UnderscoresFirst, true);
 
