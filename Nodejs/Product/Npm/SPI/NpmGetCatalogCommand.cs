@@ -68,7 +68,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     db.CreateRegistryTableIfNotExists();
 
                     using (var jsonReader = new JsonTextReader(reader)) {
-
                         while (jsonReader.Read()) {
                             if (JsonToken.PropertyName != jsonReader.TokenType) {
                                 continue;
@@ -86,7 +85,19 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                             }
 
                             var builder = new NodeModuleBuilder();
-                            var token = JToken.ReadFrom(jsonReader);
+                            JToken token = null;
+
+#if DEV14_OR_LATER
+                            try {
+#endif
+                                token = JToken.ReadFrom(jsonReader);
+#if DEV14_OR_LATER
+                            } catch (JsonReaderException) {
+                                // Reached end of file, so continue.
+                                break;
+                            }
+#endif
+
                             var module = token.FirstOrDefault();
                             while (module != null) {
                                 try {
@@ -137,11 +148,20 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                                         var package = builder.Build();
                                         InsertCatalogEntry(db, package);
                                     }
-                                } finally {
-                                    builder.Reset();
-                                    token = JToken.ReadFrom(jsonReader);
-                                    module = token.FirstOrDefault();
                                 }
+
+                                builder.Reset();
+#if DEV14_OR_LATER
+                                try {
+#endif
+                                    token = JToken.ReadFrom(jsonReader);
+#if DEV14_OR_LATER
+                                } catch (JsonReaderException) {
+                                    // Reached end of file, so continue.
+                                    break;
+                                }
+#endif
+                                module = token.FirstOrDefault();
                             }
                         }
                     }
@@ -498,7 +518,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         public IPackageCatalog Catalog { get { return this; } }
 
-        public async Task<IEnumerable<IPackage>> GetCatalogPackagesAsync(string filterText) {
+        public async Task<IEnumerable<IPackage>> GetCatalogPackagesAsync(string filterText, Uri registryUrl = null) {
             IEnumerable<IPackage> packages = null;
             using (var semaphore = GetDatabaseSemaphore()) {
                 // Wait until file is downloaded/parsed if another download is already in session.
@@ -511,15 +531,14 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 }
 
                 try {
-                    var registryUrl = (await GetRegistryUrl()).ToString();
+                    registryUrl = registryUrl ?? await GetRegistryUrl();
                     RegistryFileMapping registryFileMapping = null;
                     using (var db = new SQLiteConnection(DatabaseCacheFilePath)) {
-                        registryFileMapping = db.Table<RegistryFileMapping>().FirstOrDefault(info => info.RegistryUrl == registryUrl);
+                        registryFileMapping = db.Table<RegistryFileMapping>().FirstOrDefault(info => info.RegistryUrl == registryUrl.ToString());
                     }
 
                     if (registryFileMapping != null) {
                         string registryFileLocation = Path.Combine(CachePath, registryFileMapping.DbFileLocation, RegistryCacheFilename);
-
 
                         var packagesEnumerable = new DatabasePackageCatalogFilter(registryFileLocation).Filter(filterText);
                         packages = await Task.Run(() => packagesEnumerable.ToList());

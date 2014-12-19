@@ -116,7 +116,7 @@ namespace NpmTests {
             out IDictionary<string, IPackage> byName) {
             IList<IPackage> target = new List<IPackage>();
 
-            target = new NpmGetCatalogCommand(string.Empty, cachePath, false, RegistryUrl).GetCatalogPackagesAsync(string.Empty).GetAwaiter().GetResult().ToList();
+            target = new NpmGetCatalogCommand(string.Empty, cachePath, false, RegistryUrl).GetCatalogPackagesAsync(string.Empty, new Uri(RegistryUrl)).GetAwaiter().GetResult().ToList();
 
             //  Do this after because package names can be split across multiple
             //  lines and therefore may change after the IPackage is initially created.

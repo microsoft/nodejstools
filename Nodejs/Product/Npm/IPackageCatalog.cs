@@ -24,7 +24,7 @@ namespace Microsoft.NodejsTools.Npm {
     public interface IPackageCatalog {
         DateTime LastRefreshed { get; }
 
-        Task<IEnumerable<IPackage>> GetCatalogPackagesAsync(string filterText);
+        Task<IEnumerable<IPackage>> GetCatalogPackagesAsync(string filterText, Uri registryUrl = null);
 
         IPackage this[string name] { get; }
 
