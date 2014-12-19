@@ -44,12 +44,27 @@
                 </VisualBrush.Visual>
             </VisualBrush>
 
-            <wpf:ComparisonConverter x:Key="ValueGreaterThanZeroConverter"
-                                     IfTrue="{x:Static Visibility.Hidden}"
-                                     IfFalse="{x:Static Visibility.Visible}"
-                                     Operator="GreaterThan"
-                                     SecondOperand="0" />
+            <wpf:ComparisonConverter 
+                x:Key="NoFilterTextConverter"
+                IfTrue="{x:Static Visibility.Visible}"
+                IfFalse="{x:Static Visibility.Hidden}"
+                Operator="EqualTo"
+                SecondOperand="{x:Static npmUi:NpmPackageInstallViewModel+FilterState.NoFilterText}" />
+          
+            <wpf:ComparisonConverter 
+                x:Key="NoResultsFoundConverter"
+                IfTrue="{x:Static Visibility.Visible}"
+                IfFalse="{x:Static Visibility.Hidden}"
+                Operator="EqualTo"
+                SecondOperand="{x:Static npmUi:NpmPackageInstallViewModel+FilterState.NoResults}" />
 
+            <wpf:ComparisonConverter 
+                x:Key="FilteringConverter"
+                IfTrue="{x:Static Visibility.Visible}"
+                IfFalse="{x:Static Visibility.Hidden}"
+                Operator="EqualTo"
+                SecondOperand="{x:Static npmUi:NpmPackageInstallViewModel+FilterState.Filtering}" />
+            
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/Microsoft.NodejsTools;component/SharedProject/Wpf/Controls.xaml" />
                 <ResourceDictionary>
@@ -388,10 +403,23 @@
                           ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                           MinHeight="0"
                           KeyboardNavigation.TabIndex="1" />
-            <TextBlock Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center"
-                       Visibility="{Binding Path=FilteredPackages.Count, Converter={StaticResource ValueGreaterThanZeroConverter}}">
-                No results found.
-            </TextBlock>
+            <Grid Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock 
+                    HorizontalAlignment="Center"
+                    Visibility="{Binding Path=PackageFilterState, Converter={StaticResource NoFilterTextConverter}}">
+                    Type words to search for packages.
+                </TextBlock>
+                <ProgressBar 
+                    HorizontalAlignment="Stretch"
+                    IsEnabled="True" 
+                    IsIndeterminate="True"
+                    Visibility="{Binding Path=PackageFilterState, Converter={StaticResource FilteringConverter}}"/>
+                <TextBlock 
+                    HorizontalAlignment="Center"
+                    Visibility="{Binding Path=PackageFilterState, Converter={StaticResource NoResultsFoundConverter}}">
+                    No results found.
+                </TextBlock>
+            </Grid>
 
             <GridSplitter Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Width="2" VerticalAlignment="Stretch" HorizontalAlignment="Center" ShowsPreview="True"></GridSplitter>
             

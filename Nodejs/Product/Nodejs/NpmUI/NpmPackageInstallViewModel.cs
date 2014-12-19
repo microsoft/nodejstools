@@ -38,12 +38,20 @@ namespace Microsoft.NodejsTools.NpmUI {
             IndexGlobal = 3
         }
 
+        internal enum FilterState {
+            NoFilterText,
+            Filtering,
+            ResultsAvailable,
+            NoResults
+        }
+
         public static readonly ICommand InstallCommand = new RoutedCommand();
         public static readonly ICommand OpenHomepageCommand = new RoutedCommand();
         public static readonly ICommand RefreshCatalogCommand = new RoutedCommand();
         
         private INpmController _npmController;
-        
+
+        private bool _isFiltering = false;
         private bool _isLoadingCatalog;
         private IPackageCatalog _allPackages;
         private readonly object _filteredPackagesLock = new object();
@@ -218,10 +226,13 @@ namespace Microsoft.NodejsTools.NpmUI {
                 GC.Collect();
             }
 
+            // Reset the filter text, otherwise the results will be outdated.
+            FilterText = string.Empty;
+
             // We want to show the catalog regardless of whether an exception was thrown so that the user has the chance to refresh it.
             LoadingCatalogControlVisibility = Visibility.Collapsed;
             FilteredCatalogListVisibility = Visibility.Visible;
-
+            
             StartFilter();
         }
 
@@ -251,6 +262,30 @@ namespace Microsoft.NodejsTools.NpmUI {
         #endregion
 
         #region Filtering
+        public FilterState PackageFilterState {
+            get {
+                if (IsFiltering) {
+                    return FilterState.Filtering;
+                }
+                if (string.IsNullOrEmpty(FilterText)) {
+                    return FilterState.NoFilterText;
+                }
+                if (!FilteredPackages.Any()) {
+                    return FilterState.NoResults;
+                }
+                return FilterState.ResultsAvailable;
+            }
+        }
+
+        private bool IsFiltering {
+            get { return _isFiltering; }
+            set {
+                _isFiltering = value;
+
+                OnPropertyChanged();
+                OnPropertyChanged("PackageFilterState");
+            }
+        }
 
         public IList<PackageCatalogEntryViewModel> FilteredPackages {
             get {
@@ -262,6 +297,11 @@ namespace Microsoft.NodejsTools.NpmUI {
                 lock (_filteredPackagesLock) {
                     _filteredPackages = value;
                 }
+
+                // PackageFilterState should be triggered before FilteredPackages
+                // to allow the UI to update the status before the package list,
+                // making for a smoother experience.
+                OnPropertyChanged("PackageFilterState");
                 OnPropertyChanged();
             }
         }
@@ -270,40 +310,50 @@ namespace Microsoft.NodejsTools.NpmUI {
             get { return _filterText; }
             set {
                 _filterText = value;
-                
-                if (_currentFilter != _filterText) {
+
+                if (GetTrimmedTextSafe(_currentFilter) != GetTrimmedTextSafe(_filterText)) {
+                    FilteredPackages = new List<PackageCatalogEntryViewModel>();
                     StartFilter();
                 }
                 OnPropertyChanged();
+                OnPropertyChanged("PackageFilterState");
             }
         }
 
         private void StartFilter() {
+            if (!String.IsNullOrWhiteSpace(_filterText)) {
+                IsFiltering = true;
+            }
             _filterTimer.Change(500, Timeout.Infinite);
         }
 
         private async void FilterTimer_Elapsed(object state) {
             if (_allPackages == null) {
                 LastRefreshedMessage = LastRefreshedMessageProvider.RefreshFailed;
+                IsFiltering = false;
                 return;
             }
 
-            var filterText = _filterText.Trim();
+            var filterText = GetTrimmedTextSafe(_filterText);
 
             IEnumerable<IPackage> filtered;
-            if (string.IsNullOrEmpty(_filterText)) {
-                filtered = Enumerable.Empty<IPackage>();
-            } else {
-                try {
-                    filtered = await _allPackages.GetCatalogPackagesAsync(filterText);
-                } catch (Exception ex) {
-                    LastRefreshedMessage = LastRefreshedMessageProvider.RefreshFailed;
-                    if (IsCriticalException(ex)) {
-                        throw;
+            try {
+                if (string.IsNullOrEmpty(filterText)) {
+                    filtered = Enumerable.Empty<IPackage>();
+                } else {
+                    try {
+                        filtered = await _allPackages.GetCatalogPackagesAsync(filterText);
+                    } catch (Exception ex) {
+                        LastRefreshedMessage = LastRefreshedMessageProvider.RefreshFailed;
+                        if (IsCriticalException(ex)) {
+                            throw;
+                        }
+                        StartFilter();
+                        return;
                     }
-                    StartFilter();
-                    return;
-                }      
+                }
+            } finally {
+                IsFiltering = false;
             }
 
             if (filtered == null) {
@@ -314,7 +364,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
 
             var newItems = new List<PackageCatalogEntryViewModel>();
-            if (filterText != _filterText) {
+            if (filterText != GetTrimmedTextSafe(_filterText)) {
                 return;
             }
 
@@ -335,7 +385,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
 
             await _dispatcher.BeginInvoke((Action)(() => {
-                if (filterText != _filterText) {
+                if (filterText != GetTrimmedTextSafe(_filterText)) {
                     return;
                 }
 
@@ -353,6 +403,10 @@ namespace Microsoft.NodejsTools.NpmUI {
             // The catalog refresh operation spawns many long-lived Gen 2 objects,
             // so the garbage collector will take a while to get to them otherwise.
             GC.Collect();
+        }
+
+        private string GetTrimmedTextSafe(string text) {
+            return text != null ? text.Trim() : string.Empty;
         }
 
         public LastRefreshedMessageProvider LastRefreshedMessage {
