@@ -75,7 +75,7 @@ the code that will result in a PostBuildEvent.  This code needs to be inserted u
 ```
 <PropertyGroup>
   <PostBuildEvent>
-      grunt
+      grunt --no-color
   </PostBuildEvent>
 </PropertyGroup>
 ```
