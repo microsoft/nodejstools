@@ -31,7 +31,10 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         public IEnumerable<IPackage> Filter(string filterString) {
             filterString = filterString ?? string.Empty;
-            string escapedFilterString = filterString.Replace("'", "''");
+
+            // Escape all quotes so that the sql query is valid. Also replace hyphens with spaces
+            // so that we can search text including hyphens because FTS uses '-' as a NOT operator.
+            string escapedFilterString = filterString.Replace("'", "''").Replace('-', ' ');
 
             using (var db = new SQLiteConnection(_dbFilename)) {
                 if (filterString.Length >= 3) {

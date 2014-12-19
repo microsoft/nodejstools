@@ -458,6 +458,13 @@ namespace NpmTests {
             }
         }
 
+        [TestMethod, Priority(0)]
+        public void TestFilterStringWithDashes() {
+            const string filterString = "grunt-contrib";
+            var results = GetFilteredPackageList(filterString);
+            Assert.AreEqual("grunt-contrib", results.First().Name);
+        }
+
         private void CheckRegexFilterResults(string filterString, IList<IPackage> results) {
             const string expectedMatch = "express";
             Assert.IsTrue(results.Count > 0, string.Format("Should be some filter results for '{0}'.", filterString));
