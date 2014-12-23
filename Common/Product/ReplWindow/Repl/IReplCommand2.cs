@@ -14,9 +14,7 @@
 //
 //*********************************************************//
 
-using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
 namespace Microsoft.NodejsTools.Repl {

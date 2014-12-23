@@ -125,6 +125,8 @@ namespace Microsoft.NodejsTools.Project {
         internal const string NpmPackageVersion = "NpmPackageVersion";
         internal const string NpmPackageVersionDescription = "NpmPackageVersionDescription";
         internal const string NpmReplCommandCompletedWithErrors = "NpmReplCommandCompletedWithErrors";
+        internal const string NpmReplCommandHelp = "NpmReplCommandHelp";
+        internal const string NpmReplCommandInvalidProject = "NpmReplCommandInvalidProject";
         internal const string NpmStatusExecuting = "NpmStatusExecuting";
         internal const string NpmStatusExecutingErrors = "NpmStatusExecutingErrors";
         internal const string NpmStatusExecutingQueued = "NpmStatusExecutingQueued";
@@ -161,6 +163,11 @@ namespace Microsoft.NodejsTools.Project {
         internal const string PropertiesClassLocalPackage = "PropertiesClassLocalPackage";
         internal const string PropertiesClassLocalSubPackage = "PropertiesClassLocalSubPackage";
         internal const string PropertiesClassNpm = "PropertiesClassNpm";
+        internal const string ProjectReplCommandHelp = "ProjectReplCommandHelp";
+        internal const string ProjectReplCommandUnsupportedRepl = "ProjectReplCommandUnsupportedRepl";
+        internal const string ProjectReplCommandActiveProject = "ProjectReplCommandActiveProject";
+        internal const string ProjectReplCommandNoActiveProject = "ProjectReplCommandNoActiveProject";
+        internal const string ProjectReplCommandNoMatchingProjectFound = "ProjectReplCommandNoMatchingProjectFound";
         internal const string ReplInitializationMessage = "ReplInitializationMessage";
         internal const string RequestedVersionRangeNone = "RequestedVersionRangeNone";
         internal const string ScriptArgumentsToolTip = "ScriptArgumentsToolTip";

@@ -46,66 +46,25 @@ namespace Microsoft.NodejsTools.Repl {
 
         #region IReplCommand Members
 
+        /// <summary>
+        /// Executes npm command in the REPL
+        /// </summary>
+        /// <param name="window"></param>
+        /// <param name="arguments">Expected format "project of path to folder" "arguments"</param>
+        /// <returns></returns>
         public async Task<ExecutionResult> Execute(IReplWindow window, string arguments) {
+
+            if (null == _npmPath || !File.Exists(_npmPath)) {
+                try {
+                    _npmPath = NpmHelpers.GetPathToNpm();
+                } catch (NpmNotFoundException) {
+                    Nodejs.ShowNodejsNotInstalled();
+                    return ExecutionResult.Failure;
+                }
+            }
+
             string projectPath = string.Empty;
             string npmArguments = arguments.TrimStart(' ', '\t');
-
-            // Parse project name/directory in square brackets
-            if (npmArguments.StartsWith("[")) {
-                var match = Regex.Match(npmArguments, @"(?:[[]\s*\""?\s*)(.*?)(?:\s*\""?\s*[]]\s*)");
-                projectPath = match.Groups[1].Value;
-                npmArguments = npmArguments.Substring(match.Length);
-            }
-
-            var solution = Package.GetGlobalService(typeof(SVsSolution)) as IVsSolution;
-            IEnumerable<IVsProject> loadedProjects = solution.EnumerateLoadedProjects(onlyNodeProjects: true);
-
-            var projectNameToDirectoryDictionary = new Dictionary<string, Tuple<string, IVsHierarchy>>(StringComparer.OrdinalIgnoreCase);
-            foreach (IVsProject project in loadedProjects) {
-                var hierarchy = (IVsHierarchy)project;
-                object extObject;
-
-                var projectResult = hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ExtObject, out extObject);
-                if (!ErrorHandler.Succeeded(projectResult)) {
-                    continue;
-                }
-
-                EnvDTE.Project dteProject = extObject as EnvDTE.Project;
-                if (dteProject == null) {
-                    continue;
-                }
-
-                EnvDTE.Properties properties = dteProject.Properties;
-                if (dteProject.Properties == null) {
-                    continue;
-                }
-
-                string projectName = dteProject.Name;
-                EnvDTE.Property projectHome = properties.Item("ProjectHome");
-                if (projectHome == null || projectName == null) {
-                    continue;
-                }
-
-                var projectDirectory = projectHome.Value as string;
-                if (projectDirectory != null) {
-                    projectNameToDirectoryDictionary.Add(projectName, Tuple.Create(projectDirectory, hierarchy));
-                }
-            }
-
-            Tuple<string, IVsHierarchy> projectInfo;
-            if (string.IsNullOrEmpty(projectPath) && projectNameToDirectoryDictionary.Count == 1) {
-                projectInfo = projectNameToDirectoryDictionary.Values.First();
-            } else {
-                projectNameToDirectoryDictionary.TryGetValue(projectPath, out projectInfo);
-            }
-
-            NodejsProjectNode nodejsProject = null;
-            if (projectInfo != null) {
-                projectPath = projectInfo.Item1;
-                if (projectInfo.Item2 != null) {
-                    nodejsProject = projectInfo.Item2.GetProject().GetNodejsProject();
-                }
-            }
 
             bool isGlobalInstall = false;
             if (npmArguments.Contains(" -g") || npmArguments.Contains(" --global")) {
@@ -113,26 +72,54 @@ namespace Microsoft.NodejsTools.Repl {
                 isGlobalInstall = true;
             }
 
-            // In case someone copies filename
-            string projectDirectoryPath = File.Exists(projectPath) ? Path.GetDirectoryName(projectPath) : projectPath;
-            
-            if (!isGlobalInstall && !(Directory.Exists(projectDirectoryPath) && File.Exists(Path.Combine(projectDirectoryPath, "package.json")))) {
-                window.WriteError("Please specify a valid Node.js project or project directory in solution. If solution contains multiple projects, specify target project using .npm [ProjectName or ProjectDir] <npm arguments>");
+            NodejsProjectNode nodejsProjectNode = null;
+            var replWindow3 = window as IReplWindow3;
+            if (!isGlobalInstall && replWindow3 != null) {
+                //Grab the project we should target
+                IVsHierarchy hierarchy;
+                IVsProject project;
+                if (replWindow3.Properties.TryGetProperty<IVsProject>(typeof(IVsProject), out project)) {
+                    hierarchy = (IVsHierarchy)project;
+                } else {
+                    //No project was set, see if we can find the active project
+                    var solution = Package.GetGlobalService(typeof(SVsSolutionBuildManager)) as IVsSolutionBuildManager;
+                    
+                    solution.get_StartupProject(out hierarchy);
+                    if (hierarchy == null) {
+                        //Startup project is not node.js project
+                        window.WriteError(SR.GetString(SR.NpmReplCommandInvalidProject));
+                        return ExecutionResult.Failure;
+                    }
+                    project = (IVsProject)hierarchy;
+                }
+                EnvDTE.Project envProject = hierarchy.GetProject();
+                if (envProject == null) {
+                    window.WriteError(SR.GetString(SR.NpmReplCommandInvalidProject));
+                    return ExecutionResult.Failure;
+                }
+                nodejsProjectNode = envProject.GetNodejsProject();
+                if (nodejsProjectNode == null) {
+                    window.WriteError(SR.GetString(SR.NpmReplCommandInvalidProject));
+                    return ExecutionResult.Failure;
+                }
+                projectPath = nodejsProjectNode.ProjectHome;
+            }
+
+            if (!Directory.Exists(projectPath)) {
+                window.WriteError(SR.GetString(SR.NpmReplCommandInvalidProject));
                 return ExecutionResult.Failure;
             }
 
-            if (null == _npmPath || !File.Exists(_npmPath)) {
-                try {
-                    _npmPath = NpmHelpers.GetPathToNpm();
-                } catch (NpmNotFoundException) {
-                    Nodejs.ShowNodejsNotInstalled();
-                }
+            if (!isGlobalInstall && !(Directory.Exists(projectPath) && File.Exists(Path.Combine(projectPath, "package.json")))) {
+                window.WriteError(SR.GetString(SR.NpmReplCommandInvalidProject));
+                return ExecutionResult.Failure;
             }
+
             var npmReplRedirector = new NpmReplRedirector(window);
                
             await ExecuteNpmCommandAsync(npmReplRedirector,
                     _npmPath,
-                    projectDirectoryPath,
+                    projectPath,
                 new[] { npmArguments },
                 null);
 
@@ -142,15 +129,15 @@ namespace Microsoft.NodejsTools.Repl {
                 window.WriteLine(SR.GetString(SR.NpmSuccessfullyCompleted, arguments));
             }
 
-            if (nodejsProject != null) {
-                await nodejsProject.CheckForLongPaths(npmArguments);
+            if (nodejsProjectNode != null) {
+                await nodejsProjectNode.CheckForLongPaths(npmArguments);
             }
 
             return ExecutionResult.Success;
         }
 
         public string Description {
-            get { return "Executes npm command. If solution contains multiple projects, specify target project using .npm [ProjectName] <npm arguments>"; }
+            get { return SR.GetString(SR.NpmReplCommandHelp); }
         }
 
         public string Command {

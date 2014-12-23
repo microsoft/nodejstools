@@ -146,9 +146,13 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
                                 s.TopLevelJavaScriptFiles.Add(file);
                             }
                         }
-                        if (fileList.Contains("server.js") || fileList.Contains("server.ts")) {
+                        if (fileList.Contains("server.ts")) {
+                            s.StartupFile = "server.ts";
+                        } else if (fileList.Contains("server.js")) {
                             s.StartupFile = "server.js";
-                        } else if (fileList.Contains("app.js") || fileList.Contains("app.ts")) {
+                        } else if (fileList.Contains("app.ts")){
+                            s.StartupFile = "app.ts";
+                        } else if(fileList.Contains("app.js")) {
                             s.StartupFile = "app.js";
                         } else if (fileList.Count > 0) {
                             s.StartupFile = fileList.First();
@@ -265,7 +269,7 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
             writer.WriteElementString("ProjectView", "ShowAllFiles");
 
             if (CommonUtils.IsValidPath(startupFile)) {
-                writer.WriteElementString("StartupFile", Path.GetFileNameWithoutExtension(startupFile) + NodejsConstants.JavaScriptExtension);
+                writer.WriteElementString("StartupFile", Path.GetFileName(startupFile));
             } else {
                 writer.WriteElementString("StartupFile", String.Empty);
             }
@@ -344,9 +348,16 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
             writer.WriteAttributeString("Condition", @"Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')");
             writer.WriteEndElement();
 
+            writer.WriteComment("Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them.");
+            writer.WriteStartElement("Import");
+            writer.WriteAttributeString("Project", @"$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets");
+            writer.WriteAttributeString("Condition", @"False");
+            writer.WriteEndElement();
+
             writer.WriteStartElement("Import");
             writer.WriteAttributeString("Project", @"$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets");
             writer.WriteEndElement();
+
             writer.WriteRaw(@"
     <ProjectExtensions>
         <VisualStudio>

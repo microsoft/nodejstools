@@ -65,7 +65,7 @@ namespace Microsoft.VisualStudio.Repl {
     /// starts having problems w/ a large number of inputs.
     /// </summary>
     [Guid(ReplWindow.TypeGuid)]
-    class ReplWindow : ToolWindowPane, IOleCommandTarget, IReplWindow2, IVsFindTarget {
+    class ReplWindow : ToolWindowPane, IOleCommandTarget, IReplWindow3, IVsFindTarget {
 #if NTVS_FEATURE_INTERACTIVEWINDOW
         public const string TypeGuid = "2153A414-267E-4731-B891-E875ADBA1993";
 #else
@@ -86,6 +86,7 @@ namespace Microsoft.VisualStudio.Repl {
         private IEditorOperations _editorOperations;
         private readonly History/*!*/ _history;
         private TaskScheduler _uiScheduler;
+        private PropertyCollection _properties;
 
         //
         // Services
@@ -180,7 +181,9 @@ namespace Microsoft.VisualStudio.Repl {
             Contract.Assert(contentType != null);
             Contract.Assert(title != null);
             Contract.Assert(model != null);
-            
+
+            _properties = new PropertyCollection();
+
             _replId = replId;
             _langSvcGuid = languageServiceGuid;
             _buffer = new OutputBuffer(this);
@@ -2453,7 +2456,12 @@ namespace Microsoft.VisualStudio.Repl {
         }
 
         #endregion
-        
+
+        public PropertyCollection Properties {
+            get { return _properties; }
+        }
+
+
         #region Scopes
 
         private void InitializeScopeList() {
@@ -3292,5 +3300,6 @@ namespace Microsoft.VisualStudio.Repl {
         }
 
         #endregion
+
     }
 }

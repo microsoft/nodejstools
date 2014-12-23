@@ -485,6 +485,27 @@ NAME2=value2
   <data name="NpmReplCommandCompletedWithErrors" xml:space="preserve">
     <value>{0} completed with errors</value>
   </data>
+  <data name="NpmReplCommandHelp" xml:space="preserve">
+    <value>Executes npm command.  Commands target the project specified in .project</value>
+  </data>
+  <data name="NpmReplCommandInvalidProject" xml:space="preserve">
+    <value>Please specify a valid Node.js project using .project &lt;ProjectName&gt;</value>
+  </data>
+  <data name="ProjectReplCommandHelp" xml:space="preserve">
+    <value>Please specify a valid Node.js project using .project &lt;ProjectName&gt;</value>
+  </data>
+  <data name="ProjectReplCommandUnsupportedRepl" xml:space="preserve">
+    <value>Current REPL does not support per Project operations.</value>
+  </data>
+  <data name="ProjectReplCommandActiveProject" xml:space="preserve">
+    <value>REPL is executing against {0}.</value>
+  </data>
+  <data name="ProjectReplCommandNoActiveProject" xml:space="preserve">
+    <value>REPL project not set.  Using active project or global interpreter</value>
+  </data>
+  <data name="ProjectReplCommandNoMatchingProjectFound" xml:space="preserve">
+    <value>{0} does not match any currently loaded projects</value>
+  </data>
   <data name="LongPathWarningTitle" xml:space="preserve">
     <value>Path Too Long Warning</value>
   </data>
