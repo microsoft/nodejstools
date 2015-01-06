@@ -1895,6 +1895,12 @@ namespace Microsoft.NodejsTools.Parsing
             return operatorsPrec;
         }
 
+        public bool UnterminatedComment {
+            get {
+                return _state.UnterminatedComment;
+            }
+        }
+
         /// <summary>
         /// Mutable parser state.  This is the state which changes
         /// as we parse.  The current state can be captured to enable

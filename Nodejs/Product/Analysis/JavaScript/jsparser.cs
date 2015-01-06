@@ -4403,6 +4403,9 @@ namespace Microsoft.NodejsTools.Parsing
                     doclet = m_scanner.Identifier;
                 }
 
+                if (m_scanner.UnterminatedComment) {
+                    ReportError(JSError.NoCommentEnd);
+                }
                 nextToken = m_scanner.ScanNextToken(false);
             }
 

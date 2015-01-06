@@ -678,8 +678,8 @@ namespace Microsoft.NodejsTools.Intellisense {
                 lock (oldAnalyzer._activeBufferParsers) {
                     bufferParsers = oldAnalyzer._activeBufferParsers.ToArray();
                 }
-
                 foreach (var bufferParser in bufferParsers) {
+                    _activeBufferParsers.Add(bufferParser);
                     ReAnalyzeTextBuffers(bufferParser);
                 }
             }
@@ -708,6 +708,15 @@ namespace Microsoft.NodejsTools.Intellisense {
         /// _openFiles must be locked when calling this function.
         /// </summary>
         private void ReAnalyzeTextBuffers(BufferParser bufferParser) {
+            if (!_fullyLoaded) {
+                lock (_loadingDeltas) {
+                    if (!_fullyLoaded) {
+                        _loadingDeltas.Add(() => ReAnalyzeTextBuffers(bufferParser));
+                        return;
+                    }
+                }
+            }
+
             ITextBuffer[] buffers = bufferParser.Buffers;
             if (buffers.Length > 0) {
                 var projEntry = GetOrCreateProjectEntry(buffers[0], new SnapshotCookie(buffers[0].CurrentSnapshot));

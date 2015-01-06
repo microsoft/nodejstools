@@ -87,6 +87,7 @@ namespace Microsoft.NodejsTools.Editor.Core {
                 insertionPoint.Snapshot != null &&
                 insertionPoint.Position > commentStartingPoint.Position;
 
+            var snapshot = commentStartingPoint.Snapshot;
             Debug.Assert(commentStartingPointPrechecks,
                 "Comment Starting Point should be set to the beginning of a multiline comment.");
 
@@ -100,8 +101,8 @@ namespace Microsoft.NodejsTools.Editor.Core {
             }
 
             // Figure out the amount of whitespace preceeding the * on the line.  Take spacing style with this to match.
-            int startOfFirstCommentLine = textView.TextSnapshot.GetLineFromPosition(commentStartingPoint).Start;
-            string beforeAsterisk = textView.TextSnapshot.GetText(startOfFirstCommentLine, commentStartingPoint - startOfFirstCommentLine);
+            int startOfFirstCommentLine = snapshot.GetLineFromPosition(commentStartingPoint).Start;
+            string beforeAsterisk = snapshot.GetText(startOfFirstCommentLine, commentStartingPoint - startOfFirstCommentLine);
 
             // If ConvertTabsToSpaces is enabled, do that and make a string of all spaces of the same length.
             // Otherwise, walk the string and replace all non-whitespace characters with a space and use that string.
@@ -129,7 +130,7 @@ namespace Microsoft.NodejsTools.Editor.Core {
             string afterAsterisk = " "; // by default we want a single space
             if (insertionPoint.Position >= 1) // only do if we aren't the first line.
             {
-                string previousLineText = textView.TextSnapshot.GetLineFromPosition(insertionPoint.Position - 1).GetText();
+                string previousLineText = snapshot.GetLineFromPosition(insertionPoint.Position - 1).GetText();
 
                 // Replace tabs in previous line string if we have that option set so later calculations are correct.
                 if (textView.Options.IsConvertTabsToSpacesEnabled()) {
@@ -150,13 +151,20 @@ namespace Microsoft.NodejsTools.Editor.Core {
             int commentInsertionPoint = insertionPoint;
 
             // Insert the whitespace * string and set the caret to the correct position
-            using (var edit = insertionPoint.Snapshot.TextBuffer.CreateEdit()) {
+            using (var edit = snapshot.TextBuffer.CreateEdit()) {
                 edit.Insert(commentInsertionPoint, beforeAsterisk + afterAsterisk);
                 edit.Apply();
             }
-
-            // Set the cursor position immediatelly following our edit to guarantee placement.
-            textView.Caret.MoveTo(new SnapshotPoint(textView.TextSnapshot, commentInsertionPoint + beforeAsterisk.Length + afterAsterisk.Length));
+            var pt = textView.BufferGraph.MapUpToBuffer(
+                new SnapshotPoint(snapshot.TextBuffer.CurrentSnapshot, commentInsertionPoint + beforeAsterisk.Length + afterAsterisk.Length),
+                PointTrackingMode.Positive,
+                PositionAffinity.Successor,
+                textView.TextSnapshot.TextBuffer
+            );
+            if (pt != null) {
+                // Set the cursor position immediatelly following our edit to guarantee placement.
+                textView.Caret.MoveTo(pt.Value);
+            }
         }
 
         internal static bool IsMultilineComment(this SnapshotPoint insertionPoint, out SnapshotSpan commentSpan) {

@@ -199,6 +199,9 @@ namespace Microsoft.NodejsTools.Project {
                         default:
                             break;
                         case VsCommands.UnloadProject:
+                        case VsCommands.NewFolder:
+                        case VsCommands.EditLabel:
+                        case VsCommands.Rename:
                             return true;
                     }
                 }
