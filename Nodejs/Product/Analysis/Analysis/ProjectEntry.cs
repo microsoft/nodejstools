@@ -316,6 +316,12 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
+        internal AnalysisUnit Unit {
+            get {
+                return _unit;
+            }
+        }
+
         public string ModuleName {
             get {
                 return _filePath;

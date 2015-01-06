@@ -321,9 +321,10 @@ namespace Microsoft.NodejsTools.Intellisense {
                 if (!reportErrors) {
                     TaskProvider.Value.Clear(item.Entry, ParserTaskMoniker);
                 }
-
+                
                 if ((_reparseDateTime != null && new FileInfo(path).LastWriteTime > _reparseDateTime.Value)
-                        || (reportErrors && !item.ReportErrors)) {
+                        || (reportErrors && !item.ReportErrors) ||
+                        (item.Entry.Module == null || item.Entry.Unit == null)) {
                     // this file was written to since our cached analysis was saved, reload it.
                     // Or it was just included in the project and we need to parse for reporting
                     // errors.
