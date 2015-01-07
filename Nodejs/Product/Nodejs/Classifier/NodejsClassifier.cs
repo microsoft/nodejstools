@@ -128,6 +128,11 @@ namespace Microsoft.NodejsTools.Classifier {
             }
         }
 
+        struct TokenInfoWithLine {
+            public TokenInfo? TokenInfo;
+            public int Line;
+        }
+
         /// <summary>
         /// Adds classification spans to the given collection.
         /// Scans a contiguous sub-<paramref name="span"/> of a larger code span which starts at <paramref name="codeStartLine"/>.
@@ -150,7 +155,7 @@ namespace Microsoft.NodejsTools.Classifier {
 
             // track the previous 2 tokens to adjust our classifications of keywords
             // when they shouldn't be displayed as keywords...
-            TokenInfo? prevToken = null, prevPrevToken = null;
+            TokenInfoWithLine? prevToken = null, prevPrevToken = null;
 
             // initialize the previous tokens so we can handle things like:
             //      foo.
@@ -163,7 +168,7 @@ namespace Microsoft.NodejsTools.Classifier {
                     var tempToken = prevLineTokenization.Tokens[i];
                     if (IsValidPreviousToken(ref tempToken)) {
                         prevToken = prevPrevToken;
-                        prevPrevToken = tempToken;
+                        prevPrevToken = new TokenInfoWithLine() { TokenInfo = tempToken, Line = prevLine };
                     }
                 }
                 prevLine--;
@@ -222,7 +227,7 @@ namespace Microsoft.NodejsTools.Classifier {
                         ClassificationSpan classification = null;
                         if (token.Category == TokenCategory.Keyword) {
                             // check and see if we're not really a keyword...
-                            if (IsKeywordInIdentifierContext(snapshot, prevToken, prevPrevToken, token, currentLine)) {
+                            if (IsKeywordInIdentifierContext(snapshot, prevToken, prevPrevToken, new TokenInfoWithLine() { TokenInfo = token, Line = currentLine })) {
                                 classification = GetClassificationSpan(
                                     span,
                                     token,
@@ -242,7 +247,7 @@ namespace Microsoft.NodejsTools.Classifier {
 
                     if (IsValidPreviousToken(ref token)) {
                         prevPrevToken = prevToken;
-                        prevToken = token;
+                        prevToken = new TokenInfoWithLine() { TokenInfo = token, Line = currentLine };
                     }
                 }
 
@@ -256,28 +261,26 @@ namespace Microsoft.NodejsTools.Classifier {
                    token.Category != TokenCategory.None;
         }
 
-        private static bool IsKeywordInIdentifierContext(ITextSnapshot snapshot, TokenInfo? prevToken, TokenInfo? prevPrevToken, TokenInfo token, int lineNumber) {
+        private static bool IsKeywordInIdentifierContext(ITextSnapshot snapshot, TokenInfoWithLine? prevToken, TokenInfoWithLine? prevPrevToken, TokenInfoWithLine token) {
             if (prevToken != null) {
                 var prevValue = prevToken.Value;
-                if (prevValue.Category == TokenCategory.Operator &&
-                    prevValue.Trigger == TokenTriggers.MemberSelect) {
+                if (prevValue.TokenInfo.Value.Category == TokenCategory.Operator &&
+                    prevValue.TokenInfo.Value.Trigger == TokenTriggers.MemberSelect) {
                     // https://nodejstools.codeplex.com/workitem/967
                     // member.get
                     return true;
-                }
-
-                if (prevValue.Category == TokenCategory.Keyword &&
-                    snapshot.GetText(SnapshotSpanToSpan(snapshot, prevValue, lineNumber)) == "function") {
+                } if (prevValue.TokenInfo.Value.Category == TokenCategory.Keyword &&
+                     snapshot.GetText(SnapshotSpanToSpan(snapshot, prevValue.TokenInfo.Value, prevValue.Line)) == "function") {
                     // https://nodejstools.codeplex.com/workitem/976
                     // function static() { }
                     return true;
                 }
 
-                if (prevPrevToken != null && prevValue.Category == TokenCategory.Operator) {
-                    var prevSpan = SnapshotSpanToSpan(snapshot, prevValue, lineNumber);
+                if (prevPrevToken != null && prevValue.TokenInfo.Value.Category == TokenCategory.Operator) {
+                    var prevSpan = SnapshotSpanToSpan(snapshot, prevValue.TokenInfo.Value, prevValue.Line);
                     if (snapshot.GetText(prevSpan) == "*") {
                         var prevPrevValue = prevPrevToken.Value;
-                        var prevPrevSpan = SnapshotSpanToSpan(snapshot, prevPrevValue, lineNumber);
+                        var prevPrevSpan = SnapshotSpanToSpan(snapshot, prevPrevValue.TokenInfo.Value, prevPrevValue.Line);
                         if (snapshot.GetText(prevPrevSpan) == "function") {
                             // https://nodejstools.codeplex.com/workitem/976
                             // This time with a generator function...
@@ -287,7 +290,6 @@ namespace Microsoft.NodejsTools.Classifier {
                     }
                 }
             }
-
 
             return false;
         }

@@ -227,6 +227,36 @@ function /*blah*/ * /*blah*/ static() {
             );
         }
 
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("VSTestHost")]
+        public void ClassificationTest1661()
+        {
+            // https://nodejstools.codeplex.com/workitem/1661
+            var code = @"/*some comment to make long line*/ var incomplete =
+var";
+
+            VerifyClassifications(
+                code,
+                new Classification("comment", 0, 34, "/*some comment to make long line*/"),
+                new Classification("keyword", 35, 38, "var"),
+                new Classification("identifier", 39, 49, "incomplete"),
+                new Classification("Node.js operator", 50, 51, "="),
+                new Classification("keyword", 53, 56, "var")
+            );
+
+             code = @"/*some comment to make long line*/ var incomplete var
+var";
+
+             VerifyClassifications(
+                 code,
+                 new Classification("comment", 0, 34, "/*some comment to make long line*/"),
+                 new Classification("keyword", 35, 38, "var"),
+                 new Classification("identifier", 39, 49, "incomplete"),
+                 new Classification("keyword", 50, 53, "var"),
+                 new Classification("keyword", 55, 58, "var")
+             );
+        }
+
         private static void VerifyClassifications(string code, params Classification[] expected) {
             using (var solution = Project(
                 "Classifications", Compile("server", code)).Generate().ToVs()) {
