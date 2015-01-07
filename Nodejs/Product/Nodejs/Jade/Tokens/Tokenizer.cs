@@ -293,14 +293,14 @@ namespace Microsoft.NodejsTools.Jade {
         /// Collects all characters up to the next whitespace
         /// </summary>
         /// <param name="terminator">Terminator character</param>
-        /// <param name="skipOver">True if sequence includes the terminator, 
+        /// <param name="inclusive">True if sequence includes the terminator, 
         /// false if advance should stop at the terminator character</param>
         /// <returns>Sequence range</returns>
         protected virtual ITextRange GetNonWSSequence(char terminator, bool inclusive) {
             int start = _cs.Position;
 
             while (!_cs.IsEndOfStream() && !_cs.IsWhiteSpace()) {
-                if (terminator != '\0' && _cs.CurrentChar == terminator) {
+                if (_cs.CurrentChar == terminator && terminator != '\0') {
                     if (inclusive)
                         _cs.MoveToNextChar();
 
@@ -324,10 +324,8 @@ namespace Microsoft.NodejsTools.Jade {
             _cs.MoveToNextChar();
 
             while (!_cs.IsEndOfStream() && !_cs.IsWhiteSpace()) {
-                for (int i = 0; i < terminators.Length; i++) {
-                    if (terminators.IndexOf(_cs.CurrentChar) != -1)
-                        return TextRange.FromBounds(start, _cs.Position);
-                }
+                if (terminators.IndexOf(_cs.CurrentChar) != -1)
+                    return TextRange.FromBounds(start, _cs.Position);
 
                 _cs.MoveToNextChar();
             }
