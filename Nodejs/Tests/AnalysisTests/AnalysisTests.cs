@@ -637,7 +637,8 @@ var x = 42;
             var analysis = ProcessText(code);
             AssertUtil.ContainsAtLeast(
                 analysis.GetAllAvailableMembersByIndex(code.Length).Select(x => x.Name),
-                "require"
+                "require",
+                "setTimeout"
             );
         }
 

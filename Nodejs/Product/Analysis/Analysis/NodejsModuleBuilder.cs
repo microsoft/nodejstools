@@ -94,10 +94,12 @@ namespace Microsoft.NodejsTools.Analysis {
             foreach (var misc in _all["miscs"]) {
                 if (misc["name"] == "Global Objects") {
                     GenerateGlobals(misc["globals"]);
+                    foreach (var method in misc["methods"]) {
+                        GenerateMethod(_analyzer._globalObject, null, method);
+                    }
                     break;
                 }
             }
-
         }
 
         private void GenerateMethod(ExpandoValue exports, Dictionary<string, FunctionSpecializer> specialMethods, dynamic method) {
