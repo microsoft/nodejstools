@@ -22,19 +22,17 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm.SQLiteTables;
-using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
 using SQLite;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal class NpmGetCatalogCommand : NpmCommand, IPackageCatalog {
         private IDictionary<string, IPackage> _byName = new Dictionary<string, IPackage>();
         private readonly bool _forceDownload;
-        private string _cachePath;
+        private readonly string _cachePath;
         private Uri _registryUrl;
-        private IProgress<string> _progress;
+        private readonly IProgress<string> _progress;
 
         private const int _databaseSchemaVersion = 3;
 
@@ -253,16 +251,16 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         private async Task<string> DownloadPackageJsonCache(Uri registry, string cachePath, long refreshStartKey = 0) {
             string relativeUri, filename;
+
             if (refreshStartKey > 0) {
-                relativeUri = String.Format("/-/all/since?stale=update_after&startkey={0}", refreshStartKey);
+                relativeUri = String.Format("-/all/since?stale=update_after&startkey={0}", refreshStartKey);
                 filename = Path.Combine(cachePath, "since_packages.json");
             } else {
-                relativeUri = "/-/all";
+                relativeUri = "-/all";
                 filename = Path.Combine(cachePath, "all_packages.json");
             }
 
             OnOutputLogged(string.Format(Resources.InfoPackageCacheWriteLocation, filename));
-
 
             Uri packageUri;
             if (!Uri.TryCreate(registry, relativeUri, out packageUri)) {
@@ -290,35 +288,43 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     _progress.Report(progress);
                 }
 
-                int bytesRead;
                 var buffer = new byte[4096];
-                while ((bytesRead = await response.GetResponseStream().ReadAsync(buffer, 0, buffer.Length)) > 0) {
-                    totalDownloaded += bytesRead;
-                    if (totalDownloaded > nextNotification * ONE_MB) {
-                        if (totalLength > 0) {
-                            progress = string.Format(
-                                Resources.PackagesDownloadedXOfYMB,
-                                nextNotification,
-                                totalLength / ONE_MB + 1
-                            );
-                        } else {
-                            progress = string.Format(
-                                Resources.PackagesDownloadedXMB,
-                                nextNotification
-                            );
+
+                using (var stream = response.GetResponseStream()) {
+                    if (stream == null) return null;
+
+                    int bytesRead;
+                    while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0) {
+                        totalDownloaded += bytesRead;
+
+                        if (totalDownloaded > nextNotification * ONE_MB) {
+                            if (totalLength > 0) {
+                                progress = string.Format(
+                                    Resources.PackagesDownloadedXOfYMB,
+                                    nextNotification,
+                                    totalLength / ONE_MB + 1
+                                );
+                            } else {
+                                progress = string.Format(
+                                    Resources.PackagesDownloadedXMB,
+                                    nextNotification
+                                );
+                            }
+                            OnOutputLogged(progress);
+                            if (_progress != null) {
+                                _progress.Report(progress);
+                            }
+                            nextNotification += 1;
                         }
-                        OnOutputLogged(progress);
-                        if (_progress != null) {
-                            _progress.Report(progress);
-                        }
-                        nextNotification += 1;
+
+                        await cache.WriteAsync(buffer, 0, bytesRead);
                     }
 
-                    await cache.WriteAsync(buffer, 0, bytesRead);
-                }
-                OnOutputLogged(Resources.PackagesDownloadComplete);
-                if (_progress != null) {
-                    _progress.Report(Resources.PackagesDownloadComplete);
+                    OnOutputLogged(Resources.PackagesDownloadComplete);
+
+                    if (_progress != null) {
+                        _progress.Report(Resources.PackagesDownloadComplete);
+                    }
                 }
             }
 
