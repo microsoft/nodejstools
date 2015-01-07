@@ -75,7 +75,7 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
 
         private void InstallCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e) {
-            e.CanExecute = _vm.CanInstall(e.Parameter as PackageCatalogEntryViewModel);
+            e.CanExecute = !FilterTextBox.IsFocused && _vm.CanInstall(e.Parameter as PackageCatalogEntryViewModel);
             e.Handled = true;
         }
 
@@ -106,9 +106,11 @@ namespace Microsoft.NodejsTools.NpmUI {
         private void FilterTextBox_PreviewKeyDown(object sender, KeyEventArgs e) {
             switch (e.Key) {
                 case Key.Down:
+                case Key.Enter:
                     if (_packageList.SelectedIndex == -1 && _packageList.Items.Count > 0) {
                         _packageList.SelectedIndex = 0;
                     }
+                    
                     FocusOnSelectedItemInPackageList();
                     e.Handled = true;
                     break;
@@ -116,6 +118,7 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
 
         private void FocusOnSelectedItemInPackageList() {
+            _packageList.ScrollIntoView(_packageList.SelectedItem);
             var itemContainer = (ListViewItem)_packageList.ItemContainerGenerator.ContainerFromItem(_packageList.SelectedItem);
             if (itemContainer != null) {
                 itemContainer.Focus();

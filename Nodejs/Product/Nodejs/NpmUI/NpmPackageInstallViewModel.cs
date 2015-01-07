@@ -64,7 +64,6 @@ namespace Microsoft.NodejsTools.NpmUI {
         private string _catalogLoadingMessage = string.Empty;
         private string _catalogLoadingProgressMessage = string.Empty;
         private Visibility _loadingCatalogControlVisibility = Visibility.Collapsed;
-        private Visibility _filteredCatalogListVisibility = Visibility.Visible;
         private int _selectedDependencyTypeIndex;
 
         private string _currentFilter = string.Empty;
@@ -172,19 +171,10 @@ namespace Microsoft.NodejsTools.NpmUI {
                 OnPropertyChanged("FilterControlsVisibility");
             }
         }
-
-        public Visibility FilteredCatalogListVisibility {
-            get { return _filteredCatalogListVisibility; }
-            set {
-                _filteredCatalogListVisibility = value;
-                OnPropertyChanged();
-            }
-        }
-
+        
         private async void LoadCatalog(bool forceRefresh) {
             IsLoadingCatalog = true;
 
-            FilteredCatalogListVisibility = Visibility.Collapsed;
             CatalogControlVisibility = Visibility.Collapsed;
             LoadingCatalogControlVisibility = Visibility.Visible;
             LoadingCatalogMessage = SR.GetString(SR.CatalogLoadingDefault);
@@ -231,7 +221,6 @@ namespace Microsoft.NodejsTools.NpmUI {
 
             // We want to show the catalog regardless of whether an exception was thrown so that the user has the chance to refresh it.
             LoadingCatalogControlVisibility = Visibility.Collapsed;
-            FilteredCatalogListVisibility = Visibility.Visible;
             
             StartFilter();
         }
@@ -281,7 +270,6 @@ namespace Microsoft.NodejsTools.NpmUI {
             get { return _isFiltering; }
             set {
                 _isFiltering = value;
-
                 OnPropertyChanged();
                 OnPropertyChanged("PackageFilterState");
             }
@@ -311,20 +299,16 @@ namespace Microsoft.NodejsTools.NpmUI {
             set {
                 _filterText = value;
 
-                if (GetTrimmedTextSafe(_currentFilter) != GetTrimmedTextSafe(_filterText)) {
-                    FilteredPackages = new List<PackageCatalogEntryViewModel>();
-                    StartFilter();
-                }
+                StartFilter();
+                IsFiltering = !string.IsNullOrWhiteSpace(_filterText);
+
                 OnPropertyChanged();
                 OnPropertyChanged("PackageFilterState");
             }
         }
 
         private void StartFilter() {
-            if (!String.IsNullOrWhiteSpace(_filterText)) {
-                IsFiltering = true;
-            }
-            _filterTimer.Change(500, Timeout.Infinite);
+            _filterTimer.Change(300, Timeout.Infinite);
         }
 
         private async void FilterTimer_Elapsed(object state) {
@@ -337,23 +321,19 @@ namespace Microsoft.NodejsTools.NpmUI {
             var filterText = GetTrimmedTextSafe(_filterText);
 
             IEnumerable<IPackage> filtered;
-            try {
-                if (string.IsNullOrEmpty(filterText)) {
-                    filtered = Enumerable.Empty<IPackage>();
-                } else {
-                    try {
-                        filtered = await _allPackages.GetCatalogPackagesAsync(filterText);
-                    } catch (Exception ex) {
-                        LastRefreshedMessage = LastRefreshedMessageProvider.RefreshFailed;
-                        if (IsCriticalException(ex)) {
-                            throw;
-                        }
-                        StartFilter();
-                        return;
+            if (string.IsNullOrWhiteSpace(filterText)) {
+                filtered = Enumerable.Empty<IPackage>();
+            } else {
+                try {
+                    filtered = await _allPackages.GetCatalogPackagesAsync(filterText);
+                } catch (Exception ex) {
+                    LastRefreshedMessage = LastRefreshedMessageProvider.RefreshFailed;
+                    if (IsCriticalException(ex)) {
+                        throw;
                     }
+                    StartFilter();
+                    return;
                 }
-            } finally {
-                IsFiltering = false;
             }
 
             if (filtered == null) {
@@ -389,16 +369,26 @@ namespace Microsoft.NodejsTools.NpmUI {
                     return;
                 }
 
+                var originalSelectedPackage = SelectedPackage;
                 FilteredPackages = newItems;
-                _currentFilter = filterText;
 
-                SelectedPackage = FilteredPackages.FirstOrDefault();
+                // Reassign originalSelectedPackage to the original selected package in the new list of filtered packages.
+                if (originalSelectedPackage != null) {
+                    originalSelectedPackage = FilteredPackages.FirstOrDefault(package => package.Name == originalSelectedPackage.Name);
+                }
+
+                // Maintain selection when the filter list refreshes (e.g. due to an installation running in the background)
+                SelectedPackage = originalSelectedPackage ?? FilteredPackages.FirstOrDefault();
+
+                _currentFilter = filterText;
 
                 LastRefreshedMessage = IsCatalogEmpty
                     ? LastRefreshedMessageProvider.RefreshFailed
                     : new LastRefreshedMessageProvider(_allPackages.LastRefreshed);
                 CatalogControlVisibility = Visibility.Visible;
             }));
+
+            IsFiltering = false;
 
             // The catalog refresh operation spawns many long-lived Gen 2 objects,
             // so the garbage collector will take a while to get to them otherwise.

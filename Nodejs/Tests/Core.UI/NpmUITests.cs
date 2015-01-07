@@ -82,7 +82,6 @@ namespace Microsoft.Nodejs.Tests.UI {
                     TestUtilities.UI.Keyboard.PressAndRelease(Key.Up);
                     WaitForUIInputIdle();
 
-                    selectedItem = GetSelectedPackageListItemContainer(npmWindow);
                     Assert.IsTrue(npmWindow.FilterTextBox.IsKeyboardFocused, "Focus should remain on filter box");
                     Assert.AreEqual(1, npmWindow._packageList.SelectedIndex, "Pressing up while in filter box should maintain current selection");
 
@@ -98,6 +97,14 @@ namespace Microsoft.Nodejs.Tests.UI {
                     WaitForUIInputIdle();
 
                     Assert.IsTrue(npmWindow.FilterTextBox.IsKeyboardFocused, "Focus should remain on textbox while pressing up when topmost package is selected");
+                    Assert.IsFalse(npmWindow.InstallButton.IsEnabled, "Install button should not be enabled when filter box has focus");
+
+                    TestUtilities.UI.Keyboard.PressAndRelease(Key.Enter);
+                    WaitForUIInputIdle();
+                    
+                    selectedItem = GetSelectedPackageListItemContainer(npmWindow);
+                    Assert.IsTrue(selectedItem.IsKeyboardFocused, "Focus should be on newly selected item");
+                    Assert.AreEqual(0, npmWindow._packageList.SelectedIndex);
                 });
             }
         }
@@ -134,6 +141,11 @@ namespace Microsoft.Nodejs.Tests.UI {
                     TestUtilities.UI.Keyboard.PressAndRelease(Key.Tab);
                     WaitForUIInputIdle();
 
+                    Assert.IsTrue(npmWindow.SelectedVersionComboBox.IsKeyboardFocused);
+
+                    TestUtilities.UI.Keyboard.PressAndRelease(Key.Tab);
+                    WaitForUIInputIdle();
+
                     Assert.IsTrue(npmWindow.ArgumentsTextBox.IsKeyboardFocused);
 
                     TestUtilities.UI.Keyboard.PressAndRelease(Key.Tab);
@@ -148,6 +160,14 @@ namespace Microsoft.Nodejs.Tests.UI {
             var npmControllerMock = GetNpmControllerMock();
             NpmPackageInstallWindow npmWindow = new NpmPackageInstallWindow(npmControllerMock.Object, new NpmOutputViewModel(npmControllerMock.Object));
             npmWindow.Show();
+
+            WaitForUIInputIdle();
+
+            TestUtilities.UI.Keyboard.PressAndRelease(Key.M);
+
+            WaitForUIInputIdle();
+
+
             WaitForPackageListItemsToAppear(npmWindow);
             return npmWindow;
         }
@@ -173,7 +193,10 @@ namespace Microsoft.Nodejs.Tests.UI {
             var rootPackage = new Mock<IRootPackage>();
             rootPackage.Setup(mock => mock.Modules).Returns((new Mock<INodeModules>()).Object);
 
-            npmControllerMock.Setup(mock => mock.GetRepositoryCatalogAsync(It.IsAny<bool>(), null)).ReturnsAsync(new MockPackageCatalog(packageList));
+            npmControllerMock.Setup(mock => mock.GetRepositoryCatalogAsync(It.IsAny<bool>(), It.IsAny<IProgress<string>>())).ReturnsAsync(new MockPackageCatalog(packageList));
+
+            npmControllerMock.Setup(mock => mock.MostRecentlyLoadedCatalog).Returns(new MockPackageCatalog(packageList));
+
             npmControllerMock.Setup(mock => mock.GlobalPackages).Returns(globalPackages.Object);
             npmControllerMock.Setup(mock => mock.RootPackage).Returns(rootPackage.Object);
 

@@ -28,21 +28,13 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-            <VisualBrush x:Key="HelpTextBrush" TileMode="None" Stretch="None"  AlignmentX="Left" AlignmentY="Center">
-                <VisualBrush.Visual>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="7"></ColumnDefinition>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        <!--Hacky, but the only way I could come up with to move the background text into the appropriate location.-->
-                        <TextBlock Visibility="Hidden">a</TextBlock>
-                        <TextBlock Grid.Column="1" FontStyle="Italic" Padding="0 7 0 0" Opacity="0.5">
-                            Search for packages
-                        </TextBlock>
-                    </Grid>
-                </VisualBrush.Visual>
-            </VisualBrush>
+            
+            <wpf:ComparisonConverter 
+                x:Key="ResultsAvailableConverter"
+                IfTrue="{x:Static Visibility.Visible}"
+                IfFalse="{x:Static Visibility.Hidden}"
+                Operator="EqualTo"
+                SecondOperand="{x:Static npmUi:NpmPackageInstallViewModel+FilterState.ResultsAvailable}" />
 
             <wpf:ComparisonConverter 
                 x:Key="NoFilterTextConverter"
@@ -50,7 +42,7 @@
                 IfFalse="{x:Static Visibility.Hidden}"
                 Operator="EqualTo"
                 SecondOperand="{x:Static npmUi:NpmPackageInstallViewModel+FilterState.NoFilterText}" />
-          
+
             <wpf:ComparisonConverter 
                 x:Key="NoResultsFoundConverter"
                 IfTrue="{x:Static Visibility.Visible}"
@@ -64,7 +56,7 @@
                 IfFalse="{x:Static Visibility.Hidden}"
                 Operator="EqualTo"
                 SecondOperand="{x:Static npmUi:NpmPackageInstallViewModel+FilterState.Filtering}" />
-            
+
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/Microsoft.NodejsTools;component/SharedProject/Wpf/Controls.xaml" />
                 <ResourceDictionary>
@@ -73,60 +65,46 @@
                     </Style>
 
                     <DataTemplate x:Key="PackageInfoTemplate">
-                        <Grid>
-                            <StackPanel Name="PackageInfo">
-                                <TextBlock Margin="0">
-                                    <Run Text="{Binding Path=Name, Mode=OneWay}" FontSize="15pt" FontWeight="Bold" />
-                                    <Run Text="{Binding Path=Version, Mode=OneWay}" />
-                                </TextBlock>
+                        <StackPanel Name="PackageInfo">
+                            <TextBlock Margin="0">
+                                <Run Text="{Binding Path=Name, Mode=OneWay}" FontSize="15pt" FontWeight="Bold" />
+                                <Run Text="{Binding Path=Version, Mode=OneWay}" />
+                            </TextBlock>
 
-                                <TextBlock Margin="0 4 0 4"
-                                           Text="{Binding Keywords, Mode=OneWay}"
-                                           TextWrapping="Wrap"
-                                           Opacity="0.5" />
+                            <TextBlock Margin="0 4 0 4"
+                                        Text="{Binding Keywords, Mode=OneWay}"
+                                        TextWrapping="Wrap"
+                                        Opacity="0.5" />
 
-                                <StackPanel Orientation="Horizontal" Margin="0 4 0 4" x:Name="AuthorBlock" Visibility="{Binding Path=AuthorVisibility, Mode=OneWay}">
-                                    <TextBlock Margin="0" FontWeight="Bold" xml:space="preserve">Author: </TextBlock>
-                                    <TextBlock Text="{Binding Path=Author, Mode=OneWay}"/>
-                                </StackPanel>
-                                
-                                <StackPanel Margin="0 4 0 4" x:Name="HomepageBlock"
-                                    Visibility="{Binding HomepagesVisibility}"
-                                    Orientation="Horizontal">
-                                    <TextBlock Margin="0" FontWeight="Bold" xml:space="preserve">Homepage: </TextBlock>
-                                    <ItemsControl ItemsSource="{Binding Path=Homepages, Mode=OneWay}">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <Button Style="{StaticResource NavigationButton}"
-                                                        Content="{Binding Mode=OneWay}"
-                                                        Command="{x:Static npmUi:NpmPackageInstallViewModel.OpenHomepageCommand}"
-                                                        CommandParameter="{Binding}"
-                                                        KeyboardNavigation.IsTabStop="False"
-                                                        Margin="0"
-                                                        Padding="0"/>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                </StackPanel>
-
-                                <TextBlock Margin="0 4 0 4" TextWrapping="Wrap" x:Name="DescriptionBlock" Visibility="{Binding Path=DescriptionVisibility, Mode=OneWay}">
-                                    <Run FontWeight="Bold" xml:space="preserve">Description: </Run>
-                                    <Run Text="{Binding Path=Description, Mode=OneWay}"/>
-                                </TextBlock>
+                            <StackPanel Orientation="Horizontal" Margin="0 4 0 4" x:Name="AuthorBlock" Visibility="{Binding Path=AuthorVisibility, Mode=OneWay}">
+                                <TextBlock Margin="0" FontWeight="Bold" xml:space="preserve">Author: </TextBlock>
+                                <TextBlock Text="{Binding Path=Author, Mode=OneWay}"/>
                             </StackPanel>
-                            
-                            <TextBlock x:Name="NoPackageSelectedText" FontSize="15pt" Visibility="Hidden">(no package selected)</TextBlock>
-                        </Grid>
 
-                        <DataTemplate.Triggers>
-                            <DataTrigger Binding="{Binding}" Value="{x:Null}">
-                                <DataTrigger.Setters>
-                                    <Setter TargetName="PackageInfo" Property="Visibility" Value="Hidden" />
-                                    <Setter TargetName="NoPackageSelectedText" Property="Visibility" Value="Visible" />
-                                </DataTrigger.Setters>
-                            </DataTrigger>
-                        </DataTemplate.Triggers>
+                            <StackPanel Margin="0 4 0 4" x:Name="HomepageBlock"
+                                Visibility="{Binding HomepagesVisibility}"
+                                Orientation="Horizontal">
+                                <TextBlock Margin="0" FontWeight="Bold" xml:space="preserve">Homepage: </TextBlock>
+                                <ItemsControl ItemsSource="{Binding Path=Homepages, Mode=OneWay}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button Style="{StaticResource NavigationButton}"
+                                                    Content="{Binding Mode=OneWay}"
+                                                    Command="{x:Static npmUi:NpmPackageInstallViewModel.OpenHomepageCommand}"
+                                                    CommandParameter="{Binding}"
+                                                    KeyboardNavigation.IsTabStop="False"
+                                                    Margin="0"
+                                                    Padding="0"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
 
+                            <TextBlock Margin="0 4 0 4" TextWrapping="Wrap" x:Name="DescriptionBlock" Visibility="{Binding Path=DescriptionVisibility, Mode=OneWay}">
+                                <Run FontWeight="Bold" xml:space="preserve">Description: </Run>
+                                <Run Text="{Binding Path=Description, Mode=OneWay}"/>
+                            </TextBlock>
+                        </StackPanel>
                     </DataTemplate>
 
                     <DataTemplate DataType="{x:Type npmUi:ReadOnlyPackageCatalogEntryViewModel}">
@@ -322,7 +300,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" Margin="0 6 0 0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
@@ -370,31 +348,40 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="7*" MinWidth="100"/>
             </Grid.ColumnDefinitions>
+            <Grid Grid.Row="0" Grid.Column="0">
 
-            <TextBox Grid.Column="0" Grid.Row="0"
-                             x:Name="FilterTextBox"
+                <TextBox x:Name="FilterTextBox"
                              IsVisibleChanged="FilterTextBox_IsVisibleChanged"
                              Height="24"
                              Text="{Binding FilterText,UpdateSourceTrigger=PropertyChanged}"
                              PreviewKeyDown="FilterTextBox_PreviewKeyDown"
-                             KeyboardNavigation.TabIndex="0">
+                             KeyboardNavigation.TabIndex="0"/>
+                <TextBlock IsEnabled="False" Background="{x:Null}"
+                           Focusable="False"
+                           IsHitTestVisible="False"
+                           IsManipulationEnabled="False"
+                                    x:Name="SearchBlock" FontStyle="Italic" Padding="6 4 0 0" Opacity="0.5">
+                            Search for packages
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                            <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.ForegroundKey}}" />
+                            <Setter Property="Visibility" Value="Hidden"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding FilterText}"  Value="">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding FilterText}"  Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </Grid>
 
-                <TextBox.Style>
-                    <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
-                        <Style.Triggers>
-                            <Trigger Property="Text" Value="{x:Null}">
-                                <Setter Property="Background" Value="{StaticResource HelpTextBrush}"/>
-                            </Trigger>
-                            <Trigger Property="Text" Value="">
-                                <Setter Property="Background" Value="{StaticResource HelpTextBrush}"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBox.Style>
-            </TextBox>
             <ContentControl Style="{StaticResource SearchStyle}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsTabStop="False" Focusable="False" />
-            <ListView x:Name="_packageList"
-                          Grid.Row="1"
+            <Grid Grid.Row="1" Background="{Binding ElementName=_packageList, Path=Background}">
+                <ListView x:Name="_packageList"
                           ItemsSource="{Binding FilteredPackages}"
                           SelectedItem="{Binding SelectedPackage}"
                           SelectionChanged="_packageList_SelectionChanged"
@@ -402,27 +389,30 @@
                           HorizontalContentAlignment="Stretch"
                           ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                           MinHeight="0"
-                          KeyboardNavigation.TabIndex="1" />
-            <Grid Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <TextBlock 
-                    HorizontalAlignment="Center"
-                    Visibility="{Binding Path=PackageFilterState, Converter={StaticResource NoFilterTextConverter}}">
-                    Type words to search for packages.
-                </TextBlock>
-                <ProgressBar 
+                          KeyboardNavigation.TabIndex="1" 
+                          Visibility="{Binding Path=PackageFilterState, Converter={StaticResource ResultsAvailableConverter}}"/>
+                <Border BorderBrush="{Binding ElementName=_packageList, Path=BorderBrush}"
+                        BorderThickness="{Binding ElementName=_packageList,Path=BorderThickness}">
+                    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock HorizontalAlignment="Center"
+                                   Visibility="{Binding Path=PackageFilterState, Converter={StaticResource NoFilterTextConverter}}">
+                            Type to search for packages.
+                        </TextBlock>
+                        <ProgressBar 
                     HorizontalAlignment="Stretch"
                     IsEnabled="True" 
                     IsIndeterminate="True"
                     Visibility="{Binding Path=PackageFilterState, Converter={StaticResource FilteringConverter}}"/>
-                <TextBlock 
+                        <TextBlock 
                     HorizontalAlignment="Center"
                     Visibility="{Binding Path=PackageFilterState, Converter={StaticResource NoResultsFoundConverter}}">
                     No results found.
-                </TextBlock>
+                        </TextBlock>
+                    </Grid>
+                </Border>
             </Grid>
+            <GridSplitter Grid.Column="1" Grid.Row="0" Grid.RowSpan="3" Width="6" Background="Transparent" VerticalAlignment="Stretch" HorizontalAlignment="Center" ShowsPreview="True" />
 
-            <GridSplitter Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Width="2" VerticalAlignment="Stretch" HorizontalAlignment="Center" ShowsPreview="True"></GridSplitter>
-            
             <Grid Grid.Row="2" VerticalAlignment="Top" Margin="0 4 0 0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -452,13 +442,22 @@
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SelectedPackage}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Hidden" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
                 <ScrollViewer VerticalScrollBarVisibility="Auto"
                               Content="{Binding Path=SelectedPackage}"
                               ContentTemplate="{StaticResource PackageInfoTemplate}" />
 
                 <StackPanel Grid.Row="1"
-                        Orientation="Vertical"
-                        HorizontalAlignment="Stretch">
+                            Orientation="Vertical"
+                            HorizontalAlignment="Stretch">
                     <Separator/>
                     <Grid x:Name="InstallOptions" DockPanel.Dock="Top" VerticalAlignment="Stretch">
                         <Grid.RowDefinitions>
@@ -487,7 +486,7 @@
 
                         <TextBlock Grid.Row="1" FontWeight="Bold" Margin="0 4 0 4">Options</TextBlock>
                         <Label Grid.Row="5" HorizontalAlignment="Right" VerticalAlignment="Center">Other npm arguments</Label>
-                        <TextBox x:Name="ArgumentsTextBox" Grid.Column="1" Grid.Row="5" HorizontalAlignment="Stretch" Text="{Binding Arguments}" Margin="4" TabIndex="5"/>
+                        <TextBox x:Name="ArgumentsTextBox" Grid.Column="1" Grid.Row="5" HorizontalAlignment="Stretch" Text="{Binding Arguments}" Margin="4" TabIndex="6"/>
                         <Label Grid.Row="3" HorizontalAlignment="Right" VerticalAlignment="Center">Add to package.json</Label>
                         <CheckBox x:Name="SaveToPackageJsonCheckbox" Grid.Column="1" Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Left" IsChecked="{Binding SaveToPackageJson}" Margin="4" TabIndex="4">(recommended)</CheckBox>
                         <Label Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center">Dependency type</Label>
@@ -497,7 +496,7 @@
                                   Grid.Column="1"
                                   Width="100"
                                   MaxHeight="24"
-                                      Margin="4"
+                                  Margin="4"
                                   KeyboardNavigation.TabIndex="3" SelectedIndex="{Binding SelectedDependencyTypeIndex}"
                               HorizontalAlignment="Left">
                             <ComboBoxItem Tag="St" IsSelected="True">Standard</ComboBoxItem>
@@ -505,13 +504,14 @@
                             <ComboBoxItem Tag="Opt">Optional</ComboBoxItem>
                             <ComboBoxItem Tag="Global">Global</ComboBoxItem>
                         </ComboBox>
-                        
+
                         <Label Grid.Row="4" HorizontalAlignment="Right" VerticalAlignment="Center">Selected version</Label>
                         <ComboBox Name="SelectedVersionComboBox"
                                   Grid.Row="4"
                                   Grid.Column="1"
                                   SelectedItem="{Binding Path=SelectedVersion}"
                                   SelectedIndex="0"
+                                  KeyboardNavigation.TabIndex="5"
                                   SelectionChanged="SelectedVersionComboBox_OnSelectionChanged"
                                   Margin="4">
                             <ComboBox.Resources>
