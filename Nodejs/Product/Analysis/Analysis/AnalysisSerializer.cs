@@ -296,6 +296,8 @@ namespace Microsoft.NodejsTools.Analysis {
                     return ObjectComparer.Instance;
                 case SerializationType.OrdinalComparer:
                     return StringComparer.Ordinal;
+                case SerializationType.OrdinalComparerIgnoreCase:
+                    return StringComparer.OrdinalIgnoreCase;
                 default: 
                     throw new InvalidOperationException("unsupported SerializationType");
             }
@@ -407,6 +409,10 @@ namespace Microsoft.NodejsTools.Analysis {
                     }
                 } else if (value.GetType().IsEnum) {
                     SerializeEnum(value, writer);
+                } else if(value == StringComparer.Ordinal) {
+                    writer.Write((byte)SerializationType.OrdinalComparer);
+                } else if (value == StringComparer.OrdinalIgnoreCase) {
+                    writer.Write((byte)SerializationType.OrdinalComparerIgnoreCase);
                 } else if (value is IAnalysisSerializeAsNull) {
                     writer.Write((byte)SerializationType.Null);
                 } else if (_serializer.TryGetValue(value.GetType(), out serializerFunc)) {
@@ -697,8 +703,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 { typeof(HashSet<EncodedSpan>), SerializeHashSet<EncodedSpan> },
                 { typeof(AnalysisSetEmptyObject), new SimpleTypeSerializer(SerializationType.EmptyAnalysisSet).Serialize },
                 { typeof(Microsoft.NodejsTools.Parsing.Missing), new SimpleTypeSerializer(SerializationType.MissingValue).Serialize },
-                { typeof(ObjectComparer), new SimpleTypeSerializer(SerializationType.ObjectComparer).Serialize },
-                { StringComparer.Ordinal.GetType(), new SimpleTypeSerializer(SerializationType.OrdinalComparer).Serialize }
+                { typeof(ObjectComparer), new SimpleTypeSerializer(SerializationType.ObjectComparer).Serialize }
             };
                 
             foreach(var type in AnalysisSerializationSupportedTypeAttribute.AllowedTypeIndexes) {
@@ -1117,6 +1122,7 @@ namespace Microsoft.NodejsTools.Analysis {
             MissingValue,
             ObjectComparer,
             OrdinalComparer,
+            OrdinalComparerIgnoreCase,
             ObjectEqualityComparer,
             IndexSpan,
             EncodedSpan,

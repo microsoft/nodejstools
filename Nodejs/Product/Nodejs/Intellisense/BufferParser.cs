@@ -82,7 +82,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
                     InitBuffer(textBuffer);
 
-                    VsProjectAnalyzer.ConnectErrorList(_currentProjEntry, textBuffer);
+                    _parser.ConnectErrorList(_currentProjEntry, textBuffer);
                 }
             }
 
@@ -94,7 +94,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
                     _buffers.Remove(subjectBuffer);
 
-                    VsProjectAnalyzer.DisconnectErrorList(_currentProjEntry, subjectBuffer);
+                    _parser.DisconnectErrorList(_currentProjEntry, subjectBuffer);
                 }
             }
 

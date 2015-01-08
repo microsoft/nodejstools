@@ -89,7 +89,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         // different sources of items for the same file.
         private const string ParserTaskMoniker = "Parser";
 
-        private static readonly Lazy<TaskProvider> _defaultTaskProvider = CreateDefaultTaskProvider();
+        private readonly TaskProvider _defaultTaskProvider = CreateDefaultTaskProvider();
 
 #if FALSE
         private readonly UnresolvedImportSquiggleProvider _unresolvedSquiggles;
@@ -272,12 +272,10 @@ namespace Microsoft.NodejsTools.Intellisense {
                 _unresolvedSquiggles.StopListening(bufferParser._currentProjEntry as IPythonProjectEntry);
 #endif
 
-            if (TaskProvider.IsValueCreated) {
-                TaskProvider.Value.ClearErrorSource(bufferParser._currentProjEntry, ParserTaskMoniker);
+            TaskProvider.ClearErrorSource(bufferParser._currentProjEntry, ParserTaskMoniker);
 
-                if (_implicitProject) {
-                    UnloadFile(bufferParser._currentProjEntry);
-                }
+            if (_implicitProject) {
+                UnloadFile(bufferParser._currentProjEntry);
             }
         }
 
@@ -319,7 +317,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 }
             } else {
                 if (!reportErrors) {
-                    TaskProvider.Value.Clear(item.Entry, ParserTaskMoniker);
+                    TaskProvider.Clear(item.Entry, ParserTaskMoniker);
                 }
                 
                 if ((_reparseDateTime != null && new FileInfo(path).LastWriteTime > _reparseDateTime.Value)
@@ -688,16 +686,14 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         #endregion
 
-        private static Lazy<TaskProvider> CreateDefaultTaskProvider() {
-            return new Lazy<TaskProvider>(() => {
-                var errorList = NodejsPackage.GetGlobalService(typeof(SVsErrorList)) as IVsTaskList;
-                var model = NodejsPackage.ComponentModel;
-                var errorProvider = model != null ? model.GetService<IErrorProviderFactory>() : null;
-                return new TaskProvider(errorList, errorProvider);
-            }, LazyThreadSafetyMode.ExecutionAndPublication);
+        private static TaskProvider CreateDefaultTaskProvider() {
+            var errorList = NodejsPackage.GetGlobalService(typeof(SVsErrorList)) as IVsTaskList;
+            var model = NodejsPackage.ComponentModel;
+            var errorProvider = model != null ? model.GetService<IErrorProviderFactory>() : null;
+            return new TaskProvider(errorList, errorProvider);
         }
 
-        private static Lazy<TaskProvider> TaskProvider {
+        private TaskProvider TaskProvider {
             get {
                 return _defaultTaskProvider;
             }
@@ -802,12 +798,12 @@ namespace Microsoft.NodejsTools.Intellisense {
 #endif
         }
 
-        private static void ConnectErrorList(IProjectEntry projEntry, ITextBuffer buffer) {
-            TaskProvider.Value.AddBufferForErrorSource(projEntry, ParserTaskMoniker, buffer);
+        private void ConnectErrorList(IProjectEntry projEntry, ITextBuffer buffer) {
+            TaskProvider.AddBufferForErrorSource(projEntry, ParserTaskMoniker, buffer);
         }
 
-        private static void DisconnectErrorList(IProjectEntry projEntry, ITextBuffer buffer) {
-            TaskProvider.Value.RemoveBufferForErrorSource(projEntry, ParserTaskMoniker, buffer);
+        private void DisconnectErrorList(IProjectEntry projEntry, ITextBuffer buffer) {
+            TaskProvider.RemoveBufferForErrorSource(projEntry, ParserTaskMoniker, buffer);
         }
 
         private IProjectEntry GetOrCreateProjectEntry(ITextBuffer buffer, IAnalysisCookie analysisCookie) {
@@ -973,7 +969,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                     // are analyzing a file that is not open
                     UpdateErrorsAndWarnings(entry, GetSnapshot(reader), errorSink);
                 } else {
-                    TaskProvider.Value.Clear(entry, ParserTaskMoniker);
+                    TaskProvider.Clear(entry, ParserTaskMoniker);
                 }
 
                 // enqueue analysis of the file
@@ -1114,7 +1110,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
             // Update the parser warnings/errors
             if (errorSink.Warnings.Any() || errorSink.Errors.Any()) {
-                TaskProvider.Value.ReplaceItems(
+                TaskProvider.ReplaceItems(
                     entry,
                     ParserTaskMoniker,
                     errorSink.Warnings
@@ -1123,8 +1119,8 @@ namespace Microsoft.NodejsTools.Intellisense {
                         .Concat(errorSink.Errors.Select(er => f.FromParseError(er)))
                         .ToList()
                 );
-            } else if (TaskProvider.IsValueCreated) {
-                TaskProvider.Value.Clear(entry, ParserTaskMoniker);
+            } else {
+                TaskProvider.Clear(entry, ParserTaskMoniker);
             }
 #if FALSE
             // Add a handler for the next complete analysis
@@ -1253,11 +1249,8 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         private void ClearParserTasks(IProjectEntry entry) {
             if (entry != null) {
-                if (TaskProvider.IsValueCreated) {
-                    // TaskProvider may not be created if we've never opened a
-                    // Node.js file and none of the project files have errors
-                    TaskProvider.Value.Clear(entry, ParserTaskMoniker);
-                }
+                TaskProvider.Clear(entry, ParserTaskMoniker);
+                
                 bool changed;
                 lock (_hasParseErrors) {
                     changed = _hasParseErrors.Remove(entry);
@@ -1287,15 +1280,15 @@ namespace Microsoft.NodejsTools.Intellisense {
         #region IDisposable Members
 
         public void Dispose() {
-            if (TaskProvider.IsValueCreated) {
-                foreach (var file in _projectFiles.Values) {
-                    TaskProvider.Value.Clear(file.Entry, ParserTaskMoniker);
-                }
+            foreach (var file in _projectFiles.Values) {
+                TaskProvider.Clear(file.Entry, ParserTaskMoniker);
             }
 
             if (_analysisQueue != null) {
                 _analysisQueue.Stop();
             }
+
+            TaskProvider.Dispose();
         }
 
         #endregion

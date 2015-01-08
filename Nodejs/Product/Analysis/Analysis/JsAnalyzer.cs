@@ -219,7 +219,7 @@ namespace Microsoft.NodejsTools.Analysis {
         /// about the underlying formats of our objects which is handled entirely with the
         /// SHA256 of our internal data structures.
         /// </summary>
-        private const int _analyzerVersion = 0x06;
+        private const int _analyzerVersion = 0x07;
 
         public static byte[] SerializationVersion {
             get {
