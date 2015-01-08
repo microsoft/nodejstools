@@ -742,17 +742,18 @@ namespace Microsoft.NodejsTools {
         #region Formatting support
 
         private FormattingOptions CreateFormattingOptions(){
-            return CreateFormattingOptions(_editorOptions);
+            return CreateFormattingOptions(_editorOptions, _textView.TextSnapshot);
         }
 
-        internal static FormattingOptions CreateFormattingOptions(IEditorOptions editorOptions) {
+        internal static FormattingOptions CreateFormattingOptions(IEditorOptions editorOptions, ITextSnapshot snapshot) {
             FormattingOptions res = new FormattingOptions();
             if (editorOptions.IsConvertTabsToSpacesEnabled()) {
                 res.SpacesPerIndent = editorOptions.GetIndentSize();
             } else {
                 res.SpacesPerIndent = null;
             }
-            res.NewLine = editorOptions.GetNewLineCharacter();
+
+            res.NewLine = VsExtensions.GetNewLineText(snapshot);
 
             res.SpaceAfterComma = NodejsPackage.Instance.FormattingSpacingOptionsPage.SpaceAfterComma;
             res.SpaceAfterSemiColonInFor = NodejsPackage.Instance.FormattingSpacingOptionsPage.SpaceAfterSemicolonInFor;

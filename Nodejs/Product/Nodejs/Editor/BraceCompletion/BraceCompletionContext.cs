@@ -22,6 +22,7 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.BraceCompletion;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Editor.OptionsExtensionMethods;
+using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.Editor.BraceCompletion {
     [Export(typeof(IBraceCompletionContext))]
@@ -57,7 +58,7 @@ namespace Microsoft.NodejsTools.Editor.BraceCompletion {
                 // Insert an extra newline and indent the closing brace manually.           
                 session.SubjectBuffer.Insert(
                     closingPointPosition - 1,
-                    session.TextView.Options.GetNewLineCharacter());
+                    VsExtensions.GetNewLineText(session.TextView.TextSnapshot));
 
                 // Format before setting the caret.
                 Format(session);
@@ -75,7 +76,7 @@ namespace Microsoft.NodejsTools.Editor.BraceCompletion {
                     buffer.CurrentSnapshot.GetText(),
                     session.OpeningPoint.GetPosition(buffer.CurrentSnapshot),
                     session.ClosingPoint.GetPosition(buffer.CurrentSnapshot),
-                    EditFilter.CreateFormattingOptions(session.TextView.Options)
+                    EditFilter.CreateFormattingOptions(session.TextView.Options, session.TextView.TextSnapshot)
                 )
             );
         }
