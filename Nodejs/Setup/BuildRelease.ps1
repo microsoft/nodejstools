@@ -109,7 +109,7 @@
 [CmdletBinding()]
 param(
     [string] $outdir,
-    [string] $vsTarget,
+    [string[]] $vsTarget,
     [string] $name,
     [switch] $release,
     [switch] $internal,
@@ -120,7 +120,8 @@ param(
     [switch] $skipcopy,
     [switch] $skipdebug,
     [switch] $skipbuild,
-    [switch] $dev
+    [switch] $dev,
+    [switch] $copytests
 )
 
 $buildroot = (Split-Path -Parent $MyInvocation.MyCommand.Definition)
@@ -207,6 +208,11 @@ function msbuild-options($target, $config) {
 # This function is invoked after each target is built.
 function after-build($buildroot, $target) {
     Copy-Item -Force "$buildroot\Nodejs\Prerequisites\*.reg" $($target.destdir)
+
+    if ($copytests) {
+        Copy-Item -Recurse -Force "$buildroot\BuildOutput\$($target.config)$($target.VSTarget)\Tests" "$($target.destdir)\Tests"
+        Copy-Item -Recurse -Force "$buildroot\Nodejs\Tests\TestData" "$($target.destdir)\Tests\TestData"
+    }
 }
 
 # This function is invoked after the entire build process but before scorching
@@ -243,9 +249,9 @@ $managed_files = (
 $native_files = @()
 
 $supported_vs_versions = (
-    @{number="14.0"; name="VS 2015"},
-    @{number="12.0"; name="VS 2013"},
-    @{number="11.0"; name="VS 2012"}
+    @{number="14.0"; name="VS 2015"; build_by_default=$true}},
+    @{number="12.0"; name="VS 2013"; build_by_default=$true}},
+    @{number="11.0"; name="VS 2012"; build_by_default=$true}}
 )
 
 # #############################################################################
@@ -364,8 +370,11 @@ if ($internal -or $release -or $mockrelease) {
 
 $target_versions = @()
 
+if ($vstarget) {
+    $vstarget = $vstarget | %{ "{0:00.0}" -f [float]::Parse($_) }
+}
 foreach ($target_vs in $supported_vs_versions) {
-    if (-not $vstarget -or ($vstarget -match $target_vs.number)) {
+        if ((-not $vstarget -and $target_vs.build_by_default) -or ($target_vs.number -in $vstarget)) {
         $vspath = Get-ItemProperty -Path "HKLM:\Software\Wow6432Node\Microsoft\VisualStudio\$($target_vs.number)" -EA 0
         if (-not $vspath) {
             $vspath = Get-ItemProperty -Path "HKLM:\Software\Microsoft\VisualStudio\$($target_vs.number)" -EA 0
@@ -422,6 +431,8 @@ if (-not $skipclean) {
     }
 }
 
+$logdir = mkdir "$outdir\Logs" -Force
+
 if ($scorch) {
     tfpt scorch $buildroot /noprompt
 }
@@ -449,20 +460,20 @@ try {
                 VSTarget=$($_.number);
                 VSName=$($_.name);
                 destdir=mkdir "$outdir\$($_.name)\$config" -Force;
-                logfile="$outdir\$($_.name)\BuildRelease.$config.$($_.number).log";
+                logfile="$logdir\BuildRelease.$config.$($_.number).log";
                 config=$config;
                 msi_version=$msi_version;
                 release_version=$release_version;
             }
-            $i.unsigned_bindir = mkdir "$($i.destdir)\UnsignedBinaries" -Force;
-            $i.unsigned_msidir = mkdir "$($i.destdir)\UnsignedMsi" -Force;
+            $i.unsigned_bindir = mkdir "$($i.destdir)\UnsignedBinaries" -Force
+            $i.unsigned_msidir = mkdir "$($i.destdir)\UnsignedMsi" -Force
             $i.symboldir = mkdir "$($i.destdir)\Symbols" -Force
             if ($signedBuild) {
                 $i.signed_bindir = mkdir "$($i.destdir)\SignedBinaries" -Force
                 $i.signed_unsigned_msidir = mkdir "$($i.destdir)\SignedBinariesUnsignedMsi" -Force
                 $i.signed_msidir = mkdir "$($i.destdir)\SignedMsi" -Force
                 $i.final_msidir = $i.signed_msidir
-                $i.signed_logfile = "$outdir\$($_.name)\BuildRelease_Signed.$config.$($_.number).log"
+                $i.signed_logfile = "$logdir\BuildRelease_Signed.$config.$($_.number).log"
             } else {
                 $i.final_msidir = $i.unsigned_msidir
             }
@@ -650,5 +661,9 @@ if ($successful) {
         foreach ($name in $failed_logs) {
             Write-Output "    $name"
         }
+        exit 1
     }
+    exit 0
+} else {
+    exit 1
 }
