@@ -249,9 +249,9 @@ $managed_files = (
 $native_files = @()
 
 $supported_vs_versions = (
-    @{number="14.0"; name="VS 2015"; build_by_default=$true}},
-    @{number="12.0"; name="VS 2013"; build_by_default=$true}},
-    @{number="11.0"; name="VS 2012"; build_by_default=$true}}
+    @{number="14.0"; name="VS 2015"; build_by_default=$true},
+    @{number="12.0"; name="VS 2013"; build_by_default=$true},
+    @{number="11.0"; name="VS 2012"; build_by_default=$true}
 )
 
 # #############################################################################
