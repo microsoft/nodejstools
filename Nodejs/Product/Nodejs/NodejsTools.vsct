@@ -304,7 +304,7 @@
 
   <KeyBindings>
     <KeyBinding guid="guidNodeToolsCmdSet" id="cmdidReplWindow" key1="K" mod1="Control" key2="N" editor="guidVSStd97"/>
-    <KeyBinding guid="guidNodeToolsNpmCmdSet" id="cmdidNpmManageModules" key1="K" mod1="Control" key2="P" editor="guidVSStd97"/>
+    <KeyBinding guid="guidNodeToolsNpmCmdSet" id="cmdidNpmManageModules" key1="K" mod1="Control" key2="G" editor="guidVSStd97"/>
   </KeyBindings>
 
   <Symbols>
