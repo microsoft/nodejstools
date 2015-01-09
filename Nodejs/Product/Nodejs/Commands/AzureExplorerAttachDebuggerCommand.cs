@@ -36,7 +36,7 @@ using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Commands {
     /// <summary>
-    /// Provides the command to attach to an Azure web site selected in Server Explorer.
+    /// Provides the command to attach to an Azure Website selected in Server Explorer.
     /// </summary>
     internal class AzureExplorerAttachDebuggerCommand : Command {
         private readonly Type _azureServicesType;
@@ -80,7 +80,7 @@ namespace Microsoft.NodejsTools.Commands {
             onAttach = (attachTask) => {
                 if (!attachTask.Result) {
                     string msg = string.Format(
-                        "Could not attach to node.exe process on Azure web site at {0}.\r\n\r\n" +
+                        "Could not attach to node.exe process on Azure Website at {0}.\r\n\r\n" +
                         "Error retrieving websocket debug proxy information from web.config.",
                         webSite.Uri);
                     if (MessageBox.Show(msg, null, MessageBoxButtons.RetryCancel, MessageBoxIcon.Error) == DialogResult.Retry) {
@@ -95,7 +95,7 @@ namespace Microsoft.NodejsTools.Commands {
         }
 
         /// <returns>
-        /// Information about the current selected Azure web site node in Solution Explorer, or <c>null</c>
+        /// Information about the current selected Azure Website node in Solution Explorer, or <c>null</c>
         /// if no node is selected, it's not a website node, or the information could not be retrieved.
         /// </returns>
         private AzureWebSiteInfo GetSelectedAzureWebSite() {
@@ -146,10 +146,10 @@ namespace Microsoft.NodejsTools.Commands {
                 return null;
             }
 
-            // We need to find out whether this is an Azure website object. We can't do a type check because the type of the 
+            // We need to find out whether this is an Azure Website object. We can't do a type check because the type of the 
             // browse object is private. We can, however, query for properties with specific names, and we can check the types
             // of those properties. In particular, WebSiteState is a public enum type that is a part of Azure Explorer public
-            // contract, so we can check for it, and we can be reasonably sure that it is only exposed by web site nodes.
+            // contract, so we can check for it, and we can be reasonably sure that it is only exposed by website nodes.
 
             var statusProp = obj.GetType().GetProperty("Status");
             if (statusProp == null ||
@@ -158,7 +158,7 @@ namespace Microsoft.NodejsTools.Commands {
                 return null;
             }
 
-            // Is the web site running?
+            // Is the website running?
             int status = (int)statusProp.GetValue(obj);
             if (status != 1) {
                 return null;
@@ -185,7 +185,7 @@ namespace Microsoft.NodejsTools.Commands {
         }
 
         private async Task<bool> AttachWorker(AzureWebSiteInfo webSite) {
-            using (new WaitDialog("Azure remote debugging", "Attaching to Azure web site at " + webSite.Uri, NodejsPackage.Instance, showProgress: true)) {
+            using (new WaitDialog("Azure remote debugging", "Attaching to Azure Website at " + webSite.Uri, NodejsPackage.Instance, showProgress: true)) {
                 // Get path (relative to site URL) for the debugger endpoint.
                 XDocument webConfig;
                 try {
@@ -220,7 +220,7 @@ namespace Microsoft.NodejsTools.Commands {
                     // ask the user to retry, so the only case where we actually get here is if user canceled on error. If this is the case,
                     // we don't want to pop any additional error messages, so always return true, but log the error in the Output window.
                     var output = OutputWindowRedirector.GetGeneral(NodejsPackage.Instance);
-                    output.WriteErrorLine("Failed to attach to Azure web site: " + ex.Message);
+                    output.WriteErrorLine("Failed to attach to Azure Website: " + ex.Message);
                     output.ShowAndActivate();
                 }
                 return true;
@@ -228,7 +228,7 @@ namespace Microsoft.NodejsTools.Commands {
         }
 
         /// <summary>
-        /// Retrieves web.config for a given Azure web site.
+        /// Retrieves web.config for a given Azure Website.
         /// </summary>
         /// <returns>XML document with the contents of web.config, or <c>null</c> if it could not be retrieved.</returns>
         private async Task<XDocument> GetWebConfig(AzureWebSiteInfo webSite) {
@@ -281,12 +281,12 @@ namespace Microsoft.NodejsTools.Commands {
         }
 
         /// <summary>
-        /// Retrieves the publish settings file (.pubxml) for the given Azure web site.
+        /// Retrieves the publish settings file (.pubxml) for the given Azure Website.
         /// </summary>
         /// <returns>XML document with the contents of .pubxml, or <c>null</c> if it could not be retrieved.</returns>
         private async Task<XDocument> GetPublishXml(AzureWebSiteInfo webSiteInfo) {
             // To build the publish settings request URL, we need to know subscription ID, site name, and web region to which it belongs,
-            // but we only have subscription ID and the public URL of the site at this point. Use the Azure web site service to look up
+            // but we only have subscription ID and the public URL of the site at this point. Use the Azure Website service to look up
             // the site from those two, and retrieve the missing info.
 
             IVsAzureServices webSiteServices = new VsAzureServicesShim(NodejsPackage.GetGlobalService(_azureServicesType));
@@ -380,7 +380,7 @@ namespace Microsoft.NodejsTools.Commands {
 
 
         /// <summary>
-        /// Information about an Azure Web Site node in Server Explorer.
+        /// Information about an Azure Website node in Server Explorer.
         /// </summary>
         private class AzureWebSiteInfo {
             public readonly Uri Uri;
