@@ -20,10 +20,11 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Debugger.Serialization;
-using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudioTools;
 using TestUtilities;
 using TestUtilities.Nodejs;
 
@@ -707,6 +708,7 @@ namespace NodejsTests.Debugger {
                 exceptionTreatments: CollectExceptionTreatments(ExceptionHitTreatment.BreakNever, "Error")
             );
         }
+
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void DebuggingDownloaded() {
             TestDebuggerSteps(
@@ -744,7 +746,6 @@ namespace NodejsTests.Debugger {
                 }
             );
         }
-
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void Breaking_InFunctionPassedFewerThanTakenParms() {
@@ -2050,6 +2051,57 @@ namespace NodejsTests.Debugger {
                 }
             );
         }
+        #endregion
+
+        #region Helpers Tests
+
+        [TestMethod, Priority(0), TestCategory("Debugging")]
+        public async Task TaskWaitAsync() {
+            // Successful task, no timeout.
+            var task = Task.Run(() => {
+                Thread.Sleep(500);
+                return 42; });
+            Assert.AreEqual(42, await task.WaitAsync(TimeSpan.FromMilliseconds(1000)));
+
+            // Failed task, no timeout.
+            var tex = new Exception();
+            try {
+                task = Task.Run(() => {
+                    Thread.Sleep(500);
+                    if ("".Length == 0) {
+                        throw tex;
+                    }
+                    return 42;
+                });
+                await task.WaitAsync(TimeSpan.FromMilliseconds(1000));
+                Assert.Fail("Exception expected");
+            } catch (Exception cex) {
+                Assert.AreSame(tex, cex);
+            }
+
+            // Timeout before task completes.
+            task = Task.Run(() => {
+                Thread.Sleep(500);
+                return 42;
+            });
+            try {
+                await task.WaitAsync(TimeSpan.FromMilliseconds(100));
+                Assert.Fail("TaskCanceledException expected");
+            } catch (TaskCanceledException) {
+            }
+
+            // Forced cancelation before task completes.
+            task = Task.Run(() => {
+                Thread.Sleep(500);
+                return 42;
+            });
+            try {
+                await task.WaitAsync(TimeSpan.FromMilliseconds(300), new CancellationTokenSource(100).Token);
+                Assert.Fail("TaskCanceledException expected");
+            } catch (TaskCanceledException) {
+            }
+        }
+
         #endregion
     }
 }

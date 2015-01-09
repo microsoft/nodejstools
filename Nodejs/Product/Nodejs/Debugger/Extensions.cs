@@ -180,10 +180,14 @@ namespace Microsoft.NodejsTools.Debugger {
             return true;
         }
 
-        internal static Task<T> WaitAsync<T>(this Task<T> task, TimeSpan timeout, CancellationToken token = default(CancellationToken)) {
+        internal static async Task<T> WaitAsync<T>(this Task<T> task, TimeSpan timeout, CancellationToken token = default(CancellationToken)) {
             var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
             linkedTokenSource.CancelAfter(timeout);
-            return task.ContinueWith(t => t.Result, linkedTokenSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
+            // If the token will time out, this await will throw TaskCanceledException, which is automatically propagated to our caller.
+            await task.ContinueWith(t => { }, linkedTokenSource.Token).ConfigureAwait(false);
+            // If we're still here, the token didn't time out, so the original task has completed execution (by succeeding or failing);
+            // return its result or propagate the exception.
+            return await task.ConfigureAwait(false);
         }
 
         internal static async Task<string> ReadLineBlockAsync(this StreamReader streamReader, int length) {

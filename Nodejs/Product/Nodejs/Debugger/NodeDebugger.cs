@@ -1076,17 +1076,13 @@ namespace Microsoft.NodejsTools.Debugger {
 
             // Create a new value
             var evaluateValueCommand = new EvaluateCommand(CommandId, _resultFactory, value, stackFrame);
-            if (!await TrySendRequestAsync(evaluateValueCommand, cancellationToken).ConfigureAwait(false)) {
-                return null;
-            }
+            await _client.SendRequestAsync(evaluateValueCommand, cancellationToken).ConfigureAwait(false);
             int handle = evaluateValueCommand.Result.Handle;
 
             // Set variable value
-            var setVariableValuecommand = new SetVariableValueCommand(CommandId, _resultFactory, stackFrame, name, handle);
-            if (!await TrySendRequestAsync(setVariableValuecommand, cancellationToken).ConfigureAwait(false)) {
-                return null;
-            }
-            return setVariableValuecommand.Result;
+            var setVariableValueCommand = new SetVariableValueCommand(CommandId, _resultFactory, stackFrame, name, handle);
+            await _client.SendRequestAsync(setVariableValueCommand, cancellationToken).ConfigureAwait(false);
+            return setVariableValueCommand.Result;
         }
 
         internal async Task<List<NodeEvaluationResult>> EnumChildrenAsync(NodeEvaluationResult nodeEvaluationResult, CancellationToken cancellationToken = new CancellationToken()) {
