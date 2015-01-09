@@ -337,6 +337,7 @@ namespace Microsoft.NodejsTools.Classifier {
                         _tokenCache[currentLineTemp] = lineTokenizationTemp;
                     }
 
+                    currentLineTemp++;
                     stateTemp = lineTokenizationTemp.State;
                 }
 
