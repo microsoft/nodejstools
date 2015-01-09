@@ -123,7 +123,10 @@ namespace Microsoft.NodejsTools.Classifier {
             }
             Utilities.CheckNotNull(_map);
             
+            // Move the lines following our deletion up to 'remove' the deleted lines.
             Array.Copy(_map, index + count, _map, index, _map.Length - index - count);
+           
+            // From the end of the map remove 'count' lines to remove the now bogus data at the end of the map.
             for (int i = 0; i < count; i++) {
                 _map[_map.Length - i - 1] = default(LineTokenization);
             }
@@ -132,9 +135,19 @@ namespace Microsoft.NodejsTools.Classifier {
         internal void InsertLines(int index, int count) {
             Utilities.CheckNotNull(_map);
 
+            // Copy all rows below to make room for the inserted lines.
             Array.Copy(_map, index, _map, index + count, _map.Length - index - count);
+
+            // Clear all of the cached lines where we inserted since they have the old content.
+            // Also, clear the line before the insert as it could have been split and is now invalid.
             for (int i = 0; i < count; i++) {
                 _map[index + i] = default(LineTokenization);
+            }
+
+            if (index + count < _map.Length) {
+                // Some cases (splitting lines for instance) result in an extra line afterwards
+                // that should be cleared as well.
+                _map[index + count] = default(LineTokenization);
             }
         }
     }

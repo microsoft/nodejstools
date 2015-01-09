@@ -579,6 +579,13 @@ label:
 }",
 @"function f() {
 }");
+            // https://nodejstools.codeplex.com/workitem/1740
+            TestCode(
+@"exports.hugues = function(req,res){    res.render('hugues', { title: 'Hugues', year: new Date().getFullYear(), message: 'Your hugues page.' });
+};",
+@"exports.hugues = function (req, res) {
+    res.render('hugues', { title: 'Hugues', year: new Date().getFullYear(), message: 'Your hugues page.' });
+};");
         }
 
         [TestMethod, Priority(0)]
