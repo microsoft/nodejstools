@@ -58,9 +58,9 @@ namespace Microsoft.NodejsTools.Project {
         internal const string LongPathDoNothingButWarnNextTime = "LongPathDoNothingButWarnNextTime";
         internal const string LongPathFooter = "LongPathFooter";
         internal const string LongPathHidePathsExceedingTheLimit = "LongPathHidePathsExceedingTheLimit";
-        internal const string LongPathNpmDedup = "LongPathNpmDedup";
-        internal const string LongPathNpmDedupDetail = "LongPathNpmDedupDetail";
-        internal const string LongPathNpmDedupDidNotHelp = "LongPathNpmDedupDidNotHelp";
+        internal const string LongPathNpmDedupe = "LongPathNpmDedupe";
+        internal const string LongPathNpmDedupeDetail = "LongPathNpmDedupeDetail";
+        internal const string LongPathNpmDedupeDidNotHelp = "LongPathNpmDedupeDidNotHelp";
         internal const string LongPathShowPathsExceedingTheLimit = "LongPathShowPathsExceedingTheLimit";
         internal const string LongPathWarningText = "LongPathWarningText";
         internal const string LongPathWarningTitle = "LongPathWarningTitle";

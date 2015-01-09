@@ -805,10 +805,10 @@ sd.StringDecoder
                         var npmTask = interactive.ReplWindow.ExecuteCommand(".npm install azure@0.9.12");
 
                         using (var dialog = new AutomationDialog(app, AutomationElement.FromHandle(app.WaitForDialog(npmTask)))) {
-                            // The option to offer "npm dedup" should be there.
+                            // The option to offer "npm dedupe" should be there.
                             var firstCommandLink = dialog.FindByAutomationId("CommandLink_1000");
                             Assert.IsNotNull(firstCommandLink);
-                            Assert.IsTrue(firstCommandLink.Current.Name.Contains("npm dedup"));
+                            Assert.IsTrue(firstCommandLink.Current.Name.Contains("npm dedupe"));
 
                             dialog.ClickButtonByAutomationId("ExpandoButton");
                             var detailsText = dialog.FindByAutomationId("ExpandedFooterTextLink");
@@ -836,7 +836,7 @@ sd.StringDecoder
                             }
 
                             dialog.WaitForClosed(TimeSpan.FromSeconds(1), () => {
-                                // Click the first command button (dedup).
+                                // Click the first command button (dedupe).
                                 firstCommandLink.SetFocus();
                                 Keyboard.Press(System.Windows.Input.Key.Enter);
                             });
@@ -845,15 +845,15 @@ sd.StringDecoder
                         // Clicking on that button should not change the option.
                         Assert.IsTrue(NodejsPackage.Instance.GeneralOptionsPage.CheckForLongPaths);
 
-                        interactive.WaitForTextContainsAll("dedup successfully completed");
+                        interactive.WaitForTextContainsAll("dedupe successfully completed");
                         interactive.WaitForIdleState();
 
-                        // npm dedup won't be able to fix the problem, so we should get the dialog once again.
+                        // npm dedupe won't be able to fix the problem, so we should get the dialog once again.
                         using (var dialog = new AutomationDialog(app, AutomationElement.FromHandle(app.WaitForDialog(npmTask)))) {
-                            // The option to offer "npm dedup" should not be there anymore.
+                            // The option to offer "npm dedupe" should not be there anymore.
                             var firstCommandLink = dialog.FindByAutomationId("CommandLink_1000");
                             Assert.IsNotNull(firstCommandLink);
-                            Assert.IsFalse(firstCommandLink.Current.Name.Contains("npm dedup"));
+                            Assert.IsFalse(firstCommandLink.Current.Name.Contains("npm dedupe"));
 
                             dialog.WaitForClosed(TimeSpan.FromSeconds(1), () => {
                                 Keyboard.Type("\r"); // click the first command button (do nothing, but warn next time)
@@ -872,10 +872,10 @@ sd.StringDecoder
                         npmTask = interactive.ReplWindow.ExecuteCommand(".npm list");
 
                         using (var dialog = new AutomationDialog(app, AutomationElement.FromHandle(app.WaitForDialog(npmTask)))) {
-                            // The option to offer "npm dedup" should be there again, since this is a new check.
+                            // The option to offer "npm dedupe" should be there again, since this is a new check.
                             var firstCommandLink = dialog.FindByAutomationId("CommandLink_1000");
                             Assert.IsNotNull(firstCommandLink);
-                            Assert.IsTrue(firstCommandLink.Current.Name.Contains("npm dedup"));
+                            Assert.IsTrue(firstCommandLink.Current.Name.Contains("npm dedupe"));
 
                             dialog.WaitForClosed(TimeSpan.FromSeconds(1), () => {
                                 // Click the third command button (do nothing, do not warn anymore)

@@ -518,10 +518,10 @@ NAME2=value2
   <data name="LongPathHidePathsExceedingTheLimit" xml:space="preserve">
     <value>Hide &amp;paths exceeding the limit</value>
   </data>
-  <data name="LongPathNpmDedup" xml:space="preserve">
-    <value>Run 'npm &amp;dedup' on the project</value>
+  <data name="LongPathNpmDedupe" xml:space="preserve">
+    <value>Run 'npm &amp;dedupe' on the project</value>
   </data>
-  <data name="LongPathNpmDedupDetail" xml:space="preserve">
+  <data name="LongPathNpmDedupeDetail" xml:space="preserve">
     <value>In some cases, deduplicating packages can reduce the amount of nesting in node_modules sufficiently to resolve the issue.</value>
   </data>
   <data name="LongPathDoNothingButWarnNextTime" xml:space="preserve">
@@ -539,8 +539,8 @@ NAME2=value2
   <data name="LongPathClickToCopy" xml:space="preserve">
     <value>Copy Full Path</value>
   </data>
-  <data name="LongPathNpmDedupDidNotHelp" xml:space="preserve">
-    <value>Unfortunately, running 'npm dedup' did not resolve the issue. Please consult the &lt;a href="#help"&gt;documentation&lt;/a&gt; for other potential workarounds.</value>
+  <data name="LongPathNpmDedupeDidNotHelp" xml:space="preserve">
+    <value>Unfortunately, running 'npm dedupe' did not resolve the issue. Please consult the &lt;a href="#help"&gt;documentation&lt;/a&gt; for other potential workarounds.</value>
   </data>
   <data name="StatusAnalysisSaved" xml:space="preserve">
     <value>Node.js analysis saved to disk</value>

@@ -662,7 +662,7 @@ namespace Microsoft.NodejsTools.Project {
 
             try {
                 _isCheckingForLongPaths = true;
-                TaskDialogButton dedupButton, ignoreButton, disableButton;
+                TaskDialogButton dedupeButton, ignoreButton, disableButton;
                 var taskDialog = new TaskDialog(NodejsPackage.Instance) {
                     AllowCancellation = true,
                     EnableHyperlinks = true,
@@ -672,7 +672,7 @@ namespace Microsoft.NodejsTools.Project {
                     CollapsedControlText = SR.GetString(SR.LongPathShowPathsExceedingTheLimit),
                     ExpandedControlText = SR.GetString(SR.LongPathHidePathsExceedingTheLimit),
                     Buttons = {
-                        (dedupButton = new TaskDialogButton(SR.GetString(SR.LongPathNpmDedup), SR.GetString(SR.LongPathNpmDedupDetail))),
+                        (dedupeButton = new TaskDialogButton(SR.GetString(SR.LongPathNpmDedupe), SR.GetString(SR.LongPathNpmDedupeDetail))),
                         (ignoreButton = new TaskDialogButton(SR.GetString(SR.LongPathDoNothingButWarnNextTime))),
                         (disableButton = new TaskDialogButton(SR.GetString(SR.LongPathDoNothingAndDoNotWarnAgain), SR.GetString(SR.LongPathDoNothingAndDoNotWarnAgainDetail)))
                     },
@@ -710,12 +710,12 @@ namespace Microsoft.NodejsTools.Project {
                 taskDialog.ExpandedInformation = string.Join("\r\n", longPaths);
 
                 var button = taskDialog.ShowModal();
-                if (button == dedupButton) {
+                if (button == dedupeButton) {
                     var repl = NodejsPackage.Instance.OpenReplWindow(focus: false);
-                    await repl.ExecuteCommand(".npm dedup").HandleAllExceptions(SR.ProductName);
+                    await repl.ExecuteCommand(".npm dedupe").HandleAllExceptions(SR.ProductName);
 
-                    taskDialog.Content += "\r\n\r\n" + SR.GetString(SR.LongPathNpmDedupDidNotHelp);
-                    taskDialog.Buttons.Remove(dedupButton);
+                    taskDialog.Content += "\r\n\r\n" + SR.GetString(SR.LongPathNpmDedupeDidNotHelp);
+                    taskDialog.Buttons.Remove(dedupeButton);
                     goto recheck;
                 } else if (button == disableButton) {
                     var page = NodejsPackage.Instance.GeneralOptionsPage;
