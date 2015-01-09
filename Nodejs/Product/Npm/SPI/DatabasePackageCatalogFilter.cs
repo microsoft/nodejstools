@@ -34,7 +34,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
             // Escape all quotes so that the sql query is valid. Also replace hyphens with spaces
             // so that we can search text including hyphens because FTS uses '-' as a NOT operator.
-            string escapedFilterString = filterString.Replace("'", "''").Replace('-', ' ');
+            // Lastly, trim whitespace because otherwise no results will be found.
+            string escapedFilterString = filterString.Replace("'", "''").Replace('-', ' ').Trim();
 
             using (var db = new SQLiteConnection(_dbFilename)) {
                 if (filterString.Length >= 3) {

@@ -459,10 +459,21 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestFilterStringWithDashes() {
-            const string filterString = "grunt-contrib";
-            var results = GetFilteredPackageList(filterString);
-            Assert.AreEqual("grunt-contrib", results.First().Name);
+        public void TestFilterStringWithHyphens() {
+            const string
+                filterStringWithHyphenMiddle = "grunt-contrib",
+                filterStringWithHyphenSuffix = "amazing-",
+                filterStringWithHyphenPrefix = "-grunt";
+
+            var results = GetFilteredPackageList(filterStringWithHyphenMiddle);
+            Assert.AreEqual(filterStringWithHyphenMiddle, results.First().Name, "Exact filter string match should be first in list.");
+
+            results = GetFilteredPackageList(filterStringWithHyphenSuffix);
+            Assert.AreEqual(filterStringWithHyphenSuffix, results.First().Name, "Exact filter string match (including suffix) should be first.");
+
+            // Package names cannot begin with a hyphen, but we would expect the first result to at least include the filter string.
+            results = GetFilteredPackageList(filterStringWithHyphenPrefix);
+            Assert.IsTrue(results.First().Name.Contains(filterStringWithHyphenPrefix), "Filter string match (including prefix) should be first");
         }
 
         private void CheckRegexFilterResults(string filterString, IList<IPackage> results) {

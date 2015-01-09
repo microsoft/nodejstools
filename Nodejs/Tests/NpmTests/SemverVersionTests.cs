@@ -83,7 +83,7 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestPreReleaseHypenatedIdentifier() {
+        public void TestPreReleaseHyphenatedIdentifier() {
             SemverVersionTestHelper.AssertVersionsEqual(
                 1,
                 2,
