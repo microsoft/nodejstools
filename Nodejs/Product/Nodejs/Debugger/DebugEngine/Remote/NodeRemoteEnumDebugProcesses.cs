@@ -20,6 +20,7 @@ using System.IO;
 using System.Net.Sockets;
 using System.Net.WebSockets;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.Debugger.Communication;
 using Microsoft.VisualStudio;
@@ -61,25 +62,48 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
                     using (var client = networkClientFactory.CreateNetworkClient(port.Uri))
                     using (var stream = client.GetStream()) {
                         // https://nodejstools.codeplex.com/workitem/578
-                        // Read "welcome" headers from node debug socket before disconnecting to workaround issue
-                        // where connect and immediate disconnect leaves node.js (V8) in a bad state which blocks attach.
+
+                        // Node.js (V8) debugger is fragile during attach, and it's easy to put it into a bad state where it refuses
+                        // future connections altogether, or accepts them but send responses that it queued up for another client.
+                        // To avoid this, our ping needs to look like a proper debug session to the debuggee. For this, we need to
+                        // do the following steps in order:
+                        //
+                        // 1. Receive the debugger's greeting message.
+                        // 2. Send the "disconnect" request.
+                        // 3. Receive the "disconnect" response.
+                        //
+                        // Only then can the socket be closed safely without disrupting V8.
+
+                        // Receive greeting.
                         var buffer = new byte[1024];
-                        var readTask = stream.ReadAsync(buffer, 0, buffer.Length);
-                        if (readTask.Wait(5000)) {
-                            string response = Encoding.UTF8.GetString(buffer, 0, readTask.Result);
-                            Debug.WriteLine("NodeRemoteEnumDebugProcesses debugger response: " + response);
+                        int len = stream.ReadAsync(buffer, 0, buffer.Length, new CancellationTokenSource(5000).Token).GetAwaiter().GetResult();
+                        string response = Encoding.UTF8.GetString(buffer, 0, len);
+                        Debug.WriteLine("NodeRemoteEnumDebugProcesses debugger greeting: " + response);
 
-                            if (response == "Remote debugging session already active\r\n") {
-                                throw new DebuggerAlreadyAttachedException();
-                            }
-
-                            process = new NodeRemoteDebugProcess(port, "node.exe", String.Empty, String.Empty);
-                            Debug.WriteLine("NodeRemoteEnumDebugProcesses ping successful.");
-                            break;
-                        } else {
-                            Debug.WriteLine("NodeRemoteEnumDebugProcesses ping timed out.");
+                        // There's no error code, so we have to do the string comparison. Luckily, it is hardcoded into V8 and is not localized.
+                        if (response == "Remote debugging session already active\r\n") {
+                            throw new DebuggerAlreadyAttachedException();
                         }
+
+                        // Send "disconnect" request.
+                        string request = @"{""command"":""disconnect"",""seq"":1,""type"":""request"",""arguments"":null}";
+                        request = string.Format("Content-Length: {0}\r\n\r\n{1}", request.Length, request);
+                        buffer = Encoding.UTF8.GetBytes(request);
+                        stream.WriteAsync(buffer, 0, buffer.Length, new CancellationTokenSource(5000).Token).GetAwaiter().GetResult();
+
+                        // Receive "disconnect" response.
+                        buffer = new byte[1024];
+                        len = stream.ReadAsync(buffer, 0, buffer.Length, new CancellationTokenSource(5000).Token).GetAwaiter().GetResult();
+                        response = Encoding.UTF8.GetString(buffer, 0, len);
+                        Debug.WriteLine("NodeRemoteEnumDebugProcesses debugger response: " + response);
+
+                        // If we got to this point, the debuggee is behaving as expected, and we can report it as a valid Node.js process.
+                        process = new NodeRemoteDebugProcess(port, "node.exe", String.Empty, String.Empty);
+                        Debug.WriteLine("NodeRemoteEnumDebugProcesses ping successful.");
+                        break;
                     }
+                } catch (OperationCanceledException) {
+                    Debug.WriteLine("NodeRemoteEnumDebugProcesses ping timed out.");
                 } catch (DebuggerAlreadyAttachedException ex) {
                     exception = ex;
                 } catch (AggregateException ex) {
