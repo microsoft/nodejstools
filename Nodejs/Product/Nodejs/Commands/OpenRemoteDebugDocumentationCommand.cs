@@ -23,13 +23,7 @@ using Microsoft.VisualStudioTools;
 namespace Microsoft.NodejsTools.Commands {
     internal sealed class OpenRemoteDebugDocumentationCommand : Command {
         public override void DoCommand(object sender, EventArgs args) {
-            // Open explorer to folder
-            var filePath = Path.Combine(NodejsPackage.RemoteDebugProxyFolder, "RemoteDebugging.html");
-            if (!File.Exists(filePath)) {
-                MessageBox.Show(String.Format("Remote Debug Documentation \"{0}\" does not exist.", filePath), "Node.js Tools for Visual Studio");
-            } else {
-                Process.Start(filePath);
-            }
+            Process.Start("http://go.microsoft.com/fwlink/?LinkId=525504");
         }
 
         public override int CommandId {

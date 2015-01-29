@@ -792,9 +792,6 @@
     <Content Include="Debugger\RemoteDebug\RemoteDebug.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Debugger\RemoteDebug\RemoteDebugging.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="FileTemplates\NewItem\EmptyTs.ts">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -1027,7 +1024,9 @@
     <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\Preview.png" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\Worker.vstemplate" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\Preview.png" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\TypeScriptWebApp.vstemplate" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\TypeScriptWebApp.vstemplate">
+      <SubType>Designer</SubType>
+    </ZipProject>
     <ZipProject Include="ProjectTemplates\Express4App\app.js" />
     <ZipProject Include="ProjectTemplates\Express4App\ExpressApp.njsproj">
       <SubType>Designer</SubType>
@@ -1505,6 +1504,10 @@
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
+    <ProjectReference Include="..\WebRole\WebRole.csproj">
+      <Project>{712d84ec-b2a6-46d1-b030-ba697ae5e554}</Project>
+      <Name>WebRole</Name>
+    </ProjectReference>
     <ProjectReference2 Include="..\PressAnyKey\PressAnyKey.csproj" />
     <ProjectReference Include="..\ProjectWizard\ProjectWizard.csproj">
       <Project>{dbc73df7-1b4c-48be-8b48-715297487e7a}</Project>
@@ -1573,4 +1576,7 @@
       </ZipProject>
     </ItemGroup>
   </Target>
+  <PropertyGroup>
+    <PostBuildEvent>copy /y $(OutDir)..\WebRole\Microsoft.NodejsTools.WebRole.dll $(OutDir)Debugger\RemoteDebug\</PostBuildEvent>
+  </PropertyGroup>
 </Project>

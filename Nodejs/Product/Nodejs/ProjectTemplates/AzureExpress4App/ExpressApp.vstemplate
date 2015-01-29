@@ -38,7 +38,7 @@
         <ProjectItem>setup_web.cmd</ProjectItem>
         <ProjectItem>node.cmd</ProjectItem>
       </Folder>
-      <ProjectItem>Web.config</ProjectItem>
+      <ProjectItem ReplaceParameters="true">Web.config</ProjectItem>
       <ProjectItem ReplaceParameters="true">Web.Debug.config</ProjectItem>
       <ProjectItem OpenInEditor="true">app.js</ProjectItem>
       <ProjectItem ReplaceParameters="true">package.json</ProjectItem>

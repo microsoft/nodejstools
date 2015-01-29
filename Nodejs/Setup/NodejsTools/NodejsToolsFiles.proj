@@ -118,7 +118,7 @@
         <!-- Remote Debug files -->
         <File Include="License.html;
                        Debugger\RemoteDebug\RemoteDebug.js;
-                       Debugger\RemoteDebug\RemoteDebugging.html">
+                       Debugger\RemoteDebug\Microsoft.NodejsTools.WebRole.dll">
             <InstallDirectory>RemoteDebug</InstallDirectory>
         </File>
 
