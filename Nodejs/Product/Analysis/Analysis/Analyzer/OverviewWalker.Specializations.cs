@@ -30,7 +30,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         private static ExpectedLookup ObjectLookup = new ExpectedLookup("Object");
         private static Dictionary<string, BaseSpecialization[]> _specializations = new Dictionary<string, BaseSpecialization[]>() { 
             { "merge", new[] { MergeSpecialization2(), MergeSpecialization() } },
-            { "exports", new[] { MergeSpecialization() } }, // utils-merge 1.0
+            { "exports", new[] { MergeSpecialization(), MergeDescriptorsSpecialization()  } }, // utils-merge 1.0, merge-descriptors
             { "mergeClone", new[] { MergeCloneSpecialization()  } },
             { "copy", new[] { CopySpecialization() }},
             { "clone", new[] { new CloneSpecialization(CloneSpecializationImpl) }},
@@ -247,6 +247,61 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                     typeof(ReturnNode),
                     result.Variable
                 )
+            );
+        }
+
+        /// <summary>
+        /// Matches:
+        /// 
+        /// module.exports = function (dest, src) {
+        ///     Object.getOwnPropertyNames(src).forEach(function (name) {
+        ///         var descriptor = Object.getOwnPropertyDescriptor(src, name)
+        ///         Object.defineProperty(dest, name, descriptor)
+        ///     })
+        ///     return dest
+        /// }
+        /// </summary>
+        private static PatternSpecialization MergeDescriptorsSpecialization() {
+            var destParam = new ExpectedParameter(0);
+            var srcParam = new ExpectedParameter(1);
+            var descriptorVar = new ExpectedVariableDeclaration(
+                new ExpectedCall(
+                    new ExpectedMember(new ExpectedLookup("Object"), "getOwnPropertyDescriptor"),
+                    new ExpectedParameter(1, 1), // src in outer function
+                    new ExpectedParameter(0)    // name in inner function
+                )
+            );
+
+            return new PatternSpecialization(
+                MergeSpecializationImpl,
+                new ExpectedNode(
+                    typeof(ExpressionStatement),
+                    new ExpectedCall(
+                        new ExpectedMember(
+                            new ExpectedCall(
+                                new ExpectedMember(new ExpectedLookup("Object"), "getOwnPropertyNames"),
+                                srcParam
+                            ),
+                            "forEach"
+                        ),
+                        new ExpectedFunctionExpr(
+                            new ExpectedNode(
+                                typeof(Block),
+                                descriptorVar,
+                                new ExpectedNode(
+                                    typeof(ExpressionStatement),
+                                    new ExpectedCall(
+                                        new ExpectedMember(new ExpectedLookup("Object"), "defineProperty"),
+                                        new ExpectedParameter(0, 1),    // dest in outer function
+                                        new ExpectedParameter(0),   // name in inner function
+                                        descriptorVar.Variable
+                                    )
+                                )
+                            )
+                        )
+                    )
+                ),
+                new ExpectedNode(typeof(ReturnNode), destParam)
             );
         }
 

@@ -199,8 +199,23 @@ namespace Microsoft.NodejsTools.Analysis {
             ddg.SetCurrentUnit(this);
             Ast.Walk(ddg);
 
+            var toRemove = new List<KeyValuePair<string,VariableDef>>();
+
             foreach (var variableInfo in DeclaringModuleEnvironment.Variables) {
                 variableInfo.Value.ClearOldValues(ProjectEntry);
+                if (variableInfo.Value._dependencies.Count == 0 &&
+                    variableInfo.Value.TypesNoCopy.Count == 0) {
+                    toRemove.Add(variableInfo);
+                }
+            }
+
+            foreach (var nameValue in toRemove) {
+                DeclaringModuleEnvironment.GlobalEnvironment.RemoveVariable(nameValue.Key);
+
+                // if anyone read this value it could now be gone (e.g. user 
+                // deletes a class definition) so anyone dependent upon it
+                // needs to be updated.
+                nameValue.Value.EnqueueDependents();
             }
         }
 

@@ -1595,6 +1595,35 @@ var x = g.abc;
         }
 
         [TestMethod, Priority(0)]
+        public void TestMergeDescriptorsSpecialization() {
+            var analysis = ProcessText(@"var merge = function exports(dest, src) {
+    Object.getOwnPropertyNames(src).forEach(function (name) {
+        var descriptor = Object.getOwnPropertyDescriptor(src, name)
+        Object.defineProperty(dest, name, descriptor)
+    })
+    return dest
+};
+
+
+function f() {
+}
+
+f.abc = 42
+
+function g() {
+}
+
+merge(g, f)
+var x = g.abc;
+");
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", 0),
+                BuiltinTypeId.Number
+            );
+        }
+
+
+        [TestMethod, Priority(0)]
         public void TestMergeSpecialization2() {
             var analysis = ProcessText(@"function merge (to, from) {
   var keys = Object.keys(from)

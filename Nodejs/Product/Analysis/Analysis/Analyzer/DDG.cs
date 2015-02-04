@@ -184,7 +184,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             if (variable != null) {
                 string varName = variable.First().Name;
                 Debug.Assert(_eval.Scope.ContainsVariable(varName));
-                var prevVar = _eval.Scope.GetVariable(varName);
+                var prevVar = _eval.Scope.GetVariable(node.Variable, _unit, varName);
                 bool walkedBody = false;
                 if (coll.Count == 1) {
                     foreach (var value in coll) {
