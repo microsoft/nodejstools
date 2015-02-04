@@ -3787,11 +3787,18 @@ namespace Microsoft.NodejsTools.Parsing
                                             break;
                                         }
                                     } else {
-                                        if (m_foundEndOfLine) {
-                                            ReportError(JSError.NoRightCurly);
-                                        } else
+                                        if (JSToken.Identifier == _curToken && PeekToken() == JSToken.Colon) {
+                                            // we assume this is missing the comma.
                                             ReportError(JSError.NoComma, true);
-                                        SkipTokensAndThrow();
+                                            // continue along though, this is likely fine.  recover
+                                        } else {
+                                            if (m_foundEndOfLine) {
+                                                ReportError(JSError.NoRightCurly);
+                                            } else {
+                                                ReportError(JSError.NoComma, true);
+                                            }
+                                            SkipTokensAndThrow();
+                                        }
                                     }
                                 }
                             } catch (RecoveryTokenException exc) {

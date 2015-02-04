@@ -4985,7 +4985,7 @@ do {
             return stmt => {
                 Assert.AreEqual(typeof(Block), stmt.GetType());
                 var block = (Block)stmt;
-                Assert.AreEqual(statements.Length, block.Count);
+                Assert.AreEqual(statements.Length, block.Count, "Statement Count not Equal to found in Block");
                 for (int i = 0; i < block.Count; i++) {
                     try {
                         statements[i](block[i]);
@@ -5377,7 +5377,7 @@ do {
         public void CheckErrors(ErrorInfo[] errors) {
             bool success = false;
             try {
-                Assert.AreEqual(errors.Length, Errors.Count);
+                Assert.AreEqual(errors.Length, Errors.Count, "Unexpected Error Count");
                 for (int i = 0; i < errors.Length; i++) {
                     Assert.AreEqual(errors[i].ToString(), Errors[i].ToString());
                 }

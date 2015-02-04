@@ -792,6 +792,50 @@ c: 42, d: 100}",
         }
 
         [TestMethod, Priority(0)]
+        public void TestIndentObjectLiteralWithoutComma() {
+            // https://nodejstools.codeplex.com/workitem/1782
+            TestCode(@"Main.Test.prototype = {
+    testFunc: function () {
+
+    },
+    testFunc3: function () {}
+    testFunc2: function () {
+
+    }
+}",
+@"Main.Test.prototype = {
+    testFunc: function () {
+
+    },
+    testFunc3: function () { }
+    testFunc2: function () {
+
+    }
+}");
+
+            TestCode(@"Main.Test.prototype = {
+    testFunc: function () {
+
+    },
+    testFunc3: function () {
+}
+    testFunc2: function () {
+
+    }
+}",
+@"Main.Test.prototype = {
+    testFunc: function () {
+
+    },
+    testFunc3: function () {
+    }
+    testFunc2: function () {
+
+    }
+}");
+        }
+
+        [TestMethod, Priority(0)]
         public void TestDoWhile() {
             TestCode(@"do
     { var a
