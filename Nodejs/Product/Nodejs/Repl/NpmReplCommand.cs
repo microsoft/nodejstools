@@ -48,7 +48,7 @@ namespace Microsoft.NodejsTools.Repl {
 
         public async Task<ExecutionResult> Execute(IReplWindow window, string arguments) {
             string projectPath = string.Empty;
-            string npmArguments = arguments.TrimStart(' ', '\t');
+            string npmArguments = arguments.Trim(' ', '\t');
 
             // Parse project name/directory in square brackets
             if (npmArguments.StartsWith("[")) {
@@ -56,6 +56,10 @@ namespace Microsoft.NodejsTools.Repl {
                 projectPath = match.Groups[1].Value;
                 npmArguments = npmArguments.Substring(match.Length);
             }
+
+            // Include spaces on either side of npm arguments so that we can more simply detect arguments
+            // at beginning and end of string (e.g. '--global')
+            npmArguments = string.Format(" {0} ", npmArguments);
 
             var solution = Package.GetGlobalService(typeof(SVsSolution)) as IVsSolution;
             IEnumerable<IVsProject> loadedProjects = solution.EnumerateLoadedProjects(onlyNodeProjects: true);
@@ -107,16 +111,17 @@ namespace Microsoft.NodejsTools.Repl {
                 }
             }
 
-            bool isGlobalInstall = false;
-            if (npmArguments.Contains(" -g") || npmArguments.Contains(" --global")) {
+            bool isGlobalCommand = false;
+            if (string.IsNullOrWhiteSpace(npmArguments) ||
+                npmArguments.Contains(" -g ") || npmArguments.Contains(" --global ")) {
                 projectPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                isGlobalInstall = true;
+                isGlobalCommand = true;
             }
 
             // In case someone copies filename
             string projectDirectoryPath = File.Exists(projectPath) ? Path.GetDirectoryName(projectPath) : projectPath;
             
-            if (!isGlobalInstall && !(Directory.Exists(projectDirectoryPath) && File.Exists(Path.Combine(projectDirectoryPath, "package.json")))) {
+            if (!isGlobalCommand && !(Directory.Exists(projectDirectoryPath) && File.Exists(Path.Combine(projectDirectoryPath, "package.json")))) {
                 window.WriteError("Please specify a valid Node.js project or project directory in solution. If solution contains multiple projects, specify target project using .npm [ProjectName or ProjectDir] <npm arguments>");
                 return ExecutionResult.Failure;
             }
