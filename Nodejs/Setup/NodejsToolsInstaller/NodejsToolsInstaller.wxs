@@ -84,6 +84,17 @@
                 </ProgId>
             </Component>
 
+            <Component Id="Comp_ProfilingRegistration" DiskId="1" Guid="$(var.Comp_NjsPerfRegistrationGuid)">
+                <RegistryValue Root='HKCR' Key='.njsperf' Type='string' Name='PerceivedType' Value='text' />
+                <RegistryValue Root='HKCR' Key='VisualStudio.Launcher.njsperf.$(var.VSTargetVersion)\DefaultIcon' Type='string' Value='[Dir_NTVSInstallLocation]\NodejsProject.ico' />
+
+                <ProgId Id="VisualStudio.Launcher.njsperf.$(var.VSTargetVersion)" Description="Node.js Performance File">
+                    <Extension Id="njsperf" ContentType="text/plain">
+                        <Verb Id="Open" Command="Open" TargetProperty="VSLAUNCHER" Argument="&quot;%1&quot;"/>
+                    </Extension>
+                </ProgId>
+            </Component>
+
             <Merge Id="Merge_InteractiveWindow" Language="1033" SourceFile="InteractiveWindow.msm" DiskId="1">
                 <?foreach key in VS;VWD?>
                 <ConfigurationData Name="Config_$(var.key)ExtensionsParent" Value="Dir_$(var.key)Extensions" />
@@ -132,6 +143,7 @@
 
             <Feature Id="Feature_VsNjsFile" AllowAdvertise="no" Level="1" Title="Register file associations" Description="Associates Node.js projects and source files with Visual Studio (existing source file associations are not modified).">
                 <ComponentRef Id="Comp_NjsProgRegistration"/>
+                <ComponentRef Id="Comp_ProfilingRegistration"/>
             </Feature>
         </Feature>
         

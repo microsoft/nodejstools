@@ -7,13 +7,6 @@
 
         <?include ..\MergeModule.wxi ?>
 
-        <Property Id="VSLAUNCHER" >
-            <DirectorySearch Path="[ProgramFilesFolder]\Common Files\Microsoft Shared\MSEnv" Depth="4" Id="FindVSLauncher">
-                <FileSearch Name="VSLauncher.exe" />
-            </DirectorySearch>
-        </Property>
-
-
         <Component Id="PerUserInstallRegistry" Directory="Dir_VSInstallLocation" Guid="{1FA57071-B39A-4320-9678-ABE1AB4D04DD}">
             <Condition>NOT ALLUSERS = 1</Condition>
             <RegistryKey Root='HKCU' Key='Software\Microsoft\VisualStudio\$(var.VSTargetVersion)\ExtensionManager\EnabledExtensions'>
@@ -24,29 +17,6 @@
             </RegistryKey>
         </Component>
 
-        <?if "$(var.VSTargetVersion)" = "11.0" ?>
-        <?define Comp_NjsPerfRegistrationGuid=3A0DE583-354F-449A-AF25-9C05766035C9?>
-        <?elseif "$(var.VSTargetVersion)" = "12.0" ?>
-        <?define Comp_NjsPerfRegistrationGuid=CD1F26B8-C6EE-4711-AE83-3AEC2B567874?>
-        <?elseif "$(var.VSTargetVersion)" = "14.0" ?>
-        <?define Comp_NjsPerfRegistrationGuid=342B819E-8A93-4EAD-9FC7-FDE7CC9454FD?>
-        <?else?>
-        <!--Unknown VS version, We'll insert a bunch of bogus values such that Wix will error out-->
-        <!--  To fix this define a new section above for the new VS version.  Leave this such that future new versions continue to crash on build-->
-        <?define Comp_NjsPerfRegistrationGuid=UNKNOWN_VSTARGET?>
-        <?endif ?>
-
-        <Component Id="Comp_ProfilingRegistration" DiskId="1" Guid="$(var.Comp_NjsPerfRegistrationGuid)" Directory="Dir_VSInstallLocation">
-            <RegistryValue Root='HKCR' Key='.njsperf' Type='string' Name='PerceivedType' Value='text' />
-            <RegistryValue Root='HKCR' Key='VisualStudio.Launcher.njsperf.$(var.VSTargetVersion)\DefaultIcon' Type='string' Value='[Dir_VSInstallLocation]\NodejsProject.ico' />
-
-            <ProgId Id="VisualStudio.Launcher.njsperf.$(var.VSTargetVersion)" Description="Node.js Performance File">
-                <Extension Id="njsperf" ContentType="text/plain">
-                    <Verb Id="Open" Command="Open" TargetProperty="VSLAUNCHER" Argument="&quot;%1&quot;"/>
-                </Extension>
-            </ProgId>
-        </Component>
-        
         <ComponentGroupRef Id="CGroup_ProfilingFiles"/>
     </Module>
 </Wix>
