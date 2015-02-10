@@ -353,6 +353,32 @@ var x = arr.slice(1,2)[0];
         }
 
         [TestMethod, Priority(0)]
+        public void TestArrayConcat() {
+            string code = @"
+var arr = ['abc', 'def'];
+x = {};
+arr.concat('all').forEach(function f(a) {
+    x[a] = 42;
+}
+// here
+";
+            var analysis = ProcessText(code);
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x.abc", code.IndexOf("// here")),
+                BuiltinTypeId.Number
+            );
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x.def", code.IndexOf("// here")),
+                BuiltinTypeId.Number
+            );
+            // Some day this would be nice...
+            //AssertUtil.ContainsExactly(
+            //    analysis.GetTypeIdsByIndex("x.all", code.IndexOf("// here")),
+            //    BuiltinTypeId.Number
+            //);
+        }
+
+        [TestMethod, Priority(0)]
         public void TestPrototypeGetter() {
             string code = @"
 function MyObject() {

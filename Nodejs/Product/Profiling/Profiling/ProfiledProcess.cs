@@ -131,8 +131,16 @@ namespace Microsoft.NodejsTools.Profiling {
                     var executionTime = _process.ExitTime.Subtract(_process.StartTime);
                     var v8log = Path.Combine(_dir, "v8.log");
                     if (!File.Exists(v8log)) {
-                        MessageBox.Show(String.Format("v8 log file was not successfully saved to:\r\n{0}\r\n\r\nNo profiling data is available.", v8log));
-                        return;
+                        // later versions of Node write out to a file like isolate-####...-v8.log
+                        // Search for the latest of those.
+                        v8log = Directory.GetFiles(_dir, "*v8.log")
+                            .OrderBy(x => new FileInfo(x).CreationTime)
+                            .Reverse()
+                            .FirstOrDefault();
+                        if (v8log == null) {
+                            MessageBox.Show(String.Format("v8 log file was not successfully saved to:\r\n{0}\r\n\r\nNo profiling data is available.", v8log));
+                            return;
+                        }
                     }
 
                     var psi = new ProcessStartInfo(

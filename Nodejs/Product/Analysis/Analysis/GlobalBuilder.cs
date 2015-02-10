@@ -228,8 +228,9 @@ All other strings are considered decimal.", isOptional:true)
                 NewArray,
                 null,
                 arrayPrototype = new BuiltinObjectValue(builtinEntry) {
-                        BuiltinFunction(
+                        SpecializedFunction(
                             "concat",
+                            ArrayConcat,
                             "Combines two or more arrays.",
                             Parameter("item"),
                             Parameter("item...")
@@ -424,6 +425,12 @@ All other strings are considered decimal.", isOptional:true)
                 }
             }
             return res;
+        }
+
+        private static IAnalysisSet ArrayConcat(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
+            // supporting actual concat would be nice, but could lead to infinite
+            // analysis.  So we just return the existing array for now.
+            return @this;
         }
 
         [ThreadStatic]
