@@ -612,7 +612,14 @@ namespace Microsoft.NodejsTools.Debugger {
 
                 // Process break for breakpoint bindings, if any
                 if (!await ProcessBreakpointBreakAsync(module, breakpointBindings, false).ConfigureAwait(false)) {
-                    await AutoResumeAsync(false).ConfigureAwait(false);
+                    // If we haven't reported LoadComplete yet, and don't have any matching bindings, this is the
+                    // virtual breakpoint corresponding to the entry point (new since Node v0.12). We want to ignore
+                    // this for the time being and not do anything - when we report LoadComplete, VS will calls us
+                    // back telling us to continue, and at that point we will unfreeze the process.
+                    // Otherwise, this is just some breakpoint that we don't know of, so tell it to resume running.
+                    if (_loadCompleteHandled) {
+                        await AutoResumeAsync(false).ConfigureAwait(false);
+                    }
                 }
             });
         }

@@ -166,10 +166,10 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                     break;
 
                 case "beforeCompile":
-                    break;
                 case "breakForCommand":
                 case "newFunction":
                 case "scriptCollected":
+                case "compileError":
                     break;
 
                 default:
