@@ -24,7 +24,7 @@ using Microsoft.VisualStudioTools;
 
 namespace TestUtilities {
     public static class TestData {
-        const string BinariesAltSourcePath = @"BuildOutput";
+        const string BinariesAltSourcePath = @"Tests";
         const string BinariesSourcePath = @"BuildOutput\" +
 #if DEBUG
             @"Debug" + 
@@ -34,7 +34,7 @@ namespace TestUtilities {
             AssemblyVersionInfo.VSVersion + @"\Tests";
         const string BinariesOutPath = "";
 
-        const string DataAltSourcePath = @"TestData";
+        const string DataAltSourcePath = @"Tests\TestData";
         const string DataOutPath = @"TestData";
 
         private static string GetSolutionDir() {
