@@ -73,31 +73,32 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        [SRCategoryAttribute(SR.CategoryVersion)]
-        [SRDisplayName(SR.NpmPackageNewVersionAvailable)]
-        [SRDescriptionAttribute(SR.NpmPackageNewVersionAvailableDescription)]
-        public string NewVersionAvailable {
-            get {
-                if (IsSubPackage) {
-                    return SR.GetString(SR.NewVersionNotApplicableSubpackage);
-                }
+        // TODO Retrieving the package information is currently too slow to include in properties pane.
+        //[SRCategoryAttribute(SR.CategoryVersion)]
+        //[SRDisplayName(SR.NpmPackageNewVersionAvailable)]
+        //[SRDescriptionAttribute(SR.NpmPackageNewVersionAvailableDescription)]
+        //public string NewVersionAvailable {
+        //    get {
+        //        if (IsSubPackage) {
+        //            return SR.GetString(SR.NewVersionNotApplicableSubpackage);
+        //        }
 
-                var package = Package;
-                var catalog = MostRecentlyLoadedCatalog;
-                if (null == catalog || null == package) {
-                    return SR.GetString(SR.NewVersionUnknown);
-                }
+        //        var package = Package;
+        //        var catalog = MostRecentlyLoadedCatalog;
+        //        if (null == catalog || null == package) {
+        //            return SR.GetString(SR.NewVersionUnknown);
+        //        }
 
-                var listed = catalog[package.Name];
-                if (null == listed) {
-                    return SR.GetString(SR.NewVersionUnknown);
-                }
+        //        var listed = catalog[package.Name];
+        //        if (null == listed) {
+        //            return SR.GetString(SR.NewVersionUnknown);
+        //        }
 
-                return listed.Version > package.Version
-                    ? SR.GetString(SR.NewVersionYes, listed.Version)
-                    : SR.GetString(SR.NewVersionNo);
-            }
-        }
+        //        return listed.Version > package.Version
+        //            ? SR.GetString(SR.NewVersionYes, listed.Version)
+        //            : SR.GetString(SR.NewVersionNo);
+        //    }
+        //}
 
         [SRCategoryAttribute(SR.General)]
         [SRDisplayName(SR.NpmPackageDescription)]

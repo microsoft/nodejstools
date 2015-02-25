@@ -563,25 +563,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         public IPackage this[string name] {
             get {
-                IPackage package;
-                using (var semaphore = GetDatabaseSemaphore()) {
-                    // Wait until file is downloaded/parsed if another download is already in session.
-                    // Allows user to open multiple npm windows and show progress bar without file-in-use errors.
-                    bool success = semaphore.WaitOne(10);
-                    if (!success) {
-                        return null;
-                    }
-
-                    try {
-                        using (var db = new SQLiteConnection(DatabaseCacheFilePath)) {
-                            package = db.Table<CatalogEntry>().FirstOrDefault(entry => entry.Name == name).ToPackage();
-                        }
-                    } finally {
-                        semaphore.Release();
-                    }
-                }
-
-                return package;
+                return Task.Run(async () => await GetCatalogPackagesAsync(name)).Result.FirstOrDefault();
             }
         }
     }
