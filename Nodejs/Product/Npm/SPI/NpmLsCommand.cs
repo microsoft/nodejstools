@@ -27,7 +27,11 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             string pathToNpm = null,
             bool useFallbackIfNpmNotFound = true)
             : base(fullPathToRootPackageDirectory, pathToNpm) {
-            var buff = new StringBuilder("ls");
+
+            // We will have issues parsing the output if there are warnings.
+            // npm warns on every command, even if that command has nothing to do with the warning.
+            // For npm ls, we should use the silent flag because the warnings will never matter. 
+            var buff = new StringBuilder("ls --silent");
             if (global) {
                 buff.Append(" -g");
             }
