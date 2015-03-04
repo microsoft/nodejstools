@@ -43,6 +43,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
 
         private bool _isDisposed;
+        private bool _isReloadingModules = false;
 
         public NpmController(
             string fullPathToRootPackageDirectory,
@@ -59,8 +60,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
             try {
                 ReloadModules();
-            }
-            catch (NpmNotFoundException) { }
+            } catch (NpmNotFoundException) { }
         }
 
         internal string FullPathToRootPackageDirectory {
@@ -104,14 +104,23 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 }
             });
         }
-        
+
         public async Task RefreshAsync() {
             OnStartingRefresh();
             try {
+                lock (_fileBitsLock) {
+                    if (_isReloadingModules) {
+                        RestartFileSystemWatcherTimer();
+                        return;
+                    } else {
+                        _isReloadingModules = true;
+                    }
+                }
+
                 RootPackage = RootPackageFactory.Create(
                             _fullPathToRootPackageDirectory,
                             _showMissingDevOptionalSubPackages);
-                
+
                 var command = new NpmLsCommand(_fullPathToRootPackageDirectory, true, PathToNpm);
 
                 GlobalPackages = (await command.ExecuteAsync())
@@ -120,6 +129,9 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             } catch (IOException) {
                 // Can sometimes happen when packages are still installing because the file may still be used by another process
             } finally {
+                lock (_fileBitsLock) {
+                    _isReloadingModules = false;
+                }
                 if (RootPackage == null) {
                     OnOutputLogged("Error - Cannot load local packages.");
                 }
@@ -134,7 +146,9 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             get {
                 var command = new NpmLsCommand(_fullPathToRootPackageDirectory, true, PathToNpm);
 
-                if (Task.Run(async () => { return await command.ExecuteAsync(); } ).Result) {
+                // TODO - use GetAwaiter().GetResult() instead. 
+                // https://nodejstools.codeplex.com/workitem/1849
+                if (Task.Run(async () => { return await command.ExecuteAsync(); }).Result) {
                     return command.ListBaseDirectory;
                 }
 
@@ -231,7 +245,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             try {
                 watcher = new FileSystemWatcher(directory) {
                     NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.CreationTime,
-                    IncludeSubdirectories = true
+                    IncludeSubdirectories = true,
+                    Filter = "package.json"
                 };
 
                 watcher.Changed += Watcher_Modified;
@@ -254,7 +269,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         private void Watcher_Modified(object sender, FileSystemEventArgs e) {
             string path = e.FullPath;
-            if (!path.EndsWith("package.json", StringComparison.OrdinalIgnoreCase) && path.IndexOf("\\node_modules", StringComparison.OrdinalIgnoreCase) == -1) {
+            if (path.IndexOf("\\node_modules", StringComparison.OrdinalIgnoreCase) == -1) {
                 return;
             }
 
@@ -335,7 +350,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                         _fileSystemWatcherTimer = null;
                     }
                 }
-                
+
                 _isDisposed = true;
             }
         }
