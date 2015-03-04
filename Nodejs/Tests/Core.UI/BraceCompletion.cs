@@ -44,12 +44,24 @@ namespace Microsoft.Nodejs.Tests.UI {
             AssertListener.Initialize();
         }
 
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("VSTestHost")]
+        public void BraceCompletionsBasic() {
+            using (var solution = BasicProject.Generate().ToVs()) {
+                var server = solution.OpenItem("Require", "SomeFolder", "baz.js");
+
+                // Test '('
+                Keyboard.Type("(");
+                server.WaitForText("()");
+            }
+        }
+
         /// <summary>
         /// Test the different brace completions ({, [, (, ', ").
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void BraceCompletionsBasic() {
+        public void BraceCompletionsE2E() {
             using (var solution = BasicProject.Generate().ToVs()) {
                 var server = solution.OpenItem("Require", "SomeFolder", "baz.js");
 
@@ -71,10 +83,10 @@ namespace Microsoft.Nodejs.Tests.UI {
 
                 // Verify both nested completions and '[' as well as '''
                 Keyboard.Type("\nvar arr = ['elem\\'ent1', 'element2");
-                server.WaitForText("require(\"\");\r\nfunction a(b) {\r\nvar arr = ['elem\\'ent1', 'element2']}");
+                server.WaitForText("require(\"\");\r\nfunction a(b) {\r\n    var arr = ['elem\\'ent1', 'element2']\r\n}");
 
                 Keyboard.Type("'];");
-                server.WaitForText("require(\"\");\r\nfunction a(b) {\r\n    var arr = ['elem\\'ent1', 'element2'];}");
+                server.WaitForText("require(\"\");\r\nfunction a(b) {\r\n    var arr = ['elem\\'ent1', 'element2'];\r\n}");
 
                 // Verify typeover
                 Keyboard.Type("\n}");

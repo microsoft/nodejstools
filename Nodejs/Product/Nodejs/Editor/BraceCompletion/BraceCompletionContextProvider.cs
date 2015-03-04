@@ -15,6 +15,7 @@
 //*********************************************************//
 #if DEV12_OR_LATER
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using Microsoft.NodejsTools.Classifier;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.BraceCompletion;
@@ -43,23 +44,24 @@ namespace Microsoft.NodejsTools.Editor.BraceCompletion {
         }
 
         private bool IsValidBraceCompletionContext(SnapshotPoint openingPoint) {
-            if (openingPoint.Position <= 0) {
-                // If we are at the start of the buffer, there is no reason to do a completion.
-                return false;
-            }
+            Debug.Assert(openingPoint.Position >= 0, "SnapshotPoint.Position should always be zero or positive.");
 
-            var classifier = openingPoint.Snapshot.TextBuffer.GetNodejsClassifier();
-            var classificationSpans = classifier.GetClassificationSpans(new SnapshotSpan(openingPoint - 1, 1));
+            if (openingPoint.Position > 0) {
+                var classifier = openingPoint.Snapshot.TextBuffer.GetNodejsClassifier();
+                var classificationSpans = classifier.GetClassificationSpans(new SnapshotSpan(openingPoint - 1, 1));
 
-            foreach (ClassificationSpan span in classificationSpans) {
-                if (span.ClassificationType.IsOfType("comment")) {
-                    return false;
-                } else if (span.ClassificationType.IsOfType("literal")) {
-                    return false;
+                foreach (ClassificationSpan span in classificationSpans) {
+                    if (span.ClassificationType.IsOfType("comment")) {
+                        return false;
+                    } else if (span.ClassificationType.IsOfType("literal")) {
+                        return false;
+                    }
                 }
             }
-
+            
             // If we haven't stopped this, go ahead and start the completion session.
+            // Either we were at position 0 (a safe place to be placing a brace completion)
+            // or we were in a classification that is safe for brace completion.
             return true;
         }
     }
