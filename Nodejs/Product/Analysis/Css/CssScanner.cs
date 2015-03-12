@@ -1266,7 +1266,7 @@ namespace Microsoft.Ajax.Utilities
                         // we shouldn't NEED to check for surrogate pairs here because
                         // the encoding is up to six digits, which encompasses all the
                         // available Unicode characters without having to resort to
-                        // surrogate pairs. However, some bone-head can always manually
+                        // surrogate pairs. However, someone can always manually
                         // encode two surrogate pair values in their source.
                         if (0xd800 <= unicodeValue && unicodeValue <= 0xdbff)
                         {

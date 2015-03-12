@@ -53,12 +53,12 @@ namespace Microsoft.NodejsTools.Npm {
             var buildMetadata = match.Groups["buildmetadata"];
 
             try {
-                // NASTY: To deal with patch truncation - e.g., seen with 'classy' package in npm v1.4.3 onwards
+                // Hack: To deal with patch truncation - e.g., seen with 'classy' package in npm v1.4.3 onwards
                 var patch = match.Groups["patch"].Value;
                 while (!string.IsNullOrEmpty(patch) && patch.EndsWith("…")) {
                     patch = patch.Length == 1 ? "0" : patch.Substring(0, patch.Length - 1);
                 }
-                // /NASTY
+                // /Hack
 
                 return new SemverVersion(
                     ulong.Parse(match.Groups["major"].Value),

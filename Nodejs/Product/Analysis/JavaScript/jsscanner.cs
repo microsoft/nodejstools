@@ -1150,7 +1150,7 @@ namespace Microsoft.NodejsTools.Parsing
 
                     switch (ch)
                     {
-                        // line terminator crap
+                        // line terminators
                         case '\r':
                             if ('\n' == GetChar(_currentPosition))
                             {
