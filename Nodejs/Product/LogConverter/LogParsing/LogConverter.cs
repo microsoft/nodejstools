@@ -67,12 +67,14 @@ namespace Microsoft.NodejsTools.LogParsing {
     /// Finally we zip up the resulting ETL file and save it under the filename requested.
     /// </summary>
     class LogConverter {
-        private static char[] _invalidPathChars = Path.GetInvalidPathChars();
+        private static readonly char[] _invalidPathChars = Path.GetInvalidPathChars();
+        private static readonly Version v012 = new Version(0, 12);
 
         private readonly string _filename;
         private readonly string _outputFile;
         private readonly TimeSpan? _executionTime;
         private readonly bool _justMyCode;
+        private readonly Version _nodeVersion;
         private readonly SortedDictionary<AddressRange, bool> _codeAddresses = new SortedDictionary<AddressRange,bool>();
         private Dictionary<string, SourceMap> _sourceMaps = new Dictionary<string, SourceMap>(StringComparer.OrdinalIgnoreCase);
         // Currently we maintain 2 layouts, one for code, one for shared libraries,
@@ -84,22 +86,30 @@ namespace Microsoft.NodejsTools.LogParsing {
         static uint ProcessId = (uint)System.Diagnostics.Process.GetCurrentProcess().Id;
         const int JitModuleId = 1;
 
-        public LogConverter(string filename, string outputFile, TimeSpan? executionTime, bool justMyCode) {
+        public LogConverter(string filename, string outputFile, TimeSpan? executionTime, bool justMyCode, Version nodeVersion) {
             _filename = filename;
             _outputFile = outputFile;
             _executionTime = executionTime;
             _justMyCode = justMyCode;
+            _nodeVersion = nodeVersion;
         }
 
         public static int Main(string[] args) {
             if (args.Length < 2) {
-                Console.WriteLine("Usage: [/jmc] <v8.log path> <output.vspx path> [<start time> <execution time>]");
+                Console.WriteLine("Usage: [/jmc] [/v:<node version>] <v8.log path> <output.vspx path> [<start time> <execution time>]");
                 return 1;
             }
+
             bool jmc = false;
-            if (args[0] == "/jmc") {
+            if (string.Equals(args[0], "/jmc", StringComparison.OrdinalIgnoreCase)) {
                 args = args.Skip(1).ToArray();
                 jmc = true;
+            }
+
+            var nodeVersion = new Version(0, 10);
+            if (args[0].StartsWith("/v:", StringComparison.OrdinalIgnoreCase)) {
+                nodeVersion = new Version(args[0].Substring(3));
+                args = args.Skip(1).ToArray();
             }
 
             string inputFile = args[0];
@@ -118,7 +128,7 @@ namespace Microsoft.NodejsTools.LogParsing {
 #if DEBUG
             try {
 #endif
-                var log = new LogConverter(inputFile, outputFile, executionTime, jmc);
+                var log = new LogConverter(inputFile, outputFile, executionTime, jmc, nodeVersion);
                 log.Process();
                 return 0;
 #if DEBUG
@@ -227,13 +237,16 @@ namespace Microsoft.NodejsTools.LogParsing {
                                     continue; // missing info?
                                 }
                                 break;
+
                             case "profiler":
                                 break;
+
                             case "code-creation":
-                                if (records.Length < 5) {
+                                int shift = (_nodeVersion >= v012 ? 1 : 0);
+                                if (records.Length < shift + 5) {
                                     continue; // missing info?
                                 }
-                                var startAddr = ParseAddress(records[2]);
+                                var startAddr = ParseAddress(records[shift + 2]);
 
                                 header = NewMethodEventHeader();
 
@@ -241,11 +254,11 @@ namespace Microsoft.NodejsTools.LogParsing {
                                 methodLoad.MethodID = methodToken;
                                 methodLoad.ModuleID = JitModuleId;
                                 methodLoad.MethodStartAddress = startAddr;
-                                methodLoad.MethodSize = (uint)ParseAddress(records[3]);
+                                methodLoad.MethodSize = (uint)ParseAddress(records[shift + 3]);
                                 methodLoad.MethodToken = methodToken;
                                 methodLoad.MethodFlags = 8;
 
-                                var funcInfo = ExtractNamespaceAndMethodName(records[4], records[1]);
+                                var funcInfo = ExtractNamespaceAndMethodName(records[shift + 4], records[1]);
                                 string functionName = funcInfo.Function;
                                 if (funcInfo.IsRecompilation) {
                                     functionName += " (recompiled)";
@@ -256,6 +269,7 @@ namespace Microsoft.NodejsTools.LogParsing {
 
                                 methodToken++;
                                 break;
+
                             case "tick":
                                 if (records.Length < 5) {
                                     continue;
@@ -306,10 +320,10 @@ namespace Microsoft.NodejsTools.LogParsing {
                                     log.Trace(header, args.ToArray());
                                 }
                                 break;
+
                             default:
                                 Console.WriteLine("Unknown record type: {0}", line);
                                 break;
-
                         }
                     }
 
@@ -417,15 +431,15 @@ namespace Microsoft.NodejsTools.LogParsing {
 
         internal const string _topLevelModule = "<top-level module code>";
 
-        internal static FunctionInformation ExtractNamespaceAndMethodName(string method, bool isRecompilation, string type = "LazyCompile", Dictionary<string, SourceMap> sourceMaps = null) {
-            string methodName = method;
-            string ns = String.Empty;
-            int? lineNo = null;
-            string filename = null;
+        internal static FunctionInformation ExtractNamespaceAndMethodName(string location, bool isRecompilation, string type = "LazyCompile", Dictionary<string, SourceMap> sourceMaps = null) {
+            string fileName = null;
+            string moduleName = "";
+            string methodName = location;
+            List<int> pos = null;
 
-            if (method.StartsWith("\"") && method.EndsWith("\"")) {
+            if (location.Length >= 2 && location.StartsWith("\"") && location.EndsWith("\"")) {
                 // v8 usually includes quotes, strip them
-                method = method.Substring(1, method.Length - 2);
+                location = location.Substring(1, location.Length - 2);
             }
 
             int firstSpace;
@@ -437,45 +451,32 @@ namespace Microsoft.NodejsTools.LogParsing {
                 // this is a top level script or module, report it as such
                 methodName = _topLevelModule;
 
-                string fileTemp = method;
                 if (type == "Function") {
-                    fileTemp = fileTemp.Substring(fileTemp.IndexOf(' ') + 1);
-                }
-                return SourceMapper.MaybeMap(new FunctionInformation(_topLevelModule, GetModuleName(method), 1, GetFileName(fileTemp), isRecompilation), sourceMaps);
-            }
-
-            // " net.js:931"
-            // "f C:\Source\NodeApp2\NodeApp2\server.js:5"
-            // " C:\Source\NodeApp2\NodeApp2\server.js:16"
-
-            firstSpace = FirstSpace(method);
-            if (firstSpace != -1) {
-                if (firstSpace == 0) {
-                    methodName = "anonymous method";
-                } else {
-                    methodName = method.Substring(0, firstSpace);
+                    location = location.Substring(location.IndexOf(' ') + 1);
                 }
 
-                int fileNameEnd = method.LastIndexOf(':');
-                if (fileNameEnd != -1 && fileNameEnd > firstSpace) {
-                    string lineNumber = method.Substring(fileNameEnd + 1);
-                    int lineTemp;
-                    if (Int32.TryParse(lineNumber, out lineTemp)) {
-                        lineNo = lineTemp;
+                ParseLocation(location, out fileName, out moduleName, out pos);
+                pos = new List<int> { 1 };
+            } else {
+                // " net.js:931"
+                // "func C:\Source\NodeApp2\NodeApp2\server.js:5"
+                // " C:\Source\NodeApp2\NodeApp2\server.js:16"
+
+                firstSpace = FirstSpace(location);
+                if (firstSpace != -1) {
+                    if (firstSpace == 0) {
+                        methodName = "anonymous method";
+                    } else {
+                        methodName = location.Substring(0, firstSpace);
                     }
 
-                    filename = method.Substring(firstSpace + 1, fileNameEnd - firstSpace - 1);
-
-                    try {
-                        var moduleName = Path.GetFileNameWithoutExtension(filename);
-                        ns = moduleName;
-                    } catch (ArgumentException) {
-                        ns = "unknown_module";
-                    }
+                    location = location.Substring(firstSpace + 1);
+                    ParseLocation(location, out fileName, out moduleName, out pos);
                 }
             }
 
-            return SourceMapper.MaybeMap(new FunctionInformation(ns, methodName, lineNo, filename, isRecompilation), sourceMaps);
+            var lineNo = pos == null ? null : pos.Select(x => (int?)x).FirstOrDefault();
+            return SourceMapper.MaybeMap(new FunctionInformation(moduleName, methodName, lineNo, fileName, isRecompilation), sourceMaps);
         }
 
         private static int FirstSpace(string method) {
@@ -494,38 +495,35 @@ namespace Microsoft.NodejsTools.LogParsing {
             return -1;
         }       
 
-        private static string GetModuleName(string method) {
-            method = StripLine(method);
+        private static void ParseLocation(string location, out string fileName, out string moduleName, out List<int> pos) {
+            location = location.Trim();
+            pos = new List<int>();
 
-            if (method.IndexOfAny(_invalidPathChars) == -1) {
-                method = Path.GetFileNameWithoutExtension(method);
-            }
-
-            return method;
-        }
-
-        private static string GetFileName(string method) {
-            method = StripLine(method);
-
-            return method;
-        }
-
-        private static string StripLine(string method) {
-            method = method.Trim();
-
+            // Possible variations include:
+            //
+            // C:\Foo\Bar\baz.js
+            // C:\Foo\Bar\baz.js:1
+            // C:\Foo\Bar\baz.js:1:2
+            //
+            // To cover them all, we just repeatedly strip the tail of the string after the last ':',
+            // so long as it can be parsed as an integer.
             int colon;
-            if ((colon = method.LastIndexOf(':')) != -1) {
-                string lineNo = method.Substring(colon + 1, method.Length - (colon + 1));
-                int dummy;
-                // We need to deal with:
-                // C:\Foo\Bar\baz.js:1
-                //  and
-                // C:\Foo\Bar\baz.js
-                if (Int32.TryParse(lineNo, out dummy)) {
-                    method = method.Substring(0, colon);
+            while ((colon = location.LastIndexOf(':')) != -1) {
+                string tail = location.Substring(colon + 1, location.Length - (colon + 1));
+                int number;
+                if (!Int32.TryParse(tail, out number)) {
+                    break;
                 }
+                pos.Insert(0, number);
+                location = location.Substring(0, colon);
             }
-            return method;
+
+            moduleName = fileName = location;
+            if (string.IsNullOrEmpty(moduleName)) {
+                moduleName = "<unknown module>";
+            } else if (moduleName.IndexOfAny(_invalidPathChars) == -1) {
+                moduleName = Path.GetFileNameWithoutExtension(moduleName);
+            }
         }
 
         private static EVENT_TRACE_HEADER NewMethodEventHeader() {

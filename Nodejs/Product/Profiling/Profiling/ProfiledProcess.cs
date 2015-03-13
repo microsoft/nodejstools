@@ -127,12 +127,15 @@ namespace Microsoft.NodejsTools.Profiling {
         public void StartProfiling(string filename) {
             _process.EnableRaisingEvents = true;
             _process.Exited += (sender, args) => {
+                var v8log = Path.Combine(_dir, "v8.log");
+
                 try {
                     var executionTime = _process.ExitTime.Subtract(_process.StartTime);
-                    var v8log = Path.Combine(_dir, "v8.log");
+                    bool is012 = false;
                     if (!File.Exists(v8log)) {
                         // later versions of Node write out to a file like isolate-####...-v8.log
                         // Search for the latest of those.
+                        is012 = true;
                         v8log = Directory.GetFiles(_dir, "*v8.log")
                             .OrderBy(x => new FileInfo(x).CreationTime)
                             .Reverse()
@@ -149,6 +152,7 @@ namespace Microsoft.NodejsTools.Profiling {
                                 "Microsoft.NodejsTools.NodeLogConverter.exe"
                             ),
                             (_justMyCode ? "/jmc " : String.Empty) + 
+                            (is012 ? "/v:0.12 " : String.Empty) + 
                             "\"" + v8log + "\" " +
                             "\"" + filename + "\" " +
                             "\"" + _process.StartTime.ToString() + "\" " +
@@ -168,13 +172,15 @@ namespace Microsoft.NodejsTools.Profiling {
                 }
 
                 try {
-                    File.Delete(Path.Combine(_dir, "v8.log"));
+                    File.Delete(Path.Combine(_dir, v8log));
                 } catch {
                     // file in use, multiple node.exe's running, user trying
                     // to profile multiple times, etc...
-                    MessageBox.Show("Unable to delete v8.log.\r\n\r\n" +
-                                    "There is probably a second copy of node.exe running and the\r\n" +
-                                    "results may be unavailable or incorrect.\r\n");
+                    MessageBox.Show(string.Format(
+                        "Unable to delete '{0}'.\r\n\r\n" +
+                        "There is probably a second copy of node.exe running and the\r\n" +
+                        "results may be unavailable or incorrect.\r\n",
+                        v8log));
                 }
             };
 
