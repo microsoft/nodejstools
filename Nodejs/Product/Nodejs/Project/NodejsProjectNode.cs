@@ -39,6 +39,7 @@ namespace Microsoft.NodejsTools.Project {
         private readonly HashSet<string> _warningFiles = new HashSet<string>();
         private readonly HashSet<string> _errorFiles = new HashSet<string>();
         private string[] _analysisIgnoredDirs = new string[0];
+        private int _maxFileSize = 1024 * 512;
         internal readonly RequireCompletionCache _requireCompletionCache = new RequireCompletionCache();
         private string _intermediateOutputPath;
         private readonly Dictionary<NodejsProjectImageName, int> _imageIndexFromNameDictionary = new Dictionary<NodejsProjectImageName, int>();
@@ -341,6 +342,12 @@ namespace Microsoft.NodejsTools.Project {
                 } else {
                     _analysisIgnoredDirs = new string[0];
                 }
+
+                var maxFileSizeProp = GetProjectProperty(NodejsConstants.AnalysisMaxFileSize);
+                int maxFileSize;
+                if (maxFileSizeProp != null && Int32.TryParse(maxFileSizeProp, out maxFileSize)) {
+                    _maxFileSize = maxFileSize;
+                }
             }
         }
 
@@ -487,6 +494,10 @@ namespace Microsoft.NodejsTools.Project {
                 if (url.IndexOf(path, 0, StringComparison.OrdinalIgnoreCase) != -1) {
                     return false;
                 }
+            }
+            if (new FileInfo(fileNode.Url).Length > _maxFileSize) {
+                // skip obviously generated files...
+                return false;
             }
             return true;
         }

@@ -1648,6 +1648,19 @@ var x = g.abc;
             );
         }
 
+        [TestMethod, Priority(0)]
+        public void TestToObjectSpecialization() {
+            var analysis = ProcessText(@"function toObject(value) {
+      return isObject(value) ? value : Object(value);
+    }
+
+var x = toObject('abc');
+");
+            AssertUtil.ContainsExactly(
+                analysis.GetTypeIdsByIndex("x", 0),
+                BuiltinTypeId.String
+            );
+        }
 
         [TestMethod, Priority(0)]
         public void TestMergeSpecialization2() {

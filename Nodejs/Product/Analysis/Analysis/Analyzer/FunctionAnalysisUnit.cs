@@ -98,15 +98,21 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
         }
 
         public bool AddArgumentTypes(FunctionEnvironmentRecord funcScope, IAnalysisSet @this, IAnalysisSet[] arguments, int typeLimit = Int32.MaxValue) {
-            bool added = false;
+            bool added = false, withinTypeCountRange = true;
             if (Ast.ParameterDeclarations != null) {
                 for (int i = 0; i < Ast.ParameterDeclarations.Length && i < arguments.Length; i++) {
                     var variable = funcScope.GetVariable(Ast.ParameterDeclarations[i].Name);
                     if (typeLimit != Int32.MaxValue) {
-                        added |= variable.MakeUnionStrongerIfMoreThan(typeLimit, arguments[i]);
+                        added |= variable.MakeUnionStrongerIfMoreThan(typeLimit, arguments[i]);                        
+                        if (variable.AddTypes(this, arguments[i], false)) {
+                            if (variable.UnionStrength == UnionComparer.MAX_STRENGTH &&
+                                variable.TypesNoCopy.Count > typeLimit * 3) {
+                                withinTypeCountRange = false;
+                            }
+                        }
+                    } else {
+                        added |= variable.AddTypes(this, arguments[i], false);
                     }
-                    
-                    added |= variable.AddTypes(this, arguments[i], false);
                 }
             }
 
@@ -116,7 +122,7 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                     added |= funcScope._this.MakeUnionStrongerIfMoreThan(typeLimit, @this);
                 }
             }
-            return added;
+            return withinTypeCountRange && added;
         }
 
         public override string ToString() {

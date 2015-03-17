@@ -39,7 +39,8 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             { "setProto", new[] { SetProtoSpecialization() } },
             { "extend", new[] { BackboneExtendSpecialization(), UnderscoreExtendSpecialization() } },
             { "wrapfunction", new[] { WrapFunctionSpecialization() } },
-            { "assign", new[] { AssignSpecialization() } }
+            { "assign", new[] { AssignSpecialization() } },
+            { "toObject", new[] { ToObjectSpecialization() }},
         };
 
         private static IAnalysisSet CloneSpecializationImpl(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
@@ -924,6 +925,34 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             return AnalysisSet.Empty;
         }
 
+        /// <summary>
+        /// function toObject(value) {
+        ///    return isObject(value) ? value : Object(value);
+        /// }
+        /// </summary>
+        private static PatternSpecialization ToObjectSpecialization() {
+            var value = new ExpectedParameter(0);
+
+            return new PatternSpecialization(
+                CreateSpecializationImpl,
+                false,
+                new ExpectedNode(
+                    typeof(ReturnNode),
+                    new ExpectedNode(
+                        typeof(Conditional),
+                        new ExpectedCall(
+                            new ExpectedLookup("isObject"),
+                            value
+                        ),
+                        value,
+                        new ExpectedCall(
+                            new ExpectedLookup("Object"),
+                            value
+                        )
+                    )
+                )
+            );
+        }
 
         /// <summary>
         /// function create(o) {

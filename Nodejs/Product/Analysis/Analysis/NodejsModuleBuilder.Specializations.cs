@@ -317,7 +317,7 @@ namespace Microsoft.NodejsTools.Analysis {
         private static IAnalysisSet FsBasename(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             CallNode call = (CallNode)node;
             IAnalysisSet res = AnalysisSet.Empty;
-            if (call.Arguments.Length == 2) {
+            if (args.Length == 2) {
                 foreach (var extArg in args[1]) {
                     var strExt = extArg.Value.GetStringValue();
                     if (strExt != null) {
