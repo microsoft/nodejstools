@@ -664,7 +664,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
 
             foreach (var item in _projectFiles) {
-                if (!item.Value.Reloaded && !item.Value.Entry.IsBuiltin) {
+                if (!File.Exists(item.Value.Entry.FilePath) || (!item.Value.Reloaded && !item.Value.Entry.IsBuiltin)) {
                     UnloadFile(item.Value.Entry);
                 }
             }
@@ -747,6 +747,14 @@ namespace Microsoft.NodejsTools.Intellisense {
 #endif
 
                 bufferParser.Requeue();
+            }
+        }
+
+        public void UnloadFile(string filename) {
+            ProjectItem item;
+            _projectFiles.TryGetValue(filename, out item);
+            if (item != null) {
+                UnloadFile(item.Entry);
             }
         }
 

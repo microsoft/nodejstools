@@ -67,6 +67,20 @@ namespace Microsoft.NodejsTools.Project {
             return base.ExcludeFromProject();
         }
 
+        protected override void RaiseOnItemRemoved(string documentToRemove, string[] filesToBeDeleted) {
+            base.RaiseOnItemRemoved(documentToRemove, filesToBeDeleted);
+            foreach (var file in filesToBeDeleted) {
+                if (!File.Exists(file)) {
+                    ProjectMgr.Analyzer.UnloadFile(file);
+                }
+            }
+        }
+
+        protected override void RenameChildNodes(FileNode parentNode) {
+            base.RenameChildNodes(parentNode);
+            this.ProjectMgr.Analyzer.ReloadComplete();
+        }
+
         protected override NodeProperties CreatePropertiesObject() {
             if (IsLinkFile) {
                 return new NodejsLinkFileNodeProperties(this);
