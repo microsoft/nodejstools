@@ -260,7 +260,7 @@
             this.Controls.Add(this._scriptArguments);
             this.Controls.Add(this._nodeExeArguments);
             this.Controls.Add(this._nodeExePath);
-            this.MinimumSize = new System.Drawing.Size(303, 0);
+            this.MinimumSize = new System.Drawing.Size(303, 303);
             this.Name = "NodejsGeneralPropertyPageControl";
             this.Size = new System.Drawing.Size(488, 305);
             ((System.ComponentModel.ISupportInitialize)(this._nodeExeErrorProvider)).EndInit();
