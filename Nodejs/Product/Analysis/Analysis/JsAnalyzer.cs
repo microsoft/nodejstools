@@ -130,7 +130,7 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         public IAnalyzable AddPackageJson(string filePath, string entryPoint) {
-            if (Path.GetFileName(filePath) != "package.json") {
+            if (!Path.GetFileName(filePath).Equals("package.json", StringComparison.OrdinalIgnoreCase)) {
                 throw new InvalidOperationException("path must be to package.json file");
             }
 
