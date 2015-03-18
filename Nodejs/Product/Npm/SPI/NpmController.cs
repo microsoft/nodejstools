@@ -269,9 +269,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         private void Watcher_Modified(object sender, FileSystemEventArgs e) {
             string path = e.FullPath;
-            if (path.IndexOf("\\node_modules", StringComparison.OrdinalIgnoreCase) == -1) {
-                return;
-            }
 
             RestartFileSystemWatcherTimer();
         }
