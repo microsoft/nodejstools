@@ -64,12 +64,10 @@ var run_tests = function (testName, testFile, workingFolder, projectFolder) {
     //Choose 'xunit' rather 'min'. The reason is when under piped/redirect,
     //mocha produces undisplayable text to stdout and stderr. Using xunit works fine 
     mocha.reporter('xunit');
-    mocha.run(exitLater);
+    mocha.run(function (code) {
+        process.exit(code);
+    });
 };
-
-function exitLater(code) {
-    process.on('exit', function () { process.exit(code); });
-}
 
 function detectMocha(projectFolder) {
     try {
