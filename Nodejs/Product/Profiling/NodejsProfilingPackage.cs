@@ -417,8 +417,6 @@ namespace Microsoft.NodejsTools.Profiling {
             } else if (!File.Exists(interpreter)) {
                 Nodejs.ShowNodejsPathNotFound(interpreter);
                 return;
-            } else if (!Nodejs.CheckNodejsSupported(interpreter)) {
-                return;
             }
 
             var arch = NativeMethods.GetBinaryType(interpreter);

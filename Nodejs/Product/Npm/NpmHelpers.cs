@@ -88,9 +88,14 @@ namespace Microsoft.NodejsTools.Npm {
             return standardOutputLines;
         }
 
-        public static string GetPathToNpm() {
+        public static string GetPathToNpm(string nodePath = null) {
+            var path = GetNpmPathFromNodePath(nodePath);
+            if (!string.IsNullOrEmpty(path)) {
+                return path;
+            }
+
             string executable = "npm.cmd";
-            var path = Nodejs.GetPathToNodeExecutable(executable);
+            path = Nodejs.GetPathToNodeExecutable(executable);
 
             if (string.IsNullOrEmpty(path)) {
                 throw new NpmNotFoundException(
@@ -103,6 +108,17 @@ namespace Microsoft.NodejsTools.Npm {
             }
 
             return path;
+        }
+
+        private static string GetNpmPathFromNodePath(string nodePath) {
+            if (!string.IsNullOrEmpty(nodePath) && File.Exists(nodePath)) {
+                var dir = Path.GetDirectoryName(nodePath);
+                var npmPath = string.IsNullOrEmpty(dir) ? null : Path.Combine(dir, "npm.cmd");
+                if (npmPath != null && File.Exists(npmPath)) {
+                    return npmPath;
+                }
+            }
+            return null;
         }
     }
 }

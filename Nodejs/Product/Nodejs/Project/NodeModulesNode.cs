@@ -114,14 +114,7 @@ namespace Microsoft.NodejsTools.Project {
 
         private string GetNpmPathFromNodePathInProject() {
             var props = ProjectMgr.NodeProperties as NodejsProjectNodeProperties;
-            if (null != props) {
-                var nodePath = props.NodeExePath;
-                if (!string.IsNullOrEmpty(nodePath)) {
-                    var dir = Path.GetDirectoryName(nodePath);
-                    return string.IsNullOrEmpty(dir) ? null : Path.Combine(dir, "npm.cmd");
-                }
-            }
-            return null;
+            return NpmHelpers.GetPathToNpm(props != null ? props.NodeExePath : null);
         }
 
         private class NpmPathProvider : INpmPathProvider {

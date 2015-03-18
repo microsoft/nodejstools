@@ -866,7 +866,7 @@ namespace Microsoft.NodejsTools.Project {
                 }
             } else if (cmdGroup == Guids.NodejsNpmCmdSet) {
                 try {
-                    NpmHelpers.GetPathToNpm();
+                    NpmHelpers.GetPathToNpm(this.Project.GetNodejsProject().GetProjectProperty(NodejsConstants.NodeExePath));
                 } catch (NpmNotFoundException) {
                     Nodejs.ShowNodejsNotInstalled();
                     return VSConstants.S_OK;
@@ -878,7 +878,7 @@ namespace Microsoft.NodejsTools.Project {
         protected override int ExecCommandThatDependsOnSelectedNodes(Guid cmdGroup, uint cmdId, uint cmdExecOpt, IntPtr vaIn, IntPtr vaOut, CommandOrigin commandOrigin, IList<HierarchyNode> selectedNodes, out bool handled) {
             if (cmdGroup == Guids.NodejsNpmCmdSet) {
                 try {
-                    NpmHelpers.GetPathToNpm();
+                    NpmHelpers.GetPathToNpm(this.Project.GetNodejsProject().GetProjectProperty(NodejsConstants.NodeExePath));
                 } catch (NpmNotFoundException) {
                     Nodejs.ShowNodejsNotInstalled();
                     handled = true;

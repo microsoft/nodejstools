@@ -71,8 +71,6 @@ namespace Microsoft.NodejsTools.Project {
             if (nodePath == null) {
                 Nodejs.ShowNodejsNotInstalled();
                 return VSConstants.S_OK;
-            } else if (!Nodejs.CheckNodejsSupported(nodePath)) {
-                return VSConstants.S_OK;
             }
 
             bool startBrowser = ShouldStartBrowser();
@@ -237,9 +235,6 @@ namespace Microsoft.NodejsTools.Project {
             dbgInfo.dlo = DEBUG_LAUNCH_OPERATION.DLO_CreateProcess;
 
             dbgInfo.bstrExe = GetNodePath();
-            if (!Nodejs.CheckNodejsSupported(dbgInfo.bstrExe)) {
-                return false;
-            }
             dbgInfo.bstrCurDir = _project.GetWorkingDirectory();
             dbgInfo.bstrArg = GetFullArguments(startupFile, includeNodeArgs: false);    // we need to supply node args via options
             dbgInfo.bstrRemoteMachine = null;

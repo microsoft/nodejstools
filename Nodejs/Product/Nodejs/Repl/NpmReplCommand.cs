@@ -15,7 +15,6 @@
 //*********************************************************//
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
@@ -42,8 +41,6 @@ namespace Microsoft.NodejsTools.Repl {
 
     [Export(typeof(IReplCommand))]
     class NpmReplCommand : IReplCommand {
-        private string _npmPath;
-
         #region IReplCommand Members
 
         public async Task<ExecutionResult> Execute(IReplWindow window, string arguments) {
@@ -126,19 +123,21 @@ namespace Microsoft.NodejsTools.Repl {
                 return ExecutionResult.Failure;
             }
 
-            if (null == _npmPath || !File.Exists(_npmPath)) {
-                try {
-                    _npmPath = NpmHelpers.GetPathToNpm();
-                } catch (NpmNotFoundException) {
-                    Nodejs.ShowNodejsNotInstalled();
-                    return ExecutionResult.Failure;
-                }
+            string npmPath;
+            try {
+                npmPath = NpmHelpers.GetPathToNpm(
+                    nodejsProject != null ? nodejsProject.GetProjectProperty(NodejsConstants.NodeExePath) : null);
+            } catch (NpmNotFoundException) {
+                Nodejs.ShowNodejsNotInstalled();
+                return ExecutionResult.Failure;
             }
+
             var npmReplRedirector = new NpmReplRedirector(window);
                
-            await ExecuteNpmCommandAsync(npmReplRedirector,
-                    _npmPath,
-                    projectDirectoryPath,
+            await ExecuteNpmCommandAsync(
+                npmReplRedirector,
+                npmPath,
+                projectDirectoryPath,
                 new[] { npmArguments },
                 null);
 
