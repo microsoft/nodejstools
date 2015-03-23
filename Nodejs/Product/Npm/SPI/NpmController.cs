@@ -245,8 +245,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             try {
                 watcher = new FileSystemWatcher(directory) {
                     NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.CreationTime,
-                    IncludeSubdirectories = true,
-                    Filter = "package.json"
+                    IncludeSubdirectories = true
                 };
 
                 watcher.Changed += Watcher_Modified;
@@ -270,7 +269,13 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         private void Watcher_Modified(object sender, FileSystemEventArgs e) {
             string path = e.FullPath;
 
-            RestartFileSystemWatcherTimer();
+            // Check that the file is either a package.json file, or exists in the node_modules directory
+            // This allows us to properly detect both installed and uninstalled/linked packages (where we don't receive an event for package.json)
+            if (path.EndsWith("package.json", StringComparison.OrdinalIgnoreCase) || path.IndexOf("node_modules", StringComparison.OrdinalIgnoreCase) != -1) {
+                RestartFileSystemWatcherTimer();
+            }
+
+            return;
         }
 
 
