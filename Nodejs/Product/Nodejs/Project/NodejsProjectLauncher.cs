@@ -203,12 +203,12 @@ namespace Microsoft.NodejsTools.Project {
         }
 
 
-        private static void LaunchDebugger(IServiceProvider provider, VsDebugTargetInfo dbgInfo) {
+        private void LaunchDebugger(IServiceProvider provider, VsDebugTargetInfo dbgInfo) {
             if (!Directory.Exists(UnquotePath(dbgInfo.bstrCurDir))) {
                 MessageBox.Show(String.Format("Working directory \"{0}\" does not exist.", dbgInfo.bstrCurDir), "Node.js Tools for Visual Studio");
             } else if (!File.Exists(UnquotePath(dbgInfo.bstrExe))) {
                 MessageBox.Show(String.Format("Interpreter \"{0}\" does not exist.", dbgInfo.bstrExe), "Node.js Tools for Visual Studio");
-            } else {
+            } else if (DoesProjectSupportDebugging()) {
                 VsShellUtilities.LaunchDebugger(provider, dbgInfo);
             }
         }
@@ -218,6 +218,21 @@ namespace Microsoft.NodejsTools.Project {
                 return p.Substring(1, p.Length - 2);
             }
             return p;
+        }
+
+        private bool DoesProjectSupportDebugging() {
+            var typeScriptOutFile = _project.GetProjectProperty("TypeScriptOutFile");
+            if (!string.IsNullOrEmpty(typeScriptOutFile)) {
+                return MessageBox.Show(
+                    "This TypeScript project has 'Combine Javascript output into file' option enabled. This option is not supported by NTVS debugger, " +
+                    "and may result in erratic behavior of breakpoints, stepping, and debug tool windows. Are you sure you want to start debugging?",
+                    SR.ProductName,
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning
+                    ) == DialogResult.Yes;
+            }
+
+            return true;
         }
 
         private void AppendOption(ref VsDebugTargetInfo dbgInfo, string option, string value) {
