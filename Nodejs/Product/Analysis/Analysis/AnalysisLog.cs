@@ -110,13 +110,13 @@ namespace Microsoft.NodejsTools.Analysis {
 
         internal void Enqueue(Deque<AnalysisUnit> deque, AnalysisUnit unit) {
             if (MaxItems != 0) {
-                Add("E", unit.Id, deque.Count);
+                Add("E", unit.DeclaringModuleEnvironment.ProjectEntry.FilePath, deque.Count);
             }
         }
 
         internal void Dequeue(Deque<AnalysisUnit> deque, AnalysisUnit unit) {
             if (MaxItems != 0) {
-                Add("D", unit.Id, deque.Count);
+                Add("D", unit.DeclaringModuleEnvironment.ProjectEntry.FilePath, deque.Count);
             }
         }
 
@@ -138,7 +138,7 @@ namespace Microsoft.NodejsTools.Analysis {
 
         internal void NewUnit(AnalysisUnit unit) {
             if (MaxItems != 0) {
-                Add("N", unit.Id, new AnalysisUnitWrapper(unit));
+                Add("N", unit.DeclaringModuleEnvironment.ProjectEntry.FilePath, new AnalysisUnitWrapper(unit));
             }
         }
 
