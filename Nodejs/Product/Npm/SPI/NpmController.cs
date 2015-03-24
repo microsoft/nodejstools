@@ -68,7 +68,13 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         internal string PathToNpm {
-            get { return null == _npmPathProvider ? null : _npmPathProvider.PathToNpm; }
+            get {
+                try {
+                    return null == _npmPathProvider ? null : _npmPathProvider.PathToNpm;
+                } catch (NpmNotFoundException) {
+                    return null;
+                }
+            }
         }
 
         internal string CachePath {
