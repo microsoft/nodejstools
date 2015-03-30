@@ -55,7 +55,7 @@ var run_tests = function (testName, testFile, workingFolder, projectFolder) {
 
     var mocha = new Mocha();
     mocha.ui('tdd');
-    //set timeout to 10 minutes, becasue the default of 2 sec might be too short (TODO: make it configuable)
+    //set timeout to 10 minutes, because the default of 2 sec might be too short (TODO: make it configurable)
     mocha.suite.timeout(600000);
     if (testName) {
         mocha.grep(testName);
