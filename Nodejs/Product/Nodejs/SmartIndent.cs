@@ -205,6 +205,7 @@ namespace Microsoft.NodejsTools {
                         current.ShouldDedentAfter = true;
                     }
                 }
+
                 return current.Indentation -
                     (current.ShouldDedentAfter ? _editorOptions.GetTabSize() : 0);
             }
@@ -283,7 +284,7 @@ namespace Microsoft.NodejsTools {
             int size = 0;
             foreach (var ch in text) {
                 if (ch == '\t') {
-                    size += (size + _editorOptions.GetTabSize()) - (size % _editorOptions.GetTabSize());
+                    size += _editorOptions.GetTabSize();
                 } else if (ch == ' ') {
                     size++;
                 } else {
