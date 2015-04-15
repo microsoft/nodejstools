@@ -97,9 +97,46 @@ a.mount('/', [
     @"switch (abc) {
     case foo: function a() {
         x = 42; y = 100; [1,
-        2, 3]
+            2, 3]
     }
 }");
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestJsonArray() {
+            TestCode(
+@"(function (seedData) {
+    seedData.initialNotes = [{
+            name: ""category"",
+            notes: [{
+                    note: ""note1"",
+                    author: ""author1"", 
+            color: ""blue""
+                },
+    {
+                    note: ""note1"",
+                    author: ""author2"",
+        color: ""green""
+                }]
+        }];
+})(module.exports);",
+@"(function (seedData) {
+    seedData.initialNotes = [{
+            name: ""category"",
+            notes: [{
+                    note: ""note1"",
+                    author: ""author1"", 
+                    color: ""blue""
+                },
+                {
+                    note: ""note1"",
+                    author: ""author2"",
+                    color: ""green""
+                }]
+        }];
+})(module.exports);"
+
+                );
         }
 
         [TestMethod, Priority(0)]
@@ -279,7 +316,7 @@ a.mount('/', [
                       After  = "var x = [\r\n    1, 2, 3\r\n]"},
                 // Test multiple lines stay aligned, but individual single line arrays fixed
                 new { Before = "function f() {\r\n    var x = [[1],\r\n             [2,   3],\r\n             [3,4,5]]\r\n}",
-                      After  = "function f() {\r\n    var x = [[1],\r\n             [2, 3],\r\n             [3, 4, 5]]\r\n}"},
+                      After  = "function f() {\r\n    var x = [[1],\r\n        [2, 3],\r\n        [3, 4, 5]]\r\n}"},
                 // https://nodejstools.codeplex.com/workitem/1494 We shouldn't push the 3 & 4 together
                 new { Before = "var x = [1,2,3 4]",
                       After  = "var x = [1, 2, 3 4]"},

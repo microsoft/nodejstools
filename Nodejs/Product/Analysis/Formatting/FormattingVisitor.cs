@@ -603,18 +603,6 @@ namespace Microsoft.NodejsTools.Formatting {
                 }
             } else {
                 Indent();
-                // Only correct indentation if we're correcting it for every element...
-                // var x = [[1,2],
-                //          [...
-                //
-                // vs.
-                // var x = [
-                //              [1,2],
-                //              [2,3]
-                //
-                // If we fix up the 1st one we misalign the users indentation
-
-                bool firstElementOnNewLine = ContainsLineFeed(node.GetStartIndex(_tree.LocationResolver), node.Elements[0].GetStartIndex(_tree.LocationResolver));
 
                 for (int i = 0; i < node.Elements.Length; i++) {
                     var curExpr = node.Elements[i];
@@ -630,10 +618,7 @@ namespace Microsoft.NodejsTools.Formatting {
                             _comma);
                     }
 
-                    // if we have elements on separate lines but the first element has a line feed (separate from '[')
-                    if (firstElementOnNewLine) {
-                        ReplacePreceedingWhiteSpace(curExpr.GetStartIndex(_tree.LocationResolver));
-                    }
+                    ReplacePreceedingWhiteSpace(curExpr.GetStartIndex(_tree.LocationResolver));
                     curExpr.Walk(this);
                 }
                 Dedent();
@@ -1097,9 +1082,9 @@ namespace Microsoft.NodejsTools.Formatting {
                 } else if (_code[i] == '\n') {
                     if (i >= 1 && _code[i - 1] == '\r') {
                         MaybeReplaceText(
-                            i - 1,
-                            start,
-                            _options.NewLine + GetIndentation()
+                        i - 1,
+                        start,
+                        _options.NewLine + GetIndentation()
                         );
                         break;
                     }
@@ -1191,7 +1176,7 @@ namespace Microsoft.NodejsTools.Formatting {
 
             // if(x) // comment
             // {
-            
+
             // does the line have a single line comment?
             bool followedByCommentButNotOpenBrace = FollowedBySingleLineComment(previousExpressionEnd, inParens);
 
@@ -1201,7 +1186,7 @@ namespace Microsoft.NodejsTools.Formatting {
                 var expressionEndLine = _tree.LocationResolver.IndexToLocation(previousExpressionEnd).Line;
                 var openBraceLine = _tree.LocationResolver.IndexToLocation(openBraceLocation).Line;
                 braceOnFollowingLine = expressionEndLine != openBraceLine;
-            }    
+            }
 
             // if the brace on new line option is set, or the first line has a comment but not the brace,
             // we want the brace on the following line indented.

@@ -69,7 +69,7 @@ namespace NodejsTests {
             foreach (var testCase in testCases) {
                 string filename = "fob" + testCaseId++ + ".js";
                 Console.WriteLine(testCase["input"]);
-                var buffer = new MockTextBuffer(testCase["input"], "test.py", "Node.js");
+                var buffer = new MockTextBuffer(testCase["input"], "test.js", "Node.js");
                 if (!ApplyEdits(filename, testCase, buffer)) {
                     continue;
                 }
