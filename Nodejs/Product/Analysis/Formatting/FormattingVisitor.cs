@@ -1079,34 +1079,17 @@ namespace Microsoft.NodejsTools.Formatting {
             for (int i = start - 1; i >= 0; i--) {
                 if (_code[i] == ' ' || _code[i] == '\t') {
                     continue;
-                } else if (_code[i] == '\n') {
-                    if (i >= 1 && _code[i - 1] == '\r') {
-                        MaybeReplaceText(
-                        i - 1,
-                        start,
-                        _options.NewLine + GetIndentation()
-                        );
-                        break;
-                    }
+                } else if (_newlines.Contains(_code[i])) {
                     MaybeReplaceText(
-                        i,
+                        i + 1,
                         start,
-                        _options.NewLine + GetIndentation()
-                    );
-                    break;
-                } else if (_code[i] == '\r') {
-                    MaybeReplaceText(
-                        i,
-                        start,
-                        _options.NewLine + GetIndentation()
-                    );
+                        GetIndentation());
                     break;
                 } else {
                     MaybeReplaceText(
                         i + 1,
                         start,
-                        _options.NewLine + GetIndentation()
-                    );
+                        _options.NewLine + GetIndentation());
                     break;
                 }
             }

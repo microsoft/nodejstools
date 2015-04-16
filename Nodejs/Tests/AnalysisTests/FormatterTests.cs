@@ -567,25 +567,25 @@ label:
 
         [TestMethod, Priority(0)]
         public void TestBlock() {
-            TestCode("{\nvar b;\n}",
-@"{
-    var b;
-}"
-);
-
-            TestCode("{\rvar b;\r}",
-@"{
-    var b;
-}"
-);
+            TestCode(
+                "{\nvar b;\n}",
+                "{\n    var b;\n}",
+                new FormattingOptions() {
+                    NewLine = "\n"
+                });
 
             TestCode(
-@"{ var b;
-}",
-@"{
-    var b;
-}"
-);
+                "{\rvar b;\r}",
+                "{\r    var b;\r}",
+                new FormattingOptions() {
+                    NewLine = "\r"
+                }
+                );
+
+            TestCode(
+                "{\r\nvar b;\r\n}",
+                "{\r\n    var b;\r\n}"
+                );
         }
 
         [TestMethod, Priority(0)]
@@ -2249,6 +2249,21 @@ throw null;
 } while(true);");
         }
 
+        [TestMethod, Priority(0)]
+        public void TestFormatterNotReplacingAggressively() {
+            var code =
+@"function f() {
+    function g() {
+     
+}
+}";
+
+            var edits = Formatter.GetEditsForDocument(code, null);
+            Assert.AreEqual(1, edits.Length);
+            Assert.AreEqual(43, edits[0].Start);
+            Assert.AreEqual("    ", edits[0].Text);
+            Assert.AreEqual(0, edits[0].Length);
+        }
 
         private static void TestCode(string code, string expected, FormattingOptions options = null) {
             var firstFormat = FormatCode(code, options);
