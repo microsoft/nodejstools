@@ -388,6 +388,28 @@ a.mount('/', [
         public void TestEmpty() {
             TestCode("if (true);", "if (true);");
             TestCode("if (true) ;", "if (true);");
+
+            // https://github.com/Microsoft/nodejstools/issues/24
+            TestCode(
+@"var x = function () {
+    if (a) {
+        123455
+    };
+};",
+@"var x = function () {
+    if (a) {
+        123455
+    };
+};");
+
+            // Shouldn't insert additional space between semicolons.
+            TestCode(
+@"function a() {
+    var a;;
+}",
+@"function a() {
+    var a;;
+}");
         }
 
         [TestMethod, Priority(0)]

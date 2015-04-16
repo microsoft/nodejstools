@@ -37,6 +37,8 @@ namespace Microsoft.NodejsTools.Formatting {
         private static char[] _openParen = new[] { '(' };
         private static char[] _closeBrace = new[] { '}' };
         private static char[] _openBracket = new[] { '[' };
+        private static char[] _emptyStatementAbortTerminators = new[] { ';', '}' };
+
         public FormattingVisitor(string code, JsAst tree, FormattingOptions options = null, bool onEnter = false) {
             _code = code;
             _options = options ?? new FormattingOptions();
@@ -1000,7 +1002,7 @@ namespace Microsoft.NodejsTools.Formatting {
                         if (curStmt is EmptyStatement) {
                             // if (blah); shouldn't get a space...
                             // abort terminators prevents foo;; from getting extra whitespace
-                            ReplacePreceedingWhiteSpace(curStmt.GetStartIndex(_tree.LocationResolver), null, abortTerminators: _semicolon);
+                            ReplacePreceedingWhiteSpace(curStmt.GetStartIndex(_tree.LocationResolver), null, abortTerminators: _emptyStatementAbortTerminators);
                         } else {
                             ReplacePreceedingWhiteSpaceMaybeMultiline(curStmt.GetStartIndex(_tree.LocationResolver));
                         }
