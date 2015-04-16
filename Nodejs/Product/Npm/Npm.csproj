@@ -171,7 +171,7 @@
     <Compile Include="SPI\NpmCommand.cs" />
     <Compile Include="SPI\NpmController.cs" />
     <Compile Include="SPI\NpmInstallCommand.cs" />
-    <Compile Include="SPI\NpmLsCommand.cs" />
+    <Compile Include="SPI\NpmBinCommand.cs" />
     <Compile Include="SPI\NpmUninstallCommand.cs" />
     <Compile Include="SPI\NpmUpdateCommand.cs" />
     <Compile Include="SPI\Package.cs" />

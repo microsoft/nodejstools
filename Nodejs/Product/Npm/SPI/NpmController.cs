@@ -127,10 +127,10 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                             _fullPathToRootPackageDirectory,
                             _showMissingDevOptionalSubPackages);
 
-                var command = new NpmLsCommand(_fullPathToRootPackageDirectory, true, PathToNpm);
+                var command = new NpmBinCommand(_fullPathToRootPackageDirectory, true, PathToNpm);
 
                 GlobalPackages = (await command.ExecuteAsync())
-                    ? RootPackageFactory.Create(command.ListBaseDirectory)
+                    ? RootPackageFactory.Create(command.BinDirectory)
                     : null;
             } catch (IOException) {
                 // Can sometimes happen when packages are still installing because the file may still be used by another process
@@ -150,12 +150,12 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         public string ListBaseDirectory {
             get {
-                var command = new NpmLsCommand(_fullPathToRootPackageDirectory, true, PathToNpm);
+                var command = new NpmBinCommand(_fullPathToRootPackageDirectory, true, PathToNpm);
 
                 // TODO - use GetAwaiter().GetResult() instead. 
                 // https://nodejstools.codeplex.com/workitem/1849
                 if (Task.Run(async () => { return await command.ExecuteAsync(); }).Result) {
-                    return command.ListBaseDirectory;
+                    return command.BinDirectory;
                 }
 
                 return null;

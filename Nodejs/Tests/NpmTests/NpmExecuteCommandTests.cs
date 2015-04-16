@@ -21,12 +21,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace NpmTests {
     [TestClass]
-    class NpmExecuteCommandTests {
+    public class NpmExecuteCommandTests {
         // https://nodejstools.codeplex.com/workitem/1575
         [TestMethod, Priority(0), Timeout(180000)]
         public async Task TestNpmCommandProcessExitSucceeds() {
             var npmPath = NpmHelpers.GetPathToNpm();
-            var redirector = new NpmCommand.NpmCommandRedirector(new NpmLsCommand(null, false));
+            var redirector = new NpmCommand.NpmCommandRedirector(new NpmBinCommand(null, false));
 
             for (int j = 0; j < 200; j++) {
                 await NpmHelpers.ExecuteNpmCommandAsync(
