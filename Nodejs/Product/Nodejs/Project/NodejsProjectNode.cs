@@ -909,5 +909,30 @@ namespace Microsoft.NodejsTools.Project {
         private static bool ShowManageModulesCommandOnNode(IList<HierarchyNode> selectedNodes) {
             return selectedNodes.Count == 1 && selectedNodes[0] is AbstractNpmNode;
         }
+
+        protected internal override void SetCurrentConfiguration() {
+            if (!IsProjectOpened) {
+                return;
+            }
+
+            if (this.IsPlatformAware()) {
+                EnvDTE.Project automationObject = GetAutomationObject() as EnvDTE.Project;
+
+                this.BuildProject.SetGlobalProperty(ProjectFileConstants.Platform, automationObject.ConfigurationManager.ActiveConfiguration.PlatformName);
+            }
+            base.SetCurrentConfiguration();
+        }
+
+        public override MSBuildResult Build(string config, string target) {
+            if (this.IsPlatformAware()) {
+                var platform = this.BuildProject.GetPropertyValue(GlobalProperty.Platform.ToString());
+
+                if (platform == ProjectConfig.AnyCPU) {
+                    this.BuildProject.SetGlobalProperty(GlobalProperty.Platform.ToString(), ConfigProvider.x86Platform);
+                }
+            }
+            return base.Build(config, target);
+        }
+
     }
 }
