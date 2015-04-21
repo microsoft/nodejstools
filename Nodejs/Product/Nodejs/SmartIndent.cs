@@ -48,7 +48,7 @@ namespace Microsoft.NodejsTools {
         public int? GetDesiredIndentation(VisualStudio.Text.ITextSnapshotLine line) {
             var dte = (EnvDTE.DTE)NodejsPackage.GetGlobalService(typeof(EnvDTE.DTE));
 
-            var props = dte.get_Properties("TextEditor", "JavaScript");
+            var props = dte.get_Properties("TextEditor", "Node.js");
             switch ((EnvDTE._vsIndentStyle)(int)props.Item("IndentStyle").Value) {
                 case EnvDTE._vsIndentStyle.vsIndentStyleNone:
                     return null;
