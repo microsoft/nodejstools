@@ -252,21 +252,25 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 SendThreadCreate(thread);
             }
 
-            if (_processLoadedRunning) {
-                Send(new AD7LoadCompleteRunningEvent(), AD7LoadCompleteRunningEvent.IID, _mainThread);
-            } else {
-                Send(new AD7LoadCompleteEvent(), AD7LoadCompleteEvent.IID, _mainThread);
+            lock (_syncLock) {
+                if (_processLoadedRunning) {
+                    Send(new AD7LoadCompleteRunningEvent(), AD7LoadCompleteRunningEvent.IID, _mainThread);
+                } else {
+                    Send(new AD7LoadCompleteEvent(), AD7LoadCompleteEvent.IID, _mainThread);
+                }
             }
 
             _loadComplete = true;
 
             if (!String.IsNullOrWhiteSpace(_webBrowserUrl)) {
                 var uri = new Uri(_webBrowserUrl);
-                OnPortOpenedHandler.CreateHandler(
-                    uri.Port,
-                    shortCircuitPredicate: () => !_processLoaded,
-                    action: LaunchBrowserDebugger
-                );
+                lock (_syncLock) {
+                    OnPortOpenedHandler.CreateHandler(
+                        uri.Port,
+                        shortCircuitPredicate: () => !_processLoaded,
+                        action: LaunchBrowserDebugger
+                    );
+                }
             }
         }
 
@@ -948,7 +952,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             var riidEvent = new Guid(iidEvent);
 
             EngineUtils.RequireOk(eventObject.GetAttributes(out attributes));
-            
+
             if ((attributes & (uint)enum_EVENTATTRIBUTES.EVENT_STOPPING) != 0 && thread == null) {
                 Debug.Fail("A thread must be provided for a stopping event");
                 return;
@@ -1131,9 +1135,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private void OnProcessExited(object sender, ProcessExitedEventArgs e) {
             try {
                 _processExitedEvent.Set();
-                _processLoaded = false;
-                _processLoadedRunning = false;
-                Send(new AD7ProgramDestroyEvent((uint)e.ExitCode), AD7ProgramDestroyEvent.IID, null);
+                lock (_syncLock) {
+                    _processLoaded = false;
+                    _processLoadedRunning = false;
+                    Send(new AD7ProgramDestroyEvent((uint)e.ExitCode), AD7ProgramDestroyEvent.IID, null);
+                }
             } catch (InvalidOperationException) {
                 // we can race at shutdown and deliver the event after the debugger is shutting down.
             }
@@ -1231,7 +1237,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                     var statusBar = (IVsStatusbar)ServiceProvider.GlobalProvider.GetService(typeof(SVsStatusbar));
                     statusBar.SetText(SR.GetString(SR.DebuggerModuleUpdateFailed));
                     return;
-                } 
+                }
             }
 
             DebuggerClient.RunWithRequestExceptionsHandled(async () => {
