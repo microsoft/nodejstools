@@ -13,7 +13,7 @@ Designed, developed, and supported by Microsoft and the community.
 ####<a href="http://aka.ms/explorentvs" target="_blank">**Learn more and start developing Node.js applications in Visual Studio**</a>
 
 ## Documentation
-[NTVS documentation](https://nodejstools.codeplex.com/documentation) is currently hosted on CodePlex.
+[NTVS documentation](https://github.com/Microsoft/nodejstools/wiki) is available in the NTVS wiki.
 
 ## Releases
 [NTVS releases](https://nodejstools.codeplex.com/releases) are currently hosted on CodePlex.
@@ -22,17 +22,16 @@ Designed, developed, and supported by Microsoft and the community.
 
 ## Contributions
 We would love to have you as a contributor!
-* [Contributing to NTVS] (https://nodejstools.codeplex.com/wikipage?title=Contributing)
-* [Build Instructions for NTVS](https://nodejstools.codeplex.com/wikipage?title=Build%20Instructions%20for%20NTVS)
-
-*Note: The above links are somewhat outdated, and need to be updated now that NTVS has moved to GitHub (see migration status below).*
+* [Contributing to NTVS](https://github.com/Microsoft/nodejstools/Contributing)
+* [Build Instructions for NTVS](https://github.com/Microsoft/nodejstools/wiki/Build-Instructions)
 
 ## License
-[Apache License 2.0 (Apache)](https://nodejstools.codeplex.com/license)
+[Apache License 2.0 (Apache)](https://github.com/Microsoft/nodejstools/blob/master/LICENSE)
 
 ## GitHub Migration Status
 * **Issue tracker:** Working on migrating [existing issues](https://nodejstools.codeplex.com/workitem/list/basic), but file new issues on GitHub.
 * **Discussions:** No plans to migrate [existing discussions](https://nodejstools.codeplex.com/discussions). Please use the "discuss" tag in the GitHub issue tracker for all new discussions.  
 * **Source code:** Done!
-* **Documentation:** Not yet migrated.
+* **Documentation:** Done!
 * **Releases:** Not yet migrated.
+* 
