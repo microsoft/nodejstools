@@ -74,7 +74,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         /// </remarks>
         public static async void RunWithRequestExceptionsHandled(Func<Task> action) {
             try {
-                await action();
+                await action().ConfigureAwait(false);
             } catch (IOException) {
             } catch (OperationCanceledException) {
             }
