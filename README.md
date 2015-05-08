@@ -18,7 +18,7 @@ NTVS releases are currently hosted on CodePlex.
 
 ## Contributions
 We would love to have you as a contributor!
-* [Contributing to NTVS](https://github.com/Microsoft/nodejstools/Contributing)
+* [Contributing to NTVS](https://github.com/Microsoft/nodejstools/wiki/Contributing)
 * [Build Instructions for NTVS](https://github.com/Microsoft/nodejstools/wiki/Build-Instructions)
 
 ## License
