@@ -50,7 +50,7 @@
 { input: "function a()\r\n{\r\n}", operations: [ { operation: "Enter", point: { position: 14 } } ], expected: "function a()\r\n{\r\n}" },
 { input: " \r\nfunction a() { \r\n    return; \r\n} \r\n ", operations: [ { operation: "Document" } ], expected: "\r\nfunction a() {\r\n    return;\r\n}\r\n" },
 { input: "foo(\r\n1, 2, 3)", operations: [ { operation: "Document" } ], expected: "foo(\r\n    1, 2, 3)" },
-{ input: "function Init() {\r\n    var a = [[1, 2],\r\n             [3, 4],\r\n\r\n            ];\r\n}", operations: [ { operation: "Enter", point: { position: 63 } } ], expected: "function Init() {\r\n    var a = [[1, 2],\r\n             [3, 4],\r\n\r\n            ];\r\n}" },
+{ input: "function Init() {\r\n    var a = [[1, 2],\r\n        [3, 4],\r\n\r\n    ];\r\n}", operations: [ { operation: "Enter", point: { position: 58 } } ], expected: "function Init() {\r\n    var a = [[1, 2],\r\n        [3, 4],\r\n\r\n    ];\r\n}" },
 { input: "\r\n    //function start\r\n    function abc() { }\r\n    //function end\r\n", operations: [ { operation: "Document" } ], expected: "\r\n//function start\r\nfunction abc() { }\r\n//function end\r\n" },
 { input: "// JScript source code\r\nfunction adder(a, b) {\r\n    ///<summary>Adds two numbers </summary>\r\n    return a + b;\r\n}\r\n", operations: [ { operation: "Enter", point: { position: 94 } } ], expected: "// JScript source code\r\nfunction adder(a, b) {\r\n    ///<summary>Adds two numbers </summary>\r\n    return a + b;\r\n}\r\n" },
 { input: "if(1)if(1)if(1)if(1){x+=2}", operations: [ { operation: "CloseBrace", point: { position: 26 } } ], expected: "if (1) if (1) if (1) if (1) { x += 2 }" },

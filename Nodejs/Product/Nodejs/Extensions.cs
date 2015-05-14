@@ -34,9 +34,18 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudioTools;
+using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools {
     public static class Extensions {
+
+        internal static bool IsPlatformAware(this ProjectNode projectNode) {
+            string platAwarePropStr = projectNode.BuildProject.GetPropertyValue(ProjectFileConstants.PlatformAware);
+            bool isPlatformAware = false;
+            bool.TryParse(platAwarePropStr, out isPlatformAware);
+            return isPlatformAware;
+        }
+
         public static IEnumerable<IVsProject> EnumerateLoadedProjects(this IVsSolution solution, bool onlyNodeProjects = true) {
             var flags =
                 onlyNodeProjects ?

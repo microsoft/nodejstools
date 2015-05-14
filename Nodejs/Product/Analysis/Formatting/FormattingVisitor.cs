@@ -37,6 +37,8 @@ namespace Microsoft.NodejsTools.Formatting {
         private static char[] _openParen = new[] { '(' };
         private static char[] _closeBrace = new[] { '}' };
         private static char[] _openBracket = new[] { '[' };
+        private static char[] _emptyStatementAbortTerminators = new[] { ';', '}' };
+
         public FormattingVisitor(string code, JsAst tree, FormattingOptions options = null, bool onEnter = false) {
             _code = code;
             _options = options ?? new FormattingOptions();
@@ -601,18 +603,6 @@ namespace Microsoft.NodejsTools.Formatting {
                 }
             } else {
                 Indent();
-                // Only correct indentation if we're correcting it for every element...
-                // var x = [[1,2],
-                //          [...
-                //
-                // vs.
-                // var x = [
-                //              [1,2],
-                //              [2,3]
-                //
-                // If we fix up the 1st one we misalign the users indentation
-
-                bool firstElementOnNewLine = ContainsLineFeed(node.GetStartIndex(_tree.LocationResolver), node.Elements[0].GetStartIndex(_tree.LocationResolver));
 
                 for (int i = 0; i < node.Elements.Length; i++) {
                     var curExpr = node.Elements[i];
@@ -628,10 +618,7 @@ namespace Microsoft.NodejsTools.Formatting {
                             _comma);
                     }
 
-                    // if we have elements on separate lines but the first element has a line feed (separate from '[')
-                    if (firstElementOnNewLine) {
-                        ReplacePreceedingWhiteSpace(curExpr.GetStartIndex(_tree.LocationResolver));
-                    }
+                    ReplacePreceedingWhiteSpace(curExpr.GetStartIndex(_tree.LocationResolver));
                     curExpr.Walk(this);
                 }
                 Dedent();
@@ -1000,7 +987,7 @@ namespace Microsoft.NodejsTools.Formatting {
                         if (curStmt is EmptyStatement) {
                             // if (blah); shouldn't get a space...
                             // abort terminators prevents foo;; from getting extra whitespace
-                            ReplacePreceedingWhiteSpace(curStmt.GetStartIndex(_tree.LocationResolver), null, abortTerminators: _semicolon);
+                            ReplacePreceedingWhiteSpace(curStmt.GetStartIndex(_tree.LocationResolver), null, abortTerminators: _emptyStatementAbortTerminators);
                         } else {
                             ReplacePreceedingWhiteSpaceMaybeMultiline(curStmt.GetStartIndex(_tree.LocationResolver));
                         }
@@ -1092,34 +1079,17 @@ namespace Microsoft.NodejsTools.Formatting {
             for (int i = start - 1; i >= 0; i--) {
                 if (_code[i] == ' ' || _code[i] == '\t') {
                     continue;
-                } else if (_code[i] == '\n') {
-                    if (i >= 1 && _code[i - 1] == '\r') {
-                        MaybeReplaceText(
-                            i - 1,
-                            start,
-                            _options.NewLine + GetIndentation()
-                        );
-                        break;
-                    }
+                } else if (_newlines.Contains(_code[i])) {
                     MaybeReplaceText(
-                        i,
+                        i + 1,
                         start,
-                        _options.NewLine + GetIndentation()
-                    );
-                    break;
-                } else if (_code[i] == '\r') {
-                    MaybeReplaceText(
-                        i,
-                        start,
-                        _options.NewLine + GetIndentation()
-                    );
+                        GetIndentation());
                     break;
                 } else {
                     MaybeReplaceText(
                         i + 1,
                         start,
-                        _options.NewLine + GetIndentation()
-                    );
+                        _options.NewLine + GetIndentation());
                     break;
                 }
             }
@@ -1189,7 +1159,7 @@ namespace Microsoft.NodejsTools.Formatting {
 
             // if(x) // comment
             // {
-            
+
             // does the line have a single line comment?
             bool followedByCommentButNotOpenBrace = FollowedBySingleLineComment(previousExpressionEnd, inParens);
 
@@ -1199,7 +1169,7 @@ namespace Microsoft.NodejsTools.Formatting {
                 var expressionEndLine = _tree.LocationResolver.IndexToLocation(previousExpressionEnd).Line;
                 var openBraceLine = _tree.LocationResolver.IndexToLocation(openBraceLocation).Line;
                 braceOnFollowingLine = expressionEndLine != openBraceLine;
-            }    
+            }
 
             // if the brace on new line option is set, or the first line has a comment but not the brace,
             // we want the brace on the following line indented.

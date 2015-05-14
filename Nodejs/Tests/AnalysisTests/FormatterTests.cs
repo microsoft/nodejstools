@@ -97,9 +97,46 @@ a.mount('/', [
     @"switch (abc) {
     case foo: function a() {
         x = 42; y = 100; [1,
-        2, 3]
+            2, 3]
     }
 }");
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestJsonArray() {
+            TestCode(
+@"(function (seedData) {
+    seedData.initialNotes = [{
+            name: ""category"",
+            notes: [{
+                    note: ""note1"",
+                    author: ""author1"", 
+            color: ""blue""
+                },
+    {
+                    note: ""note1"",
+                    author: ""author2"",
+        color: ""green""
+                }]
+        }];
+})(module.exports);",
+@"(function (seedData) {
+    seedData.initialNotes = [{
+            name: ""category"",
+            notes: [{
+                    note: ""note1"",
+                    author: ""author1"", 
+                    color: ""blue""
+                },
+                {
+                    note: ""note1"",
+                    author: ""author2"",
+                    color: ""green""
+                }]
+        }];
+})(module.exports);"
+
+                );
         }
 
         [TestMethod, Priority(0)]
@@ -279,7 +316,7 @@ a.mount('/', [
                       After  = "var x = [\r\n    1, 2, 3\r\n]"},
                 // Test multiple lines stay aligned, but individual single line arrays fixed
                 new { Before = "function f() {\r\n    var x = [[1],\r\n             [2,   3],\r\n             [3,4,5]]\r\n}",
-                      After  = "function f() {\r\n    var x = [[1],\r\n             [2, 3],\r\n             [3, 4, 5]]\r\n}"},
+                      After  = "function f() {\r\n    var x = [[1],\r\n        [2, 3],\r\n        [3, 4, 5]]\r\n}"},
                 // https://nodejstools.codeplex.com/workitem/1494 We shouldn't push the 3 & 4 together
                 new { Before = "var x = [1,2,3 4]",
                       After  = "var x = [1, 2, 3 4]"},
@@ -388,6 +425,28 @@ a.mount('/', [
         public void TestEmpty() {
             TestCode("if (true);", "if (true);");
             TestCode("if (true) ;", "if (true);");
+
+            // https://github.com/Microsoft/nodejstools/issues/24
+            TestCode(
+@"var x = function () {
+    if (a) {
+        123455
+    };
+};",
+@"var x = function () {
+    if (a) {
+        123455
+    };
+};");
+
+            // Shouldn't insert additional space between semicolons.
+            TestCode(
+@"function a() {
+    var a;;
+}",
+@"function a() {
+    var a;;
+}");
         }
 
         [TestMethod, Priority(0)]
@@ -508,25 +567,25 @@ label:
 
         [TestMethod, Priority(0)]
         public void TestBlock() {
-            TestCode("{\nvar b;\n}",
-@"{
-    var b;
-}"
-);
-
-            TestCode("{\rvar b;\r}",
-@"{
-    var b;
-}"
-);
+            TestCode(
+                "{\nvar b;\n}",
+                "{\n    var b;\n}",
+                new FormattingOptions() {
+                    NewLine = "\n"
+                });
 
             TestCode(
-@"{ var b;
-}",
-@"{
-    var b;
-}"
-);
+                "{\rvar b;\r}",
+                "{\r    var b;\r}",
+                new FormattingOptions() {
+                    NewLine = "\r"
+                }
+                );
+
+            TestCode(
+                "{\r\nvar b;\r\n}",
+                "{\r\n    var b;\r\n}"
+                );
         }
 
         [TestMethod, Priority(0)]
@@ -2190,6 +2249,21 @@ throw null;
 } while(true);");
         }
 
+        [TestMethod, Priority(0)]
+        public void TestFormatterNotReplacingAggressively() {
+            var code =
+@"function f() {
+    function g() {
+     
+}
+}";
+
+            var edits = Formatter.GetEditsForDocument(code, null);
+            Assert.AreEqual(1, edits.Length);
+            Assert.AreEqual(43, edits[0].Start);
+            Assert.AreEqual("    ", edits[0].Text);
+            Assert.AreEqual(0, edits[0].Length);
+        }
 
         private static void TestCode(string code, string expected, FormattingOptions options = null) {
             var firstFormat = FormatCode(code, options);
