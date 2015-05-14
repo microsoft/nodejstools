@@ -398,7 +398,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
         public void ClearExceptionTreatment() {
             DebuggerClient.RunWithRequestExceptionsHandled(async () => {
-                bool updated = _exceptionHandler.SetDefaultExceptionHitTreatment(ExceptionHitTreatment.BreakAlways);
+                bool updated = _exceptionHandler.SetDefaultExceptionHitTreatment(ExceptionHitTreatment.BreakNever);
                 updated |= _exceptionHandler.ResetExceptionTreatments();
 
                 if (updated) {
