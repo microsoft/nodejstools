@@ -131,6 +131,21 @@ namespace AnalysisTests {
             List<AnalysisFile> files = new List<AnalysisFile>();
             foreach (var file in Directory.GetFiles(directory, "*", SearchOption.AllDirectories)) {
                 if (String.Equals(Path.GetExtension(file), ".js", StringComparison.OrdinalIgnoreCase)) {
+                    var relativeFile = file.Substring(directory.Length);
+                    int nestedModulesCount = 0;
+                    int index = relativeFile.IndexOf("node_modules");
+                    while (index != -1)
+                    {
+                        nestedModulesCount++;
+                        relativeFile = relativeFile.Substring(index + 1);
+                        index = relativeFile.IndexOf("node_modules");
+                    }
+
+                    if (nestedModulesCount > 2)
+                    {
+                        continue;
+                    }
+
                     files.Add(new AnalysisFile(file, File.ReadAllText(file)));
                 } else if (String.Equals(Path.GetFileName(file), "package.json", StringComparison.OrdinalIgnoreCase)) {
                     JavaScriptSerializer serializer = new JavaScriptSerializer();
