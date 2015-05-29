@@ -139,13 +139,13 @@
     <value>NoControl</value>
   </data>
   <data name="_fullIntelliSenseRadioButton.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 3</value>
+    <value>8, 4</value>
   </data>
   <data name="_fullIntelliSenseRadioButton.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 3, 6, 3</value>
+    <value>8, 4, 8, 4</value>
   </data>
   <data name="_fullIntelliSenseRadioButton.Size" type="System.Drawing.Size, System.Drawing">
-    <value>98, 17</value>
+    <value>127, 21</value>
   </data>
   <data name="_fullIntelliSenseRadioButton.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -169,7 +169,7 @@
     <value>tableLayoutPanel2</value>
   </data>
   <data name="&gt;&gt;_fullIntelliSenseRadioButton.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>3</value>
   </data>
   <data name="_noIntelliSenseRadioButton.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Left</value>
@@ -184,13 +184,13 @@
     <value>NoControl</value>
   </data>
   <data name="_noIntelliSenseRadioButton.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 26</value>
+    <value>8, 62</value>
   </data>
   <data name="_noIntelliSenseRadioButton.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 3, 6, 3</value>
+    <value>8, 4, 8, 4</value>
   </data>
   <data name="_noIntelliSenseRadioButton.Size" type="System.Drawing.Size, System.Drawing">
-    <value>96, 17</value>
+    <value>123, 21</value>
   </data>
   <data name="_noIntelliSenseRadioButton.TabIndex" type="System.Int32, mscorlib">
     <value>2</value>
@@ -214,7 +214,7 @@
     <value>tableLayoutPanel2</value>
   </data>
   <data name="&gt;&gt;_noIntelliSenseRadioButton.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>2</value>
   </data>
   <data name="_saveToDiskDisabledRadioButton.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Left</value>
@@ -229,13 +229,13 @@
     <value>NoControl</value>
   </data>
   <data name="_saveToDiskDisabledRadioButton.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 26</value>
+    <value>8, 33</value>
   </data>
   <data name="_saveToDiskDisabledRadioButton.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 3, 6, 3</value>
+    <value>8, 4, 8, 4</value>
   </data>
   <data name="_saveToDiskDisabledRadioButton.Size" type="System.Drawing.Size, System.Drawing">
-    <value>277, 17</value>
+    <value>370, 21</value>
   </data>
   <data name="_saveToDiskDisabledRadioButton.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -275,13 +275,13 @@
     <value>NoControl</value>
   </data>
   <data name="_saveToDiskEnabledRadioButton.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 3</value>
+    <value>8, 4</value>
   </data>
   <data name="_saveToDiskEnabledRadioButton.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 3, 6, 3</value>
+    <value>8, 4, 8, 4</value>
   </data>
   <data name="_saveToDiskEnabledRadioButton.Size" type="System.Drawing.Size, System.Drawing">
-    <value>64, 17</value>
+    <value>81, 21</value>
   </data>
   <data name="_saveToDiskEnabledRadioButton.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -322,6 +322,51 @@
   <data name="tableLayoutPanel2.ColumnCount" type="System.Int32, mscorlib">
     <value>2</value>
   </data>
+  <data name="_mediumIntelliSenseRadioButton.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Left</value>
+  </data>
+  <data name="_mediumIntelliSenseRadioButton.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="_mediumIntelliSenseRadioButton.CheckAlign" type="System.Drawing.ContentAlignment, System.Drawing">
+    <value>TopLeft</value>
+  </data>
+  <data name="_mediumIntelliSenseRadioButton.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="_mediumIntelliSenseRadioButton.Location" type="System.Drawing.Point, System.Drawing">
+    <value>8, 33</value>
+  </data>
+  <data name="_mediumIntelliSenseRadioButton.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>8, 4, 8, 4</value>
+  </data>
+  <data name="_mediumIntelliSenseRadioButton.Size" type="System.Drawing.Size, System.Drawing">
+    <value>154, 21</value>
+  </data>
+  <data name="_mediumIntelliSenseRadioButton.TabIndex" type="System.Int32, mscorlib">
+    <value>5</value>
+  </data>
+  <data name="_mediumIntelliSenseRadioButton.Text" xml:space="preserve">
+    <value>&amp;Medium IntelliSense</value>
+  </data>
+  <data name="_mediumIntelliSenseRadioButton.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
+    <value>TopLeft</value>
+  </data>
+  <data name="_mediumIntelliSenseRadioButton.ToolTip" xml:space="preserve">
+    <value>Medium completions (less memory/CPU usage)</value>
+  </data>
+  <data name="&gt;&gt;_mediumIntelliSenseRadioButton.Name" xml:space="preserve">
+    <value>_mediumIntelliSenseRadioButton</value>
+  </data>
+  <data name="&gt;&gt;_mediumIntelliSenseRadioButton.Type" xml:space="preserve">
+    <value>System.Windows.Forms.RadioButton, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_mediumIntelliSenseRadioButton.Parent" xml:space="preserve">
+    <value>tableLayoutPanel2</value>
+  </data>
+  <data name="&gt;&gt;_mediumIntelliSenseRadioButton.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
   <data name="_analysisLogMax.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Left</value>
   </data>
@@ -347,13 +392,13 @@
     <value>Max</value>
   </data>
   <data name="_analysisLogMax.Location" type="System.Drawing.Point, System.Drawing">
-    <value>145, 49</value>
+    <value>195, 91</value>
   </data>
   <data name="_analysisLogMax.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 3, 6, 3</value>
+    <value>8, 4, 8, 4</value>
   </data>
   <data name="_analysisLogMax.Size" type="System.Drawing.Size, System.Drawing">
-    <value>125, 21</value>
+    <value>165, 24</value>
   </data>
   <data name="_analysisLogMax.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
@@ -368,7 +413,7 @@
     <value>tableLayoutPanel2</value>
   </data>
   <data name="&gt;&gt;_analysisLogMax.ZOrder" xml:space="preserve">
-    <value>0</value>
+    <value>1</value>
   </data>
   <data name="_analysisLogMaxLabel.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Left</value>
@@ -380,13 +425,13 @@
     <value>NoControl</value>
   </data>
   <data name="_analysisLogMaxLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 53</value>
+    <value>8, 94</value>
   </data>
   <data name="_analysisLogMaxLabel.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 3, 6, 3</value>
+    <value>8, 4, 8, 4</value>
   </data>
   <data name="_analysisLogMaxLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>127, 13</value>
+    <value>171, 17</value>
   </data>
   <data name="_analysisLogMaxLabel.TabIndex" type="System.Int32, mscorlib">
     <value>3</value>
@@ -404,22 +449,22 @@
     <value>tableLayoutPanel2</value>
   </data>
   <data name="&gt;&gt;_analysisLogMaxLabel.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>4</value>
   </data>
   <data name="tableLayoutPanel2.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
   </data>
   <data name="tableLayoutPanel2.Location" type="System.Drawing.Point, System.Drawing">
-    <value>8, 21</value>
+    <value>11, 25</value>
   </data>
   <data name="tableLayoutPanel2.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>3, 4, 3, 4</value>
+    <value>4, 5, 4, 5</value>
   </data>
   <data name="tableLayoutPanel2.RowCount" type="System.Int32, mscorlib">
-    <value>4</value>
+    <value>5</value>
   </data>
   <data name="tableLayoutPanel2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>611, 73</value>
+    <value>814, 119</value>
   </data>
   <data name="tableLayoutPanel2.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
@@ -437,22 +482,22 @@
     <value>0</value>
   </data>
   <data name="tableLayoutPanel2.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
-    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="_analysisLogMax" Row="3" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="_noIntelliSenseRadioButton" Row="2" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="_fullIntelliSenseRadioButton" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="_analysisLogMaxLabel" Row="3" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="AutoSize,0,Percent,100" /&gt;&lt;Rows Styles="Percent,100,AutoSize,0,AutoSize,0,AutoSize,0" /&gt;&lt;/TableLayoutSettings&gt;</value>
+    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="_mediumIntelliSenseRadioButton" Row="2" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="_analysisLogMax" Row="4" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="_noIntelliSenseRadioButton" Row="3" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="_fullIntelliSenseRadioButton" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="_analysisLogMaxLabel" Row="4" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="AutoSize,0,Percent,100" /&gt;&lt;Rows Styles="Percent,100,AutoSize,0,AutoSize,0,AutoSize,0,AutoSize,0,Absolute,20" /&gt;&lt;/TableLayoutSettings&gt;</value>
   </data>
   <data name="intellisenseLevelGroupBox.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
   </data>
   <data name="intellisenseLevelGroupBox.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 3</value>
+    <value>8, 4</value>
   </data>
   <data name="intellisenseLevelGroupBox.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 3, 6, 3</value>
+    <value>8, 4, 8, 4</value>
   </data>
   <data name="intellisenseLevelGroupBox.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>8, 8, 8, 8</value>
+    <value>11, 10, 11, 10</value>
   </data>
   <data name="intellisenseLevelGroupBox.Size" type="System.Drawing.Size, System.Drawing">
-    <value>627, 102</value>
+    <value>836, 154</value>
   </data>
   <data name="intellisenseLevelGroupBox.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -491,16 +536,16 @@
     <value>Fill</value>
   </data>
   <data name="tableLayoutPanel4.Location" type="System.Drawing.Point, System.Drawing">
-    <value>8, 21</value>
+    <value>11, 25</value>
   </data>
   <data name="tableLayoutPanel4.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>3, 4, 3, 4</value>
+    <value>4, 5, 4, 5</value>
   </data>
   <data name="tableLayoutPanel4.RowCount" type="System.Int32, mscorlib">
     <value>4</value>
   </data>
   <data name="tableLayoutPanel4.Size" type="System.Drawing.Size, System.Drawing">
-    <value>611, 46</value>
+    <value>814, 58</value>
   </data>
   <data name="tableLayoutPanel4.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
@@ -524,16 +569,16 @@
     <value>Fill</value>
   </data>
   <data name="saveToDiskGroupBox.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 111</value>
+    <value>8, 166</value>
   </data>
   <data name="saveToDiskGroupBox.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 3, 6, 3</value>
+    <value>8, 4, 8, 4</value>
   </data>
   <data name="saveToDiskGroupBox.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>8, 8, 8, 8</value>
+    <value>11, 10, 11, 10</value>
   </data>
   <data name="saveToDiskGroupBox.Size" type="System.Drawing.Size, System.Drawing">
-    <value>627, 75</value>
+    <value>836, 93</value>
   </data>
   <data name="saveToDiskGroupBox.TabIndex" type="System.Int32, mscorlib">
     <value>2</value>
@@ -578,13 +623,13 @@
     <value>Left, Right</value>
   </data>
   <data name="_completionCommittedBy.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 22</value>
+    <value>8, 29</value>
   </data>
   <data name="_completionCommittedBy.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 3, 6, 3</value>
+    <value>8, 4, 8, 4</value>
   </data>
   <data name="_completionCommittedBy.Size" type="System.Drawing.Size, System.Drawing">
-    <value>609, 20</value>
+    <value>812, 22</value>
   </data>
   <data name="_completionCommittedBy.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -611,13 +656,13 @@
     <value>NoControl</value>
   </data>
   <data name="_completionCommittedByLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 3</value>
+    <value>8, 4</value>
   </data>
   <data name="_completionCommittedByLabel.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 3, 6, 3</value>
+    <value>8, 4, 8, 4</value>
   </data>
   <data name="_completionCommittedByLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>219, 13</value>
+    <value>292, 17</value>
   </data>
   <data name="_completionCommittedByLabel.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -641,16 +686,16 @@
     <value>Fill</value>
   </data>
   <data name="tableLayoutPanel3.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 16</value>
+    <value>4, 19</value>
   </data>
   <data name="tableLayoutPanel3.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>3, 4, 3, 4</value>
+    <value>4, 5, 4, 5</value>
   </data>
   <data name="tableLayoutPanel3.RowCount" type="System.Int32, mscorlib">
     <value>2</value>
   </data>
   <data name="tableLayoutPanel3.Size" type="System.Drawing.Size, System.Drawing">
-    <value>621, 45</value>
+    <value>828, 55</value>
   </data>
   <data name="tableLayoutPanel3.TabIndex" type="System.Int32, mscorlib">
     <value>7</value>
@@ -668,19 +713,22 @@
     <value>0</value>
   </data>
   <data name="tableLayoutPanel3.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
-    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="_completionCommittedBy" Row="1" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="_completionCommittedByLabel" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,100,Absolute,20" /&gt;&lt;Rows Styles="AutoSize,0,AutoSize,0" /&gt;&lt;/TableLayoutSettings&gt;</value>
+    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="_completionCommittedBy" Row="1" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="_completionCommittedByLabel" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,100,Absolute,27" /&gt;&lt;Rows Styles="AutoSize,0,AutoSize,0" /&gt;&lt;/TableLayoutSettings&gt;</value>
   </data>
   <data name="_selectionInCompletionListGroupBox.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
   </data>
   <data name="_selectionInCompletionListGroupBox.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 192</value>
+    <value>8, 267</value>
   </data>
   <data name="_selectionInCompletionListGroupBox.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 3, 6, 3</value>
+    <value>8, 4, 8, 4</value>
+  </data>
+  <data name="_selectionInCompletionListGroupBox.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>4, 4, 4, 4</value>
   </data>
   <data name="_selectionInCompletionListGroupBox.Size" type="System.Drawing.Size, System.Drawing">
-    <value>627, 64</value>
+    <value>836, 78</value>
   </data>
   <data name="_selectionInCompletionListGroupBox.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -707,13 +755,13 @@
     <value>0, 0</value>
   </data>
   <data name="tableLayoutPanel1.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>3, 4, 3, 4</value>
+    <value>4, 5, 4, 5</value>
   </data>
   <data name="tableLayoutPanel1.RowCount" type="System.Int32, mscorlib">
     <value>4</value>
   </data>
   <data name="tableLayoutPanel1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>639, 323</value>
+    <value>852, 398</value>
   </data>
   <data name="tableLayoutPanel1.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -731,19 +779,22 @@
     <value>0</value>
   </data>
   <data name="tableLayoutPanel1.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
-    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="_selectionInCompletionListGroupBox" Row="2" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="saveToDiskGroupBox" Row="1" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="intellisenseLevelGroupBox" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,100" /&gt;&lt;Rows Styles="AutoSize,0,AutoSize,0,AutoSize,0,Absolute,22" /&gt;&lt;/TableLayoutSettings&gt;</value>
+    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="_selectionInCompletionListGroupBox" Row="2" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="saveToDiskGroupBox" Row="1" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="intellisenseLevelGroupBox" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,100" /&gt;&lt;Rows Styles="AutoSize,0,AutoSize,0,AutoSize,0,Absolute,27" /&gt;&lt;/TableLayoutSettings&gt;</value>
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
-    <value>6, 13</value>
+    <value>8, 16</value>
   </data>
   <data name="$this.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
+  <data name="$this.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>4, 4, 4, 4</value>
+  </data>
   <data name="$this.Size" type="System.Drawing.Size, System.Drawing">
-    <value>639, 323</value>
+    <value>852, 398</value>
   </data>
   <data name="&gt;&gt;toolTip.Name" xml:space="preserve">
     <value>toolTip</value>

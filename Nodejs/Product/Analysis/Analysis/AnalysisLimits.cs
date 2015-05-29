@@ -34,6 +34,17 @@ namespace Microsoft.NodejsTools.Analysis {
             MaxObjectLiteralProperties = 50;
             MaxObjectKeysTypes = 5;
             MaxMergeTypes = 5;
+            NestedModulesLimit = 4;
+        }
+
+        /// <summary>
+        /// Creates instance of the <see cref="AnalysisLimits"/> for medium level of Intellisense support.
+        /// </summary>
+        /// <returns>An <see cref="AnalysisLimits"/> object representing medium level Initellisense settings.</returns>
+        public static AnalysisLimits MakeMediumAnalysisLimits() {
+            return new AnalysisLimits() {
+                NestedModulesLimit = 2
+            };
         }
 
         public static AnalysisLimits MakeLowAnalysisLimits() {
@@ -43,7 +54,8 @@ namespace Microsoft.NodejsTools.Analysis {
                 DictKeyTypes = 1,
                 DictValueTypes = 1,
                 IndexTypes = 1,
-                InstanceMembers = 1
+                InstanceMembers = 1,
+                NestedModulesLimit = 1
             };
         }
 
@@ -111,6 +123,11 @@ namespace Microsoft.NodejsTools.Analysis {
         /// </summary>
         public int MaxMergeTypes { get; set; }
 
+        /// <summary>
+        /// Gets the maximum levl  of dependency modules which could be analyzed.
+        /// </summary>
+        public int NestedModulesLimit { get; set; }
+
         public override bool Equals(object obj) {
             AnalysisLimits other = obj as AnalysisLimits;
             if (other != null) {
@@ -125,7 +142,8 @@ namespace Microsoft.NodejsTools.Analysis {
                     other.MaxArrayLiterals == MaxArrayLiterals &&
                     other.MaxObjectLiteralProperties == MaxObjectLiteralProperties &&
                     other.MaxObjectKeysTypes == MaxObjectKeysTypes &&
-                    other.MaxMergeTypes == MaxMergeTypes;
+                    other.MaxMergeTypes == MaxMergeTypes &&
+                    other.NestedModulesLimit == NestedModulesLimit;
             }
             return false;
         }
@@ -142,7 +160,8 @@ namespace Microsoft.NodejsTools.Analysis {
                 MaxArrayLiterals +
                 MaxObjectLiteralProperties +
                 MaxObjectKeysTypes +
-                MaxMergeTypes;
+                MaxMergeTypes +
+                NestedModulesLimit;
         }
     }
 }

@@ -41,6 +41,7 @@
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this._completionCommittedBy = new System.Windows.Forms.TextBox();
             this._completionCommittedByLabel = new System.Windows.Forms.Label();
+            this._mediumIntelliSenseRadioButton = new System.Windows.Forms.RadioButton();
             toolTip = new System.Windows.Forms.ToolTip(this.components);
             intellisenseLevelGroupBox = new System.Windows.Forms.GroupBox();
             saveToDiskGroupBox = new System.Windows.Forms.GroupBox();
@@ -95,10 +96,11 @@
             // tableLayoutPanel2
             // 
             resources.ApplyResources(this.tableLayoutPanel2, "tableLayoutPanel2");
-            this.tableLayoutPanel2.Controls.Add(this._analysisLogMax, 1, 3);
-            this.tableLayoutPanel2.Controls.Add(this._noIntelliSenseRadioButton, 0, 2);
+            this.tableLayoutPanel2.Controls.Add(this._mediumIntelliSenseRadioButton, 0, 2);
+            this.tableLayoutPanel2.Controls.Add(this._analysisLogMax, 1, 4);
+            this.tableLayoutPanel2.Controls.Add(this._noIntelliSenseRadioButton, 0, 3);
             this.tableLayoutPanel2.Controls.Add(this._fullIntelliSenseRadioButton, 0, 0);
-            this.tableLayoutPanel2.Controls.Add(this._analysisLogMaxLabel, 0, 3);
+            this.tableLayoutPanel2.Controls.Add(this._analysisLogMaxLabel, 0, 4);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             // 
             // _analysisLogMax
@@ -167,6 +169,14 @@
             resources.ApplyResources(this._completionCommittedByLabel, "_completionCommittedByLabel");
             this._completionCommittedByLabel.Name = "_completionCommittedByLabel";
             // 
+            // _mediumIntelliSenseRadioButton
+            // 
+            resources.ApplyResources(this._mediumIntelliSenseRadioButton, "_mediumIntelliSenseRadioButton");
+            this._mediumIntelliSenseRadioButton.Name = "_mediumIntelliSenseRadioButton";
+            this._mediumIntelliSenseRadioButton.TabStop = true;
+            toolTip.SetToolTip(this._mediumIntelliSenseRadioButton, resources.GetString("_mediumIntelliSenseRadioButton.ToolTip"));
+            this._mediumIntelliSenseRadioButton.UseVisualStyleBackColor = true;
+            // 
             // NodejsIntellisenseOptionsControl
             // 
             resources.ApplyResources(this, "$this");
@@ -207,6 +217,6 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
         private System.Windows.Forms.RadioButton _saveToDiskDisabledRadioButton;
         private System.Windows.Forms.RadioButton _saveToDiskEnabledRadioButton;
-
+        private System.Windows.Forms.RadioButton _mediumIntelliSenseRadioButton;
     }
 }

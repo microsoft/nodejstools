@@ -1459,6 +1459,9 @@ namespace Microsoft.NodejsTools.Intellisense {
 
             if (NodejsPackage.Instance != null) {
                 switch (_analysisLevel) {
+                    case Options.AnalysisLevel.Medium:
+                        defaults = AnalysisLimits.MakeMediumAnalysisLimits();
+                        break;
                     case Options.AnalysisLevel.Low:
                         defaults = _lowLimits;
                         break;
@@ -1500,6 +1503,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             limits.DictValueTypes = GetSetting(key, DictValueTypesId) ?? defaults.DictValueTypes;
             limits.IndexTypes = GetSetting(key, IndexTypesId) ?? defaults.IndexTypes;
             limits.AssignedTypes = GetSetting(key, AssignedTypesId) ?? defaults.AssignedTypes;
+            limits.NestedModulesLimit = GetSetting(key, NestedModulesLimitId) ?? defaults.NestedModulesLimit;
 
             return limits;
         }
@@ -1518,6 +1522,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         private const string DictValueTypesId = "DictValueTypes";
         private const string IndexTypesId = "IndexTypes";
         private const string AssignedTypesId = "AssignedTypes";
+        private const string NestedModulesLimitId = "NestedModulesLimit";
 
         #endregion
     }

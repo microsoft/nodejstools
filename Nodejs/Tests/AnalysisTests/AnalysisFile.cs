@@ -141,7 +141,7 @@ namespace AnalysisTests {
                         index = relativeFile.IndexOf("node_modules");
                     }
 
-                    if (nestedModulesCount > 2)
+                    if (nestedModulesCount > limits.NestedModulesLimit)
                     {
                         continue;
                     }

@@ -43,13 +43,20 @@ namespace Microsoft.NodejsTools.Options {
                 if (_fullIntelliSenseRadioButton.Checked) {
                     return AnalysisLevel.High;
                 } else {
-                    return AnalysisLevel.None;
+                    if (_mediumIntelliSenseRadioButton.Checked) {
+                        return AnalysisLevel.Medium;
+                    } else {
+                        return AnalysisLevel.None;
+                    }
                 }
             }
             set {
                 switch (value) {
                     case AnalysisLevel.High:
                         _fullIntelliSenseRadioButton.Checked = true;
+                        break;
+                    case AnalysisLevel.Medium:
+                        _mediumIntelliSenseRadioButton.Checked = true;
                         break;
                     case AnalysisLevel.None:
                         _noIntelliSenseRadioButton.Checked = true;
