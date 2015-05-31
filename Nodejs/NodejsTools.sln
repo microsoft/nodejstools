@@ -68,7 +68,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnalysisDriver", "Tests\Ana
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MockVsTests", "..\Common\Tests\MockVsTests\MockVsTests.csproj", "{A390E1C0-0D90-4A9E-8413-3E959BB07292}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildTasks", "..\Tools\BuildTasks\BuildTasks.csproj", "{E5F7D6B9-8D5A-416D-8F16-2BDC3576A5A3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildTasks", "..\Common\Tools\BuildTasks\BuildTasks.csproj", "{E5F7D6B9-8D5A-416D-8F16-2BDC3576A5A3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

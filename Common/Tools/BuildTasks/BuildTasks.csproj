@@ -60,10 +60,10 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\Common\Product\SharedProject\Wpf\LambdaConverter\ILambdaConverterProvider.cs">
+    <Compile Include="..\..\Product\SharedProject\Wpf\LambdaConverter\ILambdaConverterProvider.cs">
       <Link>ILambdaConverterProvider.cs</Link>
     </Compile>
-    <Compile Include="..\..\Common\Product\SharedProject\Wpf\LambdaConverter\LambdaConverter.cs">
+    <Compile Include="..\..\Product\SharedProject\Wpf\LambdaConverter\LambdaConverter.cs">
       <Link>LambdaConverter.cs</Link>
     </Compile>
     <Compile Include="ExtractLambdasFromXaml.cs" />
