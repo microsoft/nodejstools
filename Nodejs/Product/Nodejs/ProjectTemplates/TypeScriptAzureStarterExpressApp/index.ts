@@ -8,9 +8,9 @@ export function index(req: express.Request, res: express.Response) {
 };
 
 export function about(req: express.Request, res: express.Response) {
-    res.render('about', { title: 'About', year: new Date().getFullYear(), message: 'Your application description page.' });
+    res.render('about', { title: 'About', year: new Date().getFullYear(), message: 'Your application description page' });
 };
 
 export function contact(req: express.Request, res: express.Response) {
-    res.render('contact', { title: 'Contact', year: new Date().getFullYear(), message: 'Your contact page.' });
+    res.render('contact', { title: 'Contact', year: new Date().getFullYear(), message: 'Your contact page' });
 };
