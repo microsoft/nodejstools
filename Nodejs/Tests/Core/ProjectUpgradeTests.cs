@@ -41,8 +41,8 @@ namespace NodejsTests {
         public void UpgradeEnvironmentVariables() {
             var factory = new BaseNodeProjectFactory(null);
             var sp = new MockServiceProvider();
-            sp.Services["SVsQueryEditQuerySave"] = null;
-            sp.Services["SVsActivityLog"] = new MockActivityLog();
+            sp.Services[typeof(SVsQueryEditQuerySave).GUID] = null;
+            sp.Services[typeof(SVsActivityLog).GUID] = new MockActivityLog();
             factory.Site = sp;
 
             var upgrade = (IVsProjectUpgradeViaFactory)factory;

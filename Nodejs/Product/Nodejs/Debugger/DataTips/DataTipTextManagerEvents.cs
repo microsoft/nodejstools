@@ -22,8 +22,10 @@ using Microsoft.VisualStudio.TextManager.Interop;
 namespace Microsoft.NodejsTools.Debugger.DataTips {
     internal class DataTipTextManagerEvents : IVsTextManagerEvents {
         private readonly IVsEditorAdaptersFactoryService _editorAdaptersFactory;
+        private readonly IServiceProvider _serviceProvider;
 
         public DataTipTextManagerEvents(IServiceProvider serviceProvider) {
+            _serviceProvider = serviceProvider;
             var componentModel = (IComponentModel)serviceProvider.GetService(typeof(SComponentModel));
             _editorAdaptersFactory = componentModel.GetService<IVsEditorAdaptersFactoryService>();
         }
@@ -34,7 +36,7 @@ namespace Microsoft.NodejsTools.Debugger.DataTips {
         public void OnRegisterView(IVsTextView pView) {
             var wpfTextView = _editorAdaptersFactory.GetWpfTextView(pView);
             if (wpfTextView != null && wpfTextView.TextBuffer.ContentType.IsOfType(NodejsConstants.Nodejs)) {
-                new DataTipTextViewFilter(pView);
+                new DataTipTextViewFilter(_serviceProvider, pView);
             }
         }
 

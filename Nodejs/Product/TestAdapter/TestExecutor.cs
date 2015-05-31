@@ -92,7 +92,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
             // May be null, but this is handled by RunTestCase if it matters.
             // No VS instance just means no debugging, but everything else is
             // okay.
-            using (var app = VisualStudioApp.FromCommandLineArgs(Environment.GetCommandLineArgs())) {
+            using (var app = VisualStudioApp.FromEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable)) {
                 // .njsproj file path -> project settings
                 var sourceToSettings = new Dictionary<string, NodejsProjectSettings>();
 
@@ -164,7 +164,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
             List<string> args = new List<string>();
             int port = 0;
             if (runContext.IsBeingDebugged && app != null) {
-                app.DTE.Debugger.DetachAll();
+                app.GetDTE().Debugger.DetachAll();
                 args.AddRange(GetDebugArgs(settings, out port));
             }
 

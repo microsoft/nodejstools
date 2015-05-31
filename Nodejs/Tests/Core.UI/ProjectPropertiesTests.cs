@@ -15,6 +15,7 @@
 //*********************************************************//
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudioTools.VSTestHost;
 using TestUtilities;
 using TestUtilities.UI;
 
@@ -32,12 +33,12 @@ namespace Microsoft.Nodejs.Tests.UI {
             using (var solution = Project("DirtyProperties").Generate().ToVs()) {
                 var proj = solution.FindItem("DirtyProperties");
                 AutomationWrapper.Select(proj);
-                solution.App.Dte.ExecuteCommand("ClassViewContextMenus.ClassViewMultiselectProjectreferencesItems.Properties");
-                var window = solution.App.Dte.Windows.Item("DirtyProperties");
+                solution.ExecuteCommand("ClassViewContextMenus.ClassViewMultiselectProjectreferencesItems.Properties");
+                var window = VSTestContext.DTE.Windows.Item("DirtyProperties");
                 Assert.AreEqual(window.Caption, "DirtyProperties");
 
-                solution.Project.Properties.Item("NodejsPort").Value = 3000;
-                Assert.AreEqual(false, solution.Project.Saved);
+                solution.GetProject("DirtyProperties").Properties.Item("NodejsPort").Value = 3000;
+                Assert.AreEqual(false, solution.GetProject("DirtyProperties").Saved);
             }
         }
     }

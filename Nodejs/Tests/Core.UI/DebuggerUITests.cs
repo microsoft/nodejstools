@@ -21,6 +21,7 @@ using EnvDTE;
 using Microsoft.NodejsTools;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudioTools;
+using Microsoft.VisualStudioTools.VSTestHost;
 using TestUtilities;
 using TestUtilities.UI;
 
@@ -55,9 +56,9 @@ process.exit(" + exitCode + ");"),
                                 NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit = waitOnNormal;
 
                                 if (debug) {
-                                    solution.App.Dte.ExecuteCommand("Debug.Start");
+                                    solution.ExecuteCommand("Debug.Start");
                                 } else {
-                                    solution.App.Dte.ExecuteCommand("Debug.StartWithoutDebugging");
+                                    solution.ExecuteCommand("Debug.StartWithoutDebugging");
                                 }
 
                                 for (int i = 0; i < 10 && !File.Exists(filename); i++) {
@@ -86,7 +87,7 @@ process.exit(" + exitCode + ");"),
                                 }
 
                                 if (debug) {
-                                    solution.App.WaitForMode(dbgDebugMode.dbgDesignMode);
+                                    solution.WaitForMode(dbgDebugMode.dbgDesignMode);
                                 }
 
                                 foreach (var proc in newProcesses) {
@@ -126,7 +127,7 @@ process.exit(" + exitCode + ");"),
                         "Microsoft.NodejsTools.PressAnyKey"
                     ).Select(x => x.Id);
 
-                    solution.App.Dte.ExecuteCommand("Debug.Start");
+                    solution.ExecuteCommand("Debug.Start");
 
                     bool foundNewProcesses = false;
                     for (int i = 0; i < 10; i++) {
@@ -137,7 +138,7 @@ process.exit(" + exitCode + ");"),
                         if (newProcesses.Length > 0) {
                             // we shouldn't have gotten into debug mode
                             Assert.AreEqual(
-                                solution.App.Dte.Debugger.CurrentMode,
+                                VSTestContext.DTE.Debugger.CurrentMode,
                                 dbgDebugMode.dbgDesignMode
                             );
 

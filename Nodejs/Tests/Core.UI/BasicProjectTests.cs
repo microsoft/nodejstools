@@ -24,15 +24,17 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using EnvDTE;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudioTools;
 using TestUtilities;
 using TestUtilities.Nodejs;
+using TestUtilities.SharedProject;
 using TestUtilities.UI;
-using MessageBoxButton = TestUtilities.UI.MessageBoxButton;
+using MessageBoxButton = TestUtilities.MessageBoxButton;
 using ST = System.Threading;
 
 namespace Microsoft.Nodejs.Tests.UI {
     [TestClass]
-    public class BasicProjectTests {
+    public class BasicProjectTests : SharedProjectTest {
         [ClassInitialize]
         public static void DoDeployment(TestContext context) {
             AssertListener.Initialize();
@@ -902,6 +904,58 @@ namespace Microsoft.Nodejs.Tests.UI {
                 CountIs(itemCount, "HelloWorld.njsproj", 1);
                 CountIs(itemCount, "HelloWorld.js", 0);     // not included because the actual name is server.js
             }
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("VSTestHost")]
+        public void CopyFullPath() {
+            foreach (var projectType in ProjectTypes) {
+                var def = new ProjectDefinition(
+                    "HelloWorld",
+                    projectType,
+                    Compile("server"),
+                    Folder("IncFolder", isExcluded: false),
+                    Folder("ExcFolder", isExcluded: true),
+                    Compile("app", isExcluded: true),
+                    Compile("missing", isMissing: true)
+                );
+
+                using (var solution = def.Generate().ToVs()) {
+                    var projectDir = Path.GetDirectoryName(solution.GetProject("HelloWorld").FullName);
+
+                    CheckCopyFullPath(solution,
+                                      solution.WaitForItem("HelloWorld", "IncFolder"),
+                                      projectDir + "\\IncFolder\\");
+                    var excFolder = solution.WaitForItem("HelloWorld", "ExcFolder");
+                    if (excFolder == null) {
+                        solution.SelectProject(solution.GetProject("HelloWorld"));
+                        solution.ExecuteCommand("Project.ShowAllFiles");
+                        excFolder = solution.WaitForItem("HelloWorld", "ExcFolder");
+                    }
+                    CheckCopyFullPath(solution, excFolder, projectDir + "\\ExcFolder\\");
+                    CheckCopyFullPath(solution,
+                                      solution.WaitForItem("HelloWorld", "server" + def.ProjectType.CodeExtension),
+                                      projectDir + "\\server" + def.ProjectType.CodeExtension);
+                    CheckCopyFullPath(solution,
+                                      solution.WaitForItem("HelloWorld", "app" + def.ProjectType.CodeExtension),
+                                      projectDir + "\\app" + def.ProjectType.CodeExtension);
+                    CheckCopyFullPath(solution,
+                                      solution.WaitForItem("HelloWorld", "missing" + def.ProjectType.CodeExtension),
+                                      projectDir + "\\missing" + def.ProjectType.CodeExtension);
+                }
+            }
+        }
+
+        private void CheckCopyFullPath(IVisualStudioInstance vs, ITreeNode element, string expected) {
+            string clipboardText = "";
+            Console.WriteLine("Checking CopyFullPath on:{0}", expected);
+            AutomationWrapper.Select(element);
+            vs.Dte.ExecuteCommand("File.CopyFullPath");
+
+            var app = ((VisualStudioInstance)vs).App;
+            app.ServiceProvider.GetUIThread().Invoke(() => clipboardText = System.Windows.Clipboard.GetText());
+
+            Assert.AreEqual(expected, clipboardText);
         }
 
         private static void CountIs(Dictionary<string, int> count, string key, int expected) {

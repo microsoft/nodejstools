@@ -15,6 +15,7 @@
 //*********************************************************//
 
 using System.Text.RegularExpressions;
+using Microsoft.NodejsTools;
 using Microsoft.NodejsTools.Classifier;
 using Microsoft.NodejsTools.Debugger.DataTips;
 using Microsoft.NodejsTools.Intellisense;
@@ -29,7 +30,7 @@ namespace NodejsTests.Debugger.FileNameMapping {
             var buffer = new MockTextBuffer(input, @"C:\fob.js", "Node.js");
             var view = new MockTextView(buffer);
 
-            var classifierProvider = new NodejsClassifierProvider(new MockContentTypeRegistryService());
+            var classifierProvider = new NodejsClassifierProvider(new MockContentTypeRegistryService(NodejsConstants.Nodejs));
             classifierProvider._classificationRegistry = new MockClassificationTypeRegistryService();
             classifierProvider.GetClassifier(buffer);
 

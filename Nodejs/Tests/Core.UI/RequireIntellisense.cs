@@ -395,16 +395,16 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        private static void TypeRequireStatementAndSelectModuleName(bool doubleQuotes, EditorWindow window) {
+        private static void TypeRequireStatementAndSelectModuleName(bool doubleQuotes, IEditor window) {
             Keyboard.Type(string.Format("require({0}ab{0})", doubleQuotes ? "\"" : "'"));
             window.MoveCaret(1, 10);
             window.Select(1, 10, 2);
             Keyboard.Type(Keyboard.CtrlSpace.ToString());
         }
 
-        private static void WaitForCompletionSessionAndCommit(EditorWindow server) {
+        private static void WaitForCompletionSessionAndCommit(IEditor server) {
             using (var completionSession = server.WaitForSession<ICompletionSession>()) {
-                UIThread.Invoke(() => { completionSession.Session.Commit(); });
+                server.Invoke(() => { completionSession.Session.Commit(); });
             }
         }
 
@@ -735,7 +735,7 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var server = solution.OpenItem("Require", "server.js");
 
                 File.WriteAllText(
-                    Path.Combine(solution.Directory, "Require", "node_modules", "blah.js"),
+                    Path.Combine(solution.SolutionDirectory, "Require", "node_modules", "blah.js"),
                     "exports = function(a,b,c) { }"
                 );
 

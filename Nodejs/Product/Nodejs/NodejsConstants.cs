@@ -65,5 +65,7 @@ namespace Microsoft.NodejsTools {
         internal const string TypeScriptModuleKind = "TypeScriptModuleKind";
         internal const string CommonJSModuleKind = "CommonJS";
         internal const string TypeScript = "TypeScript";
+
+        internal const string NodeToolsProcessIdEnvironmentVariable = "_NTVS_PID";
     }
 }

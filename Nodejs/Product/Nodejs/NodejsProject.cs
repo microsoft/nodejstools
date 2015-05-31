@@ -673,7 +673,7 @@ namespace Microsoft.NodejsTools {
                 return;
             }
 
-            UIThread.Invoke(() => {
+            this._package.GetUIThread().Invoke(() => {
                 string caption;
                 object captionObj;
                 if (ErrorHandler.Failed(_innerVsHierarchy.GetProperty(

@@ -26,6 +26,7 @@ using Microsoft.NodejsTools.Intellisense;
 using Microsoft.NodejsTools.Project;
 using Microsoft.NodejsTools.Repl;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Language.StandardClassification;
 using Microsoft.VisualStudio.Shell;
@@ -107,6 +108,10 @@ namespace Microsoft.NodejsTools {
             return (project as EnvDTE.Project);
         }
 
+        internal static IComponentModel GetComponentModel(this IServiceProvider serviceProvider) {
+            return (IComponentModel)serviceProvider.GetService(typeof(SComponentModel));
+        }
+        
         internal static string GetFilePath(this ITextBuffer textBuffer) {
             ITextDocument textDocument;
             if (textBuffer.Properties.TryGetProperty<ITextDocument>(typeof(ITextDocument), out textDocument)) {

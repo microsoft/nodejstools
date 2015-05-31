@@ -27,12 +27,12 @@ using SR = Microsoft.NodejsTools.Project.SR;
 namespace Microsoft.NodejsTools {
     [Guid(Guids.NodejsBaseProjectFactoryString)]
     class BaseNodeProjectFactory : ProjectFactory {
-        public BaseNodeProjectFactory(NodejsProjectPackage package) : base(package) {
+        public BaseNodeProjectFactory(NodejsProjectPackage package)
+            : base((IServiceProvider)package) {
         }
 
         internal override ProjectNode CreateProject() {
-            NodejsProjectNode project = new NodejsProjectNode((NodejsProjectPackage)Package);
-            project.SetSite((IOleServiceProvider)((IServiceProvider)Package).GetService(typeof(IOleServiceProvider)));
+            NodejsProjectNode project = new NodejsProjectNode((NodejsProjectPackage)Site);
             return project;
         }
 

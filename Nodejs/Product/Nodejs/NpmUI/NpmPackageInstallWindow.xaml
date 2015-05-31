@@ -29,34 +29,6 @@
                 </Setter>
             </Style>
             
-            <wpf:ComparisonConverter 
-                x:Key="ResultsAvailableConverter"
-                IfTrue="{x:Static Visibility.Visible}"
-                IfFalse="{x:Static Visibility.Hidden}"
-                Operator="EqualTo"
-                SecondOperand="{x:Static npmUi:NpmPackageInstallViewModel+FilterState.ResultsAvailable}" />
-
-            <wpf:ComparisonConverter 
-                x:Key="NoFilterTextConverter"
-                IfTrue="{x:Static Visibility.Visible}"
-                IfFalse="{x:Static Visibility.Hidden}"
-                Operator="EqualTo"
-                SecondOperand="{x:Static npmUi:NpmPackageInstallViewModel+FilterState.NoFilterText}" />
-
-            <wpf:ComparisonConverter 
-                x:Key="NoResultsFoundConverter"
-                IfTrue="{x:Static Visibility.Visible}"
-                IfFalse="{x:Static Visibility.Hidden}"
-                Operator="EqualTo"
-                SecondOperand="{x:Static npmUi:NpmPackageInstallViewModel+FilterState.NoResults}" />
-
-            <wpf:ComparisonConverter 
-                x:Key="FilteringConverter"
-                IfTrue="{x:Static Visibility.Visible}"
-                IfFalse="{x:Static Visibility.Hidden}"
-                Operator="EqualTo"
-                SecondOperand="{x:Static npmUi:NpmPackageInstallViewModel+FilterState.Filtering}" />
-
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/Microsoft.NodejsTools;component/SharedProject/Wpf/Controls.xaml" />
                 <ResourceDictionary>
@@ -390,22 +362,22 @@
                           ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                           MinHeight="0"
                           KeyboardNavigation.TabIndex="1" 
-                          Visibility="{Binding Path=PackageFilterState, Converter={StaticResource ResultsAvailableConverter}}"/>
+                          Visibility="{Binding PackageFilterState, Converter={wpf:Lambda '(NpmPackageInstallViewModel.FilterState b) => NpmPackageInstallViewModel.FilterState.ResultsAvailable == b ? Visibility.Visible : Visibility.Hidden'}}"/>
                 <Border BorderBrush="{Binding ElementName=_packageList, Path=BorderBrush}"
                         BorderThickness="{Binding ElementName=_packageList,Path=BorderThickness}">
                     <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TextBlock HorizontalAlignment="Center"
-                                   Visibility="{Binding Path=PackageFilterState, Converter={StaticResource NoFilterTextConverter}}">
+                                   Visibility="{Binding PackageFilterState, Converter={wpf:Lambda '(NpmPackageInstallViewModel.FilterState b) => NpmPackageInstallViewModel.FilterState.NoFilterText == b ? Visibility.Visible : Visibility.Hidden'}}">
                             Type to search for packages.
                         </TextBlock>
                         <ProgressBar 
                     HorizontalAlignment="Stretch"
                     IsEnabled="True" 
                     IsIndeterminate="True"
-                    Visibility="{Binding Path=PackageFilterState, Converter={StaticResource FilteringConverter}}"/>
+                    Visibility="{Binding PackageFilterState, Converter={wpf:Lambda '(NpmPackageInstallViewModel.FilterState b) => NpmPackageInstallViewModel.FilterState.Filtering == b ? Visibility.Visible : Visibility.Hidden'}}"/>
                         <TextBlock 
                     HorizontalAlignment="Center"
-                    Visibility="{Binding Path=PackageFilterState, Converter={StaticResource NoResultsFoundConverter}}">
+                    Visibility="{Binding PackageFilterState, Converter={wpf:Lambda '(NpmPackageInstallViewModel.FilterState b) => NpmPackageInstallViewModel.FilterState.NoResults == b ? Visibility.Visible : Visibility.Hidden'}}">
                     No results found.
                         </TextBlock>
                     </Grid>

@@ -57,7 +57,7 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var sln = app.GetService<IVsSolution>(typeof(SVsSolution));
                 ErrorHandler.ThrowOnFailure(sln.GetProjectOfUniqueName(ccproj.FullName, out hier));
 
-                UIThread.Invoke(() =>
+                app.ServiceProvider.GetUIThread().Invoke(() =>
                     NodejsProject.UpdateServiceDefinition(
                         hier,
                         roleType,

@@ -44,7 +44,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
                 server.MoveCaret(2, 13);
 
-                solution.App.Dte.ExecuteCommand("Edit.CompleteWord");
+                solution.ExecuteCommand("Edit.CompleteWord");
 
                 server.WaitForText("var http = require('http');\r\nhttp.createServer");
             }

@@ -77,7 +77,6 @@ namespace Microsoft.NodejsTools.Profiling {
         /// initialization is the Initialize method.
         /// </summary>
         public NodejsProfilingPackage() {
-            UIThread.InitializeAndAlwaysInvokeToCurrentThread();
             Instance = this;
         }
 
@@ -88,7 +87,7 @@ namespace Microsoft.NodejsTools.Profiling {
         protected override void Initialize() {
             Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
-
+            UIThread.EnsureService(this);
             var shell = (IVsShell)GetService(typeof(SVsShell));
 
             // we call into the Node.js package, so we need it loaded.
@@ -274,11 +273,12 @@ namespace Microsoft.NodejsTools.Profiling {
         }
 
         internal async System.Threading.Tasks.Task ProfileProject(SessionNode session, EnvDTE.Project projectToProfile, bool openReport) {
-            if (!await UIThread.InvokeTask(() => EnsureProjectUpToDate(projectToProfile)) &&
-                await UIThread.InvokeAsync(() => MessageBox.Show(Resources.FailedToBuild, Resources.NodejsToolsForVS, MessageBoxButton.YesNo)) == MessageBoxResult.No) {
+            var uiThread = (UIThreadBase)NodejsProfilingPackage.Instance.GetService(typeof(UIThreadBase));
+            if (!await uiThread.InvokeTask(() => EnsureProjectUpToDate(projectToProfile)) &&
+                await uiThread.InvokeAsync(() => MessageBox.Show(Resources.FailedToBuild, Resources.NodejsToolsForVS, MessageBoxButton.YesNo)) == MessageBoxResult.No) {
                 return;
             }
-
+            
             var interpreterArgs = (string)projectToProfile.Properties.Item("NodeExeArguments").Value;
             var scriptArgs = (string)projectToProfile.Properties.Item("ScriptArguments").Value;
             var startBrowser = (bool)projectToProfile.Properties.Item("StartWebBrowser").Value;

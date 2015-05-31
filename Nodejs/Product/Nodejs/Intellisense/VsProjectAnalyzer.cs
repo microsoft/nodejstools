@@ -688,9 +688,9 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         private static TaskProvider CreateDefaultTaskProvider() {
             var errorList = NodejsPackage.GetGlobalService(typeof(SVsErrorList)) as IVsTaskList;
-            var model = NodejsPackage.ComponentModel;
+            var model = (NodejsPackage.Instance as IServiceProvider).GetComponentModel();
             var errorProvider = model != null ? model.GetService<IErrorProviderFactory>() : null;
-            return new TaskProvider(errorList, errorProvider);
+            return new TaskProvider(NodejsPackage.Instance, errorList, errorProvider);
         }
 
         private TaskProvider TaskProvider {
