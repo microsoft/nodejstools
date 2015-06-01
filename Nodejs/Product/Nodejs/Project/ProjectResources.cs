@@ -164,6 +164,7 @@ namespace Microsoft.NodejsTools.Project {
         internal const string ReplInitializationMessage = "ReplInitializationMessage";
         internal const string RequestedVersionRangeNone = "RequestedVersionRangeNone";
         internal const string ScriptArgumentsToolTip = "ScriptArgumentsToolTip";
+        internal const string ScriptFileToolTip = "ScriptFileTooltip";
         internal const string Seconds = "Seconds";
         internal const string StartBrowserToolTip = "StartBrowserToolTip";
         internal const string StatusAnalysisLoaded = "StatusAnalysisLoaded";

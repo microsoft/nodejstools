@@ -50,6 +50,7 @@ namespace Microsoft.NodejsTools.Project {
         public override void Apply() {
             Project.SetProjectProperty(NodejsConstants.NodeExePath, _control.NodeExePath);
             Project.SetProjectProperty(NodejsConstants.NodeExeArguments, _control.NodeExeArguments);
+            Project.SetProjectProperty(CommonConstants.StartupFile, _control.ScriptFile);
             Project.SetProjectProperty(NodejsConstants.ScriptArguments, _control.ScriptArguments);
             Project.SetProjectProperty(NodejsConstants.NodejsPort, _control.NodejsPort);
             Project.SetProjectProperty(NodejsConstants.StartWebBrowser, _control.StartWebBrowser.ToString());
@@ -65,6 +66,7 @@ namespace Microsoft.NodejsTools.Project {
             try {
                 _control.NodeExeArguments = Project.GetUnevaluatedProperty(NodejsConstants.NodeExeArguments);
                 _control.NodeExePath = Project.GetUnevaluatedProperty(NodejsConstants.NodeExePath);
+                _control.ScriptFile = Project.GetUnevaluatedProperty(CommonConstants.StartupFile);
                 _control.ScriptArguments = Project.GetUnevaluatedProperty(NodejsConstants.ScriptArguments);
                 _control.WorkingDirectory = Project.GetUnevaluatedProperty(CommonConstants.WorkingDirectory);
                 _control.LaunchUrl = Project.GetUnevaluatedProperty(NodejsConstants.LaunchUrl);
