@@ -133,17 +133,16 @@ namespace AnalysisTests {
                 if (String.Equals(Path.GetExtension(file), ".js", StringComparison.OrdinalIgnoreCase)) {
                     var relativeFile = file.Substring(directory.Length);
                     int nestedModulesCount = 0;
-                    int index = relativeFile.IndexOf("node_modules");
-                    while (index != -1)
-                    {
+                    int startIndex = 0;
+                    int index = relativeFile.IndexOf("node_modules", startIndex, StringComparison.OrdinalIgnoreCase);
+                    while (index != -1) {
                         nestedModulesCount++;
-                        relativeFile = relativeFile.Substring(index + 1);
-                        index = relativeFile.IndexOf("node_modules");
-                    }
+                        if (nestedModulesCount > limits.NestedModulesLimit) {
+                            continue;
+                        }
 
-                    if (nestedModulesCount > limits.NestedModulesLimit)
-                    {
-                        continue;
+                        startIndex = index + 1;
+                        index = relativeFile.IndexOf("node_modules", startIndex, StringComparison.OrdinalIgnoreCase);
                     }
 
                     files.Add(new AnalysisFile(file, File.ReadAllText(file)));

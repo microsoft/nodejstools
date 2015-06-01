@@ -32,6 +32,7 @@
             this._noIntelliSenseRadioButton = new System.Windows.Forms.RadioButton();
             this._saveToDiskDisabledRadioButton = new System.Windows.Forms.RadioButton();
             this._saveToDiskEnabledRadioButton = new System.Windows.Forms.RadioButton();
+            this._mediumIntelliSenseRadioButton = new System.Windows.Forms.RadioButton();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this._analysisLogMax = new System.Windows.Forms.ComboBox();
             this._analysisLogMaxLabel = new System.Windows.Forms.Label();
@@ -41,7 +42,6 @@
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this._completionCommittedBy = new System.Windows.Forms.TextBox();
             this._completionCommittedByLabel = new System.Windows.Forms.Label();
-            this._mediumIntelliSenseRadioButton = new System.Windows.Forms.RadioButton();
             toolTip = new System.Windows.Forms.ToolTip(this.components);
             intellisenseLevelGroupBox = new System.Windows.Forms.GroupBox();
             saveToDiskGroupBox = new System.Windows.Forms.GroupBox();
@@ -85,6 +85,14 @@
             this._saveToDiskEnabledRadioButton.TabStop = true;
             toolTip.SetToolTip(this._saveToDiskEnabledRadioButton, resources.GetString("_saveToDiskEnabledRadioButton.ToolTip"));
             this._saveToDiskEnabledRadioButton.UseVisualStyleBackColor = true;
+            // 
+            // _mediumIntelliSenseRadioButton
+            // 
+            resources.ApplyResources(this._mediumIntelliSenseRadioButton, "_mediumIntelliSenseRadioButton");
+            this._mediumIntelliSenseRadioButton.Name = "_mediumIntelliSenseRadioButton";
+            this._mediumIntelliSenseRadioButton.TabStop = true;
+            toolTip.SetToolTip(this._mediumIntelliSenseRadioButton, resources.GetString("_mediumIntelliSenseRadioButton.ToolTip"));
+            this._mediumIntelliSenseRadioButton.UseVisualStyleBackColor = true;
             // 
             // intellisenseLevelGroupBox
             // 
@@ -168,14 +176,6 @@
             // 
             resources.ApplyResources(this._completionCommittedByLabel, "_completionCommittedByLabel");
             this._completionCommittedByLabel.Name = "_completionCommittedByLabel";
-            // 
-            // _mediumIntelliSenseRadioButton
-            // 
-            resources.ApplyResources(this._mediumIntelliSenseRadioButton, "_mediumIntelliSenseRadioButton");
-            this._mediumIntelliSenseRadioButton.Name = "_mediumIntelliSenseRadioButton";
-            this._mediumIntelliSenseRadioButton.TabStop = true;
-            toolTip.SetToolTip(this._mediumIntelliSenseRadioButton, resources.GetString("_mediumIntelliSenseRadioButton.ToolTip"));
-            this._mediumIntelliSenseRadioButton.UseVisualStyleBackColor = true;
             // 
             // NodejsIntellisenseOptionsControl
             // 

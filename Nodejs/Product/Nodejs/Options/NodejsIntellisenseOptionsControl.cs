@@ -42,12 +42,10 @@ namespace Microsoft.NodejsTools.Options {
             get {
                 if (_fullIntelliSenseRadioButton.Checked) {
                     return AnalysisLevel.High;
+                } else if (_mediumIntelliSenseRadioButton.Checked) {
+                    return AnalysisLevel.Medium;
                 } else {
-                    if (_mediumIntelliSenseRadioButton.Checked) {
-                        return AnalysisLevel.Medium;
-                    } else {
-                        return AnalysisLevel.None;
-                    }
+                    return AnalysisLevel.None;
                 }
             }
             set {
