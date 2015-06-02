@@ -59,7 +59,7 @@ namespace Microsoft.NodejsTools.Project {
         [SRDescriptionAttribute(SR.NodeExePathDescription)]
         public string NodeExePath {
             get {
-                return UIThread.Invoke(() => {
+                return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
                     var res = this.Node.ProjectMgr.GetProjectProperty(NodejsConstants.NodeExePath, true);
                     if (String.IsNullOrWhiteSpace(res)) {
                         return Nodejs.NodeExePath ?? String.Empty;
@@ -68,7 +68,7 @@ namespace Microsoft.NodejsTools.Project {
                 });
             }
             set {
-                UIThread.Invoke(() => {
+                HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
                     Node.ProjectMgr.SetProjectProperty(NodejsConstants.NodeExePath, value);
                 });
             }
@@ -79,12 +79,12 @@ namespace Microsoft.NodejsTools.Project {
         [SRDescriptionAttribute(SR.NodeExeArgumentsDescription)]
         public string NodeExeArguments {
             get {
-                return UIThread.Invoke(() => {
+                return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
                     return this.Node.ProjectMgr.GetProjectProperty(NodejsConstants.NodeExeArguments, true);
                 });
             }
             set {
-                UIThread.Invoke(() => {
+                HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
                     Node.ProjectMgr.SetProjectProperty(NodejsConstants.NodeExeArguments, value);
                 });
             }
@@ -95,12 +95,12 @@ namespace Microsoft.NodejsTools.Project {
         [SRDescriptionAttribute(SR.ScriptArgumentsDescription)]
         public string ScriptArguments {
             get {
-                return UIThread.Invoke(() => {
+                return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
                     return this.Node.ProjectMgr.GetProjectProperty(NodejsConstants.ScriptArguments, true);
                 });
             }
             set {
-                UIThread.Invoke(() => {
+                HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
                     Node.ProjectMgr.SetProjectProperty(NodejsConstants.ScriptArguments, value);
                 });
             }
@@ -111,7 +111,7 @@ namespace Microsoft.NodejsTools.Project {
         [SRDescriptionAttribute(SR.NodejsPortDescription)]
         public int? NodejsPort {
             get {
-                return UIThread.Invoke((Func<int?>)(() => {
+                return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke((Func<int?>)(() => {
                     int port;
                     if (Int32.TryParse(Node.ProjectMgr.GetProjectProperty(NodejsConstants.NodejsPort, true), out port)) {
                         return port;
@@ -120,7 +120,7 @@ namespace Microsoft.NodejsTools.Project {
                 }));
             }
             set {
-                UIThread.Invoke(() => {
+                HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
                     Node.ProjectMgr.SetProjectProperty(NodejsConstants.NodejsPort, value != null ? value.ToString() : String.Empty);
                 });
             }
@@ -131,12 +131,12 @@ namespace Microsoft.NodejsTools.Project {
         [SRDescriptionAttribute(SR.LaunchUrlDescription)]
         public string LaunchUrl {
             get {
-                return UIThread.Invoke(() => {
+                return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
                     return this.Node.ProjectMgr.GetProjectProperty(NodejsConstants.LaunchUrl, true);
                 });
             }
             set {
-                UIThread.Invoke(() => {
+                HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
                     Node.ProjectMgr.SetProjectProperty(NodejsConstants.LaunchUrl, value);
                 });
             }
@@ -147,7 +147,7 @@ namespace Microsoft.NodejsTools.Project {
         [SRDescriptionAttribute(SR.StartWebBrowserDescription)]
         public bool StartWebBrowser {
             get {
-                return UIThread.Invoke(() => {
+                return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
                     bool res;
                     if (Boolean.TryParse(Node.ProjectMgr.GetProjectProperty(NodejsConstants.StartWebBrowser, true), out res)) {
                         return res;
@@ -156,7 +156,7 @@ namespace Microsoft.NodejsTools.Project {
                 });
             }
             set {
-                UIThread.Invoke(() => {
+                HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
                     Node.ProjectMgr.SetProjectProperty(NodejsConstants.StartWebBrowser, value.ToString());
                 });
             }

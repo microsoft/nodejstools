@@ -23,11 +23,11 @@ namespace Microsoft.NodejsTools.Repl {
         #region INodejsReplSite Members
 
         public CommonProjectNode GetStartupProject() {
-            return NodejsPackage.GetStartupProject();
+            return NodejsPackage.GetStartupProject(NodejsPackage.Instance);
         }
 
         public bool TryGetStartupFileAndDirectory(out string fileName, out string directory) {
-            return NodejsPackage.TryGetStartupFileAndDirectory(out fileName, out directory);
+            return NodejsPackage.TryGetStartupFileAndDirectory(NodejsPackage.Instance, out fileName, out directory);
         }
 
         #endregion

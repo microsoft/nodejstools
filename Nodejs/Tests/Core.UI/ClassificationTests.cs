@@ -260,12 +260,12 @@ var";
         private static void VerifyClassifications(string code, params Classification[] expected) {
             using (var solution = Project(
                 "Classifications", Compile("server", code)).Generate().ToVs()) {
-                var item = solution.Project.ProjectItems.Item("server.js");
+                var item = solution.GetProject("Classifications").ProjectItems.Item("server.js");
 
                 var window = item.Open();
                 window.Activate();
 
-                var doc = solution.App.GetDocument(item.Document.FullName);
+                var doc = solution.GetDocument(item.Document.FullName);
 
                 var snapshot = doc.TextView.TextBuffer.CurrentSnapshot;
                 var classifier = doc.Classifier;

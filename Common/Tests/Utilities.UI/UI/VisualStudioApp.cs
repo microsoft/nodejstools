@@ -1,18 +1,16 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 using System;
 using System.Collections.Generic;
@@ -198,7 +196,7 @@ namespace TestUtilities.UI {
                 foreach (var ex in ae.InnerExceptions) {
                     Console.WriteLine(ex.ToString());
                 }
-                throw;
+                throw ae.InnerException;
             }
 
             if (timedOut) {
@@ -304,7 +302,8 @@ namespace TestUtilities.UI {
         }
 
         /// <summary>
-        /// Selects the given source control provider.  Name merely needs to be enough text to disambiguate from other source control providers.
+        /// Selects the given source control provider.  Name merely needs to be
+        /// enough text to disambiguate from other source control providers.
         /// </summary>
         public void SelectSourceControlProvider(string providerName) {
             Element.SetFocus();
@@ -805,9 +804,19 @@ namespace TestUtilities.UI {
 
             Project project = GetProject(projectName);
 
-            Assert.IsNotNull(project, "No project loaded");
-            Assert.IsNotNull(project.Properties, "No project loaded");
-            Assert.IsTrue(project.Properties.GetEnumerator().MoveNext(), "No project loaded");
+            string outputText = "(unable to get Solution output)";
+            try {
+                outputText = GetOutputWindowText("Solution");
+            } catch (Exception) {
+            }
+            Assert.IsNotNull(project, "No project loaded: " + outputText);
+            // HACK: Testing whether Properties is just slow to initialize
+            for (int retries = 10; retries > 0 && project.Properties == null; --retries) {
+                Trace.TraceWarning("Waiting for project.Properties to become non-null");
+                System.Threading.Thread.Sleep(250);
+            }
+            Assert.IsNotNull(project.Properties, "No project properties: " + outputText);
+            Assert.IsTrue(project.Properties.GetEnumerator().MoveNext(), "No items in project properties: " + outputText);
 
             if (startItem != null && setStartupItem) {
                 project.SetStartupFile(startItem);
@@ -904,7 +913,7 @@ namespace TestUtilities.UI {
                 manageSubscriptionsDialog.SubscriptionsListBox[0].Select();
                 manageSubscriptionsDialog.ClickRemove();
                 WaitForDialogToReplace(manageSubscriptionsDialog.Element);
-                VisualStudioApp.CheckMessageBox(TestUtilities.UI.MessageBoxButton.Yes);
+                VisualStudioApp.CheckMessageBox(TestUtilities.MessageBoxButton.Yes);
             }
 
             using (var importSubscriptionDialog = manageSubscriptionsDialog.ClickImport()) {
@@ -914,7 +923,13 @@ namespace TestUtilities.UI {
         }
 
         public List<IVsTaskItem> WaitForErrorListItems(int expectedCount) {
-            var errorList = GetService<IVsTaskList>(typeof(SVsErrorList));
+            return WaitForTaskListItems(typeof(SVsErrorList), expectedCount, exactMatch: false);
+        }
+
+        public List<IVsTaskItem> WaitForTaskListItems(Type taskListService, int expectedCount, bool exactMatch = true) {
+            Console.Write("Waiting for {0} items on {1} ... ", expectedCount, taskListService.Name);
+
+            var errorList = GetService<IVsTaskList>(taskListService);
             var allItems = new List<IVsTaskItem>();
 
             if (expectedCount == 0) {
@@ -941,6 +956,11 @@ namespace TestUtilities.UI {
                 // give time for errors to process...
                 System.Threading.Thread.Sleep(1000);
             }
+
+            if (exactMatch) {
+                Assert.AreEqual(expectedCount, allItems.Count);
+            }
+
             return allItems;
         }
 

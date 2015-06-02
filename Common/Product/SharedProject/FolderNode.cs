@@ -1,18 +1,16 @@
-//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 using System;
 using System.Collections.Generic;
@@ -26,6 +24,10 @@ using Microsoft.VisualStudio.Shell.Interop;
 using OleConstants = Microsoft.VisualStudio.OLE.Interop.Constants;
 using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
 using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
+#if DEV14_OR_LATER
+using Microsoft.VisualStudio.Imaging;
+using Microsoft.VisualStudio.Imaging.Interop;
+#endif
 
 namespace Microsoft.VisualStudioTools.Project {
 
@@ -98,12 +100,22 @@ namespace Microsoft.VisualStudioTools.Project {
             return new Automation.OAFolderItem(this.ProjectMgr.GetAutomationObject() as Automation.OAProject, this);
         }
 
+#if DEV14_OR_LATER
+        protected override bool SupportsIconMonikers {
+            get { return true; }
+        }
+
+        protected override ImageMoniker GetIconMoniker(bool open) {
+            return open ? KnownMonikers.FolderOpened : KnownMonikers.FolderClosed;
+        }
+#else
         public override object GetIconHandle(bool open) {
             return ProjectMgr.GetIconHandleByName(open ?
                 ProjectNode.ImageName.OpenFolder :
                 ProjectNode.ImageName.Folder
             );
         }
+#endif
 
         /// <summary>
         /// Rename Folder
@@ -185,7 +197,7 @@ namespace Microsoft.VisualStudioTools.Project {
                 if (wasCancelled) {
                     // cancelling an edit label doesn't result in the error
                     // being displayed, so we'll display one for the user.
-                    VsShellUtilities.ShowMessageBox(
+                    Utilities.ShowMessageBox(
                         ProjectMgr.Site,
                         null,
                         PathTooLongMessage,
@@ -211,6 +223,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
                     ProjectMgr.OnItemDeleted(this);
                     this.Parent.RemoveChild(this);
+                    ProjectMgr.Site.GetUIThread().MustBeCalledFromUIThread();
                     this.ID = ProjectMgr.ItemIdMap.Add(this);
                     this.Parent.AddChild(this);
 
@@ -469,6 +482,7 @@ namespace Microsoft.VisualStudioTools.Project {
             // Reparent the folder
             ProjectMgr.OnItemDeleted(this);
             Parent.RemoveChild(this);
+            ProjectMgr.Site.GetUIThread().MustBeCalledFromUIThread();
             ID = ProjectMgr.ItemIdMap.Add(this);
 
             ItemNode.Rename(CommonUtils.GetRelativeDirectoryPath(ProjectMgr.ProjectHome, newPath));
@@ -491,7 +505,7 @@ namespace Microsoft.VisualStudioTools.Project {
                 OLEMSGICON icon = OLEMSGICON.OLEMSGICON_CRITICAL;
                 OLEMSGBUTTON buttons = OLEMSGBUTTON.OLEMSGBUTTON_OK;
                 OLEMSGDEFBUTTON defaultButton = OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST;
-                VsShellUtilities.ShowMessageBox(this.ProjectMgr.Site, title, errorMessage, icon, buttons, defaultButton);
+                Utilities.ShowMessageBox(this.ProjectMgr.Site, title, errorMessage, icon, buttons, defaultButton);
                 return VSConstants.S_OK;
             } else {
                 throw new InvalidOperationException(errorMessage);

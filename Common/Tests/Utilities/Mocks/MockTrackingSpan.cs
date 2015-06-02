@@ -1,18 +1,16 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 using System;
 using System.Collections.Generic;
@@ -22,11 +20,32 @@ namespace TestUtilities.Mocks {
     public class MockTrackingSpan : ITrackingSpan {
         private readonly int _start, _length;
         private readonly MockTextSnapshot _snapshot;
+        private readonly SpanTrackingMode _trackingMode;
+        private readonly ITrackingPoint _startPoint, _endPoint;
 
-        public MockTrackingSpan(MockTextSnapshot snapshot, int start, int length) {
+        public MockTrackingSpan(MockTextSnapshot snapshot, int start, int length, SpanTrackingMode trackingMode = SpanTrackingMode.EdgeExclusive) {
             _start = start;
             _length = length;
             _snapshot = snapshot;
+            _trackingMode = trackingMode;
+            switch(_trackingMode) {
+                case SpanTrackingMode.EdgeExclusive:
+                    _startPoint = new MockTrackingPoint(snapshot, start, PointTrackingMode.Positive);
+                    _endPoint = new MockTrackingPoint(snapshot, start + length, PointTrackingMode.Negative);
+                    break;
+                case SpanTrackingMode.EdgeInclusive:
+                    _startPoint = new MockTrackingPoint(snapshot, start, PointTrackingMode.Negative);
+                    _endPoint = new MockTrackingPoint(snapshot, start + length, PointTrackingMode.Positive);
+                    break;
+                case SpanTrackingMode.EdgeNegative:
+                    _startPoint = new MockTrackingPoint(snapshot, start, PointTrackingMode.Negative);
+                    _endPoint = new MockTrackingPoint(snapshot, start + length, PointTrackingMode.Negative);
+                    break;
+                case SpanTrackingMode.EdgePositive:
+                    _startPoint = new MockTrackingPoint(snapshot, start, PointTrackingMode.Positive);
+                    _endPoint = new MockTrackingPoint(snapshot, start + length, PointTrackingMode.Positive);
+                    break;
+            }
         }
 
         public SnapshotPoint GetEndPoint(ITextSnapshot snapshot) {
@@ -34,49 +53,10 @@ namespace TestUtilities.Mocks {
         }
 
         public Span GetSpan(ITextVersion version) {
-            var current = _snapshot.Version;
-            var target = version;
-            if (current.VersionNumber == target.VersionNumber) {
-                return new Span(_start, _length);
-            } else if (current.VersionNumber > target.VersionNumber) {
-                // Apply the changes in reverse
-                var changesStack = new Stack<INormalizedTextChangeCollection>();
-
-                for (var v = target; v.VersionNumber < current.VersionNumber; v = v.Next) {
-                    changesStack.Push(v.Changes);
-                }
-
-                var newStart = _start;
-                var newLength = _length;
-
-                while (changesStack.Count > 0) {
-                    foreach (var change in changesStack.Pop()) {
-                        if (change.NewPosition <= newStart) {
-                            newStart -= change.Delta;
-                        } else if (change.NewPosition <= newStart + newLength) {
-                            newLength -= change.Delta;
-                        }
-                    }
-                }
-
-                return new Span(newStart, newLength);
-            } else {
-                // Apply the changes normally
-                var newStart = _start;
-                var newLength = _length;
-
-                for (var v = current; v.VersionNumber < target.VersionNumber; v = v.Next) {
-                    foreach (var change in v.Changes) {
-                        if (change.OldPosition < newStart) {
-                            newStart += change.Delta;
-                        } else if (change.OldPosition < newStart + newLength) {
-                            newLength += change.Delta;
-                        }
-                    }
-                }
-
-                return new Span(newStart, newLength);
-            }
+            return Span.FromBounds(
+                _startPoint.GetPosition(version),
+                _endPoint.GetPosition(version)
+            );
         }
 
         public SnapshotSpan GetSpan(ITextSnapshot snapshot) {
@@ -102,7 +82,7 @@ namespace TestUtilities.Mocks {
         }
 
         public SpanTrackingMode TrackingMode {
-            get { throw new NotImplementedException(); }
+            get { return _trackingMode; }
         }
     }
 }

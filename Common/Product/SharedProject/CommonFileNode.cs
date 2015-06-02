@@ -1,18 +1,16 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 using System;
 using System.Diagnostics;
@@ -31,6 +29,10 @@ using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudioTools.Project.Automation;
 using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
 using VSConstants = Microsoft.VisualStudio.VSConstants;
+#if DEV14_OR_LATER
+using Microsoft.VisualStudio.Imaging;
+using Microsoft.VisualStudio.Imaging.Interop;
+#endif
 
 namespace Microsoft.VisualStudioTools.Project {
     internal class CommonFileNode : FileNode {
@@ -98,6 +100,40 @@ namespace Microsoft.VisualStudioTools.Project {
 
         #region overridden methods
 
+#if DEV14_OR_LATER
+        protected override bool SupportsIconMonikers {
+            get { return true; }
+        }
+
+        protected virtual ImageMoniker CodeFileIconMoniker {
+            get { return KnownMonikers.Document; }
+        }
+
+        protected virtual ImageMoniker StartupCodeFileIconMoniker {
+            get { return CodeFileIconMoniker; }
+        }
+
+        protected virtual ImageMoniker FormFileIconMoniker {
+            get { return KnownMonikers.WindowsForm; }
+        }
+
+        protected override ImageMoniker GetIconMoniker(bool open) {
+            if (ItemNode.IsExcluded) {
+                return KnownMonikers.HiddenFile;
+            } else if (!File.Exists(Url)) {
+                return KnownMonikers.DocumentWarning;
+            } else if (IsFormSubType) {
+                return FormFileIconMoniker;
+            } else if (this._project.IsCodeFile(FileName)) {
+                if (CommonUtils.IsSamePath(this.Url, _project.GetStartupFile())) {
+                    return StartupCodeFileIconMoniker;
+                } else {
+                    return CodeFileIconMoniker;
+                }
+            }
+            return default(ImageMoniker);
+        }
+#else
         public override int ImageIndex {
             get {
                 if (ItemNode.IsExcluded) {
@@ -116,6 +152,8 @@ namespace Microsoft.VisualStudioTools.Project {
                 return base.ImageIndex;
             }
         }
+#endif
+
 
         /// <summary>
         /// Open a file depending on the SubType property associated with the file item in the project file
@@ -135,17 +173,17 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <summary>
         /// Gets the text buffer for the file opening the document if necessary.
         /// </summary>
-        public ITextBuffer GetTextBuffer() {
+        public ITextBuffer GetTextBuffer(bool create = true) {
             // http://pytools.codeplex.com/workitem/672
             // When we FindAndLockDocument we marshal on the main UI thread, and the docdata we get
             // back is marshalled back so that we'll marshal any calls on it back.  When we pass it
             // into IVsEditorAdaptersFactoryService we don't go through a COM boundary (it's a managed
             // call) and we therefore don't get the marshaled value, and it doesn't know what we're
             // talking about.  So run the whole operation on the UI thread.
-            return UIThread.Invoke(() => GetTextBufferOnUIThread());
+            return ProjectMgr.Site.GetUIThread().Invoke(() => GetTextBufferOnUIThread(create));
         }
 
-        private ITextBuffer GetTextBufferOnUIThread() {
+        private ITextBuffer GetTextBufferOnUIThread(bool create) {
             IVsTextManager textMgr = (IVsTextManager)GetService(typeof(SVsTextManager));
             var model = GetService(typeof(SComponentModel)) as IComponentModel;
             var adapter = model.GetService<IVsEditorAdaptersFactoryService>();
@@ -163,6 +201,9 @@ namespace Microsoft.VisualStudioTools.Project {
                     //Getting a read lock on the document. Must be released later.
                     hr = rdt.FindAndLockDocument((uint)_VSRDTFLAGS.RDT_ReadLock, GetMkDocument(), out hier, out itemid, out docData, out cookie);
                     if (ErrorHandler.Failed(hr) || docData == IntPtr.Zero) {
+                        if (!create) {
+                            return null;
+                        }
                         Guid iid = VSConstants.IID_IUnknown;
                         cookie = 0;
                         docInRdt = false;
@@ -289,7 +330,7 @@ namespace Microsoft.VisualStudioTools.Project {
             if (CommonUtils.IsSamePath(ProjectMgr.GetStartupFile(), Url)) {
                 ProjectMgr.BoldItem(this, true);
             }
-
+            
             // On include, the file should be added to source control.
             this.ProjectMgr.Tracker.OnItemAdded(this.Url, VSADDFILEFLAGS.VSADDFILEFLAGS_NoFlags);
 

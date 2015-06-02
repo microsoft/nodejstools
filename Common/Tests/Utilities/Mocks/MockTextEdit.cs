@@ -1,18 +1,16 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 using System;
 using System.Collections.Generic;
@@ -131,7 +129,7 @@ namespace TestUtilities.Mocks {
                                 insert.Position,
                                 0
                             ),
-                            insert.Position + adjust,
+                            insert.Position,
                             insert.Text
                         )
                     );
@@ -151,6 +149,7 @@ namespace TestUtilities.Mocks {
                 }
             }
 
+            var previous = _snapshot;
             var res = ((MockTextBuffer)_snapshot.TextBuffer)._snapshot = new MockTextSnapshot(
                 (MockTextBuffer)_snapshot.TextBuffer,
                 text.ToString(),
@@ -158,7 +157,7 @@ namespace TestUtilities.Mocks {
                 changes.ToArray()
             );
             _applied = true;
-            ((MockTextBuffer)_snapshot.TextBuffer).EditApplied();
+            ((MockTextBuffer)_snapshot.TextBuffer).EditApplied(previous);
             return res;
         }
 

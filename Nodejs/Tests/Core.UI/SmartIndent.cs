@@ -318,7 +318,7 @@ bar""
             }
         }
 
-        private static void AutoIndentTest(VisualStudioSolution solution, string typedText, string expectedText) {
+        private static void AutoIndentTest(IVisualStudioInstance solution, string typedText, string expectedText) {
             var doc = solution.OpenItem("AutoIndent", "server.js");
             doc.MoveCaret(1, 1);
             doc.Invoke(() => doc.TextView.Caret.EnsureVisible());
@@ -337,7 +337,7 @@ bar""
             }
             Assert.AreEqual(expectedText, actual);
 
-            solution.App.Dte.ActiveWindow.Close(vsSaveChanges.vsSaveChangesNo);
+            VSTestContext.DTE.ActiveWindow.Close(vsSaveChanges.vsSaveChangesNo);
         }
 
 

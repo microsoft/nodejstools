@@ -266,6 +266,10 @@
       <Link>SharedProject\FileWatcher.cs</Link>
       <Visible>true</Visible>
     </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\FlavoredProjectFactoryBase.cs">
+      <Link>SharedProject\FlavoredProjectFactoryBase.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
     <Compile Include="$(_ProjectSystemFilesLocation)\DataObject.cs">
       <Link>SharedProject\DataObject.cs</Link>
       <Visible>true</Visible>
@@ -284,6 +288,10 @@
     </Compile>
     <Compile Include="$(_ProjectSystemFilesLocation)\DocumentManager.cs">
       <Link>SharedProject\DocumentManager.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\EnumBSTR.cs">
+      <Link>SharedProject\EnumBSTR.cs</Link>
       <Visible>true</Visible>
     </Compile>
     <Compile Include="$(_ProjectSystemFilesLocation)\EnumDependencies.cs">
@@ -322,6 +330,18 @@
       <Link>SharedProject\IDEBuildLogger.cs</Link>
       <Visible>true</Visible>
     </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\IdleManager.cs">
+      <Link>SharedProject\IdleManager.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\IClipboardService.cs">
+      <Link>SharedProject\IClipboardService.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\ClipboardService.cs">
+      <Link>SharedProject\ClipboardService.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
     <Compile Include="$(_ProjectSystemFilesLocation)\ImageHandler.cs">
       <Link>SharedProject\ImageHandler.cs</Link>
       <Visible>true</Visible>
@@ -332,6 +352,10 @@
     </Compile>
     <Compile Include="$(_ProjectSystemFilesLocation)\IProjectLauncher.cs">
       <Link>SharedProject\IProjectLauncher.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\IProjectLaunchProperties.cs">
+      <Link>SharedProject\IProjectLaunchProperties.cs</Link>
       <Visible>true</Visible>
     </Compile>
     <Compile Include="$(_ProjectSystemFilesLocation)\IProjectPublisher.cs">
@@ -372,6 +396,10 @@
     </Compile>
     <Compile Include="$(_ProjectSystemFilesLocation)\NodeProperties.cs">
       <Link>SharedProject\NodeProperties.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\ObservableCollectionExtensions.cs">
+      <Link>SharedProject\ObservableCollectionExtensions.cs</Link>
       <Visible>true</Visible>
     </Compile>
     <Compile Include="$(_ProjectSystemFilesLocation)\OleServiceProvider.cs">
@@ -523,6 +551,10 @@
       <Link>SharedProject\UIThread.cs</Link>
       <Visible>true</Visible>
     </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\UIThreadBase.cs">
+      <Link>SharedProject\UIThreadBase.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
     <Compile Include="$(_ProjectSystemFilesLocation)\UIThreadSynchronizer.cs">
       <Link>SharedProject\UIThreadSynchronizer.cs</Link>
       <Visible>true</Visible>
@@ -589,6 +621,10 @@
       <Link>SharedProject\ProvideDebugPortSupplierAttribute.cs</Link>
       <Visible>true</Visible>
     </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\ProvideDebugPortPickerAttribute.cs">
+      <Link>SharedProject\ProvideDebugPortPickerAttribute.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
     <Compile Include="$(_ProjectSystemFilesLocation)\ProvideTextEditorAutomationAttribute.cs">
       <Link>SharedProject\ProvideTextEditorAutomationAttribute.cs</Link>
       <Visible>true</Visible>
@@ -609,8 +645,16 @@
       <Link>SharedProject\TaskExtensions.cs</Link>
       <Visible>true</Visible>
     </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\VsTaskExtensions.cs">
+      <Link>SharedProject\VsTaskExtensions.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
     <Compile Include="$(_ProjectSystemFilesLocation)\Wpf\Commands.cs">
       <Link>SharedProject\Wpf\Commands.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\Wpf\ConfigurationControl.cs">
+      <Link>SharedProject\Wpf\ConfigurationControl.cs</Link>
       <Visible>true</Visible>
     </Compile>
     <Compile Include="$(_ProjectSystemFilesLocation)\Wpf\LabelledButton.cs">
@@ -639,6 +683,22 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Compile Include="$(_ProjectSystemFilesLocation)\Wpf\LambdaConverter\ILambdaConverterProvider.cs">
+      <Link>SharedProject\Wpf\ILambdaConverterProvider.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\Wpf\LambdaConverter\LambdaConverter.cs">
+      <Link>SharedProject\Wpf\LambdaConverter.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\Wpf\LambdaConverter\LambdaExtension.cs">
+      <Link>SharedProject\Wpf\LambdaExtension.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\Wpf\LambdaConverter\LambdaProperties.cs">
+      <Link>SharedProject\Wpf\LambdaProperties.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\ProjectResources.resx">

@@ -32,6 +32,12 @@ namespace Microsoft.NodejsTools.Commands {
     /// Provides the command for starting a file or the start item of a project in the REPL window.
     /// </summary>
     internal sealed class DiagnosticsCommand : Command {
+        private readonly IServiceProvider _serviceProvider;
+
+        public DiagnosticsCommand(IServiceProvider serviceProvider) {
+            _serviceProvider = serviceProvider;
+        }
+
         public override void DoCommand(object sender, EventArgs args) {
             var dlg = new DiagnosticsForm("Gathering data...");
 
@@ -124,7 +130,7 @@ namespace Microsoft.NodejsTools.Commands {
 
             try {
                 res.AppendLine("Logged events/stats:");
-                var inMemLogger = NodejsPackage.ComponentModel.GetService<InMemoryLogger>();
+                var inMemLogger = NodejsPackage.Instance.GetComponentModel().GetService<InMemoryLogger>();
                 res.AppendLine(inMemLogger.ToString());
                 res.AppendLine();
             } catch (Exception ex) {

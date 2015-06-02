@@ -1,22 +1,21 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Runtime.InteropServices;
 using EnvDTE;
 using Microsoft.VisualStudio.OLE.Interop;
@@ -27,32 +26,29 @@ namespace Microsoft.VisualStudioTools {
     class VisualStudioApp : IDisposable {
         private static readonly Dictionary<int, VisualStudioApp> _knownInstances = new Dictionary<int, VisualStudioApp>();
         private readonly int _processId;
-        private DTE _dte;
 
-        public DTE DTE {
-            get {
-                if (_dte == null) {
-                    _dte = GetDTE(_processId);
+        public static VisualStudioApp FromProcessId(int processId) {
+            VisualStudioApp inst;
+            lock (_knownInstances) {
+                if (!_knownInstances.TryGetValue(processId, out inst)) {
+                    _knownInstances[processId] = inst = new VisualStudioApp(processId);
                 }
-                return _dte;
             }
+            return inst;
         }
 
-        public static VisualStudioApp FromCommandLineArgs(string[] commandLineArgs) {
-            for (int i = 0; i < commandLineArgs.Length - 1; ++i) {
-                int processId;
-                if (commandLineArgs[i].Equals("/parentProcessId", StringComparison.InvariantCultureIgnoreCase) &&
-                    int.TryParse(commandLineArgs[i + 1], out processId)) {
-                    VisualStudioApp inst;
-                    lock (_knownInstances) {
-                        if (!_knownInstances.TryGetValue(processId, out inst)) {
-                            _knownInstances[processId] = inst = new VisualStudioApp(processId);
-                        }
-                    }
-                    return inst;
-                }
+        public static VisualStudioApp FromEnvironmentVariable(string variable) {
+            string pid = Environment.GetEnvironmentVariable(variable);
+            if (pid == null) {
+                return null;
             }
-            return null;
+
+            int processId;
+            if (!int.TryParse(pid, out processId)) {
+                return null;
+            }
+
+            return FromProcessId(processId);
         }
 
         public VisualStudioApp(int processId) {
@@ -63,11 +59,6 @@ namespace Microsoft.VisualStudioTools {
             lock (_knownInstances) {
                 _knownInstances.Remove(_processId);
             }
-            if (_dte != null) {
-                Marshal.ReleaseComObject(_dte);
-                _dte = null;
-                MessageFilter.Revoke();
-            }
         }
 
         // Source from
@@ -75,6 +66,14 @@ namespace Microsoft.VisualStudioTools {
         [SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass")]
         [DllImport("ole32.dll")]
         private static extern int CreateBindCtx(uint reserved, out IBindCtx ppbc);
+
+        public DTE GetDTE() {
+            var dte = GetDTE(_processId);
+            if (dte == null) {
+                throw new InvalidOperationException("Could not find VS DTE object for process " + _processId);
+            }
+            return dte;
+        }
 
         private static DTE GetDTE(int processId) {
             MessageFilter.Register();
@@ -133,8 +132,8 @@ namespace Microsoft.VisualStudioTools {
             return (DTE)runningObject;
         }
 
-        public bool AttachToProcess(ProcessOutput proc, Guid portSupplier, string transportQualifierUri) {
-            var debugger3 = (EnvDTE90.Debugger3)DTE.Debugger;
+        public bool AttachToProcess(ProcessOutput processOutput, Guid portSupplier, string transportQualifierUri) {
+            var debugger3 = (EnvDTE90.Debugger3)GetDTE().Debugger;
             var transports = debugger3.Transports;
             EnvDTE80.Transport transport = null;
             for (int i = 1; i <= transports.Count; ++i) {
@@ -153,25 +152,52 @@ namespace Microsoft.VisualStudioTools {
                 return false;
             }
 
+            var process = processes.Item(1);
+            return AttachToProcess(processOutput, process);
+        }
+
+        public bool AttachToProcess(ProcessOutput processOutput, Guid[] engines) {
+            var debugger3 = (EnvDTE90.Debugger3)GetDTE().Debugger;
+            var processes = debugger3.LocalProcesses;
+            for (int i = 1; i < processes.Count; ++i) {
+                var process = processes.Item(i);
+                if (process.ProcessID == processOutput.ProcessId) {
+                    return AttachToProcess(processOutput, process, engines);
+                }
+            }
+
+            return false;
+        }
+
+        public bool AttachToProcess(ProcessOutput processOutput, EnvDTE.Process process, Guid[] engines = null) {
             // Retry the attach itself 3 times before displaying a Retry/Cancel
             // dialog to the user.
-            DTE.SuppressUI = true;
+            var dte = GetDTE();
+            dte.SuppressUI = true;
             try {
                 try {
-                    processes.Item(1).Attach();
+                    if (engines == null) {
+                        process.Attach();
+                    } else {
+                        var process3 = process as EnvDTE90.Process3;
+                        if (process3 == null) {
+                            return false;
+                        }
+                        process3.Attach2(engines.Select(engine => engine.ToString("B")).ToArray());
+                    }
                     return true;
                 } catch (COMException) {
-                    if (proc.Wait(TimeSpan.FromMilliseconds(500))) {
+                    if (processOutput.Wait(TimeSpan.FromMilliseconds(500))) {
                         // Process exited while we were trying
                         return false;
                     }
                 }
             } finally {
-                DTE.SuppressUI = false;
+                dte.SuppressUI = false;
             }
 
             // Another attempt, but display UI.
-            processes.Item(1).Attach();
+            process.Attach();
             return true;
         }
     }

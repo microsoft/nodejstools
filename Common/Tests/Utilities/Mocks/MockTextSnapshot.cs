@@ -1,18 +1,16 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 using System;
 using System.Collections.Generic;
@@ -40,7 +38,7 @@ namespace TestUtilities.Mocks {
         }
 
         public Microsoft.VisualStudio.Utilities.IContentType ContentType {
-            get { throw new NotImplementedException(); }
+            get { return _buffer.ContentType; }
         }
 
         public void CopyTo(int sourceIndex, char[] destination, int destinationIndex, int count) {
@@ -48,11 +46,11 @@ namespace TestUtilities.Mocks {
         }
 
         public ITrackingPoint CreateTrackingPoint(int position, PointTrackingMode trackingMode, TrackingFidelityMode trackingFidelity) {
-            return new MockTrackingPoint(this, position);
+            return new MockTrackingPoint(this, position, trackingMode, trackingFidelity);
         }
 
         public ITrackingPoint CreateTrackingPoint(int position, PointTrackingMode trackingMode) {
-            return new MockTrackingPoint(this, position);
+            return new MockTrackingPoint(this, position, trackingMode);
         }
 
         public ITrackingSpan CreateTrackingSpan(int start, int length, SpanTrackingMode trackingMode, TrackingFidelityMode trackingFidelity) {
@@ -60,7 +58,7 @@ namespace TestUtilities.Mocks {
         }
 
         public ITrackingSpan CreateTrackingSpan(int start, int length, SpanTrackingMode trackingMode) {
-            return new MockTrackingSpan(this, start, length);
+            return new MockTrackingSpan(this, start, length, trackingMode);
         }
 
         public ITrackingSpan CreateTrackingSpan(Span span, SpanTrackingMode trackingMode, TrackingFidelityMode trackingFidelity) {
@@ -68,7 +66,7 @@ namespace TestUtilities.Mocks {
         }
 
         public ITrackingSpan CreateTrackingSpan(Span span, SpanTrackingMode trackingMode) {
-            return new MockTrackingSpan(this, span.Start, span.Length);
+            return new MockTrackingSpan(this, span.Start, span.Length, trackingMode);
         }
 
         private string[] GetLines() {
@@ -123,7 +121,11 @@ namespace TestUtilities.Mocks {
                     Debug.Assert(position <= res.EndIncludingLineBreak);
                     return res;
                 }
-                curPos += 2; // skip newline
+                if (_text[curPos] == '\n') {
+                    curPos += 1;
+                } else {
+                    curPos += 2;
+                }
                 lineNo++;
             }
 

@@ -146,7 +146,7 @@ namespace NodejsTests {
             var insertionPoint = new SnapshotPoint(view.TextSnapshot, insertionPosition);
 
             // Setup mock registry service and classification provider for the IsMultilineComment method.
-            var classifierProvider = new NodejsClassifierProvider(new MockContentTypeRegistryService());
+            var classifierProvider = new NodejsClassifierProvider(new MockContentTypeRegistryService(NodejsConstants.Nodejs));
             classifierProvider._classificationRegistry = new MockClassificationTypeRegistryService();
             var classifier = classifierProvider.GetClassifier(view.TextBuffer);
 

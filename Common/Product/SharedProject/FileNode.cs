@@ -1,18 +1,16 @@
-//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 using System;
 using System.Collections.Generic;
@@ -38,7 +36,9 @@ namespace Microsoft.VisualStudioTools.Project {
         private string _caption;
 
         #region static fields
+#if !DEV14_OR_LATER
         private static Dictionary<string, int> extensionIcons;
+#endif
         #endregion
 
         #region overriden Properties
@@ -111,6 +111,7 @@ namespace Microsoft.VisualStudioTools.Project {
             return Caption;
         }
 
+#if !DEV14_OR_LATER
         public override int ImageIndex {
             get {
                 // Check if the file is there.
@@ -130,6 +131,7 @@ namespace Microsoft.VisualStudioTools.Project {
                 return imageIndex;
             }
         }
+#endif
 
         public uint DocCookie {
             get {
@@ -173,9 +175,10 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
-        #endregion
+#endregion
 
-        #region ctor
+#region ctor
+#if !DEV14_OR_LATER
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
         static FileNode() {
             // Build the dictionary with the mapping between some well known extensions
@@ -218,7 +221,7 @@ namespace Microsoft.VisualStudioTools.Project {
             extensionIcons.Add(".pfx", (int)ProjectNode.ImageName.PFX);
             extensionIcons.Add(".snk", (int)ProjectNode.ImageName.SNK);
         }
-
+#endif
         /// <summary>
         /// Constructor for the FileNode
         /// </summary>
@@ -239,16 +242,6 @@ namespace Microsoft.VisualStudioTools.Project {
             }
 
             return new IncludedFileNodeProperties(this);
-        }
-
-        public override object GetIconHandle(bool open) {
-            int index = this.ImageIndex;
-            if (NoImage == index) {
-                // There is no image for this file; let the base class handle this case.
-                return base.GetIconHandle(open);
-            }
-            // Return the handle for the image.
-            return this.ProjectMgr.ImageHandler.GetIconHandle(index);
         }
 
         /// <summary>
@@ -604,9 +597,9 @@ namespace Microsoft.VisualStudioTools.Project {
             return File.Exists(moniker);
         }
 
-        #endregion
+#endregion
 
-        #region virtual methods
+#region virtual methods
 
         public override object GetProperty(int propId) {
             switch ((__VSHPROPID)propId) {
@@ -642,7 +635,7 @@ namespace Microsoft.VisualStudioTools.Project {
                 OLEMSGICON icon = OLEMSGICON.OLEMSGICON_CRITICAL;
                 OLEMSGBUTTON buttons = OLEMSGBUTTON.OLEMSGBUTTON_OK;
                 OLEMSGDEFBUTTON defaultButton = OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST;
-                VsShellUtilities.ShowMessageBox(this.ProjectMgr.Site, title, message, icon, buttons, defaultButton);
+                Utilities.ShowMessageBox(this.ProjectMgr.Site, title, message, icon, buttons, defaultButton);
             }
 
             return fileExist;
@@ -805,9 +798,9 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
-        #endregion
+#endregion
 
-        #region Helper methods
+#region Helper methods
         /// <summary>
         /// Gets called to rename the eventually running document this hierarchyitem points to
         /// </summary>
@@ -931,9 +924,9 @@ namespace Microsoft.VisualStudioTools.Project {
             ExpandItem(EXPANDFLAGS.EXPF_SelectItem);
         }
 
-        #endregion
+#endregion
 
-        #region helpers
+#region helpers
 
 
         /// <summary>
@@ -955,7 +948,7 @@ namespace Microsoft.VisualStudioTools.Project {
             }
             return childNodes;
         }
-        #endregion
+#endregion
 
         void IDiskBasedNode.RenameForDeferredSave(string basePath, string baseNewPath) {
             string oldLoc = CommonUtils.GetAbsoluteFilePath(basePath, ItemNode.GetMetadata(ProjectFileConstants.Include));

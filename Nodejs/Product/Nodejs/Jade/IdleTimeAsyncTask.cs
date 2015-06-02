@@ -165,12 +165,12 @@ namespace Microsoft.NodejsTools.Jade {
                             );
                             result = ex;
                         } finally {
-                            UIThread.InvokeAsync(() => UIThreadCompletedCallback(result))
+                            NodejsPackage.Instance.GetUIThread().InvokeAsync(() => UIThreadCompletedCallback(result))
                                 .HandleAllExceptions(SR.ProductName)
                                 .DoNotWait();
                         }
                     } else if (Interlocked.Read(ref _closed) > 0) {
-                        UIThread.InvokeAsync((() => UIThreadCanceledCallback(null)))
+                        NodejsPackage.Instance.GetUIThread().InvokeAsync((() => UIThreadCanceledCallback(null)))
                             .HandleAllExceptions(SR.ProductName)
                             .DoNotWait();
                     }

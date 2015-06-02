@@ -1,18 +1,16 @@
-//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 using System;
 using System.Collections.Generic;
@@ -50,14 +48,6 @@ namespace Microsoft.VisualStudioTools {
         #endregion
 
         internal CommonPackage() {
-            // This call is essential for ensuring that future calls to methods
-            // of UIThread will succeed. Unit tests can disable invoking by
-            // calling UIThread.InitializeAndNeverInvoke before or after this
-            // call. If this call does not occur here, your process will
-            // terminate immediately when an attempt is made to use the UIThread
-            // methods.
-            UIThread.InitializeAndAlwaysInvokeToCurrentThread();
-
 #if DEBUG
             AppDomain.CurrentDomain.UnhandledException += (sender, e) => {
                 if (e.IsTerminating) {
@@ -78,6 +68,7 @@ namespace Microsoft.VisualStudioTools {
 #endif
         }
 
+        
         internal static Dictionary<Command, MenuCommand> Commands {
             get {
                 return _commands;
@@ -137,8 +128,8 @@ namespace Microsoft.VisualStudioTools {
         /// Gets the current IWpfTextView that is the active document.
         /// </summary>
         /// <returns></returns>
-        public static IWpfTextView GetActiveTextView() {
-            var monitorSelection = (IVsMonitorSelection)Package.GetGlobalService(typeof(SVsShellMonitorSelection));
+        public static IWpfTextView GetActiveTextView(System.IServiceProvider serviceProvider) {
+            var monitorSelection = (IVsMonitorSelection)serviceProvider.GetService(typeof(SVsShellMonitorSelection));
             if (monitorSelection == null) {
                 return null;
             }
@@ -167,7 +158,7 @@ namespace Microsoft.VisualStudioTools {
                     return null;
                 }
 
-                var model = (IComponentModel)GetGlobalService(typeof(SComponentModel));
+                var model = (IComponentModel)serviceProvider.GetService(typeof(SComponentModel));
                 var adapterFactory = model.GetService<IVsEditorAdaptersFactoryService>();
                 var wpfTextView = adapterFactory.GetWpfTextView(textView);
                 return wpfTextView;
@@ -175,14 +166,15 @@ namespace Microsoft.VisualStudioTools {
             return null;
         }
 
+        [Obsolete("ComponentModel should be retrieved from an IServiceProvider")]
         public static IComponentModel ComponentModel {
             get {
                 return (IComponentModel)GetGlobalService(typeof(SComponentModel));
             }
         }
 
-        internal static CommonProjectNode GetStartupProject() {
-            var buildMgr = (IVsSolutionBuildManager)Package.GetGlobalService(typeof(IVsSolutionBuildManager));
+        internal static CommonProjectNode GetStartupProject(System.IServiceProvider serviceProvider) {
+            var buildMgr = (IVsSolutionBuildManager)serviceProvider.GetService(typeof(IVsSolutionBuildManager));
             IVsHierarchy hierarchy;
             if (buildMgr != null && ErrorHandler.Succeeded(buildMgr.get_StartupProject(out hierarchy)) && hierarchy != null) {
                 return hierarchy.GetProject().GetCommonProject();
@@ -192,7 +184,7 @@ namespace Microsoft.VisualStudioTools {
 
         protected override void Initialize() {
             var container = (IServiceContainer)this;
-            //container.AddService(GetLanguageServiceType(), CreateService, true);
+            UIThread.EnsureService(this);
             container.AddService(GetLibraryManagerType(), CreateService, true);
 
             var componentManager = _compMgr = (IOleComponentManager)GetService(typeof(SOleComponentManager));
@@ -212,9 +204,9 @@ namespace Microsoft.VisualStudioTools {
             return;
         }
 
-        internal static void OpenVsWebBrowser(string url) {
-            UIThread.Invoke(() => {
-                var web = GetGlobalService(typeof(SVsWebBrowsingService)) as IVsWebBrowsingService;
+        internal static void OpenVsWebBrowser(System.IServiceProvider serviceProvider, string url) {
+            serviceProvider.GetUIThread().Invoke(() => {
+                var web = serviceProvider.GetService(typeof(SVsWebBrowsingService)) as IVsWebBrowsingService;
                 if (web == null) {
                     OpenWebBrowser(url);
                     return;

@@ -1,18 +1,16 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 using System;
 using System.Diagnostics;
@@ -30,6 +28,7 @@ using TestUtilities.SharedProject;
 using TestUtilities.UI;
 using Keyboard = TestUtilities.UI.Keyboard;
 using Mouse = TestUtilities.UI.Mouse;
+using MessageBoxButton = TestUtilities.MessageBoxButton;
 
 namespace Microsoft.VisualStudioTools.SharedProjectTests {
     [TestClass]
@@ -188,7 +187,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
                     using (var solution = testDef.Generate().ToVs()) {
                         TestSccProvider.DocumentEvents.Clear();
-                        var project = app.OpenProject(solution.Filename);
+                        var project = app.OpenProject(solution.SolutionFilename);
                         var window = app.SolutionExplorerTreeView;
                         var fileName = projectType.Code(@"ExcludedFile");
 
@@ -197,11 +196,11 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                             window.WaitForChildOfProject(project, fileName).Select();
                         } catch (Exception) {
                             // Show all files so we can see the excluded item if we previously couldn't
-                            solution.App.ExecuteCommand("Project.ShowAllFiles");
+                            solution.ExecuteCommand("Project.ShowAllFiles");
                             window.WaitForChildOfProject(project, fileName).Select();
                         }
 
-                        solution.App.ExecuteCommand("Project.IncludeInProject");
+                        solution.ExecuteCommand("Project.IncludeInProject");
 
                         System.Threading.Thread.Sleep(250);
 

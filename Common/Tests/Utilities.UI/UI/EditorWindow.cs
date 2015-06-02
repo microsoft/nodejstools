@@ -1,18 +1,16 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 using System;
 using System.Collections.Generic;
@@ -32,9 +30,10 @@ using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudioTools.VSTestHost;
+using Task = System.Threading.Tasks.Task;
 
 namespace TestUtilities.UI {
-    public class EditorWindow : AutomationWrapper {
+    public class EditorWindow : AutomationWrapper, IEditor {
         private readonly string _filename;
 
         public EditorWindow(string filename, AutomationElement element)
@@ -55,7 +54,7 @@ namespace TestUtilities.UI {
         }
 
         public void MoveCaret(SnapshotPoint newPoint) {
-            ((UIElement)TextView).Dispatcher.Invoke((Action)(() => {
+            Invoke((Action)(() => {
                 TextView.Caret.MoveTo(newPoint.TranslateTo(newPoint.Snapshot.TextBuffer.CurrentSnapshot, PointTrackingMode.Positive));
             }));
         }
@@ -174,52 +173,45 @@ namespace TestUtilities.UI {
 #endif
         public void StartSmartTagSessionNoSession() {
             ShowSmartTag();
-            System.Threading.Thread.Sleep(100);
-            Assert.IsTrue(!(IntellisenseSessionStack.TopSession is ISmartTagSession));
+            Thread.Sleep(100);
+            Assert.IsNotInstanceOfType(
+                IntellisenseSessionStack.TopSession,
+#if DEV14_OR_LATER
+                typeof(ILightBulbSession)
+#else
+                typeof(ISmartTagSession)
+#endif
+            );
         }
 
         private static void ShowSmartTag() {
-            ThreadPool.QueueUserWorkItem(ShowSmartTagWorker);
-        }
-
-        private static void ShowSmartTagWorker(object dummy) {
-            for (int i = 0; i < 40; i++) {
-                try {
-                    VSTestContext.DTE.ExecuteCommand("View.ShowSmartTag");
-                    break;
-                } catch {
-                    System.Threading.Thread.Sleep(250);
+            Task.Run(() => {
+                for (int i = 0; i < 40; i++) {
+                    try {
+                        VSTestContext.DTE.ExecuteCommand("View.ShowSmartTag");
+                        break;
+                    } catch {
+                        Thread.Sleep(250);
+                    }
                 }
-            }
+            }).Wait();
         }
 
-
-        // TODO: Switch from smart tags to Light Bulb: http://go.microsoft.com/fwlink/?LinkId=394601
-        public SessionHolder<ISmartTagSession> StartSmartTagSession() {
+        public SessionHolder<SmartTagSessionWrapper> StartSmartTagSession() {
             ShowSmartTag();
-            return WaitForSession<ISmartTagSession>();
-        }
 #if DEV14_OR_LATER
-#pragma warning restore 0618
+            var sh = WaitForSession<ILightBulbSession>();
+#else
+            var sh = WaitForSession<ISmartTagSession>();
 #endif
-        public class SessionHolder<T> : IDisposable where T : IIntellisenseSession {
-            public readonly T Session;
-            private readonly EditorWindow _owner;
-
-            public SessionHolder(T session, EditorWindow owner) {
-                Assert.IsNotNull(session);
-                Session = session;
-                _owner = owner;
-            }
-
-            void IDisposable.Dispose() {
-                if (!Session.IsDismissed) {
-                    _owner.Invoke(() => { Session.Dismiss(); });
-                }
-            }
+            return sh == null ? null : new SessionHolder<SmartTagSessionWrapper>(new SmartTagSessionWrapper(sh), this);
         }
 
         public SessionHolder<T> WaitForSession<T>() where T : IIntellisenseSession {
+            return WaitForSession<T>(true);
+        }
+
+        public SessionHolder<T> WaitForSession<T>(bool assertIfNoSession) where T : IIntellisenseSession {
             var sessionStack = IntellisenseSessionStack;
             for (int i = 0; i < 40; i++) {
                 if (sessionStack.TopSession is T) {
@@ -229,10 +221,14 @@ namespace TestUtilities.UI {
             }
 
             if (!(sessionStack.TopSession is T)) {
-                Console.WriteLine("Buffer text:\r\n{0}", Text);
-                Console.WriteLine("-----");
-                AutomationWrapper.DumpVS();
-                Assert.Fail("failed to find session " + typeof(T).FullName);
+                if (assertIfNoSession) {
+                    Console.WriteLine("Buffer text:\r\n{0}", Text);
+                    Console.WriteLine("-----");
+                    AutomationWrapper.DumpVS();
+                    Assert.Fail("failed to find session " + typeof(T).FullName);
+                } else {
+                    return null;
+                }
             }
             return new SessionHolder<T>((T)sessionStack.TopSession, this);
         }
@@ -318,6 +314,14 @@ namespace TestUtilities.UI {
                 Assert.Fail("Exception on UI thread: " + excep.ToString());
             }
             return res;
+        }
+
+        public IIntellisenseSession TopSession {
+            get { return IntellisenseSessionStack.TopSession;  }
+        }
+
+        public void Type(string text) {
+            Keyboard.Type(text);
         }
     }
 }

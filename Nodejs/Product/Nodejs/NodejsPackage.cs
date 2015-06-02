@@ -38,6 +38,7 @@ using Microsoft.NodejsTools.Options;
 using Microsoft.NodejsTools.Project;
 using Microsoft.NodejsTools.Repl;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
@@ -182,6 +183,8 @@ namespace Microsoft.NodejsTools {
             var langService = new NodejsLanguageInfo(this);
             ((IServiceContainer)this).AddService(langService.GetType(), langService, true);
 
+            ((IServiceContainer)this).AddService(typeof(IClipboardService), new ClipboardService(), true);
+
             RegisterProjectFactory(new NodejsProjectFactory(this));
             RegisterEditorFactory(new NodejsEditorFactory(this));
             RegisterEditorFactory(new NodejsEditorFactoryPromptForEncoding(this));
@@ -194,7 +197,7 @@ namespace Microsoft.NodejsTools {
                 new OpenRemoteDebugDocumentationCommand(),
                 new SurveyNewsCommand(),
                 new ImportWizardCommand(),
-                new DiagnosticsCommand()
+                new DiagnosticsCommand(this)
             };
             try {
                 commands.Add(new AzureExplorerAttachDebuggerCommand());
@@ -225,6 +228,10 @@ namespace Microsoft.NodejsTools {
             IntellisenseOptionsPage.AnalysisLogMaximumChanged += IntellisenseOptionsPage_AnalysisLogMaximumChanged;
 
             InitializeLogging();
+            
+            // The variable is inherited by child processes backing Test Explorer, and is used in
+            // the NTVS test discoverer and test executor to connect back to VS.
+            Environment.SetEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable, Process.GetCurrentProcess().Id.ToString());
         }
 
         private void IntellisenseOptionsPage_AnalysisLogMaximumChanged(object sender, EventArgs e) {
@@ -239,6 +246,12 @@ namespace Microsoft.NodejsTools {
             // log interesting stats on startup
             _logger.LogEvent(NodejsToolsLogEvent.SurveyNewsFrequency, GeneralOptionsPage.SurveyNewsCheck);
             _logger.LogEvent(NodejsToolsLogEvent.AnalysisLevel, IntellisenseOptionsPage.AnalysisLevel);
+        }
+
+        public new IComponentModel ComponentModel {
+            get {
+                return this.GetComponentModel();
+            }
         }
 
         internal NodejsToolsLogger Logger {
@@ -284,13 +297,13 @@ namespace Microsoft.NodejsTools {
             return window;
         }
 
-        internal static bool TryGetStartupFileAndDirectory(out string fileName, out string directory) {
-            var startupProject = GetStartupProject();
+        internal static bool TryGetStartupFileAndDirectory(System.IServiceProvider serviceProvider, out string fileName, out string directory) {
+            var startupProject = GetStartupProject(serviceProvider);
             if (startupProject != null) {
                 fileName = startupProject.GetStartupFile();
                 directory = startupProject.GetWorkingDirectory();                
             } else {
-                var textView = CommonPackage.GetActiveTextView();
+                var textView = CommonPackage.GetActiveTextView(serviceProvider);
                 if (textView == null) {
                     fileName = null;
                     directory = null;
@@ -541,7 +554,7 @@ namespace Microsoft.NodejsTools {
 
             lock (_surveyNewsUrlLock) {
                 if (!string.IsNullOrEmpty(_surveyNewsUrl)) {
-                    OpenVsWebBrowser(_surveyNewsUrl);
+                    OpenVsWebBrowser(this, _surveyNewsUrl);
                     _surveyNewsUrl = null;
                 }
             }

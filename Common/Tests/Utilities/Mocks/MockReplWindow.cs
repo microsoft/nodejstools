@@ -1,32 +1,40 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 #if NTVS_FEATURE_INTERACTIVEWINDOW
 using Microsoft.NodejsTools.Repl;
+#elif DEV14_OR_LATER
+using Microsoft.VisualStudio.InteractiveWindow;
 #else
 using Microsoft.VisualStudio.Repl;
 #endif
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Utilities;
 
 namespace TestUtilities.Mocks {
+#if !NTVS_FEATURE_INTERACTIVEWINDOW && DEV14_OR_LATER
+    using IReplEvaluator = IInteractiveEvaluator;
+    using IReplWindow = IInteractiveWindow;
+#endif
+
     public class MockReplWindow : IReplWindow {
         private readonly StringBuilder _output = new StringBuilder();
         private readonly StringBuilder _error = new StringBuilder();
@@ -34,10 +42,19 @@ namespace TestUtilities.Mocks {
         private readonly MockTextView _view;
         private readonly string _contentType;
 
-        public MockReplWindow(IReplEvaluator eval, string contentType = "Python") {            
+#if DEV14_OR_LATER
+        public event EventHandler<SubmissionBufferAddedEventArgs> SubmissionBufferAdded {
+            add {
+            }
+            remove {
+            }
+        }
+#endif
+
+        public MockReplWindow(IReplEvaluator eval, string contentType = "Python") {
             _eval = eval;
             _contentType = contentType;
-            _view = new MockTextView(new MockTextBuffer(String.Empty, "text"));
+            _view = new MockTextView(new MockTextBuffer(String.Empty, contentType, filename: "text"));
             _eval.Initialize(this);
         }
 
@@ -77,8 +94,58 @@ namespace TestUtilities.Mocks {
         }
 
         public string Title {
-            get { return "Mock Repl Window";  }
+            get { return "Mock Repl Window"; }
         }
+
+#if DEV14_OR_LATER
+        public ITextBuffer OutputBuffer {
+            get {
+                throw new NotImplementedException();
+            }
+        }
+
+        public TextWriter OutputWriter {
+            get {
+                return new StringWriter(_output);
+            }
+        }
+
+        public TextWriter ErrorOutputWriter {
+            get {
+                return new StringWriter(_error);
+            }
+        }
+
+        public bool IsRunning {
+            get {
+                throw new NotImplementedException();
+            }
+        }
+
+        public bool IsResetting {
+            get {
+                throw new NotImplementedException();
+            }
+        }
+
+        public bool IsInitializing {
+            get {
+                throw new NotImplementedException();
+            }
+        }
+
+        public IInteractiveWindowOperations Operations {
+            get {
+                throw new NotImplementedException();
+            }
+        }
+
+        public PropertyCollection Properties {
+            get {
+                throw new NotImplementedException();
+            }
+        }
+#endif
 
         public void ClearScreen() {
             _output.Clear();
@@ -93,7 +160,7 @@ namespace TestUtilities.Mocks {
             throw new NotImplementedException();
         }
 
-        public void Cancel() {            
+        public void Cancel() {
             throw new NotImplementedException();
         }
 
@@ -101,17 +168,21 @@ namespace TestUtilities.Mocks {
             throw new NotImplementedException();
         }
 
+#if !DEV14_OR_LATER
         public void Submit(IEnumerable<string> inputs) {
             throw new NotImplementedException();
         }
+#endif
 
         public System.Threading.Tasks.Task<ExecutionResult> Reset() {
-            return _eval.Reset();            
+            return _eval.Reset();
         }
 
+#if !DEV14_OR_LATER
         public void AbortCommand() {
             _eval.AbortCommand();
         }
+#endif
 
         public Task<ExecutionResult> ExecuteCommand(string command) {
             var tcs = new TaskCompletionSource<ExecutionResult>();
@@ -184,16 +255,62 @@ namespace TestUtilities.Mocks {
             _error.Append(value);
         }
 
+#if DEV14_OR_LATER
+        public TextReader ReadStandardInput() {
+            throw new NotImplementedException();
+        }
+#else
         public string ReadStandardInput() {
             throw new NotImplementedException();
         }
+#endif
 
+#if !DEV14_OR_LATER || NTVS_FEATURE_INTERACTIVEWINDOW
         public void SetOptionValue(ReplOptions option, object value) {
         }
 
         public object GetOptionValue(ReplOptions option) {
             return null;
         }
+#endif
+
+#if DEV14_OR_LATER
+        public Task<ExecutionResult> InitializeAsync() {
+            throw new NotImplementedException();
+        }
+
+        public void Close() {
+            throw new NotImplementedException();
+        }
+
+        Span IReplWindow.WriteLine(string text) {
+            throw new NotImplementedException();
+        }
+
+        public Task SubmitAsync(IEnumerable<string> inputs) {
+            throw new NotImplementedException();
+        }
+
+        public Span Write(string text) {
+            throw new NotImplementedException();
+        }
+
+        public void Write(UIElement element) {
+            throw new NotImplementedException();
+        }
+
+        public void FlushOutput() {
+            throw new NotImplementedException();
+        }
+
+        public void AddInput(string input) {
+            throw new NotImplementedException();
+        }
+
+        public void Dispose() {
+            throw new NotImplementedException();
+        }
+#endif
 
         public event Action ReadyForInput {
             add { }
@@ -202,4 +319,21 @@ namespace TestUtilities.Mocks {
 
         #endregion
     }
+
+#if DEV14_OR_LATER
+    public static class ReplEvalExtensions {
+        public static Task<ExecutionResult> Initialize(this IReplEvaluator self, IReplWindow window) {
+            self.CurrentWindow = window;
+            return self.InitializeAsync();
+        }
+
+        public static Task<ExecutionResult> ExecuteText(this IReplEvaluator self, string text) {
+            return self.ExecuteCodeAsync(text);
+        }
+
+        public static Task<ExecutionResult> Reset(this IReplEvaluator self) {
+            return self.ResetAsync();
+        }
+    }
+#endif
 }

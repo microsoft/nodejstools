@@ -1,29 +1,28 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text;
 
 namespace TestUtilities.Mocks {
     public class MockTextCaret : ITextCaret {
-        private SnapshotPoint _position;
+        private MockTrackingPoint _position;
         private readonly MockTextView _view;
 
         public MockTextCaret(MockTextView view) {
             _view = view;
+            _position = new MockTrackingPoint((MockTextSnapshot)_view.TextBuffer.CurrentSnapshot, 0);
         }
 
         public double Bottom {
@@ -35,7 +34,6 @@ namespace TestUtilities.Mocks {
         }
 
         public void EnsureVisible() {
-            throw new System.NotImplementedException();
         }
 
         public double Height {
@@ -81,7 +79,7 @@ namespace TestUtilities.Mocks {
 
         public CaretPosition MoveTo(Microsoft.VisualStudio.Text.SnapshotPoint bufferPosition) {
             _view.Selection.Clear();
-            _position = bufferPosition;
+            _position = new MockTrackingPoint((MockTextSnapshot)bufferPosition.Snapshot, bufferPosition.Position);
             return Position;
         }
 
@@ -115,14 +113,14 @@ namespace TestUtilities.Mocks {
 
         public CaretPosition Position {
             get { return new CaretPosition(
-                new VirtualSnapshotPoint(_position), 
-                new MockMappingPoint(), 
+                new VirtualSnapshotPoint(_position.GetPoint(_view.TextBuffer.CurrentSnapshot)), 
+                new MockMappingPoint(_position), 
                 PositionAffinity.Predecessor); 
             }
         }
 
         internal void SetPosition(SnapshotPoint position) {
-            _position = position;
+            _position = new MockTrackingPoint((MockTextSnapshot)position.Snapshot, position.Position);
         }
 
         public event System.EventHandler<CaretPositionChangedEventArgs> PositionChanged {

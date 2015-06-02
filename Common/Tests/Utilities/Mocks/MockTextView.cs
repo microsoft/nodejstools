@@ -1,18 +1,16 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 using System;
 using Microsoft.VisualStudio.Text;
@@ -27,6 +25,10 @@ namespace TestUtilities.Mocks {
         private readonly MockTextSelection _selection;
         private readonly MockTextCaret _caret;
         private readonly MockBufferGraph _bufferGraph;
+        private bool _hasFocus;
+        private ITextViewModel _textViewModel;
+
+        private static readonly ITextViewModel _notImplementedTextViewModel = new MockTextViewModel();
 
         public MockTextView(ITextBuffer buffer) {
             _buffer = buffer;
@@ -50,13 +52,14 @@ namespace TestUtilities.Mocks {
         }
 
         public void Close() {
-            throw new NotImplementedException();
+            IsClosed = true;
+            var evt = Closed;
+            if (evt != null) {
+                evt(this, EventArgs.Empty);
+            }
         }
 
-        public event EventHandler Closed {
-            add {  }
-            remove {  }
-        }
+        public event EventHandler Closed;
 
         public void DisplayTextLineContainingBufferPosition(Microsoft.VisualStudio.Text.SnapshotPoint bufferPosition, double verticalDistance, ViewRelativePosition relativeTo, double? viewportWidthOverride, double? viewportHeightOverride) {
             throw new NotImplementedException();
@@ -74,22 +77,25 @@ namespace TestUtilities.Mocks {
             throw new NotImplementedException();
         }
 
-        public event EventHandler GotAggregateFocus {
-            add { throw new NotImplementedException(); }
-            remove { throw new NotImplementedException(); }
+        public event EventHandler GotAggregateFocus;
+
+        public void OnGotAggregateFocus() {
+            var gotFocus = GotAggregateFocus;
+            if (gotFocus != null) {
+                gotFocus(this, EventArgs.Empty);
+            }
+            _hasFocus = true;
         }
 
         public bool HasAggregateFocus {
-            get { throw new NotImplementedException(); }
+            get { return _hasFocus; }
         }
 
         public bool InLayout {
             get { throw new NotImplementedException(); }
         }
 
-        public bool IsClosed {
-            get { throw new NotImplementedException(); }
-        }
+        public bool IsClosed { get; set; }
 
         public bool IsMouseOverViewOrAdornments {
             get { throw new NotImplementedException(); }
@@ -104,18 +110,27 @@ namespace TestUtilities.Mocks {
             get { throw new NotImplementedException(); }
         }
 
-        public event EventHandler LostAggregateFocus {
-            add { throw new NotImplementedException(); }
-            remove { throw new NotImplementedException(); }
+        public event EventHandler LostAggregateFocus;
+
+        public void OnLostAggregateFocus() {
+            var lostFocus = LostAggregateFocus;
+            if (lostFocus != null) {
+                lostFocus(this, EventArgs.Empty);
+            }
+            _hasFocus = false;
         }
 
         public double MaxTextRightCoordinate {
             get { throw new NotImplementedException(); }
         }
 
-        public event EventHandler<MouseHoverEventArgs> MouseHover {
-            add { throw new NotImplementedException(); }
-            remove { throw new NotImplementedException(); }
+        public event EventHandler<MouseHoverEventArgs> MouseHover;
+
+        public void HoverMouse(MouseHoverEventArgs args) {
+            var mouseHover = MouseHover;
+            if (mouseHover != null) {
+                mouseHover(this, args);
+            }
         }
 
         public IEditorOptions Options {
@@ -160,7 +175,17 @@ namespace TestUtilities.Mocks {
         }
 
         public ITextViewModel TextViewModel {
-            get { throw new NotImplementedException(); }
+            get {
+                if (_textViewModel == _notImplementedTextViewModel) {
+                    // To avoid the NotImplementedException, you should set
+                    // TextViewModel as part of initializing the test
+                    throw new NotImplementedException();
+                }
+                return _textViewModel;
+            }
+            set {
+                _textViewModel = value;
+            }
         }
 
         public IViewScroller ViewScroller {

@@ -1,18 +1,16 @@
-//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 using System;
 using System.Collections.Generic;
@@ -28,6 +26,10 @@ using MSBuild = Microsoft.Build.Evaluation;
 using OleConstants = Microsoft.VisualStudio.OLE.Interop.Constants;
 using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
 using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
+#if DEV14_OR_LATER
+using Microsoft.VisualStudio.Imaging;
+using Microsoft.VisualStudio.Imaging.Interop;
+#endif
 
 namespace Microsoft.VisualStudioTools.Project {
     [ComVisible(true)]
@@ -118,10 +120,21 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
 
-        public override object GetIconHandle(bool open) {
-            return this.ProjectMgr.GetIconHandleByName(ProjectNode.ImageName.ReferenceFolder);
+#if DEV14_OR_LATER
+        protected override bool SupportsIconMonikers {
+            get { return true; }
         }
 
+        protected override ImageMoniker GetIconMoniker(bool open) {
+            return KnownMonikers.Reference;
+        }
+#else
+        public override int ImageIndex {
+            get {
+                return ProjectMgr.GetIconIndex(ProjectNode.ImageName.ReferenceFolder);
+            }
+        }
+#endif
 
         /// <summary>
         /// References node cannot be dragged.
@@ -202,7 +215,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// Adds references to this container from a MSBuild project.
         /// </summary>
         public void LoadReferencesFromBuildProject(MSBuild.Project buildProject) {
-            UIThread.MustBeCalledFromUIThread();
+            ProjectMgr.Site.GetUIThread().MustBeCalledFromUIThread();
 
             foreach (string referenceType in SupportedReferenceTypes) {
                 IEnumerable<MSBuild.ProjectItem> referencesGroup = this.ProjectMgr.BuildProject.GetItems(referenceType);

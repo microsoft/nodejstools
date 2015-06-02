@@ -1,18 +1,18 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
+
+using System.Collections.Generic;
 
 namespace Microsoft.VisualStudioTools.Project {
     /// <summary>
@@ -21,16 +21,21 @@ namespace Microsoft.VisualStudioTools.Project {
     public interface IProjectLauncher {
         /// <summary>
         /// Starts a project with or without debugging.
-        /// 
-        /// Returns an HRESULT indicating success or failure.
         /// </summary>
+        /// <returns>HRESULT indicating success or failure.</returns>
         int LaunchProject(bool debug);
 
         /// <summary>
         /// Starts a file in a project with or without debugging.
-        /// 
-        /// Returns an HRESULT indicating success or failure.
         /// </summary>
+        /// <returns>HRESULT indicating success or failure.</returns>
         int LaunchFile(string file, bool debug);
+    }
+
+    public interface IProjectLauncher2 : IProjectLauncher {
+        /// <summary>
+        /// Starts a file in a project with custom settings.
+        /// </summary>
+        int LaunchFile(string file, bool debug, IProjectLaunchProperties properties);
     }
 }

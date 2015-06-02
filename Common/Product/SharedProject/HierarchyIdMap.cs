@@ -1,18 +1,16 @@
-//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 using System;
 using System.Collections.Generic;
@@ -23,9 +21,10 @@ namespace Microsoft.VisualStudioTools.Project {
         private readonly List<HierarchyNode> _ids = new List<HierarchyNode>();
         private readonly Stack<int> _freedIds = new Stack<int>();
 
+        /// <summary>
+        /// Must be called from the UI thread
+        /// </summary>
         public uint Add(HierarchyNode node) {
-            UIThread.MustBeCalledFromUIThread();
-
 #if DEBUG
             foreach (var item in _ids) {
                 Debug.Assert(node != item);
@@ -42,9 +41,10 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
+        /// <summary>
+        /// Must be called from the UI thread
+        /// </summary>
         public void Remove(HierarchyNode node) {
-            UIThread.MustBeCalledFromUIThread();
-
             int i = (int)node.ID - 1;
             if(i < 0 ||
                 i >= _ids.Count ||
@@ -56,10 +56,11 @@ namespace Microsoft.VisualStudioTools.Project {
             _freedIds.Push(i);
         }
 
+        /// <summary>
+        /// Must be called from the UI thread
+        /// </summary>
         public HierarchyNode this[uint itemId] {
             get {
-                UIThread.MustBeCalledFromUIThread();
-
                 int i = (int)itemId - 1;
                 if (0 <= i && i < _ids.Count) {
                     return _ids[i];

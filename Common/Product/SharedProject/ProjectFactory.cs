@@ -1,18 +1,16 @@
-//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 using System;
 using System.IO;
@@ -28,14 +26,13 @@ namespace Microsoft.VisualStudioTools.Project {
     /// Creates projects within the solution
     /// </summary>
 
-    public abstract class ProjectFactory : Microsoft.VisualStudio.Shell.Flavor.FlavoredProjectFactoryBase,
+    public abstract class ProjectFactory : FlavoredProjectFactoryBase,
 #if DEV11_OR_LATER
-        IVsAsynchronousProjectCreate,
+ IVsAsynchronousProjectCreate,
         IVsProjectUpgradeViaFactory4,
 #endif
-        IVsProjectUpgradeViaFactory {
+ IVsProjectUpgradeViaFactory {
         #region fields
-        private Microsoft.VisualStudio.Shell.Package package;
         private System.IServiceProvider site;
 
         /// <summary>
@@ -48,7 +45,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         private MSBuild.Project buildProject;
 #if DEV11_OR_LATER
-        private static readonly Lazy<IVsTaskSchedulerService> taskSchedulerService = new Lazy<IVsTaskSchedulerService>(() => Package.GetGlobalService(typeof(SVsTaskSchedulerService)) as IVsTaskSchedulerService);
+        private readonly Lazy<IVsTaskSchedulerService> taskSchedulerService;
 #endif
 
         // (See GetSccInfo below.)
@@ -59,13 +56,13 @@ namespace Microsoft.VisualStudioTools.Project {
         private string _cachedSccProject;
         private string _cachedSccProjectName, _cachedSccAuxPath, _cachedSccLocalPath, _cachedSccProvider;
 
-
         #endregion
 
         #region properties
+        [Obsolete("Use Site instead")]
         protected Microsoft.VisualStudio.Shell.Package Package {
             get {
-                return this.package;
+                return (Microsoft.VisualStudio.Shell.Package)this.site;
             }
         }
 
@@ -81,11 +78,20 @@ namespace Microsoft.VisualStudioTools.Project {
         #endregion
 
         #region ctor
-        protected ProjectFactory(Microsoft.VisualStudio.Shell.Package package) {
-            this.package = package;
-            this.site = package;
-            this.buildEngine = MSBuild.ProjectCollection.GlobalProjectCollection;
+        [Obsolete("Provide an IServiceProvider instead of a package")]
+        protected ProjectFactory(Microsoft.VisualStudio.Shell.Package package)
+            : this((IServiceProvider)package) {
         }
+
+        protected ProjectFactory(IServiceProvider serviceProvider)
+            : base(serviceProvider) {
+            this.site = serviceProvider;
+            this.buildEngine = MSBuild.ProjectCollection.GlobalProjectCollection;
+#if DEV11_OR_LATER
+            this.taskSchedulerService = new Lazy<IVsTaskSchedulerService>(() => Site.GetService(typeof(SVsTaskSchedulerService)) as IVsTaskSchedulerService);
+#endif
+        }
+
         #endregion
 
         #region abstract methods
@@ -141,7 +147,6 @@ namespace Microsoft.VisualStudioTools.Project {
             Utilities.CheckNotNull(node, "The project failed to be created");
             node.BuildEngine = this.buildEngine;
             node.BuildProject = this.buildProject;
-            node.Package = this.package as ProjectPackage;
             return node;
         }
 
@@ -517,13 +522,13 @@ namespace Microsoft.VisualStudioTools.Project {
             out uint pUpgradeProjectCapabilityFlags
         ) {
             pUpgradeRequired = 0;
+            pguidNewProjectFactory = Guid.Empty;
+
             if (!File.Exists(bstrFileName)) {
-                pguidNewProjectFactory = Guid.Empty;
                 pUpgradeProjectCapabilityFlags = 0;
                 return VSConstants.E_INVALIDARG;
             }
 
-            pguidNewProjectFactory = GetType().GUID;
 
             var backupSupport = __VSPPROJECTUPGRADEVIAFACTORYFLAGS.PUVFF_BACKUPSUPPORTED |
                 __VSPPROJECTUPGRADEVIAFACTORYFLAGS.PUVFF_COPYBACKUP |
@@ -561,6 +566,13 @@ namespace Microsoft.VisualStudioTools.Project {
                 pUpgradeRequired = 0;
             }
             pUpgradeProjectCapabilityFlags = (uint)backupSupport;
+
+            // If the upgrade checker set the factory GUID to ourselves, we need
+            // to clear it
+            if (pguidNewProjectFactory == GetType().GUID) {
+                pguidNewProjectFactory = Guid.Empty;
+            }
+
             return VSConstants.S_OK;
         }
 
@@ -572,14 +584,14 @@ namespace Microsoft.VisualStudioTools.Project {
             out Guid pguidNewProjectFactory,
             out uint pUpgradeProjectCapabilityFlags
         ) {
+            pguidNewProjectFactory = Guid.Empty;
+
             if (!File.Exists(bstrFileName)) {
                 pUpgradeRequired = 0;
-                pguidNewProjectFactory = Guid.Empty;
                 pUpgradeProjectCapabilityFlags = 0;
                 return;
             }
 
-            pguidNewProjectFactory = GetType().GUID;
             var backupSupport = __VSPPROJECTUPGRADEVIAFACTORYFLAGS.PUVFF_BACKUPSUPPORTED |
                 __VSPPROJECTUPGRADEVIAFACTORYFLAGS.PUVFF_COPYBACKUP |
                 __VSPPROJECTUPGRADEVIAFACTORYFLAGS.PUVFF_SXSBACKUP;
@@ -635,6 +647,12 @@ namespace Microsoft.VisualStudioTools.Project {
                 pUpgradeRequired = (uint)__VSPPROJECTUPGRADEVIAFACTORYREPAIRFLAGS.VSPUVF_PROJECT_NOREPAIR;
             }
             pUpgradeProjectCapabilityFlags = (uint)backupSupport;
+
+            // If the upgrade checker set the factory GUID to ourselves, we need
+            // to clear it
+            if (pguidNewProjectFactory == GetType().GUID) {
+                pguidNewProjectFactory = Guid.Empty;
+            }
         }
 #endif
         #endregion

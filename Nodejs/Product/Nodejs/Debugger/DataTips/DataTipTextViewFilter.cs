@@ -32,11 +32,11 @@ namespace Microsoft.NodejsTools.Debugger.DataTips {
         private readonly IWpfTextView _wpfTextView;
         private readonly IOleCommandTarget _next;
 
-        public DataTipTextViewFilter(IVsTextView vsTextView) {
+        public DataTipTextViewFilter(System.IServiceProvider serviceProvider, IVsTextView vsTextView) {
             _debugger = (IVsDebugger)NodejsPackage.GetGlobalService(typeof(IVsDebugger));
             vsTextView.GetBuffer(out _vsTextLines);
 
-            var editorAdaptersFactory = NodejsPackage.ComponentModel.GetService<IVsEditorAdaptersFactoryService>();
+            var editorAdaptersFactory = serviceProvider.GetComponentModel().GetService<IVsEditorAdaptersFactoryService>();
             _wpfTextView = editorAdaptersFactory.GetWpfTextView(vsTextView);
 
             ErrorHandler.ThrowOnFailure(vsTextView.AddCommandFilter(this, out _next));

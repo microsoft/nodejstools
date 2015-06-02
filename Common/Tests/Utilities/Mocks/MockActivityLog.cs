@@ -1,21 +1,20 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.VisualStudio;
@@ -54,42 +53,58 @@ namespace TestUtilities.Mocks {
         }
 
         public int LogEntry(uint actType, string pszSource, string pszDescription) {
-            Items.Add(string.Format("{0}//{1}//{2}", ActivityType[actType], pszSource, pszDescription));
+            var item = string.Format("{0}//{1}//{2}", ActivityType[actType], pszSource, pszDescription);
+            Debug.WriteLine(item);
+            Items.Add(item);
             return VSConstants.S_OK;
         }
 
         public int LogEntryGuid(uint actType, string pszSource, string pszDescription, Guid guid) {
-            Items.Add(string.Format("{0}//{1}//{2}//{3:B}", ActivityType[actType], pszSource, pszDescription, guid));
+            var item = string.Format("{0}//{1}//{2}//{3:B}", ActivityType[actType], pszSource, pszDescription, guid);
+            Debug.WriteLine(item);
+            Items.Add(item);
             return VSConstants.S_OK;
         }
 
         public int LogEntryGuidHr(uint actType, string pszSource, string pszDescription, Guid guid, int hr) {
-            Items.Add(string.Format("{0}//{1}//{2}//{3:B}//{4:X8}", ActivityType[actType], pszSource, pszDescription, guid, hr));
+            var item = string.Format("{0}//{1}//{2}//{3:B}//{4:X8}", ActivityType[actType], pszSource, pszDescription, guid, hr);
+            Debug.WriteLine(item);
+            Items.Add(item);
             return VSConstants.S_OK;
         }
 
         public int LogEntryGuidHrPath(uint actType, string pszSource, string pszDescription, Guid guid, int hr, string pszPath) {
-            Items.Add(string.Format("{0}//{1}//{2}//{3:B}//{4:X8}//{5}", ActivityType[actType], pszSource, pszDescription, guid, hr, pszPath));
+            var item = string.Format("{0}//{1}//{2}//{3:B}//{4:X8}//{5}", ActivityType[actType], pszSource, pszDescription, guid, hr, pszPath);
+            Debug.WriteLine(item);
+            Items.Add(item);
             return VSConstants.S_OK;
         }
 
         public int LogEntryGuidPath(uint actType, string pszSource, string pszDescription, Guid guid, string pszPath) {
-            Items.Add(string.Format("{0}//{1}//{2}//{3:B}//{4}", ActivityType[actType], pszSource, pszDescription, guid, pszPath));
+            var item = string.Format("{0}//{1}//{2}//{3:B}//{4}", ActivityType[actType], pszSource, pszDescription, guid, pszPath);
+            Debug.WriteLine(item);
+            Items.Add(item);
             return VSConstants.S_OK;
         }
 
         public int LogEntryHr(uint actType, string pszSource, string pszDescription, int hr) {
-            Items.Add(string.Format("{0}//{1}//{2}//{3:X8}", ActivityType[actType], pszSource, pszDescription, hr));
+            var item = string.Format("{0}//{1}//{2}//{3:X8}", ActivityType[actType], pszSource, pszDescription, hr);
+            Debug.WriteLine(item);
+            Items.Add(item);
             return VSConstants.S_OK;
         }
 
         public int LogEntryHrPath(uint actType, string pszSource, string pszDescription, int hr, string pszPath) {
-            Items.Add(string.Format("{0}//{1}//{2}//{3:X8}//{4}", ActivityType[actType], pszSource, pszDescription, hr, pszPath));
+            var item = string.Format("{0}//{1}//{2}//{3:X8}//{4}", ActivityType[actType], pszSource, pszDescription, hr, pszPath);
+            Debug.WriteLine(item);
+            Items.Add(item);
             return VSConstants.S_OK;
         }
 
         public int LogEntryPath(uint actType, string pszSource, string pszDescription, string pszPath) {
-            Items.Add(string.Format("{0}//{1}//{2}//{3}", ActivityType[actType], pszSource, pszDescription, pszPath));
+            var item = string.Format("{0}//{1}//{2}//{3}", ActivityType[actType], pszSource, pszDescription, pszPath);
+            Debug.WriteLine(item);
+            Items.Add(item);
             return VSConstants.S_OK;
         }
     }

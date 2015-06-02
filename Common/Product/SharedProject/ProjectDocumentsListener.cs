@@ -1,18 +1,17 @@
-//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
+
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -28,7 +27,7 @@ namespace Microsoft.VisualStudioTools.Project {
         #region fields
         private uint eventsCookie;
         private IVsTrackProjectDocuments2 projectDocTracker;
-        private ServiceProvider serviceProvider;
+        private IServiceProvider serviceProvider;
         private bool isDisposed;
         /// <summary>
         /// Defines an object that will be a mutex for this object for synchronizing thread calls.
@@ -37,7 +36,7 @@ namespace Microsoft.VisualStudioTools.Project {
         #endregion
 
         #region ctors
-        protected ProjectDocumentsListener(ServiceProvider serviceProviderParameter) {
+        protected ProjectDocumentsListener(System.IServiceProvider serviceProviderParameter) {
             Utilities.ArgumentNotNull("serviceProviderParameter", serviceProviderParameter);
 
             this.serviceProvider = serviceProviderParameter;
@@ -60,7 +59,7 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
-        protected ServiceProvider ServiceProvider {
+        protected IServiceProvider ServiceProvider {
             get {
                 return this.serviceProvider;
             }

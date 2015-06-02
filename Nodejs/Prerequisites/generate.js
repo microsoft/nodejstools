@@ -13,6 +13,7 @@ var assemblies = [
     'DebuggerUITests',
     'JSAnalysisTests',
     'ProfilingUITests',
+    'ReferenceGenerator',
     'ReplWindowUITests',
     'TestSccPackage',
     'SharedProjectTests',

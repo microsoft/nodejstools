@@ -1,18 +1,16 @@
-//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 using System;
 using System.CodeDom.Compiler;
@@ -68,6 +66,9 @@ namespace Microsoft.VisualStudioTools.Project {
         IOleCommandTarget {
         #region nested types
 
+#if DEV14_OR_LATER
+        [Obsolete("Use ImageMonikers instead")]
+#endif
         public enum ImageName {
             OfflineWebApp = 0,
             WebReferencesFolder = 1,
@@ -168,7 +169,7 @@ namespace Microsoft.VisualStudioTools.Project {
         private HierarchyIdMap itemIdMap = new HierarchyIdMap();
 
         /// <summary>A service provider call back object provided by the IDE hosting the project manager</summary>
-        private ServiceProvider site;
+        private IServiceProvider site;
 
         private TrackDocumentsHelper tracker;
 
@@ -273,11 +274,6 @@ namespace Microsoft.VisualStudioTools.Project {
         /// type mapping to the same CATID if we choose to.
         /// </summary>
         private Dictionary<Type, Guid> catidMapping;
-
-        /// <summary>
-        /// The internal package implementation.
-        /// </summary>
-        private ProjectPackage package;
 
         /// <summary>
         /// Mapping from item names to their hierarchy nodes for all disk-based nodes.
@@ -455,11 +451,17 @@ namespace Microsoft.VisualStudioTools.Project {
 
         public override string Caption {
             get {
-                // Default to file name
-                string caption = this.buildProject.FullPath;
+                var project = this.buildProject;
+                if (project == null) {
+                    // Project is not available, which probably means we are
+                    // in the process of closing
+                    return string.Empty;
+                }
+                // Use file name
+                string caption = project.FullPath;
                 if (String.IsNullOrEmpty(caption)) {
-                    if (this.buildProject.GetProperty(ProjectFileConstants.Name) != null) {
-                        caption = this.buildProject.GetProperty(ProjectFileConstants.Name).EvaluatedValue;
+                    if (project.GetProperty(ProjectFileConstants.Name) != null) {
+                        caption = project.GetProperty(ProjectFileConstants.Name).EvaluatedValue;
                         if (caption == null || caption.Length == 0) {
                             caption = this.ItemNode.GetMetadata(ProjectFileConstants.Include);
                         }
@@ -478,11 +480,16 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
+#pragma warning disable 0618, 0672
+        // Project subclasses decide whether or not to support using image
+        // monikers, and so we need to keep the ImageIndex overrides in case
+        // they choose not to.
         public override int ImageIndex {
             get {
                 return (int)ProjectNode.ImageName.Application;
             }
         }
+#pragma warning restore 0618, 0672
 
 
         #endregion
@@ -597,6 +604,9 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <summary>
         /// Gets an ImageHandler for the project node.
         /// </summary>
+#if DEV14_OR_LATER
+        [Obsolete("Use ImageMonikers instead")]
+#endif
         public ImageHandler ImageHandler {
             get {
                 if (null == imageHandler) {
@@ -824,24 +834,15 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
-        /// <summary>
-        /// The internal package implementation.
-        /// </summary>
-        internal ProjectPackage Package {
-            get {
-                return this.package;
-            }
-            set {
-                this.package = value;
-            }
-        }
         #endregion
 
         #region ctor
 
-        protected ProjectNode() {
+        protected ProjectNode(IServiceProvider serviceProvider) {
             this.extensibilityEventsDispatcher = new ExtensibilityEventsDispatcher(this);
             this.Initialize();
+            this.site = serviceProvider;
+            taskProvider = new TaskProvider(this.site);
         }
 
         #endregion
@@ -957,6 +958,12 @@ namespace Microsoft.VisualStudioTools.Project {
                     return this.ShowProjectInSolutionPage;
 
                 case __VSHPROPID.VSHPROPID_ExpandByDefault:
+                    return true;
+
+                case __VSHPROPID.VSHPROPID_DefaultEnableDeployProjectCfg:
+                    return true;
+
+                case __VSHPROPID.VSHPROPID_DefaultEnableBuildProjectCfg:
                     return true;
 
                 // Use the same icon as if the folder was closed
@@ -1088,13 +1095,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     try {
                         RegisterClipboardNotifications(false);
                     } finally {
-                        try {
-                            if (site != null) {
-                                site.Dispose();
-                            }
-                        } finally {
-                            buildEngine = null;
-                        }
+                        buildEngine = null;
                     }
                 }
 
@@ -1289,7 +1290,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     OLEMSGICON icon = OLEMSGICON.OLEMSGICON_CRITICAL;
                     OLEMSGBUTTON buttons = OLEMSGBUTTON.OLEMSGBUTTON_OK;
                     OLEMSGDEFBUTTON defaultButton = OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST;
-                    VsShellUtilities.ShowMessageBox(this.Site, title, errorMessage, icon, buttons, defaultButton);
+                    Utilities.ShowMessageBox(this.Site, title, errorMessage, icon, buttons, defaultButton);
                     return VSADDRESULT.ADDRESULT_Failure;
                 } else {
                     throw new InvalidOperationException(errorMessage);
@@ -1714,7 +1715,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <param name="resetCache">True to avoid using the cache</param>
         /// <returns>null if property does not exist, otherwise value of the property</returns>
         public virtual string GetProjectProperty(string propertyName, bool resetCache) {
-            UIThread.MustBeCalledFromUIThread();
+            Site.GetUIThread().MustBeCalledFromUIThread();
 
             MSBuildExecution.ProjectPropertyInstance property = GetMsBuildProperty(propertyName, resetCache);
             if (property == null)
@@ -1730,7 +1731,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         /// <param name="propertyName">Name of the property to get</param>
         public virtual string GetUnevaluatedProperty(string propertyName) {
-            UIThread.MustBeCalledFromUIThread();
+            Site.GetUIThread().MustBeCalledFromUIThread();
 
             var res = this.buildProject.GetProperty(propertyName);
 
@@ -1747,7 +1748,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <param name="propertyValue">Value of property</param>
         public virtual void SetProjectProperty(string propertyName, string propertyValue) {
             Utilities.ArgumentNotNull("propertyName", propertyName);
-            UIThread.MustBeCalledFromUIThread();
+            Site.GetUIThread().MustBeCalledFromUIThread();
 
             var oldValue = GetUnevaluatedProperty(propertyName) ?? string.Empty;
             propertyValue = propertyValue ?? string.Empty;
@@ -2012,7 +2013,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         /// <returns></returns>
         protected virtual Guid[] GetConfigurationIndependentPropertyPages() {
-            return new Guid[] { Guid.Empty };
+            return new Guid[] { };
         }
 
         /// <summary>
@@ -2020,7 +2021,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         /// <returns></returns>
         protected virtual Guid[] GetConfigurationDependentPropertyPages() {
-            return new Guid[0];
+            return new Guid[] { };
         }
 
         /// <summary>
@@ -2352,7 +2353,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// will reset the list of generated items/properties
         /// </remarks>
         protected virtual MSBuildResult InvokeMsBuild(string target) {
-            UIThread.MustBeCalledFromUIThread();
+            Site.GetUIThread().MustBeCalledFromUIThread();
 
             MSBuildResult result = MSBuildResult.Failed;
             const bool designTime = true;
@@ -2432,7 +2433,7 @@ namespace Microsoft.VisualStudioTools.Project {
                 }
 
                 submission.ExecuteAsync(sub => {
-                    UIThread.Invoke(() => {
+                    Site.GetUIThread().Invoke(() => {
                         IDEBuildLogger ideLogger = this.buildLogger as IDEBuildLogger;
                         if (ideLogger != null) {
                             ideLogger.FlushBuildOutput();
@@ -2535,7 +2536,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     OLEMSGICON icon = OLEMSGICON.OLEMSGICON_CRITICAL;
                     OLEMSGBUTTON buttons = OLEMSGBUTTON.OLEMSGBUTTON_OK;
                     OLEMSGDEFBUTTON defaultButton = OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST;
-                    VsShellUtilities.ShowMessageBox(this.Site, title, errorMessage, icon, buttons, defaultButton);
+                    Utilities.ShowMessageBox(this.Site, title, errorMessage, icon, buttons, defaultButton);
                     return VSConstants.OLE_E_PROMPTSAVECANCELLED;
                 }
 
@@ -2678,7 +2679,7 @@ namespace Microsoft.VisualStudioTools.Project {
             message = SR.GetString(inProject ? SR.FileAlreadyInProject : SR.FileAlreadyExists, Path.GetFileName(originalFileName));
             icon = OLEMSGICON.OLEMSGICON_QUERY;
             buttons = OLEMSGBUTTON.OLEMSGBUTTON_YESNO;
-            int msgboxResult = VsShellUtilities.ShowMessageBox(this.Site, title, message, icon, buttons, defaultButton);
+            int msgboxResult = Utilities.ShowMessageBox(this.Site, title, message, icon, buttons, defaultButton);
             if (msgboxResult == NativeMethods.IDCANCEL) {
                 return (int)E_CANCEL_FILE_ADD;
             } else if (msgboxResult != NativeMethods.IDYES) {
@@ -3005,7 +3006,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// Overloaded method. Invokes MSBuild using the default configuration and does without logging on the output window pane.
         /// </summary>
         public MSBuildResult Build(string target) {
-            UIThread.MustBeCalledFromUIThread();
+            Site.GetUIThread().MustBeCalledFromUIThread();
 
             return this.Build(String.Empty, target);
         }
@@ -3016,7 +3017,7 @@ namespace Microsoft.VisualStudioTools.Project {
         ///  PrepareBuild mainly creates directories and cleans house if cleanBuild is true
         /// </summary>
         public virtual void PrepareBuild(string config, bool cleanBuild) {
-            UIThread.MustBeCalledFromUIThread();
+            Site.GetUIThread().MustBeCalledFromUIThread();
 
             try {
                 SetConfiguration(config);
@@ -3033,7 +3034,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// Do the build by invoking msbuild
         /// </summary>
         public virtual MSBuildResult Build(string config, string target) {
-            UIThread.MustBeCalledFromUIThread();
+            Site.GetUIThread().MustBeCalledFromUIThread();
 
             lock (ProjectNode.BuildLock) {
                 IVsOutputWindowPane output = null;
@@ -3122,10 +3123,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
         internal bool QueryEditFiles(bool suppressUI, params string[] files) {
             bool result = true;
-            if (this.site == null) {
-                // We're already zombied. Better return FALSE.
-                result = false;
-            } else if (this.disableQueryEdit) {
+            if (this.disableQueryEdit) {
                 return true;
             } else {
                 IVsQueryEditQuerySave2 queryEditQuerySave = this.GetService(typeof(SVsQueryEditQuerySave)) as IVsQueryEditQuerySave2;
@@ -3391,6 +3389,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         /// <param name="iPersistXMLFragment">Object that support being initialized with an XML fragment</param>
         /// <param name="configName">Name of the configuration being initialized, null if it is the project</param>
+        /// <param name="platformName">Name of the platform being initialized, null is ok</param>
         protected internal void LoadXmlFragment(IPersistXMLFragment persistXmlFragment, string configName, string platformName) {
             Utilities.ArgumentNotNull("persistXmlFragment", persistXmlFragment);
 
@@ -3518,10 +3517,16 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
+#if DEV14_OR_LATER
+        [Obsolete("Use ImageMonikers instead")]
+#endif
         internal int GetIconIndex(ImageName name) {
             return (int)name;
         }
 
+#if DEV14_OR_LATER
+        [Obsolete("Use ImageMonikers instead")]
+#endif
         internal IntPtr GetIconHandleByName(ImageName name) {
             return ImageHandler.GetIconHandle(GetIconIndex(name));
         }
@@ -4534,7 +4539,7 @@ If the files in the existing folder have the same names as files in the folder y
         /// <param name="hwndDialog">Handle to the component picker dialog</param>
         /// <param name="pResult">Result to be returned to the caller</param>
         public virtual int AddComponent(VSADDCOMPOPERATION dwAddCompOperation, uint cComponents, System.IntPtr[] rgpcsdComponents, System.IntPtr hwndDialog, VSADDCOMPRESULT[] pResult) {
-            UIThread.MustBeCalledFromUIThread();
+            Site.GetUIThread().MustBeCalledFromUIThread();
 
             if (rgpcsdComponents == null || pResult == null) {
                 return VSConstants.E_FAIL;
@@ -5026,7 +5031,7 @@ If the files in the existing folder have the same names as files in the folder y
         /// <param name="item">msbuild item</param>
         /// <returns>parent node</returns>
         internal HierarchyNode GetItemParentNode(MSBuild.ProjectItem item) {
-            UIThread.MustBeCalledFromUIThread();
+            Site.GetUIThread().MustBeCalledFromUIThread();
 
             var link = item.GetMetadataValue(ProjectFileConstants.Link);
             HierarchyNode currentParent = this;
@@ -5446,7 +5451,7 @@ If the files in the existing folder have the same names as files in the folder y
         /// Finds a node by it's full path on disk.
         /// </summary>
         internal HierarchyNode FindNodeByFullPath(string name) {
-            UIThread.MustBeCalledFromUIThread();
+            Site.GetUIThread().MustBeCalledFromUIThread();
 
             Debug.Assert(Path.IsPathRooted(name));
 
@@ -5514,14 +5519,7 @@ If the files in the existing folder have the same names as files in the folder y
         /// </summary>
         /// <param name="site">An instance to an Microsoft.VisualStudio.OLE.Interop object</param>
         /// <returns>A success or failure value.</returns>
-        public virtual int SetSite(Microsoft.VisualStudio.OLE.Interop.IServiceProvider site) {
-            this.site = new ServiceProvider(site);
-
-            if (taskProvider != null) {
-                taskProvider.Dispose();
-            }
-            taskProvider = new TaskProvider(this.site);
-
+        public int SetSite(Microsoft.VisualStudio.OLE.Interop.IServiceProvider site) {
             return VSConstants.S_OK;
         }
 
@@ -5663,7 +5661,7 @@ If the files in the existing folder have the same names as files in the folder y
             Utilities.ArgumentNotNull("parent", parent);
             Utilities.ArgumentNotNull("child", child);
 
-            UIThread.MustBeCalledFromUIThread();
+            Site.GetUIThread().MustBeCalledFromUIThread();
 
             IDiskBasedNode diskNode = child as IDiskBasedNode;
             if (diskNode != null) {
@@ -5687,7 +5685,7 @@ If the files in the existing folder have the same names as files in the folder y
         }
 
         internal void OnItemDeleted(HierarchyNode deletedItem) {
-            UIThread.MustBeCalledFromUIThread();
+            Site.GetUIThread().MustBeCalledFromUIThread();
 
             IDiskBasedNode diskNode = deletedItem as IDiskBasedNode;
             if (diskNode != null) {
@@ -6050,7 +6048,7 @@ If the files in the existing folder have the same names as files in the folder y
         #endregion
 
         public void UpdatePathForDeferredSave(string oldPath, string newPath) {
-            UIThread.MustBeCalledFromUIThread();
+            Site.GetUIThread().MustBeCalledFromUIThread();
 
             var existing = _diskNodes[oldPath];
             _diskNodes.Remove(oldPath);

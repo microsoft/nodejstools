@@ -1,20 +1,19 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -113,10 +112,10 @@ namespace Microsoft.VisualStudioTools {
             }
 
             Uri uri1, uri2;
-            return 
+            return
                 TryMakeUri(path1, true, UriKind.Absolute, out uri1) &&
                 TryMakeUri(path2, true, UriKind.Absolute, out uri2) &&
-                uri1 == uri2;            
+                uri1 == uri2;
         }
 
         /// <summary>
@@ -500,6 +499,72 @@ namespace Microsoft.VisualStudioTools {
         public static bool IsValidPath(string path) {
             return !string.IsNullOrEmpty(path) &&
                 path.IndexOfAny(InvalidPathChars) < 0;
+        }
+
+        /// <summary>
+        /// Recursively searches for a file using breadth-first-search. This
+        /// ensures that the result closest to <paramref name="root"/> is
+        /// returned first.
+        /// </summary>
+        /// <param name="root">
+        /// Directory to start searching.
+        /// </param>
+        /// <param name="file">
+        /// Filename to find. Wildcards are not supported.
+        /// </param>
+        /// <param name="depthLimit">
+        /// The number of subdirectories to search in.
+        /// </param>
+        /// <param name="firstCheck">
+        /// A sequence of subdirectories to prioritize.
+        /// </param>
+        /// <returns>
+        /// The path to the file if found, including <paramref name="root"/>;
+        /// otherwise, null.
+        /// </returns>
+        public static string FindFile(
+            string root,
+            string file,
+            int depthLimit = 2,
+            IEnumerable<string> firstCheck = null
+        ) {
+            var candidate = Path.Combine(root, file);
+            if (File.Exists(candidate)) {
+                return candidate;
+            }
+            if (firstCheck != null) {
+                foreach (var subPath in firstCheck) {
+                    candidate = Path.Combine(root, subPath, file);
+                    if (File.Exists(candidate)) {
+                        return candidate;
+                    }
+                }
+            }
+
+            // Do a BFS of the filesystem to ensure we find the match closest to
+            // the root directory.
+            var dirQueue = new Queue<string>();
+            dirQueue.Enqueue(root);
+            dirQueue.Enqueue("<EOD>");
+            while (dirQueue.Any()) {
+                var dir = dirQueue.Dequeue();
+                if (dir == "<EOD>") {
+                    depthLimit -= 1;
+                    if (depthLimit <= 0) {
+                        return null;
+                    }
+                    continue;
+                }
+                var result = Directory.EnumerateFiles(dir, file, SearchOption.TopDirectoryOnly).FirstOrDefault();
+                if (result != null) {
+                    return result;
+                }
+                foreach (var subDir in Directory.EnumerateDirectories(dir)) {
+                    dirQueue.Enqueue(subDir);
+                }
+                dirQueue.Enqueue("<EOD>");
+            }
+            return null;
         }
 
         /// <summary>

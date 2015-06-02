@@ -1,18 +1,16 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 using System;
 using System.ComponentModel;
@@ -41,7 +39,7 @@ namespace Microsoft.VisualStudioTools.Project {
         [SRDescriptionAttribute(SR.StartupFileDescription)]
         public string StartupFile {
             get {
-                return UIThread.Invoke(() => {
+                return Node.Site.GetUIThread().Invoke(() => {
                     var res = Node.ProjectMgr.GetProjectProperty(CommonConstants.StartupFile, true);
                     if (res != null && !Path.IsPathRooted(res)) {
                         res = CommonUtils.GetAbsoluteFilePath(Node.ProjectMgr.ProjectHome, res);
@@ -50,7 +48,7 @@ namespace Microsoft.VisualStudioTools.Project {
                 });
             }
             set {
-                UIThread.Invoke(() => {
+                Node.Site.GetUIThread().Invoke(() => {
                     this.Node.ProjectMgr.SetProjectProperty(
                         CommonConstants.StartupFile,
                         CommonUtils.GetRelativeFilePath(
@@ -70,12 +68,12 @@ namespace Microsoft.VisualStudioTools.Project {
         [SRDescriptionAttribute(SR.WorkingDirectoryDescription)]
         public string WorkingDirectory {
             get {
-                return UIThread.Invoke(() => {
+                return Node.Site.GetUIThread().Invoke(() => {
                     return this.Node.ProjectMgr.GetProjectProperty(CommonConstants.WorkingDirectory, true);
                 });
             }
             set {
-                UIThread.Invoke(() => {
+                Node.Site.GetUIThread().Invoke(() => {
                     this.Node.ProjectMgr.SetProjectProperty(CommonConstants.WorkingDirectory, value);
                 });
             }
@@ -87,12 +85,12 @@ namespace Microsoft.VisualStudioTools.Project {
         [Browsable(false)]
         public string PublishUrl {
             get {
-                return UIThread.Invoke(() => {
+                return Node.Site.GetUIThread().Invoke(() => {
                     return this.Node.ProjectMgr.GetProjectProperty(CommonConstants.PublishUrl, true);
                 });
             }
             set {
-                UIThread.Invoke(() => {
+                Node.Site.GetUIThread().Invoke(() => {
                     this.Node.ProjectMgr.SetProjectProperty(CommonConstants.PublishUrl, value);
                 });
             }
@@ -367,12 +365,12 @@ namespace Microsoft.VisualStudioTools.Project {
         [Browsable(false)]
         public string StartupObject {
             get {
-                return UIThread.Invoke(() => {
+                return Node.Site.GetUIThread().Invoke(() => {
                     return Node.ProjectMgr.GetProjectProperty(CommonConstants.StartupFile);
                 });
             }
             set {
-                UIThread.Invoke(() => {
+                Node.Site.GetUIThread().Invoke(() => {
                     Node.ProjectMgr.SetProjectProperty(
                         CommonConstants.StartupFile,
                         CommonUtils.GetRelativeFilePath(Node.ProjectMgr.ProjectHome, value)

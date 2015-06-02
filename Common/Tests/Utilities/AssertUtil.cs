@@ -1,18 +1,16 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 using System;
 using System.Collections;
@@ -213,7 +211,12 @@ namespace TestUtilities
             if (set.ContainsExactly(expected)) {
                 return;
             }
-            Assert.Fail(String.Format("Expected {0}, got {1}", MakeText(expected), MakeText(set)));
+
+            Assert.Fail(String.Format("ContainsExactly failed.\n\nExpected:\n{0}\n\nActual:\n{1}\n\nExpected not in actual:\n{2}\n\nActual not in expected:\n{3}",
+                MakeText(expected),
+                MakeText(set),
+                MakeText(expected.Except(set)),
+                MakeText(set.Except(expected))));
         }
 
         [System.Diagnostics.DebuggerStepThrough]
@@ -231,19 +234,39 @@ namespace TestUtilities
             if (set.IsSupersetOf(values)) {
                 return;
             }
-            Assert.Fail(String.Format("Expected at least {0}, got {1}", MakeText(values), MakeText(set)));
+            var missing = new HashSet<T>(values);
+            missing.ExceptWith(set);
+            Assert.Fail(String.Format("Expected at least {0}, didn't find {1}. All: {2}",
+                MakeText(values),
+                MakeText(missing),
+                MakeText(set)
+            ));
         }
 
         public static string MakeText<T>(IEnumerable<T> values) {
+            var ss = values.Select(x => x == null ? "(null)" : x.ToString()).ToArray();
+            bool multiline = ss.Sum(s => s.Length) > 60;
+
             var sb = new StringBuilder("{");
-            foreach (var value in values) {
-                if (sb.Length > 1) {
-                    sb.Append(", ");
-                }
-                sb.Append(value == null ? "(null)" : value.ToString());
+            if (multiline) {
+                sb.Append("\n");
             }
-        
+
+            bool first = true;
+            foreach (var s in ss) {
+                if (first) {
+                    first = false;
+                } else {
+                    sb.Append(multiline ? ",\n" : ", ");
+                }
+                sb.Append(s);
+            }
+
+            if (multiline) {
+                sb.Append("\n");
+            }
             sb.Append("}");
+
             return sb.ToString();
         }
 

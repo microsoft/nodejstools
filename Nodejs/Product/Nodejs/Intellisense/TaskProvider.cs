@@ -279,10 +279,12 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         private bool _hasWorker;
         private readonly BlockingCollection<WorkerMessage> _workerQueue;
+        private readonly IServiceProvider _serviceProvider;
 
-        public TaskProvider(IVsTaskList errorList, IErrorProviderFactory errorProvider) {
+        public TaskProvider(IServiceProvider serviceProvider, IVsTaskList errorList, IErrorProviderFactory errorProvider) {
             _items = new Dictionary<EntryKey, List<TaskProviderItem>>();
             _errorSources = new Dictionary<EntryKey, HashSet<ITextBuffer>>();
+            _serviceProvider = serviceProvider;
 
             _errorList = errorList;
             if (_errorList != null) {
@@ -466,7 +468,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         private void Refresh() {
-            UIThread.MustNotBeCalledFromUIThread("Refresh must not be called from the UI thread");
+            _serviceProvider.GetUIThread().MustNotBeCalledFromUIThread("Refresh must not be called from the UI thread");
             RefreshAsync().WaitAndHandleAllExceptions(SR.ProductName, GetType());
         }
 
@@ -502,7 +504,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 }
             }
 
-            await UIThread.InvokeAsync(() => {
+            await _serviceProvider.GetUIThread().InvokeAsync(() => {
                 if (_errorList != null) {
                     try {
                         _errorList.RefreshTasks(_cookie);

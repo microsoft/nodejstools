@@ -1,18 +1,16 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 using System;
 using System.Diagnostics;
@@ -23,6 +21,7 @@ namespace Microsoft.VisualStudioTools.Project {
     class OutputWindowRedirector : Redirector {
         private static readonly Guid OutputWindowGuid = new Guid("{34E76E81-EE4A-11D0-AE2E-00A0C90FFFC3}");
         static OutputWindowRedirector _generalPane;
+        private readonly IServiceProvider _serviceProvider;
 
         /// <summary>
         /// Gets or creates the specified output pane.
@@ -37,7 +36,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
             IVsOutputWindowPane pane;
             if (ErrorHandler.Failed(outputWindow.GetPane(id, out pane)) || pane == null) {
-                if (ErrorHandler.Failed(UIThread.Invoke(() => outputWindow.CreatePane(id, title, 1, 0)))) {
+                if (ErrorHandler.Failed(provider.GetUIThread().Invoke(() => outputWindow.CreatePane(id, title, 1, 0)))) {
                     throw new InvalidOperationException("Unable to create output pane");
                 }
             }
@@ -75,6 +74,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// available.
         /// </exception>
         public OutputWindowRedirector(IServiceProvider provider, Guid paneGuid) {
+            _serviceProvider = provider;
             var shell = provider.GetService(typeof(SVsUIShell)) as IVsUIShell;
             if (shell != null) {
                 // Ignore errors - we just won't support opening the window if
@@ -91,31 +91,12 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
-        /// <summary>
-        /// Creates a redirector to the specified output pane.
-        /// </summary>
-        /// <param name="window">
-        /// The window containing the pane. Optional, but if omitted then the
-        /// <see cref="Show"/> and <see cref="ShowAndActivate"/> methods become
-        /// no-ops.
-        /// </param>
-        /// <param name="pane">
-        /// The pane to direct output to.
-        /// </param>
-        public OutputWindowRedirector(IVsWindowFrame window, IVsOutputWindowPane pane) {
-            _window = window;
-            if (pane == null) {
-                throw new ArgumentNullException("pane");
-            }
-            _pane = pane;
-        }
-
         public override void Show() {
-            UIThread.Invoke(() => ErrorHandler.ThrowOnFailure(_pane.Activate()));
+            _serviceProvider.GetUIThread().Invoke(() => ErrorHandler.ThrowOnFailure(_pane.Activate()));
         }
 
         public override void ShowAndActivate() {
-            UIThread.Invoke(() => {
+            _serviceProvider.GetUIThread().Invoke(() => {
                 ErrorHandler.ThrowOnFailure(_pane.Activate());
                 if (_window != null) {
                     ErrorHandler.ThrowOnFailure(_window.ShowNoActivate());

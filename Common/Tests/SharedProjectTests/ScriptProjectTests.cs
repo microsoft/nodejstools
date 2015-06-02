@@ -1,18 +1,16 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -33,15 +31,11 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                 var testDef = new ProjectDefinition("RunWithoutStartupFile", projectType);
 
                 using (var solution = testDef.Generate().ToVs()) {
-                    solution.App.OpenDialogWithDteExecuteCommand("Debug.Start");
-                    VisualStudioApp.CheckMessageBox(
-                        "No startup file is defined for the startup project."
-                    );
+                    solution.OpenDialogWithDteExecuteCommand("Debug.Start");
+                    solution.CheckMessageBox("startup file");
 
-                    solution.App.OpenDialogWithDteExecuteCommand("Debug.StartWithoutDebugging");
-                    VisualStudioApp.CheckMessageBox(
-                        "No startup file is defined for the startup project."
-                    );
+                    solution.OpenDialogWithDteExecuteCommand("Debug.StartWithoutDebugging");
+                    solution.CheckMessageBox("startup file");
                 }
             }
         }
@@ -63,10 +57,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                 );
 
                 using (var solution = testDef.Generate().ToVs()) {
-                    var folder = solution.Project.ProjectItems.Item("Folder");
+                    var folder = solution.GetProject("RenameStartupFileFolder").ProjectItems.Item("Folder");
                     folder.Name = "FolderNew";
 
-                    string startupFile = (string)solution.Project.Properties.Item("StartupFile").Value;
+                    string startupFile = (string)solution.GetProject("RenameStartupFileFolder").Properties.Item("StartupFile").Value;
                     Assert.IsTrue(
                         startupFile.EndsWith(projectType.Code("FolderNew\\server")),
                         "Expected FolderNew in path, got {0}",
@@ -89,13 +83,13 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                 );
 
                 using (var solution = testDef.Generate().ToVs()) {
-                    var file = solution.Project.ProjectItems.Item("Folder").ProjectItems.Item("server" + projectType.CodeExtension);
+                    var file = solution.GetProject("RenameStartupFileFolder").ProjectItems.Item("Folder").ProjectItems.Item("server" + projectType.CodeExtension);
                     file.Name = "server2" + projectType.CodeExtension;
 
                     Assert.AreEqual(
                         "server2" + projectType.CodeExtension,
                         Path.GetFileName(
-                            (string)solution.Project.Properties.Item("StartupFile").Value
+                            (string)solution.GetProject("RenameStartupFileFolder").Properties.Item("StartupFile").Value
                         )
                     );
                 }

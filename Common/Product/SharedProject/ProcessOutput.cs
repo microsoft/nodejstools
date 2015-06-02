@@ -1,18 +1,16 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 using System;
 using System.Collections.Generic;
@@ -107,11 +105,13 @@ namespace Microsoft.VisualStudioTools.Project {
         private readonly Process _process;
         private readonly string _arguments;
         private readonly List<string> _output, _error;
-        private ProcessWaitHandle _waitHandle;
+        private ManualResetEvent _waitHandleEvent;
         private readonly Redirector _redirector;
         private bool _isDisposed;
+        private readonly object _seenNullLock = new object();
         private bool _seenNullInOutput, _seenNullInError;
         private bool _haveRaisedExitedEvent;
+        private Task<int> _awaiter;
 
         private static readonly char[] EolChars = new[] { '\r', '\n' };
         private static readonly char[] _needToBeQuoted = new[] { ' ', '"' };
@@ -442,8 +442,12 @@ namespace Microsoft.VisualStudioTools.Project {
             }
 
             if (e.Data == null) {
-                _seenNullInOutput = true;
-                if (_seenNullInError || !_process.StartInfo.RedirectStandardError) {
+                bool shouldExit;
+                lock (_seenNullLock) {
+                    _seenNullInOutput = true;
+                    shouldExit = _seenNullInError || !_process.StartInfo.RedirectStandardError;
+                }
+                if (shouldExit) {
                     OnExited(_process, EventArgs.Empty);
                 }
             } else if (!string.IsNullOrEmpty(e.Data)) {
@@ -464,8 +468,12 @@ namespace Microsoft.VisualStudioTools.Project {
             }
 
             if (e.Data == null) {
-                _seenNullInError = true;
-                if (_seenNullInOutput || !_process.StartInfo.RedirectStandardOutput) {
+                bool shouldExit;
+                lock (_seenNullLock) {
+                    _seenNullInError = true;
+                    shouldExit = _seenNullInOutput || !_process.StartInfo.RedirectStandardOutput;
+                }
+                if (shouldExit) {
                     OnExited(_process, EventArgs.Empty);
                 }
             } else if (!string.IsNullOrEmpty(e.Data)) {
@@ -480,12 +488,27 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
+        public int? ProcessId {
+            get {
+                return _process != null ? _process.Id : (int?)null;
+            }
+        }
+
         /// <summary>
         /// The arguments that were originally passed, including the filename.
         /// </summary>
         public string Arguments {
             get {
                 return _arguments;
+            }
+        }
+
+        /// <summary>
+        /// True if the process started. False if an error occurred.
+        /// </summary>
+        public bool IsStarted {
+            get {
+                return _process != null;
             }
         }
 
@@ -557,6 +580,13 @@ namespace Microsoft.VisualStudioTools.Project {
                     // Reader has already been cancelled
                 }
             }
+
+            if (_waitHandleEvent != null) {
+                try {
+                    _waitHandleEvent.Set();
+                } catch (ObjectDisposedException) {
+                }
+            }
         }
 
         /// <summary>
@@ -584,10 +614,13 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         public WaitHandle WaitHandle {
             get {
-                if (_waitHandle == null && _process != null) {
-                    _waitHandle = new ProcessWaitHandle(_process);
+                if (_process == null) {
+                    return null;
                 }
-                return _waitHandle;
+                if (_waitHandleEvent == null) {
+                    _waitHandleEvent = new ManualResetEvent(_haveRaisedExitedEvent);
+                }
+                return _waitHandleEvent;
             }
         }
 
@@ -597,7 +630,8 @@ namespace Microsoft.VisualStudioTools.Project {
         public void Wait() {
             if (_process != null) {
                 _process.WaitForExit();
-                FlushAndCloseOutput();
+                // Should have already been called, in which case this is a no-op
+                OnExited(this, EventArgs.Empty);
             }
         }
 
@@ -612,7 +646,8 @@ namespace Microsoft.VisualStudioTools.Project {
             if (_process != null) {
                 bool exited = _process.WaitForExit((int)timeout.TotalMilliseconds);
                 if (exited) {
-                    FlushAndCloseOutput();
+                    // Should have already been called, in which case this is a no-op
+                    OnExited(this, EventArgs.Empty);
                 }
                 return exited;
             }
@@ -623,22 +658,30 @@ namespace Microsoft.VisualStudioTools.Project {
         /// Enables using 'await' on this object.
         /// </summary>
         public TaskAwaiter<int> GetAwaiter() {
-            var tcs = new TaskCompletionSource<int>();
-
-            if (_process == null) {
-                tcs.SetCanceled();
-            } else {
-                Exited += (s, e) => {
-                    FlushAndCloseOutput();
-                    tcs.TrySetResult(_process.ExitCode);
-                };
-                if (_process.HasExited) {
-                    FlushAndCloseOutput();
-                    tcs.TrySetResult(_process.ExitCode);
+            if (_awaiter == null) {
+                if (_process == null) {
+                    var tcs = new TaskCompletionSource<int>();
+                    tcs.SetCanceled();
+                    _awaiter = tcs.Task;
+                } else if (_process.HasExited) {
+                    // Should have already been called, in which case this is a no-op
+                    OnExited(this, EventArgs.Empty);
+                    var tcs = new TaskCompletionSource<int>();
+                    tcs.SetResult(_process.ExitCode);
+                    _awaiter = tcs.Task;
+                } else {
+                    _awaiter = Task.Run(() => {
+                        try {
+                            Wait();
+                        } catch (Win32Exception) {
+                            throw new OperationCanceledException();
+                        }
+                        return _process.ExitCode;
+                    });
                 }
             }
 
-            return tcs.Task.GetAwaiter();
+            return _awaiter.GetAwaiter();
         }
 
         /// <summary>
@@ -647,7 +690,8 @@ namespace Microsoft.VisualStudioTools.Project {
         public void Kill() {
             if (_process != null && !_process.HasExited) {
                 _process.Kill();
-                FlushAndCloseOutput();
+                // Should have already been called, in which case this is a no-op
+                OnExited(this, EventArgs.Empty);
             }
         }
 
@@ -661,16 +705,10 @@ namespace Microsoft.VisualStudioTools.Project {
                 return;
             }
             _haveRaisedExitedEvent = true;
+            FlushAndCloseOutput();
             var evt = Exited;
             if (evt != null) {
                 evt(this, e);
-            }
-        }
-
-        class ProcessWaitHandle : WaitHandle {
-            public ProcessWaitHandle(Process process) {
-                Debug.Assert(process != null);
-                SafeWaitHandle = new SafeWaitHandle(process.Handle, false); // Process owns the handle
             }
         }
 
@@ -693,8 +731,9 @@ namespace Microsoft.VisualStudioTools.Project {
                 if (disp != null) {
                     disp.Dispose();
                 }
-                if (_waitHandle != null) {
-                    _waitHandle.Dispose();
+                if (_waitHandleEvent != null) {
+                    _waitHandleEvent.Set();
+                    _waitHandleEvent.Dispose();
                 }
             }
         }

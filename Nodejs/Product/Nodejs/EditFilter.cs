@@ -44,6 +44,7 @@ using Microsoft.VisualStudioTools.Navigation;
 namespace Microsoft.NodejsTools {
     internal sealed class EditFilter : IOleCommandTarget {
         private readonly ITextView _textView;
+        private readonly System.IServiceProvider _serviceProvider;
         private readonly IEditorOperations _editorOps;
         private readonly IIntellisenseSessionStack _intellisenseStack;
         private readonly IComponentModel _compModel;
@@ -54,7 +55,8 @@ namespace Microsoft.NodejsTools {
         private IOleCommandTarget _next;
         private ICompletionSession _activeSession;
 
-        public EditFilter(ITextView textView, IEditorOperations editorOps, IEditorOptions editorOptions, IIntellisenseSessionStack intellisenseStack, IComponentModel compModel) {
+        public EditFilter(System.IServiceProvider serviceProvider, ITextView textView, IEditorOperations editorOps, IEditorOptions editorOptions, IIntellisenseSessionStack intellisenseStack, IComponentModel compModel) {
+            _serviceProvider = serviceProvider;
             _textView = textView;
             _editorOps = editorOps;
             _intellisenseStack = intellisenseStack;
@@ -263,7 +265,7 @@ namespace Microsoft.NodejsTools {
             Debug.Assert(location.Column > 0);
 
             if (CommonUtils.IsSamePath(location.FilePath, _textView.GetFilePath())) {
-                var adapterFactory = NodejsPackage.ComponentModel.GetService<IVsEditorAdaptersFactoryService>();
+                var adapterFactory = _serviceProvider.GetComponentModel().GetService<IVsEditorAdaptersFactoryService>();
                 var viewAdapter = adapterFactory.GetViewAdapter(_textView);
                 viewAdapter.SetCaretPos(location.Line - 1, location.Column - 1);
                 viewAdapter.CenterLines(location.Line - 1, 1);

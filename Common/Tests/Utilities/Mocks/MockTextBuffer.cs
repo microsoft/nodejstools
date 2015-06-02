@@ -1,27 +1,25 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 using System;
-using Microsoft.VisualStudioTools;
+using System.IO;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Utilities;
 
 namespace TestUtilities.Mocks {
     public class MockTextBuffer : ITextBuffer {
-        private readonly string _filename, _contentType;
+        private readonly IContentType _contentType;
         internal MockTextSnapshot _snapshot;
         private MockTextEdit _edit;
 
@@ -30,22 +28,38 @@ namespace TestUtilities.Mocks {
         /// </summary>
         private PropertyCollection _properties;
 
-        public MockTextBuffer(string content, string filename = "C:\\fob.py", string contentType = "Python") {
+        public MockTextBuffer(string content) {
+        }
+
+        public MockTextBuffer(string content, string contentType, string filename = null) {
             _snapshot = new MockTextSnapshot(this, content);
-            _filename = filename;
+            _contentType = new MockContentType(contentType, new IContentType[0]);
+            if (filename == null) {
+                filename = Path.Combine(TestData.GetTempPath(), Path.GetRandomFileName(), "file.py");
+            }
+            Properties[typeof(ITextDocument)] = new MockTextDocument(this, filename);
+        }
+
+        public MockTextBuffer(string content, IContentType contentType, string filename = null) {
+            _snapshot = new MockTextSnapshot(this, content);
             _contentType = contentType;
+            if (filename == null) {
+                filename = Path.Combine(TestData.GetTempPath(), Path.GetRandomFileName(), "file.py");
+            }
+            Properties[typeof(ITextDocument)] = new MockTextDocument(this, filename);
         }
 
         public void ChangeContentType(Microsoft.VisualStudio.Utilities.IContentType newContentType, object editTag) {
             throw new NotImplementedException();
         }
-#pragma warning disable 67
+
         public event EventHandler<TextContentChangedEventArgs> Changed;
 
         public event EventHandler<TextContentChangedEventArgs> ChangedHighPriority;
 
         public event EventHandler<TextContentChangedEventArgs> ChangedLowPriority;
 
+#pragma warning disable 67
         public event EventHandler<TextContentChangingEventArgs> Changing;
 
         public event EventHandler PostChanged;
@@ -79,8 +93,8 @@ namespace TestUtilities.Mocks {
             throw new NotImplementedException();
         }
 
-        public Microsoft.VisualStudio.Utilities.IContentType ContentType {
-            get { return new MockContentType(_contentType, new IContentType[0]); }
+        public IContentType ContentType {
+            get { return _contentType; }
         }
 
         public ITextEdit CreateEdit() {
@@ -104,15 +118,24 @@ namespace TestUtilities.Mocks {
         }
 
         public ITextSnapshot Delete(Span deleteSpan) {
-            throw new NotImplementedException();
+            using (var edit = CreateEdit()) {
+                edit.Delete(deleteSpan);
+                return edit.Apply();
+            }
         }
 
         public bool EditInProgress {
             get { return _edit != null; }
         }
 
-        internal void EditApplied() {
+        internal void EditApplied(ITextSnapshot previous) {
             _edit = null;
+            var e = new TextContentChangedEventArgs(previous, _snapshot, new EditOptions(), null);
+            foreach (var evt in new[] { ChangedHighPriority, Changed, ChangedLowPriority }) {
+                if (evt != null) {
+                    evt(this, e);
+                }
+            }
         }
 
         public NormalizedSpanCollection GetReadOnlyExtents(Span span) {
@@ -168,7 +191,6 @@ namespace TestUtilities.Mocks {
             get {
                 if (_properties == null) {
                     _properties = new PropertyCollection();
-                    _properties.AddProperty(typeof(ITextDocument), new MockTextDocument(_filename));
                 }
                 return _properties;
             }

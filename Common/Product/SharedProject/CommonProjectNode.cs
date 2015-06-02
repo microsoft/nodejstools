@@ -1,18 +1,16 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+﻿/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 using System;
 using System.Collections.Generic;
@@ -49,7 +47,6 @@ namespace Microsoft.VisualStudioTools.Project {
     }
 
     internal abstract class CommonProjectNode : ProjectNode, IVsProjectSpecificEditorMap2, IVsDeferredSaveProject {
-        private CommonProjectPackage/*!*/ _package;
         private Guid _mruPageGuid = new Guid(CommonConstants.AddReferenceMRUPageGuid);
         private VSLangProj.VSProject _vsProject = null;
         private static ImageList _imageList;
@@ -67,6 +64,7 @@ namespace Microsoft.VisualStudioTools.Project {
         private MSBuild.Project _userBuildProject;
         private readonly Dictionary<string, FileSystemWatcher> _symlinkWatchers = new Dictionary<string, FileSystemWatcher>();
         private DiskMerger _currentMerger;
+        private IdleManager _idleManager;
 #if DEV11_OR_LATER
         private IVsHierarchyItemManager _hierarchyManager;
         private Dictionary<uint, bool> _needBolding;
@@ -75,22 +73,36 @@ namespace Microsoft.VisualStudioTools.Project {
 #endif
         private int _idleTriggered;
 
-        public CommonProjectNode(CommonProjectPackage/*!*/ package, ImageList/*!*/ imageList) {
-            Contract.Assert(package != null);
+        public CommonProjectNode(IServiceProvider serviceProvider, ImageList imageList)
+            : base(serviceProvider) {
+#if !DEV14_OR_LATER
             Contract.Assert(imageList != null);
+#endif
 
-            _package = package;
             CanFileNodesHaveChilds = true;
             SupportsProjectDesigner = true;
-            _imageList = imageList;
+            if (imageList != null) {
+                _imageList = imageList;
 
-            //Store the number of images in ProjectNode so we know the offset of the language icons.
-            _imageOffset = ImageHandler.ImageList.Images.Count;
-            foreach (Image img in ImageList.Images) {
-                ImageHandler.AddImage(img);
+                //Store the number of images in ProjectNode so we know the offset of the language icons.
+#pragma warning disable 0618
+                _imageOffset = ImageHandler.ImageList.Images.Count;
+                foreach (Image img in ImageList.Images) {
+                    ImageHandler.AddImage(img);
+                }
+#pragma warning restore 0618
             }
 
-            package.OnIdle += OnIdle;
+            //Initialize a new object to track project document changes so that we can update the StartupFile Property accordingly
+            _projectDocListenerForStartupFileUpdates = new ProjectDocumentsListenerForStartupFileUpdates(Site, this);
+            _projectDocListenerForStartupFileUpdates.Init();
+
+#if DEV11_OR_LATER
+            UpdateHierarchyManager(alwaysCreate: false);
+#endif
+
+            _idleManager = new IdleManager(Site);
+            _idleManager.OnIdle += OnIdle;
         }
 
         public override int QueryService(ref Guid guidService, out object result) {
@@ -102,7 +114,7 @@ namespace Microsoft.VisualStudioTools.Project {
             return base.QueryService(ref guidService, out result);
         }
 
-        #region abstract methods
+#region abstract methods
 
         public abstract Type GetProjectFactoryType();
         public abstract Type GetEditorFactoryType();
@@ -118,13 +130,9 @@ namespace Microsoft.VisualStudioTools.Project {
         public abstract Type GetGeneralPropertyPageType();
         public abstract Type GetLibraryManagerType();
 
-        #endregion
+#endregion
 
-        #region Properties
-
-        public new CommonProjectPackage/*!*/ Package {
-            get { return _package; }
-        }
+#region Properties
 
         public int ImageOffset {
             get { return _imageOffset; }
@@ -190,9 +198,9 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
-        #endregion
+#endregion
 
-        #region overridden properties
+#region overridden properties
 
         public override bool CanShowAllFiles {
             get {
@@ -210,6 +218,9 @@ namespace Microsoft.VisualStudioTools.Project {
         /// Since we appended the language images to the base image list in the constructor,
         /// this should be the offset in the ImageList of the langauge project icon.
         /// </summary>
+#if DEV14_OR_LATER
+        [Obsolete("Use GetIconMoniker() to specify the icon and GetIconHandle() for back-compat")]
+#endif
         public override int ImageIndex {
             get {
                 return _imageOffset + (int)CommonImageName.Project;
@@ -231,9 +242,9 @@ namespace Microsoft.VisualStudioTools.Project {
                 return VSProject;
             }
         }
-        #endregion
+#endregion
 
-        #region overridden methods
+#region overridden methods
 
         public override object GetAutomationObject() {
             if (_automationObject == null) {
@@ -333,7 +344,7 @@ namespace Microsoft.VisualStudioTools.Project {
             if (!String.IsNullOrWhiteSpace(publishUrl)) {
                 var url = new Url(publishUrl);
 
-                var publishers = CommonPackage.ComponentModel.GetExtensions<IProjectPublisher>();
+                var publishers = ((IComponentModel)Site.GetService(typeof(SComponentModel))).GetExtensions<IProjectPublisher>();
                 foreach (var publisher in publishers) {
                     if (publisher.Schema == url.Uri.Scheme) {
                         var project = new PublishProject(this, publishOptions);
@@ -363,11 +374,11 @@ namespace Microsoft.VisualStudioTools.Project {
                 }
 
                 if (!found) {
-                    var statusBar = (IVsStatusbar)CommonPackage.GetGlobalService(typeof(SVsStatusbar));
+                    var statusBar = (IVsStatusbar)Site.GetService(typeof(SVsStatusbar));
                     statusBar.SetText(String.Format("Publish failed: Unknown publish scheme ({0})", url.Uri.Scheme));
                 }
             } else {
-                var statusBar = (IVsStatusbar)CommonPackage.GetGlobalService(typeof(SVsStatusbar));
+                var statusBar = (IVsStatusbar)Site.GetService(typeof(SVsStatusbar));
                 statusBar.SetText(String.Format("Project is not configured for publishing in project properties."));
             }
             return found;
@@ -527,14 +538,17 @@ namespace Microsoft.VisualStudioTools.Project {
                 if (this._userBuildProject != null) {
                     _userBuildProject.ProjectCollection.UnloadProject(_userBuildProject);
                 }
-                _package.OnIdle -= OnIdle;
+                if (_idleManager != null) {
+                    _idleManager.OnIdle -= OnIdle;
+                    _idleManager.Dispose();
+                }
             }
 
             base.Dispose(disposing);
         }
 
         protected internal override int ShowAllFiles() {
-            UIThread.MustBeCalledFromUIThread();
+            Site.GetUIThread().MustBeCalledFromUIThread();
 
             if (!QueryEditProjectFile(false)) {
                 return VSConstants.E_FAIL;
@@ -722,7 +736,7 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
         private void RemoveSubTree(HierarchyNode node) {
-            UIThread.MustBeCalledFromUIThread();
+            Site.GetUIThread().MustBeCalledFromUIThread();
             foreach (var child in node.AllChildren) {
                 RemoveSubTree(child);
             }
@@ -938,7 +952,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         private void TriggerIdle() {
             if (Interlocked.CompareExchange(ref _idleTriggered, 1, 0) == 0) {
-                UIThread.InvokeAsync(Nop).DoNotWait();
+                Site.GetUIThread().InvokeAsync(Nop).DoNotWait();
             }
         }
 
@@ -1090,7 +1104,7 @@ namespace Microsoft.VisualStudioTools.Project {
             private void ChildDeleted(HierarchyNode child) {
                 if (child != null) {
                     _project.TryDeactivateSymLinkWatcher(child);
-                    UIThread.MustBeCalledFromUIThread();
+                    _project.Site.GetUIThread().MustBeCalledFromUIThread();
 
                     // rapid changes can arrive out of order, if the file or directory 
                     // actually exists ignore the event.
@@ -1167,7 +1181,7 @@ namespace Microsoft.VisualStudioTools.Project {
                         _project.AddAllFilesFile(parent, _path);
                         if (String.Equals(_project.GetStartupFile(), _path, StringComparison.OrdinalIgnoreCase)) {
                             _project.BoldStartupItem();
-                    }
+                        }
                     }
 
                     parent.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
@@ -1189,26 +1203,12 @@ namespace Microsoft.VisualStudioTools.Project {
             return new CommonProjectNodeProperties(this);
         }
 
-        public override int SetSite(Microsoft.VisualStudio.OLE.Interop.IServiceProvider site) {
-            base.SetSite(site);
-
-            //Initialize a new object to track project document changes so that we can update the StartupFile Property accordingly
-            _projectDocListenerForStartupFileUpdates = new ProjectDocumentsListenerForStartupFileUpdates((ServiceProvider)Site, this);
-            _projectDocListenerForStartupFileUpdates.Init();
-
-#if DEV11_OR_LATER
-            UpdateHierarchyManager(alwaysCreate: false);
-#endif
-
-            return VSConstants.S_OK;
-        }
-
         public override void Close() {
             if (null != _projectDocListenerForStartupFileUpdates) {
                 _projectDocListenerForStartupFileUpdates.Dispose();
                 _projectDocListenerForStartupFileUpdates = null;
             }
-            LibraryManager libraryManager = ((IServiceContainer)Package).GetService(GetLibraryManagerType()) as LibraryManager;
+            LibraryManager libraryManager = Site.GetService(GetLibraryManagerType()) as LibraryManager;
             if (null != libraryManager) {
                 libraryManager.UnregisterHierarchy(InteropSafeHierarchy);
             }
@@ -1523,9 +1523,9 @@ namespace Microsoft.VisualStudioTools.Project {
         protected override ConfigProvider CreateConfigProvider() {
             return new CommonConfigProvider(this);
         }
-        #endregion
+#endregion
 
-        #region Methods
+#region Methods
 
         /// <summary>
         /// This method retrieves an instance of a service that 
@@ -1677,9 +1677,9 @@ namespace Microsoft.VisualStudioTools.Project {
             return _userBuildProject.GetPropertyValue(propertyName);
         }
 
-        #endregion
+#endregion
 
-        #region IVsProjectSpecificEditorMap2 Members
+#region IVsProjectSpecificEditorMap2 Members
 
         public int GetSpecificEditorProperty(string mkDocument, int propid, out object result) {
             // initialize output params
@@ -1731,9 +1731,9 @@ namespace Microsoft.VisualStudioTools.Project {
             return VSConstants.E_NOTIMPL;
         }
 
-        #endregion
+#endregion
 
-        #region IVsDeferredSaveProject Members
+#region IVsDeferredSaveProject Members
 
         /// <summary>
         /// Implements deferred save support.  Enabled by unchecking Tools->Options->Solutions and Projects->Save New Projects Created.
@@ -1829,7 +1829,7 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
-        #endregion
+#endregion
 
         internal void SuppressFileChangeNotifications() {
             _watcher.EnableRaisingEvents = false;

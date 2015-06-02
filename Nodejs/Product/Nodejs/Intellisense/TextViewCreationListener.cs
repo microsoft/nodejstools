@@ -30,6 +30,7 @@ namespace Microsoft.NodejsTools.Intellisense {
     [ContentType(NodejsConstants.Nodejs)]
     [TextViewRole(PredefinedTextViewRoles.Editable)]
     class TextViewCreationListener : IVsTextViewCreationListener {
+        private readonly IServiceProvider _serviceProvider;
         private readonly IVsEditorAdaptersFactoryService _adaptersFactory;
         private readonly IEditorOperationsFactoryService _editorOperationsFactory;
         private readonly IComponentModel _compModel;
@@ -37,6 +38,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         [ImportingConstructor]
         public TextViewCreationListener(IVsEditorAdaptersFactoryService adaptersFactory, IEditorOperationsFactoryService editorOperationsFactory, [Import(typeof(SVsServiceProvider))]IServiceProvider serviceProvider, IEditorOptionsFactoryService editorOptionsFactory) {
+            _serviceProvider = serviceProvider;
             _adaptersFactory = adaptersFactory;
             _editorOperationsFactory = editorOperationsFactory;
             _compModel = (IComponentModel)serviceProvider.GetService(typeof(SComponentModel));
@@ -48,6 +50,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         public void VsTextViewCreated(VisualStudio.TextManager.Interop.IVsTextView textViewAdapter) {
             var textView = _adaptersFactory.GetWpfTextView(textViewAdapter);            
             var editFilter = new EditFilter(
+                _serviceProvider,
                 textView,
                 _editorOperationsFactory.GetEditorOperations(textView),
                 _editorOptionsFactory.GetOptions(textView),
@@ -67,6 +70,7 @@ namespace Microsoft.NodejsTools.Intellisense {
     [Export(typeof(IReplWindowCreationListener))]
     [ContentType(NodejsConstants.Nodejs)]
     class ReplWindowTextViewCreationListener : IReplWindowCreationListener {
+        private readonly IServiceProvider _serviceProvider;
         private readonly IVsEditorAdaptersFactoryService _adaptersFactory;
         private readonly IEditorOperationsFactoryService _editorOperationsFactory;
         private readonly IComponentModel _compModel;
@@ -74,6 +78,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         [ImportingConstructor]
         public ReplWindowTextViewCreationListener(IVsEditorAdaptersFactoryService adaptersFactory, IEditorOperationsFactoryService editorOperationsFactory, [Import(typeof(SVsServiceProvider))]IServiceProvider serviceProvider, IEditorOptionsFactoryService editorOptionsFactory) {
+            _serviceProvider = serviceProvider;
             _adaptersFactory = adaptersFactory;
             _editorOperationsFactory = editorOperationsFactory;
             _compModel = (IComponentModel)serviceProvider.GetService(typeof(SComponentModel));
@@ -83,6 +88,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         public void ReplWindowCreated(IReplWindow window) {
             var textView = window.TextView;
             var editFilter = new EditFilter(
+                _serviceProvider,
                 textView,
                 _editorOperationsFactory.GetEditorOperations(textView),
                 _editorOptionsFactory.GetOptions(textView),

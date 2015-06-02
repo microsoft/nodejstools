@@ -47,8 +47,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             using (var app = new VisualStudioApp()) {
                 // Initialize call is required because NTVS does not autoload its package
                 // We may not be on UI thread, but Dev11 and Dev12 know how to sort that out.
-                UIThread.InitializeAndAlwaysInvokeToCurrentThread();
-                UIThread.Invoke(() => {
+                app.ServiceProvider.GetUIThread().Invoke(() => {
                     NpmPackageInstallWindow npmWindow = OpenNpmWindowAndWaitForReady();
 
                     Assert.IsTrue(npmWindow.FilterTextBox.IsKeyboardFocused, "FilterTextBox should be keyboard focused");
@@ -61,8 +60,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         [HostType("VSTestHost")]
         public void TestNpmUIArrowKeyBehavior() {
             using (var app = new VisualStudioApp()) {
-                UIThread.InitializeAndAlwaysInvokeToCurrentThread();
-                UIThread.Invoke(() => {
+                app.ServiceProvider.GetUIThread().Invoke(() => {
                     NpmPackageInstallWindow npmWindow = OpenNpmWindowAndWaitForReady();
 
                     System.Windows.Input.Keyboard.Focus(npmWindow.FilterTextBox);
@@ -113,8 +111,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         [HostType("VSTestHost")]
         public void TestNpmUITabKeyBehavior() {
             using (var app = new VisualStudioApp()) {
-                UIThread.InitializeAndAlwaysInvokeToCurrentThread();
-                UIThread.Invoke(() => {
+                app.ServiceProvider.GetUIThread().Invoke(() => {
                     NpmPackageInstallWindow npmWindow = OpenNpmWindowAndWaitForReady();
 
                     npmWindow.FilterTextBox.Focus();

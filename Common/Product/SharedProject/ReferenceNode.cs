@@ -1,18 +1,16 @@
-//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 using System;
 using System.Collections.Generic;
@@ -26,6 +24,10 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using OleConstants = Microsoft.VisualStudio.OLE.Interop.Constants;
 using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
+#if DEV14_OR_LATER
+using Microsoft.VisualStudio.Imaging;
+using Microsoft.VisualStudio.Imaging.Interop;
+#endif
 
 namespace Microsoft.VisualStudioTools.Project {
     internal abstract class ReferenceNode : HierarchyNode {
@@ -98,12 +100,24 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
 
-        public override object GetIconHandle(bool open) {
-            return ProjectMgr.GetIconHandleByName(CanShowDefaultIcon() ?
-                ProjectNode.ImageName.Reference :
-                ProjectNode.ImageName.DanglingReference
-            );
+#if DEV14_OR_LATER
+        protected override bool SupportsIconMonikers {
+            get { return true; }
         }
+
+        protected override ImageMoniker GetIconMoniker(bool open) {
+            return CanShowDefaultIcon() ? KnownMonikers.Reference : KnownMonikers.ReferenceWarning;
+        }
+#else
+        public override int ImageIndex {
+            get {
+                return ProjectMgr.GetIconIndex(CanShowDefaultIcon() ?
+                    ProjectNode.ImageName.Reference :
+                    ProjectNode.ImageName.DanglingReference
+                );
+            }
+        }
+#endif
 
         /// <summary>
         /// Not supported.
@@ -165,7 +179,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// Links a reference node to the project and hierarchy.
         /// </summary>
         public virtual void AddReference() {
-            UIThread.MustBeCalledFromUIThread();
+            ProjectMgr.Site.GetUIThread().MustBeCalledFromUIThread();
 
             ReferenceContainerNode referencesFolder = this.ProjectMgr.GetReferenceContainer() as ReferenceContainerNode;
             Utilities.CheckNotNull(referencesFolder, "Could not find the References node");

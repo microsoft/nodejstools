@@ -24,6 +24,7 @@ using Microsoft.NodejsTools;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudioTools;
+using Microsoft.VisualStudioTools.VSTestHost;
 using TestUtilities;
 using TestUtilities.UI;
 
@@ -37,18 +38,18 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var project = solution.WaitForItem("AddNewTypeScriptItem", "server.js");
                 AutomationWrapper.Select(project);
 
-                using (var newItem = NewItemDialog.FromDte(solution.App)) {
+                using (var newItem = solution.AddNewItem()) {
                     newItem.FileName = "NewTSFile.ts";
                     newItem.OK();
                 }
 
                 using (AutoResetEvent buildDone = new AutoResetEvent(false)) {
-                    solution.App.Dte.Events.BuildEvents.OnBuildDone += (sender, args) => {
+                    VSTestContext.DTE.Events.BuildEvents.OnBuildDone += (sender, args) => {
                         buildDone.Set();
                     };
 
-                    solution.App.ExecuteCommand("Build.BuildSolution");
-                    solution.App.WaitForOutputWindowText("Build", "tsc.exe");
+                    solution.ExecuteCommand("Build.BuildSolution");
+                    solution.WaitForOutputWindowText("Build", "tsc.exe");
                     Assert.IsTrue(buildDone.WaitOne(10000), "failed to wait for build)");
                 }
             }
@@ -66,21 +67,21 @@ namespace Microsoft.Nodejs.Tests.UI {
             );
 
             using (var solution = project.Generate().ToVs()) {
-                List<IVsTaskItem> allItems = solution.App.WaitForErrorListItems(0);
+                List<IVsTaskItem> allItems = solution.WaitForErrorListItems(0);
                 Assert.AreEqual(0, allItems.Count);
 
                 var excluded = solution.WaitForItem("TestExcludedErrors", "excluded.js");
                 AutomationWrapper.Select(excluded);
-                solution.App.Dte.ExecuteCommand("Project.IncludeInProject");
+                solution.ExecuteCommand("Project.IncludeInProject");
 
-                allItems = solution.App.WaitForErrorListItems(1);
+                allItems = solution.WaitForErrorListItems(1);
                 Assert.AreEqual(1, allItems.Count);
 
                 excluded = solution.WaitForItem("TestExcludedErrors", "excluded.js");
                 AutomationWrapper.Select(excluded);
-                solution.App.Dte.ExecuteCommand("Project.ExcludeFromProject");
+                solution.ExecuteCommand("Project.ExcludeFromProject");
 
-                allItems = solution.App.WaitForErrorListItems(0);
+                allItems = solution.WaitForErrorListItems(0);
                 Assert.AreEqual(0, allItems.Count);
             }
         }
@@ -103,14 +104,14 @@ while(true) {{
             );
 
             using (var solution = project.Generate().ToVs()) {
-                solution.App.Dte.ExecuteCommand("Debug.Start");
-                solution.App.WaitForMode(dbgDebugMode.dbgRunMode);
+                solution.ExecuteCommand("Debug.Start");
+                solution.WaitForMode(dbgDebugMode.dbgRunMode);
 
                 for (int i = 0; i < 10 && !File.Exists(filename); i++) {
                     System.Threading.Thread.Sleep(1000);
                 }
                 Assert.IsTrue(File.Exists(filename), "debugger port not written out");
-                solution.App.Dte.ExecuteCommand("Debug.StopDebugging");
+                solution.ExecuteCommand("Debug.StopDebugging");
 
                 Assert.AreEqual(
                     File.ReadAllText(filename),
@@ -136,14 +137,14 @@ while(true) {{
             );
 
             using (var solution = project.Generate().ToVs()) {
-                solution.App.Dte.ExecuteCommand("Debug.Start");
-                solution.App.WaitForMode(dbgDebugMode.dbgRunMode);
+                solution.ExecuteCommand("Debug.Start");
+                solution.WaitForMode(dbgDebugMode.dbgRunMode);
 
                 for (int i = 0; i < 10 && !File.Exists(filename); i++) {
                     System.Threading.Thread.Sleep(1000);
                 }
                 Assert.IsTrue(File.Exists(filename), "environment variables not written out");
-                solution.App.Dte.ExecuteCommand("Debug.StopDebugging");
+                solution.ExecuteCommand("Debug.StopDebugging");
 
                 Assert.AreEqual(
                     File.ReadAllText(filename),
@@ -168,7 +169,7 @@ require('fs').writeFileSync('{0}', process.env.fob + process.env.bar + process.e
             );
 
             using (var solution = project.Generate().ToVs()) {
-                solution.App.Dte.ExecuteCommand("Debug.StartWithoutDebugging");
+                solution.ExecuteCommand("Debug.StartWithoutDebugging");
 
                 for (int i = 0; i < 10 && !File.Exists(filename); i++) {
                     System.Threading.Thread.Sleep(1000);
@@ -198,10 +199,10 @@ require('fs').writeFileSync('{0}', process.env.fob + process.env.bar + process.e
                 var projectNode = solution.WaitForItem("ProjectProperties");
                 AutomationWrapper.Select(projectNode);
 
-                solution.App.Dte.ExecuteCommand("ClassViewContextMenus.ClassViewMultiselectProjectReferencesItems.Properties");
+                solution.ExecuteCommand("ClassViewContextMenus.ClassViewMultiselectProjectReferencesItems.Properties");
                 AutomationElement doc = null;
                 for (int i = 0; i < 10; i++) {
-                    doc = solution.App.GetDocumentTab("ProjectProperties");
+                    doc = ((VisualStudioInstance)solution).App.GetDocumentTab("ProjectProperties");
                     if (doc != null) {
                         break;
                     }
@@ -228,9 +229,9 @@ require('fs').writeFileSync('{0}', process.env.fob + process.env.bar + process.e
                 Keyboard.Backspace();
                 Keyboard.Type("fob=0\nbar=0;0\nbaz=0");
 
-                solution.App.Dte.ExecuteCommand("File.SaveAll");
+                solution.ExecuteCommand("File.SaveAll");
 
-                var projFile = File.ReadAllText(solution.Project.FullName);
+                var projFile = File.ReadAllText(solution.GetProject("ProjectProperties").FullName);
                 Assert.AreNotEqual(-1, projFile.IndexOf("<DebuggerPort>2468</DebuggerPort>"));
                 Assert.AreNotEqual(-1, projFile.IndexOf("<Environment>fob=0\r\nbar=0;0\r\nbaz=0</Environment>"));
             }

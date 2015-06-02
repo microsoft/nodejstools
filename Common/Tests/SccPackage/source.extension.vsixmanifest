@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Vsix Version="1.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2010">
-  <Identifier Id="49e63f87-6b69-42ca-9496-1e20a919ef1f">
+  <Identifier Id="394d1b85-f4a7-4af2-9078-e4aab7673b22">
     <Name>SccPackage</Name>
     <Author>Microsoft</Author>
-    <Version>2.1</Version>
+    <Version>2.2</Version>
     <Description xml:space="preserve">Information about my package</Description>
     <Locale>1033</Locale>
     <InstalledByMsi>false</InstalledByMsi>
@@ -17,16 +17,19 @@
         <Edition>Pro</Edition>
       </VisualStudio>
       <VisualStudio Version="12.0">
+        <Edition>IntegratedShell</Edition>
+        <Edition>VSWinDesktopExpress</Edition>
+        <Edition>VWDExpress</Edition>
+      </VisualStudio>
+      <VisualStudio Version="14.0">
         <Edition>Pro</Edition>
+        <Edition>VSWinDesktopExpress</Edition>
+        <Edition>VWDExpress</Edition>
       </VisualStudio>
     </SupportedProducts>
-    <SupportedFrameworkRuntimeEdition MinVersion="4.0" />
+    <SupportedFrameworkRuntimeEdition MinVersion="4.5" />
   </Identifier>
-  <References>
-        <Reference Id="Microsoft.VisualStudio.MPF" MinVersion="10.0">
-            <Name>Visual Studio MPF</Name>
-        </Reference>
-  </References>
+  <References />
   <Content>
     <VsPackage>|%CurrentProject%;PkgdefProjectOutputGroup|</VsPackage>
   </Content>

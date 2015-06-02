@@ -1,18 +1,16 @@
-//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+/* ****************************************************************************
+ *
+ * Copyright (c) Microsoft Corporation. 
+ *
+ * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
+ * copy of the license can be found in the License.html file at the root of this distribution. If 
+ * you cannot locate the Apache License, Version 2.0, please send an email to 
+ * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
+ * by the terms of the Apache License, Version 2.0.
+ *
+ * You must not remove this notice, or any other, from this software.
+ *
+ * ***************************************************************************/
 
 
 using System;
@@ -78,6 +76,37 @@ namespace Microsoft.VisualStudioTools.Project {
             int inAutomation = 0;
             ErrorHandler.ThrowOnFailure(extensibility.IsInAutomationFunction(out inAutomation));
             return inAutomation != 0;
+        }
+
+        /// <summary>
+        /// Use this instead of VsShellUtilities.ShowMessageBox because VSU uses ThreadHelper which
+        /// uses a private interface that can't be mocked AND goes to the global service provider.
+        /// </summary>
+        public static int ShowMessageBox(IServiceProvider serviceProvider, string message, string title, OLEMSGICON icon, OLEMSGBUTTON msgButton, OLEMSGDEFBUTTON defaultButton) {
+            IVsUIShell uiShell = serviceProvider.GetService(typeof(IVsUIShell)) as IVsUIShell;
+            Debug.Assert(uiShell != null, "Could not get the IVsUIShell object from the services exposed by this serviceprovider");
+            if (uiShell == null) {
+                throw new InvalidOperationException();
+            }
+
+            Guid emptyGuid = Guid.Empty;
+            int result = 0;
+
+            serviceProvider.GetUIThread().Invoke(() => {
+                ErrorHandler.ThrowOnFailure(uiShell.ShowMessageBox(
+                    0,
+                    ref emptyGuid,
+                    title,
+                    message,
+                    null,
+                    0,
+                    msgButton,
+                    defaultButton,
+                    icon,
+                    0,
+                    out result));
+            });
+            return result;
         }
 
         /// <summary>
