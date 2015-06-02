@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nodejs", "Product\Nodejs\Nodejs.csproj", "{32EC5259-98DA-40CA-9E2D-1B1B2E966F88}"
 	ProjectSection(ProjectDependencies) = postProject
 		{5085DF35-3A32-4894-835E-E5A3956D4F57} = {5085DF35-3A32-4894-835E-E5A3956D4F57}
+		{E5F7D6B9-8D5A-416D-8F16-2BDC3576A5A3} = {E5F7D6B9-8D5A-416D-8F16-2BDC3576A5A3}
 		{CB61D8BD-48DC-40F4-A4BA-5B68A10A7481} = {CB61D8BD-48DC-40F4-A4BA-5B68A10A7481}
 	EndProjectSection
 EndProject
@@ -16,6 +17,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestUtilities", "..\Common\Tests\Utilities\TestUtilities.csproj", "{D092D54E-FF29-4D32-9AEE-4EF704C92F67}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestUtilities.UI", "..\Common\Tests\Utilities.UI\TestUtilities.UI.csproj", "{E8150EBC-6B62-40BF-BF91-1DC60149B530}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A390E1C0-0D90-4A9E-8413-3E959BB07292} = {A390E1C0-0D90-4A9E-8413-3E959BB07292}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Profiling", "Product\Profiling\Profiling.csproj", "{C42B194E-3333-45E8-BB26-D69D1A51EF0B}"
 	ProjectSection(ProjectDependencies) = postProject
