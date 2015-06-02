@@ -61,9 +61,10 @@ var run_tests = function (testName, testFile, workingFolder, projectFolder) {
         mocha.grep(testName);
     }
     mocha.addFile(testFile);
-    //Choose 'xunit' rather 'min'. The reason is when under piped/redirect,
-    //mocha produces undisplayable text to stdout and stderr. Using xunit works fine 
-    mocha.reporter('xunit');
+    // Choose 'tap' rather 'min'. The reason is when under piped/redirect,
+    // mocha produces undisplayable text to stdout and stderr. Using xunit works fine 
+    // And 'xunit' does not print the stack trace from the test.
+    mocha.reporter('tap');
     mocha.run(function (code) {
         process.exit(code);
     });
