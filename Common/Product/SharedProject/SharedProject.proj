@@ -334,8 +334,8 @@
       <Link>SharedProject\IdleManager.cs</Link>
       <Visible>true</Visible>
     </Compile>
-    <Compile Include="$(_ProjectSystemFilesLocation)\IClipboardService.cs">
-      <Link>SharedProject\IClipboardService.cs</Link>
+    <Compile Include="$(_ProjectSystemFilesLocation)\ClipboardServiceBase.cs">
+      <Link>SharedProject\ClipboardServiceBase.cs</Link>
       <Visible>true</Visible>
     </Compile>
     <Compile Include="$(_ProjectSystemFilesLocation)\ClipboardService.cs">

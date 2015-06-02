@@ -16,17 +16,17 @@ using System;
 using Microsoft.VisualStudio.OLE.Interop;
 
 namespace Microsoft.VisualStudioTools {
-    interface IClipboardService {
-        void SetClipboard(IDataObject dataObject);
+    public abstract class ClipboardServiceBase {
+        public abstract void SetClipboard(IDataObject dataObject);
 
-        IDataObject GetClipboard();
+        public abstract IDataObject GetClipboard();
 
-        void FlushClipboard();
+        public abstract void FlushClipboard();
 
-        bool OpenClipboard();
+        public abstract bool OpenClipboard();
 
-        void EmptyClipboard();
+        public abstract void EmptyClipboard();
 
-        void CloseClipboard();
+        public abstract void CloseClipboard();
     }
 }
