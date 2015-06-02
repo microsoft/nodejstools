@@ -92,8 +92,8 @@ namespace Microsoft.VisualStudioTools {
             }
         }
 
-        internal static IClipboardService GetClipboardService(this IServiceProvider serviceProvider) {
-            return (IClipboardService)serviceProvider.GetService(typeof(IClipboardService));
+        internal static ClipboardServiceBase GetClipboardService(this IServiceProvider serviceProvider) {
+            return (ClipboardServiceBase)serviceProvider.GetService(typeof(ClipboardServiceBase));
         }
 
         internal static UIThreadBase GetUIThread(this IServiceProvider serviceProvider) {

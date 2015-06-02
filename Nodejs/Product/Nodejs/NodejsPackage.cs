@@ -183,7 +183,7 @@ namespace Microsoft.NodejsTools {
             var langService = new NodejsLanguageInfo(this);
             ((IServiceContainer)this).AddService(langService.GetType(), langService, true);
 
-            ((IServiceContainer)this).AddService(typeof(IClipboardService), new ClipboardService(), true);
+            ((IServiceContainer)this).AddService(typeof(ClipboardServiceBase), new ClipboardService(), true);
 
             RegisterProjectFactory(new NodejsProjectFactory(this));
             RegisterEditorFactory(new NodejsEditorFactory(this));

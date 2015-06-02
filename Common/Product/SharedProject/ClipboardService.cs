@@ -19,32 +19,32 @@ using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.VisualStudioTools {
 
-    class ClipboardService : IClipboardService {
-        public void SetClipboard(IDataObject dataObject) {
+    class ClipboardService : ClipboardServiceBase {
+        public override void SetClipboard(IDataObject dataObject) {
             ErrorHandler.ThrowOnFailure(UnsafeNativeMethods.OleSetClipboard(dataObject));
         }
 
-        public IDataObject GetClipboard() {
+        public override IDataObject GetClipboard() {
             IDataObject res;
             ErrorHandler.ThrowOnFailure(UnsafeNativeMethods.OleGetClipboard(out res));
             return res;
         }
 
-        public void FlushClipboard() {
+        public override void FlushClipboard() {
             ErrorHandler.ThrowOnFailure(UnsafeNativeMethods.OleFlushClipboard());
         }
 
-        public bool OpenClipboard() {
+        public override bool OpenClipboard() {
             int res = UnsafeNativeMethods.OpenClipboard(IntPtr.Zero);
             ErrorHandler.ThrowOnFailure(res);
             return res == 1;
         }
 
-        public void EmptyClipboard() {
+        public override void EmptyClipboard() {
             ErrorHandler.ThrowOnFailure(UnsafeNativeMethods.EmptyClipboard());
         }
 
-        public void CloseClipboard() {
+        public override void CloseClipboard() {
             ErrorHandler.ThrowOnFailure(UnsafeNativeMethods.CloseClipboard());
         }
     }
