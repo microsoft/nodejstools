@@ -302,7 +302,9 @@ namespace Microsoft.NodejsTools.Project {
         public override bool IsCodeFile(string fileName) {
             var ext = Path.GetExtension(fileName);
             return ext.Equals(NodejsConstants.JavaScriptExtension, StringComparison.OrdinalIgnoreCase) ||
-                   ext.Equals(NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase);
+                   ext.Equals(NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase) ||
+                   // for some reason, the default express 4 template's startup file lacks an extension.
+                   string.IsNullOrEmpty(ext);
         }
 
         public override int InitializeForOuter(string filename, string location, string name, uint flags, ref Guid iid, out IntPtr projectPointer, out int canceled) {
@@ -434,6 +436,9 @@ namespace Microsoft.NodejsTools.Project {
                         break;
                     case NodejsConstants.NodeExeArguments:
                         propPage.NodeExeArguments = newValue;
+                        break;
+                    case CommonConstants.StartupFile:
+                        propPage.ScriptFile = newValue;
                         break;
                     case NodejsConstants.ScriptArguments:
                         propPage.ScriptArguments = newValue;

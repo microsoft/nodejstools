@@ -99,10 +99,13 @@ namespace Microsoft.NodejsTools.Debugger {
 
             _debuggerEndpointUri = new UriBuilder { Scheme = "tcp", Host = "localhost", Port = debuggerPortOrDefault }.Uri;
 
-            string allArgs = String.Format("--debug-brk={0} {1}", debuggerPortOrDefault, script);
-            if (!string.IsNullOrEmpty(interpreterOptions)) {
-                allArgs = interpreterOptions + " " + allArgs;
-            }
+            // Node usage: node [options] [ -e script | script.js ] [arguments]
+            string allArgs = String.Format(
+                "--debug-brk={0} {1} {2}",
+                debuggerPortOrDefault,
+                interpreterOptions,
+                script
+            );
 
             var psi = new ProcessStartInfo(exe, allArgs) {
                 CreateNoWindow = !createNodeWindow,

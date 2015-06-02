@@ -45,6 +45,7 @@ namespace Microsoft.NodejsTools.Project {
         private void AddToolTips() {
             _tooltip.SetToolTip(_nodeExePath, SR.GetString(SR.NodeExePathToolTip));
             _tooltip.SetToolTip(_nodeExeArguments, SR.GetString(SR.NodeExeArgumentsToolTip));
+            _tooltip.SetToolTip(_scriptFile, SR.GetString(SR.ScriptFileToolTip));
             _tooltip.SetToolTip(_scriptArguments, SR.GetString(SR.ScriptArgumentsToolTip));
             _tooltip.SetToolTip(_nodejsPort, SR.GetString(SR.NodejsPortToolTip));
             _tooltip.SetToolTip(_startBrowser, SR.GetString(SR.StartBrowserToolTip));
@@ -69,6 +70,15 @@ namespace Microsoft.NodejsTools.Project {
             }
             set {
                 _nodeExeArguments.Text = value;
+            }
+        }
+
+        public string ScriptFile  {
+            get {
+                return this._scriptFile.Text;
+            }
+            set {
+                this._scriptFile.Text = value;
             }
         }
 

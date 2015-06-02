@@ -327,6 +327,9 @@
   <data name="ScriptArgumentsToolTip" xml:space="preserve">
     <value>Specifies the arguments passed to the script on launch.</value>
   </data>
+  <data name="ScriptFileTooltip" xml:space="preserve">
+    <value>Specifies the script run on launch.</value>
+  </data>
   <data name="StartBrowserToolTip" xml:space="preserve">
     <value>When checked a web browser is opened on launch</value>
   </data>
