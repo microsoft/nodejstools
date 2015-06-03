@@ -73,6 +73,7 @@ namespace Microsoft.NodejsTools.Project {
                     case PkgCmdId.cmdidNpmInstallSingleMissingModule:
                     case PkgCmdId.cmdidNpmUninstallModule:
                     case PkgCmdId.cmdidNpmUpdateSingleModule:
+                    case PkgCmdId.cmdidNpmOpenModuleHomepage:
                         result = QueryStatusResult.SUPPORTED | QueryStatusResult.INVISIBLE;
                         return VSConstants.S_OK;
                 }

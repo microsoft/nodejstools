@@ -161,37 +161,51 @@ namespace Microsoft.NodejsTools.Project {
             //  Latter condition is because it's only valid to carry out npm operations
             //  on top level dependencies of the user's project, not sub-dependencies.
             //  Performing operations on sub-dependencies would just break things.
-            if (cmdGroup == Guids.NodejsNpmCmdSet && null == _parent) {
+            if (cmdGroup == Guids.NodejsNpmCmdSet) {
                 switch (cmd) {
-                    case PkgCmdId.cmdidNpmInstallSingleMissingModule:
-                        if (GetPropertiesObject().IsGlobalInstall) {
-                            result = QueryStatusResult.SUPPORTED | QueryStatusResult.INVISIBLE;
-                        } else if (null == _projectNode.ModulesNode
-                            || _projectNode.ModulesNode.IsCurrentStateASuppressCommandsMode()) {
-                            result = QueryStatusResult.SUPPORTED;
-                        } else {
-                            if (null != Package && Package.IsMissing) {
+                    case PkgCmdId.cmdidNpmOpenModuleHomepage:
+                        using (var enumerator = this.Package.Homepages.GetEnumerator()) {
+                            if (enumerator.MoveNext() && !string.IsNullOrEmpty(enumerator.Current)) {
                                 result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
                             } else {
                                 result = QueryStatusResult.SUPPORTED;
                             }
                         }
                         return VSConstants.S_OK;
+                }
 
-                    case PkgCmdId.cmdidNpmUpdateSingleModule:
-                    case PkgCmdId.cmdidNpmUninstallModule:
-                        if (null != _projectNode.ModulesNode &&
-                            !_projectNode.ModulesNode.IsCurrentStateASuppressCommandsMode()) {
-                            result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
-                        } else {
-                            result = QueryStatusResult.SUPPORTED;
-                        }
-                        return VSConstants.S_OK;
+                if (null == _parent) {
+                    switch (cmd) {
+                        case PkgCmdId.cmdidNpmInstallSingleMissingModule:
+                            if (GetPropertiesObject().IsGlobalInstall) {
+                                result = QueryStatusResult.SUPPORTED | QueryStatusResult.INVISIBLE;
+                            } else if (null == _projectNode.ModulesNode
+                                || _projectNode.ModulesNode.IsCurrentStateASuppressCommandsMode()) {
+                                result = QueryStatusResult.SUPPORTED;
+                            } else {
+                                if (null != Package && Package.IsMissing) {
+                                    result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
+                                } else {
+                                    result = QueryStatusResult.SUPPORTED;
+                                }
+                            }
+                            return VSConstants.S_OK;
 
-                    case PkgCmdId.cmdidNpmInstallModules:
-                    case PkgCmdId.cmdidNpmUpdateModules:
-                        result = QueryStatusResult.SUPPORTED | QueryStatusResult.INVISIBLE;
-                        return VSConstants.S_OK;
+                        case PkgCmdId.cmdidNpmUpdateSingleModule:
+                        case PkgCmdId.cmdidNpmUninstallModule:
+                            if (null != _projectNode.ModulesNode &&
+                                !_projectNode.ModulesNode.IsCurrentStateASuppressCommandsMode()) {
+                                result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
+                            } else {
+                                result = QueryStatusResult.SUPPORTED;
+                            }
+                            return VSConstants.S_OK;
+
+                        case PkgCmdId.cmdidNpmInstallModules:
+                        case PkgCmdId.cmdidNpmUpdateModules:
+                            result = QueryStatusResult.SUPPORTED | QueryStatusResult.INVISIBLE;
+                            return VSConstants.S_OK;
+                    }
                 }
             } else if (cmdGroup == Microsoft.VisualStudioTools.Project.VsMenus.guidStandardCommandSet2K) {
                 switch ((VsCommands2K)cmd) {
@@ -205,28 +219,39 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         internal override int ExecCommandOnNode(Guid cmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
-            if (cmdGroup == Guids.NodejsNpmCmdSet && null == _parent) {
+            if (cmdGroup == Guids.NodejsNpmCmdSet) {
                 switch (cmd) {
-                    case PkgCmdId.cmdidNpmInstallSingleMissingModule:
-                        if (null != _projectNode.ModulesNode) {
-                            var t = _projectNode.ModulesNode.InstallMissingModule(this);
-                        }
-                        return VSConstants.S_OK;
-
-                    case PkgCmdId.cmdidNpmUninstallModule:
-                        if (null != _projectNode.ModulesNode) {
-                            var t = _projectNode.ModulesNode.UninstallModule(this);
-                        }
-                        return VSConstants.S_OK;
-
-                    case PkgCmdId.cmdidNpmUpdateSingleModule:
-                        if (null != _projectNode.ModulesNode) {
-                            var t = _projectNode.ModulesNode.UpdateModule(this);
+                    case PkgCmdId.cmdidNpmOpenModuleHomepage:
+                        using (var enumerator = this.Package.Homepages.GetEnumerator()) {
+                            if (enumerator.MoveNext() && !string.IsNullOrEmpty(enumerator.Current)) {
+                                Process.Start(enumerator.Current);
+                            }
                         }
                         return VSConstants.S_OK;
                 }
+                if (null == _parent) {
+                    switch (cmd) {
+                        case PkgCmdId.cmdidNpmInstallSingleMissingModule:
+                            if (null != _projectNode.ModulesNode) {
+                                var t = _projectNode.ModulesNode.InstallMissingModule(this);
+                            }
+                            return VSConstants.S_OK;
+
+                        case PkgCmdId.cmdidNpmUninstallModule:
+                            if (null != _projectNode.ModulesNode) {
+                                var t = _projectNode.ModulesNode.UninstallModule(this);
+                            }
+                            return VSConstants.S_OK;
+
+                        case PkgCmdId.cmdidNpmUpdateSingleModule:
+                            if (null != _projectNode.ModulesNode) {
+                                var t = _projectNode.ModulesNode.UpdateModule(this);
+                            }
+                            return VSConstants.S_OK;
+                    }
+                }
             } else if (cmdGroup == Microsoft.VisualStudioTools.Project.VsMenus.guidStandardCommandSet2K) {
-                switch((VsCommands2K)cmd) {
+                switch ((VsCommands2K)cmd) {
                     case CommonConstants.OpenFolderInExplorerCmdId:
                         string path = this.Package.Path;
                         try {
