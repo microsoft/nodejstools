@@ -99,7 +99,7 @@ function applyMochaOptions(mocha, options) {
                 try {
                     mochaOpt.call(mocha, optValue);
                 } catch (e) {
-                    error("Could not set mocha option '" + opt + "' with value '" + optValue + "' due to error: " + e);
+                    logError("Could not set mocha option '" + opt + "' with value '" + optValue + "' due to error: " + e);
                 }
             }
         }
