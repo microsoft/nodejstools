@@ -1,5 +1,10 @@
 ﻿var fs = require('fs');
 
+// Choose 'tap' rather than 'min' or 'xunit'. The reason is that
+// 'min' produces undisplayable text to stdout and stderr under piped/redirect, 
+// and 'xunit' does not print the stack trace from the test.
+var defaultMochaOptions = { ui: 'tdd', reporter: 'tap', timeout: 600000 };
+
 var find_tests = function (testFileList, discoverResultFile, projectFolder) {
     var Mocha = detectMocha(projectFolder);
     if (!Mocha) {
@@ -11,7 +16,7 @@ var find_tests = function (testFileList, discoverResultFile, projectFolder) {
             if (suite.tests && suite.tests.length !== 0) {
                 suite.tests.forEach(function (t, i, testArray) {
                     testList.push({
-                        test: t.fullTitle(),
+                        test: t.title,
                         suite: suite.fullTitle(),
                         file: testFile,
                         line: 0,
@@ -29,15 +34,14 @@ var find_tests = function (testFileList, discoverResultFile, projectFolder) {
     }
     var testList = [];
     testFileList.split(';').forEach(function (testFile) {
-        var mocha = new Mocha();
+        var mocha = initializeMocha(Mocha, projectFolder);
         try {
-            mocha.ui('tdd');
             mocha.addFile(testFile);
             mocha.loadFiles();
             getTestList(mocha.suite, testFile);
         } catch (e) {
             //we would like continue discover other files, so swallow, log and continue;
-            console.error('catch discover error:' + e);
+            logError('An error occurred during mocha discovery:' + e);
         }
     });
 
@@ -53,33 +57,68 @@ var run_tests = function (testName, testFile, workingFolder, projectFolder) {
         return;
     }
 
-    var mocha = new Mocha();
-    mocha.ui('tdd');
-    //set timeout to 10 minutes, because the default of 2 sec might be too short (TODO: make it configurable)
-    mocha.suite.timeout(600000);
+    var mocha = initializeMocha(Mocha, projectFolder);
+
     if (testName) {
         mocha.grep(testName);
     }
     mocha.addFile(testFile);
-
-    // Choose 'tap' rather than 'min' or 'xunit'. The reason is that
-    // 'min' produces undisplayable text to stdout and stderr under piped/redirect, 
-    // and 'xunit' does not print the stack trace from the test.
-    mocha.reporter('tap');
 
     mocha.run(function (code) {
         process.exit(code);
     });
 };
 
+function logError(errorMessage) {
+    console.log("NTVS_ERROR: " + errorMessage);
+}
+
 function detectMocha(projectFolder) {
     try {
         var Mocha = new require(projectFolder + '\\node_modules\\mocha');
         return Mocha;
     } catch (ex) {
-        console.log("NTVS_ERROR:Failed to find Mocha package.  Mocha must be installed in the project locally.  Mocha can be installed locally with the npm manager via solution explorer or with \".npm install mocha\" via the Node.js interactive window.");
+        logError("Failed to find Mocha package.  Mocha must be installed in the project locally.  Mocha can be installed locally with the npm manager via solution explorer or with \".npm install mocha\" via the Node.js interactive window.");
         return null;
     }
+}
+
+function initializeMocha(Mocha, projectFolder) {
+    var mocha = new Mocha();
+    applyMochaOptions(mocha, getMochaOptions(projectFolder));
+    return mocha;
+}
+
+function applyMochaOptions(mocha, options) {
+    if (options) {
+        for (var opt in options) {
+            var mochaOpt = mocha[opt];
+            var optValue = options[opt];
+
+            if (typeof mochaOpt == 'function') {
+                try {
+                    mochaOpt.call(mocha, optValue);
+                } catch (e) {
+                    error("Could not set mocha option '" + opt + "' with value '" + optValue + "' due to error: " + e);
+                }
+            }
+        }
+    }
+}
+
+function getMochaOptions(projectFolder) {
+    var mochaOptions = defaultMochaOptions;
+    try {
+        var options = require(projectFolder + '\\test\\mocha.json');
+        options = options || {};
+        for (var opt in options) {
+            mochaOptions[opt] = options[opt];
+        }
+    } catch (ex) {
+        console.log("NTVS: mocha.json options file not found. Using default values.");
+    }
+
+    return mochaOptions;
 }
 
 module.exports.run_tests = run_tests;
