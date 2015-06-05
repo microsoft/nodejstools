@@ -115,3 +115,5 @@ VSPackage.xform.resx
 /Nodejs/Product/Nodejs/ProjectTemplates/AddWebSiteAzureNodejsApp/AddWebSiteAzureNodejsApp.vstemplate
 /Nodejs/Product/Nodejs/ProjectTemplates/AddWebSiteExpressApp/AddWebSiteExpressApp.vstemplate
 /Nodejs/Product/Nodejs/ProjectTemplates/AddWebSiteNodejsWebApp/AddWebSiteNodejsWebApp.vstemplate
+/Nodejs/Product/Nodejs/ProjectTemplates/AddWebSiteAzureStarterExpressApp/AddWebSiteAzureStarterExpressApp.vstemplate
+/Nodejs/Product/Nodejs/ProjectTemplates/AddWebSiteStarterExpressApp/AddWebSiteStarterExpressApp.vstemplate
