@@ -491,7 +491,6 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 #pragma warning restore 0618, 0672
 
-
         #endregion
 
         #region virtual properties
@@ -704,7 +703,6 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
-
         /// <summary>
         /// Gets or set the relative path to the folder containing the project ouput. 
         /// </summary>
@@ -770,7 +768,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 return this.filename;
             }
         }
-
 
         /// <summary>
         /// Gets the configuration provider.
@@ -894,7 +891,6 @@ namespace Microsoft.VisualStudioTools.Project {
             } else if (this.ProjectFolder.Length + label.Length + 1 > NativeMethods.MAX_PATH) {
                 throw new InvalidOperationException(SR.GetString(SR.PathTooLong, label));
             }
-
 
             // TODO: Take file extension into account?
             string fileName = Path.GetFileNameWithoutExtension(label);
@@ -1296,7 +1292,6 @@ namespace Microsoft.VisualStudioTools.Project {
                     throw new InvalidOperationException(errorMessage);
                 }
             }
-
 
             // Build up the ContextParams safearray
             //  [0] = Wizard type guid  (bstr)
@@ -1771,7 +1766,6 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
 
-
         public virtual CompilerParameters GetProjectOptions(string config) {
             // This needs to be commented out because if you build for Debug the properties from the Debug 
             // config are cached. When you change configurations the old props are still cached, and 
@@ -1803,7 +1797,6 @@ namespace Microsoft.VisualStudioTools.Project {
             if (!string.IsNullOrEmpty(outputtype)) {
                 outputtype = outputtype.ToLower(CultureInfo.InvariantCulture);
             }
-
 
             options.MainClass = GetProjectProperty("StartupObject", false);
 
@@ -1975,7 +1968,6 @@ namespace Microsoft.VisualStudioTools.Project {
                     return folder;
                 }
             }
-
 
             string[] parts = strFullPath.Substring(ProjectHome.Length).Split(new[] { Path.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length == 0) {
@@ -2167,7 +2159,6 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
-
         /// <summary>
         /// Handles the shows all objects command.
         /// </summary>
@@ -2302,7 +2293,6 @@ namespace Microsoft.VisualStudioTools.Project {
                     || String.Compare(itemType, ProjectFileConstants.WebPiReference, StringComparison.OrdinalIgnoreCase) == 0);
         }
 
-
         /// <summary>
         /// Associate window output pane to the build logger
         /// </summary>
@@ -2340,7 +2330,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 this.SetConfiguration(config);
             }
         }
-
 
         /// <summary>
         /// This execute an MSBuild target for a design-time build.
@@ -2593,7 +2582,6 @@ namespace Microsoft.VisualStudioTools.Project {
 
             buildProject.FullPath = newFileName;
 
-
             _diskNodes.Remove(this.filename);
             this.filename = newFileName;
             _diskNodes[this.filename] = this;
@@ -2738,7 +2726,6 @@ namespace Microsoft.VisualStudioTools.Project {
 
         }
 
-
         /// <summary>
         /// This is the list of output groups that the configuration object should
         /// provide.
@@ -2807,7 +2794,6 @@ namespace Microsoft.VisualStudioTools.Project {
             // Can't ask for the active config until the project is opened, so do nothing in that scenario
             if (!IsProjectOpened)
                 return;
-
 
             bool propertiesChanged = this.BuildProject.SetGlobalProperty(ProjectFileConstants.Configuration, config);
             if (this.currentConfig == null || propertiesChanged) {
@@ -2882,7 +2868,6 @@ namespace Microsoft.VisualStudioTools.Project {
 
                 // Make sure that we do not want to add the item, dependent, or independent twice to the ui hierarchy
                 items.Add(item.EvaluatedInclude.ToUpperInvariant(), item);
-
 
                 string dependentOf = item.GetMetadataValue(ProjectFileConstants.DependentUpon);
                 string link = item.GetMetadataValue(ProjectFileConstants.Link);
@@ -3788,7 +3773,6 @@ namespace Microsoft.VisualStudioTools.Project {
             return VSConstants.S_OK;
         }
 
-
         public virtual int AddItem(uint itemIdLoc, VSADDITEMOPERATION op, string itemName, uint filesToOpen, string[] files, IntPtr dlgOwner, VSADDRESULT[] result) {
             Guid empty = Guid.Empty;
 
@@ -3863,7 +3847,6 @@ namespace Microsoft.VisualStudioTools.Project {
             }
 
             string[] actualFiles = new string[files.Length];
-
 
             VSQUERYADDFILEFLAGS[] flags = this.GetQueryAddFileFlags(files);
 
@@ -4318,13 +4301,11 @@ If the files in the existing folder have the same names as files in the folder y
             return VSConstants.E_FAIL;
         }
 
-
         public virtual int GetItemContext(uint itemId, out Microsoft.VisualStudio.OLE.Interop.IServiceProvider psp) {
             // the as cast isn't necessary, but makes it obvious via Find all refs how this is being used
             psp = this.NodeFromItemId(itemId) as Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
             return VSConstants.S_OK;
         }
-
 
         public virtual int IsDocumentInProject(string mkDoc, out int found, VSDOCUMENTPRIORITY[] pri, out uint itemId) {
             if (pri != null && pri.Length >= 1) {
@@ -4382,7 +4363,6 @@ If the files in the existing folder have the same names as files in the folder y
             return VSConstants.E_FAIL;
         }
 
-
         public virtual int OpenItemWithSpecific(uint itemId, uint editorFlags, ref Guid editorType, string physicalView, ref Guid logicalView, IntPtr docDataExisting, out IVsWindowFrame frame) {
             // Init output params
             frame = null;
@@ -4402,7 +4382,6 @@ If the files in the existing folder have the same names as files in the folder y
             return VSConstants.E_FAIL;
         }
 
-
         public virtual int RemoveItem(uint reserved, uint itemId, out int result) {
             HierarchyNode n = this.NodeFromItemId(itemId);
             if (n == null) {
@@ -4412,7 +4391,6 @@ If the files in the existing folder have the same names as files in the folder y
             result = 1;
             return VSConstants.S_OK;
         }
-
 
         public virtual int ReopenItem(uint itemId, ref Guid editorType, string physicalView, ref Guid logicalView, IntPtr docDataExisting, out IVsWindowFrame frame) {
             // Init output params
@@ -4432,7 +4410,6 @@ If the files in the existing folder have the same names as files in the folder y
             // This node does not have an associated document manager and we must fail
             return VSConstants.E_FAIL;
         }
-
 
         /// <summary>
         /// Implements IVsProject3::TransferItem
@@ -5103,7 +5080,6 @@ If the files in the existing folder have the same names as files in the folder y
                 this.sccProvider = sccProvider;
             }
 
-
             return changed;
         }
 
@@ -5258,7 +5234,6 @@ If the files in the existing folder have the same names as files in the folder y
             this.buildProject.SetGlobalProperty(GlobalProperty.DevEnvDir.ToString(), installDir);
         }
 
-
         /// <summary>
         /// Attempts to lock in the privilege of running a build in Visual Studio.
         /// </summary>
@@ -5368,7 +5343,6 @@ If the files in the existing folder have the same names as files in the folder y
 
                     Trace.TraceError(ex.ToString());
                 }
-
 
                 try {
                     if (requiresUIThread) {
@@ -5542,7 +5516,6 @@ If the files in the existing folder have the same names as files in the folder y
             }
             return VSConstants.S_OK;
         }
-
 
         public virtual int GetProperty(uint itemId, int propId, out object propVal) {
             propVal = null;

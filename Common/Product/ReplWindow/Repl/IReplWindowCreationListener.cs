@@ -12,7 +12,6 @@
  *
  * ***************************************************************************/
 
-
 #if NTVS_FEATURE_INTERACTIVEWINDOW
 namespace Microsoft.NodejsTools.Repl {
 #else

@@ -66,7 +66,6 @@ namespace TestUtilities.UI {
             return WaitForItemRemovedHelper(FindItem, path);
         }
 
-
         /// <summary>
         /// Finds the specified item in the solution tree and returns it.
         /// </summary>

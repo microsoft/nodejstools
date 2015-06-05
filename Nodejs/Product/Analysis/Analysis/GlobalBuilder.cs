@@ -388,7 +388,6 @@ All other strings are considered decimal.", isOptional:true)
             return value;
         }
 
-
         private static IAnalysisSet ArrayPushFunction(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             if (args.Length >= 1 && @this != null) {                
                 foreach (var thisValue in @this) {

@@ -261,7 +261,6 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
 
-
         class UpgradeLogger {
             private readonly string _projectFile;
             private readonly string _projectName;
@@ -400,7 +399,6 @@ namespace Microsoft.VisualStudioTools.Project {
                     //}
                 }
 
-
                 var queryEdit = site.GetService(typeof(SVsQueryEditQuerySave)) as IVsQueryEditQuerySave2;
                 if (queryEdit != null) {
                     uint editVerdict;
@@ -528,7 +526,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 pUpgradeProjectCapabilityFlags = 0;
                 return VSConstants.E_INVALIDARG;
             }
-
 
             var backupSupport = __VSPPROJECTUPGRADEVIAFACTORYFLAGS.PUVFF_BACKUPSUPPORTED |
                 __VSPPROJECTUPGRADEVIAFACTORYFLAGS.PUVFF_COPYBACKUP |

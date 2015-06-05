@@ -181,7 +181,6 @@ namespace Microsoft.VisualStudioTools.Project {
             return VSConstants.S_OK;
         }
 
-
         #endregion
 
         #region Helper methods

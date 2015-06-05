@@ -34,7 +34,6 @@ namespace Microsoft.VisualStudioTools.Project {
         private readonly string _targetName;
         private Output _keyOutput;
 
-
         /// <summary>
         /// Constructor for IVSOutputGroup2 implementation
         /// </summary>

@@ -189,7 +189,6 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-
         [SRCategoryAttribute(SR.General)]
         [SRDisplayName(SR.NpmPackageLinkStatus)]
         [SRDescriptionAttribute(SR.NpmPackageLinkStatusDescription)]

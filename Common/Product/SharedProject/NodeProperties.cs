@@ -84,7 +84,6 @@ namespace Microsoft.VisualStudioTools.Project {
             get { return this.node; }
         }
 
-
         /// <summary>
         /// Used by Property Pages Frame to set it's title bar. The Caption of the Hierarchy Node is returned.
         /// </summary>
@@ -629,7 +628,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 this.Node.ProjectMgr.ProjectFile = value;
             }
         }
-
 
         [Browsable(false)]
         public string FullPath {

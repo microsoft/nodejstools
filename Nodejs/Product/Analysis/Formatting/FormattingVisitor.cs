@@ -790,7 +790,6 @@ namespace Microsoft.NodejsTools.Formatting {
             return _code.IndexOfAny(_newlines, start, end - start) != -1;
         }
 
-
         /// <summary>
         /// Parses the end of the line getting the range of trailing whitespace and if the line is terminated with
         /// a single line comment.

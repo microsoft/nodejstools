@@ -286,7 +286,6 @@ bar""
             }
         }
 
-
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void BraceCompletion_BasicTests() {
@@ -339,7 +338,6 @@ bar""
 
             VSTestContext.DTE.ActiveWindow.Close(vsSaveChanges.vsSaveChangesNo);
         }
-
 
         private class DefaultSmartIndentOptionHolder : IDisposable {
             List<OptionHolder> _options = new List<OptionHolder>();

@@ -24,7 +24,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             _package = package;
         }
 
-
         public string Url {
             get {
                 string url = null;

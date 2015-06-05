@@ -786,7 +786,6 @@ label:
 @"x = { get foo() { }, set foo(value) { } }"
 );
 
-
             TestCode(
 @"x = {  }",
 @"x = {}"
@@ -903,7 +902,6 @@ c: 42, d: 100}",
     var a
 } while (1)");
 
-
         }
 
         [TestMethod, Priority(0)]
@@ -940,7 +938,6 @@ c: 42, d: 100}",
 }",
                 options
             );
-
 
             TestCode(
 @"for (var i = 0; i < 10; i++) {
@@ -1087,7 +1084,6 @@ c: 42, d: 100}",
                 options
             );
 
-
             TestCode(
 @"for ( var i = 0; i < 10; i++ ) {
 }",
@@ -1137,7 +1133,6 @@ c: 42, d: 100}",
 }",
                 options
             );
-
 
             TestCode(
 @"function ( a ) {
@@ -1412,7 +1407,6 @@ break;
         break;
 }");
 
-
         }
 
         [TestMethod, Priority(0)]
@@ -1597,7 +1591,6 @@ return 1;
 @"if (foo/*comment*/) // foo
 {
 }");
-
 
 
             TestCode(
@@ -2034,7 +2027,6 @@ for (var i = 0; i < 10; i++) {
     for (var i = 0; i < 10; i++) {
     }
 } while(true);");
-
 
             TestCode(
 @"do {

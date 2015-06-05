@@ -65,7 +65,6 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
-
         /// <summary>
         /// Delegates to base.
         /// </summary>
@@ -90,7 +89,6 @@ namespace Microsoft.VisualStudioTools.Project {
             }
             return editor;
         }
-
 
         /// <summary>
         /// Return type converter for property

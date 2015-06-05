@@ -147,7 +147,6 @@ namespace NpmTests {
             string registryDatabaseFilename = Path.Combine(cachePath, registryDirectory, registryFilename);
             string relativeRegistryDatabaseFilename = Path.Combine(registryDirectory, registryFilename);
 
-
             using (var reader = GetCatalogueReader(PackageCacheAllJsonFilename)) {
                 var getCatalogCommand = new NpmGetCatalogCommand(string.Empty, cachePath, false, RegistryUrl);
                 getCatalogCommand.CreateCatalogDatabaseAndInsertEntries(catalogDatabaseFilename, registryUrl, registryDirectory);
@@ -247,7 +246,6 @@ namespace NpmTests {
                 },
                 new[] { "cms", "framework" });
         }
-
 
         private void CheckSensibleNumberOfNonZeroVersions(ICollection<IPackage> target) {
             int sensibleVersionCount = 0;

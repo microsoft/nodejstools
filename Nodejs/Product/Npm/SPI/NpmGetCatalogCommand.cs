@@ -331,7 +331,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             return filename;
         }
 
-
         private async Task<Uri> GetRegistryUrl() {
             var output = await NpmHelpers.ExecuteNpmCommandAsync(
                 null,

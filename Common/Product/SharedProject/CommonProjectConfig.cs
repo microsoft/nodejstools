@@ -12,7 +12,6 @@
  *
  * ***************************************************************************/
 
-
 using System.Runtime.InteropServices;
 
 using Microsoft.VisualStudio.Shell.Interop;

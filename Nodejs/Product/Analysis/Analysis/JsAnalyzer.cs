@@ -96,7 +96,6 @@ namespace Microsoft.NodejsTools.Analysis {
                 "all.json"
             );
 
-
             if (File.Exists(allJson)) {
                 NodejsModuleBuilder.Build(allJson, this);
             } else {
@@ -257,7 +256,6 @@ namespace Microsoft.NodejsTools.Analysis {
                     .ToArray();
             }
         }
-
 
         internal Deque<AnalysisUnit> Queue {
             get {

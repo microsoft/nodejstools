@@ -63,7 +63,6 @@ namespace TestUtilities.UI {
             ClickButtonAndClose("_cancel", nameIsAutomationId: true);
         }
 
-
         public bool AllItems {
             get {
                 return FindByAutomationId("_allItems").GetTogglePattern().Current.ToggleState == ToggleState.On;
@@ -80,7 +79,6 @@ namespace TestUtilities.UI {
                 }
             }
         }
-
 
         public string Text {
             get {

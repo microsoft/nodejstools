@@ -52,7 +52,6 @@ namespace Microsoft.NodejsTools.Analysis {
         private const int _smallestNegative = 2;
         private const int EnumInt32 = 0;
 
-
         public AnalysisSerializer() {
         }
 
@@ -80,7 +79,6 @@ namespace Microsoft.NodejsTools.Analysis {
 
             Serialize(graph, writer);
         }
-
 
         delegate void DeserializationFunc(object value);
 
@@ -750,7 +748,6 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-
         class EqualityComparerDeserializer : IClrTypeDeserializer {
             public static readonly EqualityComparerDeserializer Instance = new EqualityComparerDeserializer();
 
@@ -758,7 +755,6 @@ namespace Microsoft.NodejsTools.Analysis {
                 return EqualityComparer<T>.Default;
             }
         }
-
 
         #region Array support
 

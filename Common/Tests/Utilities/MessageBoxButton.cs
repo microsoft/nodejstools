@@ -12,7 +12,6 @@
  *
  * ***************************************************************************/
 
-
 namespace TestUtilities {
     // http://msdn.microsoft.com/en-us/library/ms645505(VS.85).aspx
     public enum MessageBoxButton {

@@ -229,7 +229,6 @@ namespace Microsoft.VisualStudioTools.Project {
             CF_VSPROJECTCLIPDESCRIPTOR = (ushort)UnsafeNativeMethods.RegisterClipboardFormat("CF_PROJECTCLIPBOARDDESCRIPTOR");
         }
 
-
         public static FORMATETC CreateFormatEtc(ushort iFormat) {
             FORMATETC fmt = new FORMATETC();
             fmt.cfFormat = iFormat;

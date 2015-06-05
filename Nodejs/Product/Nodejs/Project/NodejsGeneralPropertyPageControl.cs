@@ -109,7 +109,6 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-
         public string WorkingDirectory {
             get {
                 return _workingDir.Text;

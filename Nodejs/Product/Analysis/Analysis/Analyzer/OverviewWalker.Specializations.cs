@@ -314,7 +314,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             return new ExpectedBinary(JSToken.Assign, left, right);
         }
 
-
         private static ExpectedChild ExpectedExprStmt(ExpectedChild expression) {
             return new ExpectedNode(typeof(ExpressionStatement), expression);
         }
@@ -416,7 +415,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             }
             return AnalysisSet.Empty;
         }
-
 
         /// <summary>
         /// function extend(protoProps, staticProps) {
@@ -812,7 +810,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                     "setPrototypeOf"
                 );
 
-
             return new PatternSpecialization(
                 SetProtoSpecializationImpl,
                 false,
@@ -874,7 +871,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             var aVar = new ExpectedVariableDeclaration(ExpectedArrayLiteral.Empty);
 
             var iVar = new ExpectedVariableDeclaration(null);
-
 
             return new PatternSpecialization(
                 ObjectKeysSpecializationImpl,
@@ -1061,7 +1057,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
             }
             return AnalysisSet.Empty;
         }
-
 
         /// <summary>
         /// Matches:
@@ -1871,7 +1866,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 if (node.GetType() != typeof(FunctionExpression)) {
                     return NoMatch;
                 }
-
 
                 FunctionExpression func = (FunctionExpression)node;
 

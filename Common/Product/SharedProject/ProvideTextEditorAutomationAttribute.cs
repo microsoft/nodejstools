@@ -12,7 +12,6 @@
  *
  * ***************************************************************************/
 
-
 using System;
 using System.Globalization;
 using Microsoft.VisualStudio.Shell;

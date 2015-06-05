@@ -22,7 +22,6 @@ using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Analysis.Values;
 using Microsoft.NodejsTools.Parsing;
 
-
 namespace Microsoft.NodejsTools.Analysis {
     /// <summary>
     /// Provides interactions to analyze a single file in a project and get the results back.
@@ -234,7 +233,6 @@ namespace Microsoft.NodejsTools.Analysis {
             // collect top-level definitions first
             var walker = new OverviewWalker(this, _unit, tree);
             tree.Walk(walker);
-
 
             if (!enqueOnly) {
                 _analyzer.AnalyzeQueuedEntries(cancel);
@@ -452,7 +450,6 @@ namespace Microsoft.NodejsTools.Analysis {
         ModuleAnalysis Analysis {
             get;
         }
-
 
         event EventHandler<EventArgs> NewParseTree;
         event EventHandler<EventArgs> NewAnalysis;

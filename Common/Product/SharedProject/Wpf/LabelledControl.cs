@@ -35,7 +35,6 @@ namespace Microsoft.VisualStudioTools.Wpf {
             d.SetValue(HasHelpTextPropertyKey, !string.IsNullOrWhiteSpace(e.NewValue as string));
         }
 
-
         public bool HasHelpText {
             get { return (bool)GetValue(HasHelpTextProperty); }
             private set { SetValue(HasHelpTextPropertyKey, value); }

@@ -1226,7 +1226,6 @@ namespace Microsoft.NodejsTools.Intellisense {
             return res;
         }
 
-
         private void OnWarningAdded(string path) {
             var evt = WarningAdded;
             if (evt != null) {
@@ -1479,7 +1478,6 @@ namespace Microsoft.NodejsTools.Intellisense {
             return defaults;
         }
 
-
         /// <summary>
         /// Loads a new instance from the specified registry key.
         /// </summary>
@@ -1510,7 +1508,6 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
             return null;
         }
-
 
         private const string ReturnTypesId = "ReturnTypes";
         private const string InstanceMembersId = "InstanceMembers";

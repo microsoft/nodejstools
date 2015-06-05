@@ -494,7 +494,6 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     File.GetAttributes(file) | FileAttributes.Hidden
                 );
 
-
                 using (var solution = solutionFile.ToVs()) {
                     var projectNode = solution.WaitForItem("ShowAllFilesHiddenFiles");
 
@@ -702,7 +701,6 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     var projectNode = solution.WaitForItem("ShowAllFilesDefault");
                     AutomationWrapper.Select(projectNode);
 
-
                     Assert.IsNull(solution.FindItem("ShowAllFilesDefault", "NotInProject" + projectType.CodeExtension));
 
                     // change setting, UI should be updated
@@ -835,7 +833,6 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                 Marshal.Release(hier);
             }
         }
-
 
         /// <summary>
         /// Creating & deleting files rapidly shouldn't leave a file hanging around

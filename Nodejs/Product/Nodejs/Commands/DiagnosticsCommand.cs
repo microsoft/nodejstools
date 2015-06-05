@@ -125,7 +125,6 @@ namespace Microsoft.NodejsTools.Commands {
 
                 res.AppendLine();
 
-
             }
 
             try {

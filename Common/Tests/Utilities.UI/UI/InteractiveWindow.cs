@@ -36,7 +36,6 @@ namespace TestUtilities.UI {
     public class InteractiveWindow : EditorWindow {
         const string CommandBase = "PythonInteractive.";
 
-
         private sealed class ReplWindowInfo {
             public readonly ManualResetEvent Idle = new ManualResetEvent(false);
             public readonly ManualResetEvent ReadyForInput = new ManualResetEvent(false);

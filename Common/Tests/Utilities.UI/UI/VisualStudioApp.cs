@@ -340,7 +340,6 @@ namespace TestUtilities.UI {
             }
         }
 
-
         public void WaitForBuildComplete(int timeout) {
             for (int i = 0; i < timeout; i += 500) {
                 if (Dte.Solution.SolutionBuild.BuildState == vsBuildState.vsBuildStateDone) {

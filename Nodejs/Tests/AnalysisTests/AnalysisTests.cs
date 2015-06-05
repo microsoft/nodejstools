@@ -217,7 +217,6 @@ var z = x['./foo/quox.js'];
             );
         }
 
-
         [TestMethod, Priority(0)]
         public void TestPrimitiveMembers() {
             string code = @"
@@ -976,7 +975,6 @@ var x = new f();
         }
 
 
-
         [TestMethod, Priority(0)]
         public void TestExports() {
             string code = @"
@@ -1150,7 +1148,6 @@ var x = abcdefg;
             );
         }
 
-
         //[TestMethod, Priority(0)]
         //public void ReproTestCase() {
         //    var analysis = ProcessText(File.ReadAllText(@"C:\Source\ExpressApp29\ExpressApp29\node_modules\jade\node_modules\with\node_modules\uglify-js\lib\scope.js"));
@@ -1245,11 +1242,9 @@ var x = abcdefg;
     return obj;
   };
 
-
 var x = {};
 extend(x, {abc:42});
 ";
-
 
             var analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
@@ -1293,7 +1288,6 @@ var myclass = Model.extend({extAttr:function() { return 42; }});
 var myinst = new myclass();
 ";
 
-
             var analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
                 analysis.GetTypeIdsByIndex("myinst.extAttr", code.Length),
@@ -1334,7 +1328,6 @@ var assign = function(object, source, guard) {
      }
      return result
    };
-
 
 var x = {abc:42}
 var y = {}
@@ -1379,7 +1372,6 @@ var str = foo.str.value;
                 BuiltinTypeId.String
             );
         }
-
 
         [TestMethod, Priority(0)]
         public void TestObjectLiteral() {
@@ -1458,7 +1450,6 @@ var z = y.abc";
                 BuiltinTypeId.Number
             );
         }
-
 
         [TestMethod, Priority(0)]
         public void TestFunctionCreation() {
@@ -1602,7 +1593,6 @@ var x = keys({'abc':42});
   return a;
 };
 
-
 function f() {
 }
 
@@ -1629,7 +1619,6 @@ var x = g.abc;
     })
     return dest
 };
-
 
 function f() {
 }
@@ -1683,7 +1672,6 @@ var x = toObject('abc');
   }
 }
 
-
 function f() {
 }
 
@@ -1726,7 +1714,6 @@ var x = g.abc;
   }
 }
 
-
 function f() {
 }
 
@@ -1743,7 +1730,6 @@ var x = g.abc;
                 BuiltinTypeId.Number
             );
         }
-
 
         [TestMethod, Priority(0)]
         public void TestCloneSpecialization() {
@@ -2014,7 +2000,6 @@ var extname = path.extname('/tmp/foo.txt');
             AssertUtil.ContainsExactly(analysis.GetTypeIdsByIndex("extname", code.Length), BuiltinTypeId.String);
         }
 
-
         /// <summary>
         /// https://nodejstools.codeplex.com/workitem/1077
         /// </summary>
@@ -2058,7 +2043,6 @@ var y = require('net').createServer(null, null);
             );
         }
 
-
         [TestMethod, Priority(0)]
         public void TestSetPrototypeSpecialization() {
             StringBuilder code = new StringBuilder(@"function setProto(obj, proto) {
@@ -2077,7 +2061,6 @@ var y = require('net').createServer(null, null);
             for (int i = 1; i < varCount; i++) {
                 code.AppendLine(String.Format("setProto(v{0}, v{1});", i, i - 1));
             }
-
 
             for (int i = 0; i < varCount; i++) {
                 code.AppendLine(String.Format("i{0} = v{0}.p{0};", i));
@@ -2349,7 +2332,6 @@ x.bar = 42;
             );
         }
 
-
         [TestMethod, Priority(0)]
         public void TestFunctionExpressionNameScopingNested() {
             var code = @"
@@ -2401,7 +2383,6 @@ var y = abc()('abc');
                 BuiltinTypeId.String
             );
         }
-
 
         [TestMethod, Priority(0)]
         public void TestTypes() {
@@ -2694,7 +2675,6 @@ exports.f = f;
             File.WriteAllText("C:\\Source\\Express\\express.txt", Analyzer.DumpAnalysis("C:\\Source\\Express"));
         }
 #endif
-
 
         internal virtual ModuleAnalysis ProcessText(string text) {
             return ProcessOneText(text);

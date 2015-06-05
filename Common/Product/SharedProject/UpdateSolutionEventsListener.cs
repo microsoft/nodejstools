@@ -40,7 +40,6 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         private IVsSolutionBuildManager2 solutionBuildManager;
 
-
         /// <summary>
         /// The associated service provider.
         /// </summary>
@@ -221,7 +220,6 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
         #endregion
-
 
         #region IDisposable Members
 
