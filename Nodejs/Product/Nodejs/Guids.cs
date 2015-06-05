@@ -46,6 +46,11 @@ namespace Microsoft.NodejsTools
         public const string NodejsProfilingCmdSetString = "3F2BC93C-CA2D-450B-9BFC-0C96288F1ED6";
         public const string ProfilingEditorFactoryString = "3585dc22-81a0-409e-85ae-cae5d02d99cd";
 
+        // Debug guids
+        public const string DebugEngine = "FC5B45BA-5B9C-46EA-887A-82073AE065FE";
+        public const string DebugProgramProvider = "472CD331-218C-451E-929E-98C9408F11DD";
+        public const string RemoteDebugPortSupplier = "A241707C-7DB3-464F-8D3E-F3D33E86AE99";
+
         public static readonly Guid NodejsBaseProjectFactory = new Guid(NodejsBaseProjectFactoryString);
         public static readonly Guid NodejsCmdSet = new Guid(NodejsCmdSetString);
         public static readonly Guid NodejsEditorFactory = new Guid(NodejsEditorFactoryString);
