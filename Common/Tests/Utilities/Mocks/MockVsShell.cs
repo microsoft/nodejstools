@@ -46,7 +46,6 @@ namespace TestUtilities.Mocks {
             return VSConstants.S_OK;
         }
 
-
         public int AdviseBroadcastMessages(IVsBroadcastMessageEvents pSink, out uint pdwCookie) {
             throw new NotImplementedException();
         }

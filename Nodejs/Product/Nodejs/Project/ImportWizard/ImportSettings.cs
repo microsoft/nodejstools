@@ -175,7 +175,6 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
         private static readonly DependencyPropertyKey IsValidPropertyKey = DependencyProperty.RegisterReadOnly("IsValid", typeof(bool), typeof(ImportSettings), new PropertyMetadata(false));
         public static readonly DependencyProperty IsValidProperty = IsValidPropertyKey.DependencyProperty;
 
-
         private static XmlWriter GetDefaultWriter(string projectPath) {
             var settings = new XmlWriterSettings {
                 CloseOutput = true,

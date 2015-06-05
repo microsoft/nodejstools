@@ -35,7 +35,6 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
             }
         }
 
-
         #region overridden methods
         public override ProjectItems Collection {
             get {

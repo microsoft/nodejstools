@@ -43,7 +43,6 @@ namespace Microsoft.VisualStudioTools {
                 .WaitAndUnwrapExceptions();
         }
 
-
         /// <summary>
         /// Logs all exceptions from a task except those that return true from
         /// <see cref="IsCriticalException"/>, which are rethrown.
@@ -113,7 +112,6 @@ namespace Microsoft.VisualStudioTools {
             task.HandleAllExceptions(productTitle, callerType, callerFile, callerLineNumber, callerName)
                 .WaitAndUnwrapExceptions();
         }
-
 
         /// <summary>
         /// Logs all exceptions from a task except those that return true from

@@ -252,7 +252,6 @@ namespace Microsoft.VisualStudioTools.Project {
             return returnValue;
         }
 
-
         #endregion
 
         private new FileNode Node {

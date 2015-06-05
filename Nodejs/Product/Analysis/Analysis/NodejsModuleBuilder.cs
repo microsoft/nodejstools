@@ -309,7 +309,6 @@ namespace Microsoft.NodejsTools.Analysis {
             return res.ToArray();
         }
 
-
         private void GenerateModuleDocs() {
             foreach (var module in _all["modules"]) {
                 var desc = (string)module["desc"];
@@ -395,7 +394,6 @@ namespace Microsoft.NodejsTools.Analysis {
                     global.ContainsKey("methods") ||
                     global.ContainsKey("properties") ||
                     global.ContainsKey("classes")) {
-
 
                     _output.AppendFormat("var {0} = new ", global["name"]);
                     GenerateModuleWorker(global, 0, "__" + global["name"]);

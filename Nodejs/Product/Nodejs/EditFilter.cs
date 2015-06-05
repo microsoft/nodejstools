@@ -360,7 +360,6 @@ namespace Microsoft.NodejsTools {
         }
 
 
-
         internal class LocationCategory : SimpleObjectList<SymbolList>, IVsNavInfo, ICustomSearchListProvider {
             private readonly string _name;
 

@@ -69,11 +69,9 @@ namespace Microsoft.VisualStudioTools.Project {
             get { return VsMenus.IDM_VS_CTXT_REFERENCEROOT; }
         }
 
-
         public override Guid ItemTypeGuid {
             get { return VSConstants.GUID_ItemType_VirtualFolder; }
         }
-
 
         public override string Url {
             get { return ReferencesNodeVirtualName; }
@@ -84,7 +82,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 return SR.GetString(SR.ReferencesNodeName);
             }
         }
-
 
         private Automation.OAReferences references;
         internal override object Object {
@@ -118,7 +115,6 @@ namespace Microsoft.VisualStudioTools.Project {
         public override string GetEditLabel() {
             return null;
         }
-
 
 #if DEV14_OR_LATER
         protected override bool SupportsIconMonikers {

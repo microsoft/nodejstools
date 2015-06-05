@@ -27,7 +27,6 @@ namespace TestUtilities.Mocks {
             _filePath = filePath;
         }
 
-
         #region ITextDocument Members
 
         public event EventHandler DirtyStateChanged {

@@ -192,7 +192,6 @@ namespace TestUtilities.Mocks {
             return VSConstants.S_OK;
         }
 
-
         public int CreateCollection(string collectionPath) {
             int exists;
             int hr = CollectionExists(collectionPath, out exists);

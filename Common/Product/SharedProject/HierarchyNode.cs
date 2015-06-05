@@ -140,7 +140,6 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
-
         public virtual int MenuCommandId {
             get { return VsMenus.IDM_VS_CTXT_NOCOMMANDS; }
         }
@@ -148,7 +147,6 @@ namespace Microsoft.VisualStudioTools.Project {
         public virtual Guid MenuGroupId {
             get { return VsMenus.guidSHLMainMenu; }
         }
-
 
         /// <summary>
         /// Return an imageindex
@@ -252,7 +250,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 this.projectMgr = value;
             }
         }
-
 
         [System.ComponentModel.BrowsableAttribute(false)]
         public HierarchyNode NextSibling {
@@ -386,7 +383,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 this.parentNode = value;
             }
         }
-
 
         [System.ComponentModel.BrowsableAttribute(false)]
         public uint ID {
@@ -1460,7 +1456,6 @@ namespace Microsoft.VisualStudioTools.Project {
 
 #region query command handling
 
-
         /// <summary>
         /// Handles command status on a node. Should be overridden by descendant nodes. If a command cannot be handled then the base should be called.
         /// </summary>
@@ -1799,7 +1794,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 return null;
             return this.projectMgr.Site.GetService(type);
         }
-
 
 #endregion
 

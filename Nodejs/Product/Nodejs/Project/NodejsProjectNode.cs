@@ -48,7 +48,6 @@ namespace Microsoft.NodejsTools.Project {
         private string _intermediateOutputPath;
         private readonly Dictionary<NodejsProjectImageName, int> _imageIndexFromNameDictionary = new Dictionary<NodejsProjectImageName, int>();
 
-
         public NodejsProjectNode(NodejsProjectPackage package)
             : base(
                   package,
@@ -551,7 +550,6 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public NodeModulesNode ModulesNode { get; private set; }
-
 
 
         protected internal override void ProcessReferences() {

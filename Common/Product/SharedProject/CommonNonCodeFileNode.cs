@@ -22,7 +22,6 @@ namespace Microsoft.VisualStudioTools.Project {
             : base(root, e) {
         }
 
-
         /// <summary>
         /// Open a file depending on the SubType property associated with the file item in the project file
         /// </summary>

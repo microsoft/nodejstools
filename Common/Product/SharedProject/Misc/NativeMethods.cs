@@ -530,7 +530,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 return OLECMDTEXTF.OLECMDTEXTF_NONE;
             }
 
-
             /// <summary>
             /// Flags for the OLE command text
             /// </summary>
@@ -706,7 +705,6 @@ namespace Microsoft.VisualStudioTools.Project {
             Windows = 0x0024,
         }
 
-
         // APIS
 
         /// <summary>
@@ -758,7 +756,6 @@ namespace Microsoft.VisualStudioTools.Project {
 
             return ProcessorArchitecture.None;
         }
-
 
         [DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public extern static bool DuplicateToken(IntPtr ExistingTokenHandle,
@@ -850,7 +847,6 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <returns></returns>
         [DllImport("msi.dll", CharSet = CharSet.Unicode)]
         internal static extern uint MsiGetProductCode(string szComponent, [Out]StringBuilder lpProductBuf);
-
 
         internal enum MsiInstallState {
             NotUsed = -7,  // component disabled

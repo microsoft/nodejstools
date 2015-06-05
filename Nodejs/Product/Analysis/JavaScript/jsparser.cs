@@ -818,7 +818,6 @@ namespace Microsoft.NodejsTools.Parsing
                         ReportError(JSError.NoEqual, true);
                     }
 
-
                     // move past the equals sign
                     GetNextToken();
 
@@ -2009,7 +2008,6 @@ namespace Microsoft.NodejsTools.Parsing
             return yieldNode;
         }
 
-
         private static readonly object True = true;
         private static readonly object False = false;
 
@@ -2977,7 +2975,6 @@ namespace Microsoft.NodejsTools.Parsing
             }
             return list.ToArray();
         }
-
 
         //---------------------------------------------------------------------------------------
         // ParseExpression
@@ -4587,7 +4584,6 @@ namespace Microsoft.NodejsTools.Parsing
                 default: return null;
             }
         }
-
 
         //---------------------------------------------------------------------------------------
         // IndexOfToken

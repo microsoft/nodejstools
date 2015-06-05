@@ -119,7 +119,6 @@ namespace Microsoft.NodejsTools.Debugger {
             return text;
         }
 
-
         private static bool TryParseInt(string text, int start, int length, int b, out int value) {
             value = 0;
             if (start + length > text.Length) {

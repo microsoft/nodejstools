@@ -37,7 +37,6 @@ namespace Microsoft.VisualStudioTools.Project {
             frame = null;
             Debug.Assert(editorType == VSConstants.GUID_ProjectDesignerEditor, "Cannot open project designer with guid " + editorType.ToString());
 
-
             if (this.Node == null || this.Node.ProjectMgr == null || this.Node.ProjectMgr.IsClosed) {
                 return VSConstants.E_FAIL;
             }

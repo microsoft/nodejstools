@@ -22,7 +22,6 @@ using System.Threading;
 using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Parsing;
 
-
 namespace Microsoft.NodejsTools.Analysis {
     /// <summary>
     /// Encapsulates a single piece of code which can be analyzed.  Currently this could be a top-level module, a class definition, 

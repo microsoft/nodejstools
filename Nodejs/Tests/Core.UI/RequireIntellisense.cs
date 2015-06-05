@@ -499,7 +499,6 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void CloseParenCommits() {

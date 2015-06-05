@@ -143,7 +143,6 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
-
         /// <summary>
         ///  Asks the environment for permission to rename files.
         /// </summary>

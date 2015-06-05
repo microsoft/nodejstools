@@ -99,7 +99,6 @@ namespace Microsoft.VisualStudioTools.Project {
             return null;
         }
 
-
 #if DEV14_OR_LATER
         protected override bool SupportsIconMonikers {
             get { return true; }
@@ -174,7 +173,6 @@ namespace Microsoft.VisualStudioTools.Project {
 
         #region  methods
 
-
         /// <summary>
         /// Links a reference node to the project and hierarchy.
         /// </summary>
@@ -234,7 +232,6 @@ namespace Microsoft.VisualStudioTools.Project {
             return true;
         }
 
-
         /// <summary>
         /// Checks if a reference is already added. The method parses all references and compares the Url.
         /// </summary>
@@ -255,7 +252,6 @@ namespace Microsoft.VisualStudioTools.Project {
 
             return false;
         }
-
 
         /// <summary>
         /// Shows the Object Browser

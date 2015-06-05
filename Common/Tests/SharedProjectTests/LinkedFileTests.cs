@@ -100,7 +100,6 @@ namespace VisualStudioToolsUITests {
             );
         }
 
-
         [ClassInitialize]
         public static void DoDeployment(TestContext context) {
             AssertListener.Initialize();
@@ -122,7 +121,6 @@ namespace VisualStudioToolsUITests {
                     } catch (Exception e) {
                         Debug.WriteLine(e.ToString());
                     }
-
 
                     // explicitly linked node
                     var explicitLinkedFile = solution.FindItem("LinkedFiles", "ExplicitDir", "ExplicitLinkedFile" + projectType.CodeExtension);
@@ -405,7 +403,6 @@ namespace VisualStudioToolsUITests {
 
                     autoItem.SaveAs("..\\SaveAsCreateLink" + projectType.CodeExtension);
 
-
                     autoItem = solution.GetProject("LinkedFiles").ProjectItems.Item("SaveAsCreateLink" + projectType.CodeExtension);
                     isLinkFile = autoItem.Properties.Item("IsLinkFile").Value;
                     Assert.AreEqual(isLinkFile, true);
@@ -448,7 +445,6 @@ namespace VisualStudioToolsUITests {
 
                     Directory.CreateDirectory(Path.Combine(solution.SolutionDirectory, "LinkedFiles\\CreatedDirectory"));
                     autoItem.SaveAs(Path.Combine(solution.SolutionDirectory, "LinkedFiles\\CreatedDirectory\\SaveAsCreateFileNewDirectory" + projectType.CodeExtension));
-
 
                     autoItem = solution.GetProject("LinkedFiles").ProjectItems.Item("CreatedDirectory").ProjectItems.Item("SaveAsCreateFileNewDirectory" + projectType.CodeExtension);
                     isLinkFile = autoItem.Properties.Item("IsLinkFile").Value;
@@ -542,7 +538,6 @@ namespace VisualStudioToolsUITests {
                     Assert.IsNotNull(projectNode, "projectNode");
                     AutomationWrapper.Select(projectNode);
 
-
                     using (var addExistingDlg = solution.AddExistingItem()) {
                         addExistingDlg.FileName = Path.Combine(solution.SolutionDirectory, "ExistsOnDiskButNotInProject" + projectType.CodeExtension);
                         addExistingDlg.AddLink();
@@ -565,7 +560,6 @@ namespace VisualStudioToolsUITests {
                     var projectNode = solution.FindItem("LinkedFiles", "FolderWithAFile");
                     Assert.IsNotNull(projectNode, "projectNode");
                     AutomationWrapper.Select(projectNode);
-
 
                     using (var addExistingDlg = solution.AddExistingItem()) {
                         addExistingDlg.FileName = Path.Combine(solution.SolutionDirectory, "ExistsOnDiskAndInProject" + projectType.CodeExtension);

@@ -240,7 +240,6 @@ namespace Microsoft.NodejsTools.Analysis.Analyzer {
                 node.Body.Walk(this);
             }
 
-
             return false;
         }
 

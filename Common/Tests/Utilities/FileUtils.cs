@@ -65,7 +65,6 @@ namespace TestUtilities {
             }
         }
 
-
         public static IDisposable Backup(string path) {
             var backup = Path.GetTempFileName();
             File.Delete(backup);
@@ -115,7 +114,6 @@ namespace TestUtilities {
                 }
             }
         }
-
 
         private sealed class FileRestorer : IDisposable {
             private readonly string _original, _backup;

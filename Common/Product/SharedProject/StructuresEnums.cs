@@ -31,7 +31,6 @@ namespace Microsoft.VisualStudioTools.Project {
 
     #region enums
 
-
     /// <summary>
     /// Defines the currect state of a property page.
     /// </summary>

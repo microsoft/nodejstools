@@ -22,7 +22,6 @@ using System.Threading;
 using Microsoft.NodejsTools.Analysis.Values;
 using Microsoft.NodejsTools.Parsing;
 
-
 namespace Microsoft.NodejsTools.Analysis.Analyzer {
     /// <summary>
     /// Provides analysis of a function called with a specific set of arguments.  We analyze each function

@@ -298,7 +298,6 @@ namespace Microsoft.VisualStudio.Repl {
                 new[] { new INITVIEW { fSelectionMargin = 0, fWidgetMargin = 0, fVirtualSpace = 0, fDragDropMove = 1 } }
             );                         
 
-
             // disable change tracking because everything will be changed
             var res = adapterFactory.GetWpfTextViewHost(textViewAdapter);
             var options = res.TextView.Options;

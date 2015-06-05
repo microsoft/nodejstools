@@ -20,7 +20,6 @@ using IServiceProvider = System.IServiceProvider;
 
 namespace Microsoft.VisualStudioTools.Project {
 
-
     internal class SolutionListenerForProjectOpen : SolutionListener {
         public SolutionListenerForProjectOpen(IServiceProvider serviceProvider)
             : base(serviceProvider) {

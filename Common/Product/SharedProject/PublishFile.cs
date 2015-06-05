@@ -12,7 +12,6 @@
  *
  * ***************************************************************************/
 
-
 namespace Microsoft.VisualStudioTools.Project {
     class PublishFile : IPublishFile {
         private readonly string _filename, _destFile;

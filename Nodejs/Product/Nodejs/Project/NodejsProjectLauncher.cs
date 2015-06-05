@@ -202,7 +202,6 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-
         private void LaunchDebugger(IServiceProvider provider, VsDebugTargetInfo dbgInfo) {
             if (!Directory.Exists(UnquotePath(dbgInfo.bstrCurDir))) {
                 MessageBox.Show(String.Format("Working directory \"{0}\" does not exist.", dbgInfo.bstrCurDir), "Node.js Tools for Visual Studio");

@@ -101,7 +101,6 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
             }
         }
 
-
         /// <summary>
         /// Gets the FileCodeModel object for the project item.
         /// </summary>

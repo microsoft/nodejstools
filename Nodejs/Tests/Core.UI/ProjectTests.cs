@@ -77,7 +77,6 @@ http.createServer(function (req, res) {
             }
         }
 
-
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestNoAutoFormattingEnter() {
@@ -92,7 +91,6 @@ http.createServer(function (req, res) {
 var port = process.env.port || 1337;
 var mymod = require('./mymod.js');
 var mutatemod = require('./mutatemod.js');
-
 
 http.createServer(function (req, res) {
 
@@ -119,7 +117,6 @@ var port = process.env.port || 1337;
 var mymod = require('./mymod.js');
 var mutatemod = require('./mutatemod.js');
 
-
 http.createServer(function (req, res) {
     function f() { }
     res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -144,7 +141,6 @@ http.createServer(function (req, res) {
 var port = process.env.port || 1337;
 var mymod = require('./mymod.js');
 var mutatemod = require('./mutatemod.js');
-
 
 http.createServer(function (req, res) {
 
@@ -400,7 +396,6 @@ var server = http.createServer(null); // server.listen
 server.listen
 
 var sd = require('stringdecoder');  // sd.StringDecoder();
-
 
 ");
 

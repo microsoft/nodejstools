@@ -242,7 +242,6 @@ namespace Microsoft.NodejsTools.Analysis {
             }
         }
 
-
         internal class ReadDirSyncArrayValue : ArrayValue {
             private readonly HashSet<string> _readDirs = new HashSet<string>();
             private static char[] InvalidPathChars = Path.GetInvalidPathChars();

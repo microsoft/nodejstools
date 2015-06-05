@@ -31,7 +31,6 @@ using Microsoft.NodejsTools.SourceMapping;
 using NodeLogConverter;
 using NodeLogConverter.LogParsing;
 
-
 namespace Microsoft.NodejsTools.LogParsing {
     /// <summary>
     /// Parses a V8 profiling log which is just a CSV file.  The CSV file includes several
@@ -789,7 +788,6 @@ public static void X{0:X}() {{
 
                 Relogger.Inject(Event);
             }
-
 
             private static bool IsStackWalkRecord(ref EVENT_RECORD record) {
                 return record.EventHeader.ProviderId == TraceLog.StackWalkEventGuid &&

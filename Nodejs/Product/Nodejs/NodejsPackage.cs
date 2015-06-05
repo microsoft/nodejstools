@@ -730,7 +730,6 @@ namespace Microsoft.NodejsTools {
             }
         }
 
-
 #if UNIT_TEST_INTEGRATION
         // var testCase = require('./test/test-doubled.js'); for(var x in testCase) { console.log(x); }
         public static string EvaluateJavaScript(string code) {

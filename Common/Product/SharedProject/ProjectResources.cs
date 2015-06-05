@@ -199,7 +199,6 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 #endif
 
-
         protected static string GetStringInternal(ResourceManager manager, string value, object[] args) {
             string result = manager.GetString(value, CultureInfo.CurrentUICulture);
             if (result == null) {
@@ -219,7 +218,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 result.IndexOf(string.Format("{{{0}", args.Length)) >= 0,
                 string.Format("Resource string '{0}' requires more than {1} argument(s)", value, args.Length)
             );
-
 
             return string.Format(CultureInfo.CurrentUICulture, result, args);
         }
