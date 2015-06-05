@@ -126,6 +126,9 @@ namespace Microsoft.NodejsTools.Project {
             get { return PkgCmdId.menuIdNpm; }
         }
 
+#if DEV14_OR_LATER
+        [Obsolete]
+#endif
         public override object GetIconHandle(bool open) {
             int imageIndex = _projectNode.ImageIndexFromNameDictionary[NodejsProjectImageName.Dependency];
             if (Package.IsMissing) {
@@ -153,9 +156,9 @@ namespace Microsoft.NodejsTools.Project {
             return CreatePropertiesObject() as DependencyNodeProperties;
         }
 
-        #endregion
+#endregion
 
-        #region Command handling
+#region Command handling
 
         internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result) {
             //  Latter condition is because it's only valid to carry out npm operations
@@ -249,6 +252,6 @@ namespace Microsoft.NodejsTools.Project {
             return base.ExecCommandOnNode(cmdGroup, cmd, nCmdexecopt, pvaIn, pvaOut);
         }
 
-        #endregion
+#endregion
     }
 }

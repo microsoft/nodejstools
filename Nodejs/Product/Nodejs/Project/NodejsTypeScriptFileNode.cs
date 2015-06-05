@@ -14,22 +14,25 @@
 //
 //*********************************************************//
 
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
-using Microsoft.NodejsTools.Intellisense;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
+#if DEV14_OR_LATER
+using Microsoft.VisualStudio.Imaging.Interop;
+using Microsoft.VisualStudio.Imaging;
+#endif
 
 namespace Microsoft.NodejsTools.Project {
-    class NodejsTypeScriptFileNode : CommonFileNode {
+    class NodejsTypeScriptFileNode : NodejsFileNode {
         public NodejsTypeScriptFileNode(NodejsProjectNode root, ProjectElement e)
             : base(root, e) {
         }
+
+#if DEV14_OR_LATER
+        protected override ImageMoniker CodeFileIconMoniker {
+            get {
+                return KnownMonikers.TSFileNode;
+            }
+        }
+#endif
 
         protected override NodeProperties CreatePropertiesObject() {
             if (IsLinkFile) {

@@ -7,6 +7,10 @@ using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Project;
+#if DEV14_OR_LATER
+using Microsoft.VisualStudio.Imaging.Interop;
+using Microsoft.VisualStudio.Imaging;
+#endif
 
 namespace Microsoft.NodejsTools.Project {
     internal abstract class AbstractNpmNode : HierarchyNode {
@@ -38,18 +42,29 @@ namespace Microsoft.NodejsTools.Project {
         public sealed override string GetEditLabel() {
             return null;
         }
+#if DEV14_OR_LATER
+        protected override bool SupportsIconMonikers {
+            get { return true; }
+        }
 
+        /// <summary>
+        /// Returns the icon to use.
+        /// </summary>
+        protected override ImageMoniker GetIconMoniker(bool open) {
+            return KnownMonikers.Reference;
+        }
+#else
         public sealed override object GetIconHandle(bool open) {
             //We don't want the icon to become an expanded folder 'OpenReferenceFolder'
             //  Thus we always return 'ReferenceFolder'
             return ProjectMgr.GetIconHandleByName(ProjectNode.ImageName.ReferenceFolder);
         }
+#endif
 
         protected override NodeProperties CreatePropertiesObject() {
             return new NpmNodeProperties(this);
         }
-
-        #endregion
+#endregion
 
         public abstract void ManageNpmModules();
 

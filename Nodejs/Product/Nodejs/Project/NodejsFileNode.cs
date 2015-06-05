@@ -17,13 +17,13 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
-using Microsoft.NodejsTools.Intellisense;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
+#if DEV14_OR_LATER
+using Microsoft.VisualStudio.Imaging.Interop;
+using Microsoft.VisualStudio.Imaging;
+#endif
 
 namespace Microsoft.NodejsTools.Project {
     class NodejsFileNode : CommonFileNode {
@@ -53,6 +53,14 @@ namespace Microsoft.NodejsTools.Project {
 
             }
         }
+
+#if DEV14_OR_LATER
+        protected override ImageMoniker CodeFileIconMoniker {
+            get {
+                return KnownMonikers.JSScript;
+            }
+        }
+#endif
 
         internal override int IncludeInProject(bool includeChildren) {
             // On an include, a file is marked as Compile.  There is no reason to check whether to Analyze.  We should.
