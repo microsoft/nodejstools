@@ -331,7 +331,7 @@ namespace Microsoft.NodejsTools.Classifier {
                 int currentLineTemp = _tokenCache.IndexOfPreviousTokenization(firstLine, 0, out lineTokenizationTemp) + 1;
                 object stateTemp = lineTokenizationTemp.State;
 
-                while (currentLineTemp <= snapshot.LineCount) {
+                while (currentLineTemp < snapshot.LineCount) {
                     if (!_tokenCache.TryGetTokenization(currentLineTemp, out lineTokenizationTemp)) {
                         lineTokenizationTemp = TokenizeLine(JSScanner, snapshot, stateTemp, currentLineTemp);
                         _tokenCache[currentLineTemp] = lineTokenizationTemp;
