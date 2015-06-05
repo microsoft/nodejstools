@@ -59,7 +59,7 @@
   -->
 
   <PropertyGroup>
-    <BuildTasksProjectDir>$(BuildRoot)\Tools\BuildTasks</BuildTasksProjectDir>
+    <BuildTasksProjectDir>$(BuildRoot)\Common\Tools\BuildTasks</BuildTasksProjectDir>
     <BuildTasksAssembly>$(BuildOutputRoot)\ToolBinaries\BuildTasks\Microsoft.VisualStudioTools.BuildTasks.dll</BuildTasksAssembly>
   </PropertyGroup>
   <ItemGroup>
