@@ -21,7 +21,7 @@ using Microsoft.VisualStudio.Debugger.Interop;
 
 namespace Microsoft.NodejsTools.Debugger.Remote {
     [ComVisible(true)]
-    [Guid("A241707C-7DB3-464F-8D3E-F3D33E86AE99")]
+    [Guid(Guids.RemoteDebugPortSupplier)]
     public class NodeRemoteDebugPortSupplier : IDebugPortSupplier2, IDebugPortSupplierDescription2 {
         public const string PortSupplierId = "{9E16F805-5EFC-4CE5-8B67-9AE9B643EF80}";
         public static readonly Guid PortSupplierGuid = new Guid(PortSupplierId);

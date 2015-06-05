@@ -46,7 +46,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // process only contains one program, it is implemented on the engine.
 
     [ComVisible(true)]
-    [Guid("135F3602-FE1D-4D8A-8D7C-C8CF803B1DFC")]
+    [Guid(Guids.DebugEngine)]
     public sealed class AD7Engine : IDebugEngine2, IDebugEngineLaunch2, IDebugProgram3, IDebugSymbolSettings100 {
         // used to send events to the debugger. Some examples of these events are thread create, exception thrown, module load.
         private IDebugEventCallback2 _events;

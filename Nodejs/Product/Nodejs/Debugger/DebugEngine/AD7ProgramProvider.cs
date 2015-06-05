@@ -24,7 +24,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // This registered interface allows the session debug manager (SDM) to obtain information about programs 
     // that have been "published" through the IDebugProgramPublisher2 interface.
     [ComVisible(true)]
-    [Guid("FF3E23A2-DA7E-4fa7-AF47-6EDEDE4E922E")]
+    [Guid(Guids.DebugProgramProvider)]
     public class AD7ProgramProvider : IDebugProgramProvider2 {
         public AD7ProgramProvider() {
         }
