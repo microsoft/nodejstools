@@ -517,14 +517,16 @@ namespace Microsoft.VisualStudioTools.Project {
         protected virtual bool SupportsIconMonikers {
             get { return false; }
         }
-        
+
         /// <summary>
         /// Returns the icon to use.
         /// </summary>
         protected virtual ImageMoniker GetIconMoniker(bool open) {
             return default(ImageMoniker);
         }
-#else
+
+        [Obsolete("Use GetIconMoniker() to specify the icon")]
+#endif
         /// <summary>
         /// Return an icon handle
         /// </summary>
@@ -534,7 +536,6 @@ namespace Microsoft.VisualStudioTools.Project {
             var index = ImageIndex;
             return index == NoImage ? null : (object)ProjectMgr.ImageHandler.GetIconHandle(index);
         }
-#endif
 
         /// <summary>
         /// Removes a node from the hierarchy.
@@ -596,11 +597,13 @@ namespace Microsoft.VisualStudioTools.Project {
                     result = false;
                     break;
 
-#if !DEV14_OR_LATER
+#pragma warning disable 0618, 0612
+                // Project subclasses decide whether or not to support using image
+                // monikers, and so we need to keep the ImageIndex overrides in case
+                // they choose not to.
                 case __VSHPROPID.VSHPROPID_IconImgList:
                     result = this.ProjectMgr.ImageHandler.ImageList.Handle;
                     break;
-
                 case __VSHPROPID.VSHPROPID_OpenFolderIconIndex:
                 case __VSHPROPID.VSHPROPID_IconIndex:
                     int index = ImageIndex;
@@ -608,16 +611,13 @@ namespace Microsoft.VisualStudioTools.Project {
                         result = index;
                     }
                     break;
-
                 case __VSHPROPID.VSHPROPID_IconHandle:
                     result = GetIconHandle(false);
                     break;
-
                 case __VSHPROPID.VSHPROPID_OpenFolderIconHandle:
                     result = GetIconHandle(true);
                     break;
-#endif
-
+#pragma warning restore 0618, 0612
                 case __VSHPROPID.VSHPROPID_StateIconIndex:
                     result = (int)this.StateIconIndex;
                     break;

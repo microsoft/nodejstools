@@ -32,6 +32,10 @@ using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudioTools.Project.Automation;
 using MSBuild = Microsoft.Build.Evaluation;
 using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
+#if DEV14_OR_LATER
+using Microsoft.VisualStudio.Imaging.Interop;
+using Microsoft.VisualStudio.Imaging;
+#endif
 
 namespace Microsoft.NodejsTools.Project {
     class NodejsProjectNode : CommonProjectNode, VsWebSite.VSWebSite, INodePackageModulesCommands {
@@ -46,11 +50,21 @@ namespace Microsoft.NodejsTools.Project {
 
 
         public NodejsProjectNode(NodejsProjectPackage package)
-            : base(package, Utilities.GetImageList(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.Icons.NodejsImageList.bmp"))) {
-
+            : base(
+                  package,
+#if DEV14_OR_LATER
+                  null
+#else
+                  Utilities.GetImageList(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.Icons.NodejsImageList.bmp"))
+#endif
+        )
+        {
             Type projectNodePropsType = typeof(NodejsProjectNodeProperties);
             AddCATIDMapping(projectNodePropsType, projectNodePropsType.GUID);
+#pragma warning disable 0612
             InitNodejsProjectImages();
+#pragma warning restore 0612
+
         }
 
         public VsProjectAnalyzer Analyzer {
@@ -81,6 +95,9 @@ namespace Microsoft.NodejsTools.Project {
             get { return _imageIndexFromNameDictionary; }
         }
 
+#if DEV14_OR_LATER
+        [Obsolete]
+#endif
         private void InitNodejsProjectImages() {
             // HACK: https://nodejstools.codeplex.com/workitem/1268
 
@@ -93,6 +110,20 @@ namespace Microsoft.NodejsTools.Project {
             AddProjectImage(NodejsProjectImageName.DependencyMissing, "Microsoft.VisualStudioTools.Resources.Icons.PackageWarning_16x.png");
         }
 
+#if DEV14_OR_LATER
+        protected override bool SupportsIconMonikers {
+            get { return true; }
+        }
+
+        protected override ImageMoniker GetIconMoniker(bool open) {
+            if (string.Equals(GetProjectProperty(NodejsConstants.EnableTypeScript), "true", StringComparison.OrdinalIgnoreCase)) {
+                return KnownMonikers.TSProjectNode;
+            }
+            return KnownMonikers.JSProjectNode;
+        }
+
+        [Obsolete]
+#endif
         private void AddProjectImage(NodejsProjectImageName name, string resourceId) {
             var images = ImageHandler.ImageList.Images;
             ImageIndexFromNameDictionary.Add(name, images.Count);
@@ -105,6 +136,7 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
+#if !DEV14_OR_LATER  
         public override int ImageIndex {
             get {
                 if (string.Equals(GetProjectProperty(NodejsConstants.EnableTypeScript), "true", StringComparison.OrdinalIgnoreCase)) {
@@ -113,7 +145,7 @@ namespace Microsoft.NodejsTools.Project {
                 return base.ImageIndex;
             }
         }
-
+#endif
         internal override string IssueTrackerUrl {
             get { return NodejsConstants.IssueTrackerUrl; }
         }
@@ -223,16 +255,17 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override CommonFileNode CreateCodeFileNode(ProjectElement item) {
+            string fileName = item.Url;
+            if (!String.IsNullOrWhiteSpace(fileName)
+                && Path.GetExtension(fileName).Equals(NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
+                return new NodejsTypeScriptFileNode(this, item);
+            }
             var res = new NodejsFileNode(this, item);
             return res;
         }
 
         public override CommonFileNode CreateNonCodeFileNode(ProjectElement item) {
             string fileName = item.Url;
-            if (!String.IsNullOrWhiteSpace(fileName)
-                && Path.GetExtension(fileName).Equals(NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
-                return new NodejsTypeScriptFileNode(this, item);
-            }
             if (Path.GetFileName(fileName).Equals(NodejsConstants.PackageJsonFile, StringComparison.OrdinalIgnoreCase)) {
                 return new PackageJsonFileNode(this, item);
             }
@@ -530,7 +563,7 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        #region VSWebSite Members
+#region VSWebSite Members
 
         // This interface is just implemented so we don't get normal profiling which
         // doesn't work with our projects anyway.
@@ -597,7 +630,7 @@ namespace Microsoft.NodejsTools.Project {
             get { throw new NotImplementedException(); }
         }
 
-        #endregion
+#endregion
 
         Task INodePackageModulesCommands.InstallMissingModulesAsync() {
             //Fire off the command to update the missing modules

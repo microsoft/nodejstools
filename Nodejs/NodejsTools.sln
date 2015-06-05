@@ -1,12 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.22823.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nodejs", "Product\Nodejs\Nodejs.csproj", "{32EC5259-98DA-40CA-9E2D-1B1B2E966F88}"
 	ProjectSection(ProjectDependencies) = postProject
 		{5085DF35-3A32-4894-835E-E5A3956D4F57} = {5085DF35-3A32-4894-835E-E5A3956D4F57}
-		{E5F7D6B9-8D5A-416D-8F16-2BDC3576A5A3} = {E5F7D6B9-8D5A-416D-8F16-2BDC3576A5A3}
 		{CB61D8BD-48DC-40F4-A4BA-5B68A10A7481} = {CB61D8BD-48DC-40F4-A4BA-5B68A10A7481}
 	EndProjectSection
 EndProject
@@ -71,8 +70,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnalysisDriver", "Tests\AnalysisDriver\AnalysisDriver.csproj", "{F83AC573-0546-4BC5-A3F3-BA0261636778}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MockVsTests", "..\Common\Tests\MockVsTests\MockVsTests.csproj", "{A390E1C0-0D90-4A9E-8413-3E959BB07292}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildTasks", "..\Common\Tools\BuildTasks\BuildTasks.csproj", "{E5F7D6B9-8D5A-416D-8F16-2BDC3576A5A3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -188,10 +185,6 @@ Global
 		{A390E1C0-0D90-4A9E-8413-3E959BB07292}.Debug|x86.Build.0 = Debug|x86
 		{A390E1C0-0D90-4A9E-8413-3E959BB07292}.Release|x86.ActiveCfg = Release|x86
 		{A390E1C0-0D90-4A9E-8413-3E959BB07292}.Release|x86.Build.0 = Release|x86
-		{E5F7D6B9-8D5A-416D-8F16-2BDC3576A5A3}.Debug|x86.ActiveCfg = Debug|x86
-		{E5F7D6B9-8D5A-416D-8F16-2BDC3576A5A3}.Debug|x86.Build.0 = Debug|x86
-		{E5F7D6B9-8D5A-416D-8F16-2BDC3576A5A3}.Release|x86.ActiveCfg = Release|x86
-		{E5F7D6B9-8D5A-416D-8F16-2BDC3576A5A3}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -224,6 +217,5 @@ Global
 		{C2FA3ADC-95A6-47ED-9010-A86EDE081A73} = {850AC94A-310F-4F88-A553-2806D7732BD1}
 		{F83AC573-0546-4BC5-A3F3-BA0261636778} = {850AC94A-310F-4F88-A553-2806D7732BD1}
 		{A390E1C0-0D90-4A9E-8413-3E959BB07292} = {850AC94A-310F-4F88-A553-2806D7732BD1}
-		{E5F7D6B9-8D5A-416D-8F16-2BDC3576A5A3} = {F9719B35-F359-47A7-A2F8-34F42E53C809}
 	EndGlobalSection
 EndGlobal

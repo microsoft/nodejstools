@@ -42,7 +42,7 @@ namespace TestUtilities.Mocks {
         private readonly MockTextView _view;
         private readonly string _contentType;
 
-#if DEV14_OR_LATER
+#if DEV14_OR_LATER && !NTVS_FEATURE_INTERACTIVEWINDOW
         public event EventHandler<SubmissionBufferAddedEventArgs> SubmissionBufferAdded {
             add {
             }
@@ -97,7 +97,7 @@ namespace TestUtilities.Mocks {
             get { return "Mock Repl Window"; }
         }
 
-#if DEV14_OR_LATER
+#if DEV14_OR_LATER && !NTVS_FEATURE_INTERACTIVEWINDOW
         public ITextBuffer OutputBuffer {
             get {
                 throw new NotImplementedException();
@@ -168,7 +168,7 @@ namespace TestUtilities.Mocks {
             throw new NotImplementedException();
         }
 
-#if !DEV14_OR_LATER
+#if !DEV14_OR_LATER || NTVS_FEATURE_INTERACTIVEWINDOW
         public void Submit(IEnumerable<string> inputs) {
             throw new NotImplementedException();
         }
@@ -178,7 +178,7 @@ namespace TestUtilities.Mocks {
             return _eval.Reset();
         }
 
-#if !DEV14_OR_LATER
+#if !DEV14_OR_LATER || NTVS_FEATURE_INTERACTIVEWINDOW
         public void AbortCommand() {
             _eval.AbortCommand();
         }
@@ -255,7 +255,7 @@ namespace TestUtilities.Mocks {
             _error.Append(value);
         }
 
-#if DEV14_OR_LATER
+#if DEV14_OR_LATER && !NTVS_FEATURE_INTERACTIVEWINDOW
         public TextReader ReadStandardInput() {
             throw new NotImplementedException();
         }
@@ -274,7 +274,7 @@ namespace TestUtilities.Mocks {
         }
 #endif
 
-#if DEV14_OR_LATER
+#if DEV14_OR_LATER && !NTVS_FEATURE_INTERACTIVEWINDOW
         public Task<ExecutionResult> InitializeAsync() {
             throw new NotImplementedException();
         }
@@ -320,7 +320,7 @@ namespace TestUtilities.Mocks {
         #endregion
     }
 
-#if DEV14_OR_LATER
+#if DEV14_OR_LATER && !NTVS_FEATURE_INTERACTIVEWINDOW
     public static class ReplEvalExtensions {
         public static Task<ExecutionResult> Initialize(this IReplEvaluator self, IReplWindow window) {
             self.CurrentWindow = window;
