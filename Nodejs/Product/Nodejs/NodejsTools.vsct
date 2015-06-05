@@ -39,12 +39,16 @@
       <Group guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJWIN_SCOPE" priority="0x0500">
         <Parent guid="guidNodeToolsNpmCmdSet" id="NpmMenu"/>
       </Group>
-
+      
       <Group guid="guidNodeToolsNpmCmdSet" id="NpmGroup" priority="0x0600">
         <Parent guid="guidNodeToolsNpmCmdSet" id="NpmMenu"/>
       </Group>
-
-      <Group guid="guidSHLMainMenu" id="IDG_VS_MNUDES_PROPERTIES" priority="0x0700">
+      
+      <Group guid="guidNodeToolsNpmCmdSet" id="NpmExploreGroup" priority="0x0700">
+        <Parent guid="guidNodeToolsNpmCmdSet" id="NpmMenu"/>
+      </Group>
+      
+      <Group guid="guidSHLMainMenu" id="IDG_VS_MNUDES_PROPERTIES" priority="0x0800">
         <Parent guid="guidNodeToolsNpmCmdSet" id="NpmMenu"/>
       </Group>
     </Groups>
@@ -230,6 +234,16 @@
         </Strings>
       </Button>
 
+      <Button guid="guidNodeToolsNpmCmdSet" id="cmdidNpmOpenModuleHomepage" priority="0x8370" type="Button">
+        <Parent guid="guidNodeToolsNpmCmdSet" id="NpmExploreGroup" />
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <CommandName>cmdidNpmOpenModuleHomepage</CommandName>
+          <ButtonText>Open &amp;Documentation</ButtonText>
+        </Strings>
+      </Button>
+
       <Button guid="guidNodeToolsCmdSet" id="cmdidImportWizard" priority="0x010" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup"/>
         <CommandFlag>DefaultInvisible</CommandFlag>
@@ -289,7 +303,7 @@
       <Parent guid="guidNodeToolsCmdSet" id="CodeFileGroup"/>
     </CommandPlacement>
     <CommandPlacement guid="guidVSStd2K" id="cmdidExploreFolderInWindows" priority="0x0700">
-      <Parent guid="guidNodeToolsNpmCmdSet" id="NpmGroup"/>
+      <Parent guid="guidNodeToolsNpmCmdSet" id="NpmExploreGroup"/>
     </CommandPlacement>
     <CommandPlacement guid="guidNodeToolsCmdSet" id="cmdidOpenCommandPromptHere" priority="0x600">
       <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJECT_EXPLORE"/>
@@ -346,8 +360,11 @@
       <IDSymbol name="cmdidNpmUninstallModule" value="0x0303" />
       <IDSymbol name="cmdidNpmInstallSingleMissingModule" value="0x0304" />
       <IDSymbol name="cmdidNpmUpdateSingleModule" value="0x0305" />
-      
+      <IDSymbol name="cmdidNpmOpenModuleHomepage" value="0x0306" />
+
       <IDSymbol name="NpmGroup" value="0x2010"/>
+      <IDSymbol name="NpmExploreGroup" value="0x2011"/>
+
 
       <IDSymbol name="NpmMenu" value="0x3000"/>
     </GuidSymbol>
