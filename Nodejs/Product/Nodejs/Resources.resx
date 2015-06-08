@@ -577,7 +577,7 @@ You will need to restart Visual Studio after installation.</value>
     <value>seconds</value>
   </data>
   <data name="StatusAnalysisUpToDate" xml:space="preserve">
-    <value>Node.js code analysis is up to date, analyzed {0:N0} functions in {1}</value>
+    <value>Node.js code analysis is up to date, analyzed {0:N0} function(s) in {1}</value>
   </data>
   <data name="IncludeNodeModulesCancelTitle" xml:space="preserve">
     <value>Do nothing (recommended)</value>
