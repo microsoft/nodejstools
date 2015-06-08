@@ -3,7 +3,7 @@
   <Identifier Id="B515653F-FB69-4B64-9D3F-F1FCF8421DD0">
     <Name>Node.js Tools - Profiling</Name>
     <Author>Microsoft</Author>
-    <Version>1.0</Version>
+    <Version>1.1</Version>
     <Description xml:space="preserve">Provides support for profiling Node.js projects</Description>
     <MoreInfoUrl>http://nodejstools.codeplex.com</MoreInfoUrl>
     <GettingStartedGuide>http://nodejstools.codeplex.com</GettingStartedGuide>
@@ -24,7 +24,7 @@
     <Reference Id="Microsoft.VisualStudio.MPF" MinVersion="10.0">
       <Name>Visual Studio MPF</Name>
     </Reference>
-    <Reference Id="FE8A8C3D-328A-476D-99F9-2A24B75F8C7F" MinVersion="1.0" MaxVersion="1.0">
+    <Reference Id="FE8A8C3D-328A-476D-99F9-2A24B75F8C7F" MinVersion="1.1" MaxVersion="1.1">
       <Name>Node.js Tools for Visual Studio</Name>
     </Reference>
   </References>
