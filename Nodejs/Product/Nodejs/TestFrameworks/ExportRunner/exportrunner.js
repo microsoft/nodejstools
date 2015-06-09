@@ -7,7 +7,7 @@ var find_tests = function (testFileList, discoverResultFile) {
         try {
             testCases = require(testFile);
         } catch (ex) {
-            console.error("NTVS_ERROR:" + ex);
+            console.error("NTVS_ERROR:" + ex.stack);
             return;
         }
         for (var test in testCases) {
