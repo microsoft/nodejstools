@@ -37,7 +37,7 @@ var find_tests = function (testFileList, discoverResultFile, projectFolder) {
             getTestList(mocha.suite, testFile);
         } catch (e) {
             //we would like continue discover other files, so swallow, log and continue;
-            console.error('catch discover error:' + e.stack);
+            console.error('NTVS_ERROR:', e, "in", testFile);
         }
     });
 
