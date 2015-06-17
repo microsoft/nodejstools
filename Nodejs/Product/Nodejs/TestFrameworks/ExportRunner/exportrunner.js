@@ -1,9 +1,11 @@
 var fs = require('fs');
+var path = require('path');
 
 var find_tests = function (testFileList, discoverResultFile) {
     var testList = [];
     testFileList.split(';').forEach(function (testFile) {
         var testCases;
+        process.chdir(path.dirname(testFile));
         try {
             testCases = require(testFile);
         } catch (ex) {
