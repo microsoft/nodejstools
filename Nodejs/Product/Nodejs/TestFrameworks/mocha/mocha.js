@@ -1,4 +1,5 @@
 ﻿var fs = require('fs');
+var path = require('path');
 
 var find_tests = function (testFileList, discoverResultFile, projectFolder) {
     var Mocha = detectMocha(projectFolder);
@@ -30,6 +31,7 @@ var find_tests = function (testFileList, discoverResultFile, projectFolder) {
     var testList = [];
     testFileList.split(';').forEach(function (testFile) {
         var mocha = new Mocha();
+        process.chdir(path.dirname(testFile));
         try {
             mocha.ui('tdd');
             mocha.addFile(testFile);
