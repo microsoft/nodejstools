@@ -34,7 +34,7 @@ namespace Microsoft.NodejsTools.Analysis {
             MaxObjectLiteralProperties = 50;
             MaxObjectKeysTypes = 5;
             MaxMergeTypes = 5;
-            NestedModulesLimit = 4;
+            NestedModulesLimit = AnalysisConstants.MaxAnalysisDepthQualty;
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace Microsoft.NodejsTools.Analysis {
         /// <returns>An <see cref="AnalysisLimits"/> object representing medium level Initellisense settings.</returns>
         public static AnalysisLimits MakeMediumAnalysisLimits() {
             return new AnalysisLimits() {
-                NestedModulesLimit = 2
+                NestedModulesLimit = AnalysisConstants.MaxAnalysisDepthFast
             };
         }
 

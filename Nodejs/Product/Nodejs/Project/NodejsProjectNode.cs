@@ -490,6 +490,26 @@ namespace Microsoft.NodejsTools.Project {
             if (CommonUtils.IsSubpathOf(_intermediateOutputPath, fileNode.Url)) {
                 return false;
             }
+
+            int maxModulesDepth = AnalysisConstants.MaxAnalysisDepthQualty;
+            if (this._analyzer.AnalysisLevel == Options.AnalysisLevel.Medium) {
+                maxModulesDepth = AnalysisConstants.MaxAnalysisDepthFast;
+            }
+
+            var relativeFile = CommonUtils.GetRelativeFilePath(this.FullPathToChildren, fileNode.Url);
+            int nestedModulesCount = 0;
+            int startIndex = 0;
+            int index = relativeFile.IndexOf(AnalysisConstants.NodeModulesFolder, startIndex, StringComparison.OrdinalIgnoreCase);
+            while (index != -1) {
+                nestedModulesCount++;
+                if (nestedModulesCount > maxModulesDepth){
+                    return false;
+                }
+
+                startIndex = index + 1;
+                index = relativeFile.IndexOf(AnalysisConstants.NodeModulesFolder, startIndex, StringComparison.OrdinalIgnoreCase);
+            }
+
             foreach (var path in _analysisIgnoredDirs) {
                 if (url.IndexOf(path, 0, StringComparison.OrdinalIgnoreCase) != -1) {
                     return false;
