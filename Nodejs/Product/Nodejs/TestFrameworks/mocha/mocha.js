@@ -1,4 +1,5 @@
 ﻿var fs = require('fs');
+var path = require('path');
 
 // Choose 'tap' rather than 'min' or 'xunit'. The reason is that
 // 'min' produces undisplayable text to stdout and stderr under piped/redirect, 
@@ -41,7 +42,7 @@ var find_tests = function (testFileList, discoverResultFile, projectFolder) {
             getTestList(mocha.suite, testFile);
         } catch (e) {
             //we would like continue discover other files, so swallow, log and continue;
-            logError('An error occurred during mocha discovery:' + e);
+            logError('NTVS_ERROR: An error occurred during mocha test discovery in file: ' + testFile, e);
         }
     });
 
@@ -69,13 +70,18 @@ var run_tests = function (testName, testFile, workingFolder, projectFolder) {
     });
 };
 
-function logError(errorMessage) {
-    console.log("NTVS_ERROR: " + errorMessage);
+function logError(errorMessage, error) {
+    if (typeof error === 'undefined') {
+        console.error("NTVS_ERROR: " + errorMessage);
+    } else {
+        console.error("NTVS_ERROR: " + errorMessage, error);
+    }
 }
 
 function detectMocha(projectFolder) {
     try {
-        var Mocha = new require(projectFolder + '\\node_modules\\mocha');
+        var mochaPath = path.join(projectFolder, 'node_modules', 'mocha');
+        var Mocha = new require(mochaPath);
         return Mocha;
     } catch (ex) {
         logError("Failed to find Mocha package.  Mocha must be installed in the project locally.  Mocha can be installed locally with the npm manager via solution explorer or with \".npm install mocha\" via the Node.js interactive window.");
@@ -95,11 +101,11 @@ function applyMochaOptions(mocha, options) {
             var mochaOpt = mocha[opt];
             var optValue = options[opt];
 
-            if (typeof mochaOpt == 'function') {
+            if (typeof mochaOpt === 'function') {
                 try {
                     mochaOpt.call(mocha, optValue);
                 } catch (e) {
-                    logError("Could not set mocha option '" + opt + "' with value '" + optValue + "' due to error: " + e);
+                    logError("Could not set mocha option '" + opt + "' with value '" + optValue + "' due to error: ", e);
                 }
             }
         }
@@ -109,7 +115,8 @@ function applyMochaOptions(mocha, options) {
 function getMochaOptions(projectFolder) {
     var mochaOptions = defaultMochaOptions;
     try {
-        var options = require(projectFolder + '\\test\\mocha.json');
+        var optionsPath = path.join(projectFolder, 'test', 'mocha.json');
+        var options = require(optionsPath);
         options = options || {};
         for (var opt in options) {
             mochaOptions[opt] = options[opt];
