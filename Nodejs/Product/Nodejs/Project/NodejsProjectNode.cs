@@ -491,11 +491,17 @@ namespace Microsoft.NodejsTools.Project {
                 return false;
             }
 
-            int maxModulesDepth = AnalysisConstants.MaxAnalysisDepthQualty;
-            if (this._analyzer.AnalysisLevel == Options.AnalysisLevel.Medium) {
-                maxModulesDepth = AnalysisConstants.MaxAnalysisDepthFast;
+            foreach (var path in _analysisIgnoredDirs) {
+                if (url.IndexOf(path, 0, StringComparison.OrdinalIgnoreCase) != -1) {
+                    return false;
+                }
+            }
+            if (new FileInfo(fileNode.Url).Length > _maxFileSize) {
+                // skip obviously generated files...
+                return false;
             }
 
+            int maxModulesDepth = this._analyzer.Project.Limits.NestedModulesLimit;
             var relativeFile = CommonUtils.GetRelativeFilePath(this.FullPathToChildren, fileNode.Url);
             int nestedModulesCount = 0;
             int startIndex = 0;
@@ -506,19 +512,10 @@ namespace Microsoft.NodejsTools.Project {
                     return false;
                 }
 
-                startIndex = index + 1;
+                startIndex = index + AnalysisConstants.NodeModulesFolder.Length;
                 index = relativeFile.IndexOf(AnalysisConstants.NodeModulesFolder, startIndex, StringComparison.OrdinalIgnoreCase);
             }
 
-            foreach (var path in _analysisIgnoredDirs) {
-                if (url.IndexOf(path, 0, StringComparison.OrdinalIgnoreCase) != -1) {
-                    return false;
-                }
-            }
-            if (new FileInfo(fileNode.Url).Length > _maxFileSize) {
-                // skip obviously generated files...
-                return false;
-            }
             return true;
         }
 

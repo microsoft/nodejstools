@@ -34,7 +34,32 @@ namespace Microsoft.NodejsTools.Analysis {
             MaxObjectLiteralProperties = 50;
             MaxObjectKeysTypes = 5;
             MaxMergeTypes = 5;
-            NestedModulesLimit = AnalysisConstants.MaxAnalysisDepthQualty;
+
+            // There no practical reasons to go deeper in dependencies analysis.
+            // Number 4 is very practical. Here the examples which hightlight idea.
+            // 
+            // Example 1
+            // 
+            // Level 0 - Large system. Some code should use properties of the object on level 4 here. 
+            // Level 1 - Subsystem - pass data from level 4
+            // Level 2 - Internal dependency for company - Do some work and pass data to level 1
+            // Level 3 - Framework on top of which created Internal dependency.
+            // Level 4 - Dependency of the framework. Objects from here still should be available.
+            // Level 5 - Dependency of the framework provide some usefull primitive which would be used very often on the level of whole system. Hmmm.
+            // 
+            // Example 2 (reason why I could increase to 5)
+            // 
+            // Level 0 - Large system. Some code should use properties of the object on level 4 here. 
+            // Level 1 - Subsystem - pass data from level 4
+            // Level 2 - Internal dependency for company - Wrap access to internal library and perform business logic. Do some work and pass data to level 1
+            // Level 3 - Internal library which wrap access to API.
+            // Level 4 - Http library.
+            // Level 5 - Promise Polyfill.
+            //
+            // All these examples are highly speculative and I specifically try to create such deep level. 
+            // If you develop on windows with such deep level you already close to your limit, your maximum is probably 10. 
+            // </remarks>
+            NestedModulesLimit = 4;
         }
 
         /// <summary>
@@ -43,7 +68,9 @@ namespace Microsoft.NodejsTools.Analysis {
         /// <returns>An <see cref="AnalysisLimits"/> object representing medium level Initellisense settings.</returns>
         public static AnalysisLimits MakeMediumAnalysisLimits() {
             return new AnalysisLimits() {
-                NestedModulesLimit = AnalysisConstants.MaxAnalysisDepthFast
+
+                // Maximum practical limit for the dependencies analysis oriented on producing faster results.
+                NestedModulesLimit = 2
             };
         }
 
