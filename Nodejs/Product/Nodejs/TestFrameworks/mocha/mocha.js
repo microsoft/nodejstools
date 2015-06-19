@@ -42,7 +42,7 @@ var find_tests = function (testFileList, discoverResultFile, projectFolder) {
             getTestList(mocha.suite, testFile);
         } catch (e) {
             //we would like continue discover other files, so swallow, log and continue;
-            logError('NTVS_ERROR: An error occurred during mocha test discovery in file: ' + testFile, e);
+            logError('An error occurred during mocha test discovery in file: ' + testFile, e);
         }
     });
 
@@ -70,12 +70,10 @@ var run_tests = function (testName, testFile, workingFolder, projectFolder) {
     });
 };
 
-function logError(errorMessage, error) {
-    if (typeof error === 'undefined') {
-        console.error("NTVS_ERROR: " + errorMessage);
-    } else {
-        console.error("NTVS_ERROR: " + errorMessage, error);
-    }
+function logError() {
+    var errorArgs = Array.prototype.slice.call(arguments);
+    errorArgs.unshift("NTVS_ERROR:");
+    console.error.apply(console, errorArgs);
 }
 
 function detectMocha(projectFolder) {
@@ -105,7 +103,7 @@ function applyMochaOptions(mocha, options) {
                 try {
                     mochaOpt.call(mocha, optValue);
                 } catch (e) {
-                    logError("Could not set mocha option '" + opt + "' with value '" + optValue + "' due to error: ", e);
+                    logError("Could not set mocha option '" + opt + "' with value '" + optValue + "' due to error:", e);
                 }
             }
         }
