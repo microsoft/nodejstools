@@ -120,7 +120,7 @@ function getMochaOptions(projectFolder) {
             mochaOptions[opt] = options[opt];
         }
     } catch (ex) {
-        console.log("NTVS: mocha.json options file not found. Using default values.");
+        logError("mocha.json options file not found. Using default values.");
     }
 
     return mochaOptions;
