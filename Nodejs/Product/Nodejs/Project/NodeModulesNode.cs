@@ -188,11 +188,11 @@ namespace Microsoft.NodejsTools.Project {
 
         #region Logging and status bar updates
 
-        private static readonly Guid NpmOutputPaneGuid = new Guid("25764421-33B8-4163-BD02-A94E299D52D8");
-
 #if DEV14_OR_LATER
         // This is the package manager pane that ships with VS2015, and we should print there if available.
         private static readonly Guid VSPackageManagerPaneGuid = new Guid("C7E31C31-1451-4E05-B6BE-D11B6829E8BB");
+#else
+        private static readonly Guid NpmOutputPaneGuid = new Guid("25764421-33B8-4163-BD02-A94E299D52D8");
 #endif
 
         private OutputWindowRedirector GetNpmOutputPane() {
