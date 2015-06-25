@@ -132,7 +132,7 @@ namespace AnalysisTests {
             foreach (var file in Directory.GetFiles(directory, "*", SearchOption.AllDirectories)) {
                 if (String.Equals(Path.GetExtension(file), ".js", StringComparison.OrdinalIgnoreCase)) {
                     var relativeFile = file.Substring(directory.Length);
-                    if (!CheckExceedsNestedModulesLimit(relativeFile, limits.NestedModulesLimit)) {
+                    if (!limits.IsPathExceedNestingLimit(relativeFile)) {
                         files.Add(new AnalysisFile(file, File.ReadAllText(file)));
                     }
                 } else if (String.Equals(Path.GetFileName(file), "package.json", StringComparison.OrdinalIgnoreCase)) {
@@ -152,30 +152,6 @@ namespace AnalysisTests {
             }
 
             return Analyze(limits, parseCallback, files.ToArray());
-        }
-
-        /// <summary>
-        /// Check that relative file path does not exceed required 
-        /// </summary>
-        /// <param name="relativeFile">Relative file path to check.</param>
-        /// <param name="maxDepth">Max depth of node dependencies.</param>
-        /// <returns>True if file contains in the dependency which is too deep down dependency tree; false otherwise.</returns>
-        private static bool CheckExceedsNestedModulesLimit(string relativeFile, int maxDepth)
-        {
-            int nestedModulesCount = 0;
-            int startIndex = 0;
-            int index = relativeFile.IndexOf("node_modules", startIndex, StringComparison.OrdinalIgnoreCase);
-            while (index != -1) {
-                nestedModulesCount++;
-                if (nestedModulesCount > maxDepth) {
-                    return true;
-                }
-
-                startIndex = index + "node_modules".Length;
-                index = relativeFile.IndexOf("node_modules", startIndex, StringComparison.OrdinalIgnoreCase);
-            }
-
-            return false;
         }
     }
 }

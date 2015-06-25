@@ -501,19 +501,9 @@ namespace Microsoft.NodejsTools.Project {
                 return false;
             }
 
-            int maxModulesDepth = this._analyzer.Project.Limits.NestedModulesLimit;
             var relativeFile = CommonUtils.GetRelativeFilePath(this.FullPathToChildren, fileNode.Url);
-            int nestedModulesCount = 0;
-            int startIndex = 0;
-            int index = relativeFile.IndexOf(AnalysisConstants.NodeModulesFolder, startIndex, StringComparison.OrdinalIgnoreCase);
-            while (index != -1) {
-                nestedModulesCount++;
-                if (nestedModulesCount > maxModulesDepth){
-                    return false;
-                }
-
-                startIndex = index + AnalysisConstants.NodeModulesFolder.Length;
-                index = relativeFile.IndexOf(AnalysisConstants.NodeModulesFolder, startIndex, StringComparison.OrdinalIgnoreCase);
+            if (this._analyzer.Project.Limits.IsPathExceedNestingLimit(relativeFile)) {
+                return false;
             }
 
             return true;
