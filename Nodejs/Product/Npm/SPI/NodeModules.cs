@@ -20,7 +20,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
     internal class NodeModules : AbstractNodeModules {
         public NodeModules(IRootPackage parent, bool showMissingDevOptionalSubPackages) {
             var modulesBase = Path.Combine(parent.Path, "node_modules");
-            if (Directory.Exists(modulesBase)) {
+            if (modulesBase.Length <= 224 && Directory.Exists(modulesBase)) {
                 var bin = string.Format("{0}.bin", Path.DirectorySeparatorChar);
                 foreach (var moduleDir in Directory.EnumerateDirectories(modulesBase)) {
                     if (!moduleDir.EndsWith(bin)) {
@@ -34,12 +34,15 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 foreach (var dependency in parentPackageJson.AllDependencies) {
                     Package module = null;
                     if (!Contains(dependency.Name)) {
-                        module = new Package(
-                            parent,
-                            Path.Combine(modulesBase, dependency.Name),
-                            showMissingDevOptionalSubPackages);
-                        if (parent as IPackage == null || !module.IsMissing || showMissingDevOptionalSubPackages) {
-                            AddModule(module);
+                        var dependencyPath = Path.Combine(modulesBase, dependency.Name);
+                        if (dependencyPath.Length <= 224) {
+                            module = new Package(
+                                parent,
+                                dependencyPath,
+                                showMissingDevOptionalSubPackages);
+                            if (parent as IPackage == null || !module.IsMissing || showMissingDevOptionalSubPackages) {
+                                AddModule(module);
+                            }
                         }
                     } else {
                         module = this[dependency.Name] as Package;

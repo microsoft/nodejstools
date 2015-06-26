@@ -23,6 +23,16 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace TestUtilities {
     public static class FileUtils {
+        /// <summary>
+        /// Maximum directory length in Windows.
+        /// </summary>
+        internal const int MaxDirectoryLength = 248;
+
+        /// <summary>
+        /// Maximum file name length in Windows.
+        /// </summary>
+        internal const int MaxFileNameLength = 260;
+
         public static void CopyDirectory(string sourceDir, string destDir) {
             sourceDir = sourceDir.TrimEnd('\\');
             destDir = destDir.TrimEnd('\\');
@@ -40,7 +50,9 @@ namespace TestUtilities {
 
             foreach (var newDir in newDirectories.OrderBy(i => i.Length).Select(i => Path.Combine(destDir, i))) {
                 try {
-                    Directory.CreateDirectory(newDir);
+                    if (newDir.Length < MaxDirectoryLength) {
+                        Directory.CreateDirectory(newDir);
+                    }
                 } catch {
                     Debug.WriteLine("Failed to create directory " + newDir);
                 }
@@ -57,8 +69,13 @@ namespace TestUtilities {
                 var copyFrom = Path.Combine(sourceDir, newFile);
                 var copyTo = Path.Combine(destDir, newFile);
                 try {
-                    File.Copy(copyFrom, copyTo);
-                    File.SetAttributes(copyTo, FileAttributes.Normal);
+                    if (copyTo.Length < MaxFileNameLength && copyFrom.Length < MaxFileNameLength) {
+                        var copyToDir = Path.GetDirectoryName(copyTo);
+                        if (copyToDir.Length < MaxDirectoryLength) {
+                            File.Copy(copyFrom, copyTo);
+                            File.SetAttributes(copyTo, FileAttributes.Normal);
+                        }
+                    }
                 } catch {
                     Debug.WriteLine("Failed to copy " + copyFrom + " to " + copyTo);
                 }
