@@ -325,9 +325,12 @@ if ($name) {
 $version_file_backed_up = 0
 # Force use of a backup if there are pending changes to $version_file
 $version_file_force_backup = 0
-if (-not (tf status $version_file /format:detailed | Select-String "There are no pending changes.")) {
-    Write-Output "$version_file has pending changes. Using backup instead of tf undo."
-    $version_file_force_backup = 1
+$has_no_tf_workspace = (tf workspaces | Select-String -pattern "No workspace", "Unable to determine the workspace")
+if (-not $has_no_tf_workspace) {
+    if (-not (tf status $version_file /format:detailed | Select-String "There are no pending changes.")) {
+        Write-Output "$version_file has pending changes. Using backup instead of tf undo."
+        $version_file_force_backup = 1
+    }
 }
 $version_file_is_readonly = $version_file.Attributes -band [io.FileAttributes]::ReadOnly
 
@@ -433,7 +436,7 @@ if (-not $skipclean) {
 
 $logdir = mkdir "$outdir\Logs" -Force
 
-if ($scorch) {
+if ($scorch -and (-not $has_no_tf_workspace)) {
     tfpt scorch $buildroot /noprompt
 }
 
@@ -442,7 +445,7 @@ $failed_logs = @()
 Push-Location $buildroot
 try {
     $successful = $false
-    if (-not $version_file_force_backup) {
+    if ((-not $version_file_force_backup) -and (-not $has_no_tf_workspace)) {
         tf edit $version_file | Out-Null
     }
     if ($version_file_force_backup -or -not $?) {
@@ -636,7 +639,7 @@ try {
                 Set-ItemProperty $version_file -Name IsReadOnly -Value $true
             }
             Write-Output "Restored $version_file"
-        } elseif (-not $version_file_force_backup) {
+        } elseif ((-not $version_file_force_backup) -and (-not $has_no_tf_workspace)) {
             tf undo /noprompt $version_file | Out-Null
         }
         
