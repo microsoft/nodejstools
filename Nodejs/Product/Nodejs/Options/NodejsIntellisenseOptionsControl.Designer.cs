@@ -32,6 +32,7 @@
             this._noIntelliSenseRadioButton = new System.Windows.Forms.RadioButton();
             this._saveToDiskDisabledRadioButton = new System.Windows.Forms.RadioButton();
             this._saveToDiskEnabledRadioButton = new System.Windows.Forms.RadioButton();
+            this._mediumIntelliSenseRadioButton = new System.Windows.Forms.RadioButton();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this._analysisLogMax = new System.Windows.Forms.ComboBox();
             this._analysisLogMaxLabel = new System.Windows.Forms.Label();
@@ -85,6 +86,14 @@
             toolTip.SetToolTip(this._saveToDiskEnabledRadioButton, resources.GetString("_saveToDiskEnabledRadioButton.ToolTip"));
             this._saveToDiskEnabledRadioButton.UseVisualStyleBackColor = true;
             // 
+            // _mediumIntelliSenseRadioButton
+            // 
+            resources.ApplyResources(this._mediumIntelliSenseRadioButton, "_mediumIntelliSenseRadioButton");
+            this._mediumIntelliSenseRadioButton.Name = "_mediumIntelliSenseRadioButton";
+            this._mediumIntelliSenseRadioButton.TabStop = true;
+            toolTip.SetToolTip(this._mediumIntelliSenseRadioButton, resources.GetString("_mediumIntelliSenseRadioButton.ToolTip"));
+            this._mediumIntelliSenseRadioButton.UseVisualStyleBackColor = true;
+            // 
             // intellisenseLevelGroupBox
             // 
             resources.ApplyResources(intellisenseLevelGroupBox, "intellisenseLevelGroupBox");
@@ -95,10 +104,11 @@
             // tableLayoutPanel2
             // 
             resources.ApplyResources(this.tableLayoutPanel2, "tableLayoutPanel2");
-            this.tableLayoutPanel2.Controls.Add(this._analysisLogMax, 1, 3);
-            this.tableLayoutPanel2.Controls.Add(this._noIntelliSenseRadioButton, 0, 2);
+            this.tableLayoutPanel2.Controls.Add(this._mediumIntelliSenseRadioButton, 0, 2);
+            this.tableLayoutPanel2.Controls.Add(this._analysisLogMax, 1, 4);
+            this.tableLayoutPanel2.Controls.Add(this._noIntelliSenseRadioButton, 0, 3);
             this.tableLayoutPanel2.Controls.Add(this._fullIntelliSenseRadioButton, 0, 0);
-            this.tableLayoutPanel2.Controls.Add(this._analysisLogMaxLabel, 0, 3);
+            this.tableLayoutPanel2.Controls.Add(this._analysisLogMaxLabel, 0, 4);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             // 
             // _analysisLogMax
@@ -207,6 +217,6 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
         private System.Windows.Forms.RadioButton _saveToDiskDisabledRadioButton;
         private System.Windows.Forms.RadioButton _saveToDiskEnabledRadioButton;
-
+        private System.Windows.Forms.RadioButton _mediumIntelliSenseRadioButton;
     }
 }

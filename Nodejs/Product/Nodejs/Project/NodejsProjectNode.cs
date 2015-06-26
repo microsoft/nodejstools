@@ -528,6 +528,7 @@ namespace Microsoft.NodejsTools.Project {
             if (CommonUtils.IsSubpathOf(_intermediateOutputPath, fileNode.Url)) {
                 return false;
             }
+
             foreach (var path in _analysisIgnoredDirs) {
                 if (url.IndexOf(path, 0, StringComparison.OrdinalIgnoreCase) != -1) {
                     return false;
@@ -537,6 +538,12 @@ namespace Microsoft.NodejsTools.Project {
                 // skip obviously generated files...
                 return false;
             }
+
+            var relativeFile = CommonUtils.GetRelativeFilePath(this.FullPathToChildren, fileNode.Url);
+            if (this._analyzer.Project.Limits.IsPathExceedNestingLimit(relativeFile)) {
+                return false;
+            }
+
             return true;
         }
 

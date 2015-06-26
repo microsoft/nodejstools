@@ -34,6 +34,43 @@ namespace Microsoft.NodejsTools.Analysis {
             MaxObjectLiteralProperties = 50;
             MaxObjectKeysTypes = 5;
             MaxMergeTypes = 5;
+
+            // There no practical reasons to go deeper in dependencies analysis.
+            // Number 4 is very practical. Here the examples which hightlight idea.
+            // 
+            // Example 1
+            // 
+            // Level 0 - Large system. Some code should use properties of the object on level 4 here. 
+            // Level 1 - Subsystem - pass data from level 4
+            // Level 2 - Internal dependency for company - Do some work and pass data to level 1
+            // Level 3 - Framework on top of which created Internal dependency.
+            // Level 4 - Dependency of the framework. Objects from here still should be available.
+            // Level 5 - Dependency of the framework provide some usefull primitive which would be used very often on the level of whole system. Hmmm.
+            // 
+            // Example 2 (reason why I could increase to 5)
+            // 
+            // Level 0 - Large system. Some code should use properties of the object on level 4 here. 
+            // Level 1 - Subsystem - pass data from level 4
+            // Level 2 - Internal dependency for company - Wrap access to internal library and perform business logic. Do some work and pass data to level 1
+            // Level 3 - Internal library which wrap access to API.
+            // Level 4 - Http library.
+            // Level 5 - Promise Polyfill.
+            //
+            // All these examples are highly speculative and I specifically try to create such deep level. 
+            // If you develop on windows with such deep level you already close to your limit, your maximum is probably 10. 
+            NestedModulesLimit = 4;
+        }
+
+        /// <summary>
+        /// Creates instance of the <see cref="AnalysisLimits"/> for medium level of Intellisense support.
+        /// </summary>
+        /// <returns>An <see cref="AnalysisLimits"/> object representing medium level Initellisense settings.</returns>
+        public static AnalysisLimits MakeMediumAnalysisLimits() {
+            return new AnalysisLimits() {
+
+                // Maximum practical limit for the dependencies analysis oriented on producing faster results.
+                NestedModulesLimit = 2
+            };
         }
 
         public static AnalysisLimits MakeLowAnalysisLimits() {
@@ -43,7 +80,8 @@ namespace Microsoft.NodejsTools.Analysis {
                 DictKeyTypes = 1,
                 DictValueTypes = 1,
                 IndexTypes = 1,
-                InstanceMembers = 1
+                InstanceMembers = 1,
+                NestedModulesLimit = 1
             };
         }
 
@@ -111,6 +149,33 @@ namespace Microsoft.NodejsTools.Analysis {
         /// </summary>
         public int MaxMergeTypes { get; set; }
 
+        /// <summary>
+        /// Gets the maximum level of dependency modules which could be analyzed.
+        /// </summary>
+        public int NestedModulesLimit { get; set; }
+
+        /// <summary>
+        /// Checks whether relative path exceed the nested module limit.
+        /// </summary>
+        /// <param name="path">Path to module file which has to be checked for depth limit.</param>
+        /// <returns>True if path too deep in nesting tree; false overwise.</returns>
+        public bool IsPathExceedNestingLimit(string path) { 
+            int nestedModulesCount = 0;
+            int startIndex = 0;
+            int index = path.IndexOf(AnalysisConstants.NodeModulesFolder, startIndex, StringComparison.OrdinalIgnoreCase);
+            while (index != -1) {
+                nestedModulesCount++;
+                if (nestedModulesCount > this.NestedModulesLimit){
+                    return true;
+                }
+
+                startIndex = index + AnalysisConstants.NodeModulesFolder.Length;
+                index = path.IndexOf(AnalysisConstants.NodeModulesFolder, startIndex, StringComparison.OrdinalIgnoreCase);
+            }
+
+            return false;
+        }
+
         public override bool Equals(object obj) {
             AnalysisLimits other = obj as AnalysisLimits;
             if (other != null) {
@@ -125,7 +190,8 @@ namespace Microsoft.NodejsTools.Analysis {
                     other.MaxArrayLiterals == MaxArrayLiterals &&
                     other.MaxObjectLiteralProperties == MaxObjectLiteralProperties &&
                     other.MaxObjectKeysTypes == MaxObjectKeysTypes &&
-                    other.MaxMergeTypes == MaxMergeTypes;
+                    other.MaxMergeTypes == MaxMergeTypes &&
+                    other.NestedModulesLimit == NestedModulesLimit;
             }
             return false;
         }
@@ -142,7 +208,8 @@ namespace Microsoft.NodejsTools.Analysis {
                 MaxArrayLiterals +
                 MaxObjectLiteralProperties +
                 MaxObjectKeysTypes +
-                MaxMergeTypes;
+                MaxMergeTypes +
+                NestedModulesLimit;
         }
     }
 }

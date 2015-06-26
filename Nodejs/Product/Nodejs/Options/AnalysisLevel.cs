@@ -18,6 +18,7 @@ namespace Microsoft.NodejsTools.Options {
     enum AnalysisLevel {
         None,
         Low,
+        Medium,
         High
     }
 }
