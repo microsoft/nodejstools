@@ -97,7 +97,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
             return new string[] {
                 WrapWithQuot(_runTestsScriptFile),
                 Name,
-                WrapWithQuot(testName),
+                WrapTestNameWithQuot(testName),
                 WrapWithQuot(testFile),
                 WrapWithQuot(workingDirectory),
                 WrapWithQuot(projectRootDir)
@@ -109,6 +109,11 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
                 path = "\"" + path + "\"";
             }
             return path;
+        }
+
+        private string WrapTestNameWithQuot(string path)
+        {
+            return "\"" + path.Replace("\"", "\\\"") + "\"";
         }
 
         private string EvaluateJavaScript(string nodeExePath, string testFile, string discoverResultFile, IMessageLogger logger, string workingDirectory) {
