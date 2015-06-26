@@ -58,7 +58,6 @@ namespace Microsoft.NodejsTools.Analysis {
             //
             // All these examples are highly speculative and I specifically try to create such deep level. 
             // If you develop on windows with such deep level you already close to your limit, your maximum is probably 10. 
-            // </remarks>
             NestedModulesLimit = 4;
         }
 
