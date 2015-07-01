@@ -208,6 +208,16 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         internal override string GetItemType(string filename) {
+            string absFileName = 
+                Path.IsPathRooted(filename) ? 
+                filename :
+                Path.Combine(this.ProjectHome, filename);
+
+            var node = this.FindNodeByFullPath(absFileName) as NodejsFileNode;
+            if (node != null && node.ItemNode.ItemTypeName != null) {
+                return node.ItemNode.ItemTypeName;
+            }
+
             if (string.Equals(Path.GetExtension(filename), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
                 return NodejsConstants.TypeScriptCompileItemType;
             }
