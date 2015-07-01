@@ -287,7 +287,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
             for (HierarchyNode n = this.Parent.FirstChild; n != null; n = n.NextSibling) {
                 // TODO: Distinguish between real Urls and fake ones (eg. "References")
-                if (n != this && String.Equals(n.Caption, label, StringComparison.OrdinalIgnoreCase)) {
+                if (n != this && String.Equals(n.GetEditLabel(), label, StringComparison.OrdinalIgnoreCase)) {
                     //A file or folder with the name '{0}' already exists on disk at this location. Please choose another name.
                     //If this file or folder does not appear in the Solution Explorer, then it is not currently part of your project. To view files which exist on disk, but are not in the project, select Show All Files from the Project menu.
                     throw new InvalidOperationException(SR.GetString(SR.FileOrFolderAlreadyExists, label));
@@ -318,7 +318,7 @@ namespace Microsoft.VisualStudioTools.Project {
             // where we get called is when a folder above us gets renamed (in which case our path is invalid)
             HierarchyNode parent = this.Parent;
             while (parent != null && (parent is FolderNode)) {
-                strRelPath = Path.Combine(parent.Caption, strRelPath);
+                strRelPath = Path.Combine(parent.GetEditLabel(), strRelPath);
                 parent = parent.Parent;
             }
 
@@ -614,7 +614,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
         public virtual string FileName {
             get {
-                return this.Caption;
+                return this.GetEditLabel();
             }
             set {
                 this.SetEditLabel(value);
@@ -726,7 +726,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     newfilename = relationalName + extension;
                     newfilename = CommonUtils.GetAbsoluteFilePath(Path.GetDirectoryName(childNode.Parent.GetMkDocument()), newfilename);
                 } else {
-                    newfilename = CommonUtils.GetAbsoluteFilePath(Path.GetDirectoryName(childNode.Parent.GetMkDocument()), childNode.Caption);
+                    newfilename = CommonUtils.GetAbsoluteFilePath(Path.GetDirectoryName(childNode.Parent.GetMkDocument()), childNode.GetEditLabel());
                 }
 
                 childNode.RenameDocument(childNode.GetMkDocument(), newfilename);
