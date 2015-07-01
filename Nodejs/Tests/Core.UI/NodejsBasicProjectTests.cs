@@ -251,7 +251,7 @@ require('fs').writeFileSync('{0}', process.env.fob + process.env.bar + process.e
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestClientServerIntelliSense() {
+        public void TestClientServerIntelliSenseModes() {
             string
                 solutionLabel = "Solution 'ClientServerCode' (1 project)",
                 projectLabel = "ClientServerCode",
