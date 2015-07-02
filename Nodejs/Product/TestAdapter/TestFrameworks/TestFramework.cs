@@ -95,34 +95,38 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
             workingDirectory = workingDirectory.TrimEnd(new char['\\']);
             projectRootDir = projectRootDir.TrimEnd(new char['\\']);
             return new string[] {
-                WrapWithQuot(_runTestsScriptFile),
+                WrapWithQuotes(_runTestsScriptFile),
                 Name,
-                WrapTestNameWithQuot(testName),
-                WrapWithQuot(testFile),
-                WrapWithQuot(workingDirectory),
-                WrapWithQuot(projectRootDir)
+                WrapTestNameWithQuotes(testName),
+                WrapWithQuotes(testFile),
+                WrapWithQuotes(workingDirectory),
+                WrapWithQuotes(projectRootDir)
             };
         }
 
-        private string WrapWithQuot(string path) {
+        private string WrapWithQuotes(string path) {
             if (!path.StartsWith("\"") && !path.StartsWith("\'")) {
                 path = "\"" + path + "\"";
             }
             return path;
         }
 
-        private string WrapTestNameWithQuot(string path)
-        {
-            return "\"" + path.Replace("\"", "\\\"") + "\"";
+        /// <summary>
+        /// Wrap name of the test in the quotes, to be passed to the command line.
+        /// </summary>
+        /// <param name="testName">Name of the test to excape for command line usage.</param>
+        /// <returns>Name of the test, escaped according to the command line rules.</returns>
+        private string WrapTestNameWithQuotes(string testName) {
+            return "\"" + testName.Replace("\"", "\\\"") + "\"";
         }
 
         private string EvaluateJavaScript(string nodeExePath, string testFile, string discoverResultFile, IMessageLogger logger, string workingDirectory) {
             workingDirectory = workingDirectory.TrimEnd(new char['\\']);
-            string arguments = "--expose_debug_as=dbg " + WrapWithQuot(_findTestsScriptFile)
+            string arguments = "--expose_debug_as=dbg " + WrapWithQuotes(_findTestsScriptFile)
                 + " " + Name +
-                " " + WrapWithQuot(testFile) +
-                " " + WrapWithQuot(discoverResultFile) +
-                " " + WrapWithQuot(workingDirectory);
+                " " + WrapWithQuotes(testFile) +
+                " " + WrapWithQuotes(discoverResultFile) +
+                " " + WrapWithQuotes(workingDirectory);
 
             var processStartInfo = new ProcessStartInfo(nodeExePath, arguments);
             processStartInfo.CreateNoWindow = true;
