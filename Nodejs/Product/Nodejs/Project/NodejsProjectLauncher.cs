@@ -348,7 +348,7 @@ namespace Microsoft.NodejsTools.Project {
         private string ResolveStartupFile() {
             string startupFile = _project.GetStartupFile();
             if (string.IsNullOrEmpty(startupFile)) {
-                throw new ApplicationException("No startup file is defined for the startup project.");
+                throw new ApplicationException("Please select a startup file to launch by right-clicking the file in Solution Explorer and selecting 'Set as Node.js Startup File' or by modifying your configuration in project properties.");
             }
 
             if (TypeScriptHelpers.IsTypeScriptFile(startupFile)) {
