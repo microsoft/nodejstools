@@ -26,7 +26,7 @@ namespace Microsoft.NodejsTools.Project {
     class NodejsFolderNode : CommonFolderNode {
         private readonly CommonProjectNode _project;
         private FolderContentType _contentType = FolderContentType.NotAssigned;
-        private bool _shouldShowLabelSuffix = false;
+        private bool _containsNodeOrBrowserFiles = false;
 
         public NodejsFolderNode(CommonProjectNode root, ProjectElement element) : base(root, element) {
             _project = root;
@@ -43,7 +43,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public void UpdateContentType() {
-            _shouldShowLabelSuffix = false;
+            _containsNodeOrBrowserFiles = false;
             
             // Iterate through all of the javascript files in a directory to determine whether
             // the build actions are Content, Compile, or a mix of the two.
@@ -55,7 +55,7 @@ namespace Microsoft.NodejsTools.Project {
                 }
                 var properties = fileNodesEnumerator.Current.NodeProperties as IncludedFileNodeProperties;
                 if (properties != null) {
-                    _shouldShowLabelSuffix = true;
+                    _containsNodeOrBrowserFiles = true;
                     switch (properties.BuildAction) {
                         case prjBuildAction.prjBuildActionContent:
                             contentType |= FolderContentType.Browser;
@@ -95,7 +95,7 @@ namespace Microsoft.NodejsTools.Project {
             get {
                 var res = base.Caption;
 
-                if (_shouldShowLabelSuffix) {
+                if (NodejsPackage.Instance.GeneralOptionsPage.ShowBrowserAndNodeLabels && _containsNodeOrBrowserFiles) {
                     res = AppendLabel(res, ContentType);
                 }
                 return res;
@@ -174,12 +174,12 @@ namespace Microsoft.NodejsTools.Project {
             if (cmdGroup == Guids.NodejsCmdSet) {
                 switch (cmd) {
                     case PkgCmdId.cmdidSetAsContent:
-                        if (_shouldShowLabelSuffix && ContentType.HasFlag(FolderContentType.Node)) {
+                        if (_containsNodeOrBrowserFiles && ContentType.HasFlag(FolderContentType.Node)) {
                             result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
                         }
                         return VSConstants.S_OK;
                     case PkgCmdId.cmdidSetAsCompile:
-                        if (_shouldShowLabelSuffix && ContentType.HasFlag(FolderContentType.Browser)) {
+                        if (_containsNodeOrBrowserFiles && ContentType.HasFlag(FolderContentType.Browser)) {
                             result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
                         }
                         return VSConstants.S_OK;

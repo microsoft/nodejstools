@@ -354,6 +354,7 @@ namespace Microsoft.NodejsTools.Project {
             NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevelChanged += IntellisenseOptionsPageAnalysisLevelChanged;
             NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMaximumChanged += AnalysisLogMaximumChanged;
             NodejsPackage.Instance.IntellisenseOptionsPage.SaveToDiskChanged += IntellisenseOptionsPageSaveToDiskChanged;
+            NodejsPackage.Instance.GeneralOptionsPage.ShowBrowserAndNodeLabelsChanged += ShowBrowserAndNodeLabelsChanged;
 
             return base.InitializeForOuter(filename, location, name, flags, ref iid, out projectPointer, out canceled);
         }
@@ -456,6 +457,13 @@ namespace Microsoft.NodejsTools.Project {
         private void IntellisenseOptionsPageSaveToDiskChanged(object sender, EventArgs e) {
             if (_analyzer != null) {
                 _analyzer.SaveToDisk = NodejsPackage.Instance.IntellisenseOptionsPage.SaveToDisk;
+            }
+        }
+
+        private void ShowBrowserAndNodeLabelsChanged(object sender, EventArgs e) {
+            var nodejsFolderNodes = this.AllChildren.Where(item => (item as NodejsFolderNode) != null).Select(item => (NodejsFolderNode)item);
+            foreach (var node in nodejsFolderNodes) {
+                ProjectMgr.ReDrawNode(node, UIHierarchyElement.Caption);
             }
         }
 
