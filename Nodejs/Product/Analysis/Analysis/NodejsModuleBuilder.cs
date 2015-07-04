@@ -190,7 +190,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 }
             }
             if (klass.ContainsKey("classMethods")) {
-                foreach (var method in klass["methods"]) {
+                foreach (var method in klass["classMethods"]) {
                     GenerateMethod(
                         klassValue,
                         null,
