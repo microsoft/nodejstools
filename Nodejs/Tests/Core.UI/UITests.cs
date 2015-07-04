@@ -21,6 +21,7 @@ using System.IO;
 using System.Windows.Automation;
 using System.Windows.Input;
 using EnvDTE;
+using Microsoft.NodejsTools;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
@@ -92,8 +93,8 @@ namespace Microsoft.Nodejs.Tests.UI {
 
             using (var app = new VisualStudioApp()) {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\AbsolutePath.sln");
-                app.OpenSolutionExplorer();
-                var window = app.SolutionExplorerTreeView;
+
+                var window = app.OpenSolutionExplorer();
 
                 // find server.js, send copy & paste, verify copy of file is there
                 var programPy = window.WaitForItem("Solution 'AbsolutePath' (1 project)", "AbsolutePath", "server.js");
@@ -106,22 +107,24 @@ namespace Microsoft.Nodejs.Tests.UI {
         public void MoveStartupFile() {
             using (var app = new VisualStudioApp()) {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\MoveStartupFile.sln");
-                app.OpenSolutionExplorer();
-                var window = app.SolutionExplorerTreeView;
 
-                // find server.js, send copy & paste, verify copy of file is there
-                var server = window.WaitForItem("Solution 'MoveStartupFile' (1 project)", "HelloWorld", "server.js");
-                var folder = window.WaitForItem("Solution 'MoveStartupFile' (1 project)", "HelloWorld", "TestDir");
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                    var window = app.OpenSolutionExplorer();
 
-                AutomationWrapper.Select(server);
-                Keyboard.ControlX();
+                    // find server.js, send copy & paste, verify copy of file is there
+                    var server = window.WaitForItem("Solution 'MoveStartupFile' (1 project)", "HelloWorld", "server.js");
+                    var folder = window.WaitForItem("Solution 'MoveStartupFile' (1 project)", "HelloWorld", "TestDir");
 
-                AutomationWrapper.Select(folder);
-                Keyboard.ControlV();
+                    AutomationWrapper.Select(server);
+                    Keyboard.ControlX();
 
-                Assert.AreNotEqual(null, window.WaitForItem("Solution 'MoveStartupFile' (1 project)", "HelloWorld", "TestDir", "server.js"));
+                    AutomationWrapper.Select(folder);
+                    Keyboard.ControlV();
 
-                Assert.IsTrue(((string)project.Properties.Item("StartupFile").Value).EndsWith("TestDir\\server.js"));
+                    Assert.AreNotEqual(null, window.WaitForItem("Solution 'MoveStartupFile' (1 project)", "HelloWorld", "TestDir", "server.js"));
+
+                    Assert.IsTrue(((string)project.Properties.Item("StartupFile").Value).EndsWith("TestDir\\server.js"));
+                }
             }
         }
 
@@ -131,24 +134,25 @@ namespace Microsoft.Nodejs.Tests.UI {
             using (var app = new VisualStudioApp()) {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
-                app.OpenSolutionExplorer();
-                var window = app.SolutionExplorerTreeView;
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                    var window = app.OpenSolutionExplorer();
 
-                // find server.js, send copy & paste, verify copy of file is there
-                var programPy = window.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "server.js");
+                    // find server.js, send copy & paste, verify copy of file is there
+                    var programPy = window.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "server.js");
 
-                AutomationWrapper.Select(programPy);
+                    AutomationWrapper.Select(programPy);
 
-                Keyboard.ControlC();
-                Keyboard.ControlV();
+                    Keyboard.ControlC();
+                    Keyboard.ControlV();
 
-                Assert.AreNotEqual(null, window.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "server - Copy.js"));
+                    Assert.AreNotEqual(null, window.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "server - Copy.js"));
 
-                AutomationWrapper.Select(programPy);
-                Keyboard.ControlC();
-                Keyboard.ControlV();
+                    AutomationWrapper.Select(programPy);
+                    Keyboard.ControlC();
+                    Keyboard.ControlV();
 
-                Assert.AreNotEqual(null, window.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "server - Copy (2).js"));
+                    Assert.AreNotEqual(null, window.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "server - Copy (2).js"));
+                }
             }
         }
 
@@ -156,49 +160,50 @@ namespace Microsoft.Nodejs.Tests.UI {
         [HostType("VSTestHost")]
         public void CopyPasteRenameFile() {
             using (var app = new VisualStudioApp()) {
-                var project = app.OpenProject(@"TestData\CopyPasteRenameProject\CopyPasteRenameProject.sln");    
+                var project = app.OpenProject(@"TestData\CopyPasteRenameProject\CopyPasteRenameProject.sln");
 
-                app.OpenSolutionExplorer();
-                var window = app.SolutionExplorerTreeView;
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                    var window = app.OpenSolutionExplorer();
 
-                var jsFile = window.WaitForItem("Solution 'CopyPasteRenameProject' (2 projects)", "CopyPasteRenameJavaScript", "app.js");
+                    var jsFile = window.WaitForItem("Solution 'CopyPasteRenameProject' (2 projects)", "CopyPasteRenameJavaScript", "app.js");
 
-                AutomationWrapper.Select(jsFile);
+                    AutomationWrapper.Select(jsFile);
 
-                Keyboard.ControlC();
-                Keyboard.ControlV();
-                var copiedJsFile = window.WaitForItem("Solution 'CopyPasteRenameProject' (2 projects)", "CopyPasteRenameJavaScript", "app - Copy.js");
-                Assert.AreNotEqual(null, copiedJsFile);
+                    Keyboard.ControlC();
+                    Keyboard.ControlV();
+                    var copiedJsFile = window.WaitForItem("Solution 'CopyPasteRenameProject' (2 projects)", "CopyPasteRenameJavaScript", "app - Copy.js");
+                    Assert.AreNotEqual(null, copiedJsFile);
 
-                AutomationWrapper.Select(copiedJsFile);
+                    AutomationWrapper.Select(copiedJsFile);
 
-                Keyboard.PressAndRelease(Key.F2);
-                System.Threading.Thread.Sleep(100);
+                    Keyboard.PressAndRelease(Key.F2);
+                    System.Threading.Thread.Sleep(100);
 
-                Keyboard.Type("renamed");
-                Keyboard.PressAndRelease(Key.Enter);
+                    Keyboard.Type("renamed");
+                    Keyboard.PressAndRelease(Key.Enter);
 
-                Assert.AreNotEqual(null, window.WaitForItem("Solution 'CopyPasteRenameProject' (2 projects)", "CopyPasteRenameJavaScript", "renamed.js"));
+                    Assert.AreNotEqual(null, window.WaitForItem("Solution 'CopyPasteRenameProject' (2 projects)", "CopyPasteRenameJavaScript", "renamed.js"));
 
 
-                var tsFile = window.WaitForItem("Solution 'CopyPasteRenameProject' (2 projects)", "CopyPasteRenameProjectTypeScript", "app.ts");
+                    var tsFile = window.WaitForItem("Solution 'CopyPasteRenameProject' (2 projects)", "CopyPasteRenameProjectTypeScript", "app.ts");
 
-                AutomationWrapper.Select(tsFile);
+                    AutomationWrapper.Select(tsFile);
 
-                Keyboard.ControlC();
-                Keyboard.ControlV();
-                var copiedTsFile = window.WaitForItem("Solution 'CopyPasteRenameProject' (2 projects)", "CopyPasteRenameProjectTypeScript", "app - Copy.ts");
-                Assert.AreNotEqual(null, copiedTsFile);
+                    Keyboard.ControlC();
+                    Keyboard.ControlV();
+                    var copiedTsFile = window.WaitForItem("Solution 'CopyPasteRenameProject' (2 projects)", "CopyPasteRenameProjectTypeScript", "app - Copy.ts");
+                    Assert.AreNotEqual(null, copiedTsFile);
 
-                AutomationWrapper.Select(copiedTsFile);
+                    AutomationWrapper.Select(copiedTsFile);
 
-                Keyboard.PressAndRelease(Key.F2);
-                System.Threading.Thread.Sleep(100);
+                    Keyboard.PressAndRelease(Key.F2);
+                    System.Threading.Thread.Sleep(100);
 
-                Keyboard.Type("renamed");
-                Keyboard.PressAndRelease(Key.Enter);
+                    Keyboard.Type("renamed");
+                    Keyboard.PressAndRelease(Key.Enter);
 
-                Assert.AreNotEqual(null, window.WaitForItem("Solution 'CopyPasteRenameProject' (2 projects)", "CopyPasteRenameProjectTypeScript", "renamed.ts"));
+                    Assert.AreNotEqual(null, window.WaitForItem("Solution 'CopyPasteRenameProject' (2 projects)", "CopyPasteRenameProjectTypeScript", "renamed.ts"));
+                }
             }
         }
 
@@ -208,22 +213,23 @@ namespace Microsoft.Nodejs.Tests.UI {
             using (var app = new VisualStudioApp()) {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\DeleteFile.sln");
 
-                app.OpenSolutionExplorer();
-                var window = app.SolutionExplorerTreeView;
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                    var window = app.OpenSolutionExplorer();
 
-                // find server.js, send copy & paste, verify copy of file is there
-                var programPy = window.WaitForItem("Solution 'DeleteFile' (1 project)", "HelloWorld", "server.js");
-                Assert.IsTrue(File.Exists(@"TestData\NodejsProjectData\DeleteFile\server.js"));
-                AutomationWrapper.Select(programPy);
+                    // find server.js, send copy & paste, verify copy of file is there
+                    var programPy = window.WaitForItem("Solution 'DeleteFile' (1 project)", "HelloWorld", "server.js");
+                    Assert.IsTrue(File.Exists(@"TestData\NodejsProjectData\DeleteFile\server.js"));
+                    AutomationWrapper.Select(programPy);
 
-                Keyboard.Type(Key.Delete);
-                app.WaitForDialog();
-                VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "will be deleted permanently");
-                app.WaitForDialogDismissed();
+                    Keyboard.Type(Key.Delete);
+                    app.WaitForDialog();
+                    VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "will be deleted permanently");
+                    app.WaitForDialogDismissed();
 
-                window.WaitForItemRemoved("Solution 'DeleteFile' (1 project)", "HelloWorld", "server.js");
+                    window.WaitForItemRemoved("Solution 'DeleteFile' (1 project)", "HelloWorld", "server.js");
 
-                Assert.IsFalse(File.Exists(@"TestData\NodejsProjectData\DeleteFile\server.js"));
+                    Assert.IsFalse(File.Exists(@"TestData\NodejsProjectData\DeleteFile\server.js"));
+                }
             }
         }
 
@@ -233,27 +239,28 @@ namespace Microsoft.Nodejs.Tests.UI {
             using (var app = new VisualStudioApp()) {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
-                app.OpenSolutionExplorer();
-                var window = app.SolutionExplorerTreeView;
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                    var window = app.OpenSolutionExplorer();
 
-                // find server.js, send copy & paste, verify copy of file is there
-                var projectNode = window.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld");
-                AutomationWrapper.Select(projectNode);
+                    // find server.js, send copy & paste, verify copy of file is there
+                    var projectNode = window.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld");
+                    AutomationWrapper.Select(projectNode);
 
-                var startingDirs = new HashSet<string>(Directory.GetDirectories(@"TestData\NodejsProjectData\HelloWorld"), StringComparer.OrdinalIgnoreCase);
-                Keyboard.PressAndRelease(Key.F10, Key.LeftCtrl, Key.LeftShift);
-                Keyboard.PressAndRelease(Key.D);
-                Keyboard.PressAndRelease(Key.Right);
-                Keyboard.PressAndRelease(Key.D);
-                Keyboard.Type("MyNewFolder");
-                var curDirs = new HashSet<string>(Directory.GetDirectories(@"TestData\NodejsProjectData\HelloWorld"), StringComparer.OrdinalIgnoreCase);
-                Assert.IsTrue(curDirs.IsSubsetOf(startingDirs) && startingDirs.IsSubsetOf(curDirs), "new directory created" + String.Join(", ", curDirs) + " vs. " + String.Join(", ", startingDirs));
+                    var startingDirs = new HashSet<string>(Directory.GetDirectories(@"TestData\NodejsProjectData\HelloWorld"), StringComparer.OrdinalIgnoreCase);
+                    Keyboard.PressAndRelease(Key.F10, Key.LeftCtrl, Key.LeftShift);
+                    Keyboard.PressAndRelease(Key.D);
+                    Keyboard.PressAndRelease(Key.Right);
+                    Keyboard.PressAndRelease(Key.D);
+                    Keyboard.Type("MyNewFolder");
+                    var curDirs = new HashSet<string>(Directory.GetDirectories(@"TestData\NodejsProjectData\HelloWorld"), StringComparer.OrdinalIgnoreCase);
+                    Assert.IsTrue(curDirs.IsSubsetOf(startingDirs) && startingDirs.IsSubsetOf(curDirs), "new directory created" + String.Join(", ", curDirs) + " vs. " + String.Join(", ", startingDirs));
 
-                Keyboard.PressAndRelease(Key.Enter);
+                    Keyboard.PressAndRelease(Key.Enter);
 
-                Assert.AreNotEqual(null, window.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "MyNewFolder"));
+                    Assert.AreNotEqual(null, window.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "MyNewFolder"));
 
-                Assert.IsTrue(Directory.Exists(@"TestData\NodejsProjectData\HelloWorld\MyNewFolder"));
+                    Assert.IsTrue(Directory.Exists(@"TestData\NodejsProjectData\HelloWorld\MyNewFolder"));
+                }
             }
         }
 
@@ -266,26 +273,27 @@ namespace Microsoft.Nodejs.Tests.UI {
             using (var app = new VisualStudioApp()) {
                 var project = OpenLongFileNameProject(app, 24);
 
-                app.OpenSolutionExplorer();
-                var window = app.SolutionExplorerTreeView;
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                    var window = app.OpenSolutionExplorer();
 
-                // find server.js, send copy & paste, verify copy of file is there
-                var projectNode = window.WaitForItem("Solution 'LongFileNames' (1 project)", "LFN");
-                AutomationWrapper.Select(projectNode);
+                    // find server.js, send copy & paste, verify copy of file is there
+                    var projectNode = window.WaitForItem("Solution 'LongFileNames' (1 project)", "LFN");
+                    AutomationWrapper.Select(projectNode);
 
-                Keyboard.PressAndRelease(Key.F10, Key.LeftCtrl, Key.LeftShift);
-                Keyboard.PressAndRelease(Key.D);
-                Keyboard.PressAndRelease(Key.Right);
-                Keyboard.PressAndRelease(Key.D);
-                Keyboard.Type("01234567891");
-                Keyboard.PressAndRelease(Key.Enter);
+                    Keyboard.PressAndRelease(Key.F10, Key.LeftCtrl, Key.LeftShift);
+                    Keyboard.PressAndRelease(Key.D);
+                    Keyboard.PressAndRelease(Key.Right);
+                    Keyboard.PressAndRelease(Key.D);
+                    Keyboard.Type("01234567891");
+                    Keyboard.PressAndRelease(Key.Enter);
 
-                Assert.AreNotEqual(null, window.WaitForItem("Solution 'LongFileNames' (1 project)", "LFN", "01234567891"));
+                    Assert.AreNotEqual(null, window.WaitForItem("Solution 'LongFileNames' (1 project)", "LFN", "01234567891"));
 
-                var projectLoc = Path.GetDirectoryName(project.FullName);
-                var checkedPath = Path.Combine(projectLoc, "LongFileNames", "01234567891");
+                    var projectLoc = Path.GetDirectoryName(project.FullName);
+                    var checkedPath = Path.Combine(projectLoc, "LongFileNames", "01234567891");
 
-                Assert.IsTrue(Directory.Exists(checkedPath), checkedPath + " does not exist");
+                    Assert.IsTrue(Directory.Exists(checkedPath), checkedPath + " does not exist");
+                }
             }
         }
 
@@ -298,21 +306,22 @@ namespace Microsoft.Nodejs.Tests.UI {
             using (var app = new VisualStudioApp()) {
                 var project = OpenLongFileNameProject(app, 24);
 
-                app.OpenSolutionExplorer();
-                var window = app.SolutionExplorerTreeView;
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                    var window = app.OpenSolutionExplorer();
 
-                // find server.js, send copy & paste, verify copy of file is there
-                var projectNode = window.WaitForItem("Solution 'LongFileNames' (1 project)", "LFN");
-                AutomationWrapper.Select(projectNode);
+                    // find server.js, send copy & paste, verify copy of file is there
+                    var projectNode = window.WaitForItem("Solution 'LongFileNames' (1 project)", "LFN");
+                    AutomationWrapper.Select(projectNode);
 
-                Keyboard.PressAndRelease(Key.F10, Key.LeftCtrl, Key.LeftShift);
-                Keyboard.PressAndRelease(Key.D);
-                Keyboard.PressAndRelease(Key.Right);
-                Keyboard.PressAndRelease(Key.D);
-                Keyboard.Type("012345678912");
-                Keyboard.PressAndRelease(Key.Enter);
+                    Keyboard.PressAndRelease(Key.F10, Key.LeftCtrl, Key.LeftShift);
+                    Keyboard.PressAndRelease(Key.D);
+                    Keyboard.PressAndRelease(Key.Right);
+                    Keyboard.PressAndRelease(Key.D);
+                    Keyboard.Type("012345678912");
+                    Keyboard.PressAndRelease(Key.Enter);
 
-                VisualStudioApp.CheckMessageBox("The filename or extension is too long.");
+                    VisualStudioApp.CheckMessageBox("The filename or extension is too long.");
+                }
             }
         }
 
@@ -325,20 +334,21 @@ namespace Microsoft.Nodejs.Tests.UI {
             using (var app = new VisualStudioApp()) {
                 var project = OpenLongFileNameProject(app, 21);
 
-                app.OpenSolutionExplorer();
-                var window = app.SolutionExplorerTreeView;
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                    var window = app.OpenSolutionExplorer();
 
-                // find server.js, send copy & paste, verify copy of file is there
-                var projectNode = window.WaitForItem("Solution 'LongFileNames' (1 project)", "LFN");
-                AutomationWrapper.Select(projectNode);
+                    // find server.js, send copy & paste, verify copy of file is there
+                    var projectNode = window.WaitForItem("Solution 'LongFileNames' (1 project)", "LFN");
+                    AutomationWrapper.Select(projectNode);
 
-                Keyboard.PressAndRelease(Key.F10, Key.LeftCtrl, Key.LeftShift);
-                Keyboard.PressAndRelease(Key.D);
-                Keyboard.PressAndRelease(Key.Right);
-                Keyboard.PressAndRelease(Key.D);
-                Keyboard.PressAndRelease(Key.Escape);
+                    Keyboard.PressAndRelease(Key.F10, Key.LeftCtrl, Key.LeftShift);
+                    Keyboard.PressAndRelease(Key.D);
+                    Keyboard.PressAndRelease(Key.Right);
+                    Keyboard.PressAndRelease(Key.D);
+                    Keyboard.PressAndRelease(Key.Escape);
 
-                VisualStudioApp.CheckMessageBox("The filename or extension is too long.");
+                    VisualStudioApp.CheckMessageBox("The filename or extension is too long.");
+                }
             }
         }
 
@@ -351,8 +361,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             using (var app = new VisualStudioApp()) {
                 var project = OpenLongFileNameProject(app, 12);
 
-                app.OpenSolutionExplorer();
-                var window = app.SolutionExplorerTreeView;
+                var window = app.OpenSolutionExplorer();
 
                 // find server.js, send copy & paste, verify copy of file is there
                 var projectNode = window.WaitForItem("Solution 'LongFileNames' (1 project)", "LFN");
@@ -377,8 +386,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             using (var app = new VisualStudioApp()) {
                 var project = OpenLongFileNameProject(app, 12);
 
-                app.OpenSolutionExplorer();
-                var window = app.SolutionExplorerTreeView;
+                var window = app.OpenSolutionExplorer();
 
                 // find server.js, send copy & paste, verify copy of file is there
                 var projectNode = window.WaitForItem("Solution 'LongFileNames' (1 project)", "LFN");
@@ -402,33 +410,34 @@ namespace Microsoft.Nodejs.Tests.UI {
             using (var app = new VisualStudioApp()) {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\DeleteLockedFolder.sln");
 
-                app.OpenSolutionExplorer();
-                var window = app.SolutionExplorerTreeView;
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                    var window = app.OpenSolutionExplorer();
 
-                var folderNode = window.WaitForItem("Solution 'DeleteLockedFolder' (1 project)", "DeleteLockedFolder", "Folder");
-                AutomationWrapper.Select(folderNode);
+                    var folderNode = window.WaitForItem("Solution 'DeleteLockedFolder' (1 project)", "DeleteLockedFolder", "Folder");
+                    AutomationWrapper.Select(folderNode);
 
-                var psi = new ProcessStartInfo(
-                    Path.Combine(Environment.GetEnvironmentVariable("WINDIR"), "system32", "cmd.exe"));
-                psi.WorkingDirectory = Path.Combine(Environment.CurrentDirectory, @"TestData\NodejsProjectData\DeleteLockedFolder\Folder");
-                psi.CreateNoWindow = true;
-                psi.UseShellExecute = false;
-                using (var process = System.Diagnostics.Process.Start(psi)) {
-                    try {
-                        //Ensure the other process started and has time to lock the file
-                        System.Threading.Thread.Sleep(1000);
-                        Keyboard.Type(Key.Delete);
-                        app.WaitForDialog();
-                        Keyboard.Type(Key.Enter);
-                        System.Threading.Thread.Sleep(500);
+                    var psi = new ProcessStartInfo(
+                        Path.Combine(Environment.GetEnvironmentVariable("WINDIR"), "system32", "cmd.exe"));
+                    psi.WorkingDirectory = Path.Combine(Environment.CurrentDirectory, @"TestData\NodejsProjectData\DeleteLockedFolder\Folder");
+                    psi.CreateNoWindow = true;
+                    psi.UseShellExecute = false;
+                    using (var process = System.Diagnostics.Process.Start(psi)) {
+                        try {
+                            //Ensure the other process started and has time to lock the file
+                            System.Threading.Thread.Sleep(1000);
+                            Keyboard.Type(Key.Delete);
+                            app.WaitForDialog();
+                            Keyboard.Type(Key.Enter);
+                            System.Threading.Thread.Sleep(500);
 
-                        VisualStudioApp.CheckMessageBox("The process cannot access the file 'Folder' because it is being used by another process.");
-                    } finally {
-                        process.Kill();
+                            VisualStudioApp.CheckMessageBox("The process cannot access the file 'Folder' because it is being used by another process.");
+                        } finally {
+                            process.Kill();
+                        }
                     }
-                }
 
-                Assert.IsNotNull(window.FindItem("Solution 'DeleteLockedFolder' (1 project)", "DeleteLockedFolder", "Folder"));
+                    Assert.IsNotNull(window.FindItem("Solution 'DeleteLockedFolder' (1 project)", "DeleteLockedFolder", "Folder"));
+                }
             }
         }
 
@@ -453,44 +462,45 @@ namespace Microsoft.Nodejs.Tests.UI {
             using (var app = new VisualStudioApp()) {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
-                app.OpenSolutionExplorer();
-                var window = app.SolutionExplorerTreeView;
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                    var window = app.OpenSolutionExplorer();
 
-                // find server.js, send copy & paste, verify copy of file is there
-                var projectNode = window.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld");
-                AutomationWrapper.Select(projectNode);
+                    // find server.js, send copy & paste, verify copy of file is there
+                    var projectNode = window.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld");
+                    AutomationWrapper.Select(projectNode);
 
-                Keyboard.PressAndRelease(Key.F10, Key.LeftCtrl, Key.LeftShift);
-                Keyboard.PressAndRelease(Key.D);
-                Keyboard.PressAndRelease(Key.Right);
-                Keyboard.PressAndRelease(Key.D);
-                Keyboard.Type("FolderX");
-                Keyboard.PressAndRelease(Key.Enter);
+                    Keyboard.PressAndRelease(Key.F10, Key.LeftCtrl, Key.LeftShift);
+                    Keyboard.PressAndRelease(Key.D);
+                    Keyboard.PressAndRelease(Key.Right);
+                    Keyboard.PressAndRelease(Key.D);
+                    Keyboard.Type("FolderX");
+                    Keyboard.PressAndRelease(Key.Enter);
 
-                var folderNode = window.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "FolderX");
+                    var folderNode = window.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "FolderX");
 
-                Assert.AreNotEqual(null, folderNode, "failed to find folder X");
+                    Assert.AreNotEqual(null, folderNode, "failed to find folder X");
 
-                AutomationWrapper.Select(folderNode);
+                    AutomationWrapper.Select(folderNode);
 
-                Keyboard.PressAndRelease(Key.F10, Key.LeftCtrl, Key.LeftShift);
-                Keyboard.PressAndRelease(Key.D);
-                Keyboard.PressAndRelease(Key.Right);
-                Keyboard.PressAndRelease(Key.D);
-                Keyboard.Type("FolderY");
-                Keyboard.PressAndRelease(Key.Enter);
+                    Keyboard.PressAndRelease(Key.F10, Key.LeftCtrl, Key.LeftShift);
+                    Keyboard.PressAndRelease(Key.D);
+                    Keyboard.PressAndRelease(Key.Right);
+                    Keyboard.PressAndRelease(Key.D);
+                    Keyboard.Type("FolderY");
+                    Keyboard.PressAndRelease(Key.Enter);
 
-                var innerFolderNode = window.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "FolderX", "FolderY");
+                    var innerFolderNode = window.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "FolderX", "FolderY");
 
-                Assert.AreNotEqual(null, innerFolderNode, "failed to find folder Y");
+                    Assert.AreNotEqual(null, innerFolderNode, "failed to find folder Y");
 
-                AutomationWrapper.Select(innerFolderNode);
+                    AutomationWrapper.Select(innerFolderNode);
 
-                var newItem = project.ProjectItems.Item("FolderX").Collection.Item("FolderY").Collection.AddFromFile(
-                    TestData.GetPath(@"TestData\DebuggerProject\BreakpointBreakOn.js")
-                );
+                    var newItem = project.ProjectItems.Item("FolderX").Collection.Item("FolderY").Collection.AddFromFile(
+                        TestData.GetPath(@"TestData\DebuggerProject\BreakpointBreakOn.js")
+                    );
 
-                Assert.AreNotEqual(null, window.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "FolderX", "FolderY", "BreakpointBreakOn.js"), "failed to find added file");
+                    Assert.AreNotEqual(null, window.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", "FolderX", "FolderY", "BreakpointBreakOn.js"), "failed to find added file");
+                }
             }
         }
 
@@ -500,37 +510,38 @@ namespace Microsoft.Nodejs.Tests.UI {
             using (var app = new VisualStudioApp()) {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\RenameProjectTestUI.sln");
 
-                app.OpenSolutionExplorer();
-                var window = app.SolutionExplorerTreeView;
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                    var window = app.OpenSolutionExplorer();
 
-                // find server.js, send copy & paste, verify copy of file is there
-                var projectNode = window.WaitForItem("Solution 'RenameProjectTestUI' (1 project)", "HelloWorld");
+                    // find server.js, send copy & paste, verify copy of file is there
+                    var projectNode = window.WaitForItem("Solution 'RenameProjectTestUI' (1 project)", "HelloWorld");
 
-                // rename once, cancel renaming to existing file....
-                AutomationWrapper.Select(projectNode);
-                Keyboard.PressAndRelease(Key.F2);
-                System.Threading.Thread.Sleep(100);
+                    // rename once, cancel renaming to existing file....
+                    AutomationWrapper.Select(projectNode);
+                    Keyboard.PressAndRelease(Key.F2);
+                    System.Threading.Thread.Sleep(100);
 
-                Keyboard.Type("HelloWorldExisting");
-                Keyboard.PressAndRelease(Key.Enter);
+                    Keyboard.Type("HelloWorldExisting");
+                    Keyboard.PressAndRelease(Key.Enter);
 
-                IntPtr dialog = app.WaitForDialog();
+                    IntPtr dialog = app.WaitForDialog();
 
-                VisualStudioApp.CheckMessageBox("HelloWorldExisting.njsproj", "overwrite");
+                    VisualStudioApp.CheckMessageBox("HelloWorldExisting.njsproj", "overwrite");
 
-                // rename again, don't cancel...
-                AutomationWrapper.Select(projectNode);
-                Keyboard.PressAndRelease(Key.F2);
-                System.Threading.Thread.Sleep(100);
+                    // rename again, don't cancel...
+                    AutomationWrapper.Select(projectNode);
+                    Keyboard.PressAndRelease(Key.F2);
+                    System.Threading.Thread.Sleep(100);
 
-                Keyboard.Type("HelloWorldExisting");
-                Keyboard.PressAndRelease(Key.Enter);
+                    Keyboard.Type("HelloWorldExisting");
+                    Keyboard.PressAndRelease(Key.Enter);
 
-                dialog = app.WaitForDialog();
+                    dialog = app.WaitForDialog();
 
-                VisualStudioApp.CheckMessageBox(MessageBoxButton.Yes, "HelloWorldExisting.njsproj", "overwrite");
+                    VisualStudioApp.CheckMessageBox(MessageBoxButton.Yes, "HelloWorldExisting.njsproj", "overwrite");
 
-                Assert.AreNotEqual(null, window.WaitForItem("Solution 'RenameProjectTestUI' (1 project)", "HelloWorldExisting"));
+                    Assert.AreNotEqual(null, window.WaitForItem("Solution 'RenameProjectTestUI' (1 project)", "HelloWorldExisting"));
+                }
             }
         }
 
@@ -540,69 +551,70 @@ namespace Microsoft.Nodejs.Tests.UI {
             using (var app = new VisualStudioApp()) {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\RenameItemsTestUI.sln");
 
-                app.OpenSolutionExplorer();
-                var window = app.SolutionExplorerTreeView;
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                    var window = app.OpenSolutionExplorer();
 
-                // find server.js, send copy & paste, verify copy of file is there
-                var projectNode = window.WaitForItem("Solution 'RenameItemsTestUI' (1 project)", "HelloWorld", "server.js");
+                    // find server.js, send copy & paste, verify copy of file is there
+                    var projectNode = window.WaitForItem("Solution 'RenameItemsTestUI' (1 project)", "HelloWorld", "server.js");
 
-                // rename once, cancel renaming to existing file....
-                AutomationWrapper.Select(projectNode);
-                Keyboard.PressAndRelease(Key.F2);
-                System.Threading.Thread.Sleep(100);
-
-                Keyboard.Type("NewName.txt");
-                Keyboard.Type(Key.Delete);  // delete extension left at end
-                Keyboard.Type(Key.Delete);
-                Keyboard.Type(Key.Delete);
-                System.Threading.Thread.Sleep(100);
-                Keyboard.PressAndRelease(Key.Enter);
-
-                IntPtr dialog = app.WaitForDialog();
-
-                VisualStudioApp.CheckMessageBox(MessageBoxButton.Cancel, "file name extension");
-
-                // rename again, don't cancel...
-                AutomationWrapper.Select(projectNode);
-                Keyboard.PressAndRelease(Key.F2);
-                System.Threading.Thread.Sleep(100);
-
-                Keyboard.Type("NewName.txt");
-                Keyboard.Type(Key.Delete);  // delete extension left at end
-                Keyboard.Type(Key.Delete);
-                Keyboard.Type(Key.Delete);
-                System.Threading.Thread.Sleep(100);
-                Keyboard.PressAndRelease(Key.Enter);
-
-                dialog = app.WaitForDialog();
-
-                VisualStudioApp.CheckMessageBox(MessageBoxButton.Yes, "file name extension");
-
-                Assert.AreNotEqual(null, window.WaitForItem("Solution 'RenameItemsTestUI' (1 project)", "HelloWorld", "NewName.txt"));
-
-                var subJs = window.WaitForItem("Solution 'RenameItemsTestUI' (1 project)", "HelloWorld", "Sub1", "Sub2", "Foo.js");
-                Assert.IsNotNull(subJs);
-
-                var sub1 = window.FindItem("Solution 'RenameItemsTestUI' (1 project)", "HelloWorld", "Sub1");
-                AutomationWrapper.Select(sub1);
-                Keyboard.PressAndRelease(Key.F2);
-                System.Threading.Thread.Sleep(100);
-
-                Keyboard.Type("FolderName");
-                Keyboard.PressAndRelease(Key.Enter);
-
-                for (int i = 0; i < 20; i++) {
-                    try {
-                        if (project.GetIsFolderExpanded("FolderName")) {
-                            break;
-                        }
-                    } catch (ArgumentException) {
-                    }
+                    // rename once, cancel renaming to existing file....
+                    AutomationWrapper.Select(projectNode);
+                    Keyboard.PressAndRelease(Key.F2);
                     System.Threading.Thread.Sleep(100);
-                }
 
-                Assert.IsTrue(project.GetIsFolderExpanded("FolderName"));
-                Assert.AreNotEqual(null, window.WaitForItem("Solution 'RenameItemsTestUI' (1 project)", "HelloWorld", "FolderName", "Sub2", "Foo.js"));
+                    Keyboard.Type("NewName.txt");
+                    Keyboard.Type(Key.Delete);  // delete extension left at end
+                    Keyboard.Type(Key.Delete);
+                    Keyboard.Type(Key.Delete);
+                    System.Threading.Thread.Sleep(100);
+                    Keyboard.PressAndRelease(Key.Enter);
+
+                    IntPtr dialog = app.WaitForDialog();
+
+                    VisualStudioApp.CheckMessageBox(MessageBoxButton.Cancel, "file name extension");
+
+                    // rename again, don't cancel...
+                    AutomationWrapper.Select(projectNode);
+                    Keyboard.PressAndRelease(Key.F2);
+                    System.Threading.Thread.Sleep(100);
+
+                    Keyboard.Type("NewName.txt");
+                    Keyboard.Type(Key.Delete);  // delete extension left at end
+                    Keyboard.Type(Key.Delete);
+                    Keyboard.Type(Key.Delete);
+                    System.Threading.Thread.Sleep(100);
+                    Keyboard.PressAndRelease(Key.Enter);
+
+                    dialog = app.WaitForDialog();
+
+                    VisualStudioApp.CheckMessageBox(MessageBoxButton.Yes, "file name extension");
+
+                    Assert.AreNotEqual(null, window.WaitForItem("Solution 'RenameItemsTestUI' (1 project)", "HelloWorld", "NewName.txt"));
+
+                    var subJs = window.WaitForItem("Solution 'RenameItemsTestUI' (1 project)", "HelloWorld", "Sub1", "Sub2", "Foo.js");
+                    Assert.IsNotNull(subJs);
+
+                    var sub1 = window.FindItem("Solution 'RenameItemsTestUI' (1 project)", "HelloWorld", "Sub1");
+                    AutomationWrapper.Select(sub1);
+                    Keyboard.PressAndRelease(Key.F2);
+                    System.Threading.Thread.Sleep(100);
+
+                    Keyboard.Type("FolderName");
+                    Keyboard.PressAndRelease(Key.Enter);
+
+                    for (int i = 0; i < 20; i++) {
+                        try {
+                            if (project.GetIsFolderExpanded("FolderName")) {
+                                break;
+                            }
+                        } catch (ArgumentException) {
+                        }
+                        System.Threading.Thread.Sleep(100);
+                    }
+
+                    Assert.IsTrue(project.GetIsFolderExpanded("FolderName"));
+                    Assert.AreNotEqual(null, window.WaitForItem("Solution 'RenameItemsTestUI' (1 project)", "HelloWorld", "FolderName", "Sub2", "Foo.js"));
+                }
             }
         }
 
@@ -612,20 +624,21 @@ namespace Microsoft.Nodejs.Tests.UI {
             using (var app = new VisualStudioApp()) {
                 app.OpenProject(@"TestData\NodejsProjectData\HelloWorld2.sln", expectedProjects: 2);
 
-                app.OpenSolutionExplorer();
-                var window = app.SolutionExplorerTreeView;
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                    var window = app.OpenSolutionExplorer();
 
-                var folderNode = window.WaitForItem("Solution 'HelloWorld2' (2 projects)", "HelloWorld2", "TestFolder3");
-                AutomationWrapper.Select(folderNode);
+                    var folderNode = window.WaitForItem("Solution 'HelloWorld2' (2 projects)", "HelloWorld2", "TestFolder3");
+                    AutomationWrapper.Select(folderNode);
 
-                Keyboard.ControlC();
+                    Keyboard.ControlC();
 
-                var projectNode = window.FindItem("Solution 'HelloWorld2' (2 projects)", "HelloWorld");
+                    var projectNode = window.FindItem("Solution 'HelloWorld2' (2 projects)", "HelloWorld");
 
-                AutomationWrapper.Select(projectNode);
-                Keyboard.ControlV();
+                    AutomationWrapper.Select(projectNode);
+                    Keyboard.ControlV();
 
-                Assert.AreNotEqual(null, window.WaitForItem("Solution 'HelloWorld2' (2 projects)", "HelloWorld", "TestFolder3"));
+                    Assert.AreNotEqual(null, window.WaitForItem("Solution 'HelloWorld2' (2 projects)", "HelloWorld", "TestFolder3"));
+                }
             }
         }
 
@@ -635,21 +648,22 @@ namespace Microsoft.Nodejs.Tests.UI {
             using (var app = new VisualStudioApp()) {
                 app.OpenProject(@"TestData\NodejsProjectData\HelloWorld2.sln", expectedProjects: 2);
 
-                app.OpenSolutionExplorer();
-                var window = app.SolutionExplorerTreeView;
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                    var window = app.OpenSolutionExplorer();
 
-                var folderNode = window.WaitForItem("Solution 'HelloWorld2' (2 projects)", "HelloWorld2", "TestFolder2");
-                AutomationWrapper.Select(folderNode);
+                    var folderNode = window.WaitForItem("Solution 'HelloWorld2' (2 projects)", "HelloWorld2", "TestFolder2");
+                    AutomationWrapper.Select(folderNode);
 
-                Keyboard.ControlX();
+                    Keyboard.ControlX();
 
-                var projectNode = window.FindItem("Solution 'HelloWorld2' (2 projects)", "HelloWorld");
+                    var projectNode = window.FindItem("Solution 'HelloWorld2' (2 projects)", "HelloWorld");
 
-                AutomationWrapper.Select(projectNode);
-                Keyboard.ControlV();
+                    AutomationWrapper.Select(projectNode);
+                    Keyboard.ControlV();
 
-                Assert.AreNotEqual(null, window.WaitForItem("Solution 'HelloWorld2' (2 projects)", "HelloWorld", "TestFolder2"));
-                Assert.AreEqual(null, window.WaitForItemRemoved("Solution 'HelloWorld2' (2 projects)", "HelloWorld2", "TestFolder2"));
+                    Assert.AreNotEqual(null, window.WaitForItem("Solution 'HelloWorld2' (2 projects)", "HelloWorld", "TestFolder2"));
+                    Assert.AreEqual(null, window.WaitForItemRemoved("Solution 'HelloWorld2' (2 projects)", "HelloWorld2", "TestFolder2"));
+                }
             }
         }
 
@@ -657,23 +671,24 @@ namespace Microsoft.Nodejs.Tests.UI {
         [HostType("VSTestHost")]
         public void CutPaste() {
             using (var app = new VisualStudioApp()) {
+
                 app.OpenProject(@"TestData\NodejsProjectData\HelloWorld2.sln", expectedProjects: 2);
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                    var window = app.OpenSolutionExplorer();
 
-                app.OpenSolutionExplorer();
-                var window = app.SolutionExplorerTreeView;
+                    var subItem = window.WaitForItem("Solution 'HelloWorld2' (2 projects)", "HelloWorld2", "TestFolder", "SubItem.js");
+                    AutomationWrapper.Select(subItem);
 
-                var subItem = window.WaitForItem("Solution 'HelloWorld2' (2 projects)", "HelloWorld2", "TestFolder", "SubItem.js");
-                AutomationWrapper.Select(subItem);
+                    Keyboard.ControlX();
 
-                Keyboard.ControlX();
+                    var projectNode = window.FindItem("Solution 'HelloWorld2' (2 projects)", "HelloWorld2");
 
-                var projectNode = window.FindItem("Solution 'HelloWorld2' (2 projects)", "HelloWorld2");
+                    AutomationWrapper.Select(projectNode);
+                    Keyboard.ControlV();
 
-                AutomationWrapper.Select(projectNode);
-                Keyboard.ControlV();
-
-                Assert.AreNotEqual(null, window.WaitForItem("Solution 'HelloWorld2' (2 projects)", "HelloWorld2", "SubItem.js"));
-                Assert.AreEqual(null, window.WaitForItemRemoved("Solution 'HelloWorld2' (2 projects)", "HelloWorld2", "TestFolder", "SubItem.js"));
+                    Assert.AreNotEqual(null, window.WaitForItem("Solution 'HelloWorld2' (2 projects)", "HelloWorld2", "SubItem.js"));
+                    Assert.AreEqual(null, window.WaitForItemRemoved("Solution 'HelloWorld2' (2 projects)", "HelloWorld2", "TestFolder", "SubItem.js"));
+                }
             }
         }
 
@@ -682,18 +697,18 @@ namespace Microsoft.Nodejs.Tests.UI {
         public void CopyFolderOnToSelf() {
             using (var app = new VisualStudioApp()) {
                 app.OpenProject(@"TestData\NodejsProjectData\HelloWorld2.sln", expectedProjects: 2);
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                    var window = app.OpenSolutionExplorer();
 
-                app.OpenSolutionExplorer();
-                var window = app.SolutionExplorerTreeView;
+                    var folder = window.WaitForItem("Solution 'HelloWorld2' (2 projects)", "HelloWorld2", "TestFolder");
+                    AutomationWrapper.Select(folder);
 
-                var folder = window.WaitForItem("Solution 'HelloWorld2' (2 projects)", "HelloWorld2", "TestFolder");
-                AutomationWrapper.Select(folder);
+                    Keyboard.ControlC();
+                    AutomationWrapper.Select(folder);
+                    Keyboard.ControlV();
 
-                Keyboard.ControlC();
-                AutomationWrapper.Select(folder);
-                Keyboard.ControlV();
-
-                Assert.AreNotEqual(null, window.WaitForItem("Solution 'HelloWorld2' (2 projects)", "HelloWorld2", "TestFolder - Copy"));
+                    Assert.AreNotEqual(null, window.WaitForItem("Solution 'HelloWorld2' (2 projects)", "HelloWorld2", "TestFolder - Copy"));
+                }
             }
         }
 
@@ -703,20 +718,21 @@ namespace Microsoft.Nodejs.Tests.UI {
             using (var app = new VisualStudioApp()) {
                 app.OpenProject(@"TestData\NodejsProjectData\DragDropTest.sln");
 
-                app.OpenSolutionExplorer();
-                var window = app.SolutionExplorerTreeView;
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                    var window = app.OpenSolutionExplorer();
 
-                var folder = window.WaitForItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder", "SubItem.js");
-                var point = folder.GetClickablePoint();
-                Mouse.MoveTo(point);
-                Mouse.Down(MouseButton.Left);
+                    var folder = window.WaitForItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder", "SubItem.js");
+                    var point = folder.GetClickablePoint();
+                    Mouse.MoveTo(point);
+                    Mouse.Down(MouseButton.Left);
 
-                var project = window.FindItem("Solution 'DragDropTest' (1 project)", "DragDropTest");
-                point = project.GetClickablePoint();
-                Mouse.MoveTo(point);
-                Mouse.Up(MouseButton.Left);
+                    var project = window.FindItem("Solution 'DragDropTest' (1 project)", "DragDropTest");
+                    point = project.GetClickablePoint();
+                    Mouse.MoveTo(point);
+                    Mouse.Up(MouseButton.Left);
 
-                Assert.AreNotEqual(null, window.WaitForItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "SubItem.js"));
+                    Assert.AreNotEqual(null, window.WaitForItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "SubItem.js"));
+                }
             }
         }
 
@@ -729,21 +745,22 @@ namespace Microsoft.Nodejs.Tests.UI {
             using (var app = new VisualStudioApp()) {
                 app.OpenProject(@"TestData\NodejsProjectData\DragDropTest.sln");
 
-                app.OpenSolutionExplorer();
-                var window = app.SolutionExplorerTreeView;
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                    var window = app.OpenSolutionExplorer();
 
-                var folder = window.WaitForItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder", "SubItem2.js");
-                var point = folder.GetClickablePoint();
-                Mouse.MoveTo(point);
-                Mouse.Down(MouseButton.Left);
+                    var folder = window.WaitForItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder", "SubItem2.js");
+                    var point = folder.GetClickablePoint();
+                    Mouse.MoveTo(point);
+                    Mouse.Down(MouseButton.Left);
 
-                var project = window.FindItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder", "SubItem3.js");
-                point = project.GetClickablePoint();
-                Mouse.MoveTo(point);
-                Mouse.Up(MouseButton.Left);
+                    var project = window.FindItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder", "SubItem3.js");
+                    point = project.GetClickablePoint();
+                    Mouse.MoveTo(point);
+                    Mouse.Up(MouseButton.Left);
 
-                Assert.AreNotEqual(null, window.WaitForItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder", "SubItem2.js"));
-                Assert.AreNotEqual(null, window.WaitForItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder", "SubItem3.js"));
+                    Assert.AreNotEqual(null, window.WaitForItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder", "SubItem2.js"));
+                    Assert.AreNotEqual(null, window.WaitForItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder", "SubItem3.js"));
+                }
             }
         }
 
@@ -756,20 +773,21 @@ namespace Microsoft.Nodejs.Tests.UI {
             using (var app = new VisualStudioApp()) {
                 app.OpenProject(@"TestData\NodejsProjectData\DragDropTest.sln");
 
-                app.OpenSolutionExplorer();
-                var window = app.SolutionExplorerTreeView;
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                    var window = app.OpenSolutionExplorer();
 
-                var folder = window.WaitForItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder", "SubItem2.js");
-                var point = folder.GetClickablePoint();
-                Mouse.MoveTo(point);
-                Mouse.Down(MouseButton.Left);
+                    var folder = window.WaitForItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder", "SubItem2.js");
+                    var point = folder.GetClickablePoint();
+                    Mouse.MoveTo(point);
+                    Mouse.Down(MouseButton.Left);
 
-                var project = window.FindItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder");
-                point = project.GetClickablePoint();
-                Mouse.MoveTo(point);
-                Mouse.Up(MouseButton.Left);
+                    var project = window.FindItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder");
+                    point = project.GetClickablePoint();
+                    Mouse.MoveTo(point);
+                    Mouse.Up(MouseButton.Left);
 
-                Assert.AreNotEqual(null, window.WaitForItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder", "SubItem2.js"));
+                    Assert.AreNotEqual(null, window.WaitForItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder", "SubItem2.js"));
+                }
             }
         }
 
@@ -779,26 +797,27 @@ namespace Microsoft.Nodejs.Tests.UI {
             using (var app = new VisualStudioApp()) {
                 app.OpenProject(@"TestData\NodejsProjectData\DragDropTest.sln");
 
-                app.OpenSolutionExplorer();
-                var window = app.SolutionExplorerTreeView;
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                    var window = app.OpenSolutionExplorer();
 
-                var item = window.WaitForItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder2", "SubItem.js");
-                var project = window.WaitForItem("Solution 'DragDropTest' (1 project)", "DragDropTest");
+                    var item = window.WaitForItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder2", "SubItem.js");
+                    var project = window.WaitForItem("Solution 'DragDropTest' (1 project)", "DragDropTest");
 
-                // click on SubItem.js
-                var point = item.GetClickablePoint();
-                Mouse.MoveTo(point);
-                Mouse.Down(MouseButton.Left);
+                    // click on SubItem.js
+                    var point = item.GetClickablePoint();
+                    Mouse.MoveTo(point);
+                    Mouse.Down(MouseButton.Left);
 
-                // move to project and hover
-                var projectPoint = project.GetClickablePoint();
-                Mouse.MoveTo(projectPoint);
+                    // move to project and hover
+                    var projectPoint = project.GetClickablePoint();
+                    Mouse.MoveTo(projectPoint);
 
-                // move back and release
-                Mouse.MoveTo(point);
-                Mouse.Up(MouseButton.Left);
+                    // move back and release
+                    Mouse.MoveTo(point);
+                    Mouse.Up(MouseButton.Left);
 
-                Assert.AreNotEqual(null, window.FindItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder2", "SubItem.js"));
+                    Assert.AreNotEqual(null, window.FindItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder2", "SubItem.js"));
+                }
             }
         }
 
@@ -808,26 +827,27 @@ namespace Microsoft.Nodejs.Tests.UI {
             using (var app = new VisualStudioApp()) {
                 app.OpenProject(@"TestData\NodejsProjectData\DragDropTest.sln");
 
-                app.OpenSolutionExplorer();
-                var window = app.SolutionExplorerTreeView;
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                    var window = app.OpenSolutionExplorer();
 
-                var folder = window.WaitForItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder2", "SubFolder");
-                var project = window.WaitForItem("Solution 'DragDropTest' (1 project)", "DragDropTest");
+                    var folder = window.WaitForItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder2", "SubFolder");
+                    var project = window.WaitForItem("Solution 'DragDropTest' (1 project)", "DragDropTest");
 
-                // click on SubItem.js
-                var point = folder.GetClickablePoint();
-                Mouse.MoveTo(point);
-                Mouse.Down(MouseButton.Left);
+                    // click on SubItem.js
+                    var point = folder.GetClickablePoint();
+                    Mouse.MoveTo(point);
+                    Mouse.Down(MouseButton.Left);
 
-                // move to project and hover
-                var projectPoint = project.GetClickablePoint();
-                Mouse.MoveTo(projectPoint);
+                    // move to project and hover
+                    var projectPoint = project.GetClickablePoint();
+                    Mouse.MoveTo(projectPoint);
 
-                // move back and release
-                Mouse.MoveTo(point);
-                Mouse.Up(MouseButton.Left);
+                    // move back and release
+                    Mouse.MoveTo(point);
+                    Mouse.Up(MouseButton.Left);
 
-                Assert.AreNotEqual(null, window.FindItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder2", "SubFolder"));
+                    Assert.AreNotEqual(null, window.FindItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder2", "SubFolder"));
+                }
             }
         }
 
@@ -837,27 +857,28 @@ namespace Microsoft.Nodejs.Tests.UI {
             using (var app = new VisualStudioApp()) {
                 app.OpenProject(@"TestData\NodejsProjectData\MultiSelectCopyAndPaste.sln");
 
-                app.OpenSolutionExplorer();
-                var window = app.SolutionExplorerTreeView;
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                    var window = app.OpenSolutionExplorer();
 
-                var folderNode = window.WaitForItem("Solution 'MultiSelectCopyAndPaste' (1 project)", "MultiSelectCopyAndPaste", "server.js");
-                Mouse.MoveTo(folderNode.GetClickablePoint());
-                Mouse.Click();
+                    var folderNode = window.WaitForItem("Solution 'MultiSelectCopyAndPaste' (1 project)", "MultiSelectCopyAndPaste", "server.js");
+                    Mouse.MoveTo(folderNode.GetClickablePoint());
+                    Mouse.Click();
 
-                Keyboard.Press(Key.LeftShift);
-                Keyboard.PressAndRelease(Key.Down);
-                Keyboard.PressAndRelease(Key.Down);
-                Keyboard.Release(Key.LeftShift);
-                Keyboard.ControlC();
+                    Keyboard.Press(Key.LeftShift);
+                    Keyboard.PressAndRelease(Key.Down);
+                    Keyboard.PressAndRelease(Key.Down);
+                    Keyboard.Release(Key.LeftShift);
+                    Keyboard.ControlC();
 
-                var projectNode = window.WaitForItem("Solution 'MultiSelectCopyAndPaste' (1 project)", "MultiSelectCopyAndPaste");
+                    var projectNode = window.WaitForItem("Solution 'MultiSelectCopyAndPaste' (1 project)", "MultiSelectCopyAndPaste");
 
-                AutomationWrapper.Select(projectNode);
-                Keyboard.ControlV();
+                    AutomationWrapper.Select(projectNode);
+                    Keyboard.ControlV();
 
-                Assert.AreNotEqual(null, window.WaitForItem("Solution 'MultiSelectCopyAndPaste' (1 project)", "MultiSelectCopyAndPaste", "server - Copy.js"));
-                Assert.AreNotEqual(null, window.WaitForItem("Solution 'MultiSelectCopyAndPaste' (1 project)", "MultiSelectCopyAndPaste", "server2 - Copy.js"));
-                Assert.AreNotEqual(null, window.WaitForItem("Solution 'MultiSelectCopyAndPaste' (1 project)", "MultiSelectCopyAndPaste", "server3 - Copy.js"));
+                    Assert.AreNotEqual(null, window.WaitForItem("Solution 'MultiSelectCopyAndPaste' (1 project)", "MultiSelectCopyAndPaste", "server - Copy.js"));
+                    Assert.AreNotEqual(null, window.WaitForItem("Solution 'MultiSelectCopyAndPaste' (1 project)", "MultiSelectCopyAndPaste", "server2 - Copy.js"));
+                    Assert.AreNotEqual(null, window.WaitForItem("Solution 'MultiSelectCopyAndPaste' (1 project)", "MultiSelectCopyAndPaste", "server3 - Copy.js"));
+                }
             }
         }
 
@@ -867,30 +888,31 @@ namespace Microsoft.Nodejs.Tests.UI {
             using (var app = new VisualStudioApp()) {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
-                string filename, basename;
-                int i = 0;
-                do {
-                    i++;
-                    basename = "test" + i + " .js";
-                    filename = Path.Combine(Path.GetTempPath(), basename);
-                } while (System.IO.File.Exists(filename));
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                    string filename, basename;
+                    int i = 0;
+                    do {
+                        i++;
+                        basename = "test" + i + " .js";
+                        filename = Path.Combine(Path.GetTempPath(), basename);
+                    } while (System.IO.File.Exists(filename));
 
-                System.IO.File.WriteAllText(filename, "function f() { }");
+                    System.IO.File.WriteAllText(filename, "function f() { }");
 
-                var fileWindow = app.Dte.ItemOperations.OpenFile(filename);
+                    var fileWindow = app.Dte.ItemOperations.OpenFile(filename);
 
-                using (var dlg = ChooseLocationDialog.FromDte(app)) {
-                    dlg.SelectProject("HelloWorld");
-                    dlg.OK();
+                    using (var dlg = ChooseLocationDialog.FromDte(app)) {
+                        dlg.SelectProject("HelloWorld");
+                        dlg.OK();
+                    }
+
+                    var window = app.OpenSolutionExplorer();
+                    Assert.AreNotEqual(null, window.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", basename));
+
+                    Assert.AreEqual(fileWindow.Caption, basename);
+
+                    System.IO.File.Delete(filename);
                 }
-
-                app.OpenSolutionExplorer();
-                var window = app.SolutionExplorerTreeView;
-                Assert.AreNotEqual(null, window.WaitForItem("Solution 'HelloWorld' (1 project)", "HelloWorld", basename));
-
-                Assert.AreEqual(fileWindow.Caption, basename);
-
-                System.IO.File.Delete(filename);
             }
         }
 
@@ -900,29 +922,30 @@ namespace Microsoft.Nodejs.Tests.UI {
             using (var app = new VisualStudioApp()) {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\SaveAsUI.sln");
 
-                app.OpenSolutionExplorer();
-                var solutionTree = app.SolutionExplorerTreeView;
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                    var solutionTree = app.OpenSolutionExplorer();
 
-                // open and edit the file
-                var folderNode = solutionTree.WaitForItem("Solution 'SaveAsUI' (1 project)", "HelloWorld", "server.js");
-                folderNode.SetFocus();
-                Keyboard.PressAndRelease(Key.Enter);
+                    // open and edit the file
+                    var folderNode = solutionTree.WaitForItem("Solution 'SaveAsUI' (1 project)", "HelloWorld", "server.js");
+                    folderNode.SetFocus();
+                    Keyboard.PressAndRelease(Key.Enter);
 
-                var item = project.ProjectItems.Item("server.js");
-                var window = item.Open();
-                window.Activate();
+                    var item = project.ProjectItems.Item("server.js");
+                    var window = item.Open();
+                    window.Activate();
 
-                var selection = ((TextSelection)window.Selection);
-                selection.SelectAll();
-                selection.Delete();
+                    var selection = ((TextSelection)window.Selection);
+                    selection.SelectAll();
+                    selection.Delete();
 
-                // save under a new file name
-                var saveDialog = app.SaveAs();
-                string oldName = saveDialog.FileName;
-                saveDialog.FileName = "Program2.js";
-                saveDialog.Save();
+                    // save under a new file name
+                    var saveDialog = app.SaveAs();
+                    string oldName = saveDialog.FileName;
+                    saveDialog.FileName = "Program2.js";
+                    saveDialog.Save();
 
-                Assert.AreNotEqual(null, solutionTree.WaitForItem("Solution 'SaveAsUI' (1 project)", "HelloWorld", "Program2.js"));
+                    Assert.AreNotEqual(null, solutionTree.WaitForItem("Solution 'SaveAsUI' (1 project)", "HelloWorld", "Program2.js"));
+                }
             }
         }
     }
