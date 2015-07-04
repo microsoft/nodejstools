@@ -161,10 +161,10 @@ http.createServer(function (req, res) {
             Window window;
             using (var app = new VisualStudioApp()) {
                 var openFile = OpenProjectItem(app, "server.js", out window);
-
-                app.OpenSolutionExplorer();
-                var solutionExplorer = app.SolutionExplorerTreeView;
-                solutionExplorer.WaitForItemRemoved("Solution 'NodeAppWithModule' (1 project)", "NodeAppWithModule", "References");
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                    var solutionExplorer = app.OpenSolutionExplorer();
+                    solutionExplorer.WaitForItemRemoved("Solution 'NodeAppWithModule' (1 project)", "NodeAppWithModule", "References");
+                }
             }
         }
 
@@ -271,47 +271,50 @@ http.createServer(function (req, res) {
             using (var app = new VisualStudioApp()) {
                 app.OpenProject(Path.GetFullPath(@"TestData\NodeAppWithModule2\NodeAppWithModule.sln"));
 
-                var projectName = "NodeAppWithModule";
-                var project = app.SolutionExplorerTreeView.WaitForItem(
-                    "Solution '" + projectName + "' (1 project)",
-                    projectName);
-
-                var projectNode = new TreeNode(project);
-                projectNode.SetFocus();
-
-                System.Threading.Thread.Sleep(2000);
-
-                app.Dte.ExecuteCommand("Project.UnloadProject");
-
-                project = app.SolutionExplorerTreeView.WaitForItem(
-                    "Solution '" + projectName + "' (0 projects)",
-                    projectName + " (unavailable)");
-
-                projectNode = new TreeNode(project);
-                projectNode.Select();
-
-                System.Threading.Thread.Sleep(2000);
-
-                app.Dte.ExecuteCommand("Project.ReloadProject");
-
-                Assert.IsNotNull(
-                    app.SolutionExplorerTreeView.WaitForItem(
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                    app.OpenSolutionExplorer();
+                    var projectName = "NodeAppWithModule";
+                    var project = app.SolutionExplorerTreeView.WaitForItem(
                         "Solution '" + projectName + "' (1 project)",
-                        projectName,
-                        "server.js"
-                    ),
-                    "project not reloaded"
-                );
+                        projectName);
 
-                var openFile = OpenItem(app, "server.js", app.Dte.Solution.Projects.Item(1), out window);
+                    var projectNode = new TreeNode(project);
+                    projectNode.SetFocus();
 
-                openFile.MoveCaret(6, 1);
-                Keyboard.Type("process.");
-                using (var session = openFile.WaitForSession<ICompletionSession>()) {
+                    System.Threading.Thread.Sleep(2000);
 
-                    var completions = session.Session.CompletionSets.First().Completions.Select(x => x.InsertionText);
-                    Assert.IsTrue(completions.Contains("abort"));
-                    Assert.IsTrue(completions.Contains("chdir"));
+                    app.Dte.ExecuteCommand("Project.UnloadProject");
+
+                    project = app.SolutionExplorerTreeView.WaitForItem(
+                        "Solution '" + projectName + "' (0 projects)",
+                        projectName + " (unavailable)");
+
+                    projectNode = new TreeNode(project);
+                    projectNode.Select();
+
+                    System.Threading.Thread.Sleep(2000);
+
+                    app.Dte.ExecuteCommand("Project.ReloadProject");
+
+                    Assert.IsNotNull(
+                        app.SolutionExplorerTreeView.WaitForItem(
+                            "Solution '" + projectName + "' (1 project)",
+                            projectName,
+                            "server.js"
+                        ),
+                        "project not reloaded"
+                    );
+
+                    var openFile = OpenItem(app, "server.js", app.Dte.Solution.Projects.Item(1), out window);
+
+                    openFile.MoveCaret(6, 1);
+                    Keyboard.Type("process.");
+                    using (var session = openFile.WaitForSession<ICompletionSession>()) {
+
+                        var completions = session.Session.CompletionSets.First().Completions.Select(x => x.InsertionText);
+                        Assert.IsTrue(completions.Contains("abort"));
+                        Assert.IsTrue(completions.Contains("chdir"));
+                    }
                 }
             }
         }
@@ -437,6 +440,7 @@ sd.StringDecoder
                     System.Threading.Thread.Sleep(250);
                 }
 
+                app.OpenSolutionExplorer();
                 app.SolutionExplorerTreeView.WaitForItem(
                     "Solution '" + app.Dte.Solution.Projects.Item(1).Name + "' (1 project)",
                     app.Dte.Solution.Projects.Item(1).Name,
@@ -467,6 +471,7 @@ sd.StringDecoder
                     System.Threading.Thread.Sleep(250);
                 }
 
+                app.OpenSolutionExplorer();
                 app.SolutionExplorerTreeView.WaitForItem(
                     "Solution '" + app.Dte.Solution.Projects.Item(1).Name + "' (1 project)",
                     app.Dte.Solution.Projects.Item(1).Name,
@@ -486,38 +491,40 @@ sd.StringDecoder
             using (var app = new VisualStudioApp()) {
                 var project = app.OpenProject(@"TestData\NodeAppWithModule\NodeAppWithModule.sln");
 
-                Assert.AreEqual("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}", project.Kind.ToUpper());
-                // we don't yet expose a VSProject interface here, if we did we'd need tests for it, but it doesn't support
-                // any functionality we care about/implement yet.
-                Assert.AreEqual(typeof(NodejsProjectNode), project.Object.GetType());
-
-                Assert.AreEqual(true, project.Saved);
-                project.Saved = false;
-                Assert.AreEqual(false, project.Saved);
-                project.Saved = true;
-
-                Assert.AreEqual(null, project.Globals);
-                Assert.AreEqual("{04726c27-8125-471a-bac0-2301d273db5e}", project.ExtenderCATID);
-                var extNames = project.ExtenderNames;
-                Assert.AreEqual(typeof(string[]), extNames.GetType());
-                Assert.AreEqual(2, ((string[])extNames).Length);
-                Assert.AreEqual(null, project.ParentProjectItem);
-                Assert.AreEqual(null, project.CodeModel);
-                AssertError<ArgumentNullException>(() => project.get_Extender(null));
-                AssertError<COMException>(() => project.get_Extender("DoesNotExist"));
-                Assert.AreEqual(null, project.Collection);
-
-                foreach (ProjectItem item in project.ProjectItems) {
-                    Assert.AreEqual(item.Name, project.ProjectItems.Item(1).Name);
-                    break;
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                    Assert.AreEqual("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}", project.Kind.ToUpper());
+                    // we don't yet expose a VSProject interface here, if we did we'd need tests for it, but it doesn't support
+                    // any functionality we care about/implement yet.
+                    Assert.AreEqual(typeof(NodejsProjectNode), project.Object.GetType());
+    
+                    Assert.AreEqual(true, project.Saved);
+                    project.Saved = false;
+                    Assert.AreEqual(false, project.Saved);
+                    project.Saved = true;
+    
+                    Assert.AreEqual(null, project.Globals);
+                    Assert.AreEqual("{04726c27-8125-471a-bac0-2301d273db5e}", project.ExtenderCATID);
+                    var extNames = project.ExtenderNames;
+                    Assert.AreEqual(typeof(string[]), extNames.GetType());
+                    Assert.AreEqual(2, ((string[])extNames).Length);
+                    Assert.AreEqual(null, project.ParentProjectItem);
+                    Assert.AreEqual(null, project.CodeModel);
+                    AssertError<ArgumentNullException>(() => project.get_Extender(null));
+                    AssertError<COMException>(() => project.get_Extender("DoesNotExist"));
+                    Assert.AreEqual(null, project.Collection);
+    
+                    foreach (ProjectItem item in project.ProjectItems) {
+                        Assert.AreEqual(item.Name, project.ProjectItems.Item(1).Name);
+                        break;
+                    }
+    
+                    Assert.AreEqual(app.Dte, project.ProjectItems.DTE);
+                    Assert.AreEqual(project, project.ProjectItems.Parent);
+                    Assert.AreEqual(null, project.ProjectItems.Kind);
+    
+                    AssertError<ArgumentException>(() => project.ProjectItems.Item(-1));
+                    AssertError<ArgumentException>(() => project.ProjectItems.Item(0));
                 }
-
-                Assert.AreEqual(app.Dte, project.ProjectItems.DTE);
-                Assert.AreEqual(project, project.ProjectItems.Parent);
-                Assert.AreEqual(null, project.ProjectItems.Kind);
-
-                AssertError<ArgumentException>(() => project.ProjectItems.Item(-1));
-                AssertError<ArgumentException>(() => project.ProjectItems.Item(0));
             }
         }
 
@@ -527,29 +534,32 @@ sd.StringDecoder
             using (var app = new VisualStudioApp()) {
                 var project = app.OpenProject(@"TestData\NodeAppWithModule\NodeAppWithModule.sln");
 
-                // wait for new solution to load...
-                for (int i = 0; i < 40 && app.Dte.Solution.Projects.Count == 0; i++) {
-                    System.Threading.Thread.Sleep(250);
-                }
-
-                var item = app.SolutionExplorerTreeView.WaitForItem(
-                    "Solution '" + app.Dte.Solution.Projects.Item(1).Name + "' (1 project)",
-                    app.Dte.Solution.Projects.Item(1).Name,
-                    "mymod.js"
-                );
-
-                AutomationWrapper.Select(item);
-                app.Dte.ExecuteCommand("Project.SetasNode.jsStartupFile");
-
-                string startupFile = null;
-                for (int i = 0; i < 40; i++) {
-                    startupFile = (string)project.Properties.Item("StartupFile").Value;
-                    if (startupFile == "mymod.js") {
-                        break;
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                    // wait for new solution to load...
+                    for (int i = 0; i < 40 && app.Dte.Solution.Projects.Count == 0; i++) {
+                        System.Threading.Thread.Sleep(250);
                     }
-                    System.Threading.Thread.Sleep(250);
+
+                    app.OpenSolutionExplorer();
+                    var item = app.SolutionExplorerTreeView.WaitForItem(
+                        "Solution '" + app.Dte.Solution.Projects.Item(1).Name + "' (1 project)",
+                        app.Dte.Solution.Projects.Item(1).Name,
+                        "mymod.js"
+                    );
+
+                    AutomationWrapper.Select(item);
+                    app.Dte.ExecuteCommand("Project.SetasNode.jsStartupFile");
+
+                    string startupFile = null;
+                    for (int i = 0; i < 40; i++) {
+                        startupFile = (string)project.Properties.Item("StartupFile").Value;
+                        if (startupFile == "mymod.js") {
+                            break;
+                        }
+                        System.Threading.Thread.Sleep(250);
+                    }
+                    Assert.AreEqual(startupFile, Path.Combine(Environment.CurrentDirectory, @"TestData\NodeAppWithModule\NodeAppWithModule", "mymod.js"));
                 }
-                Assert.AreEqual(startupFile, Path.Combine(Environment.CurrentDirectory, @"TestData\NodeAppWithModule\NodeAppWithModule", "mymod.js"));
             }
         }
 

@@ -14,17 +14,148 @@
 //
 //*********************************************************//
 
+using System;
 using System.IO;
+using System.Text;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
+using VSLangProj;
 
 namespace Microsoft.NodejsTools.Project {
     class NodejsFolderNode : CommonFolderNode {
         private readonly CommonProjectNode _project;
+        private FolderContentType _contentType = FolderContentType.NotAssigned;
+        private bool _containsNodeOrBrowserFiles = false;
 
         public NodejsFolderNode(CommonProjectNode root, ProjectElement element) : base(root, element) {
             _project = root;
+        }
+
+        public FolderContentType ContentType {
+            get {
+                if (_contentType == FolderContentType.NotAssigned) {
+                    UpdateContentType();
+                }
+
+                return _contentType;
+            }
+        }
+
+        public void UpdateContentType() {
+            _containsNodeOrBrowserFiles = false;
+            
+            // Iterate through all of the javascript files in a directory to determine whether
+            // the build actions are Content, Compile, or a mix of the two.
+            var fileNodesEnumerator = this.EnumNodesOfType<NodejsFileNode>().GetEnumerator();
+            FolderContentType contentType = FolderContentType.None;
+            while (fileNodesEnumerator.MoveNext()) {
+                if (!fileNodesEnumerator.Current.FileName.EndsWith(".js", StringComparison.OrdinalIgnoreCase)) {
+                    continue;
+                }
+                var properties = fileNodesEnumerator.Current.NodeProperties as IncludedFileNodeProperties;
+                if (properties != null) {
+                    _containsNodeOrBrowserFiles = true;
+                    switch (properties.BuildAction) {
+                        case prjBuildAction.prjBuildActionContent:
+                            contentType |= FolderContentType.Browser;
+                            break;
+                        case prjBuildAction.prjBuildActionCompile:
+                            contentType |= FolderContentType.Node;
+                            break;
+                    }
+
+                    if (contentType == FolderContentType.Mixed) {
+                        break;
+                    }
+                }
+            }
+
+            // If there are no relevant javascript files in the folder, then fall back to
+            // the parent type. This enables us to provide good defaults in the event that
+            // an item is added to the directory later.
+            var parent = this.Parent as NodejsFolderNode;
+            if (contentType == FolderContentType.None) {
+                // Set as parent content type 
+                if (parent != null) {
+                    contentType = parent.ContentType;
+                }
+            }
+
+            _contentType = contentType;
+            ProjectMgr.ReDrawNode(this, UIHierarchyElement.Caption);
+
+            // Update the caption of the parent folder accordingly
+            if (parent != null) {
+                parent.UpdateContentType();
+            }
+        }
+
+        public override string Caption {
+            get {
+                var res = base.Caption;
+
+                if (NodejsPackage.Instance.GeneralOptionsPage.ShowBrowserAndNodeLabels && _containsNodeOrBrowserFiles) {
+                    res = AppendLabel(res, ContentType);
+                }
+                return res;
+            }
+        }
+
+        public override string GetEditLabel() {
+            // return base.Caption instead of this.Caption so that
+            // the labels we append do not get pulled in.
+            return base.Caption;
+        }
+
+        public override void RemoveChild(HierarchyNode node) {
+            base.RemoveChild(node);
+            UpdateContentType();
+        }
+
+        public override void AddChild(HierarchyNode node) {
+            base.AddChild(node);
+
+            // If we are adding an immediate child to a directory, then set the content type
+            // acording to the content type of the folder it is being moved to.
+            var nodejsFileNode = node as NodejsFileNode;
+            if (nodejsFileNode != null && nodejsFileNode.FileName.EndsWith(".js", StringComparison.OrdinalIgnoreCase) && nodejsFileNode.Parent == this) {
+                var properties = nodejsFileNode.NodeProperties as IncludedFileNodeProperties;
+                if (properties != null) {
+                    switch (ContentType) {
+                        case FolderContentType.Browser:
+                            properties.ItemType = ProjectFileConstants.Content;
+                            break;
+                        case FolderContentType.Node:
+                            properties.ItemType = ProjectFileConstants.Compile;
+                            break;
+                    }
+                }
+            }
+
+            UpdateContentType();
+        }
+
+        /// <summary>
+        /// Append a label denoting browser-side code, node, or both depending on the content type
+        /// 
+        /// </summary>
+        /// <param name="folderName"></param>
+        /// <param name="contentType"></param>
+        /// <returns></returns>
+        public static string AppendLabel(string folderName, FolderContentType contentType) {
+            switch (contentType) {
+                case FolderContentType.Browser:
+                    folderName += " (browser)";
+                    break;
+                case FolderContentType.Node:
+                    folderName += " (node)";
+                    break;
+                case FolderContentType.Mixed:
+                    folderName += " (node, browser)";
+                    break;
+            }
+            return folderName;
         }
 
         internal override int IncludeInProject(bool includeChildren) {
@@ -36,7 +167,49 @@ namespace Microsoft.NodejsTools.Project {
                 !ShouldIncludeNodeModulesFolderInProject()) {
                 return VSConstants.S_OK;
             }
-            return base.IncludeInProject(includeChildren);                
+            return base.IncludeInProject(includeChildren);
+        }
+
+        internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result) {
+            if (cmdGroup == Guids.NodejsCmdSet) {
+                switch (cmd) {
+                    case PkgCmdId.cmdidSetAsContent:
+                        if (_containsNodeOrBrowserFiles && ContentType.HasFlag(FolderContentType.Node)) {
+                            result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
+                        }
+                        return VSConstants.S_OK;
+                    case PkgCmdId.cmdidSetAsCompile:
+                        if (_containsNodeOrBrowserFiles && ContentType.HasFlag(FolderContentType.Browser)) {
+                            result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
+                        }
+                        return VSConstants.S_OK;
+                }
+            }
+            return base.QueryStatusOnNode(cmdGroup, cmd, pCmdText, ref result);
+        }
+
+        internal override int ExecCommandOnNode(Guid cmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
+            if (cmdGroup == Guids.NodejsCmdSet) {
+                switch (cmd) {
+                    case PkgCmdId.cmdidSetAsContent:
+                        SetItemTypeRecursively(prjBuildAction.prjBuildActionContent);
+                        return VSConstants.S_OK;
+                    case PkgCmdId.cmdidSetAsCompile:
+                        SetItemTypeRecursively(prjBuildAction.prjBuildActionCompile);
+                        return VSConstants.S_OK;
+                }
+            }
+            return base.ExecCommandOnNode(cmdGroup, cmd, nCmdexecopt, pvaIn, pvaOut);
+        }
+
+        internal void SetItemTypeRecursively(prjBuildAction buildAction) {
+            var fileNodesEnumerator = this.EnumNodesOfType<NodejsFileNode>().GetEnumerator();
+            while (fileNodesEnumerator.MoveNext()) {
+                var includedFileNodeProperties = fileNodesEnumerator.Current.NodeProperties as IncludedFileNodeProperties;
+                if (includedFileNodeProperties != null && includedFileNodeProperties.FileName.EndsWith(".js", StringComparison.OrdinalIgnoreCase)) {
+                    includedFileNodeProperties.BuildAction = buildAction;
+                }
+            }
         }
 
         private bool ShouldIncludeNodeModulesFolderInProject() {
@@ -61,5 +234,13 @@ namespace Microsoft.NodejsTools.Project {
 
             return button == includeNodeModulesButton;
         }
+    }
+
+    internal enum FolderContentType {
+        None = 0,
+        Browser = 1,
+        Node = 2,
+        Mixed = 3,
+        NotAssigned
     }
 }

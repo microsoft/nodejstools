@@ -208,6 +208,16 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         internal override string GetItemType(string filename) {
+            string absFileName = 
+                Path.IsPathRooted(filename) ? 
+                filename :
+                Path.Combine(this.ProjectHome, filename);
+
+            var node = this.FindNodeByFullPath(absFileName) as NodejsFileNode;
+            if (node != null && node.ItemNode.ItemTypeName != null) {
+                return node.ItemNode.ItemTypeName;
+            }
+
             if (string.Equals(Path.GetExtension(filename), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
                 return NodejsConstants.TypeScriptCompileItemType;
             }
@@ -344,6 +354,7 @@ namespace Microsoft.NodejsTools.Project {
             NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevelChanged += IntellisenseOptionsPageAnalysisLevelChanged;
             NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMaximumChanged += AnalysisLogMaximumChanged;
             NodejsPackage.Instance.IntellisenseOptionsPage.SaveToDiskChanged += IntellisenseOptionsPageSaveToDiskChanged;
+            NodejsPackage.Instance.GeneralOptionsPage.ShowBrowserAndNodeLabelsChanged += ShowBrowserAndNodeLabelsChanged;
 
             return base.InitializeForOuter(filename, location, name, flags, ref iid, out projectPointer, out canceled);
         }
@@ -446,6 +457,13 @@ namespace Microsoft.NodejsTools.Project {
         private void IntellisenseOptionsPageSaveToDiskChanged(object sender, EventArgs e) {
             if (_analyzer != null) {
                 _analyzer.SaveToDisk = NodejsPackage.Instance.IntellisenseOptionsPage.SaveToDisk;
+            }
+        }
+
+        private void ShowBrowserAndNodeLabelsChanged(object sender, EventArgs e) {
+            var nodejsFolderNodes = this.AllDescendants.Where(item => (item as NodejsFolderNode) != null).Select(item => (NodejsFolderNode)item);
+            foreach (var node in nodejsFolderNodes) {
+                ProjectMgr.ReDrawNode(node, UIHierarchyElement.Caption);
             }
         }
 

@@ -120,6 +120,26 @@
         </Strings>
       </Button>
 
+      <Button guid="guidNodeToolsCmdSet" id="cmdidSetAsContent" priority="0x0600" type="Button">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_ITEM_INCLUDEEXCLUDE"/>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Set as &amp;Content (browser code)</ButtonText>
+          <CommandName>Set as Content (browser code)</CommandName>
+        </Strings>
+      </Button>
+      
+      <Button guid="guidNodeToolsCmdSet" id="cmdidSetAsCompile" priority="0x0601" type="Button">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_ITEM_INCLUDEEXCLUDE"/>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Set as &amp;Compile (Node.js code)</ButtonText>
+          <CommandName>Set as Compile (Node.js code)</CommandName>
+        </Strings>
+      </Button>
+
       <Button guid="guidNodeToolsCmdSet" id="cmdidCopyFullPath" priority="0x0610" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_FOLDER_EXPLORE" />
         <CommandFlag>DefaultInvisible</CommandFlag>
@@ -308,6 +328,12 @@
     <CommandPlacement guid="guidNodeToolsCmdSet" id="cmdidOpenCommandPromptHere" priority="0x600">
       <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJECT_EXPLORE"/>
     </CommandPlacement>
+    <CommandPlacement guid="guidNodeToolsCmdSet" id="cmdidSetAsContent" priority="0x602">
+      <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJECT_EXPLORE"/>
+    </CommandPlacement>
+        <CommandPlacement guid="guidNodeToolsCmdSet" id="cmdidSetAsCompile" priority="0x603">
+      <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJECT_EXPLORE"/>
+    </CommandPlacement>
     <CommandPlacement guid="guidNodeToolsCmdSet" id="CodeFileGroup" priority="0x600">
       <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_WEBITEMNODE"/>
     </CommandPlacement>
@@ -336,6 +362,8 @@
       <IDSymbol name="cmdidOpenRemoteDebugDocumentation" value="0x0206" />
       <IDSymbol name="cmdidAzureExplorerAttachNodejsDebugger" value="0x0207" />
       <IDSymbol name="cmdidDiagnostics" value="0x0208" />
+      <IDSymbol name="cmdidSetAsContent" value="0x0209" />
+       <IDSymbol name="cmdidSetAsCompile" value="0x0210" />
 
       <!-- Shared commands, defined in CommonConstants.cs -->
       <IDSymbol name="cmdidAddExistingFolder" value="0x10001" />

@@ -34,6 +34,8 @@ namespace Microsoft.NodejsTools {
         public const uint cmdidAzureExplorerAttachNodejsDebugger = 0x207;
 
         public const int cmdidDiagnostics                   = 0x208;
+        public const int cmdidSetAsContent                  = 0x209;
+        public const int cmdidSetAsCompile                  = 0x210;
 
         public const int cmdidNpmManageModules              = 0x300;
         public const int cmdidNpmInstallModules             = 0x301;

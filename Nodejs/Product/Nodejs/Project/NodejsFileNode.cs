@@ -40,7 +40,7 @@ namespace Microsoft.NodejsTools.Project {
                 root.Analyzer.AnalyzeFile(Url, !IsNonMemberItem);
                 root._requireCompletionCache.Clear();
             }
-
+            
             ItemNode.ItemTypeChanged += ItemNode_ItemTypeChanged;
         }
 
@@ -63,16 +63,42 @@ namespace Microsoft.NodejsTools.Project {
 #endif
 
         internal override int IncludeInProject(bool includeChildren) {
-            // On an include, a file is marked as Compile.  There is no reason to check whether to Analyze.  We should.
-            ProjectMgr.Analyzer.AnalyzeFile(Url, true);
-            return base.IncludeInProject(includeChildren);
+            // Check if parent folder is designated as containing client-side code.
+            var isContent = false;
+            var folderNode = this.Parent as NodejsFolderNode;
+            if (folderNode != null) {
+                var contentType = folderNode.ContentType;
+                switch (contentType) {
+                    case FolderContentType.Browser:
+                        isContent = true;
+                        break;
+                }
+            }
+
+            var includeInProject = base.IncludeInProject(includeChildren);
+            
+            if (isContent && FileName.EndsWith(".js", StringComparison.OrdinalIgnoreCase)) {
+                this.ItemNode.ItemTypeName = ProjectFileConstants.Content;
+            }
+            
+            ProjectMgr.Analyzer.AnalyzeFile(Url, ShouldAnalyze);
+            
+            UpdateParentContentType();
+            ItemNode.ItemTypeChanged += ItemNode_ItemTypeChanged;
+
+            return includeInProject;
         }
 
         internal override int ExcludeFromProject() {
             // Analyze on removing from a project so we have the most up to date sources for this.
             // Don't report errors since the file won't remain part of the project. This removes the errors from the list.
             ProjectMgr.Analyzer.AnalyzeFile(Url, false);
-            return base.ExcludeFromProject();
+            var excludeFromProject = base.ExcludeFromProject();
+            
+            UpdateParentContentType();
+            ItemNode.ItemTypeChanged -= ItemNode_ItemTypeChanged;
+            
+            return excludeFromProject;
         }
 
         protected override void RaiseOnItemRemoved(string documentToRemove, string[] filesToBeDeleted) {
@@ -88,7 +114,7 @@ namespace Microsoft.NodejsTools.Project {
             base.RenameChildNodes(parentNode);
             this.ProjectMgr.Analyzer.ReloadComplete();
         }
-
+        
         protected override NodeProperties CreatePropertiesObject() {
             if (IsLinkFile) {
                 return new NodejsLinkFileNodeProperties(this);
@@ -117,7 +143,7 @@ namespace Microsoft.NodejsTools.Project {
 
             return base.ExecCommandOnNode(guidCmdGroup, cmd, nCmdexecopt, pvaIn, pvaOut);
         }
-
+        
         internal override int QueryStatusOnNode(Guid guidCmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result) {
             if (guidCmdGroup == Guids.NodejsCmdSet) {
                 if (this.ProjectMgr.IsCodeFile(this.Url)) {
@@ -140,6 +166,15 @@ namespace Microsoft.NodejsTools.Project {
             // item type node was changed...
             // if we have changed the type from compile to anything else, we should scrub
             ProjectMgr.Analyzer.AnalyzeFile(Url, ShouldAnalyze);
+
+            UpdateParentContentType();
+        }
+        
+        private void UpdateParentContentType() {
+            var parent = this.Parent as NodejsFolderNode;
+            if (parent != null) {
+                parent.UpdateContentType();
+            }
         }
 
         private void CloseWatcher() {
@@ -199,13 +234,14 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override void Remove(bool removeFromStorage) {
+            ItemNode.ItemTypeChanged -= ItemNode_ItemTypeChanged;
             base.Remove(removeFromStorage);
             CloseWatcher();
         }
 
         public override void Close() {
+            ItemNode.ItemTypeChanged -= ItemNode_ItemTypeChanged;
             base.Close();
-
             CloseWatcher();
         }
     }
