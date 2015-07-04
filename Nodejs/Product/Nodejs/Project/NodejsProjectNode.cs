@@ -461,7 +461,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private void ShowBrowserAndNodeLabelsChanged(object sender, EventArgs e) {
-            var nodejsFolderNodes = this.AllChildren.Where(item => (item as NodejsFolderNode) != null).Select(item => (NodejsFolderNode)item);
+            var nodejsFolderNodes = this.AllDescendants.Where(item => (item as NodejsFolderNode) != null).Select(item => (NodejsFolderNode)item);
             foreach (var node in nodejsFolderNodes) {
                 ProjectMgr.ReDrawNode(node, UIHierarchyElement.Caption);
             }
