@@ -55,6 +55,7 @@ namespace Microsoft.NodejsTools.Debugger {
         private bool _handleEntryPointHit;
         private int? _id;
         private bool _loadCompleteHandled;
+        private SourceMapInfo _mapping;
         private NodeProcess _process;
         private int _steppingCallstackDepth;
         private SteppingKind _steppingMode;
@@ -783,7 +784,7 @@ namespace Microsoft.NodejsTools.Debugger {
             foreach (NodeStackFrame stackFrame in stackFrames) {
                 // Retrieve a local module
                 NodeModule module;
-                GetOrAddModule(stackFrame.Module, out module);
+                GetOrAddModule(stackFrame.Module, out module, stackFrame);
                 module = module ?? stackFrame.Module;
 
                 int line = stackFrame.Line;
@@ -792,11 +793,11 @@ namespace Microsoft.NodejsTools.Debugger {
 
                 // Map file position to original, if required
                 if (module.JavaScriptFileName != module.FileName) {
-                    SourceMapInfo mapping = SourceMapper.MapToOriginal(module.JavaScriptFileName, line, column);
-                    if (mapping != null) {
-                        line = mapping.Line;
-                        column = mapping.Column;
-                        functionName = string.IsNullOrEmpty(mapping.Name) ? functionName : mapping.Name;
+                    this._mapping = SourceMapper.MapToOriginal(module.JavaScriptFileName, line, column);
+                    if (this._mapping != null) {
+                        line = this._mapping.Line;
+                        column = this._mapping.Column;
+                        functionName = string.IsNullOrEmpty(this._mapping.Name) ? functionName : this._mapping.Name;
                     }
                 }
 
@@ -1201,11 +1202,12 @@ namespace Microsoft.NodejsTools.Debugger {
         /// </summary>
         /// <param name="module">New module.</param>
         /// <param name="value">Existing module.</param>
+        /// <param name="stackFrame">The stack frame linked to the module.</param>
         /// <returns>True if module was added otherwise false.</returns>
-        private bool GetOrAddModule(NodeModule module, out NodeModule value) {
+        private bool GetOrAddModule(NodeModule module, out NodeModule value, NodeStackFrame stackFrame = null) {
             value = null;
+            string javaScriptFileName = module.JavaScriptFileName;                       
 
-            string javaScriptFileName = module.JavaScriptFileName;
             if (string.IsNullOrEmpty(javaScriptFileName) ||
                 javaScriptFileName == NodeVariableType.UnknownModule ||
                 javaScriptFileName.StartsWith("binding:")) {
@@ -1216,10 +1218,11 @@ namespace Microsoft.NodejsTools.Debugger {
             javaScriptFileName = FileNameMapper.GetLocalFileName(javaScriptFileName);
 
             // Try to get mapping for JS file
-            String originalFileName = SourceMapper.MapToOriginal(javaScriptFileName);
+            string originalFileName = GetOriginalFileName(javaScriptFileName, stackFrame, this._mapping);
             if (originalFileName == null) {
                 module = new NodeModule(module.Id, javaScriptFileName);
-            } else {
+            } else {                
+
                 string directoryName = Path.GetDirectoryName(javaScriptFileName) ?? string.Empty;
                 string fileName = CommonUtils.GetAbsoluteFilePath(directoryName, originalFileName.Replace('/', '\\'));
 
@@ -1237,6 +1240,37 @@ namespace Microsoft.NodejsTools.Debugger {
             _modules[module.FileName] = module;
 
             return true;
+        }
+
+        /// <summary>
+        /// Gets original file to map to
+        /// </summary>
+        /// <param name="javaScriptFileName">JavaScript compiled file</param>
+        /// <param name="stackFrame">The current stack frame</param>
+        internal string GetOriginalFileName(string javaScriptFileName, NodeStackFrame stackFrame, SourceMapInfo mapping) {
+
+            SourceMapInfo tempMapping;
+            string originalFileName = String.Empty;
+            bool mappingReady = false;            
+
+            if (stackFrame != null) {
+                tempMapping = SourceMapper.MapToOriginal(javaScriptFileName, stackFrame.Line, stackFrame.Column);
+
+                if (tempMapping != null) {
+                    originalFileName = tempMapping.FileName;
+                    mappingReady = true;
+                }
+            }
+
+            if (originalFileName.Equals(String.Empty)) {
+                originalFileName = SourceMapper.MapToOriginal(javaScriptFileName);
+            }
+
+            if (originalFileName != null && mapping != null && !mappingReady) {              
+                    originalFileName = mapping.FileName;                
+            }
+
+            return originalFileName;
         }
 
         /// <summary>
