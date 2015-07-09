@@ -1243,7 +1243,7 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         /// <summary>
-        /// Gets original file to map to
+        /// Get the original file name to map to
         /// </summary>
         /// <param name="javaScriptFileName">JavaScript compiled file</param>
         /// <param name="stackFrame">The current stack frame</param>
