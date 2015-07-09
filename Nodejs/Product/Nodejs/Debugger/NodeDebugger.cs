@@ -1222,7 +1222,6 @@ namespace Microsoft.NodejsTools.Debugger {
             if (originalFileName == null) {
                 module = new NodeModule(module.Id, javaScriptFileName);
             } else {                
-
                 string directoryName = Path.GetDirectoryName(javaScriptFileName) ?? string.Empty;
                 string fileName = CommonUtils.GetAbsoluteFilePath(directoryName, originalFileName.Replace('/', '\\'));
 
