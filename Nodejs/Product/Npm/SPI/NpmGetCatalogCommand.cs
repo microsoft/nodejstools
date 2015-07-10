@@ -120,7 +120,10 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                                             .FirstOrDefault();
 
                                         if (!string.IsNullOrEmpty(latestVersion)) {
-                                            builder.LatestVersion = SemverVersion.Parse(latestVersion);
+                                            try {
+                                                builder.LatestVersion = SemverVersion.Parse(latestVersion);
+                                            } catch (SemverVersionFormatException) { 
+                                            }
                                         }
                                     }
 
