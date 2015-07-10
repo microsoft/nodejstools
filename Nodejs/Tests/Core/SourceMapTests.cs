@@ -26,6 +26,7 @@ using Microsoft.NodejsTools.SourceMapping;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
 using TestUtilities.Nodejs;
+using Microsoft.NodejsTools.Debugger;
 
 namespace NodejsTests {
     [TestClass]
@@ -214,6 +215,17 @@ namespace NodejsTests {
             int lineNo, columnNo;
             Assert.IsTrue(mapper.MapToJavaScript(TestData.GetPath(@"TestData\DebuggerProject\TypeScriptTest.ts"), 1, 0, out fileName, out lineNo, out columnNo));
             Assert.AreEqual(TestData.GetPath(@"TestData\DebuggerProject\TypeScriptTest.js"), fileName);
+        }
+
+        [TestMethod, Priority(0), TestCategory("Debugging")]
+        public void TestGetOriginalFileNameWithStackFrame() {
+            string javaScriptFileName = TestData.GetPath(@"TestData\TypeScriptMultfile\all.js");
+            var debugger = new NodeDebugger(null, 0);
+            NodeStackFrame stackFrame = new NodeStackFrame(0);
+            stackFrame.Line = 24;
+            stackFrame.Column = 9;            
+            string originalFileName = debugger.GetOriginalFileName(javaScriptFileName,stackFrame);
+            Assert.IsTrue(originalFileName.Contains("file2.ts"));
         }
     }
 }

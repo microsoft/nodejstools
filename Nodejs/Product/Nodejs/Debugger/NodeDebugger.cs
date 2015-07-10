@@ -55,7 +55,6 @@ namespace Microsoft.NodejsTools.Debugger {
         private bool _handleEntryPointHit;
         private int? _id;
         private bool _loadCompleteHandled;
-        private SourceMapInfo _mapping;
         private NodeProcess _process;
         private int _steppingCallstackDepth;
         private SteppingKind _steppingMode;
@@ -793,11 +792,11 @@ namespace Microsoft.NodejsTools.Debugger {
 
                 // Map file position to original, if required
                 if (module.JavaScriptFileName != module.FileName) {
-                    this._mapping = SourceMapper.MapToOriginal(module.JavaScriptFileName, line, column);
-                    if (this._mapping != null) {
-                        line = this._mapping.Line;
-                        column = this._mapping.Column;
-                        functionName = string.IsNullOrEmpty(this._mapping.Name) ? functionName : this._mapping.Name;
+                    SourceMapInfo mapping = SourceMapper.MapToOriginal(module.JavaScriptFileName, line, column);
+                    if (mapping != null) {
+                        line = mapping.Line;
+                        column = mapping.Column;
+                        functionName = string.IsNullOrEmpty(mapping.Name) ? functionName : mapping.Name;
                     }
                 }
 
@@ -1218,7 +1217,7 @@ namespace Microsoft.NodejsTools.Debugger {
             javaScriptFileName = FileNameMapper.GetLocalFileName(javaScriptFileName);
 
             // Try to get mapping for JS file
-            string originalFileName = GetOriginalFileName(javaScriptFileName, stackFrame, this._mapping);
+            string originalFileName = GetOriginalFileName(javaScriptFileName, stackFrame);
             if (originalFileName == null) {
                 module = new NodeModule(module.Id, javaScriptFileName);
             } else {                
@@ -1246,27 +1245,21 @@ namespace Microsoft.NodejsTools.Debugger {
         /// </summary>
         /// <param name="javaScriptFileName">JavaScript compiled file.</param>
         /// <param name="stackFrame">The current stack frame.</param>
-        internal string GetOriginalFileName(string javaScriptFileName, NodeStackFrame stackFrame, SourceMapInfo mapping) {
+        internal string GetOriginalFileName(string javaScriptFileName, NodeStackFrame stackFrame) {
 
             SourceMapInfo tempMapping;
-            string originalFileName = String.Empty;
-            bool mappingReady = false;            
+            string originalFileName = null;
 
             if (stackFrame != null) {
                 tempMapping = SourceMapper.MapToOriginal(javaScriptFileName, stackFrame.Line, stackFrame.Column);
 
                 if (tempMapping != null) {
                     originalFileName = tempMapping.FileName;
-                    mappingReady = true;
                 }
             }
 
-            if (originalFileName.Equals(String.Empty)) {
+            if(originalFileName == null) {
                 originalFileName = SourceMapper.MapToOriginal(javaScriptFileName);
-            }
-
-            if (originalFileName != null && mapping != null && !mappingReady) {              
-                    originalFileName = mapping.FileName;                
             }
 
             return originalFileName;
