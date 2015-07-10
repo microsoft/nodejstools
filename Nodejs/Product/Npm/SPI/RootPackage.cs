@@ -25,8 +25,11 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             string fullPathToRootDirectory,
             bool showMissingDevOptionalSubPackages) {
             Path = fullPathToRootDirectory;
+            var packageJsonFile = System.IO.Path.Combine(fullPathToRootDirectory, "package.json");
             try {
-                PackageJson = PackageJsonFactory.Create(new DirectoryPackageJsonSource(fullPathToRootDirectory));
+                if (packageJsonFile.Length < 260) {
+                    PackageJson = PackageJsonFactory.Create(new DirectoryPackageJsonSource(fullPathToRootDirectory));
+                }
             } catch (RuntimeBinderException rbe) {
                 throw new PackageJsonException(
                     string.Format(@"Error processing package.json at '{0}'. The file was successfully read, and may be valid JSON, but the objects may not match the expected form for a package.json file.
@@ -34,7 +37,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 The following error was reported:
 
 {1}",
-                    System.IO.Path.Combine(fullPathToRootDirectory, "package.json"),
+                    packageJsonFile,
                     rbe.Message),
                     rbe);
             }
