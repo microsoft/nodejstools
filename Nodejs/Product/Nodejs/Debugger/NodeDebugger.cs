@@ -1246,23 +1246,17 @@ namespace Microsoft.NodejsTools.Debugger {
         /// <param name="javaScriptFileName">JavaScript compiled file.</param>
         /// <param name="stackFrame">The current stack frame.</param>
         internal string GetOriginalFileName(string javaScriptFileName, NodeStackFrame stackFrame) {
-
-            SourceMapInfo tempMapping;
             string originalFileName = null;
 
             if (stackFrame != null) {
-                tempMapping = SourceMapper.MapToOriginal(javaScriptFileName, stackFrame.Line, stackFrame.Column);
+                SourceMapInfo tempMapping = SourceMapper.MapToOriginal(javaScriptFileName, stackFrame.Line, stackFrame.Column);
 
                 if (tempMapping != null) {
                     originalFileName = tempMapping.FileName;
                 }
             }
 
-            if(originalFileName == null) {
-                originalFileName = SourceMapper.MapToOriginal(javaScriptFileName);
-            }
-
-            return originalFileName;
+            return originalFileName ?? SourceMapper.MapToOriginal(javaScriptFileName);
         }
 
         /// <summary>
