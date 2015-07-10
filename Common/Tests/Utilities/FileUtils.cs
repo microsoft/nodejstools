@@ -23,16 +23,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace TestUtilities {
     public static class FileUtils {
-        /// <summary>
-        /// Maximum directory length in Windows.
-        /// </summary>
-        internal const int MaxDirectoryLength = 248;
-
-        /// <summary>
-        /// Maximum file name length in Windows.
-        /// </summary>
-        internal const int MaxFileNameLength = 260;
-
         public static void CopyDirectory(string sourceDir, string destDir) {
             sourceDir = sourceDir.TrimEnd('\\');
             destDir = destDir.TrimEnd('\\');
@@ -50,7 +40,7 @@ namespace TestUtilities {
 
             foreach (var newDir in newDirectories.OrderBy(i => i.Length).Select(i => Path.Combine(destDir, i))) {
                 try {
-                    if (newDir.Length < MaxDirectoryLength) {
+                    if (newDir.Length < NativeMethods.MAX_FOLDER_PATH) {
                         Directory.CreateDirectory(newDir);
                     }
                 } catch {
@@ -69,15 +59,19 @@ namespace TestUtilities {
                 var copyFrom = Path.Combine(sourceDir, newFile);
                 var copyTo = Path.Combine(destDir, newFile);
                 try {
-                    if (copyTo.Length < MaxFileNameLength && copyFrom.Length < MaxFileNameLength) {
+                    if (copyTo.Length < NativeMethods.MAX_PATH && copyFrom.Length < NativeMethods.MAX_PATH) {
                         var copyToDir = Path.GetDirectoryName(copyTo);
-                        if (copyToDir.Length < MaxDirectoryLength) {
+                        if (copyToDir.Length < NativeMethods.MAX_FOLDER_PATH) {
                             File.Copy(copyFrom, copyTo);
                             File.SetAttributes(copyTo, FileAttributes.Normal);
+                        } else {
+                            Debug.WriteLine("Failed to copy " + copyFrom + " to " + copyTo + " due to max path limit");
                         }
+                    } else {
+                        Debug.WriteLine("Failed to copy " + copyFrom + " to " + copyTo + " due to max path limit");
                     }
                 } catch {
-                    Debug.WriteLine("Failed to copy " + copyFrom + " to " + copyTo);
+                    Debug.WriteLine("Failed to copy " + copyFrom + " to " + copyTo + " for unknown reason");
                 }
             }
         }

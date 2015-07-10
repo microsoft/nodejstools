@@ -819,8 +819,8 @@ namespace Microsoft.VisualStudioTools.Project {
                 return true;
             }
 
-            if ((path.Length >= 248 || !Directory.Exists(path) 
-                && (path.Length >= 260 || !File.Exists(path)))) {
+            if ((path.Length >= NativeMethods.MAX_FOLDER_PATH || !Directory.Exists(path) 
+                && (path.Length >= NativeMethods.MAX_PATH || !File.Exists(path)))) {
                 // if the file has disappeared avoid the exception...
                 // same if file is outside of path limits.
                 return true; // Files/directories that don't exist should be hidden. This also fix DiskMerger when adds files that were already deleted
