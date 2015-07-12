@@ -61,7 +61,7 @@ namespace Microsoft.NodejsTools.Project {
             Project.SetProjectProperty(NodejsConstants.OverrideDefaultBrowser, _control.OverrideDefaultBrowser.ToString());
             Project.SetProjectProperty(NodejsConstants.BrowserExecutable, _control.BrowserExecutable);
             Project.SetProjectProperty(NodejsConstants.BrowserArguments, _control.BrowserArguments);
-			IsDirty = false;
+            IsDirty = false;
         }
 
         public override void LoadSettings() {
