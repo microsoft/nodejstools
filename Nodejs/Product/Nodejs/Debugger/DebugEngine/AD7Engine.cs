@@ -69,8 +69,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private Guid _ad7ProgramId;             // A unique identifier for the program being debugged.
         private static readonly HashSet<WeakReference> Engines = new HashSet<WeakReference>();
         private string _webBrowserUrl;
-		private string _browserExecutable = null;
-		private string _browserArguments = null;
+        private string _browserExecutable = null;
+        private string _browserArguments = null;
 
         public const string DebugEngineId = "{0A638DAC-429B-4973-ADA0-E8DCDFB29B61}";
         public static Guid DebugEngineGuid = new Guid(DebugEngineId);
@@ -550,12 +550,12 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                             case WebBrowserUrl:
                                 _webBrowserUrl = setting[1];
                                 break;
-							case BrowserExecutable:
-								_browserExecutable = setting[1];
-								break;
-							case BrowserArguments:
-								_browserArguments = setting[1];
-								break;
+                            case BrowserExecutable:
+                                _browserExecutable = setting[1];
+                                break;
+                            case BrowserArguments:
+                                _browserArguments = setting[1];
+                                break;
                             case DebuggerPort:
                                 ushort dbgPortTmp;
                                 if (ushort.TryParse(setting[1], out dbgPortTmp)) {
@@ -1113,23 +1113,23 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             var infoSize = Marshal.SizeOf(info);
             info.cbSize = (uint)infoSize;
 
-			if (String.IsNullOrEmpty(_browserExecutable)) {
-				info.dlo = (uint)_DEBUG_LAUNCH_OPERATION3.DLO_LaunchBrowser;
-				info.bstrExe = _webBrowserUrl; // ~~~
-				var defaultBrowsers = GetDefaultBrowsers();
-				if (defaultBrowsers.Count != 1 || defaultBrowsers[0].DisplayName != "Internet Explorer") {
-					// if we use UseDefaultBrowser we lose the nice control & debugging of IE, so
-					// instead launch w/ no debugging when the user has selected a browser other than IE.
-					info.LaunchFlags |= (uint)__VSDBGLAUNCHFLAGS.DBGLAUNCH_StopDebuggingOnEnd |
-										(uint)__VSDBGLAUNCHFLAGS4.DBGLAUNCH_UseDefaultBrowser |
-										(uint)__VSDBGLAUNCHFLAGS.DBGLAUNCH_NoDebug;
-				}
-			}
-			else {
-				info.dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_CreateProcess;
-				info.bstrExe = _browserExecutable;
-				info.bstrArg = _browserArguments;
-			}
+            if (String.IsNullOrEmpty(_browserExecutable)) {
+                info.dlo = (uint)_DEBUG_LAUNCH_OPERATION3.DLO_LaunchBrowser;
+                info.bstrExe = _webBrowserUrl; // ~~~
+                var defaultBrowsers = GetDefaultBrowsers();
+                if (defaultBrowsers.Count != 1 || defaultBrowsers[0].DisplayName != "Internet Explorer") {
+                    // if we use UseDefaultBrowser we lose the nice control & debugging of IE, so
+                    // instead launch w/ no debugging when the user has selected a browser other than IE.
+                    info.LaunchFlags |= (uint)__VSDBGLAUNCHFLAGS.DBGLAUNCH_StopDebuggingOnEnd |
+                                        (uint)__VSDBGLAUNCHFLAGS4.DBGLAUNCH_UseDefaultBrowser |
+                                        (uint)__VSDBGLAUNCHFLAGS.DBGLAUNCH_NoDebug;
+                }
+            }
+            else {
+                info.dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_CreateProcess;
+                info.bstrExe = _browserExecutable;
+                info.bstrArg = _browserArguments;
+            }
 
             info.guidLaunchDebugEngine = DebugEngineGuid;
             IntPtr infoPtr = Marshal.AllocCoTaskMem(infoSize);
