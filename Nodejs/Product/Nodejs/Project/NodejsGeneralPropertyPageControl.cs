@@ -109,6 +109,14 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
+        public bool OverrideDefaultBrowser {
+            get {
+                return _overrideDefaultBrowser.Checked;
+            }
+            set {
+				_overrideDefaultBrowser.Checked = value;
+            }
+        }
 
         public string WorkingDirectory {
             get {
@@ -150,8 +158,43 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
+		public string BrowserExecutable {
+			get {
+				return _browserExecutable.Text;
+			}
+			set {
+				_browserExecutable.Text = value;
+			}
+		}
+
+		public string BrowserArguments {
+			get {
+				return _browserArguments.Text;
+			}
+			set {
+				_browserArguments.Text = value;
+			}
+		}
+
         private void Changed(object sender, EventArgs e) {
             _propPage.IsDirty = true;
+
+			bool overrideDefaultBrowserEnabled = false;
+			bool browserExecutableEnabled = false;
+			bool browserArgumentsEnabled = false;
+
+			if (StartWebBrowser) {
+				overrideDefaultBrowserEnabled = true;
+			}
+
+			if (OverrideDefaultBrowser) {
+				browserExecutableEnabled = true;
+				browserArgumentsEnabled = true;
+			}
+
+			_overrideDefaultBrowser.Enabled = overrideDefaultBrowserEnabled;
+			_browserExecutable.Enabled = browserExecutableEnabled;
+			_browserArguments.Enabled = browserArgumentsEnabled;
         }
 
         private void SetCueBanner() {
@@ -197,6 +240,16 @@ namespace Microsoft.NodejsTools.Project {
                 _workingDir.Text = path;
             }
         }
+
+        private void BrowseBrowserClick(object sender, EventArgs e) {
+			var dialog = new OpenFileDialog();
+			dialog.CheckFileExists = true;
+			dialog.Filter = _exeFilter;
+			if (dialog.ShowDialog() == DialogResult.OK) {
+				_browserExecutable.Text = dialog.FileName;
+				_browserExecutable.ForeColor = SystemColors.ControlText;
+			}
+		}
 
         private void PortChanged(object sender, EventArgs e) {
             var textSender = (TextBox)sender;

@@ -260,7 +260,20 @@ namespace Microsoft.NodejsTools.Project {
 
             var url = GetFullUrl();
             if (ShouldStartBrowser() && !String.IsNullOrWhiteSpace(url)) {
-                AppendOption(ref dbgInfo, AD7Engine.WebBrowserUrl, url);
+				AppendOption(ref dbgInfo, AD7Engine.WebBrowserUrl, url);
+				string browserExecutable;
+				string browserArguments;
+				if (ShouldOverrideDefaultBrowser(out browserExecutable, out browserArguments)) {
+					AppendOption(ref dbgInfo, AD7Engine.BrowserExecutable, browserExecutable);
+					if (browserArguments == null) browserArguments = "";
+					if (browserArguments.Contains("%1")) {
+						browserArguments = browserArguments.Replace("%1", url);
+					}
+					else {
+						browserArguments += (" " + url);
+					}
+					AppendOption(ref dbgInfo, AD7Engine.BrowserArguments, browserArguments);
+				}
             }
 
             var debuggerPort = _project.GetProjectProperty(NodejsConstants.DebuggerPort);
@@ -325,6 +338,25 @@ namespace Microsoft.NodejsTools.Project {
 
             return true;
         }
+
+		private bool ShouldOverrideDefaultBrowser(out string browserExecutable, out string browserArguments) {
+			browserExecutable = null;
+			browserArguments = null;
+
+			var overrideDefaultBrowser = _project.GetProjectProperty(NodejsConstants.OverrideDefaultBrowser);
+			bool fOverrideDefaultBrowser;
+			if (!String.IsNullOrEmpty(overrideDefaultBrowser) &&
+				Boolean.TryParse(overrideDefaultBrowser, out fOverrideDefaultBrowser)) {
+				browserExecutable = _project.GetProjectProperty(NodejsConstants.BrowserExecutable);
+				browserArguments = _project.GetProjectProperty(NodejsConstants.BrowserArguments);
+
+				if (fOverrideDefaultBrowser && !String.IsNullOrEmpty(browserExecutable)) {
+					return true;
+				}
+			}
+
+			return false;
+		}
 
         private IEnumerable<KeyValuePair<string, string>> GetEnvironmentVariables() {
             var envVars = _project.GetProjectProperty(NodejsConstants.Environment);

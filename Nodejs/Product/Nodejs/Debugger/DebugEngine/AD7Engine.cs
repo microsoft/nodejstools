@@ -69,6 +69,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private Guid _ad7ProgramId;             // A unique identifier for the program being debugged.
         private static readonly HashSet<WeakReference> Engines = new HashSet<WeakReference>();
         private string _webBrowserUrl;
+		private string _browserExecutable = null;
+		private string _browserArguments = null;
 
         public const string DebugEngineId = "{0A638DAC-429B-4973-ADA0-E8DCDFB29B61}";
         public static Guid DebugEngineGuid = new Guid(DebugEngineId);
@@ -101,6 +103,16 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         /// Specifies URL to which to open web browser on node debug connect.
         /// </summary>
         public const string WebBrowserUrl = "WEB_BROWSER_URL";
+
+        /// <summary>
+        /// Specifies an alternative browser executable (instead of using system default)
+        /// </summary>
+        public const string BrowserExecutable = "BROWSER_EXECUTABLE";
+
+        /// <summary>
+        /// Specifies arguments for the alternative browser executable
+        /// </summary>
+        public const string BrowserArguments = "BROWSER_ARGUMENTS";
 
         /// <summary>
         /// Specifies the port to be used for the debugger.
@@ -538,6 +550,12 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                             case WebBrowserUrl:
                                 _webBrowserUrl = setting[1];
                                 break;
+							case BrowserExecutable:
+								_browserExecutable = setting[1];
+								break;
+							case BrowserArguments:
+								_browserArguments = setting[1];
+								break;
                             case DebuggerPort:
                                 ushort dbgPortTmp;
                                 if (ushort.TryParse(setting[1], out dbgPortTmp)) {
@@ -1094,16 +1112,24 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             var info = new VsDebugTargetInfo2();
             var infoSize = Marshal.SizeOf(info);
             info.cbSize = (uint)infoSize;
-            info.bstrExe = _webBrowserUrl;
-            info.dlo = (uint)_DEBUG_LAUNCH_OPERATION3.DLO_LaunchBrowser;
-            var defaultBrowsers = GetDefaultBrowsers();
-            if (defaultBrowsers.Count != 1 || defaultBrowsers[0].DisplayName != "Internet Explorer") {
-                // if we use UseDefaultBrowser we lose the nice control & debugging of IE, so
-                // instead launch w/ no debugging when the user has selected a browser other than IE.
-                info.LaunchFlags |= (uint)__VSDBGLAUNCHFLAGS.DBGLAUNCH_StopDebuggingOnEnd |
-                                    (uint)__VSDBGLAUNCHFLAGS4.DBGLAUNCH_UseDefaultBrowser |
-                                    (uint)__VSDBGLAUNCHFLAGS.DBGLAUNCH_NoDebug;
-            }
+
+			if (String.IsNullOrEmpty(_browserExecutable)) {
+				info.dlo = (uint)_DEBUG_LAUNCH_OPERATION3.DLO_LaunchBrowser;
+				info.bstrExe = _webBrowserUrl; // ~~~
+				var defaultBrowsers = GetDefaultBrowsers();
+				if (defaultBrowsers.Count != 1 || defaultBrowsers[0].DisplayName != "Internet Explorer") {
+					// if we use UseDefaultBrowser we lose the nice control & debugging of IE, so
+					// instead launch w/ no debugging when the user has selected a browser other than IE.
+					info.LaunchFlags |= (uint)__VSDBGLAUNCHFLAGS.DBGLAUNCH_StopDebuggingOnEnd |
+										(uint)__VSDBGLAUNCHFLAGS4.DBGLAUNCH_UseDefaultBrowser |
+										(uint)__VSDBGLAUNCHFLAGS.DBGLAUNCH_NoDebug;
+				}
+			}
+			else {
+				info.dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_CreateProcess;
+				info.bstrExe = _browserExecutable;
+				info.bstrArg = _browserArguments;
+			}
 
             info.guidLaunchDebugEngine = DebugEngineGuid;
             IntPtr infoPtr = Marshal.AllocCoTaskMem(infoSize);
