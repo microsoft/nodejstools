@@ -1228,7 +1228,12 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private void OnDocumentSaved(Document document) {
             var module = Process.GetModuleForFilePath(document.FullName);
             if (module == null) {
-                return;
+                Process.RefreshModules();
+                module = Process.GetModuleForFilePath(document.FullName);
+
+                if (module == null) {
+                    return;
+                }
             }
 
             // For .ts files, we need to build the project to regenerate .js code.
@@ -1236,7 +1241,10 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 if (document.ProjectItem.ContainingProject.GetNodeProject().Build(null, null) != MSBuildResult.Successful) {
                     var statusBar = (IVsStatusbar)ServiceProvider.GlobalProvider.GetService(typeof(SVsStatusbar));
                     statusBar.SetText(SR.GetString(SR.DebuggerModuleUpdateFailed));
-                    return;
+
+                    // From some reason Build() sometimes returns false even when the compilation succeeded...
+                    // Let's not return here so that if the module compiled properly - it would be reloaded.
+                    //return; 
                 }
             }
 
