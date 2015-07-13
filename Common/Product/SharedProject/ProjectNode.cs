@@ -4905,9 +4905,9 @@ If the files in the existing folder have the same names as files in the folder y
         /// <param name="storage">Project or user file (_PersistStorageType)</param>
         /// <param name="propertyValue">Value of the property (out parameter)</param>
         /// <returns>HRESULT</returns>
-        int IVsBuildPropertyStorage.GetPropertyValue(string propertyName, string configName, uint storage, out string propertyValue) {
+        public virtual int GetPropertyValue(string propertyName, string configName, uint storage, out string propertyValue) {
             // TODO: when adding support for User files, we need to update this method
-            propertyValue = null;
+            propertyValue = null;            
             if (string.IsNullOrEmpty(configName)) {
                 propertyValue = this.GetProjectProperty(propertyName, false);
             } else {
