@@ -1205,7 +1205,8 @@ namespace Microsoft.NodejsTools.Debugger {
         /// <returns>True if module was added otherwise false.</returns>
         private bool GetOrAddModule(NodeModule module, out NodeModule value, NodeStackFrame stackFrame = null) {
             value = null;
-            string javaScriptFileName = module.JavaScriptFileName;                       
+            string javaScriptFileName = module.JavaScriptFileName;
+            int? line = null, column = null;
 
             if (string.IsNullOrEmpty(javaScriptFileName) ||
                 javaScriptFileName == NodeVariableType.UnknownModule ||
@@ -1217,7 +1218,12 @@ namespace Microsoft.NodejsTools.Debugger {
             javaScriptFileName = FileNameMapper.GetLocalFileName(javaScriptFileName);
 
             // Try to get mapping for JS file
-            string originalFileName = GetOriginalFileName(javaScriptFileName, stackFrame);
+            if(stackFrame != null) {
+                line = stackFrame.Line;
+                column = stackFrame.Column;
+            }
+            string originalFileName = SourceMapper.GetOriginalFileName(javaScriptFileName, line, column);
+
             if (originalFileName == null) {
                 module = new NodeModule(module.Id, javaScriptFileName);
             } else {

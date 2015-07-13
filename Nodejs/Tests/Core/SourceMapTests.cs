@@ -220,11 +220,9 @@ namespace NodejsTests {
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestGetOriginalFileNameWithStackFrame() {
             string javaScriptFileName = TestData.GetPath(@"TestData\TypeScriptMultfile\all.js");
-            var debugger = new NodeDebugger(null, 0);
-            NodeStackFrame stackFrame = new NodeStackFrame(0);
-            stackFrame.Line = 24;
-            stackFrame.Column = 9;            
-            string originalFileName = debugger.GetOriginalFileName(javaScriptFileName,stackFrame);
+            var sourceMapper = new SourceMapper();            
+            int? line = 24, column = 9;
+            string originalFileName = sourceMapper.GetOriginalFileName(javaScriptFileName, line, column);
             Assert.IsTrue(originalFileName.Contains("file2.ts"));
         }
     }
