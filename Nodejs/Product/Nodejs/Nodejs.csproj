@@ -775,7 +775,7 @@
     <ZipProject Include="ProjectTemplates\AzureExpress4App\Web.Debug.config" />
     <ZipItem Include="Templates\Files\DockerfileTemplate\Dockerfile" />
     <VSIXSourceItem Include="Templates\Files\DockerfileTemplate\Dockerfile">
-      <VSIXSubPath>Templates\Files\DockerfileTemplate\</VSIXSubPath>
+      <VSIXSubPath>FileTemplates\ReferenceFiles\Dockerfile</VSIXSubPath>
     </VSIXSourceItem>
     <None Include="Theme\contrast.vstheme">
       <SubType>Designer</SubType>
@@ -1604,7 +1604,7 @@
     </ItemGroup>
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>echo f | xcopy /y $(ProjectDir)Templates\Files\DockerfileTemplate\Dockerfile $(OutDir)Templates\Files\DockerfileTemplate\Dockerfile
+    <PostBuildEvent>echo f | xcopy /y $(ProjectDir)Templates\Files\DockerfileTemplate\Dockerfile $(OutDir)FileTemplates\ReferenceFiles\Dockerfile
 copy /y $(OutDir)..\WebRole\Microsoft.NodejsTools.WebRole.dll $(OutDir)Debugger\RemoteDebug\</PostBuildEvent>
   </PropertyGroup>
 </Project>

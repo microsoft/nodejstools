@@ -342,7 +342,7 @@ namespace Microsoft.NodejsTools.Project {
             switch (propertyName) {
                 case "DockerDockerfileContents":
                     propertyValue = DockerfileWizardExtension.GetDockerfileWithReplacements(
-                        File.ReadAllText(@"Templates\Files\DockerfileTemplate\Dockerfile"),
+                        File.ReadAllText(@"FileTemplates\ReferenceFiles\Dockerfile"),
                         DTE
                     );
                     return VSConstants.S_OK;
