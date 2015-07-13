@@ -27,6 +27,7 @@ using Microsoft.NodejsTools.Intellisense;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.ProjectWizard;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudioTools.Project.Automation;
@@ -38,7 +39,7 @@ using Microsoft.VisualStudio.Imaging;
 #endif
 
 namespace Microsoft.NodejsTools.Project {
-    class NodejsProjectNode : CommonProjectNode, VsWebSite.VSWebSite, INodePackageModulesCommands {
+    class NodejsProjectNode : CommonProjectNode, VsWebSite.VSWebSite, INodePackageModulesCommands, IVsBuildPropertyStorage {
         private VsProjectAnalyzer _analyzer;
         private readonly HashSet<string> _warningFiles = new HashSet<string>();
         private readonly HashSet<string> _errorFiles = new HashSet<string>();
@@ -334,6 +335,25 @@ namespace Microsoft.NodejsTools.Project {
 
         protected override NodeProperties CreatePropertiesObject() {
             return new NodejsProjectNodeProperties(this);
+        }
+        
+        public override int GetPropertyValue(string propertyName, string configName, uint storage, out string propertyValue) {
+            propertyValue = null;
+            switch (propertyName) {
+                case "DockerDockerfileContents":
+                    propertyValue = DockerfileWizardExtension.GetDockerfileWithReplacements(
+                        File.ReadAllText(@"Templates\Files\DockerfileTemplate\Dockerfile"),
+                        DTE
+                    );
+                    return VSConstants.S_OK;
+                case "DockerAppType":
+                    propertyValue = "Node.js";
+                    return VSConstants.S_OK;
+                case "DockerDefaultPublishContainerPort":
+                    propertyValue = "8080";
+                    return VSConstants.S_OK;
+            }
+            return base.GetPropertyValue(propertyName, configName, storage, out propertyValue);
         }
 
         protected override Stream ProjectIconsImageStripStream {
