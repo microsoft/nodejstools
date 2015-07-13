@@ -552,13 +552,16 @@ namespace Microsoft.NodejsTools.Project {
                     return false;
                 }
             }
-            if (new FileInfo(fileNode.Url).Length > _maxFileSize) {
-                // skip obviously generated files...
+
+            var fileInfo = new FileInfo(fileNode.Url);
+            if (!fileInfo.Exists || fileInfo.Length > _maxFileSize) {
+                // skip obviously generated and missing files...
                 return false;
             }
 
             var relativeFile = CommonUtils.GetRelativeFilePath(this.FullPathToChildren, fileNode.Url);
-            if (this._analyzer.Project != null && this._analyzer.Project.Limits.IsPathExceedNestingLimit(relativeFile)) {
+            if (this._analyzer != null && this._analyzer.Project != null 
+                && this._analyzer.Project.Limits.IsPathExceedNestingLimit(relativeFile)) {
                 return false;
             }
 
