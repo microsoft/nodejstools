@@ -1247,25 +1247,6 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         /// <summary>
-        /// Get the original file name to map to.
-        /// </summary>
-        /// <param name="javaScriptFileName">JavaScript compiled file.</param>
-        /// <param name="stackFrame">The current stack frame.</param>
-        internal string GetOriginalFileName(string javaScriptFileName, NodeStackFrame stackFrame) {
-            string originalFileName = null;
-
-            if (stackFrame != null) {
-                SourceMapInfo tempMapping = SourceMapper.MapToOriginal(javaScriptFileName, stackFrame.Line, stackFrame.Column);
-
-                if (tempMapping != null) {
-                    originalFileName = tempMapping.FileName;
-                }
-            }
-
-            return originalFileName ?? SourceMapper.MapToOriginal(javaScriptFileName);
-        }
-
-        /// <summary>
         /// Gets a module for file path.
         /// </summary>
         /// <param name="filePath">File path.</param>
