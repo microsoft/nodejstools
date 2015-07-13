@@ -329,7 +329,15 @@ namespace TestUtilities {
             FO_RENAME = 0x0004,
         }
 
+        /// <summary>
+        /// Maximum file name length in Windows.
+        /// </summary>
         public const int MAX_PATH = 260;
+
+        /// <summary>
+        /// Maximum directory length in Windows.
+        /// </summary>
+        public const int MAX_FOLDER_PATH = 248;
 
         [DllImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
