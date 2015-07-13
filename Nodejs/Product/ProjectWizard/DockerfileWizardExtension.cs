@@ -26,8 +26,8 @@ using System.Text.RegularExpressions;
 
 namespace Microsoft.NodejsTools.ProjectWizard {
     /// <summary>
-    /// Provides a project wizard extension which will optionally do an
-    /// npm install after the project is created.
+    /// Provides a project wizard extension which will replace the node arguments
+    /// in a Dockerfile with properties from the project file.
     /// </summary>
     public sealed class DockerfileWizardExtension : IWizard {
         public void BeforeOpeningFile(ProjectItem projectItem) {
