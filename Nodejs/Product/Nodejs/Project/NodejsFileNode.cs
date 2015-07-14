@@ -125,43 +125,6 @@ namespace Microsoft.NodejsTools.Project {
             return new NodejsIncludedFileNodeProperties(this);
         }
 
-        internal override int ExecCommandOnNode(Guid guidCmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
-            Debug.Assert(this.ProjectMgr != null, "The Dynamic FileNode has no project manager");
-
-            Utilities.CheckNotNull(this.ProjectMgr);
-            if (guidCmdGroup == Guids.NodejsCmdSet) {
-                switch (cmd) {
-                    case PkgCmdId.cmdidSetAsNodejsStartupFile:
-                        // Set the StartupFile project property to the Url of this node
-                        ProjectMgr.SetProjectProperty(
-                            CommonConstants.StartupFile,
-                            CommonUtils.GetRelativeFilePath(this.ProjectMgr.ProjectHome, Url)
-                        );
-                        return VSConstants.S_OK;
-                }
-            }
-
-            return base.ExecCommandOnNode(guidCmdGroup, cmd, nCmdexecopt, pvaIn, pvaOut);
-        }
-        
-        internal override int QueryStatusOnNode(Guid guidCmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result) {
-            if (guidCmdGroup == Guids.NodejsCmdSet) {
-                if (this.ProjectMgr.IsCodeFile(this.Url)) {
-                    switch (cmd) {
-                        case PkgCmdId.cmdidSetAsNodejsStartupFile:
-                            //We enable "Set as StartUp File" command only on current language code files, 
-                            //the file is in project home dir and if the file is not the startup file already.
-                            string startupFile = ((CommonProjectNode)ProjectMgr).GetStartupFile();
-                            if (!CommonUtils.IsSamePath(startupFile, this.Url)) {
-                                result |= QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
-                            }
-                            return VSConstants.S_OK;
-                    }
-                }
-            }
-            return base.QueryStatusOnNode(guidCmdGroup, cmd, pCmdText, ref result);
-        }
-
         private void ItemNode_ItemTypeChanged(object sender, EventArgs e) {
             // item type node was changed...
             // if we have changed the type from compile to anything else, we should scrub

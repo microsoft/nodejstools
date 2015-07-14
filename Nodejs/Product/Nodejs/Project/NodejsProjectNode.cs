@@ -919,7 +919,21 @@ namespace Microsoft.NodejsTools.Project {
                         }
                         return QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
                 }
+            } else if (cmdGroup == Guids.NodejsCmdSet) {
+                switch (cmd) {
+                    case PkgCmdId.cmdidSetAsNodejsStartupFile:
+                        if (ShowSetAsStartupFileCommandOnNode(selectedNodes)) {
+                            // We enable "Set as StartUp File" command only on current language code files, 
+                            // the file is in project home dir and if the file is not the startup file already.
+                            string startupFile = ((CommonProjectNode)ProjectMgr).GetStartupFile();
+                            if (!CommonUtils.IsSamePath(startupFile, this.Url)) {
+                                return QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
+                            }
+                        }
+                        break;
+                }
             }
+
             return base.QueryStatusSelectionOnNodes(selectedNodes, cmdGroup, cmd, pCmdText);
         }
 
@@ -968,8 +982,27 @@ namespace Microsoft.NodejsTools.Project {
                         }
                         break;
                 }
+            } else if (cmdGroup == Guids.NodejsCmdSet) {
+                switch (cmdId) {
+                    case PkgCmdId.cmdidSetAsNodejsStartupFile:
+                        // Set the StartupFile project property to the Url of this node
+                        SetProjectProperty(
+                            CommonConstants.StartupFile,
+                            CommonUtils.GetRelativeFilePath(ProjectHome, selectedNodes[0].Url)
+                        );
+                        handled = true;
+                        return VSConstants.S_OK;
+                }
             }
+
             return base.ExecCommandThatDependsOnSelectedNodes(cmdGroup, cmdId, cmdExecOpt, vaIn, vaOut, commandOrigin, selectedNodes, out handled);
+        }
+
+        private bool ShowSetAsStartupFileCommandOnNode(IList<HierarchyNode> selectedNodes) {
+            var selectedNode = selectedNodes[0];
+            return selectedNodes.Count == 1 && (IsCodeFile(selectedNode.Url) ||
+                // for some reason, the default express 4 template's startup file lacks an extension.
+                   string.IsNullOrEmpty(Path.GetExtension(selectedNode.Url)));
         }
 
         private static bool ShowManageModulesCommandOnNode(IList<HierarchyNode> selectedNodes) {
