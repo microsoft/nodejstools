@@ -96,6 +96,7 @@
       <Link>TestFrameworkDirectories.cs</Link>
     </Compile>
     <Compile Include="CloudServiceWizard.cs" />
+    <Compile Include="DockerfileWizardExtension.cs" />
     <Compile Include="NodejsPackageParametersExtension.cs" />
     <Compile Include="INodePackageModulesCommands.cs" />
     <Compile Include="ImportWizard.cs" />
@@ -104,6 +105,9 @@
     <Compile Include="SettingsManagerCreator.cs" />
     <Compile Include="UnitTestFileWizard.cs" />
     <Compile Include="WizardHelpers.cs" />
+    <Compile Include="$(BuildRoot)\Common\Product\SharedProject\CommonUtils.cs">
+      <Link>CommonUtils.cs</Link>
+    </Compile>
   </ItemGroup>
   <Import Project="..\Nodejs\SharedResources.proj" />
   <Import Project="..\ProjectAfter.settings" />

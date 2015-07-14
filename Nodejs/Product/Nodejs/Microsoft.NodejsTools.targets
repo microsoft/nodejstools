@@ -10,6 +10,7 @@
          will be ignored.  The directory name must completely match and no wild cards are allowed
      -->
     <AnalysisIgnoredDirectories Condition="'$(AnalysisIgnoredDirectories)' == ''">bower_components;node_modules\core-js</AnalysisIgnoredDirectories>
+    <DockerExtraPublishProfileProperties>ExcludeFoldersFromDeployment=node_modules</DockerExtraPublishProfileProperties>
   </PropertyGroup>
   <!-- *********************************************************************************** -->
   <!-- Normal install environment, use the current version -->
@@ -41,6 +42,7 @@
 
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets"/>
   <Import Project="$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets') And '$(EnableTypeScript)' == 'true'" />
+  <Import Project="$(VSToolsPath)\Docker Tools\Microsoft.DockerTools.Publish.targets" Condition="Exists('$(VSToolsPath)\Docker Tools\Microsoft.DockerTools.Publish.targets')"/>
 
   <Target
     Name="GetReferenceAssemblyPaths"
@@ -167,6 +169,20 @@
       <_NodejsDeploymentMethod>WebDeploy</_NodejsDeploymentMethod>
     </PropertyGroup>
   </Target>
+  
+  <PropertyGroup>
+    <DockerPublishDependsOn>
+      _DetectDockerPublish;
+      $(DockerPublishDependsOn);
+    </DockerPublishDependsOn>
+  </PropertyGroup>
+
+  <Target Name="_DetectDockerPublish">
+    <PropertyGroup>
+      <_IsDockerPublish>True</_IsDockerPublish>
+    </PropertyGroup>
+  </Target>
+  
 
   <Target
     Name="CollectNodejsFiles"
@@ -175,7 +191,7 @@
     >
     <Error
       Text="web.config not found in project, to create a project to deploy to Microsoft Azure you must create an Azure Node.js project."
-      Condition="'@(_FoundWebConfig)' == ''"/>
+      Condition="'@(_FoundWebConfig)' == '' and '@(_IsDockerPublish)' != 'True'"/>
 
     <ItemGroup>
       <ContentFiles Include="@(Content)" />
