@@ -926,7 +926,7 @@ namespace Microsoft.NodejsTools.Project {
                             // We enable "Set as StartUp File" command only on current language code files, 
                             // the file is in project home dir and if the file is not the startup file already.
                             string startupFile = ((CommonProjectNode)ProjectMgr).GetStartupFile();
-                            if (!CommonUtils.IsSamePath(startupFile, this.Url)) {
+                            if (!CommonUtils.IsSamePath(startupFile, selectedNodes[0].Url)) {
                                 return QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
                             }
                         }
@@ -999,10 +999,11 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private bool ShowSetAsStartupFileCommandOnNode(IList<HierarchyNode> selectedNodes) {
-            var selectedNode = selectedNodes[0];
-            return selectedNodes.Count == 1 && (IsCodeFile(selectedNode.Url) ||
+            var selectedNodeUrl = selectedNodes[0].Url;
+            return selectedNodes.Count == 1 &&
+                (IsCodeFile(selectedNodeUrl) ||
                 // for some reason, the default express 4 template's startup file lacks an extension.
-                   string.IsNullOrEmpty(Path.GetExtension(selectedNode.Url)));
+                string.IsNullOrEmpty(Path.GetExtension(selectedNodeUrl)));
         }
 
         private static bool ShowManageModulesCommandOnNode(IList<HierarchyNode> selectedNodes) {
