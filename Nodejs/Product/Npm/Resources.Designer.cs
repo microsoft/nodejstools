@@ -223,6 +223,15 @@ namespace Microsoft.NodejsTools.Npm {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Semversion {0} for package {1} is invalid.
+        /// </summary>
+        internal static string InvalidPackageSemVersion {
+            get {
+                return ResourceManager.GetString("InvalidPackageSemVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to npm command cancelled.
         /// </summary>
         internal static string NpmCommandCancelled {
