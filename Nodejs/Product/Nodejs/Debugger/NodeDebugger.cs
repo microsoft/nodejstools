@@ -475,6 +475,10 @@ namespace Microsoft.NodejsTools.Debugger {
             return true;
         }
 
+        public void RefreshModules() {
+            GetScriptsAsync().Wait((int)_timeout.TotalMilliseconds);
+        }
+
         /// <summary>
         /// Starts listening for debugger communication.  Can be called after Start
         /// to give time to attach to debugger events.
