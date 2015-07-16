@@ -340,7 +340,7 @@ namespace Microsoft.NodejsTools.Project {
         public override int GetPropertyValue(string propertyName, string configName, uint storage, out string propertyValue) {
             propertyValue = null;
             switch (propertyName) {
-                case "DockerDockerfileContents":
+                case "DockerLinuxDockerfileContents":
                     propertyValue = DockerfileWizardExtension.GetDockerfileWithReplacements(
                         File.ReadAllText(@"FileTemplates\ReferenceFiles\Dockerfile"),
                         DTE
