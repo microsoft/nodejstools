@@ -365,9 +365,7 @@ namespace Microsoft.NodejsTools.Project {
         public override bool IsCodeFile(string fileName) {
             var ext = Path.GetExtension(fileName);
             return ext.Equals(NodejsConstants.JavaScriptExtension, StringComparison.OrdinalIgnoreCase) ||
-                   ext.Equals(NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase) ||
-                   // for some reason, the default express 4 template's startup file lacks an extension.
-                   string.IsNullOrEmpty(ext);
+                   ext.Equals(NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase);
         }
 
         public override int InitializeForOuter(string filename, string location, string name, uint flags, ref Guid iid, out IntPtr projectPointer, out int canceled) {
