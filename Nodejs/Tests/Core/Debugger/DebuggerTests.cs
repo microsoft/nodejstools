@@ -240,9 +240,9 @@ namespace NodejsTests.Debugger {
         {
             LocalsTest(
                 "TimeStringLocalsTest.js",
-                3,
-                expectedLocals: new string[] { "time" },
-                expectedValues: new string[] { "2015-05-07T22:00:00.000Z" }
+                6,
+                expectedLocals: new string[] { "time", "time1", "time2" },
+                expectedValues: new string[] { "2015-05-07T22:00:00.000Z", "2015-05-07T22:00:00.000", "2015-05-07 22:00:00.000" }
             );
         }
 
