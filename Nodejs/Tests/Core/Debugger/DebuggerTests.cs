@@ -231,6 +231,21 @@ namespace NodejsTests.Debugger {
             );
         }
 
+        /// <summary>
+        /// Test that date and time value in string variable displayed correctly.
+        /// </summary>
+        /// <seealso cref="https://github.com/Microsoft/nodejstools/issues/106" />
+        [TestMethod, Priority(0), TestCategory("Debugging")]
+        public void TimeStringLocalsTest()
+        {
+            LocalsTest(
+                "TimeStringLocalsTest.js",
+                3,
+                expectedLocals: new string[] { "time" },
+                expectedValues: new string[] { "2015-05-07T22:00:00.000Z" }
+            );
+        }
+
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void GlobalsTest() {
             LocalsTest(
