@@ -21,6 +21,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Project {
@@ -169,7 +170,8 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private void NodeExePathChanged(object sender, EventArgs e) {
-            if (String.IsNullOrEmpty(_nodeExePath.Text) || _nodeExePath.Text.Contains("$(") || File.Exists(_nodeExePath.Text)) {
+            if (String.IsNullOrEmpty(_nodeExePath.Text) || _nodeExePath.Text.Contains("$(") ||
+                File.Exists(CommonUtils.GetAbsoluteFilePath(_propPage.Project.ProjectHome, _nodeExePath.Text))) {
                 _nodeExeErrorProvider.SetError(_nodeExePath, String.Empty);
             } else {
                 _nodeExeErrorProvider.SetError(_nodeExePath, SR.GetString(SR.NodeExePathNotFound));
@@ -200,7 +202,6 @@ namespace Microsoft.NodejsTools.Project {
 
         private void PortChanged(object sender, EventArgs e) {
             var textSender = (TextBox)sender;
-
             if (!textSender.Text.Contains("$(") && 
                 textSender.Text.Any(ch => !Char.IsDigit(ch))) {
                 _nodeExeErrorProvider.SetError(textSender, SR.GetString(SR.InvalidPortNumber));
