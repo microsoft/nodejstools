@@ -39,10 +39,13 @@ namespace Microsoft.NodejsTools {
         public static string GetAbsoluteNodeExePath(string root, string relativePath) {
             var overridePath = CommonUtils.UnquotePath(relativePath ?? string.Empty);
             if (!String.IsNullOrWhiteSpace(overridePath)) {
+                if (string.IsNullOrWhiteSpace(root)) {
+                    return relativePath;
+                }
                 try {
                     return CommonUtils.GetAbsoluteFilePath(root, overridePath);
                 } catch (InvalidOperationException) {
-                    // continue
+                    return relativePath;
                 }
             }
             return NodeExePath;
