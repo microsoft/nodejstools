@@ -32,9 +32,9 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         private static readonly Regex RegexPerson = new Regex(
         "\"name\":\\s*\"(?<name>[^<]+?)\"" +
         "|" +
-        "(\"email\":\\s*\"(?<email>[^<]+?)\")" +
+        "\"email\":\\s*\"(?<email>[^<]+?)\"" +
         "|" +
-        "(\"url\":\\s*\"(?<url>[^<]+?)\")",
+        "\"url\":\\s*\"(?<url>[^<]+?)\"",
         RegexOptions.Singleline);
     
         [JsonConstructor]
