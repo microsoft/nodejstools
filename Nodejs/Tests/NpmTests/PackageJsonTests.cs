@@ -43,6 +43,11 @@ namespace NpmTests {
    ""name"": ""mypackage"",
    ""version"": ""0.7.0"",
    ""description"": ""Sample package for CommonJS. This package demonstrates the required elements of a CommonJS package."",
+   ""author"": {
+       ""name"": ""Firstname Lastname"",
+       ""email"": ""firstname@lastname.com"",
+       ""url"": ""http://firstnamelastname.com""
+   },
    ""keywords"": [
        ""package"",
        ""example"" 
@@ -108,6 +113,10 @@ namespace NpmTests {
    ""name"": ""mypackage"",
    ""version"": ""0.7.0"",
    ""description"": ""Sample package for CommonJS. This package demonstrates the required elements of a CommonJS package."",
+   ""author"": {
+       ""url"": ""http://firstnamelastname.com"",
+       ""name"": ""Firstname Lastname""
+   },
    ""keywords"": [
        ""package"",
        ""example"" 
@@ -375,6 +384,22 @@ namespace NpmTests {
                 LoadFrom(PkgLargeCompliant).Man,
                 2,
                 new[] { "./man/foo.1", "./man/bar.1" });
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestReadAuthorCompliant() {
+            var compliantAuthor = LoadFrom(PkgLargeCompliant).Author;
+            Assert.AreEqual("Firstname Lastname", compliantAuthor.Name);
+            Assert.AreEqual("firstname@lastname.com", compliantAuthor.Email);
+            Assert.AreEqual("http://firstnamelastname.com", compliantAuthor.Url);
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestReadAuthorNonCompliant() {
+            var nonCompliantAuthor = LoadFrom(PkgLargeNonCompliant).Author;
+            Assert.AreEqual("Firstname Lastname", nonCompliantAuthor.Name);
+            Assert.AreEqual("http://firstnamelastname.com", nonCompliantAuthor.Url);
+            Assert.IsNull(nonCompliantAuthor.Email);
         }
 
         //  TODO: authors, contributors, private, main, bin, directories (hash), repository, config, 
