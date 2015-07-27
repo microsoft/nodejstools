@@ -27,6 +27,22 @@ namespace NpmTests {
     ""bugs"": ""http://www.mybugtracker.com/""
 }";
 
+        private const string PkgMisSpelledAuthor = @"{
+    ""name"": ""TestPkg"",
+    ""version"": ""0.1.0"",
+    ""author"": {
+        ""misspelledname"": ""Firstname Lastname""
+    }
+}";
+
+        private const string PkgSingleAuthorField = @"{
+    ""name"": ""TestPkg"",
+    ""version"": ""0.1.0"",
+    ""author"": {
+        ""name"": ""Firstname Lastname""
+    }
+}";
+
         private const string PkgSingleLicenseType = @"{
     ""name"": ""TestPkg"",
     ""version"": ""0.1.0"",
@@ -384,6 +400,29 @@ namespace NpmTests {
                 LoadFrom(PkgLargeCompliant).Man,
                 2,
                 new[] { "./man/foo.1", "./man/bar.1" });
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestReadEmptyAuthor() {
+            Assert.IsNull(LoadFrom(PkgSimple).Author);
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestReadMisspelledAuthor() {
+            Assert.AreEqual(
+                @"{
+  ""misspelledname"": ""Firstname Lastname""
+}",
+                LoadFrom(PkgMisSpelledAuthor).Author.Name
+            );
+        }
+
+        [TestMethod, Priority(0)]
+        public void TestReadSingleAuthorField() {
+            Assert.AreEqual(
+                "Firstname Lastname",
+                LoadFrom(PkgSingleAuthorField).Author.Name
+            );
         }
 
         [TestMethod, Priority(0)]

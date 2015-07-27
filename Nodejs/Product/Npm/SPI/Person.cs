@@ -83,7 +83,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             // Verify we are parsing correctly
             try {
                 var jObject = JObject.Parse(source);
-                Debug.Assert((string)jObject["name"] == Name, string.Format("Failed to parse name from {0}", source));
+                var name = (string)jObject["name"];
+                Debug.Assert(name != null ? name == Name : Name == source, string.Format("Failed to parse name from {0}", source));
                 Debug.Assert((string)jObject["email"] == Email, string.Format("Failed to parse email from {0}", source));
                 Debug.Assert((string)jObject["url"] == Url, string.Format("Failed to parse url from {0}", source));
             } catch (Exception) {
