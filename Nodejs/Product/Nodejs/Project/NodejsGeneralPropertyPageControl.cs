@@ -171,7 +171,7 @@ namespace Microsoft.NodejsTools.Project {
 
         private void NodeExePathChanged(object sender, EventArgs e) {
             if (String.IsNullOrEmpty(_nodeExePath.Text) || _nodeExePath.Text.Contains("$(") ||
-                File.Exists(CommonUtils.GetAbsoluteFilePath(_propPage.Project.ProjectHome, _nodeExePath.Text))) {
+                File.Exists(Nodejs.GetAbsoluteNodeExePath(_propPage.Project.ProjectHome, _nodeExePath.Text))) {
                 _nodeExeErrorProvider.SetError(_nodeExePath, String.Empty);
             } else {
                 _nodeExeErrorProvider.SetError(_nodeExePath, SR.GetString(SR.NodeExePathNotFound));

@@ -126,7 +126,11 @@ namespace Microsoft.NodejsTools.Repl {
             string npmPath;
             try {
                 npmPath = NpmHelpers.GetPathToNpm(
-                    nodejsProject != null ? nodejsProject.GetProjectProperty(NodejsConstants.NodeExePath) : null);
+                    nodejsProject != null ?
+                        Nodejs.GetAbsoluteNodeExePath(
+                            nodejsProject.ProjectHome,
+                            nodejsProject.GetProjectProperty(NodejsConstants.NodeExePath))
+                        : null);
             } catch (NpmNotFoundException) {
                 Nodejs.ShowNodejsNotInstalled();
                 return ExecutionResult.Failure;

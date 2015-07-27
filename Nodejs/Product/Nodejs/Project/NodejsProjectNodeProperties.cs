@@ -60,11 +60,9 @@ namespace Microsoft.NodejsTools.Project {
         public string NodeExePath {
             get {
                 return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
-                    var res = this.Node.ProjectMgr.GetProjectProperty(NodejsConstants.NodeExePath, true);
-                    if (String.IsNullOrWhiteSpace(res)) {
-                        return Nodejs.NodeExePath ?? String.Empty;
-                    }
-                    return res;
+                    return Nodejs.GetAbsoluteNodeExePath(
+                        ProjectHome,
+                        Node.ProjectMgr.GetProjectProperty(NodejsConstants.NodeExePath, true));
                 });
             }
             set {
