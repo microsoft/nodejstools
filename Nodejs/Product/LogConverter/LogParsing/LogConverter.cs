@@ -166,7 +166,7 @@ namespace Microsoft.NodejsTools.LogParsing {
                     header = NewHeader();
                     //header.TimeStamp = currentTimeStamp++;
                     header.Guid = TraceLog.ProcessEventGuid;
-                    header.Version = 3;
+                    header.Version = 1;
                     header.Type = 3;
 
                     var processInfo = new ProcessInfo();
@@ -329,7 +329,7 @@ namespace Microsoft.NodejsTools.LogParsing {
 
                     header = NewHeader();
                     header.Guid = TraceLog.ProcessEventGuid;
-                    header.Version = 3;
+                    header.Version = 1;
                     header.Type = 4;    // DCEnd
 
                     processInfo = new ProcessInfo();
@@ -598,8 +598,9 @@ namespace Microsoft.NodejsTools.LogParsing {
                     }
                     switch (records[0]) {
                         case "code-creation":
-                            var funcInfo = ExtractNamespaceAndMethodName(records[4]);
-                            if (funcInfo.LineNumber != null && funcInfo.Filename != null) {
+                            int shift = (_nodeVersion >= v012 ? 1 : 0);
+                            var funcInfo = ExtractNamespaceAndMethodName(records[shift + 4]);
+                            if (funcInfo.LineNumber != null && !String.IsNullOrWhiteSpace(funcInfo.Filename)) {
                                 pdbCode.Append(String.Format(@"
 #line {0} ""{1}""
 public static void X{2:X}() {{
