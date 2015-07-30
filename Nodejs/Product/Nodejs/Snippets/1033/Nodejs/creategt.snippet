@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets
+    xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>creategt</Title>
+      <Description>Code Snippet for creating a Grunt Task</Description>
+      <Shortcut>creategt</Shortcut>
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>taskName</ID>
+          <Default>taskName</Default>
+        </Literal>
+        <Literal>
+          <ID>tasks</ID>
+          <Default>tasks</Default>
+        </Literal>
+      </Declarations>
+      <Code Language="Nodejs">
+        <![CDATA[grunt.registerTask($taskName$, [$tasks$]);]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>
+

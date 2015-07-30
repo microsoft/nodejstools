@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets
+    xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>readstream</Title>
+      <Description>Code Snippet for streaming data</Description>
+      <Shortcut>readstream</Shortcut>
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>resource</ID>
+          <Default>resource</Default>
+        </Literal>
+      </Declarations>
+      <Code Language="Nodejs">
+        <![CDATA[var stream = fs.createReadStream('$resource$');
+stream.on('data', function (chunk) {
+    console.log(chunk);
+});
+stream.on('end', function () {
+    console.log('finished');
+});
+]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

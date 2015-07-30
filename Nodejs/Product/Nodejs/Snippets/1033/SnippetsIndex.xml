@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<SnippetCollection>
+  <Language Lang="Nodejs" Guid="{8239BEC4-EE87-11D0-8C98-00C04FC2AB22}">
+    <SnippetDir>
+      <OnOff>on</OnOff>
+      <Installed>true</Installed>
+      <Locale>1033</Locale>
+      <DirPath>Snippets\%LCID%\Nodejs</DirPath>
+      <LocalizedName>Nodejs</LocalizedName>
+    </SnippetDir>
+  </Language>
+</SnippetCollection>

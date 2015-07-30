@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets
+    xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>cberr</Title>
+      <Description>Code Snippet for an error handling callback function</Description>
+      <Shortcut>cberr</Shortcut>
+      <SnippetTypes>
+        <SnippetType>SurroundsWithStatement</SnippetType>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Code Language="Nodejs">
+        <![CDATA[var hadError = function (error, response) {
+    console.error(err);
+    response.end('Server Error');
+};
+]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>
