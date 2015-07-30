@@ -17,11 +17,17 @@
                 <Directory Id="Dir_$(var.key)TestFrameworksMocha" Name="Mocha" />
             </Directory>
             <Directory Id="Dir_$(var.key)InstallLocationScripts" Name="Scripts">
-                <Directory Id="Dir_$(var.key)InstallLocationScriptsTypings" Name="Typings">
+                <Directory Id="Dir_$(var.key)InstallLocationScriptsTypings" Name="Typings">                
                     <Directory Id="Dir_$(var.key)ScriptsTypingsNode" Name="Node" />
                 </Directory>
             </Directory>
             <Directory Id="Dir_$(var.key)RemoteDebug" Name="RemoteDebug"/>
+            <Directory Id="Dir_$(var.key)Snippets" Name="Snippets">
+                <Directory Id="Dir_$(var.key)Snippets_1033" Name="1033">
+                <Directory Id="Dir_$(var.key)Snippets_1033_Nodejs" Name="Nodejs"/>
+                <!--<Directory Id="Dir_$(var.key)Snippets_1033_Test" Name="Test"/>-->
+                </Directory>
+            </Directory>           
         </DirectoryRef>
         <?endforeach?>
 

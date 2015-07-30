@@ -100,6 +100,53 @@
                        ItemTemplates\CloudService\NETFramework4\Worker Role\Node.js\CloudServiceTypeScriptWorkerRole.zip">
           <InstallDirectory>ItemTemplates_CloudService_WorkerRole</InstallDirectory>
         </File>
+        
+        <!-- Snippets -->
+        <File Include="Snippets\1033\Nodejs\alert.snippet;
+                       Snippets\1033\Nodejs\cberr.snippet;
+                       Snippets\1033\Nodejs\cl.snippet;
+                       Snippets\1033\Nodejs\class.snippet;
+                       Snippets\1033\Nodejs\creategt.snippet;
+                       Snippets\1033\Nodejs\dowhile.snippet;
+                       Snippets\1033\Nodejs\else.snippet;
+                       Snippets\1033\Nodejs\exports.snippet;
+                       Snippets\1033\Nodejs\for.snippet;
+                       Snippets\1033\Nodejs\forin.snippet;
+                       Snippets\1033\Nodejs\forr.snippet;
+                       Snippets\1033\Nodejs\function.snippet;
+                       Snippets\1033\Nodejs\http_delete.snippet;
+                       Snippets\1033\Nodejs\http_get.snippet;
+                       Snippets\1033\Nodejs\http_post.snippet;
+                       Snippets\1033\Nodejs\http_put.snippet;
+                       Snippets\1033\Nodejs\if.snippet;
+                       Snippets\1033\Nodejs\iife.snippet;
+                       Snippets\1033\Nodejs\initConfig.snippet;
+                       Snippets\1033\Nodejs\loadgp.snippet;
+                       Snippets\1033\Nodejs\parse.snippet;
+                       Snippets\1033\Nodejs\props.snippet;
+                       Snippets\1033\Nodejs\readfile.snippet;
+                       Snippets\1033\Nodejs\readstream.snippet;
+                       Snippets\1033\Nodejs\require.snippet;
+                       Snippets\1033\Nodejs\server.snippet;
+                       Snippets\1033\Nodejs\stringify.snippet;
+                       Snippets\1033\Nodejs\switch.snippet;
+                       Snippets\1033\Nodejs\tryc.snippet;
+                       Snippets\1033\Nodejs\tryf.snippet;
+                       Snippets\1033\Nodejs\while.snippet;
+                       Snippets\1033\Nodejs\with.snippet">
+            <InstallDirectory>Snippets_1033_Nodejs</InstallDirectory>
+        </File>
+ 
+        <!--
+        <File Include="$(BuildOutputRoot)Binaries\Nodejs\Snippets\1033\Test\*.snippet">
+            <InstallDirectory>Snippets_1033_Test</InstallDirectory>
+        </File>
+        -->
+        
+        <File Include="Snippets\1033\SnippetsIndex.xml">
+            <InstallDirectory>Snippets_1033</InstallDirectory>
+        </File>
+        
 
         <!--Unit test framework support files-->
         <File Include="TestFrameworks\find_tests.js;
