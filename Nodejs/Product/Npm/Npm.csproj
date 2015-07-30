@@ -89,6 +89,7 @@
     </Compile>
     <Compile Include="IHomepages.cs" />
     <Compile Include="IPackageCatalogFilter.cs" />
+    <Compile Include="NativeMethods.cs" />
     <Compile Include="NpmArgumentBuilder.cs" />
     <Compile Include="NpmHelpers.cs" />
     <Compile Include="SemverVersionComparer.cs" />

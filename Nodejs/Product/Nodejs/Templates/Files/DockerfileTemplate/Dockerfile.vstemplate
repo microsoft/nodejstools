@@ -1,0 +1,18 @@
+﻿<VSTemplate Version="2.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+  <TemplateData>
+    <Name Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3054" />
+    <Description Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3053" />
+    <ProjectType>Node.js</ProjectType>
+    <ProjectSubType>Docker</ProjectSubType>
+    <DefaultName>Dockerfile</DefaultName>
+    <AppendDefaultFileExtension>false</AppendDefaultFileExtension>
+    <SortOrder>500</SortOrder>
+  </TemplateData>
+  <TemplateContent>
+    <ProjectItem TargetFileName="Dockerfile" SubType="Content" ReplaceParameters="true">Dockerfile</ProjectItem>
+  </TemplateContent>
+  <WizardExtension>
+    <Assembly>Microsoft.NodejsTools.ProjectWizard, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</Assembly>
+    <FullClassName>Microsoft.NodejsTools.ProjectWizard.DockerfileWizardExtension</FullClassName>
+  </WizardExtension>
+</VSTemplate>

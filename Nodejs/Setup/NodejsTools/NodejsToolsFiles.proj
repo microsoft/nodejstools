@@ -52,11 +52,16 @@
 
             <InstallDirectory>FileTemplatesNewItem</InstallDirectory>
         </File>
+        
+        <File Include="FileTemplates\ReferenceFiles\Dockerfile">
+            <InstallDirectory>FileTemplatesReferenceFiles</InstallDirectory>
+        </File>
 
         <ItemTemplate Include="ItemTemplates\JavaScript\UnitTest.zip;
                                ItemTemplates\JavaScript\MochaUnitTest.zip;
                                ItemTemplates\JavaScript\TypeScriptUnitTest.zip;
-                               ItemTemplates\JavaScript\TypeScriptMochaUnitTest.zip"/>
+                               ItemTemplates\JavaScript\TypeScriptMochaUnitTest.zip;
+                               ItemTemplates\JavaScript\DockerfileTemplate.zip"/>
 
         <ProjectTemplate Include="ProjectTemplates\JavaScript\Node.js\1033\AzureExpressApp.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\AzureExpress4App.zip;

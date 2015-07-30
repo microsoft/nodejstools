@@ -33,11 +33,11 @@ namespace Microsoft.NodejsTools.Npm {
             + "\\.(?<patch>[…0-9]+)" // The '…' is there to handle the 'classy' library, which has a very long version number - see slightly snarky comment about that unadulterated bag of hilarity below.
             + "(?:-(?<prerelease>[…0-9A-Za-z-]+(\\.[…0-9A-Za-z-]+)*))?"
             + "(?:\\+(?<buildmetadata>[…0-9A-Za-z-]+(\\.[…0-9A-Za-z-]+)*))?$",
-            RegexOptions.IgnoreCase | RegexOptions.Singleline);
+            RegexOptions.Singleline);
 
         private static readonly Regex RegexOptionalFragment = new Regex(
             "^[…0-9A-Za-z-]+(\\.[…0-9A-Za-z-]+)*$",
-            RegexOptions.IgnoreCase | RegexOptions.Singleline);
+            RegexOptions.Singleline);
 
         public static SemverVersion Parse(string versionString) {
             var matches = RegexSemver.Matches(versionString);

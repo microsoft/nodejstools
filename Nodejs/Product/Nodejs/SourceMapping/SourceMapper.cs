@@ -153,6 +153,26 @@ namespace Microsoft.NodejsTools.SourceMapping {
             return false;
         }
 
+        /// <summary>
+        /// Get the original file name to map to.
+        /// </summary>
+        /// <param name="javaScriptFileName">JavaScript compiled file.</param>
+        /// <param name="line">Line number</param>
+        /// <param name="column">Column number</param>
+        internal string GetOriginalFileName(string javaScriptFileName, int? line, int? column) {
+            string originalFileName = null;
+
+            if (line != null && column != null) {
+                SourceMapInfo tempMapping = this.MapToOriginal(javaScriptFileName, (int)line, (int)column);
+
+                if (tempMapping != null) {
+                    originalFileName = tempMapping.FileName;
+                }
+            }
+
+            return originalFileName ?? this.MapToOriginal(javaScriptFileName);
+        }
+
         private static string GetFileRelativeToFile(string relativeToFile, string newFileName) {
             return Path.Combine(Path.GetDirectoryName(relativeToFile), newFileName.Replace('/', '\\'));
         }

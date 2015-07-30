@@ -2514,7 +2514,7 @@ namespace Microsoft.VisualStudioTools.Project {
                 try {
                     fileName = Path.GetFileNameWithoutExtension(newFileName);
                 }
-                    // We want to be consistent in the error message and exception we throw. fileName could be for example #¤&%"¤&"%  and that would trigger an ArgumentException on Path.IsRooted.
+                    // We want to be consistent in the error message and exception we throw. fileName could be for example #Â¤&%"Â¤&"%  and that would trigger an ArgumentException on Path.IsRooted.
                 catch (ArgumentException) {
                     errorMessage = SR.GetString(SR.ErrorInvalidFileName, newFileName);
                 }
@@ -4905,7 +4905,7 @@ If the files in the existing folder have the same names as files in the folder y
         /// <param name="storage">Project or user file (_PersistStorageType)</param>
         /// <param name="propertyValue">Value of the property (out parameter)</param>
         /// <returns>HRESULT</returns>
-        int IVsBuildPropertyStorage.GetPropertyValue(string propertyName, string configName, uint storage, out string propertyValue) {
+        public virtual int GetPropertyValue(string propertyName, string configName, uint storage, out string propertyValue) {
             // TODO: when adding support for User files, we need to update this method
             propertyValue = null;
             if (string.IsNullOrEmpty(configName)) {
