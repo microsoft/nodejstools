@@ -777,40 +777,102 @@
     <ZipProject Include="ProjectTemplates\AzureExpress4App\setup_web.cmd" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\Web.config" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\Web.Debug.config" />
-    <Content Include="Snippets\1033\Nodejs\alert.snippet">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <None Include="Snippets\1033\Nodejs\cberr.snippet" />
-    <None Include="Snippets\1033\Nodejs\cl.snippet" />
-    <None Include="Snippets\1033\Nodejs\class.snippet" />
-    <None Include="Snippets\1033\Nodejs\creategt.snippet" />
-    <None Include="Snippets\1033\Nodejs\dowhile.snippet" />
-    <None Include="Snippets\1033\Nodejs\else.snippet" />
-    <None Include="Snippets\1033\Nodejs\exports.snippet" />
-    <None Include="Snippets\1033\Nodejs\for.snippet" />
-    <None Include="Snippets\1033\Nodejs\forin.snippet" />
-    <None Include="Snippets\1033\Nodejs\forr.snippet" />
-    <None Include="Snippets\1033\Nodejs\function.snippet" />
-    <None Include="Snippets\1033\Nodejs\http_delete.snippet" />
-    <None Include="Snippets\1033\Nodejs\http_get.snippet" />
-    <None Include="Snippets\1033\Nodejs\http_post.snippet" />
-    <None Include="Snippets\1033\Nodejs\http_put.snippet" />
-    <None Include="Snippets\1033\Nodejs\if.snippet" />
-    <None Include="Snippets\1033\Nodejs\iife.snippet" />
-    <None Include="Snippets\1033\Nodejs\initConfig.snippet" />
-    <None Include="Snippets\1033\Nodejs\loadgp.snippet" />
-    <None Include="Snippets\1033\Nodejs\parse.snippet" />
-    <None Include="Snippets\1033\Nodejs\props.snippet" />
-    <None Include="Snippets\1033\Nodejs\readfile.snippet" />
-    <None Include="Snippets\1033\Nodejs\readstream.snippet" />
-    <None Include="Snippets\1033\Nodejs\require.snippet" />
-    <None Include="Snippets\1033\Nodejs\server.snippet" />
-    <None Include="Snippets\1033\Nodejs\stringify.snippet" />
-    <None Include="Snippets\1033\Nodejs\switch.snippet" />
-    <None Include="Snippets\1033\Nodejs\tryc.snippet" />
-    <None Include="Snippets\1033\Nodejs\tryf.snippet" />
-    <None Include="Snippets\1033\Nodejs\while.snippet" />
-    <None Include="Snippets\1033\Nodejs\with.snippet" />
+    <None Include="Snippets\1033\Nodejs\alert.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\cberr.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\cl.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\class.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\creategt.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\dowhile.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\else.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\exports.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\for.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\forin.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\forr.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\function.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\http_delete.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\http_get.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\http_post.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\http_put.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\if.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\iife.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\initConfig.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\loadgp.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\parse.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\props.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\readfile.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\readstream.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\require.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\server.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\stringify.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\switch.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\tryc.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\tryf.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\while.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Snippets\1033\Nodejs\with.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Theme\contrast.vstheme">
       <SubType>Designer</SubType>
     </None>
