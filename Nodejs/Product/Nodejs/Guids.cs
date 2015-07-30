@@ -33,8 +33,9 @@ namespace Microsoft.NodejsTools
         public const string NodejsBaseProjectFactoryString = "9092AA53-FB77-4645-B42D-1CCCA6BD08BD";
         public const string TypeScriptLanguageInfoString = "87bdf188-e6e8-4fcf-a82a-9b8506e01847";
         public const string JadeEditorFactoryString = "6CB69EF8-1329-4DC0-84B4-FA134EA59BE3";
+        public const string DefaultLanguageServiceString = "{8239BEC4-EE87-11D0-8C98-00C04FC2AB22}";
 
-        internal static readonly Guid DefaultLangaugeService = new Guid("{8239BEC4-EE87-11D0-8C98-00C04FC2AB22}");
+        internal static readonly Guid DefaultLanguageService = new Guid(DefaultLanguageServiceString);
  
         //Guid for our formatting service
         internal const string JavaScriptFormattingServiceString = "F414C260-6AC0-11CF-B6D1-00AA00BBBB58";

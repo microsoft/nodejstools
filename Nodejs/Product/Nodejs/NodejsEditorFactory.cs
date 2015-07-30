@@ -230,7 +230,7 @@ namespace Microsoft.NodejsTools {
             IVsUserData userData = textLines as IVsUserData;
             if (userData != null) {
                 if (langSid != Guid.Empty) {
-                    Guid vsCoreSid = Guids.DefaultLangaugeService;
+                    Guid vsCoreSid = Guids.DefaultLanguageService;
                     Guid currentSid;
                     ErrorHandler.ThrowOnFailure(textLines.GetLanguageServiceID(out currentSid));
                     // If the language service is set to the default SID, then

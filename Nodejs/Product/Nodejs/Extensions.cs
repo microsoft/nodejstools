@@ -22,6 +22,7 @@ using System.Text;
 using Microsoft.NodejsTools;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.NodejsTools.Classifier;
+using Microsoft.NodejsTools.Editor.Core;
 using Microsoft.NodejsTools.Intellisense;
 using Microsoft.NodejsTools.Project;
 using Microsoft.NodejsTools.Repl;
@@ -296,7 +297,7 @@ namespace Microsoft.NodejsTools {
             return view.BufferGraph.MapDownToFirstMatch(
                new SnapshotPoint(view.TextBuffer.CurrentSnapshot, view.Caret.Position.BufferPosition),
                PointTrackingMode.Positive,
-               IntellisenseController.IsNodejsContent,
+               EditorExtensions.IsNodeJsContent,
                PositionAffinity.Successor
             );
         }

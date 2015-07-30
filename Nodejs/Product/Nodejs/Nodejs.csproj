@@ -79,7 +79,6 @@
       <OutputSubPath>Node.js</OutputSubPath>
     </VSTemplate>
   </ItemDefinitionGroup>
-
   <Choose>
     <When Condition="'$(VSTarget)' != '11.0' And '$(VSTarget)' != '12.0'">
       <ItemGroup>
@@ -105,6 +104,10 @@
     <Reference Include="Microsoft.Build.Utilities.$(MicrosoftBuildAssemblyVersionSuffix), Version=$(MicrosoftBuildAssemblyVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.JScript" />
+    <Reference Include="microsoft.msxml, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.ComponentModelHost, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.CoreUtility, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Debugger.Interop.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
@@ -297,6 +300,7 @@
     <Compile Include="Editor\BraceMatching\BraceMatchingTaggerProvider.cs" />
     <Compile Include="Editor\BraceMatching\BraceMatchingTagger.cs" />
     <Compile Include="Editor\EditorExtensions.cs" />
+    <Compile Include="Intellisense\ExpansionClient.cs" />
     <Compile Include="Intellisense\AnalysisPriority.cs" />
     <Compile Include="Intellisense\AnalysisQueue.cs" />
     <Compile Include="Intellisense\BufferParser.cs" />
@@ -773,6 +777,40 @@
     <ZipProject Include="ProjectTemplates\AzureExpress4App\setup_web.cmd" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\Web.config" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\Web.Debug.config" />
+    <Content Include="Snippets\1033\Nodejs\alert.snippet">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="Snippets\1033\Nodejs\cberr.snippet" />
+    <None Include="Snippets\1033\Nodejs\cl.snippet" />
+    <None Include="Snippets\1033\Nodejs\class.snippet" />
+    <None Include="Snippets\1033\Nodejs\creategt.snippet" />
+    <None Include="Snippets\1033\Nodejs\dowhile.snippet" />
+    <None Include="Snippets\1033\Nodejs\else.snippet" />
+    <None Include="Snippets\1033\Nodejs\exports.snippet" />
+    <None Include="Snippets\1033\Nodejs\for.snippet" />
+    <None Include="Snippets\1033\Nodejs\forin.snippet" />
+    <None Include="Snippets\1033\Nodejs\forr.snippet" />
+    <None Include="Snippets\1033\Nodejs\function.snippet" />
+    <None Include="Snippets\1033\Nodejs\http_delete.snippet" />
+    <None Include="Snippets\1033\Nodejs\http_get.snippet" />
+    <None Include="Snippets\1033\Nodejs\http_post.snippet" />
+    <None Include="Snippets\1033\Nodejs\http_put.snippet" />
+    <None Include="Snippets\1033\Nodejs\if.snippet" />
+    <None Include="Snippets\1033\Nodejs\iife.snippet" />
+    <None Include="Snippets\1033\Nodejs\initConfig.snippet" />
+    <None Include="Snippets\1033\Nodejs\loadgp.snippet" />
+    <None Include="Snippets\1033\Nodejs\parse.snippet" />
+    <None Include="Snippets\1033\Nodejs\props.snippet" />
+    <None Include="Snippets\1033\Nodejs\readfile.snippet" />
+    <None Include="Snippets\1033\Nodejs\readstream.snippet" />
+    <None Include="Snippets\1033\Nodejs\require.snippet" />
+    <None Include="Snippets\1033\Nodejs\server.snippet" />
+    <None Include="Snippets\1033\Nodejs\stringify.snippet" />
+    <None Include="Snippets\1033\Nodejs\switch.snippet" />
+    <None Include="Snippets\1033\Nodejs\tryc.snippet" />
+    <None Include="Snippets\1033\Nodejs\tryf.snippet" />
+    <None Include="Snippets\1033\Nodejs\while.snippet" />
+    <None Include="Snippets\1033\Nodejs\with.snippet" />
     <None Include="Theme\contrast.vstheme">
       <SubType>Designer</SubType>
     </None>
@@ -810,6 +848,10 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Debugger\RemoteDebug\RemoteDebug.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Snippets\1033\SnippetsIndex.xml">
+      <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="FileTemplates\NewItem\EmptyTs.ts">
@@ -1561,6 +1603,7 @@
     <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\startup.ts" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\server.ts" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <!--
     To specify a different registry root to register your package, uncomment the TargetRegistryRoot

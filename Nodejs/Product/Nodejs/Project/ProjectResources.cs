@@ -44,6 +44,7 @@ namespace Microsoft.NodejsTools.Project {
         internal const string IncludeNodeModulesIncludeDescription = "IncludeNodeModulesIncludeDescription";
         internal const string IncludeNodeModulesIncludeTitle = "IncludeNodeModulesIncludeTitle";
         internal const string IncludeNodeModulesInformation = "IncludeNodeModulesInformation";
+        internal const string InsertSnippet = "InsertSnippet";
         internal const string InvalidPortNumber = "InvalidPortNumber";
         internal const string LaunchUrlToolTip = "LaunchUrlToolTip";
         internal const string LinkStatusLinkedFromGlobal = "LinkStatusLinkedFromGlobal";
@@ -173,6 +174,7 @@ namespace Microsoft.NodejsTools.Project {
         internal const string StatusAnalysisSaved = "StatusAnalysisSaved";
         internal const string StatusAnalysisSaving = "StatusAnalysisSaving";
         internal const string StatusAnalysisUpToDate = "StatusAnalysisUpToDate";
+        internal const string SurroundWith = "SurroundWith";
         internal const string TestFramework = "TestFramework";
         internal const string TestFrameworkDescription = "TestFrameworkDescription";
         internal const string UpgradedEnvironmentVariables = "UpgradedEnvironmentVariables";

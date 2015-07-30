@@ -16,7 +16,11 @@
 
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows.Input;
+using Microsoft.NodejsTools.Classifier;
+using Microsoft.NodejsTools.Editor.Core;
+using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Language.Intellisense;
@@ -26,7 +30,7 @@ using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.IncrementalSearch;
 using Microsoft.VisualStudio.Text.Operations;
-using Microsoft.VisualStudioTools.Project;
+using Microsoft.VisualStudio.TextManager.Interop;
 using VSConstants = Microsoft.VisualStudio.VSConstants;
 
 namespace Microsoft.NodejsTools.Intellisense {
@@ -35,41 +39,51 @@ namespace Microsoft.NodejsTools.Intellisense {
         private readonly ITextView _textView;
         private readonly IntellisenseControllerProvider _provider;
         private readonly IIncrementalSearch _incSearch;
+        private readonly ExpansionClient _expansionClient;
+        private readonly System.IServiceProvider _serviceProvider;
+        private readonly IVsExpansionManager _expansionMgr;
         private readonly IClassifier _classifier;
         private ICompletionSession _activeSession;
         private ISignatureHelpSession _sigHelpSession;
         private IQuickInfoSession _quickInfoSession;
         private IOleCommandTarget _oldTarget;
         private IEditorOperations _editOps;
+        private static string[] _allStandardSnippetTypes = { ExpansionClient.Expansion, ExpansionClient.SurroundsWith };
+        private static string[] _surroundsWithSnippetTypes = { ExpansionClient.SurroundsWith, ExpansionClient.SurroundsWithStatement };
         [ThreadStatic]
         internal static bool ForceCompletions;
 
         /// <summary>
         /// Attaches events for invoking Statement completion 
         /// </summary>
-        public IntellisenseController(IntellisenseControllerProvider provider, ITextView textView) {
+        public IntellisenseController(IntellisenseControllerProvider provider, ITextView textView, System.IServiceProvider serviceProvider) {
             _textView = textView;
             _provider = provider;
             _classifier = _provider._classifierAgg.GetClassifier(_textView.TextBuffer);
             _editOps = provider._EditOperationsFactory.GetEditorOperations(textView);
             _incSearch = provider._IncrementalSearch.GetIncrementalSearch(textView);
             _textView.MouseHover += TextViewMouseHover;
+            _serviceProvider = serviceProvider;
+
+            if (textView.TextBuffer.IsNodeJsContent()) {
+                try {
+                    _expansionClient = new ExpansionClient(textView, provider._adaptersFactory, _serviceProvider);
+                    var textMgr = (IVsTextManager2)_serviceProvider.GetService(typeof(SVsTextManager));
+                    textMgr.GetExpansionManager(out _expansionMgr);
+                }
+                catch (ArgumentException ex) {
+                    // No expansion client for this buffer, but we can continue without it
+                    Debug.Fail(ex.ToString());
+                }
+            }
             textView.Properties.AddProperty(typeof(IntellisenseController), this);  // added so our key processors can get back to us
-        }
-
-        internal static bool IsNodejsContent(ITextBuffer buffer) {
-            return buffer.ContentType.IsOfType(NodejsConstants.Nodejs);
-        }
-
-        internal static bool IsNodejsContent(ITextSnapshot snapshot) {
-            return snapshot.TextBuffer.ContentType.IsOfType(NodejsConstants.Nodejs);
         }
 
         private void TextViewMouseHover(object sender, MouseHoverEventArgs e) {
             if (_quickInfoSession != null && !_quickInfoSession.IsDismissed) {
                 _quickInfoSession.Dismiss();
             }
-            var pt = e.TextPosition.GetPoint(IsNodejsContent, PositionAffinity.Successor);
+            var pt = e.TextPosition.GetPoint(EditorExtensions.IsNodeJsContent, PositionAffinity.Successor);
             if (pt != null) {
                 _quickInfoSession = _provider._QuickInfoBroker.TriggerQuickInfo(
                     _textView,
@@ -195,7 +209,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 SnapshotPoint? caretPoint = _textView.BufferGraph.MapDownToFirstMatch(
                     _textView.Caret.Position.BufferPosition,
                     PointTrackingMode.Positive,
-                    IsNodejsContent,
+                    EditorExtensions.IsNodeJsContent,
                     PositionAffinity.Predecessor
                 );
 
@@ -262,7 +276,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 var targetPt = _textView.BufferGraph.MapDownToFirstMatch(
                     new SnapshotPoint(_textView.TextBuffer.CurrentSnapshot, position),
                     PointTrackingMode.Positive,
-                    IsNodejsContent,
+                    EditorExtensions.IsNodeJsContent,
                     PositionAffinity.Successor
                 );
 
@@ -461,6 +475,10 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
         }
 
+        private IVsTextView GetViewAdapter() {
+            return _provider._adaptersFactory.GetViewAdapter(_textView);
+        }
+
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
             if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (int)VSConstants.VSStd2KCmdID.TYPECHAR) {
                 var ch = (char)(ushort)System.Runtime.InteropServices.Marshal.GetObjectForNativeVariant(pvaIn);
@@ -473,12 +491,15 @@ namespace Microsoft.NodejsTools.Intellisense {
                         if (_activeSession.SelectedCompletionSet.Moniker == CompletionSource.NodejsRequireCompletionSetMoniker) {
                             if (completion.InsertionText.StartsWith("'")) { // require(
                                 committedBy = ")";
-                            } else if (completion.InsertionText.EndsWith("'")) { // require('
+                            }
+                            else if (completion.InsertionText.EndsWith("'")) { // require('
                                 committedBy = "'";
-                            } else if (completion.InsertionText.EndsWith("\"")) { // require("
+                            }
+                            else if (completion.InsertionText.EndsWith("\"")) { // require("
                                 committedBy = "\"";
                             }
-                        } else {
+                        }
+                        else {
                             committedBy = NodejsPackage.Instance != null ?
                                 NodejsPackage.Instance.IntellisenseOptionsPage.CompletionCommittedBy :
                                 NodejsConstants.DefaultIntellisenseCompletionCommittedBy;
@@ -493,9 +514,11 @@ namespace Microsoft.NodejsTools.Intellisense {
                                 return VSConstants.S_OK;
                             }
                         }
-                    } else if (_activeSession.SelectedCompletionSet.Moniker.Equals(CompletionSource.NodejsRequireCompletionSetMoniker) && !IsRequireIdentifierChar(ch)) {
+                    }
+                    else if (_activeSession.SelectedCompletionSet.Moniker.Equals(CompletionSource.NodejsRequireCompletionSetMoniker) && !IsRequireIdentifierChar(ch)) {
                         _activeSession.Dismiss();
-                    } else if (!_activeSession.SelectedCompletionSet.Moniker.Equals(CompletionSource.NodejsRequireCompletionSetMoniker) && !IsIdentifierChar(ch)) {
+                    }
+                    else if (!_activeSession.SelectedCompletionSet.Moniker.Equals(CompletionSource.NodejsRequireCompletionSetMoniker) && !IsIdentifierChar(ch)) {
                         _activeSession.Dismiss();
                     }
                 }
@@ -535,7 +558,8 @@ namespace Microsoft.NodejsTools.Intellisense {
                                 if (!enterOnComplete) {
                                     return VSConstants.S_OK;
                                 }
-                            } else {
+                            }
+                            else {
                                 _activeSession.Dismiss();
                             }
                             break;
@@ -556,7 +580,8 @@ namespace Microsoft.NodejsTools.Intellisense {
                             return res;
                     }
                 }
-            } else if (_sigHelpSession != null) {
+            }
+            else if (_sigHelpSession != null) {
                 if (pguidCmdGroup == VSConstants.VSStd2K) {
                     switch ((VSConstants.VSStd2KCmdID)nCmdID) {
                         case VSConstants.VSStd2KCmdID.BACKSPACE:
@@ -588,29 +613,124 @@ namespace Microsoft.NodejsTools.Intellisense {
                     }
                 }
             }
-
-            if (pguidCmdGroup == VSConstants.VSStd2K) {
-                switch ((VSConstants.VSStd2KCmdID)nCmdID) {
-                    case VSConstants.VSStd2KCmdID.SHOWMEMBERLIST:
-                    case VSConstants.VSStd2KCmdID.COMPLETEWORD:
-                        ForceCompletions = true;
-                        try {
-                            TriggerCompletionSession((VSConstants.VSStd2KCmdID)nCmdID == VSConstants.VSStd2KCmdID.COMPLETEWORD);
-                        } finally {
-                            ForceCompletions = false;
-                        }
-                        return VSConstants.S_OK;
-                    case VSConstants.VSStd2KCmdID.QUICKINFO:
-                        TriggerQuickInfo();
-                        return VSConstants.S_OK;
-                    case VSConstants.VSStd2KCmdID.PARAMINFO:
-                        TriggerSignatureHelp();
-                        return VSConstants.S_OK;
+            else {
+                if (pguidCmdGroup == VSConstants.VSStd2K) {
+                    switch ((VSConstants.VSStd2KCmdID)nCmdID) {
+                        case VSConstants.VSStd2KCmdID.QUICKINFO:
+                            TriggerQuickInfo();
+                            return VSConstants.S_OK;
+                        case VSConstants.VSStd2KCmdID.PARAMINFO:
+                            TriggerSignatureHelp();
+                            return VSConstants.S_OK;
+                        case VSConstants.VSStd2KCmdID.RETURN:
+                            if (_expansionMgr != null && _expansionClient.InSession && ErrorHandler.Succeeded(_expansionClient.EndCurrentExpansion(false))) {
+                                return VSConstants.S_OK;
+                            }
+                            break;
+                        case VSConstants.VSStd2KCmdID.TAB:
+                            if (_expansionMgr != null && _expansionClient.InSession && ErrorHandler.Succeeded(_expansionClient.NextField())) {
+                                return VSConstants.S_OK;
+                            }
+                            if (_textView.Selection.IsEmpty && _textView.Caret.Position.BufferPosition > 0) {
+                                if (TryTriggerExpansion()) {
+                                    return VSConstants.S_OK;
+                                }
+                            }
+                            break;
+                        case VSConstants.VSStd2KCmdID.BACKTAB:
+                            if (_expansionMgr != null && _expansionClient.InSession && ErrorHandler.Succeeded(_expansionClient.PreviousField())) {
+                                return VSConstants.S_OK;
+                            }
+                            break;
+                        case VSConstants.VSStd2KCmdID.SURROUNDWITH:
+                        case VSConstants.VSStd2KCmdID.INSERTSNIPPET:
+                            TriggerSnippet(nCmdID);
+                            return VSConstants.S_OK;
+                        case VSConstants.VSStd2KCmdID.SHOWMEMBERLIST:
+                        case VSConstants.VSStd2KCmdID.COMPLETEWORD:
+                            ForceCompletions = true;
+                            try {
+                                TriggerCompletionSession((VSConstants.VSStd2KCmdID)nCmdID == VSConstants.VSStd2KCmdID.COMPLETEWORD);
+                            }
+                            finally {
+                                ForceCompletions = false;
+                            }
+                            return VSConstants.S_OK;
+                    }
                 }
-            }
-
+            } 
             return _oldTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
         }
+
+        private void TriggerSnippet(uint nCmdID) {
+            if (_expansionMgr != null) {
+                string prompt;
+                string[] snippetTypes;
+                if ((VSConstants.VSStd2KCmdID)nCmdID == VSConstants.VSStd2KCmdID.SURROUNDWITH) {
+                    prompt = "SurroundWith"; //SR.GetString(SR.SurroundWith);
+                    snippetTypes = _surroundsWithSnippetTypes;
+                }
+                else {
+                    prompt = "InsertSnippet";//SR.GetString(SR.InsertSnippet);
+                    snippetTypes = _allStandardSnippetTypes; 
+                }
+
+                _expansionMgr.InvokeInsertionUI(
+                    GetViewAdapter(),
+                    _expansionClient,
+                    Guids.DefaultLanguageService,
+                    snippetTypes,
+                    snippetTypes.Length,
+                    0,
+                    null,
+                    0,
+                    0,
+                    prompt,
+                    ">"
+                );
+            }
+        }
+
+        private bool TryTriggerExpansion() {
+            if (_expansionMgr != null) {
+                var snapshot = _textView.TextBuffer.CurrentSnapshot;
+                var span = new SnapshotSpan(snapshot, new Span(_textView.Caret.Position.BufferPosition.Position - 1, 1));
+                var classification = _textView.TextBuffer.GetNodejsClassifier().GetClassificationSpans(span);
+                if (classification.Count == 1) {
+                    var clsSpan = classification.First().Span;
+                    var text = classification.First().Span.GetText();
+
+                    TextSpan[] textSpan = new TextSpan[1];
+                    textSpan[0].iStartLine = clsSpan.Start.GetContainingLine().LineNumber;
+                    textSpan[0].iStartIndex = clsSpan.Start.Position - clsSpan.Start.GetContainingLine().Start;
+                    textSpan[0].iEndLine = clsSpan.End.GetContainingLine().LineNumber;
+                    textSpan[0].iEndIndex = clsSpan.End.Position - clsSpan.End.GetContainingLine().Start;
+
+                    string expansionPath, title;
+                    int hr = _expansionMgr.GetExpansionByShortcut(
+                        _expansionClient,
+                        Guids.DefaultLanguageService,
+                        text,
+                        GetViewAdapter(),
+                        textSpan,
+                        1,
+                        out expansionPath,
+                        out title
+                    );
+                    if (ErrorHandler.Succeeded(hr)) {
+                        // hr may be S_FALSE if there are multiple expansions,
+                        // so we don't want to InsertNamedExpansion yet. VS will
+                        // pop up a selection dialog in this case.
+                        if (hr == VSConstants.S_OK) {
+                            return ErrorHandler.Succeeded(_expansionClient.InsertNamedExpansion(title, expansionPath, textSpan[0]));
+                        }
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
 
         private static bool IsRequireIdentifierChar(char ch) {
             return ch == '_'
@@ -648,6 +768,8 @@ namespace Microsoft.NodejsTools.Intellisense {
                         case VSConstants.VSStd2KCmdID.COMPLETEWORD:
                         case VSConstants.VSStd2KCmdID.QUICKINFO:
                         case VSConstants.VSStd2KCmdID.PARAMINFO:
+                        case VSConstants.VSStd2KCmdID.SURROUNDWITH:
+                        case VSConstants.VSStd2KCmdID.INSERTSNIPPET: 
                             prgCmds[i].cmdf = (uint)(OLECMDF.OLECMDF_ENABLED | OLECMDF.OLECMDF_SUPPORTED);
                             return VSConstants.S_OK;
                     }
