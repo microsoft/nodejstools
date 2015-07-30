@@ -70,8 +70,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                     _expansionClient = new ExpansionClient(textView, provider._adaptersFactory, _serviceProvider);
                     var textMgr = (IVsTextManager2)_serviceProvider.GetService(typeof(SVsTextManager));
                     textMgr.GetExpansionManager(out _expansionMgr);
-                }
-                catch (ArgumentException ex) {
+                } catch (ArgumentException ex) {
                     // No expansion client for this buffer, but we can continue without it
                     Debug.Fail(ex.ToString());
                 }
@@ -354,7 +353,6 @@ namespace Microsoft.NodejsTools.Intellisense {
                                 sig.SetCurrentParameter(sig.Parameters[i]);
                             }
                             break;
-
                         }
                     }
                 } else if (availableSig.Parameters.Count > curParam) {
@@ -491,15 +489,12 @@ namespace Microsoft.NodejsTools.Intellisense {
                         if (_activeSession.SelectedCompletionSet.Moniker == CompletionSource.NodejsRequireCompletionSetMoniker) {
                             if (completion.InsertionText.StartsWith("'")) { // require(
                                 committedBy = ")";
-                            }
-                            else if (completion.InsertionText.EndsWith("'")) { // require('
+                            } else if (completion.InsertionText.EndsWith("'")) { // require('
                                 committedBy = "'";
-                            }
-                            else if (completion.InsertionText.EndsWith("\"")) { // require("
+                            } else if (completion.InsertionText.EndsWith("\"")) { // require("
                                 committedBy = "\"";
                             }
-                        }
-                        else {
+                        } else {
                             committedBy = NodejsPackage.Instance != null ?
                                 NodejsPackage.Instance.IntellisenseOptionsPage.CompletionCommittedBy :
                                 NodejsConstants.DefaultIntellisenseCompletionCommittedBy;
@@ -514,11 +509,9 @@ namespace Microsoft.NodejsTools.Intellisense {
                                 return VSConstants.S_OK;
                             }
                         }
-                    }
-                    else if (_activeSession.SelectedCompletionSet.Moniker.Equals(CompletionSource.NodejsRequireCompletionSetMoniker) && !IsRequireIdentifierChar(ch)) {
+                    } else if (_activeSession.SelectedCompletionSet.Moniker.Equals(CompletionSource.NodejsRequireCompletionSetMoniker) && !IsRequireIdentifierChar(ch)) {
                         _activeSession.Dismiss();
-                    }
-                    else if (!_activeSession.SelectedCompletionSet.Moniker.Equals(CompletionSource.NodejsRequireCompletionSetMoniker) && !IsIdentifierChar(ch)) {
+                    } else if (!_activeSession.SelectedCompletionSet.Moniker.Equals(CompletionSource.NodejsRequireCompletionSetMoniker) && !IsIdentifierChar(ch)) {
                         _activeSession.Dismiss();
                     }
                 }
@@ -558,8 +551,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                                 if (!enterOnComplete) {
                                     return VSConstants.S_OK;
                                 }
-                            }
-                            else {
+                            } else {
                                 _activeSession.Dismiss();
                             }
                             break;
@@ -580,8 +572,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                             return res;
                     }
                 }
-            }
-            else if (_sigHelpSession != null) {
+            } else if (_sigHelpSession != null) {
                 if (pguidCmdGroup == VSConstants.VSStd2K) {
                     switch ((VSConstants.VSStd2KCmdID)nCmdID) {
                         case VSConstants.VSStd2KCmdID.BACKSPACE:
@@ -612,8 +603,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                             break;
                     }
                 }
-            }
-            else {
+            } else {
                 if (pguidCmdGroup == VSConstants.VSStd2K) {
                     switch ((VSConstants.VSStd2KCmdID)nCmdID) {
                         case VSConstants.VSStd2KCmdID.QUICKINFO:
@@ -651,14 +641,13 @@ namespace Microsoft.NodejsTools.Intellisense {
                             ForceCompletions = true;
                             try {
                                 TriggerCompletionSession((VSConstants.VSStd2KCmdID)nCmdID == VSConstants.VSStd2KCmdID.COMPLETEWORD);
-                            }
-                            finally {
+                            } finally {
                                 ForceCompletions = false;
                             }
                             return VSConstants.S_OK;
                     }
                 }
-            } 
+            }
             return _oldTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
         }
 
@@ -669,10 +658,9 @@ namespace Microsoft.NodejsTools.Intellisense {
                 if ((VSConstants.VSStd2KCmdID)nCmdID == VSConstants.VSStd2KCmdID.SURROUNDWITH) {
                     prompt = SR.GetString(SR.SurroundWith);
                     snippetTypes = _surroundsWithSnippetTypes;
-                }
-                else {
+                } else {
                     prompt = SR.GetString(SR.InsertSnippet);
-                    snippetTypes = _allStandardSnippetTypes; 
+                    snippetTypes = _allStandardSnippetTypes;
                 }
 
                 _expansionMgr.InvokeInsertionUI(
@@ -731,7 +719,6 @@ namespace Microsoft.NodejsTools.Intellisense {
             return false;
         }
 
-
         private static bool IsRequireIdentifierChar(char ch) {
             return ch == '_'
                 || ch == '.'
@@ -769,7 +756,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                         case VSConstants.VSStd2KCmdID.QUICKINFO:
                         case VSConstants.VSStd2KCmdID.PARAMINFO:
                         case VSConstants.VSStd2KCmdID.SURROUNDWITH:
-                        case VSConstants.VSStd2KCmdID.INSERTSNIPPET: 
+                        case VSConstants.VSStd2KCmdID.INSERTSNIPPET:
                             prgCmds[i].cmdf = (uint)(OLECMDF.OLECMDF_ENABLED | OLECMDF.OLECMDF_SUPPORTED);
                             return VSConstants.S_OK;
                     }

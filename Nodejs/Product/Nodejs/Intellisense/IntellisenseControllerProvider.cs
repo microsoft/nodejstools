@@ -48,7 +48,6 @@ namespace Microsoft.NodejsTools.Intellisense {
         [Import]
         internal IServiceProvider _serviceProvider = null; // imported via MEF
 
-
         public IIntellisenseController TryCreateIntellisenseController(ITextView textView, IList<ITextBuffer> subjectBuffers) {
             IntellisenseController controller;
             if (!textView.Properties.TryGetProperty<IntellisenseController>(typeof(IntellisenseController), out controller)) {

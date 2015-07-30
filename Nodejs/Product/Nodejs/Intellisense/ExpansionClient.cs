@@ -93,8 +93,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 if (snippetType.nodeName == "SnippetType") {
                     if (snippetType.text == SurroundsWith) {
                         surroundsWith = true;
-                    }
-                    else if (snippetType.text == SurroundsWithStatement) {
+                    } else if (snippetType.text == SurroundsWithStatement) {
                         surroundsWithStatement = true;
                     }
                 }
