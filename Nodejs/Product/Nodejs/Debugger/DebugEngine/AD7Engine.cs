@@ -119,6 +119,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         public const string DirMappingSetting = "DIR_MAPPING";
 
         public AD7Engine() {
+            LiveLogger.WriteLine("--------------------------------------------------------------------------------");
             LiveLogger.WriteLine("AD7Engine Created ({0})", GetHashCode());
             _breakpointManager = new BreakpointManager(this);
             Engines.Add(new WeakReference(this));
@@ -483,7 +484,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // in which case Visual Studio uses the IDebugEngineLaunch2::LaunchSuspended method
         // The IDebugEngineLaunch2::ResumeProcess method is called to start the process after the process has been successfully launched in a suspended state.
         int IDebugEngineLaunch2.LaunchSuspended(string pszServer, IDebugPort2 port, string exe, string args, string dir, string env, string options, enum_LAUNCH_FLAGS launchFlags, uint hStdInput, uint hStdOutput, uint hStdError, IDebugEventCallback2 ad7Callback, out IDebugProcess2 process) {
-            LiveLogger.WriteLine("--------------------------------------------------------------------------------");
             LiveLogger.WriteLine("AD7Engine LaunchSuspended Called with flags '{0}' ({1})", launchFlags, GetHashCode());
             AssertMainThread();
 

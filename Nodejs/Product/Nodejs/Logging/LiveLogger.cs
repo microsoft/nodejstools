@@ -52,36 +52,17 @@ namespace Microsoft.NodejsTools.Logging {
         }
 
         public static void WriteLine(string message, Type category) {
-#if !DEBUG
-            if (_diagnosticsOptions.IsLiveDiagnosticsEnabled) {
-#endif
             WriteLine("{0}: {1}", category.Name, message);
-#if !DEBUG
-            }
-#endif
-
         }
 
         public static void WriteLine(string message) {
-#if !DEBUG
-            if (_diagnosticsOptions.IsLiveDiagnosticsEnabled) {
-#endif
             var str = String.Format("[{0}] {1}", DateTime.UtcNow.TimeOfDay, message);
             Instance.LogMessage(str);
-#if !DEBUG
-            }
-#endif
         }
 
         public static void WriteLine(string format, params object[] args) {
-#if !DEBUG
-            if (_diagnosticsOptions.IsLiveDiagnosticsEnabled) {
-#endif
             var str = String.Format(format, args);
             WriteLine(str);
-#if !DEBUG
-            }
-#endif
         }
 
         private void LogMessage(string message) {
