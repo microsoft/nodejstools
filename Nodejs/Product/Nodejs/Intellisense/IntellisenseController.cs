@@ -603,7 +603,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                             break;
                     }
                 }
-            } else {
+            }
                 if (pguidCmdGroup == VSConstants.VSStd2K) {
                     switch ((VSConstants.VSStd2KCmdID)nCmdID) {
                         case VSConstants.VSStd2KCmdID.QUICKINFO:
@@ -646,7 +646,6 @@ namespace Microsoft.NodejsTools.Intellisense {
                             }
                             return VSConstants.S_OK;
                     }
-                }
             }
             return _oldTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
         }
@@ -666,7 +665,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 _expansionMgr.InvokeInsertionUI(
                     GetViewAdapter(),
                     _expansionClient,
-                    Guids.DefaultLanguageService,
+                    Guids.NodejsLanguageInfo,
                     snippetTypes,
                     snippetTypes.Length,
                     0,
@@ -697,7 +696,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                     string expansionPath, title;
                     int hr = _expansionMgr.GetExpansionByShortcut(
                         _expansionClient,
-                        Guids.DefaultLanguageService,
+                        Guids.NodejsLanguageInfo,
                         text,
                         GetViewAdapter(),
                         textSpan,

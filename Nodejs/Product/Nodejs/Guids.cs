@@ -36,6 +36,7 @@ namespace Microsoft.NodejsTools
         public const string DefaultLanguageServiceString = "{8239BEC4-EE87-11D0-8C98-00C04FC2AB22}";
 
         internal static readonly Guid DefaultLanguageService = new Guid(DefaultLanguageServiceString);
+        internal static readonly Guid NodejsLanguageInfo = new Guid(NodejsLanguageInfoString);
  
         //Guid for our formatting service
         internal const string JavaScriptFormattingServiceString = "F414C260-6AC0-11CF-B6D1-00AA00BBBB58";
