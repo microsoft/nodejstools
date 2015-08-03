@@ -769,7 +769,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
 #endif
 
-            if (_implicitProject) {
+            if (_implicitProject && _analysisLevel != AnalysisLevel.None) {
                 ProjectItem item;
                 if (_projectFiles.TryGetValue(entry.FilePath, out item)) {
                     if (item.LoadedItems != null) {
@@ -844,7 +844,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 _projectFiles[path] = file = new ProjectItem(entry);
             }
 
-            if (_implicitProject) {
+            if (_implicitProject && _analysisLevel != AnalysisLevel.None) {
                 QueueDirectoryAnalysis(path, file);
             }
 
