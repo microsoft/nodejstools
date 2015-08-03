@@ -79,7 +79,6 @@
       <OutputSubPath>Node.js</OutputSubPath>
     </VSTemplate>
   </ItemDefinitionGroup>
-  
   <Choose>
     <When Condition="'$(VSTarget)' != '11.0' And '$(VSTarget)' != '12.0'">
       <ItemGroup>
@@ -285,6 +284,7 @@
     <Compile Include="Commands\SurveyNewsCommand.cs" />
     <Compile Include="Debugger\DataTips\DataTipTextManagerEvents.cs" />
     <Compile Include="Debugger\DebugEngine\AD7EvalErrorProperty.cs" />
+    <Compile Include="Logging\LiveLogger.cs" />
     <Compile Include="Debugger\FilePosition.cs" />
     <Compile Include="Debugger\FuzzyLogicFileNameMapper.cs" />
     <Compile Include="Debugger\IFileNameMapper.cs" />
@@ -342,6 +342,9 @@
     </Compile>
     <Compile Include="NpmUI\PackageCatalogEntryViewModel.cs" />
     <Compile Include="Options\AnalysisLevel.cs" />
+    <Compile Include="Options\NodejsDiagnosticsOptionsPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Options\NodejsNpmOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>

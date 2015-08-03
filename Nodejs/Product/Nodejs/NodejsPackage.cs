@@ -162,6 +162,12 @@ namespace Microsoft.NodejsTools {
             }
         }
 
+        public NodejsDiagnosticsOptionsPage DiagnosticsOptionsPage {
+            get {
+                return (NodejsDiagnosticsOptionsPage)GetDialogPage(typeof(NodejsDiagnosticsOptionsPage));
+            }
+        }
+
         public EnvDTE.DTE DTE {
             get {
                 return (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));

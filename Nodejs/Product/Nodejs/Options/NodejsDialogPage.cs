@@ -98,8 +98,8 @@ namespace Microsoft.NodejsTools.Options {
         }
 
         internal static string LoadString(string name, string cat) {
-            using (var pythonKey = VSRegistry.RegistryRoot(__VsLocalRegistryType.RegType_UserSettings, true).CreateSubKey(NodejsConstants.BaseRegistryKey)) {
-                using (var optionsKey = pythonKey.CreateSubKey(_optionsKey)) {
+            using (var nodeKey = VSRegistry.RegistryRoot(__VsLocalRegistryType.RegType_UserSettings, true).CreateSubKey(NodejsConstants.BaseRegistryKey)) {
+                using (var optionsKey = nodeKey.CreateSubKey(_optionsKey)) {
                     using (var categoryKey = optionsKey.CreateSubKey(cat)) {
                         return categoryKey.GetValue(name) as string;
                     }

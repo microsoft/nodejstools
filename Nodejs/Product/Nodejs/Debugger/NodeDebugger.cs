@@ -27,6 +27,7 @@ using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.NodejsTools.Debugger.Communication;
 using Microsoft.NodejsTools.Debugger.Events;
 using Microsoft.NodejsTools.Debugger.Serialization;
+using Microsoft.NodejsTools.Logging;
 using Microsoft.NodejsTools.SourceMapping;
 using Microsoft.VisualStudioTools;
 
@@ -244,14 +245,8 @@ namespace Microsoft.NodejsTools.Debugger {
             }
         }
 
-        [Conditional("DEBUG")]
         private void DebugWriteCommand(string commandName) {
-            DebugWriteLine("NodeDebugger Called " + commandName);
-        }
-
-        [Conditional("DEBUG")]
-        private void DebugWriteLine(string message) {
-            Debug.WriteLine("[{0}] {1}", DateTime.UtcNow.TimeOfDay, message);
+            LiveLogger.WriteLine("NodeDebugger Called " + commandName);
         }
 
         /// <summary>
@@ -328,7 +323,7 @@ namespace Microsoft.NodejsTools.Debugger {
                     // Stepping into or to autoresumed break
                     break;
                 default:
-                    Debug.WriteLine("Unexpected SteppingMode: {0}", _steppingMode);
+                    LiveLogger.WriteLine("Unexpected SteppingMode: {0}", _steppingMode);
                     break;
             }
 
