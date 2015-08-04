@@ -769,7 +769,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
 #endif
 
-            if (_implicitProject && _analysisLevel != AnalysisLevel.None) {
+            if (_implicitProject) {
                 ProjectItem item;
                 if (_projectFiles.TryGetValue(entry.FilePath, out item)) {
                     if (item.LoadedItems != null) {
@@ -777,7 +777,9 @@ namespace Microsoft.NodejsTools.Intellisense {
                         foreach (var implicitItem in item.LoadedItems) {
                             implicitItem.ImplicitLoadCount--;
                             if (implicitItem.ImplicitLoadCount == 0) {
-                                _analysisQueue.Enqueue(_jsAnalyzer.RemoveModule(implicitItem.Entry), AnalysisPriority.Normal);
+                                if (_analysisLevel != AnalysisLevel.None) {
+                                    _analysisQueue.Enqueue(_jsAnalyzer.RemoveModule(implicitItem.Entry), AnalysisPriority.Normal);
+                                }
                                 ProjectItem implicitRemoved;
                                 _projectFiles.TryRemove(implicitItem.Entry.FilePath, out implicitRemoved);
                             }
