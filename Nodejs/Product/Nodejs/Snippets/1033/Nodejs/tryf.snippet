@@ -4,17 +4,25 @@
   <CodeSnippet Format="1.0.0">
     <Header>
       <Title>tryf</Title>
-      <Description>Code Snippet for a Try...Finally Statement</Description>
+      <Description>Code Snippet for a Try, Catch, Finally Statement</Description>
       <Shortcut>tryf</Shortcut>
       <SnippetTypes>
         <SnippetType>Expansion</SnippetType>
       </SnippetTypes>
     </Header>
     <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>e</ID>
+          <Default>e</Default>
+        </Literal>
+      </Declarations>
       <Code Language="Nodejs">
         <![CDATA[try {
 
-} finally {
+}catch ($e$){
+
+}finally {
 
 };
 ]]>

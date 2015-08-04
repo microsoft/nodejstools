@@ -23,7 +23,7 @@ var server = http.createServer(function (request, response) {
     response.writeHead(200, { "Content-Type": "text/plain" });
     response.end("$message$");
 });
-server.listen(80);
+server.listen(process.env.PORT || 3000);
 console.log("Server is listening");
 ]]>
       </Code>

@@ -7,14 +7,19 @@
       <Description>Code Snippet for an error handling callback function</Description>
       <Shortcut>cberr</Shortcut>
       <SnippetTypes>
-        <SnippetType>SurroundsWithStatement</SnippetType>
         <SnippetType>Expansion</SnippetType>
       </SnippetTypes>
     </Header>
     <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>error</ID>
+          <Default>error</Default>
+        </Literal>
+      </Declarations>
       <Code Language="Nodejs">
-        <![CDATA[var hadError = function (error, response) {
-    console.error(err);
+        <![CDATA[var hadError = function ($error$, response) {
+    console.error($error$);
     response.end('Server Error');
 };
 ]]>

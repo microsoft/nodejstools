@@ -16,9 +16,13 @@
           <ID>myModule</ID>
           <Default>myModule</Default>
         </Object>
+        <Object>
+          <ID>myVar</ID>
+          <Default>myVar</Default>
+        </Object>
       </Declarations>
       <Code Language="Nodejs">
-        <![CDATA[module.exports.$myModule$;]]>
+        <![CDATA[module.exports.$myModule$ = $myVar$;]]>
       </Code>
     </Snippet>
   </CodeSnippet>
