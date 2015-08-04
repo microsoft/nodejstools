@@ -18,7 +18,7 @@
                 <Directory Id="Dir_$(var.key)TestFrameworksMocha" Name="Mocha" />
             </Directory>
             <Directory Id="Dir_$(var.key)InstallLocationScripts" Name="Scripts">
-                <Directory Id="Dir_$(var.key)InstallLocationScriptsTypings" Name="Typings">                
+                <Directory Id="Dir_$(var.key)InstallLocationScriptsTypings" Name="Typings">
                     <Directory Id="Dir_$(var.key)ScriptsTypingsNode" Name="Node" />
                 </Directory>
             </Directory>
