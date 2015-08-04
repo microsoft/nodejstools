@@ -495,7 +495,7 @@ undefined";
         // https://nodejstools.codeplex.com/workitem/1575
         [TestMethod, Priority(0), Timeout(180000)]
         public async Task TestNpmReplCommandProcessExitSucceeds() {
-            var npmPath = Nodejs.GetPathToNodeExecutable("npm.cmd");
+            var npmPath = Nodejs.GetPathToNodeExecutableFromEnvironment("npm.cmd");
             using (var eval = ProjectlessEvaluator()) {
                 var mockWindow = new MockReplWindow(eval) {
                     ShowAnsiCodes = true

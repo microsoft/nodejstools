@@ -15,7 +15,6 @@
 //*********************************************************//
 
 using System;
-using System.Diagnostics;
 using System.IO;
 #if !NO_WINDOWS
 using System.Windows.Forms;
@@ -23,8 +22,8 @@ using System.Windows.Forms;
 using Microsoft.Win32;
 #if !NO_WINDOWS
 using Microsoft.NodejsTools.Project;
-using System.Security;
 #endif
+using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools {
     public sealed class Nodejs {
@@ -33,11 +32,26 @@ namespace Microsoft.NodejsTools {
 
         public static string NodeExePath {
             get {
-                return GetPathToNodeExecutable();
+                return GetPathToNodeExecutableFromEnvironment();
             }
         }
 
-        public static string GetPathToNodeExecutable(string executable = "node.exe") {
+        public static string GetAbsoluteNodeExePath(string root, string relativePath) {
+            var overridePath = CommonUtils.UnquotePath(relativePath ?? string.Empty);
+            if (!String.IsNullOrWhiteSpace(overridePath)) {
+                if (string.IsNullOrWhiteSpace(root)) {
+                    return relativePath;
+                }
+                try {
+                    return CommonUtils.GetAbsoluteFilePath(root, overridePath);
+                } catch (InvalidOperationException) {
+                    return relativePath;
+                }
+            }
+            return NodeExePath;
+        }
+
+        public static string GetPathToNodeExecutableFromEnvironment(string executable = "node.exe") {
             // Attempt to find Node.js/NPM in the Registry. (Currrent User)
             using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default))
             using (var node = baseKey.OpenSubKey(NodejsRegPath)) {
