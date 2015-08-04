@@ -13,13 +13,14 @@
     <Snippet>
       <Declarations>
         <Literal>
-          <ID>error</ID>
-          <Default>error</Default>
+          <ID>e</ID>
+          <Default>e</Default>
         </Literal>
       </Declarations>
       <Code Language="Nodejs">
-        <![CDATA[var hadError = function ($error$, response) {
-    console.error($error$);
+        <![CDATA[var hadError = function ($e$, response) {
+    console.error($e$);
+    $end$
     response.end('Server Error');
 };
 ]]>
