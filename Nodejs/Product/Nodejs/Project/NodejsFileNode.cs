@@ -77,7 +77,7 @@ namespace Microsoft.NodejsTools.Project {
 
             var includeInProject = base.IncludeInProject(includeChildren);
             
-            if (isContent && FileName.EndsWith(".js", StringComparison.OrdinalIgnoreCase)) {
+            if (isContent && Url.EndsWith(".js", StringComparison.OrdinalIgnoreCase)) {
                 this.ItemNode.ItemTypeName = ProjectFileConstants.Content;
             }
             
