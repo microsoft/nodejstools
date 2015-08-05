@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.22823.1
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nodejs", "Product\Nodejs\Nodejs.csproj", "{32EC5259-98DA-40CA-9E2D-1B1B2E966F88}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -70,6 +70,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnalysisDriver", "Tests\AnalysisDriver\AnalysisDriver.csproj", "{F83AC573-0546-4BC5-A3F3-BA0261636778}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MockVsTests", "..\Common\Tests\MockVsTests\MockVsTests.csproj", "{A390E1C0-0D90-4A9E-8413-3E959BB07292}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telemetry", "Product\Telemetry\Telemetry.csproj", "{D6FCBC60-F21E-4854-AC51-AED1A0A7C868}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -185,6 +187,10 @@ Global
 		{A390E1C0-0D90-4A9E-8413-3E959BB07292}.Debug|x86.Build.0 = Debug|x86
 		{A390E1C0-0D90-4A9E-8413-3E959BB07292}.Release|x86.ActiveCfg = Release|x86
 		{A390E1C0-0D90-4A9E-8413-3E959BB07292}.Release|x86.Build.0 = Release|x86
+		{D6FCBC60-F21E-4854-AC51-AED1A0A7C868}.Debug|x86.ActiveCfg = Debug|x86
+		{D6FCBC60-F21E-4854-AC51-AED1A0A7C868}.Debug|x86.Build.0 = Debug|x86
+		{D6FCBC60-F21E-4854-AC51-AED1A0A7C868}.Release|x86.ActiveCfg = Release|x86
+		{D6FCBC60-F21E-4854-AC51-AED1A0A7C868}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

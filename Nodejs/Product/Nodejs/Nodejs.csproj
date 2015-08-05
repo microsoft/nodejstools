@@ -79,7 +79,6 @@
       <OutputSubPath>Node.js</OutputSubPath>
     </VSTemplate>
   </ItemDefinitionGroup>
-  
   <Choose>
     <When Condition="'$(VSTarget)' != '11.0' And '$(VSTarget)' != '12.0'">
       <ItemGroup>
@@ -1471,7 +1470,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\Icons\SystemRegisteredICO\NodeJS.ico">
+  <Content Include="..\Icons\SystemRegisteredICO\NodeJS.ico">
       <Link>NodeJS.ico</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -1530,6 +1529,11 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
+    </ProjectReference>
+    <ProjectReference Include="..\Telemetry\Telemetry.csproj">
+      <Project>{d6fcbc60-f21e-4854-ac51-aed1a0a7c868}</Project>
+      <Name>Telemetry</Name>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </ProjectReference>
     <ProjectReference Include="..\WebRole\WebRole.csproj">
       <Project>{712d84ec-b2a6-46d1-b030-ba697ae5e554}</Project>

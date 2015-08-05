@@ -37,6 +37,7 @@ using Microsoft.NodejsTools.Logging;
 using Microsoft.NodejsTools.Options;
 using Microsoft.NodejsTools.Project;
 using Microsoft.NodejsTools.Repl;
+using Microsoft.NodejsTools.Telemetry;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Debugger.Interop;
@@ -106,6 +107,7 @@ namespace Microsoft.NodejsTools {
         private LanguagePreferences _langPrefs;
         internal VsProjectAnalyzer _analyzer;
         private NodejsToolsLogger _logger;
+        private ITelemetryLogger _telemetryLogger;
 
         /// <summary>
         /// Default constructor of the package.
@@ -228,7 +230,9 @@ namespace Microsoft.NodejsTools {
             IntellisenseOptionsPage.AnalysisLogMaximumChanged += IntellisenseOptionsPage_AnalysisLogMaximumChanged;
 
             InitializeLogging();
-            
+
+            InitializeTelemetry();
+
             // The variable is inherited by child processes backing Test Explorer, and is used in
             // the NTVS test discoverer and test executor to connect back to VS.
             Environment.SetEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable, Process.GetCurrentProcess().Id.ToString());
@@ -248,6 +252,23 @@ namespace Microsoft.NodejsTools {
             _logger.LogEvent(NodejsToolsLogEvent.AnalysisLevel, IntellisenseOptionsPage.AnalysisLevel);
         }
 
+        private void InitializeTelemetry() {
+            if (_telemetryLogger == null) {
+                // Get telemetry logger
+                _telemetryLogger = TelemetrySetup.GetLogger();
+
+                // Set common properties to be sent with all ntvs events
+                var versionInfo = FileVersionInfo.GetVersionInfo(typeof(NodejsPackage).Assembly.Location);
+                // NTVS version
+                _telemetryLogger.SetCommonProperty(new DataPoint(TelemetryProperties.NtvsVersion, versionInfo.ProductVersion.ToString()));
+                // VS version
+                _telemetryLogger.SetCommonProperty(new DataPoint(TelemetryProperties.HostVersion, Application.ProductVersion.ToString()));
+
+                // Log package loaded event
+                _telemetryLogger.ReportEvent(TelemetryEvents.PackageLoaded);
+            }
+        }
+
         public new IComponentModel ComponentModel {
             get {
                 return this.GetComponentModel();
@@ -257,6 +278,12 @@ namespace Microsoft.NodejsTools {
         internal NodejsToolsLogger Logger {
             get {
                 return _logger;
+            }
+        }
+
+        internal ITelemetryLogger TelemetryLogger {
+            get {
+                return _telemetryLogger;
             }
         }
 
