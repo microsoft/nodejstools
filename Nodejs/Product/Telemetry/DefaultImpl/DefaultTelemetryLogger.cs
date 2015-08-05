@@ -33,14 +33,6 @@ namespace Microsoft.NodejsTools.Telemetry {
             Debug.WriteLine("Telemetry event posted: " + eventName);
         }
 
-        public object SetSharedProperty(string fullPropertyName, string contextName = "") {
-            return null;
-        }
-
-        public object GetSharedProperty(string fullPropertyName, string contextName = "") {
-            return null;
-        }
-
         public void SetCommonProperty(DataPoint property) {
             Debug.WriteLine(string.Format("Set common property '{0}' to '{1}'", property.Name, property.Value.ToString()));
         }
