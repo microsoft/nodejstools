@@ -23,6 +23,7 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Editor.OptionsExtensionMethods;
 using Microsoft.VisualStudio.TextManager.Interop;
+using Microsoft.VisualStudioTools;
 using MSXML;
 
 namespace Microsoft.NodejsTools.Intellisense {
@@ -119,20 +120,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             TextSpan? endSpan = null;
             using (var edit = _textView.TextBuffer.CreateEdit()) {
                 if (surroundsWith || surroundsWithStatement) {
-                    // this is super annoyning...  Most languages can do a surround with and $selected$ can be
-                    // an empty string and everything's the same.  But in Python we can't just have something like
-                    // "while True: " without a pass statement.  So if we start off with an empty selection we
-                    // need to insert a pass statement.  This is the purpose of the "SurroundsWithStatement"
-                    // snippet type.
-                    //
-                    // But, to make things even more complicated, we don't have a good indication of what's the 
-                    // template text vs. what's the selected text.  We do have access to the original template,
-                    // but all of the values have been replaced with their default values when we get called
-                    // here.  So we need to go back and re-apply the template, except for the $selected$ part.
-                    //
-                    // Also, the text has \n, but the inserted text has been replaced with the appropriate newline
-                    // character for the buffer.
-                    var templateText = codeNode.text.Replace("\n", _textView.Options.GetNewLineCharacter());
+                    var templateText = codeNode.text.Replace("\r \n", VsExtensions.GetNewLineText(_textView.TextSnapshot));
                     foreach (var decl in declList) {
                         string defaultValue;
                         if (ErrorHandler.Succeeded(_session.GetFieldValue(decl, out defaultValue))) {
@@ -159,13 +147,8 @@ namespace Microsoft.NodejsTools.Intellisense {
                         }
                         var selectedSpan = Span.FromBounds(start, end);
 
-                        if (surroundsWithStatement &&
+                          if (surroundsWithStatement &&
                             String.IsNullOrWhiteSpace(_textView.TextBuffer.CurrentSnapshot.GetText(selectedSpan))) {
-                            // we require a statement here and the user hasn't selected any code to surround,
-                            // so we insert a pass statement (and we'll select it after the completion is done)
-                            int startPosition;
-                            pBuffer.GetPositionOfLineIndex(ts[0].iStartLine, ts[0].iStartIndex, out startPosition);
-                            edit.Replace(new Span(startPosition + selectedIndex, end - start), "pass");
 
                             // Surround With can be invoked with no selection, but on a line with some text.
                             // In that case we need to inject an extra new line.
@@ -174,17 +157,6 @@ namespace Microsoft.NodejsTools.Intellisense {
                             if (!String.IsNullOrWhiteSpace(endText)) {
                                 edit.Insert(end, _textView.Options.GetNewLineCharacter());
                             }
-
-                            // we want to leave the pass statement selected so the user can just
-                            // continue typing over it...
-                            var startLine = _textView.TextBuffer.CurrentSnapshot.GetLineFromPosition(startPosition + selectedIndex);
-                            _selectEndSpan = true;
-                            endSpan = new TextSpan() {
-                                iStartLine = startLine.LineNumber,
-                                iEndLine = startLine.LineNumber,
-                                iStartIndex = baseIndentation.Length + indentation.Length,
-                                iEndIndex = baseIndentation.Length + indentation.Length + 4,
-                            };
                         }
 
                         IndentSpan(

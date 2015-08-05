@@ -933,6 +933,7 @@
     <Content Include="Snippets\1033\SnippetsIndex.xml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="FileTemplates\NewItem\EmptyTs.ts">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
