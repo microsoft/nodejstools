@@ -136,17 +136,10 @@
                         Snippets\1033\Nodejs\with.snippet" >
             <InstallDirectory>Snippets_1033_Nodejs</InstallDirectory>
         </File>
- 
-        <!--
-        <File Include="$(BuildOutputRoot)Binaries\Nodejs\Snippets\1033\Test\*.snippet">
-            <InstallDirectory>Snippets_1033_Test</InstallDirectory>
-        </File>
-        -->
-        
+       
         <File Include="Snippets\1033\SnippetsIndex.xml">
             <InstallDirectory>Snippets_1033</InstallDirectory>
         </File>
-        
 
         <!--Unit test framework support files-->
         <File Include="TestFrameworks\find_tests.js;
