@@ -71,7 +71,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
 
         public int FormatSpan(IVsTextLines pBuffer, TextSpan[] ts) {
-            IXMLDOMNode codeNode, snippetTypes, declarations, imports;
+            IXMLDOMNode codeNode, snippetTypes, declarations;
 
             int hr;
             if (ErrorHandler.Failed(hr = _session.GetSnippetNode("CodeSnippet:Code", out codeNode))) {
@@ -89,17 +89,6 @@ namespace Microsoft.NodejsTools.Intellisense {
                     var id = declType.selectSingleNode("./CodeSnippet:ID");
                     if (id != null) {
                         declList.Add(id.text);
-                    }
-                }
-            }
-
-            List<string> importList = new List<string>();
-            if (ErrorHandler.Succeeded(hr = _session.GetSnippetNode("CodeSnippet:Imports", out imports))
-                && imports != null) {
-                foreach (IXMLDOMNode import in imports.childNodes) {
-                    var id = import.selectSingleNode("./CodeSnippet:Namespace");
-                    if (id != null) {
-                        importList.Add(id.text);
                     }
                 }
             }
