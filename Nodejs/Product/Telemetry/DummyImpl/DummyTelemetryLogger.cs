@@ -14,14 +14,13 @@
 //
 //*********************************************************//
 
-using System;
 using System.Diagnostics;
 
 namespace Microsoft.NodejsTools.Telemetry {
     /// <summary>
     /// Dummy telemetry logger to be used if no other logger is found.
     /// </summary>
-    public class DefaultTelemetryLogger : ITelemetryLogger {
+    public class DummyTelemetryLogger : ITelemetryLogger {
         public void ReportEvent(string eventName) {
             Debug.WriteLine("Telemetry event posted: " + eventName);
         }

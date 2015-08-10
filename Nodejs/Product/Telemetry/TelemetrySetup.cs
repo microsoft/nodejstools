@@ -14,14 +14,14 @@
 //
 //*********************************************************//
 
-using Microsoft.VisualStudio.ComponentModelHost;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Linq;
+using Microsoft.VisualStudio.ComponentModelHost;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Utilities;
 
 namespace Microsoft.NodejsTools.Telemetry {
     /// <summary>
@@ -46,7 +46,7 @@ namespace Microsoft.NodejsTools.Telemetry {
                     }
                 }
                 // Use dummy one if no telemetry provider was found
-                return _telemetryFactory ?? (_telemetryFactory = new DefaultTelemetryFactory());
+                return _telemetryFactory ?? (_telemetryFactory = new DummyTelemetryFactory());
             }
         }
 

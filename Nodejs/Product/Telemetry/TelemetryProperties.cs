@@ -18,7 +18,7 @@ namespace Microsoft.NodejsTools.Telemetry {
     /// <summary>
     /// Property names for telemetry events
     /// </summary>
-    public class TelemetryProperties {
+    public static class TelemetryProperties {
         public const string NtvsVersion = "NtvsVersion";
         public const string HostVersion = "HostVersion";
         public const string ProjectGuid = "ProjectGuid";

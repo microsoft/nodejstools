@@ -18,7 +18,7 @@ namespace Microsoft.NodejsTools.Telemetry {
     /// <summary>
     /// Telemetry event names
     /// </summary>
-    public class TelemetryEvents {
+    public static class TelemetryEvents {
         public const string PackageLoaded = "PackageLoaded";
         public const string ProjectImported = "ProjectImported";
         public const string ProjectCreated = "ProjectCreated";

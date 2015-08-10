@@ -23,10 +23,10 @@ namespace Microsoft.NodejsTools.Telemetry {
     /// It's intended to be used when no other real implementation of ITelemetryFactory is found
     /// </summary>
     [Export(typeof(ITelemetryFactory))]
-    [Name("NodeJs Default Telemetry Factory")]
+    [Name("NodeJs Dummy Telemetry Factory")]
     [Order]
-    internal class DefaultTelemetryFactory : ITelemetryFactory {
-        private readonly static ITelemetryLogger _defaultLogger = new DefaultTelemetryLogger();
+    internal class DummyTelemetryFactory : ITelemetryFactory {
+        private readonly static ITelemetryLogger _defaultLogger = new DummyTelemetryLogger();
 
         public ITelemetryLogger GetLogger() {
             return _defaultLogger;

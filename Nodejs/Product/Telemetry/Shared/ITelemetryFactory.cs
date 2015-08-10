@@ -14,8 +14,6 @@
 //
 //*********************************************************//
 
-using System.Reflection;
-
 namespace Microsoft.NodejsTools.Telemetry {
 
     /// <summary>
