@@ -14,6 +14,7 @@
 //
 //*********************************************************//
 
+using System;
 using System.Diagnostics;
 
 namespace Microsoft.NodejsTools.Telemetry {
@@ -39,6 +40,10 @@ namespace Microsoft.NodejsTools.Telemetry {
 
         public void RemoveCommonProperty(string propertyName) {
             Debug.WriteLine(string.Format("Remove common property '{0}''", propertyName));
+        }
+
+        public void Dispose() {
+            // Do nothing
         }
     }
 }

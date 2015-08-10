@@ -14,8 +14,10 @@
 //
 //*********************************************************//
 
+using System;
+
 namespace Microsoft.NodejsTools.Telemetry {
-    public interface ITelemetryLogger {
+    public interface ITelemetryLogger : IDisposable {
         /// <summary>
         /// Records event with name
         /// </summary>
