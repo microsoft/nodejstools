@@ -5,6 +5,13 @@
       <OnOff>on</OnOff>
       <Installed>true</Installed>
       <Locale>1033</Locale>
+      <DirPath>Snippets\%LCID%\Test\</DirPath>
+      <LocalizedName>Test</LocalizedName>
+    </SnippetDir>
+    <SnippetDir>
+      <OnOff>on</OnOff>
+      <Installed>true</Installed>
+      <Locale>1033</Locale>
       <DirPath>Snippets\%LCID%\Nodejs\</DirPath>
       <LocalizedName>Nodejs</LocalizedName>
     </SnippetDir>

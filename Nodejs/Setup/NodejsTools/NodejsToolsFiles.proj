@@ -136,6 +136,10 @@
                         Snippets\1033\Nodejs\with.snippet" >
             <InstallDirectory>Snippets_1033_Nodejs</InstallDirectory>
         </File>
+
+        <File Include="Snippets\1033\Test\mochatest.snippet">
+            <InstallDirectory>Snippets_1033_Test</InstallDirectory>
+        </File>
        
         <File Include="Snippets\1033\SnippetsIndex.xml">
             <InstallDirectory>Snippets_1033</InstallDirectory>
