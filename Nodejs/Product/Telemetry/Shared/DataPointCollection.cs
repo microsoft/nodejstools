@@ -27,8 +27,15 @@ namespace Microsoft.NodejsTools.Telemetry {
         public DataPointCollection(int capacity) : base(capacity) {
         }
 
+        public DataPointCollection(params DataPoint[] datapoints) : base(datapoints) {
+        }
+
         public void Add(string name, object value, bool isPersonallyIdentifiable = false) {
-            this.Add(new DataPoint(name, value, isPersonallyIdentifiable));
+            base.Add(new DataPoint(name, value, isPersonallyIdentifiable));
+        }
+
+        public void Add(params DataPoint[] datapoints) {
+            base.AddRange(datapoints);
         }
     }
 }

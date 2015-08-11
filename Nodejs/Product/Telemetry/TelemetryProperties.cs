@@ -21,8 +21,7 @@ namespace Microsoft.NodejsTools.Telemetry {
     public static class TelemetryProperties {
         public const string NtvsVersion = "NtvsVersion";
         public const string HostVersion = "HostVersion";
+        public const string PackageName = "PackageName";
         public const string ProjectGuid = "ProjectGuid";
-        public const string ProjectFlavorGuid = "ProjectFlavorGuid";
-        public const string ProjectType = "ProjectType";
     }
 }

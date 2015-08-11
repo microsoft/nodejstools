@@ -257,15 +257,7 @@ namespace Microsoft.NodejsTools {
                 // Get telemetry logger
                 _telemetryLogger = TelemetrySetup.GetLogger();
 
-                // Set common properties to be sent with all ntvs events
-                var versionInfo = FileVersionInfo.GetVersionInfo(typeof(NodejsPackage).Assembly.Location);
-                // NTVS version
-                _telemetryLogger.SetCommonProperty(new DataPoint(TelemetryProperties.NtvsVersion, versionInfo.ProductVersion.ToString()));
-                // VS version
-                _telemetryLogger.SetCommonProperty(new DataPoint(TelemetryProperties.HostVersion, Application.ProductVersion.ToString()));
-
-                // Log package loaded event
-                _telemetryLogger.ReportEvent(TelemetryEvents.PackageLoaded);
+                TelemetrySetup.LogPackageLoad(_telemetryLogger, typeof(NodejsPackage).Name, typeof(NodejsPackage).Assembly, Application.ProductVersion);
             }
         }
 

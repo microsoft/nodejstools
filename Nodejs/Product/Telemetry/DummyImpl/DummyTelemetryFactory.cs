@@ -14,17 +14,11 @@
 //
 //*********************************************************//
 
-using System.ComponentModel.Composition;
-using Microsoft.VisualStudio.Utilities;
-
 namespace Microsoft.NodejsTools.Telemetry {
     /// <summary>
     /// Default, dummy <see cref="ITelemetryFactory"/> implementation.
     /// It's intended to be used when no other real implementation of ITelemetryFactory is found
     /// </summary>
-    [Export(typeof(ITelemetryFactory))]
-    [Name("NodeJs Dummy Telemetry Factory")]
-    [Order]
     internal class DummyTelemetryFactory : ITelemetryFactory {
         private readonly static ITelemetryLogger _defaultLogger = new DummyTelemetryLogger();
 

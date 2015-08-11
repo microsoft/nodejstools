@@ -169,10 +169,6 @@ if ($release -or $mockrelease) {
     $global_msbuild_options += "/p:ReleaseBuild=true"
 }
 
-if (Test-Path Internal\Nodejs\VsLogger\VsLogger.csproj) {
-    $global_msbuild_options += "/p:IncludeVsLogger=true"
-}
-
 # This function is used to get options for each configuration
 #
 # $target contains the following members:
@@ -243,7 +239,6 @@ $managed_files = (
     "Microsoft.NodejsTools.Npm.dll",
     "Microsoft.NodejsTools.TestAdapter.dll",
     "Microsoft.NodejsTools.PressAnyKey.exe",
-    "Microsoft.NodejsTools.VsLogger.dll",
     "Microsoft.NodejsTools.Telemetry.dll"
 )
 

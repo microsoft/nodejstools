@@ -25,8 +25,6 @@ using System.Windows.Forms;
 using System.Xml;
 using EnvDTE;
 using Microsoft.Build.Execution;
-using Microsoft.NodejsTools;
-using Microsoft.NodejsTools.Telemetry;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
@@ -1577,11 +1575,9 @@ namespace Microsoft.VisualStudioTools.Project {
                             }
 
                             FinishProjectCreation(basePath, baseLocation);
-                            this.LogProjectLoadTelemetry(TelemetryEvents.ProjectCreated);
                         }
                     } else {
                         this.filename = fileName;
-                        this.LogProjectLoadTelemetry(TelemetryEvents.ProjectOpened);
                     }
                     _diskNodes[this.filename] = this;
 
@@ -1595,16 +1591,6 @@ namespace Microsoft.VisualStudioTools.Project {
                     }
                 }
             }
-        }
-
-        private void LogProjectLoadTelemetry(string eventName) {
-            DataPointCollection properties = new DataPointCollection();
-            // Enclose guid in braces
-            properties.Add(TelemetryProperties.ProjectGuid, this.ProjectIDGuid.ToString("B"));
-            properties.Add(TelemetryProperties.ProjectFlavorGuid, this.ProjectGuid.ToString("B"));
-            properties.Add(TelemetryProperties.ProjectType, this.ProjectType);
-
-            NodejsPackage.Instance.TelemetryLogger.ReportEvent(eventName, properties);
         }
 
         public override void Close() {

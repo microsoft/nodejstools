@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Utilities;
@@ -53,9 +54,9 @@ namespace Microsoft.NodejsTools.Telemetry {
         public void OnImportsSatisfied() {
             try {
                 // Pick the top most one
-                var lazyFActory = Orderer.Order(_unOrderedTelemetryFactoryExports).FirstOrDefault();
-                if (lazyFActory != null) {
-                    _telemetryFactory = lazyFActory.Value;
+                var lazyFactory = Orderer.Order(_unOrderedTelemetryFactoryExports).FirstOrDefault();
+                if (lazyFactory != null) {
+                    _telemetryFactory = lazyFactory.Value;
                 }
             }
             catch {
@@ -65,6 +66,24 @@ namespace Microsoft.NodejsTools.Telemetry {
 
         public static ITelemetryLogger GetLogger() {
             return _instance.TelemetryFactory.GetLogger();
+        }
+
+        /// <summary>
+        /// Set some common properties and log package loaded event
+        /// </summary>
+        /// <param name="logger">logger instance</param>
+        /// <param name="assembly">assembly containing vs package</param>
+        /// <param name="hostVersion">host version</param>
+        public static void LogPackageLoad(ITelemetryLogger logger, string packageName, Assembly assembly, string hostVersion) {
+            // Set common properties to be sent with all ntvs events
+            var versionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
+            // NTVS version
+            logger.SetCommonProperty(new DataPoint(TelemetryProperties.NtvsVersion, versionInfo.ProductVersion.ToString()));
+            // VS version
+            logger.SetCommonProperty(new DataPoint(TelemetryProperties.HostVersion, hostVersion));
+
+            // Log package loaded event
+            logger.ReportEvent(TelemetryEvents.PackageLoaded, TelemetryProperties.PackageName, packageName);
         }
     }
 }

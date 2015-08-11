@@ -34,7 +34,7 @@ namespace Microsoft.NodejsTools.Telemetry {
         }
 
         public void SetCommonProperty(DataPoint property) {
-            Debug.WriteLine(string.Format("Set common property '{0}' to '{1}'", property.Name, property.Value.ToString()));
+            Debug.WriteLine(string.Format("Set common property '{0}' to '{1}'", property.Name, property.Value));
         }
 
         public void RemoveCommonProperty(string propertyName) {
