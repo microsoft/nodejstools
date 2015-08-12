@@ -30,7 +30,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             Compile("server", ""),
             Compile("multiline", "one\r\ntwo\r\nthree"),
             Compile("nonempty", "nonempty"),
-            Compile("indented", "if (False){\r\n    }")
+            Compile("indented", "if (false){\r\n    }")
         );
 
         class Snippet {
@@ -63,13 +63,13 @@ namespace Microsoft.Nodejs.Tests.UI {
             ),
             new Snippet(
                 "while",
-                "while (True){\r\n    $body$\r\n}",
-                new Declaration("False", "while (False){\r\n    $body$\r\n}")
+                "while (true){\r\n    $body$\r\n}",
+                new Declaration("false", "while (false){\r\n    $body$\r\n}")
             ),
             new Snippet(
                 "if",
-                "if (True){\r\n   $body$\r\n}",
-                new Declaration("False", "while (False){\r\n  $body$\r\n}")
+                "if (true){\r\n   $body$\r\n}",
+                new Declaration("false", "while (false){\r\n  $body$\r\n}")
 
             ),
             new Snippet(
@@ -107,10 +107,10 @@ namespace Microsoft.Nodejs.Tests.UI {
                 app.SetFocus();
 
                 Keyboard.Type("while\t");
-                app.WaitForText("if (False){\r\n    while (True){\r\n    body\r\n}}");
+                app.WaitForText("if (false){\r\n    while (true){\r\n    body\r\n}}");
                 Keyboard.Type("\r");
                 Keyboard.Type("replacedBody");
-                app.WaitForText("if (False){\r\n    while (True){\r\n    replacedBody\r\n}}");
+                app.WaitForText("if (false){\r\n    while (true){\r\n    replacedBody\r\n}}");
 
                 solution.CloseActiveWindow(vsSaveChanges.vsSaveChangesNo);
             }
@@ -127,6 +127,27 @@ namespace Microsoft.Nodejs.Tests.UI {
                     solution.CloseActiveWindow(vsSaveChanges.vsSaveChangesNo);
                 }
             }
+        }
+
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("VSTestHost")]
+        public void TestNesting() {
+            using (var solution = BasicProject.Generate().ToVs()) {
+                var server = solution.OpenItem("SnippetsTest", "server.js");
+                server.MoveCaret(1, 1);
+                server.Invoke(() => server.TextView.Caret.EnsureVisible());
+                server.SetFocus();
+
+                Keyboard.Type("testword");
+                server.Select(2, 5, 8);
+                Keyboard.Type("if\t");
+                solution.ExecuteCommand("Edit.SurroundWith");
+                server.WaitForText("if (true){\r\n   if (true){\r\n \r\n}\r\n}");
+
+                solution.CloseActiveWindow(vsSaveChanges.vsSaveChangesNo);
+
+            }
+
         }
 
         private static IEditor TestOneSurroundWithSnippet(IVisualStudioInstance solution, Snippet snippet, string category, string body = "body", string file = "server.js") {
