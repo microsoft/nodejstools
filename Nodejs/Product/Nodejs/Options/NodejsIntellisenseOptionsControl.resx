@@ -507,13 +507,13 @@
     <value>3, 3, 6, 3</value>
   </data>
   <data name="_analysisPreviewFeedbackLinkLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>123, 13</value>
+    <value>114, 13</value>
   </data>
   <data name="_analysisPreviewFeedbackLinkLabel.TabIndex" type="System.Int32, mscorlib">
     <value>7</value>
   </data>
   <data name="_analysisPreviewFeedbackLinkLabel.Text" xml:space="preserve">
-    <value>(Send us your feedback)</value>
+    <value>(More info &amp;&amp; feedback)</value>
   </data>
   <data name="&gt;&gt;_analysisPreviewFeedbackLinkLabel.Name" xml:space="preserve">
     <value>_analysisPreviewFeedbackLinkLabel</value>
