@@ -15,10 +15,13 @@
 //*********************************************************//
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.Options {
     [ComVisible(true)]
@@ -28,6 +31,7 @@ namespace Microsoft.NodejsTools.Options {
         private int _analysisLogMax;
         private bool _saveToDisk;
         private string _completionCommittedBy;
+        private string _toolsVersion;
         private readonly bool _enableES6Preview;
         private readonly Version _typeScriptMinVersionForES6Preview = new Version("1.6");
 
@@ -171,18 +175,17 @@ namespace Microsoft.NodejsTools.Options {
 
         }
 
-        private string _toolsVersion;
         private string GetTypeScriptToolsVersion() {
             if (_toolsVersion == null) {
                 _toolsVersion = string.Empty;
                 try {
-                    // Start with the Nodejs tools path to retrieve the IDE path
-                    var idePath = Assembly.GetExecutingAssembly().Location;
-                    while (!string.IsNullOrEmpty(idePath) && !StringComparer.OrdinalIgnoreCase.Equals(Path.GetFileName(idePath), "IDE")) {
-                        var parentInfo = Directory.GetParent(idePath);
-                        idePath = parentInfo != null ? parentInfo.FullName : string.Empty;
+                    object installDirAsObject = null;
+                    var shell = NodejsPackage.Instance.GetService(typeof(SVsShell)) as IVsShell;
+                    if (shell != null) {
+                        shell.GetProperty((int)__VSSPROPID.VSSPROPID_InstallDirectory, out installDirAsObject);
                     }
 
+                    var idePath = CommonUtils.NormalizeDirectoryPath((string)installDirAsObject) ?? string.Empty;
                     if (string.IsNullOrEmpty(idePath)) {
                         return _toolsVersion;
                     }
@@ -200,7 +203,13 @@ namespace Microsoft.NodejsTools.Options {
                     if (!string.IsNullOrWhiteSpace(version)) {
                         _toolsVersion = version;
                     }
-                } catch (Exception) { }
+                } catch (Exception ex) {
+                    if (ex.IsCriticalException()) {
+                        throw;
+                    }
+
+                    Debug.WriteLine(string.Format("Failed to obtain TypeScript tools version: {0}", ex.ToString()));
+                }
             }
 
             return _toolsVersion;
