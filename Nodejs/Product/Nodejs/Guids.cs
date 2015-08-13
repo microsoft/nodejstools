@@ -32,6 +32,7 @@ namespace Microsoft.NodejsTools
         public const string NodejsProjectFactoryString = "3AF33F2E-1136-4D97-BBB7-1795711AC8B8";
         public const string NodejsBaseProjectFactoryString = "9092AA53-FB77-4645-B42D-1CCCA6BD08BD";
         public const string TypeScriptLanguageInfoString = "87bdf188-e6e8-4fcf-a82a-9b8506e01847";
+        public const string TypeScriptEditorFactoryString = "0f2454b1-a556-402d-a7d0-1fde7f99dee0";
         public const string JadeEditorFactoryString = "6CB69EF8-1329-4DC0-84B4-FA134EA59BE3";
 
         internal static readonly Guid DefaultLangaugeService = new Guid("{8239BEC4-EE87-11D0-8C98-00C04FC2AB22}");
@@ -57,6 +58,7 @@ namespace Microsoft.NodejsTools
         public static readonly Guid NodejsDebugLanguage = new Guid(NodejsDebugLanguageString);
         public static readonly Guid NodejsNpmCmdSet = new Guid(NodejsNpmCmdSetString);
         public static readonly Guid TypeScriptDebugLanguage = new Guid(TypeScriptLanguageInfoString);
+        public static readonly Guid TypeScriptEditorFactory = new Guid(TypeScriptEditorFactoryString);
         
         public static readonly Guid ScriptDebugLanguage = new Guid(ScriptDebugLanguageString);
 

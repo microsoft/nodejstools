@@ -15,7 +15,10 @@
 //*********************************************************//
 
 using System;
+using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 
 namespace Microsoft.NodejsTools.Options {
     [ComVisible(true)]
@@ -25,9 +28,18 @@ namespace Microsoft.NodejsTools.Options {
         private int _analysisLogMax;
         private bool _saveToDisk;
         private string _completionCommittedBy;
+        private readonly bool _enableES6Preview;
+        private readonly Version _typeScriptMinVersionForES6Preview = new Version("1.6");
 
         public NodejsIntellisenseOptionsPage()
             : base("IntelliSense") {
+            Version version;
+            var versionString = GetTypeScriptToolsVersion();
+            if (!string.IsNullOrEmpty(versionString) &&
+                Version.TryParse(versionString, out version) &&
+                version.CompareTo(_typeScriptMinVersionForES6Preview) > -1) {
+                    _enableES6Preview = true;
+            }
         }
 
         // replace the default UI of the dialog page w/ our own UI.
@@ -40,6 +52,8 @@ namespace Microsoft.NodejsTools.Options {
                 return _window;
             }
         }
+
+        internal bool EnableES6Preview { get { return _enableES6Preview; } }
 
         internal bool SaveToDisk {
             get { return _saveToDisk; }
@@ -62,6 +76,13 @@ namespace Microsoft.NodejsTools.Options {
             set {
                 var oldLevel = _level;
                 _level = value;
+
+                // Fallback to full intellisense (High) if the ES6 intellisense preview isn't enabled
+                if (_level == AnalysisLevel.Preview && !_enableES6Preview) {
+                    _level = AnalysisLevel.High;
+                    SaveSettingsToStorage();
+                }
+
                 if (oldLevel != _level) {
                     var changed = AnalysisLevelChanged;
                     if (changed != null) {
@@ -148,6 +169,41 @@ namespace Microsoft.NodejsTools.Options {
             SaveString(CompletionCommittedBySetting, CompletionCommittedBy);
             SaveBool(SaveToDiskSetting, SaveToDisk);
 
+        }
+
+        private string _toolsVersion;
+        private string GetTypeScriptToolsVersion() {
+            if (_toolsVersion == null) {
+                _toolsVersion = string.Empty;
+                try {
+                    // Start with the Nodejs tools path to retrieve the IDE path
+                    var idePath = Assembly.GetExecutingAssembly().Location;
+                    while (!string.IsNullOrEmpty(idePath) && !StringComparer.OrdinalIgnoreCase.Equals(Path.GetFileName(idePath), "IDE")) {
+                        var parentInfo = Directory.GetParent(idePath);
+                        idePath = parentInfo != null ? parentInfo.FullName : string.Empty;
+                    }
+
+                    if (string.IsNullOrEmpty(idePath)) {
+                        return _toolsVersion;
+                    }
+
+                    var typeScriptServicesPath = Path.Combine(idePath, @"CommonExtensions\Microsoft\TypeScript\typescriptServices.js");
+                    if (!File.Exists(typeScriptServicesPath)) {
+                        return _toolsVersion;
+                    }
+
+                    var regex = new Regex(@"toolsVersion = ""(?<version>\d.\d?)"";");
+                    var fileText = File.ReadAllText(typeScriptServicesPath);
+                    var match = regex.Match(fileText);
+
+                    var version = match.Groups["version"].Value;
+                    if (!string.IsNullOrWhiteSpace(version)) {
+                        _toolsVersion = version;
+                    }
+                } catch (Exception) { }
+            }
+
+            return _toolsVersion;
         }
     }
 }

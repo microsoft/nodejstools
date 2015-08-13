@@ -540,7 +540,7 @@ namespace Microsoft.NodejsTools.Project {
             }
 
             var relativeFile = CommonUtils.GetRelativeFilePath(this.FullPathToChildren, fileNode.Url);
-            if (this._analyzer.Project != null && this._analyzer.Project.Limits.IsPathExceedNestingLimit(relativeFile)) {
+            if (this._analyzer != null && this._analyzer.Project != null && this._analyzer.Project.Limits.IsPathExceedNestingLimit(relativeFile)) {
                 return false;
             }
 
