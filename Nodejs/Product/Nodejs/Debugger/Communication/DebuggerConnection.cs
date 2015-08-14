@@ -21,6 +21,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.NodejsTools.Logging;
 using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json;
 
@@ -69,7 +70,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                 return;
             }
 
-            Debug.WriteLine("Request: " + message, typeof(DebuggerConnection).Name);
+            LiveLogger.WriteLine("Request: " + message, typeof(DebuggerConnection));
 
             var messageBody = _encoding.GetBytes(message);
             var messageHeader = _encoding.GetBytes(string.Format("Content-Length: {0}\r\n\r\n", messageBody.Length));
@@ -144,7 +145,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             } catch (ObjectDisposedException) {
             } catch (IOException) {
             } catch (Exception e) {
-                Debug.WriteLine(string.Format("Failed to write message {0}.", e), typeof(DebuggerConnection).Name);
+                LiveLogger.WriteLine(string.Format("Failed to write message {0}.", e), typeof(DebuggerConnection));
                 throw;
             }
         }
@@ -153,7 +154,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         /// Receives messages from debugger, parses them to extract the body, and dispatches them to <see cref="OutputMessage"/> listeners.
         /// </summary>
         private async void ReceiveAndDispatchMessagesWorker() {
-            Debug.WriteLine("Established connection.", typeof(DebuggerConnection).Name);
+            LiveLogger.WriteLine("Established connection.", typeof(DebuggerConnection));
 
             INetworkClient networkClient;
             lock (_networkClientLock) {
@@ -240,7 +241,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                     }
 
                     string message = _encoding.GetString(bodyBuffer, 0, contentLength);
-                    Debug.WriteLine("Response: " + message, typeof(DebuggerConnection).Name);
+                    LiveLogger.WriteLine("Response: " + message, typeof(DebuggerConnection));
 
                     // Notify subscribers.
                     var outputMessage = OutputMessage;
@@ -252,14 +253,14 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             } catch (IOException) {
             } catch (ObjectDisposedException) {
             } catch (DecoderFallbackException ex) {
-                Debug.WriteLine(string.Format("Error decoding response body: {0}", ex), typeof(DebuggerConnection).Name);
+                LiveLogger.WriteLine(string.Format("Error decoding response body: {0}", ex), typeof(DebuggerConnection));
             } catch (JsonReaderException ex) {
-                Debug.WriteLine(string.Format("Error parsing JSON response: {0}", ex), typeof(DebuggerConnection).Name);
+                LiveLogger.WriteLine(string.Format("Error parsing JSON response: {0}", ex), typeof(DebuggerConnection));
             } catch (Exception ex) {
-                Debug.WriteLine(string.Format("Message processing failed: {0}", ex), typeof(DebuggerConnection).Name);
+                LiveLogger.WriteLine(string.Format("Message processing failed: {0}", ex), typeof(DebuggerConnection));
                 throw;
             } finally {
-                Debug.WriteLine("Connection was closed.", typeof(DebuggerConnection).Name);
+                LiveLogger.WriteLine("Connection was closed.", typeof(DebuggerConnection));
 
                 var connectionClosed = ConnectionClosed;
                 if (connectionClosed != null) {

@@ -27,6 +27,7 @@ using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.NodejsTools.Debugger.Communication;
 using Microsoft.NodejsTools.Debugger.Events;
 using Microsoft.NodejsTools.Debugger.Serialization;
+using Microsoft.NodejsTools.Logging;
 using Microsoft.NodejsTools.SourceMapping;
 using Microsoft.VisualStudioTools;
 
@@ -244,14 +245,8 @@ namespace Microsoft.NodejsTools.Debugger {
             }
         }
 
-        [Conditional("DEBUG")]
         private void DebugWriteCommand(string commandName) {
-            DebugWriteLine("NodeDebugger Called " + commandName);
-        }
-
-        [Conditional("DEBUG")]
-        private void DebugWriteLine(string message) {
-            Debug.WriteLine("[{0}] {1}", DateTime.UtcNow.TimeOfDay, message);
+            LiveLogger.WriteLine("NodeDebugger Called " + commandName);
         }
 
         /// <summary>
@@ -328,7 +323,7 @@ namespace Microsoft.NodejsTools.Debugger {
                     // Stepping into or to autoresumed break
                     break;
                 default:
-                    Debug.WriteLine("Unexpected SteppingMode: {0}", _steppingMode);
+                    LiveLogger.WriteLine("Unexpected SteppingMode: {0}", _steppingMode);
                     break;
             }
 
@@ -783,7 +778,7 @@ namespace Microsoft.NodejsTools.Debugger {
             foreach (NodeStackFrame stackFrame in stackFrames) {
                 // Retrieve a local module
                 NodeModule module;
-                GetOrAddModule(stackFrame.Module, out module);
+                GetOrAddModule(stackFrame.Module, out module, stackFrame);
                 module = module ?? stackFrame.Module;
 
                 int line = stackFrame.Line;
@@ -1201,11 +1196,13 @@ namespace Microsoft.NodejsTools.Debugger {
         /// </summary>
         /// <param name="module">New module.</param>
         /// <param name="value">Existing module.</param>
+        /// <param name="stackFrame">The stack frame linked to the module.</param>
         /// <returns>True if module was added otherwise false.</returns>
-        private bool GetOrAddModule(NodeModule module, out NodeModule value) {
+        private bool GetOrAddModule(NodeModule module, out NodeModule value, NodeStackFrame stackFrame = null) {
             value = null;
-
             string javaScriptFileName = module.JavaScriptFileName;
+            int? line = null, column = null;
+
             if (string.IsNullOrEmpty(javaScriptFileName) ||
                 javaScriptFileName == NodeVariableType.UnknownModule ||
                 javaScriptFileName.StartsWith("binding:")) {
@@ -1216,7 +1213,12 @@ namespace Microsoft.NodejsTools.Debugger {
             javaScriptFileName = FileNameMapper.GetLocalFileName(javaScriptFileName);
 
             // Try to get mapping for JS file
-            String originalFileName = SourceMapper.MapToOriginal(javaScriptFileName);
+            if(stackFrame != null) {
+                line = stackFrame.Line;
+                column = stackFrame.Column;
+            }
+            string originalFileName = SourceMapper.GetOriginalFileName(javaScriptFileName, line, column);
+
             if (originalFileName == null) {
                 module = new NodeModule(module.Id, javaScriptFileName);
             } else {

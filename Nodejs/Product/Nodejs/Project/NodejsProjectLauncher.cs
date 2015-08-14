@@ -134,10 +134,7 @@ namespace Microsoft.NodejsTools.Project {
 
         private string GetNodePath() {
             var overridePath = _project.GetProjectProperty(NodejsConstants.NodeExePath);
-            if (!String.IsNullOrWhiteSpace(overridePath)) {
-                return overridePath;
-            }
-            return Nodejs.NodeExePath;
+            return Nodejs.GetAbsoluteNodeExePath(_project.ProjectHome, overridePath);
         }
 
         #endregion
@@ -204,20 +201,13 @@ namespace Microsoft.NodejsTools.Project {
 
 
         private void LaunchDebugger(IServiceProvider provider, VsDebugTargetInfo dbgInfo) {
-            if (!Directory.Exists(UnquotePath(dbgInfo.bstrCurDir))) {
+            if (!Directory.Exists(dbgInfo.bstrCurDir)) {
                 MessageBox.Show(String.Format("Working directory \"{0}\" does not exist.", dbgInfo.bstrCurDir), "Node.js Tools for Visual Studio");
-            } else if (!File.Exists(UnquotePath(dbgInfo.bstrExe))) {
+            } else if (!File.Exists(dbgInfo.bstrExe)) {
                 MessageBox.Show(String.Format("Interpreter \"{0}\" does not exist.", dbgInfo.bstrExe), "Node.js Tools for Visual Studio");
             } else if (DoesProjectSupportDebugging()) {
                 VsShellUtilities.LaunchDebugger(provider, dbgInfo);
             }
-        }
-
-        private static string UnquotePath(string p) {
-            if (p.StartsWith("\"") && p.EndsWith("\"")) {
-                return p.Substring(1, p.Length - 2);
-            }
-            return p;
         }
 
         private bool DoesProjectSupportDebugging() {
@@ -348,7 +338,7 @@ namespace Microsoft.NodejsTools.Project {
         private string ResolveStartupFile() {
             string startupFile = _project.GetStartupFile();
             if (string.IsNullOrEmpty(startupFile)) {
-                throw new ApplicationException("No startup file is defined for the startup project.");
+                throw new ApplicationException("Please select a startup file to launch by right-clicking the file in Solution Explorer and selecting 'Set as Node.js Startup File' or by modifying your configuration in project properties.");
             }
 
             if (TypeScriptHelpers.IsTypeScriptFile(startupFile)) {

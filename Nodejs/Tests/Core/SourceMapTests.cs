@@ -16,12 +16,6 @@
 
 using System;
 using System.IO;
-using System.Linq;
-using System.Windows;
-using System.Windows.Threading;
-using System.Xml.Linq;
-using Microsoft.NodejsTools;
-using Microsoft.NodejsTools.Project.ImportWizard;
 using Microsoft.NodejsTools.SourceMapping;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
@@ -214,6 +208,15 @@ namespace NodejsTests {
             int lineNo, columnNo;
             Assert.IsTrue(mapper.MapToJavaScript(TestData.GetPath(@"TestData\DebuggerProject\TypeScriptTest.ts"), 1, 0, out fileName, out lineNo, out columnNo));
             Assert.AreEqual(TestData.GetPath(@"TestData\DebuggerProject\TypeScriptTest.js"), fileName);
+        }
+
+        [TestMethod, Priority(0), TestCategory("Debugging")]
+        public void TestGetOriginalFileNameWithStackFrame() {
+            string javaScriptFileName = TestData.GetPath(@"TestData\TypeScriptMultfile\all.js");
+            var sourceMapper = new SourceMapper();            
+            int? line = 24, column = 9;
+            string originalFileName = sourceMapper.GetOriginalFileName(javaScriptFileName, line, column);
+            Assert.IsTrue(originalFileName.Contains("file2.ts"));
         }
     }
 }

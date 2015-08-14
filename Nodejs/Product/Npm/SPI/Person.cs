@@ -27,13 +27,15 @@ using Newtonsoft.Json.Linq;
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal class Person : IPerson {
 
-    private static readonly Regex RegexPerson = new Regex(
+        // We cannot rely on the ordering of any of these fields,
+        // so we should match them separately.
+        private static readonly Regex RegexPerson = new Regex(
         "\"name\":\\s*\"(?<name>[^<]+?)\"" +
-        "[\\s,]*" +
-        "(\"email\":\\s*\"(?<email>[^<]+?)\")?" +
-        "[\\s,]*" +
-        "(\"url\":\\s*\"(?<url>[^<]+?)\")?",
-        RegexOptions.IgnoreCase | RegexOptions.Singleline);
+        "|" +
+        "\"email\":\\s*\"(?<email>[^<]+?)\"" +
+        "|" +
+        "\"url\":\\s*\"(?<url>[^<]+?)\"",
+        RegexOptions.Singleline);
     
         [JsonConstructor]
         private Person() {
@@ -53,16 +55,26 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             // We parse using a regex because JObject.Parse throws exceptions for malformatted json,
             // and simply handling them causes performance issues.
             var matches = RegexPerson.Matches(source);
-            if (matches.Count == 1) {
-                var match = matches[0];
-                var group = match.Groups["name"];
-                Name = group.Value;
+            if (matches.Count >= 1) {
+                foreach (Match match in matches) {
+                    var group = match.Groups["name"];
+                    if (group.Success) {
+                        Name = group.Value;
+                        continue;
+                    }
 
-                group = match.Groups["email"];
-                Email = group.Value;
+                    group = match.Groups["email"];
+                    if (group.Success) {
+                        Email = group.Value;
+                        continue;
+                    }
 
-                group = match.Groups["url"];
-                Url = group.Value;
+                    group = match.Groups["url"];
+                    if (group.Success) {
+                        Url = group.Value;
+                        continue;
+                    }
+                }
             } else {
                 Name = source;
             }
@@ -71,9 +83,10 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             // Verify we are parsing correctly
             try {
                 var jObject = JObject.Parse(source);
-                Debug.Assert(((string)jObject["name"] ?? string.Empty) == Name, string.Format("Failed to parse name from {0}", source));
-                Debug.Assert(((string)jObject["email"] ?? string.Empty) == Email, string.Format("Failed to parse email from {0}", source));
-                Debug.Assert(((string)jObject["url"] ?? string.Empty) == Url, string.Format("Failed to parse url from {0}", source));
+                var name = (string)jObject["name"];
+                Debug.Assert(name != null ? name == Name : Name == source, string.Format("Failed to parse name from {0}", source));
+                Debug.Assert((string)jObject["email"] == Email, string.Format("Failed to parse email from {0}", source));
+                Debug.Assert((string)jObject["url"] == Url, string.Format("Failed to parse url from {0}", source));
             } catch (Exception) {
                 Debug.Assert(source == Name);
             }

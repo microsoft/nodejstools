@@ -1732,7 +1732,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// AddChild - add a node, sorted in the right location.
         /// </summary>
         /// <param name="node">The node to add.</param>
-        public void AddChild(HierarchyNode node) {
+        public virtual void AddChild(HierarchyNode node) {
             Utilities.ArgumentNotNull("node", node);
 
             Debug.Assert(ProjectMgr.ItemIdMap[node.hierarchyId] == null || ProjectMgr.ItemIdMap[node.hierarchyId] == node);

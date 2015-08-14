@@ -455,7 +455,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     if (node == null) {
                         child.SetEditLabel(child.GetEditLabel());
                     } else {
-                        node.RenameFolder(node.Caption);
+                        node.RenameFolder(node.GetEditLabel());
                     }
                 }
             } finally {

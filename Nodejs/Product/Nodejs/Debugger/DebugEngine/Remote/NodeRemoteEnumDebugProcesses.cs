@@ -15,7 +15,6 @@
 //*********************************************************//
 
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
 using System.Net.WebSockets;
@@ -23,6 +22,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.Debugger.Communication;
+using Microsoft.NodejsTools.Logging;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
@@ -58,7 +58,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
             while (true) {
                 Exception exception = null;
                 try {
-                    Debug.WriteLine("NodeRemoteEnumDebugProcesses pinging remote host ...");
+                    LiveLogger.WriteLine("NodeRemoteEnumDebugProcesses pinging remote host ...");
                     using (var client = networkClientFactory.CreateNetworkClient(port.Uri))
                     using (var stream = client.GetStream()) {
                         // https://nodejstools.codeplex.com/workitem/578
@@ -78,7 +78,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
                         var buffer = new byte[1024];
                         int len = stream.ReadAsync(buffer, 0, buffer.Length, new CancellationTokenSource(5000).Token).GetAwaiter().GetResult();
                         string response = Encoding.UTF8.GetString(buffer, 0, len);
-                        Debug.WriteLine("NodeRemoteEnumDebugProcesses debugger greeting: " + response);
+                        LiveLogger.WriteLine("NodeRemoteEnumDebugProcesses debugger greeting: " + response);
 
                         // There's no error code, so we have to do the string comparison. Luckily, it is hardcoded into V8 and is not localized.
                         if (response == "Remote debugging session already active\r\n") {
@@ -95,15 +95,15 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
                         buffer = new byte[1024];
                         len = stream.ReadAsync(buffer, 0, buffer.Length, new CancellationTokenSource(5000).Token).GetAwaiter().GetResult();
                         response = Encoding.UTF8.GetString(buffer, 0, len);
-                        Debug.WriteLine("NodeRemoteEnumDebugProcesses debugger response: " + response);
+                        LiveLogger.WriteLine("NodeRemoteEnumDebugProcesses debugger response: " + response);
 
                         // If we got to this point, the debuggee is behaving as expected, and we can report it as a valid Node.js process.
                         process = new NodeRemoteDebugProcess(port, "node.exe", String.Empty, String.Empty);
-                        Debug.WriteLine("NodeRemoteEnumDebugProcesses ping successful.");
+                        LiveLogger.WriteLine("NodeRemoteEnumDebugProcesses ping successful.");
                         break;
                     }
                 } catch (OperationCanceledException) {
-                    Debug.WriteLine("NodeRemoteEnumDebugProcesses ping timed out.");
+                    LiveLogger.WriteLine("NodeRemoteEnumDebugProcesses ping timed out.");
                 } catch (DebuggerAlreadyAttachedException ex) {
                     exception = ex;
                 } catch (AggregateException ex) {

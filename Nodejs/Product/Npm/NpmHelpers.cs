@@ -95,7 +95,7 @@ namespace Microsoft.NodejsTools.Npm {
             }
 
             string executable = "npm.cmd";
-            path = Nodejs.GetPathToNodeExecutable(executable);
+            path = Nodejs.GetPathToNodeExecutableFromEnvironment(executable);
 
             if (string.IsNullOrEmpty(path)) {
                 throw new NpmNotFoundException(

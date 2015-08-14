@@ -83,7 +83,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         TestSccProvider.DocumentEvents.Clear();
 
                         var project = app.OpenProject(solution.Filename);
-                        var window = app.SolutionExplorerTreeView;
+                        var window = app.OpenSolutionExplorer();
+                        
                         var folder = window.WaitForItem("Solution 'SourceControl' (1 project)", "SourceControl", "Fob", "Oar");
                         var point = folder.GetClickablePoint();
                         Mouse.MoveTo(point);
@@ -188,7 +189,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     using (var solution = testDef.Generate().ToVs()) {
                         TestSccProvider.DocumentEvents.Clear();
                         var project = app.OpenProject(solution.SolutionFilename);
-                        var window = app.SolutionExplorerTreeView;
+                        var window = app.OpenSolutionExplorer();
                         var fileName = projectType.Code(@"ExcludedFile");
 
                         // Try to select the file.  If it throws, it is likely the issue was that we weren't showing all files.
@@ -229,7 +230,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         TestSccProvider.DocumentEvents.Clear();
 
                         var project = app.OpenProject(solution.Filename);
-                        var window = app.SolutionExplorerTreeView;
+                        var window = app.OpenSolutionExplorer();
                         var fileName = "Program" + projectType.CodeExtension;
                         var program = window.WaitForChildOfProject(project, fileName);
 

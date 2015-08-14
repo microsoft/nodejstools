@@ -94,6 +94,20 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
+        public void TestPreReleaseHyphenatedIdentifierWithoutVersion()
+        {
+            // This version code is crazy, and for that reason it fail when
+            // regional settings is set to Turkish.
+            SemverVersionTestHelper.AssertVersionsEqual(
+                0,
+                1,
+                4,
+                "DEPRECATED-USE-cfenv-INSTEAD",
+                null,
+                SemverVersion.Parse("0.1.4-DEPRECATED-USE-cfenv-INSTEAD"));
+        }
+
+        [TestMethod, Priority(0)]
         public void TestPreReleaseAndBuildMetadata() {
             // 1.0.0-alpha+001, 1.0.0+20130313144700, 1.0.0-beta+exp.sha.5114f85
             SemverVersionTestHelper.AssertVersionsEqual(1, 0, 0, "alpha", "001", SemverVersion.Parse("1.0.0-alpha+001"));

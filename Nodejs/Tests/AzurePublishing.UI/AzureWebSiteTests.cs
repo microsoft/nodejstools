@@ -71,7 +71,7 @@ namespace AzurePublishingUITests {
                 System.Threading.Thread.Sleep(250);
             }
 
-            app.SolutionExplorerTreeView.WaitForItem(
+            app.OpenSolutionExplorer().WaitForItem(
                 "Solution '" + app.Dte.Solution.Projects.Item(1).Name + "' (1 project)",
                 app.Dte.Solution.Projects.Item(1).Name,
                 expectedProjectItem

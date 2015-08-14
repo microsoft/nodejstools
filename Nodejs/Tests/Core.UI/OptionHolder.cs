@@ -15,6 +15,9 @@
 //*********************************************************//
 
 using System;
+using System.Reflection;
+using Microsoft.NodejsTools;
+using Microsoft.NodejsTools.Options;
 using Microsoft.VisualStudioTools.VSTestHost;
 
 namespace Microsoft.Nodejs.Tests.UI {
@@ -34,6 +37,23 @@ namespace Microsoft.Nodejs.Tests.UI {
         public void Dispose() {
             var props = VSTestContext.DTE.get_Properties(_category, _page);
             props.Item(_option).Value = _oldValue;
+        }
+    }
+
+    class NodejsOptionHolder : IDisposable {
+        object _oldValue;
+        PropertyInfo _property;
+        object _page;
+
+        public NodejsOptionHolder(object optionsPage, string propertyName, object newValue) {
+            _page = optionsPage;
+            _property = optionsPage.GetType().GetProperty(propertyName);
+            _oldValue = _property.GetValue(_page);
+            _property.SetValue(_page, newValue);
+        }
+
+        public void Dispose() {
+            _property.SetValue(_page, _oldValue);
         }
     }
 }

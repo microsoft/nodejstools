@@ -819,8 +819,10 @@ namespace Microsoft.VisualStudioTools.Project {
                 return true;
             }
 
-            if (!File.Exists(path) && !Directory.Exists(path)) {
+            if ((path.Length >= NativeMethods.MAX_FOLDER_PATH || !Directory.Exists(path) 
+                && (path.Length >= NativeMethods.MAX_PATH || !File.Exists(path)))) {
                 // if the file has disappeared avoid the exception...
+                // same if file is outside of path limits.
                 return true; // Files/directories that don't exist should be hidden. This also fix DiskMerger when adds files that were already deleted
             }
 
@@ -1537,8 +1539,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// Returns resolved value of the current working directory property.
         /// </summary>
         public string GetWorkingDirectory() {
-            string workDir = GetProjectProperty(CommonConstants.WorkingDirectory, resetCache: false);
-
+            string workDir = CommonUtils.UnquotePath(GetProjectProperty(CommonConstants.WorkingDirectory, resetCache: false));
             return CommonUtils.GetAbsoluteDirectoryPath(ProjectHome, workDir);
         }
 

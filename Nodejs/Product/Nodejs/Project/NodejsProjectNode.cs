@@ -27,6 +27,7 @@ using Microsoft.NodejsTools.Intellisense;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.ProjectWizard;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudioTools.Project.Automation;
@@ -38,7 +39,7 @@ using Microsoft.VisualStudio.Imaging;
 #endif
 
 namespace Microsoft.NodejsTools.Project {
-    class NodejsProjectNode : CommonProjectNode, VsWebSite.VSWebSite, INodePackageModulesCommands {
+    class NodejsProjectNode : CommonProjectNode, VsWebSite.VSWebSite, INodePackageModulesCommands, IVsBuildPropertyStorage {
         private VsProjectAnalyzer _analyzer;
         private readonly HashSet<string> _warningFiles = new HashSet<string>();
         private readonly HashSet<string> _errorFiles = new HashSet<string>();
@@ -208,6 +209,16 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         internal override string GetItemType(string filename) {
+            string absFileName = 
+                Path.IsPathRooted(filename) ? 
+                filename :
+                Path.Combine(this.ProjectHome, filename);
+
+            var node = this.FindNodeByFullPath(absFileName) as NodejsFileNode;
+            if (node != null && node.ItemNode.ItemTypeName != null) {
+                return node.ItemNode.ItemTypeName;
+            }
+
             if (string.Equals(Path.GetExtension(filename), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
                 return NodejsConstants.TypeScriptCompileItemType;
             }
@@ -325,6 +336,25 @@ namespace Microsoft.NodejsTools.Project {
         protected override NodeProperties CreatePropertiesObject() {
             return new NodejsProjectNodeProperties(this);
         }
+        
+        public override int GetPropertyValue(string propertyName, string configName, uint storage, out string propertyValue) {
+            propertyValue = null;
+            switch (propertyName) {
+                case "DockerLinuxDockerfileContents":
+                    propertyValue = DockerfileWizardExtension.GetDockerfileWithReplacements(
+                        File.ReadAllText(@"FileTemplates\ReferenceFiles\Dockerfile"),
+                        DTE
+                    );
+                    return VSConstants.S_OK;
+                case "DockerAppType":
+                    propertyValue = "Node.js";
+                    return VSConstants.S_OK;
+                case "DockerDefaultPublishContainerPort":
+                    propertyValue = "8080";
+                    return VSConstants.S_OK;
+            }
+            return base.GetPropertyValue(propertyName, configName, storage, out propertyValue);
+        }
 
         protected override Stream ProjectIconsImageStripStream {
             get {
@@ -335,15 +365,14 @@ namespace Microsoft.NodejsTools.Project {
         public override bool IsCodeFile(string fileName) {
             var ext = Path.GetExtension(fileName);
             return ext.Equals(NodejsConstants.JavaScriptExtension, StringComparison.OrdinalIgnoreCase) ||
-                   ext.Equals(NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase) ||
-                   // for some reason, the default express 4 template's startup file lacks an extension.
-                   string.IsNullOrEmpty(ext);
+                   ext.Equals(NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase);
         }
 
         public override int InitializeForOuter(string filename, string location, string name, uint flags, ref Guid iid, out IntPtr projectPointer, out int canceled) {
             NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevelChanged += IntellisenseOptionsPageAnalysisLevelChanged;
             NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMaximumChanged += AnalysisLogMaximumChanged;
             NodejsPackage.Instance.IntellisenseOptionsPage.SaveToDiskChanged += IntellisenseOptionsPageSaveToDiskChanged;
+            NodejsPackage.Instance.GeneralOptionsPage.ShowBrowserAndNodeLabelsChanged += ShowBrowserAndNodeLabelsChanged;
 
             return base.InitializeForOuter(filename, location, name, flags, ref iid, out projectPointer, out canceled);
         }
@@ -449,6 +478,13 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
+        private void ShowBrowserAndNodeLabelsChanged(object sender, EventArgs e) {
+            var nodejsFolderNodes = this.AllDescendants.Where(item => (item as NodejsFolderNode) != null).Select(item => (NodejsFolderNode)item);
+            foreach (var node in nodejsFolderNodes) {
+                ProjectMgr.ReDrawNode(node, UIHierarchyElement.Caption);
+            }
+        }
+
         protected override void RaiseProjectPropertyChanged(string propertyName, string oldValue, string newValue) {
             base.RaiseProjectPropertyChanged(propertyName, oldValue, newValue);
 
@@ -534,13 +570,16 @@ namespace Microsoft.NodejsTools.Project {
                     return false;
                 }
             }
-            if (new FileInfo(fileNode.Url).Length > _maxFileSize) {
-                // skip obviously generated files...
+
+            var fileInfo = new FileInfo(fileNode.Url);
+            if (!fileInfo.Exists || fileInfo.Length > _maxFileSize) {
+                // skip obviously generated and missing files...
                 return false;
             }
 
             var relativeFile = CommonUtils.GetRelativeFilePath(this.FullPathToChildren, fileNode.Url);
-            if (this._analyzer != null && this._analyzer.Project != null && this._analyzer.Project.Limits.IsPathExceedNestingLimit(relativeFile)) {
+            if (this._analyzer != null && this._analyzer.Project != null 
+                && this._analyzer.Project.Limits.IsPathExceedNestingLimit(relativeFile)) {
                 return false;
             }
 
@@ -898,7 +937,21 @@ namespace Microsoft.NodejsTools.Project {
                         }
                         return QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
                 }
+            } else if (cmdGroup == Guids.NodejsCmdSet) {
+                switch (cmd) {
+                    case PkgCmdId.cmdidSetAsNodejsStartupFile:
+                        if (ShowSetAsStartupFileCommandOnNode(selectedNodes)) {
+                            // We enable "Set as StartUp File" command only on current language code files, 
+                            // the file is in project home dir and if the file is not the startup file already.
+                            string startupFile = ((CommonProjectNode)ProjectMgr).GetStartupFile();
+                            if (!CommonUtils.IsSamePath(startupFile, selectedNodes[0].Url)) {
+                                return QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
+                            }
+                        }
+                        break;
+                }
             }
+
             return base.QueryStatusSelectionOnNodes(selectedNodes, cmdGroup, cmd, pCmdText);
         }
 
@@ -911,7 +964,11 @@ namespace Microsoft.NodejsTools.Project {
                 }
             } else if (cmdGroup == Guids.NodejsNpmCmdSet) {
                 try {
-                    NpmHelpers.GetPathToNpm(this.Project.GetNodejsProject().GetProjectProperty(NodejsConstants.NodeExePath));
+                    NpmHelpers.GetPathToNpm(
+                        Nodejs.GetAbsoluteNodeExePath(
+                            ProjectHome,
+                            Project.GetNodejsProject().GetProjectProperty(NodejsConstants.NodeExePath)
+                    ));
                 } catch (NpmNotFoundException) {
                     Nodejs.ShowNodejsNotInstalled();
                     return VSConstants.S_OK;
@@ -923,7 +980,11 @@ namespace Microsoft.NodejsTools.Project {
         protected override int ExecCommandThatDependsOnSelectedNodes(Guid cmdGroup, uint cmdId, uint cmdExecOpt, IntPtr vaIn, IntPtr vaOut, CommandOrigin commandOrigin, IList<HierarchyNode> selectedNodes, out bool handled) {
             if (cmdGroup == Guids.NodejsNpmCmdSet) {
                 try {
-                    NpmHelpers.GetPathToNpm(this.Project.GetNodejsProject().GetProjectProperty(NodejsConstants.NodeExePath));
+                    NpmHelpers.GetPathToNpm(
+                        Nodejs.GetAbsoluteNodeExePath(
+                            ProjectHome,
+                            Project.GetNodejsProject().GetProjectProperty(NodejsConstants.NodeExePath)
+                    ));
                 } catch (NpmNotFoundException) {
                     Nodejs.ShowNodejsNotInstalled();
                     handled = true;
@@ -947,8 +1008,28 @@ namespace Microsoft.NodejsTools.Project {
                         }
                         break;
                 }
+            } else if (cmdGroup == Guids.NodejsCmdSet) {
+                switch (cmdId) {
+                    case PkgCmdId.cmdidSetAsNodejsStartupFile:
+                        // Set the StartupFile project property to the Url of this node
+                        SetProjectProperty(
+                            CommonConstants.StartupFile,
+                            CommonUtils.GetRelativeFilePath(ProjectHome, selectedNodes[0].Url)
+                        );
+                        handled = true;
+                        return VSConstants.S_OK;
+                }
             }
+
             return base.ExecCommandThatDependsOnSelectedNodes(cmdGroup, cmdId, cmdExecOpt, vaIn, vaOut, commandOrigin, selectedNodes, out handled);
+        }
+
+        private bool ShowSetAsStartupFileCommandOnNode(IList<HierarchyNode> selectedNodes) {
+            var selectedNodeUrl = selectedNodes[0].Url;
+            return selectedNodes.Count == 1 &&
+                (IsCodeFile(selectedNodeUrl) ||
+                // for some reason, the default express 4 template's startup file lacks an extension.
+                string.IsNullOrEmpty(Path.GetExtension(selectedNodeUrl)));
         }
 
         private static bool ShowManageModulesCommandOnNode(IList<HierarchyNode> selectedNodes) {

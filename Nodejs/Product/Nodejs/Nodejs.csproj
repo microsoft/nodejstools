@@ -79,7 +79,6 @@
       <OutputSubPath>Node.js</OutputSubPath>
     </VSTemplate>
   </ItemDefinitionGroup>
-
   <Choose>
     <When Condition="'$(VSTarget)' != '11.0' And '$(VSTarget)' != '12.0'">
       <ItemGroup>
@@ -285,6 +284,7 @@
     <Compile Include="Commands\SurveyNewsCommand.cs" />
     <Compile Include="Debugger\DataTips\DataTipTextManagerEvents.cs" />
     <Compile Include="Debugger\DebugEngine\AD7EvalErrorProperty.cs" />
+    <Compile Include="Logging\LiveLogger.cs" />
     <Compile Include="Debugger\FilePosition.cs" />
     <Compile Include="Debugger\FuzzyLogicFileNameMapper.cs" />
     <Compile Include="Debugger\IFileNameMapper.cs" />
@@ -342,6 +342,9 @@
     </Compile>
     <Compile Include="NpmUI\PackageCatalogEntryViewModel.cs" />
     <Compile Include="Options\AnalysisLevel.cs" />
+    <Compile Include="Options\NodejsDiagnosticsOptionsPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Options\NodejsNpmOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -773,6 +776,10 @@
     <ZipProject Include="ProjectTemplates\AzureExpress4App\setup_web.cmd" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\Web.config" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\Web.Debug.config" />
+    <ZipItem Include="Templates\Files\DockerfileTemplate\Dockerfile" />
+    <VSIXSourceItem Include="Templates\Files\DockerfileTemplate\Dockerfile">
+      <VSIXSubPath>FileTemplates\ReferenceFiles\Dockerfile</VSIXSubPath>
+    </VSIXSourceItem>
     <None Include="Theme\contrast.vstheme">
       <SubType>Designer</SubType>
     </None>
@@ -1151,6 +1158,9 @@
       <SubType>Designer</SubType>
     </ZipItem>
     <ZipItem Include="Templates\Files\UnitTest\UnitTest.js" />
+    <ZipItem Include="Templates\Files\DockerfileTemplate\Dockerfile.vstemplate">
+      <SubType>Designer</SubType>
+    </ZipItem>
     <Content Include="TestFrameworks\find_tests.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -1597,6 +1607,7 @@
     </ItemGroup>
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>copy /y $(OutDir)..\WebRole\Microsoft.NodejsTools.WebRole.dll $(OutDir)Debugger\RemoteDebug\</PostBuildEvent>
+    <PostBuildEvent>echo f | xcopy /y $(ProjectDir)Templates\Files\DockerfileTemplate\Dockerfile $(OutDir)FileTemplates\ReferenceFiles\Dockerfile
+copy /y $(OutDir)..\WebRole\Microsoft.NodejsTools.WebRole.dll $(OutDir)Debugger\RemoteDebug\</PostBuildEvent>
   </PropertyGroup>
 </Project>
