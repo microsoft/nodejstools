@@ -30,7 +30,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             Compile("server", ""),
             Compile("multiline", "one\r\ntwo\r\nthree"),
             Compile("nonempty", "nonempty"),
-            Compile("indented", "if (false){\r\n    }")
+            Compile("indented", "if (true) {\r\n   \r\n}")
         );
 
         class Snippet {
@@ -57,30 +57,24 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         private static readonly Snippet[] BasicSnippets = new Snippet[] {
             new Snippet(
-                "console.log",
-                "console.log($body$)",
-                new Declaration("body","console.log(body)")
-            ),
-            new Snippet(
                 "while",
-                "while (true){\r\n    $body$\r\n}",
-                new Declaration("false", "while (false){\r\n    $body$\r\n}")
+                "while (true) {\r\n   $body$\r\n};\r\n",
+                new Declaration("false", "while (false) {\r\n   $body$\r\n};\r\n")
             ),
             new Snippet(
                 "if",
-                "if (true){\r\n   $body$\r\n}",
-                new Declaration("false", "while (false){\r\n  $body$\r\n}")
-
+                "if (true) {\r\n   $body$\r\n}\r\n",
+                new Declaration("false", "if (false) {\r\n   $body$\r\n}\r\n")
             ),
             new Snippet(
                 "iife",
-                "(function undefined {\r\n  $body$\r\n})();",
-                new Declaration("name","(function name {\r\n    $body$\r\n})();")
+                "(function (undefined) {\r\n   $body$\r\n})();\r\n",
+                new Declaration("name","(function (name) {\r\n   $body$\r\n})();\r\n")
             ),
             new Snippet(
                 "for",
-                "for (var i = 0; i < length; i++) {\r\n   $body$\r\n}",
-                new Declaration ("length","for (var i = 0; i < 42; i++) {\r\n   $body$\r\n}")
+                "for (var i = 0; i < length; i++) {\r\n   $body$\r\n};\r\n",
+                new Declaration ("42","for (var i = 0; i < 42; i++) {\r\n   $body$\r\n};\r\n")
             )
         };
 
@@ -99,22 +93,21 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestInsertSnippetIndented() {
+        public void TestSelectedIndented() {
             using (var solution = BasicProject.Generate().ToVs()) {
-                var app = solution.OpenItem("SnippetsTest", "indented.js");
-                app.MoveCaret(2, 5);
-                app.Invoke(() => app.TextView.Caret.EnsureVisible());
-                app.SetFocus();
+                var server = solution.OpenItem("SnippetsTest", "indented.js");
+                server.MoveCaret(2, 5);
+                server.Invoke(() => server.TextView.Caret.EnsureVisible());
+                server.SetFocus();
 
-                Keyboard.Type("while\t");
-                app.WaitForText("if (false){\r\n    while (true){\r\n    body\r\n}}");
+                Keyboard.Type("if\t");
+                server.WaitForText("if (true) {\r\n   if (true) {\r\n      \r\n   }\r\n   \r\n}");
                 Keyboard.Type("\r");
-                Keyboard.Type("replacedBody");
-                app.WaitForText("if (false){\r\n    while (true){\r\n    replacedBody\r\n}}");
+                Keyboard.Type("testing");
+                server.WaitForText("if (true) {\r\n    if (true) {\r\n      testing\r\n   }\r\n   \r\n}");
 
                 solution.CloseActiveWindow(vsSaveChanges.vsSaveChangesNo);
             }
-
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
@@ -131,26 +124,24 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestNesting() {
+        public void TestSelected() {
+            var snippet = new Snippet(
+                "if",
+                "if (true) {\r\n   $body$\r\n}\r\n",
+                new Declaration("false", "if (false) {\r\n   $body$\r\n}\r\n")
+            );
             using (var solution = BasicProject.Generate().ToVs()) {
-                var server = solution.OpenItem("SnippetsTest", "server.js");
-                server.MoveCaret(1, 1);
-                server.Invoke(() => server.TextView.Caret.EnsureVisible());
-                server.SetFocus();
+                var app = TestOneTabSnippet(solution, snippet);
 
-                Keyboard.Type("testword");
-                server.Select(2, 5, 8);
-                Keyboard.Type("if\t");
-                solution.ExecuteCommand("Edit.SurroundWith");
-                server.WaitForText("if (true){\r\n   if (true){\r\n \r\n}\r\n}");
+                Keyboard.Type("testing");
+                app.WaitForText("if (false) {\r\n   testing\r\n}\r\n");
 
                 solution.CloseActiveWindow(vsSaveChanges.vsSaveChangesNo);
-
             }
 
         }
 
-        private static IEditor TestOneSurroundWithSnippet(IVisualStudioInstance solution, Snippet snippet, string category, string body = "body", string file = "server.js") {
+        private static IEditor TestOneSurroundWithSnippet(IVisualStudioInstance solution, Snippet snippet, string category, string body = "nonempty", string file = "nonempty.js") {
             Console.WriteLine("Testing: {0}", snippet.Shortcut);
             var server = solution.OpenItem("SnippetsTest", file);
             server.Select(1, 1, server.Text.Length);
@@ -161,7 +152,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             return VerifySnippet(snippet, body, server);
         }
 
-        private static IEditor TestOneInsertSnippet(IVisualStudioInstance solution, Snippet snippet, string category, string body = "body", string file = "server.js") {
+        private static IEditor TestOneInsertSnippet(IVisualStudioInstance solution, Snippet snippet, string category, string body = "nonempty", string file ="nonempty.js") {
             Console.WriteLine("Testing: {0}", snippet.Shortcut);
             var server = solution.OpenItem("SnippetsTest", file);
             server.Select(1, 1, server.Text.Length);
@@ -193,7 +184,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             server.Invoke(() => server.TextView.Caret.EnsureVisible());
             server.SetFocus();
 
-            return VerifySnippet(snippet, "body", server);
+            return VerifySnippet(snippet, "", server);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
@@ -204,7 +195,8 @@ namespace Microsoft.Nodejs.Tests.UI {
                     TestOneSurroundWithSnippet(
                         solution,
                         snippet,
-                        "one\r\n    two\r\n    three",
+                        "Nodejs",
+                        "one\r\n   two\r\n   three",
                         "multiline.js"
                     );
 
@@ -224,7 +216,10 @@ namespace Microsoft.Nodejs.Tests.UI {
                 server.WaitForText(decl.Expected.Replace("$body$", body));
                 Keyboard.Type("\t");
             }
+            //
             Keyboard.Type("\r");
+            //Keyboard.Type(body);
+
             return server;
         }
 
