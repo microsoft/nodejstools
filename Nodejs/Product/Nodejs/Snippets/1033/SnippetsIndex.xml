@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <SnippetCollection>
-  <Language Lang="Nodejs" Guid="ABD5E8A5-5A35-4BE9-BCAF-E10C1212CB40">
+  <Language Lang="Nodejs" Guid="{ABD5E8A5-5A35-4BE9-BCAF-E10C1212CB40}">
     <SnippetDir>
       <OnOff>on</OnOff>
       <Installed>true</Installed>

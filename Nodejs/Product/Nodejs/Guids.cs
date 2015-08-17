@@ -27,7 +27,7 @@ namespace Microsoft.NodejsTools
         public const string NodejsDebugLanguageString = "{65791609-BA29-49CF-A214-DBFF8AEC3BC2}";
         public const string NodejsEditorFactoryString = "88941496-93F4-4E37-83AF-AFE087415334";
         public const string NodejsEditorFactoryPromptEncodingString = "C8576E92-EFB6-4414-8F63-C84D474A539E";
-        public const string NodejsLanguageInfoString = "ABD5E8A5-5A35-4BE9-BCAF-E10C1212CB40";
+        public const string NodejsLanguageInfoString = "{ABD5E8A5-5A35-4BE9-BCAF-E10C1212CB40}";
         public const string NodejsNpmCmdSetString = "9F4B31B4-09AC-4937-A2E7-F4BC02BB7DBA";
         public const string NodejsProjectFactoryString = "3AF33F2E-1136-4D97-BBB7-1795711AC8B8";
         public const string NodejsBaseProjectFactoryString = "9092AA53-FB77-4645-B42D-1CCCA6BD08BD";

@@ -29,7 +29,7 @@ namespace Microsoft.NodejsTools {
     /// provide a code window manager so that we can have a navigation bar (actually we don't, this
     /// should be switched over to using our TextViewCreationListener instead).
     /// </summary>
-    [Guid(Guids.NodejsLanguageInfoString)]
+    [Guid("ABD5E8A5-5A35-4BE9-BCAF-E10C1212CB40")]
     internal sealed class NodejsLanguageInfo : IVsLanguageInfo, IVsLanguageDebugInfo {
         private readonly IServiceProvider _serviceProvider;
         private readonly IComponentModel _componentModel;
