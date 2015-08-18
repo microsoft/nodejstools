@@ -18,14 +18,14 @@
           <Default>file</Default>
         </Literal>
         <Literal>
-          <ID>error</ID>
-          <Default>error</Default>
+          <ID>e</ID>
+          <Default>e</Default>
         </Literal>
       </Declarations>
       <Code Language="Nodejs">
-        <![CDATA[fs.readFile('$file$', function ($error$, data) {
-    if ($error$) throw $error$;
-    console.log(data);$end$
+        <![CDATA[fs.readFile('$file$', function ($e$, data) {
+   if ($e$) throw $e$;
+   console.log(data);$end$
 });
 ]]>
       </Code>

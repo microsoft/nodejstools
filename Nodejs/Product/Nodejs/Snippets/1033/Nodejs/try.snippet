@@ -3,12 +3,13 @@
     xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
   <CodeSnippet Format="1.0.0">
     <Header>
-      <Title>cberr</Title>
-      <Description>Code Snippet for an error handling callback function</Description>
-      <Shortcut>cberr</Shortcut>
+      <Title>try</Title>
+      <Description>Code Snippet for a Try...Catch Statement</Description>
+      <Shortcut>try</Shortcut>
       <Author>Microsoft Corporation</Author>
       <SnippetTypes>
         <SnippetType>Expansion</SnippetType>
+        <SnippetType>SurroundWith</SnippetType>
       </SnippetTypes>
     </Header>
     <Snippet>
@@ -19,9 +20,10 @@
         </Literal>
       </Declarations>
       <Code Language="Nodejs">
-        <![CDATA[var hadError = function ($e$, response) {
-    console.error($e$);$end$
-    response.end('Server Error');
+        <![CDATA[try {
+   $selected$
+} catch ($e$) {
+   $end$
 };
 ]]>
       </Code>

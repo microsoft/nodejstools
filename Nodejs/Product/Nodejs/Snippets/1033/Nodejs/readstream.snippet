@@ -14,17 +14,17 @@
     <Snippet>
       <Declarations>
         <Literal>
-          <ID>resource</ID>
-          <Default>resource</Default>
+          <ID>path</ID>
+          <Default>path</Default>
         </Literal>
       </Declarations>
       <Code Language="Nodejs">
-        <![CDATA[var stream = fs.createReadStream('$resource$');
-stream.on('data', function (chunk) {
-    console.log(chunk);
+        <![CDATA[var readStream = fs.createReadStream('$path$');
+stream.on('data', function (data) {
+   console.log(data);$end$
 });
 stream.on('end', function () {
-    console.log('finished');
+   console.log('finished');
 });
 ]]>
       </Code>

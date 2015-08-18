@@ -9,6 +9,7 @@
       <Author>Microsoft Corporation</Author>
       <SnippetTypes>
         <SnippetType>Expansion</SnippetType>
+        <SnippetType>SurroundWith</SnippetType>
       </SnippetTypes>
     </Header>
     <Snippet>
@@ -20,11 +21,11 @@
       </Declarations>
       <Code Language="Nodejs">
         <![CDATA[try {
-$end$
-}catch ($e$){
-
-}finally {
-
+   $selected$
+} catch ($e$){
+   $end$
+} finally {
+   
 };
 ]]>
       </Code>
