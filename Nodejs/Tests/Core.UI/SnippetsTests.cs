@@ -74,7 +74,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             new Snippet(
                 "for",
                 "for (var i = 0; i < length; i++) {\r\n   $body$\r\n};\r\n",
-                new Declaration ("42","for (var i = 0; i < 42; i++) {\r\n   $body$\r\n};\r\n")
+                new Declaration("counter", "for (var counter = 0; counter < length; counter++) {\r\n   $body$\r\n};\r\n")
             )
         };
 
@@ -213,13 +213,11 @@ namespace Microsoft.Nodejs.Tests.UI {
             foreach (var decl in snippet.Declarations) {
                 Console.WriteLine("Declaration: {0}", decl.Replacement);
                 Keyboard.Type(decl.Replacement);
+                Keyboard.Type("\t");
                 server.WaitForText(decl.Expected.Replace("$body$", body));
                 Keyboard.Type("\t");
             }
-            //
             Keyboard.Type("\r");
-            //Keyboard.Type(body);
-
             return server;
         }
 

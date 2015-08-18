@@ -15,8 +15,6 @@
 //*********************************************************//
 using System;
 using System.Collections.Generic;
-using Microsoft.NodejsTools.Analysis;
-using Microsoft.NodejsTools.Parsing;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Text;
@@ -109,7 +107,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             TextSpan? endSpan = null;
             using (var edit = _textView.TextBuffer.CreateEdit()) {
                 if (surroundsWith || surroundsWithStatement) {
-                    var templateText = codeNode.text.Replace("\r \n", VsExtensions.GetNewLineText(_textView.TextSnapshot));
+                    var templateText = codeNode.text.Replace("\r\n", VsExtensions.GetNewLineText(_textView.TextSnapshot));
                     foreach (var decl in declList) {
                         string defaultValue;
                         if (ErrorHandler.Succeeded(_session.GetFieldValue(decl, out defaultValue))) {
@@ -169,6 +167,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
             return hr;
         }
+
         public int InsertNamedExpansion(string pszTitle, string pszPath, TextSpan textSpan) {
             if (_session != null) {
                 // if the user starts an expansion session while one is in progress
@@ -201,7 +200,6 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
             return hr;
         }
-
 
         private static string GetTemplateSelectionIndentation(string templateText, int selectedIndex) {
             string indentation = "";
@@ -293,6 +291,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         public int PositionCaretForEditing(IVsTextLines pBuffer, TextSpan[] ts) {
             return VSConstants.S_OK;
         }
+
         private void GetCaretPosition(out int caretLine, out int caretColumn) {
             ErrorHandler.ThrowOnFailure(_view.GetCaretPos(out caretLine, out caretColumn));
 
