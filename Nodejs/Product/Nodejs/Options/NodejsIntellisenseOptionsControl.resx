@@ -438,10 +438,10 @@
     <value>Max</value>
   </data>
   <data name="_analysisLogMax.Location" type="System.Drawing.Point, System.Drawing">
-    <value>161, 102</value>
+    <value>161, 95</value>
   </data>
   <data name="_analysisLogMax.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 10, 6, 3</value>
+    <value>6, 3, 6, 3</value>
   </data>
   <data name="_analysisLogMax.Size" type="System.Drawing.Size, System.Drawing">
     <value>125, 21</value>
@@ -471,10 +471,10 @@
     <value>NoControl</value>
   </data>
   <data name="_analysisLogMaxLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 106</value>
+    <value>6, 99</value>
   </data>
   <data name="_analysisLogMaxLabel.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 10, 6, 3</value>
+    <value>6, 3, 6, 3</value>
   </data>
   <data name="_analysisLogMaxLabel.Size" type="System.Drawing.Size, System.Drawing">
     <value>127, 13</value>
@@ -540,7 +540,7 @@
     <value>6</value>
   </data>
   <data name="tableLayoutPanel2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>612, 126</value>
+    <value>612, 119</value>
   </data>
   <data name="tableLayoutPanel2.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -573,7 +573,7 @@
     <value>8, 8, 8, 8</value>
   </data>
   <data name="intellisenseLevelGroupBox.Size" type="System.Drawing.Size, System.Drawing">
-    <value>628, 155</value>
+    <value>628, 148</value>
   </data>
   <data name="intellisenseLevelGroupBox.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -645,7 +645,7 @@
     <value>Fill</value>
   </data>
   <data name="saveToDiskGroupBox.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 164</value>
+    <value>6, 157</value>
   </data>
   <data name="saveToDiskGroupBox.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>6, 3, 6, 3</value>
@@ -795,7 +795,7 @@
     <value>Fill</value>
   </data>
   <data name="_selectionInCompletionListGroupBox.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 245</value>
+    <value>6, 238</value>
   </data>
   <data name="_selectionInCompletionListGroupBox.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>6, 3, 6, 3</value>
