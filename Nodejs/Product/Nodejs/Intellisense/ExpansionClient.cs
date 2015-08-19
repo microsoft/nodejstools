@@ -39,7 +39,6 @@ namespace Microsoft.NodejsTools.Intellisense {
         private ITrackingPoint _selectionStart, _selectionEnd;
 
         public const string SurroundsWith = "SurroundsWith";
-        public const string SurroundsWithStatement = "SurroundsWithStatement";
         public const string Expansion = "Expansion";
 
         public ExpansionClient(ITextView textView, IVsEditorAdaptersFactoryService adapterFactory, IServiceProvider serviceProvider) {
@@ -91,13 +90,11 @@ namespace Microsoft.NodejsTools.Intellisense {
                 }
             }
 
-            bool surroundsWith = false, surroundsWithStatement = false;
+            bool surroundsWith = false;
             foreach (MSXML.IXMLDOMNode snippetType in snippetTypes.childNodes) {
                 if (snippetType.nodeName == "SnippetType") {
                     if (snippetType.text == SurroundsWith) {
                         surroundsWith = true;
-                    } else if (snippetType.text == SurroundsWithStatement) {
-                        surroundsWithStatement = true;
                     }
                 }
             }
@@ -106,7 +103,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
             TextSpan? endSpan = null;
             using (var edit = _textView.TextBuffer.CreateEdit()) {
-                if (surroundsWith || surroundsWithStatement) {
+                if (surroundsWith) {
                     var templateText = codeNode.text.Replace("\r\n", VsExtensions.GetNewLineText(_textView.TextSnapshot));
                     foreach (var decl in declList) {
                         string defaultValue;
@@ -134,7 +131,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                         }
                         var selectedSpan = Span.FromBounds(start, end);
 
-                          if (surroundsWithStatement &&
+                          if (surroundsWith && 
                             String.IsNullOrWhiteSpace(_textView.TextBuffer.CurrentSnapshot.GetText(selectedSpan))) {
 
                             // Surround With can be invoked with no selection, but on a line with some text.

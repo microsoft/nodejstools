@@ -49,7 +49,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         private IOleCommandTarget _oldTarget;
         private IEditorOperations _editOps;
         private static string[] _allStandardSnippetTypes = { ExpansionClient.Expansion, ExpansionClient.SurroundsWith };
-        private static string[] _surroundsWithSnippetTypes = { ExpansionClient.SurroundsWith, ExpansionClient.SurroundsWithStatement };
+        private static string[] _surroundsWithSnippetTypes = { ExpansionClient.SurroundsWith };
         [ThreadStatic]
         internal static bool ForceCompletions;
 
