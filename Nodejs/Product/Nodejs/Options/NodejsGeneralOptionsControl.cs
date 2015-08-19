@@ -68,6 +68,9 @@ namespace Microsoft.NodejsTools.Options {
             _editAndContinue.Checked = page.EditAndContinue;
             _checkForLongPaths.Checked = page.CheckForLongPaths;
             _showBrowserAndNodeLabels.Checked = page.ShowBrowserAndNodeLabels;
+
+            // Disable the show "browser" and "node" labels option when the user is in ES6 IntelliSense Preview mode
+            _showBrowserAndNodeLabels.Enabled = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel != AnalysisLevel.Preview;
         }
 
         internal void SyncPageWithControlSettings(NodejsGeneralOptionsPage page) {

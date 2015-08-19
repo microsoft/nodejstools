@@ -17,6 +17,7 @@
 using System;
 using System.IO;
 using System.Text;
+using Microsoft.NodejsTools.Options;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
@@ -95,7 +96,9 @@ namespace Microsoft.NodejsTools.Project {
             get {
                 var res = base.Caption;
 
-                if (NodejsPackage.Instance.GeneralOptionsPage.ShowBrowserAndNodeLabels && _containsNodeOrBrowserFiles) {
+                if (NodejsPackage.Instance.GeneralOptionsPage.ShowBrowserAndNodeLabels &&
+                    NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel != AnalysisLevel.Preview &&
+                    _containsNodeOrBrowserFiles) {
                     res = AppendLabel(res, ContentType);
                 }
                 return res;
