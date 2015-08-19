@@ -58,23 +58,23 @@ namespace Microsoft.Nodejs.Tests.UI {
         private static readonly Snippet[] BasicSnippets = new Snippet[] {
             new Snippet(
                 "while",
-                "while (true) {\r\n   $body$\r\n};\r\n",
-                new Declaration("false", "while (false) {\r\n   $body$\r\n};\r\n")
+                "while (true) {\r\n    $body$\r\n};\r\n",
+                new Declaration("false", "while (false) {\r\n    $body$\r\n};\r\n")
             ),
             new Snippet(
                 "if",
-                "if (true) {\r\n   $body$\r\n}\r\n",
-                new Declaration("false", "if (false) {\r\n   $body$\r\n}\r\n")
+                "if (true) {\r\n    $body$\r\n}\r\n",
+                new Declaration("false", "if (false) {\r\n    $body$\r\n}\r\n")
             ),
             new Snippet(
                 "iife",
-                "(function (undefined) {\r\n   $body$\r\n})();\r\n",
-                new Declaration("name","(function (name) {\r\n   $body$\r\n})();\r\n")
+                "(function (undefined) {\r\n    $body$\r\n})();\r\n",
+                new Declaration("name","(function (name) {\r\n    $body$\r\n})();\r\n")
             ),
             new Snippet(
                 "for",
-                "for (var i = 0; i < length; i++) {\r\n   $body$\r\n};\r\n",
-                new Declaration("counter", "for (var counter = 0; counter < length; counter++) {\r\n   $body$\r\n};\r\n")
+                "for (var i = 0; i < length; i++) {\r\n    $body$\r\n};\r\n",
+                new Declaration("counter", "for (var counter = 0; counter < length; counter++) {\r\n    $body$\r\n};\r\n")
             )
         };
 
@@ -101,10 +101,10 @@ namespace Microsoft.Nodejs.Tests.UI {
                 server.SetFocus();
 
                 Keyboard.Type("if\t");
-                server.WaitForText("if (true) {\r\n   if (true) {\r\n      \r\n   }\r\n   \r\n}");
+                server.WaitForText("if (true) {\r\n    if (true) {\r\n        \r\n   }\r\n   \r\n}");
                 Keyboard.Type("\r");
                 Keyboard.Type("testing");
-                server.WaitForText("if (true) {\r\n    if (true) {\r\n      testing\r\n   }\r\n   \r\n}");
+                server.WaitForText("if (true) {\r\n    if (true) {\r\n        testing\r\n   }\r\n   \r\n}");
 
                 solution.CloseActiveWindow(vsSaveChanges.vsSaveChangesNo);
             }
@@ -127,14 +127,14 @@ namespace Microsoft.Nodejs.Tests.UI {
         public void TestSelected() {
             var snippet = new Snippet(
                 "if",
-                "if (true) {\r\n   $body$\r\n}\r\n",
-                new Declaration("false", "if (false) {\r\n   $body$\r\n}\r\n")
+                "if (true) {\r\n    $body$\r\n}\r\n",
+                new Declaration("false", "if (false) {\r\n    $body$\r\n}\r\n")
             );
             using (var solution = BasicProject.Generate().ToVs()) {
                 var app = TestOneTabSnippet(solution, snippet);
 
                 Keyboard.Type("testing");
-                app.WaitForText("if (false) {\r\n   testing\r\n}\r\n");
+                app.WaitForText("if (false) {\r\n    testing\r\n}\r\n");
 
                 solution.CloseActiveWindow(vsSaveChanges.vsSaveChangesNo);
             }
