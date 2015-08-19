@@ -133,6 +133,7 @@
                 <ComponentRef Id="Comp_ProfilingRegistration"/>
             </Feature>
         </Feature>
+      
         
         <!-- Execute devenv /setup -->
         <CustomAction Id="DevEnvSetup" Property="DEVENV_PATH" ExeCommand="/setup" Execute="deferred" Return="check" Impersonate="no" />
@@ -140,11 +141,26 @@
         <CustomAction Id="VWDExpressSetup" Property="VWDEXPRESS_PATH" ExeCommand="/setup" Execute="deferred" Return="check" Impersonate="no" />
         <CustomAction Id="VWDExpressSetup_Rollback" Property="VWDEXPRESS_PATH" ExeCommand="/setup" Execute="rollback" Return="check" Impersonate="no" />
 
+        <!-- Custom Action and properties for installer telemetry-->
+        <Property Id="VSVersion" Value="$(var.VSTargetVersion)"></Property>
+        <Property Id="NTVSVersion" Value="$(var.ReleaseVersion)"></Property>
+        <Property Id="MSIVersion" Value="$(var.MsiVersion)"></Property>
+        <Property Id="InstallStartTime" Value="Default"></Property>
+        <Binary Id="Custom_Action.CA.dll" SourceFile="..\Custom_Action\bin\$(var.Configuration)\Custom_Action.CA.dll" />
+        <CustomAction Id="LogStart" BinaryKey="Custom_Action.CA.dll" DllEntry="RecordInstallStartTime"/>
+        <CustomAction Id="LogSuccess" BinaryKey="Custom_Action.CA.dll" DllEntry="LogInstallSuccessResult"/>
+        <CustomAction Id="LogFailure" BinaryKey="Custom_Action.CA.dll" DllEntry="LogInstallErrorResult"/>
+        <CustomAction Id="LogCancel" BinaryKey="Custom_Action.CA.dll" DllEntry="LogInstallCancelResult"/>
+
         <InstallExecuteSequence>
             <Custom Action="DevEnvSetup_Rollback" Before="DevEnvSetup" Overridable="yes">NOT SKIP_DEVENV_SETUP AND DEVENV_PATH</Custom>
             <Custom Action="DevEnvSetup" Before="InstallFinalize" Overridable="yes">NOT SKIP_DEVENV_SETUP AND DEVENV_PATH</Custom>
             <Custom Action="VWDExpressSetup_Rollback" Before="VWDExpressSetup" Overridable="yes">NOT SKIP_DEVENV_SETUP AND VWDEXPRESS_PATH</Custom>
             <Custom Action="VWDExpressSetup" Before="InstallFinalize" Overridable="yes">NOT SKIP_DEVENV_SETUP AND VWDEXPRESS_PATH</Custom>
+            <Custom Action="LogStart" Before="CostFinalize"/>
+            <Custom Action="LogSuccess" OnExit="success"/>
+            <Custom Action="LogFailure" OnExit="error" />
+            <Custom Action="LogCancel" OnExit="cancel"/>
         </InstallExecuteSequence>
         <InstallUISequence>
             <Show Dialog="CustomAdvancedWelcomeEulaDlg" Before="FindRelatedProducts">NOT Installed</Show>

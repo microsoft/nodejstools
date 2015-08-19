@@ -52,6 +52,10 @@
     <Content Include="NodejsToolsInstallerVars.wxi" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Custom_Action\Custom_Action.csproj">
+      <Name>Custom_Action</Name>
+      <Project>{775e686d-c646-4dab-9dcf-d2c37ff8ea78}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\InteractiveWindow\InteractiveWindow.wixproj">
       <Name>InteractiveWindow</Name>
       <Project>{C0D64130-C0E9-4CAB-99BC-68F62357F010}</Project>
