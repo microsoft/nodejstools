@@ -150,11 +150,15 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         private void CreateNewAnalyzer(AnalysisLimits limits) {
             _jsAnalyzer = new JsAnalyzer(limits);
-            if (_analysisLevel != AnalysisLevel.None) {
+            if (ShouldEnqueue()) {
                 _analysisQueue = new AnalysisQueue(this);
             }
             _fullyLoaded = true;
         }
+
+         private bool ShouldEnqueue() {
+             return _analysisLevel != AnalysisLevel.None && _analysisLevel != AnalysisLevel.Preview;
+         }
 
         #region Public API
 
@@ -385,7 +389,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 }
             }
 
-            if (_analysisLevel != AnalysisLevel.None) {
+            if (ShouldEnqueue()) {
                 _analysisQueue.Enqueue(
                     _jsAnalyzer.AddPackageJson(path, mainFile),
                     AnalysisPriority.Normal
@@ -794,7 +798,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
 
             ClearParserTasks(entry);
-            if (_analysisLevel != AnalysisLevel.None) {
+            if (ShouldEnqueue()) {
                 _analysisQueue.Enqueue(_jsAnalyzer.RemoveModule(entry), AnalysisPriority.Normal);
             }
             ProjectItem removed;
@@ -983,12 +987,12 @@ namespace Microsoft.NodejsTools.Intellisense {
                 }
 
                 // enqueue analysis of the file
-                if (ast != null && _analysisLevel != AnalysisLevel.None) {
+                if (ast != null && ShouldEnqueue()) {
                     _analysisQueue.Enqueue(jsEntry, AnalysisPriority.Normal);
                 }
             } else if ((externalEntry = entry as IExternalProjectEntry) != null) {
                 externalEntry.ParseContent(reader ?? reader, cookie);
-                if (_analysisLevel != AnalysisLevel.None) {
+                if (ShouldEnqueue()) {
                     _analysisQueue.Enqueue(entry, AnalysisPriority.Normal);
                 }
             }
@@ -1035,7 +1039,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                     if ((externalEntry = (entry as IExternalProjectEntry)) != null) {
                         var snapshotContent = new SnapshotSpanSourceCodeReader(new SnapshotSpan(snapshot, new Span(0, snapshot.Length)));
                         externalEntry.ParseContent(snapshotContent, new SnapshotCookie(snapshotContent.Snapshot));
-                        if (_analysisLevel != AnalysisLevel.None) {
+                        if (ShouldEnqueue()) {
                             _analysisQueue.Enqueue(entry, AnalysisPriority.High);
                         }
                     }
@@ -1059,7 +1063,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                     }
 
                     jsProjEntry.UpdateTree(finalAst, new SnapshotCookie(snapshots[0])); // SnapshotCookie is not entirely right, we should merge the snapshots
-                    if (_analysisLevel != AnalysisLevel.None) {
+                    if (ShouldEnqueue()) {
                         _analysisQueue.Enqueue(entry, AnalysisPriority.High);
                     }
                 } else {
@@ -1307,7 +1311,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         private bool LoadCachedAnalysis(AnalysisLimits limits) {
             string analysisDb = GetAnalysisPath();
-            if (File.Exists(analysisDb) && _analysisLevel != AnalysisLevel.None) {
+            if (File.Exists(analysisDb) && ShouldEnqueue()) {
                 FileStream stream = null;
                 bool disposeStream = true;
                 try {
