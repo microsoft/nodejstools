@@ -69,7 +69,6 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         public int FormatSpan(IVsTextLines pBuffer, TextSpan[] ts) {
             IXMLDOMNode codeNode, snippetTypes, declarations;
-
             int hr;
             if (ErrorHandler.Failed(hr = _session.GetSnippetNode("CodeSnippet:Code", out codeNode))) {
                 return hr;
@@ -125,14 +124,14 @@ namespace Microsoft.NodejsTools.Intellisense {
                         var start = _selectionStart.GetPosition(_textView.TextBuffer.CurrentSnapshot);
                         var end = _selectionEnd.GetPosition(_textView.TextBuffer.CurrentSnapshot);
                         if (end < start) {
-                            // we didn't actually have a selction, and our negative tracking pushed us
+                            // we didn't actually have a selection, and our negative tracking pushed us
                             // back to the start of the buffer...
                             end = start;
                         }
                         var selectedSpan = Span.FromBounds(start, end);
 
-                          if (surroundsWith && 
-                            String.IsNullOrWhiteSpace(_textView.TextBuffer.CurrentSnapshot.GetText(selectedSpan))) {
+                        if (surroundsWith &&
+                          String.IsNullOrWhiteSpace(_textView.TextBuffer.CurrentSnapshot.GetText(selectedSpan))) {
 
                             // Surround With can be invoked with no selection, but on a line with some text.
                             // In that case we need to inject an extra new line.
@@ -156,6 +155,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 IndentSpan(edit, baseIndentation, ts[0].iStartLine + 1, ts[0].iEndLine);
 
                 edit.Apply();
+
             }
 
             if (endSpan != null) {
@@ -300,5 +300,6 @@ namespace Microsoft.NodejsTools.Intellisense {
                 caretColumn = lineLength;
             }
         }
+
     }
 }

@@ -101,10 +101,10 @@ namespace Microsoft.Nodejs.Tests.UI {
                 server.SetFocus();
 
                 Keyboard.Type("if\t");
-                server.WaitForText("if (true) {\r\n    if (true) {\r\n        \r\n   }\r\n   \r\n}");
+                server.WaitForText("if (true) {\r\n    if (true) {\r\n        \r\n   }\r\n    \r\n}");
                 Keyboard.Type("\r");
                 Keyboard.Type("testing");
-                server.WaitForText("if (true) {\r\n    if (true) {\r\n        testing\r\n   }\r\n   \r\n}");
+                server.WaitForText("if (true) {\r\n    if (true) {\r\n        testing\r\n    }\r\n    \r\n}");
 
                 solution.CloseActiveWindow(vsSaveChanges.vsSaveChangesNo);
             }
@@ -196,7 +196,7 @@ namespace Microsoft.Nodejs.Tests.UI {
                         solution,
                         snippet,
                         "Nodejs",
-                        "one\r\n   two\r\n   three",
+                        "one\r\n    two\r\n    three",
                         "multiline.js"
                     );
 
