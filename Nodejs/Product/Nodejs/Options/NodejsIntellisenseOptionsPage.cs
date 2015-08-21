@@ -84,7 +84,6 @@ namespace Microsoft.NodejsTools.Options {
                 // Fallback to full intellisense (High) if the ES6 intellisense preview isn't enabled
                 if (_level == AnalysisLevel.Preview && !_enableES6Preview) {
                     _level = AnalysisLevel.High;
-                    SaveSettingsToStorage();
                 }
 
                 if (oldLevel != _level) {
@@ -159,6 +158,11 @@ namespace Microsoft.NodejsTools.Options {
             if (_window != null) {
                 _window.SyncControlWithPageSettings(this);
             }
+
+            // Settings values can change after loading them from storage as there
+            // are conditions which could make them fallback to default values.
+            // Save the final settings back to storage.
+            SaveSettingsToStorage();
         }
 
         public override void SaveSettingsToStorage() {
