@@ -129,7 +129,7 @@ namespace Microsoft.NodejsTools.Analysis {
             return entry;
         }
 
-        public IAnalyzable AddPackageJson(string filePath, string entryPoint) {
+        public IAnalyzable AddPackageJson(string filePath, string entryPoint, List<string> dependencies = null) {
             if (!Path.GetFileName(filePath).Equals("package.json", StringComparison.OrdinalIgnoreCase)) {
                 throw new InvalidOperationException("path must be to package.json file");
             }
@@ -140,8 +140,13 @@ namespace Microsoft.NodejsTools.Analysis {
             }
 
             var tree = Modules.GetModuleTree(Path.GetDirectoryName(filePath));
-            
+
             tree.DefaultPackage = entryPoint;
+            if (dependencies != null) {
+                foreach (var dependency in dependencies) {
+                    RequireAnalysisUnit.UpdateVisibilities(tree, Modules, new ProjectEntry(this, filePath, null), dependency);
+                }
+            }
 
             return new TreeUpdateAnalysis(tree);
         }

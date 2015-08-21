@@ -374,16 +374,30 @@ namespace Microsoft.NodejsTools.Intellisense {
 
                 object mainFile;
                 if (json != null && json.TryGetValue("main", out mainFile) && mainFile is string) {
-                    AddPackageJson(packageJsonPath, (string)mainFile);
+                    List<string> dependencyList = GetDependencyListFromJson(json, "dependencies", "devDependencies", "optionalDependencies");
+                    AddPackageJson(packageJsonPath, (string)mainFile, dependencyList);
                 }
             }
         }
 
-        public void AddPackageJson(string path, string mainFile) {
+        private static List<string> GetDependencyListFromJson(Dictionary<string, object> json, params string[] dependencyTypes) {
+            var allDependencies = new List<string>();
+            foreach (var type in dependencyTypes) {
+                object dependencies;
+                json.TryGetValue(type, out dependencies);
+                var dep = dependencies as Dictionary<string, object>;
+                if (dep != null) {
+                    allDependencies.AddRange(dep.Keys.ToList());
+                }
+            }
+            return allDependencies;
+        }
+
+        public void AddPackageJson(string path, string mainFile, List<string> dependencies) {
             if (!_fullyLoaded) {
                 lock (_loadingDeltas) {
                     if (!_fullyLoaded) {
-                        _loadingDeltas.Add(() => AddPackageJson(path, mainFile));
+                        _loadingDeltas.Add(() => AddPackageJson(path, mainFile, dependencies));
                         return;
                     }
                 }
@@ -391,7 +405,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
             if (ShouldEnqueue()) {
                 _analysisQueue.Enqueue(
-                    _jsAnalyzer.AddPackageJson(path, mainFile),
+                    _jsAnalyzer.AddPackageJson(path, mainFile, dependencies),
                     AnalysisPriority.Normal
                 );
             }

@@ -96,6 +96,7 @@ using Microsoft.NodejsTools.Parsing;
 [assembly: AnalysisSerializationSupportedType(typeof(FunctionAnalysisUnit))]
 [assembly: AnalysisSerializationSupportedType(typeof(CartesianProductFunctionAnalysisUnit))]
 [assembly: AnalysisSerializationSupportedType(typeof(CartesianProductFunctionAnalysisUnit.CartesianLocalVariable))]
+[assembly: AnalysisSerializationSupportedType(typeof(RequireAnalysisUnit))]
 [assembly: AnalysisSerializationSupportedType(typeof(ReferenceDict))]
 [assembly: AnalysisSerializationSupportedType(typeof(ReferenceList))]
 [assembly: AnalysisSerializationSupportedType(typeof(DependentKeyValue))]

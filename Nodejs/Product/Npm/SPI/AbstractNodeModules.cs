@@ -14,6 +14,7 @@
 //
 //*********************************************************//
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -23,8 +24,10 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         private readonly IDictionary<string, IPackage> _packagesByName = new Dictionary<string, IPackage>();
 
         protected virtual void AddModule(IPackage package) {
-            _packagesSorted.Add(package);
-            _packagesByName[package.Name] = package;
+            if (!_packagesSorted.Contains(package) && package.Name != null) {
+                _packagesSorted.Add(package);
+                _packagesByName[package.Name] = package;
+            }
         }
 
         public int Count {
@@ -65,5 +68,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         IEnumerator IEnumerable.GetEnumerator() {
             return GetEnumerator();
         }
+
+        public abstract int GetDepth(string filepath);
     }
 }

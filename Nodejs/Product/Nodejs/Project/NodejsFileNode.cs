@@ -15,10 +15,7 @@
 //*********************************************************//
 
 using System;
-using System.Diagnostics;
 using System.IO;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 #if DEV14_OR_LATER
 using Microsoft.VisualStudio.Imaging.Interop;
@@ -36,11 +33,18 @@ namespace Microsoft.NodejsTools.Project {
 #if FALSE
             CreateWatcher(Url);
 #endif
-            if (ShouldAnalyze) {
-                root.Analyzer.AnalyzeFile(Url, !IsNonMemberItem);
-                root._requireCompletionCache.Clear();
+            if (Url.Contains(AnalysisConstants.NodeModulesFolder)) {
+                root.DelayedAnalysisQueue.Enqueue(this);
+            } else {
+                Analyze();
             }
-            
+        }
+
+        internal void Analyze() {
+            if (ShouldAnalyze) {
+                ProjectMgr.Analyzer.AnalyzeFile(Url, !IsNonMemberItem);
+                ProjectMgr._requireCompletionCache.Clear();
+            }
             ItemNode.ItemTypeChanged += ItemNode_ItemTypeChanged;
         }
 
@@ -48,8 +52,9 @@ namespace Microsoft.NodejsTools.Project {
             get {
                 // We analyze if we are a member item or the file is included
                 // Also, it should either be marked as compile or not have an item type name (value is null for node_modules
-                return (!IsNonMemberItem || ProjectMgr.IncludeNodejsFile(this))
-                    && (ItemNode.ItemTypeName == ProjectFileConstants.Compile || string.IsNullOrEmpty(ItemNode.ItemTypeName));
+                return !ProjectMgr.DelayedAnalysisQueue.Contains(this) &&
+                    (!IsNonMemberItem || ProjectMgr.IncludeNodejsFile(this)) &&
+                    (ItemNode.ItemTypeName == ProjectFileConstants.Compile || string.IsNullOrEmpty(ItemNode.ItemTypeName));
 
             }
         }

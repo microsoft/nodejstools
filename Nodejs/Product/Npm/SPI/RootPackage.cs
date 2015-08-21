@@ -23,7 +23,9 @@ namespace Microsoft.NodejsTools.Npm.SPI {
     internal class RootPackage : IRootPackage {
         public RootPackage(
             string fullPathToRootDirectory,
-            bool showMissingDevOptionalSubPackages) {
+            bool showMissingDevOptionalSubPackages,
+            Dictionary<string, int> allModules = null,
+            int depth = 0) {
             Path = fullPathToRootDirectory;
             var packageJsonFile = System.IO.Path.Combine(fullPathToRootDirectory, "package.json");
             try {
@@ -43,7 +45,7 @@ The following error was reported:
             }
 
             try {
-                Modules = new NodeModules(this, showMissingDevOptionalSubPackages);
+                Modules = new NodeModules(this, showMissingDevOptionalSubPackages, allModules, depth);
             }  catch (PathTooLongException) {
                 // otherwise we fail to create it completely...
             }

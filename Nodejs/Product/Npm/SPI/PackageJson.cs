@@ -14,6 +14,7 @@
 //
 //*********************************************************//
 
+using System.Linq;
 using System.Collections.Generic;
 using Microsoft.CSharp.RuntimeBinder;
 using Newtonsoft.Json.Linq;
@@ -37,6 +38,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             InitBundledDependencies();
             InitOptionalDependencies();
             InitAllDependencies();
+            InitRequiredBy();
         }
 
         private void WrapRuntimeBinderExceptionAndRethrow(
@@ -153,6 +155,17 @@ The following error occurred:
             }
         }
 
+        private void InitRequiredBy() {
+            try {
+                RequiredBy = (_package["_requiredBy"] as IEnumerable<JToken> ?? Enumerable.Empty<JToken>()).Values<string>();
+            } catch (RuntimeBinderException rbe) {
+                System.Diagnostics.Debug.WriteLine(rbe);
+                WrapRuntimeBinderExceptionAndRethrow(
+                    "required by",
+                    rbe);
+            }
+        }
+
         public string Name {
             get { return null == _package.name ? null : _package.name.ToString(); }
         }
@@ -213,5 +226,6 @@ The following error occurred:
         public IBundledDependencies BundledDependencies { get; private set; }
         public IDependencies OptionalDependencies { get; private set; }
         public IDependencies AllDependencies { get; private set; }
+        public IEnumerable<string> RequiredBy { get; private set; }
     }
 }
