@@ -30,7 +30,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             Compile("server", ""),
             Compile("multiline", "one\r\ntwo\r\nthree"),
             Compile("nonempty", "nonempty"),
-            Compile("indented", "if (true) {\r\n   \r\n}")
+            Compile("indented", "if (true) {\r\n    \r\n}")
         );
 
         class Snippet {
@@ -101,7 +101,7 @@ namespace Microsoft.Nodejs.Tests.UI {
                 server.SetFocus();
 
                 Keyboard.Type("if\t");
-                server.WaitForText("if (true) {\r\n    if (true) {\r\n        \r\n   }\r\n    \r\n}");
+                server.WaitForText("if (true) {\r\n    if (true) {\r\n        \r\n    }\r\n    \r\n}");
                 Keyboard.Type("\r");
                 Keyboard.Type("testing");
                 server.WaitForText("if (true) {\r\n    if (true) {\r\n        testing\r\n    }\r\n    \r\n}");
