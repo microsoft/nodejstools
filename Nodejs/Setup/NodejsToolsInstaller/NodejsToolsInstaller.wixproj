@@ -56,8 +56,8 @@
     <Content Include="NodejsToolsInstallerVars.wxi" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Custom_Action\Custom_Action.csproj">
-      <Name>Custom_Action</Name>
+    <ProjectReference Include="..\InstallerTelemetryAction\InstallerTelemetryAction.csproj" Condition="'$(Configuration)' == 'Release'">
+      <Name>InstallerTelemetryAction</Name>
       <Project>{775e686d-c646-4dab-9dcf-d2c37ff8ea78}</Project>
     </ProjectReference>
     <ProjectReference Include="..\InteractiveWindow\InteractiveWindow.wixproj">
