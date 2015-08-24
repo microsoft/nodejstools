@@ -66,7 +66,6 @@ namespace Microsoft.NodejsTools.Intellisense {
             return VSConstants.S_OK;
         }
 
-
         public int FormatSpan(IVsTextLines pBuffer, TextSpan[] ts) {
             IXMLDOMNode codeNode, snippetTypes, declarations;
             int hr;
@@ -110,8 +109,8 @@ namespace Microsoft.NodejsTools.Intellisense {
                             templateText = templateText.Replace("$" + decl + "$", defaultValue);
                         }
                     }
-                    templateText = templateText.Replace("$end$", "");
 
+                    templateText = templateText.Replace("$end$", "");
                     // we can finally figure out where the selected text began witin the original template...
                     int selectedIndex = templateText.IndexOf("$selected$");
                     if (selectedIndex != -1) {
@@ -131,7 +130,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                         var selectedSpan = Span.FromBounds(start, end);
 
                         if (surroundsWith &&
-                          String.IsNullOrWhiteSpace(_textView.TextBuffer.CurrentSnapshot.GetText(selectedSpan))) {
+                          string.IsNullOrWhiteSpace(_textView.TextBuffer.CurrentSnapshot.GetText(selectedSpan))) {
 
                             // Surround With can be invoked with no selection, but on a line with some text.
                             // In that case we need to inject an extra new line.
@@ -140,6 +139,11 @@ namespace Microsoft.NodejsTools.Intellisense {
                             if (!String.IsNullOrWhiteSpace(endText)) {
                                 edit.Insert(end, _textView.Options.GetNewLineCharacter());
                             }
+
+                        }else if (surroundsWith &&
+                          !string.IsNullOrWhiteSpace(_textView.TextBuffer.CurrentSnapshot.GetText(selectedSpan))) {
+                            _selectEndSpan = true;
+
                         }
 
                         IndentSpan(
@@ -276,7 +280,8 @@ namespace Microsoft.NodejsTools.Intellisense {
                 if (ErrorHandler.Succeeded(_session.GetEndSpan(endSpan))) {
                     var snapshot = _textView.TextBuffer.CurrentSnapshot;
                     var startLine = snapshot.GetLineFromLineNumber(endSpan[0].iStartLine);
-                    var span = new Span(startLine.Start + endSpan[0].iStartIndex, 4);
+                    var selectionLength = _selectionEnd.GetPosition(_textView.TextBuffer.CurrentSnapshot) - _selectionStart.GetPosition(_textView.TextBuffer.CurrentSnapshot);
+                    var span = new Span(startLine.Start + endSpan[0].iStartIndex + selectionLength, 0);
                     _textView.Caret.MoveTo(new SnapshotPoint(snapshot, span.Start));
                     _textView.Selection.Select(new SnapshotSpan(_textView.TextBuffer.CurrentSnapshot, span), false);
                     return _session.EndCurrentExpansion(1);
