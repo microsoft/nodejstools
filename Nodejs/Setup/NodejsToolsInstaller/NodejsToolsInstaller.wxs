@@ -147,8 +147,8 @@
             </Feature>
         </Feature>
       <Property Id="VSVersion" Value="$(var.VSTargetVersion)"></Property>
-      <Property Id="NTVSVersion" Value="$(var.ReleaseVersion)"></Property>
-      <Property Id="MSIVersion" Value="$(var.MsiVersion)"></Property>
+      <Property Id="NtvsVersion" Value="$(var.ReleaseVersion)"></Property>
+      <Property Id="MsiVersion" Value="$(var.MsiVersion)"></Property>
       <Property Id="InstallStartTime" Value="Default"></Property>
         
         <!-- Execute devenv /setup -->
