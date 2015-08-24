@@ -100,7 +100,6 @@ namespace Microsoft.NodejsTools.Intellisense {
             // get the indentation of where we're inserting the code...
             string baseIndentation = GetBaseIndentation(ts);
 
-            TextSpan? endSpan = null;
             using (var edit = _textView.TextBuffer.CreateEdit()) {
                 if (surroundsWith) {
                     var templateText = codeNode.text.Replace("\r\n", VsExtensions.GetNewLineText(_textView.TextSnapshot));
@@ -130,20 +129,20 @@ namespace Microsoft.NodejsTools.Intellisense {
                         }
                         var selectedSpan = Span.FromBounds(start, end);
 
-                        if (surroundsWith &&
-                          string.IsNullOrWhiteSpace(_textView.TextBuffer.CurrentSnapshot.GetText(selectedSpan))) {
+                        if (surroundsWith) {
+                            if (string.IsNullOrWhiteSpace(_textView.TextBuffer.CurrentSnapshot.GetText(selectedSpan))) {
 
-                            // Surround With can be invoked with no selection, but on a line with some text.
-                            // In that case we need to inject an extra new line.
-                            var endLine = _textView.TextBuffer.CurrentSnapshot.GetLineFromPosition(end);
-                            var endText = endLine.GetText().Substring(end - endLine.Start);
-                            if (!String.IsNullOrWhiteSpace(endText)) {
-                                edit.Insert(end, _textView.Options.GetNewLineCharacter());
+                                // Surround With can be invoked with no selection, but on a line with some text.
+                                // In that case we need to inject an extra new line.
+                                var endLine = _textView.TextBuffer.CurrentSnapshot.GetLineFromPosition(end);
+                                var endText = endLine.GetText().Substring(end - endLine.Start);
+                                if (!String.IsNullOrWhiteSpace(endText)) {
+                                    edit.Insert(end, _textView.Options.GetNewLineCharacter());
+                                }
+
+                            } else {
+                                _selectEndSpan = true;
                             }
-
-                        }else if (surroundsWith &&
-                          !string.IsNullOrWhiteSpace(_textView.TextBuffer.CurrentSnapshot.GetText(selectedSpan))) {
-                            _selectEndSpan = true;
 
                         }
 
@@ -161,10 +160,6 @@ namespace Microsoft.NodejsTools.Intellisense {
 
                 edit.Apply();
 
-            }
-
-            if (endSpan != null) {
-                _session.SetEndSpan(endSpan.Value);
             }
 
             return hr;
@@ -284,7 +279,6 @@ namespace Microsoft.NodejsTools.Intellisense {
                     var selectionLength = _selectionEnd.GetPosition(_textView.TextBuffer.CurrentSnapshot) - _selectionStart.GetPosition(_textView.TextBuffer.CurrentSnapshot);
                     var span = new Span(startLine.Start + endSpan[0].iStartIndex + selectionLength, 0);
                     _textView.Caret.MoveTo(new SnapshotPoint(snapshot, span.Start));
-                    _textView.Selection.Select(new SnapshotSpan(_textView.TextBuffer.CurrentSnapshot, span), false);
                     return _session.EndCurrentExpansion(1);
                 }
             }
