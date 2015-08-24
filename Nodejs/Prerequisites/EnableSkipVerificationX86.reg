@@ -31,4 +31,6 @@ Windows Registry Editor Version 5.00
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\StrongName\Verification\TestUtilities.Nodejs,B03F5F7F11D50A3A]
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\StrongName\Verification\TestUtilities.UI,B03F5F7F11D50A3A]
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\StrongName\Verification\TestUtilities.UI.Nodejs,B03F5F7F11D50A3A]
-[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\StrongName\Verification\Microsoft.NodejsTools.Telemetry,B03F5F7F11D50A3A]
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\StrongName\Verification\Microsoft.NodejsTools.Telemetry.11.0,B03F5F7F11D50A3A]
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\StrongName\Verification\Microsoft.NodejsTools.Telemetry.12.0,B03F5F7F11D50A3A]
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\StrongName\Verification\Microsoft.NodejsTools.Telemetry.14.0,B03F5F7F11D50A3A]

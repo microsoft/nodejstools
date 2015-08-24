@@ -239,7 +239,9 @@ $managed_files = (
     "Microsoft.NodejsTools.Npm.dll",
     "Microsoft.NodejsTools.TestAdapter.dll",
     "Microsoft.NodejsTools.PressAnyKey.exe",
-    "Microsoft.NodejsTools.Telemetry.dll"
+    "Microsoft.NodejsTools.Telemetry.11.0.dll",
+    "Microsoft.NodejsTools.Telemetry.12.0.dll",
+    "Microsoft.NodejsTools.Telemetry.14.0.dll"
 )
 
 $native_files = @()

@@ -254,10 +254,12 @@ namespace Microsoft.NodejsTools {
 
         private void InitializeTelemetry() {
             if (_telemetryLogger == null) {
-                // Get telemetry logger
-                _telemetryLogger = TelemetrySetup.GetLogger();
+                var thisAssembly = typeof(NodejsPackage).Assembly;
 
-                TelemetrySetup.LogPackageLoad(_telemetryLogger, typeof(NodejsPackage).Name, typeof(NodejsPackage).Assembly, Application.ProductVersion);
+                // Get telemetry logger
+                _telemetryLogger = TelemetrySetup.Instance.GetLogger(thisAssembly);
+
+                TelemetrySetup.Instance.LogPackageLoad(_telemetryLogger, Guid.Parse(Guids.NodejsPackageString), thisAssembly, Application.ProductVersion);
             }
         }
 

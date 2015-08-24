@@ -14,22 +14,11 @@
 //
 //*********************************************************//
 
-using System.Diagnostics;
-
 namespace Microsoft.NodejsTools.Telemetry {
     /// <summary>
-    /// DataPoint - Represents a single Visual Studio telemetry parameter
+    /// Property names for telemetry events
     /// </summary>
-    [DebuggerDisplay("{Name}: {Value}")]
-    public class DataPoint {
-        public string Name { get; private set; }
-        public object Value { get; set; }
-        public bool IsPersonallyIdentifiable { get; set; }
-
-        public DataPoint(string name, object value, bool isPersonallyIdentifiable = false) {
-            this.Name = name;
-            this.Value = value;
-            this.IsPersonallyIdentifiable = isPersonallyIdentifiable;
-        }
+    public static class TelemetryProperties {
+        public const string ProjectGuid = "ProjectGuid";
     }
 }
