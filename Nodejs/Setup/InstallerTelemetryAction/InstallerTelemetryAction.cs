@@ -57,31 +57,62 @@ namespace Microsoft.NodejsTools
             session.Log("Starting POST");
             Dictionary<string, object> data = new Dictionary<string, object>()
             {
-                { "iKey" , "377a3718-78a7-49df-abcc-1001317db729" },
-                { "name" , "Microsoft.ApplicationInsights.Event"},
-                {"time" , DateTime.Now.ToUniversalTime().ToString(CultureInfo.InvariantCulture)},
-                {"data" , new Dictionary<string,object>()
-                 {
-                  {"baseType" , "EventData"},
-                  {"baseData" , new Dictionary<string,object>()
-                   {
-                   {"ver" , AIVersion},
-                   {"name" , "NtvsInstallerTelemetry"},
-                   {"properties" , new Dictionary<string,object>()
-                     {
-                     {"InstallStatus" , "Success"},
-                     {"IsNtvsInstalled" , isInstalled.ToString()},
-                     {"CurrentState" , currentState},
-                     {"RequestState" , requestState},
-                     {"NtvsVersion" , session["NTVSVersion"]},
-                     {"VSVersion" , session["VSVersion"]},
-                     {"MsiVersion" , session["MSIVersion"]},
-                     {"TimeTakenInSeconds" , installTime.TotalSeconds.ToString(CultureInfo.InvariantCulture)}
-                     }
-                   }
-                   }
-                  }
-                 }
+                {
+                    "iKey", "377a3718-78a7-49df-abcc-1001317db729"
+                },
+                {
+                    "name", "Microsoft.ApplicationInsights.Event"
+                },
+                {
+                    "time", DateTime.Now.ToUniversalTime().ToString(CultureInfo.InvariantCulture)
+                },
+                {
+                    "data", new Dictionary < string, object > ()
+                    {
+                        {
+                            "baseType", "EventData"
+                        },
+                        {
+                            "baseData", new Dictionary < string, object > ()
+                            {
+                                {
+                                    "ver", AIVersion
+                                },
+                                {
+                                    "name", "NtvsInstallerTelemetry"
+                                },
+                                {
+                                    "properties", new Dictionary < string, string > ()
+                                    {
+                                        {
+                                            "InstallStatus", "Success"
+                                        },
+                                        {
+                                            "IsNtvsInstalled", isInstalled.ToString()
+                                        },
+                                        {
+                                            "CurrentState", currentState
+                                        },
+                                        {
+                                            "RequestState", requestState
+                                        },
+                                        {
+                                            "NtvsVersion", session["NtvsVersion"]
+                                        },
+                                        {
+                                            "VSVersion", session["VSVersion"]
+                                        },
+                                        {
+                                            "MsiVersion", session["MsiVersion"]
+                                        },
+                                        {
+                                            "TimeTakenInSeconds", installTime.TotalSeconds.ToString(CultureInfo.InvariantCulture)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             };
 
@@ -118,31 +149,62 @@ namespace Microsoft.NodejsTools
             session.Log("Starting POST");
             Dictionary<string, object> data = new Dictionary<string, object>()
             {
-                { "iKey" , "377a3718-78a7-49df-abcc-1001317db729" },
-                { "name" , "Microsoft.ApplicationInsights.Event"},
-                {"time" , DateTime.Now.ToUniversalTime().ToString(CultureInfo.InvariantCulture)},
-                {"data" , new Dictionary<string,object>()
-                 {
-                  {"baseType" , "EventData"},
-                  {"baseData" , new Dictionary<string,object>()
-                   {
-                   {"ver" , AIVersion},
-                   {"name" , "NtvsInstallerTelemetry"},
-                   {"properties" , new Dictionary<string,object>()
-                     {
-                     {"InstallStatus" , "Error"},
-                     {"IsNtvsInstalled" , isInstalled.ToString()},
-                     {"CurrentState" , currentState},
-                     {"RequestState" , requestState},
-                     {"NtvsVersion" , session["NTVSVersion"]},
-                     {"VSVersion" , session["VSVersion"]},
-                     {"MsiVersion" , session["MSIVersion"]},
-                     {"TimeTakenInSeconds" , installTime.TotalSeconds.ToString(CultureInfo.InvariantCulture)}
-                     }
-                   }
-                   }
-                  }
-                 }
+                {
+                    "iKey", "377a3718-78a7-49df-abcc-1001317db729"
+                },
+                {
+                    "name", "Microsoft.ApplicationInsights.Event"
+                },
+                {
+                    "time", DateTime.Now.ToUniversalTime().ToString(CultureInfo.InvariantCulture)
+                },
+                {
+                    "data", new Dictionary < string, object > ()
+                    {
+                        {
+                            "baseType", "EventData"
+                        },
+                        {
+                            "baseData", new Dictionary < string, object > ()
+                            {
+                                {
+                                    "ver", AIVersion
+                                },
+                                {
+                                    "name", "NtvsInstallerTelemetry"
+                                },
+                                {
+                                    "properties", new Dictionary < string, string > ()
+                                    {
+                                        {
+                                            "InstallStatus", "Error"
+                                        },
+                                        {
+                                            "IsNtvsInstalled", isInstalled.ToString()
+                                        },
+                                        {
+                                            "CurrentState", currentState
+                                        },
+                                        {
+                                            "RequestState", requestState
+                                        },
+                                        {
+                                            "NtvsVersion", session["NtvsVersion"]
+                                        },
+                                        {
+                                            "VSVersion", session["VSVersion"]
+                                        },
+                                        {
+                                            "MsiVersion", session["MsiVersion"]
+                                        },
+                                        {
+                                            "TimeTakenInSeconds", installTime.TotalSeconds.ToString(CultureInfo.InvariantCulture)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             };
 
@@ -179,31 +241,62 @@ namespace Microsoft.NodejsTools
             session.Log("Starting POST");
             Dictionary<string, object> data = new Dictionary<string, object>()
             {
-                { "iKey" , "377a3718-78a7-49df-abcc-1001317db729" },
-                { "name" , "Microsoft.ApplicationInsights.Event"},
-                {"time" , DateTime.Now.ToUniversalTime().ToString(CultureInfo.InvariantCulture)},
-                {"data" , new Dictionary<string,object>()
-                 {
-                  {"baseType" , "EventData"},
-                  {"baseData" , new Dictionary<string,object>()
-                   {
-                   {"ver" , AIVersion},
-                   {"name" , "NtvsInstallerTelemetry"},
-                   {"properties" , new Dictionary<string,object>()
-                     {
-                     {"InstallStatus" , "Cancel"},
-                     {"IsNtvsInstalled" , isInstalled.ToString()},
-                     {"CurrentState" , currentState},
-                     {"RequestState" , requestState},
-                     {"NtvsVersion" , session["NTVSVersion"]},
-                     {"VSVersion" , session["VSVersion"]},
-                     {"MsiVersion" , session["MSIVersion"]},
-                     {"TimeTakenInSeconds" , installTime.TotalSeconds.ToString(CultureInfo.InvariantCulture)}
-                     }
-                   }
-                   }
-                  }
-                 }
+                {
+                    "iKey", "377a3718-78a7-49df-abcc-1001317db729"
+                },
+                {
+                    "name", "Microsoft.ApplicationInsights.Event"
+                },
+                {
+                    "time", DateTime.Now.ToUniversalTime().ToString(CultureInfo.InvariantCulture)
+                },
+                {
+                    "data", new Dictionary < string, object > ()
+                    {
+                        {
+                            "baseType", "EventData"
+                        },
+                        {
+                            "baseData", new Dictionary < string, object > ()
+                            {
+                                {
+                                    "ver", AIVersion
+                                },
+                                {
+                                    "name", "NtvsInstallerTelemetry"
+                                },
+                                {
+                                    "properties", new Dictionary < string, string > ()
+                                    {
+                                        {
+                                            "InstallStatus", "Cancel"
+                                        },
+                                        {
+                                            "IsNtvsInstalled", isInstalled.ToString()
+                                        },
+                                        {
+                                            "CurrentState", currentState
+                                        },
+                                        {
+                                            "RequestState", requestState
+                                        },
+                                        {
+                                            "NtvsVersion", session["NtvsVersion"]
+                                        },
+                                        {
+                                            "VSVersion", session["VSVersion"]
+                                        },
+                                        {
+                                            "MsiVersion", session["MsiVersion"]
+                                        },
+                                        {
+                                            "TimeTakenInSeconds", installTime.TotalSeconds.ToString(CultureInfo.InvariantCulture)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             };
             string jsonString = (new JavaScriptSerializer()).Serialize(data);
