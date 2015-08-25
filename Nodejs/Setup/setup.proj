@@ -19,7 +19,7 @@
     <ProjectFile Include="NodejsTools\NodejsTools.wixproj"/>
     <ProjectFile Include="NodejsToolsInstaller\NodejsToolsInstaller.wixproj"/>
     <ProjectFile Include="..\..\Internal\Nodejs\VsLoggerSetup\VsLogger.wixproj" Condition="'$(IncludeVsLogger)' == 'True'"/>
-    <ProjectFile Include="InstallerTelemetryAction\InstallerTelemetryAction.csproj" Condition="'$(Configuration)' == 'Release'" />
+    <ProjectFile Include="InstallerTelemetryAction\InstallerTelemetryAction.csproj" Condition="'$(ReleaseBuild)' == 'True'" />
   </ItemGroup>
 
   <Import Project="$(TargetsPath)\Common.Build.Traversal.targets" />

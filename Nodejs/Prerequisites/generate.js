@@ -39,6 +39,8 @@ var assemblies = [
     'Microsoft.NodejsTools.WebRole',
     'Microsoft.NodejsTools.Npm',
     'Microsoft.NodejsTools.PressAnyKey',
+    'Microsoft.NodejsTools.InstallerTelemetryAction.CA',
+    'Microsoft.NodejsTools.InstallerTelemetryAction',
     'Microsoft.NodejsTools.VsLogger'
 ].sort();
 
