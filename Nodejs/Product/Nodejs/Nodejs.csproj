@@ -106,7 +106,7 @@
     <Reference Include="Microsoft.JScript" />
     <Reference Include="Microsoft.NodejsTools.Telemetry">
       <HintPath>..\..\Common\Telemetry\Microsoft.NodejsTools.Telemetry.$(VSTarget).dll</HintPath>
-   </Reference>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.ComponentModelHost, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.CoreUtility, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Debugger.Interop.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
@@ -615,8 +615,6 @@
     <Compile Include="SmartIndent.cs" />
     <Compile Include="SmartIndentProvider.cs" />
     <Compile Include="SourceMapping\SourceMap.cs" />
-    <Compile Include="Telemetry\TelemetryEvents.cs" />
-    <Compile Include="Telemetry\TelemetryProperties.cs" />
     <Compile Include="TestFrameworks\TestFrameworkDirectories.cs" />
     <Compile Include="VsMenus.cs" />
     <Compile Include="AzureSolutionListener.cs" />
@@ -816,19 +814,19 @@
     <Content Include="..\..\Common\Telemetry\Microsoft.NodejsTools.Telemetry.$(VSTarget).dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
-	  <VSIXSubPath>.</VSIXSubPath>
+      <VSIXSubPath>.</VSIXSubPath>
     </Content>
-    <Content Include="..\..\packages\Microsoft.ApplicationInsights.1.2.0\lib\net45\Microsoft.ApplicationInsights.dll">
+    <Content Include="..\..\packages\Microsoft.ApplicationInsights.1.2.0\lib\net45\Microsoft.ApplicationInsights.dll" Condition="'$(VSTarget)' == '11.0' Or '$(VSTarget)' == '12.0'">
       <Link>Microsoft.ApplicationInsights.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
-	  <VSIXSubPath>.</VSIXSubPath>
+      <VSIXSubPath>.</VSIXSubPath>
     </Content>
-    <Content Include="..\..\packages\Microsoft.ApplicationInsights.PersistenceChannel.1.2.0\lib\net45\Microsoft.ApplicationInsights.PersistenceChannel.dll">
+    <Content Include="..\..\packages\Microsoft.ApplicationInsights.PersistenceChannel.1.2.0\lib\net45\Microsoft.ApplicationInsights.PersistenceChannel.dll" Condition="'$(VSTarget)' == '11.0' Or '$(VSTarget)' == '12.0'">
       <Link>Microsoft.ApplicationInsights.PersistenceChannel.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
-	  <VSIXSubPath>.</VSIXSubPath>
+      <VSIXSubPath>.</VSIXSubPath>
     </Content>
     <Content Include="Credits.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

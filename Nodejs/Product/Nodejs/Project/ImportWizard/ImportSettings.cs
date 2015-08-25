@@ -24,9 +24,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Xml;
-using Microsoft.NodejsTools.Telemetry;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudioTools;
+using Microsoft.VisualStudioTools.Telemetry;
 
 namespace Microsoft.NodejsTools.Project.ImportWizard {
     internal class ImportSettings : DependencyObject {

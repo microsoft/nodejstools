@@ -14,11 +14,11 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Telemetry {
+namespace Microsoft.VisualStudioTools.Telemetry {
     /// <summary>
-    /// Property names for telemetry events
+    /// Telemetry event names
     /// </summary>
-    public static class TelemetryProperties {
-        public const string ProjectGuid = "ProjectGuid";
+    internal static class TelemetryEvents {
+        public const string ProjectImported = "ProjectImported";
     }
 }

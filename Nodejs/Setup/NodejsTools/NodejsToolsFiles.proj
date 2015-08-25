@@ -22,8 +22,8 @@
         <!-- Support Files -->
         <File Include="all.json" />
         <File Include="Newtonsoft.Json.dll"/>
-        <File Include="Microsoft.ApplicationInsights.dll"/>
-        <File Include="Microsoft.ApplicationInsights.PersistenceChannel.dll"/>
+        <File Include="Microsoft.ApplicationInsights.dll" Condition="'$(VSTarget)' == '11.0' Or '$(VSTarget)' == '12.0'"/>
+        <File Include="Microsoft.ApplicationInsights.PersistenceChannel.dll" Condition="'$(VSTarget)' == '11.0' Or '$(VSTarget)' == '12.0'"/>
         <File Include="sqlite3.dll" />
         <File Include="visualstudio_nodejs_repl.js"/>
         <File Include="nodejsref.js"/>
