@@ -21,11 +21,11 @@
       <Code Language="Nodejs">
         <![CDATA[var http = require('http');
 var server = http.createServer(function (request, response) {
-    response.writeHead(200, { "Content-Type": "text/plain" });$end$
-    response.end("$message$");
+    response.writeHead(200, { 'Content-Type': 'text/plain' });$end$
+    response.end('$message$');
 });
 server.listen(process.env.PORT || 3000);
-console.log("Server is listening");
+console.log('Server is listening');
 ]]>
       </Code>
     </Snippet>
