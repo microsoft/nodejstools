@@ -3,12 +3,13 @@
     xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
   <CodeSnippet Format="1.0.0">
     <Header>
-      <Title>mochatest</Title>
-      <Description>Code Snippet for a Unit Test using Mochajs</Description>
-      <Shortcut>mochatest</Shortcut>
+      <Title>describe</Title>
+      <Description>Code Snippet for a Describe statement using Mochajs</Description>
+      <Shortcut>des</Shortcut>
       <Author>Microsoft Corporation</Author>
       <SnippetTypes>
         <SnippetType>Expansion</SnippetType>
+        <SnippetType>SurroundsWith</SnippetType>
       </SnippetTypes>
     </Header>
     <Snippet>
@@ -17,17 +18,10 @@
           <ID>myFunction</ID>
           <Default>myFunction</Default>
         </Literal>
-        <Literal>
-          <ID>message</ID>
-          <Default>should work</Default>
-        </Literal>
       </Declarations>
       <Code Language="Nodejs">
-        <![CDATA[var assert = require("assert");
-describe("myFunction", function () {
-    it("should work", function () {
-        $end$
-    });
+        <![CDATA[describe('$myFunction$', function () {
+    $selected$$end$
 });
 ]]>
       </Code>
