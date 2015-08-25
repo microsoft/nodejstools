@@ -149,6 +149,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             server.SetFocus();
 
             solution.ExecuteCommand("Edit.SurroundWith");
+            Keyboard.Type(category + "\t");
+
             return VerifySnippet(snippet, body, server);
         }
 

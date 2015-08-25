@@ -135,7 +135,8 @@
             <InstallDirectory>Snippets_1033_Nodejs</InstallDirectory>
         </File>
 
-        <File Include="Snippets\1033\Test\mochatest.snippet">
+        <File Include="Snippets\1033\Test\describe.snippet;
+                       Snippets\1033\Test\it.snippet">
             <InstallDirectory>Snippets_1033_Test</InstallDirectory>
         </File>
        
