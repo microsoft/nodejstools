@@ -95,6 +95,8 @@ namespace Microsoft.NodejsTools {
     [ProvideLanguageEditorOptionPage(typeof(NodejsFormattingGeneralOptionsPage), NodejsConstants.Nodejs, "Formatting", "General", "3044")]
     [ProvideLanguageEditorOptionPage(typeof(NodejsIntellisenseOptionsPage), NodejsConstants.Nodejs, "IntelliSense", "", "3048")]
     [ProvideLanguageEditorOptionPage(typeof(NodejsAdvancedEditorOptionsPage), NodejsConstants.Nodejs, "Advanced", "", "3050")]
+    [ProvideCodeExpansions(Guids.NodejsLanguageInfoString, false, 106, "Nodejs", @"Snippets\%LCID%\SnippetsIndex.xml", @"Snippets\%LCID%\Nodejs\")]
+    [ProvideCodeExpansionPath("Nodejs", "Test", @"Snippets\%LCID%\Test\")]
     internal sealed partial class NodejsPackage : CommonPackage {
         internal const string NodeExpressionEvaluatorGuid = "{F16F2A71-1C45-4BAB-BECE-09D28CFDE3E6}";
         private IContentType _contentType;

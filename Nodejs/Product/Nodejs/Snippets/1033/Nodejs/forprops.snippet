@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets
+    xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>forprops</Title>
+      <Description>Code Snippet for iterating through the properties of an object</Description>
+      <Shortcut>forprops</Shortcut>
+      <Author>Microsoft Corporation</Author>
+      <SnippetTypes>
+        <SnippetType>SurroundsWith</SnippetType>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>property</ID>
+          <Default>property</Default>
+        </Literal>
+        <Object>
+          <ID>object</ID>
+          <Default>object</Default>
+        </Object>
+      </Declarations>
+      <Code Language="Nodejs">
+        <![CDATA[for (var $property$ in $object$) {
+    if ($object$.hasOwnProperty($property$)) {
+        $selected$$end$
+    }
+};
+]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets
+    xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>server</Title>
+      <Description>Code Snippet for a basic server</Description>
+      <Shortcut>server</Shortcut>
+      <Author>Microsoft Corporation</Author>
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>message</ID>
+          <Default>message</Default>
+        </Literal>
+      </Declarations>
+      <Code Language="Nodejs">
+        <![CDATA[var http = require('http');
+var server = http.createServer(function (request, response) {
+    response.writeHead(200, { 'Content-Type': 'text/plain' });$end$
+    response.end('$message$');
+});
+server.listen(process.env.PORT || 3000);
+console.log('Server is listening');
+]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

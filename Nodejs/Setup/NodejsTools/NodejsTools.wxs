@@ -23,6 +23,12 @@
                 </Directory>
             </Directory>
             <Directory Id="Dir_$(var.key)RemoteDebug" Name="RemoteDebug"/>
+            <Directory Id="Dir_$(var.key)Snippets" Name="Snippets">
+                <Directory Id="Dir_$(var.key)Snippets_1033" Name="1033">
+                    <Directory Id="Dir_$(var.key)Snippets_1033_Nodejs" Name="Nodejs"/>
+                    <Directory Id="Dir_$(var.key)Snippets_1033_Test" Name="Test"/>
+                </Directory>
+            </Directory>           
         </DirectoryRef>
         <?endforeach?>
 
