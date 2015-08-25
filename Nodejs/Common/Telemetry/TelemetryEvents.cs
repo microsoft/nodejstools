@@ -14,7 +14,7 @@
 //
 //*********************************************************//
 
-namespace Microsoft.VisualStudioTools.Telemetry {
+namespace Microsoft.NodejsTools.Telemetry {
     /// <summary>
     /// Telemetry event names
     /// </summary>

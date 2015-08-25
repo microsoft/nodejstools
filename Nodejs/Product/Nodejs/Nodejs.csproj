@@ -687,6 +687,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <TelemetryFiles Include="..\..\Common\Telemetry\*.cs" />
+    <Compile Include="@(TelemetryFiles)">
+      <Link>Telemetry\%(TelemetryFiles.FileName).cs</Link>
+      <Visible>true</Visible>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="Commands\DiagnosticsForm.resx">
       <DependentUpon>DiagnosticsForm.cs</DependentUpon>
     </EmbeddedResource>

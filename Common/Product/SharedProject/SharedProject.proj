@@ -699,14 +699,6 @@
       <Link>SharedProject\Wpf\LambdaProperties.cs</Link>
       <Visible>true</Visible>
     </Compile>
-    <Compile Include="$(_ProjectSystemFilesLocation)\Telemetry\TelemetryEvents.cs">
-      <Link>SharedProject\Telemetry\TelemetryEvents.cs</Link>
-      <Visible>true</Visible>
-    </Compile>
-    <Compile Include="$(_ProjectSystemFilesLocation)\Telemetry\TelemetryProperties.cs">
-      <Link>SharedProject\Telemetry\TelemetryProperties.cs</Link>
-      <Visible>true</Visible>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\ProjectResources.resx">
