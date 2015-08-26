@@ -145,8 +145,8 @@
     <Copy SourceFiles="@(DebugSymbolsProjectOutputGroupOutput->'%(FinalOutputPath)')"
           DestinationFolder="$(CopyOutputsToPath)Symbols" />
 
-    <Copy SourceFiles="@(OutputBinaries -> '$(OutputPath)%(filename)%(extension)')"
+    <Copy SourceFiles="@(OutputBinariesToSign -> '$(OutputPath)%(filename)%(extension)')"
           DestinationFolder="$(CopyOutputsToPath)UnsignedBinaries"
-          Condition="'@(OutputBinaries)' != ''"/>
+          Condition="'@(OutputBinariesToSign)' != ''"/>
   </Target>
 </Project>

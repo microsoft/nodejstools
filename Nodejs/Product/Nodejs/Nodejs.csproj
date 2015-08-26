@@ -180,7 +180,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <OutputBinaries Include="Microsoft.NodejsTools.Telemetry.$(VSTarget).dll" />
+    <OutputBinariesToSign Include="Microsoft.NodejsTools.Telemetry.$(VSTarget).dll" />
   </ItemGroup>
   <Choose>
     <!-- 
