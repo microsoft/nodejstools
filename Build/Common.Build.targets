@@ -147,6 +147,6 @@
 
     <Copy SourceFiles="@(OutputBinariesToSign->'$(OutputPath)%(filename)%(extension)')"
             DestinationFolder="$(CopyOutputsToPath)UnsignedBinaries"
-            Condition="'@(OutputBinaries)' != ''"/>
+            Condition="'@(OutputBinariesToSign)' != ''"/>
   </Target>
 </Project>
