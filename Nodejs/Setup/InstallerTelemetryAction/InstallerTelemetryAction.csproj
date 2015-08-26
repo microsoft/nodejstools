@@ -63,6 +63,5 @@
 	<Content Include="CustomAction.config" />   
   </ItemGroup> 
  <Import Project="..\SetupProjectAfter.settings" />
- <Import Project="$(BuildRoot)\Tools\WiX\3.7\Wix.CA.targets" />
- <!--<Import Project="$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.CA.targets" />-->
+ <Import Project="$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.CA.targets" />
 </Project>
