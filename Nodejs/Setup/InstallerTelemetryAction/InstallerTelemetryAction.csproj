@@ -62,6 +62,7 @@
     <Compile Include="InstallerTelemetryAction.cs" />
     <Content Include="CustomAction.config" />   
   </ItemGroup>
+
+ <Import Project="$(BuildRoot)\Tools\Wix\3.7\wix.ca.targets"/>
  <Import Project="..\SetupProjectAfter.settings" />
- <Import Project="$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.CA.targets" />
 </Project>

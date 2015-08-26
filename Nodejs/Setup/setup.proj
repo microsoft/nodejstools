@@ -23,6 +23,5 @@
   </ItemGroup>
 
   <Import Project="$(TargetsPath)\Common.Build.Traversal.targets" />
-
   <Import Project="$(TargetsPath)\Common.Build.VSSDK.targets" Condition="'$(SignedBinariesPath)' != ''"/>
 </Project>
