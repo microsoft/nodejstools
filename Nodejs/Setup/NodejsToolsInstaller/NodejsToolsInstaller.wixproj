@@ -12,10 +12,6 @@
     <SccProvider>SAK</SccProvider>
     <SccAuxPath>SAK</SccAuxPath>
     <SccLocalPath>SAK</SccLocalPath>
-    <DefineConstants>
-      $(DefineConstants);
-      IncludeVsLogger=$(IncludeVsLogger)
-    </DefineConstants>
     <DefineConstants Condition="$(VSTarget) == '12.0'">
       $(DefineConstants);
       IncludeVWDExpress=12.0.30219.0;
@@ -67,10 +63,6 @@
     <ProjectReference Include="..\Profiling\Profiling.wixproj">
       <Name>NodejsProfiler</Name>
       <Project>{C7D3FCEB-47DA-4539-8D20-6B9047BAC3F7}</Project>
-    </ProjectReference>
-    <ProjectReference Include="$(BuildRoot)\Internal\Nodejs\VsLoggerSetup\VsLogger.wixproj" Condition="'$(IncludeVsLogger)' == 'True'">
-      <Name>VsLoggerMsm</Name>
-      <Project>{639BFC80-B31B-4D3F-9DF3-A65913000B4B}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

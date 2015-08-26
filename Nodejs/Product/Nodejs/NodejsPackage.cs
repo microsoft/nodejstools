@@ -37,6 +37,7 @@ using Microsoft.NodejsTools.Logging;
 using Microsoft.NodejsTools.Options;
 using Microsoft.NodejsTools.Project;
 using Microsoft.NodejsTools.Repl;
+using Microsoft.NodejsTools.Telemetry;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Debugger.Interop;
@@ -108,6 +109,7 @@ namespace Microsoft.NodejsTools {
         private LanguagePreferences _langPrefs;
         internal VsProjectAnalyzer _analyzer;
         private NodejsToolsLogger _logger;
+        private ITelemetryLogger _telemetryLogger;
 
         /// <summary>
         /// Default constructor of the package.
@@ -236,7 +238,9 @@ namespace Microsoft.NodejsTools {
             IntellisenseOptionsPage.AnalysisLogMaximumChanged += IntellisenseOptionsPage_AnalysisLogMaximumChanged;
 
             InitializeLogging();
-            
+
+            InitializeTelemetry();
+
             // The variable is inherited by child processes backing Test Explorer, and is used in
             // the NTVS test discoverer and test executor to connect back to VS.
             Environment.SetEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable, Process.GetCurrentProcess().Id.ToString());
@@ -256,6 +260,15 @@ namespace Microsoft.NodejsTools {
             _logger.LogEvent(NodejsToolsLogEvent.AnalysisLevel, IntellisenseOptionsPage.AnalysisLevel);
         }
 
+        private void InitializeTelemetry() {
+            var thisAssembly = typeof(NodejsPackage).Assembly;
+
+            // Get telemetry logger
+            _telemetryLogger = TelemetrySetup.Instance.GetLogger(thisAssembly);
+
+            TelemetrySetup.Instance.LogPackageLoad(_telemetryLogger, Guid.Parse(Guids.NodejsPackageString), thisAssembly, Application.ProductVersion);
+        }
+
         public new IComponentModel ComponentModel {
             get {
                 return this.GetComponentModel();
@@ -265,6 +278,12 @@ namespace Microsoft.NodejsTools {
         internal NodejsToolsLogger Logger {
             get {
                 return _logger;
+            }
+        }
+
+        internal ITelemetryLogger TelemetryLogger {
+            get {
+                return _telemetryLogger;
             }
         }
 
