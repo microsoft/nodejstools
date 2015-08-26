@@ -24,7 +24,7 @@ using System.Collections.Specialized;
 using System.Web.Script.Serialization;
 using System.Globalization;
 
-namespace Microsoft.NodejsTools
+namespace Microsoft.NodejsTools.Telemetry
 {
     public class InstallerTelemetryActions {
         private static void LogInstallStatus(string InstallStatus,Session session) {
@@ -35,8 +35,8 @@ namespace Microsoft.NodejsTools
 
             FeatureInfoCollection featureInfoCollection = session.Features;
             foreach (FeatureInfo featureInfo in featureInfoCollection) {
-                currentState = featureInfo.CurrentState.ToString();
-                requestState = featureInfo.RequestState.ToString();
+                currentState = featureInfo.CurrentState.ToString("F");
+                requestState = featureInfo.RequestState.ToString("F");
                 // we just want the current and requested state of A feature to understand if its a new user, upgrade, reinstall or remove.
                 break;
             }
@@ -63,7 +63,7 @@ namespace Microsoft.NodejsTools
                                         {
                                             "InstallStatus", InstallStatus
                                         }, {
-                                            "IsNtvsInstalled", isInstalled.ToString()
+                                            "IsNtvsInstalled", isInstalled.ToString(CultureInfo.InvariantCulture)
                                         }, {
                                             "CurrentState", currentState
                                         }, {

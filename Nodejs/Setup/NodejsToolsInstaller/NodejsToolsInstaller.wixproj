@@ -16,6 +16,10 @@
       $(DefineConstants);
       IncludeVsLogger=$(IncludeVsLogger)
     </DefineConstants>
+    <DefineConstants>
+      $(DefineConstants);
+      ReleaseBuild=$(ReleaseBuild)
+    </DefineConstants>
     <DefineConstants Condition="$(VSTarget) == '12.0'">
       $(DefineConstants);
       IncludeVWDExpress=12.0.30219.0;
