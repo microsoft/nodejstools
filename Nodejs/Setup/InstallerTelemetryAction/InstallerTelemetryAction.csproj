@@ -41,7 +41,7 @@
     <ProjectGuid>{775E686D-C646-4DAB-9DCF-D2C37FF8EA78}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Microsoft.NodejsTools</RootNamespace>
+    <RootNamespace>Microsoft.NodejsTools.Telemetry</RootNamespace>
     <AssemblyName>Microsoft.NodejsTools.InstallerTelemetryAction</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
@@ -63,5 +63,6 @@
 	<Content Include="CustomAction.config" />   
   </ItemGroup> 
  <Import Project="..\SetupProjectAfter.settings" />
- <Import Project="$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.CA.targets" />
+ <Import Project="$(BuildRoot)\Tools\WiX\3.7\Wix.CA.targets" />
+ <!--<Import Project="$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.CA.targets" />-->
 </Project>
