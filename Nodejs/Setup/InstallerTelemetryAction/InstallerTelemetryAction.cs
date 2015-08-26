@@ -16,13 +16,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using Microsoft.Deployment.WindowsInstaller;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Net;
-using System.Collections.Specialized;
+using System.Text;
 using System.Web.Script.Serialization;
 using System.Globalization;
+using Microsoft.Deployment.WindowsInstaller;
 
 namespace Microsoft.NodejsTools.Telemetry
 {
