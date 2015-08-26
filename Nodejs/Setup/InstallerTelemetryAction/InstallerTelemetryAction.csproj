@@ -60,8 +60,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="InstallerTelemetryAction.cs" />
-	<Content Include="CustomAction.config" />   
-  </ItemGroup> 
+    <Content Include="CustomAction.config" />   
+  </ItemGroup>
+  <ItemGroup>    
+    <OutputBinariesToSign Include="Microsoft.NodejsTools.InstallerTelemetryAction.dll;Microsoft.NodejsTools.InstallerTelemetryAction.CA.dll" />
+  </ItemGroup>
  <Import Project="..\SetupProjectAfter.settings" />
  <Import Project="$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.CA.targets" />
 </Project>

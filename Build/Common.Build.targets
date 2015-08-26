@@ -133,7 +133,7 @@
           Condition="'$(CopyOutputsToPath)' != '' and $(MSBuildProjectExtension) != '.wixproj' and Exists($(TargetPath))">
     <PropertyGroup>
       <CopyOutputsToPath Condition="!HasTrailingSlash($(CopyOutputsToPath))">$(CopyOutputsToPath)\</CopyOutputsToPath>
-    </PropertyGroup>
+     </PropertyGroup>
 
     <MakeDir Directories="$(CopyOutputsToPath)UnsignedBinaries;$(CopyOutputsToPath)Symbols"
              ContinueOnError="true" />
