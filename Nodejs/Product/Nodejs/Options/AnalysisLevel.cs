@@ -19,6 +19,7 @@ namespace Microsoft.NodejsTools.Options {
         None,
         Low,
         Medium,
-        High
+        High,
+        Preview
     }
 }

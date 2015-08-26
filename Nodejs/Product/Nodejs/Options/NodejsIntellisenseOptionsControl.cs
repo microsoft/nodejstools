@@ -23,6 +23,7 @@ namespace Microsoft.NodejsTools.Options {
     public partial class NodejsIntellisenseOptionsControl : UserControl {
         public NodejsIntellisenseOptionsControl() {
             InitializeComponent();
+            _previewIntelliSenseRadioButton.Enabled = NodejsPackage.Instance.IntellisenseOptionsPage.EnableES6Preview;
         }
 
         internal bool SaveToDisk {
@@ -40,7 +41,9 @@ namespace Microsoft.NodejsTools.Options {
 
         internal AnalysisLevel AnalysisLevel {
             get {
-                if (_fullIntelliSenseRadioButton.Checked) {
+                if (_previewIntelliSenseRadioButton.Checked) {
+                    return AnalysisLevel.Preview;
+                } else if (_fullIntelliSenseRadioButton.Checked) {
                     return AnalysisLevel.High;
                 } else if (_mediumIntelliSenseRadioButton.Checked) {
                     return AnalysisLevel.Medium;
@@ -50,6 +53,9 @@ namespace Microsoft.NodejsTools.Options {
             }
             set {
                 switch (value) {
+                    case AnalysisLevel.Preview:
+                        _previewIntelliSenseRadioButton.Checked = true;
+                        break;
                     case AnalysisLevel.High:
                         _fullIntelliSenseRadioButton.Checked = true;
                         break;
@@ -117,6 +123,10 @@ namespace Microsoft.NodejsTools.Options {
             AnalysisLogMaximum = page.AnalysisLogMax;
             CompletionCommittedBy = page.CompletionCommittedBy;
             SaveToDisk = page.SaveToDisk;
+        }
+
+        private void _analysisPreviewFeedbackLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
+            Process.Start("http://aka.ms/NtvsEs6Preview");
         }
     }
 }

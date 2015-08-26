@@ -493,6 +493,18 @@ namespace Microsoft.VisualStudioTools {
         }
 
         /// <summary>
+        /// Remove first and last quotes from path
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string UnquotePath(string path) {
+            if (path.StartsWith("\"") && path.EndsWith("\"")) {
+                return path.Substring(1, path.Length - 2);
+            }
+            return path;
+        }
+
+        /// <summary>
         /// Returns true if the path is a valid path, regardless of whether the
         /// file exists or not.
         /// </summary>

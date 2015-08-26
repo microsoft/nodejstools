@@ -27,14 +27,18 @@ namespace Microsoft.NodejsTools
         public const string NodejsDebugLanguageString = "{65791609-BA29-49CF-A214-DBFF8AEC3BC2}";
         public const string NodejsEditorFactoryString = "88941496-93F4-4E37-83AF-AFE087415334";
         public const string NodejsEditorFactoryPromptEncodingString = "C8576E92-EFB6-4414-8F63-C84D474A539E";
-        public const string NodejsLanguageInfoString = "ABD5E8A5-5A35-4BE9-BCAF-E10C1212CB40";
+        //do not remove the curly braces. Without curly braces, in certain cases some language service features (e.g. snippets)  will fail to load because
+        //some comparisons in native code surround the guid string with curlies, and they'll fail to match unless we also surround the guid string with curlies.
+        public const string NodejsLanguageInfoString = "{ABD5E8A5-5A35-4BE9-BCAF-E10C1212CB40}";
         public const string NodejsNpmCmdSetString = "9F4B31B4-09AC-4937-A2E7-F4BC02BB7DBA";
         public const string NodejsProjectFactoryString = "3AF33F2E-1136-4D97-BBB7-1795711AC8B8";
         public const string NodejsBaseProjectFactoryString = "9092AA53-FB77-4645-B42D-1CCCA6BD08BD";
         public const string TypeScriptLanguageInfoString = "87bdf188-e6e8-4fcf-a82a-9b8506e01847";
         public const string JadeEditorFactoryString = "6CB69EF8-1329-4DC0-84B4-FA134EA59BE3";
+        public const string DefaultLanguageServiceString = "{8239BEC4-EE87-11D0-8C98-00C04FC2AB22}";
 
-        internal static readonly Guid DefaultLangaugeService = new Guid("{8239BEC4-EE87-11D0-8C98-00C04FC2AB22}");
+        internal static readonly Guid DefaultLanguageService = new Guid(DefaultLanguageServiceString);
+        internal static readonly Guid NodejsLanguageInfo = new Guid(NodejsLanguageInfoString);
  
         //Guid for our formatting service
         internal const string JavaScriptFormattingServiceString = "F414C260-6AC0-11CF-B6D1-00AA00BBBB58";

@@ -15,12 +15,6 @@
 //*********************************************************//
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Microsoft.NodejsTools.Commands {
@@ -43,6 +37,10 @@ namespace Microsoft.NodejsTools.Commands {
         private void _copy_Click(object sender, EventArgs e) {
             _textBox.SelectAll();
             Clipboard.SetText(_textBox.SelectedText);
+        }
+
+        private void _diagnosticLoggingCheckbox_CheckedChanged(object sender, EventArgs e) {
+            NodejsPackage.Instance.DiagnosticsOptionsPage.IsLiveDiagnosticsEnabled = _diagnosticLoggingCheckbox.Checked;
         }
     }
 }

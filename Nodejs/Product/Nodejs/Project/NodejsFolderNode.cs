@@ -17,6 +17,7 @@
 using System;
 using System.IO;
 using System.Text;
+using Microsoft.NodejsTools.Options;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
@@ -50,7 +51,7 @@ namespace Microsoft.NodejsTools.Project {
             var fileNodesEnumerator = this.EnumNodesOfType<NodejsFileNode>().GetEnumerator();
             FolderContentType contentType = FolderContentType.None;
             while (fileNodesEnumerator.MoveNext()) {
-                if (!fileNodesEnumerator.Current.FileName.EndsWith(".js", StringComparison.OrdinalIgnoreCase)) {
+                if (!fileNodesEnumerator.Current.Url.EndsWith(".js", StringComparison.OrdinalIgnoreCase)) {
                     continue;
                 }
                 var properties = fileNodesEnumerator.Current.NodeProperties as IncludedFileNodeProperties;
@@ -95,7 +96,9 @@ namespace Microsoft.NodejsTools.Project {
             get {
                 var res = base.Caption;
 
-                if (NodejsPackage.Instance.GeneralOptionsPage.ShowBrowserAndNodeLabels && _containsNodeOrBrowserFiles) {
+                if (NodejsPackage.Instance.GeneralOptionsPage.ShowBrowserAndNodeLabels &&
+                    NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel != AnalysisLevel.Preview &&
+                    _containsNodeOrBrowserFiles) {
                     res = AppendLabel(res, ContentType);
                 }
                 return res;
@@ -119,7 +122,7 @@ namespace Microsoft.NodejsTools.Project {
             // If we are adding an immediate child to a directory, then set the content type
             // acording to the content type of the folder it is being moved to.
             var nodejsFileNode = node as NodejsFileNode;
-            if (nodejsFileNode != null && nodejsFileNode.FileName.EndsWith(".js", StringComparison.OrdinalIgnoreCase) && nodejsFileNode.Parent == this) {
+            if (nodejsFileNode != null && nodejsFileNode.Url.EndsWith(".js", StringComparison.OrdinalIgnoreCase) && nodejsFileNode.Parent == this) {
                 var properties = nodejsFileNode.NodeProperties as IncludedFileNodeProperties;
                 if (properties != null) {
                     switch (ContentType) {
@@ -206,7 +209,7 @@ namespace Microsoft.NodejsTools.Project {
             var fileNodesEnumerator = this.EnumNodesOfType<NodejsFileNode>().GetEnumerator();
             while (fileNodesEnumerator.MoveNext()) {
                 var includedFileNodeProperties = fileNodesEnumerator.Current.NodeProperties as IncludedFileNodeProperties;
-                if (includedFileNodeProperties != null && includedFileNodeProperties.FileName.EndsWith(".js", StringComparison.OrdinalIgnoreCase)) {
+                if (includedFileNodeProperties != null && includedFileNodeProperties.URL.EndsWith(".js", StringComparison.OrdinalIgnoreCase)) {
                     includedFileNodeProperties.BuildAction = buildAction;
                 }
             }

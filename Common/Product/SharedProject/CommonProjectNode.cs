@@ -1539,8 +1539,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// Returns resolved value of the current working directory property.
         /// </summary>
         public string GetWorkingDirectory() {
-            string workDir = GetProjectProperty(CommonConstants.WorkingDirectory, resetCache: false);
-
+            string workDir = CommonUtils.UnquotePath(GetProjectProperty(CommonConstants.WorkingDirectory, resetCache: false));
             return CommonUtils.GetAbsoluteDirectoryPath(ProjectHome, workDir);
         }
 

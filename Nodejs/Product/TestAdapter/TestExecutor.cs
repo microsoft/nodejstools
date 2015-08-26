@@ -239,10 +239,10 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
             projSettings.WorkingDir = Path.GetFullPath(Path.Combine(projectRootDir, proj.GetPropertyValue(CommonConstants.WorkingDirectory) ?? "."));
 
-            projSettings.NodeExePath = proj.GetPropertyValue(NodejsConstants.NodeExePath);
-            if (string.IsNullOrEmpty(projSettings.NodeExePath)) {
-                projSettings.NodeExePath = NodejsTools.Nodejs.NodeExePath;
-            }
+            projSettings.NodeExePath =
+                Nodejs.GetAbsoluteNodeExePath(
+                    projectRootDir,
+                    proj.GetPropertyValue(NodejsConstants.NodeExePath));
 
             return projSettings;
         }

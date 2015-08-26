@@ -87,6 +87,9 @@
     <Compile Include="..\..\..\Common\Product\SharedProject\ProcessOutput.cs">
       <Link>ProcessOutput.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\Common\Product\SharedProject\CommonUtils.cs">
+      <Link>CommonUtils.cs</Link>
+    </Compile>
     <Compile Include="IHomepages.cs" />
     <Compile Include="IPackageCatalogFilter.cs" />
     <Compile Include="NativeMethods.cs" />

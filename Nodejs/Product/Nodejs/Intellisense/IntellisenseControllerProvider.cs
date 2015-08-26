@@ -45,11 +45,13 @@ namespace Microsoft.NodejsTools.Intellisense {
         internal IIncrementalSearchFactoryService _IncrementalSearch = null; // Set via MEF
         [Import]
         internal IClassifierAggregatorService _classifierAgg = null; // Set via MEF
+        [Import]
+        internal IServiceProvider _serviceProvider = null; // imported via MEF
 
         public IIntellisenseController TryCreateIntellisenseController(ITextView textView, IList<ITextBuffer> subjectBuffers) {
             IntellisenseController controller;
             if (!textView.Properties.TryGetProperty<IntellisenseController>(typeof(IntellisenseController), out controller)) {
-                controller = new IntellisenseController(this, textView);
+                controller = new IntellisenseController(this, textView, _serviceProvider);
             }
 
             foreach (var buffer in subjectBuffers) {
@@ -58,7 +60,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             return controller;
         }
 
-        internal static IntellisenseController GetOrCreateController(IComponentModel model, ITextView textView) {
+        internal static IntellisenseController GetOrCreateController(IComponentModel model, ITextView textView, IServiceProvider serviceProvider) {
             IntellisenseController controller;
             if (!textView.Properties.TryGetProperty<IntellisenseController>(typeof(IntellisenseController), out controller)) {
                 var intellisenseControllerProvider = (
@@ -67,7 +69,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                    where exportedContentType == NodejsConstants.Nodejs && export.Value.GetType() == typeof(IntellisenseControllerProvider)
                    select export.Value
                 ).First();
-                controller = new IntellisenseController((IntellisenseControllerProvider)intellisenseControllerProvider, textView);
+                controller = new IntellisenseController((IntellisenseControllerProvider)intellisenseControllerProvider, textView, serviceProvider);
             }
             return controller;
         }

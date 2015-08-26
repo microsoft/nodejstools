@@ -228,10 +228,10 @@ namespace Microsoft.NodejsTools.Repl {
             var startupProject = _site.GetStartupProject();
             string nodeExePath;
             if (startupProject != null) {
-                nodeExePath = startupProject.GetProjectProperty(NodejsConstants.NodeExePath);
-                if (String.IsNullOrWhiteSpace(nodeExePath)) {
-                    nodeExePath = Nodejs.NodeExePath;
-                }
+                nodeExePath = Nodejs.GetAbsoluteNodeExePath(
+                    startupProject.ProjectHome,
+                    startupProject.GetProjectProperty(NodejsConstants.NodeExePath)
+                );
             } else {
                 nodeExePath = Nodejs.NodeExePath;
             }

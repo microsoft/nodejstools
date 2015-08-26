@@ -17,7 +17,7 @@ var find_tests = function (testFileList, discoverResultFile, projectFolder) {
             if (suite.tests && suite.tests.length !== 0) {
                 suite.tests.forEach(function (t, i, testArray) {
                     testList.push({
-                        test: t.title,
+                        test: t.fullTitle(),
                         suite: suite.fullTitle(),
                         file: testFile,
                         line: 0,

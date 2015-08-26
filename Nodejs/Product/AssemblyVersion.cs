@@ -22,12 +22,13 @@ using System.Runtime.InteropServices;
 // Properties\AssemblyInfo.cs file and remove any lines duplicating the ones below.
 // (See also AssemblyInfoCommon.cs in this same directory.)
 
-#if !SUPPRESS_COMMON_ASSEMBLY_VERSION
-[assembly: AssemblyVersion(AssemblyVersionInfo.StableVersion)]
-#endif
-[assembly: AssemblyFileVersion(AssemblyVersionInfo.Version)]
+#if !SUPPRESS_COMMON_ASSEMBLY_VERSION 
+[assembly: AssemblyVersion(AssemblyVersionInfo.StableVersion)] 
+#endif 
+[assembly: AssemblyFileVersion(AssemblyVersionInfo.Version)] 
 
 class AssemblyVersionInfo {
+
     // This version string (and the comment for StableVersion) should be
     // updated manually between major releases (e.g. from 1.0 to 2.0).
     // Servicing branches and minor releases should retain the value.
