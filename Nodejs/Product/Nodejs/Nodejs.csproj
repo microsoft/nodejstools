@@ -179,6 +179,9 @@
     </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
+  <ItemGroup>
+    <OutputBinaries Include="Microsoft.NodejsTools.Telemetry.$(VSTarget).dll" />
+  </ItemGroup>
   <Choose>
     <!-- 
     VS 2015's devenv.config.exe contains a bindingRedirect for Newtonsoft.Json
