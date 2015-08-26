@@ -144,7 +144,7 @@
         <CustomAction Id="VWDExpressSetup" Property="VWDEXPRESS_PATH" ExeCommand="/setup" Execute="deferred" Return="check" Impersonate="no" />
         <CustomAction Id="VWDExpressSetup_Rollback" Property="VWDEXPRESS_PATH" ExeCommand="/setup" Execute="rollback" Return="check" Impersonate="no" />
 
-      <?if "$(var.ReleaseBuild)" = "True" ?>
+      <?if "$(var.ReleaseBuild)" ~= "" ?>
       <Binary Id="InstallerTelemetryAction.CA.dll" SourceFile="..\..\..\BuildOutput\$(var.Configuration)$(var.VSTargetVersion)\Setup\Microsoft.NodejsTools.InstallerTelemetryAction.CA.dll" />
       
       <!-- Custom Action for installer telemetry-->
@@ -160,7 +160,7 @@
             <Custom Action="DevEnvSetup" Before="InstallFinalize" Overridable="yes">NOT SKIP_DEVENV_SETUP AND DEVENV_PATH</Custom>
             <Custom Action="VWDExpressSetup_Rollback" Before="VWDExpressSetup" Overridable="yes">NOT SKIP_DEVENV_SETUP AND VWDEXPRESS_PATH</Custom>
             <Custom Action="VWDExpressSetup" Before="InstallFinalize" Overridable="yes">NOT SKIP_DEVENV_SETUP AND VWDEXPRESS_PATH</Custom>
-            <?if "$(var.ReleaseBuild)" = "True" ?>
+            <?if "$(var.ReleaseBuild)" ~= "" ?>
             <Custom Action="LogStart" Before="CostFinalize"/>
             <Custom Action="LogSuccess" OnExit="success"/>
             <Custom Action="LogFailure" OnExit="error" />

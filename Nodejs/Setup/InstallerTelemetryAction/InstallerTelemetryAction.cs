@@ -27,14 +27,47 @@ using System.Globalization;
 namespace Microsoft.NodejsTools.Telemetry
 {
     public class InstallerTelemetryActions {
-        private static void LogInstallStatus(string InstallStatus,Session session) {
+
+        [CustomAction]
+        public static ActionResult RecordInstallStartTime(Session session) {
+            session["InstallStartTime"] = DateTime.Now.ToString(CultureInfo.InvariantCulture);
+            return ActionResult.Success;
+        }
+
+        [CustomAction]
+        public static ActionResult LogInstallSuccessResult(Session session) {
+            session.Log("Begin Telemetry Log");
+            LogInstallStatus("Success", session);
+            session.Log("End Telemetry Log");
+            return ActionResult.Success;
+        }
+
+        [CustomAction] 
+        public static ActionResult LogInstallErrorResult(Session session) {
+            session.Log("Begin Telemetry Log");
+            LogInstallStatus("Error", session);
+            session.Log("End Telemetry Log");
+            return ActionResult.Success;
+        }
+
+        [CustomAction]
+        public static ActionResult LogInstallCancelResult(Session session) {
+            session.Log("Begin Telemetry Log");
+            LogInstallStatus("Cancel", session);
+            session.Log("End Telemetry Log");
+            return ActionResult.Success;
+        }
+
+        private static void LogInstallStatus(string InstallStatus, Session session)
+        {
             TimeSpan installTime = DateTime.Now - DateTime.Parse(session["InstallStartTime"]);
             bool isInstalled = session.EvaluateCondition("Installed");
             string currentState = null;
             string requestState = null;
 
             FeatureInfoCollection featureInfoCollection = session.Features;
-            foreach (FeatureInfo featureInfo in featureInfoCollection) {
+            foreach (FeatureInfo featureInfo in featureInfoCollection)
+            {
                 currentState = featureInfo.CurrentState.ToString("F");
                 requestState = featureInfo.RequestState.ToString("F");
                 // we just want the current and requested state of A feature to understand if its a new user, upgrade, reinstall or remove.
@@ -85,40 +118,12 @@ namespace Microsoft.NodejsTools.Telemetry
                 }
             };
             string jsonString = (new JavaScriptSerializer()).Serialize(data);
-            using (WebClient client = new WebClient()) {
+            using (WebClient client = new WebClient())
+            {
                 string response = client.UploadString("https://dc.services.visualstudio.com/v2/track", jsonString);
                 session.Log(response);
             }
         }
 
-        [CustomAction]
-        public static ActionResult RecordInstallStartTime(Session session) {
-            session["InstallStartTime"] = DateTime.Now.ToString(CultureInfo.InvariantCulture);
-            return ActionResult.Success;
-        }
-
-        [CustomAction]
-        public static ActionResult LogInstallSuccessResult(Session session) {
-            session.Log("Begin Telemetry Log");
-            LogInstallStatus("Success", session);
-            session.Log("End Telemetry Log");
-            return ActionResult.Success;
-        }
-
-        [CustomAction] 
-        public static ActionResult LogInstallErrorResult(Session session) {
-            session.Log("Begin Telemetry Log");
-            LogInstallStatus("Error", session);
-            session.Log("End Telemetry Log");
-            return ActionResult.Success;
-        }
-
-        [CustomAction]
-        public static ActionResult LogInstallCancelResult(Session session) {
-            session.Log("Begin Telemetry Log");
-            LogInstallStatus("Cancel", session);
-            session.Log("End Telemetry Log");
-            return ActionResult.Success;
-        }
     }
 }
