@@ -17,10 +17,13 @@
         <File Include="Microsoft.NodejsTools.ProjectWizard.dll" />
         <File Include="Microsoft.NodejsTools.Analysis.dll" />
         <File Include="Microsoft.NodejsTools.TestAdapter.dll" />
+        <File Include="Microsoft.NodejsTools.Telemetry.$(VSTarget).dll" />
 
         <!-- Support Files -->
         <File Include="all.json" />
         <File Include="Newtonsoft.Json.dll"/>
+        <File Include="Microsoft.ApplicationInsights.dll" Condition="'$(VSTarget)' == '11.0' Or '$(VSTarget)' == '12.0'"/>
+        <File Include="Microsoft.ApplicationInsights.PersistenceChannel.dll" Condition="'$(VSTarget)' == '11.0' Or '$(VSTarget)' == '12.0'"/>
         <File Include="sqlite3.dll" />
         <File Include="visualstudio_nodejs_repl.js"/>
         <File Include="nodejsref.js"/>
@@ -104,6 +107,44 @@
         <File Include="ItemTemplates\CloudService\NETFramework4\Worker Role\Node.js\CloudServiceWorkerRole.zip;
                        ItemTemplates\CloudService\NETFramework4\Worker Role\Node.js\CloudServiceTypeScriptWorkerRole.zip">
           <InstallDirectory>ItemTemplates_CloudService_WorkerRole</InstallDirectory>
+        </File>
+        
+        <!-- Snippets -->
+        <File Include= "Snippets\1033\Nodejs\cl.snippet;
+                        Snippets\1033\Nodejs\dowhile.snippet;
+                        Snippets\1033\Nodejs\else.snippet;
+                        Snippets\1033\Nodejs\express_delete.snippet;
+                        Snippets\1033\Nodejs\express_get.snippet;
+                        Snippets\1033\Nodejs\express_post.snippet;
+                        Snippets\1033\Nodejs\express_put.snippet;
+                        Snippets\1033\Nodejs\for.snippet;
+                        Snippets\1033\Nodejs\forin.snippet;
+                        Snippets\1033\Nodejs\forprops.snippet;
+                        Snippets\1033\Nodejs\forr.snippet;
+                        Snippets\1033\Nodejs\function.snippet;
+                        Snippets\1033\Nodejs\if.snippet;
+                        Snippets\1033\Nodejs\iife.snippet;
+                        Snippets\1033\Nodejs\parse.snippet;
+                        Snippets\1033\Nodejs\readfile.snippet;
+                        Snippets\1033\Nodejs\readstream.snippet;
+                        Snippets\1033\Nodejs\require.snippet;
+                        Snippets\1033\Nodejs\server.snippet;
+                        Snippets\1033\Nodejs\stringify.snippet;
+                        Snippets\1033\Nodejs\switch.snippet;
+                        Snippets\1033\Nodejs\try.snippet;
+                        Snippets\1033\Nodejs\tryf.snippet;
+                        Snippets\1033\Nodejs\while.snippet;
+                        Snippets\1033\Nodejs\with.snippet" >
+            <InstallDirectory>Snippets_1033_Nodejs</InstallDirectory>
+        </File>
+
+        <File Include="Snippets\1033\Test\describe.snippet;
+                       Snippets\1033\Test\it.snippet">
+            <InstallDirectory>Snippets_1033_Test</InstallDirectory>
+        </File>
+       
+        <File Include="Snippets\1033\SnippetsIndex.xml">
+            <InstallDirectory>Snippets_1033</InstallDirectory>
         </File>
 
         <!--Unit test framework support files-->

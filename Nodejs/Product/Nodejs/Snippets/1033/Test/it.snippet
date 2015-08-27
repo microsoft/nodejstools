@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets
+    xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+    <CodeSnippet Format="1.0.0">
+        <Header>
+            <Title>it</Title>
+            <Description>Code Snippet for an It statement using Mochajs</Description>
+            <Shortcut>it</Shortcut>
+            <Author>Microsoft Corporation</Author>
+            <SnippetTypes>
+                <SnippetType>Expansion</SnippetType>
+                <SnippetType>SurroundsWith</SnippetType>
+            </SnippetTypes>
+        </Header>
+        <Snippet>
+            <Declarations>
+                <Literal>
+                    <ID>message</ID>
+                    <Default>should work</Default>
+                </Literal>
+            </Declarations>
+            <Code Language="Nodejs">
+                <![CDATA[it('$message$', function () {
+    $selected$$end$
+});
+]]>
+            </Code>
+        </Snippet>
+    </CodeSnippet>
+</CodeSnippets>
+

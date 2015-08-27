@@ -24,6 +24,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Xml;
+using Microsoft.NodejsTools.Telemetry;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudioTools;
 
@@ -208,10 +209,13 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
             bool excludeNodeModules = ExcludeNodeModules;
             return Task.Factory.StartNew<string>(() => {
                 bool success = false;
+                Guid projectGuid;
                 try {
                     using (var writer = GetDefaultWriter(projectPath)) {
-                        WriteProjectXml(writer, projectPath, sourcePath, filters, startupFile, excludeNodeModules );
+                        WriteProjectXml(writer, projectPath, sourcePath, filters, startupFile, excludeNodeModules, out projectGuid);
                     }
+                    // Log telemetry
+                    NodejsPackage.Instance.TelemetryLogger.ReportEvent(TelemetryEvents.ProjectImported, TelemetryProperties.ProjectGuid, projectGuid.ToString("B"));
                     success = true;
                     return projectPath;
                 } finally {
@@ -248,9 +252,11 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
             string sourcePath,
             string filters,
             string startupFile,
-            bool excludeNodeModules
+            bool excludeNodeModules,
+            out Guid projectGuid
         ) {
             var projectHome = CommonUtils.GetRelativeDirectoryPath(Path.GetDirectoryName(projectPath), sourcePath);
+            projectGuid = Guid.NewGuid();
 
             writer.WriteStartDocument();
             writer.WriteStartElement("Project", "http://schemas.microsoft.com/developer/msbuild/2003");
@@ -264,7 +270,7 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
             writer.WriteEndElement();
 
             writer.WriteElementString("SchemaVersion", "2.0");
-            writer.WriteElementString("ProjectGuid", Guid.NewGuid().ToString("B"));
+            writer.WriteElementString("ProjectGuid", projectGuid.ToString("B"));
             writer.WriteElementString("ProjectHome", projectHome);
             writer.WriteElementString("ProjectView", "ShowAllFiles");
 

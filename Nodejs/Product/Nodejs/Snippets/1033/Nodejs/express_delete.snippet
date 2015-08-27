@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets
+    xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>express_delete</Title>
+      <Description>Code Snippet for handling a DELETE request with Express</Description>
+      <Shortcut>expdelete</Shortcut>
+      <Author>Microsoft Corporation</Author>
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>Hello World</ID>
+          <Default>Hello World</Default>
+        </Literal>
+        <Literal>
+          <ID>route</ID>
+          <Default>route</Default>
+        </Literal>
+      </Declarations>
+      <Code Language="Nodejs">
+        <![CDATA[app.delete('$route$', function (request, response) {
+    response.send('$Hello World$');$end$
+});
+]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

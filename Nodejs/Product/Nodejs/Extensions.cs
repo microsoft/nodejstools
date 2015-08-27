@@ -22,6 +22,7 @@ using System.Text;
 using Microsoft.NodejsTools;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.NodejsTools.Classifier;
+using Microsoft.NodejsTools.Editor.Core;
 using Microsoft.NodejsTools.Intellisense;
 using Microsoft.NodejsTools.Project;
 using Microsoft.NodejsTools.Repl;
@@ -111,7 +112,7 @@ namespace Microsoft.NodejsTools {
         internal static IComponentModel GetComponentModel(this IServiceProvider serviceProvider) {
             return (IComponentModel)serviceProvider.GetService(typeof(SComponentModel));
         }
-        
+
         internal static string GetFilePath(this ITextBuffer textBuffer) {
             ITextDocument textDocument;
             if (textBuffer.Properties.TryGetProperty<ITextDocument>(typeof(ITextDocument), out textDocument)) {
@@ -125,15 +126,6 @@ namespace Microsoft.NodejsTools {
             T[] res = new T[list.Length + 1];
             list.CopyTo(res, 0);
             res[res.Length - 1] = item;
-            return res;
-        }
-
-        internal static T[] Append<T>(this T[] list, params T[] items) {
-            T[] res = new T[list.Length + items.Length];
-            list.CopyTo(res, 0);
-            for (int i = 0; i < items.Length; i++) {
-                res[res.Length - items.Length + i] = items[i];
-            }
             return res;
         }
 
@@ -298,14 +290,14 @@ namespace Microsoft.NodejsTools {
                 location.FilePath,
                 location.Line - 1,
                 location.Column - 1
-            );            
+            );
         }
 
         internal static SnapshotPoint? GetCaretPosition(this ITextView view) {
             return view.BufferGraph.MapDownToFirstMatch(
                new SnapshotPoint(view.TextBuffer.CurrentSnapshot, view.Caret.Position.BufferPosition),
                PointTrackingMode.Positive,
-               IntellisenseController.IsNodejsContent,
+               EditorExtensions.IsNodeJsContent,
                PositionAffinity.Successor
             );
         }

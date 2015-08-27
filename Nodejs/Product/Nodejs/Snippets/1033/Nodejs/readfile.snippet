@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets
+    xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>readfile</Title>
+      <Description>Code Snippet for reading a file using the fs module</Description>
+      <Shortcut>readfile</Shortcut>
+      <Author>Microsoft Corporation</Author>
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>file</ID>
+          <Default>file</Default>
+        </Literal>
+        <Literal>
+          <ID>e</ID>
+          <Default>e</Default>
+        </Literal>
+      </Declarations>
+      <Code Language="Nodejs">
+        <![CDATA[fs.readFile('$file$', function ($e$, data) {
+    if ($e$) throw $e$;
+    console.log(data);$end$
+});
+]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

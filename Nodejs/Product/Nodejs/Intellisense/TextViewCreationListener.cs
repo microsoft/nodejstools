@@ -95,7 +95,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 _compModel.GetService<IIntellisenseSessionStackMapService>().GetStackForTextView(textView),
                 _compModel
             );
-            IntellisenseController controller = IntellisenseControllerProvider.GetOrCreateController(_compModel, textView);
+            IntellisenseController controller = IntellisenseControllerProvider.GetOrCreateController(_compModel, textView, _serviceProvider);
             controller.AttachKeyboardFilter();
             
             editFilter.AttachKeyboardFilter(_adaptersFactory.GetViewAdapter(window.TextView));

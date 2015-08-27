@@ -594,4 +594,10 @@ You will need to restart Visual Studio after installation.</value>
   <data name="IncludeNodeModulesInformation" xml:space="preserve">
     <value>&lt;a href="http://go.microsoft.com/fwlink/?LinkID=518083"&gt;More Information&lt;/a&gt;</value>
   </data>
+  <data name="InsertSnippet" xml:space="preserve">
+    <value>Insert Snippet</value>
+  </data>
+  <data name="SurroundWith" xml:space="preserve">
+    <value>Surround With</value>
+  </data>
 </root>
