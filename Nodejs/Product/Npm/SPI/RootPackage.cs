@@ -24,7 +24,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         public RootPackage(
             string fullPathToRootDirectory,
             bool showMissingDevOptionalSubPackages,
-            Dictionary<string, int> allModules = null,
+            Dictionary<string, ModuleInfo> allModules = null,
             int depth = 0) {
             Path = fullPathToRootDirectory;
             var packageJsonFile = System.IO.Path.Combine(fullPathToRootDirectory, "package.json");

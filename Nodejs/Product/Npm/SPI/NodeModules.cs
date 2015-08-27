@@ -22,18 +22,18 @@ using System.Linq;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal class NodeModules : AbstractNodeModules {
-        private Dictionary<string, int> _allModulesToDepth;
+        private Dictionary<string, ModuleInfo> _allModules;
         private readonly string[] _ignoredDirectories = { @"\.bin", @"\.staging" };
 
-        public NodeModules(IRootPackage parent, bool showMissingDevOptionalSubPackages, Dictionary<string, int> allModulesToDepth = null, int depth = 0) {
+        public NodeModules(IRootPackage parent, bool showMissingDevOptionalSubPackages, Dictionary<string, ModuleInfo> allModulesToDepth = null, int depth = 0) {
             var modulesBase = Path.Combine(parent.Path, NodejsConstants.NodeModulesFolder);
 
-            _allModulesToDepth = allModulesToDepth ?? new Dictionary<string, int>();
+            _allModules = allModulesToDepth ?? new Dictionary<string, ModuleInfo>();
 
             // This is the first time NodeModules is being created.
             // Iterate through directories to add everything that's known to be top-level.
             if (depth == 0) {
-                Debug.Assert(_allModulesToDepth.Count == 0, "Depth is 0, but top-level modules have already been added.");
+                Debug.Assert(_allModules.Count == 0, "Depth is 0, but top-level modules have already been added.");
 
                 IEnumerable<string> topLevelDirectories = Enumerable.Empty<string>();
                 try {
@@ -71,14 +71,15 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 // Iterate through all dependencies in package.json
                 foreach (var dependency in parent.PackageJson.AllDependencies) {
                     var moduleDir = modulesBase;
-
+                    
                     // try to find folder by recursing up tree
                     do {
-                        if (AddModuleIfNotExists(parent, dependency, moduleDir, showMissingDevOptionalSubPackages, depth)) {
+                        moduleDir = Path.Combine(moduleDir, dependency.Name);
+                        if (AddModuleIfNotExists(parent, moduleDir, showMissingDevOptionalSubPackages, depth, dependency)) {
                             break;
                         }
 
-                        var parentNodeModulesIndex = moduleDir.LastIndexOf(NodejsConstants.NodeModulesFolder, Math.Max(0, moduleDir.Length - NodejsConstants.NodeModulesFolder.Length - 1));
+                        var parentNodeModulesIndex = moduleDir.LastIndexOf(NodejsConstants.NodeModulesFolder, Math.Max(0, moduleDir.Length - NodejsConstants.NodeModulesFolder.Length - dependency.Name.Length - 1));
                         moduleDir = moduleDir.Substring(0, parentNodeModulesIndex + NodejsConstants.NodeModulesFolder.Length);
                     } while (moduleDir.Contains(NodejsConstants.NodeModulesFolder));
                 }
@@ -89,60 +90,70 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         private void AddTopLevelModule(IRootPackage parent, bool showMissingDevOptionalSubPackages, string moduleDir, int depth) {
             Debug.Assert(depth == 0, "Depth should be 0 when adding a top level dependency");
-
-            depth++;
-
-            if (_allModulesToDepth.ContainsKey(moduleDir)) {
-                if (_allModulesToDepth[moduleDir] > depth) {
-                    _allModulesToDepth[moduleDir] = depth;
-                }
-            } else {
-                _allModulesToDepth.Add(moduleDir, depth);
-            }
-
-            if (Directory.Exists(moduleDir)) {
-                AddModule(new Package(parent, moduleDir, showMissingDevOptionalSubPackages, _allModulesToDepth, depth));
-            }
+            AddModuleIfNotExists(parent, moduleDir, showMissingDevOptionalSubPackages, depth);
         }
 
-        private bool AddModuleIfNotExists(IRootPackage parent, IDependency dependency, string moduleDir, bool showMissingDevOptionalSubPackages, int depth) {
-            moduleDir = Path.Combine(moduleDir, dependency.Name);
+        private bool AddModuleIfNotExists(IRootPackage parent, string moduleDir, bool showMissingDevOptionalSubPackages, int depth, IDependency dependency = null) {
             depth++;
 
-            if (_allModulesToDepth.ContainsKey(moduleDir)) {
-                if (_allModulesToDepth[moduleDir] > depth) {
-                    _allModulesToDepth[moduleDir] = depth;
+            ModuleInfo moduleInfo;
+            _allModules.TryGetValue(moduleDir, out moduleInfo);
+
+            if (moduleInfo != null) {
+                if (moduleInfo.Depth > depth) {
+                    moduleInfo.Depth = depth;
                 }
 
-                var package = this[dependency.Name] as Package;
-                if (package != null) {
-                    package.RequestedVersionRange = dependency.VersionRangeText;
+                if (dependency != null) {
+                    var existingPackage = this[dependency.Name] as Package;
+                    if (existingPackage != null) {
+                        existingPackage.RequestedVersionRange = dependency.VersionRangeText;
+                    }
                 }
-                // prevents infinite loops
+            } else if (Directory.Exists(moduleDir)) {
+                moduleInfo = new ModuleInfo(depth);
+                _allModules.Add(moduleDir, moduleInfo);
+            } else {
+                // The module directory wasn't found.
+                return false;
+            }
+
+            if (moduleInfo.RequiredBy.Contains(parent.Name)) {
                 return true;
             }
 
-            if (Directory.Exists(moduleDir)) {
-                _allModulesToDepth.Add(moduleDir, depth);
-                AddModule(new Package(parent, moduleDir, showMissingDevOptionalSubPackages, _allModulesToDepth, depth) {
-                    RequestedVersionRange = dependency.VersionRangeText
-                });
-                return true;
+            moduleInfo.RequiredBy.Add(parent.Name);
+            var package = new Package(parent, moduleDir, showMissingDevOptionalSubPackages, _allModules, depth);
+            if (dependency != null) {
+                package.RequestedVersionRange = dependency.VersionRangeText;
             }
+            AddModule(package);
 
-            return false;
+            return true;
         }
 
         public override int GetDepth(string filepath) {
             var lastNodeModules = filepath.LastIndexOf(NodejsConstants.NodeModulesFolder + "\\");
-            var directoryToSearch = filepath.IndexOf("\\", lastNodeModules + NodejsConstants.NodeModulesFolder.Length);
+            var directoryToSearch = filepath.IndexOf("\\", lastNodeModules + NodejsConstants.NodeModulesFolder.Length + 1);
             var directorySubString = directoryToSearch == -1 ? filepath : filepath.Substring(0, directoryToSearch);
 
-            int value = 0;
-            _allModulesToDepth.TryGetValue(directorySubString, out value);
-            Debug.WriteLine(filepath + " : " + value);
+            ModuleInfo value = null;
+            _allModules.TryGetValue(directorySubString, out value);
 
-            return value;
+            var depth = value != null ? value.Depth : 0;
+            Debug.Assert(filepath.Length >= NativeMethods.MAX_FOLDER_PATH || depth != 0, "Could not calculate depth for {0}", filepath);
+
+            return depth;
+        }
+    }
+
+    internal class ModuleInfo {
+        public int Depth { get; set; }
+        public IList<string> RequiredBy { get; set; }
+
+        internal ModuleInfo(int depth) {
+            Depth = depth;
+            RequiredBy = new List<string>();
         }
     }
 }
