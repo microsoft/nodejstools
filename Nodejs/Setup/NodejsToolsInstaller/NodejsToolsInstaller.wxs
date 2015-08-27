@@ -157,15 +157,17 @@
         <CustomAction Id="VWDExpressSetup" Property="VWDEXPRESS_PATH" ExeCommand="/setup" Execute="deferred" Return="check" Impersonate="no" />
         <CustomAction Id="VWDExpressSetup_Rollback" Property="VWDEXPRESS_PATH" ExeCommand="/setup" Execute="rollback" Return="check" Impersonate="no" />
 
-      <?if "$(var.ReleaseBuild)" ~= "" ?>
+       <?if "$(var.ReleaseBuild)" ~= "True" ?> 
       <Binary Id="InstallerTelemetryAction.CA.dll" SourceFile="..\..\..\BuildOutput\$(var.Configuration)$(var.VSTargetVersion)\Setup\Microsoft.NodejsTools.InstallerTelemetryAction.CA.dll" />
+      <?endif?>
       
-      <!-- Custom Action for installer telemetry-->
+     <!-- Custom Action for installer telemetry -->
+      <?if "$(var.ReleaseBuild)" ~= "True" ?>
       <CustomAction Id="LogStart" BinaryKey="InstallerTelemetryAction.CA.dll" DllEntry="RecordInstallStartTime"/>
       <CustomAction Id="LogSuccess" BinaryKey="InstallerTelemetryAction.CA.dll" DllEntry="LogInstallSuccessResult"/>
       <CustomAction Id="LogFailure" BinaryKey="InstallerTelemetryAction.CA.dll" DllEntry="LogInstallErrorResult"/>
       <CustomAction Id="LogCancel" BinaryKey="InstallerTelemetryAction.CA.dll" DllEntry="LogInstallCancelResult"/>
-      <?endif?>
+      <?endif?> 
 
         <InstallExecuteSequence>
         
@@ -173,7 +175,7 @@
             <Custom Action="DevEnvSetup" Before="InstallFinalize" Overridable="yes">NOT SKIP_DEVENV_SETUP AND DEVENV_PATH</Custom>
             <Custom Action="VWDExpressSetup_Rollback" Before="VWDExpressSetup" Overridable="yes">NOT SKIP_DEVENV_SETUP AND VWDEXPRESS_PATH</Custom>
             <Custom Action="VWDExpressSetup" Before="InstallFinalize" Overridable="yes">NOT SKIP_DEVENV_SETUP AND VWDEXPRESS_PATH</Custom>
-            <?if "$(var.ReleaseBuild)" ~= "" ?>
+            <?if "$(var.ReleaseBuild)" ~= "True" ?>
             <Custom Action="LogStart" Before="CostFinalize"/>
             <Custom Action="LogSuccess" OnExit="success"/>
             <Custom Action="LogFailure" OnExit="error" />

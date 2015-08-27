@@ -18,10 +18,10 @@
     <ProjectFile Include="Profiling\Profiling.wixproj"/>
     <ProjectFile Include="NodejsTools\NodejsTools.wixproj"/>
     <ProjectFile Include="NodejsToolsInstaller\NodejsToolsInstaller.wixproj"/>
-    <ProjectFile Include="..\..\Internal\Nodejs\VsLoggerSetup\VsLogger.wixproj" Condition="'$(IncludeVsLogger)' == 'True'"/> 
-    <ProjectFile Include="InstallerTelemetryAction\InstallerTelemetryAction.csproj" Condition="'$(ReleaseBuild)' != ''" />
+    <ProjectFile Include="..\..\Internal\Nodejs\VsLoggerSetup\VsLogger.wixproj" Condition="'$(IncludeVsLogger)' == 'True'"/>
+    <ProjectFile Include="InstallerTelemetryAction\InstallerTelemetryAction.csproj" Condition="'$(ReleaseBuild)' == 'True'" />
   </ItemGroup>
-
+  
   <Import Project="$(TargetsPath)\Common.Build.Traversal.targets" />
   <Import Project="$(TargetsPath)\Common.Build.VSSDK.targets" Condition="'$(SignedBinariesPath)' != ''"/>
 </Project>
