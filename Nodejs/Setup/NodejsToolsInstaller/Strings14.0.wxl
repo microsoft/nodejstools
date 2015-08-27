@@ -20,4 +20,6 @@
     <String Id="WDExpressSetup_Rollback">Removing extension from !(loc.WDProductName)...</String>
     <String Id="VWDExpressSetup">Registering extension in !(loc.VWDProductName)...</String>
     <String Id="VWDExpressSetup_Rollback">Removing extension from !(loc.VWDProductName)...</String>
+    <String Id="AcceptLicenseText">I agree to the license terms and conditions and to the</String>
+    <String Id="PrivacyStatementLinkText">privacy statement</String>
 </WixLocalization>

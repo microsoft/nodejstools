@@ -13,7 +13,10 @@
         <Control Id="LicenseText" Type="ScrollableText" X="20" Y="55" Width="330" Height="121" Sunken="yes" TabSkip="no">
           <Text SourceFile="License.rtf" />
         </Control>
-        <Control Id="LicenseAcceptedCheckBox" Type="CheckBox" X="20" Y="180" Width="226" Height="18" CheckBoxValue="1" Property="LicenseAccepted" Text="!(loc.WelcomeEulaDlgLicenseAcceptedCheckBox)" />
+        <Control Id="LicenseAcceptedCheckBox" Type="CheckBox" X="20" Y="180" Width="205" Height="18" CheckBoxValue="1" Property="LicenseAccepted" Text="!(loc.AcceptLicenseText)" />
+        <Control Id="PrivacyStatementLink" Type="Hyperlink" X="227" Y="184" Width="200" Height="18">
+          <Text><![CDATA[<a href="http://go.microsoft.com/fwlink/?LinkID=528096&clcid=0x409">!(loc.PrivacyStatementLinkText)</a>]]></Text>
+        </Control>
         <Control Id="DescriptionPerMachine" Type="Text" X="20" Y="202" Width="330" Height="31" Transparent="yes" NoPrefix="yes" Hidden="yes" Text="!(loc.AdvancedWelcomeEulaDlgDescriptionPerMachine)">
           <Condition Action="show">ALLUSERS</Condition>
         </Control>
