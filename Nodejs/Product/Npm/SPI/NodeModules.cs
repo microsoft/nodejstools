@@ -141,7 +141,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             _allModules.TryGetValue(directorySubString, out value);
 
             var depth = value != null ? value.Depth : 0;
-            Debug.Assert(filepath.Length >= NativeMethods.MAX_FOLDER_PATH || depth != 0, "Could not calculate depth for {0}", filepath);
+            Debug.WriteLine("Module Depth: {0} [{1}]", filepath, depth);
 
             return depth;
         }
