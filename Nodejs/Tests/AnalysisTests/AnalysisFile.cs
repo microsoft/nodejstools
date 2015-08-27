@@ -132,9 +132,7 @@ namespace AnalysisTests {
             foreach (var file in Directory.GetFiles(directory, "*", SearchOption.AllDirectories)) {
                 if (String.Equals(Path.GetExtension(file), ".js", StringComparison.OrdinalIgnoreCase)) {
                     var relativeFile = file.Substring(directory.Length);
-                    if (!limits.IsPathExceedNestingLimit(relativeFile)) {
-                        files.Add(new AnalysisFile(file, File.ReadAllText(file)));
-                    }
+                    files.Add(new AnalysisFile(file, File.ReadAllText(file)));
                 } else if (String.Equals(Path.GetFileName(file), "package.json", StringComparison.OrdinalIgnoreCase)) {
                     JavaScriptSerializer serializer = new JavaScriptSerializer();
                     Dictionary<string, object> json;

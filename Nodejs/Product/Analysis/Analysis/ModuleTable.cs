@@ -115,7 +115,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 tree.ProjectEntry = value;
 
                 // Update visibility..
-                AddVisibility(tree, value, true);
+                AddVisibility(tree, value);
 
                 value._enqueueModuleDependencies = true;
 
@@ -141,7 +141,7 @@ namespace Microsoft.NodejsTools.Analysis {
         // We share hashsets of visible nodes.  They're stored in the ModuleTree and when a
         // new module is added we assign it's _visibleEntries field to the one shared by all
         // of it's peers.  We then update the relevant entries with the new values.
-        private void AddVisibility(ModuleTree tree, ProjectEntry newModule, bool recurse) {
+        internal void AddVisibility(ModuleTree tree, ProjectEntry newModule) {
             // My peers can see my assignments/I can see my peers assignments.  Update
             // ourselves and our peers so we can see each others writes.
             var curTree = tree;
@@ -202,28 +202,29 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         private IAnalysisSet RequireModule(Node node, AnalysisUnit unit, string moduleName, ModuleTree relativeTo) {
+            ModuleTree tree = RequireModule(unit, moduleName, relativeTo);
+            if (node != null) {
+                return GetExports(node, unit, tree);
+            }
+            return AnalysisSet.Empty;
+        }
+
+        internal ModuleTree RequireModule(AnalysisUnit unit, string moduleName, ModuleTree relativeTo) {
+            ModuleTree curTree = null;
             if (moduleName.StartsWith("./") || moduleName.StartsWith("../")) {
                 // search relative to our declaring module.
-                return GetExports(
-                    node,
-                    unit,
-                    ResolveModule(relativeTo, moduleName, unit)
-                );
+                curTree = ResolveModule(relativeTo, moduleName, unit);
             } else {
                 // must be in node_modules, search in the current directory
                 // and up through our parents                
                 do {
                     var nodeModules = relativeTo.GetChild(AnalysisConstants.NodeModulesFolder, unit);
-                    var curTree = ResolveModule(nodeModules, moduleName, unit);
-
-                    if (curTree != null) {
-                        return GetExports(node, unit, curTree);
-                    }
+                    curTree = ResolveModule(nodeModules, moduleName, unit);
 
                     relativeTo = relativeTo.Parent;
-                } while (relativeTo != null);
+                } while (relativeTo != null && curTree == null);
             }
-            return AnalysisSet.Empty;
+            return curTree;
         }
 
         public static ModuleTree ResolveModule(ModuleTree parentTree, string relativeName) {

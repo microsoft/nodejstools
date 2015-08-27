@@ -699,7 +699,7 @@ namespace Microsoft.NodejsTools.Analysis {
             do {
                 ModuleTree nodeModules;
                 if (parentMT.Children.TryGetValue(AnalysisConstants.NodeModulesFolder, out nodeModules)) {
-                    foreach (var child in GetChildrenExcludingNodeModules(nodeModules)) {
+                    foreach (var child in nodeModules.GetChildrenExcludingNodeModules()) {
                         var module = ModuleTable.ResolveModule(child.Parent, child.Name);
                         if (module != null) {
                             res.Add(MakeProjectMemberResult(module.Name));
@@ -709,7 +709,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 parentMT = parentMT.Parent;
             } while (parentMT != null);
 
-            foreach (var sibling in GetChildrenExcludingNodeModules(moduleTree.Parent)) {
+            foreach (var sibling in moduleTree.Parent.GetChildrenExcludingNodeModules()) {
                 if (sibling == moduleTree) {
                     //Don't let us require ourself
                     continue;
@@ -731,19 +731,8 @@ namespace Microsoft.NodejsTools.Analysis {
                 JsMemberType.Module);
         }
 
-        private IEnumerable<ModuleTree> GetChildrenExcludingNodeModules(ModuleTree moduleTree) {
-            if (moduleTree == null) {
-                return Enumerable.Empty<ModuleTree>();
-            }
-            //Children.Values returns an IEnumerable
-            //  The process of resolving modules can lead us to add entries into the underlying array
-            //  doing so results in exceptions b/c the array has changed under the enumerable
-            //  To avoid this, we call .ToArray() to create a copy of the array locally which we then Enumerate
-            return moduleTree.Children.Values.ToArray().Where(mod => !String.Equals(mod.Name, AnalysisConstants.NodeModulesFolder, StringComparison.OrdinalIgnoreCase));
-        }
-
         private void GetChildModules(List<MemberResult> res, ModuleTree moduleTree, string projectRelative) {
-            foreach (var child in GetChildrenExcludingNodeModules(moduleTree)) {
+            foreach (var child in moduleTree.GetChildrenExcludingNodeModules()) {
                 Debug.Assert(child.Name != AnalysisConstants.NodeModulesFolder);
                 if (child.ProjectEntry == null) {
                     GetChildModules(res, child, projectRelative + child.Name + "/");

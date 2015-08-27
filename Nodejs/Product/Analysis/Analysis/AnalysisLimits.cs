@@ -157,23 +157,10 @@ namespace Microsoft.NodejsTools.Analysis {
         /// <summary>
         /// Checks whether relative path exceed the nested module limit.
         /// </summary>
-        /// <param name="path">Path to module file which has to be checked for depth limit.</param>
+        /// <param name="nestedModulesDepth">Depth of module file which has to be checked for depth limit.</param>
         /// <returns>True if path too deep in nesting tree; false overwise.</returns>
-        public bool IsPathExceedNestingLimit(string path) { 
-            int nestedModulesCount = 0;
-            int startIndex = 0;
-            int index = path.IndexOf(AnalysisConstants.NodeModulesFolder, startIndex, StringComparison.OrdinalIgnoreCase);
-            while (index != -1) {
-                nestedModulesCount++;
-                if (nestedModulesCount > this.NestedModulesLimit){
-                    return true;
-                }
-
-                startIndex = index + AnalysisConstants.NodeModulesFolder.Length;
-                index = path.IndexOf(AnalysisConstants.NodeModulesFolder, startIndex, StringComparison.OrdinalIgnoreCase);
-            }
-
-            return false;
+        public bool IsPathExceedNestingLimit(int nestedModulesDepth) {
+            return nestedModulesDepth > NestedModulesLimit;
         }
 
         public override bool Equals(object obj) {

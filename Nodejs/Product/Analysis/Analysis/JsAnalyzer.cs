@@ -129,7 +129,7 @@ namespace Microsoft.NodejsTools.Analysis {
             return entry;
         }
 
-        public IAnalyzable AddPackageJson(string filePath, string entryPoint) {
+        public IAnalyzable AddPackageJson(string filePath, string entryPoint, List<string> dependencies = null) {
             if (!Path.GetFileName(filePath).Equals("package.json", StringComparison.OrdinalIgnoreCase)) {
                 throw new InvalidOperationException("path must be to package.json file");
             }
@@ -140,10 +140,18 @@ namespace Microsoft.NodejsTools.Analysis {
             }
 
             var tree = Modules.GetModuleTree(Path.GetDirectoryName(filePath));
-            
+
             tree.DefaultPackage = entryPoint;
 
-            return new TreeUpdateAnalysis(tree);
+            var requireAnalysisUnits = new List<RequireAnalysisUnit>();
+            if (dependencies != null) {
+                var projectEntry = new ProjectEntry(this, filePath, null);
+                requireAnalysisUnits.AddRange(dependencies.Select(
+                    dependency => { return new RequireAnalysisUnit(tree, Modules, projectEntry, dependency);
+                }));
+            }
+
+            return new TreeUpdateAnalysis(tree, requireAnalysisUnits);
         }
 
         /// <summary>
@@ -154,13 +162,21 @@ namespace Microsoft.NodejsTools.Analysis {
         [Serializable]
         internal class TreeUpdateAnalysis : IAnalyzable {
             private readonly ModuleTree _tree;
-            public TreeUpdateAnalysis(ModuleTree tree) {
+            private readonly IEnumerable<RequireAnalysisUnit> _requireAnalysisUnits;
+
+            public TreeUpdateAnalysis(ModuleTree tree, IEnumerable<RequireAnalysisUnit> requireAnalysisUnits = null) {
                 _tree = tree;
+                _requireAnalysisUnits = requireAnalysisUnits;
             }
 
             public void Analyze(CancellationToken cancel) {
                 if (_tree != null) {
                     _tree.EnqueueDependents();
+                }
+                if (_requireAnalysisUnits != null) {
+                    foreach (var unit in _requireAnalysisUnits) {
+                        unit.AnalyzeWorker(null, cancel);
+                    }
                 }
             }
         }

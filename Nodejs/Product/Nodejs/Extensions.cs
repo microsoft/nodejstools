@@ -112,7 +112,7 @@ namespace Microsoft.NodejsTools {
         internal static IComponentModel GetComponentModel(this IServiceProvider serviceProvider) {
             return (IComponentModel)serviceProvider.GetService(typeof(SComponentModel));
         }
-        
+
         internal static string GetFilePath(this ITextBuffer textBuffer) {
             ITextDocument textDocument;
             if (textBuffer.Properties.TryGetProperty<ITextDocument>(typeof(ITextDocument), out textDocument)) {
@@ -290,7 +290,7 @@ namespace Microsoft.NodejsTools {
                 location.FilePath,
                 location.Line - 1,
                 location.Column - 1
-            );            
+            );
         }
 
         internal static SnapshotPoint? GetCaretPosition(this ITextView view) {

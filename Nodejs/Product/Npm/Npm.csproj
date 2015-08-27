@@ -90,6 +90,9 @@
     <Compile Include="..\..\..\Common\Product\SharedProject\CommonUtils.cs">
       <Link>CommonUtils.cs</Link>
     </Compile>
+    <Compile Include="$(BuildRoot)\Nodejs\Product\Nodejs\NodejsConstants.cs">
+      <Link>NodejsConstants.cs</Link>
+    </Compile>
     <Compile Include="IHomepages.cs" />
     <Compile Include="IPackageCatalogFilter.cs" />
     <Compile Include="NativeMethods.cs" />

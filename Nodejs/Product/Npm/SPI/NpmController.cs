@@ -277,7 +277,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
             // Check that the file is either a package.json file, or exists in the node_modules directory
             // This allows us to properly detect both installed and uninstalled/linked packages (where we don't receive an event for package.json)
-            if (path.EndsWith("package.json", StringComparison.OrdinalIgnoreCase) || path.IndexOf("node_modules", StringComparison.OrdinalIgnoreCase) != -1) {
+            if (path.EndsWith("package.json", StringComparison.OrdinalIgnoreCase) || path.IndexOf(NodejsConstants.NodeModulesFolder, StringComparison.OrdinalIgnoreCase) != -1) {
                 RestartFileSystemWatcherTimer();
             }
 
@@ -291,6 +291,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     _fileSystemWatcherTimer.Dispose();
                 }
 
+                // Be sure to update the FileWatcher in NodejsProjectNode if the dueTime value changes.
                 _fileSystemWatcherTimer = new Timer(o => UpdateModulesFromTimer(), null, 1000, Timeout.Infinite);
             }
         }
