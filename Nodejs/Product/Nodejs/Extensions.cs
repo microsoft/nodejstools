@@ -121,6 +121,13 @@ namespace Microsoft.NodejsTools {
             }
         }
 
+        internal static T[] Append<T>(this T[] list, T item) {
+            T[] res = new T[list.Length + 1];
+            list.CopyTo(res, 0);
+            res[res.Length - 1] = item;
+            return res;
+        }
+
         internal static T[] Append<T>(this T[] list, params T[] items) {
             T[] res = new T[list.Length + items.Length];
             list.CopyTo(res, 0);

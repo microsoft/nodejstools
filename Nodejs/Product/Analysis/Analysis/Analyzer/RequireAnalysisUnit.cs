@@ -14,44 +14,39 @@
 //
 //*********************************************************//
 
-using System.IO;
+using System.Diagnostics;
 using System.Threading;
 
 namespace Microsoft.NodejsTools.Analysis.Analyzer {
     class RequireAnalysisUnit : AnalysisUnit {
         private string _dependency;
         private ModuleTree _tree;
-        private ProjectEntry _entry;
         private ModuleTable _table;
 
-        public RequireAnalysisUnit(ModuleTree tree, ModuleTable table, ProjectEntry entry, string dependency) : base (entry.Tree, entry.EnvironmentRecord) {
+        internal RequireAnalysisUnit(ModuleTree tree, ModuleTable table, ProjectEntry entry, string dependency) : base (entry.Tree, entry.EnvironmentRecord) {
             _tree = tree;
             _table = table;
-            _entry = entry;
             _dependency = dependency;
         }
 
         internal override void AnalyzeWorker(DDG ddg, CancellationToken cancel) {
-            UpdateVisibilities(_tree, _table, _entry, _dependency);
-        }
-
-        internal static void UpdateVisibilities(ModuleTree _tree, ModuleTable _table, ProjectEntry entry, string dependency) {
-            ModuleTree module = _table.RequireModule(new RequireAnalysisUnit(_tree, _table, entry, dependency), dependency, _tree);
+            ModuleTree module = _table.RequireModule(this, _dependency, _tree);
             if (module == null) {
                 return;
             }
 
-            var enumerator = module.Children.Values.GetEnumerator();
-            while (enumerator.MoveNext()) {
-                var childTree = enumerator.Current;
-                if (childTree.ProjectEntry != null) {
+            AddChildVisibilitiesExcludingNodeModules(module);
+        }
+
+        private void AddChildVisibilitiesExcludingNodeModules(ModuleTree moduleTree) {
+            foreach (var childTree in moduleTree.GetChildrenExcludingNodeModules()) {
+                Debug.Assert(childTree.Name != AnalysisConstants.NodeModulesFolder);
+                if (childTree.ProjectEntry == null) {
+                    AddChildVisibilitiesExcludingNodeModules(childTree);
+                } else {
                     _table.AddVisibility(_tree, childTree.ProjectEntry);
                 }
             }
-        }
-
-        internal override ModuleEnvironmentRecord GetDeclaringModuleEnvironment() {
-            return base.GetDeclaringModuleEnvironment();
         }
     }
 }

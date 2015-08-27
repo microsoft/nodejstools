@@ -142,13 +142,16 @@ namespace Microsoft.NodejsTools.Analysis {
             var tree = Modules.GetModuleTree(Path.GetDirectoryName(filePath));
 
             tree.DefaultPackage = entryPoint;
+
+            var requireAnalysisUnits = new List<RequireAnalysisUnit>();
             if (dependencies != null) {
-                foreach (var dependency in dependencies) {
-                    RequireAnalysisUnit.UpdateVisibilities(tree, Modules, new ProjectEntry(this, filePath, null), dependency);
-                }
+                var projectEntry = new ProjectEntry(this, filePath, null);
+                requireAnalysisUnits.AddRange(dependencies.Select(
+                    dependency => { return new RequireAnalysisUnit(tree, Modules, projectEntry, dependency);
+                }));
             }
 
-            return new TreeUpdateAnalysis(tree);
+            return new TreeUpdateAnalysis(tree, requireAnalysisUnits);
         }
 
         /// <summary>
@@ -159,13 +162,21 @@ namespace Microsoft.NodejsTools.Analysis {
         [Serializable]
         internal class TreeUpdateAnalysis : IAnalyzable {
             private readonly ModuleTree _tree;
-            public TreeUpdateAnalysis(ModuleTree tree) {
+            private readonly IEnumerable<RequireAnalysisUnit> _requireAnalysisUnits;
+
+            public TreeUpdateAnalysis(ModuleTree tree, IEnumerable<RequireAnalysisUnit> requireAnalysisUnits = null) {
                 _tree = tree;
+                _requireAnalysisUnits = requireAnalysisUnits;
             }
 
             public void Analyze(CancellationToken cancel) {
                 if (_tree != null) {
                     _tree.EnqueueDependents();
+                }
+                if (_requireAnalysisUnits != null) {
+                    foreach (var unit in _requireAnalysisUnits) {
+                        unit.AnalyzeWorker(null, cancel);
+                    }
                 }
             }
         }
