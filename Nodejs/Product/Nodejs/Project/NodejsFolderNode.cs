@@ -44,50 +44,57 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public void UpdateContentType() {
+            var oldContentType = _contentType;
+            _contentType = FolderContentType.None;
+            var parent = Parent as NodejsFolderNode;
             _containsNodeOrBrowserFiles = false;
-            
-            // Iterate through all of the javascript files in a directory to determine whether
-            // the build actions are Content, Compile, or a mix of the two.
-            var fileNodesEnumerator = this.EnumNodesOfType<NodejsFileNode>().GetEnumerator();
-            FolderContentType contentType = FolderContentType.None;
-            while (fileNodesEnumerator.MoveNext()) {
-                if (!fileNodesEnumerator.Current.Url.EndsWith(".js", StringComparison.OrdinalIgnoreCase)) {
-                    continue;
-                }
-                var properties = fileNodesEnumerator.Current.NodeProperties as IncludedFileNodeProperties;
-                if (properties != null) {
-                    _containsNodeOrBrowserFiles = true;
-                    switch (properties.BuildAction) {
-                        case prjBuildAction.prjBuildActionContent:
-                            contentType |= FolderContentType.Browser;
-                            break;
-                        case prjBuildAction.prjBuildActionCompile:
-                            contentType |= FolderContentType.Node;
-                            break;
+
+            if (ItemNode.IsExcluded || ItemNode.Url.Contains(NodejsConstants.NodeModulesFolder)) {
+                _contentType = FolderContentType.None;
+            } else {
+                // Iterate through all of the javascript files in a directory to determine whether
+                // the build actions are Content, Compile, or a mix of the two.
+                var nodejsFileNodes = EnumNodesOfType<NodejsFileNode>();
+                FolderContentType contentType = FolderContentType.None;
+                foreach (var fileNode in nodejsFileNodes) {
+                    if (!fileNode.Url.EndsWith(".js", StringComparison.OrdinalIgnoreCase)) {
+                        continue;
                     }
 
-                    if (contentType == FolderContentType.Mixed) {
-                        break;
+                    var properties = fileNode.NodeProperties as IncludedFileNodeProperties;
+                    if (properties != null) {
+                        _containsNodeOrBrowserFiles = true;
+                        switch (properties.BuildAction) {
+                            case prjBuildAction.prjBuildActionContent:
+                                contentType |= FolderContentType.Browser;
+                                break;
+                            case prjBuildAction.prjBuildActionCompile:
+                                contentType |= FolderContentType.Node;
+                                break;
+                        }
+
+                        if (contentType == FolderContentType.Mixed) {
+                            break;
+                        }
                     }
                 }
-            }
 
-            // If there are no relevant javascript files in the folder, then fall back to
-            // the parent type. This enables us to provide good defaults in the event that
-            // an item is added to the directory later.
-            var parent = this.Parent as NodejsFolderNode;
-            if (contentType == FolderContentType.None) {
-                // Set as parent content type 
-                if (parent != null) {
-                    contentType = parent.ContentType;
+                // If there are no relevant javascript files in the folder, then fall back to
+                // the parent type. This enables us to provide good defaults in the event that
+                // an item is added to the directory later.
+                if (contentType == FolderContentType.None) {
+                    // Set as parent content type 
+                    if (parent != null) {
+                        contentType = parent.ContentType;
+                    }
                 }
-            }
 
-            _contentType = contentType;
-            ProjectMgr.ReDrawNode(this, UIHierarchyElement.Caption);
+                _contentType = contentType;
+                ProjectMgr.ReDrawNode(this, UIHierarchyElement.Caption);
+            }
 
             // Update the caption of the parent folder accordingly
-            if (parent != null) {
+            if (parent != null && _contentType != oldContentType) {
                 parent.UpdateContentType();
             }
         }
