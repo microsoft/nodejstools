@@ -63,6 +63,7 @@
     <Compile Include="InstallerTelemetryAction.cs" />
     <Content Include="CustomAction.config" />
   </ItemGroup>
+  <Import Project="$(BuildRoot)\Build\Common.Build.CSharp.targets" />
   <Import Project="$(WixCATargetsPath)" />
   <Import Project="..\SetupProjectAfter.settings" />
 </Project>
