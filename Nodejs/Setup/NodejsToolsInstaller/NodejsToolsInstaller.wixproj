@@ -12,10 +12,6 @@
     <SccProvider>SAK</SccProvider>
     <SccAuxPath>SAK</SccAuxPath>
     <SccLocalPath>SAK</SccLocalPath>
-    <DefineConstants>
-      $(DefineConstants);
-      ReleaseBuild=$(ReleaseBuild)
-    </DefineConstants>
     <DefineConstants Condition="$(VSTarget) == '12.0'">
       $(DefineConstants);
       IncludeVWDExpress=12.0.30219.0;
@@ -56,10 +52,6 @@
     <Content Include="NodejsToolsInstallerVars.wxi" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\InstallerTelemetryAction\InstallerTelemetryAction.csproj" Condition="'$(ReleaseBuild)' == 'True'" >
-      <Name>InstallerTelemetryAction</Name>
-      <Project>{775e686d-c646-4dab-9dcf-d2c37ff8ea78}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\InteractiveWindow\InteractiveWindow.wixproj">
       <Name>InteractiveWindow</Name>
       <Project>{C0D64130-C0E9-4CAB-99BC-68F62357F010}</Project>
