@@ -477,7 +477,7 @@ namespace Microsoft.NodejsTools.Project {
                 var ignoredPaths = GetProjectProperty(NodejsConstants.AnalysisIgnoredDirectories);
 
                 if (!string.IsNullOrWhiteSpace(ignoredPaths)) {
-                    _analysisIgnoredDirs = _analysisIgnoredDirs.Concat(ignoredPaths.Split(';').Select(x => '\\' + x + '\\').ToArray()).ToArray();
+                    _analysisIgnoredDirs.Append(ignoredPaths.Split(';').Select(x => '\\' + x + '\\').ToArray());
                 }
 
                 var maxFileSizeProp = GetProjectProperty(NodejsConstants.AnalysisMaxFileSize);
