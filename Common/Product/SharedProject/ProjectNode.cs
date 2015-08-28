@@ -2676,7 +2676,7 @@ namespace Microsoft.VisualStudioTools.Project {
             OLEMSGDEFBUTTON defaultButton = OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST;
 
             // File already exists in project... message box
-            message = SR.GetString(inProject ? SR.FileAlreadyInProject : SR.FileAlreadyExists, Path.GetFileName(originalFileName));
+            message = SR.GetString(inProject ? SR.FileAlreadyInProject : SR.FileAlreadyExists, Path.GetFileName(computedNewFileName));
             icon = OLEMSGICON.OLEMSGICON_QUERY;
             buttons = OLEMSGBUTTON.OLEMSGBUTTON_YESNO;
             int msgboxResult = Utilities.ShowMessageBox(this.Site, title, message, icon, buttons, defaultButton);
