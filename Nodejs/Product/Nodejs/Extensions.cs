@@ -129,6 +129,15 @@ namespace Microsoft.NodejsTools {
             return res;
         }
 
+        internal static T[] Append<T>(this T[] list, params T[] items) {
+            T[] res = new T[list.Length + items.Length];
+            list.CopyTo(res, 0);
+            for (int i = 0; i < items.Length; i++) {
+                res[res.Length - items.Length + i] = items[i];
+            }
+            return res;
+        }
+
         internal static EnvDTE.Project GetProject(this ITextBuffer buffer) {
             var path = buffer.GetFilePath();
             if (path != null && NodejsPackage.Instance != null) {
