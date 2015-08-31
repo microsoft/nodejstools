@@ -81,7 +81,15 @@ namespace Microsoft.NodejsTools.Commands {
                         }
                         if (File.Exists(path)) {
                             object outRef = null, pathRef = "\"" + path + "\"";
-                            NodejsPackage.Instance.DTE.Commands.Raise(VSConstants.GUID_VSStandardCommandSet97.ToString("B"), (int)VSConstants.VSStd97CmdID.AddExistingProject, ref pathRef, ref outRef);
+                            var addExistingProjectCmd = NodejsPackage.Instance.DTE.Commands.Item("File.AddExistingProject");
+                            if (addExistingProjectCmd.IsAvailable)
+                            {
+                                NodejsPackage.Instance.DTE.Commands.Raise(VSConstants.GUID_VSStandardCommandSet97.ToString("B"), (int)VSConstants.VSStd97CmdID.AddExistingProject, ref pathRef, ref outRef);
+                            }
+                            else
+                            {
+                                NodejsPackage.Instance.DTE.Commands.Raise(VSConstants.GUID_VSStandardCommandSet97.ToString("B"), (int)VSConstants.VSStd97CmdID.OpenProject, ref pathRef, ref outRef);
+                            }
                             statusBar.SetText(String.Empty);
                         } else {
                             statusBar.SetText("An error occurred and your project was not created.");
