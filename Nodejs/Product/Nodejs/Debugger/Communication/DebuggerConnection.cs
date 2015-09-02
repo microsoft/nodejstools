@@ -22,6 +22,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Logging;
+using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json;
 
@@ -118,11 +119,9 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             lock (_networkClientLock) {
                 int connection_attempts = 0;
                 const int MAX_ATTEMPTS = 5;
-                while (true)
-                {
+                while (true) {
                     connection_attempts++;
-                    try
-                    {
+                    try {
                         // TODO: This currently results in a call to the synchronous TcpClient
                         // constructor, which is a blocking call, and can take a couple of seconds
                         // to connect (with timeouts and retries). This code is running on the UI
@@ -132,25 +131,23 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                         // Unclear if the above can succeed and not be connected, but check for safety.
                         // The code needs to either break out the while loop, or hit the retry logic
                         // in the exception handler.
-                        if (_networkClient.Connected)
-                        {
+                        if (_networkClient.Connected) {
                             LiveLogger.WriteLine("Debugger connected successfully");
                             break;
                         }
-                        else
-                        {
+                        else {
                             throw new SocketException();
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        LiveLogger.WriteLine("Connection attempt {0} failed with: {1}", connection_attempts, ex);
-                        if (connection_attempts >= MAX_ATTEMPTS)
-                        {
+                    catch (Exception ex) {
+                        if (ex.IsCriticalException()) {
                             throw;
                         }
-                        else
-                        {
+                        LiveLogger.WriteLine("Connection attempt {0} failed with: {1}", connection_attempts, ex);
+                        if (connection_attempts >= MAX_ATTEMPTS) {
+                            throw;
+                        }
+                        else {
                             // See above TODO. This should be moved off the UI thread or posted to retry
                             // without blocking in the meantime. For now, this seems the lesser of two
                             // evils. (The other being the debugger failing to attach on launch if the
