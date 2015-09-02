@@ -27,24 +27,27 @@ namespace Microsoft.NodejsTools.Commands {
     /// Provides the command to import a project from existing code.
     /// </summary>
     class ImportWizardCommand : Command {
+
         public override void DoCommand(object sender, EventArgs args) {
             var statusBar = (IVsStatusbar)CommonPackage.GetGlobalService(typeof(SVsStatusbar));
             statusBar.SetText("Importing project...");
 
             var dlg = new Microsoft.NodejsTools.Project.ImportWizard.ImportWizard();
+            String context = "";
             
             Microsoft.VisualStudio.Shell.OleMenuCmdEventArgs oleArgs = args as Microsoft.VisualStudio.Shell.OleMenuCmdEventArgs;
             if (oleArgs != null) {
                 string projectArgs = oleArgs.InValue as string;
                 if (projectArgs != null) {
                     var argItems = projectArgs.Split('|');
-                    if (argItems.Length == 2) {
+                    if (argItems.Length == 3) {
                         dlg.ImportSettings.ProjectPath = CommonUtils.GetAvailableFilename(
                             argItems[1], 
                             argItems[0], 
                             ".njsproj"
                         );
                         dlg.ImportSettings.SourcePath = argItems[1];
+                        context = argItems[2];
                     }
                 }
             }
@@ -81,13 +84,10 @@ namespace Microsoft.NodejsTools.Commands {
                         }
                         if (File.Exists(path)) {
                             object outRef = null, pathRef = "\"" + path + "\"";
-                            var addExistingProjectCmd = NodejsPackage.Instance.DTE.Commands.Item("File.AddExistingProject");
-                            if (addExistingProjectCmd.IsAvailable)
-                            {
+                            if (context == "AddNewProject") {
                                 NodejsPackage.Instance.DTE.Commands.Raise(VSConstants.GUID_VSStandardCommandSet97.ToString("B"), (int)VSConstants.VSStd97CmdID.AddExistingProject, ref pathRef, ref outRef);
                             }
-                            else
-                            {
+                            else {
                                 NodejsPackage.Instance.DTE.Commands.Raise(VSConstants.GUID_VSStandardCommandSet97.ToString("B"), (int)VSConstants.VSStd97CmdID.OpenProject, ref pathRef, ref outRef);
                             }
                             statusBar.SetText(String.Empty);

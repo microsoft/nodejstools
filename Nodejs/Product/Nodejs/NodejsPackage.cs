@@ -38,6 +38,7 @@ using Microsoft.NodejsTools.Options;
 using Microsoft.NodejsTools.Project;
 using Microsoft.NodejsTools.Repl;
 using Microsoft.NodejsTools.Telemetry;
+using Microsoft.NodejsTools.ProjectWizard;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Debugger.Interop;
@@ -182,6 +183,8 @@ namespace Microsoft.NodejsTools {
         // Overridden Package Implementation
         #region Package Members
 
+        private List<EnvDTE.CommandEvents> subscribedCommandEvents = new List<EnvDTE.CommandEvents>();
+
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
         /// where you can put all the initialization code that rely on services provided by VisualStudio.
@@ -189,6 +192,17 @@ namespace Microsoft.NodejsTools {
         protected override void Initialize() {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
+
+            var addNewProjectGuid = typeof(VSConstants.VSStd97CmdID).GUID.ToString("B");
+            var addNewProjectId = (int)VSConstants.VSStd97CmdID.AddNewProject;
+            var addNewProjectEvent = DTE.Events.CommandEvents[addNewProjectGuid, addNewProjectId];
+            addNewProjectEvent.BeforeExecute += delegate {
+                NewProjectFromExistingWizard.AddingNewProject = true;
+            };
+            addNewProjectEvent.AfterExecute += delegate {
+                NewProjectFromExistingWizard.AddingNewProject = false;
+            };
+            subscribedCommandEvents.Add(addNewProjectEvent);
 
             var langService = new NodejsLanguageInfo(this);
             ((IServiceContainer)this).AddService(langService.GetType(), langService, true);
