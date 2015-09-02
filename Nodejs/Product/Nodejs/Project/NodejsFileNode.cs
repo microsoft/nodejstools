@@ -41,7 +41,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         internal void Analyze() {
-            if (ProjectMgr?.Analyzer != null && ShouldAnalyze) {
+            if (ProjectMgr != null && ProjectMgr.Analyzer != null && ShouldAnalyze) {
                 ProjectMgr.Analyzer.AnalyzeFile(Url, !IsNonMemberItem);
                 ProjectMgr._requireCompletionCache.Clear();
             }
