@@ -22,6 +22,7 @@ using System.Text.RegularExpressions;
 using Microsoft.NodejsTools.SourceMapping;
 using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json.Linq;
+using TypeScriptSourceMapReader;
 
 namespace Microsoft.NodejsTools.Debugger.Commands {
     sealed class SetBreakpointCommand : DebuggerCommand {
@@ -29,17 +30,19 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
         private readonly NodeBreakpoint _breakpoint;
         private readonly NodeModule _module;
         private readonly SourceMapper _sourceMapper;
+        private readonly SourceMapReader _sourceMapReader;
         private readonly FilePosition _position;
 
-        public SetBreakpointCommand(int id, NodeModule module, NodeBreakpoint breakpoint, bool withoutPredicate, bool remote, SourceMapper sourceMapper = null)
+        public SetBreakpointCommand(int id, NodeModule module, NodeBreakpoint breakpoint, bool withoutPredicate, bool remote, SourceMapper sourceMapper = null, SourceMapReader sourceMapReader = null)
             : base(id, "setbreakpoint") {
             Utilities.ArgumentNotNull("breakpoint", breakpoint);
 
             _module = module;
             _breakpoint = breakpoint;
             _sourceMapper = sourceMapper;
+            _sourceMapReader = sourceMapReader;
 
-            _position = breakpoint.GetPosition(_sourceMapper);
+            _position = breakpoint.GetPosition(_sourceMapper, _sourceMapReader);
 
             // Zero based line numbers
             int line = _position.Line;

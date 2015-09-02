@@ -14,10 +14,13 @@
 //
 //*********************************************************//
 
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.SourceMapping;
+using TypeScriptSourceMapReader;
 
 namespace Microsoft.NodejsTools.Debugger {
     sealed class NodeBreakpoint {
@@ -55,18 +58,59 @@ namespace Microsoft.NodejsTools.Debugger {
         /// This translates the breakpoint from the location where the user set it (possibly
         /// a TypeScript file) into the location where it lives in JavaScript code.
         /// </summary>
-        public FilePosition GetPosition(SourceMapper mapper) {
+        public FilePosition GetPosition(SourceMapper mapper, SourceMapReader sourceMapReader) {
             // Checks whether source map is available
             string javaScriptFileName;
             int javaScriptLine;
             int javaScriptColumn;
+            string name = "";
+            int tsLine = -1, tsColumn = -1;
+            int jsLine = -1, jsColumn = -1;
+
+            if (sourceMapReader != null) {
+                DecodedSourceMap decodedSourceMap = null;
+                DkmTextSpan? tsSpan = null;
+                string jsFileName = Target.FileName;                
+                string sourceMapFilename = FindSourceMapFile(jsFileName);
+                SourceMapSourceInfo sourceInfo = null;
+                if (!string.IsNullOrEmpty(sourceMapFilename)) {
+                    decodedSourceMap = sourceMapReader.LoadSourceMap(jsFileName, sourceMapFilename);
+                    tsSpan = decodedSourceMap.MapJsSourcePosition(new DkmTextSpan(line + 1, line + 1, column + 1, column + 1), out sourceInfo, out name);
+                }
+            }
 
             if (mapper != null &&
                 mapper.MapToJavaScript(Target.FileName, Target.Line, Target.Column, out javaScriptFileName, out javaScriptLine, out javaScriptColumn)) {
+
+                // TODO: Verify if this statement needed. Did not find a project/configuration where this statement was hit.
+                // If so, replace with the upper section.
                 return new FilePosition(javaScriptFileName, javaScriptLine, javaScriptColumn);
             }
 
             return Target;
+        }
+
+        string FindSourceMapFile(string jsFileName) {
+            string sourceMapFilename = null;
+
+            if (File.Exists(jsFileName)) {
+                string[] contents = File.ReadAllLines(jsFileName);
+                const string marker = "# sourceMappingURL=";
+                int markerStart;
+                string markerLine = contents.Reverse().FirstOrDefault(x => x.IndexOf(marker, StringComparison.Ordinal) != -1);
+                if (markerLine != null && (markerStart = markerLine.IndexOf(marker, StringComparison.Ordinal)) != -1) {
+                    sourceMapFilename = markerLine.Substring(markerStart + marker.Length).Trim();
+
+                    try {
+                        if (!File.Exists(sourceMapFilename)) {
+                            sourceMapFilename = Path.Combine(Path.GetDirectoryName(jsFileName) ?? string.Empty, Path.GetFileName(sourceMapFilename));
+                        }
+                    } catch (ArgumentException) {
+                    } catch (PathTooLongException) {
+                    }
+                }
+            }
+            return sourceMapFilename;
         }
 
         public bool Enabled {

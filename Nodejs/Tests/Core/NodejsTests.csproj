@@ -188,6 +188,10 @@
       <Project>{a731c4c3-3741-4080-a946-c47574c1f3bf}</Project>
       <Name>TestUtilities.UI.Nodejs</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Product\TypeScriptSourceMapReader\TypeScriptSourceMapReader.csproj">
+      <Project>{61a8d7ef-b83e-4c21-9479-ba832357e42c}</Project>
+      <Name>TypeScriptSourceMapReader</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Utilities.Nodejs\TestUtilities.Nodejs.csproj">
       <Project>{9e395ba3-765e-4f35-a520-19f1c323d625}</Project>
       <Name>TestUtilities.Nodejs</Name>
