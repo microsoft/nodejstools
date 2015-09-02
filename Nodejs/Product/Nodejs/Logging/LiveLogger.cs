@@ -32,10 +32,12 @@ namespace Microsoft.NodejsTools.Logging {
         private static volatile LiveLogger _instance;
         private static object _loggerLock = new object();
 
-        private NodejsDiagnosticsOptionsPage _diagnosticsOptions;
+        private NodejsDiagnosticsOptionsPage _diagnosticsOptions = null;
 
         private LiveLogger() {
-            _diagnosticsOptions = NodejsPackage.Instance.DiagnosticsOptionsPage;
+            if (NodejsPackage.Instance != null) {
+                _diagnosticsOptions = NodejsPackage.Instance.DiagnosticsOptionsPage;
+            }
         }
 
         private static LiveLogger Instance {
@@ -68,7 +70,7 @@ namespace Microsoft.NodejsTools.Logging {
         private void LogMessage(string message) {
             Debug.WriteLine(message);
 
-            if (_diagnosticsOptions.IsLiveDiagnosticsEnabled) {
+            if (_diagnosticsOptions != null && _diagnosticsOptions.IsLiveDiagnosticsEnabled) {
                 var pane = OutputWindowRedirector.Get(VisualStudio.Shell.ServiceProvider.GlobalProvider, LiveDiagnosticLogPaneGuid, LiveDiagnosticLogPaneName);
                 if (pane != null) {
                     pane.WriteLine(message);
