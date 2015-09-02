@@ -112,10 +112,53 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         /// <param name="uri">URI identifying the endpoint to connect to.</param>
         public void Connect(Uri uri) {
             Utilities.ArgumentNotNull("uri", uri);
+            LiveLogger.WriteLine("Debugger connecting to URI: {0}", uri);
 
             Close();
             lock (_networkClientLock) {
-                _networkClient = _networkClientFactory.CreateNetworkClient(uri);
+                int connection_attempts = 0;
+                const int MAX_ATTEMPTS = 5;
+                while (true)
+                {
+                    connection_attempts++;
+                    try
+                    {
+                        // TODO: This currently results in a call to the synchronous TcpClient
+                        // constructor, which is a blocking call, and can take a couple of seconds
+                        // to connect (with timeouts and retries). This code is running on the UI
+                        // thread. Ideally this should be connecting async, or moved off the UI thread.
+                        _networkClient = _networkClientFactory.CreateNetworkClient(uri);
+
+                        // Unclear if the above can succeed and not be connected, but check for safety.
+                        // The code needs to either break out the while loop, or hit the retry logic
+                        // in the exception handler.
+                        if (_networkClient.Connected)
+                        {
+                            LiveLogger.WriteLine("Debugger connected successfully");
+                            break;
+                        }
+                        else
+                        {
+                            throw new SocketException();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        LiveLogger.WriteLine("Connection attempt {0} failed with: {1}", connection_attempts, ex);
+                        if (connection_attempts >= MAX_ATTEMPTS)
+                        {
+                            throw;
+                        }
+                        else
+                        {
+                            // See above TODO. This should be moved off the UI thread or posted to retry
+                            // without blocking in the meantime. For now, this seems the lesser of two
+                            // evils. (The other being the debugger failing to attach on launch if the
+                            // debuggee socket wasn't open quickly enough).
+                            System.Threading.Thread.Sleep(200);
+                        }
+                    }
+                }
             }
 
             Task.Factory.StartNew(ReceiveAndDispatchMessagesWorker);

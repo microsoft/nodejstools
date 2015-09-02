@@ -103,18 +103,24 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
                         break;
                     }
                 } catch (OperationCanceledException) {
-                    LiveLogger.WriteLine("NodeRemoteEnumDebugProcesses ping timed out.");
+                    LiveLogger.WriteLine("OperationCanceledException connecting to remote debugger");
                 } catch (DebuggerAlreadyAttachedException ex) {
+                    LiveLogger.WriteLine("DebuggerAlreadyAttachedException connecting to remote debugger");
                     exception = ex;
                 } catch (AggregateException ex) {
+                    LiveLogger.WriteLine("AggregateException connecting to remote debugger");
                     exception = ex;
                 } catch (IOException ex) {
+                    LiveLogger.WriteLine("IOException connecting to remote debugger");
                     exception = ex;
                 } catch (SocketException ex) {
+                    LiveLogger.WriteLine("SocketException connecting to remote debugger");
                     exception = ex;
                 } catch (WebSocketException ex) {
+                    LiveLogger.WriteLine("WebSocketException connecting to remote debugger");
                     exception = ex;
                 } catch (PlatformNotSupportedException) {
+                    LiveLogger.WriteLine("NodeRemoteEnumDebugProcesses ping timed out.");
                     MessageBox.Show(
                         "Remote debugging of node.js Microsoft Azure applications is only supported on Windows 8 and above.",
                         null, MessageBoxButtons.OK, MessageBoxIcon.Error);
