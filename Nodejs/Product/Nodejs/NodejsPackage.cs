@@ -183,6 +183,8 @@ namespace Microsoft.NodejsTools {
         // Overridden Package Implementation
         #region Package Members
 
+        // Hold references for the subscribed events. Otherwise the callbacks will be garbage collected
+        // after the initialization
         private List<EnvDTE.CommandEvents> subscribedCommandEvents = new List<EnvDTE.CommandEvents>();
 
         /// <summary>
