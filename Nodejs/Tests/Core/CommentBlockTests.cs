@@ -17,7 +17,8 @@
 using Microsoft.NodejsTools.Editor.Core;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.Text;
-using TestUtilities.Mocks;
+using MockTextView = TestUtilities.Mocks.MockTextView;
+using MockTextBuffer = NodejsTests.Mocks.MockTextBuffer;
 
 namespace NodejsTests {
     [TestClass]
