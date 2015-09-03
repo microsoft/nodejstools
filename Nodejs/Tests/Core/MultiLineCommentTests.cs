@@ -142,7 +142,7 @@ namespace NodejsTests {
 
             // create the view and request a multiline comment format
             var view = new MockTextView(
-                new MockTextBuffer(startingText, "C:\\app.js", NodejsConstants.Nodejs));
+                new MockTextBuffer(content: startingText, contentType: NodejsConstants.Nodejs, filename: "C:\\app.js"));
             var insertionPoint = new SnapshotPoint(view.TextSnapshot, insertionPosition);
 
             // Setup mock registry service and classification provider for the IsMultilineComment method.
