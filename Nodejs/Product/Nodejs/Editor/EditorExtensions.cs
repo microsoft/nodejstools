@@ -172,7 +172,7 @@ namespace Microsoft.NodejsTools.Editor.Core {
             var classifier = buffer.GetNodejsClassifier();
 
             // Find if this is a comment and then find the starting position of the comment if so.
-            var classificationSpans = buffer.GetNodejsClassifier().GetClassificationSpans(
+            var classificationSpans = classifier.GetClassificationSpans(
                 new SnapshotSpan(insertionPoint.Snapshot, new Span(insertionPoint.Position - 1, 1)));
 
             foreach (var span in classificationSpans) {
