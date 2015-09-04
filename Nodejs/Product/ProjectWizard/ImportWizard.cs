@@ -19,17 +19,18 @@ using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 using EnvDTE;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TemplateWizard;
 
 namespace Microsoft.NodejsTools.ProjectWizard {
     public sealed class NewProjectFromExistingWizard : IWizard {
+        public static Boolean IsAddNewProjectCmd { get; set; }
         public void BeforeOpeningFile(EnvDTE.ProjectItem projectItem) { }
         public void ProjectFinishedGenerating(EnvDTE.Project project) { }
         public void ProjectItemFinishedGenerating(EnvDTE.ProjectItem projectItem) { }
         public void RunFinished() { }
-        public static Boolean AddingNewProject { get; set; } = false;
 
         public void RunStarted(object automationObject, Dictionary<string, string> replacementsDictionary, WizardRunKind runKind, object[] customParams) {
             try {
@@ -76,12 +77,14 @@ namespace Microsoft.NodejsTools.ProjectWizard {
                         directory = Path.GetDirectoryName(Path.GetDirectoryName(replacementsDictionary["$destinationdirectory$"]));
                     }
 
-                    var context = addingNewProject ? "AddNewProject" : "OpenProject";
+                    var context = addingNewProject ? 
+                        (int)VSConstants.VSStd97CmdID.AddExistingProject : 
+                        (int)VSConstants.VSStd97CmdID.OpenProject;
                     object inObj = projName + "|" + directory + "|" + context, outObj = null;
                     dte.Commands.Raise(Guids.NodejsCmdSet.ToString("B"), (int)PkgCmdId.cmdidImportWizard, ref inObj, ref outObj);
                 });
             }
-            addingNewProject = AddingNewProject;
+            addingNewProject = IsAddNewProjectCmd;
             throw new WizardCancelledException();
         }
 

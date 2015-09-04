@@ -33,7 +33,7 @@ namespace Microsoft.NodejsTools.Commands {
             statusBar.SetText("Importing project...");
 
             var dlg = new Microsoft.NodejsTools.Project.ImportWizard.ImportWizard();
-            String context = "";
+            int commandIdToRaise = (int)VSConstants.VSStd97CmdID.OpenProject;
             
             Microsoft.VisualStudio.Shell.OleMenuCmdEventArgs oleArgs = args as Microsoft.VisualStudio.Shell.OleMenuCmdEventArgs;
             if (oleArgs != null) {
@@ -47,7 +47,7 @@ namespace Microsoft.NodejsTools.Commands {
                             ".njsproj"
                         );
                         dlg.ImportSettings.SourcePath = argItems[1];
-                        context = argItems[2];
+                        commandIdToRaise = int.Parse(argItems[2]);
                     }
                 }
             }
@@ -84,12 +84,7 @@ namespace Microsoft.NodejsTools.Commands {
                         }
                         if (File.Exists(path)) {
                             object outRef = null, pathRef = "\"" + path + "\"";
-                            if (context == "AddNewProject") {
-                                NodejsPackage.Instance.DTE.Commands.Raise(VSConstants.GUID_VSStandardCommandSet97.ToString("B"), (int)VSConstants.VSStd97CmdID.AddExistingProject, ref pathRef, ref outRef);
-                            }
-                            else {
-                                NodejsPackage.Instance.DTE.Commands.Raise(VSConstants.GUID_VSStandardCommandSet97.ToString("B"), (int)VSConstants.VSStd97CmdID.OpenProject, ref pathRef, ref outRef);
-                            }
+                            NodejsPackage.Instance.DTE.Commands.Raise(VSConstants.GUID_VSStandardCommandSet97.ToString("B"), commandIdToRaise, ref pathRef, ref outRef);
                             statusBar.SetText(String.Empty);
                         } else {
                             statusBar.SetText("An error occurred and your project was not created.");
