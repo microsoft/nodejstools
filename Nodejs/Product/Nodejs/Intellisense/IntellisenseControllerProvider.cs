@@ -27,6 +27,7 @@ using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.IncrementalSearch;
 using Microsoft.VisualStudio.Text.Operations;
 using Microsoft.VisualStudio.Utilities;
+using Microsoft.VisualStudio.Shell;
 
 namespace Microsoft.NodejsTools.Intellisense {
     [Export(typeof(IIntellisenseControllerProvider)), ContentType(NodejsConstants.Nodejs), Order]
@@ -45,7 +46,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         internal IIncrementalSearchFactoryService _IncrementalSearch = null; // Set via MEF
         [Import]
         internal IClassifierAggregatorService _classifierAgg = null; // Set via MEF
-        [Import]
+        [Import(typeof(SVsServiceProvider))]
         internal IServiceProvider _serviceProvider = null; // imported via MEF
 
         public IIntellisenseController TryCreateIntellisenseController(ITextView textView, IList<ITextBuffer> subjectBuffers) {
