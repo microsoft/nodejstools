@@ -20,6 +20,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.SourceMapping;
+using Microsoft.VisualStudio.Debugger.Symbols;
 using TypeScriptSourceMapReader;
 
 namespace Microsoft.NodejsTools.Debugger {
@@ -64,8 +65,6 @@ namespace Microsoft.NodejsTools.Debugger {
             int javaScriptLine;
             int javaScriptColumn;
             string name = "";
-            int tsLine = -1, tsColumn = -1;
-            int jsLine = -1, jsColumn = -1;
 
             if (sourceMapReader != null) {
                 DecodedSourceMap decodedSourceMap = null;
@@ -75,7 +74,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 SourceMapSourceInfo sourceInfo = null;
                 if (!string.IsNullOrEmpty(sourceMapFilename)) {
                     decodedSourceMap = sourceMapReader.LoadSourceMap(jsFileName, sourceMapFilename);
-                    tsSpan = decodedSourceMap.MapJsSourcePosition(new DkmTextSpan(line + 1, line + 1, column + 1, column + 1), out sourceInfo, out name);
+                    tsSpan = decodedSourceMap.MapJsSourcePosition(new DkmTextSpan(Target.Line + 1, Target.Line + 1, Target.Column + 1, Target.Column + 1), out sourceInfo, out name);
                 }
             }
 
