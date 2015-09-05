@@ -66,104 +66,78 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     db.CreateRegistryTableIfNotExists();
 
                     using (var jsonReader = new JsonTextReader(reader)) {
-                        while (jsonReader.Read()) {
-                            if (JsonToken.PropertyName != jsonReader.TokenType) {
-                                continue;
-                            }
+                        while (jsonReader.Read())
+                        {
+                            // The JSON response is an array of packages
+                            if (jsonReader.TokenType == JsonToken.StartArray)
+                            {
+                                // Inside the package array, each object in the array is a package
+                                var builder = new NodeModuleBuilder();
+                                while (jsonReader.Read())
+                                {
+                                    if (jsonReader.TokenType == JsonToken.StartObject)
+                                    {
+                                        builder.Reset();
+                                        var module = JToken.ReadFrom(jsonReader);
 
-                            if ((string)jsonReader.Value == "_updated") {
-                                jsonReader.Read();
-                                db.InsertOrReplace(new RegistryInfo() {
-                                    RegistryUrl = registryUrl,
-                                    Revision = (long)jsonReader.Value,
-                                    UpdatedOn = DateTime.Now
-                                });
-                                continue;
+                                        builder.Name = (string)module["name"];
+                                        if (string.IsNullOrEmpty(builder.Name))
+                                        {
+                                            continue;
+                                        }
 
-                            }
+                                        builder.AppendToDescription((string)module["description"] ?? string.Empty);
 
-                            var builder = new NodeModuleBuilder();
-                            JToken token = null;
+                                        var time = module["time"];
+                                        if (time != null)
+                                        {
+                                            builder.AppendToDate((string)time["modified"]);
+                                        }
 
-#if DEV14_OR_LATER
-                            try {
-#endif
-                                token = JToken.ReadFrom(jsonReader);
-#if DEV14_OR_LATER
-                            } catch (JsonReaderException) {
-                                // Reached end of file, so continue.
-                                break;
-                            }
-#endif
+                                        var distTags = module["dist-tags"];
+                                        if (distTags != null)
+                                        {
+                                            var latestVersion = distTags
+                                                .OfType<JProperty>()
+                                                .Where(v => (string)v.Name == "latest")
+                                                .Select(v => (string)v.Value)
+                                                .FirstOrDefault();
 
-                            var module = token.FirstOrDefault();
-                            while (module != null) {
-                                try {
-                                    builder.Name = (string)module["name"];
-                                    if (string.IsNullOrEmpty(builder.Name)) {
-                                        continue;
-                                    }
-
-                                    builder.AppendToDescription((string)module["description"] ?? string.Empty);
-
-                                    var time = module["time"];
-                                    if (time != null) {
-                                        builder.AppendToDate((string)time["modified"]);
-                                    }
-
-                                    var distTags = module["dist-tags"];
-                                    if (distTags != null) {
-                                        var latestVersion = distTags
-                                            .OfType<JProperty>()
-                                            .Where(v => (string)v.Name == "latest")
-                                            .Select(v => (string)v.Value)
-                                            .FirstOrDefault();
-
-                                        if (!string.IsNullOrEmpty(latestVersion)) {
-                                            try {
-                                                builder.LatestVersion = SemverVersion.Parse(latestVersion);
-                                            } catch (SemverVersionFormatException) {
-                                                OnOutputLogged(String.Format(Resources.InvalidPackageSemVersion, latestVersion, builder.Name));
+                                            if (!string.IsNullOrEmpty(latestVersion))
+                                            {
+                                                try
+                                                {
+                                                    builder.LatestVersion = SemverVersion.Parse(latestVersion);
+                                                }
+                                                catch (SemverVersionFormatException)
+                                                {
+                                                    OnOutputLogged(String.Format(Resources.InvalidPackageSemVersion, latestVersion, builder.Name));
+                                                }
                                             }
                                         }
-                                    }
 
-                                    var versions = module["versions"];
-                                    if (versions != null) {
-                                        builder.AvailableVersions = GetVersions(versions);
-                                    }
+                                        var versions = module["versions"];
+                                        if (versions != null)
+                                        {
+                                            builder.AvailableVersions = GetVersions(versions);
+                                        }
 
-                                    AddKeywords(builder, module["keywords"]);
+                                        AddKeywords(builder, module["keywords"]);
+                                        AddAuthor(builder, module["author"]);
+                                        AddHomepage(builder, module["homepage"]);
 
-                                    AddAuthor(builder, module["author"]);
-
-                                    AddHomepage(builder, module["homepage"]);
-
-                                    var package = builder.Build();
-
-                                    InsertCatalogEntry(db, package);
-                                } catch (InvalidOperationException) {
-                                    // Occurs if a JValue appears where we expect JProperty
-                                } catch (ArgumentException) {
-                                    OnOutputLogged(string.Format(Resources.ParsingError, builder.Name));
-                                    if (!string.IsNullOrEmpty(builder.Name)) {
                                         var package = builder.Build();
                                         InsertCatalogEntry(db, package);
                                     }
+                                    else
+                                    {
+                                        if (jsonReader.TokenType == JsonToken.EndArray)
+                                        {
+                                            // End of the array of package entries
+                                            break;
+                                        }
+                                    }
                                 }
-
-                                builder.Reset();
-#if DEV14_OR_LATER
-                                try {
-#endif
-                                    token = JToken.ReadFrom(jsonReader);
-#if DEV14_OR_LATER
-                                } catch (JsonReaderException) {
-                                    // Reached end of file, so continue.
-                                    break;
-                                }
-#endif
-                                module = token.FirstOrDefault();
                             }
                         }
                     }
