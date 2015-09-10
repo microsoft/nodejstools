@@ -58,7 +58,10 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             _progress = progress;
         }
 
-        internal void ParseResultsAndAddToDatabase(TextReader reader, string dbFilename, string registryUrl) {
+        internal void ParseResultsAndAddToDatabase(TextReader reader,
+                                                   string dbFilename,
+                                                   string registryUrl) {
+
             Directory.CreateDirectory(Path.GetDirectoryName(dbFilename));
 
             using (var db = new SQLiteConnection(dbFilename)) {
@@ -69,10 +72,12 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                         /*
                         The schema seems to have changed over time.
 
-                        The first format we need to handle is an object literal. It starts with an "_updated"
-                        property, with a value of the timestamp it was retrived, and then a property for each
-                        package, with a name of the package name, and a value which is on object literal
-                        representing the package info. An example downloaded may start:
+                        The first format we need to handle is an object literal. It
+                        starts with an "_updated" property, with a value of the
+                        timestamp it was retrived, and then a property for each
+                        package, with a name of the package name, and a value which
+                        is on object literal representing the package info. An example
+                        downloaded may start:
 
 {
 "_updated": 1413573404788,
@@ -85,20 +90,23 @@ namespace Microsoft.NodejsTools.Npm.SPI {
       "name": "kesla",
 etc.
 
-                        The other format is an array literal, where each element is an object literal
-                        for a package, similar to the value of the properties above, for example:
+                        The other format is an array literal, where each element is an
+                        object literal for a package, similar to the value of the
+                        properties above, for example:
 
 [
-{"name":"008-somepackage","description":"Test Package","dist-tags":{"latest":"1.1.1"},"maintainers":...
+{"name":"008-somepackage","description":"Test Package","dist-tags":{"latest":"1.1.1"}..
 ,
-{"name":"01-simple","description":"That is the first app in order to study the Node-JS technology","dist-tags":...
+{"name":"01-simple","description":"That is the first app in order to study the ..."
 ,
 etc.
 
-                        In this second format, there is no "_updated" property with a timestamp, and the 'Date'
-                        timestamp from the HTTP request for the data is used instead.
+                        In this second format, there is no "_updated" property with a
+                        timestamp, and the 'Date' timestamp from the HTTP request for
+                        the data is used instead.
 
-                        The NPM code that handles the payload seems to be written in a way to handle both formats
+                        The NPM code that handles the payload seems to be written in
+                        a way to handle both formats
                         See https://github.com/npm/npm/blob/2.x-release/lib/cache/update-index.js#L87
                         */
                         jsonReader.Read();
@@ -107,14 +115,18 @@ etc.
                                 ReadPackagesFromObject(db, jsonReader, registryUrl);
                                 break;
                             case JsonToken.StartArray:
-                                // The array format doesn't contain the "_update" field, so create a rough timestamp.
-                                // Use the time from 30 mins ago (to set it before the download request started),
-                                // converted to a JavaScript value (milliseconds since start of 1970)
-                                long revision = (long)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 30, 0, DateTimeKind.Utc)).TotalMilliseconds;
+                                // The array format doesn't contain the "_update" field,
+                                // so create a rough timestamp. Use the time from 30 mins
+                                // ago (to set it before the download request started),
+                                // converted to a JavaScript value (milliseconds since
+                                // start of 1970)
+                                var timestamp = DateTime.UtcNow
+                                    .Subtract(new DateTime(1970, 1, 1, 0, 30, 0, DateTimeKind.Utc))
+                                    .TotalMilliseconds;
                                 ReadPackagesFromArray(db, jsonReader);
                                 db.InsertOrReplace(new RegistryInfo() {
                                     RegistryUrl = registryUrl,
-                                    Revision = revision,
+                                    Revision = (long)timestamp,
                                     UpdatedOn = DateTime.Now
                                 });
                                 break;
@@ -129,15 +141,18 @@ etc.
             }
         }
 
-        private void ReadPackagesFromObject(SQLiteConnection db, JsonTextReader jsonReader, string registryUrl) {
+        private void ReadPackagesFromObject(SQLiteConnection db,
+                                            JsonTextReader jsonReader,
+                                            string registryUrl) {
             var builder = new NodeModuleBuilder();
             while (jsonReader.Read()) {
                 if (jsonReader.TokenType == JsonToken.EndObject) {
-                    // Reached the end of the object literal containing the data. This should be the normal exit point.
+                    // Reached the end of the object literal containing the data.
+                    // This should be the normal exit point.
                     return;
                 }
 
-                // Every property in the object should be either the "_updated" value, or a package
+                // Every property should be either the "_updated" value, or a package
                 if (jsonReader.TokenType != JsonToken.PropertyName) {
                     throw new JsonException("Unexpected JSON token in NPM catalog data");
                 }
@@ -154,7 +169,7 @@ etc.
                     continue;
                 }
 
-                // Else the property value should be an object literal representing the package
+                // Else the property should be an object literal representing the package
                 jsonReader.Read();
                 if (jsonReader.TokenType == JsonToken.StartObject) {
                     IPackage package = ReadPackage(jsonReader, builder);
@@ -180,7 +195,7 @@ etc.
                         }
                         break;
                     case JsonToken.EndArray:
-                        // Done. This is the spot the function should always exit on valid data
+                        // This is the spot the function should always exit on valid data
                         return;
                     default:
                         throw new JsonException("Unexpected JSON token in NPM catalog data array");
@@ -194,13 +209,15 @@ etc.
             builder.Reset();
 
             try {
-                // The JsonTextReader should be positioned at the start of the object literal token for the package
+                // The JsonTextReader should be positioned at the start of the
+                // object literal token for the package
                 var module = JToken.ReadFrom(jsonReader);
 
                 builder.Name = (string)module["name"];
                 if (string.IsNullOrEmpty(builder.Name)) {
-                    // I don't believe this should ever happen if the data returned is well formed.
-                    // Could throw an exception, but just skip instead for resiliency on the NTVS side.
+                    // I don't believe this should ever happen if the data returned is
+                    // well formed. Could throw an exception, but just skip instead for
+                    // resiliency on the NTVS side.
                     return null;
                 }
 
@@ -223,7 +240,10 @@ etc.
                         try {
                             builder.LatestVersion = SemverVersion.Parse(latestVersion);
                         } catch (SemverVersionFormatException) {
-                            OnOutputLogged(String.Format(Resources.InvalidPackageSemVersion, latestVersion, builder.Name));
+                            OnOutputLogged(String.Format(
+                                Resources.InvalidPackageSemVersion,
+                                latestVersion,
+                                builder.Name));
                         }
                     }
                 }
