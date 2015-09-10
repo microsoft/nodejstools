@@ -1027,6 +1027,8 @@ namespace Microsoft.NodejsTools.Project {
                             }
                         }
                         break;
+                    case PkgCmdId.cmdidAddNewJavaScriptFileCommand:
+                        return QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
                 }
             }
 
@@ -1094,6 +1096,10 @@ namespace Microsoft.NodejsTools.Project {
                             CommonConstants.StartupFile,
                             CommonUtils.GetRelativeFilePath(ProjectHome, selectedNodes[0].Url)
                         );
+                        handled = true;
+                        return VSConstants.S_OK;
+                    case PkgCmdId.cmdidAddNewJavaScriptFileCommand:
+                        Debug.Fail("Not implemented");
                         handled = true;
                         return VSConstants.S_OK;
                 }
