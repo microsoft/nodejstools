@@ -121,9 +121,6 @@
     <None Include="TestData\NpmSearchData\NpmCache\registry\registrycache.sqlite">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestData\NpmSearchData\packagecache.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="TestData\NpmPackageJsonData\fresh_package.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -175,10 +172,16 @@
     <None Include="TestData\NpmPackageJsonData\fresh_package_unescapedquote.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestData\NpmSearchData\testpackagecache.sqlite">
+    <None Include="TestData\NpmSearchData\packagecache.min.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestData\NpmSearchData\since_packages.json">
+    <None Include="TestData\NpmSearchData\since_packages.array.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestData\NpmSearchData\since_packages.object.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestData\NpmSearchData\testpackagecache.sqlite">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

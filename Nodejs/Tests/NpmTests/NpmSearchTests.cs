@@ -28,11 +28,13 @@ namespace NpmTests {
 
     [TestClass]
     [DeploymentItem(@"TestData\NpmSearchData\", "NpmSearchData")]
-    [DeploymentItem(@"sqlite3.dll")]
+    // TODO: The below was causing failures when included. Figure out if/how this should be set. (Seems to work fine without it).
+    //[DeploymentItem(@"sqlite3.dll")]
     public class NpmSearchTests {
 
-        private const string PackageCacheAllJsonFilename = "packagecache.json";
-        private const string PackageCacheSinceJsonFilename = "since_packages.json";
+        private const string PackageCacheAllJsonFilename = "packagecache.min.json";
+        private const string PackageCacheSinceJsonFilename = "since_packages.object.json";
+        private const string PackageCacheSinceJsonArrayFilename = "since_packages.array.json";
         private const string PackageCacheDirectory = @"NpmSearchData\NpmCache";
         private const string PackageCacheFilename = @"NpmSearchData\testpackagecache.sqlite";
         private const string RegistryUrl = "http://registry.npmjs.org";
@@ -157,12 +159,12 @@ namespace NpmTests {
             IDictionary<string, IPackage> byName;
             var target = GetTestPackageList(cachePath, out byName);
 
-            Assert.AreEqual(89924, target.Count);
+            Assert.AreEqual(102, target.Count);
 
             CheckPackage(
                 target,
                 byName,
-                13890,
+                93,
                 "cordova",
                 "Cordova command line interface tool",
                 "Anis Kadri",
@@ -190,13 +192,13 @@ namespace NpmTests {
             IDictionary<string, IPackage> byName;
             var target = GetTestPackageList(cachePath, out byName);
 
-            Assert.AreEqual(104627, target.Count);
+            Assert.AreEqual(89978, target.Count);
 
             // Package updated successfully
             CheckPackage(
                 target,
                 byName,
-                16086,
+                13898,
                 "cordova",
                 "Cordova command line interface tool",
                 "Anis Kadri",
@@ -206,14 +208,14 @@ namespace NpmTests {
                     SemverVersion.Parse("4.0.0"),
                     SemverVersion.Parse("3.6.0-0.2.8"),
                 },
-                new[] { "cordova", "client", "cli"}
+                new[] { "cordova", "client", "cli" }
                 );
 
             // Package added successfully
             CheckPackage(
                 target,
                 byName,
-                62899,
+                54151,
                 "mytestpackage98",
                 null,
                 null,
@@ -226,7 +228,58 @@ namespace NpmTests {
                 );
 
         }
-        
+
+        [TestMethod, Priority(0)]
+        public void CheckDatabaseUpdateArray() {
+            string cachePath = "NpmCacheUpdate";
+            string registryPath = Path.Combine(cachePath, "registry", NpmGetCatalogCommand.RegistryCacheFilename);
+
+            FileUtils.CopyDirectory(PackageCacheDirectory, cachePath);
+
+            using (var reader = GetCatalogueReader(PackageCacheSinceJsonArrayFilename)) {
+                new NpmGetCatalogCommand(string.Empty, cachePath, false).ParseResultsAndAddToDatabase(reader, registryPath, RegistryUrl);
+            }
+
+            IDictionary<string, IPackage> byName;
+            var target = GetTestPackageList(cachePath, out byName);
+
+            Assert.AreEqual(90066, target.Count);
+
+            // Package updated successfully
+            CheckPackage(
+                target,
+                byName,
+                13986,
+                "cordova",
+                "Cordova command line interface tool",
+                "Anis Kadri",
+                "10/16/2014 18:05:13",
+                SemverVersion.Parse("4.0.0"),
+                new[] {
+                    SemverVersion.Parse("4.0.0"),
+                    SemverVersion.Parse("3.6.0-0.2.8"),
+                },
+                new[] { "cordova", "client", "cli" }
+                );
+
+            // Package added successfully
+            CheckPackage(
+                target,
+                byName,
+                253,
+                "9e-sass-lint",
+                "Makes sure you stick to our CSS rule order http://9elements.com/css-rule-order/",
+                "Sascha Gehlich",
+                "08/19/2015 08:21:25",
+                SemverVersion.Parse("0.0.12"),
+                new[] {
+                    SemverVersion.Parse("0.0.12")
+                },
+                new[] { "sass", "css", "lint", "rules" }
+                );
+
+        }
+
         [TestMethod, Priority(0)]
         public void CheckPackageWithBuildPreReleaseInfo() {
             IDictionary<string, IPackage> byName;
