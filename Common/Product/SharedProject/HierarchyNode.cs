@@ -590,7 +590,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     break;
 
                 case __VSHPROPID.VSHPROPID_Name:
-                    result = this.Caption;
+                    result = CommonUtils.GetFileOrDirectoryName(this.Url);
                     break;
 
                 case __VSHPROPID.VSHPROPID_ExpandByDefault:
