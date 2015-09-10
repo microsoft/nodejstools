@@ -682,7 +682,8 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
 
             foreach (var item in _projectFiles) {
-                if (!File.Exists(item.Value.Entry.FilePath) || (!item.Value.Reloaded && !item.Value.Entry.IsBuiltin)) {
+                if ((!File.Exists(item.Value.Entry.FilePath) || !item.Value.Reloaded)
+                    && !item.Value.Entry.IsBuiltin) {
                     UnloadFile(item.Value.Entry);
                 }
             }
