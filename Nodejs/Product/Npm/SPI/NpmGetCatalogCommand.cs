@@ -66,79 +66,60 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     db.CreateRegistryTableIfNotExists();
 
                     using (var jsonReader = new JsonTextReader(reader)) {
-                        while (jsonReader.Read())
-                        {
-                            // The JSON response is an array of packages
-                            if (jsonReader.TokenType == JsonToken.StartArray)
-                            {
-                                // Inside the package array, each object in the array is a package
-                                var builder = new NodeModuleBuilder();
-                                while (jsonReader.Read())
-                                {
-                                    if (jsonReader.TokenType == JsonToken.StartObject)
-                                    {
-                                        builder.Reset();
-                                        var module = JToken.ReadFrom(jsonReader);
+                        /*
+                        The schema seems to have changed over time.
 
-                                        builder.Name = (string)module["name"];
-                                        if (string.IsNullOrEmpty(builder.Name))
-                                        {
-                                            continue;
-                                        }
+                        The first format we need to handle is an object literal. It starts with an "_updated"
+                        property, with a value of the timestamp it was retrived, and then a property for each
+                        package, with a name of the package name, and a value which is on object literal
+                        representing the package info. An example downloaded may start:
 
-                                        builder.AppendToDescription((string)module["description"] ?? string.Empty);
+{
+"_updated": 1413573404788,
+"unlink-empty-files": {
+  "name": "unlink-empty-files",
+  "description": "given a directory, unlink (remove) all files with a length of 0",
+  "dist-tags": { "latest": "1.0.1" },
+  "maintainers": [
+    {
+      "name": "kesla",
+etc.
 
-                                        var time = module["time"];
-                                        if (time != null)
-                                        {
-                                            builder.AppendToDate((string)time["modified"]);
-                                        }
+                        The other format is an array literal, where each element is an object literal
+                        for a package, similar to the value of the properties above, for example:
 
-                                        var distTags = module["dist-tags"];
-                                        if (distTags != null)
-                                        {
-                                            var latestVersion = distTags
-                                                .OfType<JProperty>()
-                                                .Where(v => (string)v.Name == "latest")
-                                                .Select(v => (string)v.Value)
-                                                .FirstOrDefault();
+[
+{"name":"008-somepackage","description":"Test Package","dist-tags":{"latest":"1.1.1"},"maintainers":...
+,
+{"name":"01-simple","description":"That is the first app in order to study the Node-JS technology","dist-tags":...
+,
+etc.
 
-                                            if (!string.IsNullOrEmpty(latestVersion))
-                                            {
-                                                try
-                                                {
-                                                    builder.LatestVersion = SemverVersion.Parse(latestVersion);
-                                                }
-                                                catch (SemverVersionFormatException)
-                                                {
-                                                    OnOutputLogged(String.Format(Resources.InvalidPackageSemVersion, latestVersion, builder.Name));
-                                                }
-                                            }
-                                        }
+                        In this second format, there is no "_updated" property with a timestamp, and the 'Date'
+                        timestamp from the HTTP request for the data is used instead.
 
-                                        var versions = module["versions"];
-                                        if (versions != null)
-                                        {
-                                            builder.AvailableVersions = GetVersions(versions);
-                                        }
-
-                                        AddKeywords(builder, module["keywords"]);
-                                        AddAuthor(builder, module["author"]);
-                                        AddHomepage(builder, module["homepage"]);
-
-                                        var package = builder.Build();
-                                        InsertCatalogEntry(db, package);
-                                    }
-                                    else
-                                    {
-                                        if (jsonReader.TokenType == JsonToken.EndArray)
-                                        {
-                                            // End of the array of package entries
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
+                        The NPM code that handles the payload seems to be written in a way to handle both formats
+                        See https://github.com/npm/npm/blob/2.x-release/lib/cache/update-index.js#L87
+                        */
+                        jsonReader.Read();
+                        switch (jsonReader.TokenType) {
+                            case JsonToken.StartObject:
+                                ReadPackagesFromObject(db, jsonReader, registryUrl);
+                                break;
+                            case JsonToken.StartArray:
+                                // The array format doesn't contain the "_update" field, so create a rough timestamp.
+                                // Use the time from 30 mins ago (to set it before the download request started),
+                                // converted to a JavaScript value (milliseconds since start of 1970)
+                                long revision = (long)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 30, 0, DateTimeKind.Utc)).TotalMilliseconds;
+                                ReadPackagesFromArray(db, jsonReader);
+                                db.InsertOrReplace(new RegistryInfo() {
+                                    RegistryUrl = registryUrl,
+                                    Revision = revision,
+                                    UpdatedOn = DateTime.Now
+                                });
+                                break;
+                            default:
+                                throw new JsonException("Unexpected JSON token at start of NPM catalog data");
                         }
                     }
 
@@ -146,6 +127,118 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     db.Execute("DELETE FROM CatalogEntry WHERE docid NOT IN (SELECT MAX(docid) FROM CatalogEntry GROUP BY Name)");
                 });
             }
+        }
+
+        private void ReadPackagesFromObject(SQLiteConnection db, JsonTextReader jsonReader, string registryUrl) {
+            var builder = new NodeModuleBuilder();
+            while (jsonReader.Read()) {
+                if(jsonReader.TokenType == JsonToken.EndObject) {
+                    // Reached the end of the object literal containing the data. This should be the normal exit point.
+                    return;
+                }
+
+                // Every property in the object should be either the "_updated" value, or a package
+                if(jsonReader.TokenType != JsonToken.PropertyName) {
+                    throw new JsonException("Unexpected JSON token in NPM catalog data");
+                }
+                string propertyName = (string)jsonReader.Value;
+
+                // If it's "_updated", update the revision info.
+                if(propertyName.Equals("_updated", StringComparison.Ordinal)) {
+                    jsonReader.Read();
+                    db.InsertOrReplace(new RegistryInfo() {
+                        RegistryUrl = registryUrl,
+                        Revision = (long)jsonReader.Value,
+                        UpdatedOn = DateTime.Now
+                    });
+                    continue;
+                }
+
+                // Else the property value should be an object literal representing the package
+                jsonReader.Read();
+                if (jsonReader.TokenType == JsonToken.StartObject) {
+                    IPackage package = ReadPackage(jsonReader, builder);
+                    if (package != null) {
+                        InsertCatalogEntry(db, package);
+                    }
+                }
+                else {
+                    throw new JsonException("Unexpected JSON token reading a package from the NPM catalog data");
+                }
+            }
+            throw new JsonException("Unexpected end of stream reading the NPM catalog data object");
+        }
+
+        private void ReadPackagesFromArray(SQLiteConnection db, JsonTextReader jsonReader) {
+            // Inside the array, each object is an NPM package
+            var builder = new NodeModuleBuilder();
+            while (jsonReader.Read()) {
+                switch (jsonReader.TokenType) {
+                    case JsonToken.StartObject:
+                        IPackage package = ReadPackage(jsonReader, builder);
+                        if (package != null) {
+                            InsertCatalogEntry(db, package);
+                        }
+                        break;
+                    case JsonToken.EndArray:
+                        // Done. This is the spot the function should always exit on valid data
+                        return;
+                    default:
+                        throw new JsonException("Unexpected JSON token in NPM catalog data array");
+                }
+            }
+            throw new JsonException("Unexpected end of stream reading the NPM catalog data array");
+        }
+
+        private IPackage ReadPackage(JsonTextReader jsonReader, NodeModuleBuilder builder) {
+            builder.Reset();
+
+            // The JsonTextReader should be positioned at the start of the object literal token for the package
+            var module = JToken.ReadFrom(jsonReader);
+
+            builder.Name = (string)module["name"];
+            if (string.IsNullOrEmpty(builder.Name)) {
+                // I don't believe this should ever happen if the data returned is well formed.
+                // Could throw an exception, but just skip instead for resiliency on the NTVS side.
+                return null;
+            }
+
+            builder.AppendToDescription((string)module["description"] ?? string.Empty);
+
+            var time = module["time"];
+            if (time != null) {
+                builder.AppendToDate((string)time["modified"]);
+            }
+
+            var distTags = module["dist-tags"];
+            if (distTags != null) {
+                var latestVersion = distTags
+                    .OfType<JProperty>()
+                    .Where(v => (string)v.Name == "latest")
+                    .Select(v => (string)v.Value)
+                    .FirstOrDefault();
+
+                if (!string.IsNullOrEmpty(latestVersion)) {
+                    try {
+                        builder.LatestVersion = SemverVersion.Parse(latestVersion);
+                    }
+                    catch (SemverVersionFormatException) {
+                        OnOutputLogged(String.Format(Resources.InvalidPackageSemVersion, latestVersion, builder.Name));
+                    }
+                }
+            }
+
+            var versions = module["versions"];
+            if (versions != null) {
+                builder.AvailableVersions = GetVersions(versions);
+            }
+
+            AddKeywords(builder, module["keywords"]);
+            AddAuthor(builder, module["author"]);
+            AddHomepage(builder, module["homepage"]);
+
+            var package = builder.Build();
+            return package;
         }
 
         private static void InsertCatalogEntry(SQLiteConnection db, IPackage package) {
