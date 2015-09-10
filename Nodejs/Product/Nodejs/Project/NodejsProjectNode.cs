@@ -454,7 +454,10 @@ namespace Microsoft.NodejsTools.Project {
 
         protected override void Reload() {
             using (new DebugTimer("Project Load")) {
-                _intermediateOutputPath = Path.Combine(ProjectHome, GetProjectProperty("BaseIntermediateOutputPath"));
+                // Populate values from project properties before we do anything else.
+                // Otherwise we run into race conditions where, for instance, _analysisIgnoredDirectories
+                // is not properly set before the FileNodes get created in base.Reload()
+                UpdateProjectNodeFromProjectProperties();
 
                 if (_analyzer != null && _analyzer.RemoveUser()) {
                     _analyzer.Dispose();
@@ -473,18 +476,22 @@ namespace Microsoft.NodejsTools.Project {
                 // scan for files which were loaded from cached analysis but no longer
                 // exist and remove them.
                 _analyzer.ReloadComplete();
+            }
+        }
 
-                var ignoredPaths = GetProjectProperty(NodejsConstants.AnalysisIgnoredDirectories);
+        private void UpdateProjectNodeFromProjectProperties() {
+            _intermediateOutputPath = Path.Combine(ProjectHome, GetProjectProperty("BaseIntermediateOutputPath"));
 
-                if (!string.IsNullOrWhiteSpace(ignoredPaths)) {
-                    _analysisIgnoredDirs.Append(ignoredPaths.Split(';').Select(x => '\\' + x + '\\').ToArray());
-                }
+            var ignoredPaths = GetProjectProperty(NodejsConstants.AnalysisIgnoredDirectories);
 
-                var maxFileSizeProp = GetProjectProperty(NodejsConstants.AnalysisMaxFileSize);
-                int maxFileSize;
-                if (maxFileSizeProp != null && Int32.TryParse(maxFileSizeProp, out maxFileSize)) {
-                    _maxFileSize = maxFileSize;
-                }
+            if (!string.IsNullOrWhiteSpace(ignoredPaths)) {
+                _analysisIgnoredDirs = _analysisIgnoredDirs.Append(ignoredPaths.Split(';').Select(x => '\\' + x + '\\').ToArray());
+            }
+
+            var maxFileSizeProp = GetProjectProperty(NodejsConstants.AnalysisMaxFileSize);
+            int maxFileSize;
+            if (maxFileSizeProp != null && Int32.TryParse(maxFileSizeProp, out maxFileSize)) {
+                _maxFileSize = maxFileSize;
             }
         }
 
