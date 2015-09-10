@@ -108,7 +108,7 @@ namespace Microsoft.VisualStudioTools.Project {
                 // cannot rename link files
                 return null;
             }
-            return Caption;
+            return base.GetEditLabel();
         }
 
 #if !DEV14_OR_LATER
@@ -630,7 +630,7 @@ namespace Microsoft.VisualStudioTools.Project {
             bool fileExist = IsFileOnDisk(this.Url);
 
             if (!fileExist && showMessage && !Utilities.IsInAutomationFunction(this.ProjectMgr.Site)) {
-                string message = SR.GetString(SR.ItemDoesNotExistInProjectDirectory, Caption);
+                string message = SR.GetString(SR.ItemDoesNotExistInProjectDirectory, GetEditLabel());
                 string title = string.Empty;
                 OLEMSGICON icon = OLEMSGICON.OLEMSGICON_CRITICAL;
                 OLEMSGBUTTON buttons = OLEMSGBUTTON.OLEMSGBUTTON_OK;

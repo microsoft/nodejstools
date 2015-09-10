@@ -211,7 +211,7 @@ namespace Microsoft.VisualStudioTools.Project {
                 return VSConstants.E_FAIL;
             }
 
-            if (filename == Caption || Parent.FindImmediateChildByName(filename) == null) {
+            if (filename == GetEditLabel() || Parent.FindImmediateChildByName(filename) == null) {
                 if (ProjectMgr.QueryFolderAdd(Parent, path)) {
                     Directory.CreateDirectory(path);
                     IsBeingCreated = false;
@@ -358,7 +358,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     }
                 } catch (IOException ioEx) {
                     // re-throw with a friendly path
-                    throw new IOException(ioEx.Message.Replace(path, Caption));
+                    throw new IOException(ioEx.Message.Replace(path, GetEditLabel()));
                 }
             }
         }
@@ -515,7 +515,7 @@ namespace Microsoft.VisualStudioTools.Project {
         protected override void OnCancelLabelEdit() {
             if (IsBeingCreated) {
                 // finish the creation
-                FinishFolderAdd(Caption, true);
+                FinishFolderAdd(GetEditLabel(), true);
             }
         }
 
