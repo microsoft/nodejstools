@@ -91,7 +91,7 @@ namespace Microsoft.VisualStudioTools.Project {
         [Browsable(false)]
         [AutomationBrowsable(false)]
         public virtual string Name {
-            get { return this.node.GetEditLabel(); }
+            get { return this.node.Caption; }
         }
 
         #endregion
@@ -788,7 +788,7 @@ namespace Microsoft.VisualStudioTools.Project {
         [AutomationBrowsable(true)]
         public override string Name {
             get {
-                return this.HierarchyNode.GetEditLabel();
+                return this.HierarchyNode.Caption;
             }
         }
 
