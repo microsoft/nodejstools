@@ -1099,7 +1099,11 @@ namespace Microsoft.NodejsTools.Project {
                         handled = true;
                         return VSConstants.S_OK;
                     case PkgCmdId.cmdidAddNewJavaScriptFileCommand:
-                        Debug.Fail("Not implemented");
+                        using (var dialog = new NewFileNameForm()) {
+                            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
+                                string itemName = dialog.TextBox.Text;
+                            }
+                        }
                         handled = true;
                         return VSConstants.S_OK;
                 }
