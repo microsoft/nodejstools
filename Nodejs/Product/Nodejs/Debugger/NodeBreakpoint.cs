@@ -59,34 +59,30 @@ namespace Microsoft.NodejsTools.Debugger {
         /// This translates the breakpoint from the location where the user set it (possibly
         /// a TypeScript file) into the location where it lives in JavaScript code.
         /// </summary>
-        public FilePosition GetPosition(SourceMapper mapper, SourceMapReader sourceMapReader) {
+        public FilePosition GetPosition(string javaScriptFileName) {
             // Checks whether source map is available
-            string javaScriptFileName;
+
             int javaScriptLine;
             int javaScriptColumn;
-            string name = "";
+            DecodedSourceMap decodedSourceMap = null;
+            DkmTextSpan? jsSpan = null;
+            string sourceMapFilename;
 
-            if (sourceMapReader != null) {
-                DecodedSourceMap decodedSourceMap = null;
-                DkmTextSpan? tsSpan = null;
-                string jsFileName = Target.FileName;                
-                string sourceMapFilename = FindSourceMapFile(jsFileName);
-                SourceMapSourceInfo sourceInfo = null;
-                if (!string.IsNullOrEmpty(sourceMapFilename)) {
-                    decodedSourceMap = sourceMapReader.LoadSourceMap(jsFileName, sourceMapFilename);
-                    tsSpan = decodedSourceMap.MapJsSourcePosition(new DkmTextSpan(Target.Line + 1, Target.Line + 1, Target.Column + 1, Target.Column + 1), out sourceInfo, out name);
+            sourceMapFilename = FindSourceMapFile(javaScriptFileName);
+            if (!string.IsNullOrEmpty(sourceMapFilename)) {
+                SourceMapReader sourceMapReader = new SourceMapReader();
+                decodedSourceMap = sourceMapReader.LoadSourceMap(javaScriptFileName, sourceMapFilename);
+
+                // The NodeJS debugger is 1-based index while the SourceMapReader is 0-based index
+                jsSpan = decodedSourceMap.MapTsSourcePosition(Target.FileName, new DkmTextSpan(Target.Line + 1, Target.Line + 1, Target.Column + 1, Target.Column + 1));
+                javaScriptLine = jsSpan.Value.StartLine - 1;
+                javaScriptColumn = jsSpan.Value.StartColumn - 1;
+                if (javaScriptLine >= 0 && javaScriptColumn >= 0) {
+                    return new FilePosition(javaScriptFileName,  javaScriptLine, javaScriptColumn);
                 }
-            }
+            }           
 
-            if (mapper != null &&
-                mapper.MapToJavaScript(Target.FileName, Target.Line, Target.Column, out javaScriptFileName, out javaScriptLine, out javaScriptColumn)) {
-
-                // TODO: Verify if this statement needed. Did not find a project/configuration where this statement was hit.
-                // If so, replace with the upper section.
-                return new FilePosition(javaScriptFileName, javaScriptLine, javaScriptColumn);
-            }
-
-            return Target;
+             return Target;
         }
 
         string FindSourceMapFile(string jsFileName) {
