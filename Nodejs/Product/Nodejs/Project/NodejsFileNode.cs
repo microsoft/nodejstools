@@ -28,8 +28,6 @@ namespace Microsoft.NodejsTools.Project {
 
         public NodejsFileNode(NodejsProjectNode root, ProjectElement e)
             : base(root, e) {
-            string referenceBaseName = Path.GetFileNameWithoutExtension(Caption);
-
 #if FALSE
             CreateWatcher(Url);
 #endif

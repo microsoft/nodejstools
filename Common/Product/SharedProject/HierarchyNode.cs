@@ -590,7 +590,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     break;
 
                 case __VSHPROPID.VSHPROPID_Name:
-                    result = this.Caption;
+                    result = this.GetEditLabel();
                     break;
 
                 case __VSHPROPID.VSHPROPID_ExpandByDefault:
@@ -686,7 +686,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
                 case __VSHPROPID.VSHPROPID_SaveName:
                     //SaveName is the name shown in the Save and the Save Changes dialog boxes.
-                    result = this.Caption;
+                    result = this.GetEditLabel();
                     break;
 
                 case __VSHPROPID.VSHPROPID_ExtObject:
@@ -874,7 +874,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         /// <returns>the node cation</returns>
         public virtual string GetEditLabel() {
-            return this.Caption;
+            return CommonUtils.GetFileOrDirectoryName(Url);
         }
 
         /// <summary>
@@ -996,11 +996,11 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
         /// <summary>
-        /// Returns the relational name which is defined as the first part of the caption until indexof NameRelationSeparator
+        /// Returns the relational name which is defined as the first part of the edit label until indexof NameRelationSeparator
         /// </summary>
         public virtual string GetRelationalName() {
             //Get the first part of the caption
-            string[] partsOfParent = this.Caption.Split(new string[] { this.NameRelationSeparator }, StringSplitOptions.None);
+            string[] partsOfParent = this.GetEditLabel().Split(new string[] { this.NameRelationSeparator }, StringSplitOptions.None);
             return partsOfParent[0];
         }
 
@@ -1010,11 +1010,11 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         /// <returns>The extension</returns>
         public virtual string GetRelationNameExtension() {
-            return this.Caption.Substring(this.Caption.IndexOf(this.NameRelationSeparator, StringComparison.Ordinal));
+            return this.GetEditLabel().Substring(this.GetEditLabel().IndexOf(this.NameRelationSeparator, StringComparison.Ordinal));
         }
 
         /// <summary>
-        /// Close open document frame for a specific node.
+        /// Close open document frame for a specific fnode.
         /// </summary> 
         protected void CloseDocumentWindow(HierarchyNode node) {
             Utilities.ArgumentNotNull("node", node);

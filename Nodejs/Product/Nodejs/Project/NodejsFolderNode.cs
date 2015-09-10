@@ -112,12 +112,6 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        public override string GetEditLabel() {
-            // return base.Caption instead of this.Caption so that
-            // the labels we append do not get pulled in.
-            return base.Caption;
-        }
-
         public override void RemoveChild(HierarchyNode node) {
             base.RemoveChild(node);
             UpdateContentType();
