@@ -132,19 +132,19 @@ etc.
         private void ReadPackagesFromObject(SQLiteConnection db, JsonTextReader jsonReader, string registryUrl) {
             var builder = new NodeModuleBuilder();
             while (jsonReader.Read()) {
-                if(jsonReader.TokenType == JsonToken.EndObject) {
+                if (jsonReader.TokenType == JsonToken.EndObject) {
                     // Reached the end of the object literal containing the data. This should be the normal exit point.
                     return;
                 }
 
                 // Every property in the object should be either the "_updated" value, or a package
-                if(jsonReader.TokenType != JsonToken.PropertyName) {
+                if (jsonReader.TokenType != JsonToken.PropertyName) {
                     throw new JsonException("Unexpected JSON token in NPM catalog data");
                 }
                 string propertyName = (string)jsonReader.Value;
 
                 // If it's "_updated", update the revision info.
-                if(propertyName.Equals("_updated", StringComparison.Ordinal)) {
+                if (propertyName.Equals("_updated", StringComparison.Ordinal)) {
                     jsonReader.Read();
                     db.InsertOrReplace(new RegistryInfo() {
                         RegistryUrl = registryUrl,
@@ -161,8 +161,7 @@ etc.
                     if (package != null) {
                         InsertCatalogEntry(db, package);
                     }
-                }
-                else {
+                } else {
                     throw new JsonException("Unexpected JSON token reading a package from the NPM catalog data");
                 }
             }
@@ -191,53 +190,61 @@ etc.
         }
 
         private IPackage ReadPackage(JsonTextReader jsonReader, NodeModuleBuilder builder) {
+            IPackage package = null;
             builder.Reset();
 
-            // The JsonTextReader should be positioned at the start of the object literal token for the package
-            var module = JToken.ReadFrom(jsonReader);
+            try {
+                // The JsonTextReader should be positioned at the start of the object literal token for the package
+                var module = JToken.ReadFrom(jsonReader);
 
-            builder.Name = (string)module["name"];
-            if (string.IsNullOrEmpty(builder.Name)) {
-                // I don't believe this should ever happen if the data returned is well formed.
-                // Could throw an exception, but just skip instead for resiliency on the NTVS side.
-                return null;
-            }
+                builder.Name = (string)module["name"];
+                if (string.IsNullOrEmpty(builder.Name)) {
+                    // I don't believe this should ever happen if the data returned is well formed.
+                    // Could throw an exception, but just skip instead for resiliency on the NTVS side.
+                    return null;
+                }
 
-            builder.AppendToDescription((string)module["description"] ?? string.Empty);
+                builder.AppendToDescription((string)module["description"] ?? string.Empty);
 
-            var time = module["time"];
-            if (time != null) {
-                builder.AppendToDate((string)time["modified"]);
-            }
+                var time = module["time"];
+                if (time != null) {
+                    builder.AppendToDate((string)time["modified"]);
+                }
 
-            var distTags = module["dist-tags"];
-            if (distTags != null) {
-                var latestVersion = distTags
-                    .OfType<JProperty>()
-                    .Where(v => (string)v.Name == "latest")
-                    .Select(v => (string)v.Value)
-                    .FirstOrDefault();
+                var distTags = module["dist-tags"];
+                if (distTags != null) {
+                    var latestVersion = distTags
+                        .OfType<JProperty>()
+                        .Where(v => (string)v.Name == "latest")
+                        .Select(v => (string)v.Value)
+                        .FirstOrDefault();
 
-                if (!string.IsNullOrEmpty(latestVersion)) {
-                    try {
-                        builder.LatestVersion = SemverVersion.Parse(latestVersion);
-                    }
-                    catch (SemverVersionFormatException) {
-                        OnOutputLogged(String.Format(Resources.InvalidPackageSemVersion, latestVersion, builder.Name));
+                    if (!string.IsNullOrEmpty(latestVersion)) {
+                        try {
+                            builder.LatestVersion = SemverVersion.Parse(latestVersion);
+                        } catch (SemverVersionFormatException) {
+                            OnOutputLogged(String.Format(Resources.InvalidPackageSemVersion, latestVersion, builder.Name));
+                        }
                     }
                 }
+
+                var versions = module["versions"];
+                if (versions != null) {
+                    builder.AvailableVersions = GetVersions(versions);
+                }
+
+                AddKeywords(builder, module["keywords"]);
+                AddAuthor(builder, module["author"]);
+                AddHomepage(builder, module["homepage"]);
+
+                package = builder.Build();
+            } catch (InvalidOperationException) {
+                // Occurs if a JValue appears where we expect JProperty
+                return null;
+            } catch (ArgumentException) {
+                OnOutputLogged(string.Format(Resources.ParsingError, builder.Name));
+                return null;
             }
-
-            var versions = module["versions"];
-            if (versions != null) {
-                builder.AvailableVersions = GetVersions(versions);
-            }
-
-            AddKeywords(builder, module["keywords"]);
-            AddAuthor(builder, module["author"]);
-            AddHomepage(builder, module["homepage"]);
-
-            var package = builder.Build();
             return package;
         }
 
