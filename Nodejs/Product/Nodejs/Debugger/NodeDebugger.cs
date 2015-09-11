@@ -47,7 +47,7 @@ namespace Microsoft.NodejsTools.Debugger {
         private readonly Dictionary<string, NodeModule> _modules = new Dictionary<string, NodeModule>(StringComparer.OrdinalIgnoreCase);
         private readonly EvaluationResultFactory _resultFactory;
         private readonly Dictionary<int, NodeThread> _threads = new Dictionary<int, NodeThread>();
-        private readonly TimeSpan _timeout = TimeSpan.FromSeconds(15);
+        private readonly TimeSpan _timeout = TimeSpan.FromSeconds(5);
         private bool _attached;
         private bool _breakOnAllExceptions;
         private bool _breakOnUncaughtExceptions;
@@ -786,7 +786,7 @@ namespace Microsoft.NodejsTools.Debugger {
             return backtraceCommand.CallstackDepth;
         }
 
-        string FindSourceMapFile(string jsFileName) {
+        private string FindSourceMapFile(string jsFileName) {
             string sourceMapFilename = null;
 
             if (File.Exists(jsFileName)) {
@@ -859,10 +859,6 @@ namespace Microsoft.NodejsTools.Debugger {
 
                 yield return stackFrame;
             }
-        }
-
-        private void LoadDecodedSourceMap() {
-
         }
 
         /// <summary>
