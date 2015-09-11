@@ -1102,6 +1102,18 @@ namespace Microsoft.NodejsTools.Project {
                         using (var dialog = new NewFileNameForm()) {
                             if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
                                 string itemName = dialog.TextBox.Text;
+
+                                //public virtual int AddItem(uint itemIdLoc, VSADDITEMOPERATION op, string itemName, uint filesToOpen, string[] files, IntPtr dlgOwner, VSADDRESULT[] result) {
+                                VSADDRESULT[] pResult = new VSADDRESULT[2];
+
+                                this.AddItem(selectedNodes[0].ID, 
+                                    VSADDITEMOPERATION.VSADDITEMOP_CLONEFILE,
+                                    itemName,
+                                    1,
+                                    new string[] { "C:\\USERS\\TIHOANH\\APPDATA\\LOCAL\\MICROSOFT\\VISUALSTUDIO\\14.0EXP\\EXTENSIONS\\MICROSOFT\\NODE.JS TOOLS\\1.1\\FileTemplates\\NewItem\\EmptyJs.js" },
+                                    IntPtr.Zero,
+                                    pResult
+                                    );
                             }
                         }
                         handled = true;
