@@ -69,6 +69,7 @@ namespace Microsoft.NodejsTools.Debugger {
             string sourceMapFilename;
 
             sourceMapFilename = FindSourceMapFile(javaScriptFileName);
+            
             if (!string.IsNullOrEmpty(sourceMapFilename)) {
                 SourceMapReader sourceMapReader = new SourceMapReader();
                 decodedSourceMap = sourceMapReader.LoadSourceMap(javaScriptFileName, sourceMapFilename);

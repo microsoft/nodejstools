@@ -1,0 +1,250 @@
+.assembly extern 'Microsoft.VisualStudio.Debugger.Engine'
+{
+	.publickeytoken = (B0 3F 5F 7F 11 D5 0A 3A)
+	.ver 1:0:0:0
+}
+.assembly extern 'System'
+{
+	.publickeytoken = (B7 7A 5C 56 19 34 E0 89)
+	.ver 4:0:0:0
+}
+.assembly extern 'mscorlib'
+{
+	.publickeytoken = (B7 7A 5C 56 19 34 E0 89)
+	.ver 4:0:0:0
+}
+.assembly 'TypeScriptSourceMapReader'
+{
+	.custom instance void ['mscorlib']'System.Runtime.InteropServices'.'ComVisibleAttribute'::.ctor(bool) = (01 00 00 00 00)
+	.custom instance void ['mscorlib']'System.Runtime.InteropServices'.'GuidAttribute'::.ctor(string) = (01 00 24 45 35 30 43 36 35 41 39 2D 31 31 33 37 2D 34 32 42 41 2D 42 44 42 44 2D 33 45 45 43 35 36 41 37 38 36 35 36 00 00)
+	.publickey = (00 24 00 00 04 80 00 00 94 00 00 00 06 02 00 00 00 24 00 00 52 53 41 31 00 04 00 00 01 00 01 00 07 D1 FA 57 C4 AE D9 F0 A3 2E 84 AA 0F AE FD 0D E9 E8 FD 6A EC 8F 87 FB 03 76 6C 83 4C 99 92 1E B2 3B E7 9A D9 D5 DC C1 DD 9A D2 36 13 21 02 90 0B 72 3C F9 80 95 7F C4 E1 77 10 8F C6 07 77 4F 29 E8 32 0E 92 EA 05 EC E4 E8 21 C0 A5 EF E8 F1 64 5C 4C 0C 93 C1 AB 99 28 5D 62 2C AA 65 2C 1D FA D6 3D 74 5D 6F 2D E5 F1 7E 5E AF 0F C4 96 3D 26 1C 8A 12 43 65 18 20 6D C0 93 34 4D 5A D2 93)
+	.hash algorithm 0x00008004
+	.ver 14:0:0:0
+}
+.namespace 'TypeScriptSourceMapReader'
+{
+	.class public 'DecodedSourceMap'
+		extends ['mscorlib']'System'.'Object'
+	{
+		.method public hidebysig 
+			instance valuetype ['Microsoft.VisualStudio.Debugger.Engine']'Microsoft.VisualStudio.Debugger.Symbols'.'DkmTextSpan' 'MapJsSourcePosition'(valuetype ['Microsoft.VisualStudio.Debugger.Engine']'Microsoft.VisualStudio.Debugger.Symbols'.'DkmTextSpan' 'jsTextSpan', [out] class 'TypeScriptSourceMapReader'.'SourceMapSourceInfo'& 'tsSourceInfo', [out] string& 'name')
+		{
+			ret
+		}
+		.method public hidebysig 
+			instance valuetype ['Microsoft.VisualStudio.Debugger.Engine']'Microsoft.VisualStudio.Debugger.Symbols'.'DkmTextSpan' 'MapTsSourcePosition'(string 'tsFilePathOrUrl', valuetype ['Microsoft.VisualStudio.Debugger.Engine']'Microsoft.VisualStudio.Debugger.Symbols'.'DkmTextSpan' 'tsTextSpan')
+		{
+			ret
+		}
+		.method public hidebysig 
+			instance valuetype ['mscorlib']'System.Collections.Generic'.'List`1'/'Enumerator'<class 'TypeScriptSourceMapReader'.'SourceMapSourceInfo'> 'GetTsSourceInfoEnumerator'()
+		{
+			ret
+		}
+		.method public hidebysig 
+			instance class 'TypeScriptSourceMapReader'.'SourceMapSourceInfo' 'GetTsSourceInfo'(string 'tsUrl')
+		{
+			ret
+		}
+		.field static public valuetype ['Microsoft.VisualStudio.Debugger.Engine']'Microsoft.VisualStudio.Debugger.Symbols'.'DkmTextSpan' 'InvalidTextSpan'
+		.field public initonly string 'jsFileUrl'
+	}
+	.class public 'EncodedSourceMap'
+		extends ['mscorlib']'System'.'Object'
+	{
+		.method public hidebysig specialname 
+			instance void '.ctor'()
+		{
+			ret
+		}
+		.field public string 'file'
+		.field public string 'mappings'
+		.field public string[] 'names'
+		.field public string 'sourceRoot'
+		.field public string[] 'sources'
+		.field public int32 'version'
+	}
+	.class public 'ErrorDecodingSourcemapException'
+		extends 'TypeScriptSourceMapReader'.'SourceMapReaderException'
+	{
+		.method public virtual hidebysig specialname 
+			instance valuetype 'TypeScriptSourceMapReader'.'SourceMapReaderExceptionKind' 'get_ExceptionKind'()
+		{
+			ret
+		}
+		.property instance valuetype 'TypeScriptSourceMapReader'.'SourceMapReaderExceptionKind' 'ExceptionKind'()
+		{
+			.get instance valuetype 'TypeScriptSourceMapReader'.'SourceMapReaderExceptionKind' 'TypeScriptSourceMapReader'.'ErrorDecodingSourcemapException'::'get_ExceptionKind'()
+		}
+	}
+	.class public 'InvalidSourceMapUrlException'
+		extends 'TypeScriptSourceMapReader'.'SourceMapReaderException'
+	{
+		.method public virtual hidebysig specialname 
+			instance valuetype 'TypeScriptSourceMapReader'.'SourceMapReaderExceptionKind' 'get_ExceptionKind'()
+		{
+			ret
+		}
+		.property instance valuetype 'TypeScriptSourceMapReader'.'SourceMapReaderExceptionKind' 'ExceptionKind'()
+		{
+			.get instance valuetype 'TypeScriptSourceMapReader'.'SourceMapReaderExceptionKind' 'TypeScriptSourceMapReader'.'InvalidSourceMapUrlException'::'get_ExceptionKind'()
+		}
+	}
+	.class public 'SourceMapReadFailedException'
+		extends 'TypeScriptSourceMapReader'.'SourceMapReaderException'
+	{
+		.method public virtual hidebysig specialname 
+			instance valuetype 'TypeScriptSourceMapReader'.'SourceMapReaderExceptionKind' 'get_ExceptionKind'()
+		{
+			ret
+		}
+		.property instance valuetype 'TypeScriptSourceMapReader'.'SourceMapReaderExceptionKind' 'ExceptionKind'()
+		{
+			.get instance valuetype 'TypeScriptSourceMapReader'.'SourceMapReaderExceptionKind' 'TypeScriptSourceMapReader'.'SourceMapReadFailedException'::'get_ExceptionKind'()
+		}
+	}
+	.class public 'SourceMapReader'
+		extends 'TypeScriptSourceMapReader'.'SourceMapTextReader'
+	{
+		.method public hidebysig 
+			instance class 'TypeScriptSourceMapReader'.'DecodedSourceMap' 'LoadSourceMap'(string 'scriptFilePathOrUrl', string 'sourceMapUrl')
+		{
+			ret
+		}
+		.method public hidebysig 
+			instance class 'TypeScriptSourceMapReader'.'DecodedSourceMap' 'LoadSourceMapFromSourceMapText'(string 'sourceMapText', string 'scriptFilePathOrUrl', class ['System']'System'.'Uri' 'sourceMapUri')
+		{
+			ret
+		}
+		.method public hidebysig specialname 
+			instance void '.ctor'()
+		{
+			ret
+		}
+	}
+	.class public abstract 'SourceMapReaderException'
+		extends ['mscorlib']'System'.'Exception'
+	{
+		.method public virtual hidebysig newslot specialname 
+			instance valuetype 'TypeScriptSourceMapReader'.'SourceMapReaderExceptionKind' 'get_ExceptionKind'()
+		{
+			ret
+		}
+		.field public string 'Parameter1'
+		.field public string 'Parameter2'
+		.property instance valuetype 'TypeScriptSourceMapReader'.'SourceMapReaderExceptionKind' 'ExceptionKind'()
+		{
+			.get instance valuetype 'TypeScriptSourceMapReader'.'SourceMapReaderExceptionKind' 'TypeScriptSourceMapReader'.'SourceMapReaderException'::'get_ExceptionKind'()
+		}
+	}
+	.class public sealed 'SourceMapReaderExceptionKind'
+		extends ['mscorlib']'System'.'Enum'
+	{
+		.field public rtspecialname specialname int32 'value__'
+		.field static public literal valuetype 'TypeScriptSourceMapReader'.'SourceMapReaderExceptionKind' 'ErrorDecodingSourcemapException' = int32(0x00000003)
+		.field static public literal valuetype 'TypeScriptSourceMapReader'.'SourceMapReaderExceptionKind' 'InvalidSourceMapUrlException' = int32(0x00000000)
+		.field static public literal valuetype 'TypeScriptSourceMapReader'.'SourceMapReaderExceptionKind' 'SourceMapReadFailedException' = int32(0x00000001)
+		.field static public literal valuetype 'TypeScriptSourceMapReader'.'SourceMapReaderExceptionKind' 'UnsupportedFormatSourceMapException' = int32(0x00000002)
+	}
+	.class public 'SourceMapSourceInfo'
+		extends ['mscorlib']'System'.'Object'
+	{
+		.method public hidebysig 
+			instance bool 'IsSameTsFile'(string 'tsFilePathOrUrl')
+		{
+			ret
+		}
+		.field public initonly string 'tsFilePath'
+		.field public initonly string 'tsUrl'
+	}
+	.class public 'SourceMapTextReader'
+		extends ['mscorlib']'System'.'Object'
+	{
+		.class nested family sealed 'TextReadDelegate`1'<'T'>
+			extends ['mscorlib']'System'.'MulticastDelegate'
+		{
+			.method public hidebysig specialname 
+				instance void '.ctor'(object 'object', native int 'method')
+				runtime 
+			{
+			}
+			.method public virtual hidebysig newslot 
+				instance !0 'Invoke'(class ['mscorlib']'System.IO'.'TextReader' 'textReader')
+				runtime 
+			{
+			}
+			.method public virtual hidebysig newslot 
+				instance class ['mscorlib']'System'.'IAsyncResult' 'BeginInvoke'(class ['mscorlib']'System.IO'.'TextReader' 'textReader', class ['mscorlib']'System'.'AsyncCallback' 'callback', object 'object')
+				runtime 
+			{
+			}
+			.method public virtual hidebysig newslot 
+				instance !0 'EndInvoke'(class ['mscorlib']'System'.'IAsyncResult' 'result')
+				runtime 
+			{
+			}
+		}
+		.method public hidebysig 
+			instance class ['System']'System'.'Uri' 'GetSourceMapUri'(string 'scriptFilePathOrUrl', string 'sourceMapUrl')
+		{
+			ret
+		}
+		.method public hidebysig 
+			instance class ['System']'System'.'Uri' 'ReadSourceMapText'(string 'scriptFilePathOrUrl', string 'sourceMapUrl', [out] string& 'sourceMapText')
+		{
+			ret
+		}
+		.method family hidebysig 
+			instance class ['System']'System'.'Uri' 'ReadSourceMap'<'T'>(string 'scriptFilePathOrUrl', string 'sourceMapUrl', [out] !!0& 'sourceMapText', class 'TypeScriptSourceMapReader'.'SourceMapTextReader'/'TextReadDelegate`1'<!!0> 'textReadDelegate')
+		{
+			ret
+		}
+		.method family hidebysig 
+			instance !!0 'ReadMapFile'<'T'>(class ['System']'System'.'Uri' 'sourceMapUri', class 'TypeScriptSourceMapReader'.'SourceMapTextReader'/'TextReadDelegate`1'<!!0> 'textReadDelegate')
+		{
+			ret
+		}
+		.method public hidebysig specialname 
+			instance void '.ctor'()
+		{
+			ret
+		}
+	}
+	.class public 'SourceMapUrlHelper'
+		extends ['mscorlib']'System'.'Object'
+	{
+		.method public static hidebysig 
+			bool 'IsScriptUrlJsUrl'(string 'urlOfScript')
+		{
+			ret
+		}
+		.method public static hidebysig 
+			string 'GetSourceMapUrlOfScript'(string 'scriptUrl', string 'scriptContents')
+		{
+			ret
+		}
+		.method public static hidebysig 
+			class ['System']'System.Net'.'WebResponse' 'GetWebResponse'(class ['System']'System'.'Uri' 'uri')
+		{
+			ret
+		}
+		.method public hidebysig specialname 
+			instance void '.ctor'()
+		{
+			ret
+		}
+	}
+	.class public 'UnsupportedFormatSourceMapException'
+		extends 'TypeScriptSourceMapReader'.'SourceMapReaderException'
+	{
+		.method public virtual hidebysig specialname 
+			instance valuetype 'TypeScriptSourceMapReader'.'SourceMapReaderExceptionKind' 'get_ExceptionKind'()
+		{
+			ret
+		}
+		.property instance valuetype 'TypeScriptSourceMapReader'.'SourceMapReaderExceptionKind' 'ExceptionKind'()
+		{
+			.get instance valuetype 'TypeScriptSourceMapReader'.'SourceMapReaderExceptionKind' 'TypeScriptSourceMapReader'.'UnsupportedFormatSourceMapException'::'get_ExceptionKind'()
+		}
+	}
+}
