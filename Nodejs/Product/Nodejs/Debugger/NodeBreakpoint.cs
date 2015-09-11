@@ -85,7 +85,7 @@ namespace Microsoft.NodejsTools.Debugger {
              return Target;
         }
 
-        string FindSourceMapFile(string jsFileName) {
+        private string FindSourceMapFile(string jsFileName) {
             string sourceMapFilename = null;
 
             if (File.Exists(jsFileName)) {
