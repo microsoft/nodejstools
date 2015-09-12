@@ -283,8 +283,8 @@
     <Compile Include="Commands\OpenRemoteDebugDocumentationCommand.cs" />
     <Compile Include="Commands\OpenRemoteDebugProxyFolderCommand.cs" />
     <Compile Include="Commands\SurveyNewsCommand.cs" />
-    <Compile Include="Debugger\BinaryDeserializer.cs" />
-    <Compile Include="Debugger\BinarySerializer.cs" />
+    <Compile Include="Debugger\Serialization\BinaryDeserializer.cs" />
+    <Compile Include="Debugger\Serialization\BinarySerializer.cs" />
     <Compile Include="Debugger\DataTips\DataTipTextManagerEvents.cs" />
     <Compile Include="Debugger\DebugEngine\AD7EvalErrorProperty.cs" />
     <Compile Include="Debugger\FilePosition.cs" />
@@ -293,8 +293,8 @@
     <Compile Include="Debugger\LocalFileNameMapper.cs" />
     <Compile Include="Debugger\NodeProcess.cs" />
     <Compile Include="Debugger\ScriptTree.cs" />
-    <Compile Include="Debugger\TypeScriptRuntime.cs" />
-    <Compile Include="Debugger\TypeScriptSymbolFileId.cs" />
+    <Compile Include="Debugger\TypeScriptHelpers\TypeScriptRuntime.cs" />
+    <Compile Include="Debugger\TypeScriptHelpers\TypeScriptSymbolFileId.cs" />
     <Compile Include="Editor\BraceCompletion\BraceKind.cs" />
     <Compile Include="Editor\BraceCompletion\BraceCompletionContext.cs" />
     <Compile Include="Editor\BraceCompletion\BraceCompletionContextProvider.cs" />

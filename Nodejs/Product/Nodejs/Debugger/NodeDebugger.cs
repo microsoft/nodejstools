@@ -27,9 +27,8 @@ using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.NodejsTools.Debugger.Communication;
 using Microsoft.NodejsTools.Debugger.Events;
 using Microsoft.NodejsTools.Debugger.Serialization;
-using Microsoft.NodejsTools.SourceMapping;
-using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudio.Debugger.Symbols;
+using Microsoft.VisualStudioTools;
 using TypeScriptSourceMapReader;
 
 namespace Microsoft.NodejsTools.Debugger {
@@ -822,7 +821,6 @@ namespace Microsoft.NodejsTools.Debugger {
                 int lineEnd = stackFrame.EndLine;
 
                 string name = "";
-                //int tsLine = -1, tsColumn = -1;
 
                 // Map file position to original, if required
                 if (module.JavaScriptFileName != module.FileName) {
@@ -1277,15 +1275,12 @@ namespace Microsoft.NodejsTools.Debugger {
                 column = stackFrame.Column;
             }
 
-            SourceMapSourceInfo sourceInfo = null;
-            string name;
-
-            string sourceMapFilename = FindSourceMapFile(javaScriptFileName);
-
-            DecodedSourceMap decodedSourceMap;
+            SourceMapSourceInfo sourceInfo = null;        
+            string sourceMapFilename = FindSourceMapFile(javaScriptFileName);            
 
             if (!string.IsNullOrEmpty(sourceMapFilename)) {
 
+                DecodedSourceMap decodedSourceMap;
                 if (DecodedSourceMaps.ContainsKey(sourceMapFilename)) {
                     decodedSourceMap = DecodedSourceMaps[sourceMapFilename];
                 } else {
@@ -1294,6 +1289,7 @@ namespace Microsoft.NodejsTools.Debugger {
                     _sourceMapFiles.Add(javaScriptFileName, sourceMapFilename);
                 }
 
+                string name;
                 decodedSourceMap.MapJsSourcePosition(new DkmTextSpan((int)line + 1, (int)line + 1, (int)column + 1, (int)column + 1), out sourceInfo, out name);
             }
 

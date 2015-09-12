@@ -60,24 +60,19 @@ namespace Microsoft.NodejsTools.Debugger {
         /// a TypeScript file) into the location where it lives in JavaScript code.
         /// </summary>
         public FilePosition GetPosition(string javaScriptFileName) {
+            
             // Checks whether source map is available
-
-            int javaScriptLine;
-            int javaScriptColumn;
-            DecodedSourceMap decodedSourceMap = null;
-            DkmTextSpan? jsSpan = null;
-            string sourceMapFilename;
-
-            sourceMapFilename = FindSourceMapFile(javaScriptFileName);
+            string sourceMapFilename = FindSourceMapFile(javaScriptFileName);
             
             if (!string.IsNullOrEmpty(sourceMapFilename)) {
+
                 SourceMapReader sourceMapReader = new SourceMapReader();
-                decodedSourceMap = sourceMapReader.LoadSourceMap(javaScriptFileName, sourceMapFilename);
+                DecodedSourceMap decodedSourceMap = sourceMapReader.LoadSourceMap(javaScriptFileName, sourceMapFilename);
 
                 // The NodeJS debugger is 1-based index while the SourceMapReader is 0-based index
-                jsSpan = decodedSourceMap.MapTsSourcePosition(Target.FileName, new DkmTextSpan(Target.Line + 1, Target.Line + 1, Target.Column + 1, Target.Column + 1));
-                javaScriptLine = jsSpan.Value.StartLine - 1;
-                javaScriptColumn = jsSpan.Value.StartColumn - 1;
+                DkmTextSpan jsSpan = decodedSourceMap.MapTsSourcePosition(Target.FileName, new DkmTextSpan(Target.Line + 1, Target.Line + 1, Target.Column + 1, Target.Column + 1));
+                int javaScriptLine = jsSpan.StartLine - 1;
+                int javaScriptColumn = jsSpan.StartColumn - 1;
                 if (javaScriptLine >= 0 && javaScriptColumn >= 0) {
                     return new FilePosition(javaScriptFileName,  javaScriptLine, javaScriptColumn);
                 }
@@ -90,9 +85,9 @@ namespace Microsoft.NodejsTools.Debugger {
             string sourceMapFilename = null;
 
             if (File.Exists(jsFileName)) {
-                string[] contents = File.ReadAllLines(jsFileName);
-                const string marker = "# sourceMappingURL=";
                 int markerStart;
+                string[] contents = File.ReadAllLines(jsFileName);
+                const string marker = "# sourceMappingURL=";                
                 string markerLine = contents.Reverse().FirstOrDefault(x => x.IndexOf(marker, StringComparison.Ordinal) != -1);
                 if (markerLine != null && (markerStart = markerLine.IndexOf(marker, StringComparison.Ordinal)) != -1) {
                     sourceMapFilename = markerLine.Substring(markerStart + marker.Length).Trim();
