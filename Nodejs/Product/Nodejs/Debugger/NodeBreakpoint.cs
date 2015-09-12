@@ -62,7 +62,7 @@ namespace Microsoft.NodejsTools.Debugger {
         public FilePosition GetPosition(string javaScriptFileName) {
             
             // Checks whether source map is available
-            string sourceMapFilename = FindSourceMapFile(javaScriptFileName);
+            string sourceMapFilename = SourceMapReaderHelper.FindSourceMapFile(javaScriptFileName);
             
             if (!string.IsNullOrEmpty(sourceMapFilename)) {
 
@@ -79,29 +79,6 @@ namespace Microsoft.NodejsTools.Debugger {
             }           
 
              return Target;
-        }
-
-        private string FindSourceMapFile(string jsFileName) {
-            string sourceMapFilename = null;
-
-            if (File.Exists(jsFileName)) {
-                int markerStart;
-                string[] contents = File.ReadAllLines(jsFileName);
-                const string marker = "# sourceMappingURL=";                
-                string markerLine = contents.Reverse().FirstOrDefault(x => x.IndexOf(marker, StringComparison.Ordinal) != -1);
-                if (markerLine != null && (markerStart = markerLine.IndexOf(marker, StringComparison.Ordinal)) != -1) {
-                    sourceMapFilename = markerLine.Substring(markerStart + marker.Length).Trim();
-
-                    try {
-                        if (!File.Exists(sourceMapFilename)) {
-                            sourceMapFilename = Path.Combine(Path.GetDirectoryName(jsFileName) ?? string.Empty, Path.GetFileName(sourceMapFilename));
-                        }
-                    } catch (ArgumentException) {
-                    } catch (PathTooLongException) {
-                    }
-                }
-            }
-            return sourceMapFilename;
         }
 
         public bool Enabled {

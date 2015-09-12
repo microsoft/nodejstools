@@ -785,29 +785,6 @@ namespace Microsoft.NodejsTools.Debugger {
             return backtraceCommand.CallstackDepth;
         }
 
-        private string FindSourceMapFile(string jsFileName) {
-            string sourceMapFilename = null;
-
-            if (File.Exists(jsFileName)) {
-                string[] contents = File.ReadAllLines(jsFileName);
-                const string marker = "# sourceMappingURL=";
-                int markerStart;
-                string markerLine = contents.Reverse().FirstOrDefault(x => x.IndexOf(marker, StringComparison.Ordinal) != -1);
-                if (markerLine != null && (markerStart = markerLine.IndexOf(marker, StringComparison.Ordinal)) != -1) {
-                    sourceMapFilename = markerLine.Substring(markerStart + marker.Length).Trim();
-
-                    try {
-                        if (!File.Exists(sourceMapFilename)) {
-                            sourceMapFilename = Path.Combine(Path.GetDirectoryName(jsFileName) ?? string.Empty, Path.GetFileName(sourceMapFilename));
-                        }
-                    } catch (ArgumentException) {
-                    } catch (PathTooLongException) {
-                    }
-                }
-            }
-            return sourceMapFilename;
-        }
-
         private IEnumerable<NodeStackFrame> GetLocalFrames(IEnumerable<NodeStackFrame> stackFrames) {
             foreach (NodeStackFrame stackFrame in stackFrames) {
                 // Retrieve a local module
@@ -827,7 +804,7 @@ namespace Microsoft.NodejsTools.Debugger {
                     DecodedSourceMap decodedSourceMap = null;
                     DkmTextSpan? tsSpan = null;
                     string jsFileName = module.JavaScriptFileName;
-                    string sourceMapFilename = FindSourceMapFile(jsFileName);
+                    string sourceMapFilename = SourceMapReaderHelper.FindSourceMapFile(jsFileName);
                     SourceMapSourceInfo sourceInfo = null;
                     if (!string.IsNullOrEmpty(sourceMapFilename)) {
 
@@ -1276,7 +1253,7 @@ namespace Microsoft.NodejsTools.Debugger {
             }
 
             SourceMapSourceInfo sourceInfo = null;        
-            string sourceMapFilename = FindSourceMapFile(javaScriptFileName);            
+            string sourceMapFilename = SourceMapReaderHelper.FindSourceMapFile(javaScriptFileName);            
 
             if (!string.IsNullOrEmpty(sourceMapFilename)) {
 

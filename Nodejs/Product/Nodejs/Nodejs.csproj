@@ -293,6 +293,7 @@
     <Compile Include="Debugger\LocalFileNameMapper.cs" />
     <Compile Include="Debugger\NodeProcess.cs" />
     <Compile Include="Debugger\ScriptTree.cs" />
+    <Compile Include="Debugger\TypeScriptHelpers\SourceMapReaderHelper.cs" />
     <Compile Include="Debugger\TypeScriptHelpers\TypeScriptRuntime.cs" />
     <Compile Include="Debugger\TypeScriptHelpers\TypeScriptSymbolFileId.cs" />
     <Compile Include="Editor\BraceCompletion\BraceKind.cs" />
