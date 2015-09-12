@@ -18,10 +18,7 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
-    <OutputPath>$(BinariesDirectory)\bin\$(BuildArchitecture)\typescript\TypeScriptSourceMapReader</OutputPath>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <DebuggerAPIRefPath>$(InternalAPIsPath)\debugger\ref\v4.5\$(InterApiType)</DebuggerAPIRefPath>
-    <NewtonsoftJsonPath>$(EnlistmentRootPath)\externalapis\AspWebStack\Newtonsoft.Json.6.0.4\lib\net45</NewtonsoftJsonPath>
     <CreateAsmMeta>true</CreateAsmMeta>
     <CreateMetaAssembly>true</CreateMetaAssembly>
     <PublishMetaAssembly>true</PublishMetaAssembly>
