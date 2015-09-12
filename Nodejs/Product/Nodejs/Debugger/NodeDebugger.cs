@@ -245,6 +245,14 @@ namespace Microsoft.NodejsTools.Debugger {
             }
         }
 
+        internal bool IsRunning() {
+            var backtraceCommand = new BacktraceCommand(CommandId, _resultFactory, 0, 1);
+            if (TrySendRequestAsync(backtraceCommand).GetAwaiter().GetResult()) {
+                return backtraceCommand.Running;
+            }
+            return false;
+        }
+
         private void DebugWriteCommand(string commandName) {
             LiveLogger.WriteLine("NodeDebugger Called " + commandName);
         }
@@ -492,18 +500,17 @@ namespace Microsoft.NodejsTools.Debugger {
             if (!backTraceTask.Wait((int)_timeout.TotalMilliseconds)) {
                 throw new TimeoutException("Timed out while performing initial backtrace.");
             }
-            bool running = backTraceTask.GetAwaiter().GetResult();
 
             // At this point we can fire events
             EventHandler<ThreadEventArgs> newThread = ThreadCreated;
             if (newThread != null) {
                 newThread(this, new ThreadEventArgs(mainThread));
             }
-
-            EventHandler<ProcessLoadedEventArgs> procLoaded = ProcessLoaded;
+            EventHandler<ThreadEventArgs> procLoaded = ProcessLoaded;
             if (procLoaded != null) {
-                procLoaded(this, new ProcessLoadedEventArgs(mainThread, running));
+                procLoaded(this, new ThreadEventArgs(MainThread));
             }
+
         }
 
         private void OnConnectionClosed(object sender, EventArgs args) {
@@ -1170,7 +1177,7 @@ namespace Microsoft.NodejsTools.Debugger {
         /// <summary>
         /// Fired when the process has started and is broken into the debugger, but before any user code is run.
         /// </summary>
-        public event EventHandler<ProcessLoadedEventArgs> ProcessLoaded;
+        public event EventHandler<ThreadEventArgs> ProcessLoaded;
 
         public event EventHandler<ThreadEventArgs> ThreadCreated;
         public event EventHandler<ThreadEventArgs> ThreadExited;
