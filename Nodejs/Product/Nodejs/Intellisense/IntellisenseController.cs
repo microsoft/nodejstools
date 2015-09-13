@@ -495,8 +495,8 @@ namespace Microsoft.NodejsTools.Intellisense {
                                 committedBy = "\"";
                             }
                         } else {
-                            committedBy = NodejsPackage.Instance != null ?
-                                NodejsPackage.Instance.IntellisenseOptionsPage.CompletionCommittedBy :
+                            committedBy = NodejsPackage.Instance != null && NodejsPackage.Instance.IntellisenseOptionsPage.OnlyTabOrEnterToCommit ?
+                                string.Empty :
                                 NodejsConstants.DefaultIntellisenseCompletionCommittedBy;
                         }
 

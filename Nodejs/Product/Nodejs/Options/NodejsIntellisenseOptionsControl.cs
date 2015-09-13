@@ -102,26 +102,26 @@ namespace Microsoft.NodejsTools.Options {
             }
         }
 
-        internal string CompletionCommittedBy {
+        internal bool OnlyTabOrEnterToCommit {
             get {
-                return _completionCommittedBy.Text;
+                return _onlyTabOrEnterToCommit.Checked;
             }
             set {
-                _completionCommittedBy.Text = value;
+                _onlyTabOrEnterToCommit.Checked = value;
             }
         }
 
         internal void SyncPageWithControlSettings(NodejsIntellisenseOptionsPage page) {
             page.AnalysisLevel = AnalysisLevel;
             page.AnalysisLogMax = AnalysisLogMaximum;
-            page.CompletionCommittedBy = CompletionCommittedBy;
+            page.OnlyTabOrEnterToCommit = OnlyTabOrEnterToCommit;
             page.SaveToDisk = SaveToDisk;
         }
 
         internal void SyncControlWithPageSettings(NodejsIntellisenseOptionsPage page) {
             AnalysisLevel = page.AnalysisLevel;
             AnalysisLogMaximum = page.AnalysisLogMax;
-            CompletionCommittedBy = page.CompletionCommittedBy;
+            OnlyTabOrEnterToCommit = page.OnlyTabOrEnterToCommit;
             SaveToDisk = page.SaveToDisk;
         }
 
