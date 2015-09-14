@@ -48,6 +48,7 @@
             this.textBox.Name = "textBox";
             this.textBox.Size = new System.Drawing.Size(306, 20);
             this.textBox.TabIndex = 1;
+            this.textBox.TextChanged += this.TextBox_TextChanged;
             // 
             // cancelButton
             // 
@@ -87,7 +88,6 @@
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Specify Name for Item";
-            this.Load += new System.EventHandler(this.NewFileNameForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

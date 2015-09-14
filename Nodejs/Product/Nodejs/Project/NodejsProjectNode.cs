@@ -1028,6 +1028,9 @@ namespace Microsoft.NodejsTools.Project {
                         }
                         break;
                     case PkgCmdId.cmdidAddNewJavaScriptFileCommand:
+                    case PkgCmdId.cmdidAddNewTypeScriptFileCommand:
+                    case PkgCmdId.cmdidAddNewHTMLFileCommand:
+                    case PkgCmdId.cmdidAddNewCSSFileCommand:
                         return QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
                 }
             }
@@ -1098,24 +1101,24 @@ namespace Microsoft.NodejsTools.Project {
                         );
                         handled = true;
                         return VSConstants.S_OK;
+
                     case PkgCmdId.cmdidAddNewJavaScriptFileCommand:
-                        using (var dialog = new NewFileNameForm()) {
-                            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
-                                string itemName = dialog.TextBox.Text;
+                        NewFileMenuGroup.NewFileUtilities.CreateNewJavaScriptFile(projectNode: this, containerId: selectedNodes[0].ID);
+                        handled = true;
+                        return VSConstants.S_OK;
 
-                                //public virtual int AddItem(uint itemIdLoc, VSADDITEMOPERATION op, string itemName, uint filesToOpen, string[] files, IntPtr dlgOwner, VSADDRESULT[] result) {
-                                VSADDRESULT[] pResult = new VSADDRESULT[2];
+                    case PkgCmdId.cmdidAddNewTypeScriptFileCommand:
+                        NewFileMenuGroup.NewFileUtilities.CreateNewTypeScriptFile(projectNode: this, containerId: selectedNodes[0].ID);
+                        handled = true;
+                        return VSConstants.S_OK;
 
-                                this.AddItem(selectedNodes[0].ID, 
-                                    VSADDITEMOPERATION.VSADDITEMOP_CLONEFILE,
-                                    itemName,
-                                    1,
-                                    new string[] { "C:\\USERS\\TIHOANH\\APPDATA\\LOCAL\\MICROSOFT\\VISUALSTUDIO\\14.0EXP\\EXTENSIONS\\MICROSOFT\\NODE.JS TOOLS\\1.1\\FileTemplates\\NewItem\\EmptyJs.js" },
-                                    IntPtr.Zero,
-                                    pResult
-                                    );
-                            }
-                        }
+                    case PkgCmdId.cmdidAddNewHTMLFileCommand:
+                        NewFileMenuGroup.NewFileUtilities.CreateNewHTMLFile(projectNode: this, containerId: selectedNodes[0].ID);
+                        handled = true;
+                        return VSConstants.S_OK;
+
+                    case PkgCmdId.cmdidAddNewCSSFileCommand:
+                        NewFileMenuGroup.NewFileUtilities.CreateNewCSSFile(projectNode: this, containerId: selectedNodes[0].ID);
                         handled = true;
                         return VSConstants.S_OK;
                 }
