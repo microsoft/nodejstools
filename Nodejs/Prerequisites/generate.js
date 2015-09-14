@@ -28,6 +28,7 @@ var assemblies = [
     'ProfilerTests',
     'TestAdapterTests',
     'NpmTests',
+    'MockVsTests',
     'Microsoft.NodejsTools',
     'Microsoft.NodejsTools.Analysis',
     'Microsoft.NodejsTools.Profiling',
