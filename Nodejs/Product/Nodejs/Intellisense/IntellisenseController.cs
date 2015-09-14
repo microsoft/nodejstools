@@ -193,6 +193,13 @@ namespace Microsoft.NodejsTools.Intellisense {
                             UpdateCurrentParameter();
                         }
                         break;
+                    default:
+                        if (IsIdentifierFirstChar(ch) && _activeSession == null
+                            && NodejsPackage.Instance.LangPrefs.AutoListMembers
+                            && NodejsPackage.Instance.IntellisenseOptionsPage.ShowCompletionListAfterCharacterTyped) {
+                            TriggerCompletionSession(false);
+                        }
+                        break;
                 }
             }
         }
@@ -725,8 +732,12 @@ namespace Microsoft.NodejsTools.Intellisense {
                 || (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9');
         }
 
+        private static bool IsIdentifierFirstChar(char ch) {
+            return ch == '_' || (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
+        }
+
         private static bool IsIdentifierChar(char ch) {
-            return ch == '_' || (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9');
+            return IsIdentifierFirstChar(ch) || (ch >= '0' && ch <= '9');
         }
 
         private bool EnterOnCompleteText() {

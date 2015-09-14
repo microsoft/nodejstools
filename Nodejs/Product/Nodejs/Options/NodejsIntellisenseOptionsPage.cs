@@ -31,6 +31,7 @@ namespace Microsoft.NodejsTools.Options {
         private int _analysisLogMax;
         private bool _saveToDisk;
         private bool _onlyTabOrEnterToCommit;
+        private bool _showCompletionListAfterCharacterTyped;
         private string _toolsVersion;
         private readonly bool _enableES6Preview;
         private readonly Version _typeScriptMinVersionForES6Preview = new Version("1.6");
@@ -126,11 +127,28 @@ namespace Microsoft.NodejsTools.Options {
                 }
             }
         }
+
+        internal bool ShowCompletionListAfterCharacterTyped {
+            get {
+                return _showCompletionListAfterCharacterTyped;
+            }
+            set {
+                var oldSetting = _showCompletionListAfterCharacterTyped;
+                _showCompletionListAfterCharacterTyped = value;
+                if (oldSetting != _showCompletionListAfterCharacterTyped) {
+                    var changed = ShowCompletionListAfterCharacterTypedChanged;
+                    if (changed != null) {
+                        changed(this, EventArgs.Empty);
+                    }
+                }
+            }
+        }
         
         public event EventHandler<EventArgs> AnalysisLevelChanged;
         public event EventHandler<EventArgs> AnalysisLogMaximumChanged;
-        public event EventHandler<EventArgs> OnlyTabOrEnterToCommitChanged;
         public event EventHandler<EventArgs> SaveToDiskChanged;
+        public event EventHandler<EventArgs> OnlyTabOrEnterToCommitChanged;
+        public event EventHandler<EventArgs> ShowCompletionListAfterCharacterTypedChanged;
 
         /// <summary>
         /// Resets settings back to their defaults. This should be followed by
@@ -144,8 +162,9 @@ namespace Microsoft.NodejsTools.Options {
 
         private const string AnalysisLevelSetting = "AnalysisLevel";
         private const string AnalysisLogMaximumSetting = "AnalysisLogMaximum";
-        private const string OnlyTabOrEnterToCommitSetting = "OnlyTabOrEnterToCommit";
         private const string SaveToDiskSetting = "SaveToDisk";
+        private const string OnlyTabOrEnterToCommitSetting = "OnlyTabOrEnterToCommit";
+        private const string ShowCompletionListAfterCharacterTypedSetting = "ShowCompletionListAfterCharacterTyped";
 
         public override void LoadSettingsFromStorage() {
             // Load settings from storage.
@@ -153,6 +172,7 @@ namespace Microsoft.NodejsTools.Options {
             AnalysisLogMax = LoadInt(AnalysisLogMaximumSetting) ?? 100;
             SaveToDisk = LoadBool(SaveToDiskSetting) ?? true;
             OnlyTabOrEnterToCommit = LoadBool(OnlyTabOrEnterToCommitSetting) ?? true;
+            ShowCompletionListAfterCharacterTyped = LoadBool(ShowCompletionListAfterCharacterTypedSetting) ?? true;
 
             // Synchronize UI with backing properties.
             if (_window != null) {
@@ -174,8 +194,9 @@ namespace Microsoft.NodejsTools.Options {
             // Save settings.
             SaveEnum(AnalysisLevelSetting, AnalysisLevel);
             SaveInt(AnalysisLogMaximumSetting, AnalysisLogMax);
-            SaveBool(OnlyTabOrEnterToCommitSetting, OnlyTabOrEnterToCommit);
             SaveBool(SaveToDiskSetting, SaveToDisk);
+            SaveBool(OnlyTabOrEnterToCommitSetting, OnlyTabOrEnterToCommit);
+            SaveBool(ShowCompletionListAfterCharacterTypedSetting, ShowCompletionListAfterCharacterTyped);
         }
 
         private string GetTypeScriptToolsVersion() {
