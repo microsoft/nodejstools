@@ -662,7 +662,6 @@
     <Compile Include="Debugger\Extensions.cs" />
     <Compile Include="Debugger\ModuleLoadedEventArgs.cs" />
     <Compile Include="Debugger\OutputEventArgs.cs" />
-    <Compile Include="Debugger\ProcessLoadedEventArgs.cs" />
     <Compile Include="Debugger\ProcessExitedEventArgs.cs" />
     <Compile Include="Debugger\NodeBreakpoint.cs" />
     <Compile Include="Debugger\NodeBreakpointBinding.cs" />
