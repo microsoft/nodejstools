@@ -1198,11 +1198,10 @@ namespace Microsoft.NodejsTools.Intellisense {
                 // Check for context-sensitive intellisense
                 var lastClass = tokens[tokens.Count - 1];
 
-                if (lastClass.ClassificationType == classifier.Provider.Comment) {
-                    // No completions in comments
-                    return CompletionAnalysis.EmptyCompletionContext;
-                } else if (lastClass.ClassificationType == classifier.Provider.StringLiteral) {
-                    // String completion
+                if (lastClass.ClassificationType == classifier.Provider.Comment ||
+                    lastClass.ClassificationType == classifier.Provider.StringLiteral ||
+                    lastClass.Span.GetText() == "var") {
+                    // No completions in comments, strings, or after "var" keywords.
                     return CompletionAnalysis.EmptyCompletionContext;
                 }
                 return null;
