@@ -46,7 +46,14 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 // Go through every directory in node_modules, and see if it's required as a top-level dependency
                 foreach (var moduleDir in topLevelDirectories) {
                     if (moduleDir.Length < NativeMethods.MAX_FOLDER_PATH && !_ignoredDirectories.Any(toIgnore => moduleDir.EndsWith(toIgnore))) {
-                        var packageJson = PackageJsonFactory.Create(new DirectoryPackageJsonSource(moduleDir));
+                        IPackageJson packageJson;
+                        try {
+                            packageJson = PackageJsonFactory.Create(new DirectoryPackageJsonSource(moduleDir));
+                        } catch (PackageJsonException) {
+                            // Fail gracefully if there was an error parsing the package.json
+                            Debug.Fail("Failed to parse package.json in {0}", moduleDir);
+                            continue;
+                        }
 
                         if (packageJson != null) {
                             if (packageJson.RequiredBy.Count() > 0) {
