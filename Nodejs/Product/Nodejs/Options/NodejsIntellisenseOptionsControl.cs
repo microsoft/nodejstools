@@ -111,18 +111,29 @@ namespace Microsoft.NodejsTools.Options {
             }
         }
 
+        internal bool ShowCompletionListAfterCharacterTyped {
+            get {
+                return _showCompletionListAfterCharacterTyped.Checked;
+            }
+            set {
+                _showCompletionListAfterCharacterTyped.Checked = value;
+            }
+        }
+
         internal void SyncPageWithControlSettings(NodejsIntellisenseOptionsPage page) {
             page.AnalysisLevel = AnalysisLevel;
             page.AnalysisLogMax = AnalysisLogMaximum;
-            page.OnlyTabOrEnterToCommit = OnlyTabOrEnterToCommit;
             page.SaveToDisk = SaveToDisk;
+            page.OnlyTabOrEnterToCommit = OnlyTabOrEnterToCommit;
+            page.ShowCompletionListAfterCharacterTyped = ShowCompletionListAfterCharacterTyped;
         }
 
         internal void SyncControlWithPageSettings(NodejsIntellisenseOptionsPage page) {
             AnalysisLevel = page.AnalysisLevel;
             AnalysisLogMaximum = page.AnalysisLogMax;
-            OnlyTabOrEnterToCommit = page.OnlyTabOrEnterToCommit;
             SaveToDisk = page.SaveToDisk;
+            OnlyTabOrEnterToCommit = page.OnlyTabOrEnterToCommit;
+            ShowCompletionListAfterCharacterTyped = page.ShowCompletionListAfterCharacterTyped;
         }
 
         private void _analysisPreviewFeedbackLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {

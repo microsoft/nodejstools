@@ -43,6 +43,7 @@
             this._selectionInCompletionListGroupBox = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this._onlyTabOrEnterToCommit = new System.Windows.Forms.CheckBox();
+            this._showCompletionListAfterCharacterTyped = new System.Windows.Forms.CheckBox();
             toolTip = new System.Windows.Forms.ToolTip(this.components);
             intellisenseLevelGroupBox = new System.Windows.Forms.GroupBox();
             saveToDiskGroupBox = new System.Windows.Forms.GroupBox();
@@ -182,6 +183,7 @@
             // 
             resources.ApplyResources(this.tableLayoutPanel3, "tableLayoutPanel3");
             this.tableLayoutPanel3.Controls.Add(this._onlyTabOrEnterToCommit, 0, 0);
+            this.tableLayoutPanel3.Controls.Add(this._showCompletionListAfterCharacterTyped, 0, 1);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
             // 
             // _onlyTabOrEnterToCommit
@@ -189,6 +191,12 @@
             resources.ApplyResources(this._onlyTabOrEnterToCommit, "_onlyTabOrEnterToCommit");
             this._onlyTabOrEnterToCommit.Name = "_onlyTabOrEnterToCommit";
             this._onlyTabOrEnterToCommit.UseVisualStyleBackColor = true;
+            // 
+            // _showCompletionListAfterCharacterTyped
+            // 
+            resources.ApplyResources(this._showCompletionListAfterCharacterTyped, "_showCompletionListAfterCharacterTyped");
+            this._showCompletionListAfterCharacterTyped.Name = "_showCompletionListAfterCharacterTyped";
+            this._showCompletionListAfterCharacterTyped.UseVisualStyleBackColor = true;
             // 
             // NodejsIntellisenseOptionsControl
             // 
@@ -232,5 +240,6 @@
         private System.Windows.Forms.RadioButton _fullIntelliSenseRadioButton;
         private System.Windows.Forms.LinkLabel _analysisPreviewFeedbackLinkLabel;
         private System.Windows.Forms.CheckBox _onlyTabOrEnterToCommit;
+        private System.Windows.Forms.CheckBox _showCompletionListAfterCharacterTyped;
     }
 }
