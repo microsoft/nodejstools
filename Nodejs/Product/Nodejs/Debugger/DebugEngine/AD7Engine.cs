@@ -1149,7 +1149,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 if (_loadComplete) {
                     SendModuleLoad(adModule);
                 }
-                
             }
         }
 
