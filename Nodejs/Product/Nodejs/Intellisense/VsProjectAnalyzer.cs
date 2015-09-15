@@ -1200,7 +1200,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
                 if (lastClass.ClassificationType == classifier.Provider.Comment ||
                     lastClass.ClassificationType == classifier.Provider.StringLiteral ||
-                    lastClass.Span.GetText() == "var") {
+                    (lastClass.ClassificationType == classifier.Provider.Keyword && lastClass.Span.GetText() == "var")) {
                     // No completions in comments, strings, or after "var" keywords.
                     return CompletionAnalysis.EmptyCompletionContext;
                 }
