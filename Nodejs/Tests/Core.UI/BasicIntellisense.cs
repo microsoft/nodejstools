@@ -43,7 +43,6 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var server = solution.OpenItem("CtrlSpace", "server.js");
 
                 server.MoveCaret(2, 13);
-
                 solution.ExecuteCommand("Edit.CompleteWord");
 
                 server.WaitForText("var http = require('http');\r\nhttp.createServer");
@@ -265,6 +264,37 @@ namespace Microsoft.Nodejs.Tests.UI {
                     var session = sh.Session;
                     AssertUtil.ContainsAtLeast(session.CompletionSets[0].Completions.Select(x => x.InsertionText), "big");
                 }
+            }
+        }
+
+        /// <summary>
+        /// https://github.com/Microsoft/nodejstools/issues/454
+        /// </summary>
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("VSTestHost")]
+        public void IntellisenseAfterVarKeyword() {
+            var project = Project("IntellisenseAfterVarKeywordTest",
+                Compile("server", "var c \r\nexports.var = 3; exports.var ")
+            );
+
+            using (var solution = project.Generate().ToVs()) {
+                var server = solution.OpenItem("IntellisenseAfterVarKeywordTest", "server.js");
+
+                server.MoveCaret(1, 4);
+                Keyboard.Type(Keyboard.CtrlSpace.ToString());
+                using (var sh = server.WaitForSession<ICompletionSession>(true)) { }
+
+                server.MoveCaret(1, 6);
+                Keyboard.Type(Keyboard.CtrlSpace.ToString());
+                server.AssertNoIntellisenseSession();
+
+                server.MoveCaret(1, 7);
+                Keyboard.Type(Keyboard.CtrlSpace.ToString());
+                using (var sh = server.WaitForSession<ICompletionSession>(true)) { }
+
+                server.MoveCaret(2, 30);
+                Keyboard.Type(Keyboard.CtrlSpace.ToString());
+                using (var sh = server.WaitForSession<ICompletionSession>(true)) { }
             }
         }
 
