@@ -1193,6 +1193,16 @@ namespace Microsoft.NodejsTools.Intellisense {
                 }
             }
 
+            // Get the classifiers from beginning of the line to the beginning of snapSpan.
+            // The contents of snapSpan differ depending on what is determined in
+            // CompletionSource.GetApplicableSpan.
+            //
+            // In the case of:
+            //      var myIdentifier<cursor>
+            // the applicable span will be "myIdentifier", so GetClassificationSpans will operate on "var "
+            // 
+            // In the case of comments and string literals, the applicable span will be empty,
+            // so snapSpan.Start will occur at the current cursor position. 
             var tokens = classifier.GetClassificationSpans(new SnapshotSpan(start.GetContainingLine().Start, snapSpan.Start));
             if (tokens.Count > 0) {
                 // Check for context-sensitive intellisense
@@ -1201,7 +1211,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 if (lastClass.ClassificationType == classifier.Provider.Comment ||
                     lastClass.ClassificationType == classifier.Provider.StringLiteral ||
                     (lastClass.ClassificationType == classifier.Provider.Keyword && lastClass.Span.GetText() == "var")) {
-                    // No completions in comments, strings, or after "var" keywords.
+                    // No completions in comments, strings, or directly after "var" keywords.
                     return CompletionAnalysis.EmptyCompletionContext;
                 }
                 return null;
