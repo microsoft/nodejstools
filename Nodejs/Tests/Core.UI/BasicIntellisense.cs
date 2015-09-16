@@ -17,13 +17,13 @@
 using System;
 using System.Linq;
 using System.Windows;
+using Microsoft.NodejsTools.Intellisense;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.Text;
 using TestUtilities;
 using TestUtilities.UI;
 using Key = System.Windows.Input.Key;
-using Microsoft.NodejsTools.Intellisense;
 
 namespace Microsoft.Nodejs.Tests.UI {
     [TestClass]
