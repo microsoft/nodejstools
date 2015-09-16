@@ -1210,6 +1210,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             if (tokens.Count > 0) {
                 // Check for context-sensitive intellisense
                 var lastClass = tokens[tokens.Count - 1];
+
                 if (lastClass.ClassificationType == classifier.Provider.Comment ||
                     lastClass.ClassificationType == classifier.Provider.StringLiteral ||
                     (lastClass.ClassificationType == classifier.Provider.Keyword &&
