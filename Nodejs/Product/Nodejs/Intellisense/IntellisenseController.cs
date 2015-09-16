@@ -647,7 +647,8 @@ namespace Microsoft.NodejsTools.Intellisense {
                         case VSConstants.VSStd2KCmdID.COMPLETEWORD:
                             ForceCompletions = true;
                             try {
-                                TriggerCompletionSession((VSConstants.VSStd2KCmdID)nCmdID == VSConstants.VSStd2KCmdID.COMPLETEWORD);
+                                TriggerCompletionSession((VSConstants.VSStd2KCmdID)nCmdID == VSConstants.VSStd2KCmdID.COMPLETEWORD
+                                    && !NodejsPackage.Instance.IntellisenseOptionsPage.OnlyTabOrEnterToCommit);
                             } finally {
                                 ForceCompletions = false;
                             }
