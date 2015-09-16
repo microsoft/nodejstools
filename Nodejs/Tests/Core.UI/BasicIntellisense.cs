@@ -17,6 +17,7 @@
 using System;
 using System.Linq;
 using System.Windows;
+using Microsoft.NodejsTools.Intellisense;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.Text;
@@ -272,29 +273,31 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void IntellisenseAfterVarKeyword() {
-            var project = Project("IntellisenseAfterVarKeywordTest",
-                Compile("server", "var c \r\nexports.var = 3; exports.var ")
-            );
+        public void IntellisenseAfterEmptyCompletionContextKeywords() {
+            foreach (var keyword in VsProjectAnalyzer._emptyCompletionContextKeywords) {
+                var project = Project("IntellisenseAfterEmptyCompletionContextKeywordTest",
+                    Compile("server", String.Format("{0} c \r\nexports.{0} = 3; exports.{0} ", keyword))
+                );
 
-            using (var solution = project.Generate().ToVs()) {
-                var server = solution.OpenItem("IntellisenseAfterVarKeywordTest", "server.js");
+                using (var solution = project.Generate().ToVs()) {
+                    var server = solution.OpenItem("IntellisenseAfterEmptyCompletionContextKeywordTest", "server.js");
 
-                server.MoveCaret(1, 4);
-                Keyboard.Type(Keyboard.CtrlSpace.ToString());
-                using (var sh = server.WaitForSession<ICompletionSession>(true)) { }
+                    server.MoveCaret(1, keyword.Length + 1);
+                    Keyboard.Type(Keyboard.CtrlSpace.ToString());
+                    using (var sh = server.WaitForSession<ICompletionSession>(true)) { }
 
-                server.MoveCaret(1, 6);
-                Keyboard.Type(Keyboard.CtrlSpace.ToString());
-                server.AssertNoIntellisenseSession();
+                    server.MoveCaret(1, keyword.Length + 3);
+                    Keyboard.Type(Keyboard.CtrlSpace.ToString());
+                    server.AssertNoIntellisenseSession();
 
-                server.MoveCaret(1, 7);
-                Keyboard.Type(Keyboard.CtrlSpace.ToString());
-                using (var sh = server.WaitForSession<ICompletionSession>(true)) { }
+                    server.MoveCaret(1, keyword.Length + 4);
+                    Keyboard.Type(Keyboard.CtrlSpace.ToString());
+                    using (var sh = server.WaitForSession<ICompletionSession>(true)) { }
 
-                server.MoveCaret(2, 30);
-                Keyboard.Type(Keyboard.CtrlSpace.ToString());
-                using (var sh = server.WaitForSession<ICompletionSession>(true)) { }
+                    server.MoveCaret(2, keyword.Length*2 + 24);
+                    Keyboard.Type(Keyboard.CtrlSpace.ToString());
+                    using (var sh = server.WaitForSession<ICompletionSession>(true)) { }
+                }
             }
         }
 
