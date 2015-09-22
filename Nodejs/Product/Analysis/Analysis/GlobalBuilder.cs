@@ -226,7 +226,8 @@ All other strings are considered decimal.", isOptional:true)
                 builtinEntry,
                 "Array",
                 NewArray,
-                null,
+                ArrayOverloads(),
+                "This is an array 1",
                 arrayPrototype = new BuiltinObjectValue(builtinEntry) {
                         SpecializedFunction(
                             "concat",
@@ -356,6 +357,14 @@ All other strings are considered decimal.", isOptional:true)
                         ),
                 }) { 
                 new ReturningFunctionValue(builtinEntry, "isArray", _analyzer._falseInst.Proxy)
+            };
+        }
+
+        private OverloadResult[] ArrayOverloads()
+        {
+            return new OverloadResult[] {
+                new SimpleOverloadResult("Array", "", Parameter("arrayLength", "If this is an between 0 and 2^32-1 and it is the only argument passed to the Array constructor, returns a new array with length set to this number.")),
+                new SimpleOverloadResult("Array", "", Parameter("item", "Element of the array."), Parameter("item...", "Element of the array."))
             };
         }
 
