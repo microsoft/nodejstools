@@ -122,7 +122,9 @@ namespace Microsoft.NodejsTools.Project {
                     }
                 }
                 var fileNode = DelayedAnalysisQueue.Dequeue();
-                fileNode.Analyze();
+                if (fileNode != null) {
+                    fileNode.Analyze();
+                }
             }
         }
 
@@ -974,6 +976,10 @@ namespace Microsoft.NodejsTools.Project {
                     }
 
                     _analyzer = null;
+                }
+
+                if (_idleNodeModulesTimer != null) {
+                    _idleNodeModulesTimer.Dispose();
                 }
 
                 NodejsPackage.Instance.IntellisenseOptionsPage.SaveToDiskChanged -= IntellisenseOptionsPageSaveToDiskChanged;
