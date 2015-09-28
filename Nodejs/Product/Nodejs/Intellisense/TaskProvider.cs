@@ -296,11 +296,15 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         public void Dispose() {
             lock (_workerQueue) {
-                if (_hasWorker) {
-                    _hasWorker = false;
-                    _workerQueue.CompleteAdding();
-                } else {
-                    _workerQueue.Dispose();
+                try {
+                    if (_hasWorker) {
+                        _hasWorker = false;
+                        _workerQueue.CompleteAdding();
+                    } else {
+                        _workerQueue.Dispose();
+                    }
+                } catch (ObjectDisposedException) {
+                    // _workerQueue is already disposed
                 }
             }
             lock (_itemsLock) {
@@ -462,8 +466,14 @@ namespace Microsoft.NodejsTools.Intellisense {
                 msg.Apply(_items, _itemsLock);
             }
 
-            if (_workerQueue.IsCompleted) {
-                _workerQueue.Dispose();
+            lock(_workerQueue) {
+                try {
+                    if (_workerQueue.IsCompleted) {
+                        _workerQueue.Dispose();
+                    }
+                } catch (ObjectDisposedException) {
+                    // We are already disposed
+                }
             }
         }
 
@@ -543,6 +553,9 @@ namespace Microsoft.NodejsTools.Intellisense {
         private void SendMessage(WorkerMessage message) {
             lock (_workerQueue) {
                 try {
+                    if (_workerQueue.IsAddingCompleted) {
+                        return;
+                    }
                     _workerQueue.Add(message);
                 } catch (ObjectDisposedException) {
                     return;
