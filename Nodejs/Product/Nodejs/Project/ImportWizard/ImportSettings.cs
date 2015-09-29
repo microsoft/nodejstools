@@ -323,8 +323,7 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
                     .Where(ShouldIncludeDirectory)
             );
             if (excludeNodeModules) {
-                folders.Remove(NodejsConstants.NodeModulesFolder);
-                folders.RemoveWhere(folder => folder.StartsWith(NodejsConstants.NodeModulesFolder + "\\", StringComparison.OrdinalIgnoreCase));
+                folders.RemoveWhere(folder => ("\\" + folder + "\\").IndexOf("\\" + NodejsConstants.NodeModulesFolder + "\\", StringComparison.OrdinalIgnoreCase) >= 0);
             }
             writer.WriteStartElement("ItemGroup");
             foreach (var file in EnumerateAllFiles(sourcePath, filters, excludeNodeModules)) {
