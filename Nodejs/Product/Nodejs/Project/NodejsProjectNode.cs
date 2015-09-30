@@ -956,6 +956,8 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
+        internal event EventHandler OnDispose;
+
         protected override void Dispose(bool disposing) {
             if (disposing) {
                 if (_analyzer != null) {
@@ -979,6 +981,11 @@ namespace Microsoft.NodejsTools.Project {
                 NodejsPackage.Instance.IntellisenseOptionsPage.SaveToDiskChanged -= IntellisenseOptionsPageSaveToDiskChanged;
                 NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevelChanged -= IntellisenseOptionsPageAnalysisLevelChanged;
                 NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMaximumChanged -= AnalysisLogMaximumChanged;
+
+                EventHandler handler = OnDispose;
+                if (handler != null) {
+                    handler(this, EventArgs.Empty);
+                }
             }
             base.Dispose(disposing);
         }

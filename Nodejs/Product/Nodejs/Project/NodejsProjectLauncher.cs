@@ -102,6 +102,7 @@ namespace Microsoft.NodejsTools.Project {
                     NodejsPackage.Instance.GeneralOptionsPage.WaitOnAbnormalExit,
                     NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit
                 );
+                _project.OnDispose += process.ResponseToTerminateEvent;
 
                 if (startBrowser && uri != null) {
                     OnPortOpenedHandler.CreateHandler(
