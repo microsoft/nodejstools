@@ -39,10 +39,8 @@ namespace Microsoft.NodejsTools.Logging {
 
         private NodejsDiagnosticsOptionsPage DiagnosticsOptions {
             get {
-                if (_diagnosticsOptions == null) {
-                    if (NodejsPackage.Instance != null) {
-                        _diagnosticsOptions = NodejsPackage.Instance.DiagnosticsOptionsPage;
-                    }
+                if (_diagnosticsOptions == null && NodejsPackage.Instance != null) {
+                    _diagnosticsOptions = NodejsPackage.Instance.DiagnosticsOptionsPage;
                 }
                 return _diagnosticsOptions;
             }
