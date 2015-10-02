@@ -67,102 +67,22 @@ namespace Microsoft.NodejsTools.Intellisense {
             return VSConstants.S_OK;
         }
 
+        /// <summary>
+        /// Format the content inserted by code snippet.
+        /// </summary>
+        /// <param name="pBuffer">The text buffer which contains the text to be formatted.</param>
+        /// <param name="ts">The span (a pair of beginning and ending positions) of text that is to be formatted.</param>
         public int FormatSpan(IVsTextLines pBuffer, TextSpan[] ts) {
-            IXMLDOMNode codeNode, snippetTypes, declarations;
-            int hr;
-            if (ErrorHandler.Failed(hr = _session.GetSnippetNode("CodeSnippet:Code", out codeNode))) {
-                return hr;
-            }
+            int startPos = 0, endPos = 0;
+            pBuffer.GetPositionOfLineIndex(ts[0].iStartLine, ts[0].iStartIndex, out startPos);
+            pBuffer.GetPositionOfLineIndex(ts[0].iEndLine, ts[0].iEndIndex, out endPos);
 
-            if (ErrorHandler.Failed(hr = _session.GetHeaderNode("CodeSnippet:SnippetTypes", out snippetTypes))) {
-                return hr;
-            }
+            Formatting.FormattingOptions options = EditFilter.CreateFormattingOptions(_textView.Options, _textView.TextBuffer.CurrentSnapshot);
+            string text = _textView.TextBuffer.CurrentSnapshot.GetText();
+            var edits = Formatting.Formatter.GetEditsForRange(text, startPos, endPos, options);
+            EditFilter.ApplyEdits(_textView.TextBuffer, edits);
 
-            List<string> declList = new List<string>();
-            if (ErrorHandler.Succeeded(hr = _session.GetSnippetNode("CodeSnippet:Declarations", out declarations))
-                && declarations != null) {
-                foreach (IXMLDOMNode declType in declarations.childNodes) {
-                    var id = declType.selectSingleNode("./CodeSnippet:ID");
-                    if (id != null) {
-                        declList.Add(id.text);
-                    }
-                }
-            }
-
-            bool surroundsWith = false;
-            foreach (MSXML.IXMLDOMNode snippetType in snippetTypes.childNodes) {
-                if (snippetType.nodeName == "SnippetType") {
-                    if (snippetType.text == SurroundsWith) {
-                        surroundsWith = true;
-                    }
-                }
-            }
-            // get the indentation of where we're inserting the code...
-            string baseIndentation = GetBaseIndentation(ts);
-
-            using (var edit = _textView.TextBuffer.CreateEdit()) {
-                if (surroundsWith) {
-                    var templateText = codeNode.text.Replace("\r\n", VsExtensions.GetNewLineText(_textView.TextSnapshot));
-                    foreach (var decl in declList) {
-                        string defaultValue;
-                        if (ErrorHandler.Succeeded(_session.GetFieldValue(decl, out defaultValue))) {
-                            templateText = templateText.Replace("$" + decl + "$", defaultValue);
-                        }
-                    }
-
-                    templateText = templateText.Replace("$end$", "");
-                    // we can finally figure out where the selected text began witin the original template...
-                    int selectedIndex = templateText.IndexOf("$selected$");
-                    if (selectedIndex != -1) {
-                        var selection = _textView.Selection;
-
-                        // now we need to get the indentation of the $selected$ element within the template,
-                        // as we'll need to indent the selected code to that level.
-                        string indentation = GetTemplateSelectionIndentation(templateText, selectedIndex);
-
-                        var start = _selectionStart.GetPosition(_textView.TextBuffer.CurrentSnapshot);
-                        var end = _selectionEnd.GetPosition(_textView.TextBuffer.CurrentSnapshot);
-                        if (end < start) {
-                            // we didn't actually have a selection, and our negative tracking pushed us
-                            // back to the start of the buffer...
-                            end = start;
-                        }
-                        var selectedSpan = Span.FromBounds(start, end);
-
-                        if (surroundsWith) {
-                            if (string.IsNullOrWhiteSpace(_textView.TextBuffer.CurrentSnapshot.GetText(selectedSpan))) {
-
-                                // Surround With can be invoked with no selection, but on a line with some text.
-                                // In that case we need to inject an extra new line.
-                                var endLine = _textView.TextBuffer.CurrentSnapshot.GetLineFromPosition(end);
-                                var endText = endLine.GetText().Substring(end - endLine.Start);
-                                if (!String.IsNullOrWhiteSpace(endText)) {
-                                    edit.Insert(end, _textView.Options.GetNewLineCharacter());
-                                }
-
-                            } else {
-                                _selectEndSpan = true;
-                            }
-
-                        }
-
-                        IndentSpan(
-                            edit,
-                            indentation,
-                            _textView.TextBuffer.CurrentSnapshot.GetLineFromPosition(start).LineNumber + 1, // 1st line is already indented
-                            _textView.TextBuffer.CurrentSnapshot.GetLineFromPosition(end).LineNumber
-                        );
-                    }
-                }
-
-                // we now need to update any code which was not selected  that we just inserted.
-                IndentSpan(edit, baseIndentation, ts[0].iStartLine + 1, ts[0].iEndLine);
-
-                edit.Apply();
-
-            }
-
-            return hr;
+            return VSConstants.S_OK;
         }
 
         public int InsertNamedExpansion(string pszTitle, string pszPath, TextSpan textSpan) {
@@ -196,37 +116,6 @@ namespace Microsoft.NodejsTools.Intellisense {
                 }
             }
             return hr;
-        }
-
-        private static string GetTemplateSelectionIndentation(string templateText, int selectedIndex) {
-            string indentation = "";
-            for (int i = selectedIndex - 1; i >= 0; i--) {
-                if (templateText[i] != '\t' && templateText[i] != ' ') {
-                    indentation = templateText.Substring(i + 1, selectedIndex - i - 1);
-                    break;
-                }
-            }
-            return indentation;
-        }
-
-        private string GetBaseIndentation(TextSpan[] ts) {
-            var indentationLine = _textView.TextBuffer.CurrentSnapshot.GetLineFromLineNumber(ts[0].iStartLine).GetText();
-            string baseIndentation = indentationLine;
-            for (int i = 0; i < indentationLine.Length; i++) {
-                if (indentationLine[i] != ' ' && indentationLine[i] != '\t') {
-                    baseIndentation = indentationLine.Substring(0, i);
-                    break;
-                }
-            }
-            return baseIndentation;
-        }
-
-        private void IndentSpan(ITextEdit edit, string indentation, int startLine, int endLine) {
-            var snapshot = _textView.TextBuffer.CurrentSnapshot;
-            for (int i = startLine; i <= endLine; i++) {
-                var curline = snapshot.GetLineFromLineNumber(i);
-                edit.Insert(curline.Start, indentation);
-            }
         }
 
         public int GetExpansionFunction(IXMLDOMNode xmlFunctionNode, string bstrFieldName, out IVsExpansionFunction pFunc) {
