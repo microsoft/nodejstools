@@ -100,6 +100,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             _allModules.TryGetValue(moduleDir, out moduleInfo);
 
             if (moduleInfo != null) {
+                // Update module information if the module already exists.
                 if (moduleInfo.Depth > depth) {
                     moduleInfo.Depth = depth;
                 }
@@ -110,7 +111,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                         existingPackage.RequestedVersionRange = dependency.VersionRangeText;
                     }
                 }
-            } else if (Directory.Exists(moduleDir)) {
+            } else if (Directory.Exists(moduleDir) || depth == 1) {
+                // Top-level modules are always added so we can include missing modules.
                 moduleInfo = new ModuleInfo(depth);
                 _allModules.Add(moduleDir, moduleInfo);
             } else {
