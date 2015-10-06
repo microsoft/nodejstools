@@ -82,7 +82,6 @@ namespace Microsoft.Nodejs.Tests.UI {
         [HostType("VSTestHost")]
         public void TestInsertSnippet() {
             using (var solution = BasicProject.Generate().ToVs()) {
-                    
                 foreach (var snippet in BasicSnippets) {
                     TestOneInsertSnippet(solution, snippet, "Nodejs");
 
@@ -215,14 +214,12 @@ namespace Microsoft.Nodejs.Tests.UI {
             foreach (var decl in snippet.Declarations) {
                 Console.WriteLine("Declaration: {0}", decl.Replacement);
                 Keyboard.Type(decl.Replacement);
-                Keyboard.Type("\t");
+                Keyboard.Type("→");
                 server.WaitForText(decl.Expected.Replace("$body$", body));
                 Keyboard.Type("\t");
             }
             Keyboard.Type("\r");
             return server;
         }
-
     }
-
 }
