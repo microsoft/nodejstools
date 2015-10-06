@@ -68,21 +68,133 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         /// <summary>
-        /// Format the content inserted by code snippet.
+        /// Format the content inserted by a code snippet
         /// </summary>
-        /// <param name="pBuffer">The text buffer which contains the text to be formatted.</param>
-        /// <param name="ts">The span (a pair of beginning and ending positions) of text that is to be formatted.</param>
         public int FormatSpan(IVsTextLines pBuffer, TextSpan[] ts) {
+            // Example of a snippet template (taken from forprops.snippet and use ... to represent
+            // indent spaces):
+            //
+            // for (var $property$ in $object$) {
+            // ....if ($object$.hasOwnProperty($property$)) {
+            // ........$selected$$end$
+            // ....}
+            // };
+            //
+            // Example of code in pBuffer (the for loop is inserted by a forprops snippet):
+            //
+            // var object = { one: 1, two: 2 };
+            // for (var property in object) {
+            // ....if (object.hasOwnProperty(property)) {
+            // ........
+            // ....}
+            // };
+            //
+            // Result examples:
+            //
+            // (1) If indent size = 2:
+            //
+            // var object = { one: 1, two: 2 };
+            // for (var property in object) {
+            // ..if (object.hasOwnProperty(property)) {
+            // ....
+            // ..}
+            // };
+            //
+            // (2) If indent size = 2 and OpenBracesOnNewLineForControl = true:
+            //
+            // var object = { one: 1, two: 2 };
+            // for (var property in object)
+            // {
+            // ..if (object.hasOwnProperty(property))
+            // ..{
+            // ....
+            // ..}
+            // };
+
+            // Algorithm: The idea is to use Formatting.Formatter to format the inserted content.
+            // However, Formatting.Formatter does not format lines that only contain spaces. For
+            // example, here is how Formatting.Formatter formats the code above:
+            //
+            // var object = { one: 1, two: 2 };
+            // for (var property in object) {
+            // ..if (object.hasOwnProperty(property)) {
+            // ........
+            // ..}
+            // };
+            //
+            // An additional step will be included to ensure such lines are formatted correctly.
+
+            int baseIndentationLevel = GetViewIndentationLevelAtLine(ts[0].iStartLine);
+
+            for (int lineNumber = ts[0].iStartLine; lineNumber <= ts[0].iEndLine; ++lineNumber) {
+                string lineContent = _textView.TextBuffer.CurrentSnapshot.GetLineFromLineNumber(lineNumber).GetText();
+
+                string indentationString = GetTemplateIndentationString(lineContent);
+                if (indentationString != lineContent) { // This means line contains some characters other than spaces
+                    continue;
+                }
+
+                int newIndentationLevel = baseIndentationLevel + GetTemplateIndentationLevel(indentationString);
+
+                string newIndentation = _textView.Options.IsConvertTabsToSpacesEnabled()
+                    ? new string(' ', newIndentationLevel * _textView.Options.GetIndentSize())
+                    : new string('\t', newIndentationLevel);
+
+                using (var edit = _textView.TextBuffer.CreateEdit()) {
+                    int indendationPos;
+                    pBuffer.GetPositionOfLineIndex(lineNumber, 0, out indendationPos);
+                    Span bufferIndentationSpan = new Span(indendationPos, indentationString.Length);
+                    edit.Replace(bufferIndentationSpan, newIndentation);
+                    edit.Apply();
+                }
+            }
+
+            // Now that we have handled empty lines, use Formatter to format the inserted content.
             int startPos = 0, endPos = 0;
             pBuffer.GetPositionOfLineIndex(ts[0].iStartLine, ts[0].iStartIndex, out startPos);
             pBuffer.GetPositionOfLineIndex(ts[0].iEndLine, ts[0].iEndIndex, out endPos);
-
             Formatting.FormattingOptions options = EditFilter.CreateFormattingOptions(_textView.Options, _textView.TextBuffer.CurrentSnapshot);
             string text = _textView.TextBuffer.CurrentSnapshot.GetText();
-            var edits = Formatting.Formatter.GetEditsForRange(text, startPos, endPos, options);
-            EditFilter.ApplyEdits(_textView.TextBuffer, edits);
+            EditFilter.ApplyEdits(_textView.TextBuffer, Formatting.Formatter.GetEditsForRange(text, startPos, endPos, options));
 
             return VSConstants.S_OK;
+        }
+
+        private static string GetTemplateIndentationString(string lineContent) {
+            for (int i = 0; i < lineContent.Length; ++i) {
+                if (lineContent[i] != ' ' && lineContent[i] != '\t') {
+                    return lineContent.Substring(0, i);
+                }
+            }
+            return lineContent;
+        }
+
+        private static int GetTemplateIndentationLevel(string indentationString) {
+            if (indentationString.Length == 0) {
+                return 0;
+            }
+            if (indentationString[0] == ' ') {
+                return indentationString.Length / 4; // All node.js snippets use 4 space indentation.
+            }
+            // In case some snippets use tab style indentation
+            return indentationString.Length;
+        }
+
+        private int GetViewIndentationLevelAtLine(int line) {
+            string lineContent = _textView.TextBuffer.CurrentSnapshot.GetLineFromLineNumber(line).GetText();
+            if (_textView.Options.IsConvertTabsToSpacesEnabled()) {
+                return CountLeadingCharacters(' ', lineContent) / _textView.Options.GetIndentSize();
+            }
+            return CountLeadingCharacters('\t', lineContent);
+        }
+
+        private static int CountLeadingCharacters(char character, string lineContent) {
+            for (int i = 0; i < lineContent.Length; ++i) {
+                if (lineContent[i] != character) {
+                    return i;
+                }
+            }
+            return lineContent.Length;
         }
 
         public int InsertNamedExpansion(string pszTitle, string pszPath, TextSpan textSpan) {
