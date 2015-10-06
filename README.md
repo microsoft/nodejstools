@@ -1,7 +1,7 @@
 <a href="http://aka.ms/explorentvs" target="_blank">![Node.js Tools for Visual Studio](https://download-codeplex.sec.s-msft.com/Download?ProjectName=nodejstools&DownloadId=761175&Build=20959)</a>
 <hr>
 NTVS is a free, open source plugin that turns Visual Studio into a Node.js IDE. It is designed, developed, and supported by Microsoft and the community.
-#### <a href="http://aka.ms/explorentvs" target="_blank">**Learn more and start developing Node.js applications in Visual Studio**</a>
+#### <a href="http://aka.ms/explorentvs" target="_blank">**>> Learn more and start developing Node.js applications in Visual Studio**</a>
 
 [![Join the chat at https://gitter.im/Microsoft/nodejstools](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Microsoft/nodejstools?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
