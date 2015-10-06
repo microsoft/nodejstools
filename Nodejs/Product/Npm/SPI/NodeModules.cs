@@ -120,17 +120,27 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 return false;
             }
 
-            if (moduleInfo.RequiredBy.Contains(parent.Name)) {
-                return true;
+            IPackage package = moduleInfo.Package;
+                        
+            if (package == null || (depth == 1 && !moduleInfo.RequiredBy.Contains(parent.Name))) {
+                // Create a dummy value for the current package to prevent infinite loops
+                moduleInfo.Package = new PackageProxy();
+
+                moduleInfo.RequiredBy.Add(parent.Name);
+
+                var pkg = new Package(parent, moduleDir, showMissingDevOptionalSubPackages, _allModules, depth);
+                if (dependency != null) {
+                    pkg.RequestedVersionRange = dependency.VersionRangeText;
+                }
+
+                package = moduleInfo.Package = pkg;
             }
 
-            moduleInfo.RequiredBy.Add(parent.Name);
-            var package = new Package(parent, moduleDir, showMissingDevOptionalSubPackages, _allModules, depth);
-            if (dependency != null) {
-                package.RequestedVersionRange = dependency.VersionRangeText;
+            if (!moduleInfo.RequiredBy.Contains(parent.Name)) {
+                moduleInfo.RequiredBy.Add(parent.Name);
             }
+            
             AddModule(package);
-
             return true;
         }
 
@@ -151,6 +161,9 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
     internal class ModuleInfo {
         public int Depth { get; set; }
+
+        public IPackage Package { get; set; }
+
         public IList<string> RequiredBy { get; set; }
 
         internal ModuleInfo(int depth) {
