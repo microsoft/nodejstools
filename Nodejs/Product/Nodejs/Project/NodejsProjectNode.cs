@@ -122,7 +122,9 @@ namespace Microsoft.NodejsTools.Project {
                     }
                 }
                 var fileNode = DelayedAnalysisQueue.Dequeue();
-                fileNode.Analyze();
+                if (fileNode != null) {
+                    fileNode.Analyze();
+                }
             }
         }
 
@@ -140,12 +142,14 @@ namespace Microsoft.NodejsTools.Project {
         private void RestartFileSystemWatcherTimer() {
             lock (_idleNodeModulesLock) {
                 _isIdleNodeModules = false;
-            }
 
-            // The cooldown time here is longer than the cooldown time we use in NpmController.
-            // This gives the Npm component ample time to build up the npm node tree,
-            // so that we can query it later for perf optimizations.
-            _idleNodeModulesTimer.Change(3000, Timeout.Infinite);
+                // The cooldown time here is longer than the cooldown time we use in NpmController.
+                // This gives the Npm component ample time to build up the npm node tree,
+                // so that we can query it later for perf optimizations.
+                if (_idleNodeModulesTimer != null) {
+                    _idleNodeModulesTimer.Change(3000, Timeout.Infinite);
+                }
+            }
         }
 
         private static string[] _excludedAvailableItems = new[] {
@@ -972,8 +976,19 @@ namespace Microsoft.NodejsTools.Project {
                     if (_analyzer.RemoveUser()) {
                         _analyzer.Dispose();
                     }
-
                     _analyzer = null;
+                }
+
+                lock (_idleNodeModulesLock) {
+                    if (_idleNodeModulesTimer != null) {
+                        _idleNodeModulesTimer.Dispose();
+                    }
+                    _idleNodeModulesTimer = null;
+
+                    // Unsubscribe event handlers that trigger _idleNodeModulesTimer.
+                    _nodeModulesWatcher.Changed -= OnNodeModulesWatcherChanged;
+                    _nodeModulesWatcher.Created -= OnNodeModulesWatcherChanged;
+                    _nodeModulesWatcher.Deleted -= OnNodeModulesWatcherChanged;
                 }
 
                 NodejsPackage.Instance.IntellisenseOptionsPage.SaveToDiskChanged -= IntellisenseOptionsPageSaveToDiskChanged;
