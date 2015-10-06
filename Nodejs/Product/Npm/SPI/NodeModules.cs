@@ -68,10 +68,14 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             }
 
             if (modulesBase.Length < NativeMethods.MAX_FOLDER_PATH && parent.HasPackageJson) {
-                // Iterate through all dependencies in package.json
-                foreach (var dependency in parent.PackageJson.AllDependencies) {
+                // Iterate through all dependencies in the root package.json
+                // Otherwise, only iterate through "dependencies" because iterating through optional, bundle, etc. dependencies
+                // becomes unmanageable when they are already installed at the root of the project, and the performance impact
+                // typically isn't worth the value add. 
+                var dependencies = depth == 0 ? parent.PackageJson.AllDependencies : parent.PackageJson.Dependencies;
+                foreach (var dependency in dependencies) {
                     var moduleDir = modulesBase;
-                    
+
                     // try to find folder by recursing up tree
                     do {
                         moduleDir = Path.Combine(moduleDir, dependency.Name);
@@ -120,16 +124,25 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 return false;
             }
 
-            if (moduleInfo.RequiredBy.Contains(parent.Name)) {
-                return true;
+            IPackage package = moduleInfo.Package;
+                        
+            if (package == null || depth == 1 || !moduleInfo.RequiredBy.Contains(parent.Path)) {
+                // Create a dummy value for the current package to prevent infinite loops
+                moduleInfo.Package = new PackageProxy();
+
+                moduleInfo.RequiredBy.Add(parent.Path);
+
+                var pkg = new Package(parent, moduleDir, showMissingDevOptionalSubPackages, _allModules, depth);
+                if (dependency != null) {
+                    pkg.RequestedVersionRange = dependency.VersionRangeText;
+                }
+
+                package = moduleInfo.Package = pkg;
             }
 
-            moduleInfo.RequiredBy.Add(parent.Name);
-            var package = new Package(parent, moduleDir, showMissingDevOptionalSubPackages, _allModules, depth);
-            if (dependency != null) {
-                package.RequestedVersionRange = dependency.VersionRangeText;
+            if (parent as IPackage == null || !package.IsMissing || showMissingDevOptionalSubPackages) {
+                AddModule(package);
             }
-            AddModule(package);
 
             return true;
         }
@@ -151,6 +164,9 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
     internal class ModuleInfo {
         public int Depth { get; set; }
+
+        public IPackage Package { get; set; }
+
         public IList<string> RequiredBy { get; set; }
 
         internal ModuleInfo(int depth) {
