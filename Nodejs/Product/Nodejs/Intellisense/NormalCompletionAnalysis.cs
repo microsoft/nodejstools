@@ -17,7 +17,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
@@ -39,7 +38,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             _options = options;
         }
 
-        public override CompletionSet GetCompletions(IGlyphService glyphService) {
+        public override CompletionSet GetCompletions(IGlyphService glyphService, IEnumerable<DynamicallyVisibleCompletion> snippetCompletions) {
             var analysis = GetAnalysisEntry();
 
             var members = Enumerable.Empty<MemberResult>();
@@ -73,7 +72,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 "Node.js",
                 "Node.js",
                 Span,
-                members.Select(m => JsCompletion(glyphService, m)),
+                members.Select(m => JsCompletion(glyphService, m)).Union(snippetCompletions),
                 CompletionComparer.UnderscoresLast,
                 matchInsertionText: true
             );
@@ -117,6 +116,5 @@ namespace Microsoft.NodejsTools.Intellisense {
                 return string.Empty;
             }
         }
-
     }
 }
