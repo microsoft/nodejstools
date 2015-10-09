@@ -352,7 +352,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 keywords = keywords.Union(_stmtKeywords);
             }
 
-            return keywords.Select(kw => new MemberResult(kw, JsMemberType.Keyword));
+            return keywords.Select(kw => new MemberResult(name: kw, documentation: kw, type: JsMemberType.Keyword));
         }
 
         #endregion
