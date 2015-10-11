@@ -87,17 +87,19 @@ namespace Microsoft.NodejsTools.Analysis {
             int max = MaxItems;
 
             if (max != 0) {
-                if (LogItems.Count >= max) {
-                    while (LogItems.Count > max) {
-                        // if the queue was set to shrink remove any old items.
-                        LogItems.PopLeft();
+                lock (LogItems) {
+                    if (LogItems.Count >= max) {
+                        while (LogItems.Count > max) {
+                            // if the queue was set to shrink remove any old items.
+                            LogItems.PopLeft();
+                        }
+                        if (LogIndex >= max) {
+                            LogIndex = 0;
+                        }
+                        LogItems[LogIndex++] = new LogItem { Time = Time, Event = Event, Args = Args };
+                    } else {
+                        LogItems.Append(new LogItem { Time = Time, Event = Event, Args = Args });
                     }
-                    if (LogIndex >= max) {
-                        LogIndex = 0;
-                    }
-                    LogItems[LogIndex++] = new LogItem { Time = Time, Event = Event, Args = Args };
-                } else {
-                    LogItems.Append(new LogItem { Time = Time, Event = Event, Args = Args });
                 }
             }
         }
