@@ -166,7 +166,7 @@ namespace Microsoft.NodejsTools.LogParsing {
                     header = NewHeader();
                     //header.TimeStamp = currentTimeStamp++;
                     header.Guid = TraceLog.ProcessEventGuid;
-                    header.Version = 1;
+                    header.Version = 3;
                     header.Type = 3;
 
                     var processInfo = new ProcessInfo();
@@ -329,7 +329,7 @@ namespace Microsoft.NodejsTools.LogParsing {
 
                     header = NewHeader();
                     header.Guid = TraceLog.ProcessEventGuid;
-                    header.Version = 1;
+                    header.Version = 3;
                     header.Type = 4;    // DCEnd
 
                     processInfo = new ProcessInfo();
