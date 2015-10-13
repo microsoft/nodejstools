@@ -1310,8 +1310,7 @@ on that object, and are not inherited from the object's prototype. The propertie
 
         private static IAnalysisSet DefineProperties(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             // object, {propName: {desc}, ...}
-            var maxMergeTypes = unit.Analyzer.Limits.MaxMergeTypes;
-            if (args.Length >= 2 && args[0].Count < maxMergeTypes && args[1].Count < maxMergeTypes) {
+            if (args.Length >= 2 && args[0].Count < unit.Analyzer.Limits.MaxMergeTypes) {
                 foreach (var obj in args[0]) {
                     ExpandoValue target = obj.Value as ExpandoValue;
                     if (target != null) {
