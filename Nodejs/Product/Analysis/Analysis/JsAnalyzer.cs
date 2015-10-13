@@ -143,15 +143,12 @@ namespace Microsoft.NodejsTools.Analysis {
 
             tree.DefaultPackage = entryPoint;
 
-            var requireAnalysisUnits = new List<RequireAnalysisUnit>();
+            ProjectEntry projectEntry = null;
             if (dependencies != null) {
-                var projectEntry = new ProjectEntry(this, filePath, null);
-                requireAnalysisUnits.AddRange(dependencies.Select(
-                    dependency => { return new RequireAnalysisUnit(tree, Modules, projectEntry, dependency);
-                }));
+                projectEntry = new ProjectEntry(this, filePath, null);
             }
 
-            return new TreeUpdateAnalysis(tree, requireAnalysisUnits);
+            return new TreeUpdateAnalysis(tree, dependencies, projectEntry, Modules);
         }
 
         /// <summary>
@@ -162,19 +159,30 @@ namespace Microsoft.NodejsTools.Analysis {
         [Serializable]
         internal class TreeUpdateAnalysis : IAnalyzable {
             private readonly ModuleTree _tree;
-            private readonly IEnumerable<RequireAnalysisUnit> _requireAnalysisUnits;
+            private readonly IEnumerable<string> _dependencies;
+            private readonly ProjectEntry _projectEntry;
+            private readonly ModuleTable _modules;
 
-            public TreeUpdateAnalysis(ModuleTree tree, IEnumerable<RequireAnalysisUnit> requireAnalysisUnits = null) {
+            public TreeUpdateAnalysis(ModuleTree tree, IEnumerable<string> dependencies = null, ProjectEntry projectEntry = null, ModuleTable modules = null) {
                 _tree = tree;
-                _requireAnalysisUnits = requireAnalysisUnits;
+                _dependencies = dependencies;
+                _projectEntry = projectEntry;
+                _modules = modules;
             }
 
             public void Analyze(CancellationToken cancel) {
                 if (_tree != null) {
                     _tree.EnqueueDependents();
                 }
-                if (_requireAnalysisUnits != null) {
-                    foreach (var unit in _requireAnalysisUnits) {
+                
+                if (_dependencies != null) {
+                    var requireAnalysisUnits = new List<RequireAnalysisUnit>();
+                    requireAnalysisUnits.AddRange(_dependencies.Select(
+                        dependency => {
+                            return new RequireAnalysisUnit(_tree, _modules, _projectEntry, dependency);
+                        }));
+
+                    foreach (var unit in requireAnalysisUnits) {
                         unit.AnalyzeWorker(null, cancel);
                     }
                 }

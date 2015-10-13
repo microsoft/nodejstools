@@ -32,6 +32,9 @@ namespace Microsoft.NodejsTools.Analysis {
     /// Our dependency tracking scheme works by tracking analysis units - when we add a dependency it is the current
     /// AnalysisUnit which is dependent upon the variable.  If the value of a variable changes then all of the dependent
     /// AnalysisUnit's will be re-enqueued.  This proceeds until we reach a fixed point.
+    /// 
+    /// Note that AnalysisUnit contructors / methods are not threadsafe because we expect there to be many AnalysisUnits,
+    /// and we want to keep things as performant as possible (which means minimizing locking behavior and whatnot.)
     /// </summary>
     [Serializable]
     internal class AnalysisUnit : ISet<AnalysisUnit> {
