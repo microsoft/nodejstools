@@ -34,6 +34,7 @@ namespace Microsoft.NodejsTools.Analysis {
             MaxObjectLiteralProperties = 50;
             MaxObjectKeysTypes = 5;
             MaxMergeTypes = 5;
+            MaxEvents = 5;
 
             // There no practical reasons to go deeper in dependencies analysis.
             // Number 4 is very practical. Here the examples which hightlight idea.
@@ -148,6 +149,11 @@ namespace Microsoft.NodejsTools.Analysis {
         /// Gets the maximum number of types which can be merged at once.
         /// </summary>
         public int MaxMergeTypes { get; set; }
+
+        /// <summary>
+        /// Gets the maximum number of events which can be emitted at once.
+        /// </summary>
+        public int MaxEvents { get; set; }
 
         /// <summary>
         /// Gets the maximum level of dependency modules which could be analyzed.
