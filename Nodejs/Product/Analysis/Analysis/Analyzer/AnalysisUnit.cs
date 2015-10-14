@@ -180,7 +180,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 long endTime = _sw.ElapsedMilliseconds;
                 var thisTime = endTime - startTime;
                 _analysisTime += thisTime;
-                if (thisTime >= 500 || (_analysisTime / _analysisCount) > 500) {                
+                if (thisTime >= 500 || (_analysisTime / _analysisCount) > 500) {
                     Trace.TraceWarning("Analyzed: {0} {1} ({2} count, {3}ms total, {4}ms mean)", this, thisTime, _analysisCount, _analysisTime, (double)_analysisTime / _analysisCount);
                 }
             }
@@ -191,7 +191,7 @@ namespace Microsoft.NodejsTools.Analysis {
             Debug.Assert(Ast != null, "Ast has unexpected null value");
             Debug.Assert(ProjectEntry != null, "ProjectEntry has unexpected null value");
 
-            if (Ast != null && ProjectEntry != null && Tree != ProjectEntry.Tree) {
+            if (Ast == null || ProjectEntry == null || Tree != ProjectEntry.Tree) {
                 // analysis unit properties are invalid or we were enqueued and a new version became available
                 // don't re-analyze against the old version.
                 return;
