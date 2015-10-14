@@ -188,7 +188,10 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         internal virtual void AnalyzeWorker(DDG ddg, CancellationToken cancel) {
-            if (Ast != null && ProjectEntry != null && ProjectEntry.Tree != null && Tree != ProjectEntry.Tree) {
+            Debug.Assert(Ast != null, "Ast has unexpected null value");
+            Debug.Assert(ProjectEntry != null, "ProjectEntry has unexpected null value");
+
+            if (Ast != null && ProjectEntry != null && Tree != ProjectEntry.Tree) {
                 // analysis unit properties are invalid or we were enqueued and a new version became available
                 // don't re-analyze against the old version.
                 return;
