@@ -303,7 +303,7 @@ namespace NodejsTests {
             AssertUtil.ContainsExactly(proj.Descendants(proj.GetName("TypeScriptCompile")).Select(x => x.Attribute("Include").Value),
                 "server.ts");
 
-            Assert.AreEqual("server.js", proj.Descendant("StartupFile").Value);
+            Assert.AreEqual("server.ts", proj.Descendant("StartupFile").Value);
         }
 
         /// <summary>

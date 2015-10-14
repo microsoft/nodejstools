@@ -214,8 +214,9 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
                     using (var writer = GetDefaultWriter(projectPath)) {
                         WriteProjectXml(writer, projectPath, sourcePath, filters, startupFile, excludeNodeModules, out projectGuid);
                     }
-                    // Log telemetry
-                    NodejsPackage.Instance.TelemetryLogger.ReportEvent(TelemetryEvents.ProjectImported, TelemetryProperties.ProjectGuid, projectGuid.ToString("B"));
+                    if (NodejsPackage.Instance != null) {
+                        NodejsPackage.Instance.TelemetryLogger.ReportEvent(TelemetryEvents.ProjectImported, TelemetryProperties.ProjectGuid, projectGuid.ToString("B"));
+                    }
                     success = true;
                     return projectPath;
                 } finally {
