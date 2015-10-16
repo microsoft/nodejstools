@@ -63,18 +63,12 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
             set { SetValue(StartupFileProperty, value); }
         }
 
-        public bool ExcludeNodeModules {
-            get { return (bool)GetValue(ExcludeNodeModulesProperty); }
-            set { SetValue(ExcludeNodeModulesProperty, value); }
-        }
-
         public static readonly DependencyProperty ProjectPathProperty = DependencyProperty.Register("ProjectPath", typeof(string), typeof(ImportSettings), new PropertyMetadata(ProjectPath_Updated));
         public static readonly DependencyProperty SourcePathProperty = DependencyProperty.Register("SourcePath", typeof(string), typeof(ImportSettings), new PropertyMetadata(SourcePath_Updated));
         public static readonly DependencyProperty FiltersProperty = DependencyProperty.Register("Filters", typeof(string), typeof(ImportSettings), new PropertyMetadata());
         private static readonly DependencyPropertyKey TopLevelJavaScriptFilesPropertyKey = DependencyProperty.RegisterReadOnly("TopLevelJavaScriptFiles", typeof(ObservableCollection<string>), typeof(ImportSettings), new PropertyMetadata());
         public static readonly DependencyProperty TopLevelJavaScriptFilesProperty = TopLevelJavaScriptFilesPropertyKey.DependencyProperty;
         public static readonly DependencyProperty StartupFileProperty = DependencyProperty.Register("StartupFile", typeof(string), typeof(ImportSettings), new PropertyMetadata());
-        public static readonly DependencyProperty ExcludeNodeModulesProperty = DependencyProperty.Register("ExcludeNodeModules", typeof(bool), typeof(ImportSettings), new PropertyMetadata(true));
 
         public bool IsValid {
             get { return (bool)GetValue(IsValidProperty); }
@@ -206,13 +200,12 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
             string sourcePath = SourcePath;
             string filters = Filters;
             string startupFile = StartupFile;
-            bool excludeNodeModules = ExcludeNodeModules;
             return Task.Factory.StartNew<string>(() => {
                 bool success = false;
                 Guid projectGuid;
                 try {
                     using (var writer = GetDefaultWriter(projectPath)) {
-                        WriteProjectXml(writer, projectPath, sourcePath, filters, startupFile, excludeNodeModules, out projectGuid);
+                        WriteProjectXml(writer, projectPath, sourcePath, filters, startupFile, true, out projectGuid);
                     }
                     // Log telemetry
                     NodejsPackage.Instance.TelemetryLogger.ReportEvent(TelemetryEvents.ProjectImported, TelemetryProperties.ProjectGuid, projectGuid.ToString("B"));
