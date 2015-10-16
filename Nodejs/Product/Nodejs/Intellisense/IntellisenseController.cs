@@ -734,7 +734,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         private static bool IsIdentifierFirstChar(char ch) {
-            return ch == '_' || (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
+            return ch == '_' || ch == '$'|| (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
         }
 
         private static bool IsIdentifierChar(char ch) {

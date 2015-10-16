@@ -56,10 +56,13 @@ namespace Microsoft.VisualStudio.Web.WindowsAzure.Contracts.Shims {
         }
 
         private object InvokeByName(string name, object[] args) {
+            Type[] types = args != null ?
+                args.Select(arg => { return arg.GetType(); }).ToArray() :
+                new Type[] { };
             var method =
                 new[] { _interface }
                 .Concat(_interface.GetInterfaces())
-                .Select(t => t.GetMethod(name))
+                .Select(t => t.GetMethod(name, types))
                 .Where(m => m != null)
                 .FirstOrDefault();
             if (method == null) {

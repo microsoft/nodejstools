@@ -1310,7 +1310,7 @@ on that object, and are not inherited from the object's prototype. The propertie
 
         private static IAnalysisSet DefineProperties(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             // object, {propName: {desc}, ...}
-            if (args.Length >= 2) {
+            if (args.Length >= 2 && args[0].Count < unit.Analyzer.Limits.MaxMergeTypes) {
                 foreach (var obj in args[0]) {
                     ExpandoValue target = obj.Value as ExpandoValue;
                     if (target != null) {
@@ -1342,8 +1342,14 @@ on that object, and are not inherited from the object's prototype. The propertie
         }
 
         private static IAnalysisSet Require(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
-            CallNode call = (CallNode)node;
             IAnalysisSet res = AnalysisSet.Empty;
+
+            if (node.GetType() != typeof(CallNode)) {
+                return res;
+            }
+
+            var call = (CallNode)node;
+
             // we care a lot about require analysis and people do some pretty
             // crazy dynamic things for require calls.  If we let our normal
             // analysis and specialized function handle it we won't get things

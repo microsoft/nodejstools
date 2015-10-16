@@ -180,7 +180,7 @@ namespace Microsoft.NodejsTools.Analysis {
                     if (type.Value == null) {
                         continue;
                     }
-                    if (analyzer == null && type.Value.DeclaringModule != null) {
+                    if (analyzer == null && type.Value != null && type.Value.DeclaringModule != null) {
                         analyzer = type.Value.DeclaringModule.Analysis.ProjectState;
                     }
                     var str = type.ToString();

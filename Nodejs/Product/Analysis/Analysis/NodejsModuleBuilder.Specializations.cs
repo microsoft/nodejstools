@@ -451,7 +451,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 if (@this != null) {
                     foreach (var thisArg in @this) {
                         ExpandoValue expando = @thisArg.Value as ExpandoValue;
-                        if (expando != null) {
+                        if (expando != null && args[0].Count < unit.Analyzer.Limits.MaxEvents) {
                             foreach (var arg in args[0]) {
                                 var strValue = arg.Value.GetStringValue();
                                 if (strValue != null) {
