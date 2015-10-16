@@ -156,8 +156,7 @@ namespace ProfilingUITests {
 
         private static void WaitForReport(INodeProfiling profiling, INodeProfileSession session, out INodePerformanceReport report, NodejsVisualStudioApp app, out AutomationElement child) {
             report = WaitForReportIndex(session, 1);
-            var filename = report.Filename;
-            Assert.IsTrue(filename.Contains("NodejsProfileTest"));
+            Assert.IsTrue(report.Filename.Contains("NodejsProfileTest"));
 
             app.OpenNodejsPerformance();
             var pyPerf = app.NodejsPerformanceExplorerTreeView;
@@ -166,31 +165,9 @@ namespace ProfilingUITests {
             var item = pyPerf.FindItem("NodejsProfileTest *", "Reports");
             child = item.FindFirst(System.Windows.Automation.TreeScope.Descendants, Condition.TrueCondition);
             var childName = child.GetCurrentPropertyValue(AutomationElement.NameProperty) as string;
-
             Assert.IsTrue(childName.StartsWith("NodejsProfileTest"));
 
             AutomationWrapper.EnsureExpanded(child);
-        }
-
-        private static NodejsVisualStudioApp WaitForReport(INodeProfiling profiling, INodeProfileSession session, NodejsVisualStudioApp app, out string reportFilename) {
-            var report = WaitForReportIndex(session, 1);
-            var filename = report.Filename;
-            Assert.IsTrue(filename.Contains("NodejsProfileTest"));
-
-            app.OpenNodejsPerformance();
-            var pyPerf = app.NodejsPerformanceExplorerTreeView;
-            Assert.AreNotEqual(null, pyPerf);
-
-            var item = pyPerf.FindItem("NodejsProfileTest *", "Reports");
-            var child = item.FindFirst(System.Windows.Automation.TreeScope.Descendants, Condition.TrueCondition);
-            var childName = child.GetCurrentPropertyValue(AutomationElement.NameProperty) as string;
-
-            reportFilename = report.Filename;
-            Assert.IsTrue(childName.StartsWith("NodejsProfileTest"));
-
-            child.SetFocus();
-            Keyboard.PressAndRelease(System.Windows.Input.Key.Delete);
-            return app;
         }
 
         private static INodePerformanceReport WaitForReportIndex(INodeProfileSession session, int index) {
@@ -199,6 +176,7 @@ namespace ProfilingUITests {
                 System.Threading.Thread.Sleep(500);
                 report = session.GetReport(index);
             }
+            WaitForFileExistenceOnDisk(report.Filename);
             return report;
         }
 
@@ -795,14 +773,17 @@ namespace ProfilingUITests {
             using (var app = OpenProfileTestProject(out project, out profiling)) {
                 var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
                 try {
-                    string reportFilename;
-                    WaitForReport(profiling, session, app, out reportFilename);
+                    INodePerformanceReport report;
+                    AutomationElement child;
+                    WaitForReport(profiling, session, out report, app, out child);
+
+                    child.SetFocus();
+                    Keyboard.PressAndRelease(System.Windows.Input.Key.Delete);
 
                     new RemoveItemDialog(app.WaitForDialog()).Delete();
-
                     app.WaitForDialogDismissed();
 
-                    Assert.IsTrue(!File.Exists(reportFilename));
+                    Assert.IsTrue(!File.Exists(report.Filename)); // Delete permanently
                 } finally {
                     profiling.RemoveSession(session, true);
                 }
@@ -819,11 +800,9 @@ namespace ProfilingUITests {
                 var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
                 try {
                     WaitForReportIndex(session, 1);
-                    WaitForFileExistenceOnDisk(session.GetReport(1).Filename);
 
                     session.Launch(false);
                     WaitForReportIndex(session, 2);
-                    WaitForFileExistenceOnDisk(session.GetReport(2).Filename);
 
                     var pyPerf = app.NodejsPerformanceExplorerTreeView;
 
@@ -888,14 +867,17 @@ namespace ProfilingUITests {
             using (var app = OpenProfileTestProject(out project, out profiling)) {
                 var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
                 try {
-                    string reportFilename;
-                    WaitForReport(profiling, session, app, out reportFilename);
-                    WaitForFileExistenceOnDisk(reportFilename);
+                    INodePerformanceReport report;
+                    AutomationElement child;
+                    WaitForReport(profiling, session, out report, app, out child);
+
+                    child.SetFocus();
+                    Keyboard.PressAndRelease(System.Windows.Input.Key.Delete);
 
                     new RemoveItemDialog(app.WaitForDialog()).Remove();
                     app.WaitForDialogDismissed();
 
-                    Assert.IsTrue(File.Exists(reportFilename)); // Removed but not deleted
+                    Assert.IsTrue(File.Exists(report.Filename)); // Removed but not deleted
                 } finally {
                     profiling.RemoveSession(session, true);
                 }
@@ -914,8 +896,6 @@ namespace ProfilingUITests {
                     INodePerformanceReport report;
                     AutomationElement child;
                     WaitForReport(profiling, session, out report, app, out child);
-
-                    WaitForFileExistenceOnDisk(report.Filename);
 
                     var clickPoint = child.GetClickablePoint();
                     Mouse.MoveTo(clickPoint);
@@ -942,8 +922,6 @@ namespace ProfilingUITests {
                     INodePerformanceReport report;
                     AutomationElement child;
                     WaitForReport(profiling, session, out report, app, out child);
-
-                    WaitForFileExistenceOnDisk(report.Filename);
 
                     var clickPoint = child.GetClickablePoint();
                     Mouse.MoveTo(clickPoint);
