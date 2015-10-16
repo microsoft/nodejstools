@@ -243,8 +243,7 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
         /// <summary>
         /// Checks whether a relative and double-backslashed seperated path contains a folder name.
         /// </summary>
-        private static bool ContainsNodeModulesOrBowerComponentsFolder(string path)
-        {
+        private static bool ContainsNodeModulesOrBowerComponentsFolder(string path) {
             string tmp = "\\" + path + "\\";
             return tmp.IndexOf("\\" + NodejsConstants.NodeModulesFolder + "\\", StringComparison.OrdinalIgnoreCase) >= 0 ||
                 tmp.IndexOf("\\" + NodejsConstants.BowerComponentsFolder + "\\", StringComparison.OrdinalIgnoreCase) >= 0;
