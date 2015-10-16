@@ -230,6 +230,24 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0)]
+        public void ImportWizardExcludeBowerComponents() {
+            var settings = new ImportSettings();
+
+            settings.SourcePath = TestData.GetPath("TestData\\HelloWorld6");
+            settings.Filters = "*.js";
+            settings.StartupFile = "server.js";
+            settings.ProjectPath = TestData.GetPath("TestData\\TestDestination\\Subdirectory\\ProjectName.njsproj");
+
+            var path = settings.CreateRequestedProject();
+
+            Assert.AreEqual(settings.ProjectPath, path);
+            var proj = XDocument.Load(path);
+
+            AssertUtil.ContainsExactly(proj.Descendants(proj.GetName("Folder")).Select(x => x.Attribute("Include").Value),
+                "Baz");
+        }
+
+        [TestMethod, Priority(0)]
         public void ProjectFileAlreadyExists() {
             DispatcherTest(async () => {
                 var settings = new ImportSettings();
