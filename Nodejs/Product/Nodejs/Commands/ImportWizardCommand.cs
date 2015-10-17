@@ -16,6 +16,8 @@
 
 using System;
 using System.IO;
+using System.Threading.Tasks;
+using System.Threading;
 using System.Windows;
 using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio;
@@ -89,7 +91,10 @@ namespace Microsoft.NodejsTools.Commands {
                         } else {
                             statusBar.SetText("An error occurred and your project was not created.");
                         }
-                    }, System.Threading.Tasks.TaskScheduler.FromCurrentSynchronizationContext());
+                    },
+                    CancellationToken.None,
+                    TaskContinuationOptions.HideScheduler,
+                    System.Threading.Tasks.TaskScheduler.FromCurrentSynchronizationContext());
             } else {
                 statusBar.SetText("");
             }
