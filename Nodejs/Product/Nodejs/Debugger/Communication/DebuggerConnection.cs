@@ -37,6 +37,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         private INetworkClient _networkClient;
         private readonly object _networkClientLock = new object();
         private volatile Version _nodeVersion;
+        private bool _isClosed = false;
 
         public DebuggerConnection(INetworkClientFactory networkClientFactory) {
             Utilities.ArgumentNotNull("networkClientFactory", networkClientFactory);
@@ -52,6 +53,8 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         /// Close connection.
         /// </summary>
         public void Close() {
+            _isClosed = true;
+
             lock (_networkClientLock) {
                 if (_networkClient != null) {
                     _networkClient.Dispose();
@@ -119,7 +122,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             lock (_networkClientLock) {
                 int connection_attempts = 0;
                 const int MAX_ATTEMPTS = 5;
-                while (true) {
+                while (!_isClosed) {
                     connection_attempts++;
                     try {
                         // TODO: This currently results in a call to the synchronous TcpClient
