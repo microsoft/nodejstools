@@ -323,7 +323,7 @@ if ($name) {
 $version_file_backed_up = 0
 # Force use of a backup if there are pending changes to $version_file
 $version_file_force_backup = 0
-$has_tf_workspace = (-not (tf workspaces | Select-String -pattern "No workspace", "Unable to determine the workspace"))
+$has_tf_workspace = (Get-Command tf -errorAction SilentlyContinue) -and (-not (tf workspaces | Select-String -pattern "No workspace", "Unable to determine the workspace"))
 if ($has_tf_workspace) {
     if (-not (tf status $version_file /format:detailed | Select-String "There are no pending changes.")) {
         Write-Output "$version_file has pending changes. Using backup instead of tf undo."
