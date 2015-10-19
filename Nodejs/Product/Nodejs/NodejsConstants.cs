@@ -40,6 +40,7 @@ namespace Microsoft.NodejsTools {
 
         internal const string NodeModulesFolder = "node_modules";
         internal const string NodeModulesStagingFolder = "node_modules\\.staging\\";
+        internal const string BowerComponentsFolder = "bower_components";
         internal const string AnalysisIgnoredDirectories = "AnalysisIgnoredDirectories";
         internal const string AnalysisMaxFileSize = "AnalysisMaxFileSize";
         internal const string DefaultIntellisenseCompletionCommittedBy = "{}[]().,:;+-*/%&|^!~=<>?@#'\"\\";

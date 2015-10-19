@@ -19,7 +19,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
-        
+
         <wpf:LabelledControl Title="Choose which file to run when F5 is pressed."
                            HelpText="If it is not in this list, you can right-click any file in your project and choose &quot;Set as startup file&quot;"
                            Grid.Row="0">
@@ -51,13 +51,6 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-        </wpf:LabelledControl>
-        
-        <wpf:LabelledControl Title="Select any other options for your project."
-                           Grid.Row="1">
-            <StackPanel Orientation="Vertical">
-                <CheckBox IsChecked="{Binding ExcludeNodeModules}">Exclude node__modules</CheckBox>
-            </StackPanel>
         </wpf:LabelledControl>
     </Grid>
 </Page>
