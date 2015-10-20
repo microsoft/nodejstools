@@ -712,7 +712,7 @@ namespace Microsoft.Nodejs.Tests.UI {
                     Keyboard.Type(System.Windows.Input.Key.Enter);
 
 #if DEV11_OR_LATER
-                    VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "Directory names cannot contain any of the following characters");
+                    VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "Please enter a valid name.");
 #else
                 VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, ". is an invalid filename");
 #endif
@@ -722,7 +722,7 @@ namespace Microsoft.Nodejs.Tests.UI {
                     Keyboard.Type(System.Windows.Input.Key.Enter);
 
 #if DEV11_OR_LATER
-                    VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "Directory names cannot contain any of the following characters");
+                    VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "Please enter a valid name.");
 #else
                 VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, ".. is an invalid filename");
 #endif
@@ -979,7 +979,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             string clipboardText = "";
             Console.WriteLine("Checking CopyFullPath on:{0}", expected);
             AutomationWrapper.Select(element);
-            vs.Dte.ExecuteCommand("File.CopyFullPath");
+            vs.Dte.ExecuteCommand("Project.CopyFullPath");
 
             var app = ((VisualStudioInstance)vs).App;
             app.ServiceProvider.GetUIThread().Invoke(() => clipboardText = System.Windows.Clipboard.GetText());
@@ -995,6 +995,20 @@ namespace Microsoft.Nodejs.Tests.UI {
             Assert.AreEqual(expected, actual, "count[" + key + "]");
         }
 
+        /// <summary>
+        /// Remove the label denoting browser-side code, node, or both depending on the content type.
+        /// </summary>
+        private static string removeLabel(string itemName) {
+            string[] labels = new string[3] { " (browser)", " (node)", " (node, browser)" };
+            foreach (var label in labels) {
+                if (itemName.EndsWith(label)) {
+                    itemName = itemName.Substring(0, itemName.Length - label.Length);
+                    break; // safe to break as there is at most one label per name
+                }
+            }
+            return itemName;
+        }
+
         private static void CountNames(Dictionary<string, int> count, ProjectItems items) {
             if (items == null) {
                 return;
@@ -1002,11 +1016,12 @@ namespace Microsoft.Nodejs.Tests.UI {
 
             foreach (var item in items.OfType<ProjectItem>()) {
                 if (!string.IsNullOrEmpty(item.Name)) {
+                    string name = removeLabel(item.Name);
                     int value;
-                    if (!count.TryGetValue(item.Name, out value)) {
+                    if (!count.TryGetValue(name, out value)) {
                         value = 0;
                     }
-                    count[item.Name] = value + 1;
+                    count[name] = value + 1;
                 }
                 CountNames(count, item.ProjectItems);
             }

@@ -1655,7 +1655,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
                             Utilities.ShowMessageBox(
                                 Site,
-                                SR.GetString(SR.CannotAddAsDescendantOfSelf, CommonUtils.GetFileOrDirectoryName(droppedFile)),
+                                SR.GetString(SR.CannotAddFolderAsDescendantOfSelf, CommonUtils.GetFileOrDirectoryName(droppedFile)),
                                 null,
                                 OLEMSGICON.OLEMSGICON_CRITICAL,
                                 OLEMSGBUTTON.OLEMSGBUTTON_OK,

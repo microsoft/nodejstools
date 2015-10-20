@@ -45,6 +45,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
                 server.MoveCaret(2, 13);
                 solution.ExecuteCommand("Edit.CompleteWord");
+                Keyboard.Type("\t");
 
                 server.WaitForText("var http = require('http');\r\nhttp.createServer");
             }
