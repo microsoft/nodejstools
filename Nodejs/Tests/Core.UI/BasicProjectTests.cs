@@ -711,21 +711,27 @@ namespace Microsoft.Nodejs.Tests.UI {
                     Keyboard.Type("."); // bad filename
                     Keyboard.Type(System.Windows.Input.Key.Enter);
 
-#if DEV11_OR_LATER
+#if DEV11 || DEV12
+                    VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "Directory names cannot contain any of the following characters");
+#elif DEV14
                     VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "Please enter a valid name.");
 #else
-                VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, ". is an invalid filename");
+                    VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, ". is an invalid filename");
 #endif
+
                     System.Threading.Thread.Sleep(1000);
 
                     Keyboard.Type(".."); // another bad filename
                     Keyboard.Type(System.Windows.Input.Key.Enter);
 
-#if DEV11_OR_LATER
+#if DEV11 || DEV12
+                    VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "Directory names cannot contain any of the following characters");
+#elif DEV14
                     VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "Please enter a valid name.");
 #else
-                VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, ".. is an invalid filename");
+                    VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, ". is an invalid filename");
 #endif
+
                     System.Threading.Thread.Sleep(1000);
 
                     Keyboard.Type("Y"); // another bad filename
@@ -995,20 +1001,6 @@ namespace Microsoft.Nodejs.Tests.UI {
             Assert.AreEqual(expected, actual, "count[" + key + "]");
         }
 
-        /// <summary>
-        /// Remove the label denoting browser-side code, node, or both depending on the content type.
-        /// </summary>
-        private static string removeLabel(string itemName) {
-            string[] labels = new string[3] { " (browser)", " (node)", " (node, browser)" };
-            foreach (var label in labels) {
-                if (itemName.EndsWith(label)) {
-                    itemName = itemName.Substring(0, itemName.Length - label.Length);
-                    break; // safe to break as there is at most one label per name
-                }
-            }
-            return itemName;
-        }
-
         private static void CountNames(Dictionary<string, int> count, ProjectItems items) {
             if (items == null) {
                 return;
@@ -1016,12 +1008,11 @@ namespace Microsoft.Nodejs.Tests.UI {
 
             foreach (var item in items.OfType<ProjectItem>()) {
                 if (!string.IsNullOrEmpty(item.Name)) {
-                    string name = removeLabel(item.Name);
                     int value;
-                    if (!count.TryGetValue(name, out value)) {
+                    if (!count.TryGetValue(item.Name, out value)) {
                         value = 0;
                     }
-                    count[name] = value + 1;
+                    count[item.Name] = value + 1;
                 }
                 CountNames(count, item.ProjectItems);
             }
