@@ -14,9 +14,7 @@
 //
 //*********************************************************//
 
-using System;
-using System.IO;
-using Microsoft.VisualStudio.Language.Intellisense;
+using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
 using TestUtilities.SharedProject;
@@ -48,7 +46,8 @@ namespace Microsoft.Nodejs.Tests.UI {
         [HostType("VSTestHost")]
         public void BraceCompletionsBasic() {
             using (var solution = BasicProject.Generate().ToVs()) {
-                var server = solution.OpenItem("Require", "SomeFolder", "baz.js");
+                string folderName = NodejsFolderNode.AppendLabel("SomeFolder", FolderContentType.Node);
+                var server = solution.OpenItem("Require", folderName, "baz.js");
 
                 // Test '('
                 Keyboard.Type("(");
@@ -63,7 +62,8 @@ namespace Microsoft.Nodejs.Tests.UI {
         [HostType("VSTestHost")]
         public void BraceCompletionsE2E() {
             using (var solution = BasicProject.Generate().ToVs()) {
-                var server = solution.OpenItem("Require", "SomeFolder", "baz.js");
+                string folderName = NodejsFolderNode.AppendLabel("SomeFolder", FolderContentType.Node);
+                var server = solution.OpenItem("Require", folderName, "baz.js");
 
                 // Test '('
                 Keyboard.Type("require(");
@@ -101,7 +101,8 @@ namespace Microsoft.Nodejs.Tests.UI {
         [HostType("VSTestHost")]
         public void BraceCompletionDoesNotOccurInCommentsOrLiterals() {
             using (var solution = BasicProject.Generate().ToVs()) {
-                var server = solution.OpenItem("Require", "SomeFolder", "baz.js");
+                string folderName = NodejsFolderNode.AppendLabel("SomeFolder", FolderContentType.Node);
+                var server = solution.OpenItem("Require", folderName, "baz.js");
 
                 // Verify that a comment gets no completions brace causes nothing if it has no start.
                 Keyboard.Type("// '");
@@ -123,7 +124,8 @@ namespace Microsoft.Nodejs.Tests.UI {
         [HostType("VSTestHost")]
         public void BraceCompletionTerminatesOnEscapedQuoteInLiteralAndDoesntStartAgain() {
             using (var solution = BasicProject.Generate().ToVs()) {
-                var server = solution.OpenItem("Require", "SomeFolder", "baz.js");
+                string folderName = NodejsFolderNode.AppendLabel("SomeFolder", FolderContentType.Node);
+                var server = solution.OpenItem("Require", folderName, "baz.js");
 
                 // Verify that when adding an escaped double quote to a literal that we don't try to start
                 // a new brace completion on close of the string literal.
