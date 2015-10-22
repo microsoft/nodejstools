@@ -122,7 +122,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             lock (_networkClientLock) {
                 int connection_attempts = 0;
                 const int MAX_ATTEMPTS = 5;
-                while (!_isClosed) {
+                while (true) {
                     connection_attempts++;
                     try {
                         // TODO: This currently results in a call to the synchronous TcpClient
@@ -147,7 +147,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                             throw;
                         }
                         LiveLogger.WriteLine("Connection attempt {0} failed with: {1}", connection_attempts, ex);
-                        if (connection_attempts >= MAX_ATTEMPTS) {
+                        if (connection_attempts >= MAX_ATTEMPTS && !_isClosed) {
                             throw;
                         }
                         else {
