@@ -41,13 +41,15 @@ namespace Microsoft.Nodejs.Tests.UI {
             );
 
             using (var solution = project.Generate().ToVs()) {
-                var server = solution.OpenItem("CtrlSpace", "server.js");
+                var optionsPage = NodejsTools.NodejsPackage.Instance.IntellisenseOptionsPage;
+                using (new NodejsOptionHolder(optionsPage, "OnlyTabOrEnterToCommit", false)) {
+                    var server = solution.OpenItem("CtrlSpace", "server.js");
 
-                server.MoveCaret(2, 13);
-                solution.ExecuteCommand("Edit.CompleteWord");
-                Keyboard.Type("\t");
+                    server.MoveCaret(2, 13);
+                    solution.ExecuteCommand("Edit.CompleteWord");
 
-                server.WaitForText("var http = require('http');\r\nhttp.createServer");
+                    server.WaitForText("var http = require('http');\r\nhttp.createServer");
+                }
             }
         }
 
