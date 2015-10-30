@@ -38,7 +38,7 @@ namespace Microsoft.NodejsTools.Jade {
             ITextBufferFactoryService bufferFact,
             IContentTypeRegistryService contentTypeService,
             [ImportMany(typeof(ITaggerProvider))]Lazy<ITaggerProvider, TaggerProviderMetadata>[] taggerProviders,
-            [ImportMany(typeof(IClassifierProvider))]Lazy<IClassifierProvider, ClassifierProviderMetadata>[] classifierProviders) {
+            [ImportMany(typeof(IClassifierProvider))]Lazy<IClassifierProvider, IClassifierProviderMetadata>[] classifierProviders) {
             ClassificationRegistryService = registryService;
             BufferFactoryService = bufferFact;
             JsContentType = contentTypeService.GetContentType(NodejsConstants.JavaScript);
