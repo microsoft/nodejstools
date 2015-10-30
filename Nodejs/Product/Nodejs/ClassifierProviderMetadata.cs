@@ -22,7 +22,7 @@ namespace Microsoft.NodejsTools {
     /// Just used for our MEF import to get the metadata in a strongly
     /// typed way.
     /// </summary>
-    public interface IContentTypeMetadata {
+    public interface IClassifierProviderMetadata {
         IEnumerable<string> ContentTypes { get; }
     }
 }
