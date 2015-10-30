@@ -137,14 +137,23 @@
   <Target
     Name="GetTargetPath"
     DependsOnTargets="CoreCompile"
-    Returns="@(ScriptAndWebDeployFiles)"
+    Returns="@(ScriptAndWebDeployFilesWithoutMetadata)"
     >
     <ItemGroup>
       <NodejsBinFiles Include="bin\**\*"  Exclude="bin\Microsoft.NodejsTools.WebRole.dll"/>
       <ScriptAndWebDeployFiles Include="@(NodejsBinFiles->'%(RootDir)%(Directory)%(Filename)%(Extension)')"/>
       <ScriptAndWebDeployFiles Include="@(FilesCopiedToIntermediate->'%(RootDir)%(Directory)%(Filename)%(Extension)')" />
     </ItemGroup>
-    <Message Text="ScriptAndWebDeployFiles=@(ScriptAndWebDeployFiles)"  Importance="low"/>
+
+    <PropertyGroup>
+      <ScriptAndWebDeployFileList>@(ScriptAndWebDeployFiles)</ScriptAndWebDeployFileList>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ScriptAndWebDeployFilesWithoutMetadata Include="$(ScriptAndWebDeployFileList)" />
+    </ItemGroup>
+    
+    <Message Text="ScriptAndWebDeployFilesWithoutMetadata=@(ScriptAndWebDeployFilesWithoutMetadata)"  Importance="low"/>
   </Target>
   <Target Name="WatGetTargetFrameworkDirectories" Returns="" />
   <Target Name="BuiltProjectOutputGroupDependencies" Returns="" />
