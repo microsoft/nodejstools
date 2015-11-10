@@ -1,4 +1,10 @@
-﻿import assert = require('assert');
+﻿// placeholder declarations for 'describe' and 'it'
+// if you want a more complete declaration add the declaration
+// file from http://definitelytyped.org/
+declare var describe: (description: string, spec: () => void) => any;
+declare var it: (expectation: string, assertion: () => void) => any;
+
+import assert = require('assert');
 
 describe("Test Suite 1", () => {
     it("Test A", () => {
