@@ -1,6 +1,6 @@
-﻿// placeholder declarations for 'describe' and 'it'
+// Placeholder declarations for 'describe' and 'it',
 // if you want a more complete declaration add the
-// Mocha declaration file from http://definitelytyped.org/
+// Mocha declaration file from "http://definitelytyped.org/".
 declare var describe: (description: string, spec: () => void) => any;
 declare var it: (expectation: string, assertion: () => void) => any;
 
