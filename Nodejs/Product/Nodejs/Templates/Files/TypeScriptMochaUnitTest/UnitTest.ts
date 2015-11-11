@@ -2,7 +2,10 @@
 // if you want a more complete declaration add the
 // Mocha declaration file from "http://definitelytyped.org/".
 declare var describe: (description: string, spec: () => void) => any;
-declare var it: (expectation: string, assertion: () => void) => any;
+declare var it: {
+    (expectation: string, assertion: () => void): any;
+    (expectation: string, assertion: (done: (error: Error) => void) => void): any;
+};
 
 import assert = require('assert');
 
