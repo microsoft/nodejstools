@@ -32,7 +32,7 @@ namespace Microsoft.NodejsTools.Project {
             CreateWatcher(Url);
 #endif
             if (Url.Contains(AnalysisConstants.NodeModulesFolder)) {
-                root.DelayedAnalysisQueue.Enqueue(this);
+                root.EnqueueForDelayedAnalysis(this);
             } else {
                 Analyze();
             }
@@ -50,7 +50,8 @@ namespace Microsoft.NodejsTools.Project {
             get {
                 // We analyze if we are a member item or the file is included
                 // Also, it should either be marked as compile or not have an item type name (value is null for node_modules
-                return !ProjectMgr.DelayedAnalysisQueue.Contains(this) &&
+                return !Url.Contains(NodejsConstants.NodeModulesStagingFolder) &&
+                    !ProjectMgr.DelayedAnalysisQueue.Contains(this) &&
                     (!IsNonMemberItem || ProjectMgr.IncludeNodejsFile(this)) &&
                     (ItemNode.ItemTypeName == ProjectFileConstants.Compile || string.IsNullOrEmpty(ItemNode.ItemTypeName));
 
