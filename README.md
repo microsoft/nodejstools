@@ -11,10 +11,11 @@ NTVS is a free, open source plugin that turns Visual Studio into a Node.js IDE. 
 NTVS supports **editing**, **Intellisense**, **profiling**, **npm**, **TypeScript**, **debugging locally and remotely** (Windows/MacOS/Linux), as well **Azure Web Sites and Cloud Services**.
 
 ## Documentation
-[NTVS documentation](https://github.com/Microsoft/nodejstools/wiki) is available in the NTVS wiki.
+* [**NTVS documentation**](https://github.com/Microsoft/nodejstools/wiki) is available in the NTVS wiki.
+* [**Microsoft/nodejs-guidelines**](https://github.com/Microsoft/nodejs-guidelines) includes other tips for working with Node.js.
 
 ## Releases
-* **[NTVS 1.1 RC2](https://aka.ms/ntvslatest)** includes support for Visual Studio 2012, 2013, and 2015
+* **[NTVS 1.1 RC3](https://aka.ms/ntvslatest)** includes support for Visual Studio 2012, 2013, and 2015
 * **[NTVS 1.0](https://nodejstools.codeplex.com/releases/view/612573)** includes support for Visual Studio 2012 and 2013
 * **[Dev Builds](https://github.com/Microsoft/nodejstools/releases)** include the most recent changes and bugfixes (available for Visual Studio 2012, 2013, and 2015)
 
