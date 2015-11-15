@@ -246,7 +246,7 @@ namespace Microsoft.VisualStudioTools.Project {
         [AlwaysSerialized]
         public virtual string FileName {
             get {
-                return this.HierarchyNode.GetEditLabel();
+                return this.HierarchyNode.GetItemName();
             }
             set {
                 this.HierarchyNode.SetEditLabel(value);
@@ -274,7 +274,7 @@ namespace Microsoft.VisualStudioTools.Project {
         [Browsable(false)]
         public string Extension {
             get {
-                return Path.GetExtension(this.HierarchyNode.GetEditLabel());
+                return Path.GetExtension(this.HierarchyNode.GetItemName());
             }
         }
 
@@ -444,7 +444,7 @@ namespace Microsoft.VisualStudioTools.Project {
         [ReadOnly(true)]
         public override string FileName {
             get {
-                return this.HierarchyNode.GetEditLabel();
+                return this.HierarchyNode.GetItemName();
             }
             set {
                 throw new InvalidOperationException();
@@ -461,7 +461,7 @@ namespace Microsoft.VisualStudioTools.Project {
         [SRDescriptionAttribute(SR.FileNameDescription)]
         public virtual string FileName {
             get {
-                return this.HierarchyNode.GetEditLabel();
+                return this.HierarchyNode.GetItemName();
             }
         }
 
@@ -728,7 +728,7 @@ namespace Microsoft.VisualStudioTools.Project {
         [SRDescriptionAttribute(SR.FolderNameDescription)]
         public string FolderName {
             get {
-                return this.HierarchyNode.GetEditLabel();
+                return this.HierarchyNode.GetItemName();
             }
             set {
                 HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
@@ -743,7 +743,7 @@ namespace Microsoft.VisualStudioTools.Project {
         [AutomationBrowsable(true)]
         public string FileName {
             get {
-                return this.HierarchyNode.GetEditLabel();
+                return this.HierarchyNode.GetItemName();
             }
             set {
                 HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {

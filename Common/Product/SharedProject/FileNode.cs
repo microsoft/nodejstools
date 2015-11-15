@@ -287,7 +287,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
             for (HierarchyNode n = this.Parent.FirstChild; n != null; n = n.NextSibling) {
                 // TODO: Distinguish between real Urls and fake ones (eg. "References")
-                if (n != this && String.Equals(n.GetEditLabel(), label, StringComparison.OrdinalIgnoreCase)) {
+                if (n != this && String.Equals(n.GetItemName(), label, StringComparison.OrdinalIgnoreCase)) {
                     //A file or folder with the name '{0}' already exists on disk at this location. Please choose another name.
                     //If this file or folder does not appear in the Solution Explorer, then it is not currently part of your project. To view files which exist on disk, but are not in the project, select Show All Files from the Project menu.
                     throw new InvalidOperationException(SR.GetString(SR.FileOrFolderAlreadyExists, label));
@@ -318,7 +318,7 @@ namespace Microsoft.VisualStudioTools.Project {
             // where we get called is when a folder above us gets renamed (in which case our path is invalid)
             HierarchyNode parent = this.Parent;
             while (parent != null && (parent is FolderNode)) {
-                strRelPath = Path.Combine(parent.GetEditLabel(), strRelPath);
+                strRelPath = Path.Combine(parent.GetItemName(), strRelPath);
                 parent = parent.Parent;
             }
 
@@ -614,7 +614,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
         public virtual string FileName {
             get {
-                return this.GetEditLabel();
+                return this.GetItemName();
             }
             set {
                 this.SetEditLabel(value);
@@ -630,7 +630,7 @@ namespace Microsoft.VisualStudioTools.Project {
             bool fileExist = IsFileOnDisk(this.Url);
 
             if (!fileExist && showMessage && !Utilities.IsInAutomationFunction(this.ProjectMgr.Site)) {
-                string message = SR.GetString(SR.ItemDoesNotExistInProjectDirectory, GetEditLabel());
+                string message = SR.GetString(SR.ItemDoesNotExistInProjectDirectory, GetItemName());
                 string title = string.Empty;
                 OLEMSGICON icon = OLEMSGICON.OLEMSGICON_CRITICAL;
                 OLEMSGBUTTON buttons = OLEMSGBUTTON.OLEMSGBUTTON_OK;
@@ -726,7 +726,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     newfilename = relationalName + extension;
                     newfilename = CommonUtils.GetAbsoluteFilePath(Path.GetDirectoryName(childNode.Parent.GetMkDocument()), newfilename);
                 } else {
-                    newfilename = CommonUtils.GetAbsoluteFilePath(Path.GetDirectoryName(childNode.Parent.GetMkDocument()), childNode.GetEditLabel());
+                    newfilename = CommonUtils.GetAbsoluteFilePath(Path.GetDirectoryName(childNode.Parent.GetMkDocument()), childNode.GetItemName());
                 }
 
                 childNode.RenameDocument(childNode.GetMkDocument(), newfilename);
