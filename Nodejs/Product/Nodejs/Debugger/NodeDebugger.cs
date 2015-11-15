@@ -465,14 +465,10 @@ namespace Microsoft.NodejsTools.Debugger {
                 return false;
             }
 
-            // Make step into if required
-            if (changeLiveCommand.NeedStepIn) {
+            // Make step into and update stacktrace if required
+            if (changeLiveCommand.StackModified) {
                 var continueCommand = new ContinueCommand(CommandId, SteppingKind.Into);
                 await TrySendRequestAsync(continueCommand).ConfigureAwait(false);
-            }
-
-            // Update stacktrace if required
-            if (changeLiveCommand.StackModified || changeLiveCommand.NeedStepIn) {
                 await CompleteSteppingAsync(false).ConfigureAwait(false);
             }
 
