@@ -28,7 +28,7 @@ namespace Microsoft.NodejsTools.Analysis {
             // The process of resolving modules can lead us to add entries into the underlying array
             // doing so results in exceptions b/c the array has changed under the enumerable
             // To avoid this, we call .ToArray() to create a copy of the array locally which we then Enumerate
-            return moduleTree.Children.Values.ToArray().Where(mod => !String.Equals(mod.Name, AnalysisConstants.NodeModulesFolder, StringComparison.OrdinalIgnoreCase));
+            return moduleTree.Children.Values.ToArray().Where(mod => mod != null && !String.Equals(mod.Name, AnalysisConstants.NodeModulesFolder, StringComparison.OrdinalIgnoreCase));
         }
     }
 }
