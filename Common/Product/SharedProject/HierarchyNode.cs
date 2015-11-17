@@ -590,7 +590,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     break;
 
                 case __VSHPROPID.VSHPROPID_Name:
-                    result = this.GetEditLabel();
+                    result = this.GetItemName();
                     break;
 
                 case __VSHPROPID.VSHPROPID_ExpandByDefault:
@@ -686,7 +686,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
                 case __VSHPROPID.VSHPROPID_SaveName:
                     //SaveName is the name shown in the Save and the Save Changes dialog boxes.
-                    result = this.GetEditLabel();
+                    result = this.GetItemName();
                     break;
 
                 case __VSHPROPID.VSHPROPID_ExtObject:
@@ -874,6 +874,14 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         /// <returns>the node cation</returns>
         public virtual string GetEditLabel() {
+            return GetItemName();
+        }
+
+        /// <summary>
+        /// Returns the underlying file or directory name based on the Url.
+        /// </summary>
+        /// <returns></returns>
+        public string GetItemName() {
             return CommonUtils.GetFileOrDirectoryName(Url);
         }
 
@@ -1000,7 +1008,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         public virtual string GetRelationalName() {
             //Get the first part of the caption
-            string[] partsOfParent = this.GetEditLabel().Split(new string[] { this.NameRelationSeparator }, StringSplitOptions.None);
+            string[] partsOfParent = this.GetItemName().Split(new string[] { this.NameRelationSeparator }, StringSplitOptions.None);
             return partsOfParent[0];
         }
 
@@ -1010,7 +1018,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         /// <returns>The extension</returns>
         public virtual string GetRelationNameExtension() {
-            return this.GetEditLabel().Substring(this.GetEditLabel().IndexOf(this.NameRelationSeparator, StringComparison.Ordinal));
+            return this.GetItemName().Substring(this.GetItemName().IndexOf(this.NameRelationSeparator, StringComparison.Ordinal));
         }
 
         /// <summary>
