@@ -55,10 +55,6 @@
 
             <InstallDirectory>FileTemplatesNewItem</InstallDirectory>
         </File>
-        
-        <File Include="FileTemplates\ReferenceFiles\Dockerfile">
-            <InstallDirectory>FileTemplatesReferenceFiles</InstallDirectory>
-        </File>
 
         <ItemTemplate Include="ItemTemplates\JavaScript\UnitTest.zip;
                                ItemTemplates\JavaScript\MochaUnitTest.zip;

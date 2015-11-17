@@ -16,13 +16,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using EnvDTE;
 using Microsoft.VisualStudio.TemplateWizard;
 using Microsoft.VisualStudioTools;
-using System.IO;
-using System.Windows.Forms;
-using System.Text.RegularExpressions;
 
 namespace Microsoft.NodejsTools.ProjectWizard {
     /// <summary>
@@ -49,11 +45,6 @@ namespace Microsoft.NodejsTools.ProjectWizard {
         public void RunStarted(object automationObject, Dictionary<string, string> replacementsDictionary, WizardRunKind runKind, object[] customParams) {
             string arguments = GetFullNodeArguments(automationObject);
             replacementsDictionary.Add("$nodearguments$", arguments);
-        }
-
-        public static string GetDockerfileWithReplacements(string dockerFileContents, DTE dte) {
-            string arguments = GetFullNodeArguments(dte);
-            return dockerFileContents.Replace("$nodearguments$", arguments);
         }
 
         private static string GetFullNodeArguments(object automationObject) {
