@@ -58,7 +58,6 @@ namespace NodejsTests.Debugger.Commands {
             // Assert
             Assert.AreEqual(commandId, changeLiveCommand.Id);
             Assert.IsTrue(changeLiveCommand.Updated);
-            Assert.IsTrue(changeLiveCommand.NeedStepIn);
             Assert.IsTrue(changeLiveCommand.StackModified);
         }
     }

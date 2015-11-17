@@ -41,7 +41,6 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
 
         public bool Updated { get; private set; }
         public bool StackModified { get; private set; }
-        public bool NeedStepIn { get; private set; }
 
         public override void ProcessResponse(JObject response) {
             base.ProcessResponse(response);
@@ -49,7 +48,6 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             JToken result = response["body"]["result"];
             Updated = (bool)result["updated"];
             StackModified = (bool)result["stack_modified"];
-            NeedStepIn = (bool)result["stack_update_needs_step_in"];
         }
     }
 }
