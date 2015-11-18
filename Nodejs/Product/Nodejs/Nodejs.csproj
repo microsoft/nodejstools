@@ -901,10 +901,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <ZipItem Include="Templates\Files\DockerfileTemplate\Dockerfile" />
-    <VSIXSourceItem Include="Templates\Files\DockerfileTemplate\Dockerfile">
-      <VSIXSubPath>FileTemplates\ReferenceFiles\Dockerfile</VSIXSubPath>
-    </VSIXSourceItem>
     <None Include="Theme\contrast.vstheme">
       <SubType>Designer</SubType>
     </None>
@@ -1305,9 +1301,6 @@
       <SubType>Designer</SubType>
     </ZipItem>
     <ZipItem Include="Templates\Files\UnitTest\UnitTest.js" />
-    <ZipItem Include="Templates\Files\DockerfileTemplate\Dockerfile.vstemplate">
-      <SubType>Designer</SubType>
-    </ZipItem>
     <Content Include="TestFrameworks\find_tests.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -1329,6 +1322,10 @@
     </ZipItem>
     <ZipItem Include="Templates\Files\TypeScriptUnitTest\UnitTest.ts" />
     <ZipItem Include="Templates\Files\TypeScriptUnitTest\UnitTest.vstemplate">
+      <SubType>Designer</SubType>
+    </ZipItem>
+    <ZipItem Include="Templates\Files\DockerfileTemplate\Dockerfile" />
+    <ZipItem Include="Templates\Files\DockerfileTemplate\Dockerfile.vstemplate">
       <SubType>Designer</SubType>
     </ZipItem>
     <None Include="Theme\Microsoft.NodejsTools.theme.v11.0.pkgdef" />
@@ -1756,7 +1753,6 @@
   </Target>
   <PropertyGroup>
     <PostBuildEvent>
-      echo f | xcopy /y $(ProjectDir)Templates\Files\DockerfileTemplate\Dockerfile $(OutDir)FileTemplates\ReferenceFiles\Dockerfile
       copy /y $(OutDir)..\WebRole\Microsoft.NodejsTools.WebRole.dll $(OutDir)Debugger\RemoteDebug\
     </PostBuildEvent>
   </PropertyGroup>

@@ -379,25 +379,6 @@ namespace Microsoft.NodejsTools.Project {
             return new NodejsProjectNodeProperties(this);
         }
 
-        public override int GetPropertyValue(string propertyName, string configName, uint storage, out string propertyValue) {
-            propertyValue = null;
-            switch (propertyName) {
-                case "DockerLinuxDockerfileContents":
-                    propertyValue = DockerfileWizardExtension.GetDockerfileWithReplacements(
-                        File.ReadAllText(@"FileTemplates\ReferenceFiles\Dockerfile"),
-                        DTE
-                    );
-                    return VSConstants.S_OK;
-                case "DockerAppType":
-                    propertyValue = "Node.js";
-                    return VSConstants.S_OK;
-                case "DockerDefaultPublishContainerPort":
-                    propertyValue = "8080";
-                    return VSConstants.S_OK;
-            }
-            return base.GetPropertyValue(propertyName, configName, storage, out propertyValue);
-        }
-
         protected override Stream ProjectIconsImageStripStream {
             get {
                 return typeof(ProjectNode).Assembly.GetManifestResourceStream("Microsoft.VisualStudioTools.Resources.Icons.SharedProjectImageList.bmp");
