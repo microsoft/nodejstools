@@ -147,7 +147,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                             throw;
                         }
                         LiveLogger.WriteLine("Connection attempt {0} failed with: {1}", connection_attempts, ex);
-                        if (connection_attempts >= MAX_ATTEMPTS && !_isClosed) {
+                        if (_isClosed || connection_attempts >= MAX_ATTEMPTS) {
                             throw;
                         }
                         else {
