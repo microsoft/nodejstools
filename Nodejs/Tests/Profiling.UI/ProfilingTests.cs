@@ -154,6 +154,47 @@ namespace ProfilingUITests {
             }
         }
 
+        private static void WaitForReport(INodeProfiling profiling, INodeProfileSession session, out INodePerformanceReport report, NodejsVisualStudioApp app, out AutomationElement child) {
+            report = WaitForReportIndex(session, 1);
+            Assert.IsTrue(report.Filename.Contains("NodejsProfileTest"));
+
+            app.OpenNodejsPerformance();
+            var pyPerf = app.NodejsPerformanceExplorerTreeView;
+            Assert.AreNotEqual(null, pyPerf);
+
+            var item = pyPerf.FindItem("NodejsProfileTest *", "Reports");
+            child = item.FindFirst(System.Windows.Automation.TreeScope.Descendants, Condition.TrueCondition);
+            var childName = child.GetCurrentPropertyValue(AutomationElement.NameProperty) as string;
+            Assert.IsTrue(childName.StartsWith("NodejsProfileTest"));
+
+            AutomationWrapper.EnsureExpanded(child);
+        }
+
+        private static INodePerformanceReport WaitForReportIndex(INodeProfileSession session, int index) {
+            var report = session.GetReport(index);
+            for (int trial = 0; trial < 20 && report == null; ++trial) {
+                System.Threading.Thread.Sleep(500);
+                report = session.GetReport(index);
+            }
+            WaitForFileExistenceOnDisk(report.Filename);
+            return report;
+        }
+
+        private static void WaitForFileExistenceOnDisk(string filename) {
+            for (int trial = 0; trial < 20; ++trial) {
+                if (!File.Exists(filename)) {
+                    System.Threading.Thread.Sleep(500);
+                }
+            }
+        }
+
+        private static void WaitForFileNonExistenceOnDisk(string filename) {
+            for (int trial = 0; trial < 20; ++trial) {
+                if (File.Exists(filename)) {
+                    System.Threading.Thread.Sleep(500);
+                }
+            }
+        }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
@@ -298,6 +339,7 @@ namespace ProfilingUITests {
                     perfTarget.SelectProfileScript();
                     perfTarget.InterpreterPath = NodeExePath;
                     perfTarget.ScriptName = TestData.GetPath(@"TestData\NodejsProfileTest\program.js");
+                    string a = perfTarget.ScriptName;
 
                     try {
                         perfTarget.Ok();
@@ -598,11 +640,8 @@ namespace ProfilingUITests {
             using (var app = OpenProfileTestProject(out project, out profiling)) {
                 var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
                 try {
-                    while (profiling.IsProfiling) {
-                        System.Threading.Thread.Sleep(500);
-                    }
+                    var report = WaitForReportIndex(session, 1);
 
-                    var report = session.GetReport(1);
                     var filename = report.Filename;
                     Assert.IsTrue(filename.Contains("NodejsProfileTest"));
 
@@ -626,11 +665,8 @@ namespace ProfilingUITests {
             using (var app = OpenProfileTestProject(out project, out profiling, NodejsTypeScriptProfileTest)) {
                 var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsTypeScriptProfileTest"), false);
                 try {
-                    while (profiling.IsProfiling) {
-                        System.Threading.Thread.Sleep(500);
-                    }
+                    var report = WaitForReportIndex(session, 1);
 
-                    var report = session.GetReport(1);
                     var filename = report.Filename;
                     Assert.IsTrue(filename.Contains("NodejsProfileTest"));
 
@@ -654,16 +690,8 @@ namespace ProfilingUITests {
             using (var app = OpenProfileTestProject(out project, out profiling, NodejsTypeScriptProfileTestNeedsBuild)) {
                 var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsTypeScriptProfileTest"), false);
                 try {
-                    // We specifically don't use IsProfiling here because
-                    // profiling doesn't start until the build is done.
-                    while (session.GetReport(1) == null) {
-                        System.Threading.Thread.Sleep(500);
-                    }
-                    while (profiling.IsProfiling) {
-                        System.Threading.Thread.Sleep(500);
-                    }
-                    Console.WriteLine("Have report");
-                    var report = session.GetReport(1);
+                    var report = WaitForReportIndex(session, 1);
+
                     var filename = report.Filename;
                     Assert.IsTrue(filename.Contains("NodejsProfileTest"));
 
@@ -745,14 +773,17 @@ namespace ProfilingUITests {
             using (var app = OpenProfileTestProject(out project, out profiling)) {
                 var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
                 try {
-                    string reportFilename;
-                    WaitForReport(profiling, session, app, out reportFilename);
+                    INodePerformanceReport report;
+                    AutomationElement child;
+                    WaitForReport(profiling, session, out report, app, out child);
+
+                    child.SetFocus();
+                    Keyboard.PressAndRelease(System.Windows.Input.Key.Delete);
 
                     new RemoveItemDialog(app.WaitForDialog()).Delete();
-
                     app.WaitForDialogDismissed();
 
-                    Assert.IsTrue(!File.Exists(reportFilename));
+                    Assert.IsTrue(!File.Exists(report.Filename)); // Delete permanently
                 } finally {
                     profiling.RemoveSession(session, true);
                 }
@@ -768,14 +799,10 @@ namespace ProfilingUITests {
             using (var app = OpenProfileTestProject(out project, out profiling)) {
                 var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
                 try {
-                    for (int i = 0; i < 20 && profiling.IsProfiling; i++) {
-                        System.Threading.Thread.Sleep(500);
-                    }
+                    WaitForReportIndex(session, 1);
 
                     session.Launch(false);
-                    for (int i = 0; i < 20 && profiling.IsProfiling; i++) {
-                        System.Threading.Thread.Sleep(500);
-                    }
+                    WaitForReportIndex(session, 2);
 
                     var pyPerf = app.NodejsPerformanceExplorerTreeView;
 
@@ -840,14 +867,17 @@ namespace ProfilingUITests {
             using (var app = OpenProfileTestProject(out project, out profiling)) {
                 var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
                 try {
-                    string reportFilename;
-                    WaitForReport(profiling, session, app, out reportFilename);
+                    INodePerformanceReport report;
+                    AutomationElement child;
+                    WaitForReport(profiling, session, out report, app, out child);
+
+                    child.SetFocus();
+                    Keyboard.PressAndRelease(System.Windows.Input.Key.Delete);
 
                     new RemoveItemDialog(app.WaitForDialog()).Remove();
-
                     app.WaitForDialogDismissed();
 
-                    Assert.IsTrue(File.Exists(reportFilename));
+                    Assert.IsTrue(File.Exists(report.Filename)); // Removed but not deleted
                 } finally {
                     profiling.RemoveSession(session, true);
                 }
@@ -878,28 +908,6 @@ namespace ProfilingUITests {
                     profiling.RemoveSession(session, true);
                 }
             }
-        }
-
-        private static void WaitForReport(INodeProfiling profiling, INodeProfileSession session, out INodePerformanceReport report, NodejsVisualStudioApp app, out AutomationElement child) {
-            while (profiling.IsProfiling) {
-                System.Threading.Thread.Sleep(500);
-            }
-
-            report = session.GetReport(1);
-            var filename = report.Filename;
-            Assert.IsTrue(filename.Contains("NodejsProfileTest"));
-
-            app.OpenNodejsPerformance();
-            var pyPerf = app.NodejsPerformanceExplorerTreeView;
-            Assert.AreNotEqual(null, pyPerf);
-
-            var item = pyPerf.FindItem("NodejsProfileTest *", "Reports");
-            child = item.FindFirst(System.Windows.Automation.TreeScope.Descendants, Condition.TrueCondition);
-            var childName = child.GetCurrentPropertyValue(AutomationElement.NameProperty) as string;
-
-            Assert.IsTrue(childName.StartsWith("NodejsProfileTest"));
-
-            AutomationWrapper.EnsureExpanded(child);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
@@ -936,9 +944,7 @@ namespace ProfilingUITests {
             using (var app = OpenProfileTestProject(out project, out profiling)) {
                 var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
                 try {
-                    while (profiling.IsProfiling) {
-                        System.Threading.Thread.Sleep(500);
-                    }
+                    var report = WaitForReportIndex(session, 1);
 
                     app.OpenNodejsPerformance();
                     var pyPerf = app.NodejsPerformanceExplorerTreeView;
@@ -1056,6 +1062,10 @@ namespace ProfilingUITests {
                 );
 
                 try {
+                    // TODO: Review this test.
+                    // This does not seem to a correct way to check the profiling process is up
+                    // and running. If the profiling process runs too fast, it may completes
+                    // before we even reach this line.
                     for (int i = 0; i < 100 && !profiling.IsProfiling; i++) {
                         System.Threading.Thread.Sleep(100);
                     }
@@ -1078,31 +1088,6 @@ namespace ProfilingUITests {
             }
         }
 
-        private static NodejsVisualStudioApp WaitForReport(INodeProfiling profiling, INodeProfileSession session, NodejsVisualStudioApp app, out string reportFilename) {
-            while (profiling.IsProfiling) {
-                System.Threading.Thread.Sleep(100);
-            }
-
-            var report = session.GetReport(1);
-            var filename = report.Filename;
-            Assert.IsTrue(filename.Contains("NodejsProfileTest"));
-
-            app.OpenNodejsPerformance();
-            var pyPerf = app.NodejsPerformanceExplorerTreeView;
-            Assert.AreNotEqual(null, pyPerf);
-
-            var item = pyPerf.FindItem("NodejsProfileTest *", "Reports");
-            var child = item.FindFirst(System.Windows.Automation.TreeScope.Descendants, Condition.TrueCondition);
-            var childName = child.GetCurrentPropertyValue(AutomationElement.NameProperty) as string;
-
-            reportFilename = report.Filename;
-            Assert.IsTrue(childName.StartsWith("NodejsProfileTest"));
-
-            child.SetFocus();
-            Keyboard.PressAndRelease(System.Windows.Input.Key.Delete);
-            return app;
-        }
-
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void MultipleTargets() {
@@ -1114,11 +1099,7 @@ namespace ProfilingUITests {
                 INodeProfileSession session2 = null;
                 try {
                     {
-                        while (profiling.IsProfiling) {
-                            System.Threading.Thread.Sleep(100);
-                        }
-
-                        var report = session.GetReport(1);
+                        var report = WaitForReportIndex(session, 1);
                         var filename = report.Filename;
                         Assert.IsTrue(filename.Contains("NodejsProfileTest"));
 
@@ -1139,11 +1120,7 @@ namespace ProfilingUITests {
                                     false
                                 );
 
-                        while (profiling.IsProfiling) {
-                            System.Threading.Thread.Sleep(100);
-                        }
-
-                        var report = session2.GetReport(1);
+                        var report = WaitForReportIndex(session2, 1);
                         var filename = report.Filename;
                         Assert.IsTrue(filename.Contains("program"));
 
@@ -1173,11 +1150,7 @@ namespace ProfilingUITests {
                 INodeProfileSession session2 = null;
                 try {
                     {
-                        while (profiling.IsProfiling) {
-                            System.Threading.Thread.Sleep(100);
-                        }
-
-                        var report = session.GetReport(1);
+                        var report = WaitForReportIndex(session, 1);
                         var filename = report.Filename;
                         Assert.IsTrue(filename.Contains("NodejsProfileTest"));
 
@@ -1198,11 +1171,7 @@ namespace ProfilingUITests {
                             false
                         );
 
-                        while (profiling.IsProfiling) {
-                            System.Threading.Thread.Sleep(100);
-                        }
-
-                        var report = session2.GetReport(1);
+                        var report = WaitForReportIndex(session2, 1);
                         var filename = report.Filename;
                         Assert.IsTrue(filename.Contains("program"));
 
@@ -1231,12 +1200,12 @@ namespace ProfilingUITests {
             using (var app = OpenProfileTestProject(out project, out profiling)) {
                 var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
                 try {
-
-                    while (profiling.IsProfiling) {
-                        System.Threading.Thread.Sleep(100);
+                    var report = WaitForReportIndex(session, 1);
+                    while (report == null) {
+                        System.Threading.Thread.Sleep(500);
+                        report = session.GetReport(1);
                     }
 
-                    var report = session.GetReport(1);
                     var filename = report.Filename;
                     Assert.IsTrue(filename.Contains("NodejsProfileTest"));
 
@@ -1248,11 +1217,7 @@ namespace ProfilingUITests {
 
                     session.Launch();
 
-                    while (profiling.IsProfiling) {
-                        System.Threading.Thread.Sleep(100);
-                    }
-
-                    report = session.GetReport(2);
+                    report = WaitForReportIndex(session, 1);
                     VerifyReport(report, "program.f");
                 } finally {
                     profiling.RemoveSession(session, true);
@@ -1277,11 +1242,8 @@ namespace ProfilingUITests {
                     false
                 );
                 try {
-                    while (profiling.IsProfiling) {
-                        System.Threading.Thread.Sleep(100);
-                    }
+                    var report = WaitForReportIndex(session, 1);
 
-                    var report = session.GetReport(1);
                     var filename = report.Filename;
                     Assert.IsTrue(filename.Contains("program"));
 
@@ -1312,11 +1274,7 @@ namespace ProfilingUITests {
                     false
                 );
                 try {
-                    while (profiling.IsProfiling) {
-                        System.Threading.Thread.Sleep(100);
-                    }
-
-                    var report = session.GetReport(1);
+                    var report = WaitForReportIndex(session, 1);
                     var filename = report.Filename;
 
                     Assert.AreEqual(session.GetReport(2), null);
@@ -1344,12 +1302,7 @@ namespace ProfilingUITests {
                     false
                 );
                 try {
-                    while (profiling.IsProfiling) {
-                        System.Threading.Thread.Sleep(100);
-                    }
-
-                    var report = session.GetReport(1);
-                    var filename = report.Filename;
+                    var report = WaitForReportIndex(session, 1);
 
                     Assert.AreEqual(session.GetReport(2), null);
 
@@ -1377,9 +1330,7 @@ namespace ProfilingUITests {
 
                 var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
                 try {
-                    while (profiling.IsProfiling) {
-                        System.Threading.Thread.Sleep(100);
-                    }
+                    WaitForFileExistenceOnDisk(testFile);
 
                     Assert.IsTrue(File.Exists(testFile), "test file not created");
                     var lines = File.ReadAllLines(testFile);
@@ -1414,9 +1365,7 @@ namespace ProfilingUITests {
 
                 var session = LaunchProject(app, profiling, project, TestData.GetPath("TestData\\NodejsProfileTest"), false);
                 try {
-                    while (profiling.IsProfiling) {
-                        System.Threading.Thread.Sleep(100);
-                    }
+                    WaitForFileExistenceOnDisk(testFile);
 
                     Assert.IsTrue(File.Exists(testFile), "test file not created");
                 } finally {
