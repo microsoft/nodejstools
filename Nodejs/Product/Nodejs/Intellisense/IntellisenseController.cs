@@ -32,6 +32,7 @@ using Microsoft.VisualStudio.Text.IncrementalSearch;
 using Microsoft.VisualStudio.Text.Operations;
 using Microsoft.VisualStudio.TextManager.Interop;
 using VSConstants = Microsoft.VisualStudio.VSConstants;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.NodejsTools.Intellisense {
 

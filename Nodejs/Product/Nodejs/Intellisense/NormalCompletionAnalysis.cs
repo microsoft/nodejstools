@@ -17,7 +17,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
@@ -39,10 +38,11 @@ namespace Microsoft.NodejsTools.Intellisense {
             _options = options;
         }
 
-        public override CompletionSet GetCompletions(IGlyphService glyphService) {
+        public override CompletionSet GetCompletions(IGlyphService glyphService, IEnumerable<DynamicallyVisibleCompletion> snippetCompletions) {
             var analysis = GetAnalysisEntry();
 
             var members = Enumerable.Empty<MemberResult>();
+            var completions = Enumerable.Empty<DynamicallyVisibleCompletion>();
 
             var text = PrecedingExpression;
             if (!string.IsNullOrEmpty(text)) {
@@ -57,6 +57,8 @@ namespace Microsoft.NodejsTools.Intellisense {
                         ),
                         _options
                     );
+
+                    completions = members.Select(m => JsCompletion(glyphService, m));
                 }
             } else if (analysis != null) {
                 members = analysis.GetAllAvailableMembersByIndex(
@@ -67,13 +69,20 @@ namespace Microsoft.NodejsTools.Intellisense {
                     ),
                     _options
                 );
+
+                completions = members.Select(m => JsCompletion(glyphService, m));
+
+                // Include snippets as completions where we can show statement keywords e.g. try, switch, for.
+                if (_options.StatementKeywords()) {
+                    completions = completions.Union(snippetCompletions);
+                }
             }
 
             return new FuzzyCompletionSet(
                 "Node.js",
                 "Node.js",
                 Span,
-                members.Select(m => JsCompletion(glyphService, m)),
+                completions,
                 CompletionComparer.UnderscoresLast,
                 matchInsertionText: true
             );
@@ -117,6 +126,5 @@ namespace Microsoft.NodejsTools.Intellisense {
                 return string.Empty;
             }
         }
-
     }
 }
