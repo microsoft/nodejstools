@@ -30,7 +30,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
             StackFrame = stackFrame;
             Name = (string)parameter["name"] ?? NodeVariableType.AnonymousVariable;
             TypeName = (string)value["type"];
-            Value = (string)value["value"];
+            Value = GetValue((JValue)value["value"]);
             Class = (string)value["className"];
             try {
                 Text = (string)value["text"];
@@ -51,5 +51,26 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
         public NodePropertyAttributes Attributes { get; private set; }
         public NodePropertyType Type { get; private set; }
         public NodeStackFrame StackFrame { get; private set; }
+
+        /// <summary>
+        /// Converts the JValue to string.
+        /// </summary>
+        /// <param name="value">Value which has to be converted to string representation.</param>
+        /// <returns>String which represents the value.</returns>
+        private static string GetValue(JValue value) {
+            if (value == null) {
+                return null;
+            }
+
+            if (value.Type == JTokenType.Date) {
+                var parentValue = value.Parent.ToString();
+                return parentValue.Replace("\"value\": \"", string.Empty)
+                    .Replace("\"", string.Empty);
+                // var dateTimeValue = (DateTime)value.Value;
+                // return dateTimeValue.ToUniversalTime().ToString("s") + "Z";
+            }
+
+            return (string)value;
+        }
     }
 }
