@@ -36,6 +36,7 @@ namespace TestAdapterTests {
             NodejsTestData.Deploy();
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestRun() {
             
@@ -56,6 +57,7 @@ namespace TestAdapterTests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestRunAll() {
             

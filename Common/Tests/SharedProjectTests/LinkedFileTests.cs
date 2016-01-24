@@ -333,6 +333,7 @@ namespace VisualStudioToolsUITests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void MoveLinkedNodeFileExistsButNotInProject() {
@@ -434,6 +435,7 @@ namespace VisualStudioToolsUITests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void SaveAsCreateFileNewDirectory() {
@@ -460,6 +462,7 @@ namespace VisualStudioToolsUITests {
         /// <summary>
         /// Adding a duplicate link to the same item
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void AddExistingItem() {
@@ -533,6 +536,7 @@ namespace VisualStudioToolsUITests {
         /// <summary>
         /// Adding new linked item when file of same name exists (when the file only exists on disk)
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void AddExistingItemAndFileByNameExistsOnDiskButNotInProject() {
@@ -557,6 +561,7 @@ namespace VisualStudioToolsUITests {
         /// <summary>
         /// Adding new linked item when file of same name exists (both in the project and on disk)
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void AddExistingItemAndFileByNameExistsOnDiskAndInProject() {
@@ -581,6 +586,7 @@ namespace VisualStudioToolsUITests {
         /// <summary>
         /// Adding new linked item when file of same name exists (in the project, but not on disk)
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void AddExistingItemAndFileByNameExistsInProjectButNotOnDisk() {
@@ -605,6 +611,7 @@ namespace VisualStudioToolsUITests {
         /// Adding new linked item when the file lives in the project dir but not in the directory we selected
         /// Add Existing Item from.  We should add the file to the directory where it lives.
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void AddExistingItemAsLinkButFileExistsInProjectDirectory() {
@@ -628,6 +635,7 @@ namespace VisualStudioToolsUITests {
         /// <summary>
         /// Reaming the file name in the Link attribute is ignored.
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void RenamedLinkedFile() {
@@ -691,6 +699,7 @@ namespace VisualStudioToolsUITests {
         /// Test linked files with a project home set (done by save as in this test)
         /// https://nodejstools.codeplex.com/workitem/1511
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestLinkedWithProjectHome() {

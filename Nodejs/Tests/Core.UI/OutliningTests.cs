@@ -47,6 +47,7 @@ namespace NodejsTests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         [HostType("VSTestHost")]
         public void OutliningToplevelFunctionDefinitions() {
@@ -61,6 +62,7 @@ namespace NodejsTests {
 }"));
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         [HostType("VSTestHost")]
         public void OutliningNestedFunctionDefinitions() {

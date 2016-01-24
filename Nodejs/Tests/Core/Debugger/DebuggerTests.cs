@@ -162,6 +162,7 @@ namespace NodejsTests.Debugger {
 
         #region Eval Tests
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void EvalTests() {
             TestDebuggerSteps(
@@ -195,6 +196,7 @@ namespace NodejsTests.Debugger {
 
         #region Locals Tests
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void LocalsTest() {
             LocalsTest(
@@ -220,6 +222,7 @@ namespace NodejsTests.Debugger {
         /// <summary>
         /// http://nodejstools.codeplex.com/workitem/13
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void SpecialNumberLocalsTest() {
             LocalsTest(
@@ -231,6 +234,7 @@ namespace NodejsTests.Debugger {
             );
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void GlobalsTest() {
             LocalsTest(
@@ -244,6 +248,7 @@ namespace NodejsTests.Debugger {
 
         #region Stepping Tests
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void StepTest() {
             // Bug 509: http://pytools.codeplex.com/workitem/509
@@ -437,6 +442,7 @@ namespace NodejsTests.Debugger {
         }
 
         // F10/F11 startup
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void Startup_BreakOnEntryPoint() {
             TestDebuggerSteps(
@@ -449,6 +455,7 @@ namespace NodejsTests.Debugger {
         }
 
         // F5/F10/F11 startup
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void Startup_BreakOnEntryPointBreakPoint() {
             TestDebuggerSteps(
@@ -476,6 +483,7 @@ namespace NodejsTests.Debugger {
         }
 
         // F10/F11 startup
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void Startup_BreakOnEntryPointTracePoint() {
             TestDebuggerSteps(
@@ -503,6 +511,7 @@ namespace NodejsTests.Debugger {
         }
 
         // F5 startup
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void Startup_BreakOnEntryPointBreakOn() {
             TestDebuggerSteps(
@@ -523,6 +532,7 @@ namespace NodejsTests.Debugger {
         //[TestMethod, Priority(0)]
         //public void Running_Simple() { }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void Running_AccrossBreakPoint() {
             TestDebuggerSteps(
@@ -553,6 +563,7 @@ namespace NodejsTests.Debugger {
 
         #region Stepping Tests
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void Stepping_Basic() {
             TestDebuggerSteps(
@@ -585,6 +596,7 @@ namespace NodejsTests.Debugger {
             );
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void Stepping_AccrossBreakPoints() {
             TestDebuggerSteps(
@@ -633,6 +645,7 @@ namespace NodejsTests.Debugger {
             );
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void Stepping_AccrossTracePoints() {
             TestDebuggerSteps(
@@ -687,6 +700,7 @@ namespace NodejsTests.Debugger {
             );
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void Stepping_AcrossCaughtExceptions() {
             TestDebuggerSteps(
@@ -709,6 +723,7 @@ namespace NodejsTests.Debugger {
             );
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void DebuggingDownloaded() {
             TestDebuggerSteps(
@@ -747,6 +762,7 @@ namespace NodejsTests.Debugger {
             );
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void Breaking_InFunctionPassedFewerThanTakenParms() {
             TestDebuggerSteps(
@@ -762,6 +778,7 @@ namespace NodejsTests.Debugger {
             );
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void Stepping_IntoFunctionPassedFewerThanTakenParms() {
             TestDebuggerSteps(
@@ -854,6 +871,7 @@ namespace NodejsTests.Debugger {
             );
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestBreakpoints() {
             TestDebuggerSteps(
@@ -866,6 +884,7 @@ namespace NodejsTests.Debugger {
             );
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestBreakpoints2() {
             TestDebuggerSteps(
@@ -881,6 +900,7 @@ namespace NodejsTests.Debugger {
             );
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestBreakpoints3() {
             TestDebuggerSteps(
@@ -894,6 +914,7 @@ namespace NodejsTests.Debugger {
             );
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestBreakpointsConditionals() {
             TestDebuggerSteps(
@@ -925,6 +946,7 @@ namespace NodejsTests.Debugger {
             );
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestBreakpointEnable() {
             TestDebuggerSteps(
@@ -941,6 +963,7 @@ namespace NodejsTests.Debugger {
             );
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestBreakpointRemove() {
             TestDebuggerSteps(
@@ -983,6 +1006,7 @@ namespace NodejsTests.Debugger {
         //    process.WaitForExit();
         //}
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestBreakpointsBreakOn() {
             // BreakOnKind.Always
@@ -1162,6 +1186,7 @@ namespace NodejsTests.Debugger {
             Assert.IsTrue(exceptionHit);
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestBreakpointsHitCount() {
             TestDebuggerSteps(
@@ -1181,6 +1206,7 @@ namespace NodejsTests.Debugger {
             );
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestBreakpointInvalidLineFixup() {
             TestDebuggerSteps(
@@ -1397,16 +1423,19 @@ namespace NodejsTests.Debugger {
             );
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestBreakpointPredicatedEntrypointNoFixup() {
             TestBreakpointPredicatedEntrypoint("BreakpointTest.js", targetBreakpoint: 0, expectedHit: 0);
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestBreakpointPredicatedEntrypointBlankLineFixup() {
             TestBreakpointPredicatedEntrypoint("FixupBreakpointOnBlankLine.js", targetBreakpoint: 0, expectedHit: 2);
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestBreakpointPredicatedEntrypointCommentFixup() {
             TestBreakpointPredicatedEntrypoint("FixupBreakpointOnComment.js", targetBreakpoint: 0, expectedHit: 1);
@@ -1436,6 +1465,7 @@ namespace NodejsTests.Debugger {
 
         #region Exception Tests
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestExceptions() {
             // Well-known, handled
@@ -1547,6 +1577,7 @@ namespace NodejsTests.Debugger {
             );
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestExceptionsTypes() {
             TestExceptions(
@@ -1570,6 +1601,7 @@ namespace NodejsTests.Debugger {
             );
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestComplexExceptions() {
             TestExceptions(
@@ -1592,6 +1624,7 @@ namespace NodejsTests.Debugger {
         /// Exceptions shouldnt't be reported while calling Require, for alpha this means we don't break on ENOENT
         /// by default.
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestRequireExceptions() {
             TestExceptions(
@@ -1607,6 +1640,7 @@ namespace NodejsTests.Debugger {
         /// 
         /// Test handling of exceptions in evaluated code
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestExceptionInEvaluatedCode() {
             TestDebuggerSteps(
@@ -1626,6 +1660,7 @@ namespace NodejsTests.Debugger {
 
         #region Deep Callstack Tests
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void Stepping_AccrossDeepThrow() {
             TestDebuggerSteps(
@@ -1640,6 +1675,7 @@ namespace NodejsTests.Debugger {
             );
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void Stepping_AccrossDeepTracePoint() {
             TestDebuggerSteps(
@@ -1655,6 +1691,7 @@ namespace NodejsTests.Debugger {
             );
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void Stepping_AccrossDeepFixedUpTracePoint() {
             TestDebuggerSteps(
@@ -1674,6 +1711,7 @@ namespace NodejsTests.Debugger {
 
         #region Module Load Tests
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestModuleLoad() {
             TestModuleLoad(
@@ -1721,6 +1759,7 @@ namespace NodejsTests.Debugger {
 
         #region Exit Code Tests
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestExitNormal() {
             TestDebuggerSteps(
@@ -1732,6 +1771,7 @@ namespace NodejsTests.Debugger {
             );
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestExitException() {
             TestDebuggerSteps(
@@ -1761,6 +1801,7 @@ namespace NodejsTests.Debugger {
 
         #region Argument Tests
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TestScriptArguments() {
             TestDebuggerSteps(
@@ -1816,6 +1857,7 @@ namespace NodejsTests.Debugger {
 
         #region TypeScript Tests
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TypeScript_Stepping_Basic() {
             TestDebuggerSteps(
@@ -1919,6 +1961,7 @@ namespace NodejsTests.Debugger {
         /// <summary>
         /// https://nodejstools.codeplex.com/workitem/1515
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TypeScript_Stepping_Basic_RedirectDir() {
             TestDebuggerSteps(
@@ -2002,6 +2045,7 @@ namespace NodejsTests.Debugger {
             );
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TypeScript_Break_On_First_Line() {
             TestDebuggerSteps(
@@ -2022,6 +2066,7 @@ namespace NodejsTests.Debugger {
             );
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void TypeScript_Inheiritance_BreakInClass() {
             TestDebuggerSteps(

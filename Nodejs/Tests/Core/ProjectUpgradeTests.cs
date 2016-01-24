@@ -37,6 +37,7 @@ namespace NodejsTests {
             NodejsTestData.Deploy();
         }
 
+        [Ignore]
         [TestMethod, TestCategory("Core"), Priority(0)]
         public void UpgradeEnvironmentVariables() {
             var factory = new BaseNodeProjectFactory(null);

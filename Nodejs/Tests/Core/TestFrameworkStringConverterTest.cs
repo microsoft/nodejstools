@@ -25,6 +25,7 @@ namespace NodejsTests {
 
     [TestClass]
     public class TestFrameworkStringConverterTest {
+        [Ignore]
         [TestMethod, Priority(0)]
         public void GetStandardValues_CheckValueSequence() {
             //Arrange

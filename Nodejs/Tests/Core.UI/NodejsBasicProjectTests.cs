@@ -43,6 +43,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             NodejsTestData.Deploy();
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void AddNewTypeScriptItem() {
@@ -195,6 +196,7 @@ require('fs').writeFileSync('{0}', process.env.fob + process.env.bar + process.e
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestProjectProperties() {

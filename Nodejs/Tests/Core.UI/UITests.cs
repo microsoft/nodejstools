@@ -83,6 +83,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 #endif
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void AbsolutePaths() {
@@ -102,6 +103,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void MoveStartupFile() {
@@ -128,6 +130,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void CopyPasteFile() {
@@ -156,6 +159,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void CopyPasteRenameFile() {
@@ -207,6 +211,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void DeleteFile() {
@@ -233,6 +238,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void AddNewFolder() {
@@ -267,6 +273,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// <summary>
         /// Adds a new folder which fits exactly w/ no space left in the path name
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void AddNewFolderLongPathBoundary() {
@@ -300,6 +307,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// <summary>
         /// Adds a new folder with a path that's too long, typing a new path.
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void AddNewFolderLongPathTooLong() {
@@ -328,6 +336,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// <summary>
         /// Adds a folder with a path that's too long using the default provided folder name.
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void AddNewFolderLongPathTooLongCancelEdit() {
@@ -355,6 +364,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// <summary>
         /// Adds a folder with a path that's too long using the default provided folder name.
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void AddNewItemLongPathBoundary() {
@@ -380,6 +390,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// <summary>
         /// Adds a folder with a path that's too long using the default provided folder name.
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void AddNewItemLongPathTooLong() {
@@ -404,6 +415,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// <summary>
         /// Adds a folder with a path that's too long using the default provided folder name.
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void DeleteLockedFolder() {
@@ -456,6 +468,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             return app.OpenProject(Path.Combine(testDir, "LongFileNames.sln"));
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void AddNewFolderNested() {
@@ -504,6 +517,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void RenameProjectToExisting() {
@@ -545,6 +559,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void RenameItemsTest() {
@@ -618,6 +633,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void CrossProjectCopy() {
@@ -642,6 +658,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void CrossProjectCutPaste() {
@@ -667,6 +684,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void CutPaste() {
@@ -692,6 +710,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void CopyFolderOnToSelf() {
@@ -712,6 +731,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void DragDropTest() {
@@ -739,6 +759,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// <summary>
         /// Drag a file onto another file in the same directory, nothing should happen
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void DragDropFileToFileTest() {
@@ -767,6 +788,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// <summary>
         /// Drag a file onto it's containing folder, nothing should happen
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void DragDropFileToContainingFolderTest() {
@@ -791,6 +813,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void DragLeaveTest() {
@@ -821,6 +844,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void DragLeaveFolderTest() {
@@ -851,6 +875,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void MultiSelectCopyAndPaste() {
@@ -882,6 +907,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TransferItem() {
@@ -916,6 +942,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void SaveAs() {

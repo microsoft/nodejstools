@@ -104,24 +104,28 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void UpdateWebRoleServiceDefinitionInVS() {
             CloudProjectTest("Web", false);
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void UpdateWorkerRoleServiceDefinitionInVS() {
             CloudProjectTest("Worker", false);
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void UpdateWebRoleServiceDefinitionInVSDocumentOpen() {
             CloudProjectTest("Web", true);
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void UpdateWorkerRoleServiceDefinitionInVSDocumentOpen() {

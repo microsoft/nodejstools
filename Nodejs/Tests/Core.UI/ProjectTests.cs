@@ -45,6 +45,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// <summary>
         /// https://nodejstools.codeplex.com/workitem/270
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestSnippetsDisabled() {
@@ -78,6 +79,7 @@ http.createServer(function (req, res) {
         }
 
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestNoAutoFormattingEnter() {
@@ -103,6 +105,7 @@ http.createServer(function (req, res) {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestNoAutoFormattingCloseFunction() {
@@ -129,6 +132,7 @@ http.createServer(function (req, res) {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestNoAutoFormattingPaste() {
@@ -155,6 +159,7 @@ http.createServer(function (req, res) {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestNoReferences() {
@@ -168,6 +173,7 @@ http.createServer(function (req, res) {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void GlobalIntellisense() {
@@ -187,6 +193,7 @@ http.createServer(function (req, res) {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void RequireIntellisenseExpanded() {
@@ -264,6 +271,7 @@ http.createServer(function (req, res) {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void GlobalIntellisenseProjectReload() {
@@ -319,6 +327,7 @@ http.createServer(function (req, res) {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void UserModule() {
@@ -337,6 +346,7 @@ http.createServer(function (req, res) {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void AddNewItem() {
@@ -357,6 +367,7 @@ http.createServer(function (req, res) {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void EnterCompletion() {
@@ -386,6 +397,7 @@ http.createServer(function (req, res) {
         /// <summary>
         /// Tests completions against builtin node modules.
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void ModuleCompletions() {
@@ -422,6 +434,7 @@ sd.StringDecoder
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestNewProject() {
@@ -454,6 +467,7 @@ sd.StringDecoder
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestNewAzureProject() {
@@ -485,6 +499,7 @@ sd.StringDecoder
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestAutomationProject() {
@@ -528,6 +543,7 @@ sd.StringDecoder
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void SetAsStartupFile() {
@@ -597,6 +613,7 @@ sd.StringDecoder
             return app.GetDocument(item.Document.FullName);
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestProjectProperties() {
@@ -626,6 +643,7 @@ sd.StringDecoder
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestBrowserLaunch() {
@@ -776,6 +794,7 @@ sd.StringDecoder
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestLongPathCheck() {

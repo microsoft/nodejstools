@@ -122,6 +122,7 @@ namespace NodejsTests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestConsoleDir() {
             using (var eval = ProjectlessEvaluator()) {
@@ -426,6 +427,7 @@ undefined";
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestVarI() {
             using (var eval = ProjectlessEvaluator()) {
@@ -514,6 +516,7 @@ undefined";
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestNpmReplRedirector() {
             using (var eval = ProjectlessEvaluator()) {
