@@ -28,8 +28,7 @@ namespace NpmTests {
 
     [TestClass]
     [DeploymentItem(@"TestData\NpmSearchData\", "NpmSearchData")]
-    // TODO: The below was causing failures when included. Figure out if/how this should be set. (Seems to work fine without it).
-    //[DeploymentItem(@"sqlite3.dll")]
+    [DeploymentItem(@"sqlite3.dll")]
     public class NpmSearchTests {
 
         private const string PackageCacheAllJsonFilename = "packagecache.min.json";
