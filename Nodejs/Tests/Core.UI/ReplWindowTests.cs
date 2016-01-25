@@ -36,6 +36,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             AssertListener.Initialize();
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestErrorNewLine() {
@@ -47,6 +48,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             });
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestColorOutput() {
@@ -79,6 +81,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             });
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestStdErrIsRed() {
@@ -106,6 +109,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             });
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestCompletion() {
@@ -117,6 +121,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             });
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestNoSpecialCommandCompletion() {

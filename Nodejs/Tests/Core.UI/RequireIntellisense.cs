@@ -50,6 +50,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             AssertListener.Initialize();
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void InSubFolder() {
@@ -85,6 +86,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void BasicRequireCompletions() {
@@ -164,6 +166,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void BasicRequireCompletionsQuotes() {
@@ -256,6 +259,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void BasicRequireCompletionsDoubleQuotes() {
@@ -348,6 +352,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void RequireKeyboardCompletionBraceCompletionOff() {
@@ -408,6 +413,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void RequireKeyboardCompletionBraceCompletionOn() {
@@ -464,6 +470,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void RequireBuiltinModules() {
@@ -500,6 +507,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void CloseParenCommits() {
@@ -517,6 +525,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void UserModule() {
@@ -536,6 +545,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void UserModuleInFolder() {
@@ -555,6 +565,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void CloseQuoteDoesntCommit() {
@@ -574,6 +585,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void RequireAfterOperator() {
@@ -593,6 +605,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void RequireAfterOpenParen() {
@@ -612,6 +625,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void RequireAfterComma() {
@@ -631,6 +645,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void RequireAfterAssignment() {
@@ -648,6 +663,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void RequireAfterReturn() {
@@ -665,6 +681,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void RequireAfterSemiColon() {
@@ -682,6 +699,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void RequireAfterKeywordNoCompletions() {
@@ -697,6 +715,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void RequireAfterDotNoCompletions() {
@@ -711,6 +730,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void RequireAfterContinuedMultiLineStringNoCompletions() {
@@ -728,6 +748,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// 
         /// Make sure adding a module externally gets picked up
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void AddModuleExternally() {
@@ -759,6 +780,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// We should include submodules (like quox) and not just the top-level
         /// module when index.js is present.
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void SubmodulesFiles() {
@@ -780,6 +802,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void SubmodulesFiles2() {

@@ -89,6 +89,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void SmartIndentBug3() {
@@ -133,6 +134,7 @@ b = c;
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void SmartIndentBasic() {

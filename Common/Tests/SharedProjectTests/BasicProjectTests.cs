@@ -1186,6 +1186,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             }
         }
 #endif
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void OpenCommandHere() {
@@ -1546,6 +1547,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
 
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void DeleteFolderWithReadOnlyFile() {

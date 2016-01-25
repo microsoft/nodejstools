@@ -25,6 +25,7 @@ using TestUtilities;
 namespace NodejsTests {
     [TestClass]
     public class TemplateTests {
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestPackageJsonTemplateEncoding() {
             var projectTemplates = Path.Combine(TestData.BinarySourceLocation, "ProjectTemplates", "JavaScript", "Node.js", "1033");

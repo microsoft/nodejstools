@@ -22,6 +22,7 @@ using TestUtilities.Mocks;
 namespace NodejsTests {
     [TestClass]
     public class CommentBlockTests {
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestCommentCurrentLine() {
             var view = new MockTextView(
@@ -45,6 +46,7 @@ console.log('Goodbye');",
                  view.TextBuffer.CurrentSnapshot.GetText());
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestUnCommentCurrentLine() {
             var view = new MockTextView(
@@ -68,6 +70,7 @@ console.log('Goodbye');",
                 view.TextBuffer.CurrentSnapshot.GetText());
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestComment() {
             var view = new MockTextView(
@@ -86,6 +89,7 @@ console.log('Goodbye');"));
                  view.TextBuffer.CurrentSnapshot.GetText());
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestCommentEmptyLine() {
             var view = new MockTextView(
@@ -106,6 +110,7 @@ console.log('Goodbye');"));
                  view.TextBuffer.CurrentSnapshot.GetText());
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestCommentWhiteSpaceLine() {
             var view = new MockTextView(
@@ -126,6 +131,7 @@ console.log('Goodbye');"));
                  view.TextBuffer.CurrentSnapshot.GetText());
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestCommentIndented() {
             var view = new MockTextView(
@@ -153,6 +159,7 @@ console.log('Goodbye');"));
                     view.TextBuffer.CurrentSnapshot.GetText());
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestCommentIndentedBlankLine() {
             var view = new MockTextView(
@@ -182,6 +189,7 @@ console.log('Goodbye');"));
                     view.TextBuffer.CurrentSnapshot.GetText());
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestCommentBlankLine() {
             var view = new MockTextView(
@@ -199,6 +207,7 @@ console.log('bye');",
              view.TextBuffer.CurrentSnapshot.GetText());
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestCommentIndentedWhiteSpaceLine() {
             var view = new MockTextView(
@@ -228,6 +237,7 @@ console.log('bye');",
                     view.TextBuffer.CurrentSnapshot.GetText());
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestUnCommentIndented() {
             var view = new MockTextView(
@@ -255,6 +265,7 @@ console.log('bye');",
                     view.TextBuffer.CurrentSnapshot.GetText());
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestUnComment() {
             var view = new MockTextView(
@@ -273,6 +284,7 @@ console.log('Goodbye');",
                 view.TextBuffer.CurrentSnapshot.GetText());
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestCommentStartOfLastLine() {
             var view = new MockTextView(
@@ -291,6 +303,7 @@ console.log('Goodbye');",
                 view.TextBuffer.CurrentSnapshot.GetText());
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestCommentAfterCodeIsNotUncommented() {
             var view = new MockTextView(

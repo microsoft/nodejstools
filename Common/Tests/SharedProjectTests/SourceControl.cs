@@ -107,6 +107,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void AddNewItem() {
@@ -175,6 +176,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void IncludeInProject() {
@@ -214,6 +216,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void RemoveItem() {
@@ -257,6 +260,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// <summary>
         /// Verify we get called w/ a project which does have source control enabled.
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void BasicSourceControl() {
@@ -305,6 +309,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// <summary>
         /// Verify the glyph change APIs update the glyphs appropriately
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void SourceControlGlyphChanged() {
@@ -357,6 +362,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// <summary>
         /// Verify we don't get called for a project which doesn't have source control enabled.
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void SourceControlNoControl() {
@@ -393,6 +399,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// 
         /// https://pytools.codeplex.com/workitem/1417
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void SourceControlExcludedFilesNotPresent() {
@@ -422,6 +429,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// <summary>
         /// Verify we get called w/ a project which does have source control enabled.
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void SourceControlRenameFolder() {

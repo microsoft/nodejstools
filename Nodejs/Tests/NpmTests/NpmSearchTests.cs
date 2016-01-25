@@ -511,6 +511,7 @@ namespace NpmTests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestFilterStringWithHyphens() {
             const string

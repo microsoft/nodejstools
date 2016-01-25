@@ -34,6 +34,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             AssertListener.Initialize();
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void ShowAllFilesToggle() {
@@ -173,6 +174,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void ShowAllFilesIncludeExclude() {
@@ -779,6 +781,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// <summary>
         /// https://pytools.codeplex.com/workitem/1996
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void ShowAllExcludeSelected() {
@@ -842,6 +845,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// 
         /// https://nodejstools.codeplex.com/workitem/380
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void ShowAllFilesRapidChanges() {
@@ -875,6 +879,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// Creating & deleting and then re-creating files rapidly should have the files be 
         /// present in solution explorer.
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void ShowAllFilesRapidChanges2() {
@@ -908,12 +913,14 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void ShowAllFilesCopyExcludedFolderWithItemByKeyboard() {
             ShowAllFilesCopyExcludedFolderWithItem(DragDropCopyCutPaste.CopyByKeyboard);
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void ShowAllFilesCopyExcludedFolderWithItemByMouse() {
@@ -956,12 +963,14 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void ShowAllFilesMoveExcludedItemToExcludedFolderByKeyboard() {
             ShowAllFilesMoveExcludedItemToExcludedFolder(DragDropCopyCutPaste.MoveByKeyboard);
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void ShowAllFilesMoveExcludedItemToExcludedFolderByMouse() {

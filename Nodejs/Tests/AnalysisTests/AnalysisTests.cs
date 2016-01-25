@@ -482,6 +482,7 @@ z = y.abc;
         /// <summary>
         /// Currently failing because object literal {value: copied[propName]} gets merged resulting in shared types
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0)]
         public void FailingTestDefinePropertyLoop() {
             string code = @"
@@ -572,6 +573,7 @@ xyz = new Y();";
             );
         }
 
+        [Ignore]
         [TestMethod, Priority(2)]
         public void Failing_TestThis() {
             var code = @"function SimpleTest(x, y) {
@@ -744,6 +746,7 @@ abc(abc);
             return sigs.ToArray();
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestJSDoc() {
             string code = @"
@@ -1031,6 +1034,7 @@ x = f.abc;
         /// object it's reading from, and when a new property is created
         /// we need to enqueue the callers.
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestDefinePropertiesDependencies() {
             string code = @"
@@ -1450,6 +1454,7 @@ var z = y.abc";
             );
         }
 
+        [Ignore]
         [TestMethod, Priority(2)]
         public void FailingTestForInLoop2() {
             var analysis = ProcessText("for(x in ['a','b','c']) { }");

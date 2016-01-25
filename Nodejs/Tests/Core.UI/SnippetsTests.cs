@@ -78,6 +78,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             )
         };
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestInsertSnippet() {
@@ -91,6 +92,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestSelectedIndented() {
@@ -110,6 +112,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestSurroundWithSnippet() {
@@ -122,6 +125,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestSelected() {
@@ -167,6 +171,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             return VerifySnippet(snippet, body, server);
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestBasicSnippetsTab() {
@@ -189,6 +194,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             return VerifySnippet(snippet, "", server);
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestSurroundWithMultiline() {

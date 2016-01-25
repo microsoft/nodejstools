@@ -77,6 +77,7 @@ namespace ProfilerTests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestFilenameParsing() {
             AssertExpectedFileInfo(

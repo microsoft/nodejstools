@@ -155,6 +155,7 @@ namespace ProfilingUITests {
         }
 
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void NewProfilingSession() {
@@ -216,6 +217,7 @@ namespace ProfilingUITests {
         /// <summary>
         /// https://nodejstools.codeplex.com/workitem/26
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestStartAnalysisDebugMenu() {
@@ -251,6 +253,7 @@ namespace ProfilingUITests {
         /// <summary>
         /// https://nodejstools.codeplex.com/workitem/26
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestStartAnalysisDebugMenuNoProject() {
@@ -269,6 +272,7 @@ namespace ProfilingUITests {
         /// <summary>
         /// https://nodejstools.codeplex.com/workitem/149
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void LaunchNewProfilingSession() {
@@ -341,6 +345,7 @@ namespace ProfilingUITests {
         /// <summary>
         /// https://nodejstools.codeplex.com/workitem/145
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestMultipleSessions() {
@@ -414,6 +419,7 @@ namespace ProfilingUITests {
         /// 
         /// Same as TestMultipleSessions, but reversing the order of which one we launch from
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestMultipleSessions2() {
@@ -482,6 +488,7 @@ namespace ProfilingUITests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void NewProfilingSessionOpenSolution() {
@@ -542,6 +549,7 @@ namespace ProfilingUITests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void LaunchNodejsProfilingWizard() {
@@ -589,6 +597,7 @@ namespace ProfilingUITests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void LaunchProject() {
@@ -617,6 +626,7 @@ namespace ProfilingUITests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void LaunchMappedProject() {
@@ -645,6 +655,7 @@ namespace ProfilingUITests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void LaunchMappedProjectNeedsBuild() {
@@ -678,6 +689,7 @@ namespace ProfilingUITests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void LaunchMappedProjectNeedsBuildWithErrors() {
@@ -696,6 +708,7 @@ namespace ProfilingUITests {
         }
 
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestSaveDirtySession() {
@@ -736,6 +749,7 @@ namespace ProfilingUITests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestDeleteReport() {
@@ -759,6 +773,7 @@ namespace ProfilingUITests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestCompareReports() {
@@ -831,6 +846,7 @@ namespace ProfilingUITests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestRemoveReport() {
@@ -854,6 +870,7 @@ namespace ProfilingUITests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestOpenReport() {
@@ -902,6 +919,7 @@ namespace ProfilingUITests {
             AutomationWrapper.EnsureExpanded(child);
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestOpenReportCtxMenu() {
@@ -927,6 +945,7 @@ namespace ProfilingUITests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestTargetPropertiesForProject() {
@@ -960,6 +979,7 @@ namespace ProfilingUITests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestTargetPropertiesForExecutable() {
@@ -1004,6 +1024,7 @@ namespace ProfilingUITests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestStopProfiling() {
@@ -1039,6 +1060,7 @@ namespace ProfilingUITests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestTwoProfilesAtTheSameTime() {
@@ -1103,6 +1125,7 @@ namespace ProfilingUITests {
             return app;
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void MultipleTargets() {
@@ -1162,6 +1185,7 @@ namespace ProfilingUITests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void MultipleTargetsWithProjectHome() {
@@ -1222,6 +1246,7 @@ namespace ProfilingUITests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void MultipleReports() {
@@ -1261,6 +1286,7 @@ namespace ProfilingUITests {
         }
 
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void LaunchExecutable() {
@@ -1296,6 +1322,7 @@ namespace ProfilingUITests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestJustMyCode() {
@@ -1328,6 +1355,7 @@ namespace ProfilingUITests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestJustMyCodeOff() {
@@ -1360,6 +1388,7 @@ namespace ProfilingUITests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestProjectProperties() {
@@ -1396,6 +1425,7 @@ namespace ProfilingUITests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestBrowserLaunch() {
