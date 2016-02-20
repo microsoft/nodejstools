@@ -170,33 +170,12 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0)]
-        public void ImportWizardIncludeNodeModules() {
-            var settings = new ImportSettings();
-
-            settings.SourcePath = TestData.GetPath("TestData\\HelloWorld3\\");
-            settings.Filters = "*.js;*.njsproj";
-            settings.StartupFile = "server.js";
-            settings.ExcludeNodeModules = false;
-            settings.ProjectPath = TestData.GetPath("TestData\\TestDestination\\Subdirectory\\ProjectName.njsproj");
-
-            var path = settings.CreateRequestedProject();
-
-            Assert.AreEqual(settings.ProjectPath, path);
-            var proj = XDocument.Load(path);
-
-            AssertUtil.ContainsExactly(proj.Descendants(proj.GetName("Compile")).Select(x => x.Attribute("Include").Value),
-                "server.js",
-                "node_modules\\mymod.js");
-        }
-
-        [TestMethod, Priority(0)]
         public void ImportWizardExcludeNodeModules() {
             var settings = new ImportSettings();
 
             settings.SourcePath = TestData.GetPath("TestData\\HelloWorld3\\");
             settings.Filters = "*.js;*.njsproj";
             settings.StartupFile = "server.js";
-            settings.ExcludeNodeModules = true;
             settings.ProjectPath = TestData.GetPath("TestData\\TestDestination\\Subdirectory\\ProjectName.njsproj");
 
             var path = settings.CreateRequestedProject();
@@ -215,7 +194,6 @@ namespace NodejsTests {
             settings.SourcePath = TestData.GetPath("TestData\\HelloWorld5\\");
             settings.Filters = "*.js;*.njsproj";
             settings.StartupFile = "server.js";
-            settings.ExcludeNodeModules = true;
             settings.ProjectPath = TestData.GetPath("TestData\\TestDestination\\Subdirectory\\ProjectName.njsproj");
 
             var path = settings.CreateRequestedProject();
@@ -240,7 +218,6 @@ namespace NodejsTests {
             settings.SourcePath = TestData.GetPath("TestData\\HelloWorld4");
             settings.Filters = "*.js";
             settings.StartupFile = "server.js";
-            settings.ExcludeNodeModules = true;
             settings.ProjectPath = TestData.GetPath("TestData\\TestDestination\\Subdirectory\\ProjectName.njsproj");
 
             var path = settings.CreateRequestedProject();
@@ -253,13 +230,12 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0)]
-        public void ImportWizardEmptyFoldersDontExcludeNodeModules() {
+        public void ImportWizardExcludeBowerComponents() {
             var settings = new ImportSettings();
 
-            settings.SourcePath = TestData.GetPath("TestData\\HelloWorld4\\");
+            settings.SourcePath = TestData.GetPath("TestData\\HelloWorld6");
             settings.Filters = "*.js";
             settings.StartupFile = "server.js";
-            settings.ExcludeNodeModules = false;
             settings.ProjectPath = TestData.GetPath("TestData\\TestDestination\\Subdirectory\\ProjectName.njsproj");
 
             var path = settings.CreateRequestedProject();
@@ -268,7 +244,7 @@ namespace NodejsTests {
             var proj = XDocument.Load(path);
 
             AssertUtil.ContainsExactly(proj.Descendants(proj.GetName("Folder")).Select(x => x.Attribute("Include").Value),
-                "Baz", "node_modules");
+                "Baz");
         }
 
         [TestMethod, Priority(0)]
@@ -279,7 +255,6 @@ namespace NodejsTests {
                 settings.SourcePath = TestData.GetPath("TestData\\HelloWorld3");
                 settings.Filters = "*.js";
                 settings.StartupFile = "server.js";
-                settings.ExcludeNodeModules = true;
                 await Dispatcher.Yield();
                 Assert.AreEqual("HelloWorld31.njsproj", Path.GetFileName(settings.ProjectPath));
             });
@@ -292,7 +267,6 @@ namespace NodejsTests {
             settings.SourcePath = TestData.GetPath("TestData\\HelloWorldTypeScript\\");
             settings.Filters = "*.ts;*.md;*.json";
             settings.StartupFile = "server.ts";
-            settings.ExcludeNodeModules = false;
             settings.ProjectPath = TestData.GetPath("TestData\\TestDestination\\TsSubdirectory\\ProjectName.njsproj");
 
             var path = settings.CreateRequestedProject();

@@ -63,18 +63,12 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
             set { SetValue(StartupFileProperty, value); }
         }
 
-        public bool ExcludeNodeModules {
-            get { return (bool)GetValue(ExcludeNodeModulesProperty); }
-            set { SetValue(ExcludeNodeModulesProperty, value); }
-        }
-
         public static readonly DependencyProperty ProjectPathProperty = DependencyProperty.Register("ProjectPath", typeof(string), typeof(ImportSettings), new PropertyMetadata(ProjectPath_Updated));
         public static readonly DependencyProperty SourcePathProperty = DependencyProperty.Register("SourcePath", typeof(string), typeof(ImportSettings), new PropertyMetadata(SourcePath_Updated));
         public static readonly DependencyProperty FiltersProperty = DependencyProperty.Register("Filters", typeof(string), typeof(ImportSettings), new PropertyMetadata());
         private static readonly DependencyPropertyKey TopLevelJavaScriptFilesPropertyKey = DependencyProperty.RegisterReadOnly("TopLevelJavaScriptFiles", typeof(ObservableCollection<string>), typeof(ImportSettings), new PropertyMetadata());
         public static readonly DependencyProperty TopLevelJavaScriptFilesProperty = TopLevelJavaScriptFilesPropertyKey.DependencyProperty;
         public static readonly DependencyProperty StartupFileProperty = DependencyProperty.Register("StartupFile", typeof(string), typeof(ImportSettings), new PropertyMetadata());
-        public static readonly DependencyProperty ExcludeNodeModulesProperty = DependencyProperty.Register("ExcludeNodeModules", typeof(bool), typeof(ImportSettings), new PropertyMetadata(true));
 
         public bool IsValid {
             get { return (bool)GetValue(IsValidProperty); }
@@ -206,13 +200,14 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
             string sourcePath = SourcePath;
             string filters = Filters;
             string startupFile = StartupFile;
+
             bool excludeNodeModules = ExcludeNodeModules;
             return Task.Run<string>(() => {
                 bool success = false;
                 Guid projectGuid;
                 try {
                     using (var writer = GetDefaultWriter(projectPath)) {
-                        WriteProjectXml(writer, projectPath, sourcePath, filters, startupFile, excludeNodeModules, out projectGuid);
+                        WriteProjectXml(writer, projectPath, sourcePath, filters, startupFile, true, out projectGuid);
                     }
                     if (NodejsPackage.Instance != null) {
                         NodejsPackage.Instance.TelemetryLogger.ReportEvent(TelemetryEvents.ProjectImported, TelemetryProperties.ProjectGuid, projectGuid.ToString("B"));
@@ -245,6 +240,15 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
             // We won't reject the folder.
             Debug.Assert(!Path.IsPathRooted(dirName));
             return !dirName.Split(new char[] { '/', '\\' }).Any(name => name.StartsWith("."));
+        }
+
+        /// <summary>
+        /// Checks whether a relative and double-backslashed seperated path contains a folder name.
+        /// </summary>
+        private static bool ContainsNodeModulesOrBowerComponentsFolder(string path) {
+            string tmp = "\\" + path + "\\";
+            return tmp.IndexOf("\\" + NodejsConstants.NodeModulesFolder + "\\", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                tmp.IndexOf("\\" + NodejsConstants.BowerComponentsFolder + "\\", StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         internal static void WriteProjectXml(
@@ -323,10 +327,12 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
                     )
                     .Where(ShouldIncludeDirectory)
             );
+
+            // Exclude node_modules and bower_components folders.
             if (excludeNodeModules) {
-                folders.Remove(NodejsConstants.NodeModulesFolder);
-                folders.RemoveWhere(folder => folder.StartsWith(NodejsConstants.NodeModulesFolder + "\\", StringComparison.OrdinalIgnoreCase));
+                folders.RemoveWhere(folder => ContainsNodeModulesOrBowerComponentsFolder(folder));
             }
+
             writer.WriteStartElement("ItemGroup");
             foreach (var file in EnumerateAllFiles(sourcePath, filters, excludeNodeModules)) {
                 var ext = Path.GetExtension(file);
@@ -426,7 +432,7 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
             }
 
             foreach (var dir in directories) {
-                if (excludeNodeModules && dir.Contains("\\node_modules\\")) {
+                if (excludeNodeModules && ContainsNodeModulesOrBowerComponentsFolder(dir)) {
                     continue;
                 }
                 try {
@@ -441,10 +447,6 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
                 .Where(path => path.StartsWith(source))
                 .Select(path => path.Substring(source.Length).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))
                 .Distinct(StringComparer.OrdinalIgnoreCase);
-
-            if(excludeNodeModules) {
-                res = res.Where(x => !x.StartsWith("node_modules\\", StringComparison.OrdinalIgnoreCase));
-            }
 
             return res;
         }
