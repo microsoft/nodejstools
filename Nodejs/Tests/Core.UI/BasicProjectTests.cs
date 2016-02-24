@@ -719,21 +719,27 @@ namespace Microsoft.Nodejs.Tests.UI {
                     Keyboard.Type("."); // bad filename
                     Keyboard.Type(System.Windows.Input.Key.Enter);
 
-#if DEV11_OR_LATER
+#if DEV11 || DEV12
                     VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "Directory names cannot contain any of the following characters");
+#elif DEV14
+                    VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "Please enter a valid name.");
 #else
-                VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, ". is an invalid filename");
+                    VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, ". is an invalid filename");
 #endif
+
                     System.Threading.Thread.Sleep(1000);
 
                     Keyboard.Type(".."); // another bad filename
                     Keyboard.Type(System.Windows.Input.Key.Enter);
 
-#if DEV11_OR_LATER
+#if DEV11 || DEV12
                     VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "Directory names cannot contain any of the following characters");
+#elif DEV14
+                    VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "Please enter a valid name.");
 #else
-                VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, ".. is an invalid filename");
+                    VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, ". is an invalid filename");
 #endif
+
                     System.Threading.Thread.Sleep(1000);
 
                     Keyboard.Type("Y"); // another bad filename
@@ -992,7 +998,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             string clipboardText = "";
             Console.WriteLine("Checking CopyFullPath on:{0}", expected);
             AutomationWrapper.Select(element);
-            vs.Dte.ExecuteCommand("File.CopyFullPath");
+            vs.Dte.ExecuteCommand("Project.CopyFullPath");
 
             var app = ((VisualStudioInstance)vs).App;
             app.ServiceProvider.GetUIThread().Invoke(() => clipboardText = System.Windows.Clipboard.GetText());

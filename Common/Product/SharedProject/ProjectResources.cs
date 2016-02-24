@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudioTools.Project {
         internal const string CancelQueryEditMultiple = "CancelQueryEditMultiple";
         internal const string CannotAddFileExists = "CannotAddFileExists";
         internal const string CannotAddFileThatIsOpenInEditor = "CannotAddFileThatIsOpenInEditor";
-        internal const string CannotAddAsDescendantOfSelf = "CannotAddAsDescendantOfSelf";
+        internal const string CannotAddFolderAsDescendantOfSelf = "CannotAddFolderAsDescendantOfSelf";
         internal const string CannotMoveFolderExists = "CannotMoveFolderExists";
         internal const string CannotMoveIntoSameDirectory = "CannotMoveIntoSameDirectory";
         internal const string CannotMoveIntoSubfolder = "CannotMoveIntoSubfolder";
