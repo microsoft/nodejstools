@@ -249,37 +249,6 @@ namespace Microsoft.NodejsTools.Project {
 
 #endif
 
-        private void ForceUpdateStatusBarWithNpmActivity(string activity) {
-            if (string.IsNullOrEmpty(activity) || string.IsNullOrEmpty(activity.Trim())) {
-                return;
-            }
-
-            if (!activity.Contains("npm")) {
-                activity = string.Format("npm: {0}", activity);
-            }
-
-            var statusBar = (IVsStatusbar)_projectNode.GetService(typeof(SVsStatusbar));
-            if (null != statusBar) {
-                statusBar.SetText(activity);
-            }
-        }
-
-        private void ForceUpdateStatusBarWithNpmActivitySafe(string activity) {
-            ProjectMgr.Site.GetUIThread().InvokeAsync(() => ForceUpdateStatusBarWithNpmActivity(activity))
-                .HandleAllExceptions(SR.ProductName)
-                .DoNotWait();
-        }
-
-        private void UpdateStatusBarWithNpmActivity(string activity) {
-            lock (_commandCountLock) {
-                if (_npmCommandsExecuting == 0) {
-                    return;
-                }
-            }
-
-            ForceUpdateStatusBarWithNpmActivitySafe(activity);
-        }
-
         private static string TrimLastNewline(string text) {
             if (string.IsNullOrEmpty(text)) {
                 return string.Empty;
@@ -300,8 +269,6 @@ namespace Microsoft.NodejsTools.Project {
             if (null != pane) {
                 pane.WriteLine(logText);
             }
-
-            UpdateStatusBarWithNpmActivity(logText);
 
 #if INTEGRATE_WITH_ERROR_LIST
             WriteNpmErrorsToErrorList(args);
@@ -339,19 +306,6 @@ namespace Microsoft.NodejsTools.Project {
                 }
             }
 
-            string message;
-            if (e.WithErrors) {
-                message = SR.GetString(
-                    e.Cancelled ? SR.NpmCancelledWithErrors : SR.NpmCompletedWithErrors,
-                    e.CommandText
-                );
-            } else if (e.Cancelled) {
-                message = SR.GetString(SR.NpmCancelled, e.CommandText);
-            } else {
-                message = SR.GetString(SR.NpmSuccessfullyCompleted, e.CommandText);
-            }
-
-            ForceUpdateStatusBarWithNpmActivitySafe(message);
 
             StopNpmIdleTimer();
             _npmIdleTimer = new Timer(
