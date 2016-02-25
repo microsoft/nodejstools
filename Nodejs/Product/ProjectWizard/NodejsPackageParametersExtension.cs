@@ -28,7 +28,7 @@ namespace Microsoft.NodejsTools.ProjectWizard {
         /// Normalize a project name to be a valid Npm package name.
         /// </summary>
         /// <param name="projectName">Name of a VS project.</param>
-        private string GetNpmSafeProjectName(string projectName) {
+        private static string NormalizeNpmPackageName(string projectName) {
             // Remove all leading url-invalid, underscore, and period characters
             var npmProjectNameTransform = Regex.Replace(projectName, "^[^a-zA-Z0-9-~]*", string.Empty);
 
@@ -43,7 +43,7 @@ namespace Microsoft.NodejsTools.ProjectWizard {
 
         public void RunStarted(object automationObject, Dictionary<string, string> replacementsDictionary, WizardRunKind runKind, object[] customParams) {
             var projectName = replacementsDictionary["$projectname$"];
-            replacementsDictionary.Add("$npmsafeprojectname$", GetNpmSafeProjectName(projectName));
+            replacementsDictionary.Add("$npmsafeprojectname$", NormalizeNpmPackageName(projectName));
         }
 
         public void ProjectFinishedGenerating(EnvDTE.Project project) {
