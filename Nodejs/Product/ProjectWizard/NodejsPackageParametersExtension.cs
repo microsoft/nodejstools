@@ -14,6 +14,7 @@
 //
 //*********************************************************//
 
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using EnvDTE;
@@ -21,16 +22,28 @@ using Microsoft.VisualStudio.TemplateWizard;
 
 namespace Microsoft.NodejsTools.ProjectWizard {
     class NodejsPackageParametersExtension : IWizard {
-        public void RunStarted(object automationObject, Dictionary<string, string> replacementsDictionary, WizardRunKind runKind, object[] customParams) {
-            var projectName = replacementsDictionary["$projectname$"];
+        private const int NpmPackageNameMaxLength = 214;
 
-            // Remove all leading url-invalid, underscore, and period characters from the string
+        /// <summary>
+        /// Normalize a project name to be a valid Npm package name.
+        /// </summary>
+        /// <param name="projectName">Name of a VS project.</param>
+        private string GetNpmSafeProjectName(string projectName) {
+            // Remove all leading url-invalid, underscore, and period characters
             var npmProjectNameTransform = Regex.Replace(projectName, "^[^a-zA-Z0-9-~]*", string.Empty);
 
             // Replace all invalid characters with a dash
             npmProjectNameTransform = Regex.Replace(npmProjectNameTransform, "[^a-zA-Z0-9-_~.]", "-");
 
-            replacementsDictionary.Add("$npmsafeprojectname$", npmProjectNameTransform);
+            // insert hypens between camelcased sections.
+            npmProjectNameTransform = Regex.Replace(npmProjectNameTransform, "([a-z0-9])([A-Z])", "$1-$2").ToLowerInvariant();
+
+            return npmProjectNameTransform.Substring(0, Math.Min(npmProjectNameTransform.Length, NpmPackageNameMaxLength));
+        }
+
+        public void RunStarted(object automationObject, Dictionary<string, string> replacementsDictionary, WizardRunKind runKind, object[] customParams) {
+            var projectName = replacementsDictionary["$projectname$"];
+            replacementsDictionary.Add("$npmsafeprojectname$", GetNpmSafeProjectName(projectName));
         }
 
         public void ProjectFinishedGenerating(EnvDTE.Project project) {
