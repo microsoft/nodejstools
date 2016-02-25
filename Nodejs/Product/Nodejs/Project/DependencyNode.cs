@@ -167,11 +167,13 @@ namespace Microsoft.NodejsTools.Project {
             if (cmdGroup == Guids.NodejsNpmCmdSet) {
                 switch (cmd) {
                     case PkgCmdId.cmdidNpmOpenModuleHomepage:
-                        using (var enumerator = this.Package.Homepages.GetEnumerator()) {
-                            if (enumerator.MoveNext() && !string.IsNullOrEmpty(enumerator.Current)) {
-                                result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
-                            } else {
-                                result = QueryStatusResult.SUPPORTED;
+                        if (this.Package.Homepages != null) {
+                            using (var enumerator = this.Package.Homepages.GetEnumerator()) {
+                                if (enumerator.MoveNext() && !string.IsNullOrEmpty(enumerator.Current)) {
+                                    result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
+                                } else {
+                                    result = QueryStatusResult.SUPPORTED;
+                                }
                             }
                         }
                         return VSConstants.S_OK;
@@ -225,9 +227,11 @@ namespace Microsoft.NodejsTools.Project {
             if (cmdGroup == Guids.NodejsNpmCmdSet) {
                 switch (cmd) {
                     case PkgCmdId.cmdidNpmOpenModuleHomepage:
-                        using (var enumerator = this.Package.Homepages.GetEnumerator()) {
-                            if (enumerator.MoveNext() && !string.IsNullOrEmpty(enumerator.Current)) {
-                                Process.Start(enumerator.Current);
+                        if (this.Package.Homepages != null) {
+                            using (var enumerator = this.Package.Homepages.GetEnumerator()) {
+                                if (enumerator.MoveNext() && !string.IsNullOrEmpty(enumerator.Current)) {
+                                    Process.Start(enumerator.Current);
+                                }
                             }
                         }
                         return VSConstants.S_OK;
