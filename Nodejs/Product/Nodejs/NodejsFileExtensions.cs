@@ -23,6 +23,10 @@ namespace Microsoft.NodejsTools {
             return IsFileType(file, NodejsConstants.JavaScriptExtension);
         }
 
+        public static bool IsTypeScriptFile(string file) {
+            return IsFileType(file, NodejsConstants.TypeScriptExtension);
+        }
+
         private static bool IsFileType(string file, string extension) {
             var ext = Path.GetExtension(file);
             return String.Equals(ext, extension, StringComparison.OrdinalIgnoreCase);

@@ -194,8 +194,7 @@ namespace Microsoft.NodejsTools.Project {
 
         protected override void FinishProjectCreation(string sourceFolder, string destFolder) {
             foreach (MSBuild.ProjectItem item in this.BuildProject.Items) {
-                if (String.Equals(Path.GetExtension(item.EvaluatedInclude), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
-
+                if (NodejsFileExtensions.IsTypeScriptFile(item.EvaluatedInclude)) {
                     // Create the 'typings' folder
                     var typingsFolder = Path.Combine(ProjectHome, "Scripts", "typings");
                     if (!Directory.Exists(typingsFolder)) {
@@ -232,7 +231,7 @@ namespace Microsoft.NodejsTools.Project {
         protected override void AddNewFileNodeToHierarchy(HierarchyNode parentNode, string fileName) {
             base.AddNewFileNodeToHierarchy(parentNode, fileName);
 
-            if (String.Equals(Path.GetExtension(fileName), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase) &&
+            if (NodejsFileExtensions.IsTypeScriptFile(fileName) &&
                 !String.Equals(GetProjectProperty(NodejsConstants.EnableTypeScript), "true", StringComparison.OrdinalIgnoreCase)) {
                 // enable type script on the project automatically...
                 SetProjectProperty(NodejsConstants.EnableTypeScript, "true");
@@ -258,7 +257,7 @@ namespace Microsoft.NodejsTools.Project {
                 return node.ItemNode.ItemTypeName;
             }
 
-            if (string.Equals(Path.GetExtension(filename), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
+            if (NodejsFileExtensions.IsTypeScriptFile(filename)) {
                 return NodejsConstants.TypeScriptCompileItemType;
             }
             return base.GetItemType(filename);
@@ -306,8 +305,7 @@ namespace Microsoft.NodejsTools.Project {
 
         public override CommonFileNode CreateCodeFileNode(ProjectElement item) {
             string fileName = item.Url;
-            if (!String.IsNullOrWhiteSpace(fileName)
-                && Path.GetExtension(fileName).Equals(NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
+            if (!String.IsNullOrWhiteSpace(fileName) && NodejsFileExtensions.IsTypeScriptFile(fileName)) {
                 return new NodejsTypeScriptFileNode(this, item);
             }
             var res = new NodejsFileNode(this, item);
@@ -384,9 +382,8 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override bool IsCodeFile(string fileName) {
-            var ext = Path.GetExtension(fileName);
             return NodejsFileExtensions.IsJavaScriptFile(fileName) ||
-                   ext.Equals(NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase);
+                NodejsFileExtensions.IsTypeScriptFile(fileName);
         }
 
         public override int InitializeForOuter(string filename, string location, string name, uint flags, ref Guid iid, out IntPtr projectPointer, out int canceled) {

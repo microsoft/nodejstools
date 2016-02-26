@@ -31,10 +31,6 @@ using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.TypeScript {
     internal static class TypeScriptHelpers {
-        internal static bool IsTypeScriptFile(string filename) {
-            return String.Equals(Path.GetExtension(filename), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase);
-        }
-
         internal static string GetTypeScriptBackedJavaScriptFile(MSBuild.Project project, string pathToFile) {
             var typeScriptOutDir = project.GetPropertyValue("TypeScriptOutDir");
             return GetTypeScriptBackedJavaScriptFile(project.DirectoryPath, typeScriptOutDir, pathToFile);
