@@ -217,7 +217,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
 #if INTEGRATE_WITH_ERROR_LIST
-         
+
         private ErrorListProvider _errorListProvider;
 
         private ErrorListProvider GetErrorListProvider() {
