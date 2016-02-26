@@ -244,9 +244,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         internal static bool IsNodejsFile(string strFileName) {
-            var ext = Path.GetExtension(strFileName);
-
-            return String.Equals(ext, NodejsConstants.JavaScriptExtension, StringComparison.OrdinalIgnoreCase);
+            return NodejsFileExtensions.IsNodejsFile(strFileName);
         }
 
         internal override string GetItemType(string filename) {
