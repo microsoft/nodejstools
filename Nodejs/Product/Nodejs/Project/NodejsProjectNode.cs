@@ -244,7 +244,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         internal static bool IsNodejsFile(string strFileName) {
-            return NodejsFileExtensions.IsNodejsFile(strFileName);
+            return NodejsFileExtensions.IsJavaScriptFile(strFileName);
         }
 
         internal override string GetItemType(string filename) {
@@ -385,7 +385,7 @@ namespace Microsoft.NodejsTools.Project {
 
         public override bool IsCodeFile(string fileName) {
             var ext = Path.GetExtension(fileName);
-            return ext.Equals(NodejsConstants.JavaScriptExtension, StringComparison.OrdinalIgnoreCase) ||
+            return NodejsFileExtensions.IsJavaScriptFile(fileName) ||
                    ext.Equals(NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase);
         }
 

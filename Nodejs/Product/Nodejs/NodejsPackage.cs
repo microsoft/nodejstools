@@ -431,9 +431,7 @@ namespace Microsoft.NodejsTools {
         }
 
         public override bool IsRecognizedFile(string filename) {
-            var ext = Path.GetExtension(filename);
-
-            return String.Equals(ext, NodejsConstants.JavaScriptExtension, StringComparison.OrdinalIgnoreCase);
+            return NodejsFileExtensions.IsJavaScriptFile(filename);
         }
 
         internal new object GetService(Type serviceType) {

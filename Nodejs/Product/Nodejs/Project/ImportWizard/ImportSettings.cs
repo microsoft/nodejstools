@@ -335,7 +335,7 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
             writer.WriteStartElement("ItemGroup");
             foreach (var file in EnumerateAllFiles(sourcePath, filters, excludeNodeModules)) {
                 var ext = Path.GetExtension(file);
-                if (NodejsConstants.JavaScriptExtension.Equals(ext, StringComparison.OrdinalIgnoreCase)) {
+                if (NodejsFileExtensions.IsJavaScriptFile(file)) {
                     writer.WriteStartElement("Compile");
                 } else if (NodejsConstants.TypeScriptExtension.Equals(ext, StringComparison.OrdinalIgnoreCase)) {
                     writer.WriteStartElement("TypeScriptCompile");

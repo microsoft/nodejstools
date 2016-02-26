@@ -175,7 +175,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                     //  at that point this function gets invoked again on the .ts file and we'll see the newly created .js file
                     return false;
                 }
-            } else if (!NodejsConstants.JavaScriptExtension.Equals(Path.GetExtension(pathToFile), StringComparison.OrdinalIgnoreCase)) {
+            } else if (!NodejsFileExtensions.IsJavaScriptFile(pathToFile)) {
                 return false;
             }
 
