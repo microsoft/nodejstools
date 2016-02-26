@@ -217,7 +217,6 @@ namespace Microsoft.NodejsTools.Project {
         }
 
 #if INTEGRATE_WITH_ERROR_LIST
-
         private ErrorListProvider _errorListProvider;
 
         private ErrorListProvider GetErrorListProvider() {
@@ -301,8 +300,6 @@ namespace Microsoft.NodejsTools.Project {
                 pane.WriteLine(logText);
             }
 
-            UpdateStatusBarWithNpmActivity(logText);
-
 #if INTEGRATE_WITH_ERROR_LIST
             WriteNpmErrorsToErrorList(args);
 #endif
@@ -339,24 +336,24 @@ namespace Microsoft.NodejsTools.Project {
                 }
             }
 
-            string message;
-            if (e.WithErrors) {
-                message = SR.GetString(
-                    e.Cancelled ? SR.NpmCancelledWithErrors : SR.NpmCompletedWithErrors,
-                    e.CommandText
-                );
-            } else if (e.Cancelled) {
-                message = SR.GetString(SR.NpmCancelled, e.CommandText);
-            } else {
-                message = SR.GetString(SR.NpmSuccessfullyCompleted, e.CommandText);
-            }
-
+            var message = GetStatusBarMessage(e);
             ForceUpdateStatusBarWithNpmActivitySafe(message);
 
             StopNpmIdleTimer();
             _npmIdleTimer = new Timer(
                 _ => ProjectMgr.Site.GetUIThread().Invoke(() => _projectNode.CheckForLongPaths(e.Arguments).HandleAllExceptions(SR.ProductName).DoNotWait()),
                 null, 1000, Timeout.Infinite);
+        }
+
+        private static string GetStatusBarMessage(NpmCommandCompletedEventArgs e) {
+            if (e.WithErrors) {
+                return SR.GetString(
+                    e.Cancelled ? SR.NpmCancelledWithErrors : SR.NpmCompletedWithErrors,
+                    e.CommandText);
+            } else if (e.Cancelled) {
+                return SR.GetString(SR.NpmCancelled, e.CommandText);
+            }
+            return SR.GetString(SR.NpmSuccessfullyCompleted, e.CommandText);
         }
 
         private void StopNpmIdleTimer() {
