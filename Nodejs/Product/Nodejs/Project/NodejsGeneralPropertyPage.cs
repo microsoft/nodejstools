@@ -58,6 +58,9 @@ namespace Microsoft.NodejsTools.Project {
             Project.SetProjectProperty(NodejsConstants.LaunchUrl, _control.LaunchUrl);
             Project.SetProjectProperty(NodejsConstants.DebuggerPort, _control.DebuggerPort);
             Project.SetProjectProperty(NodejsConstants.Environment, _control.Environment);
+            Project.SetProjectProperty(NodejsConstants.OverrideDefaultBrowser, _control.OverrideDefaultBrowser.ToString());
+            Project.SetProjectProperty(NodejsConstants.BrowserExecutable, _control.BrowserExecutable);
+            Project.SetProjectProperty(NodejsConstants.BrowserArguments, _control.BrowserArguments);
             IsDirty = false;
         }
 
@@ -73,6 +76,8 @@ namespace Microsoft.NodejsTools.Project {
                 _control.NodejsPort = Project.GetUnevaluatedProperty(NodejsConstants.NodejsPort);
                 _control.DebuggerPort = Project.GetUnevaluatedProperty(NodejsConstants.DebuggerPort);
                 _control.Environment = Project.GetUnevaluatedProperty(NodejsConstants.Environment);
+                _control.BrowserExecutable = Project.GetUnevaluatedProperty(NodejsConstants.BrowserExecutable);
+                _control.BrowserArguments = Project.GetUnevaluatedProperty(NodejsConstants.BrowserArguments);
                 
                 // Attempt to parse the boolean.  If we fail, assume it is true.
                 bool startWebBrowser;
@@ -80,6 +85,12 @@ namespace Microsoft.NodejsTools.Project {
                     startWebBrowser = true;
                 }
                 _control.StartWebBrowser = startWebBrowser;
+
+                bool overrideDefaultBrowser;
+                if (!Boolean.TryParse(Project.GetUnevaluatedProperty(NodejsConstants.OverrideDefaultBrowser), out overrideDefaultBrowser)) {
+                    overrideDefaultBrowser = false;
+                }
+                _control.OverrideDefaultBrowser = overrideDefaultBrowser;
             } finally {
                 Loading = false;
             }

@@ -37,6 +37,9 @@ namespace Microsoft.NodejsTools {
         internal const string ProjectFileFilter = "Node.js Project File (*.njsproj)\n*.njsproj\nAll Files (*.*)\n*.*\n";
         internal const string ScriptArguments = "ScriptArguments";
         internal const string StartWebBrowser = "StartWebBrowser";
+        internal const string OverrideDefaultBrowser = "OverrideDefaultBrowser";
+        internal const string BrowserExecutable = "BrowserExecutable";
+        internal const string BrowserArguments = "BrowserArguments";
 
         internal const string NodeModulesFolder = "node_modules";
         internal const string NodeModulesStagingFolder = "node_modules\\.staging\\";
