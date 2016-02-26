@@ -217,7 +217,6 @@ namespace Microsoft.NodejsTools.Project {
         }
 
 #if INTEGRATE_WITH_ERROR_LIST
-
         private ErrorListProvider _errorListProvider;
 
         private ErrorListProvider GetErrorListProvider() {
@@ -351,8 +350,7 @@ namespace Microsoft.NodejsTools.Project {
                 return SR.GetString(
                     e.Cancelled ? SR.NpmCancelledWithErrors : SR.NpmCompletedWithErrors,
                     e.CommandText);
-            }
-            if (e.Cancelled) {
+            } else if (e.Cancelled) {
                 return SR.GetString(SR.NpmCancelled, e.CommandText);
             }
             return SR.GetString(SR.NpmSuccessfullyCompleted, e.CommandText);
