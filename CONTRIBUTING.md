@@ -26,7 +26,7 @@ In order to help us improve code quality and make NTVS better in general, here a
     - Feel free to ask for advice if you are unsure how what to test or how to integrate into our test infrastructure.
 - There is no formal code style-guide, but please try to match the style of any file you are editing.
 
-All pull requests are reviewed by one of the project maintainers before being merged in  If you are unsure of anything, feel free to ask them question. We're always happy to help.
+All pull requests are reviewed by one of the project maintainers before being merged in. If you are unsure of anything, feel free to ask a question. We're always happy to help.
 
 ### Licensing and Legal
 Node.js Tools for Visual Studio is a member of [Microsoft](http://microsoft.github.io/) and operates under the [Apache 2.0 license](https://github.com/Microsoft/nodejstools/blob/master/LICENSE). 
