@@ -13,20 +13,20 @@ When creating new issues in the issue tracker, please follow these guidelines:
 
 
 ## Submitting a Pull Request
-All pull requests are reviewed by one of the project maintainers before being merged in. Here are some guidelines that to help the process go as quickly as possible:
+In order to help us improve code quality and make NTVS better in general, here are some simple guidelines for pull requests:
 
 - Clearly state what the pull request accomplishes.
     - If it's a bug fix, what was the bug and how has it been fixed?
-    - If you're adding a new feature, what is it and what does it do for users?
-- Provide a high level explanation of the code changes. This will help reviewers understand your implementation choices and will speed up the review process.
-    - Please try to keep pull requests small and focused.
+    - If you're adding a new feature, explain the feature and its use cases.
+- Provide a high level explanation of your changes. This will help reviewers understand implementation choices and will speed up the review process.
+    - Try to keep pull requests small and focused.
 - Make sure that existing tests continue to pass.
 - All new code must include tests.
     - For a bug fix, consider adding a test that would fail before your change, but passes now.
     - Feel free to ask for advice if you are unsure how what to test or how to integrate into our test infrastructure.
 - There is no formal code style-guide, but please try to match the style of any file you are editing.
 
-If you are unsure of anything, feel free to ask a question. We're always happy to help.
+All pull requests are reviewed by one of the project maintainers before being merged in  If you are unsure of anything, feel free to ask them question. We're always happy to help.
 
 ### Licensing and Legal
 Node.js Tools for Visual Studio is a member of [Microsoft](http://microsoft.github.io/) and operates under the [Apache 2.0 license](https://github.com/Microsoft/nodejstools/blob/master/LICENSE). 
