@@ -43,6 +43,7 @@ namespace NodejsTests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestNumber() {
             using (var eval = ProjectlessEvaluator()) {
@@ -58,6 +59,7 @@ namespace NodejsTests {
             return new NodejsReplEvaluator(TestNodejsReplSite.Instance);
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestRequire() {
             using (var eval = ProjectlessEvaluator()) {
@@ -69,6 +71,7 @@ namespace NodejsTests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestFunctionDefinition() {
             var whitespaces = new[] { "", "\r\n", "   ", "\r\n    " };
@@ -89,6 +92,7 @@ namespace NodejsTests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestConsoleLog() {
             using (var eval = ProjectlessEvaluator()) {
@@ -100,6 +104,7 @@ namespace NodejsTests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestConsoleWarn() {
             using (var eval = ProjectlessEvaluator()) {
@@ -111,6 +116,7 @@ namespace NodejsTests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestConsoleError() {
             using (var eval = ProjectlessEvaluator()) {
@@ -185,6 +191,7 @@ undefined";
         }
 
         // 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void LargeOutput() {
             using (var eval = ProjectlessEvaluator()) {
@@ -201,6 +208,7 @@ undefined";
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestException() {
             using (var eval = ProjectlessEvaluator()) {
@@ -214,6 +222,7 @@ undefined";
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestExceptionNull() {
             using (var eval = ProjectlessEvaluator()) {
@@ -227,6 +236,7 @@ undefined";
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestExceptionUndefined() {
             using (var eval = ProjectlessEvaluator()) {
@@ -240,6 +250,7 @@ undefined";
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestProcessExit() {
             using (var eval = ProjectlessEvaluator()) {
@@ -258,6 +269,7 @@ undefined";
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestReset() {
             using (var eval = ProjectlessEvaluator()) {
@@ -285,6 +297,7 @@ undefined";
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestSaveNoFile() {
             using (var eval = ProjectlessEvaluator()) {
@@ -303,6 +316,7 @@ undefined";
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestSaveBadFile() {
             using (var eval = ProjectlessEvaluator()) {
@@ -321,6 +335,7 @@ undefined";
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestSave() {
             using (var eval = ProjectlessEvaluator()) {
@@ -347,6 +362,7 @@ undefined";
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestBadSave() {
             using (var eval = ProjectlessEvaluator()) {
@@ -365,6 +381,7 @@ undefined";
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void ReplEvaluatorProvider() {
             var provider = new NodejsReplEvaluatorProvider();
@@ -415,6 +432,7 @@ undefined";
                                                     "var net = require('net'),\r\n      repl = require('repl');",
                                                   };
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestPartialInputs() {
             using (var eval = ProjectlessEvaluator()) {
@@ -427,6 +445,7 @@ undefined";
             }
         }
 
+        [Ignore]
         [Ignore]
         [TestMethod, Priority(0)]
         public void TestVarI() {
@@ -447,6 +466,7 @@ undefined";
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestObjectLiteral() {
             using (var eval = ProjectlessEvaluator()) {
@@ -461,6 +481,7 @@ undefined";
         /// <summary>
         /// https://nodejstools.codeplex.com/workitem/279
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0)]
         public void TestRequireInProject() {
             string testDir;
@@ -516,6 +537,7 @@ undefined";
             }
         }
 
+        [Ignore]
         [Ignore]
         [TestMethod, Priority(0)]
         public void TestNpmReplRedirector() {
