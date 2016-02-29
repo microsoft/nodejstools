@@ -28,22 +28,25 @@ using Microsoft.VisualStudioTools.Project;
 using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
 
 namespace Microsoft.NodejsTools.Project {
-    internal class DependencyNode : HierarchyNode {
+    internal interface IDependencyNodeBasePath {
+        string GetRelativeUrlFragment();
+    }
+
+    internal class DependencyNode : HierarchyNode, IDependencyNodeBasePath {
         private readonly NodejsProjectNode _projectNode;
-        private readonly DependencyNode _parent;
+        private readonly IDependencyNodeBasePath _parent;
         private readonly string _displayString;
 
         public DependencyNode(
             NodejsProjectNode root,
-            DependencyNode parent,
+            IDependencyNodeBasePath parent,
             IPackage package)
             : base(root) {
             _projectNode = root;
             _parent = parent;
             Package = package;
 
-            var buff = GetInitialPackageDisplayString(package);
-            _displayString = buff.ToString();
+            _displayString = GetInitialPackageDisplayString(package);
             ExcludeNodeFromScc = true;
         }
 
@@ -63,7 +66,7 @@ namespace Microsoft.NodejsTools.Project {
 
         #region HierarchyNode implementation
 
-        private string GetRelativeUrlFragment() {
+        public string GetRelativeUrlFragment() {
             var buff = new StringBuilder();
             if (null != _parent) {
                 buff.Append(_parent.GetRelativeUrlFragment());
@@ -251,7 +254,7 @@ namespace Microsoft.NodejsTools.Project {
 
         #endregion
 
-        private static StringBuilder GetInitialPackageDisplayString(IPackage package) {
+        private static string GetInitialPackageDisplayString(IPackage package) {
             var buff = new StringBuilder(package.Name);
             if (package.IsMissing) {
                 buff.Append(" (missing)");
@@ -274,7 +277,7 @@ namespace Microsoft.NodejsTools.Project {
             if (package.IsBundledDependency) {
                 buff.Append("[bundled]");
             }
-            return buff;
+            return buff.ToString();
         }
 
         private static List<string> GetDependencyTypeNames(IPackage package) {

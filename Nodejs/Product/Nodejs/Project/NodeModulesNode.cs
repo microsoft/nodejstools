@@ -66,7 +66,8 @@ namespace Microsoft.NodejsTools.Project {
 
         public NodeModulesNode(NodejsProjectNode root)
             : base(root) {
-            CreateNpmController();
+            _npmController = DefaultNpmController(_projectNode.ProjectHome, new NpmPathProvider(this));
+            RegistryWithNpmController(_npmController);
 
             _globalModulesNode = new GlobalModulesNode(root, this);
             AddChild(_globalModulesNode);
@@ -130,20 +131,20 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private INpmController CreateNpmController() {
-            if (null == _npmController) {
-                _npmController = NpmControllerFactory.Create(
-                    _projectNode.ProjectHome,
-                    NodejsPackage.Instance.NpmOptionsPage.NpmCachePath,
-                    false,
-                    new NpmPathProvider(this));
-                _npmController.CommandStarted += NpmController_CommandStarted;
-                _npmController.OutputLogged += NpmController_OutputLogged;
-                _npmController.ErrorLogged += NpmController_ErrorLogged;
-                _npmController.ExceptionLogged += NpmController_ExceptionLogged;
-                _npmController.CommandCompleted += NpmController_CommandCompleted;
-            }
-            return _npmController;
+        private static INpmController DefaultNpmController(string projectHome, NpmPathProvider pathProvider) {
+            return NpmControllerFactory.Create(
+                   projectHome,
+                   NodejsPackage.Instance.NpmOptionsPage.NpmCachePath,
+                   false,
+                   pathProvider);
+        }
+
+        private void RegistryWithNpmController(INpmController controller) {
+            controller.CommandStarted += NpmController_CommandStarted;
+            controller.OutputLogged += NpmController_OutputLogged;
+            controller.ErrorLogged += NpmController_ErrorLogged;
+            controller.ExceptionLogged += NpmController_ExceptionLogged;
+            controller.CommandCompleted += NpmController_CommandCompleted;
         }
 
         void NpmController_FinishedRefresh(object sender, EventArgs e) {
