@@ -42,39 +42,7 @@ namespace Microsoft.NodejsTools.Project {
             _parent = parent;
             Package = package;
 
-            var buff = new StringBuilder(package.Name);
-            if (package.IsMissing) {
-                buff.Append(" (missing)");
-            } else {
-                buff.Append('@');
-                buff.Append(package.Version);
-
-                if (!package.IsListedInParentPackageJson) {
-                    buff.AppendFormat(" (not listed in {0})", NodejsConstants.PackageJsonFile);
-                } else {
-                    List<string> dependencyTypes = new List<string>(3);
-                    if (package.IsDependency) {
-                        dependencyTypes.Add("standard");
-                    }
-                    if (package.IsDevDependency) {
-                        dependencyTypes.Add("dev");
-                    }
-                    if (package.IsOptionalDependency) {
-                        dependencyTypes.Add("optional");
-                    }
-
-                    if (package.IsDevDependency || package.IsOptionalDependency) {
-                        buff.Append(" (");
-                        buff.Append(string.Join(", ", dependencyTypes.ToArray()));
-                        buff.Append(")");
-                    }
-                }
-            }
-
-            if (package.IsBundledDependency) {
-                buff.Append("[bundled]");
-            }
-
+            var buff = GetInitialPackageDisplayString(package);
             _displayString = buff.ToString();
             ExcludeNodeFromScc = true;
         }
@@ -281,6 +249,46 @@ namespace Microsoft.NodejsTools.Project {
             return base.ExecCommandOnNode(cmdGroup, cmd, nCmdexecopt, pvaIn, pvaOut);
         }
 
-#endregion
+        #endregion
+
+        private static StringBuilder GetInitialPackageDisplayString(IPackage package) {
+            var buff = new StringBuilder(package.Name);
+            if (package.IsMissing) {
+                buff.Append(" (missing)");
+            } else {
+                buff.Append('@');
+                buff.Append(package.Version);
+
+                if (!package.IsListedInParentPackageJson) {
+                    buff.AppendFormat(" (not listed in {0})", NodejsConstants.PackageJsonFile);
+                } else {
+                    var dependencyTypes = GetDependencyTypeNames(package);
+                    if (package.IsDevDependency || package.IsOptionalDependency) {
+                        buff.Append(" (");
+                        buff.Append(string.Join(", ", dependencyTypes.ToArray()));
+                        buff.Append(")");
+                    }
+                }
+            }
+
+            if (package.IsBundledDependency) {
+                buff.Append("[bundled]");
+            }
+            return buff;
+        }
+
+        private static List<string> GetDependencyTypeNames(IPackage package) {
+            var dependencyTypes = new List<string>(3);
+            if (package.IsDependency) {
+                dependencyTypes.Add("standard");
+            }
+            if (package.IsDevDependency) {
+                dependencyTypes.Add("dev");
+            }
+            if (package.IsOptionalDependency) {
+                dependencyTypes.Add("optional");
+            }
+            return dependencyTypes;
+        }
     }
 }
