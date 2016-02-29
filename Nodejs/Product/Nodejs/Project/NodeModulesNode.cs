@@ -379,33 +379,31 @@ namespace Microsoft.NodejsTools.Project {
             }
 
             var controller = _npmController;
-            if (null != controller) {
-                if (null != RootPackage) {
-                    var dev = controller.RootPackage.Modules.Where(package => package.IsDevDependency);
-                    _devModulesNode.Packages = dev;
-                    ReloadHierarchy(_devModulesNode, dev);
+            if (null == controller)
+                return;
 
-                    var optional = controller.RootPackage.Modules.Where(package => package.IsOptionalDependency);
-                    _optionalModulesNode.Packages = optional;
-                    ReloadHierarchy(_optionalModulesNode, optional);
+            if (null != RootPackage) {
+                var dev = GetDevPackages(controller);
+                _devModulesNode.Packages = dev;
+                ReloadHierarchy(_devModulesNode, dev);
 
-                    var root = controller.RootPackage.Modules.Where(package => 
-                        package.IsDependency || 
-                        !package.IsListedInParentPackageJson);
-                    
-                    ReloadHierarchy(this, root);
-                }
+                var optional = GetOptionalPackages(controller);
+                _optionalModulesNode.Packages = optional;
+                ReloadHierarchy(_optionalModulesNode, optional);
 
-                var global = controller.GlobalPackages;
-                if (null != global) {
-                    _globalModulesNode.GlobalPackages = global;
-                    ReloadHierarchy(_globalModulesNode, global.Modules);
-                }
+                var root = GetRootPackages(controller);
+                ReloadHierarchy(this, root);
+            }
 
-                if (_firstHierarchyLoad) {
-                    controller.FinishedRefresh += NpmController_FinishedRefresh;
-                    _firstHierarchyLoad = false;
-                }
+            var global = controller.GlobalPackages;
+            if (null != global) {
+                _globalModulesNode.GlobalPackages = global;
+                ReloadHierarchy(_globalModulesNode, global.Modules);
+            }
+
+            if (_firstHierarchyLoad) {
+                controller.FinishedRefresh += NpmController_FinishedRefresh;
+                _firstHierarchyLoad = false;
             }
         }
 
@@ -685,6 +683,20 @@ namespace Microsoft.NodejsTools.Project {
 
         public override void ManageNpmModules() {
             ManageModules();
+        }
+
+        private static IEnumerable<IPackage> GetDevPackages(INpmController controller) {
+            return controller.RootPackage.Modules.Where(package => package.IsDevDependency);
+        }
+
+        private static IEnumerable<IPackage> GetOptionalPackages(INpmController controller) {
+            return controller.RootPackage.Modules.Where(package => package.IsOptionalDependency);
+        }
+
+        private static IEnumerable<IPackage> GetRootPackages(INpmController controller) {
+            return controller.RootPackage.Modules.Where(package =>
+                package.IsDependency ||
+                !package.IsListedInParentPackageJson);
         }
     }
 }
