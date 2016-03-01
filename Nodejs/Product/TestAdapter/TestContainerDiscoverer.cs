@@ -168,14 +168,14 @@ namespace Microsoft.NodejsTools.TestAdapter {
             //Check to see if we are dealing with a TypeScript file
             //  If we are then switch the test container to the underlying js file
             //
-            if (NodejsFileExtensions.IsTypeScriptFile(pathToFile)) {
+            if (NodejsFileTypeHelpers.IsTypeScriptFile(pathToFile)) {
                 string jsFile = TypeScriptHelpers.GetTypeScriptBackedJavaScriptFile(project, pathToFile);
                 if (!File.Exists(jsFile)) {
                     //Ignore the file for now.  On the next build event the typescript compiler will generate the file
                     //  at that point this function gets invoked again on the .ts file and we'll see the newly created .js file
                     return false;
                 }
-            } else if (!NodejsFileExtensions.IsJavaScriptFile(pathToFile)) {
+            } else if (!NodejsFileTypeHelpers.IsJavaScriptFile(pathToFile)) {
                 return false;
             }
 

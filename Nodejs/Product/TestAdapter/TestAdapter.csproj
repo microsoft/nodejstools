@@ -148,6 +148,9 @@
     <Compile Include="..\Nodejs\NodejsFileExtensions.cs">
       <Link>NodejsFileExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\Nodejs\NodejsFileTypeHelpers.cs">
+      <Link>NodejsFileTypeHelpers.cs</Link>
+    </Compile>
     <Compile Include="..\Nodejs\TestFrameworks\TestFrameworkDirectories.cs">
       <Link>TestFrameworks\TestFrameworkDirectories.cs</Link>
     </Compile>

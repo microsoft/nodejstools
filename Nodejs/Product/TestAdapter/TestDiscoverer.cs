@@ -72,7 +72,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                                 continue;
                             }
                             string fileAbsolutePath = CommonUtils.GetAbsoluteFilePath(projectHome, item.EvaluatedInclude);
-                            bool typeScriptTest = NodejsFileExtensions.IsTypeScriptFile(fileAbsolutePath);
+                            bool typeScriptTest = NodejsFileTypeHelpers.IsTypeScriptFile(fileAbsolutePath);
                             if(typeScriptTest){
                                 fileAbsolutePath = TypeScript.TypeScriptHelpers.GetTypeScriptBackedJavaScriptFile(proj,fileAbsolutePath);
                             } else if (!Path.GetExtension(fileAbsolutePath).Equals(".js", StringComparison.OrdinalIgnoreCase)) {

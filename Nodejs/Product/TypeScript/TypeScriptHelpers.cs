@@ -49,7 +49,7 @@ namespace Microsoft.NodejsTools.TypeScript {
         }
 
         private static string GetTypeScriptBackedJavaScriptFile(string projectHome, string typeScriptOutDir, string pathToFile) {
-            string jsFilePath = Path.ChangeExtension(pathToFile, NodejsConstants.JavaScriptExtension);
+            string jsFilePath = Path.ChangeExtension(pathToFile, NodejsFileTypeHelpers.JavaScriptExtension);
 
             if (String.IsNullOrEmpty(typeScriptOutDir)) {
                 //No setting for OutDir

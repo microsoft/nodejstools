@@ -121,7 +121,7 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
                 Task.Factory.StartNew(() => {
                     var files = Directory.EnumerateFiles(sourcePath, "*.js", SearchOption.TopDirectoryOnly);
 
-                    if (filters.Split(';').Any(NodejsFileExtensions.IsTypeScriptFile)) {
+                    if (filters.Split(';').Any(NodejsFileTypeHelpers.IsTypeScriptFile)) {
                         files = Directory.EnumerateFiles(
                             sourcePath, 
                             "*.ts", 
@@ -287,7 +287,7 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
             writer.WriteElementString("OutputPath", ".");
             writer.WriteElementString("ProjectTypeGuids", "{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}");
             bool typeScriptSupport = EnumerateAllFiles(sourcePath, filters, excludeNodeModules)
-                .Any(NodejsFileExtensions.IsTypeScriptFile);
+                .Any(NodejsFileTypeHelpers.IsTypeScriptFile);
 
             if (typeScriptSupport) {
                 writer.WriteElementString("TypeScriptSourceMap", "true");
@@ -334,9 +334,9 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
 
             writer.WriteStartElement("ItemGroup");
             foreach (var file in EnumerateAllFiles(sourcePath, filters, excludeNodeModules)) {
-                if (NodejsFileExtensions.IsJavaScriptFile(file)) {
+                if (NodejsFileTypeHelpers.IsJavaScriptFile(file)) {
                     writer.WriteStartElement("Compile");
-                } else if (NodejsFileExtensions.IsTypeScriptFile(file)) {
+                } else if (NodejsFileTypeHelpers.IsTypeScriptFile(file)) {
                     writer.WriteStartElement("TypeScriptCompile");
                 } else {
                     writer.WriteStartElement("Content");

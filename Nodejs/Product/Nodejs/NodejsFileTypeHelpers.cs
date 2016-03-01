@@ -18,18 +18,21 @@ using System;
 using System.IO;
 
 namespace Microsoft.NodejsTools {
-    static class NodejsFileExtensions {
+    static class NodejsFileTypeHelpers {
+        internal const string JavaScriptExtension = ".js";
+        internal const string TypeScriptExtension = ".ts";
+
         public static bool IsJavaScriptFile(string file) {
-            return IsFileType(file, NodejsConstants.JavaScriptExtension);
+            return DoesFileHaveExtension(file, JavaScriptExtension);
         }
 
         public static bool IsTypeScriptFile(string file) {
-            return IsFileType(file, NodejsConstants.TypeScriptExtension);
+            return DoesFileHaveExtension(file, TypeScriptExtension);
         }
 
-        private static bool IsFileType(string file, string extension) {
+        private static bool DoesFileHaveExtension(string file, string extension) {
             var ext = Path.GetExtension(file);
-            return String.Equals(ext, extension, StringComparison.OrdinalIgnoreCase);
+            return string.Equals(ext, extension, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

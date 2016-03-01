@@ -1230,7 +1230,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             }
 
             // For .ts files, we need to build the project to regenerate .js code.
-            if (NodejsFileExtensions.IsTypeScriptFile(module.FileName)) {
+            if (NodejsFileTypeHelpers.IsTypeScriptFile(module.FileName)) {
                 if (document.ProjectItem.ContainingProject.GetNodeProject().Build(null, null) != MSBuildResult.Successful) {
                     var statusBar = (IVsStatusbar)ServiceProvider.GlobalProvider.GetService(typeof(SVsStatusbar));
                     statusBar.SetText(SR.GetString(SR.DebuggerModuleUpdateFailed));
@@ -1249,7 +1249,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         #endregion
 
         internal static void MapLanguageInfo(string filename, out string pbstrLanguage, out Guid pguidLanguage) {
-            if (NodejsFileExtensions.IsTypeScriptFile(filename)) {
+            if (NodejsFileTypeHelpers.IsTypeScriptFile(filename)) {
                 pbstrLanguage = NodejsConstants.TypeScript;
                 pguidLanguage = Guids.TypeScriptDebugLanguage;
             } else {

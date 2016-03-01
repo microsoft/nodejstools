@@ -16,8 +16,6 @@
 
 namespace Microsoft.NodejsTools {
     internal class NodejsConstants {
-        internal const string JavaScriptExtension = ".js";
-        internal const string TypeScriptExtension = ".ts";
         internal const string MapExtension = ".map";
         internal const string NodejsProjectExtension = ".njsproj";
 

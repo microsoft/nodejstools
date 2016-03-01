@@ -215,13 +215,13 @@ namespace Microsoft.NodejsTools.SourceMapping {
                     extension = String.Empty;
                 }
 
-                if (!string.Equals(extension, NodejsConstants.JavaScriptExtension, StringComparison.OrdinalIgnoreCase)) {
+                if (!string.Equals(extension, NodejsFileTypeHelpers.JavaScriptExtension, StringComparison.OrdinalIgnoreCase)) {
                     string baseFile = fileName.Substring(0, fileName.Length - extension.Length);
-                    string jsFile = baseFile + NodejsConstants.JavaScriptExtension;
+                    string jsFile = baseFile + NodejsFileTypeHelpers.JavaScriptExtension;
                     if (File.Exists(jsFile) && File.Exists(jsFile + NodejsConstants.MapExtension)) {
                         // we're using source maps...
                         try {
-                            using (StreamReader reader = new StreamReader(baseFile + NodejsConstants.JavaScriptExtension + NodejsConstants.MapExtension)) {
+                            using (StreamReader reader = new StreamReader(baseFile + NodejsFileTypeHelpers.JavaScriptExtension + NodejsConstants.MapExtension)) {
                                 _generatedFileToSourceMap[fileName] = sourceMap = new ReverseSourceMap(
                                     new SourceMap(reader),
                                     jsFile

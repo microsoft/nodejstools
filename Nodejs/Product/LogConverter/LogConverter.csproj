@@ -81,6 +81,9 @@
     <Compile Include="..\..\..\Common\Product\SharedProject\CommonUtils.cs">
       <Link>SourceMapping\CommonUtils.cs</Link>
     </Compile>
+    <Compile Include="..\Nodejs\NodejsFileTypeHelpers.cs">
+      <Link>NodejsFileTypeHelpers.cs</Link>
+    </Compile>
     <Compile Include="EtlNativeMethods.cs" />
     <Compile Include="LogParsing\ITraceEvent.cs" />
     <Compile Include="LogParsing\ITraceEventCallback.cs" />

@@ -341,7 +341,7 @@ namespace Microsoft.NodejsTools.Project {
                 throw new ApplicationException("Please select a startup file to launch by right-clicking the file in Solution Explorer and selecting 'Set as Node.js Startup File' or by modifying your configuration in project properties.");
             }
 
-            if (NodejsFileExtensions.IsTypeScriptFile(startupFile)) {
+            if (NodejsFileTypeHelpers.IsTypeScriptFile(startupFile)) {
                 startupFile = TypeScriptHelpers.GetTypeScriptBackedJavaScriptFile(_project, startupFile);
             }
             return startupFile;
