@@ -493,6 +493,7 @@ undefined";
             }
         }
 
+        [Ignore]
         // https://nodejstools.codeplex.com/workitem/1575
         [TestMethod, Priority(0), Timeout(180000)]
         public async Task TestNpmReplCommandProcessExitSucceeds() {
