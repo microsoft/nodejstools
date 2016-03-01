@@ -385,24 +385,10 @@ namespace Microsoft.NodejsTools.Project {
             if (null == controller)
                 return;
 
-            if (null != RootPackage) {
-                var dev = GetDevPackages(controller);
-                _devModulesNode.Packages = dev;
-                ReloadHierarchy(_devModulesNode, dev);
-
-                var optional = GetOptionalPackages(controller);
-                _optionalModulesNode.Packages = optional;
-                ReloadHierarchy(_optionalModulesNode, optional);
-
-                var root = GetRootPackages(controller);
-                ReloadHierarchy(this, root);
-            }
-
-            var global = controller.GlobalPackages;
-            if (null != global) {
-                _globalModulesNode.GlobalPackages = global;
-                ReloadHierarchy(_globalModulesNode, global.Modules);
-            }
+            ReloadDevPackageHierarchy(controller);
+            ReloadOptionalPackageHierarchy(controller);
+            ReloadRootPackageHierarchy(controller);
+            ReloadGlobalPackageHierarchy(controller);
 
             if (_firstHierarchyLoad) {
                 controller.FinishedRefresh += NpmController_FinishedRefresh;
@@ -410,7 +396,32 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-#endregion
+        private void ReloadGlobalPackageHierarchy(INpmController controller) {
+            var global = controller.GlobalPackages;
+            if (null != global) {
+                _globalModulesNode.GlobalPackages = global;
+                ReloadHierarchy(_globalModulesNode, global.Modules);
+            }
+        }
+
+        private void ReloadRootPackageHierarchy(INpmController controller) {
+            var root = GetRootPackages(controller);
+            ReloadHierarchy(this, root);
+        }
+
+        private void ReloadOptionalPackageHierarchy(INpmController controller) {
+            var optional = GetOptionalPackages(controller);
+            _optionalModulesNode.Packages = optional;
+            ReloadHierarchy(_optionalModulesNode, optional);
+        }
+
+        private void ReloadDevPackageHierarchy(INpmController controller) {
+            var dev = GetDevPackages(controller);
+            _devModulesNode.Packages = dev;
+            ReloadHierarchy(_devModulesNode, dev);
+        }
+
+        #endregion
 
 #region HierarchyNode implementation
 
@@ -689,14 +700,20 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private static IEnumerable<IPackage> GetDevPackages(INpmController controller) {
+            if (controller == null || controller.RootPackage == null)
+                return Enumerable.Empty<IPackage>();
             return controller.RootPackage.Modules.Where(package => package.IsDevDependency);
         }
 
         private static IEnumerable<IPackage> GetOptionalPackages(INpmController controller) {
+            if (controller == null || controller.RootPackage == null)
+                return Enumerable.Empty<IPackage>();
             return controller.RootPackage.Modules.Where(package => package.IsOptionalDependency);
         }
 
         private static IEnumerable<IPackage> GetRootPackages(INpmController controller) {
+            if (controller == null || controller.RootPackage == null)
+                return Enumerable.Empty<IPackage>();
             return controller.RootPackage.Modules.Where(package =>
                 package.IsDependency ||
                 !package.IsListedInParentPackageJson);
