@@ -62,12 +62,18 @@ namespace Microsoft.NodejsTools.Project {
 
         #endregion
 
+        #region
+
+        public event EventHandler<IEnumerable<IPackage>> PackagesAdded;
+
+        #endregion
+
         #region Initialization
 
         public NodeModulesNode(NodejsProjectNode root)
             : base(root) {
             _npmController = DefaultNpmController(_projectNode.ProjectHome, new NpmPathProvider(this));
-            RegistryWithNpmController(_npmController);
+            RegisterWithNpmController(_npmController);
 
             _globalModulesNode = new GlobalModulesNode(root, this);
             AddChild(_globalModulesNode);
@@ -139,7 +145,7 @@ namespace Microsoft.NodejsTools.Project {
                 pathProvider);
         }
 
-        private void RegistryWithNpmController(INpmController controller) {
+        private void RegisterWithNpmController(INpmController controller) {
             controller.CommandStarted += NpmController_CommandStarted;
             controller.OutputLogged += NpmController_OutputLogged;
             controller.ErrorLogged += NpmController_ErrorLogged;
@@ -387,6 +393,12 @@ namespace Microsoft.NodejsTools.Project {
             if (_firstHierarchyLoad) {
                 controller.FinishedRefresh += NpmController_FinishedRefresh;
                 _firstHierarchyLoad = false;
+            }
+
+            if (newPackages.Any()) {
+                var handler = PackagesAdded;
+                if (handler != null)
+                    handler(this, newPackages);
             }
         }
 
