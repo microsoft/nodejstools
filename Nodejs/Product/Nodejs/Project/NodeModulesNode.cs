@@ -133,10 +133,10 @@ namespace Microsoft.NodejsTools.Project {
 
         private static INpmController DefaultNpmController(string projectHome, NpmPathProvider pathProvider) {
             return NpmControllerFactory.Create(
-                   projectHome,
-                   NodejsPackage.Instance.NpmOptionsPage.NpmCachePath,
-                   false,
-                   pathProvider);
+                projectHome,
+                NodejsPackage.Instance.NpmOptionsPage.NpmCachePath,
+                false,
+                pathProvider);
         }
 
         private void RegistryWithNpmController(INpmController controller) {
@@ -385,10 +385,7 @@ namespace Microsoft.NodejsTools.Project {
             if (null == controller)
                 return;
 
-            ReloadDevPackageHierarchy(controller);
-            ReloadOptionalPackageHierarchy(controller);
-            ReloadRootPackageHierarchy(controller);
-            ReloadGlobalPackageHierarchy(controller);
+            var newPackages = ReloadPackageHierarchies(controller);
 
             if (_firstHierarchyLoad) {
                 controller.FinishedRefresh += NpmController_FinishedRefresh;
@@ -396,29 +393,38 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private void ReloadGlobalPackageHierarchy(INpmController controller) {
+        private IEnumerable<IPackage> ReloadPackageHierarchies(INpmController controller) {
+            return Enumerable.Empty<IPackage>()
+                .Concat(ReloadDevPackageHierarchy(controller))
+                .Concat(ReloadOptionalPackageHierarchy(controller))
+                .Concat(ReloadRootPackageHierarchy(controller))
+                .Concat(ReloadGlobalPackageHierarchy(controller));
+        }
+
+        private IEnumerable<IPackage> ReloadGlobalPackageHierarchy(INpmController controller) {
             var global = controller.GlobalPackages;
             if (null != global) {
                 _globalModulesNode.GlobalPackages = global;
-                ReloadHierarchy(_globalModulesNode, global.Modules);
+                return ReloadHierarchy(_globalModulesNode, global.Modules);
             }
+            return Enumerable.Empty<IPackage>();
         }
 
-        private void ReloadRootPackageHierarchy(INpmController controller) {
+        private IEnumerable<IPackage> ReloadRootPackageHierarchy(INpmController controller) {
             var root = GetRootPackages(controller);
-            ReloadHierarchy(this, root);
+            return ReloadHierarchy(this, root);
         }
 
-        private void ReloadOptionalPackageHierarchy(INpmController controller) {
+        private IEnumerable<IPackage> ReloadOptionalPackageHierarchy(INpmController controller) {
             var optional = GetOptionalPackages(controller);
             _optionalModulesNode.Packages = optional;
-            ReloadHierarchy(_optionalModulesNode, optional);
+            return ReloadHierarchy(_optionalModulesNode, optional);
         }
 
-        private void ReloadDevPackageHierarchy(INpmController controller) {
+        private IEnumerable<IPackage> ReloadDevPackageHierarchy(INpmController controller) {
             var dev = GetDevPackages(controller);
             _devModulesNode.Packages = dev;
-            ReloadHierarchy(_devModulesNode, dev);
+            return ReloadHierarchy(_devModulesNode, dev);
         }
 
         #endregion
