@@ -68,7 +68,7 @@ namespace Microsoft.NodejsTools.Project {
 
         public abstract void ManageNpmModules();
 
-        protected void ReloadHierarchy(HierarchyNode parent, IEnumerable<IPackage> modules) {
+        protected IEnumerable<IPackage> ReloadHierarchy(HierarchyNode parent, IEnumerable<IPackage> modules) {
             //  We're going to reuse nodes for which matching modules exist in the new set.
             //  The reason for this is that we want to preserve the expansion state of the
             //  hierarchy. If we just bin everything off and recreate it all from scratch
@@ -77,7 +77,7 @@ namespace Microsoft.NodejsTools.Project {
             var recycle = new Dictionary<string, DependencyNode>();
             var remove = GetNodesToRemoveOrRecycle(parent, modules, recycle);
             RemoveUnusedModuleNodesFromHeirarchy(parent, remove);
-            BuildModuleHeirarchy(parent, modules, recycle);
+            return BuildModuleHeirarchy(parent, modules, recycle);
         }
 
         private void RemoveUnusedModuleNodesFromHeirarchy(HierarchyNode parent, List<HierarchyNode> remove) {
@@ -87,29 +87,28 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private void BuildModuleHeirarchy(HierarchyNode parent, IEnumerable<IPackage> modules, IReadOnlyDictionary<string, DependencyNode> recycle) {
+        private IEnumerable<IPackage> BuildModuleHeirarchy(HierarchyNode parent, IEnumerable<IPackage> modules, IReadOnlyDictionary<string, DependencyNode> recycle) {
             if (modules == null)
-                return;
+                return Enumerable.Empty<IPackage>();
 
+            var newModules = new List<IPackage>();
             foreach (var package in modules) {
-                var child = ReuseOrCreateAndAddChildNode(parent, recycle, package);
+                DependencyNode child;
+                if (recycle.ContainsKey(package.Name)) {
+                    child = recycle[package.Name];
+                    child.Package = package;
+                } else {
+                    child = new DependencyNode(_projectNode, parent as DependencyNode, package);
+                    parent.AddChild(child);
+                    newModules.Add(package);
+                }
+
                 ReloadHierarchy(child, package.Modules);
                 if (ProjectMgr.ParentHierarchy != null) {
                     child.ExpandItem(EXPANDFLAGS.EXPF_CollapseFolder);
                 }
             }
-        }
-
-        private DependencyNode ReuseOrCreateAndAddChildNode(HierarchyNode parent, IReadOnlyDictionary<string, DependencyNode> recycle, IPackage package) {
-            DependencyNode child;
-            if (recycle.ContainsKey(package.Name)) {
-                child = recycle[package.Name];
-                child.Package = package;
-            } else {
-                child = new DependencyNode(_projectNode, parent as DependencyNode, package);
-                parent.AddChild(child);
-            }
-            return child;
+            return newModules;
         }
 
         /// <summary>
