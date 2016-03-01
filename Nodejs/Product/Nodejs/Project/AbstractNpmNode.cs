@@ -68,13 +68,57 @@ namespace Microsoft.NodejsTools.Project {
 
         public abstract void ManageNpmModules();
 
-        protected void ReloadHierarchy(HierarchyNode parent, IEnumerable<IPackage> modules) {
+        protected IEnumerable<IPackage> ReloadHierarchy(HierarchyNode parent, IEnumerable<IPackage> modules) {
             //  We're going to reuse nodes for which matching modules exist in the new set.
             //  The reason for this is that we want to preserve the expansion state of the
             //  hierarchy. If we just bin everything off and recreate it all from scratch
             //  it'll all be in the collapsed state, which will be annoying for users who
             //  have drilled down into the hierarchy
             var recycle = new Dictionary<string, DependencyNode>();
+            var remove = GetNodesToRemoveOrRecycle(parent, modules, recycle);
+            RemoveUnusedModuleNodesFromHeirarchy(parent, remove);
+            return BuildModuleHeirarchy(parent, modules, recycle);
+        }
+
+        private void RemoveUnusedModuleNodesFromHeirarchy(HierarchyNode parent, List<HierarchyNode> remove) {
+            foreach (var obsolete in remove) {
+                parent.RemoveChild(obsolete);
+                ProjectMgr.OnItemDeleted(obsolete);
+            }
+        }
+
+        private IEnumerable<IPackage> BuildModuleHeirarchy(HierarchyNode parent, IEnumerable<IPackage> modules, IReadOnlyDictionary<string, DependencyNode> recycle) {
+            if (modules == null)
+                return Enumerable.Empty<IPackage>();
+
+            var newModules = new List<IPackage>();
+            foreach (var package in modules) {
+                DependencyNode child;
+                if (recycle.ContainsKey(package.Name)) {
+                    child = recycle[package.Name];
+                    child.Package = package;
+                } else {
+                    child = new DependencyNode(_projectNode, parent as DependencyNode, package);
+                    parent.AddChild(child);
+                    newModules.Add(package);
+                }
+
+                ReloadHierarchy(child, package.Modules);
+                if (ProjectMgr.ParentHierarchy != null) {
+                    child.ExpandItem(EXPANDFLAGS.EXPF_CollapseFolder);
+                }
+            }
+            return newModules;
+        }
+
+        /// <summary>
+        /// Compute the nodes that should be removed or recycled from the current heirarchy
+        /// </summary>
+        /// <param name="parent">Existing heirarchy</param>
+        /// <param name="modules">New set of modules</param>
+        /// <param name="recycle">Set of existing nodes that should be reused</param>
+        /// <returns>List of nodes that should be removed</returns>
+        private static List<HierarchyNode> GetNodesToRemoveOrRecycle(HierarchyNode parent, IEnumerable<IPackage> modules, IDictionary<string, DependencyNode> recycle) {
             var remove = new List<HierarchyNode>();
             for (var current = parent.FirstChild; null != current; current = current.NextSibling) {
                 var dep = current as DependencyNode;
@@ -99,31 +143,7 @@ namespace Microsoft.NodejsTools.Project {
                     remove.Add(current);
                 }
             }
-
-            foreach (var obsolete in remove) {
-                parent.RemoveChild(obsolete);
-                ProjectMgr.OnItemDeleted(obsolete);
-            }
-
-            if (modules != null) {
-                foreach (var package in modules) {
-                    DependencyNode child;
-
-                    if (recycle.ContainsKey(package.Name)) {
-                        child = recycle[package.Name];
-                        child.Package = package;
-                    }
-                    else {
-                        child = new DependencyNode(_projectNode, parent as DependencyNode, package);
-                        parent.AddChild(child);
-                    }
-
-                    ReloadHierarchy(child, package.Modules);
-                    if (ProjectMgr.ParentHierarchy != null) {
-                        child.ExpandItem(EXPANDFLAGS.EXPF_CollapseFolder);
-                    }
-                }
-            }
+            return remove;
         }
     }
 }

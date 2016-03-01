@@ -28,54 +28,25 @@ using Microsoft.VisualStudioTools.Project;
 using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
 
 namespace Microsoft.NodejsTools.Project {
-    internal class DependencyNode : HierarchyNode {
+    internal interface IDependencyNodeBasePath {
+        string GetRelativeUrlFragment();
+    }
+
+    internal class DependencyNode : HierarchyNode, IDependencyNodeBasePath {
         private readonly NodejsProjectNode _projectNode;
-        private readonly DependencyNode _parent;
+        private readonly IDependencyNodeBasePath _parent;
         private readonly string _displayString;
 
         public DependencyNode(
             NodejsProjectNode root,
-            DependencyNode parent,
+            IDependencyNodeBasePath parent,
             IPackage package)
             : base(root) {
             _projectNode = root;
             _parent = parent;
             Package = package;
 
-            var buff = new StringBuilder(package.Name);
-            if (package.IsMissing) {
-                buff.Append(" (missing)");
-            } else {
-                buff.Append('@');
-                buff.Append(package.Version);
-
-                if (!package.IsListedInParentPackageJson) {
-                    buff.AppendFormat(" (not listed in {0})", NodejsConstants.PackageJsonFile);
-                } else {
-                    List<string> dependencyTypes = new List<string>(3);
-                    if (package.IsDependency) {
-                        dependencyTypes.Add("standard");
-                    }
-                    if (package.IsDevDependency) {
-                        dependencyTypes.Add("dev");
-                    }
-                    if (package.IsOptionalDependency) {
-                        dependencyTypes.Add("optional");
-                    }
-
-                    if (package.IsDevDependency || package.IsOptionalDependency) {
-                        buff.Append(" (");
-                        buff.Append(string.Join(", ", dependencyTypes.ToArray()));
-                        buff.Append(")");
-                    }
-                }
-            }
-
-            if (package.IsBundledDependency) {
-                buff.Append("[bundled]");
-            }
-
-            _displayString = buff.ToString();
+            _displayString = GetInitialPackageDisplayString(package);
             ExcludeNodeFromScc = true;
         }
 
@@ -95,7 +66,7 @@ namespace Microsoft.NodejsTools.Project {
 
         #region HierarchyNode implementation
 
-        private string GetRelativeUrlFragment() {
+        public string GetRelativeUrlFragment() {
             var buff = new StringBuilder();
             if (null != _parent) {
                 buff.Append(_parent.GetRelativeUrlFragment());
@@ -281,6 +252,46 @@ namespace Microsoft.NodejsTools.Project {
             return base.ExecCommandOnNode(cmdGroup, cmd, nCmdexecopt, pvaIn, pvaOut);
         }
 
-#endregion
+        #endregion
+
+        private static string GetInitialPackageDisplayString(IPackage package) {
+            var buff = new StringBuilder(package.Name);
+            if (package.IsMissing) {
+                buff.Append(" (missing)");
+            } else {
+                buff.Append('@');
+                buff.Append(package.Version);
+
+                if (!package.IsListedInParentPackageJson) {
+                    buff.AppendFormat(" (not listed in {0})", NodejsConstants.PackageJsonFile);
+                } else {
+                    var dependencyTypes = GetDependencyTypeNames(package);
+                    if (package.IsDevDependency || package.IsOptionalDependency) {
+                        buff.Append(" (");
+                        buff.Append(string.Join(", ", dependencyTypes.ToArray()));
+                        buff.Append(")");
+                    }
+                }
+            }
+
+            if (package.IsBundledDependency) {
+                buff.Append("[bundled]");
+            }
+            return buff.ToString();
+        }
+
+        private static List<string> GetDependencyTypeNames(IPackage package) {
+            var dependencyTypes = new List<string>(3);
+            if (package.IsDependency) {
+                dependencyTypes.Add("standard");
+            }
+            if (package.IsDevDependency) {
+                dependencyTypes.Add("dev");
+            }
+            if (package.IsOptionalDependency) {
+                dependencyTypes.Add("optional");
+            }
+            return dependencyTypes;
+        }
     }
 }
