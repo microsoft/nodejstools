@@ -27,7 +27,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             Dictionary<string, ModuleInfo> allModules = null,
             int depth = 0)
         :
-            this(LoadRootPackageJson(fullPathToRootDirectory), fullPathToRootDirectory, showMissingDevOptionalSubPackages, allModules, depth
+            this(LoadRootPackageJson(fullPathToRootDirectory), fullPathToRootDirectory, showMissingDevOptionalSubPackages, allModules, depth)
         { }
     
         public RootPackage(
