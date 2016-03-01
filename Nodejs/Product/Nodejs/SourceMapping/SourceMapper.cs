@@ -215,7 +215,7 @@ namespace Microsoft.NodejsTools.SourceMapping {
                     extension = String.Empty;
                 }
 
-                if (!string.Equals(extension, NodejsFileTypeHelpers.JavaScriptExtension, StringComparison.OrdinalIgnoreCase)) {
+                if (!NodejsFileTypeHelpers.IsJavaScriptFile(fileName)) {
                     string baseFile = fileName.Substring(0, fileName.Length - extension.Length);
                     string jsFile = baseFile + NodejsFileTypeHelpers.JavaScriptExtension;
                     if (File.Exists(jsFile) && File.Exists(jsFile + NodejsConstants.MapExtension)) {
