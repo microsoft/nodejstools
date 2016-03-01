@@ -145,9 +145,6 @@
     <Compile Include="..\Nodejs\Nodejs.cs">
       <Link>Nodejs.cs</Link>
     </Compile>
-    <Compile Include="..\Nodejs\NodejsFileExtensions.cs">
-      <Link>NodejsFileExtensions.cs</Link>
-    </Compile>
     <Compile Include="..\Nodejs\NodejsFileTypeHelpers.cs">
       <Link>NodejsFileTypeHelpers.cs</Link>
     </Compile>

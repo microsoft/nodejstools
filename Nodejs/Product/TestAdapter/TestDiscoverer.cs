@@ -75,7 +75,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                             bool typeScriptTest = NodejsFileTypeHelpers.IsTypeScriptFile(fileAbsolutePath);
                             if(typeScriptTest){
                                 fileAbsolutePath = TypeScript.TypeScriptHelpers.GetTypeScriptBackedJavaScriptFile(proj,fileAbsolutePath);
-                            } else if (!Path.GetExtension(fileAbsolutePath).Equals(".js", StringComparison.OrdinalIgnoreCase)) {
+                            } else if (!NodejsFileTypeHelpers.IsJavaScriptFile(fileAbsolutePath)) {
                                 continue;
                             }
                             List<TestFileEntry> fileList;
