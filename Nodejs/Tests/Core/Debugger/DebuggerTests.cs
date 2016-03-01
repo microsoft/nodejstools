@@ -797,8 +797,7 @@ namespace NodejsTests.Debugger {
 
         #region Breakpoint Tests
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Debugging")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
         public void CanonicalHelloWorldTest() {
             AutoResetEvent textRead = new AutoResetEvent(false);
             TestDebuggerSteps(
