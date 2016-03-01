@@ -21,6 +21,8 @@ namespace Microsoft.NodejsTools {
     static class NodejsFileTypeHelpers {
         internal const string JavaScriptExtension = ".js";
         internal const string TypeScriptExtension = ".ts";
+        internal const string MapExtension = ".map";
+        internal const string NodejsProjectExtension = ".njsproj";
 
         public static bool IsJavaScriptFile(string file) {
             return DoesFileHaveExtension(file, JavaScriptExtension);

@@ -358,7 +358,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
             //Setting/updating "TestFramework" property on a file item will cause metedata change in the project file,
             //so we need to re-discover when file change happens. 
-            if (pathToItem.EndsWith(NodejsConstants.NodejsProjectExtension, StringComparison.OrdinalIgnoreCase)) {
+            if (pathToItem.EndsWith(NodejsFileTypeHelpers.NodejsProjectExtension, StringComparison.OrdinalIgnoreCase)) {
                 return true;
             }
 

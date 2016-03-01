@@ -33,7 +33,7 @@ using Microsoft.VisualStudioTools;
 using Microsoft.NodejsTools.SourceMapping;
 
 namespace Microsoft.NodejsTools.TestAdapter {
-    [FileExtension(NodejsConstants.NodejsProjectExtension)]
+    [FileExtension(NodejsFileTypeHelpers.NodejsProjectExtension)]
     [DefaultExecutorUri(TestExecutor.ExecutorUriString)]
     class TestDiscoverer : ITestDiscoverer {
         public TestDiscoverer() {
