@@ -20,13 +20,13 @@ In order to help us improve code quality and make NTVS better in general, here a
     - If you're adding a new feature, explain the feature and its use cases.
 - Provide a high level explanation of your changes. This will help reviewers understand implementation choices and will speed up the review process.
     - Try to keep pull requests small and focused.
-- Make sure that existing tests continue to pass.
+- [Run our tests][running-test] to ensure existing tests continue to pass.
 - All new code must include tests.
     - For a bug fix, consider adding a test that would fail before your change, but passes now.
-    - Feel free to ask for advice if you are unsure how what to test or how to integrate into our test infrastructure.
+    - Feel free to ask for advice if you are unsure how what to test or how to integrate into [our test infrastructure][running-tests].
 - There is no formal code style-guide, but please try to match the style of any file you are editing.
 
-All pull requests are reviewed by one of the project maintainers before being merged in. If you are unsure of anything, feel free to ask a question. We're always happy to help.
+All pull requests are reviewed by one of the project maintainers before being merged in. If you are unsure of anything, feel free to ask. We're always happy to help.
 
 ### Licensing and Legal
 Node.js Tools for Visual Studio is a member of [Microsoft](http://microsoft.github.io/) and operates under the [Apache 2.0 license](https://github.com/Microsoft/nodejstools/blob/master/LICENSE). 
@@ -37,3 +37,4 @@ All contributions will be made under the Apache 2.0 license. Please don’t subm
 
 
 [cla]: https://cla.microsoft.com/
+[running-tests]: https://github.com/Microsoft/nodejstools/wiki/Running-Our-Tests
