@@ -106,6 +106,7 @@ namespace VisualStudioToolsUITests {
             AssertListener.Initialize();
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void RenameLinkedNode() {
