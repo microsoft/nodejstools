@@ -37,7 +37,7 @@ namespace AnalysisTests {
         /// <summary>
         /// https://nodejstools.codeplex.com/workitem/1234
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestRequireTrailingSlash() {
             var entries = Analysis.Analyze(
                 new AnalysisFile("mod.js", @"var x = require('mymod').value;"),
@@ -52,7 +52,7 @@ namespace AnalysisTests {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestRequireAssignedExports() {
             var entries = Analysis.Analyze(
                 new AnalysisFile("mod.js", @"var x = require('mymod').value;"),
@@ -67,7 +67,7 @@ namespace AnalysisTests {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestRequireDirectoryFileOverload() {
             var entries = Analysis.Analyze(
                 new AnalysisFile("mod.js", @"var x = require('mymod').value;"),
@@ -81,7 +81,7 @@ namespace AnalysisTests {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestRequireMultiAssign() {
             var entries = Analysis.Analyze(
                 new AnalysisFile("server.js", @"var mymod = require('mymod')"),
@@ -109,7 +109,7 @@ var mymod = module.exports = exports = new MyMod")
         // Both should result in the original exports being seen, not the 
         // assigned exports.
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestRequireSimple() {
             var mod1 = @"exports.foo = 42;";
             var mod2 = @"x = require('./one.js').foo";
@@ -131,7 +131,7 @@ var mymod = module.exports = exports = new MyMod")
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestBadRequire() {
             // foo.js
             //      require('./rec1')
@@ -163,7 +163,7 @@ var mymod = module.exports = exports = new MyMod")
         /// Require w/ a package.json which specifies a relative path
         /// without the leading .
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestRequireNonRelativePackageJson() {
             var analyzer = new JsAnalyzer();
             var mod = @"var x = require('./rec1')";
@@ -186,7 +186,7 @@ var mymod = module.exports = exports = new MyMod")
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestRequireNodeModules() {
             var mod1 = @"exports.foo = 42;";
             var mod2 = @"x = require('one.js').foo";
@@ -208,7 +208,7 @@ var mymod = module.exports = exports = new MyMod")
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestRequireBuiltin() {
             string code = @"
 var http = require('http');
@@ -221,7 +221,7 @@ var http = require('http');
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestRequireBinaryOp() {
             string code = @"
 var http = require('ht' + 'tp');
@@ -234,7 +234,7 @@ var http = require('ht' + 'tp');
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestRequire() {
             var testCases = new[] {
                 new { File="server.js", Line = 4, Type = "mymod.", Expected = "mymod_export" },

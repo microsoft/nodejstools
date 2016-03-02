@@ -15,6 +15,7 @@
 //*********************************************************//
 
 using System;
+using System.IO;
 using System.Text;
 using Microsoft.NodejsTools.Formatting;
 using Microsoft.NodejsTools.Parsing;
@@ -47,7 +48,7 @@ namespace AnalysisTests {
             AssertListener.Initialize();
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestAnonymousFunction() {
             TestCode(
 @"a('hello', 15, function(err, res) {
@@ -68,7 +69,7 @@ console.log(err);
         /// <summary>
         /// https://nodejstools.codeplex.com/workitem/1351
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestNestedFunctionAndArrayLiteral() {
             TestCode(
 @"var a = require('a');
@@ -101,7 +102,7 @@ a.mount('/', [
 }");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestJsonArray() {
             TestCode(
 @"(function (seedData) {
@@ -138,7 +139,7 @@ a.mount('/', [
                 );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestFormatAfterInvalidKey() {
             Assert.AreEqual(0, Formatter.GetEditsAfterKeystroke("function f  () { }", 0, ':').Length);
         }
@@ -146,7 +147,7 @@ a.mount('/', [
         /// <summary>
         /// 
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestSemicolonEndOfDocument() {
             var testCode = new[] { 
                 // https://nodejstools.codeplex.com/workitem/1102
@@ -163,7 +164,7 @@ a.mount('/', [
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestFormatAfterEnter() {
             var testCode = new[] { 
                 // https://nodejstools.codeplex.com/workitem/1078
@@ -197,7 +198,7 @@ a.mount('/', [
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestFormatAfterSemiColon() {
             string surroundingCode = "x=1";
             var testCode = new[] { 
@@ -229,7 +230,7 @@ a.mount('/', [
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestSemicolonOnOwnLine() {
             // https://nodejstools.codeplex.com/workitem/1473
             TestCode(
@@ -253,7 +254,7 @@ a.mount('/', [
 }");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestFormattingFunctionAsArgumentToFunction() {
             // Format dedenting first argument too much
             // https://nodejstools.codeplex.com/workitem/1463
@@ -301,7 +302,7 @@ a.mount('/', [
     });");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestArrayLiteral() {
             var testCode = new[] { 
                 // https://nodejstools.codeplex.com/workitem/1474
@@ -326,7 +327,7 @@ a.mount('/', [
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestFormatAfterBadFor() {
             TestCode(@"function g() { 
  for(int i = 0; i<1000000; i++) { 
@@ -342,7 +343,7 @@ a.mount('/', [
     x = 2}");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestIndexingOnFollowingLine() {
             // https://nodejstools.codeplex.com/workitem/1465
             TestCode(
@@ -355,12 +356,12 @@ a.mount('/', [
         /// <summary>
         /// https://nodejstools.codeplex.com/workitem/1204
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestShebang() {
             TestCode("#!/usr/env/node\r\n function f() {\r\n}", "#!/usr/env/node\r\nfunction f() {\r\n}");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestInvalidTrailingQuote() {
             TestCode("var x = foo()'", "var x = foo() '");
             TestCode("return 42'", "return 42 '");
@@ -370,7 +371,7 @@ a.mount('/', [
             TestCode("throw 42'", "throw 42 '");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestMember() {
             TestCode(" a.b", "a.b");
             TestCode("a .b", "a.b");
@@ -378,7 +379,7 @@ a.mount('/', [
             TestCode(" a . b", "a.b");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestInvalidMember() {
             TestCode("x.42", "x.42");
             TestCode("x3.42", "x3.42");
@@ -388,7 +389,7 @@ a.mount('/', [
             TestCode("x23.\"hello\"", "x23.\"hello\"");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestCall() {
             TestCode("a()", "a()");
             TestCode("a ()", "a()");
@@ -412,7 +413,7 @@ a.mount('/', [
 });");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestUnaryOperator() {
             TestCode("typeof  x", "typeof x");
             TestCode("delete  x", "delete x");
@@ -420,7 +421,7 @@ a.mount('/', [
             TestCode("++ x", "++x");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestEmpty() {
             TestCode("if (true);", "if (true);");
             TestCode("if (true) ;", "if (true);");
@@ -448,13 +449,13 @@ a.mount('/', [
 }");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestNew() {
             TestCode("var x = new  Blah();", "var x = new Blah();");
 
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestFormatRange() {
             string surroundingCode = "x=1";
             var testCode = new[] { 
@@ -485,7 +486,7 @@ a.mount('/', [
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestFormatAfterCloseBrace() {
             string surroundingCode = "x=1";
             var testCode = new[] { 
@@ -518,7 +519,7 @@ a.mount('/', [
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestLabeledStatement() {
             TestCode(@"foo: {
     42;
@@ -529,7 +530,7 @@ a.mount('/', [
 
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestContinue() {
             TestCode(
 @"while (true) {
@@ -564,7 +565,7 @@ label:
 );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestBlock() {
             TestCode(
                 "{\nvar b;\n}",
@@ -587,7 +588,7 @@ label:
                 );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestBreak() {
             TestCode(
 @"while (true) {
@@ -630,7 +631,7 @@ label:
 );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestFunction() {
             TestCode(
 @"function f () {
@@ -646,7 +647,7 @@ label:
 };");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestReturn() {
             TestCode(
 @"function f() {
@@ -684,7 +685,7 @@ label:
 );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestYield() {
             TestCode(
 @"function *f() {
@@ -740,7 +741,7 @@ label:
 );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestThrow() {
             TestCode(
 @"function f() {
@@ -778,7 +779,7 @@ label:
 );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestObjectLiteral() {
             TestCode(
 @"x = { get   foo() { }, set   foo(value) { } }",
@@ -849,7 +850,7 @@ c: 42, d: 100}",
 );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestIndentObjectLiteralWithoutComma() {
             // https://nodejstools.codeplex.com/workitem/1782
             TestCode(@"Main.Test.prototype = {
@@ -893,7 +894,7 @@ c: 42, d: 100}",
 }");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestDoWhile() {
             TestCode(@"do
     { var a
@@ -905,7 +906,7 @@ c: 42, d: 100}",
 
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestControlFlowBraceCombo() {
             var options = new FormattingOptions() { OpenBracesOnNewLineForControl = false, SpaceAfterKeywordsInControlFlowStatements = false };
 
@@ -928,7 +929,7 @@ c: 42, d: 100}",
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestSpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis() {
             var options = new FormattingOptions() { SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis = true };
 
@@ -1074,7 +1075,7 @@ c: 42, d: 100}",
     );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestSpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis2() {
             var options = new FormattingOptions() { SpaceAfterOpeningAndBeforeClosingNonEmptyParenthesis = false };
 
@@ -1213,12 +1214,12 @@ c: 42, d: 100}",
     );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestArithmetic() {
             TestCode("a+.0", "a + .0");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestVariableDecl() {
             TestCode(@"var i = 0, j = 1;", @"var i = 0, j = 1;");
             TestCode(@"var i=0, j=1;", @"var i = 0, j = 1;");
@@ -1227,12 +1228,12 @@ c: 42, d: 100}",
             TestCode(@"var i = 0, j = 1;", @"var i=0, j=1;", new FormattingOptions() { SpaceBeforeAndAfterBinaryOperator = false });
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestLexcialDecl() {
             TestCode(@"i=1", @"i = 1");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestForIn() {
             TestCode(
 @"for(    var    x     in    abc) {
@@ -1241,7 +1242,7 @@ c: 42, d: 100}",
 }");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestFor() {
             var options = new FormattingOptions() { SpaceAfterSemiColonInFor = true };
             TestCode(
@@ -1260,7 +1261,7 @@ c: 42, d: 100}",
   options);
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestSpaceAfterComma() {
             var options = new FormattingOptions() { SpaceAfterComma = true };
             TestCode(
@@ -1291,7 +1292,7 @@ function x(a,b,c) {
                 options);
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestSpaceAfterFunctionInAnonymousFunctions() {
             var options = new FormattingOptions() { SpaceAfterFunctionInAnonymousFunctions = true };
             TestCode(
@@ -1315,7 +1316,7 @@ x = function() {
                 options);
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestNestedSwitch() {
             TestCode("switch (a){\r\n    case 1: x += 2;\r\n case   2  : \r\n     for (var i=0;i<10;i++)\r\ni  --;\r\n}\r\n",
             @"switch (a) {
@@ -1327,7 +1328,7 @@ x = function() {
 ");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestNestedIfs() {
             TestCode(@"if(1)if(1)if(1)if(1) {
     x += 2
@@ -1343,7 +1344,7 @@ x = function() {
 }");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestSwitch() {
             TestCode("switch (a){\r\ncase   1   :   x+=2 ;    break;\r\n    case 2:{\r\n    }\r\n}\r\n",
                      "switch (a) {\r\n    case 1: x += 2; break;\r\n    case 2: {\r\n    }\r\n}\r\n");
@@ -1414,7 +1415,7 @@ break;
 
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestNewLineBracesForFunctions() {
             var options = new FormattingOptions() { OpenBracesOnNewLineForFunctions = true };
 
@@ -1436,7 +1437,7 @@ break;
                options);
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestInsertTabs() {
             var options = new FormattingOptions() { SpacesPerIndent = null };
             TestCode(
@@ -1462,7 +1463,7 @@ break;
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestComments() {
             // comments in weird spots can result in some slightly odd 
             // insertions or missing insertions.  These aren't set in stone
@@ -1527,7 +1528,7 @@ break;
 );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestSingleLineComments() {
             TestCode(
 @"var x = {'abc':42,
@@ -1727,7 +1728,7 @@ writeToEngine(ep);
 });");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestInsertSpaces() {
             var options = new FormattingOptions() { SpacesPerIndent = 2 };
             TestCode(
@@ -1756,7 +1757,7 @@ writeToEngine(ep);
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestNewLineBracesForFlowControl() {
             var options = new FormattingOptions() { OpenBracesOnNewLineForControl = true };
             TestCode(
@@ -1851,7 +1852,7 @@ writeToEngine(ep);
         options);
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestNewLineBracesForFlowControl2() {
             var options = new FormattingOptions() { OpenBracesOnNewLineForControl = false };
             TestCode(
@@ -1946,7 +1947,7 @@ writeToEngine(ep);
         options);
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestIf() {
             // https://nodejstools.codeplex.com/workitem/1175
             TestCode(
@@ -1997,7 +1998,7 @@ else{
 
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestNestedBlock() {
             TestCode(
 @"do {
@@ -2112,7 +2113,7 @@ case 42: break;
 } while(true);");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestSpacesAroundBinaryOperator() {
             TestCode("x+y", "x + y", new FormattingOptions() { SpaceBeforeAndAfterBinaryOperator = true });
             TestCode("x+y", "x+y", new FormattingOptions() { SpaceBeforeAndAfterBinaryOperator = false });
@@ -2124,7 +2125,7 @@ case 42: break;
             TestCode("x + y + z", "x+y+z", new FormattingOptions() { SpaceBeforeAndAfterBinaryOperator = false });
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestSpaceAfterKeywordsInControlFlowStatements() {
             TestCode(
 @"if(true) {
@@ -2181,7 +2182,7 @@ case 42: break;
 }", new FormattingOptions() { SpaceAfterKeywordsInControlFlowStatements = false });
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestSimple() {
             TestCode(
 @"do {
@@ -2248,7 +2249,7 @@ throw null;
 } while(true);");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestFormatterNotReplacingAggressively() {
             var code =
 @"function f() {

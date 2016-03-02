@@ -193,19 +193,19 @@ namespace NpmTests {
    } 
 }";
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestReadNoNameNull() {
             var pkg = LoadFrom(PkgEmpty);
             Assert.IsNull(pkg.Name, "Name should be null.");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestReadNoVersionIsZeroed() {
             var pkg = LoadFrom(PkgEmpty);
             Assert.AreEqual(new SemverVersion(), pkg.Version, "Empty version mismatch.");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestReadNameAndVersion() {
             var pkgJson = LoadFrom(PkgSimple);
 
@@ -217,7 +217,7 @@ namespace NpmTests {
             SemverVersionTestHelper.AssertVersionsEqual(0, 1, 0, null, null, pkgJson.Version);
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestGetEmptyScripts() {
             var pkg = LoadFrom(PkgSimple);
             var scripts = pkg.Scripts;
@@ -225,7 +225,7 @@ namespace NpmTests {
             Assert.AreEqual(0, scripts.Count, "Shouldn't find any scripts.");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestReadSingleStartScript() {
             var pkg = LoadFrom(PkgStartScript);
             var scripts = pkg.Scripts;
@@ -236,7 +236,7 @@ namespace NpmTests {
             Assert.AreEqual("node server.js", start.Code, "Script code mismatch.");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestReadNonExistentScriptsNull() {
             var pkg = LoadFrom(PkgStartScript);
             var scripts = pkg.Scripts;
@@ -254,13 +254,13 @@ namespace NpmTests {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestReadNoDescriptionNull() {
             var pkg = LoadFrom(PkgEmpty);
             Assert.IsNull(pkg.Description, "Description should be null.");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestReadDescription() {
             var pkg = LoadFrom(PkgLargeCompliant);
             Assert.AreEqual(
@@ -269,12 +269,12 @@ namespace NpmTests {
                 "Description mismatch.");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestReadEmptyKeywordsCountZero() {
             CheckEmptyArray(LoadFrom(PkgEmpty).Keywords);
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestEnumerationOverKeywords() {
             CheckStringArrayContents(
                 LoadFrom(PkgLargeCompliant).Keywords,
@@ -282,13 +282,13 @@ namespace NpmTests {
                 new[] { "package", "example" });
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestReadNoHomepageEmpty() {
             var pkg = LoadFrom(PkgSimple);
             Assert.AreEqual(0, pkg.Homepages.Count, "Homepage should be empty.");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestReadHomepageCompliant() {
             var pkg = LoadFrom(PkgLargeCompliant);
             CheckStringArrayContents(
@@ -297,7 +297,7 @@ namespace NpmTests {
                 new[] { "http://www.mypackagehomepage.com/" });
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestReadHomepageNonCompliant() {
             var pkg = LoadFrom(PkgLargeNonCompliant);
             CheckStringArrayContents(
@@ -306,13 +306,13 @@ namespace NpmTests {
                 new[] { "http://www.mypackagehomepage.com/" });
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestReadNoBugsNull() {
             var pkg = LoadFrom(PkgSimple);
             Assert.IsNull(pkg.Bugs, "Bugs should be null.");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestReadBugsUrlOnly() {
             var pkg = LoadFrom(PkgSimpleBugs);
             var bugs = pkg.Bugs;
@@ -329,17 +329,17 @@ namespace NpmTests {
             Assert.AreEqual("dev@example.com", bugs.Email, "Bugs email mismatch.");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestReadBugsUrlAndEmailCompliant() {
             TestReadBugsUrlAndEmail(PkgLargeCompliant);
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestReadBugsUrlAndEmailNonCompliant() {
             TestReadBugsUrlAndEmail(PkgLargeNonCompliant);
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestReadNoLicensesEmpty() {
             var pkg = LoadFrom(PkgSimpleBugs);
             var licenses = pkg.Licenses;
@@ -347,7 +347,7 @@ namespace NpmTests {
             Assert.AreEqual(0, licenses.Count, "Should not be any licenses.");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestReadLicensesTypeOnly() {
             var pkg = LoadFrom(PkgSingleLicenseType);
             var licenses = pkg.Licenses;
@@ -357,7 +357,7 @@ namespace NpmTests {
             Assert.AreEqual("BSD", license.Type, "License type mismatch.");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ReadLicensesTypeAndUrl() {
             var pkg = LoadFrom(PkgLargeCompliant);
             var licenses = pkg.Licenses;
@@ -368,12 +368,12 @@ namespace NpmTests {
             Assert.AreEqual("http://www.example.org/licenses/gpl.html", license.Url, "License URL mismatch.");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestReadEmptyFilesEmpty() {
             CheckEmptyArray(LoadFrom(PkgSimple).Files);
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestReadFiles() {
             CheckStringArrayContents(
                 LoadFrom(PkgLargeCompliant).Files,
@@ -381,12 +381,12 @@ namespace NpmTests {
                 new[] { "server.js", "customlib.js", "path/to/subfolder" });
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestReadEmptyManEmpty() {
             CheckEmptyArray(LoadFrom(PkgSimple).Man);
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestReadSingleMan() {
             CheckStringArrayContents(
                 LoadFrom(PkgLargeNonCompliant).Man,
@@ -394,7 +394,7 @@ namespace NpmTests {
                 new[] { "./man/foo.1" });
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestReadMultiMan() {
             CheckStringArrayContents(
                 LoadFrom(PkgLargeCompliant).Man,
@@ -402,12 +402,12 @@ namespace NpmTests {
                 new[] { "./man/foo.1", "./man/bar.1" });
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestReadEmptyAuthor() {
             Assert.IsNull(LoadFrom(PkgSimple).Author);
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestReadMisspelledAuthor() {
             Assert.AreEqual(
                 @"{
@@ -417,7 +417,7 @@ namespace NpmTests {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestReadSingleAuthorField() {
             Assert.AreEqual(
                 "Firstname Lastname",
@@ -425,7 +425,7 @@ namespace NpmTests {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestReadAuthorCompliant() {
             var compliantAuthor = LoadFrom(PkgLargeCompliant).Author;
             Assert.AreEqual("Firstname Lastname", compliantAuthor.Name);
@@ -433,7 +433,7 @@ namespace NpmTests {
             Assert.AreEqual("http://firstnamelastname.com", compliantAuthor.Url);
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestReadAuthorNonCompliant() {
             var nonCompliantAuthor = LoadFrom(PkgLargeNonCompliant).Author;
             Assert.AreEqual("Firstname Lastname", nonCompliantAuthor.Name);

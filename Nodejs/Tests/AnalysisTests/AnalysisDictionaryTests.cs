@@ -26,7 +26,7 @@ using TestUtilities;
 namespace NodejsTests {
     [TestClass]
     public class AnalysisDictionaryTests {
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestBasic() {
             var dict = new AnalysisDictionary<string, string>();
             Assert.IsFalse(dict.Remove("Foo"));
@@ -109,13 +109,13 @@ namespace NodejsTests {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestAddExisting() {
             var dict = new AnalysisDictionary<string, string>() { { "1", "One" } };
             AssertUtil.Throws<ArgumentException>(() => dict.Add("1", "Two"));
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestGrowth() {
             var dict = new AnalysisDictionary<string, string>();
             for (int i = 0; i < 25; i++) {
@@ -136,7 +136,7 @@ namespace NodejsTests {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestReplaceExisting() {
             // same object reference
             var dict = new AnalysisDictionary<string, string>();
@@ -159,7 +159,7 @@ namespace NodejsTests {
             Assert.AreEqual(1, dict2.Count);
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestRemoveExisting() {
             var dict = new AnalysisDictionary<Hashable, string>();
             var one = new Hashable(1, (self, x) => x._hash == 1);
@@ -169,7 +169,7 @@ namespace NodejsTests {
             Assert.AreEqual(0, dict.Count);
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestNull() {
             var dict = new AnalysisDictionary<string, string>();
             string dummy;
@@ -187,7 +187,7 @@ namespace NodejsTests {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestAddRemoveAdd() {
             // same object reference
             var dict = new AnalysisDictionary<string, string>();
@@ -214,7 +214,7 @@ namespace NodejsTests {
             Assert.AreEqual(false, dict2.Remove(new Hashable(2)));
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestCollision() {
             // difference object reference, but equal.
             var dict = new AnalysisDictionary<Hashable, string>();
@@ -238,7 +238,7 @@ namespace NodejsTests {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestComparer() {
             // difference object reference, but equal.
             foreach (var dict in new[] {
@@ -252,7 +252,7 @@ namespace NodejsTests {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestEnumeration() {
             var dict = new AnalysisDictionary<string, string>() { { "1", "One" } };
             var enumer = dict.GetEnumerator();
@@ -266,7 +266,7 @@ namespace NodejsTests {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestClear() {
             var dict = new AnalysisDictionary<string, string>();
             dict.Clear();
@@ -288,7 +288,7 @@ namespace NodejsTests {
         /// Tests when the value is removed and replaced with an equivalent value 
         /// that we pick up the new value correctly.
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestThreadedReaderUpdatedValue() {
             var comparer = new SynchronizedComparer();
 
@@ -312,7 +312,7 @@ namespace NodejsTests {
         /// Tests when the value is removed and replaced with a non-equivalent
         /// value that we don't find the non-equivalent value.
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestThreadedReaderValueRemoved() {
             var comparer = new SynchronizedComparer();
 

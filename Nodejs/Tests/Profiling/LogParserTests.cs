@@ -14,6 +14,8 @@
 //
 //*********************************************************//
 
+using System;
+using Microsoft.NodejsTools.LogGeneration;
 using Microsoft.NodejsTools.LogParsing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
@@ -26,7 +28,7 @@ namespace ProfilerTests {
             AssertListener.Initialize();
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void SplitRecord() {
             AssertExpectedRecords(@"shared-library,""C:\Program Files\nodejs\node.exe"",0x05c60000,0x06226000",
                 "shared-library",
