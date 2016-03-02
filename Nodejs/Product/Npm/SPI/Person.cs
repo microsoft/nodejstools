@@ -38,7 +38,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             RegexOptions.Singleline);
 
         private static readonly Regex StringPersonRegex = new Regex(
-            "^\"([^\"]+)\"$",
+            @"^""(?<name>[^""]+)""$",
             RegexOptions.Singleline);
 
         [JsonConstructor]
@@ -46,7 +46,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             // Enables Json deserialization
         }
 
-        private Person(string name, string email = "", string url = "") {
+        private Person(string name, string email = null, string url = null) {
             Name = name;
             Email = email;
             Url = url;
@@ -115,9 +115,11 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         /// <param name="source">Json source</param>
         private static Person TryCreatePersonFromString(string source) {
             var matches = StringPersonRegex.Matches(source);
-            if (matches.Count >= 1) {
+            if (matches.Count == 1) {
                 var match = matches[0];
-                return new Person(match.Value);
+                var group = match.Groups["name"];
+                if (group.Success)
+                    return new Person(group.Value);
             }
             return null;
         }
