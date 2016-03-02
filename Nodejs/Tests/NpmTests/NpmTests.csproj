@@ -94,6 +94,7 @@
     <Compile Include="NpmSearchTests.cs" />
     <Compile Include="PackageJsonDependencyTests.cs" />
     <Compile Include="PackageJsonTests.cs" />
+    <Compile Include="PersonTests.cs" />
     <Compile Include="ProblematicPackageJsonTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SemverVersionTestHelper.cs" />
