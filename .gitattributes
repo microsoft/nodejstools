@@ -1,5 +1,4 @@
 # Do not normalize line endings from CR LF to LF, regardless of core.autocrlf.
 * -text
 
-# Normalize C# source files to use CR LF line endings.
-*.cs text eol=crlf
+*.cs diff=csharp
