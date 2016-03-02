@@ -797,8 +797,8 @@ namespace NodejsTests.Debugger {
 
         #region Breakpoint Tests
 
-        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
-        public void CanonicalHelloWorldTest() {
+        [TestMethod, Priority(0), TestCategory("Debugging")]
+        public void CannonicalHelloWorldTest() {
             AutoResetEvent textRead = new AutoResetEvent(false);
             TestDebuggerSteps(
                 "HelloWorld.js",
@@ -827,7 +827,6 @@ namespace NodejsTests.Debugger {
             );
         }
 
-        [Ignore]
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void BreakOnFixedUpBreakpoint() {
             AutoResetEvent textRead = new AutoResetEvent(false);
