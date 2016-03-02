@@ -20,7 +20,7 @@ In order to help us improve code quality and make NTVS better in general, here a
     - If you're adding a new feature, explain the feature and its use cases.
 - Provide a high level explanation of your changes. This will help reviewers understand implementation choices and will speed up the review process.
     - Try to keep pull requests small and focused.
-- [Run our tests][running-test] to ensure existing tests continue to pass.
+- [Run our tests][running-tests] to ensure existing tests continue to pass.
 - All new code must include tests.
     - For a bug fix, consider adding a test that would fail before your change, but passes now.
     - Feel free to ask for advice if you are unsure how what to test or how to integrate into [our test infrastructure][running-tests].
