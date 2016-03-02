@@ -69,6 +69,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         /// <summary>
         /// Try to create a person object from a json object.
+        /// 
+        /// This can either be a json object or a string: https://docs.npmjs.com/files/package.json#people-fields-author-contributors
         /// </summary>
         /// <param name="source">Json source</param>
         private static Person TryCreatePersonFromObject(string source) {
