@@ -43,7 +43,7 @@ namespace NodejsTests {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
+        [TestMethod, Priority(0)]
         public void TestNumber() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
@@ -58,7 +58,7 @@ namespace NodejsTests {
             return new NodejsReplEvaluator(TestNodejsReplSite.Instance);
         }
 
-        [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
+        [TestMethod, Priority(0)]
         public void TestRequire() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
@@ -69,7 +69,7 @@ namespace NodejsTests {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
+        [TestMethod, Priority(0)]
         public void TestFunctionDefinition() {
             var whitespaces = new[] { "", "\r\n", "   ", "\r\n    " };
             using (var eval = ProjectlessEvaluator()) {
@@ -89,7 +89,7 @@ namespace NodejsTests {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
+        [TestMethod, Priority(0)]
         public void TestConsoleLog() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
@@ -100,7 +100,7 @@ namespace NodejsTests {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
+        [TestMethod, Priority(0)]
         public void TestConsoleWarn() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
@@ -111,7 +111,7 @@ namespace NodejsTests {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
+        [TestMethod, Priority(0)]
         public void TestConsoleError() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
@@ -122,7 +122,8 @@ namespace NodejsTests {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
+        [Ignore]
+        [TestMethod, Priority(0)]
         public void TestConsoleDir() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
@@ -184,7 +185,7 @@ undefined";
         }
 
         // 
-        [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
+        [TestMethod, Priority(0)]
         public void LargeOutput() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
@@ -200,7 +201,7 @@ undefined";
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
+        [TestMethod, Priority(0)]
         public void TestException() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
@@ -213,7 +214,7 @@ undefined";
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
+        [TestMethod, Priority(0)]
         public void TestExceptionNull() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
@@ -226,7 +227,7 @@ undefined";
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
+        [TestMethod, Priority(0)]
         public void TestExceptionUndefined() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
@@ -239,7 +240,7 @@ undefined";
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
+        [TestMethod, Priority(0)]
         public void TestProcessExit() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
@@ -257,7 +258,7 @@ undefined";
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
+        [TestMethod, Priority(0)]
         public void TestReset() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
@@ -284,7 +285,7 @@ undefined";
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
+        [TestMethod, Priority(0)]
         public void TestSaveNoFile() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
@@ -302,7 +303,7 @@ undefined";
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
+        [TestMethod, Priority(0)]
         public void TestSaveBadFile() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
@@ -320,7 +321,7 @@ undefined";
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
+        [TestMethod, Priority(0)]
         public void TestSave() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval, NodejsConstants.JavaScript);
@@ -346,7 +347,7 @@ undefined";
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
+        [TestMethod, Priority(0)]
         public void TestBadSave() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
@@ -364,7 +365,7 @@ undefined";
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
+        [TestMethod, Priority(0)]
         public void ReplEvaluatorProvider() {
             var provider = new NodejsReplEvaluatorProvider();
             Assert.AreEqual(null, provider.GetEvaluator("Unknown"));
@@ -414,7 +415,7 @@ undefined";
                                                     "var net = require('net'),\r\n      repl = require('repl');",
                                                   };
 
-        [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
+        [TestMethod, Priority(0)]
         public void TestPartialInputs() {
             using (var eval = ProjectlessEvaluator()) {
                 foreach (var partialInput in _partialInputs) {
@@ -446,7 +447,7 @@ undefined";
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
+        [TestMethod, Priority(0)]
         public void TestObjectLiteral() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
@@ -460,7 +461,7 @@ undefined";
         /// <summary>
         /// https://nodejstools.codeplex.com/workitem/279
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
+        [TestMethod, Priority(0)]
         public void TestRequireInProject() {
             string testDir;
             do {
@@ -493,7 +494,6 @@ undefined";
             }
         }
 
-        [Ignore]
         // https://nodejstools.codeplex.com/workitem/1575
         [TestMethod, Priority(0), Timeout(180000)]
         public async Task TestNpmReplCommandProcessExitSucceeds() {
