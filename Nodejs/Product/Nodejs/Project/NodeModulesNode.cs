@@ -392,7 +392,8 @@ namespace Microsoft.NodejsTools.Project {
             TypingAcquisition.AquireTypings(
                 controller.ListBaseDirectory,
                 controller.FullPathToRootPackageDirectory,
-                newPackages);
+                newPackages,
+                null).ContinueWith(x => x);
         }
 
         private IEnumerable<IPackage> ReloadPackageHierarchies(INpmController controller) {
