@@ -84,20 +84,20 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             if (matches.Count >= 1) {
                 foreach (Match match in matches) {
                     var group = match.Groups["name"];
-                    if (@group.Success) {
-                        name = @group.Value;
+                    if (group.Success) {
+                        name = group.Value;
                         continue;
                     }
 
-                    @group = match.Groups["email"];
-                    if (@group.Success) {
-                        email = @group.Value;
+                    group = match.Groups["email"];
+                    if (group.Success) {
+                        email = group.Value;
                         continue;
                     }
 
-                    @group = match.Groups["url"];
-                    if (@group.Success) {
-                        url = @group.Value;
+                    group = match.Groups["url"];
+                    if (group.Success) {
+                        url = group.Value;
                         continue;
                     }
                 }
