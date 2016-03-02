@@ -109,6 +109,16 @@ namespace Microsoft.VisualStudioTools.Project {
                                 "cmd.exe"
                             )
                         );
+
+                        string visualStudioVersion = Environment.GetEnvironmentVariable("VisualStudioVersion");
+                        string commonToolsDir = Environment.GetEnvironmentVariable(string.Format("VS{0}COMNTOOLS", visualStudioVersion.Replace(".", "")));
+                        string devCmdFileName = Path.Combine(commonToolsDir, "VsDevCmd.bat");
+
+                        if (File.Exists(devCmdFileName)) {
+                            // cmd.exe /K <to_exec> -- /K carries out the command specified but doesn't terminate window afterwards
+                            psi.Arguments = string.Format("/K \"{0}\"", devCmdFileName);
+                        }
+
                         psi.WorkingDirectory = FullPathToChildren;
                         Process.Start(psi);
                         return VSConstants.S_OK;
