@@ -55,7 +55,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         public static Person CreateFromJsonSource(string source) {
             if (source == null)
                 return new Person(string.Empty);
-            
 
             var objectPerson = TryCreatePersonFromObject(source);
             if (objectPerson != null)
@@ -64,18 +63,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             var stringPerson = TryCreatePersonFromString(source);
             if (stringPerson != null)
                 return stringPerson;
-#if DEBUG
-    // Verify we are parsing correctly
-            try {
-                var jObject = JObject.Parse(source);
-                var name = (string)jObject["name"];
-                Debug.Assert(name != null ? name == Name : Name == source, string.Format("Failed to parse name from {0}", source));
-                Debug.Assert((string)jObject["email"] == Email, string.Format("Failed to parse email from {0}", source));
-                Debug.Assert((string)jObject["url"] == Url, string.Format("Failed to parse url from {0}", source));
-            } catch (Exception) {
-                Debug.Assert(source == Name);
-            }
-#endif
+
             return new Person(source);
         }
 
