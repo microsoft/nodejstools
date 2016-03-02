@@ -75,7 +75,7 @@ namespace NpmTests {
         }
 
         [TestMethod, TestCategory("UnitTest")]
-        public void ShouldReturnInputStringAsNameIfInputIsNotJsonStringOrObject() {
+        public void ShouldReturnInputAsNameIfInputIsNotJsonStringOrObject() {
             var name = "J Scripter";
             var person = Person.CreateFromJsonSource(name);
             Assert.IsNotNull(person);
