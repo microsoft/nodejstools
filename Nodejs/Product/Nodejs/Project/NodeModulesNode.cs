@@ -265,7 +265,7 @@ namespace Microsoft.NodejsTools.Project {
 
         private void ForceUpdateStatusBarWithNpmActivitySafe(string activity) {
             ProjectMgr.Site.GetUIThread().InvokeAsync(() => ForceUpdateStatusBarWithNpmActivity(activity))
-                .HandleAllExceptions(SR.ProductName)
+                .HandleAllExceptions(NodeJsProjectSr.ProductName)
                 .DoNotWait();
         }
 
@@ -341,19 +341,19 @@ namespace Microsoft.NodejsTools.Project {
 
             StopNpmIdleTimer();
             _npmIdleTimer = new Timer(
-                _ => ProjectMgr.Site.GetUIThread().Invoke(() => _projectNode.CheckForLongPaths(e.Arguments).HandleAllExceptions(SR.ProductName).DoNotWait()),
+                _ => ProjectMgr.Site.GetUIThread().Invoke(() => _projectNode.CheckForLongPaths(e.Arguments).HandleAllExceptions(NodeJsProjectSr.ProductName).DoNotWait()),
                 null, 1000, Timeout.Infinite);
         }
 
         private static string GetStatusBarMessage(NpmCommandCompletedEventArgs e) {
             if (e.WithErrors) {
-                return SR.GetString(
-                    e.Cancelled ? SR.NpmCancelledWithErrors : SR.NpmCompletedWithErrors,
+                return NodeJsProjectSr.GetString(
+                    e.Cancelled ? NodeJsProjectSr.NpmCancelledWithErrors : NodeJsProjectSr.NpmCompletedWithErrors,
                     e.CommandText);
             } else if (e.Cancelled) {
-                return SR.GetString(SR.NpmCancelled, e.CommandText);
+                return string.Format(Resources.NpmCancelled, e.CommandText);
             }
-            return SR.GetString(SR.NpmSuccessfullyCompleted, e.CommandText);
+            return string.Format(Resources.NpmSuccessfullyCompleted, e.CommandText);
         }
 
         private void StopNpmIdleTimer() {
@@ -368,7 +368,7 @@ namespace Microsoft.NodejsTools.Project {
 
         internal void ReloadHierarchySafe() {
             NodejsPackage.Instance.GetUIThread().InvokeAsync(ReloadHierarchy)
-                .HandleAllExceptions(SR.ProductName)
+                .HandleAllExceptions(NodeJsProjectSr.ProductName)
                 .DoNotWait();
         }
 

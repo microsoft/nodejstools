@@ -146,7 +146,7 @@ namespace Microsoft.NodejsTools.Project {
                 return GetFullUrl(host, TestServerPort);
             } catch (UriFormatException) {
                 var output = OutputWindowRedirector.GetGeneral(NodejsPackage.Instance);
-                output.WriteErrorLine(SR.GetString(SR.ErrorInvalidLaunchUrl, host));
+                output.WriteErrorLine(Resources.ErrorInvalidLaunchUrl, host);
                 output.ShowAndActivate();
                 return string.Empty;
             }
@@ -216,7 +216,7 @@ namespace Microsoft.NodejsTools.Project {
                 return MessageBox.Show(
                     "This TypeScript project has 'Combine Javascript output into file' option enabled. This option is not supported by NTVS debugger, " +
                     "and may result in erratic behavior of breakpoints, stepping, and debug tool windows. Are you sure you want to start debugging?",
-                    SR.ProductName,
+                    NodeJsProjectSr.ProductName,
                     MessageBoxButtons.YesNo,
                     MessageBoxIcon.Warning
                     ) == DialogResult.Yes;

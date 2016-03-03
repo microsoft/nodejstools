@@ -120,8 +120,8 @@ namespace Microsoft.NodejsTools {
 #if !NO_WINDOWS
         public static void ShowNodejsNotInstalled() {
             MessageBox.Show(
-                SR.GetString(SR.NodejsNotInstalled),
-                SR.ProductName,
+                Resources.NodejsNotInstalled,
+                NodeJsProjectSr.ProductName,
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error
             );
@@ -129,8 +129,8 @@ namespace Microsoft.NodejsTools {
 
         public static void ShowNodejsPathNotFound(string path) {
             MessageBox.Show(
-                SR.GetString(SR.NodeExeDoesntExist, path),
-                SR.ProductName,
+                string.Format(Resources.NodeExeDoesntExist, path),
+                NodeJsProjectSr.ProductName,
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error
             );

@@ -794,18 +794,18 @@ namespace Microsoft.NodejsTools.Project {
                 var taskDialog = new TaskDialog(NodejsPackage.Instance) {
                     AllowCancellation = true,
                     EnableHyperlinks = true,
-                    Title = SR.GetString(SR.LongPathWarningTitle),
+                    Title = Resources.LongPathWarningTitle,
                     MainIcon = TaskDialogIcon.Warning,
-                    Content = SR.GetString(SR.LongPathWarningText),
-                    CollapsedControlText = SR.GetString(SR.LongPathShowPathsExceedingTheLimit),
-                    ExpandedControlText = SR.GetString(SR.LongPathHidePathsExceedingTheLimit),
+                    Content = Resources.LongPathWarningText,
+                    CollapsedControlText = Resources.LongPathShowPathsExceedingTheLimit,
+                    ExpandedControlText = Resources.LongPathHidePathsExceedingTheLimit,
                     Buttons = {
-                        (dedupeButton = new TaskDialogButton(SR.GetString(SR.LongPathNpmDedupe), SR.GetString(SR.LongPathNpmDedupeDetail))),
-                        (ignoreButton = new TaskDialogButton(SR.GetString(SR.LongPathDoNothingButWarnNextTime))),
-                        (disableButton = new TaskDialogButton(SR.GetString(SR.LongPathDoNothingAndDoNotWarnAgain), SR.GetString(SR.LongPathDoNothingAndDoNotWarnAgainDetail)))
+                        (dedupeButton = new TaskDialogButton(Resources.LongPathNpmDedupe, Resources.LongPathNpmDedupeDetail)),
+                        (ignoreButton = new TaskDialogButton(Resources.LongPathDoNothingButWarnNextTime)),
+                        (disableButton = new TaskDialogButton(Resources.LongPathDoNothingAndDoNotWarnAgain, Resources.LongPathDoNothingAndDoNotWarnAgainDetail))
                     },
                     FooterIcon = TaskDialogIcon.Information,
-                    Footer = SR.GetString(SR.LongPathFooter)
+                    Footer = Resources.LongPathFooter
                 };
 
                 taskDialog.HyperlinkClicked += (sender, e) => {
@@ -830,7 +830,7 @@ namespace Microsoft.NodejsTools.Project {
                 var longPaths = await Task.Factory.StartNew(() =>
                     GetLongSubPaths(ProjectHome)
                     .Concat(GetLongSubPaths(_intermediateOutputPath))
-                    .Select(lpi => string.Format("• {1}\u00A0<a href=\"{0}\">{2}</a>", lpi.FullPath, lpi.RelativePath, SR.GetString(SR.LongPathClickToCopy)))
+                    .Select(lpi => string.Format("• {1}\u00A0<a href=\"{0}\">{2}</a>", lpi.FullPath, lpi.RelativePath, Resources.LongPathClickToCopy))
                     .ToArray());
                 if (longPaths.Length == 0) {
                     return;
@@ -840,9 +840,9 @@ namespace Microsoft.NodejsTools.Project {
                 var button = taskDialog.ShowModal();
                 if (button == dedupeButton) {
                     var repl = NodejsPackage.Instance.OpenReplWindow(focus: false);
-                    await repl.ExecuteCommand(".npm dedupe").HandleAllExceptions(SR.ProductName);
+                    await repl.ExecuteCommand(".npm dedupe").HandleAllExceptions(NodeJsProjectSr.ProductName);
 
-                    taskDialog.Content += "\r\n\r\n" + SR.GetString(SR.LongPathNpmDedupeDidNotHelp);
+                    taskDialog.Content += "\r\n\r\n" + Resources.LongPathNpmDedupeDidNotHelp;
                     taskDialog.Buttons.Remove(dedupeButton);
                     goto recheck;
                 } else if (button == disableButton) {

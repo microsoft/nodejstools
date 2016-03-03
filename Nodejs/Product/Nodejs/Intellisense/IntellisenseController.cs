@@ -663,10 +663,10 @@ namespace Microsoft.NodejsTools.Intellisense {
                 string prompt;
                 string[] snippetTypes;
                 if ((VSConstants.VSStd2KCmdID)nCmdID == VSConstants.VSStd2KCmdID.SURROUNDWITH) {
-                    prompt = SR.GetString(SR.SurroundWith);
+                    prompt = Resources.SurroundWith;
                     snippetTypes = _surroundsWithSnippetTypes;
                 } else {
-                    prompt = SR.GetString(SR.InsertSnippet);
+                    prompt = Resources.InsertSnippet;
                     snippetTypes = _allStandardSnippetTypes;
                 }
 

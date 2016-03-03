@@ -177,7 +177,7 @@ namespace Microsoft.NodejsTools.NpmUI {
 
             CatalogControlVisibility = Visibility.Collapsed;
             LoadingCatalogControlVisibility = Visibility.Visible;
-            LoadingCatalogMessage = SR.GetString(SR.CatalogLoadingDefault);
+            LoadingCatalogMessage = Resources.CatalogLoadingDefault;
 
             LastRefreshedMessage = LastRefreshedMessageProvider.RefreshInProgress;
 

@@ -31,7 +31,6 @@ using Microsoft.VisualStudio.Shell.Interop;
 using VSLangProj;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 using Microsoft.NodejsTools.TestFrameworks;
-using SR = Microsoft.NodejsTools.Project.SR;
 
 namespace Microsoft.NodejsTools.Project {
 
@@ -41,16 +40,16 @@ namespace Microsoft.NodejsTools.Project {
             : base(node) {
         }
 
-        [SRCategoryAttribute(SR.Advanced)]
-        [LocDisplayName(SR.TestFramework)]
-        [SRDescriptionAttribute(SR.TestFrameworkDescription)]
+        [SRCategoryAttribute(NodeJsProjectSr.Advanced)]
+        [LocDisplayName(NodeJsProjectSr.TestFramework)]
+        [SRDescriptionAttribute(NodeJsProjectSr.TestFrameworkDescription)]
         [TypeConverter(typeof(TestFrameworkStringConverter))]
         public string TestFramework {
             get {
-                return GetProperty(SR.TestFramework, string.Empty);
+                return GetProperty(NodeJsProjectSr.TestFramework, string.Empty);
             }
             set {
-                SetProperty(SR.TestFramework, value.ToString());
+                SetProperty(NodeJsProjectSr.TestFramework, value.ToString());
             }
         }
     }
@@ -61,16 +60,16 @@ namespace Microsoft.NodejsTools.Project {
             : base(node) {
         }
 
-        [SRCategoryAttribute(SR.Advanced)]
-        [LocDisplayName(SR.TestFramework)]
-        [SRDescriptionAttribute(SR.TestFrameworkDescription)]
+        [SRCategoryAttribute(NodeJsProjectSr.Advanced)]
+        [LocDisplayName(NodeJsProjectSr.TestFramework)]
+        [SRDescriptionAttribute(NodeJsProjectSr.TestFrameworkDescription)]
         [TypeConverter(typeof(TestFrameworkStringConverter))]
         public string TestFramework {
             get {
-                return GetProperty(SR.TestFramework, string.Empty);
+                return GetProperty(NodeJsProjectSr.TestFramework, string.Empty);
             }
             set {
-                SetProperty(SR.TestFramework, value.ToString());
+                SetProperty(NodeJsProjectSr.TestFramework, value.ToString());
             }
         }
     }

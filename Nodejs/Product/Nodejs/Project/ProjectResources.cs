@@ -20,7 +20,7 @@ using System.Threading;
 using CommonSR = Microsoft.VisualStudioTools.Project.SR;
 
 namespace Microsoft.NodejsTools.Project {
-    internal class SR : CommonSR {
+    internal class NodeJsProjectSr : CommonSR {
         internal const string NodejsToolsForVisualStudio = "NodejsToolsForVisualStudio";
 
         internal const string AzureToolsInstallInstructions = "AzureToolsInstallInstructions";
@@ -182,7 +182,7 @@ namespace Microsoft.NodejsTools.Project {
         internal const string WorkingDirToolTip = "WorkingDirToolTip";
 
         private static readonly Lazy<ResourceManager> _manager = new Lazy<ResourceManager>(
-            () => new System.Resources.ResourceManager("Microsoft.NodejsTools.Resources", typeof(SR).Assembly),
+            () => new System.Resources.ResourceManager("Microsoft.NodejsTools.Resources", typeof(NodeJsProjectSr).Assembly),
             LazyThreadSafetyMode.ExecutionAndPublication
         );
 

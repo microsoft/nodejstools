@@ -121,12 +121,12 @@ namespace Microsoft.NodejsTools.ProjectWizard {
                 }
 
                 var dlg = new TaskDialog(provider) {
-                    Title = SR.ProductName,
-                    MainInstruction = SR.GetString(SR.AzureToolsRequired),
-                    Content = SR.GetString(SR.AzureToolsInstallInstructions),
+                    Title = NodeJsProjectSr.ProductName,
+                    MainInstruction = Resources.AzureToolsRequired,
+                    Content = Resources.AzureToolsInstallInstructions,
                     AllowCancellation = true
                 };
-                var download = new TaskDialogButton(SR.GetString(SR.DownloadAndInstall));
+                var download = new TaskDialogButton(Resources.DownloadAndInstall);
                 dlg.Buttons.Add(download);
                 dlg.Buttons.Add(TaskDialogButton.Cancel);
 
@@ -146,15 +146,15 @@ namespace Microsoft.NodejsTools.ProjectWizard {
                 if (!store.CollectionExists(DontShowUpgradeDialogAgainCollection) ||
                     !store.GetBoolean(DontShowUpgradeDialogAgainCollection, DontShowUpgradeDialogAgainProperty, false)) {
                     var dlg = new TaskDialog(provider) {
-                        Title = SR.ProductName,
-                        MainInstruction = SR.GetString(SR.AzureToolsUpgradeRecommended),
-                        Content = SR.GetString(SR.AzureToolsUpgradeInstructions),
+                        Title = NodeJsProjectSr.ProductName,
+                        MainInstruction = Resources.AzureToolsUpgradeRecommended,
+                        Content = Resources.AzureToolsUpgradeInstructions,
                         AllowCancellation = true,
-                        VerificationText = SR.GetString(SR.DontShowAgain)
+                        VerificationText = Resources.DontShowAgain
                     };
-                    var download = new TaskDialogButton(SR.GetString(SR.DownloadAndInstall));
+                    var download = new TaskDialogButton(Resources.DownloadAndInstall);
                     dlg.Buttons.Add(download);
-                    var cont = new TaskDialogButton(SR.GetString(SR.ContinueWithoutAzureToolsUpgrade));
+                    var cont = new TaskDialogButton(Resources.ContinueWithoutAzureToolsUpgrade);
                     dlg.Buttons.Add(cont);
                     dlg.Buttons.Add(TaskDialogButton.Cancel);
 

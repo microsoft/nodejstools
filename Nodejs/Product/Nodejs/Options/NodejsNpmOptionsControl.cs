@@ -58,7 +58,7 @@ namespace Microsoft.NodejsTools.Options {
                        );
             } catch (Exception exception) {
                 try {
-                    ActivityLog.LogError(SR.ProductName, exception.ToString());
+                    ActivityLog.LogError(NodeJsProjectSr.ProductName, exception.ToString());
                 } catch (InvalidOperationException) {
                     // Activity Log is unavailable.
                 }

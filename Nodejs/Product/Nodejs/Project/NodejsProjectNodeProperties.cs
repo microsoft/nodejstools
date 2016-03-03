@@ -54,9 +54,9 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        [SRCategoryAttribute(SR.General)]
-        [SRDisplayName(SR.NodeExePath)]
-        [SRDescriptionAttribute(SR.NodeExePathDescription)]
+        [SRCategoryAttribute(NodeJsProjectSr.General)]
+        [SRDisplayName(NodeJsProjectSr.NodeExePath)]
+        [SRDescriptionAttribute(NodeJsProjectSr.NodeExePathDescription)]
         public string NodeExePath {
             get {
                 return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
@@ -72,9 +72,9 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        [SRCategoryAttribute(SR.General)]
-        [SRDisplayName(SR.NodeExeArguments)]
-        [SRDescriptionAttribute(SR.NodeExeArgumentsDescription)]
+        [SRCategoryAttribute(NodeJsProjectSr.General)]
+        [SRDisplayName(NodeJsProjectSr.NodeExeArguments)]
+        [SRDescriptionAttribute(NodeJsProjectSr.NodeExeArgumentsDescription)]
         public string NodeExeArguments {
             get {
                 return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
@@ -88,9 +88,9 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        [SRCategoryAttribute(SR.General)]
-        [SRDisplayName(SR.ScriptArguments)]
-        [SRDescriptionAttribute(SR.ScriptArgumentsDescription)]
+        [SRCategoryAttribute(NodeJsProjectSr.General)]
+        [SRDisplayName(NodeJsProjectSr.ScriptArguments)]
+        [SRDescriptionAttribute(NodeJsProjectSr.ScriptArgumentsDescription)]
         public string ScriptArguments {
             get {
                 return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
@@ -104,9 +104,9 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        [SRCategoryAttribute(SR.General)]
-        [SRDisplayName(SR.NodejsPort)]
-        [SRDescriptionAttribute(SR.NodejsPortDescription)]
+        [SRCategoryAttribute(NodeJsProjectSr.General)]
+        [SRDisplayName(NodeJsProjectSr.NodejsPort)]
+        [SRDescriptionAttribute(NodeJsProjectSr.NodejsPortDescription)]
         public int? NodejsPort {
             get {
                 return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke((Func<int?>)(() => {
@@ -124,9 +124,9 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        [SRCategoryAttribute(SR.General)]
-        [SRDisplayName(SR.LaunchUrl)]
-        [SRDescriptionAttribute(SR.LaunchUrlDescription)]
+        [SRCategoryAttribute(NodeJsProjectSr.General)]
+        [SRDisplayName(NodeJsProjectSr.LaunchUrl)]
+        [SRDescriptionAttribute(NodeJsProjectSr.LaunchUrlDescription)]
         public string LaunchUrl {
             get {
                 return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
@@ -140,9 +140,9 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        [SRCategoryAttribute(SR.General)]
-        [SRDisplayName(SR.StartWebBrowser)]
-        [SRDescriptionAttribute(SR.StartWebBrowserDescription)]
+        [SRCategoryAttribute(NodeJsProjectSr.General)]
+        [SRDisplayName(NodeJsProjectSr.StartWebBrowser)]
+        [SRDescriptionAttribute(NodeJsProjectSr.StartWebBrowserDescription)]
         public bool StartWebBrowser {
             get {
                 return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {

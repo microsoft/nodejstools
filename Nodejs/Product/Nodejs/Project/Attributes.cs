@@ -28,7 +28,7 @@ namespace Microsoft.NodejsTools.Project {
 
         public override string DisplayName {
             get {
-                return SR.GetString(_name);
+                return NodeJsProjectSr.GetString(_name);
             }
         }
     }
@@ -45,7 +45,7 @@ namespace Microsoft.NodejsTools.Project {
             get {
                 if (!_replaced) {
                     _replaced = true;
-                    DescriptionValue = SR.GetString(base.Description);
+                    DescriptionValue = NodeJsProjectSr.GetString(base.Description);
                 }
                 return base.Description;
             }
@@ -59,7 +59,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         protected override string GetLocalizedString(string value) {
-            return SR.GetString(value);
+            return NodeJsProjectSr.GetString(value);
         }
     }
 }
