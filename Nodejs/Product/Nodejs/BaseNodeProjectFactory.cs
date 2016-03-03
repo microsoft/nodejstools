@@ -22,7 +22,6 @@ using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Project;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
-using SR = Microsoft.NodejsTools.Project.SR;
 
 namespace Microsoft.NodejsTools {
     [Guid(Guids.NodejsBaseProjectFactoryString)]
@@ -51,7 +50,7 @@ namespace Microsoft.NodejsTools {
                 var globals = projectXml.PropertyGroups.FirstOrDefault() ?? projectXml.AddPropertyGroup();
                 AddOrSetProperty(globals, NodejsConstants.Environment, envVarsProp.Value.Replace(";", "\r\n"));
                 envVarsProp.Parent.RemoveChild(envVarsProp);
-                log(__VSUL_ERRORLEVEL.VSUL_INFORMATIONAL, SR.GetString(SR.UpgradedEnvironmentVariables));
+                log(__VSUL_ERRORLEVEL.VSUL_INFORMATIONAL, Resources.UpgradedEnvironmentVariables);
             }
         }
 

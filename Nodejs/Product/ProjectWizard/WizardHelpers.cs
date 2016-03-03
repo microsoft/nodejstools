@@ -28,7 +28,7 @@ namespace Microsoft.NodejsTools.ProjectWizard {
             if (oleProvider != null) {
                 return new ServiceProvider(oleProvider);
             }
-            MessageBox.Show(SR.GetString(SR.ErrorNoDte), SR.ProductName);
+            MessageBox.Show(Resources.ErrorNoDte, SR.ProductName);
             return null;
         }
 
@@ -41,7 +41,7 @@ namespace Microsoft.NodejsTools.ProjectWizard {
                 }
             }
             if (dte == null) {
-                MessageBox.Show(SR.GetString(SR.ErrorNoDte), SR.ProductName);
+                MessageBox.Show(Resources.ErrorNoDte, SR.ProductName);
             }
             return dte;
         }

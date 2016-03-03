@@ -30,7 +30,6 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Project;
-using SR = Microsoft.NodejsTools.Project.SR;
 using Task = System.Threading.Tasks.Task;
 
 namespace Microsoft.NodejsTools.Repl {
@@ -146,9 +145,9 @@ namespace Microsoft.NodejsTools.Repl {
                 null);
 
             if (npmReplRedirector.HasErrors) {
-                window.WriteError(SR.GetString(SR.NpmReplCommandCompletedWithErrors, arguments));
+                window.WriteError(string.Format(Resources.NpmReplCommandCompletedWithErrors, arguments));
             } else {
-                window.WriteLine(SR.GetString(SR.NpmSuccessfullyCompleted, arguments));
+                window.WriteLine(string.Format(Resources.NpmSuccessfullyCompleted, arguments));
             }
 
             if (nodejsProject != null) {

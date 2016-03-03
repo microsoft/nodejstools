@@ -38,7 +38,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override string GetClassName() {
-            return SR.GetString(IsGlobalNode ? SR.PropertiesClassGlobal : SR.PropertiesClassNpm);
+            return (IsGlobalNode ? Resources.PropertiesClassGlobal : Resources.PropertiesClassNpm);
         }
 
         [SRCategoryAttribute(SR.General)]
@@ -46,7 +46,7 @@ namespace Microsoft.NodejsTools.Project {
         [SRDescriptionAttribute(SR.NpmNodePackageInstallationDescription)]
         public string PackageInstallation {
             get {
-                return SR.GetString(IsGlobalNode ? SR.PackageInstallationGlobal : SR.PackageInstallationLocal);
+                return (IsGlobalNode ? Resources.PackageInstallationGlobal : Resources.PackageInstallationLocal);
             }
         }
 

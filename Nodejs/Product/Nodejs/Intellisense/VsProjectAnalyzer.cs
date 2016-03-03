@@ -28,6 +28,7 @@ using Microsoft.NodejsTools.Analysis;
 using Microsoft.NodejsTools.Classifier;
 using Microsoft.NodejsTools.Options;
 using Microsoft.NodejsTools.Parsing;
+using Microsoft.NodejsTools.Project;
 using Microsoft.NodejsTools.Repl;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -35,7 +36,6 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Adornments;
 using Microsoft.VisualStudioTools;
 using Microsoft.Win32;
-using SR = Microsoft.NodejsTools.Project.SR;
 using Task = System.Threading.Tasks.Task;
 
 namespace Microsoft.NodejsTools.Intellisense {
@@ -1349,7 +1349,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                     if (DbHeader.SequenceEqual(header)) {
                         var statusbar = (IVsStatusbar)NodejsPackage.GetGlobalService(typeof(SVsStatusbar));
                         if (statusbar != null) {
-                            statusbar.SetText(SR.GetString(SR.StatusAnalysisLoading));
+                            statusbar.SetText(Resources.StatusAnalysisLoading);
                         }
 
                         Task.Run(() => {
@@ -1369,20 +1369,20 @@ namespace Microsoft.NodejsTools.Intellisense {
                                         _jsAnalyzer = analyzer;
 
                                         if (statusbar != null) {
-                                            statusbar.SetText(SR.GetString(SR.StatusAnalysisLoaded));
+                                            statusbar.SetText(Resources.StatusAnalysisLoaded);
                                         }
                                     }
                                 }
                             } catch (InvalidOperationException) {
                                 // corrupt or invalid DB
                                 if (statusbar != null) {
-                                    statusbar.SetText(SR.GetString(SR.StatusAnalysisLoadFailed));
+                                    statusbar.SetText(Resources.StatusAnalysisLoadFailed);
                                 }
                             } catch (Exception e) {
                                 Debug.Fail(String.Format("Unexpected exception while loading analysis: {0}", e));
                                 // bug in deserialization
                                 if (statusbar != null) {
-                                    statusbar.SetText(SR.GetString(SR.StatusAnalysisLoadFailed));
+                                    statusbar.SetText(Resources.StatusAnalysisLoadFailed);
                                 }
                             } finally {
                                 stream.Dispose();
@@ -1401,7 +1401,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                                     }
                                 }
                             }
-                        }).HandleAllExceptions(SR.GetString(SR.NodejsToolsForVisualStudio)).DoNotWait();
+                        }).HandleAllExceptions(Resources.NodejsToolsForVisualStudio).DoNotWait();
                         disposeStream = false;
                         return true;
                     }

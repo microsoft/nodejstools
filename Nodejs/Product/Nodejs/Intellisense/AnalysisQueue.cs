@@ -188,21 +188,21 @@ namespace Microsoft.NodejsTools.Intellisense {
                             int count = _analyzer._jsAnalyzer.GetAndClearAnalysisCount();
                             if (count != 0) {
                                 var elapsedTime = TimeSpan.FromMilliseconds(watch.ElapsedMilliseconds - startTime);
-                                statsMessage = SR.GetString(SR.StatusAnalysisUpToDate, count, FormatTime(elapsedTime));
+                                statsMessage = String.Format(Resources.StatusAnalysisUpToDate, count, FormatTime(elapsedTime));
                             }
                         }
 
                         if (_analyzer._saveToDisk && analyzedAnything && (DateTime.Now - _lastSave) > _SaveAnalysisTime) {
                             var statusbar = (IVsStatusbar)NodejsPackage.GetGlobalService(typeof(SVsStatusbar));
                             if (statusbar != null) {
-                                statusbar.SetText(SR.GetString(SR.StatusAnalysisSaving) + " " + statsMessage);
+                                statusbar.SetText(Resources.StatusAnalysisSaving + " " + statsMessage);
                             }
 
                             _analyzer.SaveAnalysis();
                             _lastSave = DateTime.Now;
 
                             if (statusbar != null) {
-                                statusbar.SetText(SR.GetString(SR.StatusAnalysisSaved) + " " + statsMessage);
+                                statusbar.SetText(Resources.StatusAnalysisSaved + " " + statsMessage);
                             }
                         } else if(statsMessage != null) {
                             var statusbar = (IVsStatusbar)NodejsPackage.GetGlobalService(typeof(SVsStatusbar));
@@ -224,9 +224,9 @@ namespace Microsoft.NodejsTools.Intellisense {
 
             private static string FormatTime(TimeSpan elapsedTime) {
                 if (elapsedTime.TotalMilliseconds < 1000) {
-                    return elapsedTime.TotalMilliseconds + " " + SR.GetString(SR.Milliseconds);
+                    return elapsedTime.TotalMilliseconds + " " + Resources.Milliseconds;
                 } else if (elapsedTime.TotalSeconds < 60) {
-                    return elapsedTime.TotalSeconds + " " + SR.GetString(SR.Seconds);
+                    return elapsedTime.TotalSeconds + " " + Resources.Seconds;
                 }
                 return elapsedTime.ToString("g");
             }

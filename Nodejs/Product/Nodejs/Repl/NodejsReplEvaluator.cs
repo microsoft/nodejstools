@@ -58,7 +58,7 @@ namespace Microsoft.NodejsTools.Repl {
             _window.SetOptionValue(ReplOptions.SupportAnsiColors, true);
             _window.SetOptionValue(ReplOptions.UseSmartUpDown, true);
 
-            _window.WriteLine(SR.GetString(SR.ReplInitializationMessage));
+            _window.WriteLine(Resources.ReplInitializationMessage);
 
             return ExecutionResult.Succeeded;
         }
@@ -179,11 +179,11 @@ namespace Microsoft.NodejsTools.Repl {
 
             string nodeExePath = GetNodeExePath();
             if (String.IsNullOrWhiteSpace(nodeExePath)) {
-                _window.WriteError(SR.GetString(SR.NodejsNotInstalled));
+                _window.WriteError(Resources.NodejsNotInstalled);
                 _window.WriteError(Environment.NewLine);
                 return;
             } else if (!File.Exists(nodeExePath)) {
-                _window.WriteError(SR.GetString(SR.NodeExeDoesntExist, nodeExePath));
+                _window.WriteError(string.Format(Resources.NodeExeDoesntExist, nodeExePath));
                 _window.WriteError(Environment.NewLine);
                 return;
             }

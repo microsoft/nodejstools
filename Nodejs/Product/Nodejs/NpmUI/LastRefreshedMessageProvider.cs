@@ -21,12 +21,12 @@ namespace Microsoft.NodejsTools.NpmUI {
     internal class LastRefreshedMessageProvider {
         public static readonly LastRefreshedMessageProvider RefreshFailed = new LastRefreshedMessageProvider {
             Days = int.MaxValue,
-            Description = SR.GetString(SR.PackageCatalogRefreshFailed)
+            Description = Resources.PackageCatalogRefreshFailed
         };
 
         public static readonly LastRefreshedMessageProvider RefreshInProgress = new LastRefreshedMessageProvider {
             Days = 0,
-            Description = SR.GetString(SR.PackageCatalogRefreshing)
+            Description = Resources.PackageCatalogRefreshing
         };
 
         public static readonly LastRefreshedMessageProvider NpmNotFound = new LastRefreshedMessageProvider {
@@ -39,25 +39,25 @@ namespace Microsoft.NodejsTools.NpmUI {
         public LastRefreshedMessageProvider(DateTime lastRefreshTime) {
             if (lastRefreshTime == DateTime.MinValue) {
                 Days = int.MaxValue;
-                Description = SR.GetString(SR.PackageCatalogRefreshFailed);
+                Description = Resources.PackageCatalogRefreshFailed;
             } else {
                 Days = (int)(DateTime.Now.Date - lastRefreshTime.Date).TotalDays;
                 if (Days == 0) {
-                    Description = SR.GetString(SR.PackageCatalogRefresh0Days, lastRefreshTime);
+                    Description = string.Format(Resources.PackageCatalogRefresh0Days, lastRefreshTime);
                 } else if (Days == 1) {
-                    Description = SR.GetString(SR.PackageCatalogRefresh1Day, lastRefreshTime);
+                    Description = string.Format(Resources.PackageCatalogRefresh1Day, lastRefreshTime);
                 } else if (Days <= 7) {
-                    Description = SR.GetString(SR.PackageCatalogRefresh2To7Days, Days);
+                    Description = string.Format(Resources.PackageCatalogRefresh2To7Days, Days);
                 } else if (Days <= 14) {
-                    Description = SR.GetString(SR.PackageCatalogRefresh1Week);
+                    Description = Resources.PackageCatalogRefresh1Week;
                 } else if (Days <= 21) {
-                    Description = SR.GetString(SR.PackageCatalogRefresh2Weeks);
+                    Description = Resources.PackageCatalogRefresh2Weeks;
                 } else if (Days <= 31) {
-                    Description = SR.GetString(SR.PackageCatalogRefresh3Weeks);
+                    Description = Resources.PackageCatalogRefresh3Weeks;
                 } else if (Days <= 92) {
-                    Description = SR.GetString(SR.PackageCatalogRefresh1Month);
+                    Description = Resources.PackageCatalogRefresh1Month;
                 } else {
-                    Description = SR.GetString(SR.PackageCatalogRefresh3Months);
+                    Description = Resources.PackageCatalogRefresh3Months;
                 }
             }
         }

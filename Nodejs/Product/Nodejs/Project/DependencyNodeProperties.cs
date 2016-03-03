@@ -32,9 +32,9 @@ namespace Microsoft.NodejsTools.Project {
         private IPackage Package { get { return DependencyNode.Package; } }
 
         public override string GetClassName() {
-            return SR.GetString(IsSubPackage
-                ? (IsGlobalInstall ? SR.PropertiesClassGlobalSubPackage : SR.PropertiesClassLocalSubPackage)
-                : (IsGlobalInstall ? SR.PropertiesClassGlobalPackage : SR.PropertiesClassLocalPackage)
+            return (IsSubPackage
+                ? (IsGlobalInstall ? Resources.PropertiesClassGlobalSubPackage : Resources.PropertiesClassLocalSubPackage)
+                : (IsGlobalInstall ? Resources.PropertiesClassGlobalPackage : Resources.PropertiesClassLocalPackage)
             );
         }
 
@@ -62,7 +62,7 @@ namespace Microsoft.NodejsTools.Project {
         public string RequestedVersionRange {
             get {
                 var range = null == Package ? null : Package.RequestedVersionRange;
-                return range ?? SR.GetString(SR.RequestedVersionRangeNone);
+                return range ?? Resources.RequestedVersionRangeNone;
             }
         }
 
@@ -179,13 +179,13 @@ namespace Microsoft.NodejsTools.Project {
             get {
                 if (IsGlobalInstall) {
                     return IsSubPackage
-                        ? SR.GetString(SR.PackageTypeGlobalSubpackage)
-                        : SR.GetString(SR.PackageTypeGlobal);
+                        ? Resources.PackageTypeGlobalSubpackage
+                        : Resources.PackageTypeGlobal;
                 }
 
                 return IsSubPackage
-                    ? SR.GetString(SR.PackageTypeLocalSubpackage)
-                    : SR.GetString(SR.PackageTypeLocal);
+                    ? Resources.PackageTypeLocalSubpackage
+                    : Resources.PackageTypeLocal;
             }
         }
 
@@ -196,7 +196,7 @@ namespace Microsoft.NodejsTools.Project {
         public string LinkStatus {
             get {
                 if (IsSubPackage) {
-                    return SR.GetString(SR.LinkStatusNotApplicableSubPackages);
+                    return Resources.LinkStatusNotApplicableSubPackages;
                 }
 
                 var package = Package;
@@ -207,21 +207,21 @@ namespace Microsoft.NodejsTools.Project {
                         if (null != root) {
                             var local = root.Modules[package.Name];
                             return null == local || local.Version != package.Version
-                                ? SR.GetString(SR.LinkStatusNotLinkedToProject)
-                                : SR.GetString(SR.LinkStatusLinkedToProject);
+                                ? Resources.LinkStatusNotLinkedToProject
+                                : Resources.LinkStatusLinkedToProject;
                         }
                     } else {
                         var global = controller.GlobalPackages;
                         if (null != global) {
                             var installed = global.Modules[package.Name];
                             return null == installed || installed.Version != package.Version
-                                ? SR.GetString(SR.LinkStatusLocallyInstalled)
-                                : SR.GetString(SR.LinkStatusLinkedFromGlobal);
+                                ? Resources.LinkStatusLocallyInstalled
+                                : Resources.LinkStatusLinkedFromGlobal;
                         }
                     }
                 }
 
-                return SR.GetString(SR.LinkStatusUnknown);
+                return Resources.LinkStatusUnknown;
             }
         }
 

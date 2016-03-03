@@ -217,20 +217,20 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private bool ShouldIncludeNodeModulesFolderInProject() {
-            var includeNodeModulesButton = new TaskDialogButton(SR.GetString(SR.IncludeNodeModulesIncludeTitle), SR.GetString(SR.IncludeNodeModulesIncludeDescription));
-            var cancelOperationButton = new TaskDialogButton(SR.GetString(SR.IncludeNodeModulesCancelTitle));
+            var includeNodeModulesButton = new TaskDialogButton(Resources.IncludeNodeModulesIncludeTitle, Resources.IncludeNodeModulesIncludeDescription);
+            var cancelOperationButton = new TaskDialogButton(Resources.IncludeNodeModulesCancelTitle);
             var taskDialog = new TaskDialog(_project.ProjectMgr.Site) {
                 AllowCancellation = true,
                 EnableHyperlinks = true,
                 Title = SR.ProductName,
                 MainIcon = TaskDialogIcon.Warning,
-                Content = SR.GetString(SR.IncludeNodeModulesContent),
+                Content = Resources.IncludeNodeModulesContent,
                 Buttons = {
                     cancelOperationButton,
                     includeNodeModulesButton
                 },
                 FooterIcon = TaskDialogIcon.Information,
-                Footer = SR.GetString(SR.IncludeNodeModulesInformation),
+                Footer = Resources.IncludeNodeModulesInformation,
                 SelectedButton = cancelOperationButton
             };
 
