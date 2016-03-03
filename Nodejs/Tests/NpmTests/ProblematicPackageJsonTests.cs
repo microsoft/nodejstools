@@ -184,7 +184,7 @@ namespace NpmTests {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestParseFromEveryCharValue() {
             var buff = new StringBuilder();
             var ch = (char)0;

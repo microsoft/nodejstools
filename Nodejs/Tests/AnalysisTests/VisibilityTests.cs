@@ -15,7 +15,10 @@
 //*********************************************************//
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
@@ -23,7 +26,7 @@ using TestUtilities;
 namespace AnalysisTests {
     [TestClass]
     public class VisibilityTests {
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void DirectedTests() {
             // make sure the order of adding modules doesn't matter...
             var analysis2 = Analysis.Analyze(
@@ -68,7 +71,7 @@ namespace AnalysisTests {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestVisible() {
             // make sure the order of adding modules doesn't matter...
             var analysis = Analysis.Analyze(
