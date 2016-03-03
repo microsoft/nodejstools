@@ -46,7 +46,7 @@ namespace Microsoft.NodejsTools.Project {
         [SRDescriptionAttribute(NodeJsProjectSr.NpmNodePackageInstallationDescription)]
         public string PackageInstallation {
             get {
-                return NodeJsProjectSr.GetString(IsGlobalNode ? NodeJsProjectSr.PackageInstallationGlobal : NodeJsProjectSr.PackageInstallationLocal);
+                return (IsGlobalNode ? Resources.PackageInstallationGlobal : Resources.PackageInstallationLocal);
             }
         }
 

@@ -146,7 +146,7 @@ namespace Microsoft.NodejsTools.Project {
                 return GetFullUrl(host, TestServerPort);
             } catch (UriFormatException) {
                 var output = OutputWindowRedirector.GetGeneral(NodejsPackage.Instance);
-                output.WriteErrorLine(Resources.ErrorInvalidLaunchUrl, host);
+                output.WriteErrorLine(SR.GetString(SR.ErrorInvalidLaunchUrl, host));
                 output.ShowAndActivate();
                 return string.Empty;
             }

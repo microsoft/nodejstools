@@ -347,8 +347,8 @@ namespace Microsoft.NodejsTools.Project {
 
         private static string GetStatusBarMessage(NpmCommandCompletedEventArgs e) {
             if (e.WithErrors) {
-                return NodeJsProjectSr.GetString(
-                    e.Cancelled ? NodeJsProjectSr.NpmCancelledWithErrors : NodeJsProjectSr.NpmCompletedWithErrors,
+                return string.Format(
+                    e.Cancelled ? Resources.NpmCancelledWithErrors : Resources.NpmCompletedWithErrors,
                     e.CommandText);
             } else if (e.Cancelled) {
                 return string.Format(Resources.NpmCancelled, e.CommandText);

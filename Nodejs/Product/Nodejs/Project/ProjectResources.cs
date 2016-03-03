@@ -198,7 +198,7 @@ namespace Microsoft.NodejsTools.Project {
 
         internal static string ProductName {
             get {
-                return GetString(NodejsToolsForVisualStudio);
+                return Resources.NodejsToolsForVisualStudio;
             }
         }
     }

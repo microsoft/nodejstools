@@ -32,9 +32,9 @@ namespace Microsoft.NodejsTools.Project {
         private IPackage Package { get { return DependencyNode.Package; } }
 
         public override string GetClassName() {
-            return NodeJsProjectSr.GetString(IsSubPackage
-                ? (IsGlobalInstall ? NodeJsProjectSr.PropertiesClassGlobalSubPackage : NodeJsProjectSr.PropertiesClassLocalSubPackage)
-                : (IsGlobalInstall ? NodeJsProjectSr.PropertiesClassGlobalPackage : NodeJsProjectSr.PropertiesClassLocalPackage)
+            return (IsSubPackage
+                ? (IsGlobalInstall ? Resources.PropertiesClassGlobalSubPackage : Resources.PropertiesClassLocalSubPackage)
+                : (IsGlobalInstall ? Resources.PropertiesClassGlobalPackage : Resources.PropertiesClassLocalPackage)
             );
         }
 

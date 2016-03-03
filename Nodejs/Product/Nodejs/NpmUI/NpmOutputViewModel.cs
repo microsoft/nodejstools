@@ -317,21 +317,21 @@ namespace Microsoft.NodejsTools.NpmUI {
             if (executingCommand && null != command) {
                 var commandText = command.ToString();
                 if (count > 0) {
-                    status = NodeJsProjectSr.GetString(
-                        WithErrors ? NodeJsProjectSr.NpmStatusExecutingQueuedErrors : NodeJsProjectSr.NpmStatusExecutingQueued,
+                    status = string.Format(
+                        WithErrors ? Resources.NpmStatusExecutingQueuedErrors : Resources.NpmStatusExecutingQueued,
                         commandText,
                         count,
                         errorsInfo
                     );
                 } else {
-                    status = NodeJsProjectSr.GetString(
-                        WithErrors ? NodeJsProjectSr.NpmStatusExecutingErrors : NodeJsProjectSr.NpmStatusExecuting,
+                    status = string.Format(
+                        WithErrors ? Resources.NpmStatusExecutingErrors : Resources.NpmStatusExecuting,
                         commandText,
                         errorsInfo
                     );
                 }
             } else {
-                status = NodeJsProjectSr.GetString(WithErrors ? NodeJsProjectSr.NpmStatusReadyWithErrors : NodeJsProjectSr.NpmStatusReady, errorsInfo);
+                status = string.Format(WithErrors ? Resources.NpmStatusReadyWithErrors : Resources.NpmStatusReady, errorsInfo);
             }
 
             StatusText = status;

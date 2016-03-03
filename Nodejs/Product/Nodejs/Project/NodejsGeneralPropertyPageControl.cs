@@ -46,7 +46,7 @@ namespace Microsoft.NodejsTools.Project {
         private void AddToolTips() {
             _tooltip.SetToolTip(_nodeExePath, Resources.NodeExePathToolTip);
             _tooltip.SetToolTip(_nodeExeArguments, Resources.NodeExeArgumentsToolTip);
-            _tooltip.SetToolTip(_scriptFile, Resources.ScriptFileToolTip);
+            _tooltip.SetToolTip(_scriptFile, Resources.ScriptFileTooltip);
             _tooltip.SetToolTip(_scriptArguments, Resources.ScriptArgumentsToolTip);
             _tooltip.SetToolTip(_nodejsPort, Resources.NodejsPortToolTip);
             _tooltip.SetToolTip(_startBrowser, Resources.StartBrowserToolTip);

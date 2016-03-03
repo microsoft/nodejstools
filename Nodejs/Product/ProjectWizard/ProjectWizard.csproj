@@ -92,6 +92,9 @@
     <Compile Include="..\Nodejs\PkgCmdID.cs">
       <Link>PkgCmdID.cs</Link>
     </Compile>
+    <Compile Include="..\Nodejs\Resources.Designer.cs">
+      <Link>Resources.Designer.cs</Link>
+    </Compile>
     <Compile Include="..\Nodejs\TestFrameworks\TestFrameworkDirectories.cs">
       <Link>TestFrameworkDirectories.cs</Link>
     </Compile>
