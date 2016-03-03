@@ -38,7 +38,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override string GetClassName() {
-            return NodeJsProjectSr.GetString(IsGlobalNode ? NodeJsProjectSr.PropertiesClassGlobal : NodeJsProjectSr.PropertiesClassNpm);
+            return (IsGlobalNode ? Resources.PropertiesClassGlobal : Resources.PropertiesClassNpm);
         }
 
         [SRCategoryAttribute(NodeJsProjectSr.General)]
