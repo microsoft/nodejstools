@@ -41,18 +41,18 @@ namespace Microsoft.NodejsTools.Project {
             return (IsGlobalNode ? Resources.PropertiesClassGlobal : Resources.PropertiesClassNpm);
         }
 
-        [SRCategoryAttribute(NodeJsProjectSr.General)]
-        [SRDisplayName(NodeJsProjectSr.NpmNodePackageInstallation)]
-        [SRDescriptionAttribute(NodeJsProjectSr.NpmNodePackageInstallationDescription)]
+        [SRCategoryAttribute(SR.General)]
+        [SRDisplayName(SR.NpmNodePackageInstallation)]
+        [SRDescriptionAttribute(SR.NpmNodePackageInstallationDescription)]
         public string PackageInstallation {
             get {
                 return (IsGlobalNode ? Resources.PackageInstallationGlobal : Resources.PackageInstallationLocal);
             }
         }
 
-        [SRCategoryAttribute(NodeJsProjectSr.General)]
-        [SRDisplayName(NodeJsProjectSr.NpmNodePath)]
-        [SRDescriptionAttribute(NodeJsProjectSr.NpmNodePathDescription)]
+        [SRCategoryAttribute(SR.General)]
+        [SRDisplayName(SR.NpmNodePath)]
+        [SRDescriptionAttribute(SR.NpmNodePathDescription)]
         public string Path {
             get {
                 var node = NpmNode;

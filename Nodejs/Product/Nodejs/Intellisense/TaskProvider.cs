@@ -479,7 +479,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         private void Refresh() {
             _serviceProvider.GetUIThread().MustNotBeCalledFromUIThread("Refresh must not be called from the UI thread");
-            RefreshAsync().WaitAndHandleAllExceptions(NodeJsProjectSr.ProductName, GetType());
+            RefreshAsync().WaitAndHandleAllExceptions(SR.ProductName, GetType());
         }
 
         private async Task RefreshAsync() {
@@ -563,7 +563,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 if (!_hasWorker) {
                     _hasWorker = true;
                     Task.Run(() => Worker())
-                        .HandleAllExceptions(NodeJsProjectSr.ProductName, GetType())
+                        .HandleAllExceptions(SR.ProductName, GetType())
                         .DoNotWait();
                 }
             }

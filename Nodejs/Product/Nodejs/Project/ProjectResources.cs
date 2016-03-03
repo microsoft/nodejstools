@@ -20,7 +20,7 @@ using System.Threading;
 using CommonSR = Microsoft.VisualStudioTools.Project.SR;
 
 namespace Microsoft.NodejsTools.Project {
-    internal class NodeJsProjectSr : CommonSR {
+    internal class SR : CommonSR {
         internal const string NodejsToolsForVisualStudio = "NodejsToolsForVisualStudio";
 
         internal const string CategoryStatus = "CategoryStatus";
@@ -67,7 +67,7 @@ namespace Microsoft.NodejsTools.Project {
         internal const string TestFrameworkDescription = "TestFrameworkDescription";
 
         private static readonly Lazy<ResourceManager> _manager = new Lazy<ResourceManager>(
-            () => new System.Resources.ResourceManager("Microsoft.NodejsTools.Resources", typeof(NodeJsProjectSr).Assembly),
+            () => new System.Resources.ResourceManager("Microsoft.NodejsTools.Resources", typeof(SR).Assembly),
             LazyThreadSafetyMode.ExecutionAndPublication
         );
 

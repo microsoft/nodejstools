@@ -121,7 +121,7 @@ namespace Microsoft.NodejsTools.ProjectWizard {
                 }
 
                 var dlg = new TaskDialog(provider) {
-                    Title = NodeJsProjectSr.ProductName,
+                    Title = SR.ProductName,
                     MainInstruction = Resources.AzureToolsRequired,
                     Content = Resources.AzureToolsInstallInstructions,
                     AllowCancellation = true
@@ -146,7 +146,7 @@ namespace Microsoft.NodejsTools.ProjectWizard {
                 if (!store.CollectionExists(DontShowUpgradeDialogAgainCollection) ||
                     !store.GetBoolean(DontShowUpgradeDialogAgainCollection, DontShowUpgradeDialogAgainProperty, false)) {
                     var dlg = new TaskDialog(provider) {
-                        Title = NodeJsProjectSr.ProductName,
+                        Title = SR.ProductName,
                         MainInstruction = Resources.AzureToolsUpgradeRecommended,
                         Content = Resources.AzureToolsUpgradeInstructions,
                         AllowCancellation = true,

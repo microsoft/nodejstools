@@ -38,19 +38,19 @@ namespace Microsoft.NodejsTools.Project {
             : base(node) {
         }
 
-        [SRCategoryAttribute(NodeJsProjectSr.Advanced)]
-        [LocDisplayName(NodeJsProjectSr.TestFramework)]
-        [SRDescriptionAttribute(NodeJsProjectSr.TestFrameworkDescription)]
+        [SRCategoryAttribute(SR.Advanced)]
+        [LocDisplayName(SR.TestFramework)]
+        [SRDescriptionAttribute(SR.TestFrameworkDescription)]
         public string TestFramework {
             get {
-                var framework = this.HierarchyNode.ItemNode.GetMetadata(NodeJsProjectSr.TestFramework);
+                var framework = this.HierarchyNode.ItemNode.GetMetadata(SR.TestFramework);
                 if (String.IsNullOrWhiteSpace(framework)) {
                     return String.Empty;
                 }
                 return Convert.ToString(framework);
             }
             set {
-                this.HierarchyNode.ItemNode.SetMetadata(NodeJsProjectSr.TestFramework, value.ToString());
+                this.HierarchyNode.ItemNode.SetMetadata(SR.TestFramework, value.ToString());
             }
         }
     }
@@ -61,12 +61,12 @@ namespace Microsoft.NodejsTools.Project {
             : base(node) {
         }
 
-        [SRCategoryAttribute(NodeJsProjectSr.Advanced)]
-        [LocDisplayName(NodeJsProjectSr.TestFramework)]
-        [SRDescriptionAttribute(NodeJsProjectSr.TestFrameworkDescription)]
+        [SRCategoryAttribute(SR.Advanced)]
+        [LocDisplayName(SR.TestFramework)]
+        [SRDescriptionAttribute(SR.TestFrameworkDescription)]
         public string TestFramework {
             get {
-                var framework = this.HierarchyNode.ItemNode.GetMetadata(NodeJsProjectSr.TestFramework);
+                var framework = this.HierarchyNode.ItemNode.GetMetadata(SR.TestFramework);
                 if (String.IsNullOrEmpty(framework)) {
                     return String.Empty;
                 }
@@ -74,7 +74,7 @@ namespace Microsoft.NodejsTools.Project {
             }
             set {
 
-                this.HierarchyNode.ItemNode.SetMetadata(NodeJsProjectSr.TestFramework, value.ToString());
+                this.HierarchyNode.ItemNode.SetMetadata(SR.TestFramework, value.ToString());
             }
         }
     }

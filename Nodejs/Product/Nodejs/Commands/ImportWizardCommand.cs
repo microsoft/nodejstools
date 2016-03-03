@@ -68,7 +68,7 @@ namespace Microsoft.NodejsTools.Commands {
                                     "Some file paths could not be accessed." + Environment.NewLine +
                                     "Try moving your source code to a location where you " +
                                     "can read and write files.",
-                                    NodeJsProjectSr.ProductName
+                                    SR.ProductName
                                 );
                             } else {
                                 string exName = String.Empty;
@@ -79,7 +79,7 @@ namespace Microsoft.NodejsTools.Commands {
                                 MessageBox.Show(
                                     "An unexpected error " + exName +
                                     "occurred while creating your project.",
-                                    NodeJsProjectSr.ProductName
+                                    SR.ProductName
                                 );
                             }
                             return;

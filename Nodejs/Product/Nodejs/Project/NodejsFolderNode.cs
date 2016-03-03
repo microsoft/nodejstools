@@ -222,7 +222,7 @@ namespace Microsoft.NodejsTools.Project {
             var taskDialog = new TaskDialog(_project.ProjectMgr.Site) {
                 AllowCancellation = true,
                 EnableHyperlinks = true,
-                Title = NodeJsProjectSr.ProductName,
+                Title = SR.ProductName,
                 MainIcon = TaskDialogIcon.Warning,
                 Content = Resources.IncludeNodeModulesContent,
                 Buttons = {

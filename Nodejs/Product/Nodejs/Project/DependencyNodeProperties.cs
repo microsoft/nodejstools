@@ -38,27 +38,27 @@ namespace Microsoft.NodejsTools.Project {
             );
         }
 
-        [SRCategoryAttribute(NodeJsProjectSr.General)]
-        [SRDisplayName(NodeJsProjectSr.NpmPackageName)]
-        [SRDescriptionAttribute(NodeJsProjectSr.NpmPackageNameDescription)]
+        [SRCategoryAttribute(SR.General)]
+        [SRDisplayName(SR.NpmPackageName)]
+        [SRDescriptionAttribute(SR.NpmPackageNameDescription)]
         public string PackageName {
             get {
                 return null == Package ? null : Package.Name;
             }
         }
 
-        [SRCategoryAttribute(NodeJsProjectSr.CategoryVersion)]
-        [SRDisplayName(NodeJsProjectSr.NpmPackageVersion)]
-        [SRDescriptionAttribute(NodeJsProjectSr.NpmPackageVersionDescription)]
+        [SRCategoryAttribute(SR.CategoryVersion)]
+        [SRDisplayName(SR.NpmPackageVersion)]
+        [SRDescriptionAttribute(SR.NpmPackageVersionDescription)]
         public string PackageVersion {
             get {
                 return null == Package ? null : Package.Version.ToString();
             }
         }
 
-        [SRCategoryAttribute(NodeJsProjectSr.CategoryVersion)]
-        [SRDisplayName(NodeJsProjectSr.NpmPackageRequestedVersionRange)]
-        [SRDescriptionAttribute(NodeJsProjectSr.NpmPackageRequestedVersionRangeDescription)]
+        [SRCategoryAttribute(SR.CategoryVersion)]
+        [SRDisplayName(SR.NpmPackageRequestedVersionRange)]
+        [SRDescriptionAttribute(SR.NpmPackageRequestedVersionRangeDescription)]
         public string RequestedVersionRange {
             get {
                 var range = null == Package ? null : Package.RequestedVersionRange;
@@ -100,18 +100,18 @@ namespace Microsoft.NodejsTools.Project {
         //    }
         //}
 
-        [SRCategoryAttribute(NodeJsProjectSr.General)]
-        [SRDisplayName(NodeJsProjectSr.NpmPackageDescription)]
-        [SRDescriptionAttribute(NodeJsProjectSr.NpmPackageDescriptionDescription)]
+        [SRCategoryAttribute(SR.General)]
+        [SRDisplayName(SR.NpmPackageDescription)]
+        [SRDescriptionAttribute(SR.NpmPackageDescriptionDescription)]
         public string Description {
             get {
                 return null == Package ? null : Package.Description;
             }
         }
 
-        [SRCategoryAttribute(NodeJsProjectSr.General)]
-        [SRDisplayName(NodeJsProjectSr.NpmPackageKeywords)]
-        [SRDescriptionAttribute(NodeJsProjectSr.NpmPackageKeywordsDescription)]
+        [SRCategoryAttribute(SR.General)]
+        [SRDisplayName(SR.NpmPackageKeywords)]
+        [SRDescriptionAttribute(SR.NpmPackageKeywordsDescription)]
         public string Keywords {
             get {
                 if (null == Package) {
@@ -129,9 +129,9 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        [SRCategoryAttribute(NodeJsProjectSr.General)]
-        [SRDisplayName(NodeJsProjectSr.NpmPackageAuthor)]
-        [SRDescriptionAttribute(NodeJsProjectSr.NpmPackageAuthorDescription)]
+        [SRCategoryAttribute(SR.General)]
+        [SRDisplayName(SR.NpmPackageAuthor)]
+        [SRDescriptionAttribute(SR.NpmPackageAuthorDescription)]
         public string Author {
             get {
                 var author = null == Package ? null : Package.Author;
@@ -139,9 +139,9 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        [SRCategoryAttribute(NodeJsProjectSr.General)]
-        [SRDisplayName(NodeJsProjectSr.NpmPackagePath)]
-        [SRDescriptionAttribute(NodeJsProjectSr.NpmPackagePathDescription)]
+        [SRCategoryAttribute(SR.General)]
+        [SRDisplayName(SR.NpmPackagePath)]
+        [SRDescriptionAttribute(SR.NpmPackagePathDescription)]
         public string Path {
             get {
                 return null == Package ? null : Package.Path;
@@ -172,9 +172,9 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        [SRCategoryAttribute(NodeJsProjectSr.General)]
-        [SRDisplayName(NodeJsProjectSr.NpmPackageType)]
-        [SRDescriptionAttribute(NodeJsProjectSr.NpmPackageTypeDescription)]
+        [SRCategoryAttribute(SR.General)]
+        [SRDisplayName(SR.NpmPackageType)]
+        [SRDescriptionAttribute(SR.NpmPackageTypeDescription)]
         public string PackageType {
             get {
                 if (IsGlobalInstall) {
@@ -190,9 +190,9 @@ namespace Microsoft.NodejsTools.Project {
         }
 
 
-        [SRCategoryAttribute(NodeJsProjectSr.General)]
-        [SRDisplayName(NodeJsProjectSr.NpmPackageLinkStatus)]
-        [SRDescriptionAttribute(NodeJsProjectSr.NpmPackageLinkStatusDescription)]
+        [SRCategoryAttribute(SR.General)]
+        [SRDisplayName(SR.NpmPackageLinkStatus)]
+        [SRDescriptionAttribute(SR.NpmPackageLinkStatusDescription)]
         public string LinkStatus {
             get {
                 if (IsSubPackage) {
@@ -225,45 +225,45 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        [SRCategoryAttribute(NodeJsProjectSr.CategoryStatus)]
-        [SRDisplayName(NodeJsProjectSr.NpmPackageIsListedInParentPackageJson)]
-        [SRDescriptionAttribute(NodeJsProjectSr.NpmPackageIsListedInParentPackageJsonDescription)]
+        [SRCategoryAttribute(SR.CategoryStatus)]
+        [SRDisplayName(SR.NpmPackageIsListedInParentPackageJson)]
+        [SRDescriptionAttribute(SR.NpmPackageIsListedInParentPackageJsonDescription)]
         public bool IsListedInParentPackageJson {
             get {
                 return null != Package && Package.IsListedInParentPackageJson;
             }
         }
 
-        [SRCategoryAttribute(NodeJsProjectSr.CategoryStatus)]
-        [SRDisplayName(NodeJsProjectSr.NpmPackageIsMissing)]
-        [SRDescriptionAttribute(NodeJsProjectSr.NpmPackageIsMissingDescription)]
+        [SRCategoryAttribute(SR.CategoryStatus)]
+        [SRDisplayName(SR.NpmPackageIsMissing)]
+        [SRDescriptionAttribute(SR.NpmPackageIsMissingDescription)]
         public bool IsMissing {
             get {
                 return null != Package && Package.IsMissing;
             }
         }
 
-        [SRCategoryAttribute(NodeJsProjectSr.CategoryStatus)]
-        [SRDisplayName(NodeJsProjectSr.NpmPackageIsDevDependency)]
-        [SRDescriptionAttribute(NodeJsProjectSr.NpmPackageIsDevDependencyDescription)]
+        [SRCategoryAttribute(SR.CategoryStatus)]
+        [SRDisplayName(SR.NpmPackageIsDevDependency)]
+        [SRDescriptionAttribute(SR.NpmPackageIsDevDependencyDescription)]
         public bool IsDevDependency {
             get {
                 return null != Package && Package.IsDevDependency;
             }
         }
 
-        [SRCategoryAttribute(NodeJsProjectSr.CategoryStatus)]
-        [SRDisplayName(NodeJsProjectSr.NpmPackageIsOptionalDependency)]
-        [SRDescriptionAttribute(NodeJsProjectSr.NpmPackageIsOptionalDependencyDescription)]
+        [SRCategoryAttribute(SR.CategoryStatus)]
+        [SRDisplayName(SR.NpmPackageIsOptionalDependency)]
+        [SRDescriptionAttribute(SR.NpmPackageIsOptionalDependencyDescription)]
         public bool IsOptionalDependency {
             get {
                 return null != Package && Package.IsOptionalDependency;
             }
         }
 
-        [SRCategoryAttribute(NodeJsProjectSr.CategoryStatus)]
-        [SRDisplayName(NodeJsProjectSr.NpmPackageIsBundledDependency)]
-        [SRDescriptionAttribute(NodeJsProjectSr.NpmPackageIsBundledDependencyDescription)]
+        [SRCategoryAttribute(SR.CategoryStatus)]
+        [SRDisplayName(SR.NpmPackageIsBundledDependency)]
+        [SRDescriptionAttribute(SR.NpmPackageIsBundledDependencyDescription)]
         public bool IsBundledDependency {
             get {
                 return null != Package && Package.IsBundledDependency;

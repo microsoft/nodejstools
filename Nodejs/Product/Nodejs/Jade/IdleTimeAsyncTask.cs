@@ -22,6 +22,7 @@ using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
+using SR = Microsoft.NodejsTools.Project.SR;
 
 namespace Microsoft.NodejsTools.Jade {
     /// <summary>
@@ -166,12 +167,12 @@ namespace Microsoft.NodejsTools.Jade {
                             result = ex;
                         } finally {
                             NodejsPackage.Instance.GetUIThread().InvokeAsync(() => UIThreadCompletedCallback(result))
-                                .HandleAllExceptions(NodeJsProjectSr.ProductName)
+                                .HandleAllExceptions(SR.ProductName)
                                 .DoNotWait();
                         }
                     } else if (Interlocked.Read(ref _closed) > 0) {
                         NodejsPackage.Instance.GetUIThread().InvokeAsync((() => UIThreadCanceledCallback(null)))
-                            .HandleAllExceptions(NodeJsProjectSr.ProductName)
+                            .HandleAllExceptions(SR.ProductName)
                             .DoNotWait();
                     }
                 });

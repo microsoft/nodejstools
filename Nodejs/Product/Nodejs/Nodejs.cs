@@ -121,7 +121,7 @@ namespace Microsoft.NodejsTools {
         public static void ShowNodejsNotInstalled() {
             MessageBox.Show(
                 Resources.NodejsNotInstalled,
-                NodeJsProjectSr.ProductName,
+                SR.ProductName,
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error
             );
@@ -130,7 +130,7 @@ namespace Microsoft.NodejsTools {
         public static void ShowNodejsPathNotFound(string path) {
             MessageBox.Show(
                 string.Format(Resources.NodeExeDoesntExist, path),
-                NodeJsProjectSr.ProductName,
+                SR.ProductName,
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error
             );

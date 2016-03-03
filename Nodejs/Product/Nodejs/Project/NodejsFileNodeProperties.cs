@@ -40,16 +40,16 @@ namespace Microsoft.NodejsTools.Project {
             : base(node) {
         }
 
-        [SRCategoryAttribute(NodeJsProjectSr.Advanced)]
-        [LocDisplayName(NodeJsProjectSr.TestFramework)]
-        [SRDescriptionAttribute(NodeJsProjectSr.TestFrameworkDescription)]
+        [SRCategoryAttribute(SR.Advanced)]
+        [LocDisplayName(SR.TestFramework)]
+        [SRDescriptionAttribute(SR.TestFrameworkDescription)]
         [TypeConverter(typeof(TestFrameworkStringConverter))]
         public string TestFramework {
             get {
-                return GetProperty(NodeJsProjectSr.TestFramework, string.Empty);
+                return GetProperty(SR.TestFramework, string.Empty);
             }
             set {
-                SetProperty(NodeJsProjectSr.TestFramework, value.ToString());
+                SetProperty(SR.TestFramework, value.ToString());
             }
         }
     }
@@ -60,16 +60,16 @@ namespace Microsoft.NodejsTools.Project {
             : base(node) {
         }
 
-        [SRCategoryAttribute(NodeJsProjectSr.Advanced)]
-        [LocDisplayName(NodeJsProjectSr.TestFramework)]
-        [SRDescriptionAttribute(NodeJsProjectSr.TestFrameworkDescription)]
+        [SRCategoryAttribute(SR.Advanced)]
+        [LocDisplayName(SR.TestFramework)]
+        [SRDescriptionAttribute(SR.TestFrameworkDescription)]
         [TypeConverter(typeof(TestFrameworkStringConverter))]
         public string TestFramework {
             get {
-                return GetProperty(NodeJsProjectSr.TestFramework, string.Empty);
+                return GetProperty(SR.TestFramework, string.Empty);
             }
             set {
-                SetProperty(NodeJsProjectSr.TestFramework, value.ToString());
+                SetProperty(SR.TestFramework, value.ToString());
             }
         }
     }

@@ -267,7 +267,7 @@ namespace Microsoft.NodejsTools.Project {
                             if (ex is InvalidOperationException || ex is Win32Exception) {
                                 MessageBox.Show(
                                     String.Format("Path to module does not exist:\n {0}", path),
-                                    NodeJsProjectSr.ProductName,
+                                    SR.ProductName,
                                     MessageBoxButtons.OK,
                                     MessageBoxIcon.Error);
                                 return VSConstants.S_FALSE;

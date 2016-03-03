@@ -225,9 +225,9 @@ namespace Microsoft.NodejsTools {
                 }
             } else if (values.Count + definitions.Count == 0) {
                 if (String.IsNullOrWhiteSpace(analysis.Expression)) {
-                    MessageBox.Show(String.Format("Cannot go to definition.  The cursor is not on a symbol."), NodeJsProjectSr.ProductName);
+                    MessageBox.Show(String.Format("Cannot go to definition.  The cursor is not on a symbol."), SR.ProductName);
                 } else {
-                    MessageBox.Show(String.Format("Cannot go to definition \"{0}\"", analysis.Expression), NodeJsProjectSr.ProductName);
+                    MessageBox.Show(String.Format("Cannot go to definition \"{0}\"", analysis.Expression), SR.ProductName);
                 }
             } else if (definitions.Count == 0) {
                 ShowFindSymbolsDialog(analysis, new SymbolList("Values", StandardGlyphGroup.GlyphForwardType, values.Values));

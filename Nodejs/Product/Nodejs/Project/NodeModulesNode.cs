@@ -265,7 +265,7 @@ namespace Microsoft.NodejsTools.Project {
 
         private void ForceUpdateStatusBarWithNpmActivitySafe(string activity) {
             ProjectMgr.Site.GetUIThread().InvokeAsync(() => ForceUpdateStatusBarWithNpmActivity(activity))
-                .HandleAllExceptions(NodeJsProjectSr.ProductName)
+                .HandleAllExceptions(SR.ProductName)
                 .DoNotWait();
         }
 
@@ -341,7 +341,7 @@ namespace Microsoft.NodejsTools.Project {
 
             StopNpmIdleTimer();
             _npmIdleTimer = new Timer(
-                _ => ProjectMgr.Site.GetUIThread().Invoke(() => _projectNode.CheckForLongPaths(e.Arguments).HandleAllExceptions(NodeJsProjectSr.ProductName).DoNotWait()),
+                _ => ProjectMgr.Site.GetUIThread().Invoke(() => _projectNode.CheckForLongPaths(e.Arguments).HandleAllExceptions(SR.ProductName).DoNotWait()),
                 null, 1000, Timeout.Infinite);
         }
 
@@ -368,7 +368,7 @@ namespace Microsoft.NodejsTools.Project {
 
         internal void ReloadHierarchySafe() {
             NodejsPackage.Instance.GetUIThread().InvokeAsync(ReloadHierarchy)
-                .HandleAllExceptions(NodeJsProjectSr.ProductName)
+                .HandleAllExceptions(SR.ProductName)
                 .DoNotWait();
         }
 
