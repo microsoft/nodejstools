@@ -33,14 +33,23 @@ namespace Microsoft.NodejsTools.Npm {
             public IEnumerable<IPackage> Removed { get { return _removed; } }
         }
 
-        private List<IPackage> _packages;
+        private IEnumerable<IPackage> _packages;
 
-        public PackageSet(List<IPackage> packages) {
-            _packages = packages;
+        public PackageSet(IEnumerable<IPackage> packages) {
+            _packages = packages.Distinct(new PackageComparer());
         }
 
-        public IReadOnlyList<IPackage> Packages { get { return _packages; } }
+        public IEnumerable<IPackage> Packages { get { return _packages; } }
 
+        public PackageSet Concat(PackageSet other) {
+            return new PackageSet(Packages.Concat(other.Packages));
+        }
+
+        /// <summary>
+        /// Compare this package set to another package set, returning an added/removed
+        /// diff of the two.
+        /// </summary>
+        /// <param name="other">Package set to compare against.</param>
         public PackageSetDiff Diff(PackageSet other) {
             var added = other.Packages.Except(_packages, new PackageComparer());
             var removed = _packages.Except(other.Packages, new PackageComparer());
@@ -59,9 +68,9 @@ namespace Microsoft.NodejsTools.Npm {
             }
 
             public override int GetHashCode(IPackage obj) {
-                if (obj.Name == null)
+                if (obj.Name == null || obj.Version == null)
                     return obj.GetHashCode();
-                return obj.Name.GetHashCode();
+                return obj.Name.GetHashCode() ^ obj.Version.GetHashCode();
             }
         }
     }
