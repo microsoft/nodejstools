@@ -48,7 +48,7 @@ namespace NodejsTests {
             var package1 = new PackageSet(Enumerable.Empty<IPackage>());
             var package2 = new PackageSet(Enumerable.Empty<IPackage>());
 
-            var diff = package1.Diff(package2);
+            var diff = package1.DiffAgainst(package2);
             Assert.IsFalse(diff.Added.Any());
             Assert.IsFalse(diff.Removed.Any());
         }
@@ -64,7 +64,7 @@ namespace NodejsTests {
             var package1 = new PackageSet(Enumerable.Empty<IPackage>());
             var package2 = new PackageSet(packageList);
 
-            var diff = package1.Diff(package2);
+            var diff = package1.DiffAgainst(package2);
             AssertUtil.ArrayEquals(packageList, diff.Added);
             Assert.IsFalse(diff.Removed.Any());
         }
@@ -80,7 +80,7 @@ namespace NodejsTests {
             var package1 = new PackageSet(packageList);
             var package2 = new PackageSet(Enumerable.Empty<IPackage>());
 
-            var diff = package1.Diff(package2);
+            var diff = package1.DiffAgainst(package2);
             Assert.IsFalse(diff.Added.Any());
             AssertUtil.ArrayEquals(packageList, diff.Removed);
         }
@@ -94,7 +94,7 @@ namespace NodejsTests {
             var package1 = new PackageSet(new [] { p1, p2 });
             var package2 = new PackageSet(new [] { p1, p3 });
 
-            var diff = package1.Diff(package2);
+            var diff = package1.DiffAgainst(package2);
             AssertUtil.ArrayEquals(new [] { p3 }, diff.Added);
             AssertUtil.ArrayEquals(new [] { p2 }, diff.Removed);
         }
@@ -111,7 +111,7 @@ namespace NodejsTests {
             var package1 = new PackageSet(new [] { p1, p2 });
             var package2 = new PackageSet(new [] { newP1 });
 
-            var diff = package1.Diff(package2);
+            var diff = package1.DiffAgainst(package2);
             Assert.IsFalse(diff.Added.Any());
             AssertUtil.ArrayEquals(new [] { p2 }, diff.Removed);
         }
@@ -130,7 +130,7 @@ namespace NodejsTests {
             var package1 = new PackageSet(new [] { p1, p2 });
             var package2 = new PackageSet(new [] { newP1 });
 
-            var diff = package1.Diff(package2);
+            var diff = package1.DiffAgainst(package2);
             AssertUtil.ArrayEquals(new [] { newP1 }, diff.Added);
             AssertUtil.ArrayEquals(new [] { p1, p2 }, diff.Removed);
         }
