@@ -14,12 +14,17 @@
 //
 //*********************************************************//
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Microsoft.NodejsTools.Npm {
+    /// <summary>
+    /// Immutable collection of packages.
+    /// </summary>
     public class PackageSet {
+        /// <summary>
+        /// Different between two package sets (called L and R for documentation purposes)
+        /// </summary>
         public class PackageSetDiff {
             private IEnumerable<IPackage> _added;
             private IEnumerable<IPackage> _removed;
@@ -29,11 +34,18 @@ namespace Microsoft.NodejsTools.Npm {
                 _removed = removed;
             }
 
+            /// <summary>
+            /// Elements that are in R that are not in L.
+            /// </summary>
             public IEnumerable<IPackage> Added { get { return _added; } }
+
+            /// <summary>
+            /// Elements that are in L that are in in R.
+            /// </summary>
             public IEnumerable<IPackage> Removed { get { return _removed; } }
         }
 
-        private IEnumerable<IPackage> _packages;
+        private readonly IEnumerable<IPackage> _packages;
 
         public PackageSet(IEnumerable<IPackage> packages) {
             _packages = packages.Distinct(new PackageComparer());
