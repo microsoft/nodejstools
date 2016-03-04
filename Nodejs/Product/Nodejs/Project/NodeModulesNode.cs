@@ -62,12 +62,6 @@ namespace Microsoft.NodejsTools.Project {
 
         #endregion
 
-        #region
-
-        public event EventHandler<IEnumerable<IPackage>> PackagesAdded;
-
-        #endregion
-
         #region Initialization
 
         public NodeModulesNode(NodejsProjectNode root)
@@ -395,11 +389,11 @@ namespace Microsoft.NodejsTools.Project {
                 _firstHierarchyLoad = false;
             }
 
-            if (newPackages.Any()) {
-                var handler = PackagesAdded;
-                if (handler != null)
-                    handler(this, newPackages);
-            }
+            TypingAcquisition.AquireTypings(
+                controller.ListBaseDirectory,
+                controller.FullPathToRootPackageDirectory,
+                newPackages,
+                null).ContinueWith(x => x);
         }
 
         private IEnumerable<IPackage> ReloadPackageHierarchies(INpmController controller) {
