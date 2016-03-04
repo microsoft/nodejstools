@@ -25,13 +25,21 @@ namespace Microsoft.NodejsTools.Npm {
         /// <summary>
         /// Different between two package sets (called L and R for documentation purposes)
         /// </summary>
-        public class PackageSetDiff {
+        public class Diff {
+            public static readonly Diff Empty = new Diff(Enumerable.Empty<IPackage>(), Enumerable.Empty<IPackage>());
+
             private IEnumerable<IPackage> _added;
             private IEnumerable<IPackage> _removed;
 
-            internal PackageSetDiff(IEnumerable<IPackage> added, IEnumerable<IPackage> removed) {
+            internal Diff(IEnumerable<IPackage> added, IEnumerable<IPackage> removed) {
                 _added = added;
                 _removed = removed;
+            }
+
+            public Diff Concat(Diff other) {
+                return new Diff(
+                    Added.Concat(other.Added),
+                    Removed.Concat(other.Removed));
             }
 
             /// <summary>
@@ -44,6 +52,8 @@ namespace Microsoft.NodejsTools.Npm {
             /// </summary>
             public IEnumerable<IPackage> Removed { get { return _removed; } }
         }
+
+        public static PackageSet Empty = new PackageSet(Enumerable.Empty<IPackage>());
 
         private readonly IEnumerable<IPackage> _packages;
 
@@ -62,10 +72,10 @@ namespace Microsoft.NodejsTools.Npm {
         /// diff of the two.
         /// </summary>
         /// <param name="other">Package set to compare against.</param>
-        public PackageSetDiff Diff(PackageSet other) {
+        public Diff DiffAgainst(PackageSet other) {
             var added = other.Packages.Except(_packages, new PackageComparer());
             var removed = _packages.Except(other.Packages, new PackageComparer());
-            return new PackageSetDiff(added, removed);
+            return new Diff(added, removed);
         }
 
         class PackageComparer : EqualityComparer<IPackage> {

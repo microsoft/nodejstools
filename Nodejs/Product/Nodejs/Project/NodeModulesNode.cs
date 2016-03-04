@@ -50,6 +50,11 @@ namespace Microsoft.NodejsTools.Project {
         private readonly LocalModulesNode _devModulesNode;
         private readonly LocalModulesNode _optionalModulesNode;
 
+        private PackageSet _globalPackageSet = PackageSet.Empty;
+        private PackageSet _rootPackageSet = PackageSet.Empty;
+        private PackageSet _devPackageSet = PackageSet.Empty;
+        private PackageSet _optionalPackageSet = PackageSet.Empty;
+
         private Timer _npmIdleTimer;
         private INpmController _npmController;
         private int _npmCommandsExecuting;
@@ -392,42 +397,57 @@ namespace Microsoft.NodejsTools.Project {
             TypingAcquisition.AquireTypings(
                 controller.ListBaseDirectory,
                 controller.FullPathToRootPackageDirectory,
-                newPackages,
+                newPackages.Added,
                 null).ContinueWith(x => x);
         }
 
-        private IEnumerable<IPackage> ReloadPackageHierarchies(INpmController controller) {
-            return Enumerable.Empty<IPackage>()
-                .Concat(ReloadDevPackageHierarchy(controller))
+        private PackageSet.Diff ReloadPackageHierarchies(INpmController controller) {
+            return ReloadDevPackageHierarchy(controller)
                 .Concat(ReloadOptionalPackageHierarchy(controller))
                 .Concat(ReloadRootPackageHierarchy(controller))
                 .Concat(ReloadGlobalPackageHierarchy(controller));
         }
 
-        private IEnumerable<IPackage> ReloadGlobalPackageHierarchy(INpmController controller) {
+        private PackageSet.Diff ReloadGlobalPackageHierarchy(INpmController controller) {
             var global = controller.GlobalPackages;
-            if (null != global) {
+            if (null != global && global.Modules != null) {
                 _globalModulesNode.GlobalPackages = global;
-                return ReloadHierarchy(_globalModulesNode, global.Modules);
+
+                var globalSet = new PackageSet(global.Modules);
+                var diff = _globalPackageSet.DiffAgainst(globalSet);
+                _globalPackageSet = globalSet;
+                ReloadHierarchy(_globalModulesNode, global.Modules);
+                return diff;
             }
-            return Enumerable.Empty<IPackage>();
+            return PackageSet.Diff.Empty;
         }
 
-        private IEnumerable<IPackage> ReloadRootPackageHierarchy(INpmController controller) {
+        private PackageSet.Diff ReloadRootPackageHierarchy(INpmController controller) {
             var root = GetRootPackages(controller);
-            return ReloadHierarchy(this, root);
+            var diff = _rootPackageSet.DiffAgainst(root);
+            _rootPackageSet = root;
+            ReloadHierarchy(this, root.Packages);
+            return diff;
         }
 
-        private IEnumerable<IPackage> ReloadOptionalPackageHierarchy(INpmController controller) {
+        private PackageSet.Diff ReloadOptionalPackageHierarchy(INpmController controller) {
             var optional = GetOptionalPackages(controller);
-            _optionalModulesNode.Packages = optional;
-            return ReloadHierarchy(_optionalModulesNode, optional);
+            _optionalModulesNode.Packages = optional.Packages;
+
+            var diff = _optionalPackageSet.DiffAgainst(optional);
+            _optionalPackageSet = optional;
+            ReloadHierarchy(_optionalModulesNode, optional.Packages);
+            return diff;
         }
 
-        private IEnumerable<IPackage> ReloadDevPackageHierarchy(INpmController controller) {
+        private PackageSet.Diff ReloadDevPackageHierarchy(INpmController controller) {
             var dev = GetDevPackages(controller);
-            _devModulesNode.Packages = dev;
-            return ReloadHierarchy(_devModulesNode, dev);
+            _devModulesNode.Packages = dev.Packages;
+
+            var diff = _globalPackageSet.DiffAgainst(dev);
+            _devPackageSet = dev;
+            ReloadHierarchy(_devModulesNode, dev.Packages);
+            return diff;
         }
 
         #endregion
@@ -708,24 +728,27 @@ namespace Microsoft.NodejsTools.Project {
             ManageModules();
         }
 
-        private static IEnumerable<IPackage> GetDevPackages(INpmController controller) {
+        private static PackageSet GetDevPackages(INpmController controller) {
             if (controller == null || controller.RootPackage == null)
-                return Enumerable.Empty<IPackage>();
-            return controller.RootPackage.Modules.Where(package => package.IsDevDependency);
+                return PackageSet.Empty;
+            return new PackageSet(
+                controller.RootPackage.Modules.Where(package => package.IsDevDependency));
         }
 
-        private static IEnumerable<IPackage> GetOptionalPackages(INpmController controller) {
+        private static PackageSet GetOptionalPackages(INpmController controller) {
             if (controller == null || controller.RootPackage == null)
-                return Enumerable.Empty<IPackage>();
-            return controller.RootPackage.Modules.Where(package => package.IsOptionalDependency);
+                return PackageSet.Empty;
+            return new PackageSet(
+                controller.RootPackage.Modules.Where(package => package.IsOptionalDependency));
         }
 
-        private static IEnumerable<IPackage> GetRootPackages(INpmController controller) {
+        private static PackageSet GetRootPackages(INpmController controller) {
             if (controller == null || controller.RootPackage == null)
-                return Enumerable.Empty<IPackage>();
-            return controller.RootPackage.Modules.Where(package =>
-                package.IsDependency ||
-                !package.IsListedInParentPackageJson);
+                return PackageSet.Empty;
+            return new PackageSet(
+                controller.RootPackage.Modules.Where(package =>
+                    package.IsDependency ||
+                    !package.IsListedInParentPackageJson));
         }
     }
 }
