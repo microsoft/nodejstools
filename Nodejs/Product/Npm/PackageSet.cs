@@ -26,21 +26,33 @@ namespace Microsoft.NodejsTools.Npm {
         /// Different between two package sets (called L and R for documentation purposes)
         /// </summary>
         public class Diff {
-            public static readonly Diff Empty = new Diff(Enumerable.Empty<IPackage>(), Enumerable.Empty<IPackage>());
+            public static readonly Diff Empty =
+                new Diff(
+                    PackageSet.Empty,
+                    Enumerable.Empty<IPackage>(),
+                    Enumerable.Empty<IPackage>());
 
+            private PackageSet _packages;
             private IEnumerable<IPackage> _added;
             private IEnumerable<IPackage> _removed;
 
-            internal Diff(IEnumerable<IPackage> added, IEnumerable<IPackage> removed) {
+            internal Diff(PackageSet packages, IEnumerable<IPackage> added, IEnumerable<IPackage> removed) {
+                _packages = packages;
                 _added = added;
                 _removed = removed;
             }
 
             public Diff Concat(Diff other) {
                 return new Diff(
+                    Packages.Concat(other.Packages),
                     Added.Concat(other.Added),
                     Removed.Concat(other.Removed));
             }
+
+            /// <summary>
+            /// Set of packages in R.
+            /// </summary>
+            public PackageSet Packages { get { return _packages; } }
 
             /// <summary>
             /// Elements that are in R that are not in L.
@@ -75,10 +87,14 @@ namespace Microsoft.NodejsTools.Npm {
         public Diff DiffAgainst(PackageSet other) {
             var added = other.Packages.Except(_packages, new PackageComparer());
             var removed = _packages.Except(other.Packages, new PackageComparer());
-            return new Diff(added, removed);
+            return new Diff(other, added, removed);
         }
 
-        class PackageComparer : EqualityComparer<IPackage> {
+        public Diff DiffAgainst(IEnumerable<IPackage> other) {
+            return DiffAgainst(new PackageSet(other));
+        }
+
+        public class PackageComparer : EqualityComparer<IPackage> {
             public override bool Equals(IPackage p1, IPackage p2) {
                 return p1.Name == p2.Name
                     && p1.Version == p2.Version

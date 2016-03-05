@@ -413,10 +413,9 @@ namespace Microsoft.NodejsTools.Project {
             if (null != global && global.Modules != null) {
                 _globalModulesNode.GlobalPackages = global;
 
-                var globalSet = new PackageSet(global.Modules);
-                var diff = _globalPackageSet.DiffAgainst(globalSet);
-                _globalPackageSet = globalSet;
-                ReloadHierarchy(_globalModulesNode, global.Modules);
+                var diff = _globalPackageSet.DiffAgainst(global.Modules);
+                _globalPackageSet = diff.Packages;
+                ReloadHierarchy(_globalModulesNode, diff.Packages.Packages);
                 return diff;
             }
             return PackageSet.Diff.Empty;
@@ -444,7 +443,7 @@ namespace Microsoft.NodejsTools.Project {
             var dev = GetDevPackages(controller);
             _devModulesNode.Packages = dev.Packages;
 
-            var diff = _globalPackageSet.DiffAgainst(dev);
+            var diff = _devPackageSet.DiffAgainst(dev);
             _devPackageSet = dev;
             ReloadHierarchy(_devModulesNode, dev.Packages);
             return diff;
