@@ -1,4 +1,4 @@
-﻿//*********************************************************//
+//*********************************************************//
 //    Copyright (c) Microsoft. All rights reserved.
 //    
 //    Apache 2.0 License
@@ -14,6 +14,8 @@
 //
 //*********************************************************//
 
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -21,26 +23,45 @@ namespace Microsoft.NodejsTools.Npm {
     /// <summary>
     /// Immutable collection of packages.
     /// </summary>
-    public class PackageSet {
+    public class PackageSet : IEnumerable<IPackage> {
         /// <summary>
-        /// Different between two package sets (called L and R for documentation purposes)
+        /// Different between a left package set and right package set.
         /// </summary>
         public class Diff {
-            public static readonly Diff Empty = new Diff(Enumerable.Empty<IPackage>(), Enumerable.Empty<IPackage>());
+            public static readonly Diff Empty =
+                new Diff(
+                    PackageSet.Empty,
+                    Enumerable.Empty<IPackage>(),
+                    Enumerable.Empty<IPackage>());
+
+            private PackageSet _rightPackages;
 
             private IEnumerable<IPackage> _added;
             private IEnumerable<IPackage> _removed;
 
-            internal Diff(IEnumerable<IPackage> added, IEnumerable<IPackage> removed) {
+            public static Diff Create(PackageSet l, PackageSet r) {
+                var added = r.Except(l, new PackageEqualityComparer());
+                var removed = l.Except(r, new PackageEqualityComparer());
+                return new Diff(r, added, removed);
+            }
+
+            private Diff(PackageSet r, IEnumerable<IPackage> added, IEnumerable<IPackage> removed) {
+                _rightPackages = r;
                 _added = added;
                 _removed = removed;
             }
 
             public Diff Concat(Diff other) {
                 return new Diff(
+                    NewPackages.Concat(other.NewPackages),
                     Added.Concat(other.Added),
                     Removed.Concat(other.Removed));
             }
+
+            /// <summary>
+            /// Set of packages in R.
+            /// </summary>
+            public PackageSet NewPackages { get { return _rightPackages; } }
 
             /// <summary>
             /// Elements that are in R that are not in L.
@@ -58,13 +79,19 @@ namespace Microsoft.NodejsTools.Npm {
         private readonly IEnumerable<IPackage> _packages;
 
         public PackageSet(IEnumerable<IPackage> packages) {
-            _packages = packages.Distinct(new PackageComparer());
+            _packages = packages.Distinct(new PackageEqualityComparer());
         }
 
-        public IEnumerable<IPackage> Packages { get { return _packages; } }
+        public IEnumerator<IPackage> GetEnumerator() {
+            return _packages.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() {
+            return _packages.GetEnumerator();
+        }
 
         public PackageSet Concat(PackageSet other) {
-            return new PackageSet(Packages.Concat(other.Packages));
+            return new PackageSet(_packages.Concat(other));
         }
 
         /// <summary>
@@ -73,27 +100,11 @@ namespace Microsoft.NodejsTools.Npm {
         /// </summary>
         /// <param name="other">Package set to compare against.</param>
         public Diff DiffAgainst(PackageSet other) {
-            var added = other.Packages.Except(_packages, new PackageComparer());
-            var removed = _packages.Except(other.Packages, new PackageComparer());
-            return new Diff(added, removed);
+            return Diff.Create(this, other);
         }
 
-        class PackageComparer : EqualityComparer<IPackage> {
-            public override bool Equals(IPackage p1, IPackage p2) {
-                return p1.Name == p2.Name
-                    && p1.Version == p2.Version
-                    && p1.IsBundledDependency == p2.IsBundledDependency
-                    && p1.IsDevDependency == p2.IsDevDependency
-                    && p1.IsListedInParentPackageJson == p2.IsListedInParentPackageJson
-                    && p1.IsMissing == p2.IsMissing
-                    && p1.IsOptionalDependency == p2.IsOptionalDependency;
-            }
-
-            public override int GetHashCode(IPackage obj) {
-                if (obj.Name == null || obj.Version == null)
-                    return obj.GetHashCode();
-                return obj.Name.GetHashCode() ^ obj.Version.GetHashCode();
-            }
+        public Diff DiffAgainst(IEnumerable<IPackage> other) {
+            return DiffAgainst(new PackageSet(other));
         }
     }
 }

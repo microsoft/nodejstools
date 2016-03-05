@@ -413,10 +413,16 @@ namespace Microsoft.NodejsTools.Project {
             if (null != global && global.Modules != null) {
                 _globalModulesNode.GlobalPackages = global;
 
+<<<<<<< fc16103cf2243f7b1986d243dd99b8c12e2fcabf
                 var globalSet = new PackageSet(global.Modules);
                 var diff = _globalPackageSet.DiffAgainst(globalSet);
                 _globalPackageSet = globalSet;
                 ReloadHierarchy(_globalModulesNode, global.Modules);
+=======
+                var diff = _globalPackageSet.DiffAgainst(global.Modules);
+                _globalPackageSet = diff.NewPackages;
+                ReloadHierarchy(_globalModulesNode, diff.NewPackages);
+>>>>>>> Cleanin up interfaces
                 return diff;
             }
             return PackageSet.Diff.Empty;
@@ -426,27 +432,27 @@ namespace Microsoft.NodejsTools.Project {
             var root = GetRootPackages(controller);
             var diff = _rootPackageSet.DiffAgainst(root);
             _rootPackageSet = root;
-            ReloadHierarchy(this, root.Packages);
+            ReloadHierarchy(this, root);
             return diff;
         }
 
         private PackageSet.Diff ReloadOptionalPackageHierarchy(INpmController controller) {
             var optional = GetOptionalPackages(controller);
-            _optionalModulesNode.Packages = optional.Packages;
+            _optionalModulesNode.Packages = optional;
 
             var diff = _optionalPackageSet.DiffAgainst(optional);
             _optionalPackageSet = optional;
-            ReloadHierarchy(_optionalModulesNode, optional.Packages);
+            ReloadHierarchy(_optionalModulesNode, optional);
             return diff;
         }
 
         private PackageSet.Diff ReloadDevPackageHierarchy(INpmController controller) {
             var dev = GetDevPackages(controller);
-            _devModulesNode.Packages = dev.Packages;
+            _devModulesNode.Packages = dev;
 
             var diff = _globalPackageSet.DiffAgainst(dev);
             _devPackageSet = dev;
-            ReloadHierarchy(_devModulesNode, dev.Packages);
+            ReloadHierarchy(_devModulesNode, dev);
             return diff;
         }
 

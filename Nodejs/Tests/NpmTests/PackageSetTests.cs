@@ -1,4 +1,4 @@
-﻿//*********************************************************//
+//*********************************************************//
 //    Copyright (c) Microsoft. All rights reserved.
 //    
 //    Apache 2.0 License
@@ -27,7 +27,7 @@ namespace NodejsTests {
         [TestMethod]
         public void ShouldBeEmptyForEmptySetOfPackages() {
             var p = new PackageSet(Enumerable.Empty<IPackage>());
-            Assert.IsFalse(p.Packages.Any());
+            Assert.IsFalse(p.Any());
         }
 
         [TestMethod]
@@ -40,7 +40,7 @@ namespace NodejsTests {
             var set2 = new PackageSet(new[] { p1, p3 });
 
             var joined = set1.Concat(set2);
-            AssertUtil.ArrayEquals(new[] { p1, p2, p3 }, joined.Packages);
+            AssertUtil.ArrayEquals(new[] { p1, p2, p3 }, joined);
         }
 
         [TestMethod]
