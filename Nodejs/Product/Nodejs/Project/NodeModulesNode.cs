@@ -414,8 +414,8 @@ namespace Microsoft.NodejsTools.Project {
                 _globalModulesNode.GlobalPackages = global;
 
                 var diff = _globalPackageSet.DiffAgainst(global.Modules);
-                _globalPackageSet = diff.Packages;
-                ReloadHierarchy(_globalModulesNode, diff.Packages.Packages);
+                _globalPackageSet = diff.NewPackages;
+                ReloadHierarchy(_globalModulesNode, diff.NewPackages);
                 return diff;
             }
             return PackageSet.Diff.Empty;
@@ -425,27 +425,27 @@ namespace Microsoft.NodejsTools.Project {
             var root = GetRootPackages(controller);
             var diff = _rootPackageSet.DiffAgainst(root);
             _rootPackageSet = root;
-            ReloadHierarchy(this, root.Packages);
+            ReloadHierarchy(this, root);
             return diff;
         }
 
         private PackageSet.Diff ReloadOptionalPackageHierarchy(INpmController controller) {
             var optional = GetOptionalPackages(controller);
-            _optionalModulesNode.Packages = optional.Packages;
+            _optionalModulesNode.Packages = optional;
 
             var diff = _optionalPackageSet.DiffAgainst(optional);
             _optionalPackageSet = optional;
-            ReloadHierarchy(_optionalModulesNode, optional.Packages);
+            ReloadHierarchy(_optionalModulesNode, optional);
             return diff;
         }
 
         private PackageSet.Diff ReloadDevPackageHierarchy(INpmController controller) {
             var dev = GetDevPackages(controller);
-            _devModulesNode.Packages = dev.Packages;
+            _devModulesNode.Packages = dev;
 
             var diff = _devPackageSet.DiffAgainst(dev);
             _devPackageSet = dev;
-            ReloadHierarchy(_devModulesNode, dev.Packages);
+            ReloadHierarchy(_devModulesNode, dev);
             return diff;
         }
 
