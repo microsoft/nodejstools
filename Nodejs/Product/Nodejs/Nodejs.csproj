@@ -1,6 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <Choose>
+    <When Condition=" '$(VisualStudioVersion)'=='15.0'  Or '$(TargetVisualStudioVersion)'=='VS150' ">
+      <PropertyGroup>
+        <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
+        <FileUpgradeFlags>
+        </FileUpgradeFlags>
+        <UpgradeBackupLocation>
+        </UpgradeBackupLocation>
+        <OldToolsVersion>4.0</OldToolsVersion>
+      </PropertyGroup>
+    </When>
     <When Condition=" '$(VisualStudioVersion)'=='14.0'  Or '$(TargetVisualStudioVersion)'=='VS140' ">
       <PropertyGroup>
         <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">14.0</VisualStudioVersion>
@@ -84,10 +94,10 @@
       <ItemGroup>
         <Reference Include="Microsoft.VisualStudio.ImageCatalog, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
         <Reference Include="Microsoft.VisualStudio.Imaging, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-        <Reference Include="Microsoft.VisualStudio.Imaging.Interop.$(VSTarget).DesignTime, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+        <Reference Include="Microsoft.VisualStudio.Imaging.Interop.14.0.DesignTime, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
           <EmbedInteropTypes>True</EmbedInteropTypes>
         </Reference>
-        <Reference Include="Microsoft.VisualStudio.Shell.Interop.$(VSTarget).DesignTime, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+        <Reference Include="Microsoft.VisualStudio.Shell.Interop.14.0.DesignTime, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
           <EmbedInteropTypes>True</EmbedInteropTypes>
         </Reference>
         <Reference Include="Microsoft.VisualStudio.Shell.Immutable.$(VSTarget), Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
@@ -197,7 +207,7 @@
         </Reference>
       </ItemGroup>
     </When>
-    <When Condition="'$(VSTarget)' == '14.0'">
+    <When Condition="'$(VSTarget)' == '14.0' or '$(VSTarget)' == '15.0'">
       <ItemGroup>
         <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
           <HintPath>..\..\packages\Newtonsoft.Json.6.0.4\lib\net40\Newtonsoft.Json.dll</HintPath>
@@ -1331,6 +1341,7 @@
     <None Include="Theme\Microsoft.NodejsTools.theme.v11.0.pkgdef" />
     <None Include="Theme\Microsoft.NodejsTools.theme.v12.0.pkgdef" />
     <None Include="Theme\Microsoft.NodejsTools.theme.v14.0.pkgdef" />
+    <None Include="Theme\Microsoft.NodejsTools.theme.v15.0.pkgdef" />    
     <Content Include="VSTemplateStore.pkgdef">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

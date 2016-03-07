@@ -21,7 +21,7 @@
     [Optional] The VS version to build for. If omitted, builds for all versions
     that are installed.
     
-    Valid values: "11.0", "12.0", "14.0"
+    Valid values: "11.0", "12.0", "14.0", "15.0"
 
 .Parameter name
     [Optional] A suffix to append to the name of the build.
@@ -247,6 +247,7 @@ $managed_files = (
 $native_files = @()
 
 $supported_vs_versions = (
+    @{number="15.0"; name="VS vNext"; build_by_default=$true},    
     @{number="14.0"; name="VS 2015"; build_by_default=$true},
     @{number="12.0"; name="VS 2013"; build_by_default=$true},
     @{number="11.0"; name="VS 2012"; build_by_default=$true}

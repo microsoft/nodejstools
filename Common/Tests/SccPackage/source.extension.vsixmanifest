@@ -26,6 +26,11 @@
         <Edition>VSWinDesktopExpress</Edition>
         <Edition>VWDExpress</Edition>
       </VisualStudio>
+      <VisualStudio Version="15.0">
+        <Edition>Pro</Edition>
+        <Edition>VSWinDesktopExpress</Edition>
+        <Edition>VWDExpress</Edition>
+      </VisualStudio>
     </SupportedProducts>
     <SupportedFrameworkRuntimeEdition MinVersion="4.5" />
   </Identifier>
