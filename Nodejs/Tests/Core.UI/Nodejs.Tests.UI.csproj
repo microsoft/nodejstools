@@ -124,7 +124,6 @@
   <ItemGroup>
     <Compile Include="AzureProjectTests.cs" />
     <Compile Include="BasicIntellisense.cs" />
-    <Compile Include="SnippetsTests.cs" />
     <Compile Include="ClassificationTests.cs" />
     <Compile Include="DebuggerUITests.cs" />
     <Compile Include="JadeUITests.cs" />
