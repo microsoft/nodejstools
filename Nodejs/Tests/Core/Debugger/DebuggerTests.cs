@@ -462,7 +462,7 @@ namespace NodejsTests.Debugger {
         }
 
         // F5 startup
-        [TestMethod, Priority(0), TestCategory("Debugging")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
         public void Startup_NoBreakOnEntryPointTracePoint() {
             TestDebuggerSteps(
                 "BreakpointTest.js",
