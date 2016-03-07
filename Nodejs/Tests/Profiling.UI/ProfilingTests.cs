@@ -155,8 +155,7 @@ namespace ProfilingUITests {
         }
 
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void NewProfilingSession() {
             using (new JustMyCodeSetting(false)) {
@@ -217,8 +216,7 @@ namespace ProfilingUITests {
         /// <summary>
         /// https://nodejstools.codeplex.com/workitem/26
         /// </summary>
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void TestStartAnalysisDebugMenu() {
             EnvDTE.Project project;
@@ -253,8 +251,7 @@ namespace ProfilingUITests {
         /// <summary>
         /// https://nodejstools.codeplex.com/workitem/26
         /// </summary>
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void TestStartAnalysisDebugMenuNoProject() {
             using (new JustMyCodeSetting(false))
@@ -272,8 +269,7 @@ namespace ProfilingUITests {
         /// <summary>
         /// https://nodejstools.codeplex.com/workitem/149
         /// </summary>
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void LaunchNewProfilingSession() {
             EnvDTE.Project project;
@@ -345,8 +341,7 @@ namespace ProfilingUITests {
         /// <summary>
         /// https://nodejstools.codeplex.com/workitem/145
         /// </summary>
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void TestMultipleSessions() {
             EnvDTE.Project project;
@@ -419,8 +414,7 @@ namespace ProfilingUITests {
         /// 
         /// Same as TestMultipleSessions, but reversing the order of which one we launch from
         /// </summary>
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void TestMultipleSessions2() {
             EnvDTE.Project project;
@@ -488,8 +482,7 @@ namespace ProfilingUITests {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void NewProfilingSessionOpenSolution() {
             EnvDTE.Project project;
@@ -549,8 +542,7 @@ namespace ProfilingUITests {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void LaunchNodejsProfilingWizard() {
             EnvDTE.Project project;
@@ -597,8 +589,7 @@ namespace ProfilingUITests {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void LaunchProject() {
             EnvDTE.Project project;
@@ -626,8 +617,7 @@ namespace ProfilingUITests {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void LaunchMappedProject() {
             EnvDTE.Project project;
@@ -655,8 +645,7 @@ namespace ProfilingUITests {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void LaunchMappedProjectNeedsBuild() {
             EnvDTE.Project project;
@@ -689,8 +678,7 @@ namespace ProfilingUITests {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void LaunchMappedProjectNeedsBuildWithErrors() {
             EnvDTE.Project project;
@@ -708,8 +696,7 @@ namespace ProfilingUITests {
         }
 
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void TestSaveDirtySession() {
             EnvDTE.Project project;
@@ -749,8 +736,7 @@ namespace ProfilingUITests {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void TestDeleteReport() {
             EnvDTE.Project project;
@@ -773,8 +759,7 @@ namespace ProfilingUITests {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void TestCompareReports() {
             EnvDTE.Project project;
@@ -846,8 +831,7 @@ namespace ProfilingUITests {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void TestRemoveReport() {
             EnvDTE.Project project;
@@ -870,8 +854,7 @@ namespace ProfilingUITests {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void TestOpenReport() {
             EnvDTE.Project project;
@@ -919,8 +902,7 @@ namespace ProfilingUITests {
             AutomationWrapper.EnsureExpanded(child);
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void TestOpenReportCtxMenu() {
             EnvDTE.Project project;
@@ -945,8 +927,7 @@ namespace ProfilingUITests {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void TestTargetPropertiesForProject() {
             EnvDTE.Project project;
@@ -979,8 +960,7 @@ namespace ProfilingUITests {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void TestTargetPropertiesForExecutable() {
             EnvDTE.Project project;
@@ -1024,8 +1004,7 @@ namespace ProfilingUITests {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void TestStopProfiling() {
             EnvDTE.Project project;
@@ -1060,8 +1039,7 @@ namespace ProfilingUITests {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void TestTwoProfilesAtTheSameTime() {
             EnvDTE.Project project;
@@ -1125,8 +1103,7 @@ namespace ProfilingUITests {
             return app;
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void MultipleTargets() {
             EnvDTE.Project project;
@@ -1185,8 +1162,7 @@ namespace ProfilingUITests {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void MultipleTargetsWithProjectHome() {
             EnvDTE.Project project;
@@ -1246,8 +1222,7 @@ namespace ProfilingUITests {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void MultipleReports() {
             EnvDTE.Project project;
@@ -1286,8 +1261,7 @@ namespace ProfilingUITests {
         }
 
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void LaunchExecutable() {
             EnvDTE.Project project;
@@ -1322,8 +1296,7 @@ namespace ProfilingUITests {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void TestJustMyCode() {
             EnvDTE.Project project;
@@ -1355,8 +1328,7 @@ namespace ProfilingUITests {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void TestJustMyCodeOff() {
             EnvDTE.Project project;
@@ -1388,8 +1360,7 @@ namespace ProfilingUITests {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void TestProjectProperties() {
             EnvDTE.Project project;
@@ -1425,8 +1396,7 @@ namespace ProfilingUITests {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void TestBrowserLaunch() {
             EnvDTE.Project project;
