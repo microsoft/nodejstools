@@ -2055,7 +2055,7 @@ namespace NodejsTests.Debugger {
 
         #region Helpers Tests
 
-        [TestMethod, Priority(0), TestCategory("Debugging")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
         public async Task TaskWaitAsync() {
             // Successful task, no timeout.
             var task = Task.Run(() => {
