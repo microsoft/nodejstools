@@ -50,8 +50,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             AssertListener.Initialize();
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void InSubFolder() {
             using (var solution = BasicProject.Generate().ToVs()) {
@@ -86,8 +85,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void BasicRequireCompletions() {
             using (new OptionHolder("TextEditor", "Node.js", "BraceCompletion", false)) {
@@ -166,8 +164,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void BasicRequireCompletionsQuotes() {
             using (new OptionHolder("TextEditor", "Node.js", "BraceCompletion", false)) {
@@ -259,8 +256,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void BasicRequireCompletionsDoubleQuotes() {
             using (new OptionHolder("TextEditor", "Node.js", "BraceCompletion", false)) {
@@ -352,8 +348,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void RequireKeyboardCompletionBraceCompletionOff() {
             using (new OptionHolder("TextEditor", "Node.js", "BraceCompletion", false)) {
@@ -413,8 +408,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void RequireKeyboardCompletionBraceCompletionOn() {
             using (new OptionHolder("TextEditor", "Node.js", "BraceCompletion", true)) {
@@ -470,8 +464,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void RequireBuiltinModules() {
             using (var solution = BasicProject.Generate().ToVs()) {
@@ -507,8 +500,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void CloseParenCommits() {
             using (var solution = BasicProject.Generate().ToVs()) {
@@ -525,8 +517,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void UserModule() {
             using (new OptionHolder("TextEditor", "Node.js", "BraceCompletion", false)) {
@@ -545,8 +536,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void UserModuleInFolder() {
             using (new OptionHolder("TextEditor", "Node.js", "BraceCompletion", false)) {
@@ -565,8 +555,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void CloseQuoteDoesntCommit() {
             using (new OptionHolder("TextEditor", "Node.js", "BraceCompletion", false)) {
@@ -585,8 +574,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void RequireAfterOperator() {
             using (new OptionHolder("TextEditor", "Node.js", "BraceCompletion", false)) {
@@ -605,8 +593,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void RequireAfterOpenParen() {
             using (new OptionHolder("TextEditor", "Node.js", "BraceCompletion", false)) {
@@ -625,8 +612,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void RequireAfterComma() {
             using (new OptionHolder("TextEditor", "Node.js", "BraceCompletion", false)) {
@@ -645,8 +631,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void RequireAfterAssignment() {
             using (var solution = BasicProject.Generate().ToVs()) {
@@ -663,8 +648,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void RequireAfterReturn() {
             using (var solution = BasicProject.Generate().ToVs()) {
@@ -681,8 +665,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void RequireAfterSemiColon() {
             using (var solution = BasicProject.Generate().ToVs()) {
@@ -699,8 +682,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void RequireAfterKeywordNoCompletions() {
             using (new OptionHolder("TextEditor", "Node.js", "BraceCompletion", false)) {
@@ -715,8 +697,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void RequireAfterDotNoCompletions() {
             using (new OptionHolder("TextEditor", "Node.js", "BraceCompletion", false)) {
@@ -730,8 +711,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void RequireAfterContinuedMultiLineStringNoCompletions() {
             using (var solution = BasicProject.Generate().ToVs()) {
@@ -748,8 +728,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// 
         /// Make sure adding a module externally gets picked up
         /// </summary>
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void AddModuleExternally() {
             using (var solution = BasicProject.Generate().ToVs()) {
@@ -780,8 +759,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// We should include submodules (like quox) and not just the top-level
         /// module when index.js is present.
         /// </summary>
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void SubmodulesFiles() {
             var project = Project("RequireSubmodules",
@@ -802,8 +780,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void SubmodulesFiles2() {
             var project = Project("RequireSubmodules",

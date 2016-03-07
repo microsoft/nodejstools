@@ -122,8 +122,7 @@ namespace NodejsTests {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestConsoleDir() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
@@ -427,8 +426,7 @@ undefined";
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestVarI() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
@@ -516,8 +514,7 @@ undefined";
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestNpmReplRedirector() {
             using (var eval = ProjectlessEvaluator()) {
                 var mockWindow = new MockReplWindow(eval) {
