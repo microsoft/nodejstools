@@ -201,7 +201,6 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
             string filters = Filters;
             string startupFile = StartupFile;
 
-            bool excludeNodeModules = ExcludeNodeModules;
             return Task.Run<string>(() => {
                 bool success = false;
                 Guid projectGuid;
