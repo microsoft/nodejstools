@@ -16,13 +16,16 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Microsoft.NodejsTools.Parsing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AnalysisTests {
     [TestClass]
     public class ScannerTests {
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestPartialScanning() {
             var code1 = "/* hello world ";
             var code2 = "   goodbye */";
@@ -47,7 +50,7 @@ namespace AnalysisTests {
             Assert.AreEqual(scanner.CurrentState.GetHashCode(), 2);
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest"), TestCategory("Ignore")]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestOperators() {
             var code = @"x %= 1
 x &= 1
@@ -126,7 +129,7 @@ x /= 1
         );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestNumericLiteral() {
             var code = @".123";
 
@@ -139,7 +142,7 @@ x /= 1
 
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestIllegalEscape() {
             var code = "\\while";
 
@@ -154,7 +157,7 @@ x /= 1
 
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestIllegalEscapeRead() {
             var code = "\\while";
 
@@ -169,7 +172,7 @@ x /= 1
 
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestLineTerminators() {
             var code = "\u2028 \u2029";
 
@@ -182,7 +185,7 @@ x /= 1
 
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestUnicodeIdentifiers() {
             var code = "\u0257abc";
 
@@ -193,7 +196,7 @@ x /= 1
 
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestUnicodeWhiteSpace() {
             var code = "\u00a0\u00a0";
 
@@ -204,7 +207,7 @@ x /= 1
 
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestUnicodeIllegalCharacter() {
             var code = "`";
 
@@ -218,7 +221,7 @@ x /= 1
 
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestRegularExpressionLiteral() {
             var code = @"x = /foo/";
 
@@ -232,7 +235,7 @@ x /= 1
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestBadNumericLiteral() {
             var code = @"1Z";
 
@@ -257,7 +260,7 @@ x /= 1
             );
         }
         
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestOctalStringLiterals() {
             var code = @"'\10'";
 
@@ -315,7 +318,7 @@ x /= 1
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest"), TestCategory("Ignore")]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestUnterminatedString() {
             var code = @"'abc
 ";
@@ -340,7 +343,7 @@ x /= 1
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestHexEscape() {
             var code = "'\\xAA'";
 
@@ -352,7 +355,7 @@ x /= 1
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestHexEscape2() {
             var code = "'\\xaa'";
 
@@ -364,7 +367,7 @@ x /= 1
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestInvalidHexEscape() {
             var code = "'\\xZZ'";
 
@@ -397,7 +400,7 @@ x /= 1
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestInvalidUnicodeEscape() {
             var code = "'\\uZZZZ'";
 
@@ -450,7 +453,7 @@ x /= 1
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestIllegalCharacter() {
             var code = "\0\0";
 
@@ -464,7 +467,7 @@ x /= 1
 
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest"), TestCategory("Ignore")]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestMultilineComment() {
             var code = @"/*
 hello world
@@ -477,7 +480,7 @@ hello world
 
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest"), TestCategory("Ignore")]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestMultilineCommentUnterminated() {
             var code = @"/*
 hello world
@@ -490,7 +493,7 @@ hello world
 
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestPositions() {
             var code = "one\n\ntwo";
 

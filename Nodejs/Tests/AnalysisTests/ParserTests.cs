@@ -25,7 +25,7 @@ using TestUtilities;
 namespace AnalysisTests {
     [TestClass]
     public class ParserTests {
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestCodeSettings() {
             var settings1 = new CodeSettings();
             var settings2 = new CodeSettings() { AllowShebangLine = true, SourceMode = JavaScriptSourceMode.Expression, StrictMode = true };
@@ -41,7 +41,7 @@ namespace AnalysisTests {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestSourceSpan() {
             var span = new SourceSpan(
                 new SourceLocation(1, 1, 1),
@@ -60,7 +60,7 @@ namespace AnalysisTests {
             Assert.IsTrue(span.Equals(span2));
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest"), TestCategory("Ignore")]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestFunctionRecovery() {
             const string code = @"
 [1,2,
@@ -104,7 +104,7 @@ function Y() {
         /// https://nodejstools.codeplex.com/workitem/1194
         /// https://nodejstools.codeplex.com/workitem/1200
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestParseUnterminatedFunctionInList() {
             const string code = @"console.log(function(error, response) {";
 
@@ -134,7 +134,7 @@ function Y() {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestParseExpression() {
             const string code = @"
 42
@@ -153,7 +153,7 @@ function Y() {
         }
 
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorCallBadArgs() {
             const string code = @"
 foo(abc.'foo')
@@ -174,7 +174,7 @@ foo(abc.'foo')
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorCallBadArgs2() {
             const string code = @"
 foo(abc.'foo' else function)
@@ -196,7 +196,7 @@ foo(abc.'foo' else function)
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestMemberKeyword() {
             const string code = @"
 foo.get
@@ -213,7 +213,7 @@ foo.get
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorGroupingNoCloseParen() {
             const string code = @"
 (foo
@@ -228,7 +228,7 @@ foo.get
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorGroupingNoSkipToken() {
             const string code = @"
 (else function)
@@ -244,7 +244,7 @@ foo.get
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorPostfixNoSkipToken() {
             const string code = @"
 (else++)
@@ -261,7 +261,7 @@ foo
         }
 
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorDoubleOverflow() {
             const string code = @"
 1e100000
@@ -277,7 +277,7 @@ foo
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void WarningDoubleBoundaries() {
             const string code = @"
 1.7976931348623157E+308;
@@ -297,7 +297,7 @@ foo
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorWithStatementBody() {
             const string code = @"
 with(abc) {
@@ -318,7 +318,7 @@ with(abc) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorWithStatementBody2() {
             const string code = @"
 with(abc) {
@@ -342,7 +342,7 @@ with(abc) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void WarningWithStatementNoCurlys() {
             const string code = @"
 with(abc) 
@@ -366,7 +366,7 @@ with(abc)
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorWithStatement() {
             const string code = @"
 with(abc.'foo') {
@@ -385,7 +385,7 @@ with(abc.'foo') {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorWithStatement2() {
             const string code = @"
 with(else) {
@@ -404,7 +404,7 @@ with(else) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorWithStatement3() {
             const string code = @"
 with(else function) {
@@ -421,7 +421,7 @@ with(else function) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorWithStatementNoParens() {
             const string code = @"
 with abc {
@@ -441,7 +441,7 @@ with abc {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest"), TestCategory("Ignore")]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void ErrorArrayLiteralBad() {
             const string code = @"
 i = [foo foo]";
@@ -464,7 +464,7 @@ i = [foo foo]";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorArrayLiteralBad2() {
             const string code = @"
 i = [foo.'abc']";
@@ -486,7 +486,7 @@ i = [foo.'abc']";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorArrayLiteralBad3() {
             const string code = @"
 i = [foo.'abc' else function]";
@@ -504,7 +504,7 @@ i = [foo.'abc' else function]";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ArrayLiteralEmpty() {
             const string code = @"
 i = []";
@@ -524,7 +524,7 @@ i = []";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ArrayLiteralMissing() {
             const string code = @"
 i = [1,,]";
@@ -547,7 +547,7 @@ i = [1,,]";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorFunctionBadBody3() {
             const string code = @"
 function foo() {
@@ -570,7 +570,7 @@ function foo() {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorFunctionBadBody2() {
             const string code = @"
 function foo() {
@@ -591,7 +591,7 @@ function foo() {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorFunctionBadBody() {
             const string code = @"
 function foo() {
@@ -612,7 +612,7 @@ function foo() {
         }
 
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorFunctionBadArgList2() {
             const string code = @"
 function foo(arg if) {
@@ -628,7 +628,7 @@ function foo(arg if) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorFunctionTypeDefinition() {
             const string code = @"
 function foo(arg arg) {
@@ -649,7 +649,7 @@ function foo(arg arg) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorFunctionBadArgList() {
             const string code = @"
 function foo(] ) {
@@ -668,7 +668,7 @@ function foo(] ) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorFunctionExtraComma() {
             const string code = @"
 function foo(, ) {
@@ -687,7 +687,7 @@ function foo(, ) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorFunctionNoRightParen() {
             const string code = @"
 function foo( {
@@ -706,7 +706,7 @@ function foo( {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorFunctionNoRightParen2() {
             const string code = @"
 function foo(abc {
@@ -726,7 +726,7 @@ function foo(abc {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestFunctionStrictMode() {
             const string code = @"
 function abc() {
@@ -747,7 +747,7 @@ function abc() {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestFunctionKeywordIdentifier() {
             const string code = @"
 function get() {
@@ -763,7 +763,7 @@ function get() {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestGenerators() {
             string code = @"
 function *x() {
@@ -835,7 +835,7 @@ function *x() {
 
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestYieldMember() {
             string code = @"
 function *x() {
@@ -860,7 +860,7 @@ function *x() {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void WarningYieldNoSemicolon() {
             var code = @"
 function *x() {
@@ -887,7 +887,7 @@ function *x() {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorYieldVar() {
             var code = @"
 function *x() {
@@ -913,7 +913,7 @@ function *x() {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorYieldLabel() {
             var code = @"
 function *x() {
@@ -947,7 +947,7 @@ function *x() {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void WarningYieldSemiColonInsertion() {
             var code = @"
 function *x() {
@@ -975,7 +975,7 @@ function *x() {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryYieldBadOperand() {
             var code = @"
 function *x() {
@@ -1003,7 +1003,7 @@ function *x() {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoverYieldBadOperand2() {
             var code = @"
 function *x() {
@@ -1028,7 +1028,7 @@ function *x() {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryYieldBadOperand3() {
             var code = @"
 function *x() {
@@ -1051,7 +1051,7 @@ function *x() {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorTryCatchNoTryOrFinally() {
             const string code = @"
 try {
@@ -1072,7 +1072,7 @@ foo";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorTryCatchBadCatch() {
             const string code = @"
 try {
@@ -1094,7 +1094,7 @@ try {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorTryCatchBadCatch2() {
             const string code = @"
 try {
@@ -1113,7 +1113,7 @@ try {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorTryCatchNonIdentifierKeyword() {
             const string code = @"
 try {
@@ -1140,7 +1140,7 @@ try {
         }
 
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorTryCatchIdentifierKeyword() {
             const string code = @"
 try {
@@ -1160,7 +1160,7 @@ try {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorTryCatchNoParens() {
             const string code = @"
 try {
@@ -1182,7 +1182,7 @@ try {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorTryBadBody() {
             const string code = @"
 try {
@@ -1205,7 +1205,7 @@ try {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorTryBadBody2() {
             const string code = @"
 try {
@@ -1228,7 +1228,7 @@ try {
         }
 
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorTryMissingCurlys() {
             const string code = @"
 try
@@ -1253,7 +1253,7 @@ catch(quox)
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void WarningThrowSemicolonInsertion() {
             const string code = @"
 throw foo
@@ -1274,7 +1274,7 @@ foo";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorThrowNoSemicolon() {
             const string code = @"
 throw foo foo";
@@ -1292,7 +1292,7 @@ throw foo foo";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorThrowBadExpression2() {
             const string code = @"
 throw foo.'abc' foo";
@@ -1306,7 +1306,7 @@ throw foo.'abc' foo";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorThrowBadExpression() {
             const string code = @"
 throw foo.'abc'
@@ -1325,7 +1325,7 @@ foo";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorSwitchCaseBadStatement() {
             const string code = @"
 switch(foo){
@@ -1349,7 +1349,7 @@ switch(foo){
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorSwitchCaseBadCase2() {
             const string code = @"
 switch(foo){
@@ -1369,7 +1369,7 @@ switch(foo){
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorSwitchCaseBadCase() {
             const string code = @"
 switch(foo){
@@ -1392,7 +1392,7 @@ switch(foo){
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorSwitchCaseMissingColon() {
             const string code = @"
 switch(foo){
@@ -1415,7 +1415,7 @@ switch(foo){
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorSwitchNoCasesOrDefault() {
             const string code = @"
 switch(foo){
@@ -1440,7 +1440,7 @@ switch(foo){
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorSwitchDuplicateDefault() {
             const string code = @"
 switch(foo){
@@ -1469,7 +1469,7 @@ switch(foo){
         }
 
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorSwitchBadExpressionNoLeftCurly() {
             const string code = @"
 switch(foo.'abc') 
@@ -1493,7 +1493,7 @@ switch(foo.'abc')
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorSwitchBadExpression() {
             const string code = @"
 switch(foo.'abc') {
@@ -1516,7 +1516,7 @@ switch(foo.'abc') {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorSwitchBadExpression2() {
             const string code = @"
 switch(else) {
@@ -1539,7 +1539,7 @@ switch(else) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorSwitchBadExpression3() {
             const string code = @"
 switch(else function) {
@@ -1557,7 +1557,7 @@ switch(else function) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorSwitchNoLeftCurly() {
             const string code = @"
 switch(abc) 
@@ -1580,7 +1580,7 @@ switch(abc)
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorSwitchNoParens() {
             const string code = @"
 switch abc {
@@ -1604,7 +1604,7 @@ switch abc {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorBracketInvalidExpression() {
             const string code = @"
 i[foo.'abc'];";
@@ -1624,7 +1624,7 @@ i[foo.'abc'];";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorBracketInvalidExpression2() {
             const string code = @"
 i[foo.'abc' function];";
@@ -1645,7 +1645,7 @@ i[foo.'abc' function];";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorBracketInvalidExpression3() {
             const string code = @"
 i[else function];";
@@ -1663,7 +1663,7 @@ i[else function];";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorBracketInvalidExpression4() {
             const string code = @"
 i[function];";
@@ -1691,7 +1691,7 @@ i[function];";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void WarningOctalLiteral() {
             const string code = @"
 i = 0100;";
@@ -1714,7 +1714,7 @@ i = 0100;";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorObjectLiteralNoColon() {
             const string code = @"
 i = {abc:42, foo 0};";
@@ -1737,7 +1737,7 @@ i = {abc:42, foo 0};";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorObjectLiteralNoRightCurly() {
             const string code = @"
 i = {abc:42, foo:0
@@ -1755,7 +1755,7 @@ foo
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorObjectLiteralNoComma() {
             const string code = @"
 i = {abc:42, foo:0 foo
@@ -1780,7 +1780,7 @@ i = {abc:42, foo:0 foo
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorObjectLiteralBadExpression() {
             const string code = @"
 i = {abc:foo.'abc'};";
@@ -1802,7 +1802,7 @@ i = {abc:foo.'abc'};";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorObjectLiteralBadExpression2() {
             const string code = @"
 i = {abc:foo.'abc' else };";
@@ -1824,7 +1824,7 @@ i = {abc:foo.'abc' else };";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorObjectLiteralBadExpression3() {
             const string code = @"
 i = {abc:foo.'abc' else, foo:42 };";
@@ -1847,7 +1847,7 @@ i = {abc:foo.'abc' else, foo:42 };";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorObjectLiteralNoMemberIdentifier() {
             const string code = @"
 i = {abc:foo, [:42};";
@@ -1870,7 +1870,7 @@ i = {abc:foo, [:42};";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorObjectLiteralInvalidNumeric() {
             const string code = @"
 i = {abc:foo, 1e100000:42};";
@@ -1893,7 +1893,7 @@ i = {abc:foo, 1e100000:42};";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void VariableDeclarationBadInitializer2() {
             const string code = @"
 var i = foo.'abc' else function;";
@@ -1915,7 +1915,7 @@ var i = foo.'abc' else function;";
         /// Verify that when we report the missing semicolon error that we properly
         /// don't treat the current token twice.
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void InvalidTrailingStringLiteral() {
             var preceedingTests = new[] { 
                 new { Code = "var i = 0", Expected = CheckVar(CheckVarDecl("i", Zero)) },
@@ -1940,7 +1940,7 @@ var i = foo.'abc' else function;";
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void VariableDeclarationBadInitializer3() {
             const string code = @"
 var j = 0, i = foo.'abc' else function;";
@@ -1959,7 +1959,7 @@ var j = 0, i = foo.'abc' else function;";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void VariableDeclarationBadInitializer() {
             const string code = @"
 var i = foo.'abc';";
@@ -1976,7 +1976,7 @@ var i = foo.'abc';";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void VariableDeclarationEqual() {
             const string code = @"
 var i == 1;";
@@ -1994,7 +1994,7 @@ var i == 1;";
         }
 
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorDebuggerMissingSemiColon() {
             const string code = @"
 debugger foo";
@@ -2010,7 +2010,7 @@ debugger foo";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void WarningDebuggerMissingSemiColon() {
             const string code = @"
 debugger
@@ -2029,7 +2029,7 @@ foo";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorDuplicateLabel() {
             const string code = @"
 label:
@@ -2051,7 +2051,7 @@ blah;
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorBadContinueBadLabel() {
             const string code = @"
 foo:
@@ -2071,7 +2071,7 @@ continue foo
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void WarningContinueSemicolonInsertion() {
             const string code = @"
 for(var i = 0; i<4; i++) {
@@ -2100,7 +2100,7 @@ for(var i = 0; i<4; i++) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void WarningBreakSemicolonInsertion() {
             const string code = @"
 for(var i = 0; i<4; i++) {
@@ -2129,7 +2129,7 @@ for(var i = 0; i<4; i++) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorContinueNoSemicolon() {
             const string code = @"
 for(var i = 0; i<4; i++) {
@@ -2156,7 +2156,7 @@ for(var i = 0; i<4; i++) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorBreakNoSemicolon() {
             const string code = @"
 for(var i = 0; i<4; i++) {
@@ -2183,7 +2183,7 @@ for(var i = 0; i<4; i++) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorBadContinue() {
             const string code = @"
 continue
@@ -2201,7 +2201,7 @@ blah
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorBadBreak() {
             const string code = @"
 break
@@ -2219,7 +2219,7 @@ blah
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void WarningWithNoParens() {
             var code = @"
 with abc {
@@ -2243,7 +2243,7 @@ with abc {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void WarningReturnNoSemicolon() {
             var code = @"
 return 4 4
@@ -2262,7 +2262,7 @@ return 4 4
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void WarningReturnSemiColonInsertion() {
             var code = @"
 return 4
@@ -2282,7 +2282,7 @@ return 4
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryReturnBadOperand() {
             var code = @"
 return foo.'abc'
@@ -2303,7 +2303,7 @@ return foo.'abc'
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoverReturnBadOperand2() {
             var code = @"
 return else
@@ -2323,7 +2323,7 @@ return else
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryReturnBadOperand3() {
             var code = @"
 return else function";
@@ -2339,7 +2339,7 @@ return else function";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorIfMissingParens() {
             var code = @"
 if true {
@@ -2361,7 +2361,7 @@ if true {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void WarningIfSuspectAssign() {
             var code = @"
 if(i = 1) {
@@ -2383,7 +2383,7 @@ if(i = 1) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void WarningIfSuspectSemicolon() {
             var code = @"
 if(true);";
@@ -2405,7 +2405,7 @@ if(true);";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void WarningIfElseSuspectSemicolon() {
             var code = @"
 if(true) { }
@@ -2430,7 +2430,7 @@ else;";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void WarningIfElseStatementBlock() {
             var code = @"
 if(true) { }
@@ -2457,7 +2457,7 @@ else i";
         }
 
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryIfBadConditional() {
             var code = @"
 if(foo.'abc') {
@@ -2477,7 +2477,7 @@ if(foo.'abc') {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryIfBadConditional2() {
             var code = @"
 if(else) {
@@ -2497,7 +2497,7 @@ if(else) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryIfBadConditional3() {
             var code = @"
 if(else function) {
@@ -2515,7 +2515,7 @@ if(else function) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryIfBadBody() {
             var code = @"
 if(true) 
@@ -2540,7 +2540,7 @@ if(true)
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryIfBadBody2() {
             var code = @"
 if(true) 
@@ -2564,7 +2564,7 @@ if(true)
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryIfBadBody3() {
             var code = @"
 if(true) 
@@ -2588,7 +2588,7 @@ if(true)
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryIfElseBadBody() {
             var code = @"
 if(true) {
@@ -2616,7 +2616,7 @@ if(true) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryIfElseBadBody2() {
             var code = @"
 if(true)  {
@@ -2642,7 +2642,7 @@ if(true)  {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryIfElseBadBody3() {
             var code = @"
 if(true) {
@@ -2668,7 +2668,7 @@ if(true) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void WarningWhileSuspectAssignment() {
             var code = @"
 while(i = 4) {
@@ -2691,7 +2691,7 @@ while(i = 4) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryWhileBadBody() {
             var code = @"
 while(true) 
@@ -2718,7 +2718,7 @@ while(true)
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryWhileBadBody2() {
             var code = @"
 while(true) 
@@ -2743,7 +2743,7 @@ while(true)
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryWhileBadCondition() {
             var code = @"
 while(foo.'abc') {
@@ -2764,7 +2764,7 @@ while(foo.'abc') {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryWhileBadCondition2() {
             var code = @"
 while(else) {
@@ -2785,7 +2785,7 @@ while(else) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryWhileBadCondition3() {
             var code = @"
 while(else function) {
@@ -2804,7 +2804,7 @@ while(else function) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorWhileNoOpenParens() {
             var code = @"
 while true {
@@ -2828,7 +2828,7 @@ while true {
         }
 
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryDoWhileBadCondition() {
             var code = @"
 do {
@@ -2852,7 +2852,7 @@ do {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryDoWhileBadCondition2() {
             var code = @"
 do {
@@ -2881,7 +2881,7 @@ do {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorDoWhileMissngParens() {
             var code = @"
 do {
@@ -2907,7 +2907,7 @@ do {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ErrorDoWhileNoWhile() {
             var code = @"
 do {
@@ -2933,7 +2933,7 @@ do {
         }
 
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void WarningDoWhileMissingOpenCurly() {
             var code = @"
 do 
@@ -2958,7 +2958,7 @@ while(true);
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void WarningDoWhileSuspectAssignment() {
             var code = @"
 do {
@@ -2987,7 +2987,7 @@ do {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryDoWhileBadBody() {
             var code = @"
 do 
@@ -3011,7 +3011,7 @@ while(true);
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryDoWhileBadBody2() {
             var code = @"
 do
@@ -3033,7 +3033,7 @@ while(true);
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryDoWhileBadBody3() {
             var code = @"
 do
@@ -3061,7 +3061,7 @@ while(true);
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void WarningForAssignment() {
             var code = @"
 for(var i = 0; i = 4; i++) {
@@ -3085,7 +3085,7 @@ for(var i = 0; i = 4; i++) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void WarningForStatementBlock() {
             var code = @"
 for(var i = 0; i < 4; i++) 
@@ -3113,7 +3113,7 @@ for(var i = 0; i < 4; i++)
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryForIn() {
             var code = @"
 for(x in ) {
@@ -3136,7 +3136,7 @@ for(x in ) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryForInBadCollection() {
             var code = @"
 for(x in foo.'abc') {
@@ -3159,7 +3159,7 @@ for(x in foo.'abc') {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryForIn2() {
             var code = @"
 for(x in < function() { }) {
@@ -3183,7 +3183,7 @@ for(x in < function() { }) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryForInBadBody() {
             // foo.'abc' will trigger a recovery w/ an expression which can be
             // promoted to an expression statement
@@ -3212,7 +3212,7 @@ for(x in abc)
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryForInBadBody2() {
             // } will trigger a recovery w/ an expression
             var code = @"
@@ -3240,7 +3240,7 @@ for(x in abc)
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryForNoClosingParen() {
             // } will trigger a recovery w/ an expression
             var code = @"
@@ -3265,7 +3265,7 @@ for(x in abc {
         }
 
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryForBadBody() {
             // foo.'abc' will trigger a recovery w/ an expression which can be
             // promoted to an expression statement
@@ -3299,7 +3299,7 @@ for(var i = 0; i< 4; i++)
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryForBadBody2() {
             // } will trigger a recovery w/ an expression
             var code = @"
@@ -3330,7 +3330,7 @@ for(var i = 0; i< 4; i++)
         }
 
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryForNoOpenParen() {
             var code = @"
 for var i = 0; i<4; i++) {
@@ -3353,7 +3353,7 @@ for var i = 0; i<4; i++) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryForMissingClosingParen() {
             var code = @"
 for(var i = 0; i<4; i++ {
@@ -3376,7 +3376,7 @@ for(var i = 0; i<4; i++ {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryForMissingIncrement() {
             var code = @"
 for(var i = 0; i<4) {
@@ -3399,7 +3399,7 @@ for(var i = 0; i<4) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryForMissingConditionColon() {
             var code = @"
 for(var i = 0 : ) {
@@ -3422,7 +3422,7 @@ for(var i = 0 : ) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryForMissingConditionColonSemicolon() {
             var code = @"
 for(var i = 0 : ; i < 4) {
@@ -3446,7 +3446,7 @@ for(var i = 0 : ; i < 4) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryForUnknownFollowingToken() {
             var code = @"
 for(var i = 0, j = 0; < function() { } {
@@ -3468,7 +3468,7 @@ for(var i = 0, j = 0; < function() { } {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryForMissingConditionMultipleVars() {
             var code = @"
 for(var i = 0, j = 0) {
@@ -3494,7 +3494,7 @@ for(var i = 0, j = 0) {
         /// <summary>
         /// let not in strict mode should be fine...
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void RecoveryForMissingCondition() {
             var code = @"
 for(var i = 0;) {
@@ -3535,7 +3535,7 @@ for(var i = 0;
         /// <summary>
         /// let not in strict mode should be fine...
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void ForMultipleVariables() {
             var code = @"
 for(var i = 0, j = 1; i<4; i++) {
@@ -3561,7 +3561,7 @@ for(var i = 0, j = 1; i<4; i++) {
         /// <summary>
         /// let not in strict mode should be fine...
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void LetNotInStrictMode() {
             var code = @"
     let = _(let).succ();
@@ -3605,7 +3605,7 @@ for(var i = 0, j = 1; i<4; i++) {
         ///     \u200C (ZWNJ)
         ///     \u200D (ZWJ)
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void IdentifierNames() {
             const string identifiers = @"
 $
@@ -3624,7 +3624,7 @@ _f
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestUnicodeIdentifier() {
             const string identifiers = @"
 \u1234abc
@@ -3641,7 +3641,7 @@ abc\u1234
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestBlock() {
             const string code = @"
 { 1; 2 }";
@@ -3656,7 +3656,7 @@ abc\u1234
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestDebugger() {
             const string code = @"
 debugger;";
@@ -3668,7 +3668,7 @@ debugger;";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestSwitch() {
             const string code = @"
 switch(abc) {
@@ -3708,7 +3708,7 @@ switch(abc) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestThrow() {
             const string code = @"
 throw ""abc"";
@@ -3723,7 +3723,7 @@ throw;
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestWith() {
             const string code = @"
 with(abc) {
@@ -3743,7 +3743,7 @@ with(abc) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestConditional() {
             const string identifiers = @"
 1 ? 2 : 3
@@ -3762,7 +3762,7 @@ with(abc) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestVoid() {
             const string identifiers = @"
 void 1
@@ -3780,7 +3780,7 @@ void 1
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestTypeOf() {
             const string identifiers = @"
 typeof 1
@@ -3798,7 +3798,7 @@ typeof 1
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestUnary() {
             const string identifiers = @"
 +1;
@@ -3823,7 +3823,7 @@ delete abc;
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestUnaryPostFix() {
             const string identifiers = @"
 abc++;
@@ -3838,7 +3838,7 @@ abc--;
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestGrouping() {
             const string identifiers = @"
 (1)
@@ -3851,7 +3851,7 @@ abc--;
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestArrayLiteral() {
             const string identifiers = @"
 [1,2,3];
@@ -3866,7 +3866,7 @@ abc--;
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestObjectLiteral() {
             // Expression statements can't start with { as it's ambiguous with block,
             // so we do an assignment here
@@ -3938,7 +3938,7 @@ x = {set abc (value) { 42 }}
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestPrecedence() {
             const string code = @"
 1 + 2 * 3;
@@ -4029,7 +4029,7 @@ x = {set abc (value) { 42 }}
         /// BooleanLiteral
         ///     true false
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void SimpleLiterals() {
             const string identifiers = @"
 null
@@ -4080,7 +4080,7 @@ false
         /// HexDigit :: one of
         ///     0 1 2 3 4 5 6 7 8 9 a b c d e f A B C D E F
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("UnitTest"), TestCategory("Ignore")]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestNumericLiterals() {
             const string numbers = @"
 0
@@ -4171,7 +4171,7 @@ false
         /// UnicodeEscapeSequence ::
         ///     u HexDigit HexDigit HexDigit HexDigit
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestStringLiterals() {
             const string strings = @"
 ""hello""
@@ -4238,7 +4238,7 @@ lo""
         ///     [empty]
         ///     RegularExpressionFlags IdentifierPart
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestRegexLiterals() {
             // TODO: More test cases
             const string regexs = @"
@@ -4260,7 +4260,7 @@ lo""
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestVariableDeclaration() {
             const string code = @"
 var i = 0, j = 1;
@@ -4276,7 +4276,7 @@ var i = 0, j = 1;
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestVariableDeclarationKeyword() {
             const string code = @"
 var get = 0;";
@@ -4290,7 +4290,7 @@ var get = 0;";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestVariableDeclarationError() {
             const string code = @"
 var function = 0;";
@@ -4307,7 +4307,7 @@ var function = 0;";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestVariableDeclarationError2() {
             const string code = @"
 var 42 = 0;";
@@ -4324,7 +4324,7 @@ var 42 = 0;";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestEmptyStatement() {
             const string code = @"
 ;
@@ -4337,7 +4337,7 @@ var 42 = 0;";
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestIfStatement() {
             const string code = @"
 if(true) {
@@ -4368,7 +4368,7 @@ if(true) {
         }
 
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestForStatement() {
             const string ForCode = @"
 for(var i = 0; i<4; i++) { }
@@ -4386,7 +4386,7 @@ for(var i = 0; i<4; i++) { }
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestForStatementLexical() {
             const string ForCode = @"
 for(const i = 0; false; ) { }
@@ -4404,7 +4404,7 @@ for(const i = 0; false; ) { }
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestForNoVarStatement() {
             const string ForCode = @"
 for(i = 0; i<4; i++) { }
@@ -4428,7 +4428,7 @@ for(i = 0; i<4; i++) { }
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestForInStatement() {
             const string ForCode = @"
 for(var i in []) { }
@@ -4451,7 +4451,7 @@ for(i in []) { }
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestForContinueStatement() {
             const string ForCode = @"
 for(var i = 0; i<4; i++) { continue; }
@@ -4471,7 +4471,7 @@ for(var i = 0; i<4; i++) { continue; }
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestForBreakStatement() {
             const string ForCode = @"
 for(var i = 0; i<4; i++) { break; }
@@ -4491,7 +4491,7 @@ for(var i = 0; i<4; i++) { break; }
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestForContinueLabelStatement() {
             const string ForCode = @"
 for(var i = 0; i<4; i++) { continue myLabel; }
@@ -4516,7 +4516,7 @@ myLabel:
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestForContinueLabelStatement2() {
             const string ForCode = @"
 for(var i = 0; i<4; i++) { 
@@ -4542,7 +4542,7 @@ continue myLabel;
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestForContinueLabelStatement3() {
             const string ForCode = @"
 for(var j = 0; j<4; j++) {
@@ -4579,7 +4579,7 @@ for(var j = 0; j<4; j++) {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestForBreakLabelStatement() {
             const string ForCode = @"
 for(var i = 0; i<4; i++) { break myLabel; }
@@ -4604,7 +4604,7 @@ myLabel:
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TryStatement() {
             const string ForCode = @"
 try {
@@ -4623,7 +4623,7 @@ try {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void WhileStatement() {
             const string ForCode = @"
 while(i<0) { 2; }
@@ -4639,7 +4639,7 @@ while(i<0) { 2; }
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestUseStrictDirective() {
             const string code = @"'use strict';
 42";
@@ -4655,7 +4655,7 @@ while(i<0) { 2; }
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void DoWhileStatement() {
             const string ForCode = @"
 do {

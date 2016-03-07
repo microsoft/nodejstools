@@ -25,7 +25,7 @@ namespace NpmTests {
     /// </summary>
     [TestClass]
     public class SemverVersionTests {
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestBasicMajorMinorPatchVersion() {
             SemverVersionTestHelper.AssertVersionsEqual(
                 1,
@@ -36,53 +36,53 @@ namespace NpmTests {
                 SemverVersion.Parse("1.2.3"));
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         [ExpectedException(typeof(SemverVersionFormatException), "Should not allow negative major version.")]
         public void TestNegativeMajorVersionFails() {
             SemverVersion.Parse("-1.2.3");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         [ExpectedException(typeof(SemverVersionFormatException), "Should not allow negative minor version.")]
         public void TestNegativeMinorVersionFails() {
             SemverVersion.Parse("1.-2.3");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         [ExpectedException(typeof(SemverVersionFormatException), "Should not allow negative patch version.")]
         public void TestNegativePatchVersionFails() {
             SemverVersion.Parse("1.2.-3");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         [ExpectedException(typeof(SemverVersionFormatException), "Should not allow non-numeric major version.")]
         public void TestNonNumericMajorVersionFails() {
             SemverVersion.Parse("a.2.3");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         [ExpectedException(typeof(SemverVersionFormatException), "Should not allow non-numeric minor version.")]
         public void TestNonNumericMinorVersionFails() {
             SemverVersion.Parse("1.b.3");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         [ExpectedException(typeof(SemverVersionFormatException), "Should not allow non-numeric patch version.")]
         public void TestNonNumericPatchVersionFails() {
             SemverVersion.Parse("1.2.c");
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestAlphaPreRelease() {
             SemverVersionTestHelper.AssertVersionsEqual(1, 2, 3, "alpha", null, SemverVersion.Parse("1.2.3-alpha"));
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestNumericPreRelease() {
             SemverVersionTestHelper.AssertVersionsEqual(1, 2, 3, "4.5.6", null, SemverVersion.Parse("1.2.3-4.5.6"));
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestPreReleaseHyphenatedIdentifier() {
             SemverVersionTestHelper.AssertVersionsEqual(
                 1,
@@ -93,7 +93,7 @@ namespace NpmTests {
                 SemverVersion.Parse("1.2.3-alpha-2.1"));
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestPreReleaseHyphenatedIdentifierWithoutVersion()
         {
             // This version code is crazy, and for that reason it fail when
@@ -107,7 +107,7 @@ namespace NpmTests {
                 SemverVersion.Parse("0.1.4-DEPRECATED-USE-cfenv-INSTEAD"));
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestPreReleaseAndBuildMetadata() {
             // 1.0.0-alpha+001, 1.0.0+20130313144700, 1.0.0-beta+exp.sha.5114f85
             SemverVersionTestHelper.AssertVersionsEqual(1, 0, 0, "alpha", "001", SemverVersion.Parse("1.0.0-alpha+001"));
@@ -120,7 +120,7 @@ namespace NpmTests {
                 SemverVersion.Parse("1.0.0-beta+exp.sha.5114f85"));
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestBuildMetadataOnly() {
             SemverVersionTestHelper.AssertVersionsEqual(
                 1,
