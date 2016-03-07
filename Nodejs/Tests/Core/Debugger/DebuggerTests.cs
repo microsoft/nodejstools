@@ -780,7 +780,7 @@ namespace NodejsTests.Debugger {
 
         #region Breakpoint Tests
 
-        [TestMethod, Priority(0), TestCategory("Debugging")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
         public void CannonicalHelloWorldTest() {
             AutoResetEvent textRead = new AutoResetEvent(false);
             TestDebuggerSteps(
@@ -810,7 +810,7 @@ namespace NodejsTests.Debugger {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("Debugging")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
         public void BreakOnFixedUpBreakpoint() {
             AutoResetEvent textRead = new AutoResetEvent(false);
             TestDebuggerSteps(
@@ -1746,7 +1746,7 @@ namespace NodejsTests.Debugger {
 
         }
 
-        [TestMethod, Priority(0), TestCategory("Debugging")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
         public void TestExitExplicit() {
             TestDebuggerSteps(
                 "ExitExplicit.js",
@@ -1786,7 +1786,7 @@ namespace NodejsTests.Debugger {
 
         #region Attach Tests
 
-        [TestMethod, Priority(0), TestCategory("Debugging")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
         public void LocalAttach() {
             var filename = "RunForever.js";
 

@@ -42,7 +42,7 @@ namespace NpmTests {
             //  TODO!
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
         public void TestInstallUninstallMaxPathGlobalModule() {
             var controller = NpmControllerFactory.Create(string.Empty, string.Empty);
             
