@@ -73,7 +73,7 @@ namespace NpmTests {
             Assert.AreEqual(0, rootPackage.Modules.Count, "Should be no modules after package installed.");
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
         public void TestAddPackageNoPackageJsonThenUninstall() {
             var rootDir = CreateRootPackage(PkgSimple);
             File.Delete(Path.Combine(rootDir, "package.json"));
