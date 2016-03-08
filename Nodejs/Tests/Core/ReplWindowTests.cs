@@ -493,8 +493,7 @@ undefined";
         }
 
         // https://nodejstools.codeplex.com/workitem/1575
-        [Ignore]
-        [TestMethod, Priority(0), Timeout(180000)]
+        [TestMethod, Priority(0), Timeout(180000), TestCategory("Ignore")]
         public async Task TestNpmReplCommandProcessExitSucceeds() {
             var npmPath = Nodejs.GetPathToNodeExecutableFromEnvironment("npm.cmd");
             using (var eval = ProjectlessEvaluator()) {
