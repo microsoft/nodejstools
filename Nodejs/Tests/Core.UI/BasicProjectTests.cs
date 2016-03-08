@@ -143,7 +143,8 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         }
 
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void ProjectAddFolder() {
             using (var app = new VisualStudioApp()) {
@@ -227,7 +228,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestAddExistingFolder() {
             using (var app = new VisualStudioApp()) {
@@ -263,7 +265,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestAddExistingFolderProject() {
             using (var app = new VisualStudioApp()) {
@@ -287,7 +290,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestAddExistingFolderDebugging() {
             using (var app = new VisualStudioApp()) {
@@ -435,7 +439,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void ProjectRenameAndDeleteItem() {
             using (var app = new VisualStudioApp()) {
@@ -510,7 +515,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestAutomationProperties() {
             using (var app = new VisualStudioApp()) {
@@ -579,7 +585,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestAutomationProject() {
             using (var app = new VisualStudioApp()) {
@@ -688,7 +695,8 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// Opens a project w/ a reference to a .NET assembly (not a project).  Makes sure we get completion against the assembly, changes the assembly, rebuilds, makes
         /// sure the completion info changes.
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void AddFolderExists() {
             Directory.CreateDirectory(TestData.GetPath(@"TestData\NodejsProjectData\\AddFolderExists\\X"));
@@ -791,7 +799,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void CopyAndPasteFolder() {
             using (var app = new VisualStudioApp()) {
@@ -834,7 +843,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void CopyAndPasteEmptyFolder() {
             using (var app = new VisualStudioApp()) {
@@ -887,7 +897,8 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// <summary>
         /// Verify we can copy a folder with multiple items in it.
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void CopyFolderWithMultipleItems() {
             // http://mpfproj10.codeplex.com/workitem/11618
@@ -915,7 +926,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void LoadProjectWithDuplicateItems() {
             using (var app = new VisualStudioApp()) {
@@ -935,7 +947,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void CopyFullPath() {
             foreach (var projectType in ProjectTypes) {

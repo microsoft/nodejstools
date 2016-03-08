@@ -29,7 +29,8 @@ using TestUtilities;
 namespace NodejsTests {
     [TestClass]
     public class AzureTests {
-        [TestMethod, Priority(0), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0)]
         public void UpdateWorkerRoleServiceDefinitionTest() {
             var doc = new XmlDocument();
             doc.LoadXml(@"<?xml version=""1.0"" encoding=""utf-8""?>

@@ -106,7 +106,8 @@ process.exit(" + exitCode + ");"),
         /// Verifies that we can launch node.exe in a way where debugging doesn't
         /// start (in this case -v is passed to display the version).  VS shouldn't crash.
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Debugging UI"), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Debugging UI")]
         [HostType("VSTestHost")]
         public void TestNoDebugging() {
             var project = Project("NoDebugging",

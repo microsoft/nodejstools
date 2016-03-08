@@ -341,6 +341,7 @@
     <Compile Include="Logging\NodejsToolsLogger.cs" />
     <Compile Include="Navigation\DropDownBarClient.cs" />
     <Compile Include="Debugger\DataTips\DataTipTextViewFilter.cs" />
+    <Compile Include="NodejsFileTypeHelpers.cs" />
     <Compile Include="NodejsPackage.Debugger.cs" />
     <Compile Include="NpmUI\NpmOutputWindow.xaml.cs">
       <DependentUpon>NpmOutputWindow.xaml</DependentUpon>

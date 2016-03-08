@@ -78,7 +78,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             )
         };
 
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestInsertSnippet() {
             using (var solution = BasicProject.Generate().ToVs()) {
@@ -91,7 +92,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestSelectedIndented() {
             using (var solution = BasicProject.Generate().ToVs()) {
@@ -110,7 +112,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestSurroundWithSnippet() {
             using (var solution = BasicProject.Generate().ToVs()) {
@@ -122,7 +125,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestSelected() {
             var snippet = new Snippet(
@@ -167,7 +171,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             return VerifySnippet(snippet, body, server);
         }
 
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestBasicSnippetsTab() {
             using (var solution = BasicProject.Generate().ToVs()) {
@@ -189,7 +194,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             return VerifySnippet(snippet, "", server);
         }
 
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestSurroundWithMultiline() {
             using (var solution = BasicProject.Generate().ToVs()) {

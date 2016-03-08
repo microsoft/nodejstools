@@ -33,7 +33,8 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// 
         /// Make sure Ctrl-Space works
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void CtrlSpace() {
             var project = Project("CtrlSpace",
@@ -55,7 +56,8 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// 
         /// Make sure we get intellisense for process.stdin
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void ProcessStdinIntellisense() {
             var project = Project("ProcessStdIn",
@@ -79,7 +81,8 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// 
         /// Make sure reference path intellisense works
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void ReferenceIntellisense() {
             var project = Project("ReferenceIntellisense",

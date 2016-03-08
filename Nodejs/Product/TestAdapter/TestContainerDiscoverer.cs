@@ -168,14 +168,14 @@ namespace Microsoft.NodejsTools.TestAdapter {
             //Check to see if we are dealing with a TypeScript file
             //  If we are then switch the test container to the underlying js file
             //
-            if (TypeScriptHelpers.IsTypeScriptFile(pathToFile)) {
+            if (NodejsFileTypeHelpers.IsTypeScriptFile(pathToFile)) {
                 string jsFile = TypeScriptHelpers.GetTypeScriptBackedJavaScriptFile(project, pathToFile);
                 if (!File.Exists(jsFile)) {
                     //Ignore the file for now.  On the next build event the typescript compiler will generate the file
                     //  at that point this function gets invoked again on the .ts file and we'll see the newly created .js file
                     return false;
                 }
-            } else if (!NodejsConstants.JavaScriptExtension.Equals(Path.GetExtension(pathToFile), StringComparison.OrdinalIgnoreCase)) {
+            } else if (!NodejsFileTypeHelpers.IsJavaScriptFile(pathToFile)) {
                 return false;
             }
 
@@ -358,7 +358,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
             //Setting/updating "TestFramework" property on a file item will cause metedata change in the project file,
             //so we need to re-discover when file change happens. 
-            if (pathToItem.EndsWith(NodejsConstants.NodejsProjectExtension, StringComparison.OrdinalIgnoreCase)) {
+            if (pathToItem.EndsWith(NodejsFileTypeHelpers.NodejsProjectExtension, StringComparison.OrdinalIgnoreCase)) {
                 return true;
             }
 

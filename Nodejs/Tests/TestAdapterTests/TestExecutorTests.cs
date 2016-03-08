@@ -36,7 +36,8 @@ namespace TestAdapterTests {
             NodejsTestData.Deploy();
         }
 
-        [TestMethod, Priority(0), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0)]
         public void TestRun() {
             
             var executor = new TestExecutor();
@@ -56,7 +57,8 @@ namespace TestAdapterTests {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0)]
         public void TestRunAll() {
             
             var executor = new TestExecutor();

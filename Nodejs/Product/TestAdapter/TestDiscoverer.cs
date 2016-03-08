@@ -33,7 +33,7 @@ using Microsoft.VisualStudioTools;
 using Microsoft.NodejsTools.SourceMapping;
 
 namespace Microsoft.NodejsTools.TestAdapter {
-    [FileExtension(NodejsConstants.NodejsProjectExtension)]
+    [FileExtension(NodejsFileTypeHelpers.NodejsProjectExtension)]
     [DefaultExecutorUri(TestExecutor.ExecutorUriString)]
     class TestDiscoverer : ITestDiscoverer {
         public TestDiscoverer() {
@@ -72,10 +72,10 @@ namespace Microsoft.NodejsTools.TestAdapter {
                                 continue;
                             }
                             string fileAbsolutePath = CommonUtils.GetAbsoluteFilePath(projectHome, item.EvaluatedInclude);
-                            bool typeScriptTest = TypeScript.TypeScriptHelpers.IsTypeScriptFile(fileAbsolutePath);
+                            bool typeScriptTest = NodejsFileTypeHelpers.IsTypeScriptFile(fileAbsolutePath);
                             if(typeScriptTest){
                                 fileAbsolutePath = TypeScript.TypeScriptHelpers.GetTypeScriptBackedJavaScriptFile(proj,fileAbsolutePath);
-                            } else if (!Path.GetExtension(fileAbsolutePath).Equals(".js", StringComparison.OrdinalIgnoreCase)) {
+                            } else if (!NodejsFileTypeHelpers.IsJavaScriptFile(fileAbsolutePath)) {
                                 continue;
                             }
                             List<TestFileEntry> fileList;

@@ -37,7 +37,8 @@ namespace NodejsTests {
             NodejsTestData.Deploy();
         }
 
-        [TestMethod, TestCategory("Core"), Priority(0), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, TestCategory("Core"), Priority(0)]
         public void UpgradeEnvironmentVariables() {
             var factory = new BaseNodeProjectFactory(null);
             var sp = new MockServiceProvider();

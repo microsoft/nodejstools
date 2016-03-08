@@ -35,107 +35,128 @@ namespace NodejsTests {
             NodejsTestData.Deploy();
         }
 
-        [TestMethod, Priority(0), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File01() {
             Tokenize("001.jade");
         }
 
-        [TestMethod, Priority(0), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File02() {
             Tokenize("002.jade");
         }
 
-        [TestMethod, Priority(0), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File03() {
             Tokenize("003.jade");
         }
 
-        [TestMethod, Priority(0), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File04() {
             Tokenize("004.jade");
         }
 
-        [TestMethod, Priority(0), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File05() {
             Tokenize("005.jade");
         }
 
-        [TestMethod, Priority(0), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File06() {
             Tokenize("006.jade");
         }
 
-        [TestMethod, Priority(0), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File07() {
             Tokenize("007.jade");
         }
 
-        [TestMethod, Priority(0), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File08() {
             Tokenize("008.jade");
         }
 
-        [TestMethod, Priority(0), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File09() {
             Tokenize("009.jade");
         }
 
-        [TestMethod, Priority(0), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File10() {
             Tokenize("010.jade");
         }
 
-        [TestMethod, Priority(0), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File11() {
             Tokenize("011.jade");
         }
 
-        [TestMethod, Priority(0), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File12() {
             Tokenize("012.jade");
         }
 
-        [TestMethod, Priority(0), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File13() {
             Tokenize("013.jade");
         }
 
-        [TestMethod, Priority(0), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File14() {
             Tokenize("014.jade");
         }
 
-        [TestMethod, Priority(0), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File15() {
             Tokenize("015.jade");
         }
 
-        [TestMethod, Priority(0), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File16() {
             Tokenize("016.jade");
         }
 
-        [TestMethod, Priority(0), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File17() {
             Tokenize("017.jade");
         }
 
-        [TestMethod, Priority(0), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File18() {
             Tokenize("018.jade");
         }
 
-        [TestMethod, Priority(0), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File19() {
             Tokenize("019.jade");
         }
 
-        [TestMethod, Priority(0), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File20() {
             Tokenize("020.jade");
         }
 
-        [TestMethod, Priority(0), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File21() {
             Tokenize("021.jade");
         }
@@ -145,7 +166,8 @@ namespace NodejsTests {
             Tokenize("022.jade");
         }
 
-        [TestMethod, Priority(0), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File23() {
             Tokenize("023.jade");
         }

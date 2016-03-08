@@ -22,7 +22,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace NpmTests {
     [TestClass]
     public class InstallUninstallPackageTests : AbstractFilesystemPackageJsonTests {
-        [TestMethod, Priority(0), TestCategory("Ignore")]
+        [Ignore]
+        [TestMethod, Priority(0)]
         public void TestAddPackageToSimplePackageJsonThenUninstall() {
             var rootDir = CreateRootPackage(PkgSimple);
             var controller = NpmControllerFactory.Create(rootDir, string.Empty);
