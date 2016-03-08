@@ -122,7 +122,12 @@ namespace NodejsTests {
             }
         }
 
+<<<<<<< HEAD
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore"), TestCategory("Ignore")]
+=======
+        [Ignore]
+        [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
+>>>>>>> 59fe154edefc5a62b312756298a95d54b2afe8da
         public void TestConsoleDir() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
@@ -431,7 +436,10 @@ undefined";
 =======
         [Ignore]
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
+<<<<<<< HEAD
 >>>>>>> e9bec53... Add AppVeyorIgnoreCategory to repl window tests and disable one that fails locally
+=======
+>>>>>>> 59fe154edefc5a62b312756298a95d54b2afe8da
         public void TestVarI() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
@@ -525,7 +533,10 @@ undefined";
 =======
         [Ignore]
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
+<<<<<<< HEAD
 >>>>>>> e9bec53... Add AppVeyorIgnoreCategory to repl window tests and disable one that fails locally
+=======
+>>>>>>> 59fe154edefc5a62b312756298a95d54b2afe8da
         public void TestNpmReplRedirector() {
             using (var eval = ProjectlessEvaluator()) {
                 var mockWindow = new MockReplWindow(eval) {
