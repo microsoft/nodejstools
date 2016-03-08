@@ -36,8 +36,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             AssertListener.Initialize();
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void TestErrorNewLine() {
             Test((app, window) => {
@@ -48,8 +47,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             });
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void TestColorOutput() {
             Test((app, window) => {
@@ -81,8 +79,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             });
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void TestStdErrIsRed() {
             Test((app, window) => {
@@ -109,8 +106,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             });
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void TestCompletion() {
             Test((app, window) => {
@@ -121,8 +117,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             });
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void TestNoSpecialCommandCompletion() {
             Test((app, window) => {

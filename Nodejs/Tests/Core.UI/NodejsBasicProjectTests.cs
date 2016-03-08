@@ -43,8 +43,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             NodejsTestData.Deploy();
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void AddNewTypeScriptItem() {
             using (var solution = Project("AddNewTypeScriptItem", Compile("server")).Generate().ToVs()) {
@@ -196,8 +195,7 @@ require('fs').writeFileSync('{0}', process.env.fob + process.env.bar + process.e
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void TestProjectProperties() {
             var filename = Path.Combine(TestData.GetTempPath(), Path.GetRandomFileName());

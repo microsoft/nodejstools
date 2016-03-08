@@ -25,8 +25,7 @@ namespace NodejsTests {
 
     [TestClass]
     public class TestFrameworkStringConverterTest {
-        [Ignore]
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void GetStandardValues_CheckValueSequence() {
             //Arrange
             TestFrameworkStringConverter convert = new TestFrameworkStringConverter();

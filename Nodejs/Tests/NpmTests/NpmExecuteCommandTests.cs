@@ -23,6 +23,7 @@ namespace NpmTests {
     [TestClass]
     public class NpmExecuteCommandTests {
         // https://nodejstools.codeplex.com/workitem/1575
+        [Ignore]
         [TestMethod, Priority(0), Timeout(180000)]
         public async Task TestNpmCommandProcessExitSucceeds() {
             var npmPath = NpmHelpers.GetPathToNpm();

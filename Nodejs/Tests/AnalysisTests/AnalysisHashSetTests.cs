@@ -16,6 +16,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.NodejsTools.Analysis.AnalysisSetDetails;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -23,7 +26,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace AnalysisTests {
     [TestClass]
     public class AnalysisHashSetTests {
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestEmpty() {
             TestEmptySet(AnalysisSet.Empty);
             TestObjectSet(AnalysisSet.Empty);
@@ -35,7 +38,7 @@ namespace AnalysisTests {
             TestImmutableSet(emptySet);
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestWrapperSelfSet() {
             var projectEntry = CreateProjectEntry();
             var value = new TestAnalysisValue(projectEntry);
@@ -44,7 +47,7 @@ namespace AnalysisTests {
             TestImmutableSet(value.Proxy);
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestSetOfOne() {
             var projectEntry = CreateProjectEntry();
             var value = new TestAnalysisValue(projectEntry);
@@ -52,7 +55,7 @@ namespace AnalysisTests {
             TestImmutableSet(value.Proxy);
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestSetOfTwo() {
             var projectEntry = CreateProjectEntry();
             var value1 = new TestAnalysisValue(projectEntry);
@@ -61,7 +64,7 @@ namespace AnalysisTests {
             TestImmutableSet(new AnalysisSetTwoObject(value1.Proxy, value2.Proxy));
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestHashSet() {
             var projectEntry = CreateProjectEntry();
             List<AnalysisProxy> values = new List<AnalysisProxy>();

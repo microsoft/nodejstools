@@ -63,8 +63,7 @@ namespace NpmTests {
             TestFreshPackage("doublecomma");
         }
 
-        [Ignore]
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         [ExpectedException(typeof(PackageJsonException))]
         public void TestParseDuplicateProperty() {
             TestFreshPackage("duplicateproperty");
@@ -129,14 +128,12 @@ namespace NpmTests {
             TestFreshPackage("missingpropnamequotes");
         }
 
-        [Ignore]
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestParseMissingTrailingBrace() {
             TestFreshPackage("missingtrailingbrace");
         }
 
-        [Ignore]
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestParseMissingTrailingListBrace() {
             TestFreshPackage("missingtrailinglistbrace");
         }
@@ -184,7 +181,7 @@ namespace NpmTests {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("UnitTest")]
+        [TestMethod, Priority(0)]
         public void TestParseFromEveryCharValue() {
             var buff = new StringBuilder();
             var ch = (char)0;
