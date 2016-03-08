@@ -74,20 +74,11 @@ namespace NpmTests {
         }
 
         [TestMethod, TestCategory("UnitTest")]
-        public void ShouldReturnInputAsNameIfInputIsNotJsonStringOrObject() {
+        public void ShouldReturnInputAsNameIfInputIsObject() {
             var name = "J Scripter";
             var person = Person.CreateFromJsonSource(name);
             Assert.IsNotNull(person);
             Assert.AreEqual(name, person.Name);
-            Assert.IsNull(person.Email);
-            Assert.IsNull(person.Url);
-        }
-
-        [TestMethod, TestCategory("UnitTest")]
-        public void ShouldTreatStringAsName() {
-            var person = Person.CreateFromJsonSource(@"""J Scripter""");
-            Assert.IsNotNull(person);
-            Assert.AreEqual("J Scripter", person.Name);
             Assert.IsNull(person.Email);
             Assert.IsNull(person.Url);
         }
