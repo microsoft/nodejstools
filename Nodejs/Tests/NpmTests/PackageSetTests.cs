@@ -1,8 +1,4 @@
-<<<<<<< c3a5c04224c291ced127520c93d5dc993dbfda06
 //*********************************************************//
-=======
-﻿//*********************************************************//
->>>>>>> Convert packageset line endings
 //    Copyright (c) Microsoft. All rights reserved.
 //    
 //    Apache 2.0 License
@@ -139,8 +135,4 @@ namespace NodejsTests {
             AssertUtil.ArrayEquals(new [] { p1, p2 }, diff.Removed);
         }
     }
-<<<<<<< c3a5c04224c291ced127520c93d5dc993dbfda06
 }
-=======
-}
->>>>>>> Convert packageset line endings
