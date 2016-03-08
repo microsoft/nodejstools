@@ -91,7 +91,8 @@
                                   ProjectTemplates\TypeScript\Node.js\1033\TypeScriptFromExistingCode.zip;
                                   ProjectTemplates\TypeScript\Node.js\1033\TypeScriptAzureNodejsWorker.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\TypeScriptAzureNodejsWorkerRole.zip;
-                                  ProjectTemplates\JavaScript\Node.js\1033\CloudService.zip"/>
+                                  ProjectTemplates\JavaScript\Node.js\1033\CloudService.zip;
+                                  ProjectTemplates\VS_Nodejs.project.vstman"/>
 
         <File Include="ItemTemplates\CloudService\NETFramework4\Web Role\Node.js\CloudServiceWebRole.zip;
                        ItemTemplates\CloudService\NETFramework4\Web Role\Node.js\CloudServiceExpressWebRole.zip;

@@ -911,6 +911,14 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="ProjectTemplates\VS_Nodejs.project.vstman">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\Files\VS_Nodejs.item.vstman">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <None Include="Theme\contrast.vstheme">
       <SubType>Designer</SubType>
     </None>
@@ -1341,7 +1349,7 @@
     <None Include="Theme\Microsoft.NodejsTools.theme.v11.0.pkgdef" />
     <None Include="Theme\Microsoft.NodejsTools.theme.v12.0.pkgdef" />
     <None Include="Theme\Microsoft.NodejsTools.theme.v14.0.pkgdef" />
-    <None Include="Theme\Microsoft.NodejsTools.theme.v15.0.pkgdef" />    
+    <None Include="Theme\Microsoft.NodejsTools.theme.v15.0.pkgdef" />
     <Content Include="VSTemplateStore.pkgdef">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
