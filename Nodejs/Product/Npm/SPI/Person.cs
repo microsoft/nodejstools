@@ -20,10 +20,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 
-#if DEBUG
-using Newtonsoft.Json.Linq;
-#endif
-
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal class Person : IPerson {
 
