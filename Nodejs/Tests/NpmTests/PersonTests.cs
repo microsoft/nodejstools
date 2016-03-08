@@ -1,4 +1,3 @@
-//*********************************************************//
 //    Copyright (c) Microsoft. All rights reserved.
 //    
 //    Apache 2.0 License
@@ -94,4 +93,3 @@ namespace NpmTests {
         }
     }
 }
-
