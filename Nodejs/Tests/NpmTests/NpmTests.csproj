@@ -82,7 +82,7 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
     <Reference Include="System" />
-    <Compile Include="AbstractFilesystemPackageJsonTests.cs" />
+    <Compile Include="FilesystemPackageJsonTestHelpers.cs" />
     <Compile Include="AbstractPackageJsonTests.cs" />
     <Compile Include="InstallUninstallPackageTests.cs" />
     <Compile Include="FileSystemPackageJsonTests.cs" />

@@ -21,11 +21,11 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace NpmTests {
     [TestClass]
-    public class InstallUninstallPackageTests : AbstractFilesystemPackageJsonTests {
+    public class InstallUninstallPackageTests : AbstractPackageJsonTests {
         [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestAddPackageToSimplePackageJsonThenUninstall() {
             using (var manager = new TemporaryFileManager()) {
-                var rootDir = CreateRootPackage(manager, PkgSimple);
+                var rootDir = FilesystemPackageJsonTestHelpers.CreateRootPackage(manager, PkgSimple);
                 var controller = NpmControllerFactory.Create(rootDir, string.Empty);
                 controller.Refresh();
                 var rootPackage = controller.RootPackage;
@@ -78,7 +78,7 @@ namespace NpmTests {
         [TestMethod, Priority(0)]
         public void TestAddPackageNoPackageJsonThenUninstall() {
             using (var manager = new TemporaryFileManager()) {
-                var rootDir = CreateRootPackage(manager, PkgSimple);
+                var rootDir = FilesystemPackageJsonTestHelpers.CreateRootPackage(manager, PkgSimple);
                 File.Delete(Path.Combine(rootDir, "package.json"));
                 var controller = NpmControllerFactory.Create(rootDir, string.Empty);
                 controller.Refresh();
@@ -132,7 +132,7 @@ namespace NpmTests {
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
         public void TestAddPackageNoSavePackageJsonThenUninstall() {
             using (var manager = new TemporaryFileManager()) {
-                var rootDir = CreateRootPackage(manager, PkgSimple);
+                var rootDir = FilesystemPackageJsonTestHelpers.CreateRootPackage(manager, PkgSimple);
                 var controller = NpmControllerFactory.Create(rootDir, string.Empty);
                 controller.Refresh();
                 var rootPackage = controller.RootPackage;

@@ -22,12 +22,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace NpmTests {
 
     [TestClass]
-    public class MaxPathTests : AbstractFilesystemPackageJsonTests {
+    public class MaxPathTests : AbstractPackageJsonTests {
 
         [TestMethod, Priority(0)]
         public void TestAngularFullstackScaffoldedProject() {
             using (var manager = new TemporaryFileManager()) {
-                var rootDir = CreateRootPackageDir(manager);
+                var rootDir = FilesystemPackageJsonTestHelpers.CreateRootPackageDir(manager);
                 var controller = NpmControllerFactory.Create(rootDir, string.Empty);
                 controller.OutputLogged += controller_OutputLogged;
                 controller.ErrorLogged += controller_OutputLogged;

@@ -23,7 +23,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace NpmTests {
     [TestClass]
-    public class ModuleHierarchyTests : AbstractFilesystemPackageJsonTests {
+    public class ModuleHierarchyTests : AbstractPackageJsonTests {
         protected const string PkgSingleDependency = @"{
     ""name"": ""TestPkg"",
     ""version"": ""0.1.0"",
@@ -43,7 +43,7 @@ namespace NpmTests {
         [TestMethod, Priority(0)]
         public void TestReadRootPackageNoDependencies() {
             using (var manager = new TemporaryFileManager()) {
-                var rootDir = CreateRootPackage(manager, PkgSimple);
+                var rootDir = FilesystemPackageJsonTestHelpers.CreateRootPackage(manager, PkgSimple);
                 var pkg = RootPackageFactory.Create(rootDir);
                 Assert.IsNotNull(pkg, "Root package should not be null.");
                 Assert.AreEqual(rootDir, pkg.Path, "Package path mismatch.");
@@ -64,7 +64,7 @@ namespace NpmTests {
         [TestMethod, Priority(0)]
         public void TestReadRootPackageOneDependency() {
             using (var manager = new TemporaryFileManager()) {
-                var rootDir = CreateRootPackage(manager, PkgSingleDependency);
+                var rootDir = FilesystemPackageJsonTestHelpers.CreateRootPackage(manager, PkgSingleDependency);
                 RunNpmInstall(rootDir);
 
                 var pkg = RootPackageFactory.Create(rootDir);
@@ -109,7 +109,7 @@ namespace NpmTests {
         [TestMethod, Priority(0)]
         public void TestReadRootPackageMissingDependency() {
             using (var manager = new TemporaryFileManager()) {
-                var rootDir = CreateRootPackage(manager, PkgSingleDependency);
+                var rootDir = FilesystemPackageJsonTestHelpers.CreateRootPackage(manager, PkgSingleDependency);
 
                 var pkg = RootPackageFactory.Create(rootDir);
 
@@ -154,7 +154,7 @@ namespace NpmTests {
         public void TestReadRootDependencyRecursive() {
             using (var manager = new TemporaryFileManager()) {
 
-                var rootDir = CreateRootPackage(manager, PkgSingleRecursiveDependency);
+                var rootDir = FilesystemPackageJsonTestHelpers.CreateRootPackage(manager, PkgSingleRecursiveDependency);
                 RunNpmInstall(rootDir);
 
                 var pkg = RootPackageFactory.Create(rootDir);

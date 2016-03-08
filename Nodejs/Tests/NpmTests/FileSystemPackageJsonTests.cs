@@ -20,13 +20,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace NpmTests {
     [TestClass]
-    public class FileSystemPackageJsonTests : AbstractFilesystemPackageJsonTests {
+    public class FileSystemPackageJsonTests : AbstractPackageJsonTests {
         [TestMethod, Priority(0)]
         public void TestReadFromFile() {
             using (var manager = new TemporaryFileManager()) {
                 var dir = manager.GetNewTempDirectory();
                 var path = Path.Combine(dir.FullName, "package.json");
-                CreatePackageJson(path, PkgSimple);
+                FilesystemPackageJsonTestHelpers.CreatePackageJson(path, PkgSimple);
                 CheckPackage(PackageJsonFactory.Create(new FilePackageJsonSource(path)));
             }
         }
@@ -35,7 +35,7 @@ namespace NpmTests {
         public void TestReadFromDirectory() {
             using (var manager = new TemporaryFileManager()) {
                 var dir = manager.GetNewTempDirectory();
-                CreatePackageJson(Path.Combine(dir.FullName, "package.json"), PkgSimple);
+                FilesystemPackageJsonTestHelpers.CreatePackageJson(Path.Combine(dir.FullName, "package.json"), PkgSimple);
                 CheckPackage(PackageJsonFactory.Create(new DirectoryPackageJsonSource(dir.FullName)));
             }
         }
