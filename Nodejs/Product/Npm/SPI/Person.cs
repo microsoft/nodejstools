@@ -29,68 +29,99 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         // We cannot rely on the ordering of any of these fields,
         // so we should match them separately.
-        private static readonly Regex RegexPerson = new Regex(
-        "\"name\":\\s*\"(?<name>[^<]+?)\"" +
-        "|" +
-        "\"email\":\\s*\"(?<email>[^<]+?)\"" +
-        "|" +
-        "\"url\":\\s*\"(?<url>[^<]+?)\"",
-        RegexOptions.Singleline);
-    
+        private static readonly Regex ObjectPersonRegex = new Regex(
+            "\"name\":\\s*\"(?<name>[^<]+?)\"" +
+            "|" +
+            "\"email\":\\s*\"(?<email>[^<]+?)\"" +
+            "|" +
+            "\"url\":\\s*\"(?<url>[^<]+?)\"",
+            RegexOptions.Singleline);
+
+        private static readonly Regex StringPersonRegex = new Regex(
+            @"^""(?<name>[^""]+)""$",
+            RegexOptions.Singleline);
+
         [JsonConstructor]
         private Person() {
             // Enables Json deserialization
         }
 
-        public Person(string source) {
-            InitFromString(source);
+        private Person(string name, string email = null, string url = null) {
+            Name = name;
+            Email = email;
+            Url = url;
         }
 
-        private void InitFromString(string source) {
-            if (source == null) {
-                Name = string.Empty;
-                return;
-            }
+        public static Person CreateFromJsonSource(string source) {
+            if (source == null)
+                return new Person(string.Empty);
+
+            var objectPerson = TryCreatePersonFromObject(source);
+            if (objectPerson != null)
+                return objectPerson;
+
+            var stringPerson = TryCreatePersonFromString(source);
+            if (stringPerson != null)
+                return stringPerson;
+
+            return new Person(source);
+        }
+
+        /// <summary>
+        /// Try to create a person object from a json object.
+        /// 
+        /// This can either be a json object or a string: https://docs.npmjs.com/files/package.json#people-fields-author-contributors
+        /// </summary>
+        /// <param name="source">Json source</param>
+        private static Person TryCreatePersonFromObject(string source) {
+            string name = null;
+            string email = null;
+            string url = null;
 
             // We parse using a regex because JObject.Parse throws exceptions for malformatted json,
             // and simply handling them causes performance issues.
-            var matches = RegexPerson.Matches(source);
+            var matches = ObjectPersonRegex.Matches(source);
             if (matches.Count >= 1) {
                 foreach (Match match in matches) {
                     var group = match.Groups["name"];
                     if (group.Success) {
-                        Name = group.Value;
+                        name = group.Value;
                         continue;
                     }
 
                     group = match.Groups["email"];
                     if (group.Success) {
-                        Email = group.Value;
+                        email = group.Value;
                         continue;
                     }
 
                     group = match.Groups["url"];
                     if (group.Success) {
-                        Url = group.Value;
+                        url = group.Value;
                         continue;
                     }
                 }
             } else {
-                Name = source;
+                return null;
             }
+            return new Person(name, email, url);
+        }
 
-#if DEBUG
-            // Verify we are parsing correctly
-            try {
-                var jObject = JObject.Parse(source);
-                var name = (string)jObject["name"];
-                Debug.Assert(name != null ? name == Name : Name == source, string.Format("Failed to parse name from {0}", source));
-                Debug.Assert((string)jObject["email"] == Email, string.Format("Failed to parse email from {0}", source));
-                Debug.Assert((string)jObject["url"] == Url, string.Format("Failed to parse url from {0}", source));
-            } catch (Exception) {
-                Debug.Assert(source == Name);
+        /// <summary>
+        /// Try to create a person object from a json string.
+        /// 
+        /// TODO: currently does not try to parse the string to extract the email or url.
+        /// </summary>
+        /// <param name="source">Json source</param>
+        private static Person TryCreatePersonFromString(string source) {
+            var matches = StringPersonRegex.Matches(source);
+            if (matches.Count == 1) {
+                var match = matches[0];
+                var group = match.Groups["name"];
+                if (group.Success)
+                    return new Person(group.Value);
             }
-#endif
+            return null;
         }
 
         [JsonProperty]
