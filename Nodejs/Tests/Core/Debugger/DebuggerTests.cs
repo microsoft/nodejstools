@@ -425,7 +425,7 @@ namespace NodejsTests.Debugger {
         #region Startup Tests
 
         // F5 startup
-        [TestMethod, Priority(0), TestCategory("Debugging")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
         public void Startup_NoBreakOnEntryPoint() {
             TestDebuggerSteps(
                 "BreakpointTest.js",
@@ -437,7 +437,7 @@ namespace NodejsTests.Debugger {
         }
 
         // F10/F11 startup
-        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore"), TestCategory("Ignore")]
         public void Startup_BreakOnEntryPoint() {
             TestDebuggerSteps(
                 "BreakpointTest.js",
@@ -449,7 +449,7 @@ namespace NodejsTests.Debugger {
         }
 
         // F5/F10/F11 startup
-        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore"), TestCategory("Ignore")]
         public void Startup_BreakOnEntryPointBreakPoint() {
             TestDebuggerSteps(
                 "BreakpointTest.js",
@@ -462,7 +462,7 @@ namespace NodejsTests.Debugger {
         }
 
         // F5 startup
-        [TestMethod, Priority(0), TestCategory("Debugging")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
         public void Startup_NoBreakOnEntryPointTracePoint() {
             TestDebuggerSteps(
                 "BreakpointTest.js",
@@ -780,7 +780,7 @@ namespace NodejsTests.Debugger {
 
         #region Breakpoint Tests
 
-        [TestMethod, Priority(0), TestCategory("Debugging")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
         public void CannonicalHelloWorldTest() {
             AutoResetEvent textRead = new AutoResetEvent(false);
             TestDebuggerSteps(
@@ -810,7 +810,7 @@ namespace NodejsTests.Debugger {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("Debugging")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
         public void BreakOnFixedUpBreakpoint() {
             AutoResetEvent textRead = new AutoResetEvent(false);
             TestDebuggerSteps(
@@ -1746,7 +1746,7 @@ namespace NodejsTests.Debugger {
 
         }
 
-        [TestMethod, Priority(0), TestCategory("Debugging")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
         public void TestExitExplicit() {
             TestDebuggerSteps(
                 "ExitExplicit.js",
@@ -1786,7 +1786,7 @@ namespace NodejsTests.Debugger {
 
         #region Attach Tests
 
-        [TestMethod, Priority(0), TestCategory("Debugging")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
         public void LocalAttach() {
             var filename = "RunForever.js";
 
@@ -2055,7 +2055,7 @@ namespace NodejsTests.Debugger {
 
         #region Helpers Tests
 
-        [TestMethod, Priority(0), TestCategory("Debugging")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
         public async Task TaskWaitAsync() {
             // Successful task, no timeout.
             var task = Task.Run(() => {

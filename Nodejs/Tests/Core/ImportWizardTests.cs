@@ -59,6 +59,7 @@ namespace NodejsTests {
             });
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void ImportWizardSimpleApp() {
             DispatcherTest(async () => {                
@@ -83,6 +84,7 @@ namespace NodejsTests {
             });
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void ImportWizardSimpleOther() {
             DispatcherTest(async () => {
@@ -107,6 +109,7 @@ namespace NodejsTests {
             });
         }
 
+        [Ignore]
         [TestMethod, Priority(0)]
         public void ImportWizardFiltered() {
             var settings = new ImportSettings();
