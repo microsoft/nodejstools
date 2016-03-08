@@ -536,7 +536,7 @@ namespace NodejsTests.Debugger {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("Debugging")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
         public void Running_AccrossTracePoint() {
             TestDebuggerSteps(
                 "BreakpointTest3.js",
@@ -840,7 +840,7 @@ namespace NodejsTests.Debugger {
             );
         }
 
-        [TestMethod, Priority(0), TestCategory("Debugging")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
         public void SetBreakpointWhileRunning() {
             TestDebuggerSteps(
                 "RunForever.js",
@@ -1412,7 +1412,7 @@ namespace NodejsTests.Debugger {
             TestBreakpointPredicatedEntrypoint("FixupBreakpointOnComment.js", targetBreakpoint: 0, expectedHit: 1);
         }
 
-        [TestMethod, Priority(0), TestCategory("Debugging")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
         public void TestDuplicateFileName() {
             TestDebuggerSteps(
                 "DuppedFilename.js",
