@@ -425,7 +425,7 @@ namespace NodejsTests.Debugger {
         #region Startup Tests
 
         // F5 startup
-        [TestMethod, Priority(0), TestCategory("Debugging")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
         public void Startup_NoBreakOnEntryPoint() {
             TestDebuggerSteps(
                 "BreakpointTest.js",
@@ -437,7 +437,7 @@ namespace NodejsTests.Debugger {
         }
 
         // F10/F11 startup
-        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore"), TestCategory("Ignore")]
         public void Startup_BreakOnEntryPoint() {
             TestDebuggerSteps(
                 "BreakpointTest.js",
@@ -449,7 +449,7 @@ namespace NodejsTests.Debugger {
         }
 
         // F5/F10/F11 startup
-        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore"), TestCategory("Ignore")]
         public void Startup_BreakOnEntryPointBreakPoint() {
             TestDebuggerSteps(
                 "BreakpointTest.js",
