@@ -132,7 +132,7 @@ namespace NodejsTests.Debugger {
 
         #region BreakAll Tests
 
-        [TestMethod, Priority(0), TestCategory("Debugging")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
         public void TestBreakAll() {
             // Load process (running)
             NodeThread thread = null;
