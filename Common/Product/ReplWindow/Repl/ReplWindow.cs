@@ -2145,7 +2145,7 @@ namespace Microsoft.VisualStudio.Repl {
                 }
                 if (!_readingStdIn && !EndsWithLineBreak(text)) {
                     var lineBreak = GetLineBreak();
-                    edit.Insert(startPosition, lineBreak);
+                    edit.Insert(oldBufferLength, lineBreak);
                     _addedLineBreakOnLastOutput = true;
                     // Adust last span.
                     var last = spans.Last();
@@ -2158,7 +2158,6 @@ namespace Microsoft.VisualStudio.Repl {
             ApplyProtection(_outputBuffer, _outputProtection);
 
             int newLineCount = _outputBuffer.CurrentSnapshot.LineCount;
-
             int insertBeforePrompt = -1;
             if (!_isRunning) {
                 int lastPrimaryPrompt, lastPrompt;
