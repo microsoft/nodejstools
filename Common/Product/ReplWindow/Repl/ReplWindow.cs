@@ -2110,14 +2110,18 @@ namespace Microsoft.VisualStudio.Repl {
         /// <summary>
         /// Appends text to the output buffer and updates projection buffer to include it.
         /// </summary>
-        internal void AppendOutput(ConsoleColor color, string text, bool lastOutput) {
+        internal void AppendOutput(OutputBuffer.OutputEntry[] entries) {
+            if (!entries.Any())
+                return;
+
+            var spans = new List<KeyValuePair<Span, OutputBuffer.OutputEntryProperties>>(entries.Length);
+
             int oldBufferLength = _outputBuffer.CurrentSnapshot.Length;
             int oldLineCount = _outputBuffer.CurrentSnapshot.LineCount;
 
             RemoveProtection(_outputBuffer, _outputProtection);
 
             // append the text to output buffer and make sure it ends with a line break:
-            int newOutputLength = text.Length;
             using (var edit = _outputBuffer.CreateEdit()) {
                 if (_addedLineBreakOnLastOutput) {
                     // appending additional output, remove the line break we previously injected
@@ -2126,18 +2130,28 @@ namespace Microsoft.VisualStudio.Repl {
                     Debug.Assert(_outputBuffer.CurrentSnapshot.GetText(deleteSpan) == lineBreak);
                     edit.Delete(deleteSpan);
                     oldBufferLength -= lineBreak.Length;
-                }
-
-                edit.Insert(oldBufferLength, text);
-                if (lastOutput && !_readingStdIn && !EndsWithLineBreak(text)) {
-                    var lineBreak = GetLineBreak();
-                    edit.Insert(oldBufferLength, lineBreak);
-                    newOutputLength += lineBreak.Length;
-                    _addedLineBreakOnLastOutput = true;
-                } else {
                     _addedLineBreakOnLastOutput = false;
                 }
-                
+
+                var text = String.Empty;
+                var startPosition = oldBufferLength;
+                foreach (var entry in entries) {
+                    text = entry.Buffer.ToString();
+                    edit.Insert(oldBufferLength, text);
+
+                    var span = new Span(startPosition, text.Length);
+                    spans.Add(new KeyValuePair<Span, OutputBuffer.OutputEntryProperties>(span, entry.Properties));
+                    startPosition += text.Length;
+                }
+                if (!_readingStdIn && !EndsWithLineBreak(text)) {
+                    var lineBreak = GetLineBreak();
+                    edit.Insert(startPosition, lineBreak);
+                    _addedLineBreakOnLastOutput = true;
+                    // Adust last span.
+                    var last = spans.Last();
+                    var newLastSpan = new Span(last.Key.Start, last.Key.Length + lineBreak.Length);
+                    spans[spans.Count() - 1] = new KeyValuePair<Span, OutputBuffer.OutputEntryProperties>(newLastSpan, last.Value);
+                }
                 edit.Apply();
             }
 
@@ -2145,28 +2159,30 @@ namespace Microsoft.VisualStudio.Repl {
 
             int newLineCount = _outputBuffer.CurrentSnapshot.LineCount;
 
-            var span = new Span(oldBufferLength, newOutputLength);
-            var trackingSpan = new CustomTrackingSpan(
-                _outputBuffer.CurrentSnapshot,
-                span,
-                PointTrackingMode.Negative,
-                PointTrackingMode.Negative
-            );
-
-            var outputSpan = new ReplSpan(trackingSpan, ReplSpanKind.Output);
-            _outputColors.Add(new ColoredSpan(span, color));
-
-            bool appended = false;
-
+            int insertBeforePrompt = -1;
             if (!_isRunning) {
-                // insert output span immediately before the last primary span
-
                 int lastPrimaryPrompt, lastPrompt;
+
                 IndexOfLastPrompt(out lastPrimaryPrompt, out lastPrompt);
 
                 // If the last prompt is STDIN prompt insert output before it, otherwise before the primary prompt:
-                int insertBeforePrompt = (lastPrompt != -1 && _projectionSpans[lastPrompt].Kind == ReplSpanKind.StandardInputPrompt) ? lastPrompt : lastPrimaryPrompt;
+                insertBeforePrompt = (lastPrompt != -1 && _projectionSpans[lastPrompt].Kind == ReplSpanKind.StandardInputPrompt) ? lastPrompt : lastPrimaryPrompt;
+            }
 
+            foreach (var entry in spans) {
+                var span = entry.Key;
+                var props = entry.Value;
+
+                var trackingSpan = new CustomTrackingSpan(
+                    _outputBuffer.CurrentSnapshot,
+                    span,
+                    PointTrackingMode.Negative,
+                    PointTrackingMode.Negative);
+
+                var outputSpan = new ReplSpan(trackingSpan, ReplSpanKind.Output);
+                _outputColors.Add(new ColoredSpan(span, props.Color));
+
+                // insert output span immediately before the last primary span
                 if (insertBeforePrompt >= 0) {
                     if (oldLineCount != newLineCount) {
                         int delta = newLineCount - oldLineCount;
@@ -2176,18 +2192,14 @@ namespace Microsoft.VisualStudio.Repl {
                         var lastMaplet = _promptLineMapping.Last();
                         _promptLineMapping[_promptLineMapping.Count - 1] = new KeyValuePair<int, int>(
                             lastMaplet.Key + delta,
-                            lastMaplet.Value + 1
-                        );
+                            lastMaplet.Value + 1);
                     }
 
                     // Projection buffer change might trigger events that access prompt line mapping, so do it last:
                     InsertProjectionSpan(insertBeforePrompt, outputSpan);
-                    appended = true;
+                } else {
+                    AppendProjectionSpan(outputSpan);
                 }
-            }
-
-            if (!appended) {
-                AppendProjectionSpan(outputSpan);
             }
         }
 
