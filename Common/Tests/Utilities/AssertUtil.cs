@@ -68,30 +68,24 @@ namespace TestUtilities
             Assert.Inconclusive("Missing Dependency: {0}", dependency);
         }
 
-        public static void ArrayEquals(IList expected, IList actual)
-        {
-            if (expected == null)
-            {
+        public static void ArrayEquals<T>(IEnumerable<T> expected, IEnumerable<T> actual) {
+            if (expected == null) {
                 throw new ArgumentNullException("expected");
             }
-            if (actual == null)
-            {
+            if (actual == null) {
                 Assert.Fail("AssertUtils.ArrayEquals failure. Actual collection is null.");
             }
 
-            if (expected.Count != actual.Count)
-            {
-                Assert.Fail("AssertUtils.ArrayEquals failure. Expected collection with length {0} but got collection with length {1}",
-                    expected.Count, actual.Count);
+            Assert.AreEqual(expected.Count(), actual.Count());
+
+            var expectedIt = expected.GetEnumerator();
+            var actualIt = actual.GetEnumerator();
+
+            while (expectedIt.MoveNext() && actualIt.MoveNext()) {
+                Assert.AreEqual(expectedIt.Current, actualIt.Current);
             }
-            for (int i = 0; i < expected.Count; i++)
-            {
-                if (!expected[i].Equals(actual[i]))
-                {
-                    Assert.Fail("AssertUtils.ArrayEquals failure. Expected value {0} at position {1} but got value {2}",
-                        expected[i], i, actual[i]);
-                }
-            }
+            Assert.IsFalse(expectedIt.MoveNext());
+            Assert.IsFalse(actualIt.MoveNext());
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "1")]

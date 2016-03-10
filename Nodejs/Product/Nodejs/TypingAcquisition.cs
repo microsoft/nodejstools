@@ -45,7 +45,7 @@ namespace Microsoft.NodejsTools {
 
             using (var process = ProcessOutput.Run(
                 tsdPath,
-                new[] { "install", "--save" }.Concat(packages.Select(GetPackageTsdName)),
+                TsdInstallArguments(packages),
                 pathToRootProjectDirectory,
                 null,
                 false,
@@ -84,6 +84,10 @@ namespace Microsoft.NodejsTools {
 
         private static string GetPackageTsdName(IPackage package) {
             return package.Name;
+        }
+
+        private static IEnumerable<string> TsdInstallArguments(IEnumerable<IPackage> packages) {
+            return new[] { "install", }.Concat(packages.Select(GetPackageTsdName)).Concat(new[] { "--save" });
         }
     }
 }
