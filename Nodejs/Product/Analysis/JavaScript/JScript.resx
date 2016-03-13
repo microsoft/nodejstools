@@ -136,10 +136,10 @@
     <value>Expected ']'</value>
   </data>
   <data name="NoLeftCurly" xml:space="preserve">
-    <value>Expected '{'</value>
+    <value>Expected '{{'</value>
   </data>
   <data name="NoRightCurly" xml:space="preserve">
-    <value>Expected '}'</value>
+    <value>Expected '}}'</value>
   </data>
   <data name="NoIdentifier" xml:space="preserve">
     <value>Expected identifier</value>
