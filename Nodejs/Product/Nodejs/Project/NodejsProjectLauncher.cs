@@ -202,9 +202,9 @@ namespace Microsoft.NodejsTools.Project {
 
         private void LaunchDebugger(IServiceProvider provider, VsDebugTargetInfo dbgInfo) {
             if (!Directory.Exists(dbgInfo.bstrCurDir)) {
-                MessageBox.Show(String.Format("Working directory \"{0}\" does not exist.", dbgInfo.bstrCurDir), "Node.js Tools for Visual Studio");
+                MessageBox.Show(String.Format("Working directory \"{0}\" does not exist.", dbgInfo.bstrCurDir), SR.ProductName);
             } else if (!File.Exists(dbgInfo.bstrExe)) {
-                MessageBox.Show(String.Format("Interpreter \"{0}\" does not exist.", dbgInfo.bstrExe), "Node.js Tools for Visual Studio");
+                MessageBox.Show(String.Format("Interpreter \"{0}\" does not exist.", dbgInfo.bstrExe), SR.ProductName);
             } else if (DoesProjectSupportDebugging()) {
                 VsShellUtilities.LaunchDebugger(provider, dbgInfo);
             }
