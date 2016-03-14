@@ -871,9 +871,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Templates\Files\VS_Nodejs.item.vstman">
+    <Content Include="Templates\VS_Nodejs.item.vstman">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <VSIXSubPath>ItemTemplates</VSIXSubPath>
     </Content>
     <None Include="Theme\contrast.vstheme">
       <SubType>Designer</SubType>
