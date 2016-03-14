@@ -63,7 +63,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             } catch (NpmNotFoundException) { }
         }
 
-        internal string FullPathToRootPackageDirectory {
+        public string FullPathToRootPackageDirectory {
             get { return _fullPathToRootPackageDirectory; }
         }
 

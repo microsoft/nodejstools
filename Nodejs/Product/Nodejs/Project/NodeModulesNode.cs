@@ -50,6 +50,11 @@ namespace Microsoft.NodejsTools.Project {
         private readonly LocalModulesNode _devModulesNode;
         private readonly LocalModulesNode _optionalModulesNode;
 
+        private PackageSet _globalPackageSet = PackageSet.Empty;
+        private PackageSet _rootPackageSet = PackageSet.Empty;
+        private PackageSet _devPackageSet = PackageSet.Empty;
+        private PackageSet _optionalPackageSet = PackageSet.Empty;
+
         private Timer _npmIdleTimer;
         private INpmController _npmController;
         private int _npmCommandsExecuting;
@@ -66,7 +71,8 @@ namespace Microsoft.NodejsTools.Project {
 
         public NodeModulesNode(NodejsProjectNode root)
             : base(root) {
-            CreateNpmController();
+            _npmController = DefaultNpmController(_projectNode.ProjectHome, new NpmPathProvider(this));
+            RegisterWithNpmController(_npmController);
 
             _globalModulesNode = new GlobalModulesNode(root, this);
             AddChild(_globalModulesNode);
@@ -130,20 +136,20 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private INpmController CreateNpmController() {
-            if (null == _npmController) {
-                _npmController = NpmControllerFactory.Create(
-                    _projectNode.ProjectHome,
-                    NodejsPackage.Instance.NpmOptionsPage.NpmCachePath,
-                    false,
-                    new NpmPathProvider(this));
-                _npmController.CommandStarted += NpmController_CommandStarted;
-                _npmController.OutputLogged += NpmController_OutputLogged;
-                _npmController.ErrorLogged += NpmController_ErrorLogged;
-                _npmController.ExceptionLogged += NpmController_ExceptionLogged;
-                _npmController.CommandCompleted += NpmController_CommandCompleted;
-            }
-            return _npmController;
+        private static INpmController DefaultNpmController(string projectHome, NpmPathProvider pathProvider) {
+            return NpmControllerFactory.Create(
+                projectHome,
+                NodejsPackage.Instance.NpmOptionsPage.NpmCachePath,
+                false,
+                pathProvider);
+        }
+
+        private void RegisterWithNpmController(INpmController controller) {
+            controller.CommandStarted += NpmController_CommandStarted;
+            controller.OutputLogged += NpmController_OutputLogged;
+            controller.ErrorLogged += NpmController_ErrorLogged;
+            controller.ExceptionLogged += NpmController_ExceptionLogged;
+            controller.CommandCompleted += NpmController_CommandCompleted;
         }
 
         void NpmController_FinishedRefresh(object sender, EventArgs e) {
@@ -362,9 +368,9 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-#endregion
+        #endregion
 
-#region Updating module hierarchy
+        #region Updating module hierarchy
 
         internal void ReloadHierarchySafe() {
             NodejsPackage.Instance.GetUIThread().InvokeAsync(ReloadHierarchy)
@@ -378,39 +384,74 @@ namespace Microsoft.NodejsTools.Project {
             }
 
             var controller = _npmController;
-            if (null != controller) {
-                if (null != RootPackage) {
-                    var dev = controller.RootPackage.Modules.Where(package => package.IsDevDependency);
-                    _devModulesNode.Packages = dev;
-                    ReloadHierarchy(_devModulesNode, dev);
+            if (null == controller)
+                return;
 
-                    var optional = controller.RootPackage.Modules.Where(package => package.IsOptionalDependency);
-                    _optionalModulesNode.Packages = optional;
-                    ReloadHierarchy(_optionalModulesNode, optional);
+            var newPackages = ReloadPackageHierarchies(controller);
 
-                    var root = controller.RootPackage.Modules.Where(package => 
-                        package.IsDependency || 
-                        !package.IsListedInParentPackageJson);
-                    
-                    ReloadHierarchy(this, root);
-                }
-
-                var global = controller.GlobalPackages;
-                if (null != global) {
-                    _globalModulesNode.GlobalPackages = global;
-                    ReloadHierarchy(_globalModulesNode, global.Modules);
-                }
-
-                if (_firstHierarchyLoad) {
-                    controller.FinishedRefresh += NpmController_FinishedRefresh;
-                    _firstHierarchyLoad = false;
-                }
+            if (_firstHierarchyLoad) {
+                controller.FinishedRefresh += NpmController_FinishedRefresh;
+                _firstHierarchyLoad = false;
             }
+
+            TypingAcquisition.AquireTypings(
+                controller.ListBaseDirectory,
+                controller.FullPathToRootPackageDirectory,
+                newPackages.Added,
+                null).ContinueWith(x => x);
         }
 
-#endregion
+        private PackageSet.Diff ReloadPackageHierarchies(INpmController controller) {
+            return ReloadDevPackageHierarchy(controller)
+                .Concat(ReloadOptionalPackageHierarchy(controller))
+                .Concat(ReloadRootPackageHierarchy(controller))
+                .Concat(ReloadGlobalPackageHierarchy(controller));
+        }
 
-#region HierarchyNode implementation
+        private PackageSet.Diff ReloadGlobalPackageHierarchy(INpmController controller) {
+            var global = controller.GlobalPackages;
+            if (null != global && global.Modules != null) {
+                _globalModulesNode.GlobalPackages = global;
+
+                var diff = _globalPackageSet.DiffAgainst(global.Modules);
+                _globalPackageSet = diff.NewPackages;
+                ReloadHierarchy(_globalModulesNode, diff.NewPackages);
+                return diff;
+            }
+            return PackageSet.Diff.Empty;
+        }
+
+        private PackageSet.Diff ReloadRootPackageHierarchy(INpmController controller) {
+            var root = GetRootPackages(controller);
+            var diff = _rootPackageSet.DiffAgainst(root);
+            _rootPackageSet = root;
+            ReloadHierarchy(this, root);
+            return diff;
+        }
+
+        private PackageSet.Diff ReloadOptionalPackageHierarchy(INpmController controller) {
+            var optional = GetOptionalPackages(controller);
+            _optionalModulesNode.Packages = optional;
+
+            var diff = _optionalPackageSet.DiffAgainst(optional);
+            _optionalPackageSet = optional;
+            ReloadHierarchy(_optionalModulesNode, optional);
+            return diff;
+        }
+
+        private PackageSet.Diff ReloadDevPackageHierarchy(INpmController controller) {
+            var dev = GetDevPackages(controller);
+            _devModulesNode.Packages = dev;
+
+            var diff = _devPackageSet.DiffAgainst(dev);
+            _devPackageSet = dev;
+            ReloadHierarchy(_devModulesNode, dev);
+            return diff;
+        }
+
+        #endregion
+
+        #region HierarchyNode implementation
 
         public override int SortPriority {
             get { return DefaultSortOrderNode.ReferenceContainerNode + 1; }
@@ -424,9 +465,9 @@ namespace Microsoft.NodejsTools.Project {
             get { return _cCaption; }
         }
 
-#endregion
+        #endregion
 
-#region Command handling
+        #region Command handling
 
         internal bool IsCurrentStateASuppressCommandsMode() {
             return _suppressCommands || ProjectMgr.IsCurrentStateASuppressCommandsMode();
@@ -680,10 +721,33 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-#endregion
+        #endregion
 
         public override void ManageNpmModules() {
             ManageModules();
+        }
+
+        private static PackageSet GetDevPackages(INpmController controller) {
+            if (controller == null || controller.RootPackage == null)
+                return PackageSet.Empty;
+            return new PackageSet(
+                controller.RootPackage.Modules.Where(package => package.IsDevDependency));
+        }
+
+        private static PackageSet GetOptionalPackages(INpmController controller) {
+            if (controller == null || controller.RootPackage == null)
+                return PackageSet.Empty;
+            return new PackageSet(
+                controller.RootPackage.Modules.Where(package => package.IsOptionalDependency));
+        }
+
+        private static PackageSet GetRootPackages(INpmController controller) {
+            if (controller == null || controller.RootPackage == null)
+                return PackageSet.Empty;
+            return new PackageSet(
+                controller.RootPackage.Modules.Where(package =>
+                    package.IsDependency ||
+                    !package.IsListedInParentPackageJson));
         }
     }
 }

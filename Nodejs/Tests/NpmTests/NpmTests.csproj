@@ -81,6 +81,7 @@
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
+    <Reference Include="Moq, Version=4.2.1312.1622, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Compile Include="FilesystemPackageJsonTestHelpers.cs" />
     <Compile Include="AbstractPackageJsonTests.cs" />
@@ -94,6 +95,7 @@
     <Compile Include="NpmSearchTests.cs" />
     <Compile Include="PackageJsonDependencyTests.cs" />
     <Compile Include="PackageJsonTests.cs" />
+    <Compile Include="PackageSetTests.cs" />
     <Compile Include="ProblematicPackageJsonTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SemverVersionTestHelper.cs" />
