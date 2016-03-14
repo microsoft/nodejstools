@@ -19,6 +19,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 using Microsoft.VisualStudioTools;
+using Microsoft.NodejsTools.Project;
 
 namespace Microsoft.NodejsTools.Commands {
     internal sealed class OpenRemoteDebugProxyFolderCommand : Command {
@@ -28,13 +29,13 @@ namespace Microsoft.NodejsTools.Commands {
             // Open explorer to folder
             var remoteDebugProxyFolder = NodejsPackage.RemoteDebugProxyFolder;
             if (string.IsNullOrWhiteSpace(remoteDebugProxyFolder)) {
-                MessageBox.Show("Could not find RemoteDebugProxyFolder", "Node.js Tools for Visual Studio");
+                MessageBox.Show(SR.GetString(SR.RemoteDebugProxyFolderDoesNotExist), SR.ProductName);
                 return;
             }
 
             var filePath = Path.Combine(remoteDebugProxyFolder, remoteDebugJsFileName);
             if (!File.Exists(filePath)) {
-                MessageBox.Show(String.Format("Remote Debug Proxy \"{0}\" does not exist.", filePath), "Node.js Tools for Visual Studio");
+                MessageBox.Show(SR.GetString(SR.RemoteDebugProxyFileDoesNotExist, filePath), SR.ProductName);
             } else {
                 Process.Start("explorer", string.Format("/e,/select,{0}", filePath));
             }

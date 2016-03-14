@@ -162,6 +162,8 @@ namespace Microsoft.NodejsTools.Project {
         internal const string PropertiesClassLocalPackage = "PropertiesClassLocalPackage";
         internal const string PropertiesClassLocalSubPackage = "PropertiesClassLocalSubPackage";
         internal const string PropertiesClassNpm = "PropertiesClassNpm";
+        internal const string RemoteDebugProxyFileDoesNotExist = "RemoteDebugProxyFileDoesNotExist";
+        internal const string RemoteDebugProxyFolderDoesNotExist = "RemoteDebugProxyFolderDoesNotExist";
         internal const string ReplInitializationMessage = "ReplInitializationMessage";
         internal const string RequestedVersionRangeNone = "RequestedVersionRangeNone";
         internal const string ScriptArgumentsToolTip = "ScriptArgumentsToolTip";
