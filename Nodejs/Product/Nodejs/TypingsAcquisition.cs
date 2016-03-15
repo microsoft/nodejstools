@@ -77,9 +77,7 @@ namespace Microsoft.NodejsTools {
 
         private static string GetTsdPath(string pathToRootNpmDirectory) {
             var path = Path.Combine(pathToRootNpmDirectory, TsdExe);
-            if (File.Exists(path))
-                return path;
-            return null;
+            return File.Exists(path) ? path : null;
         }
 
         private static string GetPackageTsdName(IPackage package) {

@@ -73,13 +73,5 @@ namespace Microsoft.NodejsTools.Options {
                        );
             }
         }
-
-        private void groupBox3_Enter(object sender, EventArgs e) {
-
-        }
-
-        private void checkBox1_CheckedChanged(object sender, EventArgs e) {
-
-        }
     }
 }

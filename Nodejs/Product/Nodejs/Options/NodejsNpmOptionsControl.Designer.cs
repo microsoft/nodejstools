@@ -192,7 +192,6 @@
             this.groupBox3.TabIndex = 4;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Type Acquisition";
-            this.groupBox3.Enter += new System.EventHandler(this.groupBox3_Enter);
             // 
             // tableLayoutPanel5
             // 
@@ -209,19 +208,18 @@
             this.tableLayoutPanel5.Size = new System.Drawing.Size(370, 23);
             this.tableLayoutPanel5.TabIndex = 1;
             // 
-            // _enableAutoTypeAcquisition
+            // _enableAutoTypingsAcquisition
             // 
             this._enableAutoTypingsAcquisition.AutoSize = true;
             this._enableAutoTypingsAcquisition.Checked = true;
             this._enableAutoTypingsAcquisition.CheckState = System.Windows.Forms.CheckState.Checked;
             this._enableAutoTypingsAcquisition.Dock = System.Windows.Forms.DockStyle.Top;
             this._enableAutoTypingsAcquisition.Location = new System.Drawing.Point(3, 3);
-            this._enableAutoTypingsAcquisition.Name = "_enableAutoTypeAcquisition";
+            this._enableAutoTypingsAcquisition.Name = "_enableAutoTypingsAcquisition";
             this._enableAutoTypingsAcquisition.Size = new System.Drawing.Size(364, 17);
             this._enableAutoTypingsAcquisition.TabIndex = 2;
             this._enableAutoTypingsAcquisition.Text = "Enable automatic typings acquisition for JavaScript projects";
             this._enableAutoTypingsAcquisition.UseVisualStyleBackColor = true;
-            this._enableAutoTypingsAcquisition.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // NodejsNpmOptionsControl
             // 
