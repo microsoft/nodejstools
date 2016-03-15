@@ -193,8 +193,10 @@ namespace Microsoft.NodejsTools.Project {
 
         private bool EnableAutomaticTypeAcquisition {
             get {
-                return !_projectNode.IsTypeScriptProject && NodejsPackage.Instance.IntellisenseOptionsPage.EnableES6Preview;
-            }
+                return !_projectNode.IsTypeScriptProject
+                    && NodejsPackage.Instance.IntellisenseOptionsPage.EnableES6Preview
+                    && NodejsPackage.Instance.NpmOptionsPage.EnableAutomaticTypeAcquisition;
+                }
         }
 
         #endregion

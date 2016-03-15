@@ -33,12 +33,14 @@ namespace Microsoft.NodejsTools.Options {
 
         internal void SyncControlWithPageSettings(NodejsNpmOptionsPage page) {
             _showOutputWhenRunningNpm.Checked = page.ShowOutputWindowWhenExecutingNpm;
+            _enableAutoTypeAcquisition.Checked = page.EnableAutomaticTypeAcquisition;
             _npmCachePath = page.NpmCachePath;
             _cacheClearedSuccessfully.Visible = false;
         }
 
         internal void SyncPageWithControlSettings(NodejsNpmOptionsPage page) {
             page.ShowOutputWindowWhenExecutingNpm = _showOutputWhenRunningNpm.Checked;
+            page.EnableAutomaticTypeAcquisition = _enableAutoTypeAcquisition.Checked;
         }
 
         private void ClearCacheButton_Click(object sender, EventArgs e) {
@@ -70,6 +72,14 @@ namespace Microsoft.NodejsTools.Options {
                            MessageBoxIcon.Information
                        );
             }
+        }
+
+        private void groupBox3_Enter(object sender, EventArgs e) {
+
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e) {
+
         }
     }
 }
