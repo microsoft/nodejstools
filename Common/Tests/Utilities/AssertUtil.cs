@@ -73,19 +73,16 @@ namespace TestUtilities
                 throw new ArgumentNullException("expected");
             }
             if (actual == null) {
-                Assert.Fail("AssertUtils.ArrayEquals failure. Actual collection is null.");
+                Assert.Fail("Actual collection is null.");
             }
 
             Assert.AreEqual(expected.Count(), actual.Count());
 
             var expectedIt = expected.GetEnumerator();
             var actualIt = actual.GetEnumerator();
-
-            while (expectedIt.MoveNext() && actualIt.MoveNext()) {
-                Assert.AreEqual(expectedIt.Current, actualIt.Current);
+            for (var i = 0; expectedIt.MoveNext() && actualIt.MoveNext(); ++i) {
+                Assert.AreEqual(expectedIt.Current, actualIt.Current, string.Format("Assetion failed at index {0}", i));
             }
-            Assert.IsFalse(expectedIt.MoveNext());
-            Assert.IsFalse(actualIt.MoveNext());
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "1")]
