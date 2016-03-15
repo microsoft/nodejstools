@@ -111,14 +111,16 @@ namespace Microsoft.NodejsTools.Project {
         private void TryToAcquireTypings() {
             var controller = ModulesNode?.NpmController;
             if (controller != null && EnableAutomaticTypeAcquisition) {
-                TypingsAcquisition.AcquireTypings(
-                    controller.ListBaseDirectory,
-                    controller.RootPackage.Path,
-                    controller.RootPackage.Modules.Where(package =>
+                var packages = controller.RootPackage.Modules.Where(package =>
                         package.IsDependency
                         || package.IsOptionalDependency
                         || package.IsDevDependency
-                        || !package.IsListedInParentPackageJson),
+                        || !package.IsListedInParentPackageJson);
+
+                TypingsAcquisition.AcquireTypings(
+                    controller.ListBaseDirectory,
+                    controller.RootPackage.Path,
+                    packages,
                     null).ContinueWith(x => x);
             }
         }
@@ -347,7 +349,7 @@ namespace Microsoft.NodejsTools.Project {
 
         public override CommonFileNode CreateNonCodeFileNode(ProjectElement item) {
             string fileName = item.Url;
-            if (Path.GetFileName(fileName).Equals(NodejsConstants.PackageJsonFile, StringComparison.OrdinalIgnoreCase) && 
+            if (Path.GetFileName(fileName).Equals(NodejsConstants.PackageJsonFile, StringComparison.OrdinalIgnoreCase) &&
                 !fileName.Contains(NodejsConstants.NodeModulesStagingFolder)) {
                 return new PackageJsonFileNode(this, item);
             }
