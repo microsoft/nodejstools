@@ -114,7 +114,11 @@ namespace Microsoft.NodejsTools.Project {
                 TypingsAcquisition.AcquireTypings(
                     controller.ListBaseDirectory,
                     controller.RootPackage.Path,
-                    controller.RootPackage.Modules,
+                    controller.RootPackage.Modules.Where(package =>
+                        package.IsDependency
+                        || package.IsOptionalDependency
+                        || package.IsDevDependency
+                        || !package.IsListedInParentPackageJson),
                     null).ContinueWith(x => x);
             }
         }
