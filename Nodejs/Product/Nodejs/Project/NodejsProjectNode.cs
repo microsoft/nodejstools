@@ -152,16 +152,19 @@ namespace Microsoft.NodejsTools.Project {
             AddProjectImage(NodejsProjectImageName.DependencyMissing, "Microsoft.VisualStudioTools.Resources.Icons.PackageWarning_16x.png");
         }
 
+        public bool IsTypeScriptProject {
+            get {
+                return string.Equals(GetProjectProperty(NodejsConstants.EnableTypeScript), "true", StringComparison.OrdinalIgnoreCase));
+            }
+        }
+
 #if DEV14_OR_LATER
         protected override bool SupportsIconMonikers {
             get { return true; }
         }
 
         protected override ImageMoniker GetIconMoniker(bool open) {
-            if (string.Equals(GetProjectProperty(NodejsConstants.EnableTypeScript), "true", StringComparison.OrdinalIgnoreCase)) {
-                return KnownMonikers.TSProjectNode;
-            }
-            return KnownMonikers.JSProjectNode;
+            return IsTypeScriptProject ? KnownMonikers.TSProjectNode : KnownMonikers.JSProjectNode;
         }
 
         [Obsolete]
@@ -232,8 +235,7 @@ namespace Microsoft.NodejsTools.Project {
         protected override void AddNewFileNodeToHierarchy(HierarchyNode parentNode, string fileName) {
             base.AddNewFileNodeToHierarchy(parentNode, fileName);
 
-            if (String.Equals(Path.GetExtension(fileName), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase) &&
-                !String.Equals(GetProjectProperty(NodejsConstants.EnableTypeScript), "true", StringComparison.OrdinalIgnoreCase)) {
+            if (string.Equals(Path.GetExtension(fileName), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase) && !IsTypeScriptProject) {
                 // enable type script on the project automatically...
                 SetProjectProperty(NodejsConstants.EnableTypeScript, "true");
                 SetProjectProperty(NodejsConstants.TypeScriptSourceMap, "true");
