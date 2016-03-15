@@ -404,7 +404,7 @@ namespace Microsoft.NodejsTools.Project {
             }
 
             if (EnableAutomaticTypeAcquisition) {
-                TypingAcquisition.AquireTypings(
+                TypingsAcquisition.AquireTypings(
                     controller.ListBaseDirectory,
                     controller.FullPathToRootPackageDirectory,
                     newPackages.Added,

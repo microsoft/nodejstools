@@ -24,7 +24,7 @@ using System.IO;
 using SR = Microsoft.NodejsTools.Project.SR;
 
 namespace Microsoft.NodejsTools {
-    static class TypingAcquisition {
+    static class TypingsAcquisition {
         private const string TsdExe = "tsd.cmd";
 
         public static async Task<bool> AquireTypings(
