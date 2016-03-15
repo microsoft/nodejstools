@@ -103,8 +103,9 @@ namespace Microsoft.NodejsTools {
         }
 
         private static IEnumerable<IPackage> TypingsToAcquire(string pathToRootProjectDirectory, IEnumerable<IPackage> packages) {
-            var current = new HashSet<string>(CurrentTypingsPackages(pathToRootProjectDirectory));
-            return packages.Where(package => !current.Contains(GetPackageTsdName(package)));
+            var currentTypings = new HashSet<string>(CurrentTypingsPackages(pathToRootProjectDirectory));
+            return packages.Where(package =>
+                !currentTypings.Contains(GetPackageTsdName(package)));
         }
 
         private static IEnumerable<string> CurrentTypingsPackages(string pathToRootProjectDirectory) {
@@ -112,7 +113,7 @@ namespace Microsoft.NodejsTools {
             if (Directory.Exists(typingsDirectoryPath)) {
                 foreach (var file in Directory.EnumerateFiles(typingsDirectoryPath, "*.d.ts", SearchOption.AllDirectories)) {
                     var directory = Directory.GetParent(file);
-                    if (Path.GetFullPath(directory.FullName).StartsWith(typingsDirectoryPath)) {
+                    if (directory.FullName != typingsDirectoryPath && Path.GetFullPath(directory.FullName).StartsWith(typingsDirectoryPath)) {
                         yield return directory.Name;
                     }
                 }
