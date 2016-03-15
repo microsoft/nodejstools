@@ -34,7 +34,7 @@
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
-            this._enableAutoTypeAcquisition = new System.Windows.Forms.CheckBox();
+            this._enableAutoTypingsAcquisition = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -200,7 +200,7 @@
             this.tableLayoutPanel5.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.tableLayoutPanel5.ColumnCount = 1;
             this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel5.Controls.Add(this._enableAutoTypeAcquisition, 0, 0);
+            this.tableLayoutPanel5.Controls.Add(this._enableAutoTypingsAcquisition, 0, 0);
             this.tableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Top;
             this.tableLayoutPanel5.Location = new System.Drawing.Point(3, 16);
             this.tableLayoutPanel5.Name = "tableLayoutPanel5";
@@ -211,17 +211,17 @@
             // 
             // _enableAutoTypeAcquisition
             // 
-            this._enableAutoTypeAcquisition.AutoSize = true;
-            this._enableAutoTypeAcquisition.Checked = true;
-            this._enableAutoTypeAcquisition.CheckState = System.Windows.Forms.CheckState.Checked;
-            this._enableAutoTypeAcquisition.Dock = System.Windows.Forms.DockStyle.Top;
-            this._enableAutoTypeAcquisition.Location = new System.Drawing.Point(3, 3);
-            this._enableAutoTypeAcquisition.Name = "_enableAutoTypeAcquisition";
-            this._enableAutoTypeAcquisition.Size = new System.Drawing.Size(364, 17);
-            this._enableAutoTypeAcquisition.TabIndex = 2;
-            this._enableAutoTypeAcquisition.Text = "Enable automatic typings acquisition for JavaScript projects";
-            this._enableAutoTypeAcquisition.UseVisualStyleBackColor = true;
-            this._enableAutoTypeAcquisition.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            this._enableAutoTypingsAcquisition.AutoSize = true;
+            this._enableAutoTypingsAcquisition.Checked = true;
+            this._enableAutoTypingsAcquisition.CheckState = System.Windows.Forms.CheckState.Checked;
+            this._enableAutoTypingsAcquisition.Dock = System.Windows.Forms.DockStyle.Top;
+            this._enableAutoTypingsAcquisition.Location = new System.Drawing.Point(3, 3);
+            this._enableAutoTypingsAcquisition.Name = "_enableAutoTypeAcquisition";
+            this._enableAutoTypingsAcquisition.Size = new System.Drawing.Size(364, 17);
+            this._enableAutoTypingsAcquisition.TabIndex = 2;
+            this._enableAutoTypingsAcquisition.Text = "Enable automatic typings acquisition for JavaScript projects";
+            this._enableAutoTypingsAcquisition.UseVisualStyleBackColor = true;
+            this._enableAutoTypingsAcquisition.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // NodejsNpmOptionsControl
             // 
@@ -265,6 +265,6 @@
         private System.Windows.Forms.Label _cacheClearedSuccessfully;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel5;
-        private System.Windows.Forms.CheckBox _enableAutoTypeAcquisition;
+        private System.Windows.Forms.CheckBox _enableAutoTypingsAcquisition;
     }
 }

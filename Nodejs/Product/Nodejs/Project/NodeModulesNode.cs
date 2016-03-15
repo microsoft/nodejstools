@@ -195,7 +195,7 @@ namespace Microsoft.NodejsTools.Project {
             get {
                 return !_projectNode.IsTypeScriptProject
                     && NodejsPackage.Instance.IntellisenseOptionsPage.EnableES6Preview
-                    && NodejsPackage.Instance.NpmOptionsPage.EnableAutomaticTypeAcquisition;
+                    && NodejsPackage.Instance.NpmOptionsPage.EnableAutomaticTypingsAcquisition;
                 }
         }
 

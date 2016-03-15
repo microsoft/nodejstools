@@ -48,7 +48,7 @@ namespace Microsoft.NodejsTools.Options {
         /// </summary>
         public bool ShowOutputWindowWhenExecutingNpm { get; set; }
 
-        public bool EnableAutomaticTypeAcquisition { get; set; }
+        public bool EnableAutomaticTypingsAcquisition { get; set; }
 
         public string NpmCachePath {
             get {
@@ -73,7 +73,7 @@ namespace Microsoft.NodejsTools.Options {
         public override void LoadSettingsFromStorage() {
             // Load settings from storage.
             ShowOutputWindowWhenExecutingNpm = LoadBool(ShowOutputWindowRunningNpm) ?? true;
-            EnableAutomaticTypeAcquisition = LoadBool(EnableAutomaticTypeAcquisitionSetting) ?? true;
+            EnableAutomaticTypingsAcquisition = LoadBool(EnableAutomaticTypeAcquisitionSetting) ?? true;
 
             // Synchronize UI with backing properties.
             if (_window != null) {
@@ -89,7 +89,7 @@ namespace Microsoft.NodejsTools.Options {
 
             // Save settings.
             SaveBool(ShowOutputWindowRunningNpm, ShowOutputWindowWhenExecutingNpm);
-            SaveBool(EnableAutomaticTypeAcquisitionSetting, EnableAutomaticTypeAcquisition);
+            SaveBool(EnableAutomaticTypeAcquisitionSetting, EnableAutomaticTypingsAcquisition);
         }
     }
 }
