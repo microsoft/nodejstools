@@ -49,6 +49,7 @@ namespace Microsoft.NodejsTools.Project {
         internal readonly RequireCompletionCache _requireCompletionCache = new RequireCompletionCache();
         private string _intermediateOutputPath;
         private readonly Dictionary<NodejsProjectImageName, int> _imageIndexFromNameDictionary = new Dictionary<NodejsProjectImageName, int>();
+        private bool _projectHasTypeScriptFiles = false;
 
         // We delay analysis until things calm down in the node_modules folder.
         internal Queue<NodejsFileNode> DelayedAnalysisQueue = new Queue<NodejsFileNode>();
@@ -94,6 +95,27 @@ namespace Microsoft.NodejsTools.Project {
                 if (fileNode != null) {
                     fileNode.Analyze();
                 }
+            }
+
+            TryToAcquireTypings();
+        }
+
+        private bool EnableAutomaticTypeAcquisition {
+            get {
+                return !_projectHasTypeScriptFiles
+                    && NodejsPackage.Instance.IntellisenseOptionsPage.EnableES6Preview
+                    && NodejsPackage.Instance.NpmOptionsPage.EnableAutomaticTypingsAcquisition;
+            }
+        }
+
+        private void TryToAcquireTypings() {
+            var controller = ModulesNode?.NpmController;
+            if (controller != null && EnableAutomaticTypeAcquisition) {
+                TypingsAcquisition.AcquireTypings(
+                    controller.ListBaseDirectory,
+                    controller.RootPackage.Path,
+                    controller.RootPackage.Modules,
+                    null).ContinueWith(x => x);
             }
         }
 
@@ -237,6 +259,7 @@ namespace Microsoft.NodejsTools.Project {
 
             if (string.Equals(Path.GetExtension(fileName), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase) && !IsTypeScriptProject) {
                 // enable type script on the project automatically...
+                _projectHasTypeScriptFiles = true;
                 SetProjectProperty(NodejsConstants.EnableTypeScript, "true");
                 SetProjectProperty(NodejsConstants.TypeScriptSourceMap, "true");
                 if (String.IsNullOrWhiteSpace(GetProjectProperty(NodejsConstants.TypeScriptModuleKind))) {
@@ -631,8 +654,6 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public NodeModulesNode ModulesNode { get; private set; }
-
-
 
         protected internal override void ProcessReferences() {
             base.ProcessReferences();

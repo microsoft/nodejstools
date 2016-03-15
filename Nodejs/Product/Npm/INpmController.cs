@@ -37,7 +37,5 @@ namespace Microsoft.NodejsTools.Npm {
         IPackageCatalog MostRecentlyLoadedCatalog { get; }
 
         string ListBaseDirectory { get; }
-
-        string FullPathToRootPackageDirectory { get; }
     }
 }

@@ -22,12 +22,29 @@ using System.Linq;
 using System.IO;
 
 using SR = Microsoft.NodejsTools.Project.SR;
+using System.Text.RegularExpressions;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools {
     static class TypingsAcquisition {
         private const string TsdExe = "tsd.cmd";
+        private const string typingsDirecctory = "typings";
+        private const string tsdJson = "tsd.json";
 
         public static async Task<bool> AcquireTypings(
+            string pathToRootNpmDirectory,
+            string pathToRootProjectDirectory,
+            IEnumerable<IPackage> packages,
+            Redirector redirector) {
+            var newPackages = TypingsToAcquire(pathToRootProjectDirectory, packages);
+            return await DownloadTypings(
+                pathToRootNpmDirectory,
+                pathToRootProjectDirectory,
+                newPackages,
+                redirector);
+        }
+
+        private static async Task<bool> DownloadTypings(
             string pathToRootNpmDirectory,
             string pathToRootProjectDirectory,
             IEnumerable<IPackage> packages,
@@ -86,6 +103,28 @@ namespace Microsoft.NodejsTools {
 
         private static IEnumerable<string> TsdInstallArguments(IEnumerable<IPackage> packages) {
             return new[] { "install", }.Concat(packages.Select(GetPackageTsdName)).Concat(new[] { "--save" });
+        }
+
+        private static IEnumerable<IPackage> TypingsToAcquire(string pathToRootProjectDirectory, IEnumerable<IPackage> packages) {
+            var current = CurrentTypingsPackages(pathToRootProjectDirectory);
+            return packages.Where(package => !current.Contains(GetPackageTsdName(package)));
+        }
+
+        private static HashSet<string> CurrentTypingsPackages(string pathToRootProjectDirectory) {
+            var tsdJsonFilePath = Path.Combine(pathToRootProjectDirectory, tsdJson);
+            if (!File.Exists(tsdJsonFilePath)) {
+                return new HashSet<string>();
+            }
+
+            using (var file = File.OpenText(tsdJsonFilePath)) {
+                var json = JObject.Parse(file.ReadToEnd());
+                var installed = (JObject)json["installed"];
+                return new HashSet<string>(
+                    installed.Properties()
+                        .Select(prop => Regex.Match(prop.Name, @"^[^/]+"))
+                        .Where(match => match.Success)
+                        .Select(match => match.Value));
+            }
         }
     }
 }

@@ -88,8 +88,9 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private IEnumerable<IPackage> BuildModuleHeirarchy(HierarchyNode parent, IEnumerable<IPackage> modules, IReadOnlyDictionary<string, DependencyNode> recycle) {
-            if (modules == null)
+            if (modules == null) {
                 return Enumerable.Empty<IPackage>();
+            }
 
             var newModules = new List<IPackage>();
             foreach (var package in modules) {
