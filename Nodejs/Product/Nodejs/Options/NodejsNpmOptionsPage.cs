@@ -23,7 +23,7 @@ namespace Microsoft.NodejsTools.Options {
     [ComVisible(true)]
     public class NodejsNpmOptionsPage : NodejsDialogPage {
         private const string ShowOutputWindowRunningNpm = "ShowOutputWindowRunningNpm";
-        private const string EnableAutomaticTypeAcquisitionSetting = "EnableAutomaticTypeAcquisition";
+        private const string EnableAutomaticTypingsAcquisitionSetting = "EnableAutomaticTypingsAcquisition";
 
         private NodejsNpmOptionsControl _window;
 
@@ -73,7 +73,7 @@ namespace Microsoft.NodejsTools.Options {
         public override void LoadSettingsFromStorage() {
             // Load settings from storage.
             ShowOutputWindowWhenExecutingNpm = LoadBool(ShowOutputWindowRunningNpm) ?? true;
-            EnableAutomaticTypingsAcquisition = LoadBool(EnableAutomaticTypeAcquisitionSetting) ?? true;
+            EnableAutomaticTypingsAcquisition = LoadBool(EnableAutomaticTypingsAcquisitionSetting) ?? true;
 
             // Synchronize UI with backing properties.
             if (_window != null) {
@@ -89,7 +89,7 @@ namespace Microsoft.NodejsTools.Options {
 
             // Save settings.
             SaveBool(ShowOutputWindowRunningNpm, ShowOutputWindowWhenExecutingNpm);
-            SaveBool(EnableAutomaticTypeAcquisitionSetting, EnableAutomaticTypingsAcquisition);
+            SaveBool(EnableAutomaticTypingsAcquisitionSetting, EnableAutomaticTypingsAcquisition);
         }
     }
 }
