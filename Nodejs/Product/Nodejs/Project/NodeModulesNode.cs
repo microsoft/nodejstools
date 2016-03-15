@@ -189,6 +189,13 @@ namespace Microsoft.NodejsTools.Project {
                 return null != modules && modules.Count > 0;
             }
         }
+        
+
+        private bool EnableAutomaticTypeAcquisition {
+            get {
+                return !_projectNode.IsTypeScriptProject && NodejsPackage.Instance.IntellisenseOptionsPage.EnableES6Preview;
+            }
+        }
 
         #endregion
 
@@ -394,11 +401,13 @@ namespace Microsoft.NodejsTools.Project {
                 _firstHierarchyLoad = false;
             }
 
-            TypingAcquisition.AquireTypings(
-                controller.ListBaseDirectory,
-                controller.FullPathToRootPackageDirectory,
-                newPackages.Added,
-                null).ContinueWith(x => x);
+            if (EnableAutomaticTypeAcquisition) {
+                TypingAcquisition.AquireTypings(
+                    controller.ListBaseDirectory,
+                    controller.FullPathToRootPackageDirectory,
+                    newPackages.Added,
+                    null).ContinueWith(x => x);
+            }
         }
 
         private PackageSet.Diff ReloadPackageHierarchies(INpmController controller) {
