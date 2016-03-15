@@ -36,7 +36,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 Debug.Assert(_allModules.Count == 0, "Depth is 0, but top-level modules have already been added.");
 
                 // Go through every directory in node_modules, and see if it's required as a top-level dependency
-                foreach (var topLevelDependency in GetTopLevelDependencies(modulesBase)) {
+                foreach (var topLevelDependency in GetTopLevelPackageDirectories(modulesBase)) {
                     var moduleDir = topLevelDependency.Key;
                     var packageJson = topLevelDependency.Value;
                     if (packageJson.RequiredBy.Any()) {
@@ -149,7 +149,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             return depth;
         }
 
-        private static IEnumerable<KeyValuePair<string, IPackageJson>> GetTopLevelDependencies(string modulesBase) {
+        private static IEnumerable<KeyValuePair<string, IPackageJson>> GetTopLevelPackageDirectories(string modulesBase) {
             var topLevelDirectories = Enumerable.Empty<string>();
             try {
                 topLevelDirectories = Directory.EnumerateDirectories(modulesBase);
@@ -168,8 +168,9 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                         // Fail gracefully if there was an error parsing the package.json
                         Debug.Fail("Failed to parse package.json in {0}", moduleDir);
                     }
-                    if (json != null)
+                    if (json != null) {
                         yield return new KeyValuePair<string, IPackageJson>(moduleDir, json);
+                    }
                 }
             }
         }

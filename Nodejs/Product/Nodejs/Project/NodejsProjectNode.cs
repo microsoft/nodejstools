@@ -100,7 +100,7 @@ namespace Microsoft.NodejsTools.Project {
             TryToAcquireTypings();
         }
 
-        private bool EnableAutomaticTypeAcquisition {
+        private bool ShouldAcquireTypingsAutomatically {
             get {
                 return !_projectHasTypeScriptFiles
                     && NodejsPackage.Instance.IntellisenseOptionsPage.EnableES6Preview
@@ -110,7 +110,7 @@ namespace Microsoft.NodejsTools.Project {
 
         private void TryToAcquireTypings() {
             var controller = ModulesNode?.NpmController;
-            if (controller != null && EnableAutomaticTypeAcquisition) {
+            if (controller != null && ShouldAcquireTypingsAutomatically) {
                 var packages = controller.RootPackage.Modules.Where(package =>
                         package.IsDependency
                         || package.IsOptionalDependency
@@ -349,7 +349,7 @@ namespace Microsoft.NodejsTools.Project {
 
         public override CommonFileNode CreateNonCodeFileNode(ProjectElement item) {
             string fileName = item.Url;
-            if (Path.GetFileName(fileName).Equals(NodejsConstants.PackageJsonFile, StringComparison.OrdinalIgnoreCase) &&
+            if (Path.GetFileName(fileName).Equals(NodejsConstants.PackageJsonFile, StringComparison.OrdinalIgnoreCase) && 
                 !fileName.Contains(NodejsConstants.NodeModulesStagingFolder)) {
                 return new PackageJsonFileNode(this, item);
             }
