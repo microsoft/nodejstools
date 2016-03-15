@@ -27,7 +27,7 @@ namespace Microsoft.NodejsTools {
     static class TypingsAcquisition {
         private const string TsdExe = "tsd.cmd";
 
-        public static async Task<bool> AquireTypings(
+        public static async Task<bool> AcquireTypings(
             string pathToRootNpmDirectory,
             string pathToRootProjectDirectory,
             IEnumerable<IPackage> packages,
