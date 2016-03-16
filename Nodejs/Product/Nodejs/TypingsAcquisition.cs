@@ -28,7 +28,7 @@ using System.Security;
 namespace Microsoft.NodejsTools {
     internal class TypingsAcquisition {
         private const string TsdExe = "tsd.cmd";
-        private const string TypingsDirecctoryName = "typings";
+        private const string TypingsDirectoryName = "typings";
 
         private readonly string _pathToRootNpmDirectory;
         private readonly string _pathToRootProjectDirectory;
@@ -114,7 +114,7 @@ namespace Microsoft.NodejsTools {
 
         private static IEnumerable<string> CurrentTypingsPackages(string pathToRootProjectDirectory) {
             var packages = new List<string>();
-            var typingsDirectoryPath = Path.Combine(pathToRootProjectDirectory, TypingsDirecctoryName);
+            var typingsDirectoryPath = Path.Combine(pathToRootProjectDirectory, TypingsDirectoryName);
             if (!Directory.Exists(typingsDirectoryPath)) {
                 return packages;
             }

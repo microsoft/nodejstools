@@ -104,9 +104,13 @@ namespace Microsoft.NodejsTools.Project {
 
         private bool ShouldAcquireTypingsAutomatically {
             get {
+#if DEV14
                 return !_projectHasTypeScriptFiles
                     && NodejsPackage.Instance.IntellisenseOptionsPage.EnableES6Preview
                     && NodejsPackage.Instance.NpmOptionsPage.EnableAutomaticTypingsAcquisition;
+#else
+                return false;
+#endif
             }
         }
 
@@ -225,7 +229,7 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-#if !DEV14_OR_LATER  
+#if !DEV14_OR_LATER
         public override int ImageIndex {
             get {
                 if (string.Equals(GetProjectProperty(NodejsConstants.EnableTypeScript), "true", StringComparison.OrdinalIgnoreCase)) {
@@ -687,7 +691,7 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        #region VSWebSite Members
+#region VSWebSite Members
 
         // This interface is just implemented so we don't get normal profiling which
         // doesn't work with our projects anyway.
@@ -754,7 +758,7 @@ namespace Microsoft.NodejsTools.Project {
             get { throw new NotImplementedException(); }
         }
 
-        #endregion
+#endregion
 
         Task INodePackageModulesCommands.InstallMissingModulesAsync() {
             //Fire off the command to update the missing modules
