@@ -57,8 +57,9 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         public bool IsMissing {
             get {
-                if (!IsListedInParentPackageJson)
+                if (!IsListedInParentPackageJson) {
                     return false;
+                }
                 // Limit execution time of check
                 var task = new Task<bool>(() => Directory.Exists(Path));
                 task.Start();
