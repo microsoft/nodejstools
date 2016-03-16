@@ -22,23 +22,41 @@ using System.Linq;
 using System.IO;
 
 using SR = Microsoft.NodejsTools.Project.SR;
+using System;
+using System.Security;
 
 namespace Microsoft.NodejsTools {
-    static class TypingsAcquisition {
+    internal class TypingsAcquisition {
         private const string TsdExe = "tsd.cmd";
         private const string TypingsDirecctoryName = "typings";
 
-        public static async Task<bool> AcquireTypings(
+        private readonly string _pathToRootNpmDirectory;
+        private readonly string _pathToRootProjectDirectory;
+        private readonly Lazy<HashSet<string>> _acquiredTypingsPackageNames;
+
+        public TypingsAcquisition(
             string pathToRootNpmDirectory,
-            string pathToRootProjectDirectory,
-            IEnumerable<IPackage> packages,
-            Redirector redirector) {
-            var newPackages = TypingsToAcquire(pathToRootProjectDirectory, packages);
-            return await DownloadTypings(
-                pathToRootNpmDirectory,
-                pathToRootProjectDirectory,
-                newPackages,
-                redirector);
+            string pathToRootProjectDirectory) {
+            _pathToRootNpmDirectory = pathToRootNpmDirectory;
+            _pathToRootProjectDirectory = pathToRootProjectDirectory;
+
+            _acquiredTypingsPackageNames = new Lazy<HashSet<string>>(() => {
+                return new HashSet<string>(CurrentTypingsPackages(_pathToRootProjectDirectory));
+            });
+        }
+
+        public async Task<bool> AcquireTypings(IEnumerable<IPackage> packages, Redirector redirector) {
+            var typingsToAquire = GetNewTypingsToAcquire(packages);
+            var success = await DownloadTypings(_pathToRootNpmDirectory, _pathToRootProjectDirectory, typingsToAquire, redirector);
+            if (success) {
+                _acquiredTypingsPackageNames.Value.UnionWith(typingsToAquire.Select(GetPackageTsdName));
+            }
+            return success;
+        }
+
+        private IEnumerable<IPackage> GetNewTypingsToAcquire(IEnumerable<IPackage> packages) {
+            var currentTypings = _acquiredTypingsPackageNames.Value;
+            return packages.Where(package => !currentTypings.Contains(GetPackageTsdName(package)));
         }
 
         private static async Task<bool> DownloadTypings(
@@ -52,8 +70,9 @@ namespace Microsoft.NodejsTools {
 
             var tsdPath = GetTsdPath(pathToRootNpmDirectory);
             if (tsdPath == null) {
-                if (redirector != null)
+                if (redirector != null) {
                     redirector.WriteErrorLine(SR.GetString(SR.TsdNotInstalledError));
+                }
                 return false;
             }
 
@@ -89,6 +108,29 @@ namespace Microsoft.NodejsTools {
             }
         }
 
+        private static IEnumerable<string> TsdInstallArguments(IEnumerable<IPackage> packages) {
+            return new[] { "install", }.Concat(packages.Select(GetPackageTsdName)).Concat(new[] { "--save" });
+        }
+
+        private static IEnumerable<string> CurrentTypingsPackages(string pathToRootProjectDirectory) {
+            var packages = new List<string>();
+            var typingsDirectoryPath = Path.Combine(pathToRootProjectDirectory, TypingsDirecctoryName);
+            if (!Directory.Exists(typingsDirectoryPath)) {
+                return packages;
+            }
+            try {
+                foreach (var file in Directory.EnumerateFiles(typingsDirectoryPath, "*.d.ts", SearchOption.AllDirectories)) {
+                    var directory = Directory.GetParent(file);
+                    if (directory.FullName != typingsDirectoryPath && Path.GetFullPath(directory.FullName).StartsWith(typingsDirectoryPath)) {
+                        packages.Add(directory.Name);
+                    }
+                }
+            } catch (SystemException e) when (e is IOException || e is SecurityException || e is UnauthorizedAccessException) {
+                // noop
+            }
+            return packages;
+        }
+
         private static string GetTsdPath(string pathToRootNpmDirectory) {
             var path = Path.Combine(pathToRootNpmDirectory, TsdExe);
             return File.Exists(path) ? path : null;
@@ -96,28 +138,6 @@ namespace Microsoft.NodejsTools {
 
         private static string GetPackageTsdName(IPackage package) {
             return package.Name;
-        }
-
-        private static IEnumerable<string> TsdInstallArguments(IEnumerable<IPackage> packages) {
-            return new[] { "install", }.Concat(packages.Select(GetPackageTsdName)).Concat(new[] { "--save" });
-        }
-
-        private static IEnumerable<IPackage> TypingsToAcquire(string pathToRootProjectDirectory, IEnumerable<IPackage> packages) {
-            var currentTypings = new HashSet<string>(CurrentTypingsPackages(pathToRootProjectDirectory));
-            return packages.Where(package =>
-                !currentTypings.Contains(GetPackageTsdName(package)));
-        }
-
-        private static IEnumerable<string> CurrentTypingsPackages(string pathToRootProjectDirectory) {
-            var typingsDirectoryPath = Path.Combine(pathToRootProjectDirectory, TypingsDirecctoryName);
-            if (Directory.Exists(typingsDirectoryPath)) {
-                foreach (var file in Directory.EnumerateFiles(typingsDirectoryPath, "*.d.ts", SearchOption.AllDirectories)) {
-                    var directory = Directory.GetParent(file);
-                    if (directory.FullName != typingsDirectoryPath && Path.GetFullPath(directory.FullName).StartsWith(typingsDirectoryPath)) {
-                        yield return directory.Name;
-                    }
-                }
-            }
         }
     }
 }

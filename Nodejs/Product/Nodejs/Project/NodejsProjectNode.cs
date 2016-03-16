@@ -50,6 +50,8 @@ namespace Microsoft.NodejsTools.Project {
         private string _intermediateOutputPath;
         private readonly Dictionary<NodejsProjectImageName, int> _imageIndexFromNameDictionary = new Dictionary<NodejsProjectImageName, int>();
         private bool _projectHasTypeScriptFiles = false;
+        private TypingsAcquisition _typingsAcquirer;
+
 
         // We delay analysis until things calm down in the node_modules folder.
         internal Queue<NodejsFileNode> DelayedAnalysisQueue = new Queue<NodejsFileNode>();
@@ -108,21 +110,35 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
+        private TypingsAcquisition TypingsAcquirer {
+            get {
+                if (_typingsAcquirer != null) {
+                    return _typingsAcquirer;
+                }
+
+                var controller = ModulesNode?.NpmController;
+                if (controller != null) {
+                    _typingsAcquirer = new TypingsAcquisition(controller.ListBaseDirectory, controller.RootPackage.Path);
+                }
+                return _typingsAcquirer;
+            }
+        }
+
         private void TryToAcquireTypings() {
             var controller = ModulesNode?.NpmController;
-            if (controller != null && ShouldAcquireTypingsAutomatically) {
-                var packages = controller.RootPackage.Modules.Where(package =>
-                        package.IsDependency
-                        || package.IsOptionalDependency
-                        || package.IsDevDependency
-                        || !package.IsListedInParentPackageJson);
-
-                TypingsAcquisition.AcquireTypings(
-                    controller.ListBaseDirectory,
-                    controller.RootPackage.Path,
-                    packages,
-                    null).ContinueWith(x => x);
+            if (!ShouldAcquireTypingsAutomatically || _typingsAcquirer == null || controller == null) {
+                return;
             }
+
+            var currentPackages = controller.RootPackage.Modules.Where(package =>
+                package.IsDependency
+                || package.IsOptionalDependency
+                || package.IsDevDependency
+                || !package.IsListedInParentPackageJson);
+
+            _typingsAcquirer
+                .AcquireTypings(currentPackages, null /*redirector*/)
+                .ContinueWith(x => x);
         }
 
         internal void EnqueueForDelayedAnalysis(NodejsFileNode fileNode) {
