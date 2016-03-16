@@ -32,16 +32,11 @@
             this.label1 = new System.Windows.Forms.Label();
             this._cacheClearedSuccessfully = new System.Windows.Forms.Label();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
-            this._enableAutoTypingsAcquisition = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
-            this.groupBox3.SuspendLayout();
-            this.tableLayoutPanel5.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -89,8 +84,7 @@
             this.groupBox2.AutoSize = true;
             this.groupBox2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.groupBox2.Controls.Add(this.tableLayoutPanel1);
-            this.groupBox2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.groupBox2.Enabled = false;
+            this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox2.Location = new System.Drawing.Point(6, 51);
             this.groupBox2.Margin = new System.Windows.Forms.Padding(6, 3, 6, 3);
             this.groupBox2.Name = "groupBox2";
@@ -166,60 +160,13 @@
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel2.Controls.Add(this.groupBox1, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.groupBox2, 0, 1);
-            this.tableLayoutPanel2.Controls.Add(this.groupBox3, 0, 2);
-            this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel2.GrowStyle = System.Windows.Forms.TableLayoutPanelGrowStyle.FixedSize;
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(0, -1);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-            this.tableLayoutPanel2.RowCount = 3;
+            this.tableLayoutPanel2.RowCount = 2;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(388, 148);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(388, 128);
             this.tableLayoutPanel2.TabIndex = 4;
-            // 
-            // groupBox3
-            // 
-            this.groupBox3.AutoSize = true;
-            this.groupBox3.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.groupBox3.Controls.Add(this.tableLayoutPanel5);
-            this.groupBox3.Dock = System.Windows.Forms.DockStyle.Top;
-            this.groupBox3.Location = new System.Drawing.Point(6, 131);
-            this.groupBox3.Margin = new System.Windows.Forms.Padding(6, 3, 6, 3);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(376, 14);
-            this.groupBox3.TabIndex = 4;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Type Acquisition";
-            // 
-            // tableLayoutPanel5
-            // 
-            this.tableLayoutPanel5.AutoSize = true;
-            this.tableLayoutPanel5.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.tableLayoutPanel5.ColumnCount = 1;
-            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel5.Controls.Add(this._enableAutoTypingsAcquisition, 0, 0);
-            this.tableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Top;
-            this.tableLayoutPanel5.Location = new System.Drawing.Point(3, 16);
-            this.tableLayoutPanel5.Name = "tableLayoutPanel5";
-            this.tableLayoutPanel5.RowCount = 1;
-            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel5.Size = new System.Drawing.Size(370, 23);
-            this.tableLayoutPanel5.TabIndex = 1;
-            // 
-            // _enableAutoTypingsAcquisition
-            // 
-            this._enableAutoTypingsAcquisition.AutoSize = true;
-            this._enableAutoTypingsAcquisition.Checked = true;
-            this._enableAutoTypingsAcquisition.CheckState = System.Windows.Forms.CheckState.Checked;
-            this._enableAutoTypingsAcquisition.Dock = System.Windows.Forms.DockStyle.Top;
-            this._enableAutoTypingsAcquisition.Location = new System.Drawing.Point(3, 3);
-            this._enableAutoTypingsAcquisition.Name = "_enableAutoTypingsAcquisition";
-            this._enableAutoTypingsAcquisition.Size = new System.Drawing.Size(364, 17);
-            this._enableAutoTypingsAcquisition.TabIndex = 2;
-            this._enableAutoTypingsAcquisition.Text = "Enable automatic typings acquisition for JavaScript projects";
-            this._enableAutoTypingsAcquisition.UseVisualStyleBackColor = true;
             // 
             // NodejsNpmOptionsControl
             // 
@@ -230,7 +177,7 @@
             this.Controls.Add(this.tableLayoutPanel2);
             this.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
             this.Name = "NodejsNpmOptionsControl";
-            this.Size = new System.Drawing.Size(388, 148);
+            this.Size = new System.Drawing.Size(391, 130);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.tableLayoutPanel3.ResumeLayout(false);
@@ -241,10 +188,6 @@
             this.tableLayoutPanel1.PerformLayout();
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel2.PerformLayout();
-            this.groupBox3.ResumeLayout(false);
-            this.groupBox3.PerformLayout();
-            this.tableLayoutPanel5.ResumeLayout(false);
-            this.tableLayoutPanel5.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -261,8 +204,6 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
         private System.Windows.Forms.Label _cacheClearedSuccessfully;
-        private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel5;
-        private System.Windows.Forms.CheckBox _enableAutoTypingsAcquisition;
+
     }
 }

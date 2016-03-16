@@ -130,15 +130,7 @@ namespace Microsoft.NodejsTools.Project {
                     continue;
                 }
 
-                if (modules != null && modules.Any(
-                    module =>
-                        module.Name == dep.Package.Name
-                        && module.Version == dep.Package.Version
-                        && module.IsBundledDependency == dep.Package.IsBundledDependency
-                        && module.IsDevDependency == dep.Package.IsDevDependency
-                        && module.IsListedInParentPackageJson == dep.Package.IsListedInParentPackageJson
-                        && module.IsMissing == dep.Package.IsMissing
-                        && module.IsOptionalDependency == dep.Package.IsOptionalDependency)) {
+                if (modules != null && modules.Contains(dep.Package, new PackageEqualityComparer())) {
                     recycle[dep.Package.Name] = dep;
                 } else {
                     remove.Add(current);

@@ -106,8 +106,7 @@ namespace Microsoft.NodejsTools.Project {
             get {
 #if DEV14
                 return !_projectHasTypeScriptFiles
-                    && NodejsPackage.Instance.IntellisenseOptionsPage.EnableES6Preview
-                    && NodejsPackage.Instance.NpmOptionsPage.EnableAutomaticTypingsAcquisition;
+                    && NodejsPackage.Instance.IntellisenseOptionsPage.EnableES6Preview;
 #else
                 return false;
 #endif

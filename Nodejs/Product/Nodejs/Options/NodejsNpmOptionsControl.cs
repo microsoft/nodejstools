@@ -33,14 +33,12 @@ namespace Microsoft.NodejsTools.Options {
 
         internal void SyncControlWithPageSettings(NodejsNpmOptionsPage page) {
             _showOutputWhenRunningNpm.Checked = page.ShowOutputWindowWhenExecutingNpm;
-            _enableAutoTypingsAcquisition.Checked = page.EnableAutomaticTypingsAcquisition;
             _npmCachePath = page.NpmCachePath;
             _cacheClearedSuccessfully.Visible = false;
         }
 
         internal void SyncPageWithControlSettings(NodejsNpmOptionsPage page) {
             page.ShowOutputWindowWhenExecutingNpm = _showOutputWhenRunningNpm.Checked;
-            page.EnableAutomaticTypingsAcquisition = _enableAutoTypingsAcquisition.Checked;
         }
 
         private void ClearCacheButton_Click(object sender, EventArgs e) {
