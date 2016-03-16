@@ -28,18 +28,14 @@ using Microsoft.VisualStudioTools.Project;
 using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
 
 namespace Microsoft.NodejsTools.Project {
-    internal interface IDependencyNodeBasePath {
-        string GetRelativeUrlFragment();
-    }
-
-    internal class DependencyNode : HierarchyNode, IDependencyNodeBasePath {
+    internal class DependencyNode : HierarchyNode {
         private readonly NodejsProjectNode _projectNode;
-        private readonly IDependencyNodeBasePath _parent;
+        private readonly DependencyNode _parent;
         private readonly string _displayString;
 
         public DependencyNode(
             NodejsProjectNode root,
-            IDependencyNodeBasePath parent,
+            DependencyNode parent,
             IPackage package)
             : base(root) {
             _projectNode = root;
