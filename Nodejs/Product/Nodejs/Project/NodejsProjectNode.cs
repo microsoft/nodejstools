@@ -130,7 +130,7 @@ namespace Microsoft.NodejsTools.Project {
 
         private void TryToAcquireTypings() {
             var controller = ModulesNode?.NpmController;
-            if (!ShouldAcquireTypingsAutomatically || _typingsAcquirer == null || controller == null) {
+            if (!ShouldAcquireTypingsAutomatically || TypingsAcquirer == null || controller == null) {
                 return;
             }
 
@@ -140,7 +140,7 @@ namespace Microsoft.NodejsTools.Project {
                 || package.IsDevDependency
                 || !package.IsListedInParentPackageJson);
 
-            _typingsAcquirer
+            TypingsAcquirer
                 .AcquireTypings(currentPackages, null /*redirector*/)
                 .ContinueWith(x => x);
         }
