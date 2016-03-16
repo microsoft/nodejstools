@@ -341,8 +341,8 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         private static IAnalysisSet FsReadDirSync(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
-            CallNode call = (CallNode)node;
-            if (call.Arguments.Length == 1) {
+            var call = node as CallNode;
+            if (call != null && call.Arguments.Length == 1) {
                 var ee = new ExpressionEvaluator(unit);
                 IAnalysisSet arraySet;
                 ReadDirSyncArrayValue array;
