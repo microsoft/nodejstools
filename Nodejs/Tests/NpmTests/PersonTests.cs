@@ -19,7 +19,7 @@ using Microsoft.NodejsTools.Npm.SPI;
 namespace NpmTests {
     [TestClass]
     public class PersonTests {
-        [TestMethod, TestCategory("UnitTest")]
+        [TestMethod, TestCategory("NpmIntegration")]
         public void ShouldReturnEmptyPersonForNullOrEmptyInput() {
             var sources = new[] { null, "", " ", "    " };
             foreach (var emptySource in sources) {
@@ -31,7 +31,7 @@ namespace NpmTests {
             }
         }
 
-        [TestMethod, TestCategory("UnitTest")]
+        [TestMethod, TestCategory("NpmIntegration")]
         public void ShouldReturnNameForObjectWithNameOnly() {
             var name = "J Scripter";
             var sources = new[] {
@@ -50,7 +50,7 @@ namespace NpmTests {
             }
         }
 
-        [TestMethod, TestCategory("UnitTest")]
+        [TestMethod, TestCategory("NpmIntegration")]
         public void ShouldSetNameEmailAndUrlForObjectWithTheseProperties() {
             var name = "J Scripter";
             var email = "j@contoso.com";
@@ -73,7 +73,7 @@ namespace NpmTests {
             }
         }
 
-        [TestMethod, TestCategory("UnitTest")]
+        [TestMethod, TestCategory("NpmIntegration")]
         public void ShouldReturnInputAsNameIfInputIsObject() {
             var name = "J Scripter";
             var person = Person.CreateFromJsonSource(name);
