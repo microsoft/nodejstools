@@ -24,11 +24,14 @@ using System.IO;
 using SR = Microsoft.NodejsTools.Project.SR;
 using System;
 using System.Security;
+using System.Threading;
 
 namespace Microsoft.NodejsTools {
     internal class TypingsAcquisition {
         private const string TsdExe = "tsd.cmd";
         private const string TypingsDirectoryName = "typings";
+
+        private static SemaphoreSlim tsdGlobalWorkSemaphore = new SemaphoreSlim(1);
 
         private readonly string _pathToRootNpmDirectory;
         private readonly string _pathToRootProjectDirectory;
@@ -45,13 +48,16 @@ namespace Microsoft.NodejsTools {
             });
         }
 
-        public async Task<bool> AcquireTypings(IEnumerable<IPackage> packages, Redirector redirector) {
-            var typingsToAquire = GetNewTypingsToAcquire(packages);
-            var success = await DownloadTypings(_pathToRootNpmDirectory, _pathToRootProjectDirectory, typingsToAquire, redirector);
-            if (success) {
-                _acquiredTypingsPackageNames.Value.UnionWith(typingsToAquire.Select(GetPackageTsdName));
-            }
-            return success;
+        public Task<bool> AcquireTypings(IEnumerable<IPackage> packages, Redirector redirector) {
+            return tsdGlobalWorkSemaphore.WaitAsync().ContinueWith(async _ => {
+                var typingsToAquire = GetNewTypingsToAcquire(packages);
+                var success = await DownloadTypings(_pathToRootNpmDirectory, _pathToRootProjectDirectory, typingsToAquire, redirector);
+                if (success) {
+                    _acquiredTypingsPackageNames.Value.UnionWith(typingsToAquire.Select(GetPackageTsdName));
+                }
+                tsdGlobalWorkSemaphore.Release();
+                return success;
+            }).Unwrap();
         }
 
         private IEnumerable<IPackage> GetNewTypingsToAcquire(IEnumerable<IPackage> packages) {
