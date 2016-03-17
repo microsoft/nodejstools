@@ -128,7 +128,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private void TryToAcquireTypings() {
-            var controller = ModulesNode?.NpmController;
+            var controller = ModulesNode != null ? ModulesNode.NpmController : null;
             if (!ShouldAcquireTypingsAutomatically || TypingsAcquirer == null || controller == null) {
                 return;
             }
