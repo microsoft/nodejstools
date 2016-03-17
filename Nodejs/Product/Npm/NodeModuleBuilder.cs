@@ -71,7 +71,7 @@ namespace Microsoft.NodejsTools.Npm {
         public IPerson Author {
             get {
                 var text = _authorBuff.ToString().Trim();
-                return string.IsNullOrEmpty(text) ? null : new Person(text);
+                return string.IsNullOrEmpty(text) ? null : Person.CreateFromJsonSource(text);
             }
         }
 
