@@ -119,7 +119,7 @@ namespace Microsoft.NodejsTools.Project {
                     return _typingsAcquirer;
                 }
 
-                var controller = ModulesNode?.NpmController;
+                var controller = ModulesNode != null ? ModulesNode.NpmController : null;
                 if (controller != null) {
                     _typingsAcquirer = new TypingsAcquisition(controller.ListBaseDirectory, controller.RootPackage.Path);
                 }
