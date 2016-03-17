@@ -125,7 +125,11 @@ namespace Microsoft.NodejsTools {
                         packages.Add(directory.Name);
                     }
                 }
-            } catch (SystemException e) when (e is IOException || e is SecurityException || e is UnauthorizedAccessException) {
+            } catch (IOException) {
+                // noop
+            } catch (SecurityException) {
+                // noop
+            } catch (UnauthorizedAccessException) {
                 // noop
             }
             return packages;

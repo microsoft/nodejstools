@@ -68,7 +68,7 @@ namespace Microsoft.NodejsTools.Project {
 
         public abstract void ManageNpmModules();
 
-        protected IEnumerable<IPackage> ReloadHierarchy(HierarchyNode parent, IEnumerable<IPackage> modules) {
+        protected void ReloadHierarchy(HierarchyNode parent, IEnumerable<IPackage> modules) {
             //  We're going to reuse nodes for which matching modules exist in the new set.
             //  The reason for this is that we want to preserve the expansion state of the
             //  hierarchy. If we just bin everything off and recreate it all from scratch
@@ -76,18 +76,18 @@ namespace Microsoft.NodejsTools.Project {
             //  have drilled down into the hierarchy
             var recycle = new Dictionary<string, DependencyNode>();
             var remove = GetNodesToRemoveOrRecycle(parent, modules, recycle);
-            RemoveUnusedModuleNodesFromHeirarchy(parent, remove);
-            return BuildModuleHeirarchy(parent, modules, recycle);
+            RemoveUnusedModuleNodesFromHierarchy(parent, remove);
+            BuildModuleHierarchy(parent, modules, recycle);
         }
 
-        private void RemoveUnusedModuleNodesFromHeirarchy(HierarchyNode parent, List<HierarchyNode> remove) {
+        private void RemoveUnusedModuleNodesFromHierarchy(HierarchyNode parent, List<HierarchyNode> remove) {
             foreach (var obsolete in remove) {
                 parent.RemoveChild(obsolete);
                 ProjectMgr.OnItemDeleted(obsolete);
             }
         }
 
-        private IEnumerable<IPackage> BuildModuleHeirarchy(HierarchyNode parent, IEnumerable<IPackage> modules, IReadOnlyDictionary<string, DependencyNode> recycle) {
+        private IEnumerable<IPackage> BuildModuleHierarchy(HierarchyNode parent, IEnumerable<IPackage> modules, IReadOnlyDictionary<string, DependencyNode> recycle) {
             if (modules == null) {
                 return Enumerable.Empty<IPackage>();
             }

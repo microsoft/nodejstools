@@ -62,7 +62,7 @@ namespace Microsoft.NodejsTools.Project {
 
         #region HierarchyNode implementation
 
-        public string GetRelativeUrlFragment() {
+        private string GetRelativeUrlFragment() {
             var buff = new StringBuilder();
             if (null != _parent) {
                 buff.Append(_parent.GetRelativeUrlFragment());
