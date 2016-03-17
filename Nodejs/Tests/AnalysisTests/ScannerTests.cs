@@ -50,8 +50,7 @@ namespace AnalysisTests {
             Assert.AreEqual(scanner.CurrentState.GetHashCode(), 2);
         }
 
-        [Ignore]
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestOperators() {
             var code = @"x %= 1
 x &= 1
@@ -319,8 +318,7 @@ x /= 1
             );
         }
 
-        [Ignore]
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestUnterminatedString() {
             var code = @"'abc
 ";
@@ -469,8 +467,7 @@ x /= 1
 
         }
 
-        [Ignore]
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestMultilineComment() {
             var code = @"/*
 hello world
@@ -483,8 +480,7 @@ hello world
 
         }
 
-        [Ignore]
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestMultilineCommentUnterminated() {
             var code = @"/*
 hello world

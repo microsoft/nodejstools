@@ -83,8 +83,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
 #endif
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void AbsolutePaths() {
             var proj = File.ReadAllText(TestData.GetPath(@"TestData\NodejsProjectData\AbsolutePath\AbsolutePath.njsproj"));
@@ -103,8 +102,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void MoveStartupFile() {
             using (var app = new VisualStudioApp()) {
@@ -130,8 +128,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void CopyPasteFile() {
             using (var app = new VisualStudioApp()) {
@@ -159,8 +156,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void CopyPasteRenameFile() {
             using (var app = new VisualStudioApp()) {
@@ -211,8 +207,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void DeleteFile() {
             using (var app = new VisualStudioApp()) {
@@ -238,8 +233,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void AddNewFolder() {
             using (var app = new VisualStudioApp()) {
@@ -273,8 +267,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// <summary>
         /// Adds a new folder which fits exactly w/ no space left in the path name
         /// </summary>
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void AddNewFolderLongPathBoundary() {
             using (var app = new VisualStudioApp()) {
@@ -307,8 +300,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// <summary>
         /// Adds a new folder with a path that's too long, typing a new path.
         /// </summary>
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void AddNewFolderLongPathTooLong() {
             using (var app = new VisualStudioApp()) {
@@ -336,8 +328,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// <summary>
         /// Adds a folder with a path that's too long using the default provided folder name.
         /// </summary>
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void AddNewFolderLongPathTooLongCancelEdit() {
             using (var app = new VisualStudioApp()) {
@@ -364,8 +355,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// <summary>
         /// Adds a folder with a path that's too long using the default provided folder name.
         /// </summary>
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void AddNewItemLongPathBoundary() {
             using (var app = new VisualStudioApp()) {
@@ -390,8 +380,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// <summary>
         /// Adds a folder with a path that's too long using the default provided folder name.
         /// </summary>
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void AddNewItemLongPathTooLong() {
             using (var app = new VisualStudioApp()) {
@@ -415,8 +404,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// <summary>
         /// Adds a folder with a path that's too long using the default provided folder name.
         /// </summary>
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void DeleteLockedFolder() {
             using (var app = new VisualStudioApp()) {
@@ -468,8 +456,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             return app.OpenProject(Path.Combine(testDir, "LongFileNames.sln"));
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void AddNewFolderNested() {
             using (var app = new VisualStudioApp()) {
@@ -517,8 +504,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void RenameProjectToExisting() {
             using (var app = new VisualStudioApp()) {
@@ -559,8 +545,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void RenameItemsTest() {
             using (var app = new VisualStudioApp()) {
@@ -633,8 +618,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void CrossProjectCopy() {
             using (var app = new VisualStudioApp()) {
@@ -658,8 +642,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void CrossProjectCutPaste() {
             using (var app = new VisualStudioApp()) {
@@ -684,8 +667,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void CutPaste() {
             using (var app = new VisualStudioApp()) {
@@ -710,8 +692,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void CopyFolderOnToSelf() {
             using (var app = new VisualStudioApp()) {
@@ -731,8 +712,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void DragDropTest() {
             using (var app = new VisualStudioApp()) {
@@ -759,8 +739,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// <summary>
         /// Drag a file onto another file in the same directory, nothing should happen
         /// </summary>
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void DragDropFileToFileTest() {
             using (var app = new VisualStudioApp()) {
@@ -788,8 +767,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// <summary>
         /// Drag a file onto it's containing folder, nothing should happen
         /// </summary>
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void DragDropFileToContainingFolderTest() {
             using (var app = new VisualStudioApp()) {
@@ -813,8 +791,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void DragLeaveTest() {
             using (var app = new VisualStudioApp()) {
@@ -844,8 +821,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void DragLeaveFolderTest() {
             using (var app = new VisualStudioApp()) {
@@ -875,8 +851,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void MultiSelectCopyAndPaste() {
             using (var app = new VisualStudioApp()) {
@@ -907,8 +882,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void TransferItem() {
             using (var app = new VisualStudioApp()) {
@@ -942,8 +916,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [Ignore]
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void SaveAs() {
             using (var app = new VisualStudioApp()) {

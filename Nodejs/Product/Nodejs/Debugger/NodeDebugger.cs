@@ -102,7 +102,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
             // Node usage: node [options] [ -e script | script.js ] [arguments]
             string allArgs = String.Format(
-                "--debug-brk={0} {1} {2}",
+                "--debug-brk={0} --nolazy {1} {2}",
                 debuggerPortOrDefault,
                 interpreterOptions,
                 script

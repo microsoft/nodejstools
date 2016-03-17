@@ -26,7 +26,7 @@ namespace NpmTests {
     /// <remarks>
     /// Each TemporaryFileManager can have a pre- and postfix applied to each file/directory.
     /// </remarks>
-    public class TemporaryFileManager {
+    public class TemporaryFileManager : IDisposable {
         #region Static variables
 
         public const string DEFAULT_EXTENSION = "tmp";

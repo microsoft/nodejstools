@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Choose>
     <When Condition=" '$(VisualStudioVersion)'=='15.0'  Or '$(TargetVisualStudioVersion)'=='VS150' ">
@@ -93,8 +93,8 @@
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
     <Reference Include="System" />
     <Compile Include="AbstractFilesystemPackageJsonTests.cs" />
-    <Compile Include="AbstractPackageJsonTests.cs" />
     <Compile Include="InstallUninstallPackageTests.cs" />
+    <Compile Include="FileSystemPackageJsonTestHelpers.cs" />
     <Compile Include="FileSystemPackageJsonTests.cs" />
     <Compile Include="MaxPathTests.cs" />
     <Compile Include="MockPackageCatalog.cs" />
