@@ -49,9 +49,11 @@ namespace Microsoft.NodejsTools.Project {
         internal readonly RequireCompletionCache _requireCompletionCache = new RequireCompletionCache();
         private string _intermediateOutputPath;
         private readonly Dictionary<NodejsProjectImageName, int> _imageIndexFromNameDictionary = new Dictionary<NodejsProjectImageName, int>();
+
+#if DEV14
         private bool _projectHasTypeScriptFiles = false;
         private TypingsAcquisition _typingsAcquirer;
-
+#endif
 
         // We delay analysis until things calm down in the node_modules folder.
         internal Queue<NodejsFileNode> DelayedAnalysisQueue = new Queue<NodejsFileNode>();
@@ -98,18 +100,16 @@ namespace Microsoft.NodejsTools.Project {
                     fileNode.Analyze();
                 }
             }
-
+#if DEV14
             TryToAcquireTypings();
+#endif
         }
 
+#if DEV14
         private bool ShouldAcquireTypingsAutomatically {
             get {
-#if DEV14
                 return !_projectHasTypeScriptFiles
                     && NodejsPackage.Instance.IntellisenseOptionsPage.EnableES6Preview;
-#else
-                return false;
-#endif
             }
         }
 
@@ -143,6 +143,7 @@ namespace Microsoft.NodejsTools.Project {
                 .AcquireTypings(currentPackages, null /*redirector*/)
                 .ContinueWith(x => x);
         }
+#endif
 
         internal void EnqueueForDelayedAnalysis(NodejsFileNode fileNode) {
             DelayedAnalysisQueue.Enqueue(fileNode);
@@ -284,7 +285,9 @@ namespace Microsoft.NodejsTools.Project {
 
             if (string.Equals(Path.GetExtension(fileName), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase) && !IsTypeScriptProject) {
                 // enable type script on the project automatically...
+#if DEV14
                 _projectHasTypeScriptFiles = true;
+#endif
                 SetProjectProperty(NodejsConstants.EnableTypeScript, "true");
                 SetProjectProperty(NodejsConstants.TypeScriptSourceMap, "true");
                 if (String.IsNullOrWhiteSpace(GetProjectProperty(NodejsConstants.TypeScriptModuleKind))) {
