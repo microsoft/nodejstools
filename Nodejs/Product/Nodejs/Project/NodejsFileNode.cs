@@ -40,7 +40,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         protected override void OnParentSet(HierarchyNode parent) {
-#if DEV14_OR_LATER
+#if DEV14
             if (Url.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase) && Url.IndexOf(@"\typings\", StringComparison.OrdinalIgnoreCase) >= 0) {
                 ProjectMgr.Site.GetUIThread().Invoke(() => {
                     this.IncludeInProject(true);
@@ -101,7 +101,7 @@ namespace Microsoft.NodejsTools.Project {
             UpdateParentContentType();
             ItemNode.ItemTypeChanged += ItemNode_ItemTypeChanged;
 
-#if DEV14_OR_LATER
+#if DEV14
             ProjectMgr.Site.GetUIThread().Invoke(() => {
                 ProjectMgr.OnItemAdded(this.Parent, this);
             });
