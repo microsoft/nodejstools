@@ -92,10 +92,10 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
     <Reference Include="System" />
-    <Compile Include="AbstractFilesystemPackageJsonTests.cs" />
+    <Compile Include="AbstractPackageJsonTests.cs" />
     <Compile Include="InstallUninstallPackageTests.cs" />
-    <Compile Include="FileSystemPackageJsonTestHelpers.cs" />
     <Compile Include="FileSystemPackageJsonTests.cs" />
+    <Compile Include="FileSystemPackageJsonTestHelpers.cs" />
     <Compile Include="MaxPathTests.cs" />
     <Compile Include="MockPackageCatalog.cs" />
     <Compile Include="MockPackageJsonSource.cs" />
