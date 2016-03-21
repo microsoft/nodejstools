@@ -627,6 +627,7 @@
     <Compile Include="SmartIndentProvider.cs" />
     <Compile Include="SourceMapping\SourceMap.cs" />
     <Compile Include="TestFrameworks\TestFrameworkDirectories.cs" />
+    <Compile Include="TypingsAcquisition.cs" />
     <Compile Include="VsMenus.cs" />
     <Compile Include="AzureSolutionListener.cs" />
     <Compile Include="BaseNodeProjectFactory.cs" />
