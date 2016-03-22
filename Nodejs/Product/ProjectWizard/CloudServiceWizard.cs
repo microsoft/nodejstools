@@ -38,6 +38,8 @@ namespace Microsoft.NodejsTools.ProjectWizard {
 #elif DEV14
         const string AzureToolsDownload = "http://go.microsoft.com/fwlink/?LinkID=517353";
 #elif DEV15
+        // TODO - add Azure Tools download url when available
+        // https://github.com/Microsoft/nodejstools/issues/758
         const string AzureToolsDownload = "about:blank";
 #else
 #error Unsupported VS version
