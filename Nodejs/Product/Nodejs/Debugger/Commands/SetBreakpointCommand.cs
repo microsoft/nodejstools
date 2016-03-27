@@ -19,10 +19,8 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-using Microsoft.NodejsTools.SourceMapping;
 using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json.Linq;
-using TypeScriptSourceMapReader;
 
 namespace Microsoft.NodejsTools.Debugger.Commands {
     sealed class SetBreakpointCommand : DebuggerCommand {
@@ -38,7 +36,8 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             _module = module;
             _breakpoint = breakpoint;
 
-            _position = breakpoint.GetPosition(module.JavaScriptFileName);
+            var jsFileName = module != null ? module.JavaScriptFileName : null;
+            _position = breakpoint.GetPosition(jsFileName);
 
             // Zero based line numbers
             int line = _position.Line;
