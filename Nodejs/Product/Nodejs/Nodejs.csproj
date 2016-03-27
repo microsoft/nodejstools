@@ -112,6 +112,7 @@
     </Reference>
     <Reference Include="Microsoft.VisualStudio.ComponentModelHost, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.CoreUtility, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.VisualStudio.Debugger.Engine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Debugger.Interop.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Debugger.Interop.11.0, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Debugger.InteropA, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
@@ -291,6 +292,8 @@
     <Compile Include="Commands\OpenRemoteDebugDocumentationCommand.cs" />
     <Compile Include="Commands\OpenRemoteDebugProxyFolderCommand.cs" />
     <Compile Include="Commands\SurveyNewsCommand.cs" />
+    <Compile Include="Debugger\Serialization\BinaryDeserializer.cs" />
+    <Compile Include="Debugger\Serialization\BinarySerializer.cs" />
     <Compile Include="Debugger\DataTips\DataTipTextManagerEvents.cs" />
     <Compile Include="Debugger\DebugEngine\AD7EvalErrorProperty.cs" />
     <Compile Include="Logging\LiveLogger.cs" />
@@ -300,6 +303,9 @@
     <Compile Include="Debugger\LocalFileNameMapper.cs" />
     <Compile Include="Debugger\NodeProcess.cs" />
     <Compile Include="Debugger\ScriptTree.cs" />
+    <Compile Include="Debugger\TypeScriptHelpers\SourceMapReaderHelper.cs" />
+    <Compile Include="Debugger\TypeScriptHelpers\TypeScriptRuntime.cs" />
+    <Compile Include="Debugger\TypeScriptHelpers\TypeScriptSymbolFileId.cs" />
     <Compile Include="Editor\BraceCompletion\BraceKind.cs" />
     <Compile Include="Editor\BraceCompletion\BraceCompletionContext.cs" />
     <Compile Include="Editor\BraceCompletion\BraceCompletionContextProvider.cs" />
@@ -1682,6 +1688,11 @@
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
+    <ProjectReference Include="..\TypeScriptSourceMapReader\TypeScriptSourceMapReader.csproj">
+      <Project>{61a8d7ef-b83e-4c21-9479-ba832357e42c}</Project>
+      <Name>TypeScriptSourceMapReader</Name>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </ProjectReference>
     <ProjectReference Include="..\WebRole\WebRole.csproj">
       <Project>{712d84ec-b2a6-46d1-b030-ba697ae5e554}</Project>
       <Name>WebRole</Name>
@@ -1729,6 +1740,9 @@
     <UseCodebase>true</UseCodebase>
     <RegisterOutputPackage>true</RegisterOutputPackage>
     <RegisterWithCodebase>true</RegisterWithCodebase>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DefineConstants>DEBUG;TRACE;;FEATURE_AZURE_REMOTE_DEBUG;DEV14;DEV14_OR_LATER;DEV12_OR_LATER;DEV11_OR_LATER;NODEJS_TOOLS;NTVS_FEATURE_INTERACTIVEWINDOW</DefineConstants>
   </PropertyGroup>
   <Import Project="$(BuildRoot)\Common\Product\SharedProject\SharedProject.proj" />
   <Import Project="..\ProjectAfter.settings" />
