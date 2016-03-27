@@ -34,12 +34,14 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             AssertListener.Initialize();
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void MultiPasteKeyboard() {
             MultiPaste(CopyByKeyboard);
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void MultiPasteMouse() {
@@ -99,6 +101,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// <summary>
         /// Cut item, paste into folder, paste into top-level, 2nd paste shouldn’t do anything
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Mock")]
         [HostType("VSTestHost")]
         public void CutPastePasteItem() {
@@ -136,6 +139,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// <summary>
         /// Cut item, rename it, paste into top-level, check error message
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Mock")]
         [HostType("VSTestHost")]
         public void CutRenamePaste() {
@@ -172,6 +176,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// <summary>
         /// Cut item, rename it, paste into top-level, check error message
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Mock")]
         [HostType("VSTestHost")]
         public void CutDeletePaste() {
@@ -354,6 +359,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// <summary>
         /// Copy a file node, drag and drop a different file, paste the node, should succeed
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void CopiedBeforeDragPastedAfterDrop() {
@@ -397,12 +403,14 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void DragToAnotherProjectKeyboard() {
             DragToAnotherProject(CopyByKeyboard);
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void DragToAnotherProjectMouse() {
@@ -478,6 +486,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// <summary>
         /// Drag and drop a folder onto itself, nothing should happen
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Mock")]
         [HostType("VSTestHost")]
         public void DragFolderOntoSelf() {
@@ -543,6 +552,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// Move a file to a location where A file with the same name now already exists.  We should get an overwrite
         /// dialog, and after answering yes to overwrite the file should be moved.
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void CutFileReplace() {
@@ -574,6 +584,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Mock")]
         [HostType("VSTestHost")]
         public void CutFolderAndFile() {
@@ -639,6 +650,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// Drag and drop a folder onto itself, nothing should happen
         ///     Cannot move 'DragFolderAndFileToSameFolder'. The destination folder is the same as the source folder.
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void DragFolderAndFileOntoSelf() {
@@ -708,6 +720,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void CopyDeletePaste() {
@@ -830,12 +843,14 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void CopyDuplicateFolderNameKeyboard() {
             CopyDuplicateFolderName(CopyByKeyboard);
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void CopyDuplicateFolderNameMouse() {
@@ -922,6 +937,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void MoveReverseCrossHierarchyKeyboard() {
@@ -1332,6 +1348,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// Drag item from our project to other project, copy
         /// Drag item from other project to our project, still copy back
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void MoveDoubleCrossHierarchy() {
@@ -1421,6 +1438,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// <summary>
         /// Drag item from another project, drag same item again, prompt to overwrite, say yes, only one item should be in the hierarchy
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Mock")]
         [HostType("VSTestHost")]
         public void CopyFolderMissingItem() {
@@ -1515,6 +1533,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// 
         /// http://pytools.codeplex.com/workitem/2609
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Mock")]
         [HostType("VSTestHost")]
         public void MoveFolderWithContents() {
@@ -1635,12 +1654,14 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(2), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void CopyFileFromFolderToLinkedFolderKeyboard() {
             CopyFileFromFolderToLinkedFolder(CopyByKeyboard);
         }
 
+        [Ignore]
         [TestMethod, Priority(2), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void CopyFileFromFolderToLinkedFolderMouse() {

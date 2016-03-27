@@ -33,6 +33,7 @@ x64/
 *.tli
 *.tlh
 *.tmp
+*.tmp_proj
 *.log
 *.vspscc
 *.vssscc

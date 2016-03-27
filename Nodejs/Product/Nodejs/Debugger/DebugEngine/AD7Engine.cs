@@ -61,7 +61,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private AD7Thread _mainThread;
         private bool _sdmAttached;
         private bool _processLoaded;
-        private bool _processLoadedRunning;
         private bool _loadComplete;
         private readonly object _syncLock = new object();
         private bool _attached;
@@ -255,7 +254,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             }
 
             lock (_syncLock) {
-                if (_processLoadedRunning) {
+                if (_processLoaded && _process.IsRunning()) {
                     Send(new AD7LoadCompleteRunningEvent(), AD7LoadCompleteRunningEvent.IID, _mainThread);
                 } else {
                     Send(new AD7LoadCompleteEvent(), AD7LoadCompleteEvent.IID, _mainThread);
@@ -1125,10 +1124,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             Send(new AD7SteppingCompleteEvent(), AD7SteppingCompleteEvent.IID, _threads[e.Thread]);
         }
 
-        private void OnProcessLoaded(object sender, ProcessLoadedEventArgs e) {
+        private void OnProcessLoaded(object sender, ThreadEventArgs e) {
             lock (_syncLock) {
                 _processLoaded = true;
-                _processLoadedRunning = e.Running;
                 HandleLoadComplete();
             }
         }
@@ -1138,7 +1136,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 _processExitedEvent.Set();
                 lock (_syncLock) {
                     _processLoaded = false;
-                    _processLoadedRunning = false;
                     Send(new AD7ProgramDestroyEvent((uint)e.ExitCode), AD7ProgramDestroyEvent.IID, null);
                 }
             } catch (InvalidOperationException) {

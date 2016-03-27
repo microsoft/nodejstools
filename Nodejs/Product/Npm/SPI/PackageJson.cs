@@ -194,7 +194,7 @@ The following error occurred:
         public IPerson Author {
             get {
                 var author = _package.author;
-                return null == author ? null : new Person(author.ToString());
+                return null == author ? null : Person.CreateFromJsonSource(author.ToString());
             }
         }
 

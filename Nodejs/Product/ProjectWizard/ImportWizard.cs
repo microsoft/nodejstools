@@ -19,12 +19,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 using EnvDTE;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TemplateWizard;
 
 namespace Microsoft.NodejsTools.ProjectWizard {
     public sealed class NewProjectFromExistingWizard : IWizard {
+        public static Boolean IsAddNewProjectCmd { get; set; }
         public void BeforeOpeningFile(EnvDTE.ProjectItem projectItem) { }
         public void ProjectFinishedGenerating(EnvDTE.Project project) { }
         public void ProjectItemFinishedGenerating(EnvDTE.ProjectItem projectItem) { }
@@ -45,6 +47,8 @@ namespace Microsoft.NodejsTools.ProjectWizard {
                     dte = new ServiceProvider(provider).GetService(typeof(DTE)) as DTE;
                 }
             }
+
+            bool addingNewProject = false;
             if (dte == null) {
                 MessageBox.Show("Unable to start wizard: no automation object available.", "Node.js Tools for Visual Studio");
             } else {
@@ -73,10 +77,14 @@ namespace Microsoft.NodejsTools.ProjectWizard {
                         directory = Path.GetDirectoryName(Path.GetDirectoryName(replacementsDictionary["$destinationdirectory$"]));
                     }
 
-                    object inObj = projName + "|" + directory, outObj = null;
+                    var context = addingNewProject ? 
+                        (int)VSConstants.VSStd97CmdID.AddExistingProject : 
+                        (int)VSConstants.VSStd97CmdID.OpenProject;
+                    object inObj = projName + "|" + directory + "|" + context, outObj = null;
                     dte.Commands.Raise(Guids.NodejsCmdSet.ToString("B"), (int)PkgCmdId.cmdidImportWizard, ref inObj, ref outObj);
                 });
             }
+            addingNewProject = IsAddNewProjectCmd;
             throw new WizardCancelledException();
         }
 

@@ -1,2 +1,17 @@
-# Do not normalize line endings from CR LF to LF, regardless of core.autocrlf.
-* -text
+# Normalize line endings to CRLF on checkout
+* text=auto eol=crlf
+
+# Denote all files that are truly binary and should not be modified.
+*.bmp binary
+*.png binary
+*.ico binary
+*.chm binary
+*.cub binary
+*.dll binary
+*.eot binary
+*.exe binary
+*.msi binary
+*.snk binary
+*.sqlite binary
+*.wixlib binary
+*.woff binary

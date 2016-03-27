@@ -32,6 +32,9 @@ namespace Microsoft.NodejsTools.Analysis {
     /// Our dependency tracking scheme works by tracking analysis units - when we add a dependency it is the current
     /// AnalysisUnit which is dependent upon the variable.  If the value of a variable changes then all of the dependent
     /// AnalysisUnit's will be re-enqueued.  This proceeds until we reach a fixed point.
+    /// 
+    /// Note that AnalysisUnit contructors / methods are not threadsafe because we expect there to be many AnalysisUnits,
+    /// and we want to keep things as performant as possible (which means minimizing locking behavior and whatnot.)
     /// </summary>
     [Serializable]
     internal class AnalysisUnit : ISet<AnalysisUnit> {
@@ -180,7 +183,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 long endTime = _sw.ElapsedMilliseconds;
                 var thisTime = endTime - startTime;
                 _analysisTime += thisTime;
-                if (thisTime >= 500 || (_analysisTime / _analysisCount) > 500) {                
+                if (thisTime >= 500 || (_analysisTime / _analysisCount) > 500) {
                     Trace.TraceWarning("Analyzed: {0} {1} ({2} count, {3}ms total, {4}ms mean)", this, thisTime, _analysisCount, _analysisTime, (double)_analysisTime / _analysisCount);
                 }
             }
@@ -188,9 +191,12 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         internal virtual void AnalyzeWorker(DDG ddg, CancellationToken cancel) {
-            if (Tree != ProjectEntry.Tree) {
-                // we were enqueued and a new version became available, don't re-analyze against
-                // the old version.
+            Debug.Assert(Ast != null, "Ast has unexpected null value");
+            Debug.Assert(ProjectEntry != null, "ProjectEntry has unexpected null value");
+
+            if (Ast == null || ProjectEntry == null || Tree != ProjectEntry.Tree) {
+                // analysis unit properties are invalid or we were enqueued and a new version became available
+                // don't re-analyze against the old version.
                 return;
             }
 
@@ -233,7 +239,8 @@ namespace Microsoft.NodejsTools.Analysis {
                 GetHashCode(),
                 Ast != null ? Ast.GetType().Name : "<unknown>",
                 GetType().Name,
-                Ast != null ? Ast.GetStart(ProjectEntry.Tree.LocationResolver) : SourceLocation.Invalid
+                Ast != null && ProjectEntry != null && ProjectEntry.Tree != null ?
+                    Ast.GetStart(ProjectEntry.Tree.LocationResolver) : SourceLocation.Invalid
             );
         }
 

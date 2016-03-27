@@ -16,6 +16,8 @@
 
 using System;
 using System.IO;
+using System.Threading.Tasks;
+using System.Threading;
 using System.Windows;
 using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio;
@@ -27,24 +29,27 @@ namespace Microsoft.NodejsTools.Commands {
     /// Provides the command to import a project from existing code.
     /// </summary>
     class ImportWizardCommand : Command {
+
         public override void DoCommand(object sender, EventArgs args) {
             var statusBar = (IVsStatusbar)CommonPackage.GetGlobalService(typeof(SVsStatusbar));
             statusBar.SetText("Importing project...");
 
             var dlg = new Microsoft.NodejsTools.Project.ImportWizard.ImportWizard();
+            int commandIdToRaise = (int)VSConstants.VSStd97CmdID.OpenProject;
             
             Microsoft.VisualStudio.Shell.OleMenuCmdEventArgs oleArgs = args as Microsoft.VisualStudio.Shell.OleMenuCmdEventArgs;
             if (oleArgs != null) {
                 string projectArgs = oleArgs.InValue as string;
                 if (projectArgs != null) {
                     var argItems = projectArgs.Split('|');
-                    if (argItems.Length == 2) {
+                    if (argItems.Length == 3) {
                         dlg.ImportSettings.ProjectPath = CommonUtils.GetAvailableFilename(
                             argItems[1], 
                             argItems[0], 
                             ".njsproj"
                         );
                         dlg.ImportSettings.SourcePath = argItems[1];
+                        commandIdToRaise = int.Parse(argItems[2]);
                     }
                 }
             }
@@ -81,12 +86,15 @@ namespace Microsoft.NodejsTools.Commands {
                         }
                         if (File.Exists(path)) {
                             object outRef = null, pathRef = "\"" + path + "\"";
-                            NodejsPackage.Instance.DTE.Commands.Raise(VSConstants.GUID_VSStandardCommandSet97.ToString("B"), (int)VSConstants.VSStd97CmdID.OpenProject, ref pathRef, ref outRef);
+                            NodejsPackage.Instance.DTE.Commands.Raise(VSConstants.GUID_VSStandardCommandSet97.ToString("B"), commandIdToRaise, ref pathRef, ref outRef);
                             statusBar.SetText(String.Empty);
                         } else {
                             statusBar.SetText("An error occurred and your project was not created.");
                         }
-                    }, System.Threading.Tasks.TaskScheduler.FromCurrentSynchronizationContext());
+                    },
+                    CancellationToken.None,
+                    TaskContinuationOptions.HideScheduler,
+                    System.Threading.Tasks.TaskScheduler.FromCurrentSynchronizationContext());
             } else {
                 statusBar.SetText("");
             }

@@ -102,27 +102,38 @@ namespace Microsoft.NodejsTools.Options {
             }
         }
 
-        internal string CompletionCommittedBy {
+        internal bool OnlyTabOrEnterToCommit {
             get {
-                return _completionCommittedBy.Text;
+                return _onlyTabOrEnterToCommit.Checked;
             }
             set {
-                _completionCommittedBy.Text = value;
+                _onlyTabOrEnterToCommit.Checked = value;
+            }
+        }
+
+        internal bool ShowCompletionListAfterCharacterTyped {
+            get {
+                return _showCompletionListAfterCharacterTyped.Checked;
+            }
+            set {
+                _showCompletionListAfterCharacterTyped.Checked = value;
             }
         }
 
         internal void SyncPageWithControlSettings(NodejsIntellisenseOptionsPage page) {
             page.AnalysisLevel = AnalysisLevel;
             page.AnalysisLogMax = AnalysisLogMaximum;
-            page.CompletionCommittedBy = CompletionCommittedBy;
             page.SaveToDisk = SaveToDisk;
+            page.OnlyTabOrEnterToCommit = OnlyTabOrEnterToCommit;
+            page.ShowCompletionListAfterCharacterTyped = ShowCompletionListAfterCharacterTyped;
         }
 
         internal void SyncControlWithPageSettings(NodejsIntellisenseOptionsPage page) {
             AnalysisLevel = page.AnalysisLevel;
             AnalysisLogMaximum = page.AnalysisLogMax;
-            CompletionCommittedBy = page.CompletionCommittedBy;
             SaveToDisk = page.SaveToDisk;
+            OnlyTabOrEnterToCommit = page.OnlyTabOrEnterToCommit;
+            ShowCompletionListAfterCharacterTyped = page.ShowCompletionListAfterCharacterTyped;
         }
 
         private void _analysisPreviewFeedbackLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {

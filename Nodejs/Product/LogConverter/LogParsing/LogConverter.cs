@@ -598,8 +598,9 @@ namespace Microsoft.NodejsTools.LogParsing {
                     }
                     switch (records[0]) {
                         case "code-creation":
-                            var funcInfo = ExtractNamespaceAndMethodName(records[4]);
-                            if (funcInfo.LineNumber != null && funcInfo.Filename != null) {
+                            int shift = (_nodeVersion >= v012 ? 1 : 0);
+                            var funcInfo = ExtractNamespaceAndMethodName(records[shift + 4]);
+                            if (funcInfo.LineNumber != null && !String.IsNullOrWhiteSpace(funcInfo.Filename)) {
                                 pdbCode.Append(String.Format(@"
 #line {0} ""{1}""
 public static void X{2:X}() {{

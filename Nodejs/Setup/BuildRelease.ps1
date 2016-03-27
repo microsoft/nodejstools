@@ -21,7 +21,7 @@
     [Optional] The VS version to build for. If omitted, builds for all versions
     that are installed.
     
-    Valid values: "11.0", "12.0", "14.0"
+    Valid values: "11.0", "12.0", "14.0", "15.0"
 
 .Parameter name
     [Optional] A suffix to append to the name of the build.
@@ -241,12 +241,14 @@ $managed_files = (
     "Microsoft.NodejsTools.PressAnyKey.exe",
     "Microsoft.NodejsTools.Telemetry.11.0.dll",
     "Microsoft.NodejsTools.Telemetry.12.0.dll",
-    "Microsoft.NodejsTools.Telemetry.14.0.dll"
+    "Microsoft.NodejsTools.Telemetry.14.0.dll",
+    "Microsoft.NodejsTools.Telemetry.15.0.dll"
 )
 
 $native_files = @()
 
 $supported_vs_versions = (
+    @{number="15.0"; name="VS vNext"; build_by_default=$true},    
     @{number="14.0"; name="VS 2015"; build_by_default=$true},
     @{number="12.0"; name="VS 2013"; build_by_default=$true},
     @{number="11.0"; name="VS 2012"; build_by_default=$true}
@@ -323,7 +325,7 @@ if ($name) {
 $version_file_backed_up = 0
 # Force use of a backup if there are pending changes to $version_file
 $version_file_force_backup = 0
-$has_tf_workspace = (-not (tf workspaces | Select-String -pattern "No workspace", "Unable to determine the workspace"))
+$has_tf_workspace = (Get-Command tf -errorAction SilentlyContinue) -and (-not (tf workspaces | Select-String -pattern "No workspace", "Unable to determine the workspace"))
 if ($has_tf_workspace) {
     if (-not (tf status $version_file /format:detailed | Select-String "There are no pending changes.")) {
         Write-Output "$version_file has pending changes. Using backup instead of tf undo."
@@ -561,7 +563,7 @@ try {
 
                     $jobs += begin_sign_files $msi_files $i.signed_msidir $approvers `
                         $project_name $project_url "$project_name $($i.VSName) - installer" $project_keywords `
-                        "authenticode"
+                        "msi"
                 }
 
 
@@ -575,7 +577,7 @@ try {
 
                     $jobs += begin_sign_files $vsix_files $i.signed_msidir $approvers `
                         $project_name $project_url "$project_name $($i.VSName) - VSIX" $project_keywords `
-                        "authenticode;opc"
+                        "vsix"
                 }
             }
 

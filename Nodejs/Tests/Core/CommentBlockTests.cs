@@ -22,7 +22,7 @@ using TestUtilities.Mocks;
 namespace NodejsTests {
     [TestClass]
     public class CommentBlockTests {
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestCommentCurrentLine() {
             var view = new MockTextView(
                 new MockTextBuffer(@"console.log('Hello');
@@ -45,7 +45,7 @@ console.log('Goodbye');",
                  view.TextBuffer.CurrentSnapshot.GetText());
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestUnCommentCurrentLine() {
             var view = new MockTextView(
                 new MockTextBuffer(@"//console.log('Hello');
@@ -68,7 +68,7 @@ console.log('Goodbye');",
                 view.TextBuffer.CurrentSnapshot.GetText());
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestComment() {
             var view = new MockTextView(
                 new MockTextBuffer(@"console.log('Hello');
@@ -86,7 +86,7 @@ console.log('Goodbye');"));
                  view.TextBuffer.CurrentSnapshot.GetText());
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestCommentEmptyLine() {
             var view = new MockTextView(
                 new MockTextBuffer(@"console.log('Hello');
@@ -106,7 +106,7 @@ console.log('Goodbye');"));
                  view.TextBuffer.CurrentSnapshot.GetText());
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestCommentWhiteSpaceLine() {
             var view = new MockTextView(
                 new MockTextBuffer(@"console.log('Hello');
@@ -126,7 +126,7 @@ console.log('Goodbye');"));
                  view.TextBuffer.CurrentSnapshot.GetText());
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestCommentIndented() {
             var view = new MockTextView(
                 new MockTextBuffer(@"function f(){
@@ -153,7 +153,7 @@ console.log('Goodbye');"));
                     view.TextBuffer.CurrentSnapshot.GetText());
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestCommentIndentedBlankLine() {
             var view = new MockTextView(
                 new MockTextBuffer(@"function f(){
@@ -182,7 +182,7 @@ console.log('Goodbye');"));
                     view.TextBuffer.CurrentSnapshot.GetText());
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestCommentBlankLine() {
             var view = new MockTextView(
                 new MockTextBuffer(@"console.log('hi');
@@ -199,7 +199,7 @@ console.log('bye');",
              view.TextBuffer.CurrentSnapshot.GetText());
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestCommentIndentedWhiteSpaceLine() {
             var view = new MockTextView(
                 new MockTextBuffer(@"function f(){
@@ -228,7 +228,7 @@ console.log('bye');",
                     view.TextBuffer.CurrentSnapshot.GetText());
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestUnCommentIndented() {
             var view = new MockTextView(
                 new MockTextBuffer(@"function f(){
@@ -255,7 +255,7 @@ console.log('bye');",
                     view.TextBuffer.CurrentSnapshot.GetText());
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestUnComment() {
             var view = new MockTextView(
                 new MockTextBuffer(@"//console.log('Hello');
@@ -273,7 +273,7 @@ console.log('Goodbye');",
                 view.TextBuffer.CurrentSnapshot.GetText());
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestCommentStartOfLastLine() {
             var view = new MockTextView(
                 new MockTextBuffer(@"console.log('Hello');
@@ -291,7 +291,7 @@ console.log('Goodbye');",
                 view.TextBuffer.CurrentSnapshot.GetText());
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestCommentAfterCodeIsNotUncommented() {
             var view = new MockTextView(
                 new MockTextBuffer(@"console.log('Hello');//comment that should stay a comment;

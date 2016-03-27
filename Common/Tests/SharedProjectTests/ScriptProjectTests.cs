@@ -44,6 +44,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// Renaming the folder containing the startup script should update the startup script
         /// https://nodejstools.codeplex.com/workitem/476
         /// </summary>
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void RenameStartupFileFolder() {
@@ -70,6 +71,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void RenameStartupFile() {

@@ -315,7 +315,6 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         private static IAnalysisSet FsBasename(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
-            CallNode call = (CallNode)node;
             IAnalysisSet res = AnalysisSet.Empty;
             if (args.Length == 2) {
                 foreach (var extArg in args[1]) {
@@ -341,8 +340,8 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         private static IAnalysisSet FsReadDirSync(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
-            CallNode call = (CallNode)node;
-            if (call.Arguments.Length == 1) {
+            var call = node as CallNode;
+            if (call != null && call.Arguments.Length == 1) {
                 var ee = new ExpressionEvaluator(unit);
                 IAnalysisSet arraySet;
                 ReadDirSyncArrayValue array;
@@ -451,7 +450,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 if (@this != null) {
                     foreach (var thisArg in @this) {
                         ExpandoValue expando = @thisArg.Value as ExpandoValue;
-                        if (expando != null) {
+                        if (expando != null && args[0].Count < unit.Analyzer.Limits.MaxEvents) {
                             foreach (var arg in args[0]) {
                                 var strValue = arg.Value.GetStringValue();
                                 if (strValue != null) {

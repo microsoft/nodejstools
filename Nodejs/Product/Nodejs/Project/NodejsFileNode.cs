@@ -17,6 +17,7 @@
 using System;
 using System.IO;
 using Microsoft.VisualStudioTools.Project;
+using Microsoft.VisualStudioTools;
 #if DEV14_OR_LATER
 using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Imaging;
@@ -28,16 +29,24 @@ namespace Microsoft.NodejsTools.Project {
 
         public NodejsFileNode(NodejsProjectNode root, ProjectElement e)
             : base(root, e) {
-            string referenceBaseName = Path.GetFileNameWithoutExtension(Caption);
-
 #if FALSE
             CreateWatcher(Url);
 #endif
             if (Url.Contains(AnalysisConstants.NodeModulesFolder)) {
-                root.DelayedAnalysisQueue.Enqueue(this);
+                root.EnqueueForDelayedAnalysis(this);
             } else {
                 Analyze();
             }
+        }
+
+        protected override void OnParentSet(HierarchyNode parent) {
+#if DEV14
+            if (Url.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase) && Url.IndexOf(@"\typings\", StringComparison.OrdinalIgnoreCase) >= 0) {
+                ProjectMgr.Site.GetUIThread().Invoke(() => {
+                    this.IncludeInProject(true);
+                });
+            }
+#endif
         }
 
         internal void Analyze() {
@@ -52,7 +61,8 @@ namespace Microsoft.NodejsTools.Project {
             get {
                 // We analyze if we are a member item or the file is included
                 // Also, it should either be marked as compile or not have an item type name (value is null for node_modules
-                return !ProjectMgr.DelayedAnalysisQueue.Contains(this) &&
+                return !Url.Contains(NodejsConstants.NodeModulesStagingFolder) &&
+                    !ProjectMgr.DelayedAnalysisQueue.Contains(this) &&
                     (!IsNonMemberItem || ProjectMgr.IncludeNodejsFile(this)) &&
                     (ItemNode.ItemTypeName == ProjectFileConstants.Compile || string.IsNullOrEmpty(ItemNode.ItemTypeName));
 
@@ -81,15 +91,21 @@ namespace Microsoft.NodejsTools.Project {
             }
 
             var includeInProject = base.IncludeInProject(includeChildren);
-            
+
             if (isContent && Url.EndsWith(".js", StringComparison.OrdinalIgnoreCase)) {
                 this.ItemNode.ItemTypeName = ProjectFileConstants.Content;
             }
-            
+
             ProjectMgr.Analyzer.AnalyzeFile(Url, ShouldAnalyze);
-            
+
             UpdateParentContentType();
             ItemNode.ItemTypeChanged += ItemNode_ItemTypeChanged;
+
+#if DEV14
+            ProjectMgr.Site.GetUIThread().Invoke(() => {
+                ProjectMgr.OnItemAdded(this.Parent, this);
+            });
+#endif
 
             return includeInProject;
         }
@@ -99,10 +115,10 @@ namespace Microsoft.NodejsTools.Project {
             // Don't report errors since the file won't remain part of the project. This removes the errors from the list.
             ProjectMgr.Analyzer.AnalyzeFile(Url, false);
             var excludeFromProject = base.ExcludeFromProject();
-            
+
             UpdateParentContentType();
             ItemNode.ItemTypeChanged -= ItemNode_ItemTypeChanged;
-            
+
             return excludeFromProject;
         }
 
@@ -119,7 +135,7 @@ namespace Microsoft.NodejsTools.Project {
             base.RenameChildNodes(parentNode);
             this.ProjectMgr.Analyzer.ReloadComplete();
         }
-        
+
         protected override NodeProperties CreatePropertiesObject() {
             if (IsLinkFile) {
                 return new NodejsLinkFileNodeProperties(this);
@@ -137,7 +153,7 @@ namespace Microsoft.NodejsTools.Project {
 
             UpdateParentContentType();
         }
-        
+
         private void UpdateParentContentType() {
             var parent = this.Parent as NodejsFolderNode;
             if (parent != null) {
@@ -187,12 +203,6 @@ namespace Microsoft.NodejsTools.Project {
                     CreateWatcher(oldName);
                 }
             }
-        }
-
-        public override int SetEditLabel(string label) {
-            var res = base.SetEditLabel(label);
-
-            return res;
         }
 
         public new NodejsProjectNode ProjectMgr {

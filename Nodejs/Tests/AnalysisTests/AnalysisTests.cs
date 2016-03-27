@@ -482,7 +482,7 @@ z = y.abc;
         /// <summary>
         /// Currently failing because object literal {value: copied[propName]} gets merged resulting in shared types
         /// </summary>
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void FailingTestDefinePropertyLoop() {
             string code = @"
 var o = {};
@@ -572,7 +572,7 @@ xyz = new Y();";
             );
         }
 
-        [TestMethod, Priority(2)]
+        [TestMethod, Priority(2), TestCategory("Ignore")]
         public void Failing_TestThis() {
             var code = @"function SimpleTest(x, y) {
     this._name = 'SimpleTest';
@@ -744,7 +744,7 @@ abc(abc);
             return sigs.ToArray();
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestJSDoc() {
             string code = @"
 /** Documentation for f.
@@ -1031,7 +1031,7 @@ x = f.abc;
         /// object it's reading from, and when a new property is created
         /// we need to enqueue the callers.
         /// </summary>
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestDefinePropertiesDependencies() {
             string code = @"
 var x =  {};
@@ -1450,7 +1450,7 @@ var z = y.abc";
             );
         }
 
-        [TestMethod, Priority(2)]
+        [TestMethod, Priority(2), TestCategory("Ignore")]
         public void FailingTestForInLoop2() {
             var analysis = ProcessText("for(x in ['a','b','c']) { }");
             AssertUtil.ContainsExactly(

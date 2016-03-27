@@ -165,7 +165,7 @@ namespace Microsoft.NodejsTools.Commands {
                 }
             }
 
-            res.AppendLine(String.Format("Intellisense Completion Committed By: {0}", NodejsPackage.Instance.IntellisenseOptionsPage.CompletionCommittedBy));
+            res.AppendLine(String.Format("IntelliSense Completion Only Tab or Enter to Commit: {0}", NodejsPackage.Instance.IntellisenseOptionsPage.OnlyTabOrEnterToCommit));
             res.AppendLine();
 
             return res.ToString();

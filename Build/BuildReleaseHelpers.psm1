@@ -59,8 +59,8 @@ function begin_sign_files {
         }
     }
     
-    [Reflection.Assembly]::Load("CODESIGN.Submitter, Version=3.0.0.6, Culture=neutral, PublicKeyToken=3d8252bd1272440d, processorArchitecture=MSIL") | Out-Null
-    [Reflection.Assembly]::Load("CODESIGN.PolicyManager, Version=1.0.0.0, Culture=neutral, PublicKeyToken=3d8252bd1272440d, processorArchitecture=MSIL") | Out-Null
+    [Reflection.Assembly]::Load("CODESIGN.Submitter, Version=4.1.0.0, Culture=neutral, PublicKeyToken=3d8252bd1272440d, processorArchitecture=MSIL") | Out-Null
+    [Reflection.Assembly]::Load("CODESIGN.PolicyManager, Version=4.1.0.0, Culture=neutral, PublicKeyToken=3d8252bd1272440d, processorArchitecture=MSIL") | Out-Null
 
     while ($True) {
         try {
@@ -69,13 +69,16 @@ function begin_sign_files {
             $job.Keywords = $jobKeywords
             
             if ($certificates -match "authenticode") {
-                $job.SelectCertificate("10006")  # Authenticode
+                $job.SelectCertificate("401")  # Authenticode
+            }
+            if ($certificates -match "msi") {
+                $job.SelectCertificate("400")  # Authenticode
             }
             if ($certificates -match "strongname") {
                 $job.SelectCertificate("67")     # StrongName key
             }
-            if ($certificates -match "opc") {
-                $job.SelectCertificate("160")     # Microsoft OPC Publisher (VSIX)
+            if ($certificates -match "vsix") {
+                $job.SelectCertificate("10040160")     # Microsoft OPC Publisher (VSIX)
             }
             
             foreach ($approver in $approvers) {

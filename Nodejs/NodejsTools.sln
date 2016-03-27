@@ -1,4 +1,4 @@
-﻿
+﻿﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
@@ -188,9 +188,9 @@ Global
 		{A390E1C0-0D90-4A9E-8413-3E959BB07292}.Release|x86.ActiveCfg = Release|x86
 		{A390E1C0-0D90-4A9E-8413-3E959BB07292}.Release|x86.Build.0 = Release|x86
 		{61A8D7EF-B83E-4C21-9479-BA832357E42C}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{61A8D7EF-B83E-4C21-9479-BA832357E42C}.Debug|x86.Build.0 = Debug|Any CPU
-		{61A8D7EF-B83E-4C21-9479-BA832357E42C}.Release|x86.ActiveCfg = Debug|Any CPU
-		{61A8D7EF-B83E-4C21-9479-BA832357E42C}.Release|x86.Build.0 = Debug|Any CPU
+ 		{61A8D7EF-B83E-4C21-9479-BA832357E42C}.Debug|x86.Build.0 = Debug|Any CPU
+ 		{61A8D7EF-B83E-4C21-9479-BA832357E42C}.Release|x86.ActiveCfg = Debug|Any CPU
+ 		{61A8D7EF-B83E-4C21-9479-BA832357E42C}.Release|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

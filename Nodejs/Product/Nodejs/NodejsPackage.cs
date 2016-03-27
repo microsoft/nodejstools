@@ -36,6 +36,7 @@ using Microsoft.NodejsTools.Jade;
 using Microsoft.NodejsTools.Logging;
 using Microsoft.NodejsTools.Options;
 using Microsoft.NodejsTools.Project;
+using Microsoft.NodejsTools.ProjectWizard;
 using Microsoft.NodejsTools.Repl;
 using Microsoft.NodejsTools.Telemetry;
 using Microsoft.VisualStudio;
@@ -110,6 +111,9 @@ namespace Microsoft.NodejsTools {
         internal VsProjectAnalyzer _analyzer;
         private NodejsToolsLogger _logger;
         private ITelemetryLogger _telemetryLogger;
+        // Hold references for the subscribed events. Otherwise the callbacks will be garbage collected
+        // after the initialization
+        private List<EnvDTE.CommandEvents> _subscribedCommandEvents = new List<EnvDTE.CommandEvents>();
 
         /// <summary>
         /// Default constructor of the package.
@@ -190,7 +194,13 @@ namespace Microsoft.NodejsTools {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
 
-            var langService = new NodejsLanguageInfo(this);
+            SubscribeToVsCommandEvents(
+                (int)VSConstants.VSStd97CmdID.AddNewProject,
+                delegate { NewProjectFromExistingWizard.IsAddNewProjectCmd = true; },
+                delegate { NewProjectFromExistingWizard.IsAddNewProjectCmd = false; }
+            );
+
+             var langService = new NodejsLanguageInfo(this);
             ((IServiceContainer)this).AddService(langService.GetType(), langService, true);
 
             ((IServiceContainer)this).AddService(typeof(ClipboardServiceBase), new ClipboardService(), true);
@@ -245,6 +255,22 @@ namespace Microsoft.NodejsTools {
             // the NTVS test discoverer and test executor to connect back to VS.
             Environment.SetEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable, Process.GetCurrentProcess().Id.ToString());
         }
+
+        private void SubscribeToVsCommandEvents(
+            int eventId, 
+            EnvDTE._dispCommandEvents_BeforeExecuteEventHandler beforeExecute = null,
+            EnvDTE._dispCommandEvents_AfterExecuteEventHandler afterExecute = null) {
+            var commandEventGuid = typeof(VSConstants.VSStd97CmdID).GUID.ToString("B");
+            var targetEvent = DTE.Events.CommandEvents[commandEventGuid, eventId];
+            if (beforeExecute != null) {
+                targetEvent.BeforeExecute += beforeExecute;
+            }
+            if (afterExecute != null) {
+                targetEvent.AfterExecute += afterExecute;
+            }
+            _subscribedCommandEvents.Add(targetEvent);
+        }
+
 
         private void IntellisenseOptionsPage_AnalysisLogMaximumChanged(object sender, EventArgs e) {
             if (_analyzer != null) {

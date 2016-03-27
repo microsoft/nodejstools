@@ -17,12 +17,21 @@
 using System;
 using System.IO;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Npm {
     public class ReaderPackageJsonSource : IPackageJsonSource {
         public ReaderPackageJsonSource(TextReader reader) {
             try {
-                Package = JsonConvert.DeserializeObject(reader.ReadToEnd());
+                var text = reader.ReadToEnd();
+                try {
+                    // JsonConvert and JObject.Parse exhibit slightly different behavior,
+                    // so fall back to JObject.Parse if JsonConvert does not properly deserialize
+                    // the object.
+                    Package = JsonConvert.DeserializeObject(text);
+                } catch (ArgumentException) {
+                    Package = JObject.Parse(text);
+                }
             } catch (JsonReaderException jre) {
                 WrapExceptionAndRethrow(jre);
             } catch (JsonSerializationException jse) {

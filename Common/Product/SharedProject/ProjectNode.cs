@@ -4306,7 +4306,7 @@ If the files in the existing folder have the same names as files in the folder y
                     continue;
                 }
 
-                if (parent.AllChildren.Any(n => candidate == n.GetEditLabel())) {
+                if (parent.AllChildren.Any(n => candidate == n.GetItemName())) {
                     // Cannot create a node if one exists with the same name.
                     continue;
                 }

@@ -28,6 +28,7 @@ var assemblies = [
     'ProfilerTests',
     'TestAdapterTests',
     'NpmTests',
+    'MockVsTests',
     'Microsoft.NodejsTools',
     'Microsoft.NodejsTools.Analysis',
     'Microsoft.NodejsTools.Profiling',
@@ -41,7 +42,8 @@ var assemblies = [
     'Microsoft.NodejsTools.PressAnyKey',
     'Microsoft.NodejsTools.Telemetry.11.0',
     'Microsoft.NodejsTools.Telemetry.12.0',
-    'Microsoft.NodejsTools.Telemetry.14.0'
+    'Microsoft.NodejsTools.Telemetry.14.0',
+    'Microsoft.NodejsTools.Telemetry.15.0'
 ].sort();
 
 var files = [

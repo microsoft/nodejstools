@@ -42,8 +42,8 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this._selectionInCompletionListGroupBox = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
-            this._completionCommittedBy = new System.Windows.Forms.TextBox();
-            this._completionCommittedByLabel = new System.Windows.Forms.Label();
+            this._onlyTabOrEnterToCommit = new System.Windows.Forms.CheckBox();
+            this._showCompletionListAfterCharacterTyped = new System.Windows.Forms.CheckBox();
             toolTip = new System.Windows.Forms.ToolTip(this.components);
             intellisenseLevelGroupBox = new System.Windows.Forms.GroupBox();
             saveToDiskGroupBox = new System.Windows.Forms.GroupBox();
@@ -182,19 +182,21 @@
             // tableLayoutPanel3
             // 
             resources.ApplyResources(this.tableLayoutPanel3, "tableLayoutPanel3");
-            this.tableLayoutPanel3.Controls.Add(this._completionCommittedBy, 0, 1);
-            this.tableLayoutPanel3.Controls.Add(this._completionCommittedByLabel, 0, 0);
+            this.tableLayoutPanel3.Controls.Add(this._onlyTabOrEnterToCommit, 0, 0);
+            this.tableLayoutPanel3.Controls.Add(this._showCompletionListAfterCharacterTyped, 0, 1);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
             // 
-            // _completionCommittedBy
+            // _onlyTabOrEnterToCommit
             // 
-            resources.ApplyResources(this._completionCommittedBy, "_completionCommittedBy");
-            this._completionCommittedBy.Name = "_completionCommittedBy";
+            resources.ApplyResources(this._onlyTabOrEnterToCommit, "_onlyTabOrEnterToCommit");
+            this._onlyTabOrEnterToCommit.Name = "_onlyTabOrEnterToCommit";
+            this._onlyTabOrEnterToCommit.UseVisualStyleBackColor = true;
             // 
-            // _completionCommittedByLabel
+            // _showCompletionListAfterCharacterTyped
             // 
-            resources.ApplyResources(this._completionCommittedByLabel, "_completionCommittedByLabel");
-            this._completionCommittedByLabel.Name = "_completionCommittedByLabel";
+            resources.ApplyResources(this._showCompletionListAfterCharacterTyped, "_showCompletionListAfterCharacterTyped");
+            this._showCompletionListAfterCharacterTyped.Name = "_showCompletionListAfterCharacterTyped";
+            this._showCompletionListAfterCharacterTyped.UseVisualStyleBackColor = true;
             // 
             // NodejsIntellisenseOptionsControl
             // 
@@ -226,8 +228,6 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.GroupBox _selectionInCompletionListGroupBox;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
-        private System.Windows.Forms.TextBox _completionCommittedBy;
-        private System.Windows.Forms.Label _completionCommittedByLabel;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
         private System.Windows.Forms.RadioButton _saveToDiskDisabledRadioButton;
         private System.Windows.Forms.RadioButton _saveToDiskEnabledRadioButton;
@@ -239,5 +239,7 @@
         private System.Windows.Forms.Label _analysisLogMaxLabel;
         private System.Windows.Forms.RadioButton _fullIntelliSenseRadioButton;
         private System.Windows.Forms.LinkLabel _analysisPreviewFeedbackLinkLabel;
+        private System.Windows.Forms.CheckBox _onlyTabOrEnterToCommit;
+        private System.Windows.Forms.CheckBox _showCompletionListAfterCharacterTyped;
     }
 }

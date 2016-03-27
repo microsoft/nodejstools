@@ -11,7 +11,6 @@
         <DirectoryRef Id="Dir_$(var.key)InstallLocation">
             <Directory Id="Dir_$(var.key)InstallLocationFileTemplates" Name="FileTemplates">
                 <Directory Id="Dir_$(var.key)FileTemplatesNewItem" Name="NewItem" />
-                <Directory Id="Dir_$(var.key)FileTemplatesReferenceFiles" Name="ReferenceFiles" />
             </Directory>
             <Directory Id="Dir_$(var.key)TestFrameworks" Name="TestFrameworks">
                 <Directory Id="Dir_$(var.key)TestFrameworksExportRunner" Name="ExportRunner" />

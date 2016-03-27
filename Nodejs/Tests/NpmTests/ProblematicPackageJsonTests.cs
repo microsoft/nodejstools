@@ -63,7 +63,7 @@ namespace NpmTests {
             TestFreshPackage("doublecomma");
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         [ExpectedException(typeof(PackageJsonException))]
         public void TestParseDuplicateProperty() {
             TestFreshPackage("duplicateproperty");
@@ -128,12 +128,12 @@ namespace NpmTests {
             TestFreshPackage("missingpropnamequotes");
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestParseMissingTrailingBrace() {
             TestFreshPackage("missingtrailingbrace");
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestParseMissingTrailingListBrace() {
             TestFreshPackage("missingtrailinglistbrace");
         }

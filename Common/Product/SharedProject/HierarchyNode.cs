@@ -384,9 +384,9 @@ namespace Microsoft.VisualStudioTools.Project {
             }
             set {
                 this.parentNode = value;
+                OnParentSet(value);
             }
         }
-
 
         [System.ComponentModel.BrowsableAttribute(false)]
         public uint ID {
@@ -590,7 +590,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     break;
 
                 case __VSHPROPID.VSHPROPID_Name:
-                    result = this.Caption;
+                    result = this.GetItemName();
                     break;
 
                 case __VSHPROPID.VSHPROPID_ExpandByDefault:
@@ -686,7 +686,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
                 case __VSHPROPID.VSHPROPID_SaveName:
                     //SaveName is the name shown in the Save and the Save Changes dialog boxes.
-                    result = this.Caption;
+                    result = this.GetItemName();
                     break;
 
                 case __VSHPROPID.VSHPROPID_ExtObject:
@@ -874,7 +874,15 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         /// <returns>the node cation</returns>
         public virtual string GetEditLabel() {
-            return this.Caption;
+            return GetItemName();
+        }
+
+        /// <summary>
+        /// Returns the underlying file or directory name based on the Url.
+        /// </summary>
+        /// <returns></returns>
+        public string GetItemName() {
+            return CommonUtils.GetFileOrDirectoryName(Url);
         }
 
         /// <summary>
@@ -963,6 +971,12 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
+        /// <summary>
+        /// Invoked when the Node's parent is updated.
+        /// </summary>
+        /// <param name="parent">New parent node.</param>
+        protected virtual void OnParentSet(HierarchyNode parent) { /*noop*/ }
+
         protected virtual void RaiseOnItemRemoved(string documentToRemove, string[] filesToBeDeleted) {
             if (!String.IsNullOrWhiteSpace(documentToRemove)) {
                 // Notify document tracker listeners that we have removed the item.
@@ -996,11 +1010,11 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
         /// <summary>
-        /// Returns the relational name which is defined as the first part of the caption until indexof NameRelationSeparator
+        /// Returns the relational name which is defined as the first part of the edit label until indexof NameRelationSeparator
         /// </summary>
         public virtual string GetRelationalName() {
             //Get the first part of the caption
-            string[] partsOfParent = this.Caption.Split(new string[] { this.NameRelationSeparator }, StringSplitOptions.None);
+            string[] partsOfParent = this.GetItemName().Split(new string[] { this.NameRelationSeparator }, StringSplitOptions.None);
             return partsOfParent[0];
         }
 
@@ -1010,11 +1024,11 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         /// <returns>The extension</returns>
         public virtual string GetRelationNameExtension() {
-            return this.Caption.Substring(this.Caption.IndexOf(this.NameRelationSeparator, StringComparison.Ordinal));
+            return this.GetItemName().Substring(this.GetItemName().IndexOf(this.NameRelationSeparator, StringComparison.Ordinal));
         }
 
         /// <summary>
-        /// Close open document frame for a specific node.
+        /// Close open document frame for a specific fnode.
         /// </summary> 
         protected void CloseDocumentWindow(HierarchyNode node) {
             Utilities.ArgumentNotNull("node", node);
@@ -1772,7 +1786,8 @@ namespace Microsoft.VisualStudioTools.Project {
                 }
             }
 
-            node.parentNode = this;
+            node.Parent = this;
+
             ProjectMgr.OnItemAdded(this, node, previousVisible);
 #if DEV10
             // Dev10 won't check the IsHiddenItem flag when we add an item, and it'll just

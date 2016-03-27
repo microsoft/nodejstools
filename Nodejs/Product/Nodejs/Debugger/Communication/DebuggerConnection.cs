@@ -37,6 +37,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         private INetworkClient _networkClient;
         private readonly object _networkClientLock = new object();
         private volatile Version _nodeVersion;
+        private bool _isClosed = false;
 
         public DebuggerConnection(INetworkClientFactory networkClientFactory) {
             Utilities.ArgumentNotNull("networkClientFactory", networkClientFactory);
@@ -52,6 +53,8 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         /// Close connection.
         /// </summary>
         public void Close() {
+            _isClosed = true;
+
             lock (_networkClientLock) {
                 if (_networkClient != null) {
                     _networkClient.Dispose();
@@ -144,7 +147,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                             throw;
                         }
                         LiveLogger.WriteLine("Connection attempt {0} failed with: {1}", connection_attempts, ex);
-                        if (connection_attempts >= MAX_ATTEMPTS) {
+                        if (_isClosed || connection_attempts >= MAX_ATTEMPTS) {
                             throw;
                         }
                         else {

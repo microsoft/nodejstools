@@ -193,6 +193,13 @@ namespace Microsoft.NodejsTools.Intellisense {
                             UpdateCurrentParameter();
                         }
                         break;
+                    default:
+                        if (IsIdentifierFirstChar(ch) && _activeSession == null
+                            && NodejsPackage.Instance.LangPrefs.AutoListMembers
+                            && NodejsPackage.Instance.IntellisenseOptionsPage.ShowCompletionListAfterCharacterTyped) {
+                            TriggerCompletionSession(false);
+                        }
+                        break;
                 }
             }
         }
@@ -495,8 +502,8 @@ namespace Microsoft.NodejsTools.Intellisense {
                                 committedBy = "\"";
                             }
                         } else {
-                            committedBy = NodejsPackage.Instance != null ?
-                                NodejsPackage.Instance.IntellisenseOptionsPage.CompletionCommittedBy :
+                            committedBy = NodejsPackage.Instance != null && NodejsPackage.Instance.IntellisenseOptionsPage.OnlyTabOrEnterToCommit ?
+                                string.Empty :
                                 NodejsConstants.DefaultIntellisenseCompletionCommittedBy;
                         }
 
@@ -640,7 +647,8 @@ namespace Microsoft.NodejsTools.Intellisense {
                         case VSConstants.VSStd2KCmdID.COMPLETEWORD:
                             ForceCompletions = true;
                             try {
-                                TriggerCompletionSession((VSConstants.VSStd2KCmdID)nCmdID == VSConstants.VSStd2KCmdID.COMPLETEWORD);
+                                TriggerCompletionSession((VSConstants.VSStd2KCmdID)nCmdID == VSConstants.VSStd2KCmdID.COMPLETEWORD
+                                    && !NodejsPackage.Instance.IntellisenseOptionsPage.OnlyTabOrEnterToCommit);
                             } finally {
                                 ForceCompletions = false;
                             }
@@ -725,8 +733,12 @@ namespace Microsoft.NodejsTools.Intellisense {
                 || (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9');
         }
 
+        private static bool IsIdentifierFirstChar(char ch) {
+            return ch == '_' || ch == '$'|| (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
+        }
+
         private static bool IsIdentifierChar(char ch) {
-            return ch == '_' || (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9');
+            return IsIdentifierFirstChar(ch) || (ch >= '0' && ch <= '9');
         }
 
         private bool EnterOnCompleteText() {

@@ -27,12 +27,14 @@ using Mouse = TestUtilities.UI.Mouse;
 namespace Microsoft.VisualStudioTools.SharedProjectTests {
     [TestClass]
     public class NewDragDropCopyCutPaste : SharedProjectTest {
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void MoveToMissingFolderKeyboard() {
             MoveToMissingFolder(MoveByKeyboard);
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void MoveToMissingFolderMouse() {
@@ -248,12 +250,14 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VsTestHost")]
         public void MoveDuplicateFileNamesFoldersSkipOneKeyboard() {
             MoveDuplicateFileNamesFoldersSkipOne(MoveByKeyboard);
         }
 
+        [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VsTestHost")]
         public void MoveDuplicateFileNamesFoldersSkipOneMouse() {
@@ -483,12 +487,14 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             }
         }
 
+        [Ignore]
         [TestMethod, Priority(2), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void MoveFileFromFolderToLinkedFolderKeyboard() {
             MoveFileFromFolderToLinkedFolder(MoveByKeyboard);
         }
 
+        [Ignore]
         [TestMethod, Priority(2), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void MoveFileFromFolderToLinkedFolderMouse() {

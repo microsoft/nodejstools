@@ -25,7 +25,7 @@ using TestUtilities;
 namespace NodejsTests {
     [TestClass]
     public class TemplateTests {
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         public void TestPackageJsonTemplateEncoding() {
             var projectTemplates = Path.Combine(TestData.BinarySourceLocation, "ProjectTemplates", "JavaScript", "Node.js", "1033");
             Assert.IsTrue(Directory.Exists(projectTemplates), "Project templates are not available");

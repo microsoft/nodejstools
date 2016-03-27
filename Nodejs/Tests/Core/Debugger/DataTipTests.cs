@@ -81,7 +81,7 @@ namespace NodejsTests.Debugger.FileNameMapping {
                 new { actualSpan.iStartLine, actualSpan.iStartIndex, actualSpan.iEndLine, actualSpan.iEndIndex });
         }
 
-        [TestMethod, Priority(0), TestCategory("Debugging")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
         public void DataTipStandAloneVariable() {
             const string code = "start; middle; end";
 
@@ -92,7 +92,7 @@ namespace NodejsTests.Debugger.FileNameMapping {
             DataTipTest(code, @"(?<=mid)(?=dle)", "middle");
         }
 
-        [TestMethod, Priority(0), TestCategory("Debugging")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
         public void DataTipSelection() {
             const string code = "abc";
 
@@ -104,7 +104,7 @@ namespace NodejsTests.Debugger.FileNameMapping {
             DataTipTest(code, @"(?<=a)bc", "abc");
         }
 
-        [TestMethod, Priority(0), TestCategory("Debugging")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
         public void DataTipPropertyAccess() {
             const string code = "a.b[1-'2'].c";
 
@@ -114,7 +114,7 @@ namespace NodejsTests.Debugger.FileNameMapping {
             DataTipTest(code, @"(?=c)", "a.b[1-'2'].c");
         }
 
-        [TestMethod, Priority(0), TestCategory("Debugging")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
         public void DataTipParens() {
             const string code = "((a-b)*(c-d))";
 
@@ -123,7 +123,7 @@ namespace NodejsTests.Debugger.FileNameMapping {
             DataTipTest(code, @"(?<=d\))", code);
         }
 
-        [TestMethod, Priority(0), TestCategory("Debugging")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
         public void DataTipNoSideEffects() {
             const string code = "(1 - f(x).y - 2).z";
 
@@ -136,7 +136,7 @@ namespace NodejsTests.Debugger.FileNameMapping {
             DataTipTest(code, @"(?=z)", null);
         }
 
-        [TestMethod, Priority(0), TestCategory("Debugging")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
         public void DataTipSingleLineComment() {
             const string code = "/*a*/b/*c*/.d";
 
@@ -146,7 +146,7 @@ namespace NodejsTests.Debugger.FileNameMapping {
             DataTipTest(code, @"(?=d)", "b/*c*/.d");
         }
 
-        [TestMethod, Priority(0), TestCategory("Debugging")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
         public void DataTipMultiLineComment() {
             const string code = "//a\r\nb//c\r\n.d";
 

@@ -89,7 +89,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         }
 
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void SmartIndentBug3() {
             using (new DefaultSmartIndentOptionHolder(insertTabs: true)) {
@@ -133,7 +133,7 @@ b = c;
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void SmartIndentBasic() {
             using (new DefaultSmartIndentOptionHolder(braceCompletion:false)) {

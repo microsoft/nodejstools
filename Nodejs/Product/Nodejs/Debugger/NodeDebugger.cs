@@ -108,7 +108,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
             // Node usage: node [options] [ -e script | script.js ] [arguments]
             string allArgs = String.Format(
-                "--debug-brk={0} {1} {2}",
+                "--debug-brk={0} --nolazy {1} {2}",
                 debuggerPortOrDefault,
                 interpreterOptions,
                 script
@@ -249,6 +249,15 @@ namespace Microsoft.NodejsTools.Debugger {
             if (asyncBreakComplete != null) {
                 asyncBreakComplete(this, new ThreadEventArgs(MainThread));
             }
+        }
+
+        internal bool IsRunning() {
+            var backtraceCommand = new BacktraceCommand(CommandId, _resultFactory, fromFrame: 0, toFrame: 1);
+            var tokenSource = new CancellationTokenSource(_timeout);
+            if (TrySendRequestAsync(backtraceCommand, tokenSource.Token).GetAwaiter().GetResult()) {
+                return backtraceCommand.Running;
+            }
+            return false;
         }
 
         private void DebugWriteCommand(string commandName) {
@@ -463,14 +472,10 @@ namespace Microsoft.NodejsTools.Debugger {
                 return false;
             }
 
-            // Make step into if required
-            if (changeLiveCommand.NeedStepIn) {
+            // Make step into and update stacktrace if required
+            if (changeLiveCommand.StackModified) {
                 var continueCommand = new ContinueCommand(CommandId, SteppingKind.Into);
                 await TrySendRequestAsync(continueCommand).ConfigureAwait(false);
-            }
-
-            // Update stacktrace if required
-            if (changeLiveCommand.StackModified || changeLiveCommand.NeedStepIn) {
                 await CompleteSteppingAsync(false).ConfigureAwait(false);
             }
 
@@ -499,18 +504,17 @@ namespace Microsoft.NodejsTools.Debugger {
             if (!backTraceTask.Wait((int)_timeout.TotalMilliseconds)) {
                 throw new TimeoutException("Timed out while performing initial backtrace.");
             }
-            bool running = backTraceTask.GetAwaiter().GetResult();
 
             // At this point we can fire events
             EventHandler<ThreadEventArgs> newThread = ThreadCreated;
             if (newThread != null) {
                 newThread(this, new ThreadEventArgs(mainThread));
             }
-
-            EventHandler<ProcessLoadedEventArgs> procLoaded = ProcessLoaded;
+            EventHandler<ThreadEventArgs> procLoaded = ProcessLoaded;
             if (procLoaded != null) {
-                procLoaded(this, new ProcessLoadedEventArgs(mainThread, running));
+                procLoaded(this, new ThreadEventArgs(MainThread));
             }
+
         }
 
         private void OnConnectionClosed(object sender, EventArgs args) {
@@ -1200,7 +1204,7 @@ namespace Microsoft.NodejsTools.Debugger {
         /// <summary>
         /// Fired when the process has started and is broken into the debugger, but before any user code is run.
         /// </summary>
-        public event EventHandler<ProcessLoadedEventArgs> ProcessLoaded;
+        public event EventHandler<ThreadEventArgs> ProcessLoaded;
 
         public event EventHandler<ThreadEventArgs> ThreadCreated;
         public event EventHandler<ThreadEventArgs> ThreadExited;

@@ -47,7 +47,7 @@ namespace NodejsTests {
             }
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void OutliningToplevelFunctionDefinitions() {
             OutlineTest(
@@ -61,7 +61,7 @@ namespace NodejsTests {
 }"));
         }
 
-        [TestMethod, Priority(0)]
+        [TestMethod, Priority(0), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void OutliningNestedFunctionDefinitions() {
             OutlineTest("nested.js",

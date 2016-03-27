@@ -17,6 +17,7 @@
 using System;
 using System.Linq;
 using System.Windows;
+using Microsoft.NodejsTools.Intellisense;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.Text;
@@ -32,7 +33,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// 
         /// Make sure Ctrl-Space works
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void CtrlSpace() {
             var project = Project("CtrlSpace",
@@ -43,7 +44,6 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var server = solution.OpenItem("CtrlSpace", "server.js");
 
                 server.MoveCaret(2, 13);
-
                 solution.ExecuteCommand("Edit.CompleteWord");
 
                 server.WaitForText("var http = require('http');\r\nhttp.createServer");
@@ -55,7 +55,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// 
         /// Make sure we get intellisense for process.stdin
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void ProcessStdinIntellisense() {
             var project = Project("ProcessStdIn",
@@ -79,7 +79,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// 
         /// Make sure reference path intellisense works
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void ReferenceIntellisense() {
             var project = Project("ReferenceIntellisense",
@@ -264,6 +264,39 @@ namespace Microsoft.Nodejs.Tests.UI {
                 using (var sh = server.WaitForSession<ICompletionSession>()) {
                     var session = sh.Session;
                     AssertUtil.ContainsAtLeast(session.CompletionSets[0].Completions.Select(x => x.InsertionText), "big");
+                }
+            }
+        }
+
+        /// <summary>
+        /// https://github.com/Microsoft/nodejstools/issues/454
+        /// </summary>
+        [TestMethod, Priority(0), TestCategory("Core")]
+        [HostType("VSTestHost")]
+        public void IntellisenseAfterEmptyCompletionContextKeywords() {
+            foreach (var keyword in VsProjectAnalyzer._emptyCompletionContextKeywords) {
+                var project = Project("IntellisenseAfterEmptyCompletionContextKeywordTest",
+                    Compile("server", String.Format("{0} c \r\nexports.{0} = 3; exports.{0} ", keyword))
+                );
+
+                using (var solution = project.Generate().ToVs()) {
+                    var server = solution.OpenItem("IntellisenseAfterEmptyCompletionContextKeywordTest", "server.js");
+
+                    server.MoveCaret(1, keyword.Length + 1);
+                    Keyboard.Type(Keyboard.CtrlSpace.ToString());
+                    using (var sh = server.WaitForSession<ICompletionSession>(true)) { }
+
+                    server.MoveCaret(1, keyword.Length + 3);
+                    Keyboard.Type(Keyboard.CtrlSpace.ToString());
+                    server.AssertNoIntellisenseSession();
+
+                    server.MoveCaret(1, keyword.Length + 4);
+                    Keyboard.Type(Keyboard.CtrlSpace.ToString());
+                    using (var sh = server.WaitForSession<ICompletionSession>(true)) { }
+
+                    server.MoveCaret(2, keyword.Length*2 + 24);
+                    Keyboard.Type(Keyboard.CtrlSpace.ToString());
+                    using (var sh = server.WaitForSession<ICompletionSession>(true)) { }
                 }
             }
         }

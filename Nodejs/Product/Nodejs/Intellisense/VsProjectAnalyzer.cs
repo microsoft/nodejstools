@@ -91,6 +91,9 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         private readonly TaskProvider _defaultTaskProvider = CreateDefaultTaskProvider();
 
+        internal static readonly string[] _emptyCompletionContextKeywords = new string[] {
+            "var", "function", "const", "let"
+        };
 #if FALSE
         private readonly UnresolvedImportSquiggleProvider _unresolvedSquiggles;
 #endif
@@ -156,9 +159,9 @@ namespace Microsoft.NodejsTools.Intellisense {
             _fullyLoaded = true;
         }
 
-         private bool ShouldEnqueue() {
-             return _analysisLevel != AnalysisLevel.None && _analysisLevel != AnalysisLevel.Preview;
-         }
+        private bool ShouldEnqueue() {
+            return _analysisLevel != AnalysisLevel.None && _analysisLevel != AnalysisLevel.Preview;
+        }
 
         #region Public API
 
@@ -257,7 +260,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
 
             BufferParser bufferParser;
-            if (!buffer.Properties.TryGetProperty<BufferParser>(typeof(BufferParser), out bufferParser)) { 
+            if (!buffer.Properties.TryGetProperty<BufferParser>(typeof(BufferParser), out bufferParser)) {
                 return;
             }
 
@@ -323,7 +326,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 if (!reportErrors) {
                     TaskProvider.Clear(item.Entry, ParserTaskMoniker);
                 }
-                
+
                 if ((_reparseDateTime != null && new FileInfo(path).LastWriteTime > _reparseDateTime.Value)
                         || (reportErrors && !item.ReportErrors) ||
                         (item.Entry.Module == null || item.Entry.Unit == null)) {
@@ -682,7 +685,8 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
 
             foreach (var item in _projectFiles) {
-                if (!File.Exists(item.Value.Entry.FilePath) || (!item.Value.Reloaded && !item.Value.Entry.IsBuiltin)) {
+                if ((!File.Exists(item.Value.Entry.FilePath) || !item.Value.Reloaded)
+                    && !item.Value.Entry.IsBuiltin) {
                     UnloadFile(item.Value.Entry);
                 }
             }
@@ -1192,16 +1196,26 @@ namespace Microsoft.NodejsTools.Intellisense {
                 }
             }
 
+            // Get the classifiers from beginning of the line to the beginning of snapSpan.
+            // The contents of snapSpan differ depending on what is determined in
+            // CompletionSource.GetApplicableSpan.
+            //
+            // In the case of:
+            //      var myIdentifier<cursor>
+            // the applicable span will be "myIdentifier", so GetClassificationSpans will operate on "var "
+            // 
+            // In the case of comments and string literals, the applicable span will be empty,
+            // so snapSpan.Start will occur at the current cursor position. 
             var tokens = classifier.GetClassificationSpans(new SnapshotSpan(start.GetContainingLine().Start, snapSpan.Start));
             if (tokens.Count > 0) {
                 // Check for context-sensitive intellisense
                 var lastClass = tokens[tokens.Count - 1];
 
-                if (lastClass.ClassificationType == classifier.Provider.Comment) {
-                    // No completions in comments
-                    return CompletionAnalysis.EmptyCompletionContext;
-                } else if (lastClass.ClassificationType == classifier.Provider.StringLiteral) {
-                    // String completion
+                if (lastClass.ClassificationType == classifier.Provider.Comment ||
+                    lastClass.ClassificationType == classifier.Provider.StringLiteral ||
+                    (lastClass.ClassificationType == classifier.Provider.Keyword &&
+                    _emptyCompletionContextKeywords.Contains(lastClass.Span.GetText()))) {
+                    // No completions in comments, strings, or directly after certain keywords.
                     return CompletionAnalysis.EmptyCompletionContext;
                 }
                 return null;
@@ -1278,7 +1292,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         private void ClearParserTasks(IProjectEntry entry) {
             if (entry != null) {
                 TaskProvider.Clear(entry, ParserTaskMoniker);
-                
+
                 bool changed;
                 lock (_hasParseErrors) {
                     changed = _hasParseErrors.Remove(entry);
