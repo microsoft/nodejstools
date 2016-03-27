@@ -22,24 +22,23 @@ using System.Text.RegularExpressions;
 using Microsoft.NodejsTools.SourceMapping;
 using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json.Linq;
+using TypeScriptSourceMapReader;
 
 namespace Microsoft.NodejsTools.Debugger.Commands {
     sealed class SetBreakpointCommand : DebuggerCommand {
         private readonly Dictionary<string, object> _arguments;
         private readonly NodeBreakpoint _breakpoint;
         private readonly NodeModule _module;
-        private readonly SourceMapper _sourceMapper;
         private readonly FilePosition _position;
 
-        public SetBreakpointCommand(int id, NodeModule module, NodeBreakpoint breakpoint, bool withoutPredicate, bool remote, SourceMapper sourceMapper = null)
+        public SetBreakpointCommand(int id, NodeModule module, NodeBreakpoint breakpoint, bool withoutPredicate, bool remote)
             : base(id, "setbreakpoint") {
             Utilities.ArgumentNotNull("breakpoint", breakpoint);
 
             _module = module;
             _breakpoint = breakpoint;
-            _sourceMapper = sourceMapper;
 
-            _position = breakpoint.GetPosition(_sourceMapper);
+            _position = breakpoint.GetPosition(module.JavaScriptFileName);
 
             // Zero based line numbers
             int line = _position.Line;
@@ -98,6 +97,12 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
         public int Line { get; private set; }
 
         public int Column { get; private set; }
+
+        public NodeModule Module {
+            get {
+                return _module;
+            }
+        }
 
         public override void ProcessResponse(JObject response) {
             base.ProcessResponse(response);

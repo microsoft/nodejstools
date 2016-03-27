@@ -182,6 +182,12 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TypeScriptSourceMapReader\TypeScriptSourceMapReader.csproj">
+      <Project>{61a8d7ef-b83e-4c21-9479-ba832357e42c}</Project>
+      <Name>TypeScriptSourceMapReader</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(BuildRoot)\Nodejs\Product\Nodejs\SourceMapping\SourceMapping.proj" />
   <Import Project="..\ProjectAfter.settings" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

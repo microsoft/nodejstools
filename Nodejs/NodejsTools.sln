@@ -71,6 +71,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnalysisDriver", "Tests\Ana
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MockVsTests", "..\Common\Tests\MockVsTests\MockVsTests.csproj", "{A390E1C0-0D90-4A9E-8413-3E959BB07292}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeScriptSourceMapReader", "Product\TypeScriptSourceMapReader\TypeScriptSourceMapReader.csproj", "{61A8D7EF-B83E-4C21-9479-BA832357E42C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -185,6 +187,10 @@ Global
 		{A390E1C0-0D90-4A9E-8413-3E959BB07292}.Debug|x86.Build.0 = Debug|x86
 		{A390E1C0-0D90-4A9E-8413-3E959BB07292}.Release|x86.ActiveCfg = Release|x86
 		{A390E1C0-0D90-4A9E-8413-3E959BB07292}.Release|x86.Build.0 = Release|x86
+		{61A8D7EF-B83E-4C21-9479-BA832357E42C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{61A8D7EF-B83E-4C21-9479-BA832357E42C}.Debug|x86.Build.0 = Debug|Any CPU
+		{61A8D7EF-B83E-4C21-9479-BA832357E42C}.Release|x86.ActiveCfg = Debug|Any CPU
+		{61A8D7EF-B83E-4C21-9479-BA832357E42C}.Release|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -217,5 +223,6 @@ Global
 		{C2FA3ADC-95A6-47ED-9010-A86EDE081A73} = {850AC94A-310F-4F88-A553-2806D7732BD1}
 		{F83AC573-0546-4BC5-A3F3-BA0261636778} = {850AC94A-310F-4F88-A553-2806D7732BD1}
 		{A390E1C0-0D90-4A9E-8413-3E959BB07292} = {850AC94A-310F-4F88-A553-2806D7732BD1}
+		{61A8D7EF-B83E-4C21-9479-BA832357E42C} = {F9719B35-F359-47A7-A2F8-34F42E53C809}
 	EndGlobalSection
 EndGlobal

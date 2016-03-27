@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="dogfood" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{61A8D7EF-B83E-4C21-9479-BA832357E42C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>TypeScriptSourceMapReader</RootNamespace>
+    <AssemblyName>TypeScriptSourceMapReader</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <UseVSVersion>true</UseVSVersion>
+    <GenerateAssemblyAttribute>false</GenerateAssemblyAttribute>
+    <ConvertLocalizableResourcesToDefaultCulture>True</ConvertLocalizableResourcesToDefaultCulture>
+    <UICulture>en</UICulture>
+    <GenerateLCE>true</GenerateLCE>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <CreateAsmMeta>true</CreateAsmMeta>
+    <CreateMetaAssembly>true</CreateMetaAssembly>
+    <PublishMetaAssembly>true</PublishMetaAssembly>
+    <PublishMetaAssemblyVisibility>Inter</PublishMetaAssemblyVisibility>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(DebugBuild)' == 'true' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>$(DefineConstants);DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(DebugBuild)' == 'false' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DelaySign>true</DelaySign>
+  </PropertyGroup>
+  <Import Project="..\ProjectBefore.settings" />
+  <PropertyGroup>
+    <AssemblyAttributesFileName>..\..\..\typescriptfileversion.cspp</AssemblyAttributesFileName>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>FinalPublicKey.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <OutputPath>..\..\..\BuildOutput\Debug14.0\Binaries\TypeScriptSourceMapReader\</OutputPath>
+    <PlatformTarget>x86</PlatformTarget>
+    <DefineConstants>DEBUG;TRACE;FEATURE_AZURE_REMOTE_DEBUG;DEV14;DEV14_OR_LATER;DEV12_OR_LATER;DEV11_OR_LATER;NODEJS_TOOLS;NTVS_FEATURE_INTERACTIVEWINDOW</DefineConstants>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>436</NoWarn>
+    <ErrorReport>prompt</ErrorReport>
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ManagedPreprocessFile Include="$(AssemblyAttributesFileName)">
+      <OutputFileExtension>.cs</OutputFileExtension>
+      <SuppressLineNumbers>true</SuppressLineNumbers>
+      <Defines>CSC_INVOKED=1;PPTARGET_CS=1</Defines>
+    </ManagedPreprocessFile>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.VisualStudio.Debugger.Engine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Newtonsoft.Json.6.0.4\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Base64VLQ.cs" />
+    <Compile Include="Base64VLQFormat.cs" />
+    <Compile Include="EncodedSourceMap.cs" />
+    <Compile Include="DecodedSourceMap.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SourceMapReader.cs" />
+    <Compile Include="SourceMapReaderException.cs" />
+    <Compile Include="SourceMapSourceInfo.cs" />
+    <Compile Include="SourceMapSpan.cs" />
+    <Compile Include="SourceMapSpanMapping.cs" />
+    <Compile Include="SourceMapTextReader.cs" />
+    <Compile Include="SourceMapUrlHelper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="FinalPublicKey.snk" />
+  </ItemGroup>
+  <Import Project="..\ProjectAfter.settings" />
+</Project>
