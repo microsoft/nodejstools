@@ -34,7 +34,7 @@ namespace Microsoft.NodejsTools.Options {
         private bool _showCompletionListAfterCharacterTyped;
         private string _toolsVersion;
         private readonly bool _enableES6Preview;
-        private readonly Version _typeScriptMinVersionForES6Preview = new Version("1.6");
+        private readonly Version _typeScriptMinVersionForES6Preview = new Version("1.8");
 
         public NodejsIntellisenseOptionsPage()
             : base("IntelliSense") {
@@ -84,7 +84,7 @@ namespace Microsoft.NodejsTools.Options {
 
                 // Fallback to full intellisense (High) if the ES6 intellisense preview isn't enabled
                 if (_level == AnalysisLevel.Preview && !_enableES6Preview) {
-                    _level = AnalysisLevel.High;
+                    _level = AnalysisLevel.NodeLsHigh;
                 }
 
                 if (oldLevel != _level) {
@@ -156,7 +156,7 @@ namespace Microsoft.NodejsTools.Options {
         /// values.
         /// </summary>
         public override void ResetSettings() {
-            AnalysisLevel = AnalysisLevel.High;
+            AnalysisLevel = AnalysisLevel.Preview;
             AnalysisLogMax = 100;
         }
 
@@ -168,7 +168,7 @@ namespace Microsoft.NodejsTools.Options {
 
         public override void LoadSettingsFromStorage() {
             // Load settings from storage.
-            AnalysisLevel = LoadEnum<AnalysisLevel>(AnalysisLevelSetting) ?? AnalysisLevel.High;
+            AnalysisLevel = LoadEnum<AnalysisLevel>(AnalysisLevelSetting) ?? AnalysisLevel.Preview;
             AnalysisLogMax = LoadInt(AnalysisLogMaximumSetting) ?? 100;
             SaveToDisk = LoadBool(SaveToDiskSetting) ?? true;
             OnlyTabOrEnterToCommit = LoadBool(OnlyTabOrEnterToCommitSetting) ?? true;

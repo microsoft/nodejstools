@@ -106,7 +106,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 _analysisLevel = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel;
                 _saveToDisk = NodejsPackage.Instance.IntellisenseOptionsPage.SaveToDisk;
             } else {
-                _analysisLevel = AnalysisLevel.High;
+                _analysisLevel = AnalysisLevel.NodeLsHigh;
                 _saveToDisk = true;
             }
 
@@ -160,7 +160,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         private bool ShouldEnqueue() {
-            return _analysisLevel != AnalysisLevel.None && _analysisLevel != AnalysisLevel.Preview;
+            return _analysisLevel != AnalysisLevel.NodeLsNone && _analysisLevel != AnalysisLevel.Preview;
         }
 
         #region Public API
@@ -799,7 +799,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                         foreach (var implicitItem in item.LoadedItems) {
                             implicitItem.ImplicitLoadCount--;
                             if (implicitItem.ImplicitLoadCount == 0) {
-                                if (_analysisLevel != AnalysisLevel.None) {
+                                if (_analysisLevel != AnalysisLevel.NodeLsNone) {
                                     _analysisQueue.Enqueue(_jsAnalyzer.RemoveModule(implicitItem.Entry), AnalysisPriority.Normal);
                                 }
                                 ProjectItem implicitRemoved;
@@ -868,7 +868,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 _projectFiles[path] = file = new ProjectItem(entry);
             }
 
-            if (_implicitProject && _analysisLevel != AnalysisLevel.None) {
+            if (_implicitProject && _analysisLevel != AnalysisLevel.NodeLsNone) {
                 QueueDirectoryAnalysis(path, file);
             }
 
@@ -1493,10 +1493,10 @@ namespace Microsoft.NodejsTools.Intellisense {
 
             if (NodejsPackage.Instance != null) {
                 switch (_analysisLevel) {
-                    case Options.AnalysisLevel.Medium:
+                    case Options.AnalysisLevel.NodeLsMedium:
                         defaults = AnalysisLimits.MakeMediumAnalysisLimits();
                         break;
-                    case Options.AnalysisLevel.Low:
+                    case Options.AnalysisLevel.NodeLsLow:
                         defaults = _lowLimits;
                         break;
                 }
