@@ -1,87 +1,91 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="dogfood" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Choose>
+    <When Condition=" '$(VisualStudioVersion)'=='15.0'  Or '$(TargetVisualStudioVersion)'=='VS150' ">
+      <PropertyGroup>
+        <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
+        <FileUpgradeFlags>
+        </FileUpgradeFlags>
+        <UpgradeBackupLocation>
+        </UpgradeBackupLocation>
+        <OldToolsVersion>4.0</OldToolsVersion>
+      </PropertyGroup>
+    </When>
+    <When Condition=" '$(VisualStudioVersion)'=='14.0'  Or '$(TargetVisualStudioVersion)'=='VS140' ">
+      <PropertyGroup>
+        <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
+        <FileUpgradeFlags>
+        </FileUpgradeFlags>
+        <UpgradeBackupLocation>
+        </UpgradeBackupLocation>
+        <OldToolsVersion>4.0</OldToolsVersion>
+      </PropertyGroup>
+    </When>
+    <When Condition=" '$(VisualStudioVersion)'=='12.0'  Or '$(TargetVisualStudioVersion)'=='VS120' ">
+      <PropertyGroup>
+        <MinimumVisualStudioVersion>12.0</MinimumVisualStudioVersion>
+        <FileUpgradeFlags>
+        </FileUpgradeFlags>
+        <UpgradeBackupLocation>
+        </UpgradeBackupLocation>
+        <OldToolsVersion>4.0</OldToolsVersion>
+      </PropertyGroup>
+    </When>
+    <When Condition=" '$(VisualStudioVersion)'=='11.0'  Or '$(TargetVisualStudioVersion)'=='VS110' ">
+      <PropertyGroup>
+        <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
+        <FileUpgradeFlags>
+        </FileUpgradeFlags>
+        <UpgradeBackupLocation>
+        </UpgradeBackupLocation>
+        <OldToolsVersion>4.0</OldToolsVersion>
+      </PropertyGroup>
+    </When>
+  </Choose>
+  <Import Project="..\ProjectBefore.settings" />
   <PropertyGroup>
-    <ProductVersion>9.0.30729</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{61A8D7EF-B83E-4C21-9479-BA832357E42C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TypeScriptSourceMapReader</RootNamespace>
-    <AssemblyName>TypeScriptSourceMapReader</AssemblyName>
-    <FileAlignment>512</FileAlignment>
-    <UseVSVersion>true</UseVSVersion>
-    <GenerateAssemblyAttribute>false</GenerateAssemblyAttribute>
-    <ConvertLocalizableResourcesToDefaultCulture>True</ConvertLocalizableResourcesToDefaultCulture>
-    <UICulture>en</UICulture>
-    <GenerateLCE>true</GenerateLCE>
+    <RootNamespace>Microsoft.NodejsTools.TypeScriptSourceMapReader</RootNamespace>
+    <AssemblyName>Microsoft.NodejsTools.TypeScriptSourceMapReader</AssemblyName>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <CreateAsmMeta>true</CreateAsmMeta>
-    <CreateMetaAssembly>true</CreateMetaAssembly>
-    <PublishMetaAssembly>true</PublishMetaAssembly>
-    <PublishMetaAssemblyVisibility>Inter</PublishMetaAssemblyVisibility>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(DebugBuild)' == 'true' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <DefineConstants>$(DefineConstants);DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(DebugBuild)' == 'false' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <DelaySign>true</DelaySign>
-  </PropertyGroup>
-  <Import Project="..\ProjectBefore.settings" />
-  <PropertyGroup>
-    <AssemblyAttributesFileName>..\..\..\typescriptfileversion.cspp</AssemblyAttributesFileName>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>FinalPublicKey.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-    <OutputPath>..\..\..\BuildOutput\Debug14.0\Binaries\TypeScriptSourceMapReader\</OutputPath>
-    <PlatformTarget>x86</PlatformTarget>
-    <DefineConstants>DEBUG;TRACE;FEATURE_AZURE_REMOTE_DEBUG;DEV14;DEV14_OR_LATER;DEV12_OR_LATER;DEV11_OR_LATER;NODEJS_TOOLS;NTVS_FEATURE_INTERACTIVEWINDOW</DefineConstants>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <NoWarn>436</NoWarn>
-    <ErrorReport>prompt</ErrorReport>
-    <DebugType>full</DebugType>
-  </PropertyGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <ManagedPreprocessFile Include="$(AssemblyAttributesFileName)">
-      <OutputFileExtension>.cs</OutputFileExtension>
-      <SuppressLineNumbers>true</SuppressLineNumbers>
-      <Defines>CSC_INVOKED=1;PPTARGET_CS=1</Defines>
-    </ManagedPreprocessFile>
-  </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.Debugger.Engine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Newtonsoft.Json.6.0.4\lib\net40\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml" />
   </ItemGroup>
+  <Choose>
+    <!-- 
+    VS 2015's devenv.config.exe contains a bindingRedirect for Newtonsoft.Json
+    (versions 0.0.0.0-6.0.0.0 -> 6.0.0.0) so until we upgrade everything to use
+    6.0.0.0 (or get VS to remove the redirect) and deal with all the breaking changes,
+    we should conditionally include the respective Newtonsoft.Json dll version so 
+    that our tests will work with the version shipped with VS 2015.
+    -->
+    <When Condition="'$(VSTarget)' == '12.0' Or '$(VSTarget)' == '11.0'">
+      <ItemGroup>
+        <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+          <HintPath>..\..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="'$(VSTarget)' == '14.0' Or '$(VSTarget)' == '15.0'">
+      <ItemGroup>
+        <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+          <HintPath>..\..\packages\Newtonsoft.Json.6.0.4\lib\net40\Newtonsoft.Json.dll</HintPath>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
   <ItemGroup>
     <Compile Include="Base64VLQ.cs" />
     <Compile Include="Base64VLQFormat.cs" />
@@ -96,8 +100,6 @@
     <Compile Include="SourceMapTextReader.cs" />
     <Compile Include="SourceMapUrlHelper.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="FinalPublicKey.snk" />
-  </ItemGroup>
   <Import Project="..\ProjectAfter.settings" />
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
 </Project>
