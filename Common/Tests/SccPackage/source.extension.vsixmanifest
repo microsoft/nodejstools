@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Vsix Version="1.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2010">
   <Identifier Id="394d1b85-f4a7-4af2-9078-e4aab7673b22">
     <Name>SccPackage</Name>
@@ -22,6 +22,11 @@
         <Edition>VWDExpress</Edition>
       </VisualStudio>
       <VisualStudio Version="14.0">
+        <Edition>Pro</Edition>
+        <Edition>VSWinDesktopExpress</Edition>
+        <Edition>VWDExpress</Edition>
+      </VisualStudio>
+      <VisualStudio Version="15.0">
         <Edition>Pro</Edition>
         <Edition>VSWinDesktopExpress</Edition>
         <Edition>VWDExpress</Edition>
