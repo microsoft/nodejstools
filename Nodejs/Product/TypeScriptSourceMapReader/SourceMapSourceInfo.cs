@@ -14,13 +14,11 @@
 //
 //*********************************************************//
 
-namespace TypeScriptSourceMapReader
-{
+namespace Microsoft.NodejsTools.TypeScriptSourceMapReader {
     /// <summary>
     /// Source information - contains start span in .js where the new source file mapping starts
     /// </summary>
-    public class SourceMapSourceInfo
-    {
+    public class SourceMapSourceInfo {
         /// <summary>
         /// Index in the mappings where the JS span corresponding to this source starts
         /// </summary>
@@ -42,8 +40,7 @@ namespace TypeScriptSourceMapReader
         /// <param name="jsStartSpanIndex">Index in the mappings where the JS span corresponding to this source starts</param>
         /// <param name="tsUrl">Typescript file url</param>
         /// <param name="tsFilePath">File path of the ts file</param>
-        internal SourceMapSourceInfo(int jsStartSpanIndex, string tsUrl, string tsFilePath)
-        {
+        internal SourceMapSourceInfo(int jsStartSpanIndex, string tsUrl, string tsFilePath) {
             this.tsUrl = tsUrl;
             this.jsStartSpanIndex = jsStartSpanIndex;
             this.tsFilePath = tsFilePath;
@@ -54,11 +51,9 @@ namespace TypeScriptSourceMapReader
         /// </summary>
         /// <param name="tsFilePathOrUrl">ts documents path or file name</param>
         /// <returns></returns>
-        public bool IsSameTsFile(string tsFilePathOrUrl)
-        {
+        public bool IsSameTsFile(string tsFilePathOrUrl) {
             var lowerTsFilePathOrUrl = tsFilePathOrUrl.ToLowerInvariant();
-            if (!string.IsNullOrEmpty(this.tsFilePath) && this.tsFilePath.ToLowerInvariant() == lowerTsFilePathOrUrl)
-            {
+            if (!string.IsNullOrEmpty(this.tsFilePath) && this.tsFilePath.ToLowerInvariant() == lowerTsFilePathOrUrl) {
                 return true;
             }
             return this.tsUrl.ToLowerInvariant() == lowerTsFilePathOrUrl;

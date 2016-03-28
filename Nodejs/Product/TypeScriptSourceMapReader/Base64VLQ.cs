@@ -14,13 +14,11 @@
 //
 //*********************************************************//
 
-namespace TypeScriptSourceMapReader
-{
+namespace Microsoft.NodejsTools.TypeScriptSourceMapReader {
     /// <summary>
     /// Class that decodes Base64 format
     /// </summary>
-    internal class Base64Format
-    {
+    internal class Base64Format {
         private static string encodedValues = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
         /// <summary>
@@ -28,8 +26,7 @@ namespace TypeScriptSourceMapReader
         /// </summary>
         /// <param name="inChar">Bas64 encoded character</param>
         /// <returns>Decoded value</returns>
-        static internal int decodeChar(char inChar)
-        {
+        static internal int decodeChar(char inChar) {
             return Base64Format.encodedValues.IndexOf(inChar);
         }
     }

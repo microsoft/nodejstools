@@ -28,10 +28,9 @@ using Microsoft.NodejsTools.Debugger.Communication;
 using Microsoft.NodejsTools.Debugger.Events;
 using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.NodejsTools.Logging;
-using Microsoft.NodejsTools.SourceMapping;
+using Microsoft.NodejsTools.TypeScriptSourceMapReader;
 using Microsoft.VisualStudio.Debugger.Symbols;
 using Microsoft.VisualStudioTools;
-using TypeScriptSourceMapReader;
 
 namespace Microsoft.NodejsTools.Debugger {
     /// <summary>
@@ -804,7 +803,7 @@ namespace Microsoft.NodejsTools.Debugger {
                     DecodedSourceMap decodedSourceMap = null;
                     DkmTextSpan? tsSpan = null;
                     string jsFileName = module.JavaScriptFileName;
-                    string sourceMapFilename = SourceMapReaderHelper.FindSourceMapFile(jsFileName);
+                    string sourceMapFilename = SourceMapFileHelper.FindSourceMapFile(jsFileName);
                     SourceMapSourceInfo sourceInfo = null;
                     if (!string.IsNullOrEmpty(sourceMapFilename)) {
 
@@ -1253,7 +1252,7 @@ namespace Microsoft.NodejsTools.Debugger {
             }
 
             SourceMapSourceInfo sourceInfo = null;        
-            string sourceMapFilename = SourceMapReaderHelper.FindSourceMapFile(javaScriptFileName);            
+            string sourceMapFilename = SourceMapFileHelper.FindSourceMapFile(javaScriptFileName);            
 
             if (!string.IsNullOrEmpty(sourceMapFilename)) {
 

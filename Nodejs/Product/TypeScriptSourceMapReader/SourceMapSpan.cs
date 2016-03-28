@@ -16,13 +16,11 @@
 
 using Microsoft.VisualStudio.Debugger.Symbols;
 
-namespace TypeScriptSourceMapReader
-{
+namespace Microsoft.NodejsTools.TypeScriptSourceMapReader {
     /// <summary>
     /// The start line/column ranges for a contiguous span of text.
     /// </summary>
-    internal class SourceMapSpan
-    {
+    internal class SourceMapSpan {
         /// <summary>
         /// 1-based integer for the starting source line.
         /// </summary>
@@ -39,8 +37,7 @@ namespace TypeScriptSourceMapReader
         /// </summary>
         /// <param name="startLine">Start line of the span</param>
         /// <param name="startColumn">Start column of the span</param>
-        internal SourceMapSpan(int startLine, int startColumn)
-        {
+        internal SourceMapSpan(int startLine, int startColumn) {
             this.StartLine = startLine;
             this.StartColumn = startColumn;
         }
@@ -50,18 +47,13 @@ namespace TypeScriptSourceMapReader
         /// </summary>
         /// <param name="textSpan">Text span asked</param>
         /// <returns></returns>
-        internal bool IsStartSpanOfTextSpan(DkmTextSpan textSpan)
-        {
+        internal bool IsStartSpanOfTextSpan(DkmTextSpan textSpan) {
             if (this.StartLine >= textSpan.StartLine &&
-                  this.StartColumn >= textSpan.StartColumn)
-            {
+                  this.StartColumn >= textSpan.StartColumn) {
                 // Value is after than start span. 
-                if (this.StartLine < textSpan.EndLine)
-                {
+                if (this.StartLine < textSpan.EndLine) {
                     return true;
-                }
-                else if (this.StartLine == textSpan.EndLine)
-                {
+                } else if (this.StartLine == textSpan.EndLine) {
                     return this.StartColumn <= textSpan.EndColumn;
                 }
             }
@@ -74,15 +66,11 @@ namespace TypeScriptSourceMapReader
         /// </summary>
         /// <param name="textSpan">Text span asked</param>
         /// <returns></returns>
-        internal bool IsEndSpanOfTextSpan(DkmTextSpan textSpan)
-        {
-            if (this.StartLine > textSpan.EndLine)
-            {
+        internal bool IsEndSpanOfTextSpan(DkmTextSpan textSpan) {
+            if (this.StartLine > textSpan.EndLine) {
                 return true;
-            }
-            else if (this.StartLine == textSpan.EndLine &&
-                this.StartColumn >= textSpan.EndColumn)
-            {
+            } else if (this.StartLine == textSpan.EndLine &&
+                  this.StartColumn >= textSpan.EndColumn) {
                 return true;
             }
             return false;
@@ -93,15 +81,11 @@ namespace TypeScriptSourceMapReader
         /// </summary>
         /// <param name="textSpan">Text span asked</param>
         /// <returns></returns>
-        internal bool StartsBeforeTextSpan(DkmTextSpan textSpan)
-        {
-            if (this.StartLine < textSpan.StartLine)
-            {
+        internal bool StartsBeforeTextSpan(DkmTextSpan textSpan) {
+            if (this.StartLine < textSpan.StartLine) {
                 return true;
-            }
-            else if (this.StartLine == textSpan.StartLine &&
-                this.StartColumn <= textSpan.StartColumn)
-            {
+            } else if (this.StartLine == textSpan.StartLine &&
+                  this.StartColumn <= textSpan.StartColumn) {
                 return true;
             }
 

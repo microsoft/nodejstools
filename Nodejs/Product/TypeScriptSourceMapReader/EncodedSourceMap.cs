@@ -14,13 +14,11 @@
 //
 //*********************************************************//
 
-namespace TypeScriptSourceMapReader
-{
+namespace Microsoft.NodejsTools.TypeScriptSourceMapReader {
     /// <summary>
     /// SourceMap as we read from the mapping file
     /// </summary>
-    public class EncodedSourceMap
-    {
+    public class EncodedSourceMap {
         /// <summary>
         /// Version string in the map
         /// </summary>

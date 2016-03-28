@@ -18,13 +18,11 @@ using Microsoft.VisualStudio.Debugger.Symbols;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace TypeScriptSourceMapReader
-{
+namespace Microsoft.NodejsTools.TypeScriptSourceMapReader {
     /// <summary>
     /// Entry corresponding to the js file's decoded and cached mapping
     /// </summary>
-    public class DecodedSourceMap
-    {
+    public class DecodedSourceMap {
         /// <summary>
         /// List of all the decoded map entries
         /// </summary>
@@ -55,8 +53,7 @@ namespace TypeScriptSourceMapReader
         /// </summary>
         /// <param name="jsFileUrl">Url of the js file this sourceMapEntry represents</param>
         /// <param name="names">Names for this map</param>
-        internal DecodedSourceMap(string jsFileUrl, string[] names)
-        {
+        internal DecodedSourceMap(string jsFileUrl, string[] names) {
             this.names = names;
             this.jsFileUrl = jsFileUrl;
         }
@@ -68,8 +65,7 @@ namespace TypeScriptSourceMapReader
         /// <param name="jsEntry"></param>
         /// <param name="tsEntry"></param>
         /// <param name="nameIndex"></param>
-        internal void AddSourceMapSpanMapping(SourceMapSpan jsEntry, SourceMapSpan tsEntry, int nameIndex) 
-        {
+        internal void AddSourceMapSpanMapping(SourceMapSpan jsEntry, SourceMapSpan tsEntry, int nameIndex) {
             this.spanMappings.Add(new SourceMapSpanMapping(jsEntry, tsEntry, nameIndex));
         }
 
@@ -78,8 +74,7 @@ namespace TypeScriptSourceMapReader
         /// </summary>
         /// <param name="tsUrl">url of the ts file</param>
         /// <param name="tsFilePath">tsFile path if the url corresponds to local file</param>
-        internal void AddSourceMapSourceInfo(string tsUrl, string tsFilePath) 
-        {
+        internal void AddSourceMapSourceInfo(string tsUrl, string tsFilePath) {
             this.tsSourceInfos.Add(new SourceMapSourceInfo(this.spanMappings.Count, tsUrl, tsFilePath));
         }
         #endregion
@@ -92,8 +87,7 @@ namespace TypeScriptSourceMapReader
         /// <param name="tsSourceInfo">returns the source info correspoding to the ts file the span maps to</param>
         /// <param name="name">name corresponding to this mapping</param>
         /// <returns>returns the span in the ts File if mapping is present, DkmSpan corresponding to -1 line, column info</returns>
-        public DkmTextSpan MapJsSourcePosition(DkmTextSpan jsTextSpan, out SourceMapSourceInfo tsSourceInfo, out string name)
-        {
+        public DkmTextSpan MapJsSourcePosition(DkmTextSpan jsTextSpan, out SourceMapSourceInfo tsSourceInfo, out string name) {
             tsSourceInfo = null;
             name = null;
 
@@ -101,14 +95,12 @@ namespace TypeScriptSourceMapReader
             int startIndex = this.spanMappings.FindIndex(spanMapping => spanMapping.jsEntry.IsStartSpanOfTextSpan(jsTextSpan));
 
             // Couldnt map, return invalid span
-            if (startIndex == -1)
-            {
+            if (startIndex == -1) {
                 return DecodedSourceMap.InvalidTextSpan;
             }
 
             // Get the name for this mapping
-            if (this.spanMappings[startIndex].nameIndex != -1)
-            {
+            if (this.spanMappings[startIndex].nameIndex != -1) {
                 name = this.names[this.spanMappings[startIndex].nameIndex];
             }
 
@@ -119,7 +111,7 @@ namespace TypeScriptSourceMapReader
             endIndex = endIndex > startIndex ? endIndex : this.spanMappings.Count - 1;
 
             // Find the sourceIndex
-            int sourceInfoIndex = this.tsSourceInfos.FindLastIndex(sourceInfo => 
+            int sourceInfoIndex = this.tsSourceInfos.FindLastIndex(sourceInfo =>
                 this.spanMappings[sourceInfo.jsStartSpanIndex].jsEntry.StartsBeforeTextSpan(jsTextSpan));
             Debug.Assert(sourceInfoIndex != -1);
 
@@ -140,8 +132,7 @@ namespace TypeScriptSourceMapReader
         /// <param name="tsFilePathOrUrl">.ts file's path or Url</param>
         /// <param name="tsTextSpan">Text span in the .ts file</param>
         /// <returns>Source position in .js file</returns>
-        public DkmTextSpan MapTsSourcePosition(string tsFilePathOrUrl, DkmTextSpan tsTextSpan)
-        {
+        public DkmTextSpan MapTsSourcePosition(string tsFilePathOrUrl, DkmTextSpan tsTextSpan) {
             // Find the starting span in jsEntries where this ts File emit begins
             var tsSourceIndexInfo = this.tsSourceInfos.Find(sourceInfo => sourceInfo.IsSameTsFile(tsFilePathOrUrl));
             Debug.Assert(tsSourceIndexInfo != null);
@@ -150,8 +141,7 @@ namespace TypeScriptSourceMapReader
             var startIndex = this.spanMappings.FindIndex(tsSourceIndexInfo.jsStartSpanIndex, spanMapping => spanMapping.tsEntry.IsStartSpanOfTextSpan(tsTextSpan));
 
             // Couldnt map, return invalid span
-            if (startIndex == -1)
-            {
+            if (startIndex == -1) {
                 return DecodedSourceMap.InvalidTextSpan;
             }
 
@@ -172,8 +162,7 @@ namespace TypeScriptSourceMapReader
         /// Get the ts source file info enumerator
         /// </summary>
         /// <returns></returns>
-        public List<SourceMapSourceInfo>.Enumerator GetTsSourceInfoEnumerator()
-        {
+        public List<SourceMapSourceInfo>.Enumerator GetTsSourceInfoEnumerator() {
             return this.tsSourceInfos.GetEnumerator();
         }
         #endregion
@@ -184,8 +173,7 @@ namespace TypeScriptSourceMapReader
         /// </summary>
         /// <param name="tsUrl">url of the ts file</param>
         /// <returns></returns>
-        public SourceMapSourceInfo GetTsSourceInfo(string tsUrl)
-        {
+        public SourceMapSourceInfo GetTsSourceInfo(string tsUrl) {
             return this.tsSourceInfos.Find(sourceInfo => sourceInfo.tsUrl == tsUrl);
         }
         #endregion

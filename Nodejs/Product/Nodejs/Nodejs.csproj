@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <Choose>
     <When Condition=" '$(VisualStudioVersion)'=='15.0'  Or '$(TargetVisualStudioVersion)'=='VS150' ">
@@ -206,9 +206,6 @@
     </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
-  <ItemGroup>
-    <OutputBinariesToSign Include="Microsoft.NodejsTools.Telemetry.$(VSTarget).dll" />
-  </ItemGroup>
   <Choose>
     <!-- 
     VS 2015's devenv.config.exe contains a bindingRedirect for Newtonsoft.Json
@@ -262,8 +259,6 @@
     <Compile Include="Commands\OpenRemoteDebugDocumentationCommand.cs" />
     <Compile Include="Commands\OpenRemoteDebugProxyFolderCommand.cs" />
     <Compile Include="Commands\SurveyNewsCommand.cs" />
-    <Compile Include="Debugger\Serialization\BinaryDeserializer.cs" />
-    <Compile Include="Debugger\Serialization\BinarySerializer.cs" />
     <Compile Include="Debugger\DataTips\DataTipTextManagerEvents.cs" />
     <Compile Include="Debugger\DebugEngine\AD7EvalErrorProperty.cs" />
     <Compile Include="Logging\LiveLogger.cs" />
@@ -273,9 +268,6 @@
     <Compile Include="Debugger\LocalFileNameMapper.cs" />
     <Compile Include="Debugger\NodeProcess.cs" />
     <Compile Include="Debugger\ScriptTree.cs" />
-    <Compile Include="Debugger\TypeScriptHelpers\SourceMapReaderHelper.cs" />
-    <Compile Include="Debugger\TypeScriptHelpers\TypeScriptRuntime.cs" />
-    <Compile Include="Debugger\TypeScriptHelpers\TypeScriptSymbolFileId.cs" />
     <Compile Include="Editor\BraceCompletion\BraceKind.cs" />
     <Compile Include="Editor\BraceCompletion\BraceCompletionContext.cs" />
     <Compile Include="Editor\BraceCompletion\BraceCompletionContextProvider.cs" />

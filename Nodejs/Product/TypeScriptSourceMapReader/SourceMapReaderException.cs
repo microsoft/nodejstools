@@ -18,13 +18,11 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 
-namespace TypeScriptSourceMapReader
-{
+namespace Microsoft.NodejsTools.TypeScriptSourceMapReader {
     /// <summary>
     /// Type of SourceMapException
     /// </summary>
-    public enum SourceMapReaderExceptionKind
-    {
+    public enum SourceMapReaderExceptionKind {
         InvalidSourceMapUrlException,
         SourceMapReadFailedException,
         UnsupportedFormatSourceMapException,
@@ -34,15 +32,12 @@ namespace TypeScriptSourceMapReader
     /// <summary>
     /// Exception thrown by SourceMapReader
     /// </summary>
-    public abstract class SourceMapReaderException : Exception
-    {
+    public abstract class SourceMapReaderException : Exception {
         /// <summary>
         /// Kind of the exception
         /// </summary>
-        public virtual SourceMapReaderExceptionKind ExceptionKind
-        {
-            get
-            {
+        public virtual SourceMapReaderExceptionKind ExceptionKind {
+            get {
                 throw new NotSupportedException();
             }
         }
@@ -58,12 +53,10 @@ namespace TypeScriptSourceMapReader
         public string Parameter2;
 
         internal SourceMapReaderException(string parameter1 = null, string parameter2 = null, Exception innerException = null) :
-            base(null, innerException)
-        {
+            base(null, innerException) {
             this.Parameter1 = parameter1;
             this.Parameter2 = parameter2;
-            if (innerException != null)
-            {
+            if (innerException != null) {
                 this.HResult = innerException.HResult;
             }
         }
@@ -75,19 +68,15 @@ namespace TypeScriptSourceMapReader
     /// Parameter1 = sourceMapUrl
     /// Parameter2 = scriptUrl
     /// </summary>
-    public class InvalidSourceMapUrlException : SourceMapReaderException
-    {
-        public override SourceMapReaderExceptionKind ExceptionKind
-        {
-            get
-            {
-                return SourceMapReaderExceptionKind.InvalidSourceMapUrlException; 
+    public class InvalidSourceMapUrlException : SourceMapReaderException {
+        public override SourceMapReaderExceptionKind ExceptionKind {
+            get {
+                return SourceMapReaderExceptionKind.InvalidSourceMapUrlException;
             }
         }
 
         internal InvalidSourceMapUrlException(string sourceMapUrl, string scriptUrl, Exception innerException) :
-            base(sourceMapUrl, scriptUrl, innerException)
-        {
+            base(sourceMapUrl, scriptUrl, innerException) {
         }
     }
 
@@ -97,19 +86,15 @@ namespace TypeScriptSourceMapReader
     /// Parameter1 = mapFileName
     /// Parameter2 = this.InnerException.Message = Reason for read fail
     /// </summary>
-    public class SourceMapReadFailedException : SourceMapReaderException
-    {
-        public override SourceMapReaderExceptionKind ExceptionKind
-        {
-            get
-            {
+    public class SourceMapReadFailedException : SourceMapReaderException {
+        public override SourceMapReaderExceptionKind ExceptionKind {
+            get {
                 return SourceMapReaderExceptionKind.SourceMapReadFailedException;
             }
         }
 
         internal SourceMapReadFailedException(string mapFileName, Exception innerException) :
-            base(mapFileName, innerException.Message, innerException)
-        {
+            base(mapFileName, innerException.Message, innerException) {
         }
     }
 
@@ -119,20 +104,15 @@ namespace TypeScriptSourceMapReader
     /// Parameter1 = null
     /// Parameter2 = null
     /// </summary>
-    public class UnsupportedFormatSourceMapException : SourceMapReaderException
-    {
-        public override SourceMapReaderExceptionKind ExceptionKind
-        {
-            get
-            {
+    public class UnsupportedFormatSourceMapException : SourceMapReaderException {
+        public override SourceMapReaderExceptionKind ExceptionKind {
+            get {
                 return SourceMapReaderExceptionKind.UnsupportedFormatSourceMapException;
             }
         }
 
-        internal UnsupportedFormatSourceMapException(string debugPrintMessage = null)
-        {
-            if (debugPrintMessage != null)
-            {
+        internal UnsupportedFormatSourceMapException(string debugPrintMessage = null) {
+            if (debugPrintMessage != null) {
                 Debug.WriteLine(debugPrintMessage);
             }
         }
@@ -144,18 +124,14 @@ namespace TypeScriptSourceMapReader
     /// Parameter1 = null
     /// Parameter2 = null
     /// </summary>
-    public class ErrorDecodingSourcemapException : SourceMapReaderException
-    {
-        public override SourceMapReaderExceptionKind ExceptionKind
-        {
-            get
-            {
+    public class ErrorDecodingSourcemapException : SourceMapReaderException {
+        public override SourceMapReaderExceptionKind ExceptionKind {
+            get {
                 return SourceMapReaderExceptionKind.ErrorDecodingSourcemapException;
             }
         }
 
-        internal ErrorDecodingSourcemapException(string debugPrintMessage)
-        {
+        internal ErrorDecodingSourcemapException(string debugPrintMessage) {
             Debug.WriteLine(debugPrintMessage);
         }
     }

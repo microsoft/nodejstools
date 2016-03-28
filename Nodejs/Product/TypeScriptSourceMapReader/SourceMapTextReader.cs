@@ -18,13 +18,11 @@ using System;
 using System.Diagnostics;
 using System.IO;
 
-namespace TypeScriptSourceMapReader
-{
+namespace Microsoft.NodejsTools.TypeScriptSourceMapReader {
     /// <summary>
     /// Basic source map text reader class
     /// </summary>
-    public class SourceMapTextReader
-    {
+    public class SourceMapTextReader {
         #region ApiGetSourceMapUri
         /// <summary>
         /// Get the source map uri from raw sourceMapUrl read from the js contents of the scriptFilePathOrUrl
@@ -32,46 +30,34 @@ namespace TypeScriptSourceMapReader
         /// <param name="scriptFilePathOrUrl">FilePath or Url of the js script file</param>
         /// <param name="sourceMapUrl">url of the source map</param>
         /// <returns>source map uri if the source map url is valid and resolved</returns>
-        public Uri GetSourceMapUri(string scriptFilePathOrUrl, string sourceMapUrl)
-        {
+        public Uri GetSourceMapUri(string scriptFilePathOrUrl, string sourceMapUrl) {
             Uri sourceMapUri = null;
-            if (!string.IsNullOrEmpty(sourceMapUrl))
-            {
+            if (!string.IsNullOrEmpty(sourceMapUrl)) {
                 // try getting uri for mapFile
-                try
-                {
+                try {
                     // Rooted map file name
                     sourceMapUri = new Uri(sourceMapUrl, UriKind.Absolute);
-                }
-                catch (UriFormatException)
-                {
+                } catch (UriFormatException) {
                     // Source map was relative path so couldnt create Uri
                 }
 
                 // This is relative path and hence we couldnt just create the uri
-                if (sourceMapUri == null)
-                {
+                if (sourceMapUri == null) {
                     Uri scriptUri = null;
-                    try
-                    {
+                    try {
                         // We couldnt create url from the sourceMapUrl so it is a relative path,
                         // create a new Uri to serve as the root.
                         scriptUri = new Uri(scriptFilePathOrUrl, UriKind.Absolute);
-                    }
-                    catch (UriFormatException e)
-                    {
+                    } catch (UriFormatException e) {
                         // If we couldnt create the script Uri and the sourcemap path wasnt relative
                         // we cant work with this sourcemap (eg. cscript opening tc.js with 
                         // mapPath as tc.js.map instead of fully qualified path
                         throw new InvalidSourceMapUrlException(sourceMapUrl, scriptFilePathOrUrl, e);
                     }
 
-                    try
-                    {
+                    try {
                         sourceMapUri = new Uri(scriptUri, new Uri(sourceMapUrl, UriKind.Relative));
-                    }
-                    catch (Exception e)
-                    {
+                    } catch (Exception e) {
                         // If this fails, this is invalid source map url
                         throw new InvalidSourceMapUrlException(sourceMapUrl, scriptFilePathOrUrl, e);
                     }
@@ -90,8 +76,7 @@ namespace TypeScriptSourceMapReader
         /// <param name="sourceMapUrl">url of the source map</param>
         /// <param name="sourceMapText">sourceMap contents if the mapping present otherwise null, throws SourceMapReaderException if read fails</param>
         /// <returns>Returns Uri used to read the source map from</returns>
-        public Uri ReadSourceMapText(string scriptFilePathOrUrl, string sourceMapUrl, out string sourceMapText)
-        {
+        public Uri ReadSourceMapText(string scriptFilePathOrUrl, string sourceMapUrl, out string sourceMapText) {
             return this.ReadSourceMap(scriptFilePathOrUrl, sourceMapUrl, out sourceMapText, textReader => textReader.ReadToEnd());
         }
         #endregion
@@ -113,16 +98,12 @@ namespace TypeScriptSourceMapReader
         /// <param name="textReadDelegate">Delegate to read the sourceMapfrom the steam in desired format</param>
         /// <param name="sourceMapText">sourceMap contents if the mapping present otherwise null, throws SourceMapReaderException if read fails</param>
         /// <returns>Returns Uri used to read the source map from</returns>
-        protected Uri ReadSourceMap<T>(string scriptFilePathOrUrl, string sourceMapUrl, out T sourceMapText, TextReadDelegate<T> textReadDelegate)
-        {
+        protected Uri ReadSourceMap<T>(string scriptFilePathOrUrl, string sourceMapUrl, out T sourceMapText, TextReadDelegate<T> textReadDelegate) {
             var sourceMapUri = this.GetSourceMapUri(scriptFilePathOrUrl, sourceMapUrl);
-            if (sourceMapUri != null)
-            {
+            if (sourceMapUri != null) {
                 // Read map files
                 sourceMapText = this.ReadMapFile(sourceMapUri, textReadDelegate);
-            }
-            else
-            {
+            } else {
                 sourceMapText = default(T);
             }
             return sourceMapUri;
@@ -135,30 +116,21 @@ namespace TypeScriptSourceMapReader
         /// </summary>
         /// <param name="sourceMapUri">Uri correspoding to the map file to read from</param>
         /// <returns>SourceMap for the mapfile</returns>
-        protected T ReadMapFile<T>(Uri sourceMapUri, TextReadDelegate<T> textReadDelegate)
-        {
+        protected T ReadMapFile<T>(Uri sourceMapUri, TextReadDelegate<T> textReadDelegate) {
             Debug.WriteLine("Reading JSMapFile: " + sourceMapUri.AbsoluteUri);
-            try
-            {
-                if (sourceMapUri.IsFile)
-                {
-                    using (var streamReader = new StreamReader(sourceMapUri.LocalPath))
-                    {
+            try {
+                if (sourceMapUri.IsFile) {
+                    using (var streamReader = new StreamReader(sourceMapUri.LocalPath)) {
                         return textReadDelegate(streamReader);
                     }
-                }
-                else
-                {
+                } else {
                     using (var webResponse = SourceMapUrlHelper.GetWebResponse(sourceMapUri))
                     using (var stream = webResponse.GetResponseStream())
-                    using (var streamReader = new StreamReader(stream))
-                    {
+                    using (var streamReader = new StreamReader(stream)) {
                         return textReadDelegate(streamReader);
                     }
                 }
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 throw new SourceMapReadFailedException(sourceMapUri.IsFile ? sourceMapUri.LocalPath : sourceMapUri.AbsoluteUri, e);
             }
         }

@@ -14,14 +14,11 @@
 //
 //*********************************************************//
 
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.NodejsTools.SourceMapping;
+using Microsoft.NodejsTools.TypeScriptSourceMapReader;
 using Microsoft.VisualStudio.Debugger.Symbols;
-using TypeScriptSourceMapReader;
 
 namespace Microsoft.NodejsTools.Debugger {
     sealed class NodeBreakpoint {
@@ -62,7 +59,7 @@ namespace Microsoft.NodejsTools.Debugger {
         public FilePosition GetPosition(string javaScriptFileName) {
             
             // Checks whether source map is available
-            string sourceMapFilename = SourceMapReaderHelper.FindSourceMapFile(javaScriptFileName);
+            string sourceMapFilename = SourceMapFileHelper.FindSourceMapFile(javaScriptFileName);
             
             if (!string.IsNullOrEmpty(sourceMapFilename)) {
 
