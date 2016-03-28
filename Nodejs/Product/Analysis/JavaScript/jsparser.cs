@@ -3902,7 +3902,13 @@ namespace Microsoft.NodejsTools.Parsing
                             }
 
                             // parse the number as a hex integer, converted to a double
-                            doubleValue = (double)System.Convert.ToInt64(str, 16);
+                            long hexValue;
+                            if (Int64.TryParse(str.Substring(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out hexValue)) {
+                                doubleValue = hexValue;
+                            } else {
+                                doubleValue = 0;
+                                return false;
+                            }
                         }
                         else
                         {
