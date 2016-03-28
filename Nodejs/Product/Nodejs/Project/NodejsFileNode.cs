@@ -41,6 +41,10 @@ namespace Microsoft.NodejsTools.Project {
 
         protected override void OnParentSet(HierarchyNode parent) {
 #if DEV14
+            if (ProjectMgr == null || ProjectMgr.Analyzer == null) {
+                return;
+            }
+
             if (Url.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase) && Url.IndexOf(@"\typings\", StringComparison.OrdinalIgnoreCase) >= 0) {
                 ProjectMgr.Site.GetUIThread().Invoke(() => {
                     this.IncludeInProject(true);
