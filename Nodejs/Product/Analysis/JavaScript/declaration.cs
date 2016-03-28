@@ -56,8 +56,9 @@ namespace Microsoft.NodejsTools.Parsing
 
             set {
                 for (int i = 0; i < value.Length; i++) {
-                    if (value[i] != null)
+                    if (value[i] != null) {
                         value[i].Parent = this;
+                    }
                 }
                 m_list = value;
             }

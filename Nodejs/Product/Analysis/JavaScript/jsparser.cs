@@ -22,6 +22,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Microsoft.Ajax.Utilities;
+using System.Linq;
 
 namespace Microsoft.NodejsTools.Parsing
 {
@@ -1086,7 +1087,7 @@ namespace Microsoft.NodejsTools.Parsing
                 Statement lhs = null;
                 Statement initializer = null;
                 int headerEnd = -1;
-                List<VariableDeclaration> varList = new List<VariableDeclaration>();
+                var varList = new List<VariableDeclaration>();
                 try
                 {
                     if (JSToken.Var == _curToken
@@ -1108,16 +1109,20 @@ namespace Microsoft.NodejsTools.Parsing
                         }
 
                         var varInitializer = ParseIdentifierInitializer(JSToken.In);
-                        varList.Add(varInitializer);
-                        UpdateWithOtherNode(declaration, varInitializer);
+                        if (varInitializer != null) {
+                            varList.Add(varInitializer);
+                            UpdateWithOtherNode(declaration, varInitializer);
+                        }
 
                         // a list of variable initializers is allowed only in a for(;;)
                         while (JSToken.Comma == _curToken)
                         {
                             isForIn = false;
                             varInitializer = ParseIdentifierInitializer(JSToken.In);
-                            varList.Add(varInitializer);
-                            UpdateWithOtherNode(declaration, initializer);
+                            if (varInitializer != null) {
+                                varList.Add(varInitializer);
+                                UpdateWithOtherNode(declaration, initializer);
+                            }
                             //initializer = new Comma(initializer.context.CombineWith(var.context), initializer, var);
                         }
 
