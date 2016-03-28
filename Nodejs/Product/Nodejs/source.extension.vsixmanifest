@@ -18,7 +18,7 @@
   <Dependencies>
     <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" Version="4.5" />
     <Dependency Id="TestWindow.Microsoft.0771d463-d74d-4e95-aac2-39d3c7ec1f97" IsRequired="false" DisplayName="Test Explorer" Version="11.0" />
-    <Dependency Id="29102E6C-34F2-4FF1-BA2F-C02ADE3846E8" IsRequired="true" DisplayName="Node.js Tools - Interactive Window" Version="1.0"/>
+    <Dependency Id="29102E6C-34F2-4FF1-BA2F-C02ADE3846E8" IsRequired="true" DisplayName="Node.js Tools - Interactive Window" Version="1.2"/>
   </Dependencies>
   <Assets>
     <Asset Type="Microsoft.VisualStudio.Package" Path="|%CurrentProject%|" d:Source="Project" d:ProjectName="%CurrentProject%" />
