@@ -51,7 +51,7 @@ namespace Microsoft.NodejsTools.Project {
         private readonly Dictionary<NodejsProjectImageName, int> _imageIndexFromNameDictionary = new Dictionary<NodejsProjectImageName, int>();
 
 #if DEV14
-        private bool _projectHasTypeScriptFiles = false;
+        private bool _projectIsOnlyJavascript = false;
         private TypingsAcquisition _typingsAcquirer;
 #endif
 
@@ -108,7 +108,7 @@ namespace Microsoft.NodejsTools.Project {
 #if DEV14
         private bool ShouldAcquireTypingsAutomatically {
             get {
-                return !_projectHasTypeScriptFiles
+                return _projectIsOnlyJavascript
                     && NodejsPackage.Instance.IntellisenseOptionsPage.EnableES6Preview;
             }
         }
@@ -244,8 +244,10 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         protected override void FinishProjectCreation(string sourceFolder, string destFolder) {
+            bool foundTypeScriptFile = false;
             foreach (MSBuild.ProjectItem item in this.BuildProject.Items) {
                 if (String.Equals(Path.GetExtension(item.EvaluatedInclude), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
+                    foundTypeScriptFile = true;
 
                     // Create the 'typings' folder
                     var typingsFolder = Path.Combine(ProjectHome, "Scripts", "typings");
@@ -276,6 +278,7 @@ namespace Microsoft.NodejsTools.Project {
                     break;
                 }
             }
+            _projectIsOnlyJavascript = !foundTypeScriptFile;
 
             base.FinishProjectCreation(sourceFolder, destFolder);
         }
@@ -286,7 +289,7 @@ namespace Microsoft.NodejsTools.Project {
             if (string.Equals(Path.GetExtension(fileName), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase) && !IsTypeScriptProject) {
                 // enable type script on the project automatically...
 #if DEV14
-                _projectHasTypeScriptFiles = true;
+                _projectIsOnlyJavascript = false;
 #endif
                 SetProjectProperty(NodejsConstants.EnableTypeScript, "true");
                 SetProjectProperty(NodejsConstants.TypeScriptSourceMap, "true");
