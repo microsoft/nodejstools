@@ -37,7 +37,7 @@ class AssemblyVersionInfo {
     // This version string (and the comment for Version) should be updated
     // manually between minor releases (e.g. from 1.0 to 1.1).
     // Servicing branches and prereleases should retain the value.
-    public const string FileVersion = "1.1";
+    public const string FileVersion = "1.2";
 
     // This version should never change from "4100.00"; BuildRelease.ps1
     // will replace it with a generated value.
@@ -63,6 +63,6 @@ class AssemblyVersionInfo {
     // Defaults to "1.0.0.(2012|2013|2015)"
     public const string StableVersion = ReleaseVersion + "." + VSVersionSuffix;
 
-    // Defaults to "1.1.4100.00"
+    // Defaults to "1.2.4100.00"
     public const string Version = FileVersion + "." + BuildNumber;
 }
