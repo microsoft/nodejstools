@@ -189,12 +189,7 @@ namespace Microsoft.VisualStudioTools.Project {
             }
 
             var psi = new ProcessStartInfo(filename);
-            if (quoteArgs) {
-                psi.Arguments = string.Join(" ",
-                    arguments.Where(a => a != null).Select(QuoteSingleArgument));
-            } else {
-                psi.Arguments = string.Join(" ", arguments.Where(a => a != null));
-            }
+            psi.Arguments = GetArguments(arguments, quoteArgs);
             psi.WorkingDirectory = workingDirectory;
             psi.CreateNoWindow = !visible;
             psi.UseShellExecute = false;
@@ -243,15 +238,9 @@ namespace Microsoft.VisualStudioTools.Project {
             psi.UseShellExecute = true;
             psi.Verb = "runas";
 
-            string args;
-            if (quoteArgs) {
-                args = string.Join(" ", arguments.Where(a => a != null).Select(QuoteSingleArgument));
-            } else {
-                args = string.Join(" ", arguments.Where(a => a != null));
-            }
             psi.Arguments = string.Format("/S /C \"{0} {1} >>{2} 2>>{3}\"",
                 QuoteSingleArgument(filename),
-                args,
+                GetArguments(arguments, quoteArgs),
                 QuoteSingleArgument(outFile),
                 QuoteSingleArgument(errFile)
             );
@@ -314,6 +303,14 @@ namespace Microsoft.VisualStudioTools.Project {
                 };
             }
             return result;
+        }
+
+        private static string GetArguments(IEnumerable<string> arguments, bool quoteArgs) {
+            if (quoteArgs) {
+                return string.Join(" ", arguments.Where(a => a != null).Select(QuoteSingleArgument));
+            } else {
+                return string.Join(" ", arguments.Where(a => a != null));
+            }
         }
 
         internal static IEnumerable<string> SplitLines(string source) {
