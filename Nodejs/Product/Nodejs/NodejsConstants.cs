@@ -76,7 +76,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         /// Checks whether a relative and double-backslashed seperated path contains a folder name.
         /// </summary>
-        public static bool ContainsNodeModulesOrBowerComponentsFolder(string path) {
+        internal static bool ContainsNodeModulesOrBowerComponentsFolder(string path) {
             string tmp = "\\" + path + "\\";
             return tmp.IndexOf("\\" + NodeModulesFolder + "\\", StringComparison.OrdinalIgnoreCase) >= 0
                 || tmp.IndexOf("\\" + BowerComponentsFolder + "\\", StringComparison.OrdinalIgnoreCase) >= 0;

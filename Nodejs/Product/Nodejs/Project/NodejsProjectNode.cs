@@ -107,8 +107,15 @@ namespace Microsoft.NodejsTools.Project {
 #if DEV14
         private bool ShouldAcquireTypingsAutomatically {
             get {
-                return !IsTypeScriptProject
-                    && NodejsPackage.Instance.IntellisenseOptionsPage.EnableES6Preview;
+                if (!NodejsPackage.Instance.IntellisenseOptionsPage.EnableES6Preview) {
+                    return false;
+                }
+
+                var task = ProjectMgr.Site.GetUIThread().InvokeAsync(() => {
+                    return IsTypeScriptProject;
+                });
+                task.Wait();
+                return !task.Result;
             }
         }
 
@@ -201,11 +208,7 @@ namespace Microsoft.NodejsTools.Project {
 
         public bool IsTypeScriptProject {
             get {
-                var task = ProjectMgr.Site.GetUIThread().InvokeAsync(() => {
-                    return string.Equals(GetProjectProperty(NodejsConstants.EnableTypeScript), "true", StringComparison.OrdinalIgnoreCase);
-                });
-                task.Wait();
-                return task.Result;
+                return string.Equals(GetProjectProperty(NodejsConstants.EnableTypeScript), "true", StringComparison.OrdinalIgnoreCase);
             }
         }
 
@@ -244,12 +247,6 @@ namespace Microsoft.NodejsTools.Project {
 #endif
         internal override string IssueTrackerUrl {
             get { return NodejsConstants.IssueTrackerUrl; }
-        }
-
-        private static bool IsProjectTypeScriptSourceFile(string path) {
-            return string.Equals(Path.GetExtension(path), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)
-                && !string.Equals(Path.GetExtension(path), NodejsConstants.TypeScriptDeclarationExtension, StringComparison.OrdinalIgnoreCase)
-                && !NodejsConstants.ContainsNodeModulesOrBowerComponentsFolder(path);
         }
 
         protected override void FinishProjectCreation(string sourceFolder, string destFolder) {
@@ -299,6 +296,12 @@ namespace Microsoft.NodejsTools.Project {
                     SetProjectProperty(NodejsConstants.TypeScriptModuleKind, NodejsConstants.CommonJSModuleKind);
                 }
             }
+        }
+
+        private static bool IsProjectTypeScriptSourceFile(string path) {
+            return string.Equals(Path.GetExtension(path), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)
+                && !string.Equals(Path.GetExtension(path), NodejsConstants.TypeScriptDeclarationExtension, StringComparison.OrdinalIgnoreCase)
+                && !NodejsConstants.ContainsNodeModulesOrBowerComponentsFolder(path);
         }
 
         internal static bool IsNodejsFile(string strFileName) {
