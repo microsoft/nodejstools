@@ -187,16 +187,17 @@ namespace Microsoft.VisualStudioTools.Project {
                     errorEncoding);
             }
 
-            var psi = new ProcessStartInfo("cmd.exe");
-            psi.Arguments = string.Format(@"/S /C pushd ""{0}"" & ""{1}"" {2}",
-                workingDirectory,
-                filename,
-                GetArguments(arguments, quoteArgs));
-            psi.CreateNoWindow = !visible;
-            psi.UseShellExecute = false;
-            psi.RedirectStandardError = !visible || (redirector != null);
-            psi.RedirectStandardOutput = !visible || (redirector != null);
-            psi.RedirectStandardInput = !visible;
+            var psi = new ProcessStartInfo("cmd.exe") { 
+                Arguments = string.Format(@"/S /C pushd ""{0}"" & ""{1}"" {2}",
+                    workingDirectory,
+                    filename,
+                    GetArguments(arguments, quoteArgs)),
+                CreateNoWindow = !visible,
+                UseShellExecute = false,
+                RedirectStandardError = !visible || (redirector != null),
+                RedirectStandardOutput = !visible || (redirector != null),
+                RedirectStandardInput = !visible
+            };
             psi.StandardOutputEncoding = outputEncoding ?? psi.StandardOutputEncoding;
             psi.StandardErrorEncoding = errorEncoding ?? outputEncoding ?? psi.StandardErrorEncoding;
             if (env != null) {
@@ -233,20 +234,18 @@ namespace Microsoft.VisualStudioTools.Project {
         ) {
             var outFile = Path.GetTempFileName();
             var errFile = Path.GetTempFileName();
-            var psi = new ProcessStartInfo("cmd.exe");
-            psi.CreateNoWindow = true;
-            psi.WindowStyle = ProcessWindowStyle.Hidden;
-            psi.UseShellExecute = true;
-            psi.Verb = "runas";
-
-            psi.Arguments = string.Format(@"/S /C pushd ""{0}"" & """"{1}"" {2} >>{3} 2>>{4}""",
+            var psi = new ProcessStartInfo("cmd.exe") {
+                WindowStyle = ProcessWindowStyle.Hidden,
+                Verb = "runas",
+                CreateNoWindow = true,
+                UseShellExecute = true,
+                Arguments = string.Format(@"/S /C pushd ""{0}"" & """"{1}"" {2} >>{3} 2>>{4}""",
                 workingDirectory,
                 QuoteSingleArgument(filename),
                 GetArguments(arguments, quoteArgs),
                 QuoteSingleArgument(outFile),
-                QuoteSingleArgument(errFile));
-            psi.CreateNoWindow = true;
-            psi.UseShellExecute = true;
+                QuoteSingleArgument(errFile))
+            };
 
             var process = new Process();
             process.StartInfo = psi;
