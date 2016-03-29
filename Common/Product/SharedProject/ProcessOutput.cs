@@ -240,11 +240,11 @@ namespace Microsoft.VisualStudioTools.Project {
                 CreateNoWindow = true,
                 UseShellExecute = true,
                 Arguments = string.Format(@"/S /C pushd {0} & ""{1} {2} >>{3} 2>>{4}""",
-                QuoteSingleArgument(workingDirectory),
-                QuoteSingleArgument(filename),
-                GetArguments(arguments, quoteArgs),
-                QuoteSingleArgument(outFile),
-                QuoteSingleArgument(errFile))
+                    QuoteSingleArgument(workingDirectory),
+                    QuoteSingleArgument(filename),
+                    GetArguments(arguments, quoteArgs),
+                    QuoteSingleArgument(outFile),
+                    QuoteSingleArgument(errFile))
             };
 
             var process = new Process();
