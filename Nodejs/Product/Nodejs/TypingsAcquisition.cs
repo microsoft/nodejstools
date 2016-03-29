@@ -21,10 +21,8 @@ using System.IO;
 using System.Security;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Microsoft.VisualStudioTools.Project;
 using Microsoft.NodejsTools.Npm;
-using Microsoft.NodejsTools.Npm.SPI;
 
 using SR = Microsoft.NodejsTools.Project.SR;
 
@@ -77,7 +75,9 @@ namespace Microsoft.NodejsTools {
 
             string tsdPath = await EnsureTsdInstalled();
             if (string.IsNullOrEmpty(tsdPath)) {
-                redirector.WriteErrorLine(SR.GetString(SR.TsdNotInstalledError));
+                if (redirector != null) {
+                    redirector.WriteErrorLine(SR.GetString(SR.TsdNotInstalledError));
+                }
                 return false;
             }
 
