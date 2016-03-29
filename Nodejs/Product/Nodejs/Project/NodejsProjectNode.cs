@@ -51,7 +51,6 @@ namespace Microsoft.NodejsTools.Project {
         private readonly Dictionary<NodejsProjectImageName, int> _imageIndexFromNameDictionary = new Dictionary<NodejsProjectImageName, int>();
 
 #if DEV14
-        private bool _projectHasTypeScriptFiles = false;
         private TypingsAcquisition _typingsAcquirer;
 #endif
 
@@ -108,8 +107,15 @@ namespace Microsoft.NodejsTools.Project {
 #if DEV14
         private bool ShouldAcquireTypingsAutomatically {
             get {
-                return !_projectHasTypeScriptFiles
-                    && NodejsPackage.Instance.IntellisenseOptionsPage.EnableES6Preview;
+                if (!NodejsPackage.Instance.IntellisenseOptionsPage.EnableES6Preview) {
+                    return false;
+                }
+
+                var task = ProjectMgr.Site.GetUIThread().InvokeAsync(() => {
+                    return IsTypeScriptProject;
+                });
+                task.Wait();
+                return !task.Result;
             }
         }
 
@@ -121,7 +127,7 @@ namespace Microsoft.NodejsTools.Project {
 
                 var controller = ModulesNode != null ? ModulesNode.NpmController : null;
                 if (controller != null) {
-                    _typingsAcquirer = new TypingsAcquisition(controller.ListBaseDirectory, controller.RootPackage.Path);
+                    _typingsAcquirer = new TypingsAcquisition(controller);
                 }
                 return _typingsAcquirer;
             }
@@ -248,8 +254,7 @@ namespace Microsoft.NodejsTools.Project {
 
         protected override void FinishProjectCreation(string sourceFolder, string destFolder) {
             foreach (MSBuild.ProjectItem item in this.BuildProject.Items) {
-                if (String.Equals(Path.GetExtension(item.EvaluatedInclude), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
-
+                if (IsProjectTypeScriptSourceFile(item.EvaluatedInclude)) {
                     // Create the 'typings' folder
                     var typingsFolder = Path.Combine(ProjectHome, "Scripts", "typings");
                     if (!Directory.Exists(typingsFolder)) {
@@ -286,17 +291,20 @@ namespace Microsoft.NodejsTools.Project {
         protected override void AddNewFileNodeToHierarchy(HierarchyNode parentNode, string fileName) {
             base.AddNewFileNodeToHierarchy(parentNode, fileName);
 
-            if (string.Equals(Path.GetExtension(fileName), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase) && !IsTypeScriptProject) {
-                // enable type script on the project automatically...
-#if DEV14
-                _projectHasTypeScriptFiles = true;
-#endif
+            if (IsProjectTypeScriptSourceFile(fileName) && !IsTypeScriptProject) {
+                // enable TypeScript on the project automatically...
                 SetProjectProperty(NodejsConstants.EnableTypeScript, "true");
                 SetProjectProperty(NodejsConstants.TypeScriptSourceMap, "true");
                 if (String.IsNullOrWhiteSpace(GetProjectProperty(NodejsConstants.TypeScriptModuleKind))) {
                     SetProjectProperty(NodejsConstants.TypeScriptModuleKind, NodejsConstants.CommonJSModuleKind);
                 }
             }
+        }
+
+        private static bool IsProjectTypeScriptSourceFile(string path) {
+            return string.Equals(Path.GetExtension(path), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)
+                && !string.Equals(Path.GetExtension(path), NodejsConstants.TypeScriptDeclarationExtension, StringComparison.OrdinalIgnoreCase)
+                && !NodejsConstants.ContainsNodeModulesOrBowerComponentsFolder(path);
         }
 
         internal static bool IsNodejsFile(string strFileName) {

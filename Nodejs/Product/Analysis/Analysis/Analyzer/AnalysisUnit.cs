@@ -193,8 +193,10 @@ namespace Microsoft.NodejsTools.Analysis {
         internal virtual void AnalyzeWorker(DDG ddg, CancellationToken cancel) {
             Debug.Assert(Ast != null, "Ast has unexpected null value");
             Debug.Assert(ProjectEntry != null, "ProjectEntry has unexpected null value");
+            Debug.Assert(DeclaringModuleEnvironment != null, "DeclaringModuleEnvironment has unexpected null value");
+            Debug.Assert(DeclaringModuleEnvironment.GlobalEnvironment != null, "DeclaringModuleEnvironment.GlobalEnvironment has unexpected null value");
 
-            if (Ast == null || ProjectEntry == null || Tree != ProjectEntry.Tree) {
+            if (Ast == null || ProjectEntry == null || Tree != ProjectEntry.Tree || DeclaringModuleEnvironment == null) {
                 // analysis unit properties are invalid or we were enqueued and a new version became available
                 // don't re-analyze against the old version.
                 return;
@@ -216,7 +218,10 @@ namespace Microsoft.NodejsTools.Analysis {
             }
 
             foreach (var nameValue in toRemove) {
-                DeclaringModuleEnvironment.GlobalEnvironment.RemoveVariable(nameValue.Key);
+                var globalEnvironment = DeclaringModuleEnvironment.GlobalEnvironment;
+                if (globalEnvironment != null) {
+                    globalEnvironment.RemoveVariable(nameValue.Key);
+                }
 
                 // if anyone read this value it could now be gone (e.g. user 
                 // deletes a class definition) so anyone dependent upon it

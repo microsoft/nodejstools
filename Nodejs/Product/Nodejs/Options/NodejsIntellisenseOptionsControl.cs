@@ -44,11 +44,11 @@ namespace Microsoft.NodejsTools.Options {
                 if (_previewIntelliSenseRadioButton.Checked) {
                     return AnalysisLevel.Preview;
                 } else if (_fullIntelliSenseRadioButton.Checked) {
-                    return AnalysisLevel.High;
+                    return AnalysisLevel.NodeLsHigh;
                 } else if (_mediumIntelliSenseRadioButton.Checked) {
-                    return AnalysisLevel.Medium;
+                    return AnalysisLevel.NodeLsMedium;
                 } else {
-                    return AnalysisLevel.None;
+                    return AnalysisLevel.NodeLsNone;
                 }
             }
             set {
@@ -56,13 +56,13 @@ namespace Microsoft.NodejsTools.Options {
                     case AnalysisLevel.Preview:
                         _previewIntelliSenseRadioButton.Checked = true;
                         break;
-                    case AnalysisLevel.High:
+                    case AnalysisLevel.NodeLsHigh:
                         _fullIntelliSenseRadioButton.Checked = true;
                         break;
-                    case AnalysisLevel.Medium:
+                    case AnalysisLevel.NodeLsMedium:
                         _mediumIntelliSenseRadioButton.Checked = true;
                         break;
-                    case AnalysisLevel.None:
+                    case AnalysisLevel.NodeLsNone:
                         _noIntelliSenseRadioButton.Checked = true;
                         break;
                     default:
