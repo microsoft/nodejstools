@@ -51,24 +51,24 @@ namespace Microsoft.NodejsTools {
             });
         }
 
-        public Task<bool> AcquireTypings(IEnumerable<IPackage> packages, Redirector redirector) {
+        public Task<bool> AcquireTypings(IEnumerable<string> packages, Redirector redirector) {
             return tsdGlobalWorkSemaphore.WaitAsync().ContinueWith(async _ => {
                 var typingsToAquire = GetNewTypingsToAcquire(packages);
                 var success = await DownloadTypings(typingsToAquire, redirector);
                 if (success) {
-                    _acquiredTypingsPackageNames.Value.UnionWith(typingsToAquire.Select(GetPackageTsdName));
+                    _acquiredTypingsPackageNames.Value.UnionWith(typingsToAquire);
                 }
                 tsdGlobalWorkSemaphore.Release();
                 return success;
             }).Unwrap();
         }
 
-        private IEnumerable<IPackage> GetNewTypingsToAcquire(IEnumerable<IPackage> packages) {
+        private IEnumerable<string> GetNewTypingsToAcquire(IEnumerable<string> packages) {
             var currentTypings = _acquiredTypingsPackageNames.Value;
-            return packages.Where(package => !currentTypings.Contains(GetPackageTsdName(package)));
+            return packages.Where(package => !currentTypings.Contains(package));
         }
 
-        private async Task<bool> DownloadTypings(IEnumerable<IPackage> packages, Redirector redirector) {
+        private async Task<bool> DownloadTypings(IEnumerable<string> packages, Redirector redirector) {
             if (!packages.Any()) {
                 return true;
             }
@@ -128,7 +128,7 @@ namespace Microsoft.NodejsTools {
                 }
                 return await EnsureTsdInstalled();
             }
-    }
+        }
 
         private async Task<bool> TryInstallTsd() {
             using (var commander = _npmController.CreateNpmCommander()) {
@@ -136,8 +136,8 @@ namespace Microsoft.NodejsTools {
             }
         }
 
-        private static IEnumerable<string> TsdInstallArguments(IEnumerable<IPackage> packages) {
-            return new[] { "install", }.Concat(packages.Select(GetPackageTsdName)).Concat(new[] { "--save" });
+        private static IEnumerable<string> TsdInstallArguments(IEnumerable<string> packages) {
+            return new[] { "install", }.Concat(packages).Concat(new[] { "--save" });
         }
 
         private static IEnumerable<string> CurrentTypingsPackages(string pathToRootProjectDirectory) {
@@ -161,10 +161,6 @@ namespace Microsoft.NodejsTools {
                 // noop
             }
             return packages;
-        }
-
-        private static string GetPackageTsdName(IPackage package) {
-            return package.Name;
         }
     }
 }

@@ -100,7 +100,7 @@ namespace Microsoft.NodejsTools.Project {
                 }
             }
 #if DEV14
-            TryToAcquireTypings();
+            TryToAcquireCurrentTypings();
 #endif
         }
 
@@ -133,21 +133,28 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private void TryToAcquireTypings() {
+        private void TryToAcquireTypings(IEnumerable<string> packages) {
+            if (ShouldAcquireTypingsAutomatically && TypingsAcquirer != null) {
+                TypingsAcquirer
+                    .AcquireTypings(packages, null /*redirector*/)
+                    .ContinueWith(x => x);
+            }
+        }
+
+        private void TryToAcquireCurrentTypings() {
             var controller = ModulesNode != null ? ModulesNode.NpmController : null;
-            if (!ShouldAcquireTypingsAutomatically || TypingsAcquirer == null || controller == null) {
+            if (controller == null) {
                 return;
             }
 
-            var currentPackages = controller.RootPackage.Modules.Where(package =>
-                package.IsDependency
-                || package.IsOptionalDependency
-                || package.IsDevDependency
-                || !package.IsListedInParentPackageJson);
+            var currentPackages = controller.RootPackage.Modules
+                .Where(package =>
+                    package.IsDependency
+                    || package.IsOptionalDependency
+                    || package.IsDevDependency
+                    || !package.IsListedInParentPackageJson);
 
-            TypingsAcquirer
-                .AcquireTypings(currentPackages, null /*redirector*/)
-                .ContinueWith(x => x);
+            TryToAcquireTypings(currentPackages.Select(package => package.Name));
         }
 #endif
 
@@ -481,6 +488,10 @@ namespace Microsoft.NodejsTools.Project {
 
                 NodejsPackage.Instance.CheckSurveyNews(false);
                 ModulesNode.ReloadHierarchySafe();
+
+#if DEV14
+                TryToAcquireTypings(new[] { "node" });
+#endif
 
                 // scan for files which were loaded from cached analysis but no longer
                 // exist and remove them.
