@@ -179,6 +179,9 @@ namespace Microsoft.NodejsTools.Project {
         internal const string SurroundWith = "SurroundWith";
         internal const string TestFramework = "TestFramework";
         internal const string TestFrameworkDescription = "TestFrameworkDescription";
+        internal const string TsdInstallCompleted = "TsdInstallCompleted";
+        internal const string TsdInstallErrorOccurred = "TsdInstallErrorOccurred";
+        internal const string TsdNotInstalledError = "TsdNotInstalledError";
         internal const string UpgradedEnvironmentVariables = "UpgradedEnvironmentVariables";
         internal const string WorkingDirInvalidOrMissing = "WorkingDirInvalidOrMissing";
         internal const string WorkingDirToolTip = "WorkingDirToolTip";

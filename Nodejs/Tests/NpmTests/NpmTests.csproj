@@ -1,6 +1,16 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Choose>
+    <When Condition=" '$(VisualStudioVersion)'=='15.0'  Or '$(TargetVisualStudioVersion)'=='VS150' ">
+      <PropertyGroup>
+        <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
+        <FileUpgradeFlags>
+        </FileUpgradeFlags>
+        <UpgradeBackupLocation>
+        </UpgradeBackupLocation>
+        <OldToolsVersion>4.0</OldToolsVersion>
+      </PropertyGroup>
+    </When>
     <When Condition=" '$(VisualStudioVersion)'=='14.0'  Or '$(TargetVisualStudioVersion)'=='VS140' ">
       <PropertyGroup>
         <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
@@ -70,7 +80,7 @@
         </Reference>
       </ItemGroup>
     </When>
-    <When Condition="'$(VSTarget)' == '14.0'">
+    <When Condition="'$(VSTarget)' == '14.0' Or '$(VSTarget)' == '15.0'">
       <ItemGroup>
         <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
           <HintPath>..\..\packages\Newtonsoft.Json.6.0.4\lib\net40\Newtonsoft.Json.dll</HintPath>
@@ -82,10 +92,10 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
     <Reference Include="System" />
-    <Compile Include="FilesystemPackageJsonTestHelpers.cs" />
     <Compile Include="AbstractPackageJsonTests.cs" />
     <Compile Include="InstallUninstallPackageTests.cs" />
     <Compile Include="FileSystemPackageJsonTests.cs" />
+    <Compile Include="FileSystemPackageJsonTestHelpers.cs" />
     <Compile Include="MaxPathTests.cs" />
     <Compile Include="MockPackageCatalog.cs" />
     <Compile Include="MockPackageJsonSource.cs" />
@@ -94,6 +104,7 @@
     <Compile Include="NpmSearchTests.cs" />
     <Compile Include="PackageJsonDependencyTests.cs" />
     <Compile Include="PackageJsonTests.cs" />
+    <Compile Include="PersonTests.cs" />
     <Compile Include="ProblematicPackageJsonTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SemverVersionTestHelper.cs" />
