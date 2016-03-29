@@ -188,9 +188,9 @@ namespace Microsoft.VisualStudioTools.Project {
             }
 
             var psi = new ProcessStartInfo("cmd.exe") { 
-                Arguments = string.Format(@"/S /C pushd ""{0}"" & ""{1}"" {2}",
-                    workingDirectory,
-                    filename,
+                Arguments = string.Format(@"/S /C pushd {0} & {1} {2}",
+                    QuoteSingleArgument(workingDirectory),
+                    QuoteSingleArgument(filename),
                     GetArguments(arguments, quoteArgs)),
                 CreateNoWindow = !visible,
                 UseShellExecute = false,
@@ -239,7 +239,7 @@ namespace Microsoft.VisualStudioTools.Project {
                 Verb = "runas",
                 CreateNoWindow = true,
                 UseShellExecute = true,
-                Arguments = string.Format(@"/S /C pushd ""{0}"" & """"{1}"" {2} >>{3} 2>>{4}""",
+                Arguments = string.Format(@"/S /C pushd ""{0}"" & ""{1} {2} >>{3} 2>>{4}""",
                 workingDirectory,
                 QuoteSingleArgument(filename),
                 GetArguments(arguments, quoteArgs),
