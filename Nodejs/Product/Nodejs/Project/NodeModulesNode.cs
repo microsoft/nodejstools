@@ -66,7 +66,8 @@ namespace Microsoft.NodejsTools.Project {
 
         public NodeModulesNode(NodejsProjectNode root)
             : base(root) {
-            CreateNpmController();
+            _npmController = DefaultNpmController(_projectNode.ProjectHome, new NpmPathProvider(this));
+            RegisterWithNpmController(_npmController);
 
             _globalModulesNode = new GlobalModulesNode(root, this);
             AddChild(_globalModulesNode);
@@ -130,20 +131,20 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private INpmController CreateNpmController() {
-            if (null == _npmController) {
-                _npmController = NpmControllerFactory.Create(
-                    _projectNode.ProjectHome,
-                    NodejsPackage.Instance.NpmOptionsPage.NpmCachePath,
-                    false,
-                    new NpmPathProvider(this));
-                _npmController.CommandStarted += NpmController_CommandStarted;
-                _npmController.OutputLogged += NpmController_OutputLogged;
-                _npmController.ErrorLogged += NpmController_ErrorLogged;
-                _npmController.ExceptionLogged += NpmController_ExceptionLogged;
-                _npmController.CommandCompleted += NpmController_CommandCompleted;
-            }
-            return _npmController;
+        private static INpmController DefaultNpmController(string projectHome, NpmPathProvider pathProvider) {
+            return NpmControllerFactory.Create(
+                projectHome,
+                NodejsPackage.Instance.NpmOptionsPage.NpmCachePath,
+                false,
+                pathProvider);
+        }
+
+        private void RegisterWithNpmController(INpmController controller) {
+            controller.CommandStarted += NpmController_CommandStarted;
+            controller.OutputLogged += NpmController_OutputLogged;
+            controller.ErrorLogged += NpmController_ErrorLogged;
+            controller.ExceptionLogged += NpmController_ExceptionLogged;
+            controller.CommandCompleted += NpmController_CommandCompleted;
         }
 
         void NpmController_FinishedRefresh(object sender, EventArgs e) {
@@ -362,9 +363,9 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-#endregion
+        #endregion
 
-#region Updating module hierarchy
+        #region Updating module hierarchy
 
         internal void ReloadHierarchySafe() {
             NodejsPackage.Instance.GetUIThread().InvokeAsync(ReloadHierarchy)
@@ -378,39 +379,53 @@ namespace Microsoft.NodejsTools.Project {
             }
 
             var controller = _npmController;
-            if (null != controller) {
-                if (null != RootPackage) {
-                    var dev = controller.RootPackage.Modules.Where(package => package.IsDevDependency);
-                    _devModulesNode.Packages = dev;
-                    ReloadHierarchy(_devModulesNode, dev);
+            if (null == controller) {
+                return;
+            }
 
-                    var optional = controller.RootPackage.Modules.Where(package => package.IsOptionalDependency);
-                    _optionalModulesNode.Packages = optional;
-                    ReloadHierarchy(_optionalModulesNode, optional);
+            ReloadPackageHierarchies(controller);
 
-                    var root = controller.RootPackage.Modules.Where(package => 
-                        package.IsDependency || 
-                        !package.IsListedInParentPackageJson);
-                    
-                    ReloadHierarchy(this, root);
-                }
-
-                var global = controller.GlobalPackages;
-                if (null != global) {
-                    _globalModulesNode.GlobalPackages = global;
-                    ReloadHierarchy(_globalModulesNode, global.Modules);
-                }
-
-                if (_firstHierarchyLoad) {
-                    controller.FinishedRefresh += NpmController_FinishedRefresh;
-                    _firstHierarchyLoad = false;
-                }
+            if (_firstHierarchyLoad) {
+                controller.FinishedRefresh += NpmController_FinishedRefresh;
+                _firstHierarchyLoad = false;
             }
         }
 
-#endregion
+        private void ReloadPackageHierarchies(INpmController controller) {
+            ReloadDevPackageHierarchy(controller);
+            ReloadOptionalPackageHierarchy(controller);
+            ReloadRootPackageHierarchy(controller);
+            ReloadGlobalPackageHierarchy(controller);
+        }
 
-#region HierarchyNode implementation
+        private void ReloadGlobalPackageHierarchy(INpmController controller) {
+            var global = controller.GlobalPackages;
+            if (global != null && global.Modules != null) {
+                _globalModulesNode.GlobalPackages = global;
+                ReloadHierarchy(_globalModulesNode, global.Modules);
+            }
+        }
+
+        private void ReloadRootPackageHierarchy(INpmController controller) {
+            var root = GetRootPackages(controller);
+            ReloadHierarchy(this, root);
+        }
+
+        private void ReloadOptionalPackageHierarchy(INpmController controller) {
+            var optional = GetOptionalPackages(controller);
+            _optionalModulesNode.Packages = optional;
+            ReloadHierarchy(_optionalModulesNode, optional);
+        }
+
+        private void ReloadDevPackageHierarchy(INpmController controller) {
+            var dev = GetDevPackages(controller);
+            _devModulesNode.Packages = dev;
+            ReloadHierarchy(_devModulesNode, dev);
+        }
+
+        #endregion
+
+        #region HierarchyNode implementation
 
         public override int SortPriority {
             get { return DefaultSortOrderNode.ReferenceContainerNode + 1; }
@@ -424,9 +439,9 @@ namespace Microsoft.NodejsTools.Project {
             get { return _cCaption; }
         }
 
-#endregion
+        #endregion
 
-#region Command handling
+        #region Command handling
 
         internal bool IsCurrentStateASuppressCommandsMode() {
             return _suppressCommands || ProjectMgr.IsCurrentStateASuppressCommandsMode();
@@ -680,10 +695,29 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-#endregion
+        #endregion
 
         public override void ManageNpmModules() {
             ManageModules();
+        }
+
+        private static IEnumerable<IPackage> GetDevPackages(INpmController controller) {
+            if (controller == null || controller.RootPackage == null)
+                return Enumerable.Empty<IPackage>();
+            return controller.RootPackage.Modules.Where(package => package.IsDevDependency);
+        }
+
+        private static IEnumerable<IPackage> GetOptionalPackages(INpmController controller) {
+            if (controller == null || controller.RootPackage == null)
+                return Enumerable.Empty<IPackage>();
+            return controller.RootPackage.Modules.Where(package => package.IsOptionalDependency);
+        }
+
+        private static IEnumerable<IPackage> GetRootPackages(INpmController controller) {
+            if (controller == null || controller.RootPackage == null)
+                return Enumerable.Empty<IPackage>();
+            return controller.RootPackage.Modules.Where(package =>
+                package.IsDependency || !package.IsListedInParentPackageJson);
         }
     }
 }

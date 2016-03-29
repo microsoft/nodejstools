@@ -50,6 +50,11 @@ namespace Microsoft.NodejsTools.Project {
         private string _intermediateOutputPath;
         private readonly Dictionary<NodejsProjectImageName, int> _imageIndexFromNameDictionary = new Dictionary<NodejsProjectImageName, int>();
 
+#if DEV14
+        private bool _projectHasTypeScriptFiles = false;
+        private TypingsAcquisition _typingsAcquirer;
+#endif
+
         // We delay analysis until things calm down in the node_modules folder.
         internal Queue<NodejsFileNode> DelayedAnalysisQueue = new Queue<NodejsFileNode>();
         private object _idleNodeModulesLock = new object();
@@ -95,7 +100,50 @@ namespace Microsoft.NodejsTools.Project {
                     fileNode.Analyze();
                 }
             }
+#if DEV14
+            TryToAcquireTypings();
+#endif
         }
+
+#if DEV14
+        private bool ShouldAcquireTypingsAutomatically {
+            get {
+                return !_projectHasTypeScriptFiles
+                    && NodejsPackage.Instance.IntellisenseOptionsPage.EnableES6Preview;
+            }
+        }
+
+        private TypingsAcquisition TypingsAcquirer {
+            get {
+                if (_typingsAcquirer != null) {
+                    return _typingsAcquirer;
+                }
+
+                var controller = ModulesNode != null ? ModulesNode.NpmController : null;
+                if (controller != null) {
+                    _typingsAcquirer = new TypingsAcquisition(controller.ListBaseDirectory, controller.RootPackage.Path);
+                }
+                return _typingsAcquirer;
+            }
+        }
+
+        private void TryToAcquireTypings() {
+            var controller = ModulesNode != null ? ModulesNode.NpmController : null;
+            if (!ShouldAcquireTypingsAutomatically || TypingsAcquirer == null || controller == null) {
+                return;
+            }
+
+            var currentPackages = controller.RootPackage.Modules.Where(package =>
+                package.IsDependency
+                || package.IsOptionalDependency
+                || package.IsDevDependency
+                || !package.IsListedInParentPackageJson);
+
+            TypingsAcquirer
+                .AcquireTypings(currentPackages, null /*redirector*/)
+                .ContinueWith(x => x);
+        }
+#endif
 
         internal void EnqueueForDelayedAnalysis(NodejsFileNode fileNode) {
             DelayedAnalysisQueue.Enqueue(fileNode);
@@ -152,16 +200,19 @@ namespace Microsoft.NodejsTools.Project {
             AddProjectImage(NodejsProjectImageName.DependencyMissing, "Microsoft.VisualStudioTools.Resources.Icons.PackageWarning_16x.png");
         }
 
+        public bool IsTypeScriptProject {
+            get {
+                return string.Equals(GetProjectProperty(NodejsConstants.EnableTypeScript), "true", StringComparison.OrdinalIgnoreCase);
+            }
+        }
+
 #if DEV14_OR_LATER
         protected override bool SupportsIconMonikers {
             get { return true; }
         }
 
         protected override ImageMoniker GetIconMoniker(bool open) {
-            if (string.Equals(GetProjectProperty(NodejsConstants.EnableTypeScript), "true", StringComparison.OrdinalIgnoreCase)) {
-                return KnownMonikers.TSProjectNode;
-            }
-            return KnownMonikers.JSProjectNode;
+            return IsTypeScriptProject ? KnownMonikers.TSProjectNode : KnownMonikers.JSProjectNode;
         }
 
         [Obsolete]
@@ -178,7 +229,7 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-#if !DEV14_OR_LATER  
+#if !DEV14_OR_LATER
         public override int ImageIndex {
             get {
                 if (string.Equals(GetProjectProperty(NodejsConstants.EnableTypeScript), "true", StringComparison.OrdinalIgnoreCase)) {
@@ -232,9 +283,11 @@ namespace Microsoft.NodejsTools.Project {
         protected override void AddNewFileNodeToHierarchy(HierarchyNode parentNode, string fileName) {
             base.AddNewFileNodeToHierarchy(parentNode, fileName);
 
-            if (String.Equals(Path.GetExtension(fileName), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase) &&
-                !String.Equals(GetProjectProperty(NodejsConstants.EnableTypeScript), "true", StringComparison.OrdinalIgnoreCase)) {
+            if (string.Equals(Path.GetExtension(fileName), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase) && !IsTypeScriptProject) {
                 // enable type script on the project automatically...
+#if DEV14
+                _projectHasTypeScriptFiles = true;
+#endif
                 SetProjectProperty(NodejsConstants.EnableTypeScript, "true");
                 SetProjectProperty(NodejsConstants.TypeScriptSourceMap, "true");
                 if (String.IsNullOrWhiteSpace(GetProjectProperty(NodejsConstants.TypeScriptModuleKind))) {
@@ -630,8 +683,6 @@ namespace Microsoft.NodejsTools.Project {
 
         public NodeModulesNode ModulesNode { get; private set; }
 
-
-
         protected internal override void ProcessReferences() {
             base.ProcessReferences();
 
@@ -642,7 +693,7 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        #region VSWebSite Members
+#region VSWebSite Members
 
         // This interface is just implemented so we don't get normal profiling which
         // doesn't work with our projects anyway.
@@ -709,7 +760,7 @@ namespace Microsoft.NodejsTools.Project {
             get { throw new NotImplementedException(); }
         }
 
-        #endregion
+#endregion
 
         Task INodePackageModulesCommands.InstallMissingModulesAsync() {
             //Fire off the command to update the missing modules

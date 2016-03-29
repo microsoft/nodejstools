@@ -1,5 +1,5 @@
 # Normalize line endings to CRLF on checkout
-* text eol=crlf
+* text=auto eol=crlf
 
 # Denote all files that are truly binary and should not be modified.
 *.bmp binary

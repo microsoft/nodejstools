@@ -45,7 +45,7 @@ namespace NodejsTests.Debugger {
             Assert.IsFalse(updated);
         }
 
-        [TestMethod, Priority(0), TestCategory("Debugging")]
+        [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
         public void GetExceptionHitTreatmentForKnownError() {
             // Arrange
             var exceptionHandler = new ExceptionHandler();

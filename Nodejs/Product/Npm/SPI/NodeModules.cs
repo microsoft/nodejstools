@@ -23,7 +23,7 @@ using System.Linq;
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal class NodeModules : AbstractNodeModules {
         private Dictionary<string, ModuleInfo> _allModules;
-        private readonly string[] _ignoredDirectories = { @"\.bin", @"\.staging" };
+        private static readonly string[] _ignoredDirectories = { @"\.bin", @"\.staging" };
 
         public NodeModules(IRootPackage parent, bool showMissingDevOptionalSubPackages, Dictionary<string, ModuleInfo> allModulesToDepth = null, int depth = 0) {
             var modulesBase = Path.Combine(parent.Path, NodejsConstants.NodeModulesFolder);
@@ -35,41 +35,22 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             if (depth == 0) {
                 Debug.Assert(_allModules.Count == 0, "Depth is 0, but top-level modules have already been added.");
 
-                IEnumerable<string> topLevelDirectories = Enumerable.Empty<string>();
-                try {
-                    topLevelDirectories = Directory.EnumerateDirectories(modulesBase);
-                } catch (IOException) {
-                    // We want to handle DirectoryNotFound, DriveNotFound, PathTooLong
-                } catch (UnauthorizedAccessException) {
-                }
-
                 // Go through every directory in node_modules, and see if it's required as a top-level dependency
-                foreach (var moduleDir in topLevelDirectories) {
-                    if (moduleDir.Length < NativeMethods.MAX_FOLDER_PATH && !_ignoredDirectories.Any(toIgnore => moduleDir.EndsWith(toIgnore))) {
-                        IPackageJson packageJson;
-                        try {
-                            packageJson = PackageJsonFactory.Create(new DirectoryPackageJsonSource(moduleDir));
-                        } catch (PackageJsonException) {
-                            // Fail gracefully if there was an error parsing the package.json
-                            Debug.Fail("Failed to parse package.json in {0}", moduleDir);
-                            continue;
-                        }
-
-                        if (packageJson != null) {
-                            if (packageJson.RequiredBy.Count() > 0) {
-                                // All dependencies in npm v3 will have at least one element present in _requiredBy.
-                                // _requiredBy dependencies that begin with hash characters represent top-level dependencies
-                                foreach (var requiredBy in packageJson.RequiredBy) {
-                                    if (requiredBy.StartsWith("#") || requiredBy == "/") {
-                                        AddTopLevelModule(parent, showMissingDevOptionalSubPackages, moduleDir, depth);
-                                        break;
-                                    }
-                                }
-                            } else {
-                                // This dependency is a top-level dependency not added by npm v3
+                foreach (var topLevelDependency in GetTopLevelPackageDirectories(modulesBase)) {
+                    var moduleDir = topLevelDependency.Key;
+                    var packageJson = topLevelDependency.Value;
+                    if (packageJson.RequiredBy.Any()) {
+                        // All dependencies in npm v3 will have at least one element present in _requiredBy.
+                        // _requiredBy dependencies that begin with hash characters represent top-level dependencies
+                        foreach (var requiredBy in packageJson.RequiredBy) {
+                            if (requiredBy.StartsWith("#") || requiredBy == "/") {
                                 AddTopLevelModule(parent, showMissingDevOptionalSubPackages, moduleDir, depth);
+                                break;
                             }
                         }
+                    } else {
+                        // This dependency is a top-level dependency not added by npm v3
+                        AddTopLevelModule(parent, showMissingDevOptionalSubPackages, moduleDir, depth);
                     }
                 }
             }
@@ -166,6 +147,32 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             Debug.WriteLine("Module Depth: {0} [{1}]", filepath, depth);
 
             return depth;
+        }
+
+        private static IEnumerable<KeyValuePair<string, IPackageJson>> GetTopLevelPackageDirectories(string modulesBase) {
+            var topLevelDirectories = Enumerable.Empty<string>();
+            try {
+                topLevelDirectories = Directory.EnumerateDirectories(modulesBase);
+            } catch (IOException) {
+                // We want to handle DirectoryNotFound, DriveNotFound, PathTooLong
+            } catch (UnauthorizedAccessException) {
+            }
+
+            // Go through every directory in node_modules, and see if it's required as a top-level dependency
+            foreach (var moduleDir in topLevelDirectories) {
+                if (moduleDir.Length < NativeMethods.MAX_FOLDER_PATH && !_ignoredDirectories.Any(toIgnore => moduleDir.EndsWith(toIgnore))) {
+                    IPackageJson json = null;
+                    try {
+                        json = PackageJsonFactory.Create(new DirectoryPackageJsonSource(moduleDir));
+                    } catch (PackageJsonException) {
+                        // Fail gracefully if there was an error parsing the package.json
+                        Debug.Fail("Failed to parse package.json in {0}", moduleDir);
+                    }
+                    if (json != null) {
+                        yield return new KeyValuePair<string, IPackageJson>(moduleDir, json);
+                    }
+                }
+            }
         }
     }
 
