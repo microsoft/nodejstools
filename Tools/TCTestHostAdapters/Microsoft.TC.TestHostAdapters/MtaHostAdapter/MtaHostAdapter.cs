@@ -37,6 +37,8 @@ namespace Microsoft.TC.TestHostAdapters
     [DefaultRegistryRoot(@"Software\Microsoft\VisualStudio\12.0")]
 #elif DEV14
     [DefaultRegistryRoot(@"Software\Microsoft\VisualStudio\14.0")]
+#elif DEV15
+    [DefaultRegistryRoot(@"Software\Microsoft\VisualStudio\15.0")]
 #else
 #error Unrecognized VS Version.
 #endif

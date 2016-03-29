@@ -22,30 +22,32 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace NpmTests {
 
     [TestClass]
-    public class MaxPathTests : AbstractFilesystemPackageJsonTests {
+    public class MaxPathTests : AbstractPackageJsonTests {
 
         [TestMethod, Priority(0)]
-        public void TestAngularFullstackScaffoldedProject(){
-            var rootDir = CreateRootPackageDir();
-            var controller = NpmControllerFactory.Create(rootDir, string.Empty);
-            controller.OutputLogged += controller_OutputLogged;
-            controller.ErrorLogged += controller_OutputLogged;
-            controller.Refresh();
+        public void TestAngularFullstackScaffoldedProject() {
+            using (var manager = new TemporaryFileManager()) {
+                var rootDir = FilesystemPackageJsonTestHelpers.CreateRootPackageDir(manager);
+                var controller = NpmControllerFactory.Create(rootDir, string.Empty);
+                controller.OutputLogged += controller_OutputLogged;
+                controller.ErrorLogged += controller_OutputLogged;
+                controller.Refresh();
 
-            using (var commander = controller.CreateNpmCommander()) {
-                var task = commander.InstallGlobalPackageByVersionAsync("yo", "*");
-                task.Wait();
+                using (var commander = controller.CreateNpmCommander()) {
+                    var task = commander.InstallGlobalPackageByVersionAsync("yo", "*");
+                    task.Wait();
+                }
+
+                var info = new ProcessStartInfo();
+
+                //  TODO!
             }
-
-            var info = new ProcessStartInfo();
-
-            //  TODO!
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
         public void TestInstallUninstallMaxPathGlobalModule() {
             var controller = NpmControllerFactory.Create(string.Empty, string.Empty);
-            
+
             using (var commander = controller.CreateNpmCommander()) {
                 commander.InstallGlobalPackageByVersionAsync("yo", "^1.2.0").Wait();
             }

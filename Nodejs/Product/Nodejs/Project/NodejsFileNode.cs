@@ -17,6 +17,7 @@
 using System;
 using System.IO;
 using Microsoft.VisualStudioTools.Project;
+using Microsoft.VisualStudioTools;
 #if DEV14_OR_LATER
 using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Imaging;
@@ -36,6 +37,20 @@ namespace Microsoft.NodejsTools.Project {
             } else {
                 Analyze();
             }
+        }
+
+        protected override void OnParentSet(HierarchyNode parent) {
+#if DEV14
+            if (ProjectMgr == null || ProjectMgr.Analyzer == null) {
+                return;
+            }
+
+            if (Url.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase) && Url.IndexOf(@"\typings\", StringComparison.OrdinalIgnoreCase) >= 0) {
+                ProjectMgr.Site.GetUIThread().Invoke(() => {
+                    this.IncludeInProject(true);
+                });
+            }
+#endif
         }
 
         internal void Analyze() {
@@ -80,15 +95,21 @@ namespace Microsoft.NodejsTools.Project {
             }
 
             var includeInProject = base.IncludeInProject(includeChildren);
-            
+
             if (isContent && Url.EndsWith(".js", StringComparison.OrdinalIgnoreCase)) {
                 this.ItemNode.ItemTypeName = ProjectFileConstants.Content;
             }
-            
+
             ProjectMgr.Analyzer.AnalyzeFile(Url, ShouldAnalyze);
-            
+
             UpdateParentContentType();
             ItemNode.ItemTypeChanged += ItemNode_ItemTypeChanged;
+
+#if DEV14
+            ProjectMgr.Site.GetUIThread().Invoke(() => {
+                ProjectMgr.OnItemAdded(this.Parent, this);
+            });
+#endif
 
             return includeInProject;
         }
@@ -98,10 +119,10 @@ namespace Microsoft.NodejsTools.Project {
             // Don't report errors since the file won't remain part of the project. This removes the errors from the list.
             ProjectMgr.Analyzer.AnalyzeFile(Url, false);
             var excludeFromProject = base.ExcludeFromProject();
-            
+
             UpdateParentContentType();
             ItemNode.ItemTypeChanged -= ItemNode_ItemTypeChanged;
-            
+
             return excludeFromProject;
         }
 
@@ -118,7 +139,7 @@ namespace Microsoft.NodejsTools.Project {
             base.RenameChildNodes(parentNode);
             this.ProjectMgr.Analyzer.ReloadComplete();
         }
-        
+
         protected override NodeProperties CreatePropertiesObject() {
             if (IsLinkFile) {
                 return new NodejsLinkFileNodeProperties(this);
@@ -136,7 +157,7 @@ namespace Microsoft.NodejsTools.Project {
 
             UpdateParentContentType();
         }
-        
+
         private void UpdateParentContentType() {
             var parent = this.Parent as NodejsFolderNode;
             if (parent != null) {

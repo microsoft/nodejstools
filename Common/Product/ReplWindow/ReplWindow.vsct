@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <!--  This is the file that defines the actual layout and type of the commands.
@@ -244,6 +244,8 @@
             bitmap strip containing the bitmaps and then there are the numeric ids of the elements used 
             inside a button definition. An important aspect of this declaration is that the element id 
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
+          <Bitmap guid="guidReplToolbarImages" href="..\Icons\Dev15.0\ReplToolBarImages.bmp" usedList="bmpCancelEval, bmpResetSession, bmpClearScreen"
+                  Condition="Defined(DEV15)"/>
           <Bitmap guid="guidReplToolbarImages" href="..\Icons\Dev14.0\ReplToolBarImages.bmp" usedList="bmpCancelEval, bmpResetSession, bmpClearScreen"
                   Condition="Defined(DEV14)"/>
           <Bitmap guid="guidReplToolbarImages" href="..\Icons\Dev12.0\ReplToolBarImages.bmp" usedList="bmpCancelEval, bmpResetSession, bmpClearScreen"

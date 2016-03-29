@@ -54,6 +54,9 @@
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '14.0' ">
     <DefineConstants>$(DefineConstants);DEV14</DefineConstants>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(VisualStudioVersion)' == '15.0' ">
+    <DefineConstants>$(DefineConstants);DEV15</DefineConstants>
+  </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\..\..\Build\TCWB.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>

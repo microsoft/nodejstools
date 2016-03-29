@@ -15,23 +15,10 @@
 //*********************************************************//
 
 using System.IO;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace NpmTests {
-    public abstract class AbstractFilesystemPackageJsonTests : AbstractPackageJsonTests {
-        protected TemporaryFileManager TempFileManager { get; private set; }
-
-        [TestInitialize]
-        public void Init() {
-            TempFileManager = new TemporaryFileManager();
-        }
-
-        [TestCleanup]
-        public void Cleanup() {
-            TempFileManager.Dispose();
-        }
-
-        protected void CreatePackageJson(string filename, string json) {
+    public static class FilesystemPackageJsonTestHelpers {
+        public static void CreatePackageJson(string filename, string json) {
             using (var fout = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None)) {
                 using (var writer = new StreamWriter(fout)) {
                     writer.Write(json);
@@ -39,12 +26,12 @@ namespace NpmTests {
             }
         }
 
-        protected string CreateRootPackageDir() {
-            return TempFileManager.GetNewTempDirectory().FullName;
+        public static string CreateRootPackageDir(TemporaryFileManager manager) {
+            return manager.GetNewTempDirectory().FullName;
         }
 
-        protected string CreateRootPackage(string json) {
-            var dir = CreateRootPackageDir();
+        public static string CreateRootPackage(TemporaryFileManager manager, string json) {
+            var dir = CreateRootPackageDir(manager);
             var path = Path.Combine(dir, "package.json");
             CreatePackageJson(path, json);
             return dir;
