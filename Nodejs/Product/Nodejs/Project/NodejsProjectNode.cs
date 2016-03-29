@@ -121,7 +121,7 @@ namespace Microsoft.NodejsTools.Project {
 
                 var controller = ModulesNode != null ? ModulesNode.NpmController : null;
                 if (controller != null) {
-                    _typingsAcquirer = new TypingsAcquisition(controller.ListBaseDirectory, controller.RootPackage.Path);
+                    _typingsAcquirer = new TypingsAcquisition(controller);
                 }
                 return _typingsAcquirer;
             }

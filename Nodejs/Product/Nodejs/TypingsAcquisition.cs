@@ -14,34 +14,39 @@
 //
 //*********************************************************//
 
-using System.Threading.Tasks;
-using Microsoft.VisualStudioTools.Project;
-using Microsoft.NodejsTools.Npm;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-
-using SR = Microsoft.NodejsTools.Project.SR;
-using System;
 using System.Security;
 using System.Threading;
+using System.Threading.Tasks;
+
+using Microsoft.VisualStudioTools.Project;
+using Microsoft.NodejsTools.Npm;
+using Microsoft.NodejsTools.Npm.SPI;
+
+using SR = Microsoft.NodejsTools.Project.SR;
 
 namespace Microsoft.NodejsTools {
     internal class TypingsAcquisition {
-        private const string TsdExe = "tsd.cmd";
+        private const string Tsd = "tsd";
+        private const string TsdExe = Tsd + ".cmd";
         private const string TypingsDirectoryName = "typings";
 
         private static SemaphoreSlim tsdGlobalWorkSemaphore = new SemaphoreSlim(1);
 
+        private readonly INpmController _npmController;
         private readonly string _pathToRootNpmDirectory;
         private readonly string _pathToRootProjectDirectory;
-        private readonly Lazy<HashSet<string>> _acquiredTypingsPackageNames;
 
-        public TypingsAcquisition(
-            string pathToRootNpmDirectory,
-            string pathToRootProjectDirectory) {
-            _pathToRootNpmDirectory = pathToRootNpmDirectory;
-            _pathToRootProjectDirectory = pathToRootProjectDirectory;
+        private readonly Lazy<HashSet<string>> _acquiredTypingsPackageNames;
+        private bool _didTryToInstallTsd;
+
+        public TypingsAcquisition(INpmController controller) {
+            _npmController = controller;
+            _pathToRootNpmDirectory = controller.ListBaseDirectory;
+            _pathToRootProjectDirectory = controller.RootPackage.Path;
 
             _acquiredTypingsPackageNames = new Lazy<HashSet<string>>(() => {
                 return new HashSet<string>(CurrentTypingsPackages(_pathToRootProjectDirectory));
@@ -51,7 +56,7 @@ namespace Microsoft.NodejsTools {
         public Task<bool> AcquireTypings(IEnumerable<IPackage> packages, Redirector redirector) {
             return tsdGlobalWorkSemaphore.WaitAsync().ContinueWith(async _ => {
                 var typingsToAquire = GetNewTypingsToAcquire(packages);
-                var success = await DownloadTypings(_pathToRootNpmDirectory, _pathToRootProjectDirectory, typingsToAquire, redirector);
+                var success = await DownloadTypings(typingsToAquire, redirector);
                 if (success) {
                     _acquiredTypingsPackageNames.Value.UnionWith(typingsToAquire.Select(GetPackageTsdName));
                 }
@@ -65,27 +70,21 @@ namespace Microsoft.NodejsTools {
             return packages.Where(package => !currentTypings.Contains(GetPackageTsdName(package)));
         }
 
-        private static async Task<bool> DownloadTypings(
-            string pathToRootNpmDirectory,
-            string pathToRootProjectDirectory,
-            IEnumerable<IPackage> packages,
-            Redirector redirector) {
+        private async Task<bool> DownloadTypings(IEnumerable<IPackage> packages, Redirector redirector) {
             if (!packages.Any()) {
                 return true;
             }
 
-            var tsdPath = GetTsdPath(pathToRootNpmDirectory);
-            if (tsdPath == null) {
-                if (redirector != null) {
-                    redirector.WriteErrorLine(SR.GetString(SR.TsdNotInstalledError));
-                }
+            string tsdPath = await EnsureTsdInstalled();
+            if (string.IsNullOrEmpty(tsdPath)) {
+                redirector.WriteErrorLine(SR.GetString(SR.TsdNotInstalledError));
                 return false;
             }
 
             using (var process = ProcessOutput.Run(
                 tsdPath,
                 TsdInstallArguments(packages),
-                pathToRootProjectDirectory,
+                _pathToRootProjectDirectory,
                 null,
                 false,
                 redirector,
@@ -114,6 +113,29 @@ namespace Microsoft.NodejsTools {
             }
         }
 
+        private async Task<string> EnsureTsdInstalled() {
+            var tsdPath = Path.Combine(_pathToRootNpmDirectory, TsdExe);
+            if (File.Exists(tsdPath)) {
+                return tsdPath;
+            }
+
+            if (_didTryToInstallTsd) {
+                return null;
+            } else {
+                _didTryToInstallTsd = true;
+                if (!await TryInstallTsd()) {
+                    return null;
+                }
+                return await EnsureTsdInstalled();
+            }
+    }
+
+        private async Task<bool> TryInstallTsd() {
+            using (var commander = _npmController.CreateNpmCommander()) {
+                return await commander.InstallGlobalPackageByVersionAsync(Tsd, "*");
+            }
+        }
+
         private static IEnumerable<string> TsdInstallArguments(IEnumerable<IPackage> packages) {
             return new[] { "install", }.Concat(packages.Select(GetPackageTsdName)).Concat(new[] { "--save" });
         }
@@ -139,11 +161,6 @@ namespace Microsoft.NodejsTools {
                 // noop
             }
             return packages;
-        }
-
-        private static string GetTsdPath(string pathToRootNpmDirectory) {
-            var path = Path.Combine(pathToRootNpmDirectory, TsdExe);
-            return File.Exists(path) ? path : null;
         }
 
         private static string GetPackageTsdName(IPackage package) {
