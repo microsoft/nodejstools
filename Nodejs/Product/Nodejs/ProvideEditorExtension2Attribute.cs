@@ -71,12 +71,10 @@ namespace Microsoft.NodejsTools {
             _extensions = extensions;
         }
 
-#if DEV11_OR_LATER
         public ProvideEditorExtension2Attribute(object factoryType, string extension, int priority, __VSPHYSICALVIEWATTRIBUTES commonViewAttributes, params string[] extensions) :
             this(factoryType, extension, priority, extensions) {
             _commonViewAttrs = commonViewAttributes;
         }
-#endif
 
         /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="ProvideEditorExtensionAttribute.Extension"]' />
         /// <devdoc>

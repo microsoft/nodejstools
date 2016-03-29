@@ -711,21 +711,13 @@ namespace Microsoft.Nodejs.Tests.UI {
                     Keyboard.Type("."); // bad filename
                     Keyboard.Type(System.Windows.Input.Key.Enter);
 
-#if DEV11_OR_LATER
                     VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "Directory names cannot contain any of the following characters");
-#else
-                VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, ". is an invalid filename");
-#endif
                     System.Threading.Thread.Sleep(1000);
 
                     Keyboard.Type(".."); // another bad filename
                     Keyboard.Type(System.Windows.Input.Key.Enter);
 
-#if DEV11_OR_LATER
                     VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "Directory names cannot contain any of the following characters");
-#else
-                VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, ".. is an invalid filename");
-#endif
                     System.Threading.Thread.Sleep(1000);
 
                     Keyboard.Type("Y"); // another bad filename

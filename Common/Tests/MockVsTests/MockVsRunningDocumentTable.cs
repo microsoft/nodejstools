@@ -19,11 +19,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Microsoft.VisualStudioTools.MockVsTests {
-    class MockVsRunningDocumentTable : IVsRunningDocumentTable
-#if DEV12_OR_LATER
-        , IVsRunningDocumentTable4
-#endif
-        {
+    class MockVsRunningDocumentTable : IVsRunningDocumentTable, IVsRunningDocumentTable4 {
         private readonly MockVs _vs;
         private readonly Dictionary<uint, DocInfo> _table = new Dictionary<uint, DocInfo>();
         private readonly Dictionary<string, uint> _ids = new Dictionary<string, uint>(StringComparer.OrdinalIgnoreCase);
@@ -303,7 +299,6 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
             throw new NotImplementedException();
         }
 
-#if DEV12_OR_LATER
         public uint GetRelatedSaveTreeItems(uint cookie, uint grfSave, uint celt, VSSAVETREEITEM[] rgSaveTreeItems) {
             throw new NotImplementedException();
         }
@@ -379,6 +374,5 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
         public Guid GetDocumentProjectGuid(uint cookie) {
             throw new NotImplementedException();
         }
-#endif
     }
 }
