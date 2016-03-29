@@ -193,6 +193,8 @@ namespace Microsoft.NodejsTools.Analysis {
         internal virtual void AnalyzeWorker(DDG ddg, CancellationToken cancel) {
             Debug.Assert(Ast != null, "Ast has unexpected null value");
             Debug.Assert(ProjectEntry != null, "ProjectEntry has unexpected null value");
+            Debug.Assert(DeclaringModuleEnvironment != null, "DeclaringModuleEnvironment has unexpected null value");
+            Debug.Assert(DeclaringModuleEnvironment.GlobalEnvironment != null, "DeclaringModuleEnvironment.GlobalEnvironment has unexpected null value");
 
             if (Ast == null || ProjectEntry == null || Tree != ProjectEntry.Tree || DeclaringModuleEnvironment == null) {
                 // analysis unit properties are invalid or we were enqueued and a new version became available
