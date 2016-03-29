@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nodejs", "Product\Nodejs\Nodejs.csproj", "{32EC5259-98DA-40CA-9E2D-1B1B2E966F88}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -188,7 +188,9 @@ Global
 		{A390E1C0-0D90-4A9E-8413-3E959BB07292}.Release|x86.ActiveCfg = Release|x86
 		{A390E1C0-0D90-4A9E-8413-3E959BB07292}.Release|x86.Build.0 = Release|x86
 		{61A8D7EF-B83E-4C21-9479-BA832357E42C}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{61A8D7EF-B83E-4C21-9479-BA832357E42C}.Release|x86.ActiveCfg = Debug|Any CPU
+		{61A8D7EF-B83E-4C21-9479-BA832357E42C}.Debug|x86.Build.0 = Debug|Any CPU
+		{61A8D7EF-B83E-4C21-9479-BA832357E42C}.Release|x86.ActiveCfg = Release|Any CPU
+		{61A8D7EF-B83E-4C21-9479-BA832357E42C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
