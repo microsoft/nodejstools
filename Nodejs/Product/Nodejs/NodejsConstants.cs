@@ -14,10 +14,13 @@
 //
 //*********************************************************//
 
+using System;
+
 namespace Microsoft.NodejsTools {
     internal class NodejsConstants {
         internal const string JavaScriptExtension = ".js";
         internal const string TypeScriptExtension = ".ts";
+        internal const string TypeScriptDeclarationExtension = ".d.ts";
         internal const string MapExtension = ".map";
         internal const string NodejsProjectExtension = ".njsproj";
 
@@ -69,5 +72,14 @@ namespace Microsoft.NodejsTools {
         internal const string TypeScript = "TypeScript";
 
         internal const string NodeToolsProcessIdEnvironmentVariable = "_NTVS_PID";
+
+        /// <summary>
+        /// Checks whether a relative and double-backslashed seperated path contains a folder name.
+        /// </summary>
+        internal static bool ContainsNodeModulesOrBowerComponentsFolder(string path) {
+            string tmp = "\\" + path + "\\";
+            return tmp.IndexOf("\\" + NodeModulesFolder + "\\", StringComparison.OrdinalIgnoreCase) >= 0
+                || tmp.IndexOf("\\" + BowerComponentsFolder + "\\", StringComparison.OrdinalIgnoreCase) >= 0;
+        }
     }
 }
