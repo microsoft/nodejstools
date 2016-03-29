@@ -17,7 +17,6 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -26,26 +25,26 @@ using Microsoft.VisualStudioTools;
 namespace Microsoft.NodejsTools.Options {
     [ComVisible(true)]
     public class NodejsIntellisenseOptionsPage : NodejsDialogPage {
+        private static readonly Version _typeScriptMinVersionForES6Preview = new Version("1.8");
+
         private NodejsIntellisenseOptionsControl _window;
         private AnalysisLevel _level;
         private int _analysisLogMax;
         private bool _saveToDisk;
         private bool _onlyTabOrEnterToCommit;
         private bool _showCompletionListAfterCharacterTyped;
-        private string _toolsVersion;
-        private readonly bool _enableES6Preview;
-        private readonly Version _typeScriptMinVersionForES6Preview = new Version("1.8");
 
-        public NodejsIntellisenseOptionsPage()
-            : base("IntelliSense") {
+        private readonly Lazy<bool> _enableES6Preview = new Lazy<bool>(() => {
             Version version;
             var versionString = GetTypeScriptToolsVersion();
-            if (!string.IsNullOrEmpty(versionString) &&
-                Version.TryParse(versionString, out version) &&
-                version.CompareTo(_typeScriptMinVersionForES6Preview) > -1) {
-                    _enableES6Preview = true;
-            }
-        }
+            return !string.IsNullOrEmpty(versionString)
+                && Version.TryParse(versionString, out version)
+                && version.CompareTo(_typeScriptMinVersionForES6Preview) > -1;
+        });
+
+        public NodejsIntellisenseOptionsPage()
+            : base("IntelliSense")
+        { }
 
         // replace the default UI of the dialog page w/ our own UI.
         protected override System.Windows.Forms.IWin32Window Window {
@@ -58,7 +57,9 @@ namespace Microsoft.NodejsTools.Options {
             }
         }
 
-        internal bool EnableES6Preview { get { return _enableES6Preview; } }
+        internal bool EnableES6Preview {
+            get { return _enableES6Preview.Value; }
+        }
 
         internal bool SaveToDisk {
             get { return _saveToDisk; }
@@ -83,7 +84,7 @@ namespace Microsoft.NodejsTools.Options {
                 _level = value;
 
                 // Fallback to full intellisense (High) if the ES6 intellisense preview isn't enabled
-                if (_level == AnalysisLevel.Preview && !_enableES6Preview) {
+                if (_level == AnalysisLevel.Preview && !EnableES6Preview) {
                     _level = AnalysisLevel.NodeLsHigh;
                 }
 
@@ -143,7 +144,7 @@ namespace Microsoft.NodejsTools.Options {
                 }
             }
         }
-        
+
         public event EventHandler<EventArgs> AnalysisLevelChanged;
         public event EventHandler<EventArgs> AnalysisLogMaximumChanged;
         public event EventHandler<EventArgs> SaveToDiskChanged;
@@ -199,44 +200,42 @@ namespace Microsoft.NodejsTools.Options {
             SaveBool(ShowCompletionListAfterCharacterTypedSetting, ShowCompletionListAfterCharacterTyped);
         }
 
-        private string GetTypeScriptToolsVersion() {
-            if (_toolsVersion == null) {
-                _toolsVersion = string.Empty;
-                try {
-                    object installDirAsObject = null;
-                    var shell = NodejsPackage.Instance.GetService(typeof(SVsShell)) as IVsShell;
-                    if (shell != null) {
-                        shell.GetProperty((int)__VSSPROPID.VSSPROPID_InstallDirectory, out installDirAsObject);
-                    }
-
-                    var idePath = CommonUtils.NormalizeDirectoryPath((string)installDirAsObject) ?? string.Empty;
-                    if (string.IsNullOrEmpty(idePath)) {
-                        return _toolsVersion;
-                    }
-
-                    var typeScriptServicesPath = Path.Combine(idePath, @"CommonExtensions\Microsoft\TypeScript\typescriptServices.js");
-                    if (!File.Exists(typeScriptServicesPath)) {
-                        return _toolsVersion;
-                    }
-
-                    var regex = new Regex(@"toolsVersion = ""(?<version>\d.\d?)"";");
-                    var fileText = File.ReadAllText(typeScriptServicesPath);
-                    var match = regex.Match(fileText);
-
-                    var version = match.Groups["version"].Value;
-                    if (!string.IsNullOrWhiteSpace(version)) {
-                        _toolsVersion = version;
-                    }
-                } catch (Exception ex) {
-                    if (ex.IsCriticalException()) {
-                        throw;
-                    }
-
-                    Debug.WriteLine(string.Format("Failed to obtain TypeScript tools version: {0}", ex.ToString()));
+        private static string GetTypeScriptToolsVersion() {
+            var toolsVersion = string.Empty;
+            try {
+                object installDirAsObject = null;
+                var shell = NodejsPackage.Instance.GetService(typeof(SVsShell)) as IVsShell;
+                if (shell != null) {
+                    shell.GetProperty((int)__VSSPROPID.VSSPROPID_InstallDirectory, out installDirAsObject);
                 }
+
+                var idePath = CommonUtils.NormalizeDirectoryPath((string)installDirAsObject) ?? string.Empty;
+                if (string.IsNullOrEmpty(idePath)) {
+                    return toolsVersion;
+                }
+
+                var typeScriptServicesPath = Path.Combine(idePath, @"CommonExtensions\Microsoft\TypeScript\typescriptServices.js");
+                if (!File.Exists(typeScriptServicesPath)) {
+                    return toolsVersion;
+                }
+
+                var regex = new Regex(@"toolsVersion = ""(?<version>\d.\d?)"";");
+                var fileText = File.ReadAllText(typeScriptServicesPath);
+                var match = regex.Match(fileText);
+
+                var version = match.Groups["version"].Value;
+                if (!string.IsNullOrWhiteSpace(version)) {
+                    toolsVersion = version;
+                }
+            } catch (Exception ex) {
+                if (ex.IsCriticalException()) {
+                    throw;
+                }
+
+                Debug.WriteLine(string.Format("Failed to obtain TypeScript tools version: {0}", ex.ToString()));
             }
 
-            return _toolsVersion;
+            return toolsVersion;
         }
     }
 }
