@@ -184,13 +184,14 @@ namespace Microsoft.VisualStudioTools.Project {
                     redirector,
                     quoteArgs,
                     outputEncoding,
-                    errorEncoding
-                );
+                    errorEncoding);
             }
 
-            var psi = new ProcessStartInfo(filename);
-            psi.Arguments = GetArguments(arguments, quoteArgs);
-            psi.WorkingDirectory = workingDirectory;
+            var psi = new ProcessStartInfo("cmd.exe");
+            psi.Arguments = string.Format(@"/S /C pushd ""{0}"" & ""{1}"" {2}",
+                workingDirectory,
+                filename,
+                GetArguments(arguments, quoteArgs));
             psi.CreateNoWindow = !visible;
             psi.UseShellExecute = false;
             psi.RedirectStandardError = !visible || (redirector != null);
@@ -238,13 +239,12 @@ namespace Microsoft.VisualStudioTools.Project {
             psi.UseShellExecute = true;
             psi.Verb = "runas";
 
-            psi.Arguments = string.Format("/S /C \"{0} {1} >>{2} 2>>{3}\"",
+            psi.Arguments = string.Format(@"/S /C pushd ""{0}"" & """"{1}"" {2} >>{3} 2>>{4}""",
+                workingDirectory,
                 QuoteSingleArgument(filename),
                 GetArguments(arguments, quoteArgs),
                 QuoteSingleArgument(outFile),
-                QuoteSingleArgument(errFile)
-            );
-            psi.WorkingDirectory = workingDirectory;
+                QuoteSingleArgument(errFile));
             psi.CreateNoWindow = true;
             psi.UseShellExecute = true;
 
