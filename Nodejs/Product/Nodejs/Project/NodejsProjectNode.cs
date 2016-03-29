@@ -152,11 +152,9 @@ namespace Microsoft.NodejsTools.Project {
                     package.IsDependency
                     || package.IsOptionalDependency
                     || package.IsDevDependency
-                    || !package.IsListedInParentPackageJson)
-                .Select(package => package.Name)
-                .Concat(new[] { "node" });
+                    || !package.IsListedInParentPackageJson);
 
-            TryToAcquireTypings(currentPackages);
+            TryToAcquireTypings(currentPackages.Select(package => package.Name));
         }
 #endif
 
