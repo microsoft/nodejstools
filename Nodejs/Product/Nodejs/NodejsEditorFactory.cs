@@ -249,7 +249,7 @@ namespace Microsoft.NodejsTools {
         }
 
         private void InitializeLanguageService(IVsTextLines textLines) {
-            InitializeLanguageService(textLines, typeof(NodejsEditorFactory).GUID);
+            InitializeLanguageService(textLines, typeof(NodejsLanguageInfo).GUID);
         }
 
         private IntPtr CreateDocumentView(string documentMoniker, string physicalView, IVsHierarchy hierarchy, uint itemid, IVsTextLines textLines, bool createdDocData, out string editorCaption, out Guid cmdUI) {
