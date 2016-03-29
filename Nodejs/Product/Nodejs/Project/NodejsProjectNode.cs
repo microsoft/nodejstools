@@ -133,11 +133,14 @@ namespace Microsoft.NodejsTools.Project {
                 return;
             }
 
-            var currentPackages = controller.RootPackage.Modules.Where(package =>
-                package.IsDependency
-                || package.IsOptionalDependency
-                || package.IsDevDependency
-                || !package.IsListedInParentPackageJson);
+            var currentPackages = controller.RootPackage.Modules
+                .Where(package =>
+                    package.IsDependency
+                    || package.IsOptionalDependency
+                    || package.IsDevDependency
+                    || !package.IsListedInParentPackageJson)
+                .Select(package => package.Name)
+                .Concat(new[] { "node" });
 
             TypingsAcquirer
                 .AcquireTypings(currentPackages, null /*redirector*/)
