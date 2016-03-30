@@ -173,13 +173,6 @@ namespace Microsoft.NodejsTools.Analysis.Values {
             _func = func;
         }
 
-        public SpecializedFunctionValue(ProjectEntry projectEntry, string name, CallDelegate func, OverloadResult[] overloads, string documentation = null, ExpandoValue prototype = null)
-            : base(projectEntry, name, overloads, documentation, prototype)
-        {
-            _func = func;
-        }
-
-
         public override IAnalysisSet Call(Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
             return _func(this, node, unit, @this, args);
         }
