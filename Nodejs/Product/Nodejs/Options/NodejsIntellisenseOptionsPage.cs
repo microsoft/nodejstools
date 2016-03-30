@@ -34,7 +34,7 @@ namespace Microsoft.NodejsTools.Options {
         private bool _showCompletionListAfterCharacterTyped;
         private string _toolsVersion;
         private readonly bool _enableES6Preview;
-        private readonly Version _typeScriptMinVersionForES6Preview = new Version("1.8");
+        private readonly Version _typeScriptMinVersionForES6Preview = new Version("1.6");
 
         public NodejsIntellisenseOptionsPage()
             : base("IntelliSense") {
