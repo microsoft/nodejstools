@@ -151,11 +151,13 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         private static IEnumerable<KeyValuePair<string, IPackageJson>> GetTopLevelPackageDirectories(string modulesBase) {
             var topLevelDirectories = Enumerable.Empty<string>();
-            try {
-                topLevelDirectories = Directory.EnumerateDirectories(modulesBase);
-            } catch (IOException) {
-                // We want to handle DirectoryNotFound, DriveNotFound, PathTooLong
-            } catch (UnauthorizedAccessException) {
+            if (Directory.Exists(modulesBase)) {
+                try {
+                    topLevelDirectories = Directory.EnumerateDirectories(modulesBase);
+                } catch (IOException) {
+                    // We want to handle DirectoryNotFound, DriveNotFound, PathTooLong
+                } catch (UnauthorizedAccessException) {
+                }
             }
 
             // Go through every directory in node_modules, and see if it's required as a top-level dependency
