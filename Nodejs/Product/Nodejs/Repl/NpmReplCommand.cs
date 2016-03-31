@@ -59,7 +59,7 @@ namespace Microsoft.NodejsTools.Repl {
             npmArguments = string.Format(" {0} ", npmArguments);
 
             var solution = Package.GetGlobalService(typeof(SVsSolution)) as IVsSolution;
-            IEnumerable<IVsProject> loadedProjects = solution.EnumerateLoadedProjects(onlyNodeProjects: true);
+            var loadedProjects = solution.EnumerateLoadedProjects(onlyNodeProjects: false);
 
             var projectNameToDirectoryDictionary = new Dictionary<string, Tuple<string, IVsHierarchy>>(StringComparer.OrdinalIgnoreCase);
             foreach (IVsProject project in loadedProjects) {
@@ -76,19 +76,9 @@ namespace Microsoft.NodejsTools.Repl {
                     continue;
                 }
 
-                EnvDTE.Properties properties = dteProject.Properties;
-                if (dteProject.Properties == null) {
-                    continue;
-                }
-
                 string projectName = dteProject.Name;
-                EnvDTE.Property projectHome = properties.Item("ProjectHome");
-                if (projectHome == null || projectName == null) {
-                    continue;
-                }
-
-                var projectDirectory = projectHome.Value as string;
-                if (projectDirectory != null) {
+                string projectDirectory = Path.GetDirectoryName(dteProject.FullName);
+                if (!string.IsNullOrEmpty(projectDirectory)) {
                     projectNameToDirectoryDictionary.Add(projectName, Tuple.Create(projectDirectory, hierarchy));
                 }
             }
@@ -118,7 +108,7 @@ namespace Microsoft.NodejsTools.Repl {
             // In case someone copies filename
             string projectDirectoryPath = File.Exists(projectPath) ? Path.GetDirectoryName(projectPath) : projectPath;
             
-            if (!isGlobalCommand && !(Directory.Exists(projectDirectoryPath) && File.Exists(Path.Combine(projectDirectoryPath, "package.json")))) {
+            if (!isGlobalCommand && !Directory.Exists(projectDirectoryPath)) {
                 window.WriteError("Please specify a valid Node.js project or project directory. If your solution contains multiple projects, specify a target project using .npm [ProjectName or ProjectDir] <npm arguments> For example: .npm [MyApp] list");
                 return ExecutionResult.Failure;
             }
@@ -137,7 +127,20 @@ namespace Microsoft.NodejsTools.Repl {
             }
 
             var npmReplRedirector = new NpmReplRedirector(window);
-               
+            
+            if (!isGlobalCommand && !File.Exists(Path.Combine(projectDirectoryPath, "package.json"))) {
+                await ExecuteNpmCommandAsync(
+                    npmReplRedirector,
+                    npmPath,
+                    projectDirectoryPath,
+                    new[] { "init", "--yes" },
+                    null);
+
+                if (npmReplRedirector.HasErrors) {
+                    return ExecutionResult.Failure;
+                }
+            }
+
             await ExecuteNpmCommandAsync(
                 npmReplRedirector,
                 npmPath,
