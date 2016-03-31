@@ -61,7 +61,7 @@ namespace Microsoft.NodejsTools.Repl {
             var solution = Package.GetGlobalService(typeof(SVsSolution)) as IVsSolution;
             var loadedProjects = solution.EnumerateLoadedProjects(onlyNodeProjects: false);
 
-            var projectNameToDirectoryDictionary = new Dictionary<string, Tuple<string, IVsHierarchy>>();
+            var projectNameToDirectoryDictionary = new Dictionary<string, Tuple<string, IVsHierarchy>>(StringComparer.OrdinalIgnoreCase);
             foreach (IVsProject project in loadedProjects) {
                 var hierarchy = (IVsHierarchy)project;
                 object extObject;
