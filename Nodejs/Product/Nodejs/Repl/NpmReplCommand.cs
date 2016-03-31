@@ -111,20 +111,6 @@ namespace Microsoft.NodejsTools.Repl {
             }
 
             var npmReplRedirector = new NpmReplRedirector(window);
-            
-            if (!isGlobalCommand && !File.Exists(Path.Combine(projectDirectoryPath, "package.json"))) {
-                await ExecuteNpmCommandAsync(
-                    npmReplRedirector,
-                    npmPath,
-                    projectDirectoryPath,
-                    new[] { "init", "--yes" },
-                    null);
-
-                if (npmReplRedirector.HasErrors) {
-                    return ExecutionResult.Failure;
-                }
-            }
-
             await ExecuteNpmCommandAsync(
                 npmReplRedirector,
                 npmPath,
