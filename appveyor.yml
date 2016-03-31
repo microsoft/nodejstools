@@ -10,9 +10,6 @@
     - nodejs_version: 4
       vs_version: 14.0
       architecture: x64
-    - nodejs_version: 0.12
-      vs_version: 12.0
-      architecture: x64
     - nodejs_version: 5
       vs_version: 14.0
       architecture: x86
