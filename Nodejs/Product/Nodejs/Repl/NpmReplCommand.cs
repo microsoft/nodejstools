@@ -61,26 +61,10 @@ namespace Microsoft.NodejsTools.Repl {
             var solution = Package.GetGlobalService(typeof(SVsSolution)) as IVsSolution;
             var loadedProjects = solution.EnumerateLoadedProjects(onlyNodeProjects: false);
 
-            var projectNameToDirectoryDictionary = new Dictionary<string, Tuple<string, IVsHierarchy>>(StringComparer.OrdinalIgnoreCase);
-            foreach (IVsProject project in loadedProjects) {
-                var hierarchy = (IVsHierarchy)project;
-                object extObject;
-
-                var projectResult = hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ExtObject, out extObject);
-                if (!ErrorHandler.Succeeded(projectResult)) {
-                    continue;
-                }
-
-                EnvDTE.Project dteProject = extObject as EnvDTE.Project;
-                if (dteProject == null) {
-                    continue;
-                }
-
-                string projectName = dteProject.Name;
-                string projectDirectory = Path.GetDirectoryName(dteProject.FullName);
-                if (!string.IsNullOrEmpty(projectDirectory)) {
-                    projectNameToDirectoryDictionary.Add(projectName, Tuple.Create(projectDirectory, hierarchy));
-                }
+            // Prefer Node projects, but fall back to a non-node project if no Node projects are loaded.
+            var projectNameToDirectoryDictionary = GetProjectInfo(solution.EnumerateLoadedProjects(onlyNodeProjects: true));
+            if (!projectNameToDirectoryDictionary.Any()) {
+                projectNameToDirectoryDictionary = GetProjectInfo(solution.EnumerateLoadedProjects(onlyNodeProjects: false));
             }
 
             Tuple<string, IVsHierarchy> projectInfo;
@@ -230,6 +214,31 @@ namespace Microsoft.NodejsTools.Repl {
         }
 
         #endregion
+
+        private static Dictionary<string, Tuple<string, IVsHierarchy>> GetProjectInfo(IEnumerable<IVsProject> loadedProjects) {
+            var projectNameToDirectoryDictionary = new Dictionary<string, Tuple<string, IVsHierarchy>>();
+            foreach (IVsProject project in loadedProjects) {
+                var hierarchy = (IVsHierarchy)project;
+                object extObject;
+
+                var projectResult = hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ExtObject, out extObject);
+                if (!ErrorHandler.Succeeded(projectResult)) {
+                    continue;
+                }
+
+                EnvDTE.Project dteProject = extObject as EnvDTE.Project;
+                if (dteProject == null) {
+                    continue;
+                }
+
+                string projectName = dteProject.Name;
+                string projectDirectory = Path.GetDirectoryName(dteProject.FullName);
+                if (!string.IsNullOrEmpty(projectDirectory)) {
+                    projectNameToDirectoryDictionary.Add(projectName, Tuple.Create(projectDirectory, hierarchy));
+                }
+            }
+            return projectNameToDirectoryDictionary;
+        }
 
         internal class NpmReplRedirector : Redirector {
             
