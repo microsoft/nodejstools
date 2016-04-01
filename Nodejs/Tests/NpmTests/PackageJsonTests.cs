@@ -218,14 +218,6 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestGetEmptyScripts() {
-            var pkg = LoadFrom(PkgSimple);
-            var scripts = pkg.Scripts;
-            Assert.IsNotNull(scripts, "Scripts collection should not be null.");
-            Assert.AreEqual(0, scripts.Count, "Shouldn't find any scripts.");
-        }
-
-        [TestMethod, Priority(0)]
         public void TestReadNoDescriptionNull() {
             var pkg = LoadFrom(PkgEmpty);
             Assert.IsNull(pkg.Description, "Description should be null.");
@@ -275,35 +267,6 @@ namespace NpmTests {
                 pkg.Homepages,
                 1,
                 new[] { "http://www.mypackagehomepage.com/" });
-        }
-
-        [TestMethod, Priority(0)]
-        public void TestReadNoLicensesEmpty() {
-            var pkg = LoadFrom(PkgSimpleBugs);
-            var licenses = pkg.Licenses;
-            Assert.IsNotNull(licenses, "Licenses should not be null.");
-            Assert.AreEqual(0, licenses.Count, "Should not be any licenses.");
-        }
-
-        [TestMethod, Priority(0)]
-        public void TestReadLicensesTypeOnly() {
-            var pkg = LoadFrom(PkgSingleLicenseType);
-            var licenses = pkg.Licenses;
-            Assert.AreEqual(1, licenses.Count, "License count mismatch.");
-            var license = licenses[0];
-            Assert.IsNotNull(license, "License should not be null.");
-            Assert.AreEqual("BSD", license.Type, "License type mismatch.");
-        }
-
-        [TestMethod, Priority(0)]
-        public void ReadLicensesTypeAndUrl() {
-            var pkg = LoadFrom(PkgLargeCompliant);
-            var licenses = pkg.Licenses;
-            Assert.AreEqual(1, licenses.Count, "License count mismatch.");
-            var license = licenses[0];
-            Assert.IsNotNull(license, "License should not be null.");
-            Assert.AreEqual("GPLv2", license.Type, "License type mismatch.");
-            Assert.AreEqual("http://www.example.org/licenses/gpl.html", license.Url, "License URL mismatch.");
         }
 
         [TestMethod, Priority(0)]
