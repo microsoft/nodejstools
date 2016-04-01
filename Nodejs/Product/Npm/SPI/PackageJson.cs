@@ -38,17 +38,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             OptionalDependencies = LoadOptionalDependencies(package);
             AllDependencies = LoadAllDependencies(package);
             RequiredBy = LoadRequiredBy(package);
-
-            dynamic scriptsJson = package.scripts;
-            if (null == scriptsJson) {
-                scriptsJson = new JObject();
-                package.scripts = scriptsJson;
-            }
-            Scripts = new Scripts(scriptsJson);
-
-            if (package.bugs != null) {
-                Bugs = new Bugs(package);
-            }
         }
 
         private static PackageJsonException WrapRuntimeBinderException(string errorProperty, RuntimeBinderException rbe) {
@@ -156,8 +145,6 @@ The following error occurred:
 
         public SemverVersion Version { get; private set; }
 
-        public IScripts Scripts { get; private set; }
-
         public IPerson Author { get; private set; }
 
         public string Description { get; private set; }
@@ -165,8 +152,6 @@ The following error occurred:
         public IKeywords Keywords { get; private set; }
 
         public IHomepages Homepages { get; private set; }
-
-        public IBugs Bugs { get; private set; }
 
         public ILicenses Licenses { get; private set; }
 

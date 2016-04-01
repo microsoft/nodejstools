@@ -226,35 +226,6 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestReadSingleStartScript() {
-            var pkg = LoadFrom(PkgStartScript);
-            var scripts = pkg.Scripts;
-            Assert.AreEqual(1, scripts.Count, "Should be a single script.");
-            IScript start = scripts[ScriptName.Start];
-            Assert.IsNotNull(start, "Start script should not be null.");
-            Assert.AreEqual(ScriptName.Start, start.Name, "Script name mismatch.");
-            Assert.AreEqual("node server.js", start.Code, "Script code mismatch.");
-        }
-
-        [TestMethod, Priority(0)]
-        public void TestReadNonExistentScriptsNull() {
-            var pkg = LoadFrom(PkgStartScript);
-            var scripts = pkg.Scripts;
-
-            foreach (var name in new[]{
-                ScriptName.Install,
-                ScriptName.Postinstall,
-                ScriptName.Postpublish,
-                ScriptName.Postrestart,
-                ScriptName.Poststart,
-                ScriptName.Poststop,
-                ScriptName.Posttest
-            }) {
-                Assert.IsNull(scripts[name], string.Format("Script '{0}' should be null.", name));
-            }
-        }
-
-        [TestMethod, Priority(0)]
         public void TestReadNoDescriptionNull() {
             var pkg = LoadFrom(PkgEmpty);
             Assert.IsNull(pkg.Description, "Description should be null.");
@@ -304,39 +275,6 @@ namespace NpmTests {
                 pkg.Homepages,
                 1,
                 new[] { "http://www.mypackagehomepage.com/" });
-        }
-
-        [TestMethod, Priority(0)]
-        public void TestReadNoBugsNull() {
-            var pkg = LoadFrom(PkgSimple);
-            Assert.IsNull(pkg.Bugs, "Bugs should be null.");
-        }
-
-        [TestMethod, Priority(0)]
-        public void TestReadBugsUrlOnly() {
-            var pkg = LoadFrom(PkgSimpleBugs);
-            var bugs = pkg.Bugs;
-            Assert.IsNotNull(bugs, "Bugs should not be null.");
-            Assert.AreEqual("http://www.mybugtracker.com/", bugs.Url, "Bugs URL mismatch.");
-            Assert.IsNull(bugs.Email, "Bugs email should be null.");
-        }
-
-        private void TestReadBugsUrlAndEmail(string json) {
-            var pkg = LoadFrom(json);
-            var bugs = pkg.Bugs;
-            Assert.IsNotNull(bugs, "Bugs should not be null.");
-            Assert.AreEqual("http://www.example.com/bugs", bugs.Url, "Bugs URL mismatch.");
-            Assert.AreEqual("dev@example.com", bugs.Email, "Bugs email mismatch.");
-        }
-
-        [TestMethod, Priority(0)]
-        public void TestReadBugsUrlAndEmailCompliant() {
-            TestReadBugsUrlAndEmail(PkgLargeCompliant);
-        }
-
-        [TestMethod, Priority(0)]
-        public void TestReadBugsUrlAndEmailNonCompliant() {
-            TestReadBugsUrlAndEmail(PkgLargeNonCompliant);
         }
 
         [TestMethod, Priority(0)]

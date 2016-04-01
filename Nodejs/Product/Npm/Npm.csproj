@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Choose>
     <When Condition=" '$(VisualStudioVersion)'=='15.0'  Or '$(TargetVisualStudioVersion)'=='VS150' ">
@@ -114,7 +114,6 @@
     <Compile Include="DependencyUrlType.cs" />
     <Compile Include="DirectoryPackageJsonSource.cs" />
     <Compile Include="FilePackageJsonSource.cs" />
-    <Compile Include="IBugs.cs" />
     <Compile Include="IBundledDependencies.cs" />
     <Compile Include="IDependencies.cs" />
     <Compile Include="IDependency.cs" />
@@ -137,8 +136,6 @@
     <Compile Include="IPerson.cs" />
     <Compile Include="IPkgStringArray.cs" />
     <Compile Include="IRootPackage.cs" />
-    <Compile Include="IScript.cs" />
-    <Compile Include="IScripts.cs" />
     <Compile Include="..\Nodejs\Nodejs.cs">
       <Link>Nodejs.cs</Link>
     </Compile>
@@ -173,7 +170,6 @@
     <Compile Include="SemverVersion.cs" />
     <Compile Include="SemverVersionFormatException.cs" />
     <Compile Include="SPI\AbstractNodeModules.cs" />
-    <Compile Include="SPI\Bugs.cs" />
     <Compile Include="SPI\BundledDependencies.cs" />
     <Compile Include="SPI\Dependencies.cs" />
     <Compile Include="SPI\Dependency.cs" />
@@ -200,8 +196,6 @@
     <Compile Include="SPI\PkgStringArray.cs" />
     <Compile Include="SPI\PkgFiles.cs" />
     <Compile Include="SPI\RootPackage.cs" />
-    <Compile Include="SPI\Script.cs" />
-    <Compile Include="SPI\Scripts.cs" />
     <Compile Include="SQLite\CatalogTables.cs" />
     <Compile Include="SQLite\SQLite.cs" />
     <Compile Include="SQLite\SQLiteAsync.cs" />
