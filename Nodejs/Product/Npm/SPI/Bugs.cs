@@ -18,21 +18,19 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal class Bugs : IBugs {
-        private readonly dynamic _package;
+        private readonly dynamic _json;
 
         public Bugs(dynamic package) {
-            _package = package;
+            _json = package.bugs;
         }
-
 
         public string Url {
             get {
                 string url = null;
-                var bugs = _package.bugs;
-                if (null != bugs) {
-                    var token = bugs as JToken;
+                if (null != _json) {
+                    var token = _json as JToken;
                     if (token.Type == JTokenType.Object) {
-                        var temp = bugs.url ?? bugs.web;
+                        var temp = _json.url ?? _json.web;
                         if (null != temp) {
                             url = temp.ToString();
                         }
@@ -47,11 +45,10 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         public string Email {
             get {
                 string email = null;
-                var bugs = _package.bugs;
-                if (null != bugs) {
-                    var token = bugs as JToken;
+                if (null != _json) {
+                    var token = _json as JToken;
                     if (token.Type == JTokenType.Object) {
-                        var temp = bugs.email ?? bugs.mail;
+                        var temp = _json.email ?? _json.mail;
                         if (null != temp) {
                             email = temp.ToString();
                         }
