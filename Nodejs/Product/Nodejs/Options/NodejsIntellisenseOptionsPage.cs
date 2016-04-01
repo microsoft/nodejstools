@@ -25,7 +25,7 @@ using Microsoft.VisualStudioTools;
 namespace Microsoft.NodejsTools.Options {
     [ComVisible(true)]
     public class NodejsIntellisenseOptionsPage : NodejsDialogPage {
-        private static readonly Version _typeScriptMinVersionForES6Preview = new Version("1.8");
+        private static readonly Version _typeScriptMinVersionForES6Preview = new Version("1.6");
 
         private NodejsIntellisenseOptionsControl _window;
         private AnalysisLevel _level;
