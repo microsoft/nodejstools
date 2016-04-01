@@ -22,17 +22,33 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal abstract class PkgStringArray : IPkgStringArray {
-        private readonly JObject _package;
-        private readonly string[] arrayPropertyNames;
+        private IList<string> elements;
 
         protected PkgStringArray(JObject package, params string[] arrayPropertyNames) {
-            _package = package;
-            this.arrayPropertyNames = arrayPropertyNames;
+
+            var token = GetArrayProperty(package, arrayPropertyNames);
+            if (token == null) {
+                elements = new List<string>();
+            } else {
+                switch (token.Type) {
+                    case JTokenType.String:
+                        elements = new[] { token.Value<string>() };
+                        break;
+
+                    case JTokenType.Array:
+                        elements = (token as JArray).Select(value => value.Value<string>()).ToList();
+                        break;
+
+                    default:
+                        elements = new List<string>();
+                        break;
+                }
+            }
         }
 
-        private JToken GetArrayProperty() {
+        private static JToken GetArrayProperty(JObject package, string[] arrayPropertyNames) {
             foreach (var name in arrayPropertyNames) {
-                var array = _package[name] as JToken;
+                var array = package[name] as JToken;
                 if (null != array) {
                     return array;
                 }
@@ -42,21 +58,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         public int Count {
             get {
-                var token = GetArrayProperty();
-                if (null == token) {
-                    return 0;
-                }
-
-                switch (token.Type) {
-                    case JTokenType.String:
-                        return 1;
-
-                    case JTokenType.Array:
-                        return (token as JArray).Count;
-
-                    default:
-                        return 0;
-                }
+                return elements.Count;
             }
         }
 
@@ -67,37 +69,18 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                         "Cannot retrieve item from empty package.json string array.");
                 }
 
-                var token = GetArrayProperty();
-                switch (token.Type) {
-                    case JTokenType.String:
-                        if (index != 0) {
-                            throw new IndexOutOfRangeException(
-                                string.Format(
-                                    "Cannot retrieve value from index '{0}' in a package.json string array containing only 1 item.",
-                                    index));
-                        }
-                        return token.Value<string>();
-
-                    default: //  Can only be an array at this point, since Count has been called.
-                        return (token as JArray)[index].Value<string>();
+                if (index > Count) {
+                    throw new IndexOutOfRangeException(
+                        string.Format(
+                            "Cannot retrieve value from index '{0}' in a package.json string array containing only 1 item.",
+                            index));
                 }
+                return elements[index];
             }
         }
 
         public IEnumerator<string> GetEnumerator() {
-            switch (Count) {
-                case 0:
-                    return new List<string>().GetEnumerator();
-
-                case 1:
-                    return new List<string> { this[0] }.GetEnumerator();
-
-                default:
-                    return
-                        (GetArrayProperty() as JArray).Select(value => value.Value<string>())
-                                                      .ToList()
-                                                      .GetEnumerator();
-            }
+            return elements.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator() {
