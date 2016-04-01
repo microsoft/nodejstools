@@ -24,11 +24,15 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         private IList<Dependency> _dependencyProperties;
 
         public Dependencies(JObject package, params string[] dependencyPropertyNames) {
-            _dependencyProperties = dependencyPropertyNames
-                .Select(propertyName => package[propertyName] as JObject)
-                .Where(x => x != null)
-                .SelectMany(x => x.Properties().Select(property => new Dependency(property.Name, property.Value.Value<string>())))
-                .ToList();
+            _dependencyProperties = new List<Dependency>();
+            foreach (var propertyName in dependencyPropertyNames) {
+                var dependencies = package[propertyName] as JObject;
+                if (dependencies != null) {
+                    foreach (var property in dependencies.Properties()) {
+                        _dependencyProperties.Add(new Dependency(property.Name, property.Value.Value<string>()));
+                    }
+                }
+            }
         }
 
         public IEnumerator<IDependency> GetEnumerator() {
