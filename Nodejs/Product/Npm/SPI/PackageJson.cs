@@ -21,31 +21,39 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal class PackageJson : IPackageJson {
-        private dynamic _package;
-        private Scripts _scripts;
-        private Bugs _bugs;
-
         public PackageJson(dynamic package) {
-            _package = package;
+            Name = package.name == null ? null : package.name.ToString();
+            Version =  package.version == null ? new SemverVersion() : SemverVersion.Parse(package.version.ToString());
+            Description = package.description == null ? null : package.description.ToString();
+            Author = package.author == null ? null : Person.CreateFromJsonSource(package.author.ToString());
 
-            InitKeywords();
-            InitHomepages();
-            InitLicenses();
-            InitFiles();
-            InitMan();
-            InitDependencies();
-            InitDevDependencies();
-            InitBundledDependencies();
-            InitOptionalDependencies();
-            InitAllDependencies();
-            InitRequiredBy();
+            Keywords = LoadKeywords(package);
+            Homepages = LoadHomepages(package);
+            Licenses = LoadLicenses(package);
+            Files = LoadFiles(package);
+            Man = LoadMan(package);
+            Dependencies = LoadDependencies(package);
+            DevDependencies = LoadDevDependencies(package);
+            BundledDependencies = LoadBundledDependencies(package);
+            OptionalDependencies = LoadOptionalDependencies(package);
+            AllDependencies = LoadAllDependencies(package);
+            RequiredBy = LoadRequiredBy(package);
+
+            dynamic scriptsJson = package.scripts;
+            if (null == scriptsJson) {
+                scriptsJson = new JObject();
+                package.scripts = scriptsJson;
+            }
+            Scripts = new Scripts(scriptsJson);
+
+            if (package.bugs != null) {
+                Bugs = new Bugs(package);
+            }
         }
 
-        private void WrapRuntimeBinderExceptionAndRethrow(
-            string errorProperty,
-            RuntimeBinderException rbe) {
-            throw new PackageJsonException(
-                    string.Format(@"Exception occurred retrieving {0} from package.json. The file may be invalid: you should edit it to correct an errors.
+        private static PackageJsonException WrapRuntimeBinderException(string errorProperty, RuntimeBinderException rbe) {
+            return new PackageJsonException(
+                string.Format(@"Exception occurred retrieving {0} from package.json. The file may be invalid: you should edit it to correct an errors.
 
 The following error occurred:
 
@@ -54,166 +62,111 @@ The following error occurred:
                         rbe));
         }
 
-        private void InitKeywords() {
+        private static IKeywords LoadKeywords(dynamic package) {
             try {
-                Keywords = new Keywords(_package);
+                return new Keywords(package);
             } catch (RuntimeBinderException rbe) {
-                WrapRuntimeBinderExceptionAndRethrow(
-                    "keywords",
-                    rbe);
+                throw WrapRuntimeBinderException("keywords", rbe);
             }
         }
 
-        private void InitHomepages() {
+        private static IHomepages LoadHomepages(dynamic package) {
             try {
-                Homepages = new Homepages(_package);
+                return new Homepages(package);
             }
             catch (RuntimeBinderException rbe) {
-                WrapRuntimeBinderExceptionAndRethrow(
-                    "homepage",
-                    rbe);
+                throw WrapRuntimeBinderException("homepage", rbe);
             }
         }
 
-        private void InitFiles() {
+        private static IFiles LoadFiles(dynamic package) {
             try {
-                Files = new PkgFiles(_package);
+                return new PkgFiles(package);
             } catch (RuntimeBinderException rbe) {
-                WrapRuntimeBinderExceptionAndRethrow(
-                    "files",
-                    rbe);
+                throw WrapRuntimeBinderException("files", rbe);
             }
         }
 
-        private void InitLicenses() {
+        private static ILicenses LoadLicenses(dynamic package) {
             try {
-                Licenses = new Licenses(_package);
+                return new Licenses(package);
             } catch (RuntimeBinderException rbe) {
-                WrapRuntimeBinderExceptionAndRethrow(
-                    "licenses",
-                    rbe);
+                throw WrapRuntimeBinderException("licenses",rbe);
             }
         }
 
-        private void InitMan() {
+        private static IMan LoadMan(dynamic package) {
             try {
-                Man = new Man(_package);
+                return new Man(package);
             } catch (RuntimeBinderException rbe) {
-                WrapRuntimeBinderExceptionAndRethrow(
-                    "man",
-                    rbe);
+                throw WrapRuntimeBinderException("man", rbe);
             }
         }
 
-        private void InitDependencies() {
+        private static IDependencies LoadDependencies(dynamic package) {
             try {
-                Dependencies = new Dependencies(_package, "dependencies");
+                return new Dependencies(package, "dependencies");
             } catch (RuntimeBinderException rbe) {
-                WrapRuntimeBinderExceptionAndRethrow(
-                    "dependencies",
-                    rbe);
+                throw WrapRuntimeBinderException("dependencies", rbe);
             }
         }
 
-        private void InitDevDependencies() {
+        private static IDependencies LoadDevDependencies(dynamic package) {
             try {
-                DevDependencies = new Dependencies(_package, "devDependencies");
+                return new Dependencies(package, "devDependencies");
             } catch (RuntimeBinderException rbe) {
-                WrapRuntimeBinderExceptionAndRethrow(
-                    "dev dependencies",
-                    rbe);
+                throw WrapRuntimeBinderException("dev dependencies", rbe);
             }
         }
 
-        private void InitBundledDependencies() {
+        private static IBundledDependencies LoadBundledDependencies(dynamic package) {
             try {
-                BundledDependencies = new BundledDependencies(_package);
+                return new BundledDependencies(package);
             } catch (RuntimeBinderException rbe) {
-                WrapRuntimeBinderExceptionAndRethrow(
-                    "bundled dependencies",
-                    rbe);
+                throw WrapRuntimeBinderException("bundled dependencies", rbe);
             }
         }
 
-        private void InitOptionalDependencies() {
+        private static IDependencies LoadOptionalDependencies(dynamic package) {
             try {
-                OptionalDependencies = new Dependencies(_package, "optionalDependencies");
+                return new Dependencies(package, "optionalDependencies");
             } catch (RuntimeBinderException rbe) {
-                WrapRuntimeBinderExceptionAndRethrow(
-                    "optional dependencies",
-                    rbe);
+                throw WrapRuntimeBinderException("optional dependencies", rbe);
             }
         }
 
-        private void InitAllDependencies() {
+        private static IDependencies LoadAllDependencies(dynamic package) {
             try {
-                AllDependencies = new Dependencies(_package, "dependencies", "devDependencies", "optionalDependencies");
+                return new Dependencies(package, "dependencies", "devDependencies", "optionalDependencies");
             } catch (RuntimeBinderException rbe) {
-                WrapRuntimeBinderExceptionAndRethrow(
-                    "all dependencies",
-                    rbe);
+                throw WrapRuntimeBinderException("all dependencies", rbe);
             }
         }
 
-        private void InitRequiredBy() {
+        private static IEnumerable<string> LoadRequiredBy(dynamic package) {
             try {
-                RequiredBy = (_package["_requiredBy"] as IEnumerable<JToken> ?? Enumerable.Empty<JToken>()).Values<string>();
+                return (package["_requiredBy"] as IEnumerable<JToken> ?? Enumerable.Empty<JToken>()).Values<string>();
             } catch (RuntimeBinderException rbe) {
                 System.Diagnostics.Debug.WriteLine(rbe);
-                WrapRuntimeBinderExceptionAndRethrow(
-                    "required by",
-                    rbe);
+                throw WrapRuntimeBinderException("required by", rbe);
             }
         }
 
-        public string Name {
-            get { return null == _package.name ? null : _package.name.ToString(); }
-        }
+        public string Name { get; private set; }
 
-        public SemverVersion Version {
-            get {
-                return null == _package.version ? new SemverVersion() : SemverVersion.Parse(_package.version.ToString());
-            }
-        }
+        public SemverVersion Version { get; private set; }
 
-        public IScripts Scripts {
-            get {
-                if (null == _scripts) {
-                    dynamic scriptsJson = _package.scripts;
-                    if (null == scriptsJson) {
-                        scriptsJson = new JObject();
-                        _package.scripts = scriptsJson;
-                    }
-                    _scripts = new Scripts(scriptsJson);
-                }
+        public IScripts Scripts { get; private set; }
 
-                return _scripts;
-            }
-        }
+        public IPerson Author { get; private set; }
 
-        public IPerson Author {
-            get {
-                var author = _package.author;
-                return null == author ? null : Person.CreateFromJsonSource(author.ToString());
-            }
-        }
-
-        public string Description {
-            get { return null == _package.description ? null : _package.description.ToString(); }
-        }
+        public string Description { get; private set; }
 
         public IKeywords Keywords { get; private set; }
 
         public IHomepages Homepages { get; private set; }
 
-        public IBugs Bugs {
-            get {
-                if (null == _bugs && null != _package.bugs) {
-                    _bugs = new Bugs(_package);
-                }
-                return _bugs;
-            }
-        }
+        public IBugs Bugs { get; private set; }
 
         public ILicenses Licenses { get; private set; }
 
