@@ -40,8 +40,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         protected override void OnParentSet(HierarchyNode parent) {
-#if DEV14
-            if (ProjectMgr == null || ProjectMgr.Analyzer == null) {
+            if (ProjectMgr == null || ProjectMgr.Analyzer == null || !ProjectMgr.ShouldAcquireTypingsAutomatically) {
                 return;
             }
 
@@ -50,7 +49,6 @@ namespace Microsoft.NodejsTools.Project {
                     this.IncludeInProject(true);
                 });
             }
-#endif
         }
 
         internal void Analyze() {
@@ -105,11 +103,11 @@ namespace Microsoft.NodejsTools.Project {
             UpdateParentContentType();
             ItemNode.ItemTypeChanged += ItemNode_ItemTypeChanged;
 
-#if DEV14
-            ProjectMgr.Site.GetUIThread().Invoke(() => {
-                ProjectMgr.OnItemAdded(this.Parent, this);
-            });
-#endif
+            if (ProjectMgr.ShouldAcquireTypingsAutomatically) {
+                ProjectMgr.Site.GetUIThread().Invoke(() => {
+                    ProjectMgr.OnItemAdded(this.Parent, this);
+                });
+            }
 
             return includeInProject;
         }

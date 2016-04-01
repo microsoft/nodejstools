@@ -104,10 +104,11 @@ namespace Microsoft.NodejsTools.Project {
 #endif
         }
 
-#if DEV14
-        private bool ShouldAcquireTypingsAutomatically {
+
+        internal bool ShouldAcquireTypingsAutomatically {
             get {
-                if (!NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel != Options.AnalysisLevel.Preview) {
+#if DEV14
+                if (NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel != Options.AnalysisLevel.Preview) {
                     return false;
                 }
 
@@ -116,9 +117,13 @@ namespace Microsoft.NodejsTools.Project {
                 });
                 task.Wait();
                 return !task.Result;
+#else
+                return false;
+#endif
             }
         }
 
+#if DEV14
         private TypingsAcquisition TypingsAcquirer {
             get {
                 if (_typingsAcquirer != null) {
