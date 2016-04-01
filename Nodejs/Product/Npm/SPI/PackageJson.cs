@@ -29,7 +29,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
             Keywords = LoadKeywords(package);
             Homepages = LoadHomepages(package);
-            Licenses = LoadLicenses(package);
             Files = LoadFiles(package);
             Man = LoadMan(package);
             Dependencies = LoadDependencies(package);
@@ -73,14 +72,6 @@ The following error occurred:
                 return new PkgFiles(package);
             } catch (RuntimeBinderException rbe) {
                 throw WrapRuntimeBinderException("files", rbe);
-            }
-        }
-
-        private static ILicenses LoadLicenses(dynamic package) {
-            try {
-                return new Licenses(package);
-            } catch (RuntimeBinderException rbe) {
-                throw WrapRuntimeBinderException("licenses",rbe);
             }
         }
 
@@ -134,7 +125,7 @@ The following error occurred:
 
         private static IEnumerable<string> LoadRequiredBy(dynamic package) {
             try {
-                return (package["_requiredBy"] as IEnumerable<JToken> ?? Enumerable.Empty<JToken>()).Values<string>();
+                return (package["_requiredBy"] as IEnumerable<JToken> ?? Enumerable.Empty<JToken>()).Values<string>().ToList();
             } catch (RuntimeBinderException rbe) {
                 System.Diagnostics.Debug.WriteLine(rbe);
                 throw WrapRuntimeBinderException("required by", rbe);

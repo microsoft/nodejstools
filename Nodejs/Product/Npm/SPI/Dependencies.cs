@@ -21,23 +21,18 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal class Dependencies : IDependencies {
-        private IList<JObject> _dependencyProperties;
+        private IList<Dependency> _dependencyProperties;
 
         public Dependencies(JObject package, params string[] dependencyPropertyNames) {
             _dependencyProperties = dependencyPropertyNames
                 .Select(propertyName => package[propertyName] as JObject)
                 .Where(x => x != null)
+                .SelectMany(x => x.Properties().Select(property => new Dependency(property.Name, property.Value.Value<string>())))
                 .ToList();
         }
 
         public IEnumerator<IDependency> GetEnumerator() {
-            foreach (var dependencies in _dependencyProperties) {
-                if (dependencies != null) {
-                    foreach (var property in dependencies.Properties()) {
-                        yield return new Dependency(property.Name, property.Value.Value<string>());
-                    }
-                }
-            }
+            return _dependencyProperties.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator() {
@@ -50,10 +45,9 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         public IDependency this[string name] {
             get {
-                foreach (var dependencies in _dependencyProperties) {
-                    var property = dependencies[name];
-                    if (null != property) {
-                        return new Dependency(name, property.Value<string>());
+                foreach (var dependeny in _dependencyProperties) {
+                    if (dependeny.Name == name) {
+                        return dependeny;
                     }
                 }
                 return null;

@@ -176,8 +176,6 @@
     <Compile Include="SPI\DependencyUrl.cs" />
     <Compile Include="SPI\GlobalPackages.cs" />
     <Compile Include="SPI\Keywords.cs" />
-    <Compile Include="SPI\License.cs" />
-    <Compile Include="SPI\Licenses.cs" />
     <Compile Include="SPI\Man.cs" />
     <Compile Include="SPI\NodeModules.cs" />
     <Compile Include="SPI\NodeModulesProxy.cs" />
