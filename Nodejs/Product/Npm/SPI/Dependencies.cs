@@ -29,7 +29,9 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 var dependencies = package[propertyName] as JObject;
                 if (dependencies != null) {
                     foreach (var property in dependencies.Properties()) {
-                        _dependencyProperties.Add(new Dependency(property.Name, property.Value.Value<string>()));
+                        if (property.Value.Type == JTokenType.String) {
+                            _dependencyProperties.Add(new Dependency(property.Name, property.Value.Value<string>()));
+                        }
                     }
                 }
             }
