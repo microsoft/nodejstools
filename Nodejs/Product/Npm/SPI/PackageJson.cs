@@ -22,11 +22,6 @@ using Newtonsoft.Json.Linq;
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal class PackageJson : IPackageJson {
         public PackageJson(dynamic package) {
-            Name = package.name == null ? null : package.name.ToString();
-            Version =  package.version == null ? new SemverVersion() : SemverVersion.Parse(package.version.ToString());
-            Description = package.description == null ? null : package.description.ToString();
-            Author = package.author == null ? null : Person.CreateFromJsonSource(package.author.ToString());
-
             Keywords = LoadKeywords(package);
             Homepages = LoadHomepages(package);
             Files = LoadFiles(package);
@@ -37,6 +32,11 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             OptionalDependencies = LoadOptionalDependencies(package);
             AllDependencies = LoadAllDependencies(package);
             RequiredBy = LoadRequiredBy(package);
+
+            Name = package.name == null ? null : package.name.ToString();
+            Version = package.version == null ? new SemverVersion() : SemverVersion.Parse(package.version.ToString());
+            Description = package.description == null ? null : package.description.ToString();
+            Author = package.author == null ? null : Person.CreateFromJsonSource(package.author.ToString());
         }
 
         private static PackageJsonException WrapRuntimeBinderException(string errorProperty, RuntimeBinderException rbe) {
