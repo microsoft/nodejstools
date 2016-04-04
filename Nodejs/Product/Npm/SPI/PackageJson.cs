@@ -21,6 +21,8 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal class PackageJson : IPackageJson {
+        private string _versionString;
+
         public PackageJson(dynamic package) {
             Keywords = LoadKeywords(package);
             Homepages = LoadHomepages(package);
@@ -34,7 +36,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             RequiredBy = LoadRequiredBy(package);
 
             Name = package.name == null ? null : package.name.ToString();
-            Version = package.version == null ? new SemverVersion() : SemverVersion.Parse(package.version.ToString());
+            _versionString = package.version;
             Description = package.description == null ? null : package.description.ToString();
             Author = package.author == null ? null : Person.CreateFromJsonSource(package.author.ToString());
         }
@@ -134,7 +136,11 @@ The following error occurred:
 
         public string Name { get; private set; }
 
-        public SemverVersion Version { get; private set; }
+        public SemverVersion Version {
+            get {
+                return _versionString == null ? new SemverVersion() : SemverVersion.Parse(_versionString);
+            }
+        }
 
         public IPerson Author { get; private set; }
 
