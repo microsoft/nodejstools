@@ -173,10 +173,14 @@ namespace Microsoft.NodejsTools.Commands {
 
         private static string GetProjectProperty(EnvDTE.Project project, string name) {
             try {
-                return project.Properties.Item(name).Value.ToString();
+                var item = project.Properties.Item(name);
+                if (item != null && item.Value != null) {
+                    return item.Value.ToString();
+                }
             } catch {
-                return "<undefined>";
+                // noop
             }
+            return "<undefined>";
         }
 
         public override int CommandId {
