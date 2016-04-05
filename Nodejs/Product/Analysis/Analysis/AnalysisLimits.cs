@@ -61,28 +61,22 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         /// <summary>
-        /// Creates instance of the <see cref="AnalysisLimits"/> for medium level of Intellisense support.
+        /// <see cref="AnalysisLimits"/> for medium level of Intellisense support.
         /// </summary>
-        /// <returns>An <see cref="AnalysisLimits"/> object representing medium level Initellisense settings.</returns>
-        public static AnalysisLimits MakeMediumAnalysisLimits() {
-            return new AnalysisLimits() {
+        public static AnalysisLimits MediumAnalysisLimits = new AnalysisLimits() {
+            // Maximum practical limit for the dependencies analysis oriented on producing faster results.
+            NestedModulesLimit = 2
+        };
 
-                // Maximum practical limit for the dependencies analysis oriented on producing faster results.
-                NestedModulesLimit = 2
-            };
-        }
-
-        public static AnalysisLimits MakeLowAnalysisLimits() {
-            return new AnalysisLimits() {
-                ReturnTypes = 1,
-                AssignedTypes = 1,
-                DictKeyTypes = 1,
-                DictValueTypes = 1,
-                IndexTypes = 1,
-                InstanceMembers = 1,
-                NestedModulesLimit = 1
-            };
-        }
+        public static AnalysisLimits LowAnalysisLimit = new AnalysisLimits() {
+            ReturnTypes = 1,
+            AssignedTypes = 1,
+            DictKeyTypes = 1,
+            DictValueTypes = 1,
+            IndexTypes = 1,
+            InstanceMembers = 1,
+            NestedModulesLimit = 1
+        };
 
         /// <summary>
         /// Loads a new instance from the specified registry key.

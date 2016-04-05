@@ -167,7 +167,7 @@ namespace AnalysisDriver {
             sw.Start();
             var analyzer = Analysis.Analyze(
                 testDir,
-                _lowAnalysis ? AnalysisLimits.MakeLowAnalysisLimits() : null,
+                _lowAnalysis ? AnalysisLimits.LowAnalysisLimit : null,
                 () => {
                     for (int i = 0; i < 3; i++) {
                         GC.Collect(GC.MaxGeneration);

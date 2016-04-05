@@ -81,7 +81,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         private bool _fullyLoaded;
         private List<Action> _loadingDeltas = new List<Action>();
 
-        private static AnalysisLimits _lowLimits = AnalysisLimits.MakeLowAnalysisLimits();
+        private static AnalysisLimits _lowLimits = AnalysisLimits.LowAnalysisLimit;
         private static AnalysisLimits _highLimits = new AnalysisLimits();
         private static byte[] _dbHeader;
 
@@ -1494,7 +1494,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             if (NodejsPackage.Instance != null) {
                 switch (_analysisLevel) {
                     case Options.AnalysisLevel.NodeLsMedium:
-                        defaults = AnalysisLimits.MakeMediumAnalysisLimits();
+                        defaults = AnalysisLimits.MediumAnalysisLimits;
                         break;
                     case Options.AnalysisLevel.NodeLsLow:
                         defaults = _lowLimits;
