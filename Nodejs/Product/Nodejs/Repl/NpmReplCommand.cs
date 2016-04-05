@@ -59,7 +59,7 @@ namespace Microsoft.NodejsTools.Repl {
             npmArguments = string.Format(" {0} ", npmArguments);
 
             var solution = Package.GetGlobalService(typeof(SVsSolution)) as IVsSolution;
-            var loadedProjects = solution.EnumerateLoadedProjects(onlyNodeProjects: false);
+            IEnumerable<IVsProject> loadedProjects = solution.EnumerateLoadedProjects(onlyNodeProjects: false);
 
             var projectNameToDirectoryDictionary = new Dictionary<string, Tuple<string, IVsHierarchy>>(StringComparer.OrdinalIgnoreCase);
             foreach (IVsProject project in loadedProjects) {
@@ -77,6 +77,10 @@ namespace Microsoft.NodejsTools.Repl {
                 }
 
                 string projectName = dteProject.Name;
+                if (string.IsNullOrEmpty(projectName)) {
+                    continue;
+                }
+
                 string projectDirectory = Path.GetDirectoryName(dteProject.FullName);
                 if (!string.IsNullOrEmpty(projectDirectory)) {
                     projectNameToDirectoryDictionary.Add(projectName, Tuple.Create(projectDirectory, hierarchy));
