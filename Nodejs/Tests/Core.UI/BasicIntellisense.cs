@@ -40,13 +40,16 @@ namespace Microsoft.Nodejs.Tests.UI {
                 Compile("server", "var http = require('http');\r\nhttp.createS")
             );
 
-            using (var solution = project.Generate().ToVs()) {
-                var server = solution.OpenItem("CtrlSpace", "server.js");
+			using (var solution = project.Generate().ToVs()) {
+                var optionsPage = NodejsTools.NodejsPackage.Instance.IntellisenseOptionsPage;
+                using (new NodejsOptionHolder(optionsPage, "OnlyTabOrEnterToCommit", false)) {
+                    var server = solution.OpenItem("CtrlSpace", "server.js");
 
-                server.MoveCaret(2, 13);
-                solution.ExecuteCommand("Edit.CompleteWord");
+                    server.MoveCaret(2, 13);
+                    solution.ExecuteCommand("Edit.CompleteWord");
 
-                server.WaitForText("var http = require('http');\r\nhttp.createServer");
+                    server.WaitForText("var http = require('http');\r\nhttp.createServer");
+                }
             }
         }
 
