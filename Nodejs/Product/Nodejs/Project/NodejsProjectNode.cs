@@ -108,7 +108,7 @@ namespace Microsoft.NodejsTools.Project {
         internal bool ShouldAcquireTypingsAutomatically {
             get {
 #if DEV14
-                if (!NodejsPackage.Instance.IntellisenseOptionsPage.EnableES6Preview) {
+                if (NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel != Options.AnalysisLevel.Preview) {
                     return false;
                 }
 
