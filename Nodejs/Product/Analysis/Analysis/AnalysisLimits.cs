@@ -15,8 +15,6 @@
 //*********************************************************//
 
 using System;
-using System.IO;
-using System.Security;
 using Microsoft.Win32;
 
 namespace Microsoft.NodejsTools.Analysis {
@@ -87,78 +85,116 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         /// <summary>
+        /// Loads a new instance from the specified registry key.
+        /// </summary>
+        /// <param name="key">
+        /// The key to load settings from. If
+        /// null, all settings are assumed to be unspecified and the default
+        /// values are used.
+        /// </param>
+        /// <param name="defaults">
+        /// The default analysis limits if they're not available in the regkey.
+        /// </param>
+        public static AnalysisLimits LoadLimitsFromStorage(RegistryKey key, AnalysisLimits defaults) {
+            return new AnalysisLimits() {
+                ReturnTypes = GetSetting(key, ReturnTypesId) ?? defaults.ReturnTypes,
+                InstanceMembers = GetSetting(key, InstanceMembersId) ?? defaults.InstanceMembers,
+                DictKeyTypes = GetSetting(key, DictKeyTypesId) ?? defaults.DictKeyTypes,
+                DictValueTypes = GetSetting(key, DictValueTypesId) ?? defaults.DictValueTypes,
+                IndexTypes = GetSetting(key, IndexTypesId) ?? defaults.IndexTypes,
+                AssignedTypes = GetSetting(key, AssignedTypesId) ?? defaults.AssignedTypes,
+                NestedModulesLimit = GetSetting(key, NestedModulesLimitId) ?? defaults.NestedModulesLimit
+            };
+        }
+
+        private static int? GetSetting(RegistryKey key, string setting) {
+            if (key != null) {
+                return key.GetValue(ReturnTypesId) as int?;
+            }
+            return null;
+        }
+
+        private const string ReturnTypesId = "ReturnTypes";
+        private const string InstanceMembersId = "InstanceMembers";
+        private const string DictKeyTypesId = "DictKeyTypes";
+        private const string DictValueTypesId = "DictValueTypes";
+        private const string IndexTypesId = "IndexTypes";
+        private const string AssignedTypesId = "AssignedTypes";
+        private const string NestedModulesLimitId = "NestedModulesLimit";
+
+        /// <summary>
         /// The number of types in a return value at which to start combining
         /// similar types.
         /// </summary>
-        public int ReturnTypes { get; set; }
+        public int ReturnTypes { get; private set; }
 
         /// <summary>
         /// The number of types in an instance attribute at which to start
         /// combining similar types.
         /// </summary>
-        public int InstanceMembers { get; set; }
+        public int InstanceMembers { get; private set; }
 
         /// <summary>
         /// The number of keys in a dictionary at which to start combining
         /// similar types.
         /// </summary>
-        public int DictKeyTypes { get; set; }
+        public int DictKeyTypes { get; private set; }
 
         /// <summary>
         /// The number of values in a dictionary entry at which to start
         /// combining similar types. Note that this applies to each value in a
         /// dictionary, not to all values at once.
         /// </summary>
-        public int DictValueTypes { get; set; }
+        public int DictValueTypes { get; private set; }
 
         /// <summary>
         /// The number of values in a collection at which to start combining
         /// similar types. This does not apply to dictionaries.
         /// </summary>
-        public int IndexTypes { get; set; }
+        public int IndexTypes { get; private set; }
 
         /// <summary>
         /// The number of values in a normal variable at which to start
         /// combining similar types. This is only applied by assignment
         /// analysis.
         /// </summary>
-        public int AssignedTypes { get; set; }
+        public int AssignedTypes { get; private set; }
 
         /// <summary>
         /// The number of types that will force us to start combining
         /// types for arguments to functions.  This is only used after
         /// we've exceeded the limits on our cartesian function analysis.
         /// </summary>
-        public int MergedArgumentTypes { get; set; }
+        public int MergedArgumentTypes { get; private set; }
 
         /// <summary>
         /// The maximum number of elements an array literal can contain before
         /// simplifying the analysis.
         /// </summary>
-        public int MaxArrayLiterals { get; set; }
+        public int MaxArrayLiterals { get; private set; }
 
         /// <summary>
         /// The maximum number of elements an object literal can contain
         /// before simplifying the analysis.
         /// </summary>
-        public int MaxObjectLiteralProperties { get; set; }
+        public int MaxObjectLiteralProperties { get; private set; }
 
-        public int MaxObjectKeysTypes { get; set; }
+        public int MaxObjectKeysTypes { get; private set; }
 
         /// <summary>
         /// Gets the maximum number of types which can be merged at once.
         /// </summary>
-        public int MaxMergeTypes { get; set; }
+        public int MaxMergeTypes { get; private set; }
 
         /// <summary>
         /// Gets the maximum number of events which can be emitted at once.
         /// </summary>
-        public int MaxEvents { get; set; }
+        public int MaxEvents { get; private set; }
 
         /// <summary>
         /// Gets the maximum level of dependency modules which could be analyzed.
         /// </summary>
-        public int NestedModulesLimit { get; set; }
+        public int NestedModulesLimit { get; private set; }
 
         /// <summary>
         /// Checks whether relative path exceed the nested module limit.
