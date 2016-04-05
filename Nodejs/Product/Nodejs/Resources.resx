@@ -473,6 +473,9 @@ NAME2=value2
   <data name="ReplInitializationMessage" xml:space="preserve">
     <value>Node.js interactive window. Type .help for a list of commands.</value>
   </data>
+  <data name="ReplWindowNpmInitNoYesFlagWarning" xml:space="preserve">
+    <value>Please run '.npm init -y' to create a new package.json file.</value>
+  </data>
   <data name="NodeExePathDescription" xml:space="preserve">
     <value>Specifies the path to the node.exe executable.</value>
   </data>

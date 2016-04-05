@@ -163,6 +163,7 @@ namespace Microsoft.NodejsTools.Project {
         internal const string PropertiesClassLocalSubPackage = "PropertiesClassLocalSubPackage";
         internal const string PropertiesClassNpm = "PropertiesClassNpm";
         internal const string ReplInitializationMessage = "ReplInitializationMessage";
+        internal const string ReplWindowNpmInitNoYesFlagWarning = "ReplWindowNpmInitNoYesFlagWarning";
         internal const string RequestedVersionRangeNone = "RequestedVersionRangeNone";
         internal const string ScriptArgumentsToolTip = "ScriptArgumentsToolTip";
         internal const string ScriptFileToolTip = "ScriptFileTooltip";

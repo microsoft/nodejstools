@@ -58,6 +58,13 @@ namespace Microsoft.NodejsTools.Repl {
             // at beginning and end of string (e.g. '--global')
             npmArguments = string.Format(" {0} ", npmArguments);
 
+            // Prevent running `npm init` without the `-y` flag since it will freeze the repl window,
+            // waiting for user input that will never come.
+            if (npmArguments.Contains(" init ") && !(npmArguments.Contains(" -y ") || npmArguments.Contains(" --yes "))) {
+                window.WriteError(SR.GetString(SR.ReplWindowNpmInitNoYesFlagWarning));
+                return ExecutionResult.Failure;
+            }
+
             var solution = Package.GetGlobalService(typeof(SVsSolution)) as IVsSolution;
             IEnumerable<IVsProject> loadedProjects = solution.EnumerateLoadedProjects(onlyNodeProjects: false);
 
