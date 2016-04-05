@@ -21,6 +21,6 @@ if ($selectedVsVersion -eq '') {
 	return
 }
 
-$testFiles = $tests | % { ".\BuildOutput\Release$selectedVsVersion\Tests\$_.dll" }
+$testFiles = $tests | % { ".\BuildOutput\Debug$selectedVsVersion\Tests\$_.dll" }
 
-& "$vstest" @args $testFiles
+& "$vstest" /settings:$(".\Build\default." + $selectedVsVersion + "Exp.testsettings") @args $testFiles
