@@ -714,7 +714,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 #if DEV14
                     VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "Please enter a valid name."); 
 #else
-					VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, ". is an invalid filename");
+                    VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, ". is an invalid filename");
 #endif
                     System.Threading.Thread.Sleep(1000);
 
@@ -722,9 +722,9 @@ namespace Microsoft.Nodejs.Tests.UI {
                     Keyboard.Type(System.Windows.Input.Key.Enter);
 
 #if DEV14  
-					VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "Please enter a valid name.");  
+                    VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "Please enter a valid name.");  
 #else  
-					VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, ". is an invalid filename");
+                    VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, ". is an invalid filename");
 #endif
                     System.Threading.Thread.Sleep(1000);
 
