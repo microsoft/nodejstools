@@ -263,7 +263,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
+        [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestAddExistingFolderProject() {
             using (var app = new VisualStudioApp()) {
@@ -688,7 +688,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// Opens a project w/ a reference to a .NET assembly (not a project).  Makes sure we get completion against the assembly, changes the assembly, rebuilds, makes
         /// sure the completion info changes.
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
+        [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void AddFolderExists() {
             Directory.CreateDirectory(TestData.GetPath(@"TestData\NodejsProjectData\\AddFolderExists\\X"));
@@ -935,7 +935,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
+        [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void CopyFullPath() {
             foreach (var projectType in ProjectTypes) {
