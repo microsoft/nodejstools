@@ -215,6 +215,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Mocks\MockTextBuffer.cs" /> 
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
