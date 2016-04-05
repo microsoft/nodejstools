@@ -88,6 +88,26 @@ namespace Microsoft.NodejsTools.Repl {
                     continue;
                 }
 
+                // Try checking the `ProjectHome` property first
+                EnvDTE.Properties properties = dteProject.Properties;
+                if (dteProject.Properties != null) {
+                    EnvDTE.Property projectHome = null;
+                    try {
+                        projectHome = properties.Item("ProjectHome");
+                    } catch (ArgumentException) {
+                        // noop
+                    }
+
+                    if (projectHome != null) {
+                        var projectHomeDirectory = projectHome.Value as string;
+                        if (!string.IsNullOrEmpty(projectHomeDirectory)) {
+                            projectNameToDirectoryDictionary.Add(projectName, Tuple.Create(projectHomeDirectory, hierarchy));
+                            continue;
+                        }
+                    }
+                }
+
+                // Otherwise, fall back to using fullname
                 string projectDirectory = Path.GetDirectoryName(dteProject.FullName);
                 if (!string.IsNullOrEmpty(projectDirectory)) {
                     projectNameToDirectoryDictionary.Add(projectName, Tuple.Create(projectDirectory, hierarchy));
