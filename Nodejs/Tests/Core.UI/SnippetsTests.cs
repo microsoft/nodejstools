@@ -92,23 +92,23 @@ namespace Microsoft.Nodejs.Tests.UI {
         private static readonly Snippet[] BasicSnippets = new Snippet[] {
             new Snippet(
                 "while",
-                "while (true) {\r\n    $body$\r\n};\r\n",
-                new Declaration("false", "while (false) {\r\n    $body$\r\n};\r\n")
+                "while (true) {\r\n    $body$\r\n};",
+                new Declaration("false", "while (false) {\r\n    $body$\r\n};")
             ),
             new Snippet(
                 "if",
-                "if (true) {\r\n    $body$\r\n}\r\n",
-                new Declaration("false", "if (false) {\r\n    $body$\r\n}\r\n")
+                "if (true) {\r\n    $body$\r\n}",
+                new Declaration("false", "if (false) {\r\n    $body$\r\n}")
             ),
             new Snippet(
                 "iife",
-                "(function (undefined) {\r\n    $body$\r\n})();\r\n",
-                new Declaration("name","(function (name) {\r\n    $body$\r\n})();\r\n")
+                "(function (undefined) {\r\n    $body$\r\n})();",
+                new Declaration("name","(function (name) {\r\n    $body$\r\n})();")
             ),
             new Snippet(
                 "for",
-                "for (var i = 0; i < length; i++) {\r\n    $body$\r\n};\r\n",
-                new Declaration("counter", "for (var counter = 0; counter < length; counter++) {\r\n    $body$\r\n};\r\n")
+                "for (var i = 0; i < length; i++) {\r\n    $body$\r\n};",
+                new Declaration("counter", "for (var counter = 0; counter < length; counter++) {\r\n    $body$\r\n};")
             )
         };
 
@@ -201,23 +201,22 @@ namespace Microsoft.Nodejs.Tests.UI {
         public void TestSelected() {
             var snippet = new Snippet(
                 "if",
-                "if (true) {\r\n    $body$\r\n}\r\n",
-                new Declaration("false", "if (false) {\r\n    $body$\r\n}\r\n")
+                "if (true) {\r\n    $body$\r\n}",
+                new Declaration("false", "if (false) {\r\n    $body$\r\n}")
             );
             using (var solution = BasicProject.Generate().ToVs()) {
                 using (new SnippetTestOptionHolder()) {
                     var app = TestOneTabSnippet(solution, snippet);
 
                     Keyboard.Type("testing");
-                    app.WaitForText("if (false) {\r\n    testing\r\n}\r\n");
+                    app.WaitForText("if (false) {\r\n    testing\r\n}");
 
                     solution.CloseActiveWindow(vsSaveChanges.vsSaveChangesNo);
                 }
             }
-
         }
 
-        [TestMethod, Priority(0), TestCategory("Core")]
+        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
         public void TestBasicSnippetsTab() {
             using (var solution = BasicProject.Generate().ToVs()) {
@@ -273,10 +272,10 @@ namespace Microsoft.Nodejs.Tests.UI {
                     server.SetFocus();
 
                     Keyboard.Type("if\t\t");
-                    server.WaitForText("if (true) {\r\n    if (true) {\r\n        \r\n    }\r\n    \r\n}");
+                    server.WaitForText("if (true) {\r\n    if (true) {\r\n        \r\n    }\r\n}");
                     Keyboard.Type("\r");
                     Keyboard.Type("testing");
-                    server.WaitForText("if (true) {\r\n    if (true) {\r\n        testing\r\n    }\r\n    \r\n}");
+                    server.WaitForText("if (true) {\r\n    if (true) {\r\n        testing\r\n    }\r\n}");
 
                     solution.CloseActiveWindow(vsSaveChanges.vsSaveChangesNo);
                 }
@@ -292,8 +291,8 @@ namespace Microsoft.Nodejs.Tests.UI {
         public void TestIndentSize() {
             var snippet = new Snippet(
                 "tryf",
-                "try {\r\n  $body$\r\n} catch (e) {\r\n  \r\n} finally {\r\n  \r\n};\r\n",
-                new Declaration("exception", "try {\r\n  $body$\r\n} catch (exception) {\r\n  \r\n} finally {\r\n  \r\n};\r\n")
+                "try {\r\n  $body$\r\n} catch (e) {\r\n  \r\n} finally {\r\n  \r\n};",
+                new Declaration("exception", "try {\r\n  $body$\r\n} catch (exception) {\r\n  \r\n} finally {\r\n  \r\n};")
             );
             using (var solution = BasicProject.Generate().ToVs()) {
                 using (new SnippetTestOptionHolder(insertTabs: false, indentSize: 2, tabSize: 2)) {
@@ -308,8 +307,8 @@ namespace Microsoft.Nodejs.Tests.UI {
         public void TestTabIndentation() {
             var snippet = new Snippet(
                 "forprops",
-                "for (var property in object) {\r\n\tif (object.hasOwnProperty(property)) {\r\n\t\t$body$\r\n\t}\r\n};\r\n",
-                new Declaration("p", "for (var p in object) {\r\n\tif (object.hasOwnProperty(p)) {\r\n\t\t$body$\r\n\t}\r\n};\r\n")
+                "for (var property in object) {\r\n\tif (object.hasOwnProperty(property)) {\r\n\t\t$body$\r\n\t}\r\n};",
+                new Declaration("p", "for (var p in object) {\r\n\tif (object.hasOwnProperty(p)) {\r\n\t\t$body$\r\n\t}\r\n};")
             );
             using (var solution = BasicProject.Generate().ToVs()) {
                 using (new SnippetTestOptionHolder(insertTabs: true, indentSize: 8, tabSize: 8)) {
@@ -336,7 +335,7 @@ namespace Microsoft.Nodejs.Tests.UI {
                     server.SetFocus();
 
                     Keyboard.Type("try\t\t");
-                    server.WaitForText("if (true)\r\n{\r\n  try\r\n  {\r\n    \r\n  } catch (e)\r\n  {\r\n    \r\n  };\r\n  \r\n}");
+                    server.WaitForText("if (true)\r\n{\r\n  try\r\n  {\r\n    \r\n  } catch (e)\r\n  {\r\n    \r\n  };\r\n}");
 
                     solution.CloseActiveWindow(vsSaveChanges.vsSaveChangesNo);
                 }
