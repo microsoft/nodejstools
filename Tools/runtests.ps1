@@ -5,6 +5,8 @@ $vsversions = @("15.0", "14.0", "12.0")
 # AzurePublishing.Tests.UI are currently skipped.
 $tests = @("JSAnalysisTests", "Nodejs.Tests.UI", "NodeTests","NpmTests", "ProfilerTests", "SharedProjectTests")
 
+$nodejstoolsroot = "$PSScriptRoot\.."
+
 # Try to get the path to the vstest.console test runner
 $selectedVsVersion = ''
 $vstest =  ''
@@ -21,6 +23,6 @@ if ($selectedVsVersion -eq '') {
 	return
 }
 
-$testFiles = $tests | % { ".\BuildOutput\Release$selectedVsVersion\Tests\$_.dll" }
+$testFiles = $tests | % { "$nodejstoolsroot\BuildOutput\Release$selectedVsVersion\Tests\$_.dll" }
 
-& "$vstest" /settings:$(".\Build\default." + $selectedVsVersion + "Exp.testsettings") @args $testFiles
+& "$vstest" /settings:$("$nodejstoolsroot\Build\default." + $selectedVsVersion + "Exp.testsettings") @args $testFiles
