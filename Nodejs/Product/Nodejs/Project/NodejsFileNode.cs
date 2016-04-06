@@ -35,14 +35,16 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         protected override void OnParentSet(HierarchyNode parent) {
-            if (ProjectMgr == null || ProjectMgr.Analyzer == null || !ProjectMgr.ShouldAcquireTypingsAutomatically) {
+            if (ProjectMgr == null || ProjectMgr.Analyzer == null) {
                 return;
             }
 
             if (Url.EndsWith(NodejsConstants.TypeScriptDeclarationExtension, StringComparison.OrdinalIgnoreCase) && Url.IndexOf(@"\typings\", StringComparison.OrdinalIgnoreCase) >= 0) {
-                ProjectMgr.Site.GetUIThread().Invoke(() => {
-                    this.IncludeInProject(true);
-                });
+                if (ProjectMgr.ShouldAcquireTypingsAutomatically) {
+                    ProjectMgr.Site.GetUIThread().Invoke(() => {
+                        this.IncludeInProject(true);
+                    });
+                }
             }
         }
 
