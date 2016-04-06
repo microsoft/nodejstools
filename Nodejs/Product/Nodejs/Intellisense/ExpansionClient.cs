@@ -1,4 +1,4 @@
-﻿//*********************************************************//
+//*********************************************************//
 //    Copyright (c) Microsoft. All rights reserved.
 //    
 //    Apache 2.0 License
@@ -15,14 +15,12 @@
 //*********************************************************//
 
 using System;
-using System.Collections.Generic;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Editor.OptionsExtensionMethods;
 using Microsoft.VisualStudio.TextManager.Interop;
-using Microsoft.VisualStudioTools;
 using MSXML;
 
 namespace Microsoft.NodejsTools.Intellisense {
@@ -67,102 +65,134 @@ namespace Microsoft.NodejsTools.Intellisense {
             return VSConstants.S_OK;
         }
 
+        /// <summary>
+        /// Format the content inserted by a code snippet
+        /// </summary>
         public int FormatSpan(IVsTextLines pBuffer, TextSpan[] ts) {
-            IXMLDOMNode codeNode, snippetTypes, declarations;
-            int hr;
-            if (ErrorHandler.Failed(hr = _session.GetSnippetNode("CodeSnippet:Code", out codeNode))) {
-                return hr;
-            }
+            // Example of a snippet template (taken from forprops.snippet and use ... to represent
+            // indent spaces):
+            //
+            // for (var $property$ in $object$) {
+            // ....if ($object$.hasOwnProperty($property$)) {
+            // ........$selected$$end$
+            // ....}
+            // };
+            //
+            // Example of code in pBuffer (the for loop is inserted by a forprops snippet):
+            //
+            // var object = { one: 1, two: 2 };
+            // for (var property in object) {
+            // ....if (object.hasOwnProperty(property)) {
+            // ........
+            // ....}
+            // };
+            //
+            // Result examples:
+            //
+            // (1) If indent size = 2:
+            //
+            // var object = { one: 1, two: 2 };
+            // for (var property in object) {
+            // ..if (object.hasOwnProperty(property)) {
+            // ....
+            // ..}
+            // };
+            //
+            // (2) If indent size = 2 and OpenBracesOnNewLineForControl = true:
+            //
+            // var object = { one: 1, two: 2 };
+            // for (var property in object)
+            // {
+            // ..if (object.hasOwnProperty(property))
+            // ..{
+            // ....
+            // ..}
+            // };
 
-            if (ErrorHandler.Failed(hr = _session.GetHeaderNode("CodeSnippet:SnippetTypes", out snippetTypes))) {
-                return hr;
-            }
+            // Algorithm: The idea is to use Formatting.Formatter to format the inserted content.
+            // However, Formatting.Formatter does not format lines that only contain spaces. For
+            // example, here is how Formatting.Formatter formats the code above:
+            //
+            // var object = { one: 1, two: 2 };
+            // for (var property in object) {
+            // ..if (object.hasOwnProperty(property)) {
+            // ........
+            // ..}
+            // };
+            //
+            // An additional step will be included to ensure such lines are formatted correctly.
 
-            List<string> declList = new List<string>();
-            if (ErrorHandler.Succeeded(hr = _session.GetSnippetNode("CodeSnippet:Declarations", out declarations))
-                && declarations != null) {
-                foreach (IXMLDOMNode declType in declarations.childNodes) {
-                    var id = declType.selectSingleNode("./CodeSnippet:ID");
-                    if (id != null) {
-                        declList.Add(id.text);
-                    }
+            int baseIndentationLevel = GetViewIndentationLevelAtLine(ts[0].iStartLine);
+
+            for (int lineNumber = ts[0].iStartLine; lineNumber <= ts[0].iEndLine; ++lineNumber) {
+                string lineContent = _textView.TextBuffer.CurrentSnapshot.GetLineFromLineNumber(lineNumber).GetText();
+
+                string indentationString = GetTemplateIndentationString(lineContent);
+                if (indentationString != lineContent) { // This means line contains some characters other than spaces
+                    continue;
+                }
+
+                int newIndentationLevel = baseIndentationLevel + GetTemplateIndentationLevel(indentationString);
+
+                string newIndentation = _textView.Options.IsConvertTabsToSpacesEnabled()
+                    ? new string(' ', newIndentationLevel * _textView.Options.GetIndentSize())
+                    : new string('\t', newIndentationLevel);
+
+                using (var edit = _textView.TextBuffer.CreateEdit()) {
+                    int indendationPos;
+                    pBuffer.GetPositionOfLineIndex(lineNumber, 0, out indendationPos);
+                    Span bufferIndentationSpan = new Span(indendationPos, indentationString.Length);
+                    edit.Replace(bufferIndentationSpan, newIndentation);
+                    edit.Apply();
                 }
             }
 
-            bool surroundsWith = false;
-            foreach (MSXML.IXMLDOMNode snippetType in snippetTypes.childNodes) {
-                if (snippetType.nodeName == "SnippetType") {
-                    if (snippetType.text == SurroundsWith) {
-                        surroundsWith = true;
-                    }
+            // Now that we have handled empty lines, use Formatter to format the inserted content.
+            int startPos = 0, endPos = 0;
+            pBuffer.GetPositionOfLineIndex(ts[0].iStartLine, ts[0].iStartIndex, out startPos);
+            pBuffer.GetPositionOfLineIndex(ts[0].iEndLine, ts[0].iEndIndex, out endPos);
+            Formatting.FormattingOptions options = EditFilter.CreateFormattingOptions(_textView.Options, _textView.TextBuffer.CurrentSnapshot);
+            string text = _textView.TextBuffer.CurrentSnapshot.GetText();
+            EditFilter.ApplyEdits(_textView.TextBuffer, Formatting.Formatter.GetEditsForRange(text, startPos, endPos, options));
+
+            return VSConstants.S_OK;
+        }
+
+        private static string GetTemplateIndentationString(string lineContent) {
+            for (int i = 0; i < lineContent.Length; ++i) {
+                if (lineContent[i] != ' ' && lineContent[i] != '\t') {
+                    return lineContent.Substring(0, i);
                 }
             }
-            // get the indentation of where we're inserting the code...
-            string baseIndentation = GetBaseIndentation(ts);
+            return lineContent;
+        }
 
-            using (var edit = _textView.TextBuffer.CreateEdit()) {
-                if (surroundsWith) {
-                    var templateText = codeNode.text.Replace("\r\n", VsExtensions.GetNewLineText(_textView.TextSnapshot));
-                    foreach (var decl in declList) {
-                        string defaultValue;
-                        if (ErrorHandler.Succeeded(_session.GetFieldValue(decl, out defaultValue))) {
-                            templateText = templateText.Replace("$" + decl + "$", defaultValue);
-                        }
-                    }
-
-                    templateText = templateText.Replace("$end$", "");
-                    // we can finally figure out where the selected text began witin the original template...
-                    int selectedIndex = templateText.IndexOf("$selected$");
-                    if (selectedIndex != -1) {
-                        var selection = _textView.Selection;
-
-                        // now we need to get the indentation of the $selected$ element within the template,
-                        // as we'll need to indent the selected code to that level.
-                        string indentation = GetTemplateSelectionIndentation(templateText, selectedIndex);
-
-                        var start = _selectionStart.GetPosition(_textView.TextBuffer.CurrentSnapshot);
-                        var end = _selectionEnd.GetPosition(_textView.TextBuffer.CurrentSnapshot);
-                        if (end < start) {
-                            // we didn't actually have a selection, and our negative tracking pushed us
-                            // back to the start of the buffer...
-                            end = start;
-                        }
-                        var selectedSpan = Span.FromBounds(start, end);
-
-                        if (surroundsWith) {
-                            if (string.IsNullOrWhiteSpace(_textView.TextBuffer.CurrentSnapshot.GetText(selectedSpan))) {
-
-                                // Surround With can be invoked with no selection, but on a line with some text.
-                                // In that case we need to inject an extra new line.
-                                var endLine = _textView.TextBuffer.CurrentSnapshot.GetLineFromPosition(end);
-                                var endText = endLine.GetText().Substring(end - endLine.Start);
-                                if (!String.IsNullOrWhiteSpace(endText)) {
-                                    edit.Insert(end, _textView.Options.GetNewLineCharacter());
-                                }
-
-                            } else {
-                                _selectEndSpan = true;
-                            }
-
-                        }
-
-                        IndentSpan(
-                            edit,
-                            indentation,
-                            _textView.TextBuffer.CurrentSnapshot.GetLineFromPosition(start).LineNumber + 1, // 1st line is already indented
-                            _textView.TextBuffer.CurrentSnapshot.GetLineFromPosition(end).LineNumber
-                        );
-                    }
-                }
-
-                // we now need to update any code which was not selected  that we just inserted.
-                IndentSpan(edit, baseIndentation, ts[0].iStartLine + 1, ts[0].iEndLine);
-
-                edit.Apply();
-
+        private static int GetTemplateIndentationLevel(string indentationString) {
+            if (indentationString.Length == 0) {
+                return 0;
             }
+            if (indentationString[0] == ' ') {
+                return indentationString.Length / 4; // All node.js snippets use 4 space indentation.
+            }
+            // In case some snippets use tab style indentation
+            return indentationString.Length;
+        }
 
-            return hr;
+        private int GetViewIndentationLevelAtLine(int line) {
+            string lineContent = _textView.TextBuffer.CurrentSnapshot.GetLineFromLineNumber(line).GetText();
+            if (_textView.Options.IsConvertTabsToSpacesEnabled()) {
+                return CountLeadingCharacters(' ', lineContent) / _textView.Options.GetIndentSize();
+            }
+            return CountLeadingCharacters('\t', lineContent);
+        }
+
+        private static int CountLeadingCharacters(char character, string lineContent) {
+            for (int i = 0; i < lineContent.Length; ++i) {
+                if (lineContent[i] != character) {
+                    return i;
+                }
+            }
+            return lineContent.Length;
         }
 
         public int InsertNamedExpansion(string pszTitle, string pszPath, TextSpan textSpan) {
@@ -196,37 +226,6 @@ namespace Microsoft.NodejsTools.Intellisense {
                 }
             }
             return hr;
-        }
-
-        private static string GetTemplateSelectionIndentation(string templateText, int selectedIndex) {
-            string indentation = "";
-            for (int i = selectedIndex - 1; i >= 0; i--) {
-                if (templateText[i] != '\t' && templateText[i] != ' ') {
-                    indentation = templateText.Substring(i + 1, selectedIndex - i - 1);
-                    break;
-                }
-            }
-            return indentation;
-        }
-
-        private string GetBaseIndentation(TextSpan[] ts) {
-            var indentationLine = _textView.TextBuffer.CurrentSnapshot.GetLineFromLineNumber(ts[0].iStartLine).GetText();
-            string baseIndentation = indentationLine;
-            for (int i = 0; i < indentationLine.Length; i++) {
-                if (indentationLine[i] != ' ' && indentationLine[i] != '\t') {
-                    baseIndentation = indentationLine.Substring(0, i);
-                    break;
-                }
-            }
-            return baseIndentation;
-        }
-
-        private void IndentSpan(ITextEdit edit, string indentation, int startLine, int endLine) {
-            var snapshot = _textView.TextBuffer.CurrentSnapshot;
-            for (int i = startLine; i <= endLine; i++) {
-                var curline = snapshot.GetLineFromLineNumber(i);
-                edit.Insert(curline.Start, indentation);
-            }
         }
 
         public int GetExpansionFunction(IXMLDOMNode xmlFunctionNode, string bstrFieldName, out IVsExpansionFunction pFunc) {
@@ -302,4 +301,5 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
     }
+>>>>>>> 390673c82d6cefe157fc0e20dc178d515d7fd0a
 }

@@ -22,6 +22,8 @@ using Microsoft.NodejsTools.Repl;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
+using Microsoft.VisualStudio.TextManager.Interop;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.NodejsTools.Intellisense {
     sealed partial class CompletionSource : ICompletionSource {
@@ -32,16 +34,16 @@ namespace Microsoft.NodejsTools.Intellisense {
         private readonly IServiceProvider _serviceProvider;
         private readonly IGlyphService _glyphService;
 
-        private static string[] _allowRequireTokens = new[] { "!", "!=", "!==", "%", "%=", "&", "&&", "&=", "(", ")", 
-            "*", "*=", "+", "++", "+=", ",", "-", "--", "-=",  "..", "...", "/", "/=", ":", ";", "<", "<<", "<<=", 
-            "<=", "=", "==", "===", ">", ">=", ">>", ">>=", ">>>", ">>>=", "?", "[", "^", "^=", "{", "|", "|=", "||", 
+        private static string[] _allowRequireTokens = new[] { "!", "!=", "!==", "%", "%=", "&", "&&", "&=", "(", ")",
+            "*", "*=", "+", "++", "+=", ",", "-", "--", "-=",  "..", "...", "/", "/=", ":", ";", "<", "<<", "<<=",
+            "<=", "=", "==", "===", ">", ">=", ">>", ">>=", ">>>", ">>>=", "?", "[", "^", "^=", "{", "|", "|=", "||",
             "}", "~", "in", "case", "new", "return", "throw", "typeof"
         };
 
         private static string[] _keywords = new[] {
-            "break", "case", "catch", "class", "const", "continue", "default", "delete", "do", "else", "eval", "extends", 
-            "false", "field", "final", "finally", "for", "function", "if", "import", "in", "instanceof", "new", "null", 
-            "package", "private", "protected", "public", "return", "super", "switch", "this", "throw", "true", "try", 
+            "break", "case", "catch", "class", "const", "continue", "default", "delete", "do", "else", "eval", "extends",
+            "false", "field", "final", "finally", "for", "function", "if", "import", "in", "instanceof", "new", "null",
+            "package", "private", "protected", "public", "return", "super", "switch", "this", "throw", "true", "try",
             "typeof", "var", "while", "with",
             "abstract", "debugger", "enum", "export", "goto", "implements", "native", "static", "synchronized", "throws",
             "transient", "volatile"
@@ -79,11 +81,15 @@ namespace Microsoft.NodejsTools.Intellisense {
                 session.GetTriggerPoint(buffer)
             );
 
-            var completions = provider.GetCompletions(_glyphService);
+            List<VsExpansion> snippets = GetSnippets();
+            IEnumerable<DynamicallyVisibleCompletion> snippetCompletions = snippets.Select(x => TranslateSnippetToCompletion(x));
+
+            var completions = provider.GetCompletions(_glyphService, snippetCompletions);
             if (completions != null && completions.Completions.Count > 0) {
                 completionSets.Add(completions);
             }
         }
+
         private void AugmentCompletionSessionForRequire(SnapshotPoint triggerPoint, ICompletionSession session, IList<CompletionSet> completionSets) {
             var classifications = EnumerateClassificationsInReverse(_classifier, triggerPoint);
             bool quote = false;
@@ -193,7 +199,8 @@ namespace Microsoft.NodejsTools.Intellisense {
                 if (lastToken.CanComplete()) {
                     // Handle "fo|o"
                     return snapshot.CreateTrackingSpan(lastToken.Span, SpanTrackingMode.EdgeInclusive);
-                } else {
+                }
+                else {
                     // Handle "<|="
                     return null;
                 }
@@ -244,7 +251,8 @@ namespace Microsoft.NodejsTools.Intellisense {
                 if (!classifications.MoveNext()) {
                     // require at beginning of the file
                     atRequire = true;
-                } else {
+                }
+                else {
                     var tokenText = classifications.Current.Span.GetText();
 
                     atRequire =
@@ -274,7 +282,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             var curLine = start.GetContainingLine();
             var spanEnd = start;
 
-            for (; ; ) {
+            for (;;) {
                 var classifications = classifier.GetClassificationSpans(new SnapshotSpan(curLine.Start, spanEnd));
                 for (int i = classifications.Count - 1; i >= 0; i--) {
                     yield return classifications[i];
@@ -287,6 +295,51 @@ namespace Microsoft.NodejsTools.Intellisense {
                 curLine = start.Snapshot.GetLineFromLineNumber(curLine.LineNumber - 1);
                 spanEnd = curLine.End;
             }
+        }
+
+        private List<VsExpansion> GetSnippets() {
+            var expansionsList = new List<VsExpansion>();
+
+            IVsExpansionManager expansionManager = null;
+            var textMgr = (IVsTextManager2)_serviceProvider.GetService(typeof(SVsTextManager));
+            textMgr.GetExpansionManager(out expansionManager);
+
+            string[] snippetTypes = { ExpansionClient.Expansion, ExpansionClient.SurroundsWith };
+            IVsExpansionEnumeration expansionEnumerator = null;
+            expansionManager.EnumerateExpansions(Guids.NodejsLanguageInfo, 0, snippetTypes, snippetTypes.Length, 0, 0, out expansionEnumerator);
+
+            uint count = 0;
+            expansionEnumerator.GetCount(out count);
+
+            VsExpansion expansionInfo = new VsExpansion();
+            IntPtr[] pExpansionInfo = new IntPtr[1];
+            pExpansionInfo[0] = Marshal.AllocCoTaskMem(Marshal.SizeOf(expansionInfo));
+
+            for (uint i = 0; i < count; i++) {
+                uint fetched = 0;
+                expansionEnumerator.Next(1, pExpansionInfo, out fetched);
+                if (fetched > 0) {
+                    // Convert the returned blob of data into a structure that can be read in managed code.
+                    expansionInfo = (VsExpansion)Marshal.PtrToStructure(pExpansionInfo[0], typeof(VsExpansion));
+
+                    if (!String.IsNullOrEmpty(expansionInfo.shortcut)) {
+                        expansionsList.Add(expansionInfo);
+                    }
+                }
+            }
+
+            Marshal.FreeCoTaskMem(pExpansionInfo[0]);
+
+            return expansionsList;
+        }
+
+        private DynamicallyVisibleCompletion TranslateSnippetToCompletion(VsExpansion snippet) {
+            return new DynamicallyVisibleCompletion(snippet.shortcut,
+                snippet.shortcut,
+                () => snippet.description,
+                () => _glyphService.GetGlyph(StandardGlyphGroup.GlyphCSharpExpansion, StandardGlyphItem.GlyphItemPublic),
+                String.Empty
+            );
         }
 
         #endregion
