@@ -263,7 +263,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
+        [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void TestAddExistingFolderProject() {
             using (var app = new VisualStudioApp()) {
@@ -688,7 +688,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// Opens a project w/ a reference to a .NET assembly (not a project).  Makes sure we get completion against the assembly, changes the assembly, rebuilds, makes
         /// sure the completion info changes.
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
+        [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void AddFolderExists() {
             Directory.CreateDirectory(TestData.GetPath(@"TestData\NodejsProjectData\\AddFolderExists\\X"));
@@ -711,20 +711,20 @@ namespace Microsoft.Nodejs.Tests.UI {
                     Keyboard.Type("."); // bad filename
                     Keyboard.Type(System.Windows.Input.Key.Enter);
 
-#if DEV11_OR_LATER
-                    VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "Directory names cannot contain any of the following characters");
+#if DEV14
+                    VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "Please enter a valid name."); 
 #else
-                VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, ". is an invalid filename");
+                    VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, ". is an invalid filename");
 #endif
                     System.Threading.Thread.Sleep(1000);
 
                     Keyboard.Type(".."); // another bad filename
                     Keyboard.Type(System.Windows.Input.Key.Enter);
 
-#if DEV11_OR_LATER
-                    VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "Directory names cannot contain any of the following characters");
-#else
-                VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, ".. is an invalid filename");
+#if DEV14  
+                    VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, "Please enter a valid name.");  
+#else  
+                    VisualStudioApp.CheckMessageBox(MessageBoxButton.Ok, ". is an invalid filename");
 #endif
                     System.Threading.Thread.Sleep(1000);
 
@@ -935,7 +935,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
+        [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void CopyFullPath() {
             foreach (var projectType in ProjectTypes) {
@@ -979,7 +979,7 @@ namespace Microsoft.Nodejs.Tests.UI {
             string clipboardText = "";
             Console.WriteLine("Checking CopyFullPath on:{0}", expected);
             AutomationWrapper.Select(element);
-            vs.Dte.ExecuteCommand("File.CopyFullPath");
+            vs.Dte.ExecuteCommand("Project.CopyFullPath");
 
             var app = ((VisualStudioInstance)vs).App;
             app.ServiceProvider.GetUIThread().Invoke(() => clipboardText = System.Windows.Clipboard.GetText());
