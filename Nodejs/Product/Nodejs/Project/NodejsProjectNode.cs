@@ -220,7 +220,7 @@ namespace Microsoft.NodejsTools.Project {
 
         public bool IsTypeScriptProject {
             get {
-                return string.Equals(GetProjectProperty(NodejsConstants.EnableTypeScript), "true", StringComparison.OrdinalIgnoreCase);
+                return IsProjectOpened && string.Equals(GetProjectProperty(NodejsConstants.EnableTypeScript), "true", StringComparison.OrdinalIgnoreCase);
             }
         }
 
