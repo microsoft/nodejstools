@@ -491,12 +491,11 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
                         OnTestContainersChanged(e.Project);
                         break;
-#if DEV12_OR_LATER
+
                     // Dev12 renames files instead of overwriting them when
                     // saving, so we need to listen for renames where the new
                     // path is part of the project.
                     case TestFileChangedReason.Renamed:
-#endif
                     case TestFileChangedReason.Changed:
                         OnTestContainersChanged(GetTestProjectFromFile(e.File));
                         break;
