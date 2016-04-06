@@ -113,7 +113,7 @@ namespace Microsoft.NodejsTools.Options {
             }
         }
 
-        public bool OnlyTabOrEnterToCommit {
+        internal bool OnlyTabOrEnterToCommit {
             get {
                 return _onlyTabOrEnterToCommit;
             }
