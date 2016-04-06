@@ -78,13 +78,9 @@ namespace Microsoft.NodejsTools.Intellisense {
             var provider = VsProjectAnalyzer.GetCompletions(
                 _textBuffer.CurrentSnapshot,
                 span,
-                session.GetTriggerPoint(buffer)
-            );
+                session.GetTriggerPoint(buffer));
 
-            List<VsExpansion> snippets = GetSnippets();
-            IEnumerable<DynamicallyVisibleCompletion> snippetCompletions = snippets.Select(x => TranslateSnippetToCompletion(x));
-
-            var completions = provider.GetCompletions(_glyphService, snippetCompletions);
+            var completions = provider.GetCompletions(_glyphService);
             if (completions != null && completions.Completions.Count > 0) {
                 completionSets.Add(completions);
             }
@@ -199,8 +195,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 if (lastToken.CanComplete()) {
                     // Handle "fo|o"
                     return snapshot.CreateTrackingSpan(lastToken.Span, SpanTrackingMode.EdgeInclusive);
-                }
-                else {
+                } else {
                     // Handle "<|="
                     return null;
                 }
@@ -251,8 +246,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 if (!classifications.MoveNext()) {
                     // require at beginning of the file
                     atRequire = true;
-                }
-                else {
+                } else {
                     var tokenText = classifications.Current.Span.GetText();
 
                     atRequire =
@@ -297,50 +291,6 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
         }
 
-        private List<VsExpansion> GetSnippets() {
-            var expansionsList = new List<VsExpansion>();
-
-            IVsExpansionManager expansionManager = null;
-            var textMgr = (IVsTextManager2)_serviceProvider.GetService(typeof(SVsTextManager));
-            textMgr.GetExpansionManager(out expansionManager);
-
-            string[] snippetTypes = { ExpansionClient.Expansion, ExpansionClient.SurroundsWith };
-            IVsExpansionEnumeration expansionEnumerator = null;
-            expansionManager.EnumerateExpansions(Guids.NodejsLanguageInfo, 0, snippetTypes, snippetTypes.Length, 0, 0, out expansionEnumerator);
-
-            uint count = 0;
-            expansionEnumerator.GetCount(out count);
-
-            VsExpansion expansionInfo = new VsExpansion();
-            IntPtr[] pExpansionInfo = new IntPtr[1];
-            pExpansionInfo[0] = Marshal.AllocCoTaskMem(Marshal.SizeOf(expansionInfo));
-
-            for (uint i = 0; i < count; i++) {
-                uint fetched = 0;
-                expansionEnumerator.Next(1, pExpansionInfo, out fetched);
-                if (fetched > 0) {
-                    // Convert the returned blob of data into a structure that can be read in managed code.
-                    expansionInfo = (VsExpansion)Marshal.PtrToStructure(pExpansionInfo[0], typeof(VsExpansion));
-
-                    if (!String.IsNullOrEmpty(expansionInfo.shortcut)) {
-                        expansionsList.Add(expansionInfo);
-                    }
-                }
-            }
-
-            Marshal.FreeCoTaskMem(pExpansionInfo[0]);
-
-            return expansionsList;
-        }
-
-        private DynamicallyVisibleCompletion TranslateSnippetToCompletion(VsExpansion snippet) {
-            return new DynamicallyVisibleCompletion(snippet.shortcut,
-                snippet.shortcut,
-                () => snippet.description,
-                () => _glyphService.GetGlyph(StandardGlyphGroup.GlyphCSharpExpansion, StandardGlyphItem.GlyphItemPublic),
-                String.Empty
-            );
-        }
 
         #endregion
 

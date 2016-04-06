@@ -57,10 +57,6 @@ namespace Microsoft.NodejsTools.Intellisense {
             return null;
         }
 
-        public virtual CompletionSet GetCompletions(IGlyphService glyphService, IEnumerable<DynamicallyVisibleCompletion> snippetCompletions) {
-            return null;
-        }
-
         private static Stopwatch MakeStopWatch() {
             var res = new Stopwatch();
             res.Start();

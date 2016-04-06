@@ -301,5 +301,4 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
     }
->>>>>>> 390673c82d6cefe157fc0e20dc178d515d7fd0a
 }
