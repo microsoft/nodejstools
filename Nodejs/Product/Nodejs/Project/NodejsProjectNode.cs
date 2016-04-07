@@ -1139,9 +1139,11 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private bool ShowSetAsStartupFileCommandOnNode(IList<HierarchyNode> selectedNodes) {
+            if (selectedNodes.Count != 1) {
+                return false;
+            }
             var selectedNodeUrl = selectedNodes[0].Url;
-            return selectedNodes.Count == 1 &&
-                (IsCodeFile(selectedNodeUrl) ||
+            return (IsCodeFile(selectedNodeUrl) ||
                 // for some reason, the default express 4 template's startup file lacks an extension.
                 string.IsNullOrEmpty(Path.GetExtension(selectedNodeUrl)));
         }
