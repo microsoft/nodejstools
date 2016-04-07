@@ -3,8 +3,8 @@
     <Identity Id="FE8A8C3D-328A-476D-99F9-2A24B75F8C7F" Version="1.2" Language="en-US" Publisher="Microsoft" />
     <DisplayName>Node.js Tools</DisplayName>
     <Description xml:space="preserve">Provides support for editing and debugging Node.js programs.</Description>
-    <MoreInfo>http://nodejstools.codeplex.com</MoreInfo>
-    <GettingStartedGuide>http://nodejstools.codeplex.com</GettingStartedGuide>
+    <MoreInfo>https://github.com/Microsoft/nodejstools/</MoreInfo>
+    <GettingStartedGuide>https://github.com/Microsoft/nodejstools/wiki</GettingStartedGuide>
     <Icon>NodeJS.ico</Icon>
     <PreviewImage>NodeJS_200x.png</PreviewImage>
   </Metadata>
