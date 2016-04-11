@@ -368,7 +368,6 @@ namespace Microsoft.NodejsTools {
             return true;
         }
 
-        private static string remoteDebugProxyFolder = null;
 
         internal LanguagePreferences LangPrefs {
             get {
@@ -376,38 +375,39 @@ namespace Microsoft.NodejsTools {
             }
         }
 
+        private static Lazy<string> remoteDebugProxyFolder = new Lazy<string>(() => {
+            const string ROOT_KEY = "Software\\Microsoft\\NodeJSTools\\" + AssemblyVersionInfo.VSVersion;
+
+            // Try HKCU
+            try {
+                using (RegistryKey node = Registry.CurrentUser.OpenSubKey(ROOT_KEY)) {
+                    if (node != null) {
+                        var value = (string)node.GetValue("RemoteDebugProxyFolder");
+                        if (value != null)
+                            return value;
+                    }
+                }
+            } catch (Exception) {
+            }
+
+            // Try HKLM
+            try {
+                using (RegistryKey node = Registry.LocalMachine.OpenSubKey(ROOT_KEY)) {
+                    if (node != null) {
+                        var value = (string)node.GetValue("RemoteDebugProxyFolder");
+                        if (value != null)
+                            return value;
+                    }
+                }
+            } catch (Exception) {
+            }
+
+            return null;
+        });
+
         public static string RemoteDebugProxyFolder {
             get {
-                // Lazily evaluated
-                if (remoteDebugProxyFolder != null) {
-                    return remoteDebugProxyFolder;
-                }
-
-                const string ROOT_KEY = "Software\\Microsoft\\NodeJSTools\\" + AssemblyVersionInfo.VSVersion;
-
-                // Try HKCU
-                try {
-                    using (RegistryKey node = Registry.CurrentUser.OpenSubKey(ROOT_KEY)) {
-                        if (node != null) {
-                            remoteDebugProxyFolder = (string)node.GetValue("RemoteDebugProxyFolder");
-                        }
-                    }
-                } catch (Exception) {
-                }
-
-                // Try HKLM
-                if (remoteDebugProxyFolder == null) {
-                    try {
-                        using (RegistryKey node = Registry.LocalMachine.OpenSubKey(ROOT_KEY)) {
-                            if (node != null) {
-                                remoteDebugProxyFolder = (string)node.GetValue("RemoteDebugProxyFolder");
-                            }
-                        }
-                    } catch (Exception) {
-                    }
-                }
-
-                return remoteDebugProxyFolder;
+                return remoteDebugProxyFolder.Value;
             }
         }
 
