@@ -5,8 +5,8 @@
     <Author>Microsoft</Author>
     <Version>1.2</Version>
     <Description xml:space="preserve">Node.js Tools - Interactive Window</Description>
-    <MoreInfoUrl>http://nodejstools.codeplex.com</MoreInfoUrl>
-    <GettingStartedGuide>http://nodejstools.codeplex.com</GettingStartedGuide>
+    <MoreInfoUrl>http://go.microsoft.com/fwlink/?LinkId=785971</MoreInfoUrl>
+    <GettingStartedGuide>http://go.microsoft.com/fwlink/?LinkId=785972</GettingStartedGuide>
     <Locale>1033</Locale>
     <InstalledByMsi>true</InstalledByMsi>
     <Icon>NodeJS.ico</Icon>

@@ -43,6 +43,11 @@ namespace Microsoft.NodejsTools.Analysis {
 
     class SimpleOverloadResult : OverloadResult {
         private readonly string _documentation;
+
+        public SimpleOverloadResult(string name, string documentation) : base(name) {
+            _documentation = documentation;
+        }
+
         public SimpleOverloadResult(string name, string documentation, params ParameterResult[] parameters)
             : base(name, parameters) {
             _documentation = documentation;

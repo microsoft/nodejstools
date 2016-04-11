@@ -600,6 +600,12 @@ You will need to restart Visual Studio after installation.</value>
   <data name="SurroundWith" xml:space="preserve">
     <value>Surround With</value>
   </data>
+  <data name="RemoteDebugProxyFileDoesNotExist" xml:space="preserve">
+    <value>Remote Debug Proxy "{0}" does not exist.</value>
+  </data>
+  <data name="RemoteDebugProxyFolderDoesNotExist" xml:space="preserve">
+    <value>Could not find RemoteDebugProxyFolder</value>
+  </data>
   <data name="TsdErrorOccured" xml:space="preserve">
     <value>Error installing typings files used for Intellisense.</value>
   </data>

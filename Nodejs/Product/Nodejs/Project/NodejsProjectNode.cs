@@ -100,14 +100,15 @@ namespace Microsoft.NodejsTools.Project {
                 }
             }
 #if DEV14
-            TryToAcquireTypings();
+            TryToAcquireCurrentTypings();
 #endif
         }
 
-#if DEV14
-        private bool ShouldAcquireTypingsAutomatically {
+
+        internal bool ShouldAcquireTypingsAutomatically {
             get {
-                if (!NodejsPackage.Instance.IntellisenseOptionsPage.EnableES6Preview) {
+#if DEV14
+                if (NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel != Options.AnalysisLevel.Preview) {
                     return false;
                 }
 
@@ -116,9 +117,13 @@ namespace Microsoft.NodejsTools.Project {
                 });
                 task.Wait();
                 return !task.Result;
+#else
+                return false;
+#endif
             }
         }
 
+#if DEV14
         private TypingsAcquisition TypingsAcquirer {
             get {
                 if (_typingsAcquirer != null) {
@@ -133,21 +138,28 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private void TryToAcquireTypings() {
+        private void TryToAcquireTypings(IEnumerable<string> packages) {
+            if (ShouldAcquireTypingsAutomatically && TypingsAcquirer != null) {
+                TypingsAcquirer
+                    .AcquireTypings(packages, null /*redirector*/)
+                    .ContinueWith(x => x);
+            }
+        }
+
+        private void TryToAcquireCurrentTypings() {
             var controller = ModulesNode != null ? ModulesNode.NpmController : null;
-            if (!ShouldAcquireTypingsAutomatically || TypingsAcquirer == null || controller == null) {
+            if (controller == null) {
                 return;
             }
 
-            var currentPackages = controller.RootPackage.Modules.Where(package =>
-                package.IsDependency
-                || package.IsOptionalDependency
-                || package.IsDevDependency
-                || !package.IsListedInParentPackageJson);
+            var currentPackages = controller.RootPackage.Modules
+                .Where(package =>
+                    package.IsDependency
+                    || package.IsOptionalDependency
+                    || package.IsDevDependency
+                    || !package.IsListedInParentPackageJson);
 
-            TypingsAcquirer
-                .AcquireTypings(currentPackages, null /*redirector*/)
-                .ContinueWith(x => x);
+            TryToAcquireTypings(currentPackages.Select(package => package.Name));
         }
 #endif
 
@@ -481,6 +493,10 @@ namespace Microsoft.NodejsTools.Project {
 
                 NodejsPackage.Instance.CheckSurveyNews(false);
                 ModulesNode.ReloadHierarchySafe();
+
+#if DEV14
+                TryToAcquireTypings(new[] { "node" });
+#endif
 
                 // scan for files which were loaded from cached analysis but no longer
                 // exist and remove them.
@@ -1123,9 +1139,11 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private bool ShowSetAsStartupFileCommandOnNode(IList<HierarchyNode> selectedNodes) {
+            if (selectedNodes.Count != 1) {
+                return false;
+            }
             var selectedNodeUrl = selectedNodes[0].Url;
-            return selectedNodes.Count == 1 &&
-                (IsCodeFile(selectedNodeUrl) ||
+            return (IsCodeFile(selectedNodeUrl) ||
                 // for some reason, the default express 4 template's startup file lacks an extension.
                 string.IsNullOrEmpty(Path.GetExtension(selectedNodeUrl)));
         }
