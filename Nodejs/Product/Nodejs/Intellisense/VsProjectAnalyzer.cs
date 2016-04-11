@@ -81,7 +81,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         private bool _fullyLoaded;
         private List<Action> _loadingDeltas = new List<Action>();
 
-        private static AnalysisLimits _lowLimits = AnalysisLimits.MakeLowAnalysisLimits();
+        private static AnalysisLimits _lowLimits = AnalysisLimits.LowAnalysisLimit;
         private static AnalysisLimits _highLimits = new AnalysisLimits();
         private static byte[] _dbHeader;
 
@@ -1494,7 +1494,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             if (NodejsPackage.Instance != null) {
                 switch (_analysisLevel) {
                     case Options.AnalysisLevel.NodeLsMedium:
-                        defaults = AnalysisLimits.MakeMediumAnalysisLimits();
+                        defaults = AnalysisLimits.MediumAnalysisLimits;
                         break;
                     case Options.AnalysisLevel.NodeLsLow:
                         defaults = _lowLimits;
@@ -1507,7 +1507,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
             try {
                 using (var key = Registry.CurrentUser.OpenSubKey(AnalysisLimitsKey)) {
-                    return LoadLimitsFromStorage(key, defaults);
+                    return AnalysisLimits.LoadLimitsFromStorage(key, defaults);
                 }
             } catch (SecurityException) {
             } catch (UnauthorizedAccessException) {
@@ -1517,46 +1517,6 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
 
-        /// <summary>
-        /// Loads a new instance from the specified registry key.
-        /// </summary>
-        /// <param name="key">
-        /// The key to load settings from. If
-        /// null, all settings are assumed to be unspecified and the default
-        /// values are used.
-        /// </param>
-        /// <param name="defaults">
-        /// The default analysis limits if they're not available in the regkey.
-        /// </param>
-        private static AnalysisLimits LoadLimitsFromStorage(RegistryKey key, AnalysisLimits defaults) {
-            AnalysisLimits limits = new AnalysisLimits();
-
-            limits.ReturnTypes = GetSetting(key, ReturnTypesId) ?? defaults.ReturnTypes;
-            limits.InstanceMembers = GetSetting(key, InstanceMembersId) ?? defaults.InstanceMembers;
-            limits.DictKeyTypes = GetSetting(key, DictKeyTypesId) ?? defaults.DictKeyTypes;
-            limits.DictValueTypes = GetSetting(key, DictValueTypesId) ?? defaults.DictValueTypes;
-            limits.IndexTypes = GetSetting(key, IndexTypesId) ?? defaults.IndexTypes;
-            limits.AssignedTypes = GetSetting(key, AssignedTypesId) ?? defaults.AssignedTypes;
-            limits.NestedModulesLimit = GetSetting(key, NestedModulesLimitId) ?? defaults.NestedModulesLimit;
-
-            return limits;
-        }
-
-        private static int? GetSetting(RegistryKey key, string setting) {
-            if (key != null) {
-                return key.GetValue(ReturnTypesId) as int?;
-            }
-            return null;
-        }
-
-
-        private const string ReturnTypesId = "ReturnTypes";
-        private const string InstanceMembersId = "InstanceMembers";
-        private const string DictKeyTypesId = "DictKeyTypes";
-        private const string DictValueTypesId = "DictValueTypes";
-        private const string IndexTypesId = "IndexTypes";
-        private const string AssignedTypesId = "AssignedTypes";
-        private const string NestedModulesLimitId = "NestedModulesLimit";
 
         #endregion
     }
