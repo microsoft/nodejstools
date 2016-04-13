@@ -20,7 +20,7 @@ using System.IO;
 
 namespace Microsoft.NodejsTools.TestFrameworks {
     class TestFrameworkDirectories {
-        private const string ExportRunnerFramework = "ExportRunner";
+        public const string ExportRunnerFramework = "ExportRunner";
         private const string TestFrameworksDirectory = "TestFrameworks";
 
         private readonly Dictionary<string, string> _frameworkDirectories;
