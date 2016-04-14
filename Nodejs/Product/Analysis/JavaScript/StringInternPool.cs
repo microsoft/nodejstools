@@ -63,7 +63,7 @@ namespace Microsoft.NodejsTools.Parsing {
         /// Interns a string.
         /// Returns the reused string if the string is already in the cache, otherwise adds the string to the cache.
         /// </summary>
-        internal string Intern(string str) {
+        internal  string Intern(string str) {
             if (string.IsNullOrEmpty(str)) {
                 return string.Empty;
             }
@@ -86,7 +86,7 @@ namespace Microsoft.NodejsTools.Parsing {
             // Add new value to head of list
             var newNode = new LinkedListNode<string>(str);
             _list.AddFirst(newNode);
-            _dict[str] = newNode;
+            _dict[newNode.Value] = newNode;
             return newNode.Value;
         }
     }
