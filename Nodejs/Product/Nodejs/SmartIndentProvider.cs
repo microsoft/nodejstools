@@ -50,13 +50,10 @@ namespace Microsoft.NodejsTools {
         #region ISmartIndentProvider Members
 
         public ISmartIndent CreateSmartIndent(ITextView textView) {
-            if (_taggerProvider == null)
-                return null;
-
             return new SmartIndent(
                 textView,
                 _editorOptionsFactory.GetOptions(textView),
-                _taggerProvider.CreateTagger<ClassificationTag>(textView.TextBuffer));
+                _taggerProvider == null ? null : _taggerProvider.CreateTagger<ClassificationTag>(textView.TextBuffer));
         }
 
         #endregion
