@@ -1,15 +1,15 @@
 ﻿//*********************************************************//
 //    Copyright (c) Microsoft. All rights reserved.
-//    
+//
 //    Apache 2.0 License
-//    
+//
 //    You may obtain a copy of the License at
 //    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+//    implied. See the License for the specific language governing
 //    permissions and limitations under the License.
 //
 //*********************************************************//
@@ -89,6 +89,9 @@ namespace Microsoft.NodejsTools.TestAdapter {
                         //Debug.Fail("Before Discover");
                         DiscoverTests(testItems, proj, discoverySink, logger);
                     }
+                } catch (Exception ex) {
+                    logger.SendMessage(TestMessageLevel.Error, ex.Message);
+                    throw ex;
                 } finally {
                     // Disposing buildEngine does not clear the document cache in
                     // VS 2013, so manually unload all projects before disposing.
@@ -144,7 +147,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                             CodeFilePath = (fi != null) ? fi.Filename : filePath,
                             LineNumber = (fi != null && fi.LineNumber.HasValue) ? fi.LineNumber.Value : discoveredTest.SourceLine,
                             DisplayName = discoveredTest.TestName
-                        });                                    
+                        });
 
                 }
                 logger.SendMessage(TestMessageLevel.Informational, string.Format("Processing finished for framework of {0}", testFx));
