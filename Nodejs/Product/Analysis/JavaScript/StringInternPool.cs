@@ -39,27 +39,6 @@ namespace Microsoft.NodejsTools.Parsing {
         }
 
         /// <summary>
-        /// Tries to get the value associated with 'key', returning true if it's found and
-        /// false if it's not present.
-        /// </summary>
-        internal bool TryGetValue(string key, out string value) {
-            LinkedListNode<string> node;
-            if (_dict.TryGetValue(key, out node)) {
-                if (node.Previous != null) {
-                    // move us to the head of the list...
-                    _list.Remove(node);
-                    _list.AddFirst(node);
-                }
-
-                value = node.Value;
-                return true;
-            }
-
-            value = null;
-            return false;
-        }
-
-        /// <summary>
         /// Interns a string.
         /// Returns the reused string if the string is already in the cache, otherwise adds the string to the cache.
         /// </summary>
