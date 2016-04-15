@@ -27,9 +27,35 @@ using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 using MessageBox = System.Windows.MessageBox;
 using Timer = System.Threading.Timer;
+using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Project {
     internal class NodeModulesNode : AbstractNpmNode {
+        /// <summary>
+        /// `INpmGlobalPackageProvider` that caches `IGlobalPackages` objects for reuse.
+        /// </summary>
+        private class CacheGlobalPackageProivder : INpmGlobalPackageProvider {
+            private Dictionary<string, WeakReference<IGlobalPackages>> _packages = new Dictionary<string, WeakReference<IGlobalPackages>>();
+
+            public async Task<IGlobalPackages> GetGlobalPackages(string pathToNpm) {
+                WeakReference<IGlobalPackages> reference;
+                if (_packages.TryGetValue(pathToNpm, out reference)) {
+                    IGlobalPackages current;
+                    if (reference.TryGetTarget(out current) && current != null) {
+                        return current;
+                    }
+                }
+                var provider = new Npm.SPI.NpmBinGlobalPackageProvider();
+                var globals = await provider.GetGlobalPackages(pathToNpm);
+                if (globals != null) {
+                    _packages[pathToNpm] = new WeakReference<IGlobalPackages>(globals);
+                }
+                return globals;
+            }
+        }
+
+        private static INpmGlobalPackageProvider _cachingGlobalPackageProvider = new CacheGlobalPackageProivder();
+
         #region Constants
 
         /// <summary>
@@ -64,9 +90,9 @@ namespace Microsoft.NodejsTools.Project {
 
         #region Initialization
 
-        public NodeModulesNode(NodejsProjectNode root, INpmGlobalPackageProvider globalPackageProvider)
+        public NodeModulesNode(NodejsProjectNode root)
             : base(root) {
-            _npmController = DefaultNpmController(globalPackageProvider);
+            _npmController = DefaultNpmController();
             RegisterWithNpmController(_npmController);
 
             _globalModulesNode = new GlobalModulesNode(root, this);
@@ -131,13 +157,13 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private INpmController DefaultNpmController(INpmGlobalPackageProvider globalPackageProvider) {
+        private INpmController DefaultNpmController() {
             return NpmControllerFactory.Create(
                  _projectNode.ProjectHome,
                 NodejsPackage.Instance.NpmOptionsPage.NpmCachePath,
                 false,
                 new NpmPathProvider(this),
-                globalPackageProvider);
+                _cachingGlobalPackageProvider);
         }
 
         private void RegisterWithNpmController(INpmController controller) {

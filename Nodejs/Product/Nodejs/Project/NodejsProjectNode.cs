@@ -41,29 +41,6 @@ using Microsoft.VisualStudio.Imaging;
 
 namespace Microsoft.NodejsTools.Project {
     class NodejsProjectNode : CommonProjectNode, VsWebSite.VSWebSite, INodePackageModulesCommands, IVsBuildPropertyStorage {
-        /// <summary>
-        /// `INpmGlobalPackageProvider` that caches `IGlobalPackages` objects for reuse.
-        /// </summary>
-        private class CacheGlobalPackageProivder : INpmGlobalPackageProvider {
-            private Dictionary<string, WeakReference<IGlobalPackages>> _packages = new Dictionary<string, WeakReference<IGlobalPackages>>();
-
-            public async Task<IGlobalPackages> GetGlobalPackages(string pathToNpm) {
-                WeakReference<IGlobalPackages> reference;
-                if (_packages.TryGetValue(pathToNpm, out reference)) {
-                    IGlobalPackages current;
-                    if (reference.TryGetTarget(out current) && current != null) {
-                        return current;
-                    }
-                }
-                var provider = new Npm.SPI.NpmBinGlobalPackageProvider();
-                var globals = await provider.GetGlobalPackages(pathToNpm);
-                if (globals != null) {
-                    _packages[pathToNpm] = new WeakReference<IGlobalPackages>(globals);
-                }
-                return globals;
-            }
-        }
-
         private VsProjectAnalyzer _analyzer;
         private readonly HashSet<string> _warningFiles = new HashSet<string>();
         private readonly HashSet<string> _errorFiles = new HashSet<string>();
@@ -72,8 +49,6 @@ namespace Microsoft.NodejsTools.Project {
         internal readonly RequireCompletionCache _requireCompletionCache = new RequireCompletionCache();
         private string _intermediateOutputPath;
         private readonly Dictionary<NodejsProjectImageName, int> _imageIndexFromNameDictionary = new Dictionary<NodejsProjectImageName, int>();
-
-        private static INpmGlobalPackageProvider _cachedGlobalPackageProvider = new CacheGlobalPackageProivder();
 
 #if DEV14
         private TypingsAcquisition _typingsAcquirer;
@@ -736,7 +711,7 @@ namespace Microsoft.NodejsTools.Project {
             base.ProcessReferences();
 
             if (null == ModulesNode) {
-                ModulesNode = new NodeModulesNode(this, _cachedGlobalPackageProvider);
+                ModulesNode = new NodeModulesNode(this);
                 AddChild(ModulesNode);
                 _idleNodeModulesTimer = new Timer(OnIdleNodeModules);
             }
