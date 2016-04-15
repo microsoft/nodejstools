@@ -288,7 +288,7 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
 
             writer.WriteStartElement("VisualStudioVersion");
             writer.WriteAttributeString("Condition", "'$(VisualStudioVersion)' == ''");
-            writer.WriteString("11.0");
+            writer.WriteString("14.0");
             writer.WriteEndElement();
 
             writer.WriteStartElement("VSToolsPath");
