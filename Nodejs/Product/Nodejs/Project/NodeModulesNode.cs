@@ -64,9 +64,9 @@ namespace Microsoft.NodejsTools.Project {
 
         #region Initialization
 
-        public NodeModulesNode(NodejsProjectNode root)
+        public NodeModulesNode(NodejsProjectNode root, INpmGlobalPackageProvider globalPackageProvider)
             : base(root) {
-            _npmController = DefaultNpmController(_projectNode.ProjectHome, new NpmPathProvider(this));
+            _npmController = DefaultNpmController(globalPackageProvider);
             RegisterWithNpmController(_npmController);
 
             _globalModulesNode = new GlobalModulesNode(root, this);
@@ -131,12 +131,13 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private static INpmController DefaultNpmController(string projectHome, NpmPathProvider pathProvider) {
+        private INpmController DefaultNpmController(INpmGlobalPackageProvider globalPackageProvider) {
             return NpmControllerFactory.Create(
-                projectHome,
+                 _projectNode.ProjectHome,
                 NodejsPackage.Instance.NpmOptionsPage.NpmCachePath,
                 false,
-                pathProvider);
+                new NpmPathProvider(this),
+                globalPackageProvider);
         }
 
         private void RegisterWithNpmController(INpmController controller) {
