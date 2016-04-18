@@ -498,9 +498,7 @@ namespace Microsoft.NodejsTools.Project {
 
                 // scan for files which were loaded from cached analysis but no longer
                 // exist and remove them.
-                if (_analyzer != null) {
-                    _analyzer.ReloadComplete();
-                }
+                _analyzer?.ReloadComplete();
             }
         }
 
@@ -538,7 +536,7 @@ namespace Microsoft.NodejsTools.Project {
                         ((PackageJsonFileNode)child).AnalyzePackageJson(newAnalyzer);
                     } else if (child is NodejsFileNode) {
                         if (((NodejsFileNode)child).ShouldAnalyze) {
-                            newAnalyzer.AnalyzeFile(child.Url, !child.IsNonMemberItem);
+                            newAnalyzer?.AnalyzeFile(child.Url, !child.IsNonMemberItem);
                         }
                     }
 
@@ -570,7 +568,7 @@ namespace Microsoft.NodejsTools.Project {
             var analyzer = CreateNewAnalyser();
             Reanalyze(this, analyzer);
             if (oldAnalyzer != null) {
-                analyzer.SwitchAnalyzers(oldAnalyzer);
+                analyzer?.SwitchAnalyzers(oldAnalyzer);
                 if (oldAnalyzer.RemoveUser()) {
                     oldAnalyzer.Dispose();
                 }
