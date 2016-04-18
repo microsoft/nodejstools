@@ -81,7 +81,6 @@ namespace Microsoft.NodejsTools.Intellisense {
         private bool _fullyLoaded;
         private List<Action> _loadingDeltas = new List<Action>();
 
-        private static AnalysisLimits _lowLimits = AnalysisLimits.LowAnalysisLimit;
         private static AnalysisLimits _highLimits = new AnalysisLimits();
         private static byte[] _dbHeader;
 
@@ -99,16 +98,14 @@ namespace Microsoft.NodejsTools.Intellisense {
 #endif
 
         internal VsProjectAnalyzer(
+            AnalysisLevel analysisLevel,
+            bool saveToDisk,
             string projectFileDir = null
         ) {
             _projectFiles = new ConcurrentDictionary<string, ProjectItem>(StringComparer.OrdinalIgnoreCase);
-            if (NodejsPackage.Instance != null) {
-                _analysisLevel = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel;
-                _saveToDisk = NodejsPackage.Instance.IntellisenseOptionsPage.SaveToDisk;
-            } else {
-                _analysisLevel = AnalysisLevel.NodeLsHigh;
-                _saveToDisk = true;
-            }
+
+            _analysisLevel = analysisLevel;
+            _saveToDisk = saveToDisk;
 
             var limits = LoadLimits();
             if (projectFileDir != null) {
@@ -1489,20 +1486,17 @@ namespace Microsoft.NodejsTools.Intellisense {
     @"\Analysis\Project";
 
         private AnalysisLimits LoadLimits() {
-            AnalysisLimits defaults = null;
-
-            if (NodejsPackage.Instance != null) {
-                switch (_analysisLevel) {
-                    case Options.AnalysisLevel.NodeLsMedium:
-                        defaults = AnalysisLimits.MediumAnalysisLimits;
-                        break;
-                    case Options.AnalysisLevel.NodeLsLow:
-                        defaults = _lowLimits;
-                        break;
-                }
-            }
-            if (defaults == null) {
-                defaults = _highLimits;
+            AnalysisLimits defaults;
+            switch (_analysisLevel) {
+                case AnalysisLevel.NodeLsMedium:
+                    defaults = AnalysisLimits.MediumAnalysisLimits;
+                    break;
+                case AnalysisLevel.NodeLsLow:
+                    defaults = AnalysisLimits.LowAnalysisLimit;
+                    break;
+                default:
+                    defaults = _highLimits;
+                    break;
             }
 
             try {

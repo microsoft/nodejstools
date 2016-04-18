@@ -22,6 +22,7 @@ using Microsoft.NodejsTools.Intellisense;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.TextManager.Interop;
 using TestUtilities.Mocks;
+using Microsoft.NodejsTools.Options;
 
 namespace NodejsTests.Debugger.FileNameMapping {
     [TestClass]
@@ -34,7 +35,7 @@ namespace NodejsTests.Debugger.FileNameMapping {
             classifierProvider._classificationRegistry = new MockClassificationTypeRegistryService();
             classifierProvider.GetClassifier(buffer);
 
-            var analyzer = new VsProjectAnalyzer();
+            var analyzer = new VsProjectAnalyzer(AnalysisLevel.NodeLsHigh, true);
             buffer.AddProperty(typeof(VsProjectAnalyzer), analyzer);
             analyzer.AddBuffer(buffer);
             analyzer.WaitForCompleteAnalysis();

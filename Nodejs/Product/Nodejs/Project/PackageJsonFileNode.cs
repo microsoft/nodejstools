@@ -58,8 +58,9 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         internal void AnalyzePackageJson(Intellisense.VsProjectAnalyzer analyzer) {
-            analyzer.AddPackageJson(Url);
+            if (analyzer != null) {
+                analyzer.AddPackageJson(Url);
+            }
         }
-
     }
 }

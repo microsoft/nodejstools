@@ -483,9 +483,7 @@ namespace Microsoft.NodejsTools.Project {
                 if (_analyzer != null && _analyzer.RemoveUser()) {
                     _analyzer.Dispose();
                 }
-                _analyzer = new VsProjectAnalyzer(ProjectFolder);
-                _analyzer.MaxLogLength = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMax;
-                LogAnalysisLevel();
+                _analyzer = CreateNewAnalyser();
 
                 base.Reload();
 
@@ -500,8 +498,21 @@ namespace Microsoft.NodejsTools.Project {
 
                 // scan for files which were loaded from cached analysis but no longer
                 // exist and remove them.
-                _analyzer.ReloadComplete();
+                if (_analyzer != null) {
+                    _analyzer.ReloadComplete();
+                }
             }
+        }
+
+        private VsProjectAnalyzer CreateNewAnalyser() {
+            if (NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel == Options.AnalysisLevel.NodeLsNone ||
+                NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel == Options.AnalysisLevel.Preview) {
+                return null;
+            }
+            var analyzer = new VsProjectAnalyzer(NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel, NodejsPackage.Instance.IntellisenseOptionsPage.SaveToDisk, ProjectFolder);
+            analyzer.MaxLogLength = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMax;
+            LogAnalysisLevel(analyzer);
+            return analyzer;
         }
 
         private void UpdateProjectNodeFromProjectProperties() {
@@ -536,8 +547,7 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private void LogAnalysisLevel() {
-            var analyzer = _analyzer;
+        private static void LogAnalysisLevel(VsProjectAnalyzer analyzer) {
             if (analyzer != null) {
                 NodejsPackage.Instance.Logger.LogEvent(Logging.NodejsToolsLogEvent.AnalysisLevel, (int)analyzer.AnalysisLevel);
             }
@@ -554,11 +564,10 @@ namespace Microsoft.NodejsTools.Project {
         }
         */
         private void IntellisenseOptionsPageAnalysisLevelChanged(object sender, EventArgs e) {
-
             var oldAnalyzer = _analyzer;
             _analyzer = null;
 
-            var analyzer = new VsProjectAnalyzer(ProjectFolder);
+            var analyzer = CreateNewAnalyser();
             Reanalyze(this, analyzer);
             if (oldAnalyzer != null) {
                 analyzer.SwitchAnalyzers(oldAnalyzer);
@@ -567,8 +576,6 @@ namespace Microsoft.NodejsTools.Project {
                 }
             }
             _analyzer = analyzer;
-            _analyzer.MaxLogLength = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMax;
-            LogAnalysisLevel();
         }
 
         private void AnalysisLogMaximumChanged(object sender, EventArgs e) {

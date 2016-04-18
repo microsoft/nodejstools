@@ -35,7 +35,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         protected override void OnParentSet(HierarchyNode parent) {
-            if (ProjectMgr == null || ProjectMgr.Analyzer == null || !ProjectMgr.ShouldAcquireTypingsAutomatically) {
+            if (ProjectMgr == null || !ProjectMgr.ShouldAcquireTypingsAutomatically) {
                 return;
             }
 
@@ -93,7 +93,9 @@ namespace Microsoft.NodejsTools.Project {
                 this.ItemNode.ItemTypeName = ProjectFileConstants.Content;
             }
 
-            ProjectMgr.Analyzer.AnalyzeFile(Url, ShouldAnalyze);
+            if (ProjectMgr.Analyzer != null) {
+                ProjectMgr.Analyzer.AnalyzeFile(Url, ShouldAnalyze);
+            }
 
             UpdateParentContentType();
             ItemNode.ItemTypeChanged += ItemNode_ItemTypeChanged;
@@ -110,7 +112,9 @@ namespace Microsoft.NodejsTools.Project {
         internal override int ExcludeFromProject() {
             // Analyze on removing from a project so we have the most up to date sources for this.
             // Don't report errors since the file won't remain part of the project. This removes the errors from the list.
-            ProjectMgr.Analyzer.AnalyzeFile(Url, false);
+            if (ProjectMgr.Analyzer != null) {
+                ProjectMgr.Analyzer.AnalyzeFile(Url, false);
+            }
             var excludeFromProject = base.ExcludeFromProject();
 
             UpdateParentContentType();
@@ -121,6 +125,9 @@ namespace Microsoft.NodejsTools.Project {
 
         protected override void RaiseOnItemRemoved(string documentToRemove, string[] filesToBeDeleted) {
             base.RaiseOnItemRemoved(documentToRemove, filesToBeDeleted);
+            if (ProjectMgr.Analyzer == null) {
+                return;
+            }
             foreach (var file in filesToBeDeleted) {
                 if (!File.Exists(file)) {
                     ProjectMgr.Analyzer.UnloadFile(file);
@@ -130,7 +137,10 @@ namespace Microsoft.NodejsTools.Project {
 
         protected override void RenameChildNodes(FileNode parentNode) {
             base.RenameChildNodes(parentNode);
-            this.ProjectMgr.Analyzer.ReloadComplete();
+
+            if (ProjectMgr.Analyzer != null) {
+                ProjectMgr.Analyzer.ReloadComplete();
+            }
         }
 
         protected override NodeProperties CreatePropertiesObject() {
