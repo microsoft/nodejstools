@@ -43,6 +43,10 @@ namespace Microsoft.NodejsTools.Debugger {
             return res;
         }
 
+        public void ResponseToTerminateEvent(object sender, EventArgs e) {
+            this.Kill();
+        }
+
         public void Start() {
             string waitMode;
             if (_waitOnNormal && _waitOnAbnormal) {

@@ -100,8 +100,8 @@ namespace Microsoft.NodejsTools.Project {
                 var process = NodeProcess.Start(
                     psi,
                     NodejsPackage.Instance.GeneralOptionsPage.WaitOnAbnormalExit,
-                    NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit
-                );
+                    NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit);
+                _project.OnDispose += process.ResponseToTerminateEvent;
 
                 if (startBrowser && uri != null) {
                     OnPortOpenedHandler.CreateHandler(
