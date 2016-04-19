@@ -503,10 +503,6 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private VsProjectAnalyzer CreateNewAnalyser() {
-            if (NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel == Options.AnalysisLevel.NodeLsNone ||
-                NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel == Options.AnalysisLevel.Preview) {
-                return null;
-            }
             var analyzer = new VsProjectAnalyzer(NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel, NodejsPackage.Instance.IntellisenseOptionsPage.SaveToDisk, ProjectFolder);
             analyzer.MaxLogLength = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMax;
             LogAnalysisLevel(analyzer);
@@ -692,8 +688,7 @@ namespace Microsoft.NodejsTools.Project {
                 nestedModulesDepth = ModulesNode.NpmController.RootPackage.Modules.GetDepth(fileNode.Url);
             }
 
-            if (_analyzer != null && _analyzer.Project != null &&
-                _analyzer.Project.Limits.IsPathExceedNestingLimit(nestedModulesDepth)) {
+            if (_analyzer != null && _analyzer.Limits.IsPathExceedNestingLimit(nestedModulesDepth)) {
                 return false;
             }
 

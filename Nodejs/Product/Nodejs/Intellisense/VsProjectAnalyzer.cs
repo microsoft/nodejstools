@@ -63,6 +63,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         private readonly HashSet<BufferParser> _activeBufferParsers = new HashSet<BufferParser>();
         private readonly ConcurrentDictionary<string, ProjectItem> _projectFiles;
         private JsAnalyzer _jsAnalyzer;
+        private readonly AnalysisLimits _limits;
         private readonly bool _implicitProject;
         private readonly AutoResetEvent _queueActivityEvent = new AutoResetEvent(false);
         private readonly CodeSettings _codeSettings = new CodeSettings();
@@ -107,15 +108,15 @@ namespace Microsoft.NodejsTools.Intellisense {
             _analysisLevel = analysisLevel;
             _saveToDisk = saveToDisk;
 
-            var limits = LoadLimits();
+            _limits = LoadLimits();
             if (projectFileDir != null) {
                 _projectFileDir = projectFileDir;
-                if (!LoadCachedAnalysis(limits)) {
-                    CreateNewAnalyzer(limits);
+                if (!LoadCachedAnalysis(_limits)) {
+                    CreateNewAnalyzer(_limits);
                 }
             } else {
                 _implicitProject = true;
-                CreateNewAnalyzer(limits);
+                CreateNewAnalyzer(_limits);
             }
 
             if (!_saveToDisk) {
@@ -149,6 +150,9 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         private void CreateNewAnalyzer(AnalysisLimits limits) {
+            if (_analysisLevel == AnalysisLevel.NodeLsNone || _analysisLevel == AnalysisLevel.Preview) {
+                return;
+            }
             _jsAnalyzer = new JsAnalyzer(limits);
             if (ShouldEnqueue()) {
                 _analysisQueue = new AnalysisQueue(this);
@@ -636,9 +640,9 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
         }
 
-        public JsAnalyzer Project {
+        public AnalysisLimits Limits {
             get {
-                return _jsAnalyzer;
+                return _limits;
             }
         }
 
@@ -1335,6 +1339,10 @@ namespace Microsoft.NodejsTools.Intellisense {
         #region Cached Analysis
 
         private bool LoadCachedAnalysis(AnalysisLimits limits) {
+            if (_analysisLevel == AnalysisLevel.NodeLsNone || _analysisLevel == AnalysisLevel.Preview) {
+                return false;
+            }
+
             string analysisDb = GetAnalysisPath();
             if (File.Exists(analysisDb) && ShouldEnqueue()) {
                 FileStream stream = null;
