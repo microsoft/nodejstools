@@ -128,25 +128,34 @@ namespace Microsoft.NodejsTools.Intellisense {
             InitializeCodeSettings();
         }
 
-        private void InitializeCodeSettings() {
+        /// <summary>
+        /// Ensure the analyzer is fully loaded before executing a function.
+        /// </summary>
+        /// <param name="f">Action to execute.</param>
+        private void WhenFullyLoaded(Action f) {
             if (!_fullyLoaded) {
                 lock (_loadingDeltas) {
                     if (!_fullyLoaded) {
-                        _loadingDeltas.Add(() => InitializeCodeSettings());
+                        _loadingDeltas.Add(f);
                         return;
                     }
                 }
             }
+            f();
+        }
 
-            foreach (var name in _jsAnalyzer.GlobalMembers) {
-                _codeSettings.AddKnownGlobal(name);
-            }
-            _codeSettings.AddKnownGlobal("__dirname");
-            _codeSettings.AddKnownGlobal("__filename");
-            _codeSettings.AddKnownGlobal("module");
-            _codeSettings.AddKnownGlobal("exports");
+        private void InitializeCodeSettings() {
+            WhenFullyLoaded(() => {
+                foreach (var name in _jsAnalyzer.GlobalMembers) {
+                    _codeSettings.AddKnownGlobal(name);
+                }
+                _codeSettings.AddKnownGlobal("__dirname");
+                _codeSettings.AddKnownGlobal("__filename");
+                _codeSettings.AddKnownGlobal("module");
+                _codeSettings.AddKnownGlobal("exports");
 
-            _codeSettings.AllowShebangLine = true;
+                _codeSettings.AllowShebangLine = true;
+            });
         }
 
         private void CreateNewAnalyzer(AnalysisLimits limits) {
@@ -201,73 +210,59 @@ namespace Microsoft.NodejsTools.Intellisense {
         public EventHandler<FileEventArgs> ErrorRemoved;
 
         public void AddBuffer(ITextBuffer buffer) {
-            if (!_fullyLoaded) {
-                lock (_loadingDeltas) {
-                    if (!_fullyLoaded) {
-                        _loadingDeltas.Add(() => AddBuffer(buffer));
+            WhenFullyLoaded(() => {
+                IReplEvaluator replEval;
+                if (buffer.Properties.TryGetProperty<IReplEvaluator>(typeof(IReplEvaluator), out replEval)) {
+                    BufferParser replParser;
+                    if (_replParsers.TryGetValue(replEval, out replParser)) {
+                        replParser.AddBuffer(buffer);
                         return;
                     }
                 }
-            }
 
-            IReplEvaluator replEval;
-            if (buffer.Properties.TryGetProperty<IReplEvaluator>(typeof(IReplEvaluator), out replEval)) {
-                BufferParser replParser;
-                if (_replParsers.TryGetValue(replEval, out replParser)) {
-                    replParser.AddBuffer(buffer);
-                    return;
+                IProjectEntry projEntry = GetOrCreateProjectEntry(
+                    buffer,
+                    new SnapshotCookie(buffer.CurrentSnapshot)
+                );
+
+                ConnectErrorList(projEntry, buffer);
+
+                // kick off initial processing on the buffer
+                BufferParser bufferParser = EnqueueBuffer(projEntry, buffer);
+                lock (_activeBufferParsers) {
+                    _activeBufferParsers.Add(bufferParser);
                 }
-            }
 
-            IProjectEntry projEntry = GetOrCreateProjectEntry(
-                buffer,
-                new SnapshotCookie(buffer.CurrentSnapshot)
-            );
-
-            ConnectErrorList(projEntry, buffer);
-
-            // kick off initial processing on the buffer
-            BufferParser bufferParser = EnqueueBuffer(projEntry, buffer);
-            lock (_activeBufferParsers) {
-                _activeBufferParsers.Add(bufferParser);
-            }
-
-            if (replEval != null) {
-                _replParsers[replEval] = bufferParser;
-            }
+                if (replEval != null) {
+                    _replParsers[replEval] = bufferParser;
+                }
+            });
         }
 
         public void RemoveBuffer(ITextBuffer buffer) {
-            if (!_fullyLoaded) {
-                lock (_loadingDeltas) {
-                    if (!_fullyLoaded) {
-                        _loadingDeltas.Add(() => RemoveBuffer(buffer));
+            WhenFullyLoaded(() => {
+                IReplEvaluator replEval;
+                if (buffer.Properties.TryGetProperty<IReplEvaluator>(typeof(IReplEvaluator), out replEval)) {
+                    BufferParser replParser;
+                    if (_replParsers.TryGetValue(replEval, out replParser)) {
+                        replParser.RemoveBuffer(buffer);
+                        if (replParser.Buffers.Length == 0) {
+                            ViewDetached(buffer, replParser);
+                        }
+
                         return;
                     }
                 }
-            }
 
-            IReplEvaluator replEval;
-            if (buffer.Properties.TryGetProperty<IReplEvaluator>(typeof(IReplEvaluator), out replEval)) {
-                BufferParser replParser;
-                if (_replParsers.TryGetValue(replEval, out replParser)) {
-                    replParser.RemoveBuffer(buffer);
-                    if (replParser.Buffers.Length == 0) {
-                        ViewDetached(buffer, replParser);
-                    }
-
+                BufferParser bufferParser;
+                if (!buffer.Properties.TryGetProperty<BufferParser>(typeof(BufferParser), out bufferParser)) {
                     return;
                 }
-            }
 
-            BufferParser bufferParser;
-            if (!buffer.Properties.TryGetProperty<BufferParser>(typeof(BufferParser), out bufferParser)) {
-                return;
-            }
-
-            if (--bufferParser.AttachedViews == 0) {
-                ViewDetached(buffer, bufferParser);
-            }
+                if (--bufferParser.AttachedViews == 0) {
+                    ViewDetached(buffer, bufferParser);
+                }
+            });
         }
 
         private void ViewDetached(ITextBuffer buffer, BufferParser bufferParser) {
@@ -292,68 +287,61 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         private void AnalyzeFile(string path, bool reportErrors, ProjectItem originatingItem) {
-            if (!_fullyLoaded) {
-                lock (_loadingDeltas) {
-                    if (!_fullyLoaded) {
-                        _loadingDeltas.Add(() => AnalyzeFile(path, reportErrors, originatingItem));
-                        return;
-                    }
-                }
-            }
+            WhenFullyLoaded(() => {
+                ProjectItem item;
+                if (!_projectFiles.TryGetValue(path, out item)) {
+                    var pyEntry = _jsAnalyzer.AddModule(
+                        path,
+                        null
+                    );
 
-            ProjectItem item;
-            if (!_projectFiles.TryGetValue(path, out item)) {
-                var pyEntry = _jsAnalyzer.AddModule(
-                    path,
-                    null
-                );
+                    pyEntry.BeginParsingTree();
 
-                pyEntry.BeginParsingTree();
+                    item = new ProjectItem(pyEntry);
 
-                item = new ProjectItem(pyEntry);
-
-                item.ReportErrors = reportErrors;
-                item.Reloaded = true;
-                _projectFiles[path] = item;
-                // only parse the file if we need to report errors on it or if
-                // we're analyzing.s
-                if (reportErrors || _analysisQueue != null) {
-                    EnqueueFile(item.Entry, path);
-                } else if (item is IJsProjectEntry) {
-                    // balance BeginParsingTree call...
-                    ((IJsProjectEntry)item.Entry).UpdateTree(null, null);
-                }
-            } else {
-                if (!reportErrors) {
-                    TaskProvider.Clear(item.Entry, ParserTaskMoniker);
-                }
-
-                if ((_reparseDateTime != null && new FileInfo(path).LastWriteTime > _reparseDateTime.Value)
-                        || (reportErrors && !item.ReportErrors) ||
-                        (item.Entry.Module == null || item.Entry.Unit == null)) {
-                    // this file was written to since our cached analysis was saved, reload it.
-                    // Or it was just included in the project and we need to parse for reporting
-                    // errors.
-                    if (_analysisQueue != null) {
+                    item.ReportErrors = reportErrors;
+                    item.Reloaded = true;
+                    _projectFiles[path] = item;
+                    // only parse the file if we need to report errors on it or if
+                    // we're analyzing.s
+                    if (reportErrors || _analysisQueue != null) {
                         EnqueueFile(item.Entry, path);
+                    } else if (item is IJsProjectEntry) {
+                        // balance BeginParsingTree call...
+                        ((IJsProjectEntry)item.Entry).UpdateTree(null, null);
                     }
-                }
-                item.ReportErrors = reportErrors;
-                item.Reloaded = true;
-            }
-
-            if (_implicitProject) {
-                if (originatingItem != null) {
-                    // file was loaded as part of analysis of a collection of files...
-                    item.ImplicitLoadCount += 1;
-                    if (originatingItem.LoadedItems == null) {
-                        originatingItem.LoadedItems = new List<ProjectItem>();
-                    }
-                    originatingItem.LoadedItems.Add(item);
                 } else {
-                    originatingItem.ExplicitlyLoaded = true;
+                    if (!reportErrors) {
+                        TaskProvider.Clear(item.Entry, ParserTaskMoniker);
+                    }
+
+                    if ((_reparseDateTime != null && new FileInfo(path).LastWriteTime > _reparseDateTime.Value)
+                            || (reportErrors && !item.ReportErrors) ||
+                            (item.Entry.Module == null || item.Entry.Unit == null)) {
+                        // this file was written to since our cached analysis was saved, reload it.
+                        // Or it was just included in the project and we need to parse for reporting
+                        // errors.
+                        if (_analysisQueue != null) {
+                            EnqueueFile(item.Entry, path);
+                        }
+                    }
+                    item.ReportErrors = reportErrors;
+                    item.Reloaded = true;
                 }
-            }
+
+                if (_implicitProject) {
+                    if (originatingItem != null) {
+                        // file was loaded as part of analysis of a collection of files...
+                        item.ImplicitLoadCount += 1;
+                        if (originatingItem.LoadedItems == null) {
+                            originatingItem.LoadedItems = new List<ProjectItem>();
+                        }
+                        originatingItem.LoadedItems.Add(item);
+                    } else {
+                        originatingItem.ExplicitlyLoaded = true;
+                    }
+                }
+            });
         }
 
         public void AddPackageJson(string packageJsonPath) {
@@ -398,21 +386,14 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         public void AddPackageJson(string path, string mainFile, List<string> dependencies) {
-            if (!_fullyLoaded) {
-                lock (_loadingDeltas) {
-                    if (!_fullyLoaded) {
-                        _loadingDeltas.Add(() => AddPackageJson(path, mainFile, dependencies));
-                        return;
-                    }
+            WhenFullyLoaded(() => {
+                if (ShouldEnqueue()) {
+                    _analysisQueue.Enqueue(
+                        _jsAnalyzer.AddPackageJson(path, mainFile, dependencies),
+                        AnalysisPriority.Normal
+                    );
                 }
-            }
-
-            if (ShouldEnqueue()) {
-                _analysisQueue.Enqueue(
-                    _jsAnalyzer.AddPackageJson(path, mainFile, dependencies),
-                    AnalysisPriority.Normal
-                );
-            }
+            });
         }
 
         /// <summary>
@@ -654,16 +635,9 @@ namespace Microsoft.NodejsTools.Intellisense {
                 return _jsAnalyzer.MaxLogLength;
             }
             set {
-                if (!_fullyLoaded) {
-                    lock (_loadingDeltas) {
-                        if (!_fullyLoaded) {
-                            _loadingDeltas.Add(() => MaxLogLength = value);
-                            return;
-                        }
-                    }
-                }
-
-                _jsAnalyzer.MaxLogLength = value;
+                WhenFullyLoaded(() => {
+                    _jsAnalyzer.MaxLogLength = value;
+                });
             }
         }
 
@@ -676,21 +650,14 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         public void ReloadComplete() {
-            if (!_fullyLoaded) {
-                lock (_loadingDeltas) {
-                    if (!_fullyLoaded) {
-                        _loadingDeltas.Add(() => ReloadComplete());
-                        return;
+            WhenFullyLoaded(() => {
+                foreach (var item in _projectFiles) {
+                    if ((!File.Exists(item.Value.Entry.FilePath) || !item.Value.Reloaded)
+                        && !item.Value.Entry.IsBuiltin) {
+                        UnloadFile(item.Value.Entry);
                     }
                 }
-            }
-
-            foreach (var item in _projectFiles) {
-                if ((!File.Exists(item.Value.Entry.FilePath) || !item.Value.Reloaded)
-                    && !item.Value.Entry.IsBuiltin) {
-                    UnloadFile(item.Value.Entry);
-                }
-            }
+            });
         }
 
         public void SwitchAnalyzers(VsProjectAnalyzer oldAnalyzer) {
@@ -728,32 +695,24 @@ namespace Microsoft.NodejsTools.Intellisense {
         /// _openFiles must be locked when calling this function.
         /// </summary>
         private void ReAnalyzeTextBuffers(BufferParser bufferParser) {
-            if (!_fullyLoaded) {
-                lock (_loadingDeltas) {
-                    if (!_fullyLoaded) {
-                        _loadingDeltas.Add(() => ReAnalyzeTextBuffers(bufferParser));
-                        return;
-                    }
-                }
-            }
+            WhenFullyLoaded(() => {
+                ITextBuffer[] buffers = bufferParser.Buffers;
+                if (buffers.Length > 0) {
+                    var projEntry = GetOrCreateProjectEntry(buffers[0], new SnapshotCookie(buffers[0].CurrentSnapshot));
+                    foreach (var buffer in buffers) {
+                        buffer.Properties.RemoveProperty(typeof(IProjectEntry));
+                        buffer.Properties.AddProperty(typeof(IProjectEntry), projEntry);
 
-            ITextBuffer[] buffers = bufferParser.Buffers;
-            if (buffers.Length > 0) {
-                var projEntry = GetOrCreateProjectEntry(buffers[0], new SnapshotCookie(buffers[0].CurrentSnapshot));
-                foreach (var buffer in buffers) {
-                    buffer.Properties.RemoveProperty(typeof(IProjectEntry));
-                    buffer.Properties.AddProperty(typeof(IProjectEntry), projEntry);
+                        var classifier = buffer.GetNodejsClassifier();
+                        if (classifier != null) {
+                            classifier.NewVersion();
+                        }
 
-                    var classifier = buffer.GetNodejsClassifier();
-                    if (classifier != null) {
-                        classifier.NewVersion();
+                        ConnectErrorList(projEntry, buffer);
                     }
 
-                    ConnectErrorList(projEntry, buffer);
-                }
-
-                bufferParser._currentProjEntry = projEntry;
-                bufferParser._parser = this;
+                    bufferParser._currentProjEntry = projEntry;
+                    bufferParser._parser = this;
 
 #if FALSE
                 // TODO: Add back for navigation bar support
@@ -769,8 +728,9 @@ namespace Microsoft.NodejsTools.Intellisense {
                 }
 #endif
 
-                bufferParser.Requeue();
-            }
+                    bufferParser.Requeue();
+                }
+            });
         }
 
         public void UnloadFile(string filename) {
@@ -1517,8 +1477,6 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
             return defaults;
         }
-
-
 
         #endregion
     }
