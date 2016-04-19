@@ -76,6 +76,10 @@ namespace Microsoft.NodejsTools.Project {
 #endif
 
         internal override int IncludeInProject(bool includeChildren) {
+            if (!Parent.ItemNode.IsExcluded) {
+                return 0;
+            }
+
             // Check if parent folder is designated as containing client-side code.
             var isContent = false;
             var folderNode = this.Parent as NodejsFolderNode;
@@ -89,7 +93,6 @@ namespace Microsoft.NodejsTools.Project {
             }
 
             var includeInProject = base.IncludeInProject(includeChildren);
-
             if (isContent && Url.EndsWith(".js", StringComparison.OrdinalIgnoreCase)) {
                 this.ItemNode.ItemTypeName = ProjectFileConstants.Content;
             }
