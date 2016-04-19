@@ -39,7 +39,8 @@ namespace Microsoft.NodejsTools.Project {
                 return;
             }
 
-            if (Url.EndsWith(NodejsConstants.TypeScriptDeclarationExtension, StringComparison.OrdinalIgnoreCase) && Url.IndexOf(@"\typings\", StringComparison.OrdinalIgnoreCase) >= 0) {
+            if (Url.EndsWith(NodejsConstants.TypeScriptDeclarationExtension, StringComparison.OrdinalIgnoreCase)
+              && Url.StartsWith(Path.Combine(ProjectMgr.ProjectFolder, @"typings\"), StringComparison.OrdinalIgnoreCase)) {
                 ProjectMgr.Site.GetUIThread().Invoke(() => {
                     this.IncludeInProject(true);
                 });
