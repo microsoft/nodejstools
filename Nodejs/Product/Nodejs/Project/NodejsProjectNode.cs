@@ -1011,10 +1011,10 @@ namespace Microsoft.NodejsTools.Project {
                 NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevelChanged -= IntellisenseOptionsPageAnalysisLevelChanged;
                 NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMaximumChanged -= AnalysisLogMaximumChanged;
 
-                EventHandler handler = OnDispose;
-                if (handler != null) {
-                    handler(this, EventArgs.Empty);
-                }
+                OnDispose?.Invoke(this, EventArgs.Empty);
+
+                ModulesNode?.Dispose();
+                ModulesNode = null;
             }
             base.Dispose(disposing);
         }
