@@ -1013,8 +1013,12 @@ namespace Microsoft.NodejsTools.Project {
 
                 OnDispose?.Invoke(this, EventArgs.Empty);
 
+                RemoveChild(ModulesNode);
                 ModulesNode?.Dispose();
                 ModulesNode = null;
+#if DEV14
+                _typingsAcquirer = null;
+#endif
             }
             base.Dispose(disposing);
         }
