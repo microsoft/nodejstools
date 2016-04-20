@@ -46,9 +46,9 @@ namespace Microsoft.NodejsTools.Project {
 
         #region Member variables
 
-        private GlobalModulesNode _globalModulesNode;
-        private LocalModulesNode _devModulesNode;
-        private LocalModulesNode _optionalModulesNode;
+        private readonly GlobalModulesNode _globalModulesNode;
+        private readonly LocalModulesNode _devModulesNode;
+        private readonly LocalModulesNode _optionalModulesNode;
 
         private Timer _npmIdleTimer;
         private INpmController _npmController;
@@ -101,13 +101,7 @@ namespace Microsoft.NodejsTools.Project {
                     _npmController.ErrorLogged -= NpmController_ErrorLogged;
                     _npmController.ExceptionLogged -= NpmController_ExceptionLogged;
                     _npmController.CommandCompleted -= NpmController_CommandCompleted;
-                    _npmController.FinishedRefresh -= NpmController_FinishedRefresh;
-                    _npmController = null;
                 }
-
-                _globalModulesNode = null;
-                _devModulesNode = null;
-                _optionalModulesNode = null;
 
                 _isDisposed = true;
             }

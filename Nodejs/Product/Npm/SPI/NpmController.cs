@@ -33,8 +33,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         private IGlobalPackages _globalPackage;
         private readonly object _lock = new object();
 
-        private FileSystemWatcher _localWatcher;
-        private FileSystemWatcher _globalWatcher;
+        private readonly FileSystemWatcher _localWatcher;
+        private readonly FileSystemWatcher _globalWatcher;
 
         private Timer _fileSystemWatcherTimer;
         private int _refreshRetryCount;
@@ -343,7 +343,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                         _localWatcher.Created -= Watcher_Modified;
                         _localWatcher.Deleted -= Watcher_Modified;
                         _localWatcher.Dispose();
-                        _localWatcher = null;
                     }
 
                     if (_globalWatcher != null) {
@@ -351,7 +350,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                         _globalWatcher.Created -= Watcher_Modified;
                         _globalWatcher.Deleted -= Watcher_Modified;
                         _globalWatcher.Dispose();
-                        _globalWatcher = null;
                     }
                 }
 
