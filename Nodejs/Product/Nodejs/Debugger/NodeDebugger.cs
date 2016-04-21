@@ -480,42 +480,36 @@ namespace Microsoft.NodejsTools.Debugger {
         /// to give time to attach to debugger events.
         /// </summary>
         public void StartListening() {
+            LiveLogger.WriteLine("NodeDebugger start listening");
+
             _connection.Connect(_debuggerEndpointUri);
 
             var mainThread = new NodeThread(this, MainThreadId, false);
             _threads[mainThread.Id] = mainThread;
 
             if (!GetScriptsAsync().Wait((int)_timeout.TotalMilliseconds)) {
+                LiveLogger.WriteLine("NodeDebugger GetScripts timeout");
                 throw new TimeoutException("Timed out while retrieving scripts from debuggee.");
             }
 
             if (!SetExceptionBreakAsync().Wait((int)_timeout.TotalMilliseconds)) {
+                LiveLogger.WriteLine("NodeDebugger SetException timeout");
                 throw new TimeoutException("Timed out while setting up exception handling in debuggee.");
             }
 
             var backTraceTask = PerformBacktraceAsync();
             if (!backTraceTask.Wait((int)_timeout.TotalMilliseconds)) {
+                LiveLogger.WriteLine("NodeDebugger backtrace timeout");
                 throw new TimeoutException("Timed out while performing initial backtrace.");
             }
 
             // At this point we can fire events
-            EventHandler<ThreadEventArgs> newThread = ThreadCreated;
-            if (newThread != null) {
-                newThread(this, new ThreadEventArgs(mainThread));
-            }
-            EventHandler<ThreadEventArgs> procLoaded = ProcessLoaded;
-            if (procLoaded != null) {
-                procLoaded(this, new ThreadEventArgs(MainThread));
-            }
-
+            ThreadCreated?.Invoke(this, new ThreadEventArgs(mainThread));
+            ProcessLoaded?.Invoke(this, new ThreadEventArgs(MainThread));
         }
 
         private void OnConnectionClosed(object sender, EventArgs args) {
-            EventHandler<ThreadEventArgs> threadExited = ThreadExited;
-            if (threadExited != null) {
-                threadExited(this, new ThreadEventArgs(MainThread));
-            }
-
+            ThreadExited?.Invoke(this, new ThreadEventArgs(MainThread));
             Terminate(false);
         }
 
