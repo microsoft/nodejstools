@@ -27,9 +27,11 @@ namespace Microsoft.VisualStudioTools.Project {
         public uint Add(HierarchyNode node) {
 #if DEBUG
             foreach (var reference in _ids) {
-                HierarchyNode item;
-                if (reference.TryGetTarget(out item)) {
-                    Debug.Assert(node != item);
+                if (reference != null) {
+                    HierarchyNode item;
+                    if (reference.TryGetTarget(out item)) {
+                        Debug.Assert(node != item);
+                    }
                 }
             }
 #endif
