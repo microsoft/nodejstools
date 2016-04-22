@@ -135,7 +135,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
             #region IDisposable Members
 
-            void IDisposable.Dispose() {
+            public void Dispose() {
                 Stop();
 
                 _cancel.Dispose();

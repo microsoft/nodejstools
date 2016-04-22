@@ -1327,7 +1327,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
 
             if (_analysisQueue != null) {
-                _analysisQueue.Stop();
+                _analysisQueue.Dispose();
             }
 
             foreach (var bufferParser in _activeBufferParsers) {

@@ -49,6 +49,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         }
 
         public void Dispose() {
+            _stream.Dispose();
             try {
                 _webSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None).GetAwaiter().GetResult();
                 _webSocket.Dispose();
