@@ -55,8 +55,8 @@ namespace Microsoft.NodejsTools.Project {
 #endif
 
         // We delay analysis until things calm down in the node_modules folder.
-        internal Queue<NodejsFileNode> DelayedAnalysisQueue = new Queue<NodejsFileNode>();
-        private object _idleNodeModulesLock = new object();
+        internal readonly Queue<NodejsFileNode> DelayedAnalysisQueue = new Queue<NodejsFileNode>();
+        private readonly object _idleNodeModulesLock = new object();
         private volatile bool _isIdleNodeModules = false;
         private Timer _idleNodeModulesTimer;
 
@@ -1016,6 +1016,8 @@ namespace Microsoft.NodejsTools.Project {
                 RemoveChild(ModulesNode);
                 ModulesNode?.Dispose();
                 ModulesNode = null;
+
+                DelayedAnalysisQueue.Clear();
 #if DEV14
                 _typingsAcquirer = null;
 #endif
