@@ -39,7 +39,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             private readonly HashSet<IGroupableAnalysisProject> _enqueuedGroups;
             [NonSerialized]
             private DateTime _lastSave;
-            private CancellationTokenSource _cancel;
+            private readonly CancellationTokenSource _cancel;
             private bool _isAnalyzing;
             private int _analysisPending;
             private static readonly TimeSpan _SaveAnalysisTime = TimeSpan.FromMinutes(15);
@@ -137,6 +137,9 @@ namespace Microsoft.NodejsTools.Intellisense {
 
             void IDisposable.Dispose() {
                 Stop();
+
+                _cancel.Dispose();
+                _workEvent.Dispose();
             }
 
             #endregion

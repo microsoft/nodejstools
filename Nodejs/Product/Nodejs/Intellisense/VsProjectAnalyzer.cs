@@ -1330,6 +1330,13 @@ namespace Microsoft.NodejsTools.Intellisense {
                 _analysisQueue.Stop();
             }
 
+            foreach (var bufferParser in _activeBufferParsers) {
+                bufferParser.Dispose();
+            }
+            _activeBufferParsers.Clear();
+
+            _queueActivityEvent.Dispose();
+
             TaskProvider.Dispose();
         }
 
