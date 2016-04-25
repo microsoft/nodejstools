@@ -1,14 +1,26 @@
-﻿using System;
+﻿//*********************************************************//
+//    Copyright (c) Microsoft. All rights reserved.
+//    
+//    Apache 2.0 License
+//    
+//    You may obtain a copy of the License at
+//    http://www.apache.org/licenses/LICENSE-2.0
+//    
+//    Unless required by applicable law or agreed to in writing, software 
+//    distributed under the License is distributed on an "AS IS" BASIS, 
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
+//    implied. See the License for the specific language governing 
+//    permissions and limitations under the License.
+//
+//*********************************************************//
+
+using System;
 using System.Diagnostics;
 using Microsoft.VisualStudio.Shell.Interop;
 
-
-namespace Microsoft.NodejsTools.Project.NewFileMenuGroup
-{
-    internal static class NewFileUtilities
-    {
-        public static string GetTemplateFile(string fileType)
-        {
+namespace Microsoft.NodejsTools.Project.NewFileMenuGroup {
+    internal static class NewFileUtilities {
+        public static string GetTemplateFile(string fileType) {
             string templateFileName = null;
 
             switch (fileType) {
@@ -33,34 +45,24 @@ namespace Microsoft.NodejsTools.Project.NewFileMenuGroup
             return NodejsToolsInstallPath.GetFile("FileTemplates\\NewItem\\" + templateFileName);
         }
 
-        private static string GetInitialName(string fileType)
-        {
-            string name = null;
+        private static string GetInitialName(string fileType) {
 
             switch (fileType) {
                 case NodejsConstants.JavaScript:
-                    name = "JavaScript.js";
-                    break;
+                    return "JavaScript.js";
                 case NodejsConstants.TypeScript:
-                    name = "TypeScript.ts";
-                    break;
+                    return "TypeScript.ts";
                 case NodejsConstants.HTML:
-                    name = "HTML.html";
-                    break;
+                    return "HTML.html";
                 case NodejsConstants.CSS:
-                    name = "CSS.css";
-                    break;
+                    return "CSS.css";
+                default:
+                    Debug.Fail(String.Format("Invalid file type: {0}", fileType));
+                    return null;
             }
-
-            if (name == null) {
-                Debug.Fail(String.Format("Invalid file type: {0}", fileType));
-            }
-
-            return name;
         }
 
-        private static void CreateNewFile(NodejsProjectNode projectNode, uint containerId, string fileType)
-        {
+        private static void CreateNewFile(NodejsProjectNode projectNode, uint containerId, string fileType) {
             using (var dialog = new NewFileNameForm(GetInitialName(fileType))) {
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
                     string itemName = dialog.TextBox.Text;
@@ -81,23 +83,19 @@ namespace Microsoft.NodejsTools.Project.NewFileMenuGroup
             }
         }
 
-        internal static void CreateNewJavaScriptFile(NodejsProjectNode projectNode, uint containerId)
-        {
+        internal static void CreateNewJavaScriptFile(NodejsProjectNode projectNode, uint containerId) {
             CreateNewFile(projectNode, containerId, NodejsConstants.JavaScript);
         }
 
-        internal static void CreateNewTypeScriptFile(NodejsProjectNode projectNode, uint containerId)
-        {
+        internal static void CreateNewTypeScriptFile(NodejsProjectNode projectNode, uint containerId) {
             CreateNewFile(projectNode, containerId, NodejsConstants.TypeScript);
         }
 
-        internal static void CreateNewHTMLFile(NodejsProjectNode projectNode, uint containerId)
-        {
+        internal static void CreateNewHTMLFile(NodejsProjectNode projectNode, uint containerId) {
             CreateNewFile(projectNode, containerId, NodejsConstants.HTML);
         }
 
-        internal static void CreateNewCSSFile(NodejsProjectNode projectNode, uint containerId)
-        {
+        internal static void CreateNewCSSFile(NodejsProjectNode projectNode, uint containerId) {
             CreateNewFile(projectNode, containerId, NodejsConstants.CSS);
         }
     }
