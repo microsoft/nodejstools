@@ -563,10 +563,8 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        public async System.Threading.Tasks.Task InstallMissingModules() {
-            await RunNpmCommand(commander => {
-                return commander.Install();
-            });
+        public System.Threading.Tasks.Task InstallMissingModules() {
+            return RunNpmCommand(commander => commander.Install());
         }
 
         public async System.Threading.Tasks.Task InstallMissingModule(DependencyNode node) {
@@ -603,8 +601,8 @@ namespace Microsoft.NodejsTools.Project {
             });
         }
 
-        internal async System.Threading.Tasks.Task UpdateModules(IList<HierarchyNode> nodes) {
-            await RunNpmCommand(async commander => {
+        internal System.Threading.Tasks.Task UpdateModules(IList<HierarchyNode> nodes) {
+            return RunNpmCommand(async commander => {
                 if (nodes.Count == 1 && nodes[0] == this) {
                     await commander.UpdatePackagesAsync();
                 } else {
