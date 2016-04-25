@@ -1074,6 +1074,11 @@ namespace Microsoft.NodejsTools.Project {
                             }
                         }
                         break;
+						case PkgCmdId.cmdidAddNewJavaScriptFileCommand: 
+					case PkgCmdId.cmdidAddNewTypeScriptFileCommand: 
+					case PkgCmdId.cmdidAddNewHTMLFileCommand: 
+					case PkgCmdId.cmdidAddNewCSSFileCommand: 
+						return QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED; 
                 }
             }
 
@@ -1143,6 +1148,27 @@ namespace Microsoft.NodejsTools.Project {
                         );
                         handled = true;
                         return VSConstants.S_OK;
+						
+					case PkgCmdId.cmdidAddNewJavaScriptFileCommand:
+                        NewFileMenuGroup.NewFileUtilities.CreateNewJavaScriptFile(projectNode: this, containerId: selectedNodes[0].ID);
+                        handled = true;
+                        return VSConstants.S_OK;
+
+                    case PkgCmdId.cmdidAddNewTypeScriptFileCommand:
+                        NewFileMenuGroup.NewFileUtilities.CreateNewTypeScriptFile(projectNode: this, containerId: selectedNodes[0].ID);
+                        handled = true;
+                        return VSConstants.S_OK;
+
+                    case PkgCmdId.cmdidAddNewHTMLFileCommand:
+                        NewFileMenuGroup.NewFileUtilities.CreateNewHTMLFile(projectNode: this, containerId: selectedNodes[0].ID);
+                        handled = true;
+                        return VSConstants.S_OK;
+
+                    case PkgCmdId.cmdidAddNewCSSFileCommand:
+                        NewFileMenuGroup.NewFileUtilities.CreateNewCSSFile(projectNode: this, containerId: selectedNodes[0].ID);
+                        handled = true;
+                        return VSConstants.S_OK;
+
                 }
             }
 

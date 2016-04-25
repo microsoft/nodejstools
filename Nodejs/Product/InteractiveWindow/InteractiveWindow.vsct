@@ -301,12 +301,13 @@
             <IDSymbol name="cmdidReplSearchHistoryNext" value="0x010A"/>
             <IDSymbol name="cmdidReplSearchHistoryPrevious" value="0x010B"/>
 
-          <!-- Groups -->
+            <!-- Groups -->
             <IDSymbol name="ConsoleMenuGroup" value="0x1050" />
             <IDSymbol name="ConsoleMenuEditGroup" value="0x1051" />
             <IDSymbol name="ConsoleMenuClearGroup" value="0x1052" />
             <IDSymbol name="CodeFileGroup" value="0x1053" />
             <IDSymbol name="replToolbarGroup" value="0x1054"/>
+            <IDSymbol name="MyNewGroup" value="0x1055"/>
 
             <!-- Menus -->
             <IDSymbol name="menuIdReplToolbar" value="0x2000"/>

@@ -26,6 +26,7 @@ namespace Microsoft.NodejsTools {
 
         internal const string JavaScript = "JavaScript";
         internal const string CSS = "CSS";
+        internal const string HTML = "HTML";
         internal const string Nodejs = "Node.js";
 
         internal const string IssueTrackerUrl = "https://go.microsoft.com/fwlink/?LinkId=507637";

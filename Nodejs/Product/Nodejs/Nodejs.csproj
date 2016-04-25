@@ -354,6 +354,13 @@
     </Compile>
     <Compile Include="Outlining\JavaScriptOutliningTaggerProvider.cs" />
     <Compile Include="Project\AzureToolsContracts.cs" />
+    <Compile Include="Project\NewFileMenuGroup\NewFileUtilities.cs" />  
+    <Compile Include="Project\NewFileMenuGroup\NewFileNameForm.cs">  
+      <SubType>Form</SubType>  
+    </Compile>
+    <Compile Include="Project\NewFileMenuGroup\NewFileNameForm.Designer.cs">  
+      <DependentUpon>NewFileNameForm.cs</DependentUpon>
+    </Compile>  
     <Compile Include="Project\DependencyNodeProperties.cs" />
     <Compile Include="Project\LocalModulesNode.cs" />
     <Compile Include="Project\NodejsFolderNode.cs" />
@@ -700,6 +707,7 @@
     <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.resx">
       <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Project\NewFileNameForm.resx" /> 
     <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.resx">
       <DependentUpon>NodejsGeneralPropertyPageControl.cs</DependentUpon>
     </EmbeddedResource>
