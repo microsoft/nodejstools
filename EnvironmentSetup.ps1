@@ -79,7 +79,7 @@ foreach ($version in $target_versions) {
 }
 
 if ($shouldInstallVSTestHost) {
-    Start-Process msiexec -ArgumentList "/i $(Join-Path $rootDir $vsTestHostLocation)"
+    Start-Process msiexec -ArgumentList "/i $vsTestHostLocation"
     Wait-Process msiexec
     Write-Output "    Install completed"
 } else {
