@@ -24,7 +24,7 @@ namespace NodejsTests {
     [TestClass]
     public class CommentBlockTests {
         [TestMethod, Priority(0)]
-        public void TestCommentCurrentLine() {
+        public void CommentCurrentLine() {
             var view = new MockTextView(
                 new MockTextBuffer(@"console.log('Hello');
 console.log('Goodbye');"));
@@ -47,7 +47,7 @@ console.log('Goodbye');",
         }
 
         [TestMethod, Priority(0)]
-        public void TestUnCommentCurrentLine() {
+        public void UnCommentCurrentLine() {
             var view = new MockTextView(
                 new MockTextBuffer(@"//console.log('Hello');
 //console.log('Goodbye');"));
@@ -70,7 +70,7 @@ console.log('Goodbye');",
         }
 
         [TestMethod, Priority(0)]
-        public void TestComment() {
+        public void Comment() {
             var view = new MockTextView(
                 new MockTextBuffer(@"console.log('Hello');
 console.log('Goodbye');"));
@@ -88,7 +88,7 @@ console.log('Goodbye');"));
         }
 
         [TestMethod, Priority(0)]
-        public void TestCommentEmptyLine() {
+        public void CommentEmptyLine() {
             var view = new MockTextView(
                 new MockTextBuffer(@"console.log('Hello');
 
@@ -108,7 +108,7 @@ console.log('Goodbye');"));
         }
 
         [TestMethod, Priority(0)]
-        public void TestCommentWhiteSpaceLine() {
+        public void CommentWhiteSpaceLine() {
             var view = new MockTextView(
                 new MockTextBuffer(@"console.log('Hello');
    
@@ -128,7 +128,7 @@ console.log('Goodbye');"));
         }
 
         [TestMethod, Priority(0)]
-        public void TestCommentIndented() {
+        public void CommentIndented() {
             var view = new MockTextView(
                 new MockTextBuffer(@"function f(){
     console.log('Hello');
@@ -155,7 +155,7 @@ console.log('Goodbye');"));
         }
 
         [TestMethod, Priority(0)]
-        public void TestCommentIndentedBlankLine() {
+        public void CommentIndentedBlankLine() {
             var view = new MockTextView(
                 new MockTextBuffer(@"function f(){
     console.log('Hello');
@@ -184,7 +184,7 @@ console.log('Goodbye');"));
         }
 
         [TestMethod, Priority(0)]
-        public void TestCommentBlankLine() {
+        public void CommentBlankLine() {
             var view = new MockTextView(
                 new MockTextBuffer(@"console.log('hi');
 
@@ -201,7 +201,7 @@ console.log('bye');",
         }
 
         [TestMethod, Priority(0)]
-        public void TestCommentIndentedWhiteSpaceLine() {
+        public void CommentIndentedWhiteSpaceLine() {
             var view = new MockTextView(
                 new MockTextBuffer(@"function f(){
     console.log('Hello');
@@ -230,7 +230,7 @@ console.log('bye');",
         }
 
         [TestMethod, Priority(0)]
-        public void TestUnCommentIndented() {
+        public void UnCommentIndented() {
             var view = new MockTextView(
                 new MockTextBuffer(@"function f(){
     //console.log('Hello');
@@ -257,7 +257,7 @@ console.log('bye');",
         }
 
         [TestMethod, Priority(0), TestCategory("Ignore")]
-        public void TestUnComment() {
+        public void UnComment() {
             var view = new MockTextView(
                 new MockTextBuffer(@"//console.log('Hello');
 //console.log('Goodbye');"));
@@ -275,7 +275,7 @@ console.log('Goodbye');",
         }
 
         [TestMethod, Priority(0)]
-        public void TestCommentStartOfLastLine() {
+        public void CommentStartOfLastLine() {
             var view = new MockTextView(
                 new MockTextBuffer(@"console.log('Hello');
 console.log('Goodbye');"));
@@ -293,7 +293,7 @@ console.log('Goodbye');",
         }
 
         [TestMethod, Priority(0)]
-        public void TestCommentAfterCodeIsNotUncommented() {
+        public void CommentAfterCodeIsNotUncommented() {
             var view = new MockTextView(
                 new MockTextBuffer(@"console.log('Hello');//comment that should stay a comment;
 //console.log('Still here');//another comment that should stay a comment;

@@ -38,7 +38,7 @@ namespace AnalysisTests {
         /// https://nodejstools.codeplex.com/workitem/1234
         /// </summary>
         [TestMethod, Priority(0)]
-        public void TestRequireTrailingSlash() {
+        public void RequireTrailingSlash() {
             var entries = Analysis.Analyze(
                 new AnalysisFile("mod.js", @"var x = require('mymod').value;"),
                 new AnalysisFile("node_modules\\mymod\\mymod.js", @"module.exports = require('./mymod/')"),
@@ -53,7 +53,7 @@ namespace AnalysisTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestRequireAssignedExports() {
+        public void RequireAssignedExports() {
             var entries = Analysis.Analyze(
                 new AnalysisFile("mod.js", @"var x = require('mymod').value;"),
                 AnalysisFile.PackageJson("node_modules\\mymod\\package.json", "./lib/mymod"),
@@ -68,7 +68,7 @@ namespace AnalysisTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestRequireDirectoryFileOverload() {
+        public void RequireDirectoryFileOverload() {
             var entries = Analysis.Analyze(
                 new AnalysisFile("mod.js", @"var x = require('mymod').value;"),
                 new AnalysisFile("node_modules\\mymod\\index.js", @"module.exports = require('./realindex.js');"),
@@ -82,7 +82,7 @@ namespace AnalysisTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestRequireMultiAssign() {
+        public void RequireMultiAssign() {
             var entries = Analysis.Analyze(
                 new AnalysisFile("server.js", @"var mymod = require('mymod')"),
                 new AnalysisFile("node_modules\\mymod\\index.js", @"module.exports = require('./lib/');"),
@@ -110,7 +110,7 @@ var mymod = module.exports = exports = new MyMod")
         // assigned exports.
 
         [TestMethod, Priority(0)]
-        public void TestRequireSimple() {
+        public void RequireSimple() {
             var mod1 = @"exports.foo = 42;";
             var mod2 = @"x = require('./one.js').foo";
 
@@ -132,7 +132,7 @@ var mymod = module.exports = exports = new MyMod")
         }
 
         [TestMethod, Priority(0)]
-        public void TestBadRequire() {
+        public void BadRequire() {
             // foo.js
             //      require('./rec1')
             // rec1\
@@ -164,7 +164,7 @@ var mymod = module.exports = exports = new MyMod")
         /// without the leading .
         /// </summary>
         [TestMethod, Priority(0)]
-        public void TestRequireNonRelativePackageJson() {
+        public void RequireNonRelativePackageJson() {
             var analyzer = new JsAnalyzer();
             var mod = @"var x = require('./rec1')";
             var myindex = @"exports.abc = 100;";
@@ -187,7 +187,7 @@ var mymod = module.exports = exports = new MyMod")
         }
 
         [TestMethod, Priority(0)]
-        public void TestRequireNodeModules() {
+        public void RequireNodeModules() {
             var mod1 = @"exports.foo = 42;";
             var mod2 = @"x = require('one.js').foo";
 
@@ -209,7 +209,7 @@ var mymod = module.exports = exports = new MyMod")
         }
 
         [TestMethod, Priority(0)]
-        public void TestRequireBuiltin() {
+        public void RequireBuiltin() {
             string code = @"
 var http = require('http');
 ";
@@ -222,7 +222,7 @@ var http = require('http');
         }
 
         [TestMethod, Priority(0)]
-        public void TestRequireBinaryOp() {
+        public void RequireBinaryOp() {
             string code = @"
 var http = require('ht' + 'tp');
 ";
@@ -235,7 +235,7 @@ var http = require('ht' + 'tp');
         }
 
         [TestMethod, Priority(0)]
-        public void TestRequire() {
+        public void Require() {
             var testCases = new[] {
                 new { File="server.js", Line = 4, Type = "mymod.", Expected = "mymod_export" },
                 new { File="server.js", Line = 8, Type = "mymod2.", Expected = "mymod_export" },

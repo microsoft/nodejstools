@@ -116,7 +116,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestInsertSnippet() {
+        public void InsertSnippet() {
             using (var solution = BasicProject.Generate().ToVs()) {
                 using (new SnippetTestOptionHolder()) {
                     foreach (var snippet in BasicSnippets) {
@@ -147,7 +147,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestSurroundWithSnippet() {
+        public void SurroundWithSnippet() {
             using (var solution = BasicProject.Generate().ToVs()) {
                 using (new SnippetTestOptionHolder()) {
                     foreach (var snippet in BasicSnippets) {
@@ -161,7 +161,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestSurroundWithMultiline() {
+        public void SurroundWithMultiline() {
             using (var solution = BasicProject.Generate().ToVs()) {
                 using (new SnippetTestOptionHolder()) {
                     foreach (var snippet in BasicSnippets) {
@@ -198,7 +198,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestSelected() {
+        public void Selected() {
             var snippet = new Snippet(
                 "if",
                 "if (true) {\r\n    $body$\r\n}",
@@ -218,7 +218,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void TestBasicSnippetsTab() {
+        public void BasicSnippetsTab() {
             using (var solution = BasicProject.Generate().ToVs()) {
                 using (new SnippetTestOptionHolder()) {
                     foreach (var snippet in BasicSnippets) {
@@ -263,7 +263,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestSelectedIndented() {
+        public void SelectedIndented() {
             using (var solution = BasicProject.Generate().ToVs()) {
                 using (new SnippetTestOptionHolder()) {
                     var server = solution.OpenItem("SnippetsTest", "indented.js");
@@ -288,7 +288,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestIndentSize() {
+        public void IndentSize() {
             var snippet = new Snippet(
                 "tryf",
                 "try {\r\n  $body$\r\n} catch (e) {\r\n  \r\n} finally {\r\n  \r\n};",
@@ -304,7 +304,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestTabIndentation() {
+        public void TabIndentation() {
             var snippet = new Snippet(
                 "forprops",
                 "for (var property in object) {\r\n\tif (object.hasOwnProperty(property)) {\r\n\t\t$body$\r\n\t}\r\n};",
@@ -320,7 +320,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestBraceOnNewLine() {
+        public void BraceOnNewLine() {
             using (var solution = BasicProject.Generate().ToVs()) {
                 using (new SnippetTestOptionHolder(
                     insertTabs: false,
