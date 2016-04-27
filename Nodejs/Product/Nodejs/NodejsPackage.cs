@@ -782,41 +782,5 @@ namespace Microsoft.NodejsTools {
                 _logger.LogEvent(NodejsToolsLogEvent.AnalysisLevel, (int)val);
             }
         }
-
-
-#if UNIT_TEST_INTEGRATION
-        // var testCase = require('./test/test-doubled.js'); for(var x in testCase) { console.log(x); }
-        public static string EvaluateJavaScript(string code) {
-            // TODO: Escaping code
-            string args = "-e \"" + code + "\"";
-            var psi = new ProcessStartInfo(NodePath, args);
-            psi.RedirectStandardOutput = true;
-            psi.RedirectStandardError = true;
-            var proc = Process.Start(psi);
-            var outpReceiver = new OutputReceiver();
-            proc.OutputDataReceived += outpReceiver.DataRead;
-            proc.BeginErrorReadLine();
-            proc.BeginOutputReadLine();
-
-            return outpReceiver._data.ToString();
-        }
-
-        private void GetTestCases(string module) {
-            var testCases = EvaluateJavaScript(
-                String.Format("var testCase = require('{0}'); for(var x in testCase) { console.log(x); }", module));
-            foreach (var testCase in testCases.Split(new[] { "\r", "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)) {
-            }
-        }
-
-        class OutputReceiver {
-            internal readonly StringBuilder _data = new StringBuilder();
-            
-            public void DataRead(object sender, DataReceivedEventArgs e) {
-                if (e.Data != null) {
-                    _data.Append(e.Data);
-                }
-            }
-        }
-#endif
     }
 }

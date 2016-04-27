@@ -44,7 +44,7 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void TestNumber() {
+        public void Number() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
@@ -59,7 +59,7 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void TestRequire() {
+        public void Require() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
@@ -70,7 +70,7 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void TestFunctionDefinition() {
+        public void FunctionDefinition() {
             var whitespaces = new[] { "", "\r\n", "   ", "\r\n    " };
             using (var eval = ProjectlessEvaluator()) {
                 foreach (var whitespace in whitespaces) {
@@ -90,7 +90,7 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void TestConsoleLog() {
+        public void ConsoleLog() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
@@ -101,7 +101,7 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void TestConsoleWarn() {
+        public void ConsoleWarn() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
@@ -112,7 +112,7 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void TestConsoleError() {
+        public void ConsoleError() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
@@ -123,7 +123,7 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore"), TestCategory("Ignore")]
-        public void TestConsoleDir() {
+        public void ConsoleDir() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
@@ -201,7 +201,7 @@ undefined";
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void TestException() {
+        public void Exception() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
@@ -214,7 +214,7 @@ undefined";
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void TestExceptionNull() {
+        public void ExceptionNull() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
@@ -227,7 +227,7 @@ undefined";
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void TestExceptionUndefined() {
+        public void ExceptionUndefined() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
@@ -240,7 +240,7 @@ undefined";
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void TestProcessExit() {
+        public void ProcessExit() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
@@ -258,7 +258,7 @@ undefined";
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void TestReset() {
+        public void Reset() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
@@ -285,7 +285,7 @@ undefined";
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void TestSaveNoFile() {
+        public void SaveNoFile() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
@@ -303,7 +303,7 @@ undefined";
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void TestSaveBadFile() {
+        public void SaveBadFile() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
@@ -321,7 +321,7 @@ undefined";
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void TestSave() {
+        public void Save() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval, NodejsConstants.JavaScript);
                 window.ClearScreen();
@@ -347,7 +347,7 @@ undefined";
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void TestBadSave() {
+        public void BadSave() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
@@ -415,7 +415,7 @@ undefined";
                                                   };
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void TestPartialInputs() {
+        public void PartialInputs() {
             using (var eval = ProjectlessEvaluator()) {
                 foreach (var partialInput in _partialInputs) {
                     Assert.AreEqual(false, eval.CanExecuteText(partialInput), "Partial input successfully parsed: " + partialInput);
@@ -427,7 +427,7 @@ undefined";
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore"), TestCategory("Ignore")]
-        public void TestVarI() {
+        public void VarI() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
@@ -446,7 +446,7 @@ undefined";
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void TestObjectLiteral() {
+        public void ObjectLiteral() {
             using (var eval = ProjectlessEvaluator()) {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
@@ -460,7 +460,7 @@ undefined";
         /// https://nodejstools.codeplex.com/workitem/279
         /// </summary>
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void TestRequireInProject() {
+        public void RequireInProject() {
             string testDir;
             do {
                 testDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
@@ -515,7 +515,7 @@ undefined";
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore"), TestCategory("Ignore")]
-        public void TestNpmReplRedirector() {
+        public void NpmReplRedirector() {
             using (var eval = ProjectlessEvaluator()) {
                 var mockWindow = new MockReplWindow(eval) {
                     ShowAnsiCodes = true

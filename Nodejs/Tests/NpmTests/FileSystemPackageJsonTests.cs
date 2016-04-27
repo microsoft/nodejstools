@@ -22,7 +22,7 @@ namespace NpmTests {
     [TestClass]
     public class FileSystemPackageJsonTests : AbstractPackageJsonTests {
         [TestMethod, Priority(0)]
-        public void TestReadFromFile() {
+        public void ReadFromFile() {
             using (var manager = new TemporaryFileManager()) {
                 var dir = manager.GetNewTempDirectory();
                 var path = Path.Combine(dir.FullName, "package.json");
@@ -32,7 +32,7 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestReadFromDirectory() {
+        public void ReadFromDirectory() {
             using (var manager = new TemporaryFileManager()) {
                 var dir = manager.GetNewTempDirectory();
                 FilesystemPackageJsonTestHelpers.CreatePackageJson(Path.Combine(dir.FullName, "package.json"), PkgSimple);

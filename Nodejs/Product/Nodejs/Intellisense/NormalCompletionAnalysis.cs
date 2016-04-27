@@ -17,7 +17,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
@@ -117,6 +116,5 @@ namespace Microsoft.NodejsTools.Intellisense {
                 return string.Empty;
             }
         }
-
     }
 }

@@ -27,7 +27,7 @@ namespace AnalysisTests {
     public class ParserOffsetTests {
 
         [TestMethod, Priority(0)]
-        public void TestArrayLiteral() {
+        public void ArrayLiteral() {
             TestOneSnippet(
                 "[1,2,3]",
                 new NodeInfo(typeof(Block), 0, 7),
@@ -40,7 +40,7 @@ namespace AnalysisTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestBinaryOperator() {
+        public void BinaryOperator() {
             TestOneSnippet(
                 "1 + 2",
                 new NodeInfo(typeof(Block), 0, 5),
@@ -60,7 +60,7 @@ namespace AnalysisTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestLoopBreakContinue() {
+        public void LoopBreakContinue() {
             TestOneSnippet(
                 @"for(var i = 0; i<10; i++) {
     break;
@@ -83,7 +83,7 @@ namespace AnalysisTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestCommaOperator() {
+        public void CommaOperator() {
             TestOneSnippet("1,2,3",
                 new NodeInfo(typeof(Block), 0, 5),
                 new NodeInfo(typeof(ExpressionStatement), 0, 5),
@@ -96,7 +96,7 @@ namespace AnalysisTests {
 
         
         [TestMethod, Priority(0)]
-        public void TestCallNode() {
+        public void CallNode() {
             TestOneSnippet("f(1,2,3)",
                 new NodeInfo(typeof(Block), 0, 8),
                 new NodeInfo(typeof(ExpressionStatement), 0, 8),
@@ -127,7 +127,7 @@ namespace AnalysisTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestConditional() {
+        public void Conditional() {
             TestOneSnippet("true ? 1 : 0",
                 new NodeInfo(typeof(Block), 0, 12),
                 new NodeInfo(typeof(ExpressionStatement), 0, 12),
@@ -140,7 +140,7 @@ namespace AnalysisTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestConstant() {
+        public void Constant() {
             TestOneSnippet("'abc'",
                 new NodeInfo(typeof(Block), 0, 5),
                 new NodeInfo(typeof(ExpressionStatement), 0, 5),
@@ -154,7 +154,7 @@ namespace AnalysisTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestConstStatement() {
+        public void ConstStatement() {
             TestOneSnippet("const x = 42;",
                 new NodeInfo(typeof(Block), 0, 13),
                 new NodeInfo(typeof(LexicalDeclaration), 0, 13),
@@ -164,7 +164,7 @@ namespace AnalysisTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestDebuggerStatement() {
+        public void DebuggerStatement() {
             TestOneSnippet("debugger;",
                 new NodeInfo(typeof(Block), 0, 9),
                 new NodeInfo(typeof(DebuggerNode), 0, 9)
@@ -172,7 +172,7 @@ namespace AnalysisTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestDoWhile() {
+        public void DoWhile() {
             TestOneSnippet(@"do {
 }while(true);",
                 new NodeInfo(typeof(Block), 0, 19),
@@ -183,7 +183,7 @@ namespace AnalysisTests {
         }
         
         [TestMethod, Priority(0)]
-        public void TestEmptyStatement() {
+        public void EmptyStatement() {
             TestOneSnippet(";",
                 new NodeInfo(typeof(Block), 0, 1),
                 new NodeInfo(typeof(EmptyStatement), 0, 1)
@@ -191,7 +191,7 @@ namespace AnalysisTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestForIn() {
+        public void ForIn() {
             TestOneSnippet(@"for(var x in abc) {
 }",
                 new NodeInfo(typeof(Block), 0, 22),
@@ -205,7 +205,7 @@ namespace AnalysisTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestFor() {
+        public void For() {
             TestOneSnippet(@"for(var x = 0; x<100; x++) {
 }",
                 new NodeInfo(typeof(Block), 0, 31),
@@ -238,7 +238,7 @@ namespace AnalysisTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestFunction() {
+        public void Function() {
             TestOneSnippet(@"function f(a, b, c) {
 }",
                 new NodeInfo(typeof(Block), 0, 24),
@@ -251,7 +251,7 @@ namespace AnalysisTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestGetSet() {
+        public void GetSet() {
             TestOneSnippet(@"x = {get abc () { 42 }}",
                 new NodeInfo(typeof(Block), 0, 23),
                 new NodeInfo(typeof(ExpressionStatement), 0, 23),
@@ -282,7 +282,7 @@ namespace AnalysisTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestGrouping() {
+        public void Grouping() {
             TestOneSnippet(@"(x)",
                 new NodeInfo(typeof(Block), 0, 3),
                 new NodeInfo(typeof(ExpressionStatement), 0, 3),
@@ -292,7 +292,7 @@ namespace AnalysisTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestIf() {
+        public void If() {
             TestOneSnippet(@"if(true) {
 } else {
 }",
@@ -305,7 +305,7 @@ namespace AnalysisTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestLabeledStatement() {
+        public void LabeledStatement() {
             TestOneSnippet(@"myLabel:
 console.log('hi');",
                 new NodeInfo(typeof(Block), 0, 28),
@@ -319,7 +319,7 @@ console.log('hi');",
         }
 
         [TestMethod, Priority(0)]
-        public void TestLexicalDeclaration() {
+        public void LexicalDeclaration() {
             TestOneSnippet(@"'use strict';
 let x = 42;",
                 new NodeInfo(typeof(Block), 0, 26),
@@ -332,7 +332,7 @@ let x = 42;",
         }
 
         [TestMethod, Priority(0)]
-        public void TestBogusLexicalDeclaration() {
+        public void BogusLexicalDeclaration() {
             TestOneSnippet(@"let x = 42;",
                 new NodeInfo(typeof(Block), 0, 11),
                 new NodeInfo(typeof(ExpressionStatement), 0, 3),
@@ -345,7 +345,7 @@ let x = 42;",
         }
 
         [TestMethod, Priority(0)]
-        public void TestLookup() {
+        public void Lookup() {
             TestOneSnippet(@"x",
                 new NodeInfo(typeof(Block), 0, 1),
                 new NodeInfo(typeof(ExpressionStatement), 0, 1),
@@ -359,7 +359,7 @@ let x = 42;",
         }
 
         [TestMethod, Priority(0)]
-        public void TestMember() {
+        public void Member() {
             TestOneSnippet(@"x.abc",
                 new NodeInfo(typeof(Block), 0, 5),
                 new NodeInfo(typeof(ExpressionStatement), 0, 5),
@@ -369,7 +369,7 @@ let x = 42;",
         }
 
         [TestMethod, Priority(0)]
-        public void TestObjectLiteral() {
+        public void ObjectLiteral() {
             TestOneSnippet(@"{abc:42, aaa:100}",
                 new NodeInfo(typeof(Block), 0, 17),
                 new NodeInfo(typeof(Block), 0, 17),
@@ -382,7 +382,7 @@ let x = 42;",
         }
 
         [TestMethod, Priority(0)]
-        public void TestRegexpLiteral() {
+        public void RegexpLiteral() {
             TestOneSnippet(@"/foo/",
                 new NodeInfo(typeof(Block), 0, 5),
                 new NodeInfo(typeof(ExpressionStatement), 0, 5),
@@ -391,7 +391,7 @@ let x = 42;",
         }
 
         [TestMethod, Priority(0)]
-        public void TestReturn() {
+        public void Return() {
             TestOneSnippet(@"function f() {
     return 42;
 }",
@@ -412,7 +412,7 @@ let x = 42;",
         }
 
         [TestMethod, Priority(0)]
-        public void TestSwitch() {
+        public void Switch() {
             TestOneSnippet(@"switch(abc) {
     case 42:
         break;
@@ -439,7 +439,7 @@ let x = 42;",
         }
 
         [TestMethod, Priority(0)]
-        public void TestThis() {
+        public void This() {
             TestOneSnippet(@"var x = this.foo;",
                 new NodeInfo(typeof(Block), 0, 17),
                 new NodeInfo(typeof(Var), 0, 17),
@@ -450,7 +450,7 @@ let x = 42;",
         }
 
         [TestMethod, Priority(0)]
-        public void TestThrow() {
+        public void Throw() {
             TestOneSnippet(@"throw 'error';",
                 new NodeInfo(typeof(Block), 0, 14),
                 new NodeInfo(typeof(ThrowNode), 0, 14),
@@ -459,7 +459,7 @@ let x = 42;",
         }
 
         [TestMethod, Priority(0)]
-        public void TestTryCatch() {
+        public void TryCatch() {
             TestOneSnippet(@"try {
     x
 } catch(arg) {
@@ -475,7 +475,7 @@ let x = 42;",
         }
 
         [TestMethod, Priority(0)]
-        public void TestTryFinally() {
+        public void TryFinally() {
             TestOneSnippet(@"try {
     x
 } finally {
@@ -490,7 +490,7 @@ let x = 42;",
         }
 
         [TestMethod, Priority(0)]
-        public void TestTryCatchFinally() {
+        public void TryCatchFinally() {
             TestOneSnippet(@"try {
     x
 }catch(arg) {
@@ -508,7 +508,7 @@ let x = 42;",
         }
 
         [TestMethod, Priority(0)]
-        public void TestVariableDeclaration() {
+        public void VariableDeclaration() {
             TestOneSnippet(@"var abc = 42, foo = 100;",
                 new NodeInfo(typeof(Block), 0, 24),
                 new NodeInfo(typeof(Var), 0, 24),
@@ -520,7 +520,7 @@ let x = 42;",
         }
 
         [TestMethod, Priority(0)]
-        public void TestUnaryOperator() {
+        public void UnaryOperator() {
             TestOneSnippet(@"+42",
                 new NodeInfo(typeof(Block), 0, 3),
                 new NodeInfo(typeof(ExpressionStatement), 0, 3),
@@ -530,7 +530,7 @@ let x = 42;",
         }
 
         [TestMethod, Priority(0)]
-        public void TestWhileNode() {
+        public void WhileNode() {
             TestOneSnippet(@"while(foo) { hi; }",
                 new NodeInfo(typeof(Block), 0, 18),
                 new NodeInfo(typeof(WhileNode), 0, 18),
@@ -542,7 +542,7 @@ let x = 42;",
         }
 
         [TestMethod, Priority(0)]
-        public void TestWithNode() {
+        public void WithNode() {
             TestOneSnippet(@"with(foo) { hi; }",
                 new NodeInfo(typeof(Block), 0, 17),
                 new NodeInfo(typeof(WithNode), 0, 17),
@@ -554,7 +554,7 @@ let x = 42;",
         }
 
         [TestMethod, Priority(0)]
-        public void TestFunctionExpression() {
+        public void FunctionExpression() {
             TestOneSnippet(@"x = function() { }",
                 new NodeInfo(typeof(Block), 0, 18),
                 new NodeInfo(typeof(ExpressionStatement), 0, 18),
@@ -567,7 +567,7 @@ let x = 42;",
         }
 
         [TestMethod, Priority(0)]
-        public void TestFunctionExpressionWithName() {
+        public void FunctionExpressionWithName() {
             TestOneSnippet(@"x = function name() { }",
                 new NodeInfo(typeof(Block), 0, 23),
                 new NodeInfo(typeof(ExpressionStatement), 0, 23),
