@@ -43,13 +43,11 @@ if (-not $target_versions) {
     throw "Could not find any valid versions of Visual Studio installed"
 }
 
-$nodejstoolsroot = $PSScriptRoot
-
 foreach($vsVersion in $target_versions) {
 	$vstest = "${env:ProgramFiles(x86)}\Microsoft Visual Studio $($vsVersion.number)\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
 	if (Test-Path $vstest) {   
         $testFiles = $tests | % { ".\BuildOutput\Release$($vsVersion.number)\Tests\$_.dll" }
-        & "$vstest" /settings:$("$nodejstoolsroot\Build\default." + $vstarget + "Exp.testsettings") @args $testFiles
+        & "$vstest" /settings:$("$rootDir\Build\default." + $vstarget + "Exp.testsettings") @args $testFiles
 	} else {
         Write-Warning "Could not find valid vstest.console for VS $($vsVersion)"
     }
