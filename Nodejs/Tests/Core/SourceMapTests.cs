@@ -57,7 +57,7 @@ namespace NodejsTests {
         private const string _sample = @"{'version':3,'file':'test.js','sourceRoot':'','sources':['test.ts'],'names':['Greeter','Greeter.constructor','Greeter.greet'],'mappings':'AAAA;IACIA,iBAAYA,QAAuBA;QAAvBC,aAAeA,GAARA,QAAQA;AAAQA,IAAIA,CAACA;IACxCD,0BAAAA;QACIE,OAAOA,MAAMA,GAAGA,IAAIA,CAACA,QAAQA,GAAGA,OAAOA;IAC3CA,CAACA;IACLF,eAACA;AAADA,CAACA,IAAA;AAAA,CAAC'}";
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void TestBadMappings() {
+        public void BadMappings() {
             // empty segment
             AssertUtil.Throws<InvalidOperationException>(
                 () => new SourceMap(new StringReader("{version:3, mappings:','}"))
@@ -81,7 +81,7 @@ namespace NodejsTests {
 
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void TestMappingLine() {
+        public void MappingLine() {
             var map = new SourceMap(new StringReader(_sample));
             var testCases = new[] { 
                 new { Line = 0, Name = "Greeter", Filename = "test.ts" },
@@ -109,7 +109,7 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void TestMappingLineAndColumn() {
+        public void MappingLineAndColumn() {
             var map = new SourceMap(new StringReader(_sample));
             var testCases = new[] { 
                 new { InLine = 0, InColumn = 0, ExpectedLine = 0, ExpectedColumn = 0, Name = "Greeter", Filename = "test.ts" },
@@ -142,7 +142,7 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void TestVersion() {
+        public void Version() {
             try {
                 new SourceMap(new StringReader("{}"));
                 Assert.Fail("Exception not thrown on empty map");
@@ -164,14 +164,14 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void TestNames() {
+        public void Names() {
             var map = new SourceMap(new StringReader("{version:3, names:['foo']}"));
             Assert.AreEqual(map.Names[0], "foo");
         }
 
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void TestSources() {
+        public void Sources() {
             var map = new SourceMap(new StringReader("{version:3, sources:['test.ts']}"));
             Assert.AreEqual(map.Sources[0], "test.ts");
 
@@ -180,13 +180,13 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void TestFile() {
+        public void File() {
             var map = new SourceMap(new StringReader("{version:3, file:'test.js'}"));
             Assert.AreEqual(map.File, "test.js");
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void TestInvalidJson() {
+        public void InvalidJson() {
             try {
                 var map = new SourceMap(new StringReader("{'test.js\\'}"));
                 Assert.Fail("Argument exception not raised");
@@ -195,14 +195,14 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void TestMapToOriginal() {
+        public void MapToOriginal() {
             var mapper = new SourceMapper();
             var mapInfo = mapper.MapToOriginal(TestData.GetPath(@"TestData\DebuggerProject\TypeScriptTest.js"), 1, 0);
             Assert.AreEqual("TypeScriptTest.ts", mapInfo.FileName);
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void TestMapToJavaScript() {
+        public void MapToJavaScript() {
             var mapper = new SourceMapper();
             string fileName;
             int lineNo, columnNo;
@@ -211,7 +211,7 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void TestGetOriginalFileNameWithStackFrame() {
+        public void GetOriginalFileNameWithStackFrame() {
             string javaScriptFileName = TestData.GetPath(@"TestData\TypeScriptMultfile\all.js");
             var sourceMapper = new SourceMapper();            
             int? line = 24, column = 9;

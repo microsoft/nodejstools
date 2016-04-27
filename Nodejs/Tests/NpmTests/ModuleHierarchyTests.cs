@@ -41,7 +41,7 @@ namespace NpmTests {
 }";
 
         [TestMethod, Priority(0)]
-        public void TestReadRootPackageNoDependencies() {
+        public void ReadRootPackageNoDependencies() {
             using (var manager = new TemporaryFileManager()) {
                 var rootDir = FilesystemPackageJsonTestHelpers.CreateRootPackage(manager, PkgSimple);
                 var pkg = RootPackageFactory.Create(rootDir);
@@ -62,7 +62,7 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestReadRootPackageOneDependency() {
+        public void ReadRootPackageOneDependency() {
             using (var manager = new TemporaryFileManager()) {
                 var rootDir = FilesystemPackageJsonTestHelpers.CreateRootPackage(manager, PkgSingleDependency);
                 RunNpmInstall(rootDir);
@@ -107,7 +107,7 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestReadRootPackageMissingDependency() {
+        public void ReadRootPackageMissingDependency() {
             using (var manager = new TemporaryFileManager()) {
                 var rootDir = FilesystemPackageJsonTestHelpers.CreateRootPackage(manager, PkgSingleDependency);
 
@@ -151,7 +151,7 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestReadRootDependencyRecursive() {
+        public void ReadRootDependencyRecursive() {
             using (var manager = new TemporaryFileManager()) {
 
                 var rootDir = FilesystemPackageJsonTestHelpers.CreateRootPackage(manager, PkgSingleRecursiveDependency);

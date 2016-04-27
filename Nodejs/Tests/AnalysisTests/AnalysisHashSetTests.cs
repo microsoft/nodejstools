@@ -27,7 +27,7 @@ namespace AnalysisTests {
     [TestClass]
     public class AnalysisHashSetTests {
         [TestMethod, Priority(0)]
-        public void TestEmpty() {
+        public void Empty() {
             TestEmptySet(AnalysisSet.Empty);
             TestObjectSet(AnalysisSet.Empty);
             TestEmptySet(AnalysisSet.EmptyUnion);
@@ -39,7 +39,7 @@ namespace AnalysisTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestWrapperSelfSet() {
+        public void WrapperSelfSet() {
             var projectEntry = CreateProjectEntry();
             var value = new TestAnalysisValue(projectEntry);
 
@@ -48,7 +48,7 @@ namespace AnalysisTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestSetOfOne() {
+        public void SetOfOne() {
             var projectEntry = CreateProjectEntry();
             var value = new TestAnalysisValue(projectEntry);
             
@@ -56,7 +56,7 @@ namespace AnalysisTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestSetOfTwo() {
+        public void SetOfTwo() {
             var projectEntry = CreateProjectEntry();
             var value1 = new TestAnalysisValue(projectEntry);
             var value2 = new TestAnalysisValue(projectEntry);
@@ -65,7 +65,7 @@ namespace AnalysisTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestHashSet() {
+        public void HashSet() {
             var projectEntry = CreateProjectEntry();
             List<AnalysisProxy> values = new List<AnalysisProxy>();
             for (int i = 0; i < 10; i++) {
