@@ -15,11 +15,8 @@
 //*********************************************************//
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -27,7 +24,6 @@ namespace NpmTests {
     [TestClass]
     [DeploymentItem(@"TestData\NpmPackageJsonData\", "NpmPackageJsonData")]
     public class ProblematicPackageJsonTests : AbstractPackageJsonTests {
-
         [TestMethod, Priority(0)]
         public void FreshPackageJsonParseFromResource() {
             var pkg = LoadFromResource("NpmTests.TestData.fresh_package.json");
@@ -128,12 +124,14 @@ namespace NpmTests {
             TestFreshPackage("missingpropnamequotes");
         }
 
-        [TestMethod, Priority(0), TestCategory("Ignore")]
+        [TestMethod, Priority(0)]
+        [ExpectedException(typeof(PackageJsonException))]
         public void ParseMissingTrailingBrace() {
             TestFreshPackage("missingtrailingbrace");
         }
 
-        [TestMethod, Priority(0), TestCategory("Ignore")]
+        [TestMethod, Priority(0)]
+        [ExpectedException(typeof(PackageJsonException))]
         public void ParseMissingTrailingListBrace() {
             TestFreshPackage("missingtrailinglistbrace");
         }
