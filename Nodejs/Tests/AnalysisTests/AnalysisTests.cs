@@ -64,7 +64,7 @@ var x = new f().abc;
         /// https://nodejstools.codeplex.com/workitem/945
         /// </summary>
         [TestMethod, Priority(0)]
-        public void TestToString() {
+        public void ToStringTest() {
             string code = @"
 var x = new Object();
 var y = x.toString();
