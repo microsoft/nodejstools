@@ -513,7 +513,7 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void ReadAllDependencies() {
+        public void TestReadAllDependencies() {
             CheckDependencies(
                 ReadAllDependencies(),
                 UrlDependencies.Concat(VersionRangeDependencies)
