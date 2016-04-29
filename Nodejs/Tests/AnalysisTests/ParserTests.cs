@@ -26,7 +26,7 @@ namespace AnalysisTests {
     [TestClass]
     public class ParserTests {
         [TestMethod, Priority(0)]
-        public void TestCodeSettings() {
+        public void CodeSettings() {
             var settings1 = new CodeSettings();
             var settings2 = new CodeSettings() { AllowShebangLine = true, SourceMode = JavaScriptSourceMode.Expression, StrictMode = true };
             var settings3 = new CodeSettings() { KnownGlobalNamesList = "foo;bar" };
@@ -42,7 +42,7 @@ namespace AnalysisTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestSourceSpan() {
+        public void SourceSpan() {
             var span = new SourceSpan(
                 new SourceLocation(1, 1, 1),
                 new SourceLocation(100, 2, 100)
@@ -61,7 +61,7 @@ namespace AnalysisTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Ignore")]
-        public void TestFunctionRecovery() {
+        public void FunctionRecovery() {
             const string code = @"
 [1,2,
 function Y() {
@@ -105,7 +105,7 @@ function Y() {
         /// https://nodejstools.codeplex.com/workitem/1200
         /// </summary>
         [TestMethod, Priority(0)]
-        public void TestParseUnterminatedFunctionInList() {
+        public void ParseUnterminatedFunctionInList() {
             const string code = @"console.log(function(error, response) {";
 
             CheckAst(
@@ -135,7 +135,7 @@ function Y() {
         }
 
         [TestMethod, Priority(0)]
-        public void TestParseExpression() {
+        public void ParseExpression() {
             const string code = @"
 42
 ";
@@ -197,7 +197,7 @@ foo(abc.'foo' else function)
         }
 
         [TestMethod, Priority(0)]
-        public void TestMemberKeyword() {
+        public void MemberKeyword() {
             const string code = @"
 foo.get
 ";
@@ -727,7 +727,7 @@ function foo(abc {
         }
 
         [TestMethod, Priority(0)]
-        public void TestFunctionStrictMode() {
+        public void FunctionStrictMode() {
             const string code = @"
 function abc() {
     'use strict';
@@ -748,7 +748,7 @@ function abc() {
         }
 
         [TestMethod, Priority(0)]
-        public void TestFunctionKeywordIdentifier() {
+        public void FunctionKeywordIdentifier() {
             const string code = @"
 function get() {
 }";
@@ -764,7 +764,7 @@ function get() {
         }
 
         [TestMethod, Priority(0)]
-        public void TestGenerators() {
+        public void Generators() {
             string code = @"
 function *x() {
     yield 1;
@@ -836,7 +836,7 @@ function *x() {
         }
 
         [TestMethod, Priority(0)]
-        public void TestYieldMember() {
+        public void YieldMember() {
             string code = @"
 function *x() {
     abc.yield;
@@ -3625,7 +3625,7 @@ _f
         }
 
         [TestMethod, Priority(0)]
-        public void TestUnicodeIdentifier() {
+        public void UnicodeIdentifier() {
             const string identifiers = @"
 \u1234abc
 \u1234\u1235abc
@@ -3642,7 +3642,7 @@ abc\u1234
         }
 
         [TestMethod, Priority(0)]
-        public void TestBlock() {
+        public void Block() {
             const string code = @"
 { 1; 2 }";
             CheckAst(
@@ -3657,7 +3657,7 @@ abc\u1234
         }
 
         [TestMethod, Priority(0)]
-        public void TestDebugger() {
+        public void Debugger() {
             const string code = @"
 debugger;";
             CheckAst(
@@ -3669,7 +3669,7 @@ debugger;";
         }
 
         [TestMethod, Priority(0)]
-        public void TestSwitch() {
+        public void Switch() {
             const string code = @"
 switch(abc) {
     case 0:
@@ -3709,7 +3709,7 @@ switch(abc) {
         }
 
         [TestMethod, Priority(0)]
-        public void TestThrow() {
+        public void Throw() {
             const string code = @"
 throw ""abc"";
 throw;
@@ -3724,7 +3724,7 @@ throw;
         }
 
         [TestMethod, Priority(0)]
-        public void TestWith() {
+        public void With() {
             const string code = @"
 with(abc) {
     1;
@@ -3744,7 +3744,7 @@ with(abc) {
         }
 
         [TestMethod, Priority(0)]
-        public void TestConditional() {
+        public void Conditional() {
             const string identifiers = @"
 1 ? 2 : 3
 ";
@@ -3763,7 +3763,7 @@ with(abc) {
         }
 
         [TestMethod, Priority(0)]
-        public void TestVoid() {
+        public void Void() {
             const string identifiers = @"
 void 1
 ";
@@ -3781,7 +3781,7 @@ void 1
         }
 
         [TestMethod, Priority(0)]
-        public void TestTypeOf() {
+        public void TypeOf() {
             const string identifiers = @"
 typeof 1
 ";
@@ -3799,7 +3799,7 @@ typeof 1
         }
 
         [TestMethod, Priority(0)]
-        public void TestUnary() {
+        public void Unary() {
             const string identifiers = @"
 +1;
 -1;
@@ -3824,7 +3824,7 @@ delete abc;
         }
 
         [TestMethod, Priority(0)]
-        public void TestUnaryPostFix() {
+        public void UnaryPostFix() {
             const string identifiers = @"
 abc++;
 abc--;
@@ -3839,7 +3839,7 @@ abc--;
         }
 
         [TestMethod, Priority(0)]
-        public void TestGrouping() {
+        public void Grouping() {
             const string identifiers = @"
 (1)
 ";
@@ -3852,7 +3852,7 @@ abc--;
         }
 
         [TestMethod, Priority(0)]
-        public void TestArrayLiteral() {
+        public void ArrayLiteral() {
             const string identifiers = @"
 [1,2,3];
 [1,2,3,]
@@ -3867,7 +3867,7 @@ abc--;
         }
 
         [TestMethod, Priority(0)]
-        public void TestObjectLiteral() {
+        public void ObjectLiteral() {
             // Expression statements can't start with { as it's ambiguous with block,
             // so we do an assignment here
             const string identifiers = @"
@@ -3939,7 +3939,7 @@ x = {set abc (value) { 42 }}
         }
 
         [TestMethod, Priority(0)]
-        public void TestPrecedence() {
+        public void Precedence() {
             const string code = @"
 1 + 2 * 3;
 1 + 2 / 3;
@@ -4081,7 +4081,7 @@ false
         ///     0 1 2 3 4 5 6 7 8 9 a b c d e f A B C D E F
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Ignore")]
-        public void TestNumericLiterals() {
+        public void NumericLiterals() {
             const string numbers = @"
 0
 1
@@ -4172,7 +4172,7 @@ false
         ///     u HexDigit HexDigit HexDigit HexDigit
         /// </summary>
         [TestMethod, Priority(0)]
-        public void TestStringLiterals() {
+        public void StringLiterals() {
             const string strings = @"
 ""hello""
 'hello'
@@ -4239,7 +4239,7 @@ lo""
         ///     RegularExpressionFlags IdentifierPart
         /// </summary>
         [TestMethod, Priority(0)]
-        public void TestRegexLiterals() {
+        public void RegexLiterals() {
             // TODO: More test cases
             const string regexs = @"
 /abc/;
@@ -4261,7 +4261,7 @@ lo""
         }
 
         [TestMethod, Priority(0)]
-        public void TestVariableDeclaration() {
+        public void VariableDeclaration() {
             const string code = @"
 var i = 0, j = 1;
 ";
@@ -4277,7 +4277,7 @@ var i = 0, j = 1;
         }
 
         [TestMethod, Priority(0)]
-        public void TestVariableDeclarationKeyword() {
+        public void VariableDeclarationKeyword() {
             const string code = @"
 var get = 0;";
             CheckAst(
@@ -4291,7 +4291,7 @@ var get = 0;";
         }
 
         [TestMethod, Priority(0)]
-        public void TestVariableDeclarationError() {
+        public void VariableDeclarationError() {
             const string code = @"
 var function = 0;";
             CheckAst(
@@ -4308,7 +4308,7 @@ var function = 0;";
         }
 
         [TestMethod, Priority(0)]
-        public void TestVariableDeclarationError2() {
+        public void VariableDeclarationError2() {
             const string code = @"
 var 42 = 0;";
             CheckAst(
@@ -4325,7 +4325,7 @@ var 42 = 0;";
         }
 
         [TestMethod, Priority(0)]
-        public void TestEmptyStatement() {
+        public void EmptyStatement() {
             const string code = @"
 ;
 ";
@@ -4338,7 +4338,7 @@ var 42 = 0;";
         }
 
         [TestMethod, Priority(0)]
-        public void TestIfStatement() {
+        public void IfStatement() {
             const string code = @"
 if(true) {
     1
@@ -4369,7 +4369,7 @@ if(true) {
 
 
         [TestMethod, Priority(0)]
-        public void TestForStatement() {
+        public void ForStatement() {
             const string ForCode = @"
 for(var i = 0; i<4; i++) { }
 ";
@@ -4387,7 +4387,7 @@ for(var i = 0; i<4; i++) { }
         }
 
         [TestMethod, Priority(0)]
-        public void TestForStatementLexical() {
+        public void ForStatementLexical() {
             const string ForCode = @"
 for(const i = 0; false; ) { }
 ";
@@ -4405,7 +4405,7 @@ for(const i = 0; false; ) { }
         }
 
         [TestMethod, Priority(0)]
-        public void TestForNoVarStatement() {
+        public void ForNoVarStatement() {
             const string ForCode = @"
 for(i = 0; i<4; i++) { }
 ";
@@ -4429,7 +4429,7 @@ for(i = 0; i<4; i++) { }
         }
 
         [TestMethod, Priority(0)]
-        public void TestForInStatement() {
+        public void ForInStatement() {
             const string ForCode = @"
 for(var i in []) { }
 for(i in []) { }
@@ -4452,7 +4452,7 @@ for(i in []) { }
         }
 
         [TestMethod, Priority(0)]
-        public void TestForContinueStatement() {
+        public void ForContinueStatement() {
             const string ForCode = @"
 for(var i = 0; i<4; i++) { continue; }
 ";
@@ -4472,7 +4472,7 @@ for(var i = 0; i<4; i++) { continue; }
         }
 
         [TestMethod, Priority(0)]
-        public void TestForBreakStatement() {
+        public void ForBreakStatement() {
             const string ForCode = @"
 for(var i = 0; i<4; i++) { break; }
 ";
@@ -4492,7 +4492,7 @@ for(var i = 0; i<4; i++) { break; }
         }
 
         [TestMethod, Priority(0)]
-        public void TestForContinueLabelStatement() {
+        public void ForContinueLabelStatement() {
             const string ForCode = @"
 for(var i = 0; i<4; i++) { continue myLabel; }
 myLabel:
@@ -4517,7 +4517,7 @@ myLabel:
         }
 
         [TestMethod, Priority(0)]
-        public void TestForContinueLabelStatement2() {
+        public void ForContinueLabelStatement2() {
             const string ForCode = @"
 for(var i = 0; i<4; i++) { 
 myLabel:
@@ -4543,7 +4543,7 @@ continue myLabel;
         }
 
         [TestMethod, Priority(0)]
-        public void TestForContinueLabelStatement3() {
+        public void ForContinueLabelStatement3() {
             const string ForCode = @"
 for(var j = 0; j<4; j++) {
     myLabel:
@@ -4580,7 +4580,7 @@ for(var j = 0; j<4; j++) {
         }
 
         [TestMethod, Priority(0)]
-        public void TestForBreakLabelStatement() {
+        public void ForBreakLabelStatement() {
             const string ForCode = @"
 for(var i = 0; i<4; i++) { break myLabel; }
 myLabel:
@@ -4640,7 +4640,7 @@ while(i<0) { 2; }
         }
 
         [TestMethod, Priority(0)]
-        public void TestUseStrictDirective() {
+        public void UseStrictDirective() {
             const string code = @"'use strict';
 42";
 

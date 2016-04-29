@@ -1226,6 +1226,12 @@ namespace Microsoft.VisualStudioTools.Project {
                 _attributesWatcher = null;
             }
 
+            _fileChangedHandlers.Clear();
+
+            foreach (var pair in _symlinkWatchers)
+                pair.Value.Dispose();
+            _symlinkWatchers.Clear();
+
 #if DEV11_OR_LATER
             _needBolding = null;
 #else

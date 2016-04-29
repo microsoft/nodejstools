@@ -43,7 +43,7 @@ namespace Microsoft.Nodejs.Tests.UI {
     public class NpmUITests : NodejsProjectTest {
         [TestMethod, Priority(0), TestCategory("Npm UI")]
         [HostType("VSTestHost")]
-        public void TestNpmUIInitialization() {
+        public void NpmUIInitialization() {
             using (var app = new VisualStudioApp()) {
                 // Initialize call is required because NTVS does not autoload its package
                 // We may not be on UI thread, but Dev11 and Dev12 know how to sort that out.
@@ -58,7 +58,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Npm UI")]
         [HostType("VSTestHost")]
-        public void TestNpmUIArrowKeyBehavior() {
+        public void NpmUIArrowKeyBehavior() {
             using (var app = new VisualStudioApp()) {
                 app.ServiceProvider.GetUIThread().Invoke(() => {
                     NpmPackageInstallWindow npmWindow = OpenNpmWindowAndWaitForReady();
@@ -109,7 +109,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Npm UI")]
         [HostType("VSTestHost")]
-        public void TestNpmUITabKeyBehavior() {
+        public void NpmUITabKeyBehavior() {
             using (var app = new VisualStudioApp()) {
                 app.ServiceProvider.GetUIThread().Invoke(() => {
                     NpmPackageInstallWindow npmWindow = OpenNpmWindowAndWaitForReady();
