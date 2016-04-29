@@ -49,6 +49,7 @@ namespace Microsoft.NodejsTools.Project {
         internal readonly RequireCompletionCache _requireCompletionCache = new RequireCompletionCache();
         private string _intermediateOutputPath;
         private readonly Dictionary<NodejsProjectImageName, int> _imageIndexFromNameDictionary = new Dictionary<NodejsProjectImageName, int>();
+        private bool? shouldAcquireTypingsAutomatically;
 
 #if DEV14
         private TypingsAcquisition _typingsAcquirer;
@@ -112,11 +113,16 @@ namespace Microsoft.NodejsTools.Project {
                     return false;
                 }
 
+                if (shouldAcquireTypingsAutomatically.HasValue) {
+                    return shouldAcquireTypingsAutomatically.Value;
+                }
+
                 var task = ProjectMgr.Site.GetUIThread().InvokeAsync(() => {
                     return IsTypeScriptProject;
                 });
                 task.Wait();
-                return !task.Result;
+                shouldAcquireTypingsAutomatically = !task.Result;
+                return shouldAcquireTypingsAutomatically.Value;
 #else
                 return false;
 #endif
