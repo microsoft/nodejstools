@@ -1239,7 +1239,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             }
 
             DebuggerClient.RunWithRequestExceptionsHandled(async () => {
-                if (!await Process.UpdateModuleSourceAsync(module).ConfigureAwait(false)) {
+                var currentProcess = Process;
+                if (currentProcess == null || !await currentProcess.UpdateModuleSourceAsync(module).ConfigureAwait(false)) {
                     var statusBar = (IVsStatusbar)ServiceProvider.GlobalProvider.GetService(typeof(SVsStatusbar));
                     statusBar.SetText(SR.GetString(SR.DebuggerModuleUpdateFailed));
                 }
