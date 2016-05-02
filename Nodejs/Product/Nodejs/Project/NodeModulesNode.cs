@@ -16,9 +16,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.NpmUI;
 using Microsoft.VisualStudio;
@@ -27,14 +27,16 @@ using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 using MessageBox = System.Windows.MessageBox;
 using Timer = System.Threading.Timer;
-using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Project {
     internal class NodeModulesNode : AbstractNpmNode {
+        #region StaticFields
+        private static INpmGlobalPackageProvider _cachingGlobalPackageProvider = new CacheGlobalNpmPackageProvider();
+
         /// <summary>
         /// `INpmGlobalPackageProvider` that caches `IGlobalPackages` objects for reuse.
         /// </summary>
-        private class CacheGlobalPackageProivder : INpmGlobalPackageProvider {
+        private class CacheGlobalNpmPackageProvider : INpmGlobalPackageProvider {
             private Dictionary<string, WeakReference<IGlobalPackages>> _packages = new Dictionary<string, WeakReference<IGlobalPackages>>();
 
             public async Task<IGlobalPackages> GetGlobalPackages(string pathToNpm) {
@@ -45,16 +47,15 @@ namespace Microsoft.NodejsTools.Project {
                         return current;
                     }
                 }
-                var provider = new Npm.SPI.NpmBinGlobalPackageProvider();
-                var globals = await provider.GetGlobalPackages(pathToNpm);
+                var delegateProvider = new Npm.SPI.NpmBinGlobalPackageProvider();
+                var globals = await delegateProvider.GetGlobalPackages(pathToNpm);
                 if (globals != null) {
                     _packages[pathToNpm] = new WeakReference<IGlobalPackages>(globals);
                 }
                 return globals;
             }
         }
-
-        private static INpmGlobalPackageProvider _cachingGlobalPackageProvider = new CacheGlobalPackageProivder();
+        #endregion
 
         #region Constants
 
