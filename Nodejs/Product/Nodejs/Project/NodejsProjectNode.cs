@@ -312,7 +312,7 @@ namespace Microsoft.NodejsTools.Project {
                 SetProjectProperty(NodejsConstants.TypeScriptSourceMap, "true");
 #if DEV14
                 // Reset cached value, so it will be recalculated later.
-                this.shouldAcquireTypingsAutomatically = null;
+                this.shouldAcquireTypingsAutomatically = false;
 #endif
                 if (String.IsNullOrWhiteSpace(GetProjectProperty(NodejsConstants.TypeScriptModuleKind))) {
                     SetProjectProperty(NodejsConstants.TypeScriptModuleKind, NodejsConstants.CommonJSModuleKind);
