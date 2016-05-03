@@ -248,7 +248,8 @@ namespace Microsoft.NodejsTools.Debugger {
         internal bool IsRunning() {
             var backtraceCommand = new BacktraceCommand(CommandId, _resultFactory, fromFrame: 0, toFrame: 1);
             var tokenSource = new CancellationTokenSource(_timeout);
-            if (TrySendRequestAsync(backtraceCommand, tokenSource.Token).GetAwaiter().GetResult()) {
+            var task = TrySendRequestAsync(backtraceCommand, tokenSource.Token);
+            if (task.Wait(_timeout) && task.Result) {
                 return backtraceCommand.Running;
             }
             return false;

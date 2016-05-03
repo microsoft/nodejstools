@@ -950,8 +950,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
             uint attributes;
             var riidEvent = new Guid(iidEvent);
-
-            EngineUtils.RequireOk(eventObject.GetAttributes(out attributes));
+            var attributesResult = eventObject.GetAttributes(out attributes);
+            if (attributesResult == VSConstants.RPC_E_DISCONNECTED) {
+                return;
+            }
+            EngineUtils.RequireOk(attributesResult);
 
             if ((attributes & (uint)enum_EVENTATTRIBUTES.EVENT_STOPPING) != 0 && thread == null) {
                 Debug.Fail("A thread must be provided for a stopping event");
@@ -959,7 +962,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             }
 
             try {
-                EngineUtils.RequireOk(events.Event(this, null, program, thread, eventObject, ref riidEvent, attributes));
+                var eventResult = events.Event(this, null, program, thread, eventObject, ref riidEvent, attributes);
+                if (eventResult == VSConstants.RPC_E_DISCONNECTED) {
+                    return;
+                }
+                EngineUtils.RequireOk(eventResult);
             } catch (InvalidCastException) {
                 // COM object has gone away
             }
