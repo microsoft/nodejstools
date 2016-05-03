@@ -295,8 +295,8 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                 }
             } catch (SocketException) {
             } catch (IOException) {
-            } catch (InvalidOperationException) {
             } catch (ObjectDisposedException) {
+            } catch (InvalidOperationException) {
             } catch (DecoderFallbackException ex) {
                 LiveLogger.WriteLine(string.Format("Error decoding response body: {0}", ex), typeof(DebuggerConnection));
             } catch (JsonReaderException ex) {
