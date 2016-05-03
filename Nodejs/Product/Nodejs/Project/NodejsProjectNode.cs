@@ -51,6 +51,7 @@ namespace Microsoft.NodejsTools.Project {
         private readonly Dictionary<NodejsProjectImageName, int> _imageIndexFromNameDictionary = new Dictionary<NodejsProjectImageName, int>();
 
 #if DEV14
+        private bool? shouldAcquireTypingsAutomatically;
         private TypingsAcquisition _typingsAcquirer;
 #endif
 
@@ -112,11 +113,16 @@ namespace Microsoft.NodejsTools.Project {
                     return false;
                 }
 
+                if (shouldAcquireTypingsAutomatically.HasValue) {
+                    return shouldAcquireTypingsAutomatically.Value;
+                }
+
                 var task = ProjectMgr.Site.GetUIThread().InvokeAsync(() => {
                     return IsTypeScriptProject;
                 });
                 task.Wait();
-                return !task.Result;
+                shouldAcquireTypingsAutomatically = !task.Result;
+                return shouldAcquireTypingsAutomatically.Value;
 #else
                 return false;
 #endif
@@ -304,6 +310,10 @@ namespace Microsoft.NodejsTools.Project {
                 // enable TypeScript on the project automatically...
                 SetProjectProperty(NodejsConstants.EnableTypeScript, "true");
                 SetProjectProperty(NodejsConstants.TypeScriptSourceMap, "true");
+#if DEV14
+                // Reset cached value, so it will be recalculated later.
+                this.shouldAcquireTypingsAutomatically = false;
+#endif
                 if (String.IsNullOrWhiteSpace(GetProjectProperty(NodejsConstants.TypeScriptModuleKind))) {
                     SetProjectProperty(NodejsConstants.TypeScriptModuleKind, NodejsConstants.CommonJSModuleKind);
                 }
