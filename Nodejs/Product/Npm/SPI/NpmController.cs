@@ -21,18 +21,6 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
-    /// <summary>
-    /// Standard `INpmGlobalPackageProvider` that uses `npm bin` to get global packages.
-    /// </summary>
-    public class NpmBinGlobalPackageProvider : INpmGlobalPackageProvider {
-        public async Task<IGlobalPackages> GetGlobalPackages(string pathToNpm) {
-            var command = new NpmBinCommand(String.Empty, true, pathToNpm);
-            return (await command.ExecuteAsync())
-                ? RootPackageFactory.Create(command.BinDirectory)
-                : null;
-        }
-    }
-
     internal class NpmController : AbstractNpmLogSource, INpmController {
         private IPackageCatalog _sRepoCatalog;
         private string _fullPathToRootPackageDirectory;
@@ -40,6 +28,9 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         private bool _showMissingDevOptionalSubPackages;
         private INpmPathProvider _npmPathProvider;
         private INpmGlobalPackageProvider _globalPackageProvider;
+        private IRootPackage _rootPackage;
+        private IGlobalPackages _globalPackage;
+        private readonly object _lock = new object();
 
         private readonly FileSystemWatcher _localWatcher;
         private readonly FileSystemWatcher _globalWatcher;
@@ -168,9 +159,32 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             }
         }
 
-        public IRootPackage RootPackage { get; private set; }
+        public IRootPackage RootPackage {
+            get {
+                lock (_lock) {
+                    return _rootPackage;
+                }
+            }
 
-        public IGlobalPackages GlobalPackages { get; private set; }
+            private set {
+                lock (_lock) {
+                    _rootPackage = value;
+                }
+            }
+        }
+
+        public IGlobalPackages GlobalPackages {
+            get {
+                lock (_lock) {
+                    return _globalPackage;
+                }
+            }
+            private set {
+                lock (_lock) {
+                    _globalPackage = value;
+                }
+            }
+        }
 
         public INpmCommander CreateNpmCommander() {
             return new NpmCommander(this);
@@ -345,6 +359,18 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
                 _isDisposed = true;
             }
+        }
+    }
+
+    /// <summary>
+    /// Standard `INpmGlobalPackageProvider` that uses `npm bin` to get global packages.
+    /// </summary>
+    public class NpmBinGlobalPackageProvider : INpmGlobalPackageProvider {
+        public async Task<IGlobalPackages> GetGlobalPackages(string pathToNpm) {
+            var command = new NpmBinCommand(String.Empty, true, pathToNpm);
+            return (await command.ExecuteAsync())
+                ? RootPackageFactory.Create(command.BinDirectory)
+                : null;
         }
     }
 }
