@@ -31,7 +31,6 @@ namespace Microsoft.NodejsTools.Intellisense {
         private readonly IVsExpansion _expansion;
         private readonly IVsTextView _view;
         private readonly ITextView _textView;
-        private readonly IVsEditorAdaptersFactoryService _adapterFactory;
         private readonly IServiceProvider _serviceProvider;
         private IVsExpansionSession _session;
         private bool _sessionEnded, _selectEndSpan;
@@ -43,7 +42,6 @@ namespace Microsoft.NodejsTools.Intellisense {
         public ExpansionClient(ITextView textView, IVsEditorAdaptersFactoryService adapterFactory, IServiceProvider serviceProvider) {
             _textView = textView;
             _serviceProvider = serviceProvider;
-            _adapterFactory = adapterFactory;
             _view = adapterFactory.GetViewAdapter(textView);
             _lines = (IVsTextLines)adapterFactory.GetBufferAdapter(textView.TextBuffer);
             _expansion = _lines as IVsExpansion;

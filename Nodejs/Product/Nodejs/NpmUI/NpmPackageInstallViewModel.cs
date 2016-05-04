@@ -58,7 +58,6 @@ namespace Microsoft.NodejsTools.NpmUI {
         private IList<PackageCatalogEntryViewModel> _filteredPackages = new List<PackageCatalogEntryViewModel>();
         private LastRefreshedMessageProvider _lastRefreshedMessage;
         private PackageCatalogEntryViewModel _selectedPackage;
-        private bool _npmNotFound;
         private bool _isCatalogEmpty;
         private Visibility _catalogControlVisibility = Visibility.Collapsed;
         private string _catalogLoadingMessage = string.Empty;
@@ -66,7 +65,6 @@ namespace Microsoft.NodejsTools.NpmUI {
         private Visibility _loadingCatalogControlVisibility = Visibility.Collapsed;
         private int _selectedDependencyTypeIndex;
 
-        private string _currentFilter = string.Empty;
         private string _filterText = string.Empty;
         private readonly Timer _filterTimer;
         private string _arguments = string.Empty;
@@ -129,14 +127,6 @@ namespace Microsoft.NodejsTools.NpmUI {
 
         public bool CanRefreshCatalog {
             get { return !IsLoadingCatalog; }
-        }
-
-        public bool NpmNotFound {
-            get { return _npmNotFound; }
-            private set {
-                _npmNotFound = value;
-                OnPropertyChanged();
-            }
         }
 
         public bool IsCatalogEmpty {
@@ -379,8 +369,6 @@ namespace Microsoft.NodejsTools.NpmUI {
 
                 // Maintain selection when the filter list refreshes (e.g. due to an installation running in the background)
                 SelectedPackage = originalSelectedPackage ?? FilteredPackages.FirstOrDefault();
-
-                _currentFilter = filterText;
 
                 LastRefreshedMessage = IsCatalogEmpty
                     ? LastRefreshedMessageProvider.RefreshFailed

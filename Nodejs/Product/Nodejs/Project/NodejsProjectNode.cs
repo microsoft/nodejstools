@@ -861,7 +861,6 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private static readonly Regex _uninstallRegex = new Regex(@"\b(uninstall|rm)\b");
-        private static readonly char[] _pathSeparators = { '\\', '/' };
         private bool _isCheckingForLongPaths;
 
         public async Task CheckForLongPaths(string npmArguments = null) {
