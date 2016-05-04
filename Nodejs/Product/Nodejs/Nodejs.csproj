@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <Choose>
     <When Condition=" '$(VisualStudioVersion)'=='15.0'  Or '$(TargetVisualStudioVersion)'=='VS150' ">
@@ -247,7 +247,6 @@
     <Compile Include="Classifier\TokenCache.cs" />
     <Compile Include="Classifier\TokenCategory.cs" />
     <Compile Include="Classifier\TokenInfo.cs" />
-    <Compile Include="CodeWindowManager.cs" />
     <Compile Include="Commands\AzureExplorerAttachDebuggerCommand.cs" />
     <Compile Include="Commands\DiagnosticsCommand.cs" />
     <Compile Include="Commands\DiagnosticsForm.cs">
@@ -647,7 +646,6 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="Guids.cs" />
     <Compile Include="JsonListener.cs" />
-    <Compile Include="Navigation\CodeWindowManager.cs" />
     <Compile Include="NodejsConstants.cs" />
     <Compile Include="NodejsEditorFactory.cs" />
     <Compile Include="NodejsProject.cs" />
