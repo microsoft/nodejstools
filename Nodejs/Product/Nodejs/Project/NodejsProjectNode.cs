@@ -51,6 +51,7 @@ namespace Microsoft.NodejsTools.Project {
         private readonly Dictionary<NodejsProjectImageName, int> _imageIndexFromNameDictionary = new Dictionary<NodejsProjectImageName, int>();
 
 #if DEV14
+        private bool? shouldAcquireTypingsAutomatically;
         private TypingsAcquisition _typingsAcquirer;
 #endif
 
@@ -112,11 +113,16 @@ namespace Microsoft.NodejsTools.Project {
                     return false;
                 }
 
+                if (shouldAcquireTypingsAutomatically.HasValue) {
+                    return shouldAcquireTypingsAutomatically.Value;
+                }
+
                 var task = ProjectMgr.Site.GetUIThread().InvokeAsync(() => {
                     return IsTypeScriptProject;
                 });
                 task.Wait();
-                return !task.Result;
+                shouldAcquireTypingsAutomatically = !task.Result;
+                return shouldAcquireTypingsAutomatically.Value;
 #else
                 return false;
 #endif
@@ -304,6 +310,10 @@ namespace Microsoft.NodejsTools.Project {
                 // enable TypeScript on the project automatically...
                 SetProjectProperty(NodejsConstants.EnableTypeScript, "true");
                 SetProjectProperty(NodejsConstants.TypeScriptSourceMap, "true");
+#if DEV14
+                // Reset cached value, so it will be recalculated later.
+                this.shouldAcquireTypingsAutomatically = false;
+#endif
                 if (String.IsNullOrWhiteSpace(GetProjectProperty(NodejsConstants.TypeScriptModuleKind))) {
                     SetProjectProperty(NodejsConstants.TypeScriptModuleKind, NodejsConstants.CommonJSModuleKind);
                 }
@@ -979,6 +989,8 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
+        internal event EventHandler OnDispose;
+
         protected override void Dispose(bool disposing) {
             if (disposing) {
                 if (_analyzer != null) {
@@ -1008,6 +1020,15 @@ namespace Microsoft.NodejsTools.Project {
                 NodejsPackage.Instance.IntellisenseOptionsPage.SaveToDiskChanged -= IntellisenseOptionsPageSaveToDiskChanged;
                 NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevelChanged -= IntellisenseOptionsPageAnalysisLevelChanged;
                 NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMaximumChanged -= AnalysisLogMaximumChanged;
+
+                OnDispose?.Invoke(this, EventArgs.Empty);
+
+                RemoveChild(ModulesNode);
+                ModulesNode?.Dispose();
+                ModulesNode = null;
+#if DEV14
+                _typingsAcquirer = null;
+#endif
             }
             base.Dispose(disposing);
         }

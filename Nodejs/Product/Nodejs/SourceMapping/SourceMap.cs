@@ -113,19 +113,19 @@ namespace Microsoft.NodejsTools.SourceMapping {
 
                         generatedColumn += info[SourceStartingIndex];
 
-                        if (info.Length >= SourcesIndex) {
+                        if (SourcesIndex < info.Length) {
                             sourceIndex += info[SourcesIndex];
                         }
 
-                        if (info.Length >= OriginalLineIndex) {
+                        if (OriginalLineIndex < info.Length) {
                             originalLine += info[OriginalLineIndex];
                         }
 
-                        if (info.Length > OriginalColumnIndex) {
+                        if (OriginalColumnIndex < info.Length) {
                             originalColumn += info[OriginalColumnIndex];
                         }
 
-                        if (info.Length > NamesIndex) {
+                        if (NamesIndex < info.Length) {
                             originalName += info[NamesIndex];
                         }
 

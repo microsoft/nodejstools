@@ -33,6 +33,10 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         private ConcurrentDictionary<int, TaskCompletionSource<JObject>> _messages =
             new ConcurrentDictionary<int, TaskCompletionSource<JObject>>();
 
+        private readonly static Newtonsoft.Json.JsonSerializerSettings jsonSettings = new Newtonsoft.Json.JsonSerializerSettings() {
+            DateParseHandling = Newtonsoft.Json.DateParseHandling.None
+        };
+
         public DebuggerClient(IDebuggerConnection connection) {
             Utilities.ArgumentNotNull("connection", connection);
 
@@ -116,7 +120,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         /// <param name="sender">Sender.</param>
         /// <param name="args">Event arguments.</param>
         private void OnOutputMessage(object sender, MessageEventArgs args) {
-            JObject message = JObject.Parse(args.Message);
+            var message = Newtonsoft.Json.JsonConvert.DeserializeObject<JObject>(args.Message, jsonSettings);
             var messageType = (string)message["type"];
 
             switch (messageType) {

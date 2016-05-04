@@ -49,7 +49,7 @@ path = new function() {
 ";
 
         [TestMethod, Priority(0)]
-        public void TestPathRelative() {
+        public void PathRelative() {
             string tempPath = Path.GetTempPath().Replace('\\', '/');
             string tempPathNoFirstSlash = tempPath.Substring(0, 2) + tempPath.Substring(3);
             string tempPathNoDrive = tempPath.Substring(2);
@@ -70,17 +70,17 @@ path = new function() {
         }
 
         [TestMethod, Priority(0)]
-        public void TestPathNormalize() {
+        public void PathNormalize() {
             TestReferenceFunction("t('/foo/../bar', '/bar');", "path", "normalize");
         }
 
         [TestMethod, Priority(0)]
-        public void TestPathResolve() {
+        public void PathResolve() {
             TestReferenceFunction("t('foo/bar', '/tmp/file/', '..', 'a/../subfile')", "path", "resolve");
         }
 
         [TestMethod, Priority(0)]
-        public void TestPathJoin() {
+        public void PathJoin() {
             TestReferenceFunction("t('/foo', 'bar')", "path", "join");
             TestReferenceFunction("t('/foo', '/bar')", "path", "join");
             TestReferenceFunction("t('foo', '/bar')", "path", "join");

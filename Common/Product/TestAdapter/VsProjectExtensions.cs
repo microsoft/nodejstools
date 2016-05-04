@@ -108,12 +108,17 @@ namespace Microsoft.VisualStudioTools.TestAdapter {
             if (props == null) {
                 return null;
             }
-            var projHome = props.Item("ProjectHome");
-            if (projHome == null) {
+
+            try {
+                var projHome = props.Item("ProjectHome");
+                if (projHome == null) {
+                    return null;
+                }
+
+                return projHome.Value as string;
+            } catch (ArgumentException) {
                 return null;
             }
-
-            return projHome.Value as string;
         }
 
         /// <summary>

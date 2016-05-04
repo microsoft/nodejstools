@@ -25,7 +25,7 @@ namespace NpmTests {
     public class MaxPathTests : AbstractPackageJsonTests {
 
         [TestMethod, Priority(0)]
-        public void TestAngularFullstackScaffoldedProject() {
+        public void AngularFullstackScaffoldedProject() {
             using (var manager = new TemporaryFileManager()) {
                 var rootDir = FilesystemPackageJsonTestHelpers.CreateRootPackageDir(manager);
                 var controller = NpmControllerFactory.Create(rootDir, string.Empty);
@@ -45,7 +45,7 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void TestInstallUninstallMaxPathGlobalModule() {
+        public void InstallUninstallMaxPathGlobalModule() {
             var controller = NpmControllerFactory.Create(string.Empty, string.Empty);
 
             using (var commander = controller.CreateNpmCommander()) {

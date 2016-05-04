@@ -47,7 +47,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void TestSnippetsDisabled() {
+        public void SnippetsDisabled() {
             using (var app = new VisualStudioApp()) {
                 Window window;
                 var openFile = OpenProjectItem(app, "server.js", out window);
@@ -80,7 +80,7 @@ http.createServer(function (req, res) {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void TestNoAutoFormattingEnter() {
+        public void NoAutoFormattingEnter() {
             using (var app = new VisualStudioApp()) {
                 Window window;
                 var openFile = OpenProjectItem(app, "server.js", out window);
@@ -105,7 +105,7 @@ http.createServer(function (req, res) {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void TestNoAutoFormattingCloseFunction() {
+        public void NoAutoFormattingCloseFunction() {
             using (var app = new VisualStudioApp()) {
                 Window window;
                 var openFile = OpenProjectItem(app, "server.js", out window);
@@ -131,7 +131,7 @@ http.createServer(function (req, res) {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void TestNoAutoFormattingPaste() {
+        public void NoAutoFormattingPaste() {
             using (var app = new VisualStudioApp()) {
                 Window window;
                 var openFile = OpenProjectItem(app, "server.js", out window);
@@ -157,7 +157,7 @@ http.createServer(function (req, res) {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void TestNoReferences() {
+        public void NoReferences() {
             Window window;
             using (var app = new VisualStudioApp()) {
                 var openFile = OpenProjectItem(app, "server.js", out window);
@@ -424,7 +424,7 @@ sd.StringDecoder
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void TestNewProject() {
+        public void NewProject() {
             using (var app = new VisualStudioApp()) {
                 using (var newProjDialog = app.FileNewProject()) {
                     newProjDialog.FocusLanguageNode("JavaScript");
@@ -456,7 +456,7 @@ sd.StringDecoder
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void TestNewAzureProject() {
+        public void NewAzureProject() {
             using (var app = new VisualStudioApp()) {
                 using (var newProjDialog = app.FileNewProject()) {
                     newProjDialog.FocusLanguageNode("JavaScript");
@@ -487,7 +487,7 @@ sd.StringDecoder
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void TestAutomationProject() {
+        public void AutomationProject() {
             using (var app = new VisualStudioApp()) {
                 var project = app.OpenProject(@"TestData\NodeAppWithModule\NodeAppWithModule.sln");
 
@@ -599,7 +599,7 @@ sd.StringDecoder
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void TestProjectProperties() {
+        public void ProjectProperties() {
             for (int mode = 0; mode < 2; mode++) {
                 using (var app = new VisualStudioApp()) {
                     var testFile = Path.Combine(Path.GetTempPath(), "nodejstest.txt");
@@ -628,7 +628,7 @@ sd.StringDecoder
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void TestBrowserLaunch() {
+        public void BrowserLaunch() {
             for (int mode = 0; mode < 2; mode++) {
                 var startingProcesses = System.Diagnostics.Process.GetProcessesByName("iexplore").Select(x => x.Id).ToSet();
 
@@ -778,7 +778,7 @@ sd.StringDecoder
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void TestLongPathCheck() {
+        public void LongPathCheck() {
             string[] expectedLongPaths = {
                 @"node_modules\azure\node_modules\azure-common\node_modules\xml2js\node_modules\sax\test\trailing-attribute-no-value.js",
                 @"node_modules\azure\node_modules\azure-common\node_modules\xml2js\node_modules\sax\test\xmlns-xml-default-prefix-attribute.js",
