@@ -22,18 +22,12 @@ using Microsoft.VisualStudio.Text;
 
 namespace Microsoft.NodejsTools.Intellisense {
     internal class RequireCompletionAnalysis : CompletionAnalysis {
-        private readonly VsProjectAnalyzer _analyzer;
         private readonly ITextSnapshot _snapshot;
-        private readonly ITrackingSpan _applicableSpan;
-        private readonly ITextBuffer _textBuffer;
         private readonly bool _quote;
 
         public RequireCompletionAnalysis(VsProjectAnalyzer vsProjectAnalyzer, ITextSnapshot snapshot, VisualStudio.Text.ITrackingSpan applicableSpan, VisualStudio.Text.ITextBuffer textBuffer, bool quote)
             : base(applicableSpan, textBuffer) {
-            _analyzer = vsProjectAnalyzer;
             _snapshot = snapshot;
-            _applicableSpan = applicableSpan;
-            _textBuffer = textBuffer;
             _quote = quote;
         }
 

@@ -31,7 +31,6 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         private readonly ITextBuffer _textBuffer;
         private readonly NodejsClassifier _classifier;
-        private readonly IServiceProvider _serviceProvider;
         private readonly IGlyphService _glyphService;
 
         private static string[] _allowRequireTokens = new[] { "!", "!=", "!==", "%", "%=", "&", "&&", "&=", "(", ")",
@@ -52,7 +51,6 @@ namespace Microsoft.NodejsTools.Intellisense {
         public CompletionSource(ITextBuffer textBuffer, NodejsClassifier classifier, IServiceProvider serviceProvider, IGlyphService glyphService) {
             _textBuffer = textBuffer;
             _classifier = classifier;
-            _serviceProvider = serviceProvider;
             _glyphService = glyphService;
         }
 

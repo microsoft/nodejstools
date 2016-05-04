@@ -135,14 +135,6 @@ namespace Microsoft.NodejsTools.Debugger {
             }
             return true;
         }
-        
-        private static int HexValue(char ch) {
-            int value;
-            if (!HexValue(ch, out value)) {
-                throw new ArgumentException("bad char for integer value: " + ch);
-            }
-            return value;
-        }
 
         private static bool HexValue(char ch, out int value) {
             switch (ch) {

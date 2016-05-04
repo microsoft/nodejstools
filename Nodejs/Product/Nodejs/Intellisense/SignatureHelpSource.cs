@@ -20,11 +20,9 @@ using Microsoft.VisualStudio.Text;
 namespace Microsoft.NodejsTools.Intellisense {
     internal class SignatureHelpSource : ISignatureHelpSource {
         private readonly ITextBuffer _textBuffer;
-        private readonly SignatureHelpSourceProvider _provider;
 
         public SignatureHelpSource(SignatureHelpSourceProvider provider, ITextBuffer textBuffer) {
             _textBuffer = textBuffer;
-            _provider = provider;
         }
 
         public ISignature GetBestMatch(ISignatureHelpSession session) {
