@@ -195,9 +195,7 @@ namespace Microsoft.NodejsTools {
 
             if (pyProj != null) {
                 analyzer = pyProj.Analyzer;
-                if (analyzer != null) {
-                    return analyzer;
-                }
+                return analyzer;
             }
 
             // exists for tests where we don't run in VS and for the existing changes preview

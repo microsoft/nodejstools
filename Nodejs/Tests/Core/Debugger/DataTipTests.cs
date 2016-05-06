@@ -19,10 +19,10 @@ using Microsoft.NodejsTools;
 using Microsoft.NodejsTools.Classifier;
 using Microsoft.NodejsTools.Debugger.DataTips;
 using Microsoft.NodejsTools.Intellisense;
+using Microsoft.NodejsTools.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.TextManager.Interop;
 using TestUtilities.Mocks;
-using Microsoft.NodejsTools.Options;
 
 namespace NodejsTests.Debugger.FileNameMapping {
     [TestClass]
