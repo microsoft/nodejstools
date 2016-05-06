@@ -35,7 +35,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         protected override void OnParentSet(HierarchyNode parent) {
-            if (ProjectMgr == null || !ProjectMgr.ShouldAcquireTypingsAutomatically) {
+            if (ProjectMgr == null || ProjectMgr.Analyzer == null || !ProjectMgr.ShouldAcquireTypingsAutomatically) {
                 return;
             }
 
@@ -97,7 +97,7 @@ namespace Microsoft.NodejsTools.Project {
                 this.ItemNode.ItemTypeName = ProjectFileConstants.Content;
             }
 
-            ProjectMgr.Analyzer?.AnalyzeFile(Url, ShouldAnalyze);
+            ProjectMgr.Analyzer.AnalyzeFile(Url, ShouldAnalyze);
 
             UpdateParentContentType();
             ItemNode.ItemTypeChanged += ItemNode_ItemTypeChanged;
@@ -114,8 +114,7 @@ namespace Microsoft.NodejsTools.Project {
         internal override int ExcludeFromProject() {
             // Analyze on removing from a project so we have the most up to date sources for this.
             // Don't report errors since the file won't remain part of the project. This removes the errors from the list.
-            ProjectMgr.Analyzer?.AnalyzeFile(Url, false);
-
+            ProjectMgr.Analyzer.AnalyzeFile(Url, false);
             var excludeFromProject = base.ExcludeFromProject();
 
             UpdateParentContentType();
@@ -126,9 +125,6 @@ namespace Microsoft.NodejsTools.Project {
 
         protected override void RaiseOnItemRemoved(string documentToRemove, string[] filesToBeDeleted) {
             base.RaiseOnItemRemoved(documentToRemove, filesToBeDeleted);
-            if (ProjectMgr.Analyzer == null) {
-                return;
-            }
             foreach (var file in filesToBeDeleted) {
                 if (!File.Exists(file)) {
                     ProjectMgr.Analyzer.UnloadFile(file);
@@ -138,8 +134,7 @@ namespace Microsoft.NodejsTools.Project {
 
         protected override void RenameChildNodes(FileNode parentNode) {
             base.RenameChildNodes(parentNode);
-
-            ProjectMgr.Analyzer?.ReloadComplete();
+            this.ProjectMgr.Analyzer.ReloadComplete();
         }
 
         protected override NodeProperties CreatePropertiesObject() {
@@ -155,7 +150,7 @@ namespace Microsoft.NodejsTools.Project {
         private void ItemNode_ItemTypeChanged(object sender, EventArgs e) {
             // item type node was changed...
             // if we have changed the type from compile to anything else, we should scrub
-            ProjectMgr.Analyzer?.AnalyzeFile(Url, ShouldAnalyze);
+            ProjectMgr.Analyzer.AnalyzeFile(Url, ShouldAnalyze);
 
             UpdateParentContentType();
         }
