@@ -76,7 +76,7 @@ namespace Microsoft.NodejsTools.Project {
 #endif
 
         internal override int IncludeInProject(bool includeChildren) {
-            if (!Parent.ItemNode.IsExcluded) {
+            if (!ItemNode.IsExcluded) {
                 return 0;
             }
 

@@ -713,21 +713,6 @@ namespace Microsoft.NodejsTools.Intellisense {
 
                     bufferParser._currentProjEntry = projEntry;
                     bufferParser._parser = this;
-
-#if FALSE
-                // TODO: Add back for navigation bar support
-                foreach (var buffer in buffers) {
-                    // A buffer may have multiple DropDownBarClients, given one may open multiple CodeWindows
-                    // over a single buffer using Window/New Window
-                    List<DropDownBarClient> clients;
-                    if (buffer.Properties.TryGetProperty<List<DropDownBarClient>>(typeof(DropDownBarClient), out clients)) {
-                        foreach (var client in clients) {
-                            client.UpdateProjectEntry(projEntry);
-                        }
-                    }
-                }
-#endif
-
                     bufferParser.Requeue();
                 }
             });
