@@ -58,9 +58,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         internal void AnalyzePackageJson(Intellisense.VsProjectAnalyzer analyzer) {
-            if (analyzer != null) {
-                analyzer.AddPackageJson(Url);
-            }
+            analyzer.AddPackageJson(Url);
         }
 
         protected override void Dispose(bool disposing) {
