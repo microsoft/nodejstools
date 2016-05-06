@@ -278,7 +278,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <summary>
         /// Mapping from item names to their hierarchy nodes for all disk-based nodes.
         /// </summary>
-        protected readonly Dictionary<string, WeakReference<HierarchyNode>> _diskNodes = new Dictionary<string, WeakReference<HierarchyNode>>(StringComparer.OrdinalIgnoreCase);
+        protected readonly Dictionary<string, HierarchyNode> _diskNodes = new Dictionary<string, HierarchyNode>(StringComparer.OrdinalIgnoreCase);
 
         // Has the object been disposed.
         private bool isDisposed;
@@ -292,7 +292,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// is added, then the label is edited, and when that completes/cancels
         /// the folder gets created.
         /// </summary>
-        private WeakReference<FolderNode> _folderBeingCreated;
+        private FolderNode _folderBeingCreated;
 
         private readonly ExtensibilityEventsDispatcher extensibilityEventsDispatcher;
 
@@ -404,14 +404,10 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         internal FolderNode FolderBeingCreated {
             get {
-                FolderNode node = null;
-                if (_folderBeingCreated.TryGetTarget(out node)) {
-                    return node;
-                }
-                return null;
+                return _folderBeingCreated;
             }
             set {
-                _folderBeingCreated = value == null ? null : new WeakReference<FolderNode>(value);
+                _folderBeingCreated = value;
             }
         }
 
@@ -1128,6 +1124,9 @@ namespace Microsoft.VisualStudioTools.Project {
                     imageHandler.Close();
                     imageHandler = null;
                 }
+
+                _diskNodes.Clear();
+                _folderBeingCreated = null;
             } finally {
                 base.Dispose(disposing);
                 // Note that this isDisposed flag is separate from the base's
@@ -1583,7 +1582,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     } else {
                         this.filename = fileName;
                     }
-                    _diskNodes[this.filename] = new WeakReference<HierarchyNode>(this);
+                    _diskNodes[this.filename] = this;
 
                     // now reload to fix up references
                     this.Reload();
@@ -2606,7 +2605,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
             _diskNodes.Remove(this.filename);
             this.filename = newFileName;
-            _diskNodes[this.filename] = new WeakReference<HierarchyNode>(this);
+            _diskNodes[this.filename] = this;
 
             string newFileNameWithoutExtension = Path.GetFileNameWithoutExtension(newFileName);
 
@@ -5060,13 +5059,10 @@ If the files in the existing folder have the same names as files in the folder y
             if (!String.IsNullOrWhiteSpace(link)) {
                 strPath = Path.GetDirectoryName(link);
             } else {
-                WeakReference<HierarchyNode> parentRef;
-                if (_diskNodes.TryGetValue(Path.GetDirectoryName(Path.Combine(ProjectHome, strPath)) + "\\", out parentRef)) {
-                    HierarchyNode parent;
-                    if (parentRef.TryGetTarget(out parent)) {
-                        // fast path, filename is normalized, and the folder already exists
-                        return parent;
-                    }
+                HierarchyNode parent;
+                if (_diskNodes.TryGetValue(Path.GetDirectoryName(Path.Combine(ProjectHome, strPath)) + "\\", out parent)) {
+                    // fast path, filename is normalized, and the folder already exists
+                    return parent;
                 }
 
                 string absPath = CommonUtils.GetAbsoluteFilePath(ProjectHome, strPath);
@@ -5478,13 +5474,9 @@ If the files in the existing folder have the same names as files in the folder y
 
             Debug.Assert(Path.IsPathRooted(name));
 
-            WeakReference<HierarchyNode> res;
-            if (_diskNodes.TryGetValue(name, out res)) {
-                HierarchyNode node = null;
-                res.TryGetTarget(out node);
-                return node;
-            }
-            return null;
+            HierarchyNode node;
+            _diskNodes.TryGetValue(name, out node);
+            return node;
         }
 
         /// <summary>
@@ -5692,7 +5684,7 @@ If the files in the existing folder have the same names as files in the folder y
 
             IDiskBasedNode diskNode = child as IDiskBasedNode;
             if (diskNode != null) {
-                _diskNodes[diskNode.Url] = new WeakReference<HierarchyNode>(child);
+                _diskNodes[diskNode.Url] = child;
             }
 
             if ((EventTriggeringFlag & ProjectNode.EventTriggering.DoNotTriggerHierarchyEvents) != 0) {
