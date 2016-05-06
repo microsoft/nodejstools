@@ -440,123 +440,6 @@ namespace Microsoft.NodejsTools {
             return base.GetService(serviceType);
         }
 
-        public static string NodejsReferencePath {
-            get {
-                return Path.Combine(
-                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                    "nodejsref.js"
-                );
-            }
-        }
-
-        public string BrowseForFileOpen(IntPtr owner, string filter, string initialPath = null) {
-            if (string.IsNullOrEmpty(initialPath)) {
-                initialPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal) + Path.DirectorySeparatorChar;
-            }
-
-            IVsUIShell uiShell = GetService(typeof(SVsUIShell)) as IVsUIShell;
-            if (null == uiShell) {
-                using (var sfd = new System.Windows.Forms.OpenFileDialog()) {
-                    sfd.AutoUpgradeEnabled = true;
-                    sfd.Filter = filter;
-                    sfd.FileName = Path.GetFileName(initialPath);
-                    sfd.InitialDirectory = Path.GetDirectoryName(initialPath);
-                    DialogResult result;
-                    if (owner == IntPtr.Zero) {
-                        result = sfd.ShowDialog();
-                    } else {
-                        result = sfd.ShowDialog(NativeWindow.FromHandle(owner));
-                    }
-                    if (result == DialogResult.OK) {
-                        return sfd.FileName;
-                    } else {
-                        return null;
-                    }
-                }
-            }
-
-            if (owner == IntPtr.Zero) {
-                ErrorHandler.ThrowOnFailure(uiShell.GetDialogOwnerHwnd(out owner));
-            }
-
-            VSOPENFILENAMEW[] openInfo = new VSOPENFILENAMEW[1];
-            openInfo[0].lStructSize = (uint)Marshal.SizeOf(typeof(VSOPENFILENAMEW));
-            openInfo[0].pwzFilter = filter.Replace('|', '\0') + "\0";
-            openInfo[0].hwndOwner = owner;
-            openInfo[0].nMaxFileName = 260;
-            var pFileName = Marshal.AllocCoTaskMem(520);
-            openInfo[0].pwzFileName = pFileName;
-            openInfo[0].pwzInitialDir = Path.GetDirectoryName(initialPath);
-            var nameArray = (Path.GetFileName(initialPath) + "\0").ToCharArray();
-            Marshal.Copy(nameArray, 0, pFileName, nameArray.Length);
-            try {
-                int hr = uiShell.GetOpenFileNameViaDlg(openInfo);
-                if (hr == VSConstants.OLE_E_PROMPTSAVECANCELLED) {
-                    return null;
-                }
-                ErrorHandler.ThrowOnFailure(hr);
-                return Marshal.PtrToStringAuto(openInfo[0].pwzFileName);
-            } finally {
-                if (pFileName != IntPtr.Zero) {
-                    Marshal.FreeCoTaskMem(pFileName);
-                }
-            }
-        }
-
-        public string BrowseForFileSave(IntPtr owner, string filter, string initialPath = null) {
-            if (string.IsNullOrEmpty(initialPath)) {
-                initialPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal) + Path.DirectorySeparatorChar;
-            }
-
-            IVsUIShell uiShell = GetService(typeof(SVsUIShell)) as IVsUIShell;
-            if (null == uiShell) {
-                using (var sfd = new System.Windows.Forms.SaveFileDialog()) {
-                    sfd.AutoUpgradeEnabled = true;
-                    sfd.Filter = filter;
-                    sfd.FileName = Path.GetFileName(initialPath);
-                    sfd.InitialDirectory = Path.GetDirectoryName(initialPath);
-                    DialogResult result;
-                    if (owner == IntPtr.Zero) {
-                        result = sfd.ShowDialog();
-                    } else {
-                        result = sfd.ShowDialog(NativeWindow.FromHandle(owner));
-                    }
-                    if (result == DialogResult.OK) {
-                        return sfd.FileName;
-                    } else {
-                        return null;
-                    }
-                }
-            }
-
-            if (owner == IntPtr.Zero) {
-                ErrorHandler.ThrowOnFailure(uiShell.GetDialogOwnerHwnd(out owner));
-            }
-
-            VSSAVEFILENAMEW[] saveInfo = new VSSAVEFILENAMEW[1];
-            saveInfo[0].lStructSize = (uint)Marshal.SizeOf(typeof(VSSAVEFILENAMEW));
-            saveInfo[0].pwzFilter = filter.Replace('|', '\0') + "\0";
-            saveInfo[0].hwndOwner = owner;
-            saveInfo[0].nMaxFileName = 260;
-            var pFileName = Marshal.AllocCoTaskMem(520);
-            saveInfo[0].pwzFileName = pFileName;
-            saveInfo[0].pwzInitialDir = Path.GetDirectoryName(initialPath);
-            var nameArray = (Path.GetFileName(initialPath) + "\0").ToCharArray();
-            Marshal.Copy(nameArray, 0, pFileName, nameArray.Length);
-            try {
-                int hr = uiShell.GetSaveFileNameViaDlg(saveInfo);
-                if (hr == VSConstants.OLE_E_PROMPTSAVECANCELLED) {
-                    return null;
-                }
-                ErrorHandler.ThrowOnFailure(hr);
-                return Marshal.PtrToStringAuto(saveInfo[0].pwzFileName);
-            } finally {
-                if (pFileName != IntPtr.Zero) {
-                    Marshal.FreeCoTaskMem(pFileName);
-                }
-            }
-        }
-
         public string BrowseForDirectory(IntPtr owner, string initialDirectory = null) {
             IVsUIShell uiShell = GetService(typeof(SVsUIShell)) as IVsUIShell;
             if (null == uiShell) {
@@ -750,7 +633,7 @@ namespace Microsoft.NodejsTools {
         internal VsProjectAnalyzer DefaultAnalyzer {
             get {
                 if (_analyzer == null) {
-                    _analyzer = new VsProjectAnalyzer();
+                    _analyzer = new VsProjectAnalyzer(IntellisenseOptionsPage.AnalysisLevel, IntellisenseOptionsPage.SaveToDisk);
                     LogLooseFileAnalysisLevel();
                     _analyzer.MaxLogLength = IntellisenseOptionsPage.AnalysisLogMax;
                     IntellisenseOptionsPage.AnalysisLevelChanged += IntellisenseOptionsPageAnalysisLevelChanged;
@@ -765,7 +648,7 @@ namespace Microsoft.NodejsTools {
         }
 
         private void IntellisenseOptionsPageAnalysisLevelChanged(object sender, EventArgs e) {
-            var analyzer = new VsProjectAnalyzer();
+            var analyzer = new VsProjectAnalyzer(IntellisenseOptionsPage.AnalysisLevel, IntellisenseOptionsPage.SaveToDisk);
             analyzer.SwitchAnalyzers(_analyzer);
             if (_analyzer.RemoveUser()) {
                 _analyzer.Dispose();

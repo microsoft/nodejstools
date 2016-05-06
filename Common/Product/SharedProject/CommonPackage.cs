@@ -129,6 +129,11 @@ namespace Microsoft.VisualStudioTools {
         /// </summary>
         /// <returns></returns>
         public static IWpfTextView GetActiveTextView(System.IServiceProvider serviceProvider) {
+            if (serviceProvider == null) {
+                Debug.Assert(false, "No service provider");
+                return null;
+            }
+
             var monitorSelection = (IVsMonitorSelection)serviceProvider.GetService(typeof(SVsShellMonitorSelection));
             if (monitorSelection == null) {
                 return null;
@@ -174,6 +179,10 @@ namespace Microsoft.VisualStudioTools {
         }
 
         internal static CommonProjectNode GetStartupProject(System.IServiceProvider serviceProvider) {
+            if (serviceProvider == null) {
+                Debug.Assert(false, "No service provider");
+                return null;
+            }
             var buildMgr = (IVsSolutionBuildManager)serviceProvider.GetService(typeof(IVsSolutionBuildManager));
             IVsHierarchy hierarchy;
             if (buildMgr != null && ErrorHandler.Succeeded(buildMgr.get_StartupProject(out hierarchy)) && hierarchy != null) {

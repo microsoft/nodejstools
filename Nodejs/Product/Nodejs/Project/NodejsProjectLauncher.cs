@@ -169,15 +169,6 @@ namespace Microsoft.NodejsTools.Project {
             return builder.ToString();
         }
 
-        private string TestServerPortString {
-            get {
-                if (!_testServerPort.HasValue) {
-                    _testServerPort = GetFreePort();
-                }
-                return _testServerPort.Value.ToString(CultureInfo.InvariantCulture);
-            }
-        }
-
         private int TestServerPort {
             get {
                 if (!_testServerPort.HasValue) {

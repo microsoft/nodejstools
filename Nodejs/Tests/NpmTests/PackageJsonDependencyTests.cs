@@ -345,17 +345,17 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestReadEmptyDependenciesNotNull() {
+        public void ReadEmptyDependenciesNotNull() {
             CheckEmptyDependenciesNotNull(LoadFrom(PkgSimple).Dependencies);
         }
 
         [TestMethod, Priority(0)]
-        public void TestReadEmptyDevDependenciesNotNull() {
+        public void ReadEmptyDevDependenciesNotNull() {
             CheckEmptyDependenciesNotNull(LoadFrom(PkgSimple).DevDependencies);
         }
 
         [TestMethod, Priority(0)]
-        public void TestReadEmptyOptionalDependenciesNotNull() {
+        public void ReadEmptyOptionalDependenciesNotNull() {
             CheckEmptyDependenciesNotNull(LoadFrom(PkgSimple).OptionalDependencies);
         }
 
@@ -467,27 +467,27 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestReadDependenciesWithVersionRange() {
+        public void ReadDependenciesWithVersionRange() {
             CheckDependencies(ReadDependencies(), VersionRangeDependencies);
         }
 
         [TestMethod, Priority(0)]
-        public void TestReadDependenciesWithUrls() {
+        public void ReadDependenciesWithUrls() {
             CheckDependencies(ReadDependencies(), UrlDependencies);
         }
 
         [TestMethod, Priority(0)]
-        public void TestReadDevDependenciesWithVersionRange() {
+        public void ReadDevDependenciesWithVersionRange() {
             CheckDependencies(ReadDevDependencies(), DevVersionRangeDependencies);
         }
 
         [TestMethod, Priority(0)]
-        public void TestReadDevDependenciesWithUrls() {
+        public void ReadDevDependenciesWithUrls() {
             CheckDependencies(ReadDevDependencies(), DevUrlDependencies);
         }
 
         [TestMethod, Priority(0)]
-        public void TestReadBundledDependencies() {
+        public void ReadBundledDependencies() {
             CheckStringArrayContents(
                 LoadFrom(PkgAllTheDependencies).BundledDependencies,
                 16,
@@ -495,7 +495,7 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestReadBundleDependencies() {
+        public void ReadBundleDependencies() {
             CheckStringArrayContents(
                 LoadFrom(PkgBundleDependencies).BundledDependencies,
                 16,
@@ -503,17 +503,17 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestReadOptionalDependenciesWithVersionRange() {
+        public void ReadOptionalDependenciesWithVersionRange() {
             CheckDependencies(ReadOptionalDependencies(), OptionalVersionRangeDependencies);
         }
 
         [TestMethod, Priority(0)]
-        public void TestReadOptionalDependenciesWithUrls() {
+        public void ReadOptionalDependenciesWithUrls() {
             CheckDependencies(ReadOptionalDependencies(), OptionalUrlDependencies);
         }
 
         [TestMethod, Priority(0)]
-        public void TestReadAllDependencies() {
+        public void ReadAllDependenciesTest() {
             CheckDependencies(
                 ReadAllDependencies(),
                 UrlDependencies.Concat(VersionRangeDependencies)

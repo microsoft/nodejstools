@@ -91,7 +91,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                     }
                 } catch (Exception ex) {
                     logger.SendMessage(TestMessageLevel.Error, ex.Message);
-                    throw ex;
+                    throw;
                 } finally {
                     // Disposing buildEngine does not clear the document cache in
                     // VS 2013, so manually unload all projects before disposing.

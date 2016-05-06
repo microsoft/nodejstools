@@ -550,14 +550,13 @@ namespace Microsoft.NodejsTools.TestAdapter {
             string projectPath;
             if (project != null &&
                 project.TryGetProjectPath(out projectPath) &&
+                !string.IsNullOrEmpty(projectPath) &&
                 _knownProjects.TryGetValue(projectPath, out projectInfo) &&
+                projectInfo != null &&
                 projectInfo.HasRequestedContainers) {
 
                 if (!_building || !_detectingChanges) {
-                    var evt = TestContainersUpdated;
-                    if (evt != null) {
-                        evt(this, EventArgs.Empty);
-                    }
+                    TestContainersUpdated?.Invoke(this, EventArgs.Empty);
                     return true;
                 }
             }

@@ -72,7 +72,7 @@ namespace AnalysisTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestVisible() {
+        public void Visible() {
             // make sure the order of adding modules doesn't matter...
             var analysis = Analysis.Analyze(
                 new AnalysisFile("app.js", "Object.app = 100\r\nabc = Object.quox"),

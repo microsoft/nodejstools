@@ -38,7 +38,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void TestErrorNewLine() {
+        public void ErrorNewLine() {
             Test((app, window) => {
                 Keyboard.Type("abc\r");
                 window.WaitForText("> abc", "ReferenceError: abc is not defined", "> ");
@@ -49,7 +49,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void TestColorOutput() {
+        public void ColorOutput() {
             Test((app, window) => {
                 Keyboard.Type("[1,2,3]\r");
                 window.WaitForText("> [1,2,3]", "[ 1, 2, 3 ]", "> ");
@@ -81,7 +81,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void TestStdErrIsRed() {
+        public void StdErrIsRed() {
             Test((app, window) => {
                 window.ReplWindow.Evaluator.ExecuteText("setTimeout(function () { not_a_fn(); }, 0);\r").Wait();
 
@@ -108,7 +108,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void TestCompletion() {
+        public void Completion() {
             Test((app, window) => {
                 Keyboard.Type("''.");
                 using (var session = window.WaitForSession<ICompletionSession>()) {
@@ -119,7 +119,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void TestNoSpecialCommandCompletion() {
+        public void NoSpecialCommandCompletion() {
             Test((app, window) => {
                 Keyboard.Type(".");
                 window.AssertNoIntellisenseSession();
