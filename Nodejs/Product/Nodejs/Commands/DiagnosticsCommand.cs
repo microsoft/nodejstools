@@ -102,10 +102,12 @@ namespace Microsoft.NodejsTools.Commands {
                     var njsProj = project.GetNodejsProject();
                     if (njsProj != null) {
                         var jsAnalyzer = njsProj.Analyzer;
-                        res.AppendLine("Analysis Log: ");
-                        
-                        using (StringWriter writer = new StringWriter(res)) {
-                            jsAnalyzer.DumpLog(writer);
+                        if (jsAnalyzer != null) {
+                            res.AppendLine("Analysis Log: ");
+
+                            using (StringWriter writer = new StringWriter(res)) {
+                                jsAnalyzer.DumpLog(writer);
+                            }
                         }
 
                         //foreach (var prop in interestingProjectProperties) {

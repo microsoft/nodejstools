@@ -633,7 +633,7 @@ namespace Microsoft.NodejsTools {
         internal VsProjectAnalyzer DefaultAnalyzer {
             get {
                 if (_analyzer == null) {
-                    _analyzer = new VsProjectAnalyzer();
+                    _analyzer = new VsProjectAnalyzer(IntellisenseOptionsPage.AnalysisLevel, IntellisenseOptionsPage.SaveToDisk);
                     LogLooseFileAnalysisLevel();
                     _analyzer.MaxLogLength = IntellisenseOptionsPage.AnalysisLogMax;
                     IntellisenseOptionsPage.AnalysisLevelChanged += IntellisenseOptionsPageAnalysisLevelChanged;
@@ -648,7 +648,7 @@ namespace Microsoft.NodejsTools {
         }
 
         private void IntellisenseOptionsPageAnalysisLevelChanged(object sender, EventArgs e) {
-            var analyzer = new VsProjectAnalyzer();
+            var analyzer = new VsProjectAnalyzer(IntellisenseOptionsPage.AnalysisLevel, IntellisenseOptionsPage.SaveToDisk);
             analyzer.SwitchAnalyzers(_analyzer);
             if (_analyzer.RemoveUser()) {
                 _analyzer.Dispose();
