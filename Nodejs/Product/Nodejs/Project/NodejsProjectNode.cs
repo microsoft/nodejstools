@@ -51,6 +51,7 @@ namespace Microsoft.NodejsTools.Project {
         private readonly Dictionary<NodejsProjectImageName, int> _imageIndexFromNameDictionary = new Dictionary<NodejsProjectImageName, int>();
 
 #if DEV14
+        private bool? shouldAcquireTypingsAutomatically;
         private TypingsAcquisition _typingsAcquirer;
 #endif
 
@@ -112,11 +113,16 @@ namespace Microsoft.NodejsTools.Project {
                     return false;
                 }
 
+                if (shouldAcquireTypingsAutomatically.HasValue) {
+                    return shouldAcquireTypingsAutomatically.Value;
+                }
+
                 var task = ProjectMgr.Site.GetUIThread().InvokeAsync(() => {
                     return IsTypeScriptProject;
                 });
                 task.Wait();
-                return !task.Result;
+                shouldAcquireTypingsAutomatically = !task.Result;
+                return shouldAcquireTypingsAutomatically.Value;
 #else
                 return false;
 #endif
@@ -304,6 +310,10 @@ namespace Microsoft.NodejsTools.Project {
                 // enable TypeScript on the project automatically...
                 SetProjectProperty(NodejsConstants.EnableTypeScript, "true");
                 SetProjectProperty(NodejsConstants.TypeScriptSourceMap, "true");
+#if DEV14
+                // Reset cached value, so it will be recalculated later.
+                this.shouldAcquireTypingsAutomatically = false;
+#endif
                 if (String.IsNullOrWhiteSpace(GetProjectProperty(NodejsConstants.TypeScriptModuleKind))) {
                     SetProjectProperty(NodejsConstants.TypeScriptModuleKind, NodejsConstants.CommonJSModuleKind);
                 }
@@ -483,9 +493,7 @@ namespace Microsoft.NodejsTools.Project {
                 if (_analyzer != null && _analyzer.RemoveUser()) {
                     _analyzer.Dispose();
                 }
-                _analyzer = new VsProjectAnalyzer(ProjectFolder);
-                _analyzer.MaxLogLength = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMax;
-                LogAnalysisLevel();
+                _analyzer = CreateNewAnalyser();
 
                 base.Reload();
 
@@ -502,6 +510,13 @@ namespace Microsoft.NodejsTools.Project {
                 // exist and remove them.
                 _analyzer.ReloadComplete();
             }
+        }
+
+        private VsProjectAnalyzer CreateNewAnalyser() {
+            var analyzer = new VsProjectAnalyzer(NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel, NodejsPackage.Instance.IntellisenseOptionsPage.SaveToDisk, ProjectFolder);
+            analyzer.MaxLogLength = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMax;
+            LogAnalysisLevel(analyzer);
+            return analyzer;
         }
 
         private void UpdateProjectNodeFromProjectProperties() {
@@ -536,8 +551,7 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private void LogAnalysisLevel() {
-            var analyzer = _analyzer;
+        private static void LogAnalysisLevel(VsProjectAnalyzer analyzer) {
             if (analyzer != null) {
                 NodejsPackage.Instance.Logger.LogEvent(Logging.NodejsToolsLogEvent.AnalysisLevel, (int)analyzer.AnalysisLevel);
             }
@@ -554,11 +568,10 @@ namespace Microsoft.NodejsTools.Project {
         }
         */
         private void IntellisenseOptionsPageAnalysisLevelChanged(object sender, EventArgs e) {
-
             var oldAnalyzer = _analyzer;
             _analyzer = null;
 
-            var analyzer = new VsProjectAnalyzer(ProjectFolder);
+            var analyzer = CreateNewAnalyser();
             Reanalyze(this, analyzer);
             if (oldAnalyzer != null) {
                 analyzer.SwitchAnalyzers(oldAnalyzer);
@@ -567,8 +580,6 @@ namespace Microsoft.NodejsTools.Project {
                 }
             }
             _analyzer = analyzer;
-            _analyzer.MaxLogLength = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMax;
-            LogAnalysisLevel();
         }
 
         private void AnalysisLogMaximumChanged(object sender, EventArgs e) {
@@ -687,8 +698,7 @@ namespace Microsoft.NodejsTools.Project {
                 nestedModulesDepth = ModulesNode.NpmController.RootPackage.Modules.GetDepth(fileNode.Url);
             }
 
-            if (_analyzer != null && _analyzer.Project != null &&
-                _analyzer.Project.Limits.IsPathExceedNestingLimit(nestedModulesDepth)) {
+            if (_analyzer != null && _analyzer.Limits.IsPathExceedNestingLimit(nestedModulesDepth)) {
                 return false;
             }
 
@@ -851,7 +861,6 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private static readonly Regex _uninstallRegex = new Regex(@"\b(uninstall|rm)\b");
-        private static readonly char[] _pathSeparators = { '\\', '/' };
         private bool _isCheckingForLongPaths;
 
         public async Task CheckForLongPaths(string npmArguments = null) {
@@ -979,6 +988,8 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
+        internal event EventHandler OnDispose;
+
         protected override void Dispose(bool disposing) {
             if (disposing) {
                 if (_analyzer != null) {
@@ -1008,6 +1019,16 @@ namespace Microsoft.NodejsTools.Project {
                 NodejsPackage.Instance.IntellisenseOptionsPage.SaveToDiskChanged -= IntellisenseOptionsPageSaveToDiskChanged;
                 NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevelChanged -= IntellisenseOptionsPageAnalysisLevelChanged;
                 NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMaximumChanged -= AnalysisLogMaximumChanged;
+                NodejsPackage.Instance.GeneralOptionsPage.ShowBrowserAndNodeLabelsChanged -= ShowBrowserAndNodeLabelsChanged;
+
+                OnDispose?.Invoke(this, EventArgs.Empty);
+
+                RemoveChild(ModulesNode);
+                ModulesNode?.Dispose();
+                ModulesNode = null;
+#if DEV14
+                _typingsAcquirer = null;
+#endif
             }
             base.Dispose(disposing);
         }
@@ -1139,9 +1160,11 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private bool ShowSetAsStartupFileCommandOnNode(IList<HierarchyNode> selectedNodes) {
+            if (selectedNodes.Count != 1) {
+                return false;
+            }
             var selectedNodeUrl = selectedNodes[0].Url;
-            return selectedNodes.Count == 1 &&
-                (IsCodeFile(selectedNodeUrl) ||
+            return (IsCodeFile(selectedNodeUrl) ||
                 // for some reason, the default express 4 template's startup file lacks an extension.
                 string.IsNullOrEmpty(Path.GetExtension(selectedNodeUrl)));
         }

@@ -40,7 +40,7 @@ namespace AnalysisTests {
         /// https://nodejstools.codeplex.com/workitem/945
         /// </summary>
         [TestMethod, Priority(0)]
-        public void TestFunctionApply() {
+        public void FunctionApply() {
             string code = @"
 function g() {
     this.abc = 42;
@@ -64,7 +64,7 @@ var x = new f().abc;
         /// https://nodejstools.codeplex.com/workitem/945
         /// </summary>
         [TestMethod, Priority(0)]
-        public void TestToString() {
+        public void ToStringTest() {
             string code = @"
 var x = new Object();
 var y = x.toString();
@@ -81,7 +81,7 @@ var y = x.toString();
         /// https://nodejstools.codeplex.com/workitem/965
         /// </summary>
         [TestMethod, Priority(0)]
-        public void TestBuiltinDoc() {
+        public void BuiltinDoc() {
             string code = @"
 var x = 'abc'
 ";
@@ -98,7 +98,7 @@ var x = 'abc'
         /// https://nodejstools.codeplex.com/workitem/935
         /// </summary>
         [TestMethod, Priority(0)]
-        public void TestAllMembers() {
+        public void AllMembers() {
             string code = @"
 function f() {
     if(true) {
@@ -123,7 +123,7 @@ var x = f();
         /// https://nodejstools.codeplex.com/workitem/950
         /// </summary>
         [TestMethod, Priority(0)]
-        public void TestReturnValues() {
+        public void ReturnValues() {
             string code = @"
 function f(x) {
     return x;
@@ -142,7 +142,7 @@ f({def:'abc'});
         }
 
         [TestMethod, Priority(0)]
-        public void TestArguments() {
+        public void Arguments() {
             string code = @"
 function f() {
     return arguments[0];
@@ -173,7 +173,7 @@ var z = g('abc', 0);
         }
 
         [TestMethod, Priority(0)]
-        public void TestAssignmentScope() {
+        public void AssignmentScope() {
             string code = @"
 var rjs;
 function f() {
@@ -198,7 +198,7 @@ x = g();";
         /// https://nodejstools.codeplex.com/workitem/987
         /// </summary>
         [TestMethod, Priority(0)]
-        public void TestMembersListsInvalidIdentifier() {
+        public void MembersListsInvalidIdentifier() {
             string code = @"
 var x = {};
 x['./foo/quox.js'] = 42;
@@ -219,7 +219,7 @@ var z = x['./foo/quox.js'];
 
 
         [TestMethod, Priority(0)]
-        public void TestPrimitiveMembers() {
+        public void PrimitiveMembers() {
             string code = @"
 var b = true;
 var n = 42.0;
@@ -264,7 +264,7 @@ function f() {
         }
 
         [TestMethod, Priority(0)]
-        public void TestArrayForEach() {
+        public void ArrayForEach() {
             string code = @"
 var arr = [1,2,3];
 function f(a) {
@@ -280,7 +280,7 @@ arr.forEach(f);
         }
 
         [TestMethod, Priority(0)]
-        public void TestArrayPush() {
+        public void ArrayPush() {
             string code = @"
 var arr = [];
 arr.push(42);
@@ -294,7 +294,7 @@ var x = arr[0];
         }
 
         [TestMethod, Priority(0)]
-        public void TestArrayPop() {
+        public void ArrayPop() {
             string code = @"
 var arr = [];
 arr.push(42);
@@ -316,7 +316,7 @@ var y = arr2.pop();
         }
 
         [TestMethod, Priority(0)]
-        public void TestArraySetIndex() {
+        public void ArraySetIndex() {
             string code = @"
 var arr = [];
 arr[0] = 42;
@@ -340,7 +340,7 @@ var y = arr2[0];
         }
 
         [TestMethod, Priority(0)]
-        public void TestArraySlice() {
+        public void ArraySlice() {
             string code = @"
 var arr = [1,2,3];
 var x = arr.slice(1,2)[0];
@@ -353,7 +353,7 @@ var x = arr.slice(1,2)[0];
         }
 
         [TestMethod, Priority(0)]
-        public void TestArrayConcat() {
+        public void ArrayConcat() {
             string code = @"
 var arr = ['abc', 'def'];
 x = {};
@@ -379,7 +379,7 @@ arr.concat('all').forEach(function f(a) {
         }
 
         [TestMethod, Priority(0)]
-        public void TestPrototypeGetter() {
+        public void PrototypeGetter() {
             string code = @"
 function MyObject() {
 }
@@ -400,7 +400,7 @@ var y = x.myprop;";
         }
 
         [TestMethod, Priority(0)]
-        public void TestFunctionDefineGetter() {
+        public void FunctionDefineGetter() {
             string code = @"function f() {
 }
 
@@ -415,7 +415,7 @@ var x = f.abc;";
         }
 
         [TestMethod, Priority(0)]
-        public void TestFunctionPrototypeLookup() {
+        public void FunctionPrototypeLookup() {
             string code = @"function f() {
 }
 
@@ -436,7 +436,7 @@ var x = f.xyz();
         }
 
         [TestMethod, Priority(0)]
-        public void TestProtoSetCorrectly() {
+        public void ProtoSetCorrectly() {
             string code = @"function f() { }
 f.prototype.abc = 42
 var x = (new f()).__proto__.abc;
@@ -449,7 +449,7 @@ var x = (new f()).__proto__.abc;
         }
 
         [TestMethod, Priority(0)]
-        public void TestInfiniteDescriptors() {
+        public void InfiniteDescriptors() {
             string code = @"x = {abc:42}
 
 function f(x) {
@@ -464,7 +464,7 @@ f(x)
         }
 
         [TestMethod, Priority(0)]
-        public void TestCopyDescriptor() {
+        public void CopyDescriptor() {
             string code = @"x = {abc:42}
 
 desc = Object.getOwnPropertyDescriptor(x, 'abc')
@@ -504,7 +504,7 @@ for(var propName in copied) {
         }
 
         [TestMethod, Priority(0)]
-        public void TestThisFlows() {
+        public void ThisFlows() {
             string code = @"
 function f() {
     this.func();
@@ -528,7 +528,7 @@ var x = new f().value;
         /// This needs to flow when our function call analysis exceeds our limits.
         /// </summary>
         [TestMethod, Priority(0)]
-        public void TestThisFlows2() {
+        public void ThisFlows2() {
             string code = @"
 var app = {};
 app.init = function() {
@@ -551,7 +551,7 @@ var x = app.foo;
         }
         
         [TestMethod, Priority(0)]
-        public void TestThisPassedAndReturned() {
+        public void ThisPassedAndReturned() {
             string code = @"function X(csv) {
     abc = 100;
     return csv;
@@ -606,7 +606,7 @@ SimpleTest.prototype._performRequest = function (webResource, body, options, cal
         }
 
         [TestMethod, Priority(0)]
-        public void TestPropertyGotoDef() {
+        public void PropertyGotoDef() {
             string code = @"
 Object.defineProperty(Object.prototype, 'should', { set: function() { }, get: function() { 42 } });
 var x = {};
@@ -623,7 +623,7 @@ var x = {};
         /// https://nodejstools.codeplex.com/workitem/1097
         /// </summary>
         [TestMethod, Priority(0)]
-        public void TestAttributeGotoDef() {
+        public void AttributeGotoDef() {
             string code = @"
 var x = {}; 
 x.abc = 42; 
@@ -642,7 +642,7 @@ x.abc
         /// https://nodejstools.codeplex.com/workitem/1464
         /// </summary>
         [TestMethod, Priority(0)]
-        public void TestBuiltinRequireGotoDef() {
+        public void BuiltinRequireGotoDef() {
             string code = @"
 var assert = require('assert'); 
 ";
@@ -656,7 +656,7 @@ var assert = require('assert');
         }
 
         [TestMethod, Priority(0)]
-        public void TestGlobals() {
+        public void Globals() {
             string code = @"
 var x = 42;
 ";
@@ -669,7 +669,7 @@ var x = 42;
         }
 
         [TestMethod, Priority(0)]
-        public void TestDefinitiveAssignmentScoping() {
+        public void DefinitiveAssignmentScoping() {
             string code = @"
 var x = {abc:42};
 x = x.abc;
@@ -685,7 +685,7 @@ x = x.abc;
         /// https://nodejstools.codeplex.com/workitem/949
         /// </summary>
         [TestMethod, Priority(0)]
-        public void TestDefinitiveAssignmentScoping2() {
+        public void DefinitiveAssignmentScoping2() {
             string code = @"
 a = b = c = 2;
 a
@@ -708,7 +708,7 @@ c
         }
 
         [TestMethod, Priority(0)]
-        public void TestSignatureHelp() {
+        public void SignatureHelp() {
             string code = @"
 function foo(x, y) {}
 foo(123, 'abc');
@@ -745,7 +745,7 @@ abc(abc);
         }
 
         [TestMethod, Priority(0), TestCategory("Ignore")]
-        public void TestJSDoc() {
+        public void JSDoc() {
             string code = @"
 /** Documentation for f.
   * 
@@ -801,7 +801,7 @@ Another paragraph that won't show up anywhere. This one has a {@link}.
         }
 
         [TestMethod, Priority(0)]
-        public void TestStringMembers() {
+        public void StringMembers() {
             string code = @"
 var x = 'abc';
 ";
@@ -813,7 +813,7 @@ var x = 'abc';
         }
 
         [TestMethod, Priority(0)]
-        public void TestBadIndexes() {
+        public void BadIndexes() {
             string code = @"
 var x = {};
 x[] = 42;
@@ -826,7 +826,7 @@ var y = x[];
         }
 
         [TestMethod, Priority(0)]
-        public void TestDefinitiveAssignmentMerged() {
+        public void DefinitiveAssignmentMerged() {
             string code = @"
 if(true) {
     y = 100;
@@ -844,7 +844,7 @@ x = y;
         }
 
         [TestMethod, Priority(0)]
-        public void TestDefinitiveAssignment() {
+        public void DefinitiveAssignment() {
             string code = @"
 a = 100;
 // int value
@@ -863,7 +863,7 @@ a = 'abc';
         }
 
         [TestMethod, Priority(0)]
-        public void TestDefinitiveAssignmentNested() {
+        public void DefinitiveAssignmentNested() {
             string code = @"
 a = 100;
 // a int value
@@ -906,7 +906,7 @@ b = 'abc';
         /// we return the value if the function returns an object.
         /// </summary>
         [TestMethod, Priority(0)]
-        public void TestConstruct() {
+        public void Construct() {
             var code = @"function f() {
      return {abc:42};
 }
@@ -951,7 +951,7 @@ var x = new f();
         }
 
         [TestMethod, Priority(0)]
-        public void TestConstructReturnFunction() {
+        public void ConstructReturnFunction() {
             var code = @"function f() {
      function inner() {
      }
@@ -978,7 +978,7 @@ var x = new f();
 
 
         [TestMethod, Priority(0)]
-        public void TestExports() {
+        public void Exports() {
             string code = @"
 exports.num = 42;
 module.exports.str = 'abc'
@@ -995,7 +995,7 @@ module.exports.str = 'abc'
         }
 
         [TestMethod, Priority(0)]
-        public void TestAccessorDescriptor() {
+        public void AccessorDescriptor() {
             string code = @"
 function f() {
 }
@@ -1010,7 +1010,7 @@ x = f.foo;
         }
 
         [TestMethod, Priority(0)]
-        public void TestDefineProperties() {
+        public void DefineProperties() {
             string code = @"
 function f() {
 }
@@ -1032,7 +1032,7 @@ x = f.abc;
         /// we need to enqueue the callers.
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Ignore")]
-        public void TestDefinePropertiesDependencies() {
+        public void DefinePropertiesDependencies() {
             string code = @"
 var x =  {};
 var properties = function() {
@@ -1071,7 +1071,7 @@ Object.defineProperties(x, createProperties());
         }
 
         [TestMethod, Priority(0)]
-        public void TestFunctionExpression() {
+        public void FunctionExpression() {
             string code = @"
 var abc = {abc: function abcdefg() { } };
 var x = abcdefg;
@@ -1081,7 +1081,7 @@ var x = abcdefg;
         }
 
         [TestMethod, Priority(0)]
-        public void TestGlobal() {
+        public void Global() {
             var analysis = ProcessText(";");
 
             AssertUtil.ContainsExactly(
@@ -1097,7 +1097,7 @@ var x = abcdefg;
         }
 
         [TestMethod, Priority(0)]
-        public void TestNumberFunction() {
+        public void NumberFunction() {
             var analysis = ProcessText(";");
 
             foreach (var numberValue in new[] { "length", "MAX_VALUE", "MIN_VALUE", "NaN", "NEGATIVE_INFINITY", "POSITIVE_INFINITY" }) {
@@ -1136,7 +1136,7 @@ var x = abcdefg;
         }
 
         [TestMethod, Priority(0)]
-        public void TestSimpleClosure() {
+        public void SimpleClosure() {
             var code = @" function f()
 {
  var x = 42;
@@ -1158,7 +1158,7 @@ var x = abcdefg;
         //}
 
         [TestMethod, Priority(0)]
-        public void TestNumber() {
+        public void Number() {
             string code = "x = 42;";
             var analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
@@ -1174,7 +1174,7 @@ var x = abcdefg;
         }
 
         [TestMethod, Priority(0)]
-        public void TestVariableLookup() {
+        public void VariableLookup() {
             string code = "x = 42; y = x;";
             var analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
@@ -1184,7 +1184,7 @@ var x = abcdefg;
         }
 
         [TestMethod, Priority(0)]
-        public void TestVariableDeclaration() {
+        public void VariableDeclaration() {
             var analysis = ProcessText("var x = 42;");
             AssertUtil.ContainsExactly(
                 analysis.GetTypeIdsByIndex("x", 0),
@@ -1193,7 +1193,7 @@ var x = abcdefg;
         }
 
         [TestMethod, Priority(0)]
-        public void TestStringLiteral() {
+        public void StringLiteral() {
             string code = "x = 'abc';";
             var analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
@@ -1203,7 +1203,7 @@ var x = abcdefg;
         }
 
         [TestMethod, Priority(0)]
-        public void TestArrayLiteral() {
+        public void ArrayLiteral() {
             string code = "x = [1,2,3];";
             var analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
@@ -1213,7 +1213,7 @@ var x = abcdefg;
         }
 
         [TestMethod, Priority(0)]
-        public void TestTrueFalse() {
+        public void TrueFalse() {
             string code = "x = true;";
             var analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
@@ -1230,7 +1230,7 @@ var x = abcdefg;
         }
 
         [TestMethod, Priority(0)]
-        public void TestSpecializedExtend() {
+        public void SpecializedExtend() {
             var code = @"function extend(obj) {
     if (!_.isObject(obj)) return obj;
     var source, prop;
@@ -1260,7 +1260,7 @@ extend(x, {abc:42});
         }
 
         [TestMethod, Priority(0)]
-        public void TestBackboneExtend() {
+        public void BackboneExtend() {
             var code = @"function extend(protoProps, staticProps) {
     var parent = this;
     var child;
@@ -1306,7 +1306,7 @@ var myinst = new myclass();
         }
 
         [TestMethod, Priority(0)]
-        public void TestLodashAssign() {
+        public void LodashAssign() {
             var code = @"
 var assign = function(object, source, guard) {
      var index, iterable = object, result = iterable;
@@ -1351,7 +1351,7 @@ var z = y.abc;
         }
 
         [TestMethod, Priority(0)]
-        public void TestObjectKeys() {
+        public void ObjectKeys() {
             var code = @"
 var foo = {};
 
@@ -1382,7 +1382,7 @@ var str = foo.str.value;
 
 
         [TestMethod, Priority(0)]
-        public void TestObjectLiteral() {
+        public void ObjectLiteral() {
             string code = "x = {abc:42};";
             var analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
@@ -1420,7 +1420,7 @@ var str = foo.str.value;
         }
 
         [TestMethod, Priority(1)]
-        public void TestConstructor() {
+        public void Constructor() {
             var code = @"function f() {
 	this.abc = 42;
 }
@@ -1442,7 +1442,7 @@ var z = y.abc";
         }
 
         [TestMethod, Priority(2)]
-        public void TestForInLoop() {
+        public void ForInLoop() {
             var analysis = ProcessText("for(var x in ['a','b','c']) { }");
             AssertUtil.ContainsExactly(
                 analysis.GetTypeIdsByIndex("x", 0),
@@ -1461,7 +1461,7 @@ var z = y.abc";
 
 
         [TestMethod, Priority(0)]
-        public void TestFunctionCreation() {
+        public void FunctionCreation() {
             var analysis = ProcessText(@"function f() {
 }
 f.prototype.abc = 42
@@ -1487,7 +1487,7 @@ var x = f.prototype.constructor.abc;
         }
 
         [TestMethod, Priority(0)]
-        public void TestPrototypeNoMerge() {
+        public void PrototypeNoMerge() {
             var analysis = ProcessText(@"
 var abc = Function.prototype;
 abc.bar = 42;
@@ -1504,7 +1504,7 @@ var x = new f().bar;
         /// This shouldn't stack overflow...
         /// </summary>
         [TestMethod, Priority(0)]
-        public void TestRecursiveForEach() {
+        public void RecursiveForEach() {
             var analysis = ProcessText(@"
 var x = [null];
 x[0] = x.forEach;
@@ -1516,7 +1516,7 @@ x.forEach(x.forEach);
         /// Array instances created via array constructor should be unique
         /// </summary>
         [TestMethod, Priority(0)]
-        public void TestNewArrayUnique() {
+        public void NewArrayUnique() {
             var analysis = ProcessText(@"
 var arr1 = new Array(5);
 var arr2 = new Array(10);
@@ -1539,7 +1539,7 @@ arr2.foo = 'abc';
         /// Array instances created via array constructor should be unique
         /// </summary>
         [TestMethod, Priority(0)]
-        public void TestNewObjectUnique() {
+        public void NewObjectUnique() {
             var analysis = ProcessText(@"
 var obj1 = new Object(5);
 var obj2 = new Object(10);
@@ -1559,7 +1559,7 @@ obj2.foo = 'abc';
         }
 
         [TestMethod, Priority(0)]
-        public void TestObjectInstanceNoPrototype() {
+        public void ObjectInstanceNoPrototype() {
             var analysis = ProcessText(@"
 var x = new Object().prototype;
 var y = {}.prototype;
@@ -1575,7 +1575,7 @@ var y = {}.prototype;
         }
 
         [TestMethod, Priority(0)]
-        public void TestKeysSpecialization() {
+        public void KeysSpecialization() {
             var analysis = ProcessText(@"
 function keys(o) {
   var a = []
@@ -1592,7 +1592,7 @@ var x = keys({'abc':42});
         }
 
         [TestMethod, Priority(0)]
-        public void TestMergeSpecialization() {
+        public void MergeSpecialization() {
             var analysis = ProcessText(@"function merge(a, b){
   if (a && b) {
     for (var key in b) {
@@ -1621,7 +1621,7 @@ var x = g.abc;
         }
 
         [TestMethod, Priority(0)]
-        public void TestMergeDescriptorsSpecialization() {
+        public void MergeDescriptorsSpecialization() {
             var analysis = ProcessText(@"var merge = function exports(dest, src) {
     Object.getOwnPropertyNames(src).forEach(function (name) {
         var descriptor = Object.getOwnPropertyDescriptor(src, name)
@@ -1649,7 +1649,7 @@ var x = g.abc;
         }
 
         [TestMethod, Priority(0)]
-        public void TestToObjectSpecialization() {
+        public void ToObjectSpecialization() {
             var analysis = ProcessText(@"function toObject(value) {
       return isObject(value) ? value : Object(value);
     }
@@ -1663,7 +1663,7 @@ var x = toObject('abc');
         }
 
         [TestMethod, Priority(0)]
-        public void TestMergeSpecialization2() {
+        public void MergeSpecialization2() {
             var analysis = ProcessText(@"function merge (to, from) {
   var keys = Object.keys(from)
     , i = keys.length
@@ -1702,7 +1702,7 @@ var x = g.abc;
         }
 
         [TestMethod, Priority(0)]
-        public void TestMergeCloneSpecialization2() {
+        public void MergeCloneSpecialization2() {
             var analysis = ProcessText(@"function mergeClone (to, from) {
   var keys = Object.keys(from)
     , i = keys.length
@@ -1746,7 +1746,7 @@ var x = g.abc;
 
 
         [TestMethod, Priority(0)]
-        public void TestCloneSpecialization() {
+        public void CloneSpecialization() {
             var analysis = ProcessText(@"function clone (obj) {
   if (obj === undefined || obj === null)
     return obj;
@@ -1764,7 +1764,7 @@ var y = x.abc;
         }
 
         [TestMethod, Priority(0)]
-        public void TestWrapFunctionSpecialization() {
+        public void WrapFunctionSpecialization() {
             var code = @"function wrapfunction(fn, message) {
   if (typeof fn !== 'function') {
     throw new TypeError('argument fn must be a function')
@@ -1802,7 +1802,7 @@ var res = wrapped(42);
         }
 
         [TestMethod, Priority(0)]
-        public void TestStringCasing() {
+        public void StringCasing() {
             string code = @"
 var x = {};
 ['upper'].forEach(function f(attr) { x[attr.toUpperCase()] = 42; });
@@ -1823,7 +1823,7 @@ var x = {};
         }
 
         [TestMethod, Priority(0)]
-        public void TestBuiltinFunctionDocumentation() {
+        public void BuiltinFunctionDocumentation() {
             string code = @"
 var func = Object.defineProperties;
 ";
@@ -1838,7 +1838,7 @@ var func = Object.defineProperties;
         /// are defined by JavaScript
         /// </summary>
         [TestMethod, Priority(0)]
-        public void TestImmutableObjects() {
+        public void ImmutableObjects() {
             string code = @"
 global.Infinity = 'abc'
 var x = global.Infinity";
@@ -1854,7 +1854,7 @@ var x = global.Infinity";
         /// https://nodejstools.codeplex.com/workitem/1039
         /// </summary>
         [TestMethod, Priority(0)]
-        public void TestNodejsCallbacks() {
+        public void NodejsCallbacks() {
             string code = @"
 var http = require('http');
 var https = require('https');
@@ -1971,7 +1971,7 @@ net.connect('', function(c) {
         /// https://nodejstools.codeplex.com/workitem/914
         /// </summary>
         [TestMethod, Priority(0)]
-        public void TestNodejsSpecializations() {
+        public void NodejsSpecializations() {
             string code = @"
 var pid = process.pid;
 var platform = process.platform;
@@ -1991,7 +1991,7 @@ var title = process.title;
         /// https://nodejstools.codeplex.com/workitem/1077
         /// </summary>
         [TestMethod, Priority(0)]
-        public void TestNodejsPathMembers() {
+        public void NodejsPathMembers() {
             string code = @"
 var path = require('path');
 var join = path.join('a', 'b');
@@ -2019,7 +2019,7 @@ var extname = path.extname('/tmp/foo.txt');
         /// https://nodejstools.codeplex.com/workitem/1077
         /// </summary>
         [TestMethod, Priority(0)]
-        public void TestNodejsBufferInstanceMembers() {
+        public void NodejsBufferInstanceMembers() {
             string code = @"
 var buf1 = new require('buffer').Buffer(42);
 var buf2 = require('buffer').Buffer(42);";
@@ -2042,7 +2042,7 @@ var buf2 = require('buffer').Buffer(42);";
         }
 
         [TestMethod, Priority(0)]
-        public void TestNodejsCreateFunctions() {
+        public void NodejsCreateFunctions() {
             var code = @"var x = require('http').createServer(null, null);
 var y = require('net').createServer(null, null);
 ";
@@ -2060,7 +2060,7 @@ var y = require('net').createServer(null, null);
 
 
         [TestMethod, Priority(0)]
-        public void TestSetPrototypeSpecialization() {
+        public void SetPrototypeSpecialization() {
             StringBuilder code = new StringBuilder(@"function setProto(obj, proto) {
   if (typeof Object.setPrototypeOf === 'function')
     return Object.setPrototypeOf(obj, proto)
@@ -2103,7 +2103,7 @@ var y = require('net').createServer(null, null);
         }
 
         [TestMethod, Priority(0)]
-        public void TestCopySpecialization() {
+        public void CopySpecialization() {
             var analysis = ProcessText(@"function copy (obj) {
   var o = {}
   Object.keys(obj).forEach(function (i) {
@@ -2130,7 +2130,7 @@ var abc2 = c2.bar;
         }
 
         [TestMethod, Priority(0)]
-        public void TestCreateSpecialization() {
+        public void CreateSpecialization() {
             var analysis = ProcessText(@"function F() {
 }
 
@@ -2153,7 +2153,7 @@ abc2 = create({bar:'abc'}).bar
         }
 
         [TestMethod, Priority(0)]
-        public void TestFunctionParametersMultipleCallers() {
+        public void FunctionParametersMultipleCallers() {
             var analysis = ProcessText(@"function f(a) {
     return a;
 }
@@ -2172,7 +2172,7 @@ var y = f('abc');
         }
 
         [TestMethod, Priority(0)]
-        public void TestFunctionParameters() {
+        public void FunctionParameters() {
             var analysis = ProcessText(@"function x(a) { return a; }
 var y = x(42);");
             AssertUtil.ContainsExactly(
@@ -2182,7 +2182,7 @@ var y = x(42);");
         }
 
         [TestMethod, Priority(0)]
-        public void TestFunctionReturn() {
+        public void FunctionReturn() {
             var analysis = ProcessText("function x() { return 42; }");
             AssertUtil.ContainsExactly(
                 analysis.GetTypeIdsByIndex("x()", 0),
@@ -2191,7 +2191,7 @@ var y = x(42);");
         }
 
         [TestMethod, Priority(0)]
-        public void TestFunction() {
+        public void Function() {
             var analysis = ProcessText("function x() { }");
             AssertUtil.ContainsExactly(
                 analysis.GetTypeIdsByIndex("x", 0),
@@ -2236,7 +2236,7 @@ var y = x(42);");
         }
 
         [TestMethod, Priority(0)]
-        public void TestNewFunction() {
+        public void NewFunction() {
             string code = "function y() { return 42; }\r\nx = new y();";
             var analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
@@ -2253,7 +2253,7 @@ var y = x(42);");
         }
 
         [TestMethod, Priority(0)]
-        public void TestNewFunctionInstanceVariable() {
+        public void NewFunctionInstanceVariable() {
             string code = "function f() { this.abc = 42; }\r\nx = new f();";
             var analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
@@ -2278,7 +2278,7 @@ abcy = new y();";
         }
 
         [TestMethod, Priority(0)]
-        public void TestSimplePrototype() {
+        public void SimplePrototype() {
             string code = @"
 function f() {
 }
@@ -2298,7 +2298,7 @@ x = new j();
         }
 
         [TestMethod, Priority(0)]
-        public void TestTypeOf() {
+        public void TypeOf() {
             string code = "x = typeof 42;";
             var analysis = ProcessText(code);
             AssertUtil.ContainsExactly(
@@ -2308,7 +2308,7 @@ x = new j();
         }
 
         [TestMethod, Priority(0)]
-        public void TestVariableShadowing() {
+        public void VariableShadowing() {
             var code = @"var a = 'abc';
 function f() {
 console.log(a);
@@ -2328,7 +2328,7 @@ f();";
         }
 
         [TestMethod, Priority(0)]
-        public void TestFunctionExpressionNameScoping() {
+        public void FunctionExpressionNameScoping() {
             var code = @"var x = function abc() {
     // here
     var x = 42;
@@ -2351,7 +2351,7 @@ x.bar = 42;
 
 
         [TestMethod, Priority(0)]
-        public void TestFunctionExpressionNameScopingNested() {
+        public void FunctionExpressionNameScopingNested() {
             var code = @"
 function f() {
     var x = function abc() {
@@ -2377,7 +2377,7 @@ function f() {
         }
         
         [TestMethod, Priority(0)]
-        public void TestFunctionClosureCall() {
+        public void FunctionClosureCall() {
             var code = @"function abc() {
     function g(x) {
         function inner() {
@@ -2404,7 +2404,7 @@ var y = abc()('abc');
 
 
         [TestMethod, Priority(0)]
-        public void TestTypes() {
+        public void Types() {
             string code = "x = {undefined:undefined, number:42, string:'str', null:null, boolean:true, function: function() {}, object: {}}";
             var analysis = ProcessText(code);
             var testCases = new[] { 
@@ -2434,7 +2434,7 @@ var y = abc()('abc');
         }
 
         [TestMethod, Priority(0)]
-        public void TestDateTime() {
+        public void DateTime() {
             var code = @"var d = Date;
 ";
 
@@ -2456,7 +2456,7 @@ var y = abc()('abc');
         }
 
         [TestMethod, Priority(0)]
-        public void TestDescriptions() {
+        public void Descriptions() {
             var code = @"var n = 1;
 var b = true;
 var s = 'str';
@@ -2490,7 +2490,7 @@ var undef = undefined;
         }
 
         [TestMethod, Priority(0)]
-        public void TestUtilInherits() {
+        public void UtilInherits() {
             var code = @"util = require('util');
 
 function f() {
@@ -2517,7 +2517,7 @@ var abc = new f().abc;
         }
 
         [TestMethod, Priority(0)]
-        public void TestUtilInherits2() {
+        public void UtilInherits2() {
             var code = @"util = require('util');
 
 function f() {
@@ -2548,7 +2548,7 @@ var abc = new g().abc;
         /// to the internal [[Prototype]] property.
         /// </summary>
         [TestMethod, Priority(0)]
-        public void TestDunderProto() {
+        public void DunderProto() {
             // shouldn't crash
             var code = @"
 function f() { }
@@ -2574,7 +2574,7 @@ var x = new f().abc;
         /// https://nodejstools.codeplex.com/workitem/974
         /// </summary>
         [TestMethod, Priority(0)]
-        public void TestInvalidGrouping() {
+        public void InvalidGrouping() {
             // shouldn't crash
             var code = @"var x = ();
 ";
@@ -2601,7 +2601,7 @@ Class.prototype.foo = function(fn) {
         }
 
         [TestMethod, Priority(0)]
-        public void TestEventEmitter() {
+        public void EventEmitter() {
             var code = @"
 var events = require('events')
 ee = new events.EventEmitter();
@@ -2619,7 +2619,7 @@ ee.emit('myevent', 42)
         }
 
         [TestMethod, Priority(0)]
-        public void TestAnalysisWrapperLifetime() {
+        public void AnalysisWrapperLifetime() {
                 var server1 = @"var mymod = require('./mymod.js');
 mymod.value = {abc:42}";
                 var server2 = @"var mymod = require('./mymod.js');
@@ -2645,7 +2645,7 @@ exports.f = f;
         }
 
         [TestMethod, Priority(0)]
-        public void TestExportsLocation() {
+        public void ExportsLocation() {
             var server = @"var mymod = require('./mymod.js');";
             var entries = Analysis.Analyze(
                 new AnalysisFile("server.js", server),
@@ -2663,7 +2663,7 @@ exports.f = f;
         }
 
         [TestMethod, Priority(0)]
-        public void TestBadString() {
+        public void BadString() {
             var code = "var x = '\uD83D';";
             var analysis = ProcessText(code);
             AssertUtil.ContainsExactly(

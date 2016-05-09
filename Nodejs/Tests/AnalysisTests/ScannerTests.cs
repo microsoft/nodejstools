@@ -26,7 +26,7 @@ namespace AnalysisTests {
     [TestClass]
     public class ScannerTests {
         [TestMethod, Priority(0)]
-        public void TestPartialScanning() {
+        public void PartialScanning() {
             var code1 = "/* hello world ";
             var code2 = "   goodbye */";
             CollectingErrorSink errorSink = new CollectingErrorSink(true);
@@ -51,7 +51,7 @@ namespace AnalysisTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Ignore")]
-        public void TestOperators() {
+        public void Operators() {
             var code = @"x %= 1
 x &= 1
 x *= 1
@@ -130,7 +130,7 @@ x /= 1
         }
 
         [TestMethod, Priority(0)]
-        public void TestNumericLiteral() {
+        public void NumericLiteral() {
             var code = @".123";
 
             VerifyTokens(
@@ -143,7 +143,7 @@ x /= 1
         }
 
         [TestMethod, Priority(0)]
-        public void TestIllegalEscape() {
+        public void IllegalEscape() {
             var code = "\\while";
 
             VerifyTokens(
@@ -158,7 +158,7 @@ x /= 1
         }
 
         [TestMethod, Priority(0)]
-        public void TestIllegalEscapeRead() {
+        public void IllegalEscapeRead() {
             var code = "\\while";
 
             VerifyTokens(
@@ -173,7 +173,7 @@ x /= 1
         }
 
         [TestMethod, Priority(0)]
-        public void TestLineTerminators() {
+        public void LineTerminators() {
             var code = "\u2028 \u2029";
 
             VerifyTokens(
@@ -186,7 +186,7 @@ x /= 1
         }
 
         [TestMethod, Priority(0)]
-        public void TestUnicodeIdentifiers() {
+        public void UnicodeIdentifiers() {
             var code = "\u0257abc";
 
             VerifyTokens(
@@ -197,7 +197,7 @@ x /= 1
         }
 
         [TestMethod, Priority(0)]
-        public void TestUnicodeWhiteSpace() {
+        public void UnicodeWhiteSpace() {
             var code = "\u00a0\u00a0";
 
             VerifyTokens(
@@ -208,7 +208,7 @@ x /= 1
         }
 
         [TestMethod, Priority(0)]
-        public void TestUnicodeIllegalCharacter() {
+        public void UnicodeIllegalCharacter() {
             var code = "`";
 
             VerifyTokens(
@@ -222,7 +222,7 @@ x /= 1
         }
 
         [TestMethod, Priority(0)]
-        public void TestRegularExpressionLiteral() {
+        public void RegularExpressionLiteral() {
             var code = @"x = /foo/";
 
             VerifyTokens(
@@ -236,7 +236,7 @@ x /= 1
         }
 
         [TestMethod, Priority(0)]
-        public void TestBadNumericLiteral() {
+        public void BadNumericLiteral() {
             var code = @"1Z";
 
             VerifyTokens(
@@ -261,7 +261,7 @@ x /= 1
         }
         
         [TestMethod, Priority(0)]
-        public void TestOctalStringLiterals() {
+        public void OctalStringLiterals() {
             var code = @"'\10'";
 
             VerifyTokens(
@@ -319,7 +319,7 @@ x /= 1
         }
 
         [TestMethod, Priority(0), TestCategory("Ignore")]
-        public void TestUnterminatedString() {
+        public void UnterminatedString() {
             var code = @"'abc
 ";
 
@@ -344,7 +344,7 @@ x /= 1
         }
 
         [TestMethod, Priority(0)]
-        public void TestHexEscape() {
+        public void HexEscape() {
             var code = "'\\xAA'";
 
             VerifyTokens(
@@ -356,7 +356,7 @@ x /= 1
         }
 
         [TestMethod, Priority(0)]
-        public void TestHexEscape2() {
+        public void HexEscape2() {
             var code = "'\\xaa'";
 
             VerifyTokens(
@@ -368,7 +368,7 @@ x /= 1
         }
 
         [TestMethod, Priority(0)]
-        public void TestInvalidHexEscape() {
+        public void InvalidHexEscape() {
             var code = "'\\xZZ'";
 
             VerifyTokens(
@@ -401,7 +401,7 @@ x /= 1
         }
 
         [TestMethod, Priority(0)]
-        public void TestInvalidUnicodeEscape() {
+        public void InvalidUnicodeEscape() {
             var code = "'\\uZZZZ'";
 
             VerifyTokens(
@@ -454,7 +454,7 @@ x /= 1
         }
 
         [TestMethod, Priority(0)]
-        public void TestIllegalCharacter() {
+        public void IllegalCharacter() {
             var code = "\0\0";
 
             VerifyTokens(
@@ -468,7 +468,7 @@ x /= 1
         }
 
         [TestMethod, Priority(0), TestCategory("Ignore")]
-        public void TestMultilineComment() {
+        public void MultilineComment() {
             var code = @"/*
 hello world
 */";
@@ -481,7 +481,7 @@ hello world
         }
 
         [TestMethod, Priority(0), TestCategory("Ignore")]
-        public void TestMultilineCommentUnterminated() {
+        public void MultilineCommentUnterminated() {
             var code = @"/*
 hello world
 ";
@@ -494,7 +494,7 @@ hello world
         }
 
         [TestMethod, Priority(0)]
-        public void TestPositions() {
+        public void Positions() {
             var code = "one\n\ntwo";
 
             VerifyTokens(

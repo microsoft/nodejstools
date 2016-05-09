@@ -32,11 +32,7 @@ namespace Microsoft.NodejsTools.Commands {
     /// Provides the command for starting a file or the start item of a project in the REPL window.
     /// </summary>
     internal sealed class DiagnosticsCommand : Command {
-        private readonly IServiceProvider _serviceProvider;
-
-        public DiagnosticsCommand(IServiceProvider serviceProvider) {
-            _serviceProvider = serviceProvider;
-        }
+        public DiagnosticsCommand(IServiceProvider serviceProvider) { }
 
         public override void DoCommand(object sender, EventArgs args) {
             var dlg = new DiagnosticsForm("Gathering data...");
@@ -106,10 +102,12 @@ namespace Microsoft.NodejsTools.Commands {
                     var njsProj = project.GetNodejsProject();
                     if (njsProj != null) {
                         var jsAnalyzer = njsProj.Analyzer;
-                        res.AppendLine("Analysis Log: ");
-                        
-                        using (StringWriter writer = new StringWriter(res)) {
-                            jsAnalyzer.DumpLog(writer);
+                        if (jsAnalyzer != null) {
+                            res.AppendLine("Analysis Log: ");
+
+                            using (StringWriter writer = new StringWriter(res)) {
+                                jsAnalyzer.DumpLog(writer);
+                            }
                         }
 
                         //foreach (var prop in interestingProjectProperties) {

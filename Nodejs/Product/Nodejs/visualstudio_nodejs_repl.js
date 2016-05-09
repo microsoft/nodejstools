@@ -13,6 +13,7 @@
 //    permissions and limitations under the License.
 //
 //*********************************************************//
+"use strict";
 
 if (process.argv.length <= 2) {
     console.log('Repl requires port number to connect to');
@@ -91,10 +92,13 @@ var vm = require('vm');
 var context = global;
 context.require = require;
 context.module = module;
+vm.createContext(context);
 
 util.inspect.styles['number'] = 'blue';
 util.inspect.styles['boolean'] = 'blue';
 util.inspect.colors['blue'] = [94, 39];
+
+var evalPrefix = "'use strict'; undefined;"
 
 function processRequest(command) {
     switch (command["type"]) {
@@ -107,17 +111,17 @@ function processRequest(command) {
                 if (!/^\s*function/.test(command["code"])) {
                     try {
                         // object literals are ambigious, so first try w/ parens.
-                        obj = eval.call(context, '(' + command["code"] + ')');
+                        obj = vm.runInContext(evalPrefix + '(' + command["code"] + ')', context);
                     } catch (err) {
                         // fallback to normal code if we can't parse this.
                         if (err.toString().substr(0, 12) == 'SyntaxError:') {
-                            obj = eval.call(context, command["code"]);
+                            obj = vm.runInContext(evalPrefix + command["code"], context);
                         } else {
                             throw err;
                         }
                     }
                 } else {
-                    obj = eval.call(context, command["code"]);
+                    obj = vm.runInContext(evalPrefix + '(' + command["code"] + ')', context);
                 }
                 
                 var result = util.inspect(obj, undefined, undefined, true);
@@ -141,7 +145,7 @@ function processRequest(command) {
     }
 }
 
-reader_state = { 'prevData': Buffer(0), 'state': 'header' }
+var reader_state = { 'prevData': Buffer(0), 'state': 'header' }
 
 client.on('data', function (data) {
     try {

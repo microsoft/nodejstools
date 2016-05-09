@@ -45,12 +45,9 @@ namespace Microsoft.NodejsTools {
     internal sealed class EditFilter : IOleCommandTarget {
         private readonly ITextView _textView;
         private readonly System.IServiceProvider _serviceProvider;
-        private readonly IEditorOperations _editorOps;
         private readonly IIntellisenseSessionStack _intellisenseStack;
         private readonly IComponentModel _compModel;
-        private readonly IClassifier _classifier;
         private readonly IIncrementalSearch _incSearch;
-        private readonly ICompletionBroker _broker;
         private readonly IEditorOptions _editorOptions;
         private IOleCommandTarget _next;
         private ICompletionSession _activeSession;
@@ -58,22 +55,11 @@ namespace Microsoft.NodejsTools {
         public EditFilter(System.IServiceProvider serviceProvider, ITextView textView, IEditorOperations editorOps, IEditorOptions editorOptions, IIntellisenseSessionStack intellisenseStack, IComponentModel compModel) {
             _serviceProvider = serviceProvider;
             _textView = textView;
-            _editorOps = editorOps;
             _intellisenseStack = intellisenseStack;
             _compModel = compModel;
             var agg = _compModel.GetService<IClassifierAggregatorService>();
-            _classifier = agg.GetClassifier(textView.TextBuffer);
             _incSearch = _compModel.GetService<IIncrementalSearchFactoryService>().GetIncrementalSearch(_textView);
-            _broker = _compModel.GetService<ICompletionBroker>();
             _editorOptions = editorOptions;
-        }
-
-        private bool ShouldTriggerRequireIntellisense() {
-            return CompletionSource.ShouldTriggerRequireIntellisense(
-                _textView.Caret.Position.BufferPosition,
-                _classifier,
-                false
-            );
         }
 
         internal void AttachKeyboardFilter(IVsTextView vsTextView) {
@@ -362,11 +348,7 @@ namespace Microsoft.NodejsTools {
 
 
         internal class LocationCategory : SimpleObjectList<SymbolList>, IVsNavInfo, ICustomSearchListProvider {
-            private readonly string _name;
-
             internal LocationCategory(string name, params SymbolList[] locations) {
-                _name = name;
-
                 foreach (var location in locations) {
                     if (location.Children.Count > 0) {
                         Children.Add(location);
@@ -681,12 +663,6 @@ namespace Microsoft.NodejsTools {
             var analyzer = _textView.GetAnalyzer();
             if (analyzer != null && analyzer.IsAnalyzing) {
                 statusBar.SetText("Node.js source analysis is not up to date");
-            }
-        }
-
-        private void Dismiss() {
-            while (_intellisenseStack.TopSession != null) {
-                _intellisenseStack.TopSession.Dismiss();
             }
         }
 

@@ -100,8 +100,8 @@ namespace Microsoft.NodejsTools.Project {
                 var process = NodeProcess.Start(
                     psi,
                     NodejsPackage.Instance.GeneralOptionsPage.WaitOnAbnormalExit,
-                    NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit
-                );
+                    NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit);
+                _project.OnDispose += process.ResponseToTerminateEvent;
 
                 if (startBrowser && uri != null) {
                     OnPortOpenedHandler.CreateHandler(
@@ -169,15 +169,6 @@ namespace Microsoft.NodejsTools.Project {
             return builder.ToString();
         }
 
-        private string TestServerPortString {
-            get {
-                if (!_testServerPort.HasValue) {
-                    _testServerPort = GetFreePort();
-                }
-                return _testServerPort.Value.ToString(CultureInfo.InvariantCulture);
-            }
-        }
-
         private int TestServerPort {
             get {
                 if (!_testServerPort.HasValue) {
@@ -202,9 +193,9 @@ namespace Microsoft.NodejsTools.Project {
 
         private void LaunchDebugger(IServiceProvider provider, VsDebugTargetInfo dbgInfo) {
             if (!Directory.Exists(dbgInfo.bstrCurDir)) {
-                MessageBox.Show(String.Format("Working directory \"{0}\" does not exist.", dbgInfo.bstrCurDir), "Node.js Tools for Visual Studio");
+                MessageBox.Show(String.Format("Working directory \"{0}\" does not exist.", dbgInfo.bstrCurDir), SR.ProductName);
             } else if (!File.Exists(dbgInfo.bstrExe)) {
-                MessageBox.Show(String.Format("Interpreter \"{0}\" does not exist.", dbgInfo.bstrExe), "Node.js Tools for Visual Studio");
+                MessageBox.Show(String.Format("Interpreter \"{0}\" does not exist.", dbgInfo.bstrExe), SR.ProductName);
             } else if (DoesProjectSupportDebugging()) {
                 VsShellUtilities.LaunchDebugger(provider, dbgInfo);
             }

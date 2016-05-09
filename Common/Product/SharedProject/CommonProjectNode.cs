@@ -155,8 +155,12 @@ namespace Microsoft.VisualStudioTools.Project {
                 if (IntPtr.Zero == unknownPtr) {
                     return null;
                 }
-                IVsHierarchy hier = Marshal.GetObjectForIUnknown(unknownPtr) as IVsHierarchy;
-                return hier;
+                try {
+                    IVsHierarchy hier = Marshal.GetObjectForIUnknown(unknownPtr) as IVsHierarchy;
+                    return hier;
+                } finally {
+                    Marshal.Release(unknownPtr);
+                }
             }
         }
 
@@ -1225,6 +1229,12 @@ namespace Microsoft.VisualStudioTools.Project {
                 _attributesWatcher.Dispose();
                 _attributesWatcher = null;
             }
+
+            _fileChangedHandlers.Clear();
+
+            foreach (var pair in _symlinkWatchers)
+                pair.Value.Dispose();
+            _symlinkWatchers.Clear();
 
 #if DEV11_OR_LATER
             _needBolding = null;

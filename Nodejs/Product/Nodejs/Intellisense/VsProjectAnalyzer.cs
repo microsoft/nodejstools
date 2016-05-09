@@ -63,6 +63,7 @@ namespace Microsoft.NodejsTools.Intellisense {
         private readonly HashSet<BufferParser> _activeBufferParsers = new HashSet<BufferParser>();
         private readonly ConcurrentDictionary<string, ProjectItem> _projectFiles;
         private JsAnalyzer _jsAnalyzer;
+        private readonly AnalysisLimits _limits;
         private readonly bool _implicitProject;
         private readonly AutoResetEvent _queueActivityEvent = new AutoResetEvent(false);
         private readonly CodeSettings _codeSettings = new CodeSettings();
@@ -81,7 +82,6 @@ namespace Microsoft.NodejsTools.Intellisense {
         private bool _fullyLoaded;
         private List<Action> _loadingDeltas = new List<Action>();
 
-        private static AnalysisLimits _lowLimits = AnalysisLimits.MakeLowAnalysisLimits();
         private static AnalysisLimits _highLimits = new AnalysisLimits();
         private static byte[] _dbHeader;
 
@@ -99,26 +99,24 @@ namespace Microsoft.NodejsTools.Intellisense {
 #endif
 
         internal VsProjectAnalyzer(
+            AnalysisLevel analysisLevel,
+            bool saveToDisk,
             string projectFileDir = null
         ) {
             _projectFiles = new ConcurrentDictionary<string, ProjectItem>(StringComparer.OrdinalIgnoreCase);
-            if (NodejsPackage.Instance != null) {
-                _analysisLevel = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel;
-                _saveToDisk = NodejsPackage.Instance.IntellisenseOptionsPage.SaveToDisk;
-            } else {
-                _analysisLevel = AnalysisLevel.NodeLsHigh;
-                _saveToDisk = true;
-            }
 
-            var limits = LoadLimits();
+            _analysisLevel = analysisLevel;
+            _saveToDisk = saveToDisk;
+
+            _limits = LoadLimits();
             if (projectFileDir != null) {
                 _projectFileDir = projectFileDir;
-                if (!LoadCachedAnalysis(limits)) {
-                    CreateNewAnalyzer(limits);
+                if (!LoadCachedAnalysis(_limits)) {
+                    CreateNewAnalyzer(_limits);
                 }
             } else {
                 _implicitProject = true;
-                CreateNewAnalyzer(limits);
+                CreateNewAnalyzer(_limits);
             }
 
             if (!_saveToDisk) {
@@ -130,28 +128,40 @@ namespace Microsoft.NodejsTools.Intellisense {
             InitializeCodeSettings();
         }
 
-        private void InitializeCodeSettings() {
+        /// <summary>
+        /// Ensure the analyzer is fully loaded before executing a function.
+        /// </summary>
+        /// <param name="f">Action to execute.</param>
+        private void WhenFullyLoaded(Action f) {
             if (!_fullyLoaded) {
                 lock (_loadingDeltas) {
                     if (!_fullyLoaded) {
-                        _loadingDeltas.Add(() => InitializeCodeSettings());
+                        _loadingDeltas.Add(f);
                         return;
                     }
                 }
             }
+            f();
+        }
 
-            foreach (var name in _jsAnalyzer.GlobalMembers) {
-                _codeSettings.AddKnownGlobal(name);
-            }
-            _codeSettings.AddKnownGlobal("__dirname");
-            _codeSettings.AddKnownGlobal("__filename");
-            _codeSettings.AddKnownGlobal("module");
-            _codeSettings.AddKnownGlobal("exports");
+        private void InitializeCodeSettings() {
+            WhenFullyLoaded(() => {
+                foreach (var name in _jsAnalyzer.GlobalMembers) {
+                    _codeSettings.AddKnownGlobal(name);
+                }
+                _codeSettings.AddKnownGlobal("__dirname");
+                _codeSettings.AddKnownGlobal("__filename");
+                _codeSettings.AddKnownGlobal("module");
+                _codeSettings.AddKnownGlobal("exports");
 
-            _codeSettings.AllowShebangLine = true;
+                _codeSettings.AllowShebangLine = true;
+            });
         }
 
         private void CreateNewAnalyzer(AnalysisLimits limits) {
+            if (_analysisLevel == AnalysisLevel.NodeLsNone || _analysisLevel == AnalysisLevel.Preview) {
+                return;
+            }
             _jsAnalyzer = new JsAnalyzer(limits);
             if (ShouldEnqueue()) {
                 _analysisQueue = new AnalysisQueue(this);
@@ -200,73 +210,59 @@ namespace Microsoft.NodejsTools.Intellisense {
         public EventHandler<FileEventArgs> ErrorRemoved;
 
         public void AddBuffer(ITextBuffer buffer) {
-            if (!_fullyLoaded) {
-                lock (_loadingDeltas) {
-                    if (!_fullyLoaded) {
-                        _loadingDeltas.Add(() => AddBuffer(buffer));
+            WhenFullyLoaded(() => {
+                IReplEvaluator replEval;
+                if (buffer.Properties.TryGetProperty<IReplEvaluator>(typeof(IReplEvaluator), out replEval)) {
+                    BufferParser replParser;
+                    if (_replParsers.TryGetValue(replEval, out replParser)) {
+                        replParser.AddBuffer(buffer);
                         return;
                     }
                 }
-            }
 
-            IReplEvaluator replEval;
-            if (buffer.Properties.TryGetProperty<IReplEvaluator>(typeof(IReplEvaluator), out replEval)) {
-                BufferParser replParser;
-                if (_replParsers.TryGetValue(replEval, out replParser)) {
-                    replParser.AddBuffer(buffer);
-                    return;
+                IProjectEntry projEntry = GetOrCreateProjectEntry(
+                    buffer,
+                    new SnapshotCookie(buffer.CurrentSnapshot)
+                );
+
+                ConnectErrorList(projEntry, buffer);
+
+                // kick off initial processing on the buffer
+                BufferParser bufferParser = EnqueueBuffer(projEntry, buffer);
+                lock (_activeBufferParsers) {
+                    _activeBufferParsers.Add(bufferParser);
                 }
-            }
 
-            IProjectEntry projEntry = GetOrCreateProjectEntry(
-                buffer,
-                new SnapshotCookie(buffer.CurrentSnapshot)
-            );
-
-            ConnectErrorList(projEntry, buffer);
-
-            // kick off initial processing on the buffer
-            BufferParser bufferParser = EnqueueBuffer(projEntry, buffer);
-            lock (_activeBufferParsers) {
-                _activeBufferParsers.Add(bufferParser);
-            }
-
-            if (replEval != null) {
-                _replParsers[replEval] = bufferParser;
-            }
+                if (replEval != null) {
+                    _replParsers[replEval] = bufferParser;
+                }
+            });
         }
 
         public void RemoveBuffer(ITextBuffer buffer) {
-            if (!_fullyLoaded) {
-                lock (_loadingDeltas) {
-                    if (!_fullyLoaded) {
-                        _loadingDeltas.Add(() => RemoveBuffer(buffer));
+            WhenFullyLoaded(() => {
+                IReplEvaluator replEval;
+                if (buffer.Properties.TryGetProperty<IReplEvaluator>(typeof(IReplEvaluator), out replEval)) {
+                    BufferParser replParser;
+                    if (_replParsers.TryGetValue(replEval, out replParser)) {
+                        replParser.RemoveBuffer(buffer);
+                        if (replParser.Buffers.Length == 0) {
+                            ViewDetached(buffer, replParser);
+                        }
+
                         return;
                     }
                 }
-            }
 
-            IReplEvaluator replEval;
-            if (buffer.Properties.TryGetProperty<IReplEvaluator>(typeof(IReplEvaluator), out replEval)) {
-                BufferParser replParser;
-                if (_replParsers.TryGetValue(replEval, out replParser)) {
-                    replParser.RemoveBuffer(buffer);
-                    if (replParser.Buffers.Length == 0) {
-                        ViewDetached(buffer, replParser);
-                    }
-
+                BufferParser bufferParser;
+                if (!buffer.Properties.TryGetProperty<BufferParser>(typeof(BufferParser), out bufferParser)) {
                     return;
                 }
-            }
 
-            BufferParser bufferParser;
-            if (!buffer.Properties.TryGetProperty<BufferParser>(typeof(BufferParser), out bufferParser)) {
-                return;
-            }
-
-            if (--bufferParser.AttachedViews == 0) {
-                ViewDetached(buffer, bufferParser);
-            }
+                if (--bufferParser.AttachedViews == 0) {
+                    ViewDetached(buffer, bufferParser);
+                }
+            });
         }
 
         private void ViewDetached(ITextBuffer buffer, BufferParser bufferParser) {
@@ -291,68 +287,61 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         private void AnalyzeFile(string path, bool reportErrors, ProjectItem originatingItem) {
-            if (!_fullyLoaded) {
-                lock (_loadingDeltas) {
-                    if (!_fullyLoaded) {
-                        _loadingDeltas.Add(() => AnalyzeFile(path, reportErrors, originatingItem));
-                        return;
-                    }
-                }
-            }
+            WhenFullyLoaded(() => {
+                ProjectItem item;
+                if (!_projectFiles.TryGetValue(path, out item)) {
+                    var pyEntry = _jsAnalyzer.AddModule(
+                        path,
+                        null
+                    );
 
-            ProjectItem item;
-            if (!_projectFiles.TryGetValue(path, out item)) {
-                var pyEntry = _jsAnalyzer.AddModule(
-                    path,
-                    null
-                );
+                    pyEntry.BeginParsingTree();
 
-                pyEntry.BeginParsingTree();
+                    item = new ProjectItem(pyEntry);
 
-                item = new ProjectItem(pyEntry);
-
-                item.ReportErrors = reportErrors;
-                item.Reloaded = true;
-                _projectFiles[path] = item;
-                // only parse the file if we need to report errors on it or if
-                // we're analyzing.s
-                if (reportErrors || _analysisQueue != null) {
-                    EnqueueFile(item.Entry, path);
-                } else if (item is IJsProjectEntry) {
-                    // balance BeginParsingTree call...
-                    ((IJsProjectEntry)item.Entry).UpdateTree(null, null);
-                }
-            } else {
-                if (!reportErrors) {
-                    TaskProvider.Clear(item.Entry, ParserTaskMoniker);
-                }
-
-                if ((_reparseDateTime != null && new FileInfo(path).LastWriteTime > _reparseDateTime.Value)
-                        || (reportErrors && !item.ReportErrors) ||
-                        (item.Entry.Module == null || item.Entry.Unit == null)) {
-                    // this file was written to since our cached analysis was saved, reload it.
-                    // Or it was just included in the project and we need to parse for reporting
-                    // errors.
-                    if (_analysisQueue != null) {
+                    item.ReportErrors = reportErrors;
+                    item.Reloaded = true;
+                    _projectFiles[path] = item;
+                    // only parse the file if we need to report errors on it or if
+                    // we're analyzing.s
+                    if (reportErrors || _analysisQueue != null) {
                         EnqueueFile(item.Entry, path);
+                    } else if (item is IJsProjectEntry) {
+                        // balance BeginParsingTree call...
+                        ((IJsProjectEntry)item.Entry).UpdateTree(null, null);
                     }
-                }
-                item.ReportErrors = reportErrors;
-                item.Reloaded = true;
-            }
-
-            if (_implicitProject) {
-                if (originatingItem != null) {
-                    // file was loaded as part of analysis of a collection of files...
-                    item.ImplicitLoadCount += 1;
-                    if (originatingItem.LoadedItems == null) {
-                        originatingItem.LoadedItems = new List<ProjectItem>();
-                    }
-                    originatingItem.LoadedItems.Add(item);
                 } else {
-                    originatingItem.ExplicitlyLoaded = true;
+                    if (!reportErrors) {
+                        TaskProvider.Clear(item.Entry, ParserTaskMoniker);
+                    }
+
+                    if ((_reparseDateTime != null && new FileInfo(path).LastWriteTime > _reparseDateTime.Value)
+                            || (reportErrors && !item.ReportErrors) ||
+                            (item.Entry.Module == null || item.Entry.Unit == null)) {
+                        // this file was written to since our cached analysis was saved, reload it.
+                        // Or it was just included in the project and we need to parse for reporting
+                        // errors.
+                        if (_analysisQueue != null) {
+                            EnqueueFile(item.Entry, path);
+                        }
+                    }
+                    item.ReportErrors = reportErrors;
+                    item.Reloaded = true;
                 }
-            }
+
+                if (_implicitProject) {
+                    if (originatingItem != null) {
+                        // file was loaded as part of analysis of a collection of files...
+                        item.ImplicitLoadCount += 1;
+                        if (originatingItem.LoadedItems == null) {
+                            originatingItem.LoadedItems = new List<ProjectItem>();
+                        }
+                        originatingItem.LoadedItems.Add(item);
+                    } else {
+                        originatingItem.ExplicitlyLoaded = true;
+                    }
+                }
+            });
         }
 
         public void AddPackageJson(string packageJsonPath) {
@@ -397,21 +386,14 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         public void AddPackageJson(string path, string mainFile, List<string> dependencies) {
-            if (!_fullyLoaded) {
-                lock (_loadingDeltas) {
-                    if (!_fullyLoaded) {
-                        _loadingDeltas.Add(() => AddPackageJson(path, mainFile, dependencies));
-                        return;
-                    }
+            WhenFullyLoaded(() => {
+                if (ShouldEnqueue()) {
+                    _analysisQueue.Enqueue(
+                        _jsAnalyzer.AddPackageJson(path, mainFile, dependencies),
+                        AnalysisPriority.Normal
+                    );
                 }
-            }
-
-            if (ShouldEnqueue()) {
-                _analysisQueue.Enqueue(
-                    _jsAnalyzer.AddPackageJson(path, mainFile, dependencies),
-                    AnalysisPriority.Normal
-                );
-            }
+            });
         }
 
         /// <summary>
@@ -639,9 +621,9 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
         }
 
-        public JsAnalyzer Project {
+        public AnalysisLimits Limits {
             get {
-                return _jsAnalyzer;
+                return _limits;
             }
         }
 
@@ -653,16 +635,9 @@ namespace Microsoft.NodejsTools.Intellisense {
                 return _jsAnalyzer.MaxLogLength;
             }
             set {
-                if (!_fullyLoaded) {
-                    lock (_loadingDeltas) {
-                        if (!_fullyLoaded) {
-                            _loadingDeltas.Add(() => MaxLogLength = value);
-                            return;
-                        }
-                    }
-                }
-
-                _jsAnalyzer.MaxLogLength = value;
+                WhenFullyLoaded(() => {
+                    _jsAnalyzer.MaxLogLength = value;
+                });
             }
         }
 
@@ -675,21 +650,14 @@ namespace Microsoft.NodejsTools.Intellisense {
         }
 
         public void ReloadComplete() {
-            if (!_fullyLoaded) {
-                lock (_loadingDeltas) {
-                    if (!_fullyLoaded) {
-                        _loadingDeltas.Add(() => ReloadComplete());
-                        return;
+            WhenFullyLoaded(() => {
+                foreach (var item in _projectFiles) {
+                    if ((!File.Exists(item.Value.Entry.FilePath) || !item.Value.Reloaded)
+                        && !item.Value.Entry.IsBuiltin) {
+                        UnloadFile(item.Value.Entry);
                     }
                 }
-            }
-
-            foreach (var item in _projectFiles) {
-                if ((!File.Exists(item.Value.Entry.FilePath) || !item.Value.Reloaded)
-                    && !item.Value.Entry.IsBuiltin) {
-                    UnloadFile(item.Value.Entry);
-                }
-            }
+            });
         }
 
         public void SwitchAnalyzers(VsProjectAnalyzer oldAnalyzer) {
@@ -727,49 +695,27 @@ namespace Microsoft.NodejsTools.Intellisense {
         /// _openFiles must be locked when calling this function.
         /// </summary>
         private void ReAnalyzeTextBuffers(BufferParser bufferParser) {
-            if (!_fullyLoaded) {
-                lock (_loadingDeltas) {
-                    if (!_fullyLoaded) {
-                        _loadingDeltas.Add(() => ReAnalyzeTextBuffers(bufferParser));
-                        return;
-                    }
-                }
-            }
+            WhenFullyLoaded(() => {
+                ITextBuffer[] buffers = bufferParser.Buffers;
+                if (buffers.Length > 0) {
+                    var projEntry = GetOrCreateProjectEntry(buffers[0], new SnapshotCookie(buffers[0].CurrentSnapshot));
+                    foreach (var buffer in buffers) {
+                        buffer.Properties.RemoveProperty(typeof(IProjectEntry));
+                        buffer.Properties.AddProperty(typeof(IProjectEntry), projEntry);
 
-            ITextBuffer[] buffers = bufferParser.Buffers;
-            if (buffers.Length > 0) {
-                var projEntry = GetOrCreateProjectEntry(buffers[0], new SnapshotCookie(buffers[0].CurrentSnapshot));
-                foreach (var buffer in buffers) {
-                    buffer.Properties.RemoveProperty(typeof(IProjectEntry));
-                    buffer.Properties.AddProperty(typeof(IProjectEntry), projEntry);
-
-                    var classifier = buffer.GetNodejsClassifier();
-                    if (classifier != null) {
-                        classifier.NewVersion();
-                    }
-
-                    ConnectErrorList(projEntry, buffer);
-                }
-
-                bufferParser._currentProjEntry = projEntry;
-                bufferParser._parser = this;
-
-#if FALSE
-                // TODO: Add back for navigation bar support
-                foreach (var buffer in buffers) {
-                    // A buffer may have multiple DropDownBarClients, given one may open multiple CodeWindows
-                    // over a single buffer using Window/New Window
-                    List<DropDownBarClient> clients;
-                    if (buffer.Properties.TryGetProperty<List<DropDownBarClient>>(typeof(DropDownBarClient), out clients)) {
-                        foreach (var client in clients) {
-                            client.UpdateProjectEntry(projEntry);
+                        var classifier = buffer.GetNodejsClassifier();
+                        if (classifier != null) {
+                            classifier.NewVersion();
                         }
-                    }
-                }
-#endif
 
-                bufferParser.Requeue();
-            }
+                        ConnectErrorList(projEntry, buffer);
+                    }
+
+                    bufferParser._currentProjEntry = projEntry;
+                    bufferParser._parser = this;
+                    bufferParser.Requeue();
+                }
+            });
         }
 
         public void UnloadFile(string filename) {
@@ -1338,6 +1284,10 @@ namespace Microsoft.NodejsTools.Intellisense {
         #region Cached Analysis
 
         private bool LoadCachedAnalysis(AnalysisLimits limits) {
+            if (_analysisLevel == AnalysisLevel.NodeLsNone || _analysisLevel == AnalysisLevel.Preview) {
+                return false;
+            }
+
             string analysisDb = GetAnalysisPath();
             if (File.Exists(analysisDb) && ShouldEnqueue()) {
                 FileStream stream = null;
@@ -1489,25 +1439,22 @@ namespace Microsoft.NodejsTools.Intellisense {
     @"\Analysis\Project";
 
         private AnalysisLimits LoadLimits() {
-            AnalysisLimits defaults = null;
-
-            if (NodejsPackage.Instance != null) {
-                switch (_analysisLevel) {
-                    case Options.AnalysisLevel.NodeLsMedium:
-                        defaults = AnalysisLimits.MakeMediumAnalysisLimits();
-                        break;
-                    case Options.AnalysisLevel.NodeLsLow:
-                        defaults = _lowLimits;
-                        break;
-                }
-            }
-            if (defaults == null) {
-                defaults = _highLimits;
+            AnalysisLimits defaults;
+            switch (_analysisLevel) {
+                case AnalysisLevel.NodeLsMedium:
+                    defaults = AnalysisLimits.MediumAnalysisLimits;
+                    break;
+                case AnalysisLevel.NodeLsLow:
+                    defaults = AnalysisLimits.LowAnalysisLimit;
+                    break;
+                default:
+                    defaults = _highLimits;
+                    break;
             }
 
             try {
                 using (var key = Registry.CurrentUser.OpenSubKey(AnalysisLimitsKey)) {
-                    return LoadLimitsFromStorage(key, defaults);
+                    return AnalysisLimits.LoadLimitsFromStorage(key, defaults);
                 }
             } catch (SecurityException) {
             } catch (UnauthorizedAccessException) {
@@ -1515,48 +1462,6 @@ namespace Microsoft.NodejsTools.Intellisense {
             }
             return defaults;
         }
-
-
-        /// <summary>
-        /// Loads a new instance from the specified registry key.
-        /// </summary>
-        /// <param name="key">
-        /// The key to load settings from. If
-        /// null, all settings are assumed to be unspecified and the default
-        /// values are used.
-        /// </param>
-        /// <param name="defaults">
-        /// The default analysis limits if they're not available in the regkey.
-        /// </param>
-        private static AnalysisLimits LoadLimitsFromStorage(RegistryKey key, AnalysisLimits defaults) {
-            AnalysisLimits limits = new AnalysisLimits();
-
-            limits.ReturnTypes = GetSetting(key, ReturnTypesId) ?? defaults.ReturnTypes;
-            limits.InstanceMembers = GetSetting(key, InstanceMembersId) ?? defaults.InstanceMembers;
-            limits.DictKeyTypes = GetSetting(key, DictKeyTypesId) ?? defaults.DictKeyTypes;
-            limits.DictValueTypes = GetSetting(key, DictValueTypesId) ?? defaults.DictValueTypes;
-            limits.IndexTypes = GetSetting(key, IndexTypesId) ?? defaults.IndexTypes;
-            limits.AssignedTypes = GetSetting(key, AssignedTypesId) ?? defaults.AssignedTypes;
-            limits.NestedModulesLimit = GetSetting(key, NestedModulesLimitId) ?? defaults.NestedModulesLimit;
-
-            return limits;
-        }
-
-        private static int? GetSetting(RegistryKey key, string setting) {
-            if (key != null) {
-                return key.GetValue(ReturnTypesId) as int?;
-            }
-            return null;
-        }
-
-
-        private const string ReturnTypesId = "ReturnTypes";
-        private const string InstanceMembersId = "InstanceMembers";
-        private const string DictKeyTypesId = "DictKeyTypes";
-        private const string DictValueTypesId = "DictValueTypes";
-        private const string IndexTypesId = "IndexTypes";
-        private const string AssignedTypesId = "AssignedTypes";
-        private const string NestedModulesLimitId = "NestedModulesLimit";
 
         #endregion
     }

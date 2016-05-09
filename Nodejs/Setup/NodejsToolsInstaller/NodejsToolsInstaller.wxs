@@ -25,6 +25,9 @@
         <PropertyRef Id="VS_PRERELEASE"/>
         <Condition Message="!(loc.VSPrerelease)"> NOT VS_PRERELEASE OR Installed </Condition>
         
+        <PropertyRef Id="VS_IS_2015_PRE_UPDATE_2"/>
+        <Condition Message="!(loc.VSRequires2015Update2)"> NOT VS_IS_2015_PRE_UPDATE_2 OR Installed </Condition>
+        
         <PropertyRef Id="NETFRAMEWORK45"/>
         <Condition Message="!(loc.NetFx45NotInstalled)"> NETFRAMEWORK45 OR Installed </Condition>
 

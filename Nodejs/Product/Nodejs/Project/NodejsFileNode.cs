@@ -39,12 +39,12 @@ namespace Microsoft.NodejsTools.Project {
                 return;
             }
 
-            if (Url.EndsWith(NodejsConstants.TypeScriptDeclarationExtension, StringComparison.OrdinalIgnoreCase) && Url.IndexOf(@"\typings\", StringComparison.OrdinalIgnoreCase) >= 0) {
-                if (ProjectMgr.ShouldAcquireTypingsAutomatically) {
-                    ProjectMgr.Site.GetUIThread().Invoke(() => {
-                        this.IncludeInProject(true);
-                    });
-                }
+            if (Url.EndsWith(NodejsConstants.TypeScriptDeclarationExtension, StringComparison.OrdinalIgnoreCase)
+              && Url.StartsWith(Path.Combine(ProjectMgr.ProjectFolder, @"typings\"), StringComparison.OrdinalIgnoreCase)
+              && ProjectMgr.ShouldAcquireTypingsAutomatically) {
+                ProjectMgr.Site.GetUIThread().Invoke(() => {
+                    this.IncludeInProject(true);
+                });
             }
         }
 
@@ -77,6 +77,10 @@ namespace Microsoft.NodejsTools.Project {
 #endif
 
         internal override int IncludeInProject(bool includeChildren) {
+            if (!ItemNode.IsExcluded) {
+                return 0;
+            }
+
             // Check if parent folder is designated as containing client-side code.
             var isContent = false;
             var folderNode = this.Parent as NodejsFolderNode;
@@ -90,7 +94,6 @@ namespace Microsoft.NodejsTools.Project {
             }
 
             var includeInProject = base.IncludeInProject(includeChildren);
-
             if (isContent && Url.EndsWith(".js", StringComparison.OrdinalIgnoreCase)) {
                 this.ItemNode.ItemTypeName = ProjectFileConstants.Content;
             }
