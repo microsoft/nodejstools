@@ -86,7 +86,7 @@ function detectMocha(projectFolder) {
         if (fs.existsSync(mochaJsonPath)) {
           var opt = require(mochaJsonPath);
           if (opt && opt.path) {
-            node_modulesFolder = opt.path;
+            node_modulesFolder = path.resolve(projectFolder, opt.path);
           }
         }
 
