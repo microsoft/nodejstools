@@ -90,7 +90,7 @@ function detectMocha(projectFolder) {
           }
         }
 
-        var mochaPath = path.join(node_modulesFolder, 'node_modulesFolder', 'mocha');
+        var mochaPath = path.join(node_modulesFolder, 'node_modules', 'mocha');
         var Mocha = new require(mochaPath);
         return Mocha;
     } catch (ex) {
