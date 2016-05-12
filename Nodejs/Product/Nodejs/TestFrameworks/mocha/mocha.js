@@ -80,7 +80,17 @@ function logError() {
 
 function detectMocha(projectFolder) {
     try {
-        var mochaPath = path.join(projectFolder, 'node_modules', 'mocha');
+        // use mocha.json's path value for node modules path if it is specified
+        var node_modulesFolder = projectFolder;
+        var mochaJsonPath = path.join(node_modulesFolder, 'test', 'mocha.json');
+        if (fs.existsSync(mochaJsonPath)) {
+          var opt = require(mochaJsonPath);
+          if (opt && opt.path) {
+            node_modulesFolder = opt.path;
+          }
+        }
+
+        var mochaPath = path.join(node_modulesFolder, 'node_modulesFolder', 'mocha');
         var Mocha = new require(mochaPath);
         return Mocha;
     } catch (ex) {
