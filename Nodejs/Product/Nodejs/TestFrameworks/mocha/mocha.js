@@ -79,8 +79,17 @@ function logError() {
 }
 
 function detectMocha(projectFolder) {
-    try {
-        var mochaPath = path.join(projectFolder, 'node_modules', 'mocha');
+  try {
+        var node_modulesFolder = projectFolder;
+        var mochaJsonPath = path.join(node_modulesFolder, 'test', 'mocha.json');
+        if (fs.existsSync(mochaJsonPath)) {
+          var opt = require(mochaJsonPath);
+          if (opt && opt.path) {
+            node_modulesFolder = path.resolve(projectFolder, opt.path);
+          }
+        }
+
+        var mochaPath = path.join(node_modulesFolder, 'node_modules', 'mocha');
         var Mocha = new require(mochaPath);
         return Mocha;
     } catch (ex) {
