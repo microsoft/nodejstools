@@ -29,9 +29,9 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         public NodeModules(IRootPackage parent, bool showMissingDevOptionalSubPackages, Dictionary<string, ModuleInfo> allModulesToDepth = null, int depth = 0, int maxDepth = 1) {
             _allModules = allModulesToDepth ?? new Dictionary<string, ModuleInfo>();
 
-            //if (depth >= maxDepth) {
-          //      return;
-          //  }
+            if (depth >= maxDepth) {
+                return;
+            }
 
             var modulesBase = Path.Combine(parent.Path, NodejsConstants.NodeModulesFolder);
 
