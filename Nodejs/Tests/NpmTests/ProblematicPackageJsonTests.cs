@@ -126,18 +126,6 @@ namespace NpmTests {
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(PackageJsonException))]
-        public void ParseMissingTrailingBrace() {
-            TestFreshPackage("missingtrailingbrace");
-        }
-
-        [TestMethod, Priority(0)]
-        [ExpectedException(typeof(PackageJsonException))]
-        public void ParseMissingTrailingListBrace() {
-            TestFreshPackage("missingtrailinglistbrace");
-        }
-
-        [TestMethod, Priority(0)]
-        [ExpectedException(typeof(PackageJsonException))]
         public void ParseUnescapedQuote() {
             TestFreshPackage("unescapedquote");
         }
