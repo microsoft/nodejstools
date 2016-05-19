@@ -473,6 +473,9 @@ NAME2=value2
   <data name="ReplInitializationMessage" xml:space="preserve">
     <value>Node.js interactive window. Type .help for a list of commands.</value>
   </data>
+  <data name="ReplWindowNpmInitNoYesFlagWarning" xml:space="preserve">
+    <value>Please run '.npm init -y' to create a new package.json file.</value>
+  </data>
   <data name="NodeExePathDescription" xml:space="preserve">
     <value>Specifies the path to the node.exe executable.</value>
   </data>
@@ -599,6 +602,12 @@ You will need to restart Visual Studio after installation.</value>
   </data>
   <data name="SurroundWith" xml:space="preserve">
     <value>Surround With</value>
+  </data>
+  <data name="RemoteDebugProxyFileDoesNotExist" xml:space="preserve">
+    <value>Remote Debug Proxy "{0}" does not exist.</value>
+  </data>
+  <data name="RemoteDebugProxyFolderDoesNotExist" xml:space="preserve">
+    <value>Could not find RemoteDebugProxyFolder</value>
   </data>
   <data name="TsdErrorOccured" xml:space="preserve">
     <value>Error installing typings files used for Intellisense.</value>

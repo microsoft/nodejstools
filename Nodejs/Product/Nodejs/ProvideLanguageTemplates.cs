@@ -31,7 +31,7 @@ namespace Microsoft.NodejsTools {
     /// </devdoc>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
     internal sealed class ProvideLanguageTemplatesAttribute : RegistrationAttribute {
-        private readonly string _projectFactory, _languageName, _package, _languageGuid, _description, _templateGroup,
+        private readonly string _projectFactory, _languageName, _package, _languageGuid, _description,
             _codeFileExtension, _templateFolder, _webProjectGuid;
 
         public ProvideLanguageTemplatesAttribute(string projectFactory, string languageName, string package,
@@ -41,7 +41,6 @@ namespace Microsoft.NodejsTools {
             _package = package;
             _description = description;
             _languageGuid = languageProjectGuid;
-            _templateGroup = templateGroup;
             _codeFileExtension = codeFileExtension;
             _templateFolder = templateGroup;
             _webProjectGuid = webProjectGuid;

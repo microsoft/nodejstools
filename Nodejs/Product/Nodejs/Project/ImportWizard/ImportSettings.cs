@@ -241,15 +241,6 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
             return !dirName.Split(new char[] { '/', '\\' }).Any(name => name.StartsWith("."));
         }
 
-        /// <summary>
-        /// Checks whether a relative and double-backslashed seperated path contains a folder name.
-        /// </summary>
-        private static bool ContainsNodeModulesOrBowerComponentsFolder(string path) {
-            string tmp = "\\" + path + "\\";
-            return tmp.IndexOf("\\" + NodejsConstants.NodeModulesFolder + "\\", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                tmp.IndexOf("\\" + NodejsConstants.BowerComponentsFolder + "\\", StringComparison.OrdinalIgnoreCase) >= 0;
-        }
-
         internal static void WriteProjectXml(
             XmlWriter writer,
             string projectPath,
@@ -329,7 +320,7 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
 
             // Exclude node_modules and bower_components folders.
             if (excludeNodeModules) {
-                folders.RemoveWhere(folder => ContainsNodeModulesOrBowerComponentsFolder(folder));
+                folders.RemoveWhere(NodejsConstants.ContainsNodeModulesOrBowerComponentsFolder);
             }
 
             writer.WriteStartElement("ItemGroup");
@@ -431,7 +422,7 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
             }
 
             foreach (var dir in directories) {
-                if (excludeNodeModules && ContainsNodeModulesOrBowerComponentsFolder(dir)) {
+                if (excludeNodeModules && NodejsConstants.ContainsNodeModulesOrBowerComponentsFolder(dir)) {
                     continue;
                 }
                 try {

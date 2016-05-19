@@ -23,7 +23,7 @@ namespace NpmTests {
     [TestClass]
     public class InstallUninstallPackageTests : AbstractPackageJsonTests {
         [TestMethod, Priority(0), TestCategory("Ignore")]
-        public void TestAddPackageToSimplePackageJsonThenUninstall() {
+        public void AddPackageToSimplePackageJsonThenUninstall() {
             using (var manager = new TemporaryFileManager()) {
                 var rootDir = FilesystemPackageJsonTestHelpers.CreateRootPackage(manager, PkgSimple);
                 var controller = NpmControllerFactory.Create(rootDir, string.Empty);
@@ -76,7 +76,7 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void TestAddPackageNoPackageJsonThenUninstall() {
+        public void AddPackageNoPackageJsonThenUninstall() {
             using (var manager = new TemporaryFileManager()) {
                 var rootDir = FilesystemPackageJsonTestHelpers.CreateRootPackage(manager, PkgSimple);
                 File.Delete(Path.Combine(rootDir, "package.json"));
@@ -130,7 +130,7 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void TestAddPackageNoSavePackageJsonThenUninstall() {
+        public void AddPackageNoSavePackageJsonThenUninstall() {
             using (var manager = new TemporaryFileManager()) {
                 var rootDir = FilesystemPackageJsonTestHelpers.CreateRootPackage(manager, PkgSimple);
                 var controller = NpmControllerFactory.Create(rootDir, string.Empty);

@@ -16,10 +16,10 @@
 
 namespace Microsoft.NodejsTools.Options {
     enum AnalysisLevel {
-        None,
-        Low,
-        Medium,
-        High,
+        NodeLsNone,
+        NodeLsLow,
+        NodeLsMedium,
+        NodeLsHigh,
         Preview
     }
 }

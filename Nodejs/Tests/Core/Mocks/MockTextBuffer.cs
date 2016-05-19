@@ -14,18 +14,19 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Npm.SPI {
-    internal class License : ILicense {
-        public License(string type) {
-            Type = type;
-        }
+using System.IO;
+using Microsoft.NodejsTools;
 
-        public License(string type, string url)
-            : this(type) {
-            Url = url;
-        }
+namespace NodejsTests.Mocks {
+    class MockTextBuffer : TestUtilities.Mocks.MockTextBuffer {
+        public MockTextBuffer(string content) :
+            base(content: content, contentType: NodejsConstants.Nodejs) { }
 
-        public string Type { get; private set; }
-        public string Url { get; private set; }
+        public MockTextBuffer(string content, string contentType, string filename = null) :
+            base(content: content,contentType: contentType, filename: GetRandomFileNameIfNull(filename)) { }
+
+        private static string GetRandomFileNameIfNull(string filename) {
+            return filename ?? Path.Combine(TestUtilities.TestData.GetTempPath(), Path.GetRandomFileName(), "file.js");
+        }
     }
 }

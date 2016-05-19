@@ -21,31 +21,24 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal class Dependencies : IDependencies {
-        private JObject _package;
-        private string[] _dependencyPropertyNames;
+        private IList<Dependency> _dependencyProperties;
 
         public Dependencies(JObject package, params string[] dependencyPropertyNames) {
-            _package = package;
-            _dependencyPropertyNames = dependencyPropertyNames;
-        }
-
-        private IEnumerable<JObject> GetDependenciesProperties() {
-            foreach (var propertyName in _dependencyPropertyNames) {
-                var property = _package[propertyName] as JObject;
-                if (null != property) {
-                    yield return property;
+            _dependencyProperties = new List<Dependency>();
+            foreach (var propertyName in dependencyPropertyNames) {
+                var dependencies = package[propertyName] as JObject;
+                if (dependencies != null) {
+                    foreach (var property in dependencies.Properties()) {
+                        if (property.Value.Type == JTokenType.String) {
+                            _dependencyProperties.Add(new Dependency(property.Name, property.Value.Value<string>()));
+                        }
+                    }
                 }
             }
         }
 
         public IEnumerator<IDependency> GetEnumerator() {
-            var dependencyProps = GetDependenciesProperties();
-            foreach (var dependencies in dependencyProps) {
-                var properties = null == dependencies ? new List<JProperty>() : dependencies.Properties();
-                foreach (var property in properties) {
-                    yield return new Dependency(property.Name, property.Value.Value<string>());
-                }
-            }
+            return _dependencyProperties.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator() {
@@ -58,10 +51,9 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         public IDependency this[string name] {
             get {
-                foreach (var dependencies in GetDependenciesProperties()) {
-                    var property = dependencies[name];
-                    if (null != property) {
-                        return new Dependency(name, property.Value<string>());
+                foreach (var dependeny in _dependencyProperties) {
+                    if (dependeny.Name == name) {
+                        return dependeny;
                     }
                 }
                 return null;

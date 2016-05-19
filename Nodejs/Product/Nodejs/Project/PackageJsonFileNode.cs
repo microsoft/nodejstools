@@ -61,5 +61,13 @@ namespace Microsoft.NodejsTools.Project {
             analyzer.AddPackageJson(Url);
         }
 
+        protected override void Dispose(bool disposing) {
+            if (_watcher != null) {
+                _watcher.Changed -= FileContentsChanged;
+            } else {
+                ProjectMgr?.UnregisterFileChangeNotification(this);
+            }
+            base.Dispose(disposing);
+        }
     }
 }

@@ -15,13 +15,9 @@
 //*********************************************************//
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-using Microsoft.NodejsTools.Repl;
-using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.Text.Editor.OptionsExtensionMethods;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Utilities;
 
@@ -42,11 +38,13 @@ namespace Microsoft.NodejsTools {
             // ITaggerProvider<ClassificationTag> instead.  We can get those tags via IClassifierAggregatorService
             // but that merges together adjacent tokens of the same type, so we go straight to the
             // source here.
-            _taggerProvider = classifierProviders.Where(
+            var foundProvider = classifierProviders.Where(
                 provider =>
                     provider.Metadata.ContentTypes.Contains(NodejsConstants.JavaScript) &&
                     provider.Metadata.TagTypes.Any(tagType => tagType.IsSubclassOf(typeof(ClassificationTag)))
-            ).First().Value;
+                ).FirstOrDefault();
+
+            _taggerProvider = foundProvider == null ? null : foundProvider.Value;
         }
 
         #region ISmartIndentProvider Members
@@ -55,8 +53,7 @@ namespace Microsoft.NodejsTools {
             return new SmartIndent(
                 textView,
                 _editorOptionsFactory.GetOptions(textView),
-                _taggerProvider.CreateTagger<ClassificationTag>(textView.TextBuffer)
-            );
+                _taggerProvider == null ? null : _taggerProvider.CreateTagger<ClassificationTag>(textView.TextBuffer));
         }
 
         #endregion

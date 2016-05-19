@@ -226,6 +226,7 @@ All other strings are considered decimal.", isOptional:true)
                 builtinEntry,
                 "Array",
                 NewArray,
+                ArrayOverloads(),
                 null,
                 arrayPrototype = new BuiltinObjectValue(builtinEntry) {
                         SpecializedFunction(
@@ -464,7 +465,7 @@ All other strings are considered decimal.", isOptional:true)
                     BuiltinFunction("valueOf"),
             };
             booleanPrototype = prototype;
-            return new BuiltinFunctionValue(builtinEntry, "Boolean", null, prototype);
+            return new BuiltinFunctionValue(builtinEntry, "Boolean", BooleanOverloads(), null, prototype);
         }
 
         private BuiltinFunctionValue DateFunction() {
@@ -772,6 +773,7 @@ All other strings are considered decimal.", isOptional:true)
             return new BuiltinFunctionValue(
                 builtinEntry, 
                 "Error", 
+                ErrorOverloads(),
                 null, 
                     new BuiltinObjectValue(builtinEntry) {
                         BuiltinFunction("constructor"),
@@ -788,9 +790,10 @@ All other strings are considered decimal.", isOptional:true)
             var builtinEntry = _analyzer._builtinEntry;
 
             return new BuiltinFunctionValue(
-                builtinEntry, 
-                errorName, 
-                null, 
+                builtinEntry,
+                errorName,
+                ErrorOverloads(errorName),
+                null,
                     new BuiltinObjectValue(builtinEntry) {
                         BuiltinFunction("arguments"),
                         BuiltinFunction("constructor"),
@@ -829,7 +832,7 @@ The this object of the bound function is associated with the specified object, a
                     ReturningFunction("toString", _analyzer._emptyStringValue),
             };
             functionPrototype = prototype;
-            return new BuiltinFunctionValue(builtinEntry, "Function", null, prototype);
+            return new BuiltinFunctionValue(builtinEntry, "Function", FunctionOverloads(), null, prototype);
         }
 
         private static IAnalysisSet ApplyFunction(FunctionValue func, Node node, AnalysisUnit unit, IAnalysisSet @this, IAnalysisSet[] args) {
@@ -1031,7 +1034,7 @@ For example, the absolute value of -5 is the same as the absolute value of 5.",
             };
             numberPrototype = prototype;
 
-            return new BuiltinFunctionValue(builtinEntry, "Number", null, prototype) { 
+            return new BuiltinFunctionValue(builtinEntry, "Number", NumberOverloads(), null, prototype) {
                 Member("length", _analyzer.GetConstant(1.0)),
                 Member("name", _analyzer.GetConstant("Number")),
                 Member("arguments", _analyzer._nullInst),
@@ -1113,8 +1116,9 @@ An own property descriptor is one that is defined directly on the object and is 
 
             return new SpecializedFunctionValue(
                 builtinEntry, 
-                "Object", 
+                "Object",
                 NewObject,
+                ObjectOverloads(),
                 null,
                 objectPrototype) { 
                 BuiltinFunction(
@@ -1404,6 +1408,7 @@ on that object, and are not inherited from the object's prototype. The propertie
             return new BuiltinFunctionValue(
                 builtinEntry, 
                 "RegExp", 
+                RegExpOverloads(),
                 null,
                     new BuiltinObjectValue(builtinEntry) {
                         BuiltinFunction("compile"),   
@@ -1641,7 +1646,7 @@ on that object, and are not inherited from the object's prototype. The propertie
             };
             stringPrototype = prototype;
 
-            return new BuiltinFunctionValue(builtinEntry, "String", null, prototype) { 
+            return new BuiltinFunctionValue(builtinEntry, "String", StringOverloads(), null, prototype) {
                 ReturningFunction("fromCharCode", _analyzer.GetConstant(String.Empty)),
             };
         }
@@ -1677,6 +1682,90 @@ on that object, and are not inherited from the object's prototype. The propertie
             }
             return res;
         }
+
+        #region Constructor Overloads
+
+        private OverloadResult[] ArrayOverloads() {
+            return new OverloadResult[] {
+                new SimpleOverloadResult("Array", "Create a new and empty array."),
+                new SimpleOverloadResult("Array", "Create a new array with specific length.",
+                    Parameter("length", "Length of the new array. Must be between 0 and 2^32-1, inclusive.")),
+                new SimpleOverloadResult("Array", "Create a new array with initial elements.",
+                    Parameter("item1", "Initial element of the array."),
+                    Parameter("item2", "Initial element of the array."),
+                    Parameter("[...]", "Initial element of the array."))
+            };
+        }
+
+        private OverloadResult[] StringOverloads() {
+            return new OverloadResult[] {
+                new SimpleOverloadResult(
+                    "String",
+                    "Create a new string.",
+                    Parameter("thing", "Anything to be converted to a string. If unspecified, an empty string is returned.", isOptional: true)
+                )
+            };
+        }
+
+        private OverloadResult[] NumberOverloads() {
+            return new OverloadResult[] {
+                new SimpleOverloadResult(
+                    "Number",
+                    "Create a new object wrapper for a numerical value.",
+                    Parameter("value", "The numeric value of the number being created. If unspecified, 0 is returned.", isOptional: true)
+                )
+            };
+        }
+
+        private OverloadResult[] BooleanOverloads() {
+            return new OverloadResult[] {
+                new SimpleOverloadResult(
+                    "Boolean",
+                    "Create a new object wrapper for a boolean value.",
+                    Parameter("value", "The initial value of the Boolean object. In unspecified, <false> is returned.", isOptional: true)
+                )
+            };
+        }
+
+        private OverloadResult[] ErrorOverloads(string errorName = "Error") {
+            return new OverloadResult[] {
+                new SimpleOverloadResult(
+                    errorName,
+                    String.Format("Create an {0} object.", errorName),
+                    Parameter("message", "Human-readable description of the error.", isOptional: true)
+                )
+            };
+        }
+
+        private OverloadResult[] ObjectOverloads() {
+            return new OverloadResult[] {
+                new SimpleOverloadResult(
+                    "Object",
+                    "Create an object wrapper that corresponds to a given value.",
+                    Parameter("value", "Any value. If the value is unspecified, null or undefined, returns an empty object.", isOptional: true))
+            };
+        }
+
+        private OverloadResult[] RegExpOverloads() {
+            return new OverloadResult[] {
+                new SimpleOverloadResult("RegExp", "Create a regular expression for matching text with a pattern.",
+                    Parameter("pattern", "The text of the regular expression"),
+                    Parameter("flags", "A combination of g (global match), i (ignore case) and m (multiline).", isOptional: true))
+            };
+        }
+
+        private OverloadResult[] FunctionOverloads() {
+            return new OverloadResult[] {
+                new SimpleOverloadResult("Function", "Create a new and empty function."),
+                new SimpleOverloadResult("Function", "Create a new function.",
+                    Parameter("body", "A string containing the JavaScript statements comprising the function definition.")),
+                new SimpleOverloadResult("Function", "Create a new function with arguments.",
+                    Parameter("arg...", "Name of argument of the function.", isOptional: true),
+                    Parameter("body", "A string containing the JavaScript statements comprising the function definition."))
+            };
+        }
+
+        #endregion
 
         #region Building Helpers
 

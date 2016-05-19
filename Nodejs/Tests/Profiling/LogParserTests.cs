@@ -78,7 +78,7 @@ namespace ProfilerTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Ignore")]
-        public void TestFilenameParsing() {
+        public void FilenameParsing() {
             AssertExpectedFileInfo(
                 " net.js:931",
                 "net",

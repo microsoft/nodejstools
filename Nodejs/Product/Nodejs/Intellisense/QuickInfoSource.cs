@@ -24,12 +24,10 @@ using Microsoft.VisualStudio.Text;
 namespace Microsoft.NodejsTools.Intellisense {
     internal class QuickInfoSource : IQuickInfoSource {
         private readonly ITextBuffer _textBuffer;
-        private readonly QuickInfoSourceProvider _provider;
         private IQuickInfoSession _curSession;
 
         public QuickInfoSource(QuickInfoSourceProvider provider, ITextBuffer textBuffer) {
             _textBuffer = textBuffer;
-            _provider = provider;
         }
 
         #region IQuickInfoSource Members
