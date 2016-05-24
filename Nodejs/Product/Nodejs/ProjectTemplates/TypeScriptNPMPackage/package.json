@@ -10,5 +10,8 @@
   "typings": "lib/index",
   "files": [
     "lib/"
-  ]
+  ],
+  "devDependencies": {
+    "typescript": "^1.8.10"
+  }
 }
