@@ -2,12 +2,12 @@
   "name": "$npmsafeprojectname$",
   "version": "0.0.0",
   "description": "$projectname$",
-  "main": "lib/app",
+  "main": "lib/index",
   "author": {
     "name": "$username$",
     "email": ""
   },
-  "typings": "lib/app",
+  "typings": "lib/index",
   "files": [
     "lib/"
   ]
