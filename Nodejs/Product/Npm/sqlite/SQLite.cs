@@ -1427,14 +1427,12 @@ namespace SQLite
 
 			try {
 				rowsAffected = Execute (q, ps.ToArray ());
-			}
-			catch (SQLiteException ex) {
-
+			} catch (SQLiteException ex) {
 				if (ex.Result == SQLite3.Result.Constraint && SQLite3.ExtendedErrCode (this.Handle) == SQLite3.ExtendedResult.ConstraintNotNull) {
-					throw NotNullConstraintViolationException.New (ex, map, obj);
+					throw NotNullConstraintViolationException.New(ex, map, obj);
 				}
 
-				throw ex;
+				throw;
 			}
 
 			if (rowsAffected > 0)

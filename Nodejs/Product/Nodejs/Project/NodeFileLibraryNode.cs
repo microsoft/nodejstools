@@ -18,10 +18,8 @@ using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.VisualStudioTools.Navigation {
     class NodeFileLibraryNode : LibraryNode {
-        private readonly HierarchyNode _hierarchy;
         public NodeFileLibraryNode(LibraryNode parent, HierarchyNode hierarchy, string name, string filename, LibraryNodeType libraryNodeType)
             : base(parent, name, filename, libraryNodeType) {
-            _hierarchy = hierarchy;
         }
     }
 }

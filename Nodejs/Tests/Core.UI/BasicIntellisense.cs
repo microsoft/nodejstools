@@ -16,11 +16,9 @@
 
 using System;
 using System.Linq;
-using System.Windows;
 using Microsoft.NodejsTools.Intellisense;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.VisualStudio.Text;
 using TestUtilities;
 using TestUtilities.UI;
 using Key = System.Windows.Input.Key;
@@ -33,7 +31,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// 
         /// Make sure Ctrl-Space works
         /// </summary>
-        [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
+        [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
         public void CtrlSpace() {
             var project = Project("CtrlSpace",
@@ -41,12 +39,15 @@ namespace Microsoft.Nodejs.Tests.UI {
             );
 
             using (var solution = project.Generate().ToVs()) {
-                var server = solution.OpenItem("CtrlSpace", "server.js");
+                var optionsPage = NodejsTools.NodejsPackage.Instance.IntellisenseOptionsPage;
+                using (new NodejsOptionHolder(optionsPage, "OnlyTabOrEnterToCommit", false)) {
+                    var server = solution.OpenItem("CtrlSpace", "server.js");
 
-                server.MoveCaret(2, 13);
-                solution.ExecuteCommand("Edit.CompleteWord");
+                    server.MoveCaret(2, 13);
+                    solution.ExecuteCommand("Edit.CompleteWord");
 
-                server.WaitForText("var http = require('http');\r\nhttp.createServer");
+                    server.WaitForText("var http = require('http');\r\nhttp.createServer");
+                }
             }
         }
 

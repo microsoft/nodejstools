@@ -66,13 +66,6 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private IPackageCatalog MostRecentlyLoadedCatalog {
-            get {
-                var controller = DependencyNode.NpmController;
-                return null == controller ? null : controller.MostRecentlyLoadedCatalog;
-            }
-        }
-
         // TODO Retrieving the package information is currently too slow to include in properties pane.
         //[SRCategoryAttribute(SR.CategoryVersion)]
         //[SRDisplayName(SR.NpmPackageNewVersionAvailable)]

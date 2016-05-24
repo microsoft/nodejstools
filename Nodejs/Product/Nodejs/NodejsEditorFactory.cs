@@ -123,24 +123,10 @@ namespace Microsoft.NodejsTools {
         }
 
         public virtual int Close() {
+            _serviceProvider?.Dispose();
             return VSConstants.S_OK;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="grfCreateDoc"></param>
-        /// <param name="pszMkDocument"></param>
-        /// <param name="pszPhysicalView"></param>
-        /// <param name="pvHier"></param>
-        /// <param name="itemid"></param>
-        /// <param name="punkDocDataExisting"></param>
-        /// <param name="ppunkDocView"></param>
-        /// <param name="ppunkDocData"></param>
-        /// <param name="pbstrEditorCaption"></param>
-        /// <param name="pguidCmdUI"></param>
-        /// <param name="pgrfCDW"></param>
-        /// <returns></returns>
         public virtual int CreateEditorInstance(
                         uint createEditorFlags,
                         string documentMoniker,
@@ -249,7 +235,7 @@ namespace Microsoft.NodejsTools {
         }
 
         private void InitializeLanguageService(IVsTextLines textLines) {
-            InitializeLanguageService(textLines, typeof(NodejsEditorFactory).GUID);
+            InitializeLanguageService(textLines, typeof(NodejsLanguageInfo).GUID);
         }
 
         private IntPtr CreateDocumentView(string documentMoniker, string physicalView, IVsHierarchy hierarchy, uint itemid, IVsTextLines textLines, bool createdDocData, out string editorCaption, out Guid cmdUI) {

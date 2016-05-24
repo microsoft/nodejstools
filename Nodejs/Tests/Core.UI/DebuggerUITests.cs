@@ -30,7 +30,7 @@ namespace Microsoft.Nodejs.Tests.UI {
     public class DebuggerUITests : NodejsProjectTest {
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Debugging UI")]
         [HostType("VSTestHost")]
-        public void TestWaitOnExit() {
+        public void WaitOnExit() {
             foreach (var debug in new[] { false, true }) {
                 foreach (var exitCode in new[] { 0, 1 }) {
                     foreach (var waitOnAbnormal in new[] { true, false }) {
@@ -108,7 +108,7 @@ process.exit(" + exitCode + ");"),
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Debugging UI"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void TestNoDebugging() {
+        public void NoDebugging() {
             var project = Project("NoDebugging",
                 Compile("server"),
                 Property(CommonConstants.StartupFile, "server.js"),

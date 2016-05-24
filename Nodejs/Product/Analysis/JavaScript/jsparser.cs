@@ -18,10 +18,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
-using System.Reflection;
 using System.Runtime.Serialization;
 using Microsoft.Ajax.Utilities;
+
 
 namespace Microsoft.NodejsTools.Parsing
 {
@@ -1086,7 +1085,7 @@ namespace Microsoft.NodejsTools.Parsing
                 Statement lhs = null;
                 Statement initializer = null;
                 int headerEnd = -1;
-                List<VariableDeclaration> varList = new List<VariableDeclaration>();
+                var varList = new List<VariableDeclaration>();
                 try
                 {
                     if (JSToken.Var == _curToken
@@ -1108,16 +1107,20 @@ namespace Microsoft.NodejsTools.Parsing
                         }
 
                         var varInitializer = ParseIdentifierInitializer(JSToken.In);
-                        varList.Add(varInitializer);
-                        UpdateWithOtherNode(declaration, varInitializer);
+                        if (varInitializer != null) {
+                            varList.Add(varInitializer);
+                            UpdateWithOtherNode(declaration, varInitializer);
+                        }
 
                         // a list of variable initializers is allowed only in a for(;;)
                         while (JSToken.Comma == _curToken)
                         {
                             isForIn = false;
                             varInitializer = ParseIdentifierInitializer(JSToken.In);
-                            varList.Add(varInitializer);
-                            UpdateWithOtherNode(declaration, initializer);
+                            if (varInitializer != null) {
+                                varList.Add(varInitializer);
+                                UpdateWithOtherNode(declaration, initializer);
+                            }
                             //initializer = new Comma(initializer.context.CombineWith(var.context), initializer, var);
                         }
 
@@ -3902,7 +3905,13 @@ namespace Microsoft.NodejsTools.Parsing
                             }
 
                             // parse the number as a hex integer, converted to a double
-                            doubleValue = (double)System.Convert.ToInt64(str, 16);
+                            long hexValue;
+                            if (Int64.TryParse(str.Substring(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out hexValue)) {
+                                doubleValue = hexValue;
+                            } else {
+                                doubleValue = 0;
+                                return false;
+                            }
                         }
                         else
                         {

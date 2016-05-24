@@ -17,7 +17,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
@@ -26,16 +25,12 @@ namespace Microsoft.NodejsTools.Intellisense {
     internal class NormalCompletionAnalysis : CompletionAnalysis {
         private readonly VsProjectAnalyzer _analyzer;
         private readonly ITextSnapshot _snapshot;
-        private readonly ITrackingSpan _applicableSpan;
-        private readonly ITextBuffer _textBuffer;
         private readonly GetMemberOptions _options;
 
         public NormalCompletionAnalysis(VsProjectAnalyzer vsProjectAnalyzer, ITextSnapshot snapshot, VisualStudio.Text.ITrackingSpan applicableSpan, VisualStudio.Text.ITextBuffer textBuffer, GetMemberOptions options)
             : base(applicableSpan, textBuffer) {
             _analyzer = vsProjectAnalyzer;
             _snapshot = snapshot;
-            _applicableSpan = applicableSpan;
-            _textBuffer = textBuffer;
             _options = options;
         }
 
@@ -117,6 +112,5 @@ namespace Microsoft.NodejsTools.Intellisense {
                 return string.Empty;
             }
         }
-
     }
 }

@@ -25,13 +25,8 @@ using Microsoft.VisualStudio.Imaging;
 
 namespace Microsoft.NodejsTools.Project {
     class NodejsFileNode : CommonFileNode {
-        private FileSystemWatcher _watcher;
-
         public NodejsFileNode(NodejsProjectNode root, ProjectElement e)
             : base(root, e) {
-#if FALSE
-            CreateWatcher(Url);
-#endif
             if (Url.Contains(AnalysisConstants.NodeModulesFolder)) {
                 root.EnqueueForDelayedAnalysis(this);
             } else {
@@ -40,17 +35,16 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         protected override void OnParentSet(HierarchyNode parent) {
-#if DEV14
-            if (ProjectMgr == null || ProjectMgr.Analyzer == null) {
+            if (ProjectMgr == null || ProjectMgr.Analyzer == null || !ProjectMgr.ShouldAcquireTypingsAutomatically) {
                 return;
             }
 
-            if (Url.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase) && Url.IndexOf(@"\typings\", StringComparison.OrdinalIgnoreCase) >= 0) {
+            if (Url.EndsWith(NodejsConstants.TypeScriptDeclarationExtension, StringComparison.OrdinalIgnoreCase)
+              && Url.StartsWith(Path.Combine(ProjectMgr.ProjectFolder, @"typings\"), StringComparison.OrdinalIgnoreCase)) {
                 ProjectMgr.Site.GetUIThread().Invoke(() => {
                     this.IncludeInProject(true);
                 });
             }
-#endif
         }
 
         internal void Analyze() {
@@ -82,6 +76,10 @@ namespace Microsoft.NodejsTools.Project {
 #endif
 
         internal override int IncludeInProject(bool includeChildren) {
+            if (!ItemNode.IsExcluded) {
+                return 0;
+            }
+
             // Check if parent folder is designated as containing client-side code.
             var isContent = false;
             var folderNode = this.Parent as NodejsFolderNode;
@@ -95,7 +93,6 @@ namespace Microsoft.NodejsTools.Project {
             }
 
             var includeInProject = base.IncludeInProject(includeChildren);
-
             if (isContent && Url.EndsWith(".js", StringComparison.OrdinalIgnoreCase)) {
                 this.ItemNode.ItemTypeName = ProjectFileConstants.Content;
             }
@@ -105,11 +102,11 @@ namespace Microsoft.NodejsTools.Project {
             UpdateParentContentType();
             ItemNode.ItemTypeChanged += ItemNode_ItemTypeChanged;
 
-#if DEV14
-            ProjectMgr.Site.GetUIThread().Invoke(() => {
-                ProjectMgr.OnItemAdded(this.Parent, this);
-            });
-#endif
+            if (ProjectMgr.ShouldAcquireTypingsAutomatically) {
+                ProjectMgr.Site.GetUIThread().Invoke(() => {
+                    ProjectMgr.OnItemAdded(this.Parent, this);
+                });
+            }
 
             return includeInProject;
         }
@@ -165,50 +162,6 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private void CloseWatcher() {
-            if (_watcher == null) {
-                ProjectMgr.UnregisterFileChangeNotification(this);
-            } else {
-                _watcher.EnableRaisingEvents = false;
-                _watcher.Dispose();
-                _watcher = null;
-            }
-        }
-
-        // TODO: Need to update analysis for files changed outside of VS
-        private void CreateWatcher(string filename) {
-#if FALSE
-            if (CommonUtils.IsSubpathOf(ProjectMgr.ProjectHome, filename)) {
-                // we want to subscribe to the project's file system watcher so users
-                // can continue to rename the directory which contains this file.
-                ProjectMgr.RegisterFileChangeNotification(this, FileContentsChanged);
-            } else {
-                // this is a link file which lives outside of our project directory,
-                // we'll need to watch the file directly, which means we're going to
-                // prevent it's parent directory from being renamed.
-                _watcher = new FileSystemWatcher(Path.GetDirectoryName(filename), Path.GetFileName(filename));
-                _watcher.EnableRaisingEvents = true;
-                _watcher.Changed += FileContentsChanged;
-                _watcher.Renamed += FileContentsChanged;
-                _watcher.NotifyFilter = NotifyFilters.LastWrite;
-            }
-#endif
-        }
-
-        internal override void RenameInStorage(string oldName, string newName) {
-            CloseWatcher();
-            bool renamed = false;
-            try {
-                base.RenameInStorage(oldName, newName);
-                renamed = true;
-                CreateWatcher(newName);
-            } finally {
-                if (!renamed) {
-                    CreateWatcher(oldName);
-                }
-            }
-        }
-
         public new NodejsProjectNode ProjectMgr {
             get {
                 return (NodejsProjectNode)base.ProjectMgr;
@@ -218,13 +171,11 @@ namespace Microsoft.NodejsTools.Project {
         public override void Remove(bool removeFromStorage) {
             ItemNode.ItemTypeChanged -= ItemNode_ItemTypeChanged;
             base.Remove(removeFromStorage);
-            CloseWatcher();
         }
 
         public override void Close() {
             ItemNode.ItemTypeChanged -= ItemNode_ItemTypeChanged;
             base.Close();
-            CloseWatcher();
         }
     }
 }

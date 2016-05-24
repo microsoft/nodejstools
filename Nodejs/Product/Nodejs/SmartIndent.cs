@@ -241,6 +241,10 @@ namespace Microsoft.NodejsTools {
         /// Enumerates all of the classifications in reverse starting at start to the beginning of the file.
         /// </summary>
         private static IEnumerator<ITagSpan<ClassificationTag>> EnumerateClassificationsInReverse(ITagger<ClassificationTag> classifier, SnapshotPoint start) {
+            if (classifier == null) {
+                yield break;
+            }
+
             var curLine = start.GetContainingLine();
             var spanEnd = start;
 

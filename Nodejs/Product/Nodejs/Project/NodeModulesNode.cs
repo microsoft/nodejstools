@@ -103,6 +103,10 @@ namespace Microsoft.NodejsTools.Project {
                     _npmController.CommandCompleted -= NpmController_CommandCompleted;
                 }
 
+                _devModulesNode.Dispose();
+                _optionalModulesNode.Dispose();
+                _globalModulesNode.Dispose();
+
                 _isDisposed = true;
             }
 
