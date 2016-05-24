@@ -193,7 +193,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     QuoteSingleArgument(filename),
                     GetArguments(arguments, quoteArgs)),
                 CreateNoWindow = !visible,
-                UseShellExecute = true,
+                UseShellExecute = false,
                 RedirectStandardError = !visible || (redirector != null),
                 RedirectStandardOutput = !visible || (redirector != null),
                 RedirectStandardInput = !visible
