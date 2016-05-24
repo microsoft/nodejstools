@@ -1,0 +1,14 @@
+{
+  "name": "$npmsafeprojectname$",
+  "version": "0.0.0",
+  "description": "$projectname$",
+  "main": "lib/app",
+  "author": {
+    "name": "$username$",
+    "email": ""
+  },
+  "typings": "lib/app",
+  "files": [
+    "lib/"
+  ]
+}

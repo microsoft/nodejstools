@@ -762,6 +762,11 @@
     <ZipProject Include="ProjectTemplates\AzureExpress4App\setup_web.cmd" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\Web.config" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\Web.Debug.config" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptNPMPackage\NodejsConsoleApp.njsproj">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptNPMPackage\NodejsConsoleApp.vstemplate" />
+    <Resource Include="ProjectTemplates\TypeScriptNPMPackage\Preview.png" />
     <Content Include="Snippets\1033\Test\describe.snippet">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -880,6 +885,9 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubPath>ItemTemplates</VSIXSubPath>
     </Content>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptNPMPackage\package.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptNPMPackage\README.md" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptNPMPackage\tsconfig.json" />
     <None Include="Theme\contrast.vstheme">
       <SubType>Designer</SubType>
     </None>
@@ -1695,7 +1703,9 @@
     <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\startup.ts" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\server.ts" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptNPMPackage\index.ts" />
+  </ItemGroup>
   <PropertyGroup>
     <!--
     To specify a different registry root to register your package, uncomment the TargetRegistryRoot

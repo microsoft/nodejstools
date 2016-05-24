@@ -1,0 +1,13 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
+    "declaration": true,
+    "outDir": "lib/"
+  },
+  "exclude": [
+    "node_modules",
+    "lib"
+  ]
+}
