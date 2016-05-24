@@ -263,7 +263,7 @@ namespace Microsoft.VisualStudio.Repl {
         /// <summary>
         /// Properties for a run of text - includes destination (stdout/stderr) and color
         /// </summary>
-        public struct OutputEntryProperties {
+        internal struct OutputEntryProperties {
             public readonly OutputEntryKind Kind;
             public readonly ConsoleColor Color;
 
@@ -294,7 +294,7 @@ namespace Microsoft.VisualStudio.Repl {
             }
         }
 
-        public enum OutputEntryKind {
+        internal enum OutputEntryKind {
             StdOut,
             StdErr
         }

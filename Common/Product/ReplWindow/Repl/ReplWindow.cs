@@ -2111,15 +2111,16 @@ namespace Microsoft.VisualStudio.Repl {
         /// Appends text to the output buffer and updates projection buffer to include it.
         /// </summary>
         internal void AppendOutput(OutputBuffer.OutputEntry[] entries) {
-            if (!entries.Any())
+            if (!entries.Any()) {
                 return;
-
-            var spans = new List<KeyValuePair<Span, OutputBuffer.OutputEntryProperties>>(entries.Length);
+            }
 
             int oldBufferLength = _outputBuffer.CurrentSnapshot.Length;
             int oldLineCount = _outputBuffer.CurrentSnapshot.LineCount;
 
             RemoveProtection(_outputBuffer, _outputProtection);
+
+            var spans = new List<KeyValuePair<Span, OutputBuffer.OutputEntryProperties>>(entries.Length);
 
             // append the text to output buffer and make sure it ends with a line break:
             using (var edit = _outputBuffer.CreateEdit()) {
@@ -2147,7 +2148,7 @@ namespace Microsoft.VisualStudio.Repl {
                     var lineBreak = GetLineBreak();
                     edit.Insert(oldBufferLength, lineBreak);
                     _addedLineBreakOnLastOutput = true;
-                    // Adust last span.
+                    // Adust last span to include line break
                     var last = spans.Last();
                     var newLastSpan = new Span(last.Key.Start, last.Key.Length + lineBreak.Length);
                     spans[spans.Count() - 1] = new KeyValuePair<Span, OutputBuffer.OutputEntryProperties>(newLastSpan, last.Value);
