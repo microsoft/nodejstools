@@ -95,7 +95,8 @@
                                   ProjectTemplates\TypeScript\Node.js\1033\TypeScriptFromExistingCode.zip;
                                   ProjectTemplates\TypeScript\Node.js\1033\TypeScriptAzureNodejsWorker.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\TypeScriptAzureNodejsWorkerRole.zip;
-                                  ProjectTemplates\JavaScript\Node.js\1033\CloudService.zip;"/>
+                                  ProjectTemplates\JavaScript\Node.js\1033\CloudService.zip;
+                                  ProjectTemplates\TypeScript\Node.js\1033\TypeScriptNPMPackage.zip;"/>
         
         <File Include="ProjectTemplates\VS_Nodejs.project.vstman">
             <InstallDirectory>AllProjectTemplates</InstallDirectory>
