@@ -11,7 +11,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>$guid1$</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>index.ts</StartupFile>
+    <StartupFile>lib\index.js</StartupFile>
     <StartWebBrowser>False</StartWebBrowser>
     <SearchPath></SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
