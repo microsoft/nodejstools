@@ -100,8 +100,8 @@ namespace Microsoft.NodejsTools.Debugger {
 
         public bool Unbound { get; set; }
 
-        public async Task Remove() {
-            await Process.RemoveBreakpointAsync(this).ConfigureAwait(false);
+        public Task Remove() {
+            return Process.RemoveBreakpointAsync(this).WaitAsync(System.TimeSpan.FromSeconds(2));
         }
 
         public uint GetHitCount() {
