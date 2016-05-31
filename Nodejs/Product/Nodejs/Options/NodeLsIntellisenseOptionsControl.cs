@@ -126,7 +126,6 @@ namespace Microsoft.NodejsTools.Options {
         }
 
         internal void SyncPageWithControlSettings(NodejsIntellisenseOptionsPage page) {
-            page.AnalysisLevel = AnalysisLevel;
             page.AnalysisLogMax = AnalysisLogMaximum;
             page.SaveToDisk = SaveToDisk;
             page.OnlyTabOrEnterToCommit = OnlyTabOrEnterToCommit;
@@ -134,7 +133,6 @@ namespace Microsoft.NodejsTools.Options {
         }
 
         internal void SyncControlWithPageSettings(NodejsIntellisenseOptionsPage page) {
-            AnalysisLevel = page.AnalysisLevel;
             AnalysisLogMaximum = page.AnalysisLogMax;
             SaveToDisk = page.SaveToDisk;
             OnlyTabOrEnterToCommit = page.OnlyTabOrEnterToCommit;

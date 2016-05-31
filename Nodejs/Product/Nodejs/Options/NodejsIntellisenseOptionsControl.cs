@@ -59,11 +59,13 @@ namespace Microsoft.NodejsTools.Options {
         internal void SyncPageWithControlSettings(NodejsIntellisenseOptionsPage page) {
             page.AnalysisLevel = AnalysisLevel;
             _nodejsES5IntelliSenseOptionsControl.SyncPageWithControlSettings(page);
+            _salsaLsIntellisenseOptionsControl.SyncPageWithControlSettings(page);
         }
 
         internal void SyncControlWithPageSettings(NodejsIntellisenseOptionsPage page) {
             AnalysisLevel = page.AnalysisLevel;
             _nodejsES5IntelliSenseOptionsControl.SyncControlWithPageSettings(page);
+            _salsaLsIntellisenseOptionsControl.SyncControlWithPageSettings(page);
         }
 
         private void _analysisPreviewFeedbackLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
@@ -72,8 +74,9 @@ namespace Microsoft.NodejsTools.Options {
 
         private void _intelliSenseModeDropdown_SelectedValueChanged(object sender, EventArgs e) {
             bool isES6PreviewIntelliSense = _intelliSenseModeDropdown.SelectedIndex == 0;
-            AnalysisLevel = AnalysisLevel;
+            //AnalysisLevel = AnalysisLevel;
             _nodejsES5IntelliSenseOptionsControl.Visible = !isES6PreviewIntelliSense;
+            _salsaLsIntellisenseOptionsControl.Visible = isES6PreviewIntelliSense;
             _es5DeprecatedWarning.Visible = !isES6PreviewIntelliSense;
         }
     }

@@ -357,6 +357,12 @@
     <Compile Include="Options\NodejsIntellisenseOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Options\SalsaLsIntellisenseOptionsControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Options\SalsaLsIntellisenseOptionsControl.Designer.cs">
+      <DependentUpon>SalsaLsIntellisenseOptionsControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Outlining\JavaScriptOutliningTaggerProvider.cs" />
     <Compile Include="Project\AzureToolsContracts.cs" />
     <Compile Include="Project\DependencyNodeProperties.cs" />
@@ -708,6 +714,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.resx">
       <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Options\SalsaLsIntellisenseOptionsControl.resx">
+      <DependentUpon>SalsaLsIntellisenseOptionsControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.resx">
       <DependentUpon>NodejsGeneralPropertyPageControl.cs</DependentUpon>
