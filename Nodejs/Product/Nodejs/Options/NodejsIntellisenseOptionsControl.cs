@@ -26,29 +26,12 @@ namespace Microsoft.NodejsTools.Options {
             _intelliSenseModeDropdown.Enabled = NodejsPackage.Instance.IntellisenseOptionsPage.EnableES6Preview;
         }
 
-        internal bool SaveToDisk {
-            get {
-                return _saveToDiskEnabledRadioButton.Checked;
-            }
-            set {
-                if (value == true) {
-                    _saveToDiskEnabledRadioButton.Checked = true;
-                } else {
-                    _saveToDiskDisabledRadioButton.Checked = true;
-                }
-            }
-        }
-
         internal AnalysisLevel AnalysisLevel {
             get {
                 if (_intelliSenseModeDropdown.SelectedIndex == 0) {
                     return AnalysisLevel.Preview;
-                } else if (_fullIntelliSenseRadioButton.Checked) {
-                    return AnalysisLevel.NodeLsHigh;
-                } else if (_mediumIntelliSenseRadioButton.Checked) {
-                    return AnalysisLevel.NodeLsMedium;
                 } else {
-                    return AnalysisLevel.NodeLsNone;
+                    return _nodejsES5IntelliSenseOptionsControl.AnalysisLevel;
                 }
             }
             set {
@@ -59,16 +42,12 @@ namespace Microsoft.NodejsTools.Options {
                 switch (value) {
                     case AnalysisLevel.Preview:
                         // Set default ES5 IntelliSense level - this setting will not take effect if ES6 Preview is enabled.
-                        _fullIntelliSenseRadioButton.Checked = true;
+                        _nodejsES5IntelliSenseOptionsControl.AnalysisLevel = AnalysisLevel.NodeLsMedium;
                         break;
                     case AnalysisLevel.NodeLsHigh:
-                        _fullIntelliSenseRadioButton.Checked = true;
-                        break;
                     case AnalysisLevel.NodeLsMedium:
-                        _mediumIntelliSenseRadioButton.Checked = true;
-                        break;
                     case AnalysisLevel.NodeLsNone:
-                        _noIntelliSenseRadioButton.Checked = true;
+                        _nodejsES5IntelliSenseOptionsControl.AnalysisLevel = value;
                         break;
                     default:
                         Debug.Fail("Unrecognized AnalysisLevel: " + value);
@@ -77,68 +56,14 @@ namespace Microsoft.NodejsTools.Options {
             }
         }
 
-        internal int AnalysisLogMaximum {
-            get {
-                int max;
-                // The Max Value is described by 'Max' instead of 'Int32.MaxValue'
-                if (_analysisLogMax.Text == "Max") {
-                    return Int32.MaxValue;
-                }
-                if (Int32.TryParse(_analysisLogMax.Text, out max)) {
-                    return max;
-                }
-                return 0;
-            }
-            set {
-                if (value == 0) {
-                    _analysisLogMax.SelectedIndex = 0;
-                    return;
-                }
-                // Handle case where value is the Max.
-                string index = value == Int32.MaxValue ? "Max" : value.ToString();
-                for (int i = 0; i < _analysisLogMax.Items.Count; i++) {
-                    if (_analysisLogMax.Items[i].ToString() == index) {
-                        _analysisLogMax.SelectedIndex = i;
-                        return;
-                    }
-                }
-
-                _analysisLogMax.Text = index;
-            }
-        }
-
-        internal bool OnlyTabOrEnterToCommit {
-            get {
-                return _onlyTabOrEnterToCommit.Checked;
-            }
-            set {
-                _onlyTabOrEnterToCommit.Checked = value;
-            }
-        }
-
-        internal bool ShowCompletionListAfterCharacterTyped {
-            get {
-                return _showCompletionListAfterCharacterTyped.Checked;
-            }
-            set {
-                _showCompletionListAfterCharacterTyped.Checked = value;
-            }
-        }
-
         internal void SyncPageWithControlSettings(NodejsIntellisenseOptionsPage page) {
             page.AnalysisLevel = AnalysisLevel;
-            page.AnalysisLogMax = AnalysisLogMaximum;
-            page.SaveToDisk = SaveToDisk;
-            page.OnlyTabOrEnterToCommit = OnlyTabOrEnterToCommit;
-            page.ShowCompletionListAfterCharacterTyped = ShowCompletionListAfterCharacterTyped;
+            _nodejsES5IntelliSenseOptionsControl.SyncPageWithControlSettings(page);
         }
 
         internal void SyncControlWithPageSettings(NodejsIntellisenseOptionsPage page) {
             AnalysisLevel = page.AnalysisLevel;
-            AnalysisLogMaximum = page.AnalysisLogMax;
-            SaveToDisk = page.SaveToDisk;
-            OnlyTabOrEnterToCommit = page.OnlyTabOrEnterToCommit;
-            ShowCompletionListAfterCharacterTyped = page.ShowCompletionListAfterCharacterTyped;
+            _nodejsES5IntelliSenseOptionsControl.SyncControlWithPageSettings(page);
         }
 
         private void _analysisPreviewFeedbackLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
@@ -148,7 +73,7 @@ namespace Microsoft.NodejsTools.Options {
         private void _intelliSenseModeDropdown_SelectedValueChanged(object sender, EventArgs e) {
             bool isES6PreviewIntelliSense = _intelliSenseModeDropdown.SelectedIndex == 0;
             AnalysisLevel = AnalysisLevel;
-            _intelliSenseAdvancedOptionsGroupBox.Visible = !isES6PreviewIntelliSense;
+            _nodejsES5IntelliSenseOptionsControl.Visible = !isES6PreviewIntelliSense;
             _es5DeprecatedWarning.Visible = !isES6PreviewIntelliSense;
         }
     }
