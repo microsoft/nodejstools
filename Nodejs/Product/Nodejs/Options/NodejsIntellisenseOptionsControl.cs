@@ -23,7 +23,7 @@ namespace Microsoft.NodejsTools.Options {
     public partial class NodejsIntellisenseOptionsControl : UserControl {
         public NodejsIntellisenseOptionsControl() {
             InitializeComponent();
-            _previewIntelliSenseRadioButton.Enabled = NodejsPackage.Instance.IntellisenseOptionsPage.EnableES6Preview;
+            _intelliSenseModeDropdown.Enabled = NodejsPackage.Instance.IntellisenseOptionsPage.EnableES6Preview;
         }
 
         internal bool SaveToDisk {
@@ -41,7 +41,7 @@ namespace Microsoft.NodejsTools.Options {
 
         internal AnalysisLevel AnalysisLevel {
             get {
-                if (_previewIntelliSenseRadioButton.Checked) {
+                if (_intelliSenseModeDropdown.SelectedIndex == 0) {
                     return AnalysisLevel.Preview;
                 } else if (_fullIntelliSenseRadioButton.Checked) {
                     return AnalysisLevel.NodeLsHigh;
@@ -52,9 +52,14 @@ namespace Microsoft.NodejsTools.Options {
                 }
             }
             set {
+                if (_intelliSenseModeDropdown.SelectedIndex == -1) {
+                    _intelliSenseModeDropdown.SelectedIndex = value == AnalysisLevel.Preview ? 0 : 1;
+                }
+
                 switch (value) {
                     case AnalysisLevel.Preview:
-                        _previewIntelliSenseRadioButton.Checked = true;
+                        // Set default ES5 IntelliSense level - this setting will not take effect if ES6 Preview is enabled.
+                        _fullIntelliSenseRadioButton.Checked = true;
                         break;
                     case AnalysisLevel.NodeLsHigh:
                         _fullIntelliSenseRadioButton.Checked = true;
@@ -138,6 +143,13 @@ namespace Microsoft.NodejsTools.Options {
 
         private void _analysisPreviewFeedbackLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
             Process.Start("http://aka.ms/NtvsEs6Preview");
+        }
+
+        private void _intelliSenseModeDropdown_SelectedValueChanged(object sender, EventArgs e) {
+            bool isES6PreviewIntelliSense = _intelliSenseModeDropdown.SelectedIndex == 0;
+            AnalysisLevel = AnalysisLevel;
+            _intelliSenseAdvancedOptionsGroupBox.Visible = !isES6PreviewIntelliSense;
+            _es5DeprecatedWarning.Visible = !isES6PreviewIntelliSense;
         }
     }
 }
