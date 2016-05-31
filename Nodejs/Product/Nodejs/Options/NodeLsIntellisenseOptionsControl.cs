@@ -20,8 +20,8 @@ using System.Windows.Forms;
 using Microsoft.NodejsTools.Project;
 
 namespace Microsoft.NodejsTools.Options {
-    public partial class NodejsIntellisenseOptionsControl2 : UserControl {
-        public NodejsIntellisenseOptionsControl2() {
+    public partial class NodeLsIntellisenseOptionsControl : UserControl {
+        public NodeLsIntellisenseOptionsControl() {
             InitializeComponent();
         }
 

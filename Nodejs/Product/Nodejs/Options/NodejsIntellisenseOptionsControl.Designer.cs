@@ -33,7 +33,7 @@
             this._analysisPreviewFeedbackLinkLabel = new System.Windows.Forms.LinkLabel();
             this._es5DeprecatedWarning = new System.Windows.Forms.Label();
             this._intelliSenseAdvancedOptionsGroupBox = new System.Windows.Forms.GroupBox();
-            this._nodejsES5IntelliSenseOptionsControl = new Microsoft.NodejsTools.Options.NodejsIntellisenseOptionsControl2();
+            this._nodejsES5IntelliSenseOptionsControl = new Microsoft.NodejsTools.Options.NodeLsIntellisenseOptionsControl();
             toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel6.SuspendLayout();
@@ -122,6 +122,6 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.LinkLabel _analysisPreviewFeedbackLinkLabel;
         private System.Windows.Forms.Label _es5DeprecatedWarning;
-        private NodejsIntellisenseOptionsControl2 _nodejsES5IntelliSenseOptionsControl;
+        private NodeLsIntellisenseOptionsControl _nodejsES5IntelliSenseOptionsControl;
     }
 }

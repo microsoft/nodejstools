@@ -1,5 +1,5 @@
 ﻿namespace Microsoft.NodejsTools.Options {
-    partial class NodejsIntellisenseOptionsControl2 {
+    partial class NodeLsIntellisenseOptionsControl {
         /// <summary> 
         /// Required designer variable.
         /// </summary>
@@ -25,7 +25,7 @@
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.ToolTip toolTip;
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NodejsIntellisenseOptionsControl2));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NodeLsIntellisenseOptionsControl));
             this._saveToDiskDisabledRadioButton = new System.Windows.Forms.RadioButton();
             this._saveToDiskEnabledRadioButton = new System.Windows.Forms.RadioButton();
             this._mediumIntelliSenseRadioButton = new System.Windows.Forms.RadioButton();
