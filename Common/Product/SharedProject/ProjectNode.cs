@@ -1124,6 +1124,9 @@ namespace Microsoft.VisualStudioTools.Project {
                     imageHandler.Close();
                     imageHandler = null;
                 }
+
+                _diskNodes.Clear();
+                _folderBeingCreated = null;
             } finally {
                 base.Dispose(disposing);
                 // Note that this isDisposed flag is separate from the base's
@@ -5471,9 +5474,9 @@ If the files in the existing folder have the same names as files in the folder y
 
             Debug.Assert(Path.IsPathRooted(name));
 
-            HierarchyNode res;
-            _diskNodes.TryGetValue(name, out res);
-            return res;
+            HierarchyNode node;
+            _diskNodes.TryGetValue(name, out node);
+            return node;
         }
 
         /// <summary>

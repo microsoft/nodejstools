@@ -1564,6 +1564,10 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         /// <param name="disposing">Is the Dispose called by some internal member, or it is called by from GC.</param>
         protected virtual void Dispose(bool disposing) {
+            firstChild = null;
+            lastChild = null;
+            nextSibling = null;
+            itemNode = null;
         }
 
         /// <summary>

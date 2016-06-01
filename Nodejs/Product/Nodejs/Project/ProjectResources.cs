@@ -165,6 +165,7 @@ namespace Microsoft.NodejsTools.Project {
         internal const string RemoteDebugProxyFileDoesNotExist = "RemoteDebugProxyFileDoesNotExist";
         internal const string RemoteDebugProxyFolderDoesNotExist = "RemoteDebugProxyFolderDoesNotExist";
         internal const string ReplInitializationMessage = "ReplInitializationMessage";
+        internal const string ReplWindowNpmInitNoYesFlagWarning = "ReplWindowNpmInitNoYesFlagWarning";
         internal const string RequestedVersionRangeNone = "RequestedVersionRangeNone";
         internal const string ScriptArgumentsToolTip = "ScriptArgumentsToolTip";
         internal const string ScriptFileToolTip = "ScriptFileTooltip";
