@@ -20,8 +20,8 @@ var find_tests = function (testFileList, discoverResultFile, projectFolder) {
                         test: t.fullTitle(),
                         suite: suite.fullTitle(),
                         file: testFile,
-                        line: 0,
-                        column: 0
+                        line: 1,
+                        column: 1
                     });
                 });
             }
