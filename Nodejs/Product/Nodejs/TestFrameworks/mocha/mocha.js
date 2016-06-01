@@ -80,18 +80,30 @@ function logError() {
 
 function detectMocha(projectFolder) {
   try {
-        var node_modulesFolder = projectFolder;
-        var mochaJsonPath = path.join(node_modulesFolder, 'test', 'mocha.json');
-        if (fs.existsSync(mochaJsonPath)) {
-          var opt = require(mochaJsonPath);
-          if (opt && opt.path) {
-            node_modulesFolder = path.resolve(projectFolder, opt.path);
-          }
-        }
+    var node_modulesFolder = projectFolder;
 
-        var mochaPath = path.join(node_modulesFolder, 'node_modules', 'mocha');
-        var Mocha = new require(mochaPath);
-        return Mocha;
+    var nodePath = process.env.NODE_PATH;
+    if (nodePath && nodePath.length > 0) {
+      // get mocha location from NODE_PATH env 
+      var ndex = nodePath.search(new RegExp(/node_modules$/i));
+      if (ndex > 0) {
+        node_modulesFolder = nodePath.slice(0, -12);
+      }
+    }
+    else {
+      // get mocha location from mocha.json 
+      var mochaJsonPath = path.join(node_modulesFolder, 'test', 'mocha.json');
+      if (fs.existsSync(mochaJsonPath)) {
+        var opt = require(mochaJsonPath);
+        if (opt && opt.path) {
+          node_modulesFolder = path.resolve(projectFolder, opt.path);
+        }
+      }
+    }
+
+    var mochaPath = path.join(node_modulesFolder, 'node_modules', 'mocha');
+    var Mocha = new require(mochaPath);
+    return Mocha;
     } catch (ex) {
         logError("Failed to find Mocha package.  Mocha must be installed in the project locally.  Mocha can be installed locally with the npm manager via solution explorer or with \".npm install mocha\" via the Node.js interactive window.");
         return null;
