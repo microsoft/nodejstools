@@ -20,8 +20,8 @@ var find_tests = function (testFileList, discoverResultFile, projectFolder) {
                         test: t.fullTitle(),
                         suite: suite.fullTitle(),
                         file: testFile,
-                        line: 0,
-                        column: 0
+                        line: 1,
+                        column: 1
                     });
                 });
             }
@@ -79,14 +79,14 @@ function logError() {
 }
 
 function detectMocha(projectFolder) {
-  try {
+    try {
         var node_modulesFolder = projectFolder;
         var mochaJsonPath = path.join(node_modulesFolder, 'test', 'mocha.json');
         if (fs.existsSync(mochaJsonPath)) {
-          var opt = require(mochaJsonPath);
-          if (opt && opt.path) {
-            node_modulesFolder = path.resolve(projectFolder, opt.path);
-          }
+            var opt = require(mochaJsonPath);
+            if (opt && opt.path) {
+                node_modulesFolder = path.resolve(projectFolder, opt.path);
+            }
         }
 
         var mochaPath = path.join(node_modulesFolder, 'node_modules', 'mocha');
