@@ -1,7 +1,15 @@
 var fs = require('fs');
 var path = require('path');
+var vm = require('vm');
 
 var find_tests = function (testFileList, discoverResultFile) {
+    var debug;
+    try {
+        debug = vm.runInDebugContext('Debug');
+    } catch (ex) {
+        console.error("NTVS_ERROR:", ex);
+    }
+
     var testList = [];
     testFileList.split(';').forEach(function (testFile) {
         var testCases;
@@ -13,16 +21,16 @@ var find_tests = function (testFileList, discoverResultFile) {
             return;
         }
         for (var test in testCases) {
-            var line = 0;
-            var column = 0;
-            if (dbg != undefined) {
+            var line = 1; // line 0 doesn't exist in editor
+            var column = 1;
+            if (debug !== undefined) {
                 try {
-                    var funcDetails = dbg.Debug.findFunctionSourceLocation(testCases[test]);
+                    var funcDetails = debug.findFunctionSourceLocation(testCases[test]);
                     if (funcDetails != undefined) {
                         //v8 is 0 based line numbers, editor is 1 based
                         line = parseInt(funcDetails.line) + 1;
-                        //v8 and editor are both 1 based column numbers, no adjustment necessary
-                        column = parseInt(funcDetails.column);
+                        //v8 is 0 based column numbers, editor is 1 based
+                        column = parseInt(funcDetails.column) + 1;
                     }
                 } catch (e) {
                     //If we take an exception mapping the source line, simply fallback to unknown source map 
