@@ -146,11 +146,12 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private void TryToAcquireTypings(IEnumerable<string> packages) {
+            bool isNewTypingsFolder = !Directory.Exists(Path.Combine(this.ProjectHome, "typings"));
             if (ShouldAcquireTypingsAutomatically && TypingsAcquirer != null) {
                 TypingsAcquirer
                     .AcquireTypings(packages, null /*redirector*/)
                     .ContinueWith(x => {
-                        if (x.Result) {
+                        if (x.Result && isNewTypingsFolder) {
                             NodejsPackage.Instance.GetUIThread().Invoke(() => {
                                 TypingsInfoBar.Instance.ShowInfoBar();
                             });
