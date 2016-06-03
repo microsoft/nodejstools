@@ -34,6 +34,7 @@ using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudioTools.Project.Automation;
 using MSBuild = Microsoft.Build.Evaluation;
 using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
+using Microsoft.NodejsTools.Options;
 #if DEV14_OR_LATER
 using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Imaging;
@@ -148,7 +149,13 @@ namespace Microsoft.NodejsTools.Project {
             if (ShouldAcquireTypingsAutomatically && TypingsAcquirer != null) {
                 TypingsAcquirer
                     .AcquireTypings(packages, null /*redirector*/)
-                    .ContinueWith(x => x);
+                    .ContinueWith(x => {
+                        if (x.Result) {
+                            NodejsPackage.Instance.GetUIThread().Invoke(() => {
+                                TypingsInfoBar.Instance.ShowInfoBar();
+                            });
+                        }
+                    });
             }
         }
 

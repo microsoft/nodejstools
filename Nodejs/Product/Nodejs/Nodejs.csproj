@@ -321,6 +321,7 @@
     </Compile>
     <Compile Include="NpmUI\PackageCatalogEntryViewModel.cs" />
     <Compile Include="Options\AnalysisLevel.cs" />
+    <Compile Include="Options\TypingsInfoBar.cs" />
     <Compile Include="Options\NodejsDiagnosticsOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
