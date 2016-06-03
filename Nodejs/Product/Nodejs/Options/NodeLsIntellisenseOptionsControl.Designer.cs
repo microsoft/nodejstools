@@ -171,12 +171,12 @@
             resources.ApplyResources(this.label1, "label1");
             this.label1.Name = "label1";
             // 
-            // NodejsIntellisenseOptionsControl2
+            // NodeLsIntellisenseOptionsControl
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.tableLayoutPanel5);
-            this.Name = "NodejsIntellisenseOptionsControl2";
+            this.Name = "NodeLsIntellisenseOptionsControl";
             this.tableLayoutPanel5.ResumeLayout(false);
             this.tableLayoutPanel5.PerformLayout();
             this.tableLayoutPanel3.ResumeLayout(false);

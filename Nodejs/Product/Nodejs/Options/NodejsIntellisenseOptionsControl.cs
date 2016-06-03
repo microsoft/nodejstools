@@ -74,7 +74,6 @@ namespace Microsoft.NodejsTools.Options {
 
         private void _intelliSenseModeDropdown_SelectedValueChanged(object sender, EventArgs e) {
             bool isES6PreviewIntelliSense = _intelliSenseModeDropdown.SelectedIndex == 0;
-            //AnalysisLevel = AnalysisLevel;
             _nodejsES5IntelliSenseOptionsControl.Visible = !isES6PreviewIntelliSense;
             _salsaLsIntellisenseOptionsControl.Visible = isES6PreviewIntelliSense;
             _es5DeprecatedWarning.Visible = !isES6PreviewIntelliSense;
