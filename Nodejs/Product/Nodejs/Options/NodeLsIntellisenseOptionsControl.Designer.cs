@@ -31,22 +31,22 @@
             this._mediumIntelliSenseRadioButton = new System.Windows.Forms.RadioButton();
             this._noIntelliSenseRadioButton = new System.Windows.Forms.RadioButton();
             this._fullIntelliSenseRadioButton = new System.Windows.Forms.RadioButton();
-            this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
-            this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+            this.outerLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+            this.statementCompletionLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this._showCompletionListAfterCharacterTyped = new System.Windows.Forms.CheckBox();
             this._onlyTabOrEnterToCommit = new System.Windows.Forms.CheckBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
-            this.label2 = new System.Windows.Forms.Label();
-            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.statementCompletionLabel = new System.Windows.Forms.Label();
+            this.saveToDiskLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+            this.saveToDiskLabel = new System.Windows.Forms.Label();
+            this.intelliSenseLevelLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this._analysisLogMax = new System.Windows.Forms.ComboBox();
             this._analysisLogMaxLabel = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
+            this.intelliSenseLevelLabel = new System.Windows.Forms.Label();
             toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.tableLayoutPanel5.SuspendLayout();
-            this.tableLayoutPanel3.SuspendLayout();
-            this.tableLayoutPanel4.SuspendLayout();
-            this.tableLayoutPanel2.SuspendLayout();
+            this.outerLayoutPanel.SuspendLayout();
+            this.statementCompletionLayoutPanel.SuspendLayout();
+            this.saveToDiskLayoutPanel.SuspendLayout();
+            this.intelliSenseLevelLayoutPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // _saveToDiskDisabledRadioButton
@@ -89,23 +89,23 @@
             toolTip.SetToolTip(this._fullIntelliSenseRadioButton, resources.GetString("_fullIntelliSenseRadioButton.ToolTip"));
             this._fullIntelliSenseRadioButton.UseVisualStyleBackColor = true;
             // 
-            // tableLayoutPanel5
+            // outerLayoutPanel
             // 
-            resources.ApplyResources(this.tableLayoutPanel5, "tableLayoutPanel5");
-            this.tableLayoutPanel5.Controls.Add(this.tableLayoutPanel3, 0, 5);
-            this.tableLayoutPanel5.Controls.Add(this.label3, 0, 4);
-            this.tableLayoutPanel5.Controls.Add(this.tableLayoutPanel4, 0, 3);
-            this.tableLayoutPanel5.Controls.Add(this.label2, 0, 2);
-            this.tableLayoutPanel5.Controls.Add(this.tableLayoutPanel2, 0, 1);
-            this.tableLayoutPanel5.Controls.Add(this.label1, 0, 0);
-            this.tableLayoutPanel5.Name = "tableLayoutPanel5";
+            resources.ApplyResources(this.outerLayoutPanel, "outerLayoutPanel");
+            this.outerLayoutPanel.Controls.Add(this.statementCompletionLayoutPanel, 0, 5);
+            this.outerLayoutPanel.Controls.Add(this.statementCompletionLabel, 0, 4);
+            this.outerLayoutPanel.Controls.Add(this.saveToDiskLayoutPanel, 0, 3);
+            this.outerLayoutPanel.Controls.Add(this.saveToDiskLabel, 0, 2);
+            this.outerLayoutPanel.Controls.Add(this.intelliSenseLevelLayoutPanel, 0, 1);
+            this.outerLayoutPanel.Controls.Add(this.intelliSenseLevelLabel, 0, 0);
+            this.outerLayoutPanel.Name = "outerLayoutPanel";
             // 
-            // tableLayoutPanel3
+            // statementCompletionLayoutPanel
             // 
-            resources.ApplyResources(this.tableLayoutPanel3, "tableLayoutPanel3");
-            this.tableLayoutPanel3.Controls.Add(this._showCompletionListAfterCharacterTyped, 0, 1);
-            this.tableLayoutPanel3.Controls.Add(this._onlyTabOrEnterToCommit, 0, 0);
-            this.tableLayoutPanel3.Name = "tableLayoutPanel3";
+            resources.ApplyResources(this.statementCompletionLayoutPanel, "statementCompletionLayoutPanel");
+            this.statementCompletionLayoutPanel.Controls.Add(this._showCompletionListAfterCharacterTyped, 0, 1);
+            this.statementCompletionLayoutPanel.Controls.Add(this._onlyTabOrEnterToCommit, 0, 0);
+            this.statementCompletionLayoutPanel.Name = "statementCompletionLayoutPanel";
             // 
             // _showCompletionListAfterCharacterTyped
             // 
@@ -119,32 +119,32 @@
             this._onlyTabOrEnterToCommit.Name = "_onlyTabOrEnterToCommit";
             this._onlyTabOrEnterToCommit.UseVisualStyleBackColor = true;
             // 
-            // label3
+            // statementCompletionLabel
             // 
-            resources.ApplyResources(this.label3, "label3");
-            this.label3.Name = "label3";
+            resources.ApplyResources(this.statementCompletionLabel, "statementCompletionLabel");
+            this.statementCompletionLabel.Name = "statementCompletionLabel";
             // 
-            // tableLayoutPanel4
+            // saveToDiskLayoutPanel
             // 
-            resources.ApplyResources(this.tableLayoutPanel4, "tableLayoutPanel4");
-            this.tableLayoutPanel4.Controls.Add(this._saveToDiskDisabledRadioButton, 0, 1);
-            this.tableLayoutPanel4.Controls.Add(this._saveToDiskEnabledRadioButton, 0, 0);
-            this.tableLayoutPanel4.Name = "tableLayoutPanel4";
+            resources.ApplyResources(this.saveToDiskLayoutPanel, "saveToDiskLayoutPanel");
+            this.saveToDiskLayoutPanel.Controls.Add(this._saveToDiskDisabledRadioButton, 0, 1);
+            this.saveToDiskLayoutPanel.Controls.Add(this._saveToDiskEnabledRadioButton, 0, 0);
+            this.saveToDiskLayoutPanel.Name = "saveToDiskLayoutPanel";
             // 
-            // label2
+            // saveToDiskLabel
             // 
-            resources.ApplyResources(this.label2, "label2");
-            this.label2.Name = "label2";
+            resources.ApplyResources(this.saveToDiskLabel, "saveToDiskLabel");
+            this.saveToDiskLabel.Name = "saveToDiskLabel";
             // 
-            // tableLayoutPanel2
+            // intelliSenseLevelLayoutPanel
             // 
-            resources.ApplyResources(this.tableLayoutPanel2, "tableLayoutPanel2");
-            this.tableLayoutPanel2.Controls.Add(this._mediumIntelliSenseRadioButton, 0, 2);
-            this.tableLayoutPanel2.Controls.Add(this._analysisLogMax, 1, 5);
-            this.tableLayoutPanel2.Controls.Add(this._noIntelliSenseRadioButton, 0, 3);
-            this.tableLayoutPanel2.Controls.Add(this._analysisLogMaxLabel, 0, 5);
-            this.tableLayoutPanel2.Controls.Add(this._fullIntelliSenseRadioButton, 0, 0);
-            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
+            resources.ApplyResources(this.intelliSenseLevelLayoutPanel, "intelliSenseLevelLayoutPanel");
+            this.intelliSenseLevelLayoutPanel.Controls.Add(this._mediumIntelliSenseRadioButton, 0, 2);
+            this.intelliSenseLevelLayoutPanel.Controls.Add(this._analysisLogMax, 1, 5);
+            this.intelliSenseLevelLayoutPanel.Controls.Add(this._noIntelliSenseRadioButton, 0, 3);
+            this.intelliSenseLevelLayoutPanel.Controls.Add(this._analysisLogMaxLabel, 0, 5);
+            this.intelliSenseLevelLayoutPanel.Controls.Add(this._fullIntelliSenseRadioButton, 0, 0);
+            this.intelliSenseLevelLayoutPanel.Name = "intelliSenseLevelLayoutPanel";
             // 
             // _analysisLogMax
             // 
@@ -166,25 +166,25 @@
             resources.ApplyResources(this._analysisLogMaxLabel, "_analysisLogMaxLabel");
             this._analysisLogMaxLabel.Name = "_analysisLogMaxLabel";
             // 
-            // label1
+            // intelliSenseLevelLabel
             // 
-            resources.ApplyResources(this.label1, "label1");
-            this.label1.Name = "label1";
+            resources.ApplyResources(this.intelliSenseLevelLabel, "intelliSenseLevelLabel");
+            this.intelliSenseLevelLabel.Name = "intelliSenseLevelLabel";
             // 
             // NodeLsIntellisenseOptionsControl
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.tableLayoutPanel5);
+            this.Controls.Add(this.outerLayoutPanel);
             this.Name = "NodeLsIntellisenseOptionsControl";
-            this.tableLayoutPanel5.ResumeLayout(false);
-            this.tableLayoutPanel5.PerformLayout();
-            this.tableLayoutPanel3.ResumeLayout(false);
-            this.tableLayoutPanel3.PerformLayout();
-            this.tableLayoutPanel4.ResumeLayout(false);
-            this.tableLayoutPanel4.PerformLayout();
-            this.tableLayoutPanel2.ResumeLayout(false);
-            this.tableLayoutPanel2.PerformLayout();
+            this.outerLayoutPanel.ResumeLayout(false);
+            this.outerLayoutPanel.PerformLayout();
+            this.statementCompletionLayoutPanel.ResumeLayout(false);
+            this.statementCompletionLayoutPanel.PerformLayout();
+            this.saveToDiskLayoutPanel.ResumeLayout(false);
+            this.saveToDiskLayoutPanel.PerformLayout();
+            this.intelliSenseLevelLayoutPanel.ResumeLayout(false);
+            this.intelliSenseLevelLayoutPanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -192,21 +192,21 @@
 
         #endregion
 
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel5;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
+        private System.Windows.Forms.TableLayoutPanel outerLayoutPanel;
+        private System.Windows.Forms.TableLayoutPanel statementCompletionLayoutPanel;
         private System.Windows.Forms.CheckBox _showCompletionListAfterCharacterTyped;
         private System.Windows.Forms.CheckBox _onlyTabOrEnterToCommit;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
+        private System.Windows.Forms.Label statementCompletionLabel;
+        private System.Windows.Forms.TableLayoutPanel saveToDiskLayoutPanel;
         private System.Windows.Forms.RadioButton _saveToDiskDisabledRadioButton;
         private System.Windows.Forms.RadioButton _saveToDiskEnabledRadioButton;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+        private System.Windows.Forms.Label saveToDiskLabel;
+        private System.Windows.Forms.TableLayoutPanel intelliSenseLevelLayoutPanel;
         private System.Windows.Forms.RadioButton _mediumIntelliSenseRadioButton;
         private System.Windows.Forms.ComboBox _analysisLogMax;
         private System.Windows.Forms.RadioButton _noIntelliSenseRadioButton;
         private System.Windows.Forms.Label _analysisLogMaxLabel;
         private System.Windows.Forms.RadioButton _fullIntelliSenseRadioButton;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label intelliSenseLevelLabel;
     }
 }

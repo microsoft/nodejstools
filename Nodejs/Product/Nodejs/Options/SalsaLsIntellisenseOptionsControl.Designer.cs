@@ -25,97 +25,96 @@
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.ToolTip toolTip;
-            this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
-            this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+            this.outerLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+            this.typingsAcquisitionLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this._enableAutomaticTypingsAcquisition = new System.Windows.Forms.CheckBox();
-            this.label3 = new System.Windows.Forms.Label();
+            this.typingsAcquisitionLabel = new System.Windows.Forms.Label();
             toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.tableLayoutPanel5.SuspendLayout();
-            this.tableLayoutPanel3.SuspendLayout();
+            this.outerLayoutPanel.SuspendLayout();
+            this.typingsAcquisitionLayoutPanel.SuspendLayout();
             this.SuspendLayout();
             // 
-            // tableLayoutPanel5
+            // outerLayoutPanel
             // 
-            this.tableLayoutPanel5.AutoSize = true;
-            this.tableLayoutPanel5.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.tableLayoutPanel5.ColumnCount = 1;
-            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel5.Controls.Add(this.tableLayoutPanel3, 0, 5);
-            this.tableLayoutPanel5.Controls.Add(this.label3, 0, 4);
-            this.tableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Top;
-            this.tableLayoutPanel5.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel5.Margin = new System.Windows.Forms.Padding(12, 6, 12, 6);
-            this.tableLayoutPanel5.Name = "tableLayoutPanel5";
-            this.tableLayoutPanel5.RowCount = 6;
-            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel5.Size = new System.Drawing.Size(842, 76);
-            this.tableLayoutPanel5.TabIndex = 6;
+            this.outerLayoutPanel.AutoSize = true;
+            this.outerLayoutPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.outerLayoutPanel.ColumnCount = 1;
+            this.outerLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.outerLayoutPanel.Controls.Add(this.typingsAcquisitionLayoutPanel, 0, 5);
+            this.outerLayoutPanel.Controls.Add(this.typingsAcquisitionLabel, 0, 4);
+            this.outerLayoutPanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.outerLayoutPanel.Location = new System.Drawing.Point(0, 0);
+            this.outerLayoutPanel.Name = "outerLayoutPanel";
+            this.outerLayoutPanel.RowCount = 6;
+            this.outerLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.outerLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.outerLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.outerLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.outerLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.outerLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.outerLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.outerLayoutPanel.Size = new System.Drawing.Size(842, 76);
+            this.outerLayoutPanel.TabIndex = 6;
             // 
-            // tableLayoutPanel3
+            // typingsAcquisitionLayoutPanel
             // 
-            this.tableLayoutPanel3.AutoSize = true;
-            this.tableLayoutPanel3.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.tableLayoutPanel3.ColumnCount = 1;
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel3.Controls.Add(this._enableAutomaticTypingsAcquisition, 0, 0);
-            this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel3.Location = new System.Drawing.Point(6, 33);
-            this.tableLayoutPanel3.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
-            this.tableLayoutPanel3.Name = "tableLayoutPanel3";
-            this.tableLayoutPanel3.RowCount = 1;
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(830, 35);
-            this.tableLayoutPanel3.TabIndex = 6;
+            this.typingsAcquisitionLayoutPanel.AutoSize = true;
+            this.typingsAcquisitionLayoutPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.typingsAcquisitionLayoutPanel.ColumnCount = 1;
+            this.typingsAcquisitionLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.typingsAcquisitionLayoutPanel.Controls.Add(this._enableAutomaticTypingsAcquisition, 0, 0);
+            this.typingsAcquisitionLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.typingsAcquisitionLayoutPanel.Location = new System.Drawing.Point(6, 33);
+            this.typingsAcquisitionLayoutPanel.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
+            this.typingsAcquisitionLayoutPanel.Name = "typingsAcquisitionLayoutPanel";
+            this.typingsAcquisitionLayoutPanel.RowCount = 1;
+            this.typingsAcquisitionLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.typingsAcquisitionLayoutPanel.Size = new System.Drawing.Size(830, 35);
+            this.typingsAcquisitionLayoutPanel.TabIndex = 6;
             // 
-            // _onlyTabOrEnterToCommit
+            // _enableAutomaticTypingsAcquisition
             // 
             this._enableAutomaticTypingsAcquisition.AutoSize = true;
             this._enableAutomaticTypingsAcquisition.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this._enableAutomaticTypingsAcquisition.Location = new System.Drawing.Point(12, 3);
             this._enableAutomaticTypingsAcquisition.Margin = new System.Windows.Forms.Padding(12, 3, 12, 3);
-            this._enableAutomaticTypingsAcquisition.Name = "_onlyTabOrEnterToCommit";
+            this._enableAutomaticTypingsAcquisition.Name = "_enableAutomaticTypingsAcquisition";
             this._enableAutomaticTypingsAcquisition.Size = new System.Drawing.Size(647, 29);
             this._enableAutomaticTypingsAcquisition.TabIndex = 0;
             this._enableAutomaticTypingsAcquisition.Text = "Automatically download IntelliSense typings to Node.js projects";
             this._enableAutomaticTypingsAcquisition.UseVisualStyleBackColor = true;
             // 
-            // label3
+            // typingsAcquisitionLabel
             // 
-            this.label3.AutoSize = true;
-            this.label3.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label3.Location = new System.Drawing.Point(0, 0);
-            this.label3.Margin = new System.Windows.Forms.Padding(0);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(199, 25);
-            this.label3.TabIndex = 5;
-            this.label3.Text = "Typings Acquisition";
+            this.typingsAcquisitionLabel.AutoSize = true;
+            this.typingsAcquisitionLabel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.typingsAcquisitionLabel.Location = new System.Drawing.Point(0, 0);
+            this.typingsAcquisitionLabel.Margin = new System.Windows.Forms.Padding(0);
+            this.typingsAcquisitionLabel.Name = "typingsAcquisitionLabel";
+            this.typingsAcquisitionLabel.Size = new System.Drawing.Size(199, 25);
+            this.typingsAcquisitionLabel.TabIndex = 5;
+            this.typingsAcquisitionLabel.Text = "Typings Acquisition";
             // 
             // SalsaLsIntellisenseOptionsControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.tableLayoutPanel5);
+            this.Controls.Add(this.outerLayoutPanel);
             this.Name = "SalsaLsIntellisenseOptionsControl";
             this.Size = new System.Drawing.Size(842, 482);
-            this.tableLayoutPanel5.ResumeLayout(false);
-            this.tableLayoutPanel5.PerformLayout();
-            this.tableLayoutPanel3.ResumeLayout(false);
-            this.tableLayoutPanel3.PerformLayout();
+            this.outerLayoutPanel.ResumeLayout(false);
+            this.outerLayoutPanel.PerformLayout();
+            this.typingsAcquisitionLayoutPanel.ResumeLayout(false);
+            this.typingsAcquisitionLayoutPanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel5;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
+        private System.Windows.Forms.TableLayoutPanel outerLayoutPanel;
+        private System.Windows.Forms.TableLayoutPanel typingsAcquisitionLayoutPanel;
         private System.Windows.Forms.CheckBox _enableAutomaticTypingsAcquisition;
-        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label typingsAcquisitionLabel;
     }
 }

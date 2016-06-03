@@ -26,46 +26,45 @@
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.ToolTip toolTip;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NodejsIntellisenseOptionsControl));
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this._es5DeprecatedWarning = new System.Windows.Forms.Label();
-            this._analysisPreviewFeedbackLinkLabel = new System.Windows.Forms.LinkLabel();
-            this.label4 = new System.Windows.Forms.Label();
+            this.outerLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+            this.advancedOptionsLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+            this.intelliSenseModeLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this._intelliSenseModeDropdown = new System.Windows.Forms.ComboBox();
-            this.tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
-            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.intelliSenseModeLabel = new System.Windows.Forms.Label();
+            this._analysisPreviewFeedbackLinkLabel = new System.Windows.Forms.LinkLabel();
+            this._es5DeprecatedWarning = new System.Windows.Forms.Label();
             this.horizontalDivider = new System.Windows.Forms.Label();
             this._nodejsES5IntelliSenseOptionsControl = new Microsoft.NodejsTools.Options.NodeLsIntellisenseOptionsControl();
             this._salsaLsIntellisenseOptionsControl = new Microsoft.NodejsTools.Options.SalsaLsIntellisenseOptionsControl();
             toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.tableLayoutPanel1.SuspendLayout();
-            this.tableLayoutPanel6.SuspendLayout();
-            this.tableLayoutPanel2.SuspendLayout();
+            this.outerLayoutPanel.SuspendLayout();
+            this.advancedOptionsLayoutPanel.SuspendLayout();
+            this.intelliSenseModeLayoutPanel.SuspendLayout();
             this.SuspendLayout();
             // 
-            // tableLayoutPanel1
+            // outerLayoutPanel
             // 
-            resources.ApplyResources(this.tableLayoutPanel1, "tableLayoutPanel1");
-            this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel2, 0, 2);
-            this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel6, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.horizontalDivider, 0, 1);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            resources.ApplyResources(this.outerLayoutPanel, "outerLayoutPanel");
+            this.outerLayoutPanel.Controls.Add(this.advancedOptionsLayoutPanel, 0, 2);
+            this.outerLayoutPanel.Controls.Add(this.intelliSenseModeLayoutPanel, 0, 0);
+            this.outerLayoutPanel.Controls.Add(this.horizontalDivider, 0, 1);
+            this.outerLayoutPanel.Name = "outerLayoutPanel";
             // 
-            // _es5DeprecatedWarning
+            // advancedOptionsLayoutPanel
             // 
-            resources.ApplyResources(this._es5DeprecatedWarning, "_es5DeprecatedWarning");
-            this._es5DeprecatedWarning.Name = "_es5DeprecatedWarning";
+            resources.ApplyResources(this.advancedOptionsLayoutPanel, "advancedOptionsLayoutPanel");
+            this.advancedOptionsLayoutPanel.Controls.Add(this._nodejsES5IntelliSenseOptionsControl, 0, 1);
+            this.advancedOptionsLayoutPanel.Controls.Add(this._salsaLsIntellisenseOptionsControl, 0, 0);
+            this.advancedOptionsLayoutPanel.Name = "advancedOptionsLayoutPanel";
             // 
-            // _analysisPreviewFeedbackLinkLabel
+            // intelliSenseModeLayoutPanel
             // 
-            resources.ApplyResources(this._analysisPreviewFeedbackLinkLabel, "_analysisPreviewFeedbackLinkLabel");
-            this._analysisPreviewFeedbackLinkLabel.Name = "_analysisPreviewFeedbackLinkLabel";
-            this._analysisPreviewFeedbackLinkLabel.TabStop = true;
-            this._analysisPreviewFeedbackLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this._analysisPreviewFeedbackLinkLabel_LinkClicked);
-            // 
-            // label4
-            // 
-            resources.ApplyResources(this.label4, "label4");
-            this.label4.Name = "label4";
+            resources.ApplyResources(this.intelliSenseModeLayoutPanel, "intelliSenseModeLayoutPanel");
+            this.intelliSenseModeLayoutPanel.Controls.Add(this._intelliSenseModeDropdown, 1, 0);
+            this.intelliSenseModeLayoutPanel.Controls.Add(this.intelliSenseModeLabel, 0, 0);
+            this.intelliSenseModeLayoutPanel.Controls.Add(this._analysisPreviewFeedbackLinkLabel, 1, 2);
+            this.intelliSenseModeLayoutPanel.Controls.Add(this._es5DeprecatedWarning, 1, 1);
+            this.intelliSenseModeLayoutPanel.Name = "intelliSenseModeLayoutPanel";
             // 
             // _intelliSenseModeDropdown
             // 
@@ -78,21 +77,22 @@
             this._intelliSenseModeDropdown.Name = "_intelliSenseModeDropdown";
             this._intelliSenseModeDropdown.SelectedValueChanged += new System.EventHandler(this._intelliSenseModeDropdown_SelectedValueChanged);
             // 
-            // tableLayoutPanel6
+            // intelliSenseModeLabel
             // 
-            resources.ApplyResources(this.tableLayoutPanel6, "tableLayoutPanel6");
-            this.tableLayoutPanel6.Controls.Add(this._intelliSenseModeDropdown, 1, 0);
-            this.tableLayoutPanel6.Controls.Add(this.label4, 0, 0);
-            this.tableLayoutPanel6.Controls.Add(this._analysisPreviewFeedbackLinkLabel, 1, 2);
-            this.tableLayoutPanel6.Controls.Add(this._es5DeprecatedWarning, 1, 1);
-            this.tableLayoutPanel6.Name = "tableLayoutPanel6";
+            resources.ApplyResources(this.intelliSenseModeLabel, "intelliSenseModeLabel");
+            this.intelliSenseModeLabel.Name = "intelliSenseModeLabel";
             // 
-            // tableLayoutPanel2
+            // _analysisPreviewFeedbackLinkLabel
             // 
-            resources.ApplyResources(this.tableLayoutPanel2, "tableLayoutPanel2");
-            this.tableLayoutPanel2.Controls.Add(this._nodejsES5IntelliSenseOptionsControl, 0, 1);
-            this.tableLayoutPanel2.Controls.Add(this._salsaLsIntellisenseOptionsControl, 0, 0);
-            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
+            resources.ApplyResources(this._analysisPreviewFeedbackLinkLabel, "_analysisPreviewFeedbackLinkLabel");
+            this._analysisPreviewFeedbackLinkLabel.Name = "_analysisPreviewFeedbackLinkLabel";
+            this._analysisPreviewFeedbackLinkLabel.TabStop = true;
+            this._analysisPreviewFeedbackLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this._analysisPreviewFeedbackLinkLabel_LinkClicked);
+            // 
+            // _es5DeprecatedWarning
+            // 
+            resources.ApplyResources(this._es5DeprecatedWarning, "_es5DeprecatedWarning");
+            this._es5DeprecatedWarning.Name = "_es5DeprecatedWarning";
             // 
             // horizontalDivider
             // 
@@ -115,14 +115,14 @@
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.tableLayoutPanel1);
+            this.Controls.Add(this.outerLayoutPanel);
             this.Name = "NodejsIntellisenseOptionsControl";
-            this.tableLayoutPanel1.ResumeLayout(false);
-            this.tableLayoutPanel1.PerformLayout();
-            this.tableLayoutPanel6.ResumeLayout(false);
-            this.tableLayoutPanel6.PerformLayout();
-            this.tableLayoutPanel2.ResumeLayout(false);
-            this.tableLayoutPanel2.PerformLayout();
+            this.outerLayoutPanel.ResumeLayout(false);
+            this.outerLayoutPanel.PerformLayout();
+            this.advancedOptionsLayoutPanel.ResumeLayout(false);
+            this.advancedOptionsLayoutPanel.PerformLayout();
+            this.intelliSenseModeLayoutPanel.ResumeLayout(false);
+            this.intelliSenseModeLayoutPanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -130,15 +130,15 @@
 
         #endregion
 
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+        private System.Windows.Forms.TableLayoutPanel outerLayoutPanel;
+        private System.Windows.Forms.TableLayoutPanel advancedOptionsLayoutPanel;
         private NodeLsIntellisenseOptionsControl _nodejsES5IntelliSenseOptionsControl;
         private SalsaLsIntellisenseOptionsControl _salsaLsIntellisenseOptionsControl;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel6;
+        private System.Windows.Forms.TableLayoutPanel intelliSenseModeLayoutPanel;
+        private System.Windows.Forms.Label intelliSenseModeLabel;
+        private System.Windows.Forms.Label horizontalDivider;
         private System.Windows.Forms.ComboBox _intelliSenseModeDropdown;
-        private System.Windows.Forms.Label label4;
         private System.Windows.Forms.LinkLabel _analysisPreviewFeedbackLinkLabel;
         private System.Windows.Forms.Label _es5DeprecatedWarning;
-        private System.Windows.Forms.Label horizontalDivider;
     }
 }
