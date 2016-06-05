@@ -145,7 +145,9 @@ namespace Microsoft.NodejsTools.Options {
             }
         }
 
-        internal bool EnableAutomaticTypingsAcquisition { get; set; }
+        public bool EnableAutomaticTypingsAcquisition { get; set; }
+
+        public bool ShowTypingsInfoBar { get; set; }
 
         public event EventHandler<EventArgs> AnalysisLevelChanged;
         public event EventHandler<EventArgs> AnalysisLogMaximumChanged;
@@ -169,6 +171,7 @@ namespace Microsoft.NodejsTools.Options {
         private const string OnlyTabOrEnterToCommitSetting = "OnlyTabOrEnterToCommit";
         private const string ShowCompletionListAfterCharacterTypedSetting = "ShowCompletionListAfterCharacterTyped";
         private const string EnableAutomaticTypingsAcquisitionSetting = "EnableAutomaticTypingsAcquisition";
+        private const string ShowTypingsInfoBarSetting = "ShowTypingsInfoBar";
 
         public override void LoadSettingsFromStorage() {
             // Load settings from storage.
@@ -178,6 +181,7 @@ namespace Microsoft.NodejsTools.Options {
             OnlyTabOrEnterToCommit = LoadBool(OnlyTabOrEnterToCommitSetting) ?? true;
             ShowCompletionListAfterCharacterTyped = LoadBool(ShowCompletionListAfterCharacterTypedSetting) ?? true;
             EnableAutomaticTypingsAcquisition = LoadBool(EnableAutomaticTypingsAcquisitionSetting) ?? true;
+            ShowTypingsInfoBar = LoadBool(ShowTypingsInfoBarSetting) ?? true;
 
             // Synchronize UI with backing properties.
             if (_window != null) {
@@ -203,6 +207,7 @@ namespace Microsoft.NodejsTools.Options {
             SaveBool(OnlyTabOrEnterToCommitSetting, OnlyTabOrEnterToCommit);
             SaveBool(ShowCompletionListAfterCharacterTypedSetting, ShowCompletionListAfterCharacterTyped);
             SaveBool(EnableAutomaticTypingsAcquisitionSetting, EnableAutomaticTypingsAcquisition);
+            SaveBool(ShowTypingsInfoBarSetting, ShowTypingsInfoBar);
         }
 
         private static string GetTypeScriptToolsVersion() {

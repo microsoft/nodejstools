@@ -16,10 +16,13 @@ namespace Microsoft.NodejsTools.Options {
 
         internal void SyncPageWithControlSettings(NodejsIntellisenseOptionsPage page) {
             page.EnableAutomaticTypingsAcquisition = _enableAutomaticTypingsAcquisition.Checked;
+            page.ShowTypingsInfoBar = _showTypingsInfoBar.Checked;
         }
 
         internal void SyncControlWithPageSettings(NodejsIntellisenseOptionsPage page) {
             _enableAutomaticTypingsAcquisition.Checked = page.EnableAutomaticTypingsAcquisition;
+            _showTypingsInfoBar.Checked = page.ShowTypingsInfoBar;
         }
+
     }
 }

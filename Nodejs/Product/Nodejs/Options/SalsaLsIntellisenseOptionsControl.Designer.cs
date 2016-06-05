@@ -29,6 +29,7 @@
             this.typingsAcquisitionLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this._enableAutomaticTypingsAcquisition = new System.Windows.Forms.CheckBox();
             this.typingsAcquisitionLabel = new System.Windows.Forms.Label();
+            this._showTypingsInfoBar = new System.Windows.Forms.CheckBox();
             toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.outerLayoutPanel.SuspendLayout();
             this.typingsAcquisitionLayoutPanel.SuspendLayout();
@@ -53,7 +54,7 @@
             this.outerLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.outerLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.outerLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.outerLayoutPanel.Size = new System.Drawing.Size(842, 76);
+            this.outerLayoutPanel.Size = new System.Drawing.Size(842, 111);
             this.outerLayoutPanel.TabIndex = 6;
             // 
             // typingsAcquisitionLayoutPanel
@@ -62,14 +63,16 @@
             this.typingsAcquisitionLayoutPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.typingsAcquisitionLayoutPanel.ColumnCount = 1;
             this.typingsAcquisitionLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.typingsAcquisitionLayoutPanel.Controls.Add(this._showTypingsInfoBar, 0, 1);
             this.typingsAcquisitionLayoutPanel.Controls.Add(this._enableAutomaticTypingsAcquisition, 0, 0);
             this.typingsAcquisitionLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.typingsAcquisitionLayoutPanel.Location = new System.Drawing.Point(6, 33);
             this.typingsAcquisitionLayoutPanel.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
             this.typingsAcquisitionLayoutPanel.Name = "typingsAcquisitionLayoutPanel";
-            this.typingsAcquisitionLayoutPanel.RowCount = 1;
+            this.typingsAcquisitionLayoutPanel.RowCount = 2;
             this.typingsAcquisitionLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.typingsAcquisitionLayoutPanel.Size = new System.Drawing.Size(830, 35);
+            this.typingsAcquisitionLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.typingsAcquisitionLayoutPanel.Size = new System.Drawing.Size(830, 70);
             this.typingsAcquisitionLayoutPanel.TabIndex = 6;
             // 
             // _enableAutomaticTypingsAcquisition
@@ -95,6 +98,18 @@
             this.typingsAcquisitionLabel.TabIndex = 5;
             this.typingsAcquisitionLabel.Text = "Typings Acquisition";
             // 
+            // _showTypingsInfoBar
+            // 
+            this._showTypingsInfoBar.AutoSize = true;
+            this._showTypingsInfoBar.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this._showTypingsInfoBar.Location = new System.Drawing.Point(12, 38);
+            this._showTypingsInfoBar.Margin = new System.Windows.Forms.Padding(12, 3, 12, 3);
+            this._showTypingsInfoBar.Name = "_showTypingsInfoBar";
+            this._showTypingsInfoBar.Size = new System.Drawing.Size(593, 29);
+            this._showTypingsInfoBar.TabIndex = 1;
+            this._showTypingsInfoBar.Text = "Show status bar after adding new typings folder to project";
+            this._showTypingsInfoBar.UseVisualStyleBackColor = true;
+            // 
             // SalsaLsIntellisenseOptionsControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
@@ -116,5 +131,6 @@
         private System.Windows.Forms.TableLayoutPanel typingsAcquisitionLayoutPanel;
         private System.Windows.Forms.CheckBox _enableAutomaticTypingsAcquisition;
         private System.Windows.Forms.Label typingsAcquisitionLabel;
+        private System.Windows.Forms.CheckBox _showTypingsInfoBar;
     }
 }
