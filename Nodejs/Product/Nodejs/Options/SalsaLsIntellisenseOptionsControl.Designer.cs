@@ -84,7 +84,7 @@
             this._enableAutomaticTypingsAcquisition.Name = "_enableAutomaticTypingsAcquisition";
             this._enableAutomaticTypingsAcquisition.Size = new System.Drawing.Size(647, 29);
             this._enableAutomaticTypingsAcquisition.TabIndex = 0;
-            this._enableAutomaticTypingsAcquisition.Text = "Automatically download IntelliSense typings to Node.js projects";
+            this._enableAutomaticTypingsAcquisition.Text = "Automatically &download IntelliSense typings to Node.js projects";
             this._enableAutomaticTypingsAcquisition.UseVisualStyleBackColor = true;
             // 
             // typingsAcquisitionLabel
@@ -107,7 +107,7 @@
             this._showTypingsInfoBar.Name = "_showTypingsInfoBar";
             this._showTypingsInfoBar.Size = new System.Drawing.Size(593, 29);
             this._showTypingsInfoBar.TabIndex = 1;
-            this._showTypingsInfoBar.Text = "Show status bar after adding new typings folder to project";
+            this._showTypingsInfoBar.Text = "&Show status bar after adding new typings folder to project";
             this._showTypingsInfoBar.UseVisualStyleBackColor = true;
             // 
             // SalsaLsIntellisenseOptionsControl
