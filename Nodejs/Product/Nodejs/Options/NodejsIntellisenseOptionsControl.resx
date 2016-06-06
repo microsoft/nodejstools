@@ -154,7 +154,7 @@
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="_nodejsES5IntelliSenseOptionsControl.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 76</value>
+    <value>0, 111</value>
   </data>
   <data name="_nodejsES5IntelliSenseOptionsControl.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>0, 0, 0, 0</value>
@@ -166,7 +166,7 @@
     <value>665, 434</value>
   </data>
   <data name="_nodejsES5IntelliSenseOptionsControl.TabIndex" type="System.Int32, mscorlib">
-    <value>2</value>
+    <value>1</value>
   </data>
   <data name="&gt;&gt;_nodejsES5IntelliSenseOptionsControl.Name" xml:space="preserve">
     <value>_nodejsES5IntelliSenseOptionsControl</value>
@@ -180,6 +180,9 @@
   <data name="&gt;&gt;_nodejsES5IntelliSenseOptionsControl.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
+  <data name="_salsaLsIntellisenseOptionsControl.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
   <data name="_salsaLsIntellisenseOptionsControl.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Top</value>
   </data>
@@ -190,10 +193,10 @@
     <value>0, 0, 0, 0</value>
   </data>
   <data name="_salsaLsIntellisenseOptionsControl.Size" type="System.Drawing.Size, System.Drawing">
-    <value>665, 76</value>
+    <value>665, 111</value>
   </data>
   <data name="_salsaLsIntellisenseOptionsControl.TabIndex" type="System.Int32, mscorlib">
-    <value>1</value>
+    <value>0</value>
   </data>
   <data name="&gt;&gt;_salsaLsIntellisenseOptionsControl.Name" xml:space="preserve">
     <value>_salsaLsIntellisenseOptionsControl</value>
@@ -220,10 +223,10 @@
     <value>2</value>
   </data>
   <data name="advancedOptionsLayoutPanel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>665, 510</value>
+    <value>665, 545</value>
   </data>
   <data name="advancedOptionsLayoutPanel.TabIndex" type="System.Int32, mscorlib">
-    <value>6</value>
+    <value>2</value>
   </data>
   <data name="&gt;&gt;advancedOptionsLayoutPanel.Name" xml:space="preserve">
     <value>advancedOptionsLayoutPanel</value>
@@ -259,7 +262,7 @@
     <value>246, 33</value>
   </data>
   <data name="_intelliSenseModeDropdown.TabIndex" type="System.Int32, mscorlib">
-    <value>0</value>
+    <value>1</value>
   </data>
   <data name="&gt;&gt;_intelliSenseModeDropdown.Name" xml:space="preserve">
     <value>_intelliSenseModeDropdown</value>
@@ -292,7 +295,7 @@
     <value>189, 25</value>
   </data>
   <data name="intelliSenseModeLabel.TabIndex" type="System.Int32, mscorlib">
-    <value>7</value>
+    <value>0</value>
   </data>
   <data name="intelliSenseModeLabel.Text" xml:space="preserve">
     <value>IntelliSense Mode:</value>
@@ -325,7 +328,7 @@
     <value>310, 25</value>
   </data>
   <data name="_analysisPreviewFeedbackLinkLabel.TabIndex" type="System.Int32, mscorlib">
-    <value>5</value>
+    <value>3</value>
   </data>
   <data name="_analysisPreviewFeedbackLinkLabel.Text" xml:space="preserve">
     <value>Learn more and send feedback</value>
@@ -355,7 +358,7 @@
     <value>341, 25</value>
   </data>
   <data name="_es5DeprecatedWarning.TabIndex" type="System.Int32, mscorlib">
-    <value>10</value>
+    <value>2</value>
   </data>
   <data name="_es5DeprecatedWarning.Text" xml:space="preserve">
     <value>⚠ ECMAScript 5 Mode deprecated</value>
@@ -388,7 +391,7 @@
     <value>665, 89</value>
   </data>
   <data name="intelliSenseModeLayoutPanel.TabIndex" type="System.Int32, mscorlib">
-    <value>5</value>
+    <value>0</value>
   </data>
   <data name="&gt;&gt;intelliSenseModeLayoutPanel.Name" xml:space="preserve">
     <value>intelliSenseModeLayoutPanel</value>
@@ -421,7 +424,7 @@
     <value>665, 2</value>
   </data>
   <data name="horizontalDivider.TabIndex" type="System.Int32, mscorlib">
-    <value>7</value>
+    <value>0</value>
   </data>
   <data name="horizontalDivider.Text" xml:space="preserve">
     <value>border</value>
@@ -451,7 +454,7 @@
     <value>3</value>
   </data>
   <data name="outerLayoutPanel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>689, 625</value>
+    <value>689, 660</value>
   </data>
   <data name="outerLayoutPanel.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -493,7 +496,7 @@
     <value>6, 6, 6, 6</value>
   </data>
   <data name="$this.Size" type="System.Drawing.Size, System.Drawing">
-    <value>695, 633</value>
+    <value>695, 668</value>
   </data>
   <data name="&gt;&gt;toolTip.Name" xml:space="preserve">
     <value>toolTip</value>

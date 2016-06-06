@@ -55,7 +55,7 @@
             this.outerLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.outerLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.outerLayoutPanel.Size = new System.Drawing.Size(842, 111);
-            this.outerLayoutPanel.TabIndex = 6;
+            this.outerLayoutPanel.TabIndex = 0;
             // 
             // typingsAcquisitionLayoutPanel
             // 
@@ -73,7 +73,7 @@
             this.typingsAcquisitionLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.typingsAcquisitionLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.typingsAcquisitionLayoutPanel.Size = new System.Drawing.Size(830, 70);
-            this.typingsAcquisitionLayoutPanel.TabIndex = 6;
+            this.typingsAcquisitionLayoutPanel.TabIndex = 1;
             // 
             // _enableAutomaticTypingsAcquisition
             // 
@@ -95,7 +95,7 @@
             this.typingsAcquisitionLabel.Margin = new System.Windows.Forms.Padding(0);
             this.typingsAcquisitionLabel.Name = "typingsAcquisitionLabel";
             this.typingsAcquisitionLabel.Size = new System.Drawing.Size(199, 25);
-            this.typingsAcquisitionLabel.TabIndex = 5;
+            this.typingsAcquisitionLabel.TabIndex = 0;
             this.typingsAcquisitionLabel.Text = "Typings Acquisition";
             // 
             // _showTypingsInfoBar
