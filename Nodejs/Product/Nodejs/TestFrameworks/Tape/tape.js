@@ -31,8 +31,8 @@ function find_tests(testFileList, discoverResultFile, projectFolder) {
                 test: t.name,
                 suite: '',
                 file: testFile,
-                line: 1,
-                column: 1
+                line: 0,
+                column: 0
             });
         }
     });
