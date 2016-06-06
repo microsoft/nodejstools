@@ -54,7 +54,7 @@
             this.outerLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.outerLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.outerLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.outerLayoutPanel.Size = new System.Drawing.Size(629, 171);
+            this.outerLayoutPanel.Size = new System.Drawing.Size(687, 171);
             this.outerLayoutPanel.TabIndex = 0;
             // 
             // typingsAcquisitionLayoutPanel
@@ -74,7 +74,7 @@
             this.typingsAcquisitionLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.typingsAcquisitionLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.typingsAcquisitionLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.typingsAcquisitionLayoutPanel.Size = new System.Drawing.Size(617, 105);
+            this.typingsAcquisitionLayoutPanel.Size = new System.Drawing.Size(675, 105);
             this.typingsAcquisitionLayoutPanel.TabIndex = 1;
             // 
             // _saveChangesToConfigFile
@@ -108,9 +108,9 @@
             this._enableAutomaticTypingsAcquisition.Location = new System.Drawing.Point(12, 3);
             this._enableAutomaticTypingsAcquisition.Margin = new System.Windows.Forms.Padding(12, 3, 12, 3);
             this._enableAutomaticTypingsAcquisition.Name = "_enableAutomaticTypingsAcquisition";
-            this._enableAutomaticTypingsAcquisition.Size = new System.Drawing.Size(534, 29);
+            this._enableAutomaticTypingsAcquisition.Size = new System.Drawing.Size(651, 29);
             this._enableAutomaticTypingsAcquisition.TabIndex = 0;
-            this._enableAutomaticTypingsAcquisition.Text = "Automatically &add typings folder to Node.js projects";
+            this._enableAutomaticTypingsAcquisition.Text = "Automatically &add IntelliSense typings folder to Node.js projects";
             this._enableAutomaticTypingsAcquisition.UseVisualStyleBackColor = true;
             // 
             // typingsAcquisitionLabel
@@ -121,7 +121,7 @@
             this.typingsAcquisitionLabel.Location = new System.Drawing.Point(0, 0);
             this.typingsAcquisitionLabel.Margin = new System.Windows.Forms.Padding(0);
             this.typingsAcquisitionLabel.Name = "typingsAcquisitionLabel";
-            this.typingsAcquisitionLabel.Size = new System.Drawing.Size(629, 25);
+            this.typingsAcquisitionLabel.Size = new System.Drawing.Size(687, 25);
             this.typingsAcquisitionLabel.TabIndex = 0;
             this.typingsAcquisitionLabel.Text = "Typings Acquisition";
             // 
@@ -129,7 +129,7 @@
             // 
             this.linkLabel1.AutoSize = true;
             this.linkLabel1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.linkLabel1.Location = new System.Drawing.Point(256, 146);
+            this.linkLabel1.Location = new System.Drawing.Point(314, 146);
             this.linkLabel1.Margin = new System.Windows.Forms.Padding(3, 0, 0, 0);
             this.linkLabel1.Name = "linkLabel1";
             this.linkLabel1.Size = new System.Drawing.Size(373, 25);
@@ -147,7 +147,7 @@
             this.Controls.Add(this.outerLayoutPanel);
             this.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
             this.Name = "SalsaLsIntellisenseOptionsControl";
-            this.Size = new System.Drawing.Size(629, 171);
+            this.Size = new System.Drawing.Size(687, 171);
             this.outerLayoutPanel.ResumeLayout(false);
             this.outerLayoutPanel.PerformLayout();
             this.typingsAcquisitionLayoutPanel.ResumeLayout(false);
