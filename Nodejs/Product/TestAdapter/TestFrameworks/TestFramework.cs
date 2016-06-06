@@ -124,7 +124,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
 
         private string EvaluateJavaScript(string nodeExePath, string testFile, string discoverResultFile, IMessageLogger logger, string workingDirectory) {
             workingDirectory = workingDirectory.TrimEnd(new char['\\']);
-            string arguments = "--expose_debug_as=dbg " + WrapWithQuotes(_findTestsScriptFile)
+            string arguments = WrapWithQuotes(_findTestsScriptFile)
                 + " " + Name +
                 " " + WrapWithQuotes(testFile) +
                 " " + WrapWithQuotes(discoverResultFile) +
