@@ -31,6 +31,7 @@
             this._showTypingsInfoBar = new System.Windows.Forms.CheckBox();
             this._enableAutomaticTypingsAcquisition = new System.Windows.Forms.CheckBox();
             this.typingsAcquisitionLabel = new System.Windows.Forms.Label();
+            this.linkLabel1 = new System.Windows.Forms.LinkLabel();
             toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.outerLayoutPanel.SuspendLayout();
             this.typingsAcquisitionLayoutPanel.SuspendLayout();
@@ -42,18 +43,16 @@
             this.outerLayoutPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.outerLayoutPanel.ColumnCount = 1;
             this.outerLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.outerLayoutPanel.Controls.Add(this.typingsAcquisitionLayoutPanel, 0, 5);
-            this.outerLayoutPanel.Controls.Add(this.typingsAcquisitionLabel, 0, 4);
+            this.outerLayoutPanel.Controls.Add(this.typingsAcquisitionLayoutPanel, 0, 1);
+            this.outerLayoutPanel.Controls.Add(this.typingsAcquisitionLabel, 0, 0);
+            this.outerLayoutPanel.Controls.Add(this.linkLabel1, 0, 2);
             this.outerLayoutPanel.Location = new System.Drawing.Point(0, 0);
             this.outerLayoutPanel.Name = "outerLayoutPanel";
-            this.outerLayoutPanel.RowCount = 6;
+            this.outerLayoutPanel.RowCount = 3;
             this.outerLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.outerLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.outerLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.outerLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.outerLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.outerLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.outerLayoutPanel.Size = new System.Drawing.Size(629, 146);
+            this.outerLayoutPanel.Size = new System.Drawing.Size(629, 171);
             this.outerLayoutPanel.TabIndex = 0;
             // 
             // typingsAcquisitionLayoutPanel
@@ -99,7 +98,6 @@
             this._showTypingsInfoBar.TabIndex = 1;
             this._showTypingsInfoBar.Text = "&Show status bar after adding new typings folder to project";
             this._showTypingsInfoBar.UseVisualStyleBackColor = true;
-            this._showTypingsInfoBar.CheckedChanged += new System.EventHandler(this._showTypingsInfoBar_CheckedChanged);
             // 
             // _enableAutomaticTypingsAcquisition
             // 
@@ -125,6 +123,18 @@
             this.typingsAcquisitionLabel.TabIndex = 0;
             this.typingsAcquisitionLabel.Text = "Typings Acquisition";
             // 
+            // linkLabel1
+            // 
+            this.linkLabel1.AutoSize = true;
+            this.linkLabel1.Dock = System.Windows.Forms.DockStyle.Right;
+            this.linkLabel1.Location = new System.Drawing.Point(253, 146);
+            this.linkLabel1.Name = "linkLabel1";
+            this.linkLabel1.Size = new System.Drawing.Size(373, 25);
+            this.linkLabel1.TabIndex = 2;
+            this.linkLabel1.TabStop = true;
+            this.linkLabel1.Text = "Learn more about IntelliSense typings";
+            this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
+            // 
             // SalsaLsIntellisenseOptionsControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
@@ -133,7 +143,7 @@
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.Controls.Add(this.outerLayoutPanel);
             this.Name = "SalsaLsIntellisenseOptionsControl";
-            this.Size = new System.Drawing.Size(632, 149);
+            this.Size = new System.Drawing.Size(632, 174);
             this.outerLayoutPanel.ResumeLayout(false);
             this.outerLayoutPanel.PerformLayout();
             this.typingsAcquisitionLayoutPanel.ResumeLayout(false);
@@ -147,8 +157,9 @@
         private System.Windows.Forms.TableLayoutPanel outerLayoutPanel;
         private System.Windows.Forms.TableLayoutPanel typingsAcquisitionLayoutPanel;
         private System.Windows.Forms.CheckBox _enableAutomaticTypingsAcquisition;
-        private System.Windows.Forms.Label typingsAcquisitionLabel;
         private System.Windows.Forms.CheckBox _showTypingsInfoBar;
         private System.Windows.Forms.CheckBox _saveChangesToConfigFile;
+        private System.Windows.Forms.Label typingsAcquisitionLabel;
+        private System.Windows.Forms.LinkLabel linkLabel1;
     }
 }

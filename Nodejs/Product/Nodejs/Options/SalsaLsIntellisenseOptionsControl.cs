@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace Microsoft.NodejsTools.Options {
     public partial class SalsaLsIntellisenseOptionsControl : UserControl {
@@ -26,8 +27,8 @@ namespace Microsoft.NodejsTools.Options {
             _saveChangesToConfigFile.Checked = page.SaveChangesToConfigFile;
         }
 
-        private void _showTypingsInfoBar_CheckedChanged(object sender, EventArgs e) {
-
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
+            Process.Start("http://aka.ms/NtvsEs6Preview");
         }
     }
 }
