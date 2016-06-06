@@ -149,6 +149,8 @@ namespace Microsoft.NodejsTools.Options {
 
         public bool ShowTypingsInfoBar { get; set; }
 
+        public bool SaveChangesToConfigFile { get; set; }
+
         public event EventHandler<EventArgs> AnalysisLevelChanged;
         public event EventHandler<EventArgs> AnalysisLogMaximumChanged;
         public event EventHandler<EventArgs> SaveToDiskChanged;
@@ -172,6 +174,7 @@ namespace Microsoft.NodejsTools.Options {
         private const string ShowCompletionListAfterCharacterTypedSetting = "ShowCompletionListAfterCharacterTyped";
         private const string EnableAutomaticTypingsAcquisitionSetting = "EnableAutomaticTypingsAcquisition";
         private const string ShowTypingsInfoBarSetting = "ShowTypingsInfoBar";
+        private const string SaveChangesToConfigFileSetting = "SaveChangesToConfigFile";
 
         public override void LoadSettingsFromStorage() {
             // Load settings from storage.
@@ -182,6 +185,8 @@ namespace Microsoft.NodejsTools.Options {
             ShowCompletionListAfterCharacterTyped = LoadBool(ShowCompletionListAfterCharacterTypedSetting) ?? true;
             EnableAutomaticTypingsAcquisition = LoadBool(EnableAutomaticTypingsAcquisitionSetting) ?? true;
             ShowTypingsInfoBar = LoadBool(ShowTypingsInfoBarSetting) ?? true;
+            SaveChangesToConfigFile = LoadBool(SaveChangesToConfigFileSetting) ?? false;
+
 
             // Synchronize UI with backing properties.
             if (_window != null) {
@@ -208,6 +213,7 @@ namespace Microsoft.NodejsTools.Options {
             SaveBool(ShowCompletionListAfterCharacterTypedSetting, ShowCompletionListAfterCharacterTyped);
             SaveBool(EnableAutomaticTypingsAcquisitionSetting, EnableAutomaticTypingsAcquisition);
             SaveBool(ShowTypingsInfoBarSetting, ShowTypingsInfoBar);
+            SaveBool(SaveChangesToConfigFileSetting, SaveChangesToConfigFile);
         }
 
         private static string GetTypeScriptToolsVersion() {

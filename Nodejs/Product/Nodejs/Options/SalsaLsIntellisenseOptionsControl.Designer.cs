@@ -30,6 +30,7 @@
             this._enableAutomaticTypingsAcquisition = new System.Windows.Forms.CheckBox();
             this.typingsAcquisitionLabel = new System.Windows.Forms.Label();
             this._showTypingsInfoBar = new System.Windows.Forms.CheckBox();
+            this._saveChangesToConfigFile = new System.Windows.Forms.CheckBox();
             toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.outerLayoutPanel.SuspendLayout();
             this.typingsAcquisitionLayoutPanel.SuspendLayout();
@@ -54,7 +55,7 @@
             this.outerLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.outerLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.outerLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.outerLayoutPanel.Size = new System.Drawing.Size(842, 111);
+            this.outerLayoutPanel.Size = new System.Drawing.Size(842, 146);
             this.outerLayoutPanel.TabIndex = 0;
             // 
             // typingsAcquisitionLayoutPanel
@@ -63,16 +64,18 @@
             this.typingsAcquisitionLayoutPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.typingsAcquisitionLayoutPanel.ColumnCount = 1;
             this.typingsAcquisitionLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.typingsAcquisitionLayoutPanel.Controls.Add(this._saveChangesToConfigFile, 0, 2);
             this.typingsAcquisitionLayoutPanel.Controls.Add(this._showTypingsInfoBar, 0, 1);
             this.typingsAcquisitionLayoutPanel.Controls.Add(this._enableAutomaticTypingsAcquisition, 0, 0);
             this.typingsAcquisitionLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.typingsAcquisitionLayoutPanel.Location = new System.Drawing.Point(6, 33);
             this.typingsAcquisitionLayoutPanel.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
             this.typingsAcquisitionLayoutPanel.Name = "typingsAcquisitionLayoutPanel";
-            this.typingsAcquisitionLayoutPanel.RowCount = 2;
+            this.typingsAcquisitionLayoutPanel.RowCount = 3;
             this.typingsAcquisitionLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.typingsAcquisitionLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.typingsAcquisitionLayoutPanel.Size = new System.Drawing.Size(830, 70);
+            this.typingsAcquisitionLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.typingsAcquisitionLayoutPanel.Size = new System.Drawing.Size(830, 105);
             this.typingsAcquisitionLayoutPanel.TabIndex = 1;
             // 
             // _enableAutomaticTypingsAcquisition
@@ -109,6 +112,19 @@
             this._showTypingsInfoBar.TabIndex = 1;
             this._showTypingsInfoBar.Text = "&Show status bar after adding new typings folder to project";
             this._showTypingsInfoBar.UseVisualStyleBackColor = true;
+            this._showTypingsInfoBar.CheckedChanged += new System.EventHandler(this._showTypingsInfoBar_CheckedChanged);
+            // 
+            // _saveChangesToConfigFile
+            // 
+            this._saveChangesToConfigFile.AutoSize = true;
+            this._saveChangesToConfigFile.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this._saveChangesToConfigFile.Location = new System.Drawing.Point(12, 73);
+            this._saveChangesToConfigFile.Margin = new System.Windows.Forms.Padding(12, 3, 12, 3);
+            this._saveChangesToConfigFile.Name = "_saveChangesToConfigFile";
+            this._saveChangesToConfigFile.Size = new System.Drawing.Size(384, 29);
+            this._saveChangesToConfigFile.TabIndex = 2;
+            this._saveChangesToConfigFile.Text = "Save changes to tsd.json &config file";
+            this._saveChangesToConfigFile.UseVisualStyleBackColor = true;
             // 
             // SalsaLsIntellisenseOptionsControl
             // 
@@ -132,5 +148,6 @@
         private System.Windows.Forms.CheckBox _enableAutomaticTypingsAcquisition;
         private System.Windows.Forms.Label typingsAcquisitionLabel;
         private System.Windows.Forms.CheckBox _showTypingsInfoBar;
+        private System.Windows.Forms.CheckBox _saveChangesToConfigFile;
     }
 }

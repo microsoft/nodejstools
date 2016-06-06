@@ -137,7 +137,11 @@ namespace Microsoft.NodejsTools {
         }
 
         private static IEnumerable<string> TsdInstallArguments(IEnumerable<string> packages) {
-            return new[] { "install", }.Concat(packages).Concat(new[] { "--save" });
+            var arguments = new[] { "install", }.Concat(packages);
+            if (NodejsPackage.Instance.IntellisenseOptionsPage.SaveChangesToConfigFile) {
+                arguments = arguments.Concat(new[] { "--save" });
+            }
+            return arguments;
         }
 
         private static IEnumerable<string> CurrentTypingsPackages(string pathToRootProjectDirectory) {
