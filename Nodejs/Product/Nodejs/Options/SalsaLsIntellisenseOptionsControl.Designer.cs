@@ -46,7 +46,9 @@
             this.outerLayoutPanel.Controls.Add(this.typingsAcquisitionLayoutPanel, 0, 1);
             this.outerLayoutPanel.Controls.Add(this.typingsAcquisitionLabel, 0, 0);
             this.outerLayoutPanel.Controls.Add(this.linkLabel1, 0, 2);
+            this.outerLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.outerLayoutPanel.Location = new System.Drawing.Point(0, 0);
+            this.outerLayoutPanel.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
             this.outerLayoutPanel.Name = "outerLayoutPanel";
             this.outerLayoutPanel.RowCount = 3;
             this.outerLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -127,7 +129,8 @@
             // 
             this.linkLabel1.AutoSize = true;
             this.linkLabel1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.linkLabel1.Location = new System.Drawing.Point(253, 146);
+            this.linkLabel1.Location = new System.Drawing.Point(256, 146);
+            this.linkLabel1.Margin = new System.Windows.Forms.Padding(3, 0, 0, 0);
             this.linkLabel1.Name = "linkLabel1";
             this.linkLabel1.Size = new System.Drawing.Size(373, 25);
             this.linkLabel1.TabIndex = 2;
@@ -142,8 +145,9 @@
             this.AutoSize = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.Controls.Add(this.outerLayoutPanel);
+            this.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
             this.Name = "SalsaLsIntellisenseOptionsControl";
-            this.Size = new System.Drawing.Size(632, 174);
+            this.Size = new System.Drawing.Size(629, 171);
             this.outerLayoutPanel.ResumeLayout(false);
             this.outerLayoutPanel.PerformLayout();
             this.typingsAcquisitionLayoutPanel.ResumeLayout(false);
