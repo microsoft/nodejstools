@@ -111,7 +111,7 @@ namespace Microsoft.NodejsTools.Project {
             get {
 #if DEV14
                 if (NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel != Options.AnalysisLevel.Preview ||
-                    NodejsPackage.Instance.IntellisenseOptionsPage.EnableAutomaticTypingsAcquisition) {
+                    !NodejsPackage.Instance.IntellisenseOptionsPage.EnableAutomaticTypingsAcquisition) {
                     return false;
                 }
 

@@ -138,16 +138,5 @@ namespace Microsoft.NodejsTools.Options {
             OnlyTabOrEnterToCommit = page.OnlyTabOrEnterToCommit;
             ShowCompletionListAfterCharacterTyped = page.ShowCompletionListAfterCharacterTyped;
         }
-
-        private void _analysisPreviewFeedbackLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
-            Process.Start("http://aka.ms/NtvsEs6Preview");
-        }
-
-        //private void _intelliSenseModeDropdown_SelectedValueChanged(object sender, EventArgs e) {
-        //    bool isES6PreviewIntelliSense = _intelliSenseModeDropdown.SelectedIndex == 0;
-        //    AnalysisLevel = AnalysisLevel;
-        //    _intelliSenseAdvancedOptionsGroupBox.Visible = !isES6PreviewIntelliSense;
-        //    _es5DeprecatedWarning.Visible = !isES6PreviewIntelliSense;
-        //}
     }
 }

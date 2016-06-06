@@ -16,6 +16,7 @@
 
 using System;
 using System.ComponentModel.Design;
+using System.Diagnostics;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Shell;
@@ -25,13 +26,19 @@ namespace Microsoft.NodejsTools.Options {
     public class TypingsInfoBar : IVsInfoBarUIEvents {
     
         private readonly static InfoBarButton _customizeInfoBarButton = new InfoBarButton ("Customize...");
+        private readonly static InfoBarHyperlink _typingsFolderHyperlink = new InfoBarHyperlink("typings folder");
 
         private readonly static InfoBarModel _infoBarModel =
             new InfoBarModel(
-                "Node.js IntelliSense added a typings folder to your project",
+                new [] {
+                    new InfoBarTextSpan("Node.js IntelliSense added a "),
+                    _typingsFolderHyperlink,
+                    new InfoBarTextSpan(" to your project")
+                },
                 new[] { _customizeInfoBarButton },
                 KnownMonikers.NewFolder,
                 true);
+        
 
         private IServiceProvider _provider;
         private static volatile TypingsInfoBar _instance;
@@ -103,21 +110,23 @@ namespace Microsoft.NodejsTools.Options {
         #region IVsInfoBarEvents
 
         public void OnActionItemClicked(IVsInfoBarUIElement infoBarUIElement, IVsInfoBarActionItem actionItem) {
-                if (actionItem.Equals(_customizeInfoBarButton)) {
-                    var optionsCommand = new CommandID(
-                        VSConstants.GUID_VSStandardCommandSet97,
-                        VSConstants.cmdidToolsOptions);
-                    var menuCommandService = _provider.GetService(typeof(IMenuCommandService)) as MenuCommandService;
-                    string intelliSenseOptionsGuidString = typeof(NodejsIntellisenseOptionsPage).GUID.ToString();
+            if (actionItem.Equals(_customizeInfoBarButton)) {
+                var optionsCommand = new CommandID(
+                    VSConstants.GUID_VSStandardCommandSet97,
+                    VSConstants.cmdidToolsOptions);
+                var menuCommandService = _provider.GetService(typeof(IMenuCommandService)) as MenuCommandService;
+                string intelliSenseOptionsGuidString = typeof(NodejsIntellisenseOptionsPage).GUID.ToString();
 
-                    menuCommandService.GlobalInvoke(optionsCommand, intelliSenseOptionsGuidString);
-                }
+                menuCommandService.GlobalInvoke(optionsCommand, intelliSenseOptionsGuidString);
+            } else if (actionItem.Equals(_typingsFolderHyperlink)) {
+                Process.Start("http://aka.ms/NtvsEs6Preview");
             }
+        }
 
-            public void OnClosed(IVsInfoBarUIElement infoBarUIElement) {
-                _isVisible = false;
-                return;
-            }
+        public void OnClosed(IVsInfoBarUIElement infoBarUIElement) {
+            _isVisible = false;
+            return;
+        }
 
         #endregion
     }
