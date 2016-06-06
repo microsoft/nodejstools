@@ -21,38 +21,31 @@ using Microsoft.NodejsTools.Project;
 
 namespace Microsoft.NodejsTools.Options {
     public partial class NodejsIntellisenseOptionsControl : UserControl {
+        private static readonly object _ecmaScript5 = SR.GetString(SR.EcmaScript5);
+        private static readonly object _ecmaScript6 = SR.GetString(SR.EcmaScript6);
+
         public NodejsIntellisenseOptionsControl() {
             InitializeComponent();
             _intelliSenseModeDropdown.Enabled = NodejsPackage.Instance.IntellisenseOptionsPage.EnableES6Preview;
+            _intelliSenseModeDropdown.Items.AddRange(new[] {
+                _ecmaScript6,
+                _ecmaScript5
+            });
         }
 
         internal AnalysisLevel AnalysisLevel {
             get {
-                if (_intelliSenseModeDropdown.SelectedIndex == 0) {
+                if (_intelliSenseModeDropdown.SelectedItem == _ecmaScript6) {
                     return AnalysisLevel.Preview;
                 } else {
                     return _nodejsES5IntelliSenseOptionsControl.AnalysisLevel;
                 }
             }
             set {
-                if (_intelliSenseModeDropdown.SelectedIndex == -1) {
-                    _intelliSenseModeDropdown.SelectedIndex = value == AnalysisLevel.Preview ? 0 : 1;
-                }
+                _intelliSenseModeDropdown.SelectedItem = 
+                    value == AnalysisLevel.Preview ? _ecmaScript6 : _ecmaScript5;
 
-                switch (value) {
-                    case AnalysisLevel.Preview:
-                        // Set default ES5 IntelliSense level - this setting will not take effect if ES6 Preview is enabled.
-                        _nodejsES5IntelliSenseOptionsControl.AnalysisLevel = AnalysisLevel.NodeLsMedium;
-                        break;
-                    case AnalysisLevel.NodeLsHigh:
-                    case AnalysisLevel.NodeLsMedium:
-                    case AnalysisLevel.NodeLsNone:
-                        _nodejsES5IntelliSenseOptionsControl.AnalysisLevel = value;
-                        break;
-                    default:
-                        Debug.Fail("Unrecognized AnalysisLevel: " + value);
-                        break;
-                }
+                _nodejsES5IntelliSenseOptionsControl.AnalysisLevel = value;
             }
         }
 
@@ -73,7 +66,7 @@ namespace Microsoft.NodejsTools.Options {
         }
 
         private void _intelliSenseModeDropdown_SelectedValueChanged(object sender, EventArgs e) {
-            bool isES6PreviewIntelliSense = _intelliSenseModeDropdown.SelectedIndex == 0;
+            bool isES6PreviewIntelliSense = _intelliSenseModeDropdown.SelectedItem == _ecmaScript6;
             _nodejsES5IntelliSenseOptionsControl.Visible = !isES6PreviewIntelliSense;
             _salsaLsIntellisenseOptionsControl.Visible = isES6PreviewIntelliSense;
             _es5DeprecatedWarning.Visible = !isES6PreviewIntelliSense;

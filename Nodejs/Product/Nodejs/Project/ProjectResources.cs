@@ -37,6 +37,8 @@ namespace Microsoft.NodejsTools.Project {
         internal const string DebuggerPort = "DebuggerPort";
         internal const string DontShowAgain = "DontShowAgain";
         internal const string DownloadAndInstall = "DownloadAndInstall";
+        internal const string EcmaScript5 = "EcmaScript5";
+        internal const string EcmaScript6 = "EcmaScript6";
         internal const string EnvironmentVariables = "EnvironmentVariables";
         internal const string ErrorNoDte = "ErrorNoDte";
         internal const string IncludeNodeModulesCancelTitle = "IncludeNodeModulesCancelTitle";
@@ -183,6 +185,10 @@ namespace Microsoft.NodejsTools.Project {
         internal const string TsdInstallCompleted = "TsdInstallCompleted";
         internal const string TsdInstallErrorOccurred = "TsdInstallErrorOccurred";
         internal const string TsdNotInstalledError = "TsdNotInstalledError";
+        internal const string TypingsInfoBarSpan1 = "TypingsInfoBarSpan1";
+        internal const string TypingsInfoBarSpan2 = "TypingsInfoBarSpan2";
+        internal const string TypingsInfoBarSpan3 = "TypingsInfoBarSpan3";
+        internal const string TypingsOpenOptionsText = "TypingsOpenOptionsText";
         internal const string UpgradedEnvironmentVariables = "UpgradedEnvironmentVariables";
         internal const string WorkingDirInvalidOrMissing = "WorkingDirInvalidOrMissing";
         internal const string WorkingDirToolTip = "WorkingDirToolTip";

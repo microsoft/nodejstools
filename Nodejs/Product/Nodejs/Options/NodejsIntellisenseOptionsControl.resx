@@ -252,12 +252,6 @@
   <data name="intelliSenseModeLayoutPanel.ColumnCount" type="System.Int32, mscorlib">
     <value>2</value>
   </data>
-  <data name="_intelliSenseModeDropdown.Items" xml:space="preserve">
-    <value>ECMAScript 6</value>
-  </data>
-  <data name="_intelliSenseModeDropdown.Items1" xml:space="preserve">
-    <value>ECMAScript 5</value>
-  </data>
   <data name="_intelliSenseModeDropdown.Location" type="System.Drawing.Point, System.Drawing">
     <value>192, 3</value>
   </data>

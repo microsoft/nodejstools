@@ -17,6 +17,7 @@
 using System;
 using System.ComponentModel.Design;
 using System.Diagnostics;
+using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Shell;
@@ -24,27 +25,27 @@ using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Microsoft.NodejsTools.Options {
     public class TypingsInfoBar : IVsInfoBarUIEvents {
-    
-        private readonly static InfoBarButton _customizeInfoBarButton = new InfoBarButton ("Customize...");
-        private readonly static InfoBarHyperlink _typingsFolderHyperlink = new InfoBarHyperlink("typings folder");
+
+        private readonly static InfoBarButton _customizeInfoBarButton;
+        private readonly static InfoBarHyperlink _typingsFolderHyperlink;
 
         private readonly static InfoBarModel _infoBarModel =
             new InfoBarModel(
-                new [] {
-                    new InfoBarTextSpan("Node.js IntelliSense added a "),
-                    _typingsFolderHyperlink,
-                    new InfoBarTextSpan(" to your project")
+                new[] {
+                    new InfoBarTextSpan(SR.GetString(SR.TypingsInfoBarSpan1)),
+                    _typingsFolderHyperlink = new InfoBarHyperlink(SR.GetString(SR.TypingsInfoBarSpan2)),
+                    new InfoBarTextSpan(SR.GetString(SR.TypingsInfoBarSpan3))
                 },
-                new[] { _customizeInfoBarButton },
+                new[] {
+                    _customizeInfoBarButton = new InfoBarButton(SR.GetString(SR.TypingsOpenOptionsText))
+                },
                 KnownMonikers.NewFolder,
                 true);
-        
 
         private IServiceProvider _provider;
         private static volatile TypingsInfoBar _instance;
         private static object _infoBarLock = new object();
         private bool _isVisible = false;
-
 
         public static TypingsInfoBar Instance {
             get {

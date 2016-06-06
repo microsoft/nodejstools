@@ -40,10 +40,7 @@ namespace Microsoft.NodejsTools.Options {
 
         internal AnalysisLevel AnalysisLevel {
             get {
-                if (false) {
-                    //_intelliSenseModeDropdown.SelectedIndex == 0
-                    //return AnalysisLevel.Preview;
-                } else if (_fullIntelliSenseRadioButton.Checked) {
+                if (_fullIntelliSenseRadioButton.Checked) {
                     return AnalysisLevel.NodeLsHigh;
                 } else if (_mediumIntelliSenseRadioButton.Checked) {
                     return AnalysisLevel.NodeLsMedium;
@@ -52,14 +49,10 @@ namespace Microsoft.NodejsTools.Options {
                 }
             }
             set {
-                //if (_intelliSenseModeDropdown.SelectedIndex == -1) {
-                //    _intelliSenseModeDropdown.SelectedIndex = value == AnalysisLevel.Preview ? 0 : 1;
-                //}
-
                 switch (value) {
                     case AnalysisLevel.Preview:
                         // Set default ES5 IntelliSense level - this setting will not take effect if ES6 Preview is enabled.
-                        _fullIntelliSenseRadioButton.Checked = true;
+                        _mediumIntelliSenseRadioButton.Checked = true;
                         break;
                     case AnalysisLevel.NodeLsHigh:
                         _fullIntelliSenseRadioButton.Checked = true;

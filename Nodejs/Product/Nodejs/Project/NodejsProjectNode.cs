@@ -110,7 +110,7 @@ namespace Microsoft.NodejsTools.Project {
         internal bool ShouldAcquireTypingsAutomatically {
             get {
 #if DEV14
-                if (NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel != Options.AnalysisLevel.Preview ||
+                if (NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel != AnalysisLevel.Preview ||
                     !NodejsPackage.Instance.IntellisenseOptionsPage.EnableAutomaticTypingsAcquisition) {
                     return false;
                 }
