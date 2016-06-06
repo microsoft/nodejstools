@@ -143,31 +143,6 @@
   <data name="advancedOptionsLayoutPanel.ColumnCount" type="System.Int32, mscorlib">
     <value>1</value>
   </data>
-  <data name="_nodejsES5IntelliSenseOptionsControl.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="_nodejsES5IntelliSenseOptionsControl.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
-    <value>GrowAndShrink</value>
-  </data>
-  <data name="_nodejsES5IntelliSenseOptionsControl.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Top</value>
-  </data>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="_nodejsES5IntelliSenseOptionsControl.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 111</value>
-  </data>
-  <data name="_nodejsES5IntelliSenseOptionsControl.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>0, 0, 0, 0</value>
-  </data>
-  <data name="_nodejsES5IntelliSenseOptionsControl.MinimumSize" type="System.Drawing.Size, System.Drawing">
-    <value>614, 434</value>
-  </data>
-  <data name="_nodejsES5IntelliSenseOptionsControl.Size" type="System.Drawing.Size, System.Drawing">
-    <value>665, 434</value>
-  </data>
-  <data name="_nodejsES5IntelliSenseOptionsControl.TabIndex" type="System.Int32, mscorlib">
-    <value>1</value>
-  </data>
   <data name="&gt;&gt;_nodejsES5IntelliSenseOptionsControl.Name" xml:space="preserve">
     <value>_nodejsES5IntelliSenseOptionsControl</value>
   </data>
@@ -178,24 +153,6 @@
     <value>advancedOptionsLayoutPanel</value>
   </data>
   <data name="&gt;&gt;_nodejsES5IntelliSenseOptionsControl.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="_salsaLsIntellisenseOptionsControl.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="_salsaLsIntellisenseOptionsControl.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Top</value>
-  </data>
-  <data name="_salsaLsIntellisenseOptionsControl.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 0</value>
-  </data>
-  <data name="_salsaLsIntellisenseOptionsControl.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>0, 0, 0, 0</value>
-  </data>
-  <data name="_salsaLsIntellisenseOptionsControl.Size" type="System.Drawing.Size, System.Drawing">
-    <value>665, 111</value>
-  </data>
-  <data name="_salsaLsIntellisenseOptionsControl.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
   </data>
   <data name="&gt;&gt;_salsaLsIntellisenseOptionsControl.Name" xml:space="preserve">
@@ -213,6 +170,7 @@
   <data name="advancedOptionsLayoutPanel.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Top</value>
   </data>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="advancedOptionsLayoutPanel.Location" type="System.Drawing.Point, System.Drawing">
     <value>12, 115</value>
   </data>
@@ -223,7 +181,7 @@
     <value>2</value>
   </data>
   <data name="advancedOptionsLayoutPanel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>665, 545</value>
+    <value>711, 580</value>
   </data>
   <data name="advancedOptionsLayoutPanel.TabIndex" type="System.Int32, mscorlib">
     <value>2</value>
@@ -248,6 +206,222 @@
   </data>
   <data name="intelliSenseModeLayoutPanel.ColumnCount" type="System.Int32, mscorlib">
     <value>2</value>
+  </data>
+  <data name="&gt;&gt;_intelliSenseModeDropdown.Name" xml:space="preserve">
+    <value>_intelliSenseModeDropdown</value>
+  </data>
+  <data name="&gt;&gt;_intelliSenseModeDropdown.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ComboBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_intelliSenseModeDropdown.Parent" xml:space="preserve">
+    <value>intelliSenseModeLayoutPanel</value>
+  </data>
+  <data name="&gt;&gt;_intelliSenseModeDropdown.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;intelliSenseModeLabel.Name" xml:space="preserve">
+    <value>intelliSenseModeLabel</value>
+  </data>
+  <data name="&gt;&gt;intelliSenseModeLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;intelliSenseModeLabel.Parent" xml:space="preserve">
+    <value>intelliSenseModeLayoutPanel</value>
+  </data>
+  <data name="&gt;&gt;intelliSenseModeLabel.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;_analysisPreviewFeedbackLinkLabel.Name" xml:space="preserve">
+    <value>_analysisPreviewFeedbackLinkLabel</value>
+  </data>
+  <data name="&gt;&gt;_analysisPreviewFeedbackLinkLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.LinkLabel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_analysisPreviewFeedbackLinkLabel.Parent" xml:space="preserve">
+    <value>intelliSenseModeLayoutPanel</value>
+  </data>
+  <data name="&gt;&gt;_analysisPreviewFeedbackLinkLabel.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="&gt;&gt;_es5DeprecatedWarning.Name" xml:space="preserve">
+    <value>_es5DeprecatedWarning</value>
+  </data>
+  <data name="&gt;&gt;_es5DeprecatedWarning.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_es5DeprecatedWarning.Parent" xml:space="preserve">
+    <value>intelliSenseModeLayoutPanel</value>
+  </data>
+  <data name="&gt;&gt;_es5DeprecatedWarning.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="intelliSenseModeLayoutPanel.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Top</value>
+  </data>
+  <data name="intelliSenseModeLayoutPanel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>12, 0</value>
+  </data>
+  <data name="intelliSenseModeLayoutPanel.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>12, 0, 12, 12</value>
+  </data>
+  <data name="intelliSenseModeLayoutPanel.RowCount" type="System.Int32, mscorlib">
+    <value>3</value>
+  </data>
+  <data name="intelliSenseModeLayoutPanel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>711, 89</value>
+  </data>
+  <data name="intelliSenseModeLayoutPanel.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;intelliSenseModeLayoutPanel.Name" xml:space="preserve">
+    <value>intelliSenseModeLayoutPanel</value>
+  </data>
+  <data name="&gt;&gt;intelliSenseModeLayoutPanel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TableLayoutPanel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;intelliSenseModeLayoutPanel.Parent" xml:space="preserve">
+    <value>outerLayoutPanel</value>
+  </data>
+  <data name="&gt;&gt;intelliSenseModeLayoutPanel.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="intelliSenseModeLayoutPanel.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
+    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="_intelliSenseModeDropdown" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="intelliSenseModeLabel" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="_analysisPreviewFeedbackLinkLabel" Row="2" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="_es5DeprecatedWarning" Row="1" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="AutoSize,0,AutoSize,0" /&gt;&lt;Rows Styles="AutoSize,0,AutoSize,0,AutoSize,0" /&gt;&lt;/TableLayoutSettings&gt;</value>
+  </data>
+  <data name="horizontalDivider.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Top</value>
+  </data>
+  <data name="horizontalDivider.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="horizontalDivider.Location" type="System.Drawing.Point, System.Drawing">
+    <value>12, 101</value>
+  </data>
+  <data name="horizontalDivider.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>12, 0, 12, 0</value>
+  </data>
+  <data name="horizontalDivider.Size" type="System.Drawing.Size, System.Drawing">
+    <value>711, 2</value>
+  </data>
+  <data name="horizontalDivider.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="horizontalDivider.Text" xml:space="preserve">
+    <value>border</value>
+  </data>
+  <data name="&gt;&gt;horizontalDivider.Name" xml:space="preserve">
+    <value>horizontalDivider</value>
+  </data>
+  <data name="&gt;&gt;horizontalDivider.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;horizontalDivider.Parent" xml:space="preserve">
+    <value>outerLayoutPanel</value>
+  </data>
+  <data name="&gt;&gt;horizontalDivider.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="outerLayoutPanel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
+  </data>
+  <data name="outerLayoutPanel.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>6, 8, 6, 8</value>
+  </data>
+  <data name="outerLayoutPanel.MinimumSize" type="System.Drawing.Size, System.Drawing">
+    <value>671, 500</value>
+  </data>
+  <data name="outerLayoutPanel.RowCount" type="System.Int32, mscorlib">
+    <value>3</value>
+  </data>
+  <data name="outerLayoutPanel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>735, 695</value>
+  </data>
+  <data name="outerLayoutPanel.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;outerLayoutPanel.Name" xml:space="preserve">
+    <value>outerLayoutPanel</value>
+  </data>
+  <data name="&gt;&gt;outerLayoutPanel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TableLayoutPanel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;outerLayoutPanel.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;outerLayoutPanel.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="outerLayoutPanel.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
+    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="advancedOptionsLayoutPanel" Row="2" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="intelliSenseModeLayoutPanel" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="horizontalDivider" Row="1" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="AutoSize,0" /&gt;&lt;Rows Styles="AutoSize,0,AutoSize,0,AutoSize,0" /&gt;&lt;/TableLayoutSettings&gt;</value>
+  </data>
+  <data name="_nodejsES5IntelliSenseOptionsControl.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="_nodejsES5IntelliSenseOptionsControl.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
+    <value>GrowAndShrink</value>
+  </data>
+  <data name="_nodejsES5IntelliSenseOptionsControl.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Top</value>
+  </data>
+  <data name="_nodejsES5IntelliSenseOptionsControl.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 146</value>
+  </data>
+  <data name="_nodejsES5IntelliSenseOptionsControl.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>0, 0, 0, 0</value>
+  </data>
+  <data name="_nodejsES5IntelliSenseOptionsControl.MinimumSize" type="System.Drawing.Size, System.Drawing">
+    <value>614, 434</value>
+  </data>
+  <data name="_nodejsES5IntelliSenseOptionsControl.Size" type="System.Drawing.Size, System.Drawing">
+    <value>711, 434</value>
+  </data>
+  <data name="_nodejsES5IntelliSenseOptionsControl.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;_nodejsES5IntelliSenseOptionsControl.Name" xml:space="preserve">
+    <value>_nodejsES5IntelliSenseOptionsControl</value>
+  </data>
+  <data name="&gt;&gt;_nodejsES5IntelliSenseOptionsControl.Type" xml:space="preserve">
+    <value>Microsoft.NodejsTools.Options.NodeLsIntellisenseOptionsControl, Microsoft.NodejsTools, Version=1.0.2015.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="&gt;&gt;_nodejsES5IntelliSenseOptionsControl.Parent" xml:space="preserve">
+    <value>advancedOptionsLayoutPanel</value>
+  </data>
+  <data name="&gt;&gt;_nodejsES5IntelliSenseOptionsControl.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="_salsaLsIntellisenseOptionsControl.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="_salsaLsIntellisenseOptionsControl.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
+    <value>GrowAndShrink</value>
+  </data>
+  <data name="_salsaLsIntellisenseOptionsControl.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Top</value>
+  </data>
+  <data name="_salsaLsIntellisenseOptionsControl.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
+  </data>
+  <data name="_salsaLsIntellisenseOptionsControl.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>0, 0, 0, 0</value>
+  </data>
+  <data name="_salsaLsIntellisenseOptionsControl.Size" type="System.Drawing.Size, System.Drawing">
+    <value>711, 146</value>
+  </data>
+  <data name="_salsaLsIntellisenseOptionsControl.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;_salsaLsIntellisenseOptionsControl.Name" xml:space="preserve">
+    <value>_salsaLsIntellisenseOptionsControl</value>
+  </data>
+  <data name="&gt;&gt;_salsaLsIntellisenseOptionsControl.Type" xml:space="preserve">
+    <value>Microsoft.NodejsTools.Options.SalsaLsIntellisenseOptionsControl, Microsoft.NodejsTools, Version=1.0.2015.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="&gt;&gt;_salsaLsIntellisenseOptionsControl.Parent" xml:space="preserve">
+    <value>advancedOptionsLayoutPanel</value>
+  </data>
+  <data name="&gt;&gt;_salsaLsIntellisenseOptionsControl.ZOrder" xml:space="preserve">
+    <value>1</value>
   </data>
   <data name="_intelliSenseModeDropdown.Items" xml:space="preserve">
     <value>ECMAScript 6</value>
@@ -375,105 +549,6 @@
   <data name="&gt;&gt;_es5DeprecatedWarning.ZOrder" xml:space="preserve">
     <value>3</value>
   </data>
-  <data name="intelliSenseModeLayoutPanel.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Top</value>
-  </data>
-  <data name="intelliSenseModeLayoutPanel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>12, 0</value>
-  </data>
-  <data name="intelliSenseModeLayoutPanel.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>12, 0, 12, 12</value>
-  </data>
-  <data name="intelliSenseModeLayoutPanel.RowCount" type="System.Int32, mscorlib">
-    <value>3</value>
-  </data>
-  <data name="intelliSenseModeLayoutPanel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>665, 89</value>
-  </data>
-  <data name="intelliSenseModeLayoutPanel.TabIndex" type="System.Int32, mscorlib">
-    <value>0</value>
-  </data>
-  <data name="&gt;&gt;intelliSenseModeLayoutPanel.Name" xml:space="preserve">
-    <value>intelliSenseModeLayoutPanel</value>
-  </data>
-  <data name="&gt;&gt;intelliSenseModeLayoutPanel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.TableLayoutPanel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;intelliSenseModeLayoutPanel.Parent" xml:space="preserve">
-    <value>outerLayoutPanel</value>
-  </data>
-  <data name="&gt;&gt;intelliSenseModeLayoutPanel.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="intelliSenseModeLayoutPanel.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
-    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="_intelliSenseModeDropdown" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="intelliSenseModeLabel" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="_analysisPreviewFeedbackLinkLabel" Row="2" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="_es5DeprecatedWarning" Row="1" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="AutoSize,0,AutoSize,0" /&gt;&lt;Rows Styles="AutoSize,0,AutoSize,0,AutoSize,0" /&gt;&lt;/TableLayoutSettings&gt;</value>
-  </data>
-  <data name="horizontalDivider.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Top</value>
-  </data>
-  <data name="horizontalDivider.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <data name="horizontalDivider.Location" type="System.Drawing.Point, System.Drawing">
-    <value>12, 101</value>
-  </data>
-  <data name="horizontalDivider.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>12, 0, 12, 0</value>
-  </data>
-  <data name="horizontalDivider.Size" type="System.Drawing.Size, System.Drawing">
-    <value>665, 2</value>
-  </data>
-  <data name="horizontalDivider.TabIndex" type="System.Int32, mscorlib">
-    <value>0</value>
-  </data>
-  <data name="horizontalDivider.Text" xml:space="preserve">
-    <value>border</value>
-  </data>
-  <data name="&gt;&gt;horizontalDivider.Name" xml:space="preserve">
-    <value>horizontalDivider</value>
-  </data>
-  <data name="&gt;&gt;horizontalDivider.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;horizontalDivider.Parent" xml:space="preserve">
-    <value>outerLayoutPanel</value>
-  </data>
-  <data name="&gt;&gt;horizontalDivider.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="outerLayoutPanel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 0</value>
-  </data>
-  <data name="outerLayoutPanel.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 8, 6, 8</value>
-  </data>
-  <data name="outerLayoutPanel.MinimumSize" type="System.Drawing.Size, System.Drawing">
-    <value>671, 500</value>
-  </data>
-  <data name="outerLayoutPanel.RowCount" type="System.Int32, mscorlib">
-    <value>3</value>
-  </data>
-  <data name="outerLayoutPanel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>689, 660</value>
-  </data>
-  <data name="outerLayoutPanel.TabIndex" type="System.Int32, mscorlib">
-    <value>0</value>
-  </data>
-  <data name="&gt;&gt;outerLayoutPanel.Name" xml:space="preserve">
-    <value>outerLayoutPanel</value>
-  </data>
-  <data name="&gt;&gt;outerLayoutPanel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.TableLayoutPanel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;outerLayoutPanel.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;outerLayoutPanel.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="outerLayoutPanel.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
-    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="advancedOptionsLayoutPanel" Row="2" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="intelliSenseModeLayoutPanel" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="horizontalDivider" Row="1" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,100" /&gt;&lt;Rows Styles="AutoSize,0,AutoSize,0,AutoSize,0" /&gt;&lt;/TableLayoutSettings&gt;</value>
-  </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
@@ -496,7 +571,7 @@
     <value>6, 6, 6, 6</value>
   </data>
   <data name="$this.Size" type="System.Drawing.Size, System.Drawing">
-    <value>695, 668</value>
+    <value>741, 703</value>
   </data>
   <data name="&gt;&gt;toolTip.Name" xml:space="preserve">
     <value>toolTip</value>

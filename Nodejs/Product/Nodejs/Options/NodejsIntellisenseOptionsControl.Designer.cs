@@ -28,14 +28,14 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NodejsIntellisenseOptionsControl));
             this.outerLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.advancedOptionsLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+            this._nodejsES5IntelliSenseOptionsControl = new Microsoft.NodejsTools.Options.NodeLsIntellisenseOptionsControl();
+            this._salsaLsIntellisenseOptionsControl = new Microsoft.NodejsTools.Options.SalsaLsIntellisenseOptionsControl();
             this.intelliSenseModeLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this._intelliSenseModeDropdown = new System.Windows.Forms.ComboBox();
             this.intelliSenseModeLabel = new System.Windows.Forms.Label();
             this._analysisPreviewFeedbackLinkLabel = new System.Windows.Forms.LinkLabel();
             this._es5DeprecatedWarning = new System.Windows.Forms.Label();
             this.horizontalDivider = new System.Windows.Forms.Label();
-            this._nodejsES5IntelliSenseOptionsControl = new Microsoft.NodejsTools.Options.NodeLsIntellisenseOptionsControl();
-            this._salsaLsIntellisenseOptionsControl = new Microsoft.NodejsTools.Options.SalsaLsIntellisenseOptionsControl();
             toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.outerLayoutPanel.SuspendLayout();
             this.advancedOptionsLayoutPanel.SuspendLayout();
@@ -56,6 +56,16 @@
             this.advancedOptionsLayoutPanel.Controls.Add(this._nodejsES5IntelliSenseOptionsControl, 0, 1);
             this.advancedOptionsLayoutPanel.Controls.Add(this._salsaLsIntellisenseOptionsControl, 0, 0);
             this.advancedOptionsLayoutPanel.Name = "advancedOptionsLayoutPanel";
+            // 
+            // _nodejsES5IntelliSenseOptionsControl
+            // 
+            resources.ApplyResources(this._nodejsES5IntelliSenseOptionsControl, "_nodejsES5IntelliSenseOptionsControl");
+            this._nodejsES5IntelliSenseOptionsControl.Name = "_nodejsES5IntelliSenseOptionsControl";
+            // 
+            // _salsaLsIntellisenseOptionsControl
+            // 
+            resources.ApplyResources(this._salsaLsIntellisenseOptionsControl, "_salsaLsIntellisenseOptionsControl");
+            this._salsaLsIntellisenseOptionsControl.Name = "_salsaLsIntellisenseOptionsControl";
             // 
             // intelliSenseModeLayoutPanel
             // 
@@ -100,16 +110,6 @@
             resources.ApplyResources(this.horizontalDivider, "horizontalDivider");
             this.horizontalDivider.ForeColor = System.Drawing.SystemColors.Control;
             this.horizontalDivider.Name = "horizontalDivider";
-            // 
-            // _nodejsES5IntelliSenseOptionsControl
-            // 
-            resources.ApplyResources(this._nodejsES5IntelliSenseOptionsControl, "_nodejsES5IntelliSenseOptionsControl");
-            this._nodejsES5IntelliSenseOptionsControl.Name = "_nodejsES5IntelliSenseOptionsControl";
-            // 
-            // _salsaLsIntellisenseOptionsControl
-            // 
-            resources.ApplyResources(this._salsaLsIntellisenseOptionsControl, "_salsaLsIntellisenseOptionsControl");
-            this._salsaLsIntellisenseOptionsControl.Name = "_salsaLsIntellisenseOptionsControl";
             // 
             // NodejsIntellisenseOptionsControl
             // 
