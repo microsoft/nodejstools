@@ -84,7 +84,9 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
             List<DiscoveredTest> discoveredTests = (List<DiscoveredTest>)JsonConvert.DeserializeObject(testInfo, typeof(List<DiscoveredTest>));
             if (discoveredTests != null) {
                 foreach (DiscoveredTest discoveredTest in discoveredTests) {
-                    NodejsTestInfo test = new NodejsTestInfo(discoveredTest.File, discoveredTest.Test, Name, discoveredTest.Line, discoveredTest.Column);
+                    var line = discoveredTest.Line + 1;
+                    var column = discoveredTest.Column + 1;
+                    NodejsTestInfo test = new NodejsTestInfo(discoveredTest.File, discoveredTest.Test, Name, line, column);
                     testCases.Add(test);
                 }
             }
