@@ -41,7 +41,7 @@
 
         vstest.console /TestCaseFilter:"TestCategory!=AppVeyorIgnore&TestCategory!=Ignore" /logger:Appveyor $("C:\projects\nodejstools\BuildOutput\Release" + $env:vs_version + "\Tests\NpmTests.dll") $("C:\projects\nodejstools\BuildOutput\Release" + $env:vs_version + "\Tests\NodeTests.dll") $("C:\projects\nodejstools\BuildOutput\Release" + $env:vs_version + "\Tests\ProfilerTests.dll") $("C:\projects\nodejstools\BuildOutput\Release" + $env:vs_version + "\Tests\JSAnalysisTests.dll") /settings:$("C:\projects\nodejstools\Build\default." + $testsettings_version + "Exp.testsettings")
   artifacts: &default_artifacts
-    - path: C:\NTVS_Out
+    - path: "C:\\NTVS_Out"
       name: NtvsOut
       type: zip
 
