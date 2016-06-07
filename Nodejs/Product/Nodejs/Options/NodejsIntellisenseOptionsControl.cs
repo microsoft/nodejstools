@@ -68,8 +68,12 @@ namespace Microsoft.NodejsTools.Options {
         private void _intelliSenseModeDropdown_SelectedValueChanged(object sender, EventArgs e) {
             bool isES6PreviewIntelliSense = _intelliSenseModeDropdown.SelectedItem == _ecmaScript6;
             _nodejsES5IntelliSenseOptionsControl.Visible = !isES6PreviewIntelliSense;
-            _salsaLsIntellisenseOptionsControl.Visible = isES6PreviewIntelliSense;
             _es5DeprecatedWarning.Visible = !isES6PreviewIntelliSense;
+#if DEV14
+            _salsaLsIntellisenseOptionsControl.Visible = isES6PreviewIntelliSense;
+#else
+            _salsaLsIntellisenseOptionsControl.Visible = false;
+#endif
         }
     }
 }
