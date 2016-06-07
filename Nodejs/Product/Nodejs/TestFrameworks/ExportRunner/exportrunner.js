@@ -21,16 +21,14 @@ var find_tests = function (testFileList, discoverResultFile) {
             return;
         }
         for (var test in testCases) {
-            var line = 1; // line 0 doesn't exist in editor
-            var column = 1;
+            var line = 0;
+            var column = 0;
             if (debug !== undefined) {
                 try {
                     var funcDetails = debug.findFunctionSourceLocation(testCases[test]);
                     if (funcDetails != undefined) {
-                        //v8 is 0 based line numbers, editor is 1 based
-                        line = parseInt(funcDetails.line) + 1;
-                        //v8 is 0 based column numbers, editor is 1 based
-                        column = parseInt(funcDetails.column) + 1;
+                        line = funcDetails.line; // 0 based
+                        column = funcDetails.column; // 0 based
                     }
                 } catch (e) {
                     //If we take an exception mapping the source line, simply fallback to unknown source map 
