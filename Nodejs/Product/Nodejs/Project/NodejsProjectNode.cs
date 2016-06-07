@@ -34,6 +34,7 @@ using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudioTools.Project.Automation;
 using MSBuild = Microsoft.Build.Evaluation;
 using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
+using Microsoft.NodejsTools.Options;
 #if DEV14_OR_LATER
 using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Imaging;
@@ -109,7 +110,8 @@ namespace Microsoft.NodejsTools.Project {
         internal bool ShouldAcquireTypingsAutomatically {
             get {
 #if DEV14
-                if (NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel != Options.AnalysisLevel.Preview) {
+                if (NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel != AnalysisLevel.Preview ||
+                    !NodejsPackage.Instance.IntellisenseOptionsPage.EnableAutomaticTypingsAcquisition) {
                     return false;
                 }
 
@@ -145,10 +147,19 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private void TryToAcquireTypings(IEnumerable<string> packages) {
+            bool isNewTypingsFolder = !Directory.Exists(Path.Combine(this.ProjectHome, "typings"));
             if (ShouldAcquireTypingsAutomatically && TypingsAcquirer != null) {
                 TypingsAcquirer
                     .AcquireTypings(packages, null /*redirector*/)
-                    .ContinueWith(x => x);
+                    .ContinueWith(x => {
+                        if (NodejsPackage.Instance.IntellisenseOptionsPage.ShowTypingsInfoBar &&
+                            x.Result &&
+                            isNewTypingsFolder) {
+                                NodejsPackage.Instance.GetUIThread().Invoke(() => {
+                                    TypingsInfoBar.Instance.ShowInfoBar();
+                                });
+                            }
+                    });
             }
         }
 
@@ -401,7 +412,7 @@ namespace Microsoft.NodejsTools.Project {
 
         public override CommonFileNode CreateNonCodeFileNode(ProjectElement item) {
             string fileName = item.Url;
-            if (Path.GetFileName(fileName).Equals(NodejsConstants.PackageJsonFile, StringComparison.OrdinalIgnoreCase) && 
+            if (Path.GetFileName(fileName).Equals(NodejsConstants.PackageJsonFile, StringComparison.OrdinalIgnoreCase) &&
                 !fileName.Contains(NodejsConstants.NodeModulesStagingFolder)) {
                 return new PackageJsonFileNode(this, item);
             }
@@ -727,7 +738,7 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-#region VSWebSite Members
+        #region VSWebSite Members
 
         // This interface is just implemented so we don't get normal profiling which
         // doesn't work with our projects anyway.
@@ -794,7 +805,7 @@ namespace Microsoft.NodejsTools.Project {
             get { throw new NotImplementedException(); }
         }
 
-#endregion
+        #endregion
 
         Task INodePackageModulesCommands.InstallMissingModulesAsync() {
             //Fire off the command to update the missing modules

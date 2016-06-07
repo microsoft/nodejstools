@@ -21,123 +21,59 @@ using Microsoft.NodejsTools.Project;
 
 namespace Microsoft.NodejsTools.Options {
     public partial class NodejsIntellisenseOptionsControl : UserControl {
+        private static readonly object _ecmaScript5 = SR.GetString(SR.EcmaScript5);
+        private static readonly object _ecmaScript6 = SR.GetString(SR.EcmaScript6);
+
         public NodejsIntellisenseOptionsControl() {
             InitializeComponent();
-            _previewIntelliSenseRadioButton.Enabled = NodejsPackage.Instance.IntellisenseOptionsPage.EnableES6Preview;
-        }
-
-        internal bool SaveToDisk {
-            get {
-                return _saveToDiskEnabledRadioButton.Checked;
-            }
-            set {
-                if (value == true) {
-                    _saveToDiskEnabledRadioButton.Checked = true;
-                } else {
-                    _saveToDiskDisabledRadioButton.Checked = true;
-                }
-            }
+            _intelliSenseModeDropdown.Enabled = NodejsPackage.Instance.IntellisenseOptionsPage.EnableES6Preview;
+            _intelliSenseModeDropdown.Items.AddRange(new[] {
+                _ecmaScript6,
+                _ecmaScript5
+            });
         }
 
         internal AnalysisLevel AnalysisLevel {
             get {
-                if (_previewIntelliSenseRadioButton.Checked) {
+                if (_intelliSenseModeDropdown.SelectedItem == _ecmaScript6) {
                     return AnalysisLevel.Preview;
-                } else if (_fullIntelliSenseRadioButton.Checked) {
-                    return AnalysisLevel.NodeLsHigh;
-                } else if (_mediumIntelliSenseRadioButton.Checked) {
-                    return AnalysisLevel.NodeLsMedium;
                 } else {
-                    return AnalysisLevel.NodeLsNone;
+                    return _nodejsES5IntelliSenseOptionsControl.AnalysisLevel;
                 }
             }
             set {
-                switch (value) {
-                    case AnalysisLevel.Preview:
-                        _previewIntelliSenseRadioButton.Checked = true;
-                        break;
-                    case AnalysisLevel.NodeLsHigh:
-                        _fullIntelliSenseRadioButton.Checked = true;
-                        break;
-                    case AnalysisLevel.NodeLsMedium:
-                        _mediumIntelliSenseRadioButton.Checked = true;
-                        break;
-                    case AnalysisLevel.NodeLsNone:
-                        _noIntelliSenseRadioButton.Checked = true;
-                        break;
-                    default:
-                        Debug.Fail("Unrecognized AnalysisLevel: " + value);
-                        break;
-                }
-            }
-        }
+                _intelliSenseModeDropdown.SelectedItem = 
+                    value == AnalysisLevel.Preview ? _ecmaScript6 : _ecmaScript5;
 
-        internal int AnalysisLogMaximum {
-            get {
-                int max;
-                // The Max Value is described by 'Max' instead of 'Int32.MaxValue'
-                if (_analysisLogMax.Text == "Max") {
-                    return Int32.MaxValue;
-                }
-                if (Int32.TryParse(_analysisLogMax.Text, out max)) {
-                    return max;
-                }
-                return 0;
-            }
-            set {
-                if (value == 0) {
-                    _analysisLogMax.SelectedIndex = 0;
-                    return;
-                }
-                // Handle case where value is the Max.
-                string index = value == Int32.MaxValue ? "Max" : value.ToString();
-                for (int i = 0; i < _analysisLogMax.Items.Count; i++) {
-                    if (_analysisLogMax.Items[i].ToString() == index) {
-                        _analysisLogMax.SelectedIndex = i;
-                        return;
-                    }
-                }
-
-                _analysisLogMax.Text = index;
-            }
-        }
-
-        internal bool OnlyTabOrEnterToCommit {
-            get {
-                return _onlyTabOrEnterToCommit.Checked;
-            }
-            set {
-                _onlyTabOrEnterToCommit.Checked = value;
-            }
-        }
-
-        internal bool ShowCompletionListAfterCharacterTyped {
-            get {
-                return _showCompletionListAfterCharacterTyped.Checked;
-            }
-            set {
-                _showCompletionListAfterCharacterTyped.Checked = value;
+                _nodejsES5IntelliSenseOptionsControl.AnalysisLevel = value;
             }
         }
 
         internal void SyncPageWithControlSettings(NodejsIntellisenseOptionsPage page) {
             page.AnalysisLevel = AnalysisLevel;
-            page.AnalysisLogMax = AnalysisLogMaximum;
-            page.SaveToDisk = SaveToDisk;
-            page.OnlyTabOrEnterToCommit = OnlyTabOrEnterToCommit;
-            page.ShowCompletionListAfterCharacterTyped = ShowCompletionListAfterCharacterTyped;
+            _nodejsES5IntelliSenseOptionsControl.SyncPageWithControlSettings(page);
+            _salsaLsIntellisenseOptionsControl.SyncPageWithControlSettings(page);
         }
 
         internal void SyncControlWithPageSettings(NodejsIntellisenseOptionsPage page) {
             AnalysisLevel = page.AnalysisLevel;
-            AnalysisLogMaximum = page.AnalysisLogMax;
-            SaveToDisk = page.SaveToDisk;
-            OnlyTabOrEnterToCommit = page.OnlyTabOrEnterToCommit;
-            ShowCompletionListAfterCharacterTyped = page.ShowCompletionListAfterCharacterTyped;
+            _nodejsES5IntelliSenseOptionsControl.SyncControlWithPageSettings(page);
+            _salsaLsIntellisenseOptionsControl.SyncControlWithPageSettings(page);
         }
 
         private void _analysisPreviewFeedbackLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
             Process.Start("http://aka.ms/NtvsEs6Preview");
+        }
+
+        private void _intelliSenseModeDropdown_SelectedValueChanged(object sender, EventArgs e) {
+            bool isES6PreviewIntelliSense = _intelliSenseModeDropdown.SelectedItem == _ecmaScript6;
+            _nodejsES5IntelliSenseOptionsControl.Visible = !isES6PreviewIntelliSense;
+            _es5DeprecatedWarning.Visible = !isES6PreviewIntelliSense;
+#if DEV14
+            _salsaLsIntellisenseOptionsControl.Visible = isES6PreviewIntelliSense;
+#else
+            _salsaLsIntellisenseOptionsControl.Visible = false;
+#endif
         }
     }
 }

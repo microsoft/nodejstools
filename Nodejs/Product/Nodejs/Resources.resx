@@ -618,4 +618,22 @@ You will need to restart Visual Studio after installation.</value>
   <data name="TsdNotInstalledError" xml:space="preserve">
     <value>Could not find TSD TypeScript package manager tool used for Intellisense. Please install it globally by running 'npm install -g tsd'.</value>
   </data>
+  <data name="TypingsInfoBarSpan1" xml:space="preserve">
+    <value>Node.js IntelliSense added a </value>
+  </data>
+  <data name="TypingsInfoBarSpan2" xml:space="preserve">
+    <value>typings folder</value>
+  </data>
+  <data name="TypingsInfoBarSpan3" xml:space="preserve">
+    <value> to your project</value>
+  </data>
+  <data name="TypingsOpenOptionsText" xml:space="preserve">
+    <value>Customize...</value>
+  </data>
+  <data name="EcmaScript5" xml:space="preserve">
+    <value>ECMAScript 5</value>
+  </data>
+  <data name="EcmaScript6" xml:space="preserve">
+    <value>ECMAScript 6</value>
+  </data>
 </root>
