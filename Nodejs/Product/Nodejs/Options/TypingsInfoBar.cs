@@ -43,20 +43,14 @@ namespace Microsoft.NodejsTools.Options {
                 true);
 
         private IServiceProvider _provider;
-        private static volatile TypingsInfoBar _instance;
-        private static object _infoBarLock = new object();
         private bool _isVisible = false;
+
+        private static readonly Lazy<TypingsInfoBar> _instance =
+            new Lazy<TypingsInfoBar>(() => new TypingsInfoBar(NodejsPackage.Instance));
 
         public static TypingsInfoBar Instance {
             get {
-                if (_instance == null) {
-                    lock (_infoBarLock) {
-                        if (_instance == null) {
-                            _instance = new TypingsInfoBar(NodejsPackage.Instance);
-                        }
-                    }
-                }
-                return _instance;
+                return _instance.Value;
             }
         }
 
