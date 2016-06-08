@@ -37,7 +37,7 @@ namespace Microsoft.NodejsTools.Options {
             _category = category;
         }
 
-        internal void SaveBool(string name, bool value) {
+        internal virtual void SaveBool(string name, bool value) {
             SaveString(name, value.ToString());
         }
 
@@ -80,7 +80,7 @@ namespace Microsoft.NodejsTools.Options {
             return null;
         }
 
-        internal bool? LoadBool(string name) {
+        internal virtual bool? LoadBool(string name) {
             string res = LoadString(name);
             if (res == null) {
                 return null;

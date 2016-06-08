@@ -21,12 +21,10 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
-using Microsoft.NodejsTools.Analysis;
 using Microsoft.NodejsTools.Commands;
 using Microsoft.NodejsTools.Debugger.DataTips;
 using Microsoft.NodejsTools.Debugger.DebugEngine;
@@ -41,7 +39,6 @@ using Microsoft.NodejsTools.Repl;
 using Microsoft.NodejsTools.Telemetry;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
-using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -200,7 +197,7 @@ namespace Microsoft.NodejsTools {
                 delegate { NewProjectFromExistingWizard.IsAddNewProjectCmd = false; }
             );
 
-             var langService = new NodejsLanguageInfo(this);
+            var langService = new NodejsLanguageInfo(this);
             ((IServiceContainer)this).AddService(langService.GetType(), langService, true);
 
             ((IServiceContainer)this).AddService(typeof(ClipboardServiceBase), new ClipboardService(), true);
@@ -225,14 +222,12 @@ namespace Microsoft.NodejsTools {
             }
             RegisterCommands(commands, Guids.NodejsCmdSet);
 
-            IVsTextManager textMgr = (IVsTextManager)Instance.GetService(typeof(SVsTextManager));
+            IVsTextManager4 textMgr = (IVsTextManager4)Instance.GetService(typeof(SVsTextManager));
 
-            var langPrefs = new LANGPREFERENCES[1];
-            langPrefs[0].guidLang = typeof(NodejsLanguageInfo).GUID;
-            ErrorHandler.ThrowOnFailure(textMgr.GetUserPreferences(null, null, langPrefs, null));
+            LANGPREFERENCES3[] langPrefs = GetNodejsLanguagePreferencesFromTypeScript(textMgr);
             _langPrefs = new LanguagePreferences(langPrefs[0]);
 
-            var textManagerEvents2Guid = typeof(IVsTextManagerEvents2).GUID;
+            var textManagerEvents2Guid = typeof(IVsTextManagerEvents4).GUID;
             IConnectionPoint textManagerEvents2ConnectionPoint;
             ((IConnectionPointContainer)textMgr).FindConnectionPoint(ref textManagerEvents2Guid, out textManagerEvents2ConnectionPoint);
             uint cookie;
@@ -254,6 +249,15 @@ namespace Microsoft.NodejsTools {
             // The variable is inherited by child processes backing Test Explorer, and is used in
             // the NTVS test discoverer and test executor to connect back to VS.
             Environment.SetEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable, Process.GetCurrentProcess().Id.ToString());
+        }
+
+        private static LANGPREFERENCES3[] GetNodejsLanguagePreferencesFromTypeScript(IVsTextManager4 textMgr) {
+            var langPrefs = new LANGPREFERENCES3[1];
+            langPrefs[0].guidLang = Guids.TypeScriptLanguageInfo;
+            ErrorHandler.ThrowOnFailure(textMgr.GetUserPreferences4(null, langPrefs, null));
+            langPrefs[0].guidLang = typeof(NodejsLanguageInfo).GUID;
+            textMgr.SetUserPreferences4(null, langPrefs, null);
+            return langPrefs;
         }
 
         private void SubscribeToVsCommandEvents(
