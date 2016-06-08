@@ -232,10 +232,10 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
         public override void Remove(bool removeFromStorage) {
-            base.Remove(removeFromStorage);
-
             // if we were a symlink folder, we need to stop watching now.
             ProjectMgr.TryDeactivateSymLinkWatcher(this);
+
+            base.Remove(removeFromStorage);
         }
 
         public override void Close() {

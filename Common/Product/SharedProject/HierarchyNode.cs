@@ -1567,7 +1567,6 @@ namespace Microsoft.VisualStudioTools.Project {
             firstChild = null;
             lastChild = null;
             nextSibling = null;
-            itemNode = null;
         }
 
         /// <summary>
