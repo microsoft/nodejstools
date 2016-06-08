@@ -387,7 +387,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
                 string path;
                 if (e.Project.TryGetProjectPath(out path) &&
-                    !string.IsNullOrEmpty(path) &&
                     !_knownProjects.ContainsKey(path)) {
                     var dteProject = ((IVsHierarchy)e.Project).GetProject();
 
@@ -429,7 +428,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 ProjectInfo projectInfo;
                 string projectPath;
                 if (e.Project.TryGetProjectPath(out projectPath) &&
-                    !string.IsNullOrEmpty(projectPath) &&
                     _knownProjects.TryGetValue(projectPath, out projectInfo)) {
                     _knownProjects.Remove(projectPath);
 
@@ -551,7 +549,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
             string projectPath;
             if (project != null &&
                 project.TryGetProjectPath(out projectPath) &&
-                !string.IsNullOrEmpty(projectPath) &&
                 _knownProjects.TryGetValue(projectPath, out projectInfo) &&
                 projectInfo != null &&
                 projectInfo.HasRequestedContainers) {
