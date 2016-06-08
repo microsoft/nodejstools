@@ -21,7 +21,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Microsoft.NodejsTools.Options {
     public class NodejsFormattingDialogPage : NodejsDialogPage {
-        ISettingsManager _settingsManager;
+        private readonly ISettingsManager _settingsManager;
         private const string TypeScriptBaseName = "TextEditor.TypeScript.Specific.";
 
         public NodejsFormattingDialogPage(string category) : base(category) {
