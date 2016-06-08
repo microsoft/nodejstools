@@ -44,7 +44,6 @@
     - path: NTVS_Out
       name: NtvsOut
       type: zip
-
 -
   version: 1.0.{build}
   branches:
