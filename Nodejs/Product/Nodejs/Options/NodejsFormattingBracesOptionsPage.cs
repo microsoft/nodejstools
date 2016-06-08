@@ -14,12 +14,11 @@
 //
 //*********************************************************//
 
-using System;
 using System.Runtime.InteropServices;
 
 namespace Microsoft.NodejsTools.Options {
     [ComVisible(true)]
-    public class NodejsFormattingBracesOptionsPage : NodejsDialogPage {
+    public class NodejsFormattingBracesOptionsPage : NodejsFormattingDialogPage {
         private NodejsFormattingBracesOptionsControl _window;
 
         public NodejsFormattingBracesOptionsPage()
@@ -51,8 +50,8 @@ namespace Microsoft.NodejsTools.Options {
             BraceOnNewLineForFunctions = BraceOnNewLineForControlBlocks = false;
         }
 
-        private const string BraceOnNewLineForFunctionsSetting = "BraceOnNewLineForFunctions";
-        private const string BraceOnNewLineForControlBlocksSetting = "BraceOnNewLineForControlBlocks";
+        private const string BraceOnNewLineForFunctionsSetting = TypeScriptRegistrySwitches.PlaceOpenBraceOnNewLineForFunctions;
+        private const string BraceOnNewLineForControlBlocksSetting = TypeScriptRegistrySwitches.PlaceOpenBraceOnNewLineForControlBlocks;
 
         public override void LoadSettingsFromStorage(){
             // Load settings from storage.
