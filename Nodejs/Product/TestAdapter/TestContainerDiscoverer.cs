@@ -387,6 +387,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
                 string path;
                 if (e.Project.TryGetProjectPath(out path) &&
+                    !string.IsNullOrEmpty(path) &&
                     !_knownProjects.ContainsKey(path)) {
                     var dteProject = ((IVsHierarchy)e.Project).GetProject();
 
