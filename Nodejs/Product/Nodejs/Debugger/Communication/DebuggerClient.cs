@@ -58,6 +58,8 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                 _connection.SendMessage(command.ToString());
                 cancellationToken.ThrowIfCancellationRequested();
 
+                cancellationToken.Register(() => promise.TrySetCanceled(), false);
+
                 JObject response = await promise.Task.ConfigureAwait(false);
                 cancellationToken.ThrowIfCancellationRequested();
 
