@@ -108,7 +108,7 @@ namespace Microsoft.NodejsTools.Repl {
                 }
 
                 // Otherwise, fall back to using fullname
-                string projectDirectory = Path.GetDirectoryName(dteProject.FullName);
+                string projectDirectory = string.IsNullOrEmpty(dteProject.FullName) ? null : Path.GetDirectoryName(dteProject.FullName);
                 if (!string.IsNullOrEmpty(projectDirectory)) {
                     projectNameToDirectoryDictionary.Add(projectName, Tuple.Create(projectDirectory, hierarchy));
                 }
