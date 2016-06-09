@@ -114,7 +114,7 @@ namespace Microsoft.NodejsTools.Options {
 
                 menuCommandService.GlobalInvoke(optionsCommand, intelliSenseOptionsGuidString);
             } else if (actionItem.Equals(_typingsFolderHyperlink)) {
-                Process.Start("http://aka.ms/NtvsEs6Preview");
+                Process.Start("http://go.microsoft.com/fwlink/?LinkID=808345");
             }
         }
 
