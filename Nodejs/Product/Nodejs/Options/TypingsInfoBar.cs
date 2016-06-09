@@ -22,6 +22,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.Options {
     public class TypingsInfoBar : IVsInfoBarUIEvents {
@@ -114,7 +115,7 @@ namespace Microsoft.NodejsTools.Options {
 
                 menuCommandService.GlobalInvoke(optionsCommand, intelliSenseOptionsGuidString);
             } else if (actionItem.Equals(_typingsFolderHyperlink)) {
-                Process.Start("http://go.microsoft.com/fwlink/?LinkID=808345");
+                CommonPackage.OpenVsWebBrowser(_provider, "http://go.microsoft.com/fwlink/?LinkID=808345");
             }
         }
 
