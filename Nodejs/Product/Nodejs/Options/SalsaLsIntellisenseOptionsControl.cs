@@ -36,7 +36,7 @@ namespace Microsoft.NodejsTools.Options {
         }
 
         private void typingsLearnMoreLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
-            Process.Start("http://aka.ms/NtvsEs6Preview");
+            Process.Start("http://go.microsoft.com/fwlink/?LinkID=808343");
         }
     }
 }
