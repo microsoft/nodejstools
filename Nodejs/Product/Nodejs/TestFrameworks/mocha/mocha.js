@@ -1,4 +1,5 @@
-﻿var fs = require('fs');
+﻿"use strict";
+var fs = require('fs');
 var path = require('path');
 
 // Choose 'tap' rather than 'min' or 'xunit'. The reason is that
@@ -125,13 +126,13 @@ function getMochaOptions(projectFolder) {
     var mochaOptions = defaultMochaOptions;
     try {
         var optionsPath = path.join(projectFolder, 'test', 'mocha.json');
-        var options = require(optionsPath);
-        options = options || {};
+        var options = require(optionsPath) || {};
         for (var opt in options) {
             mochaOptions[opt] = options[opt];
         }
+        console.log("Found mocha.json file. Using Mocha settings: ", mochaOptions);
     } catch (ex) {
-        console.log("mocha.json options file not found. Using default values:", mochaOptions);
+        console.log("Using default Mocha settings");
     }
 
     // set timeout to 10 minutes, because the default of 2 sec is too short for debugging scenarios
