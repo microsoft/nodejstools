@@ -69,6 +69,11 @@ namespace Microsoft.NodejsTools.Options {
             bool isES6PreviewIntelliSense = _intelliSenseModeDropdown.SelectedItem == _ecmaScript6;
             _nodejsES5IntelliSenseOptionsControl.Visible = !isES6PreviewIntelliSense;
             _es5DeprecatedWarning.Visible = !isES6PreviewIntelliSense;
+
+            // Enables us to auto-size the IntelliSense selection area without reflowing the entire page
+            _es6BottomPadding.Visible = isES6PreviewIntelliSense;
+
+            // IntelliSense Options are controlled by the built-in language service in DEV15+
 #if DEV14
             _salsaLsIntellisenseOptionsControl.Visible = isES6PreviewIntelliSense;
 #else
