@@ -5,7 +5,9 @@ var path = require('path');
 
 function find_tests(testFileList, discoverResultFile, projectFolder) {
     var test = findTape(projectFolder);
-    if (test === null) return;
+    if (test === null) {
+        return;
+    }
     
     var harness = test.getHarness({ exit: false });
     var tests = harness["_tests"];
@@ -37,16 +39,20 @@ module.exports.find_tests = find_tests;
 
 function run_tests(testName, testFile, workingFolder, projectFolder) {
     var testCases = loadTestCases(testFile);
-    if (testCases === null) return;
+    if (testCases === null) {
+        return;
+    }
 
     var test = findTape(projectFolder);
-    if (test === null) return;
+    if (test === null) {
+        return;
+    }
 
     try {
         var harness = test.getHarness();
         harness.only(testName);
-    } catch (ex) {
-        console.error("NTVS_ERROR:", ex);
+    } catch (e) {
+        logError("Error running test:", testName, "in", testFile, e);
         return;
     }
 }
@@ -57,7 +63,8 @@ function loadTestCases(testFile) {
         process.chdir(path.dirname(testFile));
         return require(testFile);
     } catch (e) {
-        console.error("NTVS_ERROR:", e, "in", testFile);
+        // we would like continue discover other files, so swallow, log and continue;
+        logError("Test discovery error:", e, "in", testFile);
         return null;
     }
 }
@@ -67,7 +74,13 @@ function findTape(projectFolder) {
         var tapePath = path.join(projectFolder, 'node_modules', 'tape');
         return require(tapePath);
     } catch (e) {
-        console.error("NTVS_ERROR:", "Couldn't find 'tape' module relative to", projectFolder);
+        logError("Failed to find Tape package.  Tape must be installed in the project locally.  Mocha can be installed locally with the npm manager via solution explorer or with \".npm install tape\" via the Node.js interactive window.");
         return null;
     }
+}
+
+function logError() {
+    var errorArgs = Array.prototype.slice.call(arguments);
+    errorArgs.unshift("NTVS_ERROR:");
+    console.error.apply(console, errorArgs);
 }

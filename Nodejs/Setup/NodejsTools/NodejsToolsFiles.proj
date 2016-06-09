@@ -164,7 +164,11 @@
         <File Include="TestFrameworks\mocha\mocha.js">
             <InstallDirectory>TestFrameworksMocha</InstallDirectory>
         </File>
-
+        
+        <File Include="TestFrameworks\tape\tape.js">
+            <InstallDirectory>TestFrameworksTape</InstallDirectory>
+        </File>
+        
         <!-- Remote Debug files -->
         <File Include="License.html;
                        Debugger\RemoteDebug\RemoteDebug.js;
