@@ -22,9 +22,7 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Editor.OptionsExtensionMethods;
 using Microsoft.VisualStudio.Text.Tagging;
-using Microsoft.VisualStudio.Utilities;
-using Microsoft.VisualStudio.TextManager.Interop;
-using Microsoft.VisualStudio;
+using EnvDTE;
 
 namespace Microsoft.NodejsTools {
     sealed class SmartIndent : ISmartIndent {
@@ -47,14 +45,14 @@ namespace Microsoft.NodejsTools {
 
         #region ISmartIndent Members
 
-        public int? GetDesiredIndentation(VisualStudio.Text.ITextSnapshotLine line) {
+        public int? GetDesiredIndentation(ITextSnapshotLine line) {
             var langPrefs = NodejsPackage.GetNodejsLanguagePreferencesFromTypeScript();
-            switch ((EnvDTE._vsIndentStyle)langPrefs[0].IndentStyle) {
-                case EnvDTE._vsIndentStyle.vsIndentStyleNone:
+            switch (langPrefs[0].IndentStyle) {
+                case VisualStudio.TextManager.Interop.vsIndentStyle.vsIndentStyleNone:
                     return null;
-                case EnvDTE._vsIndentStyle.vsIndentStyleDefault:
+                case VisualStudio.TextManager.Interop.vsIndentStyle.vsIndentStyleDefault:
                     return DoBlockIndent(line);
-                case EnvDTE._vsIndentStyle.vsIndentStyleSmart:
+                case VisualStudio.TextManager.Interop.vsIndentStyle.vsIndentStyleSmart:
                     return DoSmartIndent(line);
                 default:
                     return null;
