@@ -84,11 +84,7 @@ function detectMocha(projectFolder) {
 
     var nodePath = process.env.NODE_PATH;
     if (nodePath && nodePath.length > 0) {
-      // get mocha location from NODE_PATH env 
-      var ndex = nodePath.search(new RegExp(/node_modules$/i));
-      if (ndex > 0) {
-        node_modulesFolder = nodePath.slice(0, -12);
-      }
+      return new require('mocha');
     }
     else {
       // get mocha location from mocha.json 
