@@ -57,8 +57,10 @@
         </File>
 
         <ItemTemplate Include="ItemTemplates\JavaScript\UnitTest.zip;
+                               ItemTemplates\JavaScript\TapeUnitTest.zip;
                                ItemTemplates\JavaScript\MochaUnitTest.zip;
                                ItemTemplates\JavaScript\TypeScriptUnitTest.zip;
+                               ItemTemplates\JavaScript\TypeScriptTapeUnitTest.zip;
                                ItemTemplates\JavaScript\TypeScriptMochaUnitTest.zip;
                                ItemTemplates\JavaScript\DockerfileTemplate.zip"/>
                                
