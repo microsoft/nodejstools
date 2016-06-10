@@ -18,24 +18,12 @@ using System;
 
 namespace Microsoft.NodejsTools.Debugger {
     sealed class OutputEventArgs : EventArgs {
-        private readonly string _output;
-        private readonly NodeThread _thread;
+        public readonly NodeThread Thread;
+        public readonly string Output;
 
         public OutputEventArgs(NodeThread thread, string output) {
-            _thread = thread;
-            _output = output;
-        }
-
-        public NodeThread Thread {
-            get {
-                return _thread;
-            }
-        }
-
-        public string Output {
-            get {
-                return _output;
-            }
+            Thread = thread;
+            Output = output;
         }
     }
 }

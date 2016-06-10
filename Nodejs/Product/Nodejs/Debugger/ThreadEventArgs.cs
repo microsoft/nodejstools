@@ -21,16 +21,10 @@ namespace Microsoft.NodejsTools.Debugger {
     /// Event args for start/stop of threads.
     /// </summary>
     class ThreadEventArgs : EventArgs {
-        private readonly NodeThread _thread;
+        public readonly NodeThread Thread;
 
         public ThreadEventArgs(NodeThread thread) {
-            _thread = thread;
-        }
-
-        public NodeThread Thread {
-            get {
-                return _thread;
-            }
+            Thread = thread;
         }
     }
 }

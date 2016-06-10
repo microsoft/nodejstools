@@ -19,35 +19,14 @@ namespace Microsoft.NodejsTools.Debugger {
     /// Stores line and column position in the file.
     /// </summary>
     sealed class FilePosition {
-        private readonly int _column;
-        private readonly string _fileName;
-        private readonly int _line;
+        public readonly int Column;
+        public readonly string FileName;
+        public readonly int Line;
 
         public FilePosition(string fileName, int line, int column) {
-            _fileName = fileName;
-            _line = line;
-            _column = column;
-        }
-
-        /// <summary>
-        /// Gets a file name.
-        /// </summary>
-        public string FileName {
-            get { return _fileName; }
-        }
-
-        /// <summary>
-        /// Gets a line number.
-        /// </summary>
-        public int Line {
-            get { return _line; }
-        }
-
-        /// <summary>
-        /// Gets a column number.
-        /// </summary>
-        public int Column {
-            get { return _column; }
+            FileName = fileName;
+            Line = line;
+            Column = column;
         }
     }
 }
