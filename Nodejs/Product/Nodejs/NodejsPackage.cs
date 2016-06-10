@@ -251,6 +251,11 @@ namespace Microsoft.NodejsTools {
             Environment.SetEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable, Process.GetCurrentProcess().Id.ToString());
         }
 
+        public static LANGPREFERENCES3[] GetNodejsLanguagePreferencesFromTypeScript() {
+            IVsTextManager4 textMgr = (IVsTextManager4)Instance.GetService(typeof(SVsTextManager));
+            return GetNodejsLanguagePreferencesFromTypeScript(textMgr);
+        }
+
         private static LANGPREFERENCES3[] GetNodejsLanguagePreferencesFromTypeScript(IVsTextManager4 textMgr) {
             var langPrefs = new LANGPREFERENCES3[1];
             langPrefs[0].guidLang = Guids.TypeScriptLanguageInfo;
