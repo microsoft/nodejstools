@@ -16,13 +16,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.Linq;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Editor.OptionsExtensionMethods;
 using Microsoft.VisualStudio.Text.Tagging;
-using EnvDTE;
 
 namespace Microsoft.NodejsTools {
     sealed class SmartIndent : ISmartIndent {
@@ -46,8 +44,7 @@ namespace Microsoft.NodejsTools {
         #region ISmartIndent Members
 
         public int? GetDesiredIndentation(ITextSnapshotLine line) {
-            var langPrefs = NodejsPackage.GetNodejsLanguagePreferencesFromTypeScript();
-            switch (langPrefs[0].IndentStyle) {
+            switch (NodejsPackage.Instance.LangPrefs.IndentMode) {
                 case VisualStudio.TextManager.Interop.vsIndentStyle.vsIndentStyleNone:
                     return null;
                 case VisualStudio.TextManager.Interop.vsIndentStyle.vsIndentStyleDefault:
