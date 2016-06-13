@@ -38,13 +38,13 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         /// Path the the private package where the typings acquisition tool is installed.
         /// </summary>
-        private static string NtvsToolsPath {
+        private static string NtvsExternalToolsPath {
             get {
                 return Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                     "Microsoft",
                     "Node.js Tools",
-                    "Tools");
+                    "ExternalTools");
             }
         }
 
@@ -54,7 +54,7 @@ namespace Microsoft.NodejsTools {
         private static string ToolPath {
             get {
                 return Path.Combine(
-                    NtvsToolsPath,
+                    NtvsExternalToolsPath,
                     "node_modules",
                     ".bin",
                     ToolExe);
