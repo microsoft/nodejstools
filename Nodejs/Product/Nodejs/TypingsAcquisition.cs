@@ -28,22 +28,47 @@ using SR = Microsoft.NodejsTools.Project.SR;
 
 namespace Microsoft.NodejsTools {
     internal class TypingsAcquisition {
-        private const string Tsd = "tsd";
-        private const string TsdExe = Tsd + ".cmd";
+        private const string TypingsAcquisitionTool = "typings";
+        private const string TypingsAcquisitionToolExe = TypingsAcquisitionTool + ".cmd";
+        private const string TypingsAcquisitionToolVersion = "1.0.5";
         private const string TypingsDirectoryName = "typings";
 
-        private static SemaphoreSlim tsdGlobalWorkSemaphore = new SemaphoreSlim(1);
+    private static SemaphoreSlim globalWorkSemaphore = new SemaphoreSlim(1);
+
+        /// <summary>
+        /// Path the the private package where the typings acquisition tool is installed.
+        /// </summary>
+        private static string NtvsToolsPath {
+            get {
+                return Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    "Microsoft",
+                    "Node.js Tools",
+                    "Tools");
+            }
+        }
+
+        /// <summary>
+        /// Full path to the typings acquisition tool.
+        /// </summary>
+        private static string TypingsAcquisitionToolPath {
+            get {
+                return Path.Combine(
+                    NtvsToolsPath,
+                    "node_modules",
+                    ".bin",
+                    TypingsAcquisitionToolExe);
+            }
+        }
 
         private readonly INpmController _npmController;
-        private readonly string _pathToRootNpmDirectory;
         private readonly string _pathToRootProjectDirectory;
 
         private readonly Lazy<HashSet<string>> _acquiredTypingsPackageNames;
-        private bool _didTryToInstallTsd;
+        private bool _didTryToInstallTypingsTool;
 
         public TypingsAcquisition(INpmController controller) {
             _npmController = controller;
-            _pathToRootNpmDirectory = controller.ListBaseDirectory;
             _pathToRootProjectDirectory = controller.RootPackage.Path;
 
             _acquiredTypingsPackageNames = new Lazy<HashSet<string>>(() => {
@@ -52,13 +77,13 @@ namespace Microsoft.NodejsTools {
         }
 
         public Task<bool> AcquireTypings(IEnumerable<string> packages, Redirector redirector) {
-            return tsdGlobalWorkSemaphore.WaitAsync().ContinueWith(async _ => {
+            return globalWorkSemaphore.WaitAsync().ContinueWith(async _ => {
                 var typingsToAquire = GetNewTypingsToAcquire(packages);
                 var success = await DownloadTypings(typingsToAquire, redirector);
                 if (success) {
                     _acquiredTypingsPackageNames.Value.UnionWith(typingsToAquire);
                 }
-                tsdGlobalWorkSemaphore.Release();
+                globalWorkSemaphore.Release();
                 return success;
             }).Unwrap();
         }
@@ -73,7 +98,7 @@ namespace Microsoft.NodejsTools {
                 return true;
             }
 
-            string tsdPath = await EnsureTsdInstalled();
+            string tsdPath = await EnsureTypingsToolInstalled();
             if (string.IsNullOrEmpty(tsdPath)) {
                 if (redirector != null) {
                     redirector.WriteErrorLine(SR.GetString(SR.TsdNotInstalledError));
@@ -83,7 +108,7 @@ namespace Microsoft.NodejsTools {
 
             using (var process = ProcessOutput.Run(
                 tsdPath,
-                TsdInstallArguments(packages),
+                InstallArguments(packages),
                 _pathToRootProjectDirectory,
                 null,
                 false,
@@ -113,35 +138,37 @@ namespace Microsoft.NodejsTools {
             }
         }
 
-        private async Task<string> EnsureTsdInstalled() {
-            var tsdPath = Path.Combine(_pathToRootNpmDirectory, TsdExe);
-            if (File.Exists(tsdPath)) {
-                return tsdPath;
+        private async Task<string> EnsureTypingsToolInstalled() {
+            if (File.Exists(TypingsAcquisitionToolPath)) {
+                return TypingsAcquisitionToolPath;
             }
 
-            if (_didTryToInstallTsd) {
+            if (_didTryToInstallTypingsTool) {
                 return null;
-            } else {
-                _didTryToInstallTsd = true;
-                if (!await TryInstallTsd()) {
-                    return null;
-                }
-                return await EnsureTsdInstalled();
+            } 
+            if (!await InstallTypingsTool()) {
+                return null;
             }
+            return await EnsureTypingsToolInstalled();
         }
 
-        private async Task<bool> TryInstallTsd() {
+        private async Task<bool> InstallTypingsTool() {
+            Directory.CreateDirectory(NtvsToolsPath);
+            _didTryToInstallTypingsTool = true;
+
+            // install typings
             using (var commander = _npmController.CreateNpmCommander()) {
-                return await commander.InstallGlobalPackageByVersionAsync(Tsd, "*");
+                return await commander.InstallNonLocalPackageByVersionAsync(NtvsToolsPath, TypingsAcquisitionTool, TypingsAcquisitionToolVersion, false);
             }
         }
 
-        private static IEnumerable<string> TsdInstallArguments(IEnumerable<string> packages) {
-            var arguments = new[] { "install", }.Concat(packages);
+        private static IEnumerable<string> InstallArguments(IEnumerable<string> packages) {
+            var arguments = new[] { "install", }.Concat(packages.Select(name =>
+                string.Format("dt~{0}", name)));
             if (NodejsPackage.Instance.IntellisenseOptionsPage.SaveChangesToConfigFile) {
                 arguments = arguments.Concat(new[] { "--save" });
             }
-            return arguments;
+            return arguments.Concat(new[] { "--global" }); ;
         }
 
         private static IEnumerable<string> CurrentTypingsPackages(string pathToRootProjectDirectory) {
