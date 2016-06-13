@@ -28,9 +28,9 @@ using SR = Microsoft.NodejsTools.Project.SR;
 
 namespace Microsoft.NodejsTools {
     internal class TypingsAcquisition {
-        private const string Tool = "typings";
-        private const string ToolVersion = "1.0.5";
-        private const string ToolExe = Tool + ".cmd";
+        private const string TypingsTool = "typings";
+        private const string TypingsToolVersion = "1.0.5";
+        private const string TypingsToolExe = TypingsTool + ".cmd";
         private const string TypingsDirectoryName = "typings";
 
         private static SemaphoreSlim globalWorkSemaphore = new SemaphoreSlim(1);
@@ -51,13 +51,13 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         /// Full path to the typings acquisition tool.
         /// </summary>
-        private static string ToolPath {
+        private static string TypingsToolPath {
             get {
                 return Path.Combine(
                     NtvsExternalToolsPath,
                     "node_modules",
                     ".bin",
-                    ToolExe);
+                    TypingsToolExe);
             }
         }
 
@@ -65,7 +65,7 @@ namespace Microsoft.NodejsTools {
         private readonly string _pathToRootProjectDirectory;
 
         private readonly Lazy<HashSet<string>> _acquiredTypingsPackageNames;
-        private bool _didTryToInstallTool;
+        private bool _didTryToInstallTypingsTool;
 
         public TypingsAcquisition(INpmController controller) {
             _npmController = controller;
@@ -98,7 +98,7 @@ namespace Microsoft.NodejsTools {
                 return true;
             }
 
-            string tsdPath = await EnsureToolInstalled();
+            string tsdPath = await EnsureTypingsToolInstalled();
             if (string.IsNullOrEmpty(tsdPath)) {
                 if (redirector != null) {
                     redirector.WriteErrorLine(SR.GetString(SR.TsdNotInstalledError));
@@ -108,7 +108,7 @@ namespace Microsoft.NodejsTools {
 
             using (var process = ProcessOutput.Run(
                 tsdPath,
-                InstallArguments(packages),
+                GetTypingsToolInstallArguments(packages),
                 _pathToRootProjectDirectory,
                 null,
                 false,
@@ -138,32 +138,32 @@ namespace Microsoft.NodejsTools {
             }
         }
 
-        private async Task<string> EnsureToolInstalled() {
-            if (File.Exists(ToolPath)) {
-                return ToolPath;
+        private async Task<string> EnsureTypingsToolInstalled() {
+            if (File.Exists(TypingsToolPath)) {
+                return TypingsToolPath;
             }
 
-            if (_didTryToInstallTool) {
+            if (_didTryToInstallTypingsTool) {
                 return null;
             } 
-            if (!await InstallTool()) {
+            if (!await InstallTypingsTool()) {
                 return null;
             }
-            return await EnsureToolInstalled();
+            return await EnsureTypingsToolInstalled();
         }
 
-        private async Task<bool> InstallTool() {
-            _didTryToInstallTool = true;
+        private async Task<bool> InstallTypingsTool() {
+            _didTryToInstallTypingsTool = true;
 
-            Directory.CreateDirectory(NtvsToolsPath);
+            Directory.CreateDirectory(NtvsExternalToolsPath);
 
             // install typings
             using (var commander = _npmController.CreateNpmCommander()) {
-                return await commander.InstallNonLocalPackageByVersionAsync(NtvsToolsPath, Tool, ToolVersion, false);
+                return await commander.InstallPackageToFolderByVersionAsync(NtvsExternalToolsPath, TypingsTool, TypingsToolVersion, false);
             }
         }
 
-        private static IEnumerable<string> InstallArguments(IEnumerable<string> packages) {
+        private static IEnumerable<string> GetTypingsToolInstallArguments(IEnumerable<string> packages) {
             var arguments = new[] { "install" }.Concat(packages.Select(name => string.Format("dt~{0}", name)));
             if (NodejsPackage.Instance.IntellisenseOptionsPage.SaveChangesToConfigFile) {
                 arguments = arguments.Concat(new[] { "--save" });

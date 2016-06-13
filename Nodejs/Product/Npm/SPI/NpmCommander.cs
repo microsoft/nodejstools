@@ -158,7 +158,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             return InstallPackageByVersionAsync(_npmController.FullPathToRootPackageDirectory,packageName, versionRange, DependencyType.Standard, true, false);
         }
 
-        public Task<bool> InstallNonLocalPackageByVersionAsync(string pathToRootDirectory, string packageName, string versionRange, bool saveToPackageJson) {
+        public Task<bool> InstallPackageToFolderByVersionAsync(string pathToRootDirectory, string packageName, string versionRange, bool saveToPackageJson) {
             return InstallPackageByVersionAsync(pathToRootDirectory, packageName, versionRange, DependencyType.Standard, false, saveToPackageJson);
         }
 
