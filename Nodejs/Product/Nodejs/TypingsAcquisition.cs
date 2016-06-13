@@ -98,16 +98,16 @@ namespace Microsoft.NodejsTools {
                 return true;
             }
 
-            string tsdPath = await EnsureTypingsToolInstalled();
-            if (string.IsNullOrEmpty(tsdPath)) {
+            string typingsTool = await EnsureTypingsToolInstalled();
+            if (string.IsNullOrEmpty(typingsTool)) {
                 if (redirector != null) {
-                    redirector.WriteErrorLine(SR.GetString(SR.TsdNotInstalledError));
+                    redirector.WriteErrorLine(SR.GetString(SR.TypingsToolNotInstalledError));
                 }
                 return false;
             }
 
             using (var process = ProcessOutput.Run(
-                tsdPath,
+                typingsTool,
                 GetTypingsToolInstallArguments(packages),
                 _pathToRootProjectDirectory,
                 null,
@@ -118,20 +118,20 @@ namespace Microsoft.NodejsTools {
                     // Process failed to start, and any exception message has
                     // already been sent through the redirector
                     if (redirector != null) {
-                        redirector.WriteErrorLine("could not start tsd");
+                        redirector.WriteErrorLine("could not start typings");
                     }
                     return false;
                 }
                 var i = await process;
                 if (i == 0) {
                     if (redirector != null) {
-                        redirector.WriteLine(SR.GetString(SR.TsdInstallCompleted));
+                        redirector.WriteLine(SR.GetString(SR.TypingsToolInstallCompleted));
                     }
                     return true;
                 } else {
                     process.Kill();
                     if (redirector != null) {
-                        redirector.WriteErrorLine(SR.GetString(SR.TsdInstallErrorOccurred));
+                        redirector.WriteErrorLine(SR.GetString(SR.TypingsToolInstallErrorOccurred));
                     }
                     return false;
                 }

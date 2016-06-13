@@ -609,14 +609,14 @@ You will need to restart Visual Studio after installation.</value>
   <data name="RemoteDebugProxyFolderDoesNotExist" xml:space="preserve">
     <value>Could not find RemoteDebugProxyFolder</value>
   </data>
-  <data name="TsdErrorOccured" xml:space="preserve">
+  <data name="TypingsToolErrorOccured" xml:space="preserve">
     <value>Error installing typings files used for Intellisense.</value>
   </data>
-  <data name="TsdInstallCompleted" xml:space="preserve">
+  <data name="TypingsToolInstallCompleted" xml:space="preserve">
     <value>Successfully installed typing files for Intellisense.</value>
   </data>
-  <data name="TsdNotInstalledError" xml:space="preserve">
-    <value>Could not find TSD TypeScript package manager tool used for Intellisense. Please install it globally by running 'npm install -g tsd'.</value>
+  <data name="TypingsToolNotInstalledError" xml:space="preserve">
+    <value>Could not find Typings TypeScript package manager tool used for Intellisense.</value>
   </data>
   <data name="TypingsInfoBarSpan1" xml:space="preserve">
     <value>Node.js IntelliSense added a </value>

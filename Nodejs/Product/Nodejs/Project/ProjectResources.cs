@@ -182,9 +182,9 @@ namespace Microsoft.NodejsTools.Project {
         internal const string SurroundWith = "SurroundWith";
         internal const string TestFramework = "TestFramework";
         internal const string TestFrameworkDescription = "TestFrameworkDescription";
-        internal const string TsdInstallCompleted = "TsdInstallCompleted";
-        internal const string TsdInstallErrorOccurred = "TsdInstallErrorOccurred";
-        internal const string TsdNotInstalledError = "TsdNotInstalledError";
+        internal const string TypingsToolInstallCompleted = "TypingsToolInstallCompleted";
+        internal const string TypingsToolInstallErrorOccurred = "TypingsToolInstallErrorOccurred";
+        internal const string TypingsToolNotInstalledError = "TypingsToolNotInstalledError";
         internal const string TypingsInfoBarSpan1 = "TypingsInfoBarSpan1";
         internal const string TypingsInfoBarSpan2 = "TypingsInfoBarSpan2";
         internal const string TypingsInfoBarSpan3 = "TypingsInfoBarSpan3";
