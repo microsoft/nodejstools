@@ -560,6 +560,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                     debugPort
                 );
 
+            LiveLogger.WriteLine("AD7Engine starting NodeDebugger");
             _process.Start(false);
 
             AttachEvents(_process);
@@ -977,6 +978,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         private void AttachEvents(NodeDebugger process) {
+            LiveLogger.WriteLine("AD7Engine attaching events to NodeDebugger");
+
             process.ProcessLoaded += OnProcessLoaded;
             process.ModuleLoaded += OnModuleLoaded;
             process.ThreadCreated += OnThreadCreated;
