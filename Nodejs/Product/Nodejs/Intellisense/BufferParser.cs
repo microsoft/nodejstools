@@ -259,6 +259,10 @@ namespace Microsoft.NodejsTools.Intellisense {
             protected virtual void Dispose(bool disposing) {
                 if (!disposedValue) {
                     if (disposing) {
+                        foreach (var buffer in _buffers.ToArray())
+                            RemoveBuffer(buffer);
+                        _buffers.Clear();
+
                         _timer.Dispose();
                     }
 
