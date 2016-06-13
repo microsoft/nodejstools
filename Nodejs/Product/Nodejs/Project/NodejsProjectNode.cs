@@ -568,16 +568,6 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        /*
-         * Needed if we switch to per project Analysis levels
-        internal NodejsTools.Options.AnalysisLevel AnalysisLevel(){
-            var analyzer = _analyzer;
-            if (_analyzer != null) {
-                return _analyzer.AnalysisLevel;
-            }
-            return NodejsTools.Options.AnalysisLevel.None;
-        }
-        */
         private void IntellisenseOptionsPageAnalysisLevelChanged(object sender, EventArgs e) {
             var oldAnalyzer = _analyzer;
             _analyzer = null;
@@ -591,6 +581,7 @@ namespace Microsoft.NodejsTools.Project {
                 }
             }
             _analyzer = analyzer;
+            TryToAcquireCurrentTypings();
         }
 
         private void AnalysisLogMaximumChanged(object sender, EventArgs e) {
