@@ -28,12 +28,12 @@ using SR = Microsoft.NodejsTools.Project.SR;
 
 namespace Microsoft.NodejsTools {
     internal class TypingsAcquisition {
-        private const string TypingsAcquisitionTool = "typings";
-        private const string TypingsAcquisitionToolExe = TypingsAcquisitionTool + ".cmd";
-        private const string TypingsAcquisitionToolVersion = "1.0.5";
+        private const string Tool = "typings";
+        private const string ToolVersion = "1.0.5";
+        private const string ToolExe = Tool + ".cmd";
         private const string TypingsDirectoryName = "typings";
 
-    private static SemaphoreSlim globalWorkSemaphore = new SemaphoreSlim(1);
+        private static SemaphoreSlim globalWorkSemaphore = new SemaphoreSlim(1);
 
         /// <summary>
         /// Path the the private package where the typings acquisition tool is installed.
@@ -51,13 +51,13 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         /// Full path to the typings acquisition tool.
         /// </summary>
-        private static string TypingsAcquisitionToolPath {
+        private static string ToolPath {
             get {
                 return Path.Combine(
                     NtvsToolsPath,
                     "node_modules",
                     ".bin",
-                    TypingsAcquisitionToolExe);
+                    ToolExe);
             }
         }
 
@@ -65,7 +65,7 @@ namespace Microsoft.NodejsTools {
         private readonly string _pathToRootProjectDirectory;
 
         private readonly Lazy<HashSet<string>> _acquiredTypingsPackageNames;
-        private bool _didTryToInstallTypingsTool;
+        private bool _didTryToInstallTool;
 
         public TypingsAcquisition(INpmController controller) {
             _npmController = controller;
@@ -98,7 +98,7 @@ namespace Microsoft.NodejsTools {
                 return true;
             }
 
-            string tsdPath = await EnsureTypingsToolInstalled();
+            string tsdPath = await EnsureToolInstalled();
             if (string.IsNullOrEmpty(tsdPath)) {
                 if (redirector != null) {
                     redirector.WriteErrorLine(SR.GetString(SR.TsdNotInstalledError));
@@ -138,37 +138,36 @@ namespace Microsoft.NodejsTools {
             }
         }
 
-        private async Task<string> EnsureTypingsToolInstalled() {
-            if (File.Exists(TypingsAcquisitionToolPath)) {
-                return TypingsAcquisitionToolPath;
+        private async Task<string> EnsureToolInstalled() {
+            if (File.Exists(ToolPath)) {
+                return ToolPath;
             }
 
-            if (_didTryToInstallTypingsTool) {
+            if (_didTryToInstallTool) {
                 return null;
             } 
-            if (!await InstallTypingsTool()) {
+            if (!await InstallTool()) {
                 return null;
             }
-            return await EnsureTypingsToolInstalled();
+            return await EnsureToolInstalled();
         }
 
-        private async Task<bool> InstallTypingsTool() {
+        private async Task<bool> InstallTool() {
             Directory.CreateDirectory(NtvsToolsPath);
-            _didTryToInstallTypingsTool = true;
+            _didTryToInstallTool = true;
 
             // install typings
             using (var commander = _npmController.CreateNpmCommander()) {
-                return await commander.InstallNonLocalPackageByVersionAsync(NtvsToolsPath, TypingsAcquisitionTool, TypingsAcquisitionToolVersion, false);
+                return await commander.InstallNonLocalPackageByVersionAsync(NtvsToolsPath, Tool, ToolVersion, false);
             }
         }
 
         private static IEnumerable<string> InstallArguments(IEnumerable<string> packages) {
-            var arguments = new[] { "install", }.Concat(packages.Select(name =>
-                string.Format("dt~{0}", name)));
+            var arguments = new[] { "install" }.Concat(packages.Select(name => string.Format("dt~{0}", name)));
             if (NodejsPackage.Instance.IntellisenseOptionsPage.SaveChangesToConfigFile) {
                 arguments = arguments.Concat(new[] { "--save" });
             }
-            return arguments.Concat(new[] { "--global" }); ;
+            return arguments.Concat(new[] { "--global" });
         }
 
         private static IEnumerable<string> CurrentTypingsPackages(string pathToRootProjectDirectory) {
