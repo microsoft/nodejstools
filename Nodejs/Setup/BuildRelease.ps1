@@ -144,14 +144,14 @@ $setup_project = gi "$buildroot\Nodejs\Setup\setup.proj"
 
 # Project metadata
 $project_name = "Node.js Tools for Visual Studio"
-$project_url = "http://nodejstools.codeplex.com"
+$project_url = "https://github.com/Microsoft/nodejstools"
 $project_keywords = "NTVS; Visual Studio; Node.js"
 
 # These people are able to approve code signing operations
-$approvers = "smortaz", "dinov", "stevdo", "pminaev", "gilbertw", "huvalo", "jinglou", "sitani", "crwilcox"
+$approvers = "jinglou", "sitani", "matb", "kamaet"
 
 # These people are the contacts for the symbols uploaded to the symbol server
-$symbol_contacts = "$env:username;dinov;smortaz;gilbertw;jinglou"
+$symbol_contacts = "$env:username;sitani;matb;kamaet"
 
 # This single person or DL is the contact for virus scan notifications
 $vcs_contact = "ntvscore"
