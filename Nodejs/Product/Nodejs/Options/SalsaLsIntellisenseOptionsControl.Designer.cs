@@ -86,7 +86,7 @@
             this._saveChangesToConfigFile.Name = "_saveChangesToConfigFile";
             this._saveChangesToConfigFile.Size = new System.Drawing.Size(384, 29);
             this._saveChangesToConfigFile.TabIndex = 2;
-            this._saveChangesToConfigFile.Text = "Save changes to tsd.json &config file";
+            this._saveChangesToConfigFile.Text = "Save changes to typings.json &config file";
             this._saveChangesToConfigFile.UseVisualStyleBackColor = true;
             // 
             // _showTypingsInfoBar
