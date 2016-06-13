@@ -153,8 +153,9 @@ namespace Microsoft.NodejsTools {
         }
 
         private async Task<bool> InstallTool() {
-            Directory.CreateDirectory(NtvsToolsPath);
             _didTryToInstallTool = true;
+
+            Directory.CreateDirectory(NtvsToolsPath);
 
             // install typings
             using (var commander = _npmController.CreateNpmCommander()) {
