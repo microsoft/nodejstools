@@ -147,24 +147,30 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private void TryToAcquireTypings(IEnumerable<string> packages) {
-            bool isNewTypingsFolder = !Directory.Exists(Path.Combine(this.ProjectHome, "typings"));
-            if (ShouldAcquireTypingsAutomatically && TypingsAcquirer != null) {
-                TypingsAcquirer
-                    .AcquireTypings(packages, null /*redirector*/)
-                    .ContinueWith(x => {
-                        if (NodejsPackage.Instance.IntellisenseOptionsPage.ShowTypingsInfoBar &&
-                            x.Result &&
-                            isNewTypingsFolder) {
-                                NodejsPackage.Instance.GetUIThread().Invoke(() => {
-                                    TypingsInfoBar.Instance.ShowInfoBar();
-                                });
-                            }
-                    });
+            if (!ShouldAcquireTypingsAutomatically || TypingsAcquirer == null) {
+                return;
             }
+
+            bool isNewTypingsFolder = !Directory.Exists(Path.Combine(this.ProjectHome, "typings"));
+            TypingsAcquirer
+                .AcquireTypings(packages, null /*redirector*/)
+                .ContinueWith(x => {
+                    if (NodejsPackage.Instance.IntellisenseOptionsPage.ShowTypingsInfoBar &&
+                        x.Result &&
+                        isNewTypingsFolder) {
+                        NodejsPackage.Instance.GetUIThread().Invoke(() => {
+                            TypingsInfoBar.Instance.ShowInfoBar();
+                        });
+                    }
+                });
         }
 
         private void TryToAcquireCurrentTypings() {
-            var controller = ModulesNode != null ? ModulesNode.NpmController : null;
+            if (!ShouldAcquireTypingsAutomatically || TypingsAcquirer == null) {
+                return;
+            }
+
+            var controller = ModulesNode?.NpmController;
             if (controller == null) {
                 return;
             }
@@ -581,7 +587,9 @@ namespace Microsoft.NodejsTools.Project {
                 }
             }
             _analyzer = analyzer;
+#if DEV14
             TryToAcquireCurrentTypings();
+#endif
         }
 
         private void AnalysisLogMaximumChanged(object sender, EventArgs e) {
