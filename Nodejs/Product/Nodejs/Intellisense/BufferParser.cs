@@ -23,7 +23,6 @@ using Microsoft.VisualStudio.Text;
 
 namespace Microsoft.NodejsTools.Intellisense {
     sealed partial class VsProjectAnalyzer {
-
         class BufferParser : IDisposable {
             internal VsProjectAnalyzer _parser;
             private readonly Timer _timer;
@@ -259,8 +258,9 @@ namespace Microsoft.NodejsTools.Intellisense {
             protected virtual void Dispose(bool disposing) {
                 if (!disposedValue) {
                     if (disposing) {
-                        foreach (var buffer in _buffers.ToArray())
+                        foreach (var buffer in _buffers.ToArray()) {
                             RemoveBuffer(buffer);
+                        }
 
                         _timer.Dispose();
                     }
