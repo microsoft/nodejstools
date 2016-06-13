@@ -261,7 +261,6 @@ namespace Microsoft.NodejsTools.Intellisense {
                     if (disposing) {
                         foreach (var buffer in _buffers.ToArray())
                             RemoveBuffer(buffer);
-                        _buffers.Clear();
 
                         _timer.Dispose();
                     }
