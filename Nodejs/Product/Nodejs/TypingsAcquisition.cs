@@ -29,11 +29,11 @@ using SR = Microsoft.NodejsTools.Project.SR;
 namespace Microsoft.NodejsTools {
     internal class TypingsAcquisition {
         private const string TypingsTool = "typings";
-        private const string TypingsToolVersion = "1.0.5";
+        private const string TypingsToolVersion = "1.0.5"; // Lock to stable version of the 'typings' tool with known behavior.
         private const string TypingsToolExe = TypingsTool + ".cmd";
         private const string TypingsDirectoryName = "typings";
 
-        private static SemaphoreSlim globalWorkSemaphore = new SemaphoreSlim(1);
+        private static SemaphoreSlim typingsToolGlobalWorkSemaphore = new SemaphoreSlim(1);
 
         /// <summary>
         /// Path the the private package where the typings acquisition tool is installed.
@@ -77,13 +77,13 @@ namespace Microsoft.NodejsTools {
         }
 
         public Task<bool> AcquireTypings(IEnumerable<string> packages, Redirector redirector) {
-            return globalWorkSemaphore.WaitAsync().ContinueWith(async _ => {
+            return typingsToolGlobalWorkSemaphore.WaitAsync().ContinueWith(async _ => {
                 var typingsToAquire = GetNewTypingsToAcquire(packages);
                 var success = await DownloadTypings(typingsToAquire, redirector);
                 if (success) {
                     _acquiredTypingsPackageNames.Value.UnionWith(typingsToAquire);
                 }
-                globalWorkSemaphore.Release();
+                typingsToolGlobalWorkSemaphore.Release();
                 return success;
             }).Unwrap();
         }
@@ -118,7 +118,7 @@ namespace Microsoft.NodejsTools {
                     // Process failed to start, and any exception message has
                     // already been sent through the redirector
                     if (redirector != null) {
-                        redirector.WriteErrorLine("could not start typings");
+                        redirector.WriteErrorLine("could not start 'typings'");
                     }
                     return false;
                 }
