@@ -151,13 +151,14 @@ namespace Microsoft.NodejsTools.Project {
                 return;
             }
 
-            bool isNewTypingsFolder = !Directory.Exists(Path.Combine(this.ProjectHome, "typings"));
+            var typingsPath = Path.Combine(this.ProjectHome, "typings");
+            bool hadExistingTypingsFolder = Directory.Exists(typingsPath);
             TypingsAcquirer
                 .AcquireTypings(packages, null /*redirector*/)
                 .ContinueWith(x => {
                     if (NodejsPackage.Instance.IntellisenseOptionsPage.ShowTypingsInfoBar &&
                         x.Result &&
-                        isNewTypingsFolder) {
+                        (hadExistingTypingsFolder && Directory.Exists(typingsPath))) {
                         NodejsPackage.Instance.GetUIThread().Invoke(() => {
                             TypingsInfoBar.Instance.ShowInfoBar();
                         });
@@ -182,7 +183,7 @@ namespace Microsoft.NodejsTools.Project {
                     || package.IsDevDependency
                     || !package.IsListedInParentPackageJson);
 
-            TryToAcquireTypings(currentPackages.Select(package => package.Name));
+            TryToAcquireTypings(currentPackages.Select(package => package.Name).Concat(new[] { "node" }));
         }
 #endif
 
