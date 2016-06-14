@@ -15,6 +15,7 @@
 //*********************************************************//
 
 using System;
+using System.IO;
 
 namespace Microsoft.NodejsTools {
     internal class NodejsConstants {
@@ -72,6 +73,33 @@ namespace Microsoft.NodejsTools {
         internal const string TypeScript = "TypeScript";
 
         internal const string NodeToolsProcessIdEnvironmentVariable = "_NTVS_PID";
+
+        private static string NtvsLocalAppData {
+            get {
+                return Path.Combine(
+                    System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData),
+                    "Microsoft",
+                    "Node.js Tools");
+            }
+        }
+
+        /// <summary>
+        /// Path to the private package where NTVS tools are installed.
+        /// </summary>
+        public static string ExternalToolsPath {
+            get {
+                return Path.Combine(NtvsLocalAppData, "ExternalTools");
+            }
+
+        }
+        /// <summary>
+        /// Path to where NTVS caches Npm data.
+        /// </summary>
+        public static string NpmCachePath {
+            get {
+                return Path.Combine(NtvsLocalAppData, "NpmCache");
+            }
+        }
 
         /// <summary>
         /// Checks whether a relative and double-backslashed seperated path contains a folder name.

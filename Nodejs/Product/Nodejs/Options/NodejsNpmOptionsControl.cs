@@ -19,21 +19,15 @@ using System.IO;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.Options {
     public partial class NodejsNpmOptionsControl : UserControl {
-
-        private string _npmCachePath;
-
         public NodejsNpmOptionsControl() {
             InitializeComponent();
         }
 
-
         internal void SyncControlWithPageSettings(NodejsNpmOptionsPage page) {
             _showOutputWhenRunningNpm.Checked = page.ShowOutputWindowWhenExecutingNpm;
-            _npmCachePath = page.NpmCachePath;
             _cacheClearedSuccessfully.Visible = false;
         }
 
@@ -42,20 +36,26 @@ namespace Microsoft.NodejsTools.Options {
         }
 
         private void ClearCacheButton_Click(object sender, EventArgs e) {
+            bool didClearNpmCache = DeleteCacheDirectory("npm cache", NodejsConstants.NpmCachePath);
+            bool didClearTools = DeleteCacheDirectory("NTVS external tools", NodejsConstants.ExternalToolsPath);
+
+            _cacheClearedSuccessfully.Visible = (didClearNpmCache && didClearTools);
+        }
+
+        private static bool DeleteCacheDirectory(string displayName, string cachePath) {
             try {
-                Directory.Delete(_npmCachePath, true);                    
-                _cacheClearedSuccessfully.Visible = true;
+                Directory.Delete(cachePath, true);
+               return true;
             } catch (DirectoryNotFoundException) {
                 // Directory has already been deleted. Do nothing.
-                _cacheClearedSuccessfully.Visible = true;
+                return true;
             } catch (IOException exception) {
                 // files are in use or path is too long
                 MessageBox.Show(
-                           string.Format("Cannot clear npm cache. {0}", exception.Message),
-                           "Cannot Clear npm Cache",
-                           MessageBoxButtons.OK,
-                           MessageBoxIcon.Information
-                       );
+                    string.Format("Cannot clear {0}. {1}", displayName, exception.Message),
+                    string.Format("Cannot Clear {0}", displayName),
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
             } catch (Exception exception) {
                 try {
                     ActivityLog.LogError(SR.ProductName, exception.ToString());
@@ -64,12 +64,12 @@ namespace Microsoft.NodejsTools.Options {
                 }
 
                 MessageBox.Show(
-                           string.Format("Cannot clear npm cache. Try manually deleting the directory: {0}", _npmCachePath),
-                           "Cannot Clear npm Cache",
-                           MessageBoxButtons.OK,
-                           MessageBoxIcon.Information
-                       );
+                    string.Format("Cannot clear {0}. Try manually deleting the directory: {1}", displayName, cachePath),
+                    string.Format("Cannot Clear {0}", displayName),
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
             }
+            return false;
         }
     }
 }
