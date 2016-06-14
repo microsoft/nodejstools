@@ -61,12 +61,9 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             if (_module != null) {
                 _arguments["type"] = "scriptId";
                 _arguments["target"] = _module.Id;
-            } else if (remote) {
+            } else {
                 _arguments["type"] = "scriptRegExp";
                 _arguments["target"] = GetCaseInsensitiveRegex(_position.FileName);
-            } else {
-                _arguments["type"] = "script";
-                _arguments["target"] = _position.FileName;
             }
 
             if (!NodeBreakpointBinding.GetEngineEnabled(_breakpoint.Enabled, _breakpoint.BreakOn, 0)) {
