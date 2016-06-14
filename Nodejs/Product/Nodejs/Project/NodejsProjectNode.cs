@@ -158,7 +158,7 @@ namespace Microsoft.NodejsTools.Project {
                 .ContinueWith(x => {
                     if (NodejsPackage.Instance.IntellisenseOptionsPage.ShowTypingsInfoBar &&
                         x.Result &&
-                        (hadExistingTypingsFolder && Directory.Exists(typingsPath))) {
+                        (!hadExistingTypingsFolder && Directory.Exists(typingsPath))) {
                         NodejsPackage.Instance.GetUIThread().Invoke(() => {
                             TypingsInfoBar.Instance.ShowInfoBar();
                         });
