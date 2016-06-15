@@ -126,40 +126,24 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
 
         private static string CreateRemoteScriptRegExp(string filePath) {
             string fileName = Path.GetFileName(filePath) ?? string.Empty;
-            bool trailing = fileName != filePath;
-
-            fileName = Regex.Escape(fileName);
-
-            var builder = new StringBuilder();
-            if (trailing) {
-                builder.Append(pathSeperatorCharacterGroup);
-            } else {
-                builder.Append('^');
-            }
-
-            AddCaseInsensitiveStringToRegExp(fileName, builder);
-
-            builder.Append("$");
-            return builder.ToString();
+            string start = fileName != filePath ? pathSeperatorCharacterGroup : "^";
+            return string.Format("{0}{1}$", start, CreateCaseInsensitiveRegExpFromString(fileName));
         }
 
         private static string CreateLocalScriptRegExp(string filePath) {
-            string fileName = Regex.Escape(filePath);
-
-            var builder = new StringBuilder();
-            builder.Append('^');
-            AddCaseInsensitiveStringToRegExp(fileName, builder);
-            builder.Append("$");
-            return builder.ToString();
+            return string.Format("^{0}$", CreateCaseInsensitiveRegExpFromString(filePath));
         }
 
         /// <summary>
-        /// Add a case-insensitive string to a string buffer containing a regular expression.
+        /// Convert a string into a case-insensitive regular expression.
         /// 
         /// This is a work around for the fact that we cannot pass a regex case insensitive modifier to the Node (V8) engine.
         /// </summary>
-        private static void AddCaseInsensitiveStringToRegExp(string str, StringBuilder builder) {
-            foreach (var ch in str) {
+        private static string CreateCaseInsensitiveRegExpFromString(string str) {
+            string escapedString = Regex.Escape(str);
+
+            var builder = new StringBuilder();
+            foreach (var ch in escapedString) {
                 string upper = ch.ToString(CultureInfo.InvariantCulture).ToUpper();
                 string lower = ch.ToString(CultureInfo.InvariantCulture).ToLower();
                 if (upper != lower) {
@@ -171,6 +155,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                     builder.Append(upper);
                 }
             }
+            return builder.ToString();
         }
     }
 }
