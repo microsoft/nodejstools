@@ -126,24 +126,22 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
 
         private static string CreateRemoteScriptRegExp(string filePath) {
             string fileName = Path.GetFileName(filePath) ?? string.Empty;
-            string start = fileName != filePath ? pathSeperatorCharacterGroup : "^";
+            string start = fileName == filePath ? "^" : pathSeperatorCharacterGroup;
             return string.Format("{0}{1}$", start, CreateCaseInsensitiveRegExpFromString(fileName));
         }
 
-        private static string CreateLocalScriptRegExp(string filePath) {
+        public static string CreateLocalScriptRegExp(string filePath) {
             return string.Format("^{0}$", CreateCaseInsensitiveRegExpFromString(filePath));
         }
 
         /// <summary>
         /// Convert a string into a case-insensitive regular expression.
         /// 
-        /// This is a work around for the fact that we cannot pass a regex case insensitive modifier to the Node (V8) engine.
+        /// This is a workaround for the fact that we cannot pass a regex case insensitive modifier to the Node (V8) engine.
         /// </summary>
         private static string CreateCaseInsensitiveRegExpFromString(string str) {
-            string escapedString = Regex.Escape(str);
-
             var builder = new StringBuilder();
-            foreach (var ch in escapedString) {
+            foreach (var ch in Regex.Escape(str)) {
                 string upper = ch.ToString(CultureInfo.InvariantCulture).ToUpper();
                 string lower = ch.ToString(CultureInfo.InvariantCulture).ToLower();
                 if (upper != lower) {
