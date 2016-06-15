@@ -74,7 +74,7 @@ function findTape(projectFolder) {
         var tapePath = path.join(projectFolder, 'node_modules', 'tape');
         return require(tapePath);
     } catch (e) {
-        logError("Failed to find Tape package.  Tape must be installed in the project locally.  Tape can be installed locally with the npm manager via solution explorer or with \".npm install tape\" via the Node.js interactive window.");
+        logError("Failed to find Tape package.  Tape must be installed in the project locally.  Tape can be installed locally with the npm manager via solution explorer or with \".npm install tape --save-dev\" via the Node.js interactive window.");
         return null;
     }
 }

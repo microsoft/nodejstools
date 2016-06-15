@@ -93,7 +93,7 @@ function detectMocha(projectFolder) {
         var Mocha = new require(mochaPath);
         return Mocha;
     } catch (ex) {
-        logError("Failed to find Mocha package.  Mocha must be installed in the project locally.  Mocha can be installed locally with the npm manager via solution explorer or with \".npm install mocha\" via the Node.js interactive window.");
+        logError("Failed to find Mocha package.  Mocha must be installed in the project locally.  Mocha can be installed locally with the npm manager via solution explorer or with \".npm install mocha --save-dev\" via the Node.js interactive window.");
         return null;
     }
 }
