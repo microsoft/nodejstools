@@ -910,6 +910,7 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubPath>ItemTemplates</VSIXSubPath>
     </Content>
+    <ZipProject Include="ProjectTemplates\Express4App\typings.json" />
     <None Include="Theme\contrast.vstheme">
       <SubType>Designer</SubType>
     </None>
