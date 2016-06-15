@@ -1363,13 +1363,7 @@
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\AzureNodejsApp.vstemplate">
       <SubType>Designer</SubType>
     </ZipProject>
-    <ZipProject Include="ProjectTemplates\ExpressApp\ExpressApp.njsproj">
-      <SubType>Designer</SubType>
-    </ZipProject>
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\server.js" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\ExpressApp.vstemplate">
-      <SubType>Designer</SubType>
-    </ZipProject>
     <TransformedZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\AddWebSiteAzureNodejsApp.vstemplate.base">
       <SubType>Designer</SubType>
     </TransformedZipProject>
@@ -1424,15 +1418,6 @@
     <ZipProject Include="ProjectTemplates\NodejsWebApp\package.json" />
     <ZipProject Include="ProjectTemplates\NodejsWebApp\README.md" />
     <ZipProject Include="ProjectTemplates\AddWebSiteNodejsWebApp\WebApplication.webproj" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\package.json" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\README.md" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\style.styl" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\index.jade" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\layout.jade" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\Preview.png" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\app.js" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\index.js" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\user.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\package.json" />
     <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\README.md" />
     <ZipProject Include="ProjectTemplates\AzureExpressApp\package.json" />

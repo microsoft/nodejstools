@@ -540,46 +540,6 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\ExpressApp.zip</RelativePathOnDisk>
-    <TemplateFileName>ExpressApp.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>Basic Node.js Express 3 Application</Name>
-        <Description>A basic Node.js Express 3 application.</Description>
-        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="406" />
-        <ProjectType>JavaScript</ProjectType>
-        <TemplateID>Microsoft.JavaScript.ExpressApp</TemplateID>
-        <SortOrder>135</SortOrder>
-        <CreateNewFolder>true</CreateNewFolder>
-        <DefaultName>ExpressApp</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-        <PreviewImage>Preview.png</PreviewImage>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\ExpressApp.zip</RelativePathOnDisk>
-    <TemplateFileName>ExpressApp.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>Basic Node.js Express 3 Application</Name>
-        <Description>A basic Node.js Express 3 application.</Description>
-        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="406" />
-        <ProjectType>JavaScript</ProjectType>
-        <TemplateID>Microsoft.JavaScript.ExpressApp</TemplateID>
-        <SortOrder>135</SortOrder>
-        <CreateNewFolder>true</CreateNewFolder>
-        <DefaultName>ExpressApp</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-        <PreviewImage>Preview.png</PreviewImage>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
     <RelativePathOnDisk>JavaScript\Node.js\FromExistingCode.zip</RelativePathOnDisk>
     <TemplateFileName>FromExistingCode.vstemplate</TemplateFileName>
     <VSTemplateHeader>
