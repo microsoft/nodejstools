@@ -25,6 +25,8 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Debugger.Commands {
     sealed class SetBreakpointCommand : DebuggerCommand {
+        private static string pathSeperatorCharacterGroup = string.Format("[{0}{1}]", Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
         private readonly Dictionary<string, object> _arguments;
         private readonly NodeBreakpoint _breakpoint;
         private readonly NodeModule _module;
@@ -61,9 +63,12 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             if (_module != null) {
                 _arguments["type"] = "scriptId";
                 _arguments["target"] = _module.Id;
+            } else if (remote) {
+                _arguments["type"] = "scriptRegExp";
+                _arguments["target"] = CreateRemoteScriptRegExp(_position.FileName);
             } else {
                 _arguments["type"] = "scriptRegExp";
-                _arguments["target"] = GetCaseInsensitiveRegex(_position.FileName);
+                _arguments["target"] = CreateLocalScriptRegExp(_position.FileName);
             }
 
             if (!NodeBreakpointBinding.GetEngineEnabled(_breakpoint.Enabled, _breakpoint.BreakOn, 0)) {
@@ -119,8 +124,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             }
         }
 
-        private string GetCaseInsensitiveRegex(string filePath) {
-            // NOTE: There is no way to pass a regex case insensitive modifier to the Node (V8) engine
+        private static string CreateRemoteScriptRegExp(string filePath) {
             string fileName = Path.GetFileName(filePath) ?? string.Empty;
             bool trailing = fileName != filePath;
 
@@ -128,13 +132,34 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
 
             var builder = new StringBuilder();
             if (trailing) {
-                string separators = string.Format("{0}{1}", Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-                builder.Append("[" + Regex.Escape(separators) + "]");
+                builder.Append(pathSeperatorCharacterGroup);
             } else {
                 builder.Append('^');
             }
 
-            foreach (char ch in fileName) {
+            AddCaseInsensitiveStringToRegExp(fileName, builder);
+
+            builder.Append("$");
+            return builder.ToString();
+        }
+
+        private static string CreateLocalScriptRegExp(string filePath) {
+            string fileName = Regex.Escape(filePath);
+
+            var builder = new StringBuilder();
+            builder.Append('^');
+            AddCaseInsensitiveStringToRegExp(fileName, builder);
+            builder.Append("$");
+            return builder.ToString();
+        }
+
+        /// <summary>
+        /// Add a case-insensitive string to a string buffer containing a regular expression.
+        /// 
+        /// This is a work around for the fact that we cannot pass a regex case insensitive modifier to the Node (V8) engine.
+        /// </summary>
+        private static void AddCaseInsensitiveStringToRegExp(string str, StringBuilder builder) {
+            foreach (var ch in str) {
                 string upper = ch.ToString(CultureInfo.InvariantCulture).ToUpper();
                 string lower = ch.ToString(CultureInfo.InvariantCulture).ToLower();
                 if (upper != lower) {
@@ -146,9 +171,6 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                     builder.Append(upper);
                 }
             }
-
-            builder.Append("$");
-            return builder.ToString();
         }
     }
 }
