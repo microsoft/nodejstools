@@ -1073,6 +1073,12 @@ namespace Microsoft.NodejsTools.Intellisense {
             ITextSnapshot snapshot,
             CollectingErrorSink errorSink
         ) {
+            // There are some scenarios during ES6 Mode where a textview is still opened using NodeLS.
+            // In these cases, we do not properly parse ES6 syntax, and therefore do not want to display errors. 
+            if (NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel == AnalysisLevel.Preview) {
+                return;
+            }
+
             // Update the warn-on-launch state for this entry
             bool changed = false;
             lock (_hasParseErrors) {
