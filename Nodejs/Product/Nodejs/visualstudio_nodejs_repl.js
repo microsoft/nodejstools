@@ -108,7 +108,9 @@ function processRequest(command) {
                 var obj;
                 // function f() { } should return undefined, wrapping it in parens
                 // produces a value, so ignore it if we have a function definition.
-                if (!/^\s*function/.test(command["code"])) {
+                if (/^\s*function[\s\(\*]/.test(command["code"])) {
+                    obj = vm.runInContext(evalPrefix + command["code"], context);
+                } else {
                     try {
                         // object literals are ambigious, so first try w/ parens.
                         obj = vm.runInContext(evalPrefix + '(' + command["code"] + ')', context);
@@ -120,8 +122,6 @@ function processRequest(command) {
                             throw err;
                         }
                     }
-                } else {
-                    obj = vm.runInContext(evalPrefix + '(' + command["code"] + ')', context);
                 }
                 
                 var result = util.inspect(obj, undefined, undefined, true);
