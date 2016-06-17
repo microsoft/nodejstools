@@ -530,15 +530,13 @@ namespace Microsoft.NodejsTools.Debugger {
             foreach (NodeModule module in modules) {
                 NodeModule newModule;
                 if (GetOrAddModule(module, out newModule)) {
-                    if (newModule.FileName != newModule.JavaScriptFileName) {
-                        foreach (var breakpoint in _breakpointBindings) {
-                            var target = breakpoint.Value.Breakpoint.Target;
-                            if (target.FileName == newModule.FileName) {
-                                // attempt to rebind the breakpoint
-                                DebuggerClient.RunWithRequestExceptionsHandled(async () => {
-                                    await breakpoint.Value.Breakpoint.BindAsync().WaitAsync(TimeSpan.FromSeconds(2));
-                                });
-                            }
+                    foreach (var breakpoint in _breakpointBindings) {
+                        var target = breakpoint.Value.Breakpoint.Target;
+                        if (target.FileName.Equals(newModule.FileName, StringComparison.OrdinalIgnoreCase)) {
+                            // attempt to rebind the breakpoint
+                            DebuggerClient.RunWithRequestExceptionsHandled(async () => {
+                                await breakpoint.Value.Breakpoint.BindAsync().WaitAsync(TimeSpan.FromSeconds(2));
+                            });
                         }
                     }
 

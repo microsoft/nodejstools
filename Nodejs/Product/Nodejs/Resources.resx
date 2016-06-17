@@ -633,4 +633,10 @@ You will need to restart Visual Studio after installation.</value>
   <data name="EcmaScript6" xml:space="preserve">
     <value>ECMAScript 6</value>
   </data>
+  <data name="StatusTypingsLoaded" xml:space="preserve">
+    <value>Node.js IntelliSense typings folder is up to date</value>
+  </data>
+  <data name="StatusTypingsLoading" xml:space="preserve">
+    <value>Loading Node.js IntelliSense typings for npm packages...</value>
+  </data>
 </root>

@@ -4,7 +4,6 @@
   "description": "$projectname$",
   "main": "app.js",
   "author": {
-    "name": "$username$",
-    "email": ""
+    "name": "$username$"
   }
 }
