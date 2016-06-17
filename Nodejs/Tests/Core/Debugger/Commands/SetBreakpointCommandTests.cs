@@ -28,7 +28,7 @@ namespace NodejsTests.Debugger.Commands {
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void CreateLocalScriptRegExpShouldCreateCaseInSensitiveRegularExpression() {
             const string drive = "c:";
-            var pathParts = new[] { "nOdE", "IS", "awsome.js" };
+            var pathParts = new[] { "nOdE", "IS", "awesome.js" };
             string fileName = Path.Combine(drive, Path.Combine(pathParts));
 
             var scriptRegExp = new Regex(SetBreakpointCommand.CreateLocalScriptRegExp(fileName));
