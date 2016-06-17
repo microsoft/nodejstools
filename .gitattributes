@@ -2,6 +2,7 @@
 * text=auto eol=crlf
 
 *.js diff
+*.vstemplate diff
 
 # Denote all files that are truly binary and should not be modified.
 *.bmp binary
