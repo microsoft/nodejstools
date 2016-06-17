@@ -637,7 +637,7 @@ namespace Microsoft.NodejsTools {
         internal VsProjectAnalyzer DefaultAnalyzer {
             get {
                 if (_analyzer == null) {
-                    _analyzer = new VsProjectAnalyzer(IntellisenseOptionsPage.AnalysisLevel, IntellisenseOptionsPage.SaveToDisk);
+                    _analyzer = CreateLooseVsProjectAnalyzer();
                     LogLooseFileAnalysisLevel();
                     _analyzer.MaxLogLength = IntellisenseOptionsPage.AnalysisLogMax;
                     IntellisenseOptionsPage.AnalysisLevelChanged += IntellisenseOptionsPageAnalysisLevelChanged;
@@ -652,13 +652,28 @@ namespace Microsoft.NodejsTools {
         }
 
         private void IntellisenseOptionsPageAnalysisLevelChanged(object sender, EventArgs e) {
-            var analyzer = new VsProjectAnalyzer(IntellisenseOptionsPage.AnalysisLevel, IntellisenseOptionsPage.SaveToDisk);
+            var analyzer = CreateLooseVsProjectAnalyzer();
             analyzer.SwitchAnalyzers(_analyzer);
             if (_analyzer.RemoveUser()) {
                 _analyzer.Dispose();
             }
             _analyzer = analyzer;
             LogLooseFileAnalysisLevel();
+        }
+
+        private VsProjectAnalyzer CreateLooseVsProjectAnalyzer() {
+            // In ES6 IntelliSense mode, rather than overriding the default JS editor,
+            // we throw to Salsa. If Salsa detects that it's not operating within the Node.js project context,
+            // it will throw to JSLS. This means that currently, loose files will be handled by the JSLS editor,
+            // rather than the NodeLS editor (which means that the loose project analyzer will not be invoked
+            // in these scenarios.)
+            //
+            // Because Salsa doesn't support the stitching together inputs from the surrounding text view,
+            // we do not throw to Salsa from the REPL window. However, in order to provide a workable editing
+            // experience within the REPL context, we initialize the loose analyzer with Quick IntelliSense
+            // during ES6 mode.
+            var analysisLevel = IntellisenseOptionsPage.AnalysisLevel == AnalysisLevel.Preview ? AnalysisLevel.NodeLsMedium : IntellisenseOptionsPage.AnalysisLevel;
+            return new VsProjectAnalyzer(analysisLevel, false);
         }
 
         private void LogLooseFileAnalysisLevel() {
