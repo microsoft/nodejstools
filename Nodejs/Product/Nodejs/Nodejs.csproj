@@ -910,12 +910,6 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubPath>ItemTemplates</VSIXSubPath>
     </Content>
-    <None Include="ProjectTemplates\AddWebSiteAzureExpressApp\typings.json" />
-    <None Include="ProjectTemplates\AddWebSiteAzureStarterExpressApp\typings.json" />
-    <None Include="ProjectTemplates\AddWebSiteExpressApp\typings.json" />
-    <None Include="ProjectTemplates\AddWebSiteStarterExpressApp\typings.json" />
-    <None Include="ProjectTemplates\AzureStarterExpressApp\typings.json" />
-    <None Include="ProjectTemplates\StarterExpressApp\typings.json" />
     <None Include="Theme\contrast.vstheme">
       <SubType>Designer</SubType>
     </None>
@@ -991,6 +985,12 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\index.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\user.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\server.js" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\typings.json" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureStarterExpressApp\typings.json" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\typings.json" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteStarterExpressApp\typings.json" />
+    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\typings.json" />
+    <ZipProject Include="ProjectTemplates\StarterExpressApp\typings.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\README.md" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\app.ts" />
