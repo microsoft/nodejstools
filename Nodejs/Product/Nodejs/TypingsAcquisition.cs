@@ -79,7 +79,7 @@ namespace Microsoft.NodejsTools {
         public Task<bool> AcquireTypings(IEnumerable<string> packages, Redirector redirector) {
             return typingsToolGlobalWorkSemaphore.WaitAsync().ContinueWith(async _ => {
                 try {
-                    return await DownloadTypingsForProject(redirector) && await DownloadTypingsForPackages(packages, redirector);
+                    return await DownloadTypingsForPackages(packages, redirector) && await DownloadTypingsForProject(redirector);
                 } finally {
                     typingsToolGlobalWorkSemaphore.Release();
                 }
