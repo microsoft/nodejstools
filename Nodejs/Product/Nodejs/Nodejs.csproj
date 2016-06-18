@@ -935,7 +935,6 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\Preview.png" />
-    <ZipProject Include="ProjectTemplates\AzureExpress4App\typings.json" />
     <Content Include="..\..\Common\Telemetry\Microsoft.NodejsTools.Telemetry.$(VSTarget).dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -987,6 +986,7 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\user.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\server.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\typings.json" />
+    <ZipProject Include="ProjectTemplates\AzureExpress4App\typings.json" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureStarterExpressApp\typings.json" />
     <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\typings.json" />
     <ZipProject Include="ProjectTemplates\AddWebSiteStarterExpressApp\typings.json" />
