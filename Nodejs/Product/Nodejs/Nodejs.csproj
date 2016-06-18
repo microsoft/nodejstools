@@ -1203,6 +1203,7 @@
     <ZipProject Include="ProjectTemplates\Express4App\ExpressApp.vstemplate">
       <SubType>Designer</SubType>
     </ZipProject>
+    <ZipProject Include="ProjectTemplates\Express4App\typings.json" />
     <ZipProject Include="ProjectTemplates\Express4App\index.js" />
     <ZipProject Include="ProjectTemplates\Express4App\Preview.png" />
     <ZipProject Include="ProjectTemplates\Express4App\users.js" />
