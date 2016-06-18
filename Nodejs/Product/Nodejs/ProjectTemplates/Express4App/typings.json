@@ -8,7 +8,6 @@
     "jade": "registry:dt/jade#0.0.0+20160316155526",
     "mime": "registry:dt/mime#0.0.0+20160316155526",
     "morgan": "registry:dt/morgan#1.7.0+20160524142355",
-    "node": "registry:dt/node#6.0.0+20160613154055",
     "serve-favicon": "registry:dt/serve-favicon#0.0.0+20160316155526",
     "serve-static": "registry:dt/serve-static#0.0.0+20160606155157",
     "stylus": "registry:dt/stylus#0.0.0+20160317120654"
