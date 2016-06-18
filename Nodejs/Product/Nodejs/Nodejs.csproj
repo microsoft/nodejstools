@@ -910,6 +910,12 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubPath>ItemTemplates</VSIXSubPath>
     </Content>
+    <None Include="ProjectTemplates\AddWebSiteAzureExpressApp\typings.json" />
+    <None Include="ProjectTemplates\AddWebSiteAzureStarterExpressApp\typings.json" />
+    <None Include="ProjectTemplates\AddWebSiteExpressApp\typings.json" />
+    <None Include="ProjectTemplates\AddWebSiteStarterExpressApp\typings.json" />
+    <None Include="ProjectTemplates\AzureStarterExpressApp\typings.json" />
+    <None Include="ProjectTemplates\StarterExpressApp\typings.json" />
     <None Include="Theme\contrast.vstheme">
       <SubType>Designer</SubType>
     </None>

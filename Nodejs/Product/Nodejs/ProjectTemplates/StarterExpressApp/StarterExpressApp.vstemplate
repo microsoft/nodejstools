@@ -57,6 +57,7 @@
       </Folder>
       <ProjectItem OpenInEditor="true">app.js</ProjectItem>
       <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
+      <ProjectItem>typings.json</ProjectItem>
       <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
     </Project>
   </TemplateContent>
