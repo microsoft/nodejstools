@@ -935,6 +935,7 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\Preview.png" />
+    <ZipProject Include="ProjectTemplates\AzureExpress4App\typings.json" />
     <Content Include="..\..\Common\Telemetry\Microsoft.NodejsTools.Telemetry.$(VSTarget).dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
