@@ -985,6 +985,13 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\index.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\user.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\server.js" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\typings.json" />
+    <ZipProject Include="ProjectTemplates\AzureExpress4App\typings.json" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureStarterExpressApp\typings.json" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\typings.json" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteStarterExpressApp\typings.json" />
+    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\typings.json" />
+    <ZipProject Include="ProjectTemplates\StarterExpressApp\typings.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\README.md" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\app.ts" />
