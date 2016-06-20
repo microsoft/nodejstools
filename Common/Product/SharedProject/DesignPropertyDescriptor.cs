@@ -98,9 +98,7 @@ namespace Microsoft.VisualStudioTools.Project {
         public override TypeConverter Converter {
             get {
                 if (converter == null) {
-                    if (converter == null) {
-                        converter = property.Converter;
-                    }
+                    converter = property.Converter;
                 }
                 return converter;
             }

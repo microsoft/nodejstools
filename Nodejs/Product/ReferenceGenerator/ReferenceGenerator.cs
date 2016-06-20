@@ -15,11 +15,8 @@
 //*********************************************************//
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Xml;
 using Microsoft.NodejsTools;
@@ -190,7 +187,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                             case "join": body = ReferenceCode.PathJoinBody; break;
                         }
                     }
-                    GenerateMethod(name, method, indentation + 1, body);
+                    GenerateMethod(method, indentation + 1, body);
                 }
             }
 
@@ -200,7 +197,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
             if (module.ContainsKey("classes")) {
                 foreach (var klass in module["classes"]) {
-                    GenerateClass(name, klass, indentation + 1);
+                    GenerateClass(klass, indentation + 1);
                 }
             }
 
@@ -210,7 +207,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 GenerateProperties(module["properties"], indentation + 1, specializer);
             }
 
-            _output.AppendFormat("}}", name);
+            _output.Append("}}");
         }
 
         private Dictionary<string, Func<string, string>> PropertySpecializations = MakePropertySpecializations();
@@ -242,7 +239,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             return null;
         }
 
-        private void GenerateClass(string modName, dynamic klass, int indentation) {
+        private void GenerateClass(dynamic klass, int indentation) {
             string className = FixClassName(klass["name"]);
             _output.Append(' ', indentation * 4);
             _output.AppendFormat("function _{0}() {{", className);
@@ -250,7 +247,7 @@ namespace Microsoft.NodejsTools.Intellisense {
 
             if (klass.ContainsKey("methods")) {
                 foreach (var method in klass["methods"]) {
-                    GenerateMethod(modName + "." + className, method, indentation + 1);
+                    GenerateMethod(method, indentation + 1);
                 }
             }
 
@@ -294,13 +291,13 @@ namespace Microsoft.NodejsTools.Intellisense {
 
                 _output.Append(' ', indentation * 4);
                 string value = null;
-                if (desc.IndexOf("<code>Boolean</code>") != -1) {
+                if (desc.IndexOf("<code>Boolean</code>", StringComparison.Ordinal) != -1) {
                     value = "true";
-                } else if (desc.IndexOf("<code>Number</code>") != -1) {
+                } else if (desc.IndexOf("<code>Number</code>", StringComparison.Ordinal) != -1) {
                     value = "0";
-                } else if (desc.IndexOf("<code>Readable Stream</code>") != -1) {
+                } else if (desc.IndexOf("<code>Readable Stream</code>", StringComparison.Ordinal) != -1) {
                     value = "require('stream').Readable()";
-                } else if (desc.IndexOf("<code>Writable Stream</code>") != -1 || textRaw == "process.stderr") {
+                } else if (desc.IndexOf("<code>Writable Stream</code>", StringComparison.Ordinal) != -1 || textRaw == "process.stderr") {
                     value = "require('stream').Writable()";
                 } else if (!String.IsNullOrWhiteSpace(textRaw)) {
                     int start, end;
@@ -394,7 +391,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             _output.AppendLine("}");
         }
 
-        private void GenerateMethod(string fullName, dynamic method, int indentation, string body = null) {
+        private void GenerateMethod(dynamic method, int indentation, string body = null) {
             _output.Append(' ', indentation * 4);
             _output.AppendFormat("this.{0} = function(", method["name"]);
             var signature = method["signatures"][0];
@@ -475,7 +472,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 _output.AppendLine(body);
             } else if (method["name"].StartsWith("create") && method["name"].Length > 6) {
                 _output.Append(' ', indentation * 4);
-                _output.AppendFormat("return new this.{1}();", fullName, method["name"].Substring(6));
+                _output.AppendFormat("return new this.{0}();", method["name"].Substring(6));
                 _output.AppendLine();
             }
             _output.Append(' ', indentation * 4);
