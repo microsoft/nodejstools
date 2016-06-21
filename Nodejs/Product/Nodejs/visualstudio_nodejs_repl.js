@@ -92,7 +92,7 @@ var vm = require('vm');
 var context = global;
 context.require = require;
 context.module = module;
-vm.createContext(context);
+context = vm.createContext(context);
 
 util.inspect.styles['number'] = 'blue';
 util.inspect.styles['boolean'] = 'blue';
