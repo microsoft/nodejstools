@@ -1,4 +1,5 @@
-﻿var fs = require('fs');
+﻿var EOL = require('os').EOL;
+var fs = require('fs');
 var path = require('path');
 
 // Choose 'tap' rather than 'min' or 'xunit'. The reason is that
@@ -79,21 +80,24 @@ function logError() {
 }
 
 function detectMocha(projectFolder) {
-  try {
+    try {
         var node_modulesFolder = projectFolder;
         var mochaJsonPath = path.join(node_modulesFolder, 'test', 'mocha.json');
         if (fs.existsSync(mochaJsonPath)) {
-          var opt = require(mochaJsonPath);
-          if (opt && opt.path) {
-            node_modulesFolder = path.resolve(projectFolder, opt.path);
-          }
+            var opt = require(mochaJsonPath);
+            if (opt && opt.path) {
+                node_modulesFolder = path.resolve(projectFolder, opt.path);
+            }
         }
 
         var mochaPath = path.join(node_modulesFolder, 'node_modules', 'mocha');
         var Mocha = new require(mochaPath);
         return Mocha;
     } catch (ex) {
-        logError("Failed to find Mocha package.  Mocha must be installed in the project locally.  Mocha can be installed locally with the npm manager via solution explorer or with \".npm install mocha --save-dev\" via the Node.js interactive window.");
+        logError(
+            'Failed to find Mocha package.  Mocha must be installed in the project locally.' + EOL +
+            'Install Mocha locally using the npm manager via solution explorer' + EOL +
+            'or with ".npm install mocha --save-dev" via the Node.js interactive window.');
         return null;
     }
 }
