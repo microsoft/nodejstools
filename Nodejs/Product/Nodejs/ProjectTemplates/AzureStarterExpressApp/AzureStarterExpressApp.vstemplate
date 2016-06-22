@@ -58,6 +58,7 @@
       <ProjectItem OpenInEditor="true">app.js</ProjectItem>
       <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
       <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
+      <ProjectItem>typings.json</ProjectItem>
       <ProjectItem ReplaceParameters="true">Web.config</ProjectItem>
       <ProjectItem ReplaceParameters="true">Web.Debug.config</ProjectItem>
       <Folder Name="bin">

@@ -113,6 +113,9 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
                 } catch (IOException ex) {
                     LiveLogger.WriteLine("IOException connecting to remote debugger");
                     exception = ex;
+                } catch (InvalidOperationException ex) {
+                    LiveLogger.WriteLine("InvalidOperationException connecting to remote debugger");
+                    exception = ex;
                 } catch (SocketException ex) {
                     LiveLogger.WriteLine("SocketException connecting to remote debugger");
                     exception = ex;

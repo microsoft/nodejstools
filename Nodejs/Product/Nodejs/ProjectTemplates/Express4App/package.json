@@ -7,8 +7,7 @@
   },
   "description": "$projectname$",
   "author": {
-    "name": "$username$",
-    "email": ""
+    "name": "$username$"
   },
   "dependencies": {
     "express": "~4.9.0",

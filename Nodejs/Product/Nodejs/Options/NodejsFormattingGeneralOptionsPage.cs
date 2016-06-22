@@ -14,12 +14,11 @@
 //
 //*********************************************************//
 
-using System;
 using System.Runtime.InteropServices;
 
 namespace Microsoft.NodejsTools.Options {
     [ComVisible(true)]
-    public class NodejsFormattingGeneralOptionsPage : NodejsDialogPage {
+    public class NodejsFormattingGeneralOptionsPage : NodejsFormattingDialogPage {
         private NodejsFormattingGeneralOptionsControl _window;
 
         public NodejsFormattingGeneralOptionsPage()
@@ -51,10 +50,10 @@ namespace Microsoft.NodejsTools.Options {
             FormatOnEnter = FormatOnSemiColon = FormatOnCloseBrace = FormatOnPaste = true;
         }
 
-        private const string FormatOnEnterSetting = "FormatOnEnter";
-        private const string FormatOnSemiColonSetting = "FormatOnSemiColon";
-        private const string FormatOnCloseBraceSetting = "FormatOnCloseBrace";
-        private const string FormatOnPasteSetting = "FormatOnPaste";
+        private const string FormatOnEnterSetting = TypeScriptRegistrySwitches.FormatCompletedLineOnEnter;
+        private const string FormatOnSemiColonSetting = TypeScriptRegistrySwitches.FormatCompletedStatementOnSemicolon;
+        private const string FormatOnCloseBraceSetting = TypeScriptRegistrySwitches.FormatCompletedBlockOnRightCurlyBrace;
+        private const string FormatOnPasteSetting = TypeScriptRegistrySwitches.FormatOnPaste;
 
         public override void LoadSettingsFromStorage(){
             // Load settings from storage.

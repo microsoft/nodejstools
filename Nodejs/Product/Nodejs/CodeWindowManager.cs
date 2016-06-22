@@ -20,10 +20,14 @@ using Microsoft.VisualStudio.TextManager.Interop;
 
 namespace Microsoft.NodejsTools {
     class CodeWindowManager : IVsCodeWindowManager, IVsCodeWindowEvents {
+#if FALSE
         private readonly IVsEditorAdaptersFactoryService _adapterService;
-        
+#endif
+
         public CodeWindowManager(IVsEditorAdaptersFactoryService adapterService) {
+#if FALSE
             _adapterService = adapterService;
+#endif
         }
 
 #if FALSE

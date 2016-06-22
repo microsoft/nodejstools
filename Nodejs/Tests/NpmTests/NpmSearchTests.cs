@@ -115,9 +115,7 @@ namespace NpmTests {
         private IList<IPackage> GetTestPackageList(
             string cachePath,
             out IDictionary<string, IPackage> byName) {
-            IList<IPackage> target = new List<IPackage>();
-
-            target = new NpmGetCatalogCommand(string.Empty, cachePath, false, RegistryUrl).GetCatalogPackagesAsync(string.Empty, new Uri(RegistryUrl)).GetAwaiter().GetResult().ToList();
+            IList<IPackage> target = new NpmGetCatalogCommand(string.Empty, cachePath, false, RegistryUrl).GetCatalogPackagesAsync(string.Empty, new Uri(RegistryUrl)).GetAwaiter().GetResult().ToList();
 
             //  Do this after because package names can be split across multiple
             //  lines and therefore may change after the IPackage is initially created.
@@ -490,7 +488,7 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestFilterString() {
+        public void FilterString() {
             const string filterString = "express";
             var results = GetFilteredPackageList(filterString);
             Assert.IsTrue(results.Count > 0, string.Format("Should be some filter results for '{0}'.", filterString));
@@ -512,7 +510,7 @@ namespace NpmTests {
 
         [Ignore]
         [TestMethod, Priority(0)]
-        public void TestFilterStringWithHyphens() {
+        public void FilterStringWithHyphens() {
             const string
                 filterStringWithHyphenMiddle = "grunt-contrib",
                 filterStringWithHyphenSuffix = "amazing-",
@@ -553,12 +551,12 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestFilterRegex() {
+        public void FilterRegex() {
             TestFilterRegex("/^express$");
         }
 
         [TestMethod, Priority(0)]
-        public void TestFilterRegexTrailingSlash() {
+        public void FilterRegexTrailingSlash() {
             TestFilterRegex("/^express$/");
         }
     }

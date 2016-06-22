@@ -34,6 +34,7 @@ using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudioTools.Project.Automation;
 using MSBuild = Microsoft.Build.Evaluation;
 using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
+using Microsoft.NodejsTools.Options;
 #if DEV14_OR_LATER
 using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Imaging;
@@ -51,12 +52,13 @@ namespace Microsoft.NodejsTools.Project {
         private readonly Dictionary<NodejsProjectImageName, int> _imageIndexFromNameDictionary = new Dictionary<NodejsProjectImageName, int>();
 
 #if DEV14
+        private bool? shouldAcquireTypingsAutomatically;
         private TypingsAcquisition _typingsAcquirer;
 #endif
 
         // We delay analysis until things calm down in the node_modules folder.
-        internal Queue<NodejsFileNode> DelayedAnalysisQueue = new Queue<NodejsFileNode>();
-        private object _idleNodeModulesLock = new object();
+        internal readonly Queue<NodejsFileNode> DelayedAnalysisQueue = new Queue<NodejsFileNode>();
+        private readonly object _idleNodeModulesLock = new object();
         private volatile bool _isIdleNodeModules = false;
         private Timer _idleNodeModulesTimer;
 
@@ -108,15 +110,21 @@ namespace Microsoft.NodejsTools.Project {
         internal bool ShouldAcquireTypingsAutomatically {
             get {
 #if DEV14
-                if (NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel != Options.AnalysisLevel.Preview) {
+                if (NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel != AnalysisLevel.Preview ||
+                    !NodejsPackage.Instance.IntellisenseOptionsPage.EnableAutomaticTypingsAcquisition) {
                     return false;
+                }
+
+                if (shouldAcquireTypingsAutomatically.HasValue) {
+                    return shouldAcquireTypingsAutomatically.Value;
                 }
 
                 var task = ProjectMgr.Site.GetUIThread().InvokeAsync(() => {
                     return IsTypeScriptProject;
                 });
                 task.Wait();
-                return !task.Result;
+                shouldAcquireTypingsAutomatically = !task.Result;
+                return shouldAcquireTypingsAutomatically.Value;
 #else
                 return false;
 #endif
@@ -139,15 +147,67 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private void TryToAcquireTypings(IEnumerable<string> packages) {
-            if (ShouldAcquireTypingsAutomatically && TypingsAcquirer != null) {
-                TypingsAcquirer
-                    .AcquireTypings(packages, null /*redirector*/)
-                    .ContinueWith(x => x);
+            if (!ShouldAcquireTypingsAutomatically || TypingsAcquirer == null) {
+                return;
+            }
+
+            IVsStatusbar statusBar = (IVsStatusbar)NodejsPackage.Instance.GetService(typeof(SVsStatusbar));
+            object statusIcon = (short)Constants.SBAI_General;
+
+            bool statusSetSuccess = TrySetTypingsLoadingStatusBar(statusBar, statusIcon);
+
+            var typingsPath = Path.Combine(this.ProjectHome, "typings");
+            bool hadExistingTypingsFolder = Directory.Exists(typingsPath);
+            TypingsAcquirer
+                .AcquireTypings(packages, null /*redirector*/)
+                .ContinueWith(x => {
+                    if (NodejsPackage.Instance.IntellisenseOptionsPage.ShowTypingsInfoBar &&
+                        x.Result &&
+                        (!hadExistingTypingsFolder && Directory.Exists(typingsPath))) {
+                        NodejsPackage.Instance.GetUIThread().Invoke(() => {
+                            TypingsInfoBar.Instance.ShowInfoBar();
+                        });
+                    }
+                    TrySetTypingsLoadedStatusBar(statusBar, statusIcon, statusSetSuccess);
+                });
+        }
+
+        private static bool TrySetTypingsLoadingStatusBar(IVsStatusbar statusBar, object icon) {
+            if (statusBar != null && !IsStatusBarFrozen(statusBar)) {
+                statusBar.SetText(SR.GetString(SR.StatusTypingsLoading));
+                statusBar.Animation(1, ref icon);
+                if (ErrorHandler.Succeeded(statusBar.FreezeOutput(1))) {
+                    return true;
+                }
+                Debug.Fail("Failed to freeze typings status bar");
+            }
+            return false;
+        }
+
+        private static void TrySetTypingsLoadedStatusBar(IVsStatusbar statusBar, object icon, bool statusSetSuccess) {
+            if (statusBar != null && (statusSetSuccess || !IsStatusBarFrozen(statusBar))) {
+                if (!ErrorHandler.Succeeded(statusBar.FreezeOutput(0))) {
+                    Debug.Fail("Failed to unfreeze typings status bar");
+                    return;
+                }
+
+                statusBar.Animation(0, ref icon);
+                statusBar.SetText(SR.GetString(SR.StatusTypingsLoaded));
             }
         }
 
+        private static bool IsStatusBarFrozen(IVsStatusbar statusBar) {
+            int frozen;
+            statusBar.IsFrozen(out frozen);
+            return frozen == 1;
+        }
+
         private void TryToAcquireCurrentTypings() {
-            var controller = ModulesNode != null ? ModulesNode.NpmController : null;
+            if (!ShouldAcquireTypingsAutomatically || TypingsAcquirer == null) {
+                return;
+            }
+
+            var controller = ModulesNode?.NpmController;
             if (controller == null) {
                 return;
             }
@@ -159,7 +219,7 @@ namespace Microsoft.NodejsTools.Project {
                     || package.IsDevDependency
                     || !package.IsListedInParentPackageJson);
 
-            TryToAcquireTypings(currentPackages.Select(package => package.Name));
+            TryToAcquireTypings(currentPackages.Select(package => package.Name).Concat(new[] { "node" }));
         }
 #endif
 
@@ -304,6 +364,10 @@ namespace Microsoft.NodejsTools.Project {
                 // enable TypeScript on the project automatically...
                 SetProjectProperty(NodejsConstants.EnableTypeScript, "true");
                 SetProjectProperty(NodejsConstants.TypeScriptSourceMap, "true");
+#if DEV14
+                // Reset cached value, so it will be recalculated later.
+                this.shouldAcquireTypingsAutomatically = false;
+#endif
                 if (String.IsNullOrWhiteSpace(GetProjectProperty(NodejsConstants.TypeScriptModuleKind))) {
                     SetProjectProperty(NodejsConstants.TypeScriptModuleKind, NodejsConstants.CommonJSModuleKind);
                 }
@@ -391,7 +455,7 @@ namespace Microsoft.NodejsTools.Project {
 
         public override CommonFileNode CreateNonCodeFileNode(ProjectElement item) {
             string fileName = item.Url;
-            if (Path.GetFileName(fileName).Equals(NodejsConstants.PackageJsonFile, StringComparison.OrdinalIgnoreCase) && 
+            if (Path.GetFileName(fileName).Equals(NodejsConstants.PackageJsonFile, StringComparison.OrdinalIgnoreCase) &&
                 !fileName.Contains(NodejsConstants.NodeModulesStagingFolder)) {
                 return new PackageJsonFileNode(this, item);
             }
@@ -483,9 +547,7 @@ namespace Microsoft.NodejsTools.Project {
                 if (_analyzer != null && _analyzer.RemoveUser()) {
                     _analyzer.Dispose();
                 }
-                _analyzer = new VsProjectAnalyzer(ProjectFolder);
-                _analyzer.MaxLogLength = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMax;
-                LogAnalysisLevel();
+                _analyzer = CreateNewAnalyser();
 
                 base.Reload();
 
@@ -502,6 +564,13 @@ namespace Microsoft.NodejsTools.Project {
                 // exist and remove them.
                 _analyzer.ReloadComplete();
             }
+        }
+
+        private VsProjectAnalyzer CreateNewAnalyser() {
+            var analyzer = new VsProjectAnalyzer(NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel, NodejsPackage.Instance.IntellisenseOptionsPage.SaveToDisk, ProjectFolder);
+            analyzer.MaxLogLength = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMax;
+            LogAnalysisLevel(analyzer);
+            return analyzer;
         }
 
         private void UpdateProjectNodeFromProjectProperties() {
@@ -536,29 +605,17 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private void LogAnalysisLevel() {
-            var analyzer = _analyzer;
+        private static void LogAnalysisLevel(VsProjectAnalyzer analyzer) {
             if (analyzer != null) {
                 NodejsPackage.Instance.Logger.LogEvent(Logging.NodejsToolsLogEvent.AnalysisLevel, (int)analyzer.AnalysisLevel);
             }
         }
 
-        /*
-         * Needed if we switch to per project Analysis levels
-        internal NodejsTools.Options.AnalysisLevel AnalysisLevel(){
-            var analyzer = _analyzer;
-            if (_analyzer != null) {
-                return _analyzer.AnalysisLevel;
-            }
-            return NodejsTools.Options.AnalysisLevel.None;
-        }
-        */
         private void IntellisenseOptionsPageAnalysisLevelChanged(object sender, EventArgs e) {
-
             var oldAnalyzer = _analyzer;
             _analyzer = null;
 
-            var analyzer = new VsProjectAnalyzer(ProjectFolder);
+            var analyzer = CreateNewAnalyser();
             Reanalyze(this, analyzer);
             if (oldAnalyzer != null) {
                 analyzer.SwitchAnalyzers(oldAnalyzer);
@@ -567,8 +624,9 @@ namespace Microsoft.NodejsTools.Project {
                 }
             }
             _analyzer = analyzer;
-            _analyzer.MaxLogLength = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMax;
-            LogAnalysisLevel();
+#if DEV14
+            TryToAcquireCurrentTypings();
+#endif
         }
 
         private void AnalysisLogMaximumChanged(object sender, EventArgs e) {
@@ -687,8 +745,7 @@ namespace Microsoft.NodejsTools.Project {
                 nestedModulesDepth = ModulesNode.NpmController.RootPackage.Modules.GetDepth(fileNode.Url);
             }
 
-            if (_analyzer != null && _analyzer.Project != null &&
-                _analyzer.Project.Limits.IsPathExceedNestingLimit(nestedModulesDepth)) {
+            if (_analyzer != null && _analyzer.Limits.IsPathExceedNestingLimit(nestedModulesDepth)) {
                 return false;
             }
 
@@ -717,7 +774,7 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-#region VSWebSite Members
+        #region VSWebSite Members
 
         // This interface is just implemented so we don't get normal profiling which
         // doesn't work with our projects anyway.
@@ -784,7 +841,7 @@ namespace Microsoft.NodejsTools.Project {
             get { throw new NotImplementedException(); }
         }
 
-#endregion
+        #endregion
 
         Task INodePackageModulesCommands.InstallMissingModulesAsync() {
             //Fire off the command to update the missing modules
@@ -851,7 +908,6 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private static readonly Regex _uninstallRegex = new Regex(@"\b(uninstall|rm)\b");
-        private static readonly char[] _pathSeparators = { '\\', '/' };
         private bool _isCheckingForLongPaths;
 
         public async Task CheckForLongPaths(string npmArguments = null) {
@@ -1010,12 +1066,15 @@ namespace Microsoft.NodejsTools.Project {
                 NodejsPackage.Instance.IntellisenseOptionsPage.SaveToDiskChanged -= IntellisenseOptionsPageSaveToDiskChanged;
                 NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevelChanged -= IntellisenseOptionsPageAnalysisLevelChanged;
                 NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMaximumChanged -= AnalysisLogMaximumChanged;
+                NodejsPackage.Instance.GeneralOptionsPage.ShowBrowserAndNodeLabelsChanged -= ShowBrowserAndNodeLabelsChanged;
 
                 OnDispose?.Invoke(this, EventArgs.Empty);
 
                 RemoveChild(ModulesNode);
                 ModulesNode?.Dispose();
                 ModulesNode = null;
+
+                DelayedAnalysisQueue.Clear();
 #if DEV14
                 _typingsAcquirer = null;
 #endif

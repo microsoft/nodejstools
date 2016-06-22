@@ -27,7 +27,7 @@ namespace NodejsTests {
     [TestClass]
     public class AnalysisDictionaryTests {
         [TestMethod, Priority(0)]
-        public void TestBasic() {
+        public void Basic() {
             var dict = new AnalysisDictionary<string, string>();
             Assert.IsFalse(dict.Remove("Foo"));
             dict.Add("1", "One");
@@ -110,13 +110,13 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestAddExisting() {
+        public void AddExisting() {
             var dict = new AnalysisDictionary<string, string>() { { "1", "One" } };
             AssertUtil.Throws<ArgumentException>(() => dict.Add("1", "Two"));
         }
 
         [TestMethod, Priority(0)]
-        public void TestGrowth() {
+        public void Growth() {
             var dict = new AnalysisDictionary<string, string>();
             for (int i = 0; i < 25; i++) {
                 dict[i.ToString()] = i.ToString();
@@ -137,7 +137,7 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestReplaceExisting() {
+        public void ReplaceExisting() {
             // same object reference
             var dict = new AnalysisDictionary<string, string>();
             var value = "1";
@@ -160,7 +160,7 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestRemoveExisting() {
+        public void RemoveExisting() {
             var dict = new AnalysisDictionary<Hashable, string>();
             var one = new Hashable(1, (self, x) => x._hash == 1);
             var two = new Hashable(1, (self, x) => x._hash == 1);
@@ -170,7 +170,7 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestNull() {
+        public void Null() {
             var dict = new AnalysisDictionary<string, string>();
             string dummy;
             AssertUtil.Throws<ArgumentNullException>(
@@ -188,7 +188,7 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestAddRemoveAdd() {
+        public void AddRemoveAdd() {
             // same object reference
             var dict = new AnalysisDictionary<string, string>();
             var value = "1";
@@ -215,7 +215,7 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestCollision() {
+        public void Collision() {
             // difference object reference, but equal.
             var dict = new AnalysisDictionary<Hashable, string>();
             List<Hashable> items = new List<Hashable>();
@@ -239,7 +239,7 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestComparer() {
+        public void Comparer() {
             // difference object reference, but equal.
             foreach (var dict in new[] {
                 new AnalysisDictionary<string, string>(MyComparer.Instance),
@@ -253,7 +253,7 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestEnumeration() {
+        public void Enumeration() {
             var dict = new AnalysisDictionary<string, string>() { { "1", "One" } };
             var enumer = dict.GetEnumerator();
             while (enumer.MoveNext()) {
@@ -267,7 +267,7 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestClear() {
+        public void Clear() {
             var dict = new AnalysisDictionary<string, string>();
             dict.Clear();
             Assert.AreEqual(0, dict.Count);
@@ -289,7 +289,7 @@ namespace NodejsTests {
         /// that we pick up the new value correctly.
         /// </summary>
         [TestMethod, Priority(0)]
-        public void TestThreadedReaderUpdatedValue() {
+        public void ThreadedReaderUpdatedValue() {
             var comparer = new SynchronizedComparer();
 
             var dict = new AnalysisDictionary<Hashable, string>(comparer);
@@ -313,7 +313,7 @@ namespace NodejsTests {
         /// value that we don't find the non-equivalent value.
         /// </summary>
         [TestMethod, Priority(0)]
-        public void TestThreadedReaderValueRemoved() {
+        public void ThreadedReaderValueRemoved() {
             var comparer = new SynchronizedComparer();
 
             var dict = new AnalysisDictionary<Hashable, string>(comparer);
@@ -334,7 +334,7 @@ namespace NodejsTests {
         /// Tests concurrent writer with concurrent reader
         /// </summary>
         [TestMethod, Priority(2)]
-        public void TestThreaded() {
+        public void Threaded() {
             var dict = new AnalysisDictionary<string, string>();
             var keys = new[] { "1", "2", "3", "4", "5", "6" };
             foreach (var key in keys) {

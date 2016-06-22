@@ -26,7 +26,7 @@ namespace NpmTests {
     [TestClass]
     public class SemverVersionTests {
         [TestMethod, Priority(0)]
-        public void TestBasicMajorMinorPatchVersion() {
+        public void BasicMajorMinorPatchVersion() {
             SemverVersionTestHelper.AssertVersionsEqual(
                 1,
                 2,
@@ -38,52 +38,52 @@ namespace NpmTests {
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(SemverVersionFormatException), "Should not allow negative major version.")]
-        public void TestNegativeMajorVersionFails() {
+        public void NegativeMajorVersionFails() {
             SemverVersion.Parse("-1.2.3");
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(SemverVersionFormatException), "Should not allow negative minor version.")]
-        public void TestNegativeMinorVersionFails() {
+        public void NegativeMinorVersionFails() {
             SemverVersion.Parse("1.-2.3");
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(SemverVersionFormatException), "Should not allow negative patch version.")]
-        public void TestNegativePatchVersionFails() {
+        public void NegativePatchVersionFails() {
             SemverVersion.Parse("1.2.-3");
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(SemverVersionFormatException), "Should not allow non-numeric major version.")]
-        public void TestNonNumericMajorVersionFails() {
+        public void NonNumericMajorVersionFails() {
             SemverVersion.Parse("a.2.3");
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(SemverVersionFormatException), "Should not allow non-numeric minor version.")]
-        public void TestNonNumericMinorVersionFails() {
+        public void NonNumericMinorVersionFails() {
             SemverVersion.Parse("1.b.3");
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(SemverVersionFormatException), "Should not allow non-numeric patch version.")]
-        public void TestNonNumericPatchVersionFails() {
+        public void NonNumericPatchVersionFails() {
             SemverVersion.Parse("1.2.c");
         }
 
         [TestMethod, Priority(0)]
-        public void TestAlphaPreRelease() {
+        public void AlphaPreRelease() {
             SemverVersionTestHelper.AssertVersionsEqual(1, 2, 3, "alpha", null, SemverVersion.Parse("1.2.3-alpha"));
         }
 
         [TestMethod, Priority(0)]
-        public void TestNumericPreRelease() {
+        public void NumericPreRelease() {
             SemverVersionTestHelper.AssertVersionsEqual(1, 2, 3, "4.5.6", null, SemverVersion.Parse("1.2.3-4.5.6"));
         }
 
         [TestMethod, Priority(0)]
-        public void TestPreReleaseHyphenatedIdentifier() {
+        public void PreReleaseHyphenatedIdentifier() {
             SemverVersionTestHelper.AssertVersionsEqual(
                 1,
                 2,
@@ -94,7 +94,7 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestPreReleaseHyphenatedIdentifierWithoutVersion()
+        public void PreReleaseHyphenatedIdentifierWithoutVersion()
         {
             // This version code is crazy, and for that reason it fail when
             // regional settings is set to Turkish.
@@ -108,7 +108,7 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestPreReleaseAndBuildMetadata() {
+        public void PreReleaseAndBuildMetadata() {
             // 1.0.0-alpha+001, 1.0.0+20130313144700, 1.0.0-beta+exp.sha.5114f85
             SemverVersionTestHelper.AssertVersionsEqual(1, 0, 0, "alpha", "001", SemverVersion.Parse("1.0.0-alpha+001"));
             SemverVersionTestHelper.AssertVersionsEqual(
@@ -121,7 +121,7 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestBuildMetadataOnly() {
+        public void BuildMetadataOnly() {
             SemverVersionTestHelper.AssertVersionsEqual(
                 1,
                 0,

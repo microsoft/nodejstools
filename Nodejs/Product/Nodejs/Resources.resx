@@ -473,6 +473,9 @@ NAME2=value2
   <data name="ReplInitializationMessage" xml:space="preserve">
     <value>Node.js interactive window. Type .help for a list of commands.</value>
   </data>
+  <data name="ReplWindowNpmInitNoYesFlagWarning" xml:space="preserve">
+    <value>Please run '.npm init -y' to create a new package.json file.</value>
+  </data>
   <data name="NodeExePathDescription" xml:space="preserve">
     <value>Specifies the path to the node.exe executable.</value>
   </data>
@@ -606,13 +609,34 @@ You will need to restart Visual Studio after installation.</value>
   <data name="RemoteDebugProxyFolderDoesNotExist" xml:space="preserve">
     <value>Could not find RemoteDebugProxyFolder</value>
   </data>
-  <data name="TsdErrorOccured" xml:space="preserve">
-    <value>Error installing typings files used for Intellisense.</value>
-  </data>
-  <data name="TsdInstallCompleted" xml:space="preserve">
+  <data name="TypingsToolInstallCompleted" xml:space="preserve">
     <value>Successfully installed typing files for Intellisense.</value>
   </data>
-  <data name="TsdNotInstalledError" xml:space="preserve">
-    <value>Could not find TSD TypeScript package manager tool used for Intellisense. Please install it globally by running 'npm install -g tsd'.</value>
+  <data name="TypingsToolNotInstalledError" xml:space="preserve">
+    <value>Could not find Typings package manager tool used for Intellisense.</value>
+  </data>
+  <data name="TypingsInfoBarSpan1" xml:space="preserve">
+    <value>Node.js IntelliSense added a </value>
+  </data>
+  <data name="TypingsInfoBarSpan2" xml:space="preserve">
+    <value>typings folder</value>
+  </data>
+  <data name="TypingsInfoBarSpan3" xml:space="preserve">
+    <value> to your project</value>
+  </data>
+  <data name="TypingsOpenOptionsText" xml:space="preserve">
+    <value>Customize...</value>
+  </data>
+  <data name="EcmaScript5" xml:space="preserve">
+    <value>ECMAScript 5</value>
+  </data>
+  <data name="EcmaScript6" xml:space="preserve">
+    <value>ECMAScript 6</value>
+  </data>
+  <data name="StatusTypingsLoaded" xml:space="preserve">
+    <value>Node.js IntelliSense typings folder is up to date</value>
+  </data>
+  <data name="StatusTypingsLoading" xml:space="preserve">
+    <value>Loading Node.js IntelliSense typings for npm packages...</value>
   </data>
 </root>

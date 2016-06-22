@@ -191,12 +191,14 @@ namespace Microsoft.NodejsTools.Analysis {
         }
 
         internal virtual void AnalyzeWorker(DDG ddg, CancellationToken cancel) {
+            Debug.Assert(ddg != null, "ddg unexpected null value");
             Debug.Assert(Ast != null, "Ast has unexpected null value");
             Debug.Assert(ProjectEntry != null, "ProjectEntry has unexpected null value");
             Debug.Assert(DeclaringModuleEnvironment != null, "DeclaringModuleEnvironment has unexpected null value");
             Debug.Assert(DeclaringModuleEnvironment.GlobalEnvironment != null, "DeclaringModuleEnvironment.GlobalEnvironment has unexpected null value");
+            Debug.Assert(DeclaringModuleEnvironment.Variables != null, "DeclaringModuleEnvironment.Variables has unexpected null value");
 
-            if (Ast == null || ProjectEntry == null || Tree != ProjectEntry.Tree || DeclaringModuleEnvironment == null) {
+            if (ddg == null || Ast == null || ProjectEntry == null || Tree != ProjectEntry.Tree || DeclaringModuleEnvironment?.Variables == null || DeclaringModuleEnvironment?.GlobalEnvironment == null) {
                 // analysis unit properties are invalid or we were enqueued and a new version became available
                 // don't re-analyze against the old version.
                 return;
@@ -210,9 +212,12 @@ namespace Microsoft.NodejsTools.Analysis {
             var toRemove = new List<KeyValuePair<string,VariableDef>>();
 
             foreach (var variableInfo in DeclaringModuleEnvironment.Variables) {
-                variableInfo.Value.ClearOldValues(ProjectEntry);
-                if (variableInfo.Value._dependencies.Count == 0 &&
-                    variableInfo.Value.TypesNoCopy.Count == 0) {
+                var value = variableInfo.Value;
+                if (value == null) {
+                    continue;
+                }
+                value.ClearOldValues(ProjectEntry);
+                if (value._dependencies.Count == 0 && value.TypesNoCopy.Count == 0) {
                     toRemove.Add(variableInfo);
                 }
             }
@@ -226,7 +231,7 @@ namespace Microsoft.NodejsTools.Analysis {
                 // if anyone read this value it could now be gone (e.g. user 
                 // deletes a class definition) so anyone dependent upon it
                 // needs to be updated.
-                nameValue.Value.EnqueueDependents();
+                nameValue.Value?.EnqueueDependents();
             }
         }
 
