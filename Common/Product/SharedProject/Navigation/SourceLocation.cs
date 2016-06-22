@@ -154,7 +154,7 @@ namespace Microsoft.VisualStudioTools.Parsing {
         public static int Compare(SourceLocation left, SourceLocation right) {
             if (left < right)
                 return -1;
-            if (right > left)
+            if (left > right)
                 return 1;
 
             return 0;

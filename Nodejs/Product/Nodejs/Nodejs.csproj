@@ -901,6 +901,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <ZipItem Include="Templates\Files\TapeUnitTest\UnitTest.js" />
+    <ZipItem Include="Templates\Files\TapeUnitTest\UnitTest.vstemplate" />
+    <ZipItem Include="Templates\Files\TypeScriptTapeUnitTest\UnitTest.vstemplate" />
+    <ZipItem Include="Templates\Files\TypeScriptTapeUnitTest\UnitTest.ts" />
     <Content Include="Templates\VS_Nodejs.item.vstman">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -919,12 +923,6 @@
     <TransformedZipProject Include="ProjectTemplates\AddWebSiteExpressApp\AddWebSiteExpressApp.vstemplate.base">
       <SubType>Designer</SubType>
     </TransformedZipProject>
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\AzureExpressApp.njsproj">
-      <SubType>Designer</SubType>
-    </ZipProject>
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\AzureExpressApp.vstemplate">
-      <SubType>Designer</SubType>
-    </ZipProject>
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\AddWebSiteAzureExpressApp.njsproj">
       <SubType>Designer</SubType>
     </ZipProject>
@@ -934,7 +932,6 @@
     <ZipProject Include="ProjectTemplates\NodejsWebApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\AddWebSiteNodejsWebApp\Preview.png" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\Preview.png" />
@@ -981,9 +978,6 @@
     <ZipProject Include="ProjectTemplates\FromExistingCode\FromExistingCode.vstemplate">
       <SubType>Designer</SubType>
     </ZipProject>
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\app.js" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\index.js" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\user.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\app.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\index.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\user.js" />
@@ -991,6 +985,13 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\index.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\user.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\server.js" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\typings.json" />
+    <ZipProject Include="ProjectTemplates\AzureExpress4App\typings.json" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureStarterExpressApp\typings.json" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\typings.json" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteStarterExpressApp\typings.json" />
+    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\typings.json" />
+    <ZipProject Include="ProjectTemplates\StarterExpressApp\typings.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\README.md" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\app.ts" />
@@ -1209,6 +1210,7 @@
     <ZipProject Include="ProjectTemplates\Express4App\ExpressApp.vstemplate">
       <SubType>Designer</SubType>
     </ZipProject>
+    <ZipProject Include="ProjectTemplates\Express4App\typings.json" />
     <ZipProject Include="ProjectTemplates\Express4App\index.js" />
     <ZipProject Include="ProjectTemplates\Express4App\Preview.png" />
     <ZipProject Include="ProjectTemplates\Express4App\users.js" />
@@ -1337,6 +1339,9 @@
     <None Include="Theme\Microsoft.NodejsTools.theme.v12.0.pkgdef" />
     <None Include="Theme\Microsoft.NodejsTools.theme.v14.0.pkgdef" />
     <None Include="Theme\Microsoft.NodejsTools.theme.v15.0.pkgdef" />
+    <Content Include="TestFrameworks\Tape\tape.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="VSTemplateStore.pkgdef">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -1356,13 +1361,7 @@
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\AzureNodejsApp.vstemplate">
       <SubType>Designer</SubType>
     </ZipProject>
-    <ZipProject Include="ProjectTemplates\ExpressApp\ExpressApp.njsproj">
-      <SubType>Designer</SubType>
-    </ZipProject>
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\server.js" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\ExpressApp.vstemplate">
-      <SubType>Designer</SubType>
-    </ZipProject>
     <TransformedZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\AddWebSiteAzureNodejsApp.vstemplate.base">
       <SubType>Designer</SubType>
     </TransformedZipProject>
@@ -1417,26 +1416,8 @@
     <ZipProject Include="ProjectTemplates\NodejsWebApp\package.json" />
     <ZipProject Include="ProjectTemplates\NodejsWebApp\README.md" />
     <ZipProject Include="ProjectTemplates\AddWebSiteNodejsWebApp\WebApplication.webproj" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\package.json" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\README.md" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\style.styl" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\index.jade" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\layout.jade" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\Preview.png" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\app.js" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\index.js" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\user.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\package.json" />
     <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\README.md" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\package.json" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\README.md" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\Web.config" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\Web.Debug.config" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\setup_web.cmd" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\download.ps1" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\ChangeConfig.ps1" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\node.cmd" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\iisnode.yml" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\ChangeConfig.ps1" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\download.ps1" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\package.json" />
@@ -1451,9 +1432,6 @@
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\app.js" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\NodejsConsoleApp.njsproj" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\NodejsConsoleApp.vstemplate" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\index.jade" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\layout.jade" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\style.styl" />
     <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\index.jade" />
     <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\layout.jade" />
     <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\style.styl" />
@@ -1721,7 +1699,6 @@
     <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\startup.ts" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\server.ts" />
   </ItemGroup>
-  <ItemGroup />
   <PropertyGroup>
     <!--
     To specify a different registry root to register your package, uncomment the TargetRegistryRoot

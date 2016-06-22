@@ -60,6 +60,12 @@ namespace Microsoft.NodejsTools.Npm {
             string packageName,
             string versionRange);
 
+        Task<bool> InstallPackageToFolderByVersionAsync(
+            string pathToRootDirectory,
+            string packageName,
+            string versionRange,
+            bool saveToPackageJson);
+
         /// <summary>
         /// 
         /// </summary>

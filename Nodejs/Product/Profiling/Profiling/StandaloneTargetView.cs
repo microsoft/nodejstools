@@ -152,7 +152,7 @@ namespace Microsoft.NodejsTools.Profiling {
                     WorkingDirectory.IndexOfAny(Path.GetInvalidPathChars()) == -1 &&
                     (Path.IsPathRooted(ScriptPath) || Path.IsPathRooted(WorkingDirectory)) &&
                     File.Exists(Path.Combine(WorkingDirectory, ScriptPath)) &&
-                    (string.IsNullOrEmpty(WorkingDirectory) || Directory.Exists(WorkingDirectory)) &&
+                    (WorkingDirectory == string.Empty || Directory.Exists(WorkingDirectory)) &&
                     (File.Exists(InterpreterPath));
             }
         }

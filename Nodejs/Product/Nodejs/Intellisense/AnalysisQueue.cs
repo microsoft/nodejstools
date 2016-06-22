@@ -186,32 +186,11 @@ namespace Microsoft.NodejsTools.Intellisense {
                             workItem.Analyze(_cancel.Token);
                         }
                     } else {
-                        string statsMessage = null;
-                        if (_analyzer._jsAnalyzer != null) {
-                            int count = _analyzer._jsAnalyzer.GetAndClearAnalysisCount();
-                            if (count != 0) {
-                                var elapsedTime = TimeSpan.FromMilliseconds(watch.ElapsedMilliseconds - startTime);
-                                statsMessage = SR.GetString(SR.StatusAnalysisUpToDate, count, FormatTime(elapsedTime));
-                            }
-                        }
-
-                        if (_analyzer._saveToDisk && analyzedAnything && (DateTime.Now - _lastSave) > _SaveAnalysisTime) {
-                            var statusbar = (IVsStatusbar)NodejsPackage.GetGlobalService(typeof(SVsStatusbar));
-                            if (statusbar != null) {
-                                statusbar.SetText(SR.GetString(SR.StatusAnalysisSaving) + " " + statsMessage);
-                            }
-
-                            _analyzer.SaveAnalysis();
-                            _lastSave = DateTime.Now;
-
-                            if (statusbar != null) {
-                                statusbar.SetText(SR.GetString(SR.StatusAnalysisSaved) + " " + statsMessage);
-                            }
-                        } else if(statsMessage != null) {
-                            var statusbar = (IVsStatusbar)NodejsPackage.GetGlobalService(typeof(SVsStatusbar));
-                            if (statusbar != null) {
-                                statusbar.SetText(statsMessage);
-                            }
+                        // Don't update status or save to disk for implicit projects,
+                        // otherwise we end up overloading the status bar with conflicting messages.
+                        if (!_analyzer._implicitProject) {
+                            var elapsedTime = TimeSpan.FromMilliseconds(watch.ElapsedMilliseconds - startTime);
+                            UpdateAnalysisStatusAndSaveToDisk(analyzedAnything, elapsedTime);
                         }
 
                         _isAnalyzing = false;
@@ -223,6 +202,35 @@ namespace Microsoft.NodejsTools.Intellisense {
                     }
                 }
                 _isAnalyzing = false;
+            }
+
+            private void UpdateAnalysisStatusAndSaveToDisk(bool analyzedAnything, TimeSpan elapsedTime) {
+                string statsMessage = null;
+                if (_analyzer._jsAnalyzer != null) {
+                    int count = _analyzer._jsAnalyzer.GetAndClearAnalysisCount();
+                    if (count != 0) {
+                        statsMessage = SR.GetString(SR.StatusAnalysisUpToDate, count, FormatTime(elapsedTime));
+                    }
+                }
+
+                if (_analyzer._saveToDisk && analyzedAnything && (DateTime.Now - _lastSave) > _SaveAnalysisTime) {
+                    var statusbar = (IVsStatusbar)NodejsPackage.GetGlobalService(typeof(SVsStatusbar));
+                    if (statusbar != null) {
+                        statusbar.SetText(SR.GetString(SR.StatusAnalysisSaving) + " " + statsMessage);
+                    }
+
+                    _analyzer.SaveAnalysis();
+                    _lastSave = DateTime.Now;
+
+                    if (statusbar != null) {
+                        statusbar.SetText(SR.GetString(SR.StatusAnalysisSaved) + " " + statsMessage);
+                    }
+                } else if (statsMessage != null) {
+                    var statusbar = (IVsStatusbar)NodejsPackage.GetGlobalService(typeof(SVsStatusbar));
+                    if (statusbar != null) {
+                        statusbar.SetText(statsMessage);
+                    }
+                }
             }
 
             private static string FormatTime(TimeSpan elapsedTime) {

@@ -128,15 +128,16 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     _npmController.PathToNpm));
         }
 
-        private async Task<bool> InstallPackageByVersionAsync(
+        private Task<bool> InstallPackageByVersionAsync(
+            string pathToRootDirectory,
             string packageName,
             string versionRange,
             DependencyType type,
             bool global,
             bool saveToPackageJson) {
-            return await DoCommandExecute(true,
+            return DoCommandExecute(true,
                 new NpmInstallCommand(
-                    _npmController.FullPathToRootPackageDirectory,
+                    pathToRootDirectory,
                     packageName,
                     versionRange,
                     type,
@@ -145,16 +146,20 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     _npmController.PathToNpm));
         }
 
-        public async Task<bool> InstallPackageByVersionAsync(
+        public Task<bool> InstallPackageByVersionAsync(
             string packageName,
             string versionRange,
             DependencyType type,
             bool saveToPackageJson) {
-            return await InstallPackageByVersionAsync(packageName, versionRange, type, false, saveToPackageJson);
+            return InstallPackageByVersionAsync(_npmController.FullPathToRootPackageDirectory, packageName, versionRange, type, false, saveToPackageJson);
         }
 
-        public async Task<bool> InstallGlobalPackageByVersionAsync(string packageName, string versionRange) {
-            return await InstallPackageByVersionAsync(packageName, versionRange, DependencyType.Standard, true, false);
+        public Task<bool> InstallGlobalPackageByVersionAsync(string packageName, string versionRange) {
+            return InstallPackageByVersionAsync(_npmController.FullPathToRootPackageDirectory,packageName, versionRange, DependencyType.Standard, true, false);
+        }
+
+        public Task<bool> InstallPackageToFolderByVersionAsync(string pathToRootDirectory, string packageName, string versionRange, bool saveToPackageJson) {
+            return InstallPackageByVersionAsync(pathToRootDirectory, packageName, versionRange, DependencyType.Standard, false, saveToPackageJson);
         }
 
         private DependencyType GetDependencyType(string packageName) {

@@ -147,24 +147,67 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private void TryToAcquireTypings(IEnumerable<string> packages) {
-            bool isNewTypingsFolder = !Directory.Exists(Path.Combine(this.ProjectHome, "typings"));
-            if (ShouldAcquireTypingsAutomatically && TypingsAcquirer != null) {
-                TypingsAcquirer
-                    .AcquireTypings(packages, null /*redirector*/)
-                    .ContinueWith(x => {
-                        if (NodejsPackage.Instance.IntellisenseOptionsPage.ShowTypingsInfoBar &&
-                            x.Result &&
-                            isNewTypingsFolder) {
-                                NodejsPackage.Instance.GetUIThread().Invoke(() => {
-                                    TypingsInfoBar.Instance.ShowInfoBar();
-                                });
-                            }
-                    });
+            if (!ShouldAcquireTypingsAutomatically || TypingsAcquirer == null) {
+                return;
+            }
+
+            IVsStatusbar statusBar = (IVsStatusbar)NodejsPackage.Instance.GetService(typeof(SVsStatusbar));
+            object statusIcon = (short)Constants.SBAI_General;
+
+            bool statusSetSuccess = TrySetTypingsLoadingStatusBar(statusBar, statusIcon);
+
+            var typingsPath = Path.Combine(this.ProjectHome, "typings");
+            bool hadExistingTypingsFolder = Directory.Exists(typingsPath);
+            TypingsAcquirer
+                .AcquireTypings(packages, null /*redirector*/)
+                .ContinueWith(x => {
+                    if (NodejsPackage.Instance.IntellisenseOptionsPage.ShowTypingsInfoBar &&
+                        x.Result &&
+                        (!hadExistingTypingsFolder && Directory.Exists(typingsPath))) {
+                        NodejsPackage.Instance.GetUIThread().Invoke(() => {
+                            TypingsInfoBar.Instance.ShowInfoBar();
+                        });
+                    }
+                    TrySetTypingsLoadedStatusBar(statusBar, statusIcon, statusSetSuccess);
+                });
+        }
+
+        private static bool TrySetTypingsLoadingStatusBar(IVsStatusbar statusBar, object icon) {
+            if (statusBar != null && !IsStatusBarFrozen(statusBar)) {
+                statusBar.SetText(SR.GetString(SR.StatusTypingsLoading));
+                statusBar.Animation(1, ref icon);
+                if (ErrorHandler.Succeeded(statusBar.FreezeOutput(1))) {
+                    return true;
+                }
+                Debug.Fail("Failed to freeze typings status bar");
+            }
+            return false;
+        }
+
+        private static void TrySetTypingsLoadedStatusBar(IVsStatusbar statusBar, object icon, bool statusSetSuccess) {
+            if (statusBar != null && (statusSetSuccess || !IsStatusBarFrozen(statusBar))) {
+                if (!ErrorHandler.Succeeded(statusBar.FreezeOutput(0))) {
+                    Debug.Fail("Failed to unfreeze typings status bar");
+                    return;
+                }
+
+                statusBar.Animation(0, ref icon);
+                statusBar.SetText(SR.GetString(SR.StatusTypingsLoaded));
             }
         }
 
+        private static bool IsStatusBarFrozen(IVsStatusbar statusBar) {
+            int frozen;
+            statusBar.IsFrozen(out frozen);
+            return frozen == 1;
+        }
+
         private void TryToAcquireCurrentTypings() {
-            var controller = ModulesNode != null ? ModulesNode.NpmController : null;
+            if (!ShouldAcquireTypingsAutomatically || TypingsAcquirer == null) {
+                return;
+            }
+
+            var controller = ModulesNode?.NpmController;
             if (controller == null) {
                 return;
             }
@@ -176,7 +219,7 @@ namespace Microsoft.NodejsTools.Project {
                     || package.IsDevDependency
                     || !package.IsListedInParentPackageJson);
 
-            TryToAcquireTypings(currentPackages.Select(package => package.Name));
+            TryToAcquireTypings(currentPackages.Select(package => package.Name).Concat(new[] { "node" }));
         }
 #endif
 
@@ -568,16 +611,6 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        /*
-         * Needed if we switch to per project Analysis levels
-        internal NodejsTools.Options.AnalysisLevel AnalysisLevel(){
-            var analyzer = _analyzer;
-            if (_analyzer != null) {
-                return _analyzer.AnalysisLevel;
-            }
-            return NodejsTools.Options.AnalysisLevel.None;
-        }
-        */
         private void IntellisenseOptionsPageAnalysisLevelChanged(object sender, EventArgs e) {
             var oldAnalyzer = _analyzer;
             _analyzer = null;
@@ -591,6 +624,9 @@ namespace Microsoft.NodejsTools.Project {
                 }
             }
             _analyzer = analyzer;
+#if DEV14
+            TryToAcquireCurrentTypings();
+#endif
         }
 
         private void AnalysisLogMaximumChanged(object sender, EventArgs e) {

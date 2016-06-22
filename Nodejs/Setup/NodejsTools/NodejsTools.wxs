@@ -15,6 +15,7 @@
             <Directory Id="Dir_$(var.key)TestFrameworks" Name="TestFrameworks">
                 <Directory Id="Dir_$(var.key)TestFrameworksExportRunner" Name="ExportRunner" />
                 <Directory Id="Dir_$(var.key)TestFrameworksMocha" Name="Mocha" />
+                <Directory Id="Dir_$(var.key)TestFrameworksTape" Name="Tape" />
             </Directory>
             <Directory Id="Dir_$(var.key)InstallLocationScripts" Name="Scripts">
                 <Directory Id="Dir_$(var.key)InstallLocationScriptsTypings" Name="Typings">
