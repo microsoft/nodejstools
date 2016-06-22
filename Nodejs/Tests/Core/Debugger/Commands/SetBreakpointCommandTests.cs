@@ -15,6 +15,8 @@
 //*********************************************************//
 
 using System;
+using System.IO;
+using System.Text.RegularExpressions;
 using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -23,6 +25,37 @@ using Newtonsoft.Json.Linq;
 namespace NodejsTests.Debugger.Commands {
     [TestClass]
     public class SetBreakpointCommandTests {
+        [TestMethod, Priority(0), TestCategory("Debugging")]
+        public void CreateLocalScriptRegExpShouldCreateCaseInSensitiveRegularExpression() {
+            const string drive = "c:";
+            var pathParts = new[] { "nOdE", "IS", "awesome.js" };
+            string fileName = Path.Combine(drive, Path.Combine(pathParts));
+
+            var scriptRegExp = new Regex(SetBreakpointCommand.CreateLocalScriptRegExp(fileName));
+
+            Assert.IsTrue(scriptRegExp.IsMatch(fileName));
+            Assert.IsTrue(scriptRegExp.IsMatch(fileName.ToUpperInvariant()));
+            Assert.IsTrue(scriptRegExp.IsMatch(fileName.ToLowerInvariant()));
+
+            Assert.IsTrue(scriptRegExp.IsMatch(Path.Combine(drive.ToUpperInvariant(), Path.Combine(pathParts))));
+            Assert.IsTrue(scriptRegExp.IsMatch(Path.Combine(drive.ToLowerInvariant(), Path.Combine(pathParts))));
+        }
+
+        [TestMethod, Priority(0), TestCategory("Debugging")]
+        public void CreateLocalScriptRegExpShouldOnlyMatchExactPath() {
+            const string drive = "c:";
+            var pathParts = new[] { "nOdE", "IS", "awsome.js" };
+            string fileName = Path.Combine(drive, Path.Combine(pathParts));
+
+            var scriptRegExp = new Regex(SetBreakpointCommand.CreateLocalScriptRegExp(fileName));
+       
+            Assert.IsFalse(scriptRegExp.IsMatch(Path.Combine("d:", Path.Combine(pathParts))));
+
+             Assert.IsFalse(scriptRegExp.IsMatch(fileName + 'x'));
+             Assert.IsFalse(scriptRegExp.IsMatch(Path.Combine(fileName, "x")));
+             Assert.IsFalse(scriptRegExp.IsMatch("x" + fileName));
+        }
+
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void CreateSetBreakpointCommand() {
             // Arrange
@@ -114,8 +147,8 @@ namespace NodejsTests.Debugger.Commands {
             Assert.AreEqual(commandId, setBreakpointCommand.Id);
             Assert.AreEqual(
                 string.Format(
-                    "{{\"command\":\"setbreakpoint\",\"seq\":{0},\"type\":\"request\",\"arguments\":{{\"line\":{1},\"column\":{2},\"type\":\"script\",\"target\":\"{3}\",\"ignoreCount\":1}}}}",
-                    commandId, line, column, fileName.Replace(@"\", @"\\")),
+                    "{{\"command\":\"setbreakpoint\",\"seq\":{0},\"type\":\"request\",\"arguments\":{{\"line\":{1},\"column\":{2},\"type\":\"scriptRegExp\",\"target\":\"{3}\",\"ignoreCount\":1}}}}",
+                    commandId, line, column, SetBreakpointCommand.CreateLocalScriptRegExp(fileName).Replace(@"\", @"\\")),
                 setBreakpointCommand.ToString());
         }
 

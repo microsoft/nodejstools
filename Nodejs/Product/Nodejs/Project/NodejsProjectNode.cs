@@ -151,6 +151,11 @@ namespace Microsoft.NodejsTools.Project {
                 return;
             }
 
+            IVsStatusbar statusBar = (IVsStatusbar)NodejsPackage.Instance.GetService(typeof(SVsStatusbar));
+            object statusIcon = (short)Constants.SBAI_General;
+
+            bool statusSetSuccess = TrySetTypingsLoadingStatusBar(statusBar, statusIcon);
+
             var typingsPath = Path.Combine(this.ProjectHome, "typings");
             bool hadExistingTypingsFolder = Directory.Exists(typingsPath);
             TypingsAcquirer
@@ -163,7 +168,38 @@ namespace Microsoft.NodejsTools.Project {
                             TypingsInfoBar.Instance.ShowInfoBar();
                         });
                     }
+                    TrySetTypingsLoadedStatusBar(statusBar, statusIcon, statusSetSuccess);
                 });
+        }
+
+        private static bool TrySetTypingsLoadingStatusBar(IVsStatusbar statusBar, object icon) {
+            if (statusBar != null && !IsStatusBarFrozen(statusBar)) {
+                statusBar.SetText(SR.GetString(SR.StatusTypingsLoading));
+                statusBar.Animation(1, ref icon);
+                if (ErrorHandler.Succeeded(statusBar.FreezeOutput(1))) {
+                    return true;
+                }
+                Debug.Fail("Failed to freeze typings status bar");
+            }
+            return false;
+        }
+
+        private static void TrySetTypingsLoadedStatusBar(IVsStatusbar statusBar, object icon, bool statusSetSuccess) {
+            if (statusBar != null && (statusSetSuccess || !IsStatusBarFrozen(statusBar))) {
+                if (!ErrorHandler.Succeeded(statusBar.FreezeOutput(0))) {
+                    Debug.Fail("Failed to unfreeze typings status bar");
+                    return;
+                }
+
+                statusBar.Animation(0, ref icon);
+                statusBar.SetText(SR.GetString(SR.StatusTypingsLoaded));
+            }
+        }
+
+        private static bool IsStatusBarFrozen(IVsStatusbar statusBar) {
+            int frozen;
+            statusBar.IsFrozen(out frozen);
+            return frozen == 1;
         }
 
         private void TryToAcquireCurrentTypings() {

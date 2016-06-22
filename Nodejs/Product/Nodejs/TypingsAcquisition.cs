@@ -65,14 +65,32 @@ namespace Microsoft.NodejsTools {
 
         public Task<bool> AcquireTypings(IEnumerable<string> packages, Redirector redirector) {
             return typingsToolGlobalWorkSemaphore.WaitAsync().ContinueWith(async _ => {
-                var typingsToAquire = GetNewTypingsToAcquire(packages);
-                var success = await DownloadTypings(typingsToAquire, redirector);
-                if (success) {
-                    _acquiredTypingsPackageNames.Value.UnionWith(typingsToAquire);
+                try {
+                    return await DownloadTypingsForPackages(packages, redirector) && await DownloadTypingsForProject(redirector);
+                } finally {
+                    typingsToolGlobalWorkSemaphore.Release();
                 }
-                typingsToolGlobalWorkSemaphore.Release();
-                return success;
             }).Unwrap();
+        }
+
+        private async Task<bool> DownloadTypingsForProject(Redirector redirector) {
+            if (!File.Exists(Path.Combine(_pathToRootProjectDirectory, "typings.json"))) {
+                return true;
+            }
+            return await ExecuteTypingsTool(new[] { "install" }, redirector);
+        }
+
+        private async Task<bool> DownloadTypingsForPackages(IEnumerable<string> packages, Redirector redirector) {
+            var typingsToAquire = GetNewTypingsToAcquire(packages);
+            if (!typingsToAquire.Any()) {
+                return true;
+            }
+
+            var success = await ExecuteTypingsTool(GetTypingsToolInstallArguments(packages), redirector);
+            if (success) {
+                _acquiredTypingsPackageNames.Value.UnionWith(typingsToAquire);
+            }
+            return success;
         }
 
         private IEnumerable<string> GetNewTypingsToAcquire(IEnumerable<string> packages) {
@@ -80,22 +98,16 @@ namespace Microsoft.NodejsTools {
             return packages.Where(package => !currentTypings.Contains(package));
         }
 
-        private async Task<bool> DownloadTypings(IEnumerable<string> packages, Redirector redirector) {
-            if (!packages.Any()) {
-                return true;
-            }
-
+        private async Task<bool> ExecuteTypingsTool(IEnumerable<string> arguments, Redirector redirector) {
             string typingsTool = await EnsureTypingsToolInstalled();
             if (string.IsNullOrEmpty(typingsTool)) {
-                if (redirector != null) {
-                    redirector.WriteErrorLine(SR.GetString(SR.TypingsToolNotInstalledError));
-                }
+                redirector?.WriteErrorLine(SR.GetString(SR.TypingsToolNotInstalledError));
                 return false;
             }
 
             using (var process = ProcessOutput.Run(
                 typingsTool,
-                GetTypingsToolInstallArguments(packages),
+                arguments,
                 _pathToRootProjectDirectory,
                 null,
                 false,
@@ -104,22 +116,16 @@ namespace Microsoft.NodejsTools {
                 if (!process.IsStarted) {
                     // Process failed to start, and any exception message has
                     // already been sent through the redirector
-                    if (redirector != null) {
-                        redirector.WriteErrorLine("could not start 'typings'");
-                    }
+                    redirector?.WriteErrorLine("could not start 'typings'");
                     return false;
                 }
                 var i = await process;
                 if (i == 0) {
-                    if (redirector != null) {
-                        redirector.WriteLine(SR.GetString(SR.TypingsToolInstallCompleted));
-                    }
+                    redirector?.WriteLine(SR.GetString(SR.TypingsToolInstallCompleted));
                     return true;
                 } else {
                     process.Kill();
-                    if (redirector != null) {
-                        redirector.WriteErrorLine(SR.GetString(SR.TypingsToolInstallErrorOccurred));
-                    }
+                    redirector?.WriteErrorLine(SR.GetString(SR.TypingsToolInstallErrorOccurred));
                     return false;
                 }
             }

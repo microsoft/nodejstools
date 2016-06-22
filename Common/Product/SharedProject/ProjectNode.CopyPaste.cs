@@ -152,9 +152,8 @@ namespace Microsoft.VisualStudioTools.Project {
 
             int returnValue;
             try {
-                DropDataType dropDataType = DropDataType.None;
                 pdwEffect = (uint)QueryDropEffect(grfKeyState);
-                dropDataType = ProcessSelectionDataObject(pDataObject, targetNode, true, (DropEffect)pdwEffect);
+                DropDataType dropDataType = ProcessSelectionDataObject(pDataObject, targetNode, true, (DropEffect)pdwEffect);
                 if (dropDataType == DropDataType.None) {
                     pdwEffect = (uint)DropEffect.None;
                 }

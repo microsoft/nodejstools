@@ -43,7 +43,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 if (null == _binDirectory) {
                     var temp = StandardOutput;
                     if (null != temp) {
-                        temp.Trim();
+                        temp = temp.Trim();
                         if (temp.Length > 0) {
                             // The standard output contains an informational 
                             // message added by the base command class through 

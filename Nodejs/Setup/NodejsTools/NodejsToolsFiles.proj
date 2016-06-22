@@ -68,11 +68,9 @@
             <InstallDirectory>AllItemTemplates</InstallDirectory>
         </File>
 
-        <ProjectTemplate Include="ProjectTemplates\JavaScript\Node.js\1033\AzureExpressApp.zip;
-                                  ProjectTemplates\JavaScript\Node.js\1033\AzureExpress4App.zip;
+        <ProjectTemplate Include="ProjectTemplates\JavaScript\Node.js\1033\AzureExpress4App.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\AzureStarterExpressApp.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\AzureNodejsApp.zip;
-                                  ProjectTemplates\JavaScript\Node.js\1033\ExpressApp.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\Express4App.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\StarterExpressApp.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\FromExistingCode.zip;
