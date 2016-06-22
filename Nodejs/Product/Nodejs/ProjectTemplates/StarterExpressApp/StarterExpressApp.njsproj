@@ -47,6 +47,7 @@
     <Content Include="public\javascripts\respond.min.js" />
     <Content Include="public\javascripts\_references.js" />
     <Content Include="package.json" />
+    <Content Include="typings.json" />
     <Content Include="public\fonts\glyphicons-halflings-regular.eot" />
     <Content Include="public\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="public\fonts\glyphicons-halflings-regular.ttf" />

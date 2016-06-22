@@ -241,11 +241,7 @@ namespace Microsoft.VisualStudio.Repl {
             }
 
             if (entries.Length > 0) {
-                for (int i = 0; i < entries.Length; i++) {
-                    var entry = entries[i];
-
-                    _window.AppendOutput(entry.Properties.Color, entry.Buffer.ToString(), i == entries.Length - 1);
-                }
+                _window.AppendOutput(entries);
                 _window.TextView.Caret.EnsureVisible();
             }
         }
@@ -254,7 +250,7 @@ namespace Microsoft.VisualStudio.Repl {
             _timer.IsEnabled = false;
         }
 
-        struct OutputEntry {
+        public struct OutputEntry {
             public readonly StringBuilder Buffer;
             public readonly OutputEntryProperties Properties;
 
@@ -267,7 +263,7 @@ namespace Microsoft.VisualStudio.Repl {
         /// <summary>
         /// Properties for a run of text - includes destination (stdout/stderr) and color
         /// </summary>
-        struct OutputEntryProperties {
+        internal struct OutputEntryProperties {
             public readonly OutputEntryKind Kind;
             public readonly ConsoleColor Color;
 
@@ -298,7 +294,7 @@ namespace Microsoft.VisualStudio.Repl {
             }
         }
 
-        enum OutputEntryKind {
+        internal enum OutputEntryKind {
             StdOut,
             StdErr
         }

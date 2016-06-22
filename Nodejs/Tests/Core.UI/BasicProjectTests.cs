@@ -229,7 +229,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void TestAddExistingFolder() {
+        public void AddExistingFolder() {
             using (var app = new VisualStudioApp()) {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\AddExistingFolder.sln");
                 
@@ -265,7 +265,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestAddExistingFolderProject() {
+        public void AddExistingFolderProject() {
             using (var app = new VisualStudioApp()) {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\AddExistingFolder.sln");
 
@@ -289,7 +289,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void TestAddExistingFolderDebugging() {
+        public void AddExistingFolderDebugging() {
             using (var app = new VisualStudioApp()) {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\AddExistingFolder.sln");
 
@@ -512,7 +512,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void TestAutomationProperties() {
+        public void AutomationProperties() {
             using (var app = new VisualStudioApp()) {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
@@ -581,7 +581,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void TestAutomationProject() {
+        public void AutomationProject() {
             using (var app = new VisualStudioApp()) {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
@@ -622,7 +622,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestProjectItemAutomation() {
+        public void ProjectItemAutomation() {
             using (var app = new VisualStudioApp()) {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
@@ -644,7 +644,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestRelativePaths() {
+        public void RelativePaths() {
             // link to outside file should show up as top-level item
             using (var app = new VisualStudioApp()) {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\RelativePaths.sln");

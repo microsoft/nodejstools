@@ -1427,14 +1427,12 @@ namespace SQLite
 
 			try {
 				rowsAffected = Execute (q, ps.ToArray ());
-			}
-			catch (SQLiteException ex) {
-
+			} catch (SQLiteException ex) {
 				if (ex.Result == SQLite3.Result.Constraint && SQLite3.ExtendedErrCode (this.Handle) == SQLite3.ExtendedResult.ConstraintNotNull) {
-					throw NotNullConstraintViolationException.New (ex, map, obj);
+					throw NotNullConstraintViolationException.New(ex, map, obj);
 				}
 
-				throw ex;
+				throw;
 			}
 
 			if (rowsAffected > 0)
@@ -2093,9 +2091,8 @@ namespace SQLite
 				Debug.WriteLine ("Executing: " + this);
 			}
 			
-			var r = SQLite3.Result.OK;
 			var stmt = Prepare ();
-			r = SQLite3.Step (stmt);
+			var r = SQLite3.Step (stmt);
 			Finalize (stmt);
 			if (r == SQLite3.Result.Done) {
 				int rowsAffected = SQLite3.Changes (_conn.Handle);
@@ -2402,8 +2399,6 @@ namespace SQLite
 				Debug.WriteLine ("Executing: " + CommandText);
 			}
 
-			var r = SQLite3.Result.OK;
-
 			if (!Initialized) {
 				Statement = Prepare ();
 				Initialized = true;
@@ -2415,7 +2410,7 @@ namespace SQLite
 					SQLiteCommand.BindParameter (Statement, i + 1, source [i], Connection.StoreDateTimeAsTicks);
 				}
 			}
-			r = SQLite3.Step (Statement);
+			var r = SQLite3.Step (Statement);
 
 			if (r == SQLite3.Result.Done) {
 				int rowsAffected = SQLite3.Changes (Connection.Handle);

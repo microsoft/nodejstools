@@ -16,13 +16,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.Linq;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Editor.OptionsExtensionMethods;
 using Microsoft.VisualStudio.Text.Tagging;
-using Microsoft.VisualStudio.Utilities;
 
 namespace Microsoft.NodejsTools {
     sealed class SmartIndent : ISmartIndent {
@@ -45,20 +43,17 @@ namespace Microsoft.NodejsTools {
 
         #region ISmartIndent Members
 
-        public int? GetDesiredIndentation(VisualStudio.Text.ITextSnapshotLine line) {
-            var dte = (EnvDTE.DTE)NodejsPackage.GetGlobalService(typeof(EnvDTE.DTE));
-
-            var props = dte.get_Properties("TextEditor", "Node.js");
-            switch ((EnvDTE._vsIndentStyle)(int)props.Item("IndentStyle").Value) {
-                case EnvDTE._vsIndentStyle.vsIndentStyleNone:
+        public int? GetDesiredIndentation(ITextSnapshotLine line) {
+            switch (NodejsPackage.Instance.LangPrefs.IndentMode) {
+                case VisualStudio.TextManager.Interop.vsIndentStyle.vsIndentStyleNone:
                     return null;
-                case EnvDTE._vsIndentStyle.vsIndentStyleDefault:
+                case VisualStudio.TextManager.Interop.vsIndentStyle.vsIndentStyleDefault:
                     return DoBlockIndent(line);
-                case EnvDTE._vsIndentStyle.vsIndentStyleSmart:
+                case VisualStudio.TextManager.Interop.vsIndentStyle.vsIndentStyleSmart:
                     return DoSmartIndent(line);
+                default:
+                    return null;
             }
-
-            return null;
         }
 
         #endregion
@@ -241,6 +236,10 @@ namespace Microsoft.NodejsTools {
         /// Enumerates all of the classifications in reverse starting at start to the beginning of the file.
         /// </summary>
         private static IEnumerator<ITagSpan<ClassificationTag>> EnumerateClassificationsInReverse(ITagger<ClassificationTag> classifier, SnapshotPoint start) {
+            if (classifier == null) {
+                yield break;
+            }
+
             var curLine = start.GetContainingLine();
             var spanEnd = start;
 

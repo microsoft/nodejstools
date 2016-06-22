@@ -55,8 +55,10 @@
         </File>
 
         <ItemTemplate Include="ItemTemplates\JavaScript\UnitTest.zip;
+                               ItemTemplates\JavaScript\TapeUnitTest.zip;
                                ItemTemplates\JavaScript\MochaUnitTest.zip;
                                ItemTemplates\JavaScript\TypeScriptUnitTest.zip;
+                               ItemTemplates\JavaScript\TypeScriptTapeUnitTest.zip;
                                ItemTemplates\JavaScript\TypeScriptMochaUnitTest.zip;
                                ItemTemplates\JavaScript\DockerfileTemplate.zip"/>
                                
@@ -64,11 +66,9 @@
             <InstallDirectory>AllItemTemplates</InstallDirectory>
         </File>
 
-        <ProjectTemplate Include="ProjectTemplates\JavaScript\Node.js\1033\AzureExpressApp.zip;
-                                  ProjectTemplates\JavaScript\Node.js\1033\AzureExpress4App.zip;
+        <ProjectTemplate Include="ProjectTemplates\JavaScript\Node.js\1033\AzureExpress4App.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\AzureStarterExpressApp.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\AzureNodejsApp.zip;
-                                  ProjectTemplates\JavaScript\Node.js\1033\ExpressApp.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\Express4App.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\StarterExpressApp.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\FromExistingCode.zip;
@@ -162,7 +162,11 @@
         <File Include="TestFrameworks\mocha\mocha.js">
             <InstallDirectory>TestFrameworksMocha</InstallDirectory>
         </File>
-
+        
+        <File Include="TestFrameworks\tape\tape.js">
+            <InstallDirectory>TestFrameworksTape</InstallDirectory>
+        </File>
+        
         <!-- Remote Debug files -->
         <File Include="License.html;
                        Debugger\RemoteDebug\RemoteDebug.js;

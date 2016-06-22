@@ -100,8 +100,8 @@ namespace Microsoft.NodejsTools.Project {
                 var process = NodeProcess.Start(
                     psi,
                     NodejsPackage.Instance.GeneralOptionsPage.WaitOnAbnormalExit,
-                    NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit
-                );
+                    NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit);
+                _project.OnDispose += process.ResponseToTerminateEvent;
 
                 if (startBrowser && uri != null) {
                     OnPortOpenedHandler.CreateHandler(
@@ -167,15 +167,6 @@ namespace Microsoft.NodejsTools.Project {
             builder.Port = port;
 
             return builder.ToString();
-        }
-
-        private string TestServerPortString {
-            get {
-                if (!_testServerPort.HasValue) {
-                    _testServerPort = GetFreePort();
-                }
-                return _testServerPort.Value.ToString(CultureInfo.InvariantCulture);
-            }
         }
 
         private int TestServerPort {

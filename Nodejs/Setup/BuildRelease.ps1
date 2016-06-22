@@ -367,26 +367,8 @@ if ($internal -or $release -or $mockrelease) {
     $outdir = "$outdir\$buildnumber"
 }
 
-$target_versions = @()
-
-if ($vstarget) {
-    $vstarget = $vstarget | %{ "{0:00.0}" -f [float]::Parse($_) }
-}
-foreach ($target_vs in $supported_vs_versions) {
-        if ((-not $vstarget -and $target_vs.build_by_default) -or ($target_vs.number -in $vstarget)) {
-        $vspath = Get-ItemProperty -Path "HKLM:\Software\Wow6432Node\Microsoft\VisualStudio\$($target_vs.number)" -EA 0
-        if (-not $vspath) {
-            $vspath = Get-ItemProperty -Path "HKLM:\Software\Microsoft\VisualStudio\$($target_vs.number)" -EA 0
-        }
-        if ($vspath -and $vspath.InstallDir -and (Test-Path -Path $vspath.InstallDir)) {
-            $target_versions += $target_vs
-        }
-    }
-}
-
-if (-not $target_versions) {
-    Throw "No supported versions of Visual Studio installed."
-}
+Import-Module -Force $buildroot\Build\VisualStudioHelpers.psm1
+$target_versions = get_target_vs_versions $vstarget
 
 if ($skipdebug) {
     $target_configs = ("Release")

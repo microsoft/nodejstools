@@ -72,7 +72,7 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestExcludedErrors() {
+        public void ExcludedErrors() {
             var project = Project("TestExcludedErrors",
                 Compile("server", "function f(a, b, c) { }\r\n\r\n"),
                 Compile("excluded", "aa bb", isExcluded: true)
@@ -101,7 +101,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestDebuggerPort() {
+        public void DebuggerPort() {
             var filename = Path.Combine(TestData.GetTempPath(), Path.GetRandomFileName());
             Console.WriteLine("Temp file is: {0}", filename);
             var code = String.Format(@"
@@ -134,7 +134,7 @@ while(true) {{
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestEnvironmentVariables() {
+        public void EnvironmentVariables() {
             var filename = Path.Combine(TestData.GetTempPath(), Path.GetRandomFileName());
             Console.WriteLine("Temp file is: {0}", filename);
             var code = String.Format(@"
@@ -167,7 +167,7 @@ while(true) {{
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestEnvironmentVariablesNoDebugging() {
+        public void EnvironmentVariablesNoDebugging() {
             var filename = Path.Combine(TestData.GetTempPath(), Path.GetRandomFileName());
             Console.WriteLine("Temp file is: {0}", filename);
             var code = String.Format(@"
@@ -197,7 +197,7 @@ require('fs').writeFileSync('{0}', process.env.fob + process.env.bar + process.e
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void TestProjectProperties() {
+        public void ProjectProperties() {
             var filename = Path.Combine(TestData.GetTempPath(), Path.GetRandomFileName());
 
             var project = Project("ProjectProperties",
@@ -251,7 +251,7 @@ require('fs').writeFileSync('{0}', process.env.fob + process.env.bar + process.e
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestClientServerIntelliSenseModes() {
+        public void ClientServerIntelliSenseModes() {
             string
                 solutionLabel = "Solution 'ClientServerCode' (1 project)",
                 projectLabel = "ClientServerCode",

@@ -248,7 +248,8 @@ namespace Microsoft.NodejsTools.Debugger {
         internal bool IsRunning() {
             var backtraceCommand = new BacktraceCommand(CommandId, _resultFactory, fromFrame: 0, toFrame: 1);
             var tokenSource = new CancellationTokenSource(_timeout);
-            if (TrySendRequestAsync(backtraceCommand, tokenSource.Token).GetAwaiter().GetResult()) {
+            var task = TrySendRequestAsync(backtraceCommand, tokenSource.Token);
+            if (task.Wait(_timeout) && task.Result) {
                 return backtraceCommand.Running;
             }
             return false;
@@ -480,42 +481,36 @@ namespace Microsoft.NodejsTools.Debugger {
         /// to give time to attach to debugger events.
         /// </summary>
         public void StartListening() {
+            LiveLogger.WriteLine("NodeDebugger start listening");
+
             _connection.Connect(_debuggerEndpointUri);
 
             var mainThread = new NodeThread(this, MainThreadId, false);
             _threads[mainThread.Id] = mainThread;
 
             if (!GetScriptsAsync().Wait((int)_timeout.TotalMilliseconds)) {
+                LiveLogger.WriteLine("NodeDebugger GetScripts timeout");
                 throw new TimeoutException("Timed out while retrieving scripts from debuggee.");
             }
 
             if (!SetExceptionBreakAsync().Wait((int)_timeout.TotalMilliseconds)) {
+                LiveLogger.WriteLine("NodeDebugger SetException timeout");
                 throw new TimeoutException("Timed out while setting up exception handling in debuggee.");
             }
 
             var backTraceTask = PerformBacktraceAsync();
             if (!backTraceTask.Wait((int)_timeout.TotalMilliseconds)) {
+                LiveLogger.WriteLine("NodeDebugger backtrace timeout");
                 throw new TimeoutException("Timed out while performing initial backtrace.");
             }
 
             // At this point we can fire events
-            EventHandler<ThreadEventArgs> newThread = ThreadCreated;
-            if (newThread != null) {
-                newThread(this, new ThreadEventArgs(mainThread));
-            }
-            EventHandler<ThreadEventArgs> procLoaded = ProcessLoaded;
-            if (procLoaded != null) {
-                procLoaded(this, new ThreadEventArgs(MainThread));
-            }
-
+            ThreadCreated?.Invoke(this, new ThreadEventArgs(mainThread));
+            ProcessLoaded?.Invoke(this, new ThreadEventArgs(MainThread));
         }
 
         private void OnConnectionClosed(object sender, EventArgs args) {
-            EventHandler<ThreadEventArgs> threadExited = ThreadExited;
-            if (threadExited != null) {
-                threadExited(this, new ThreadEventArgs(MainThread));
-            }
-
+            ThreadExited?.Invoke(this, new ThreadEventArgs(MainThread));
             Terminate(false);
         }
 
@@ -535,15 +530,13 @@ namespace Microsoft.NodejsTools.Debugger {
             foreach (NodeModule module in modules) {
                 NodeModule newModule;
                 if (GetOrAddModule(module, out newModule)) {
-                    if (newModule.FileName != newModule.JavaScriptFileName) {
-                        foreach (var breakpoint in _breakpointBindings) {
-                            var target = breakpoint.Value.Breakpoint.Target;
-                            if (target.FileName == newModule.FileName) {
-                                // attempt to rebind the breakpoint
-                                DebuggerClient.RunWithRequestExceptionsHandled(async () => {
-                                    await breakpoint.Value.Breakpoint.BindAsync().WaitAsync(TimeSpan.FromSeconds(2));
-                                });
-                            }
+                    foreach (var breakpoint in _breakpointBindings) {
+                        var target = breakpoint.Value.Breakpoint.Target;
+                        if (target.FileName.Equals(newModule.FileName, StringComparison.OrdinalIgnoreCase)) {
+                            // attempt to rebind the breakpoint
+                            DebuggerClient.RunWithRequestExceptionsHandled(async () => {
+                                await breakpoint.Value.Breakpoint.BindAsync().WaitAsync(TimeSpan.FromSeconds(2));
+                            });
                         }
                     }
 

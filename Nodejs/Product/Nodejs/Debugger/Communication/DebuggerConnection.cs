@@ -186,6 +186,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                 }
             } catch (SocketException) {
             } catch (ObjectDisposedException) {
+            } catch (InvalidOperationException) {
             } catch (IOException) {
             } catch (Exception e) {
                 LiveLogger.WriteLine(string.Format("Failed to write message {0}.", e), typeof(DebuggerConnection));
@@ -295,6 +296,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             } catch (SocketException) {
             } catch (IOException) {
             } catch (ObjectDisposedException) {
+            } catch (InvalidOperationException) {
             } catch (DecoderFallbackException ex) {
                 LiveLogger.WriteLine(string.Format("Error decoding response body: {0}", ex), typeof(DebuggerConnection));
             } catch (JsonReaderException ex) {

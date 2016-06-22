@@ -16,12 +16,49 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal class NpmCommander : AbstractNpmLogSource, INpmCommander {
+        private class NmpCommandRunner : IDisposable {
+            private NpmCommander _commander;
+            private NpmCommand _command;
+
+            public static async Task<bool> ExecuteAsync(NpmCommander commander, NpmCommand command) {
+                using (var runner = new NmpCommandRunner(commander, command)) {
+                    return await runner._command.ExecuteAsync();
+                }
+            }
+
+            private NmpCommandRunner(NpmCommander commander, NpmCommand command) {
+                this._commander = commander;
+                this._command = command;
+
+                _commander._executingCommand = command;
+
+                _command.CommandStarted += _commander.command_CommandStarted;
+                _command.OutputLogged += _commander.command_OutputLogged;
+                _command.CommandCompleted += _commander.command_CommandCompleted;
+
+                _command.ErrorLogged += _commander.command_ErrorLogged;
+                _command.ExceptionLogged += _commander.command_ExceptionLogged;
+            }
+
+            public void Dispose() {
+                _commander._executingCommand = null;
+
+                _command.CommandStarted -= _commander.command_CommandStarted;
+                _command.OutputLogged -= _commander.command_OutputLogged;
+                _command.CommandCompleted -= _commander.command_CommandCompleted;
+
+                _command.ErrorLogged -= _commander.command_ErrorLogged;
+                _command.ExceptionLogged -= _commander.command_ExceptionLogged;
+            }
+        }
+
         private NpmController _npmController;
-        private NpmCommand _command;
+        private NpmCommand _executingCommand;
         private bool _disposed;
 
         public NpmCommander(NpmController controller) {
@@ -45,8 +82,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         public void CancelCurrentCommand() {
-            if (null != _command) {
-                _command.CancelCurrentTask();
+            if (null != _executingCommand) {
+                _executingCommand.CancelCurrentTask();
             }
         }
 
@@ -70,29 +107,10 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             OnCommandCompleted(e.Arguments, e.WithErrors, e.Cancelled);
         }
 
-        private void RegisterLogEvents(NpmCommand command) {
-            command.CommandStarted += command_CommandStarted;
-            command.OutputLogged += command_OutputLogged;
-            command.CommandCompleted += command_CommandCompleted;
-
-            command.ErrorLogged += command_ErrorLogged;
-            command.ExceptionLogged += command_ExceptionLogged;
-        }
-
-        private void UnregisterLogEvents(NpmCommand command) {
-            command.CommandStarted -= command_CommandStarted;
-            command.OutputLogged -= command_OutputLogged;
-            command.CommandCompleted -= command_CommandCompleted;
-
-            command.ErrorLogged -= command_ErrorLogged;
-            command.ExceptionLogged -= command_ExceptionLogged;
-        }
-
-        private async Task<bool> DoCommandExecute(bool refreshNpmController) {
+        private async Task<bool> DoCommandExecute(bool refreshNpmController, NpmCommand command) {
+            Debug.Assert(_executingCommand == null, "Attempting to execute multiple commands at the same time.");
             try {
-                RegisterLogEvents(_command);
-                bool success = await _command.ExecuteAsync();
-                UnregisterLogEvents(_command);
+                bool success = await NmpCommandRunner.ExecuteAsync(this, command);
                 if (refreshNpmController) {
                     _npmController.Refresh();
                 }
@@ -101,43 +119,47 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 OnOutputLogged(e.ToString());
             }
             return false;
-
         }
 
         public async Task<bool> Install() {
-            _command = new NpmInstallCommand(
-                _npmController.FullPathToRootPackageDirectory,
-                _npmController.PathToNpm);
-            return await DoCommandExecute(true);
+            return await DoCommandExecute(true,
+                new NpmInstallCommand(
+                    _npmController.FullPathToRootPackageDirectory,
+                    _npmController.PathToNpm));
         }
 
-        private async Task<bool> InstallPackageByVersionAsync(
+        private Task<bool> InstallPackageByVersionAsync(
+            string pathToRootDirectory,
             string packageName,
             string versionRange,
             DependencyType type,
             bool global,
             bool saveToPackageJson) {
-            _command = new NpmInstallCommand(
-                _npmController.FullPathToRootPackageDirectory,
-                packageName,
-                versionRange,
-                type,
-                global,
-                saveToPackageJson,
-                _npmController.PathToNpm);
-            return await DoCommandExecute(true);
+            return DoCommandExecute(true,
+                new NpmInstallCommand(
+                    pathToRootDirectory,
+                    packageName,
+                    versionRange,
+                    type,
+                    global,
+                    saveToPackageJson,
+                    _npmController.PathToNpm));
         }
 
-        public async Task<bool> InstallPackageByVersionAsync(
+        public Task<bool> InstallPackageByVersionAsync(
             string packageName,
             string versionRange,
             DependencyType type,
             bool saveToPackageJson) {
-            return await InstallPackageByVersionAsync(packageName, versionRange, type, false, saveToPackageJson);
+            return InstallPackageByVersionAsync(_npmController.FullPathToRootPackageDirectory, packageName, versionRange, type, false, saveToPackageJson);
         }
 
-        public async Task<bool> InstallGlobalPackageByVersionAsync(string packageName, string versionRange) {
-            return await InstallPackageByVersionAsync(packageName, versionRange, DependencyType.Standard, true, false);
+        public Task<bool> InstallGlobalPackageByVersionAsync(string packageName, string versionRange) {
+            return InstallPackageByVersionAsync(_npmController.FullPathToRootPackageDirectory,packageName, versionRange, DependencyType.Standard, true, false);
+        }
+
+        public Task<bool> InstallPackageToFolderByVersionAsync(string pathToRootDirectory, string packageName, string versionRange, bool saveToPackageJson) {
+            return InstallPackageByVersionAsync(pathToRootDirectory, packageName, versionRange, DependencyType.Standard, false, saveToPackageJson);
         }
 
         private DependencyType GetDependencyType(string packageName) {
@@ -157,13 +179,13 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         private async Task<bool> UninstallPackageAsync(string packageName, bool global) {
-            _command = new NpmUninstallCommand(
-                _npmController.FullPathToRootPackageDirectory,
-                packageName,
-                GetDependencyType(packageName),
-                global,
-                _npmController.PathToNpm);
-            return await DoCommandExecute(true);
+            return await DoCommandExecute(true,
+                new NpmUninstallCommand(
+                    _npmController.FullPathToRootPackageDirectory,
+                    packageName,
+                    GetDependencyType(packageName),
+                    global,
+                    _npmController.PathToNpm));
         }
 
         public async Task<bool> UninstallPackageAsync(string packageName) {
@@ -175,14 +197,14 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         public async Task<IPackageCatalog> GetCatalogAsync(bool forceDownload, IProgress<string> progress) {
-            _command = new NpmGetCatalogCommand(
+            var command = new NpmGetCatalogCommand(
                 _npmController.FullPathToRootPackageDirectory,
                 _npmController.CachePath,
                 forceDownload,
                 pathToNpm:_npmController.PathToNpm,
                 progress: progress);
-            await DoCommandExecute(false);
-            return (_command as NpmGetCatalogCommand).Catalog;
+            await DoCommandExecute(false, command);
+            return (command as NpmGetCatalogCommand).Catalog;
         }
 
         public async Task<bool> UpdatePackagesAsync() {
@@ -190,12 +212,12 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         private async Task<bool> UpdatePackagesAsync(IEnumerable<IPackage> packages, bool global) {
-            _command = new NpmUpdateCommand(
-                _npmController.FullPathToRootPackageDirectory,
-                packages,
-                global,
-                _npmController.PathToNpm);
-            return await DoCommandExecute(true);
+            return await DoCommandExecute(true,
+                new NpmUpdateCommand(
+                    _npmController.FullPathToRootPackageDirectory,
+                    packages,
+                    global,
+                    _npmController.PathToNpm));
         }
 
         public async Task<bool> UpdatePackagesAsync(IEnumerable<IPackage> packages) {
@@ -207,11 +229,11 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         public async Task<bool> ExecuteNpmCommandAsync(string arguments) {
-            _command = new GenericNpmCommand(
-                _npmController.FullPathToRootPackageDirectory,
-                arguments,
-                _npmController.PathToNpm);
-            return await DoCommandExecute(true);
+            return await DoCommandExecute(true,
+                new GenericNpmCommand(
+                    _npmController.FullPathToRootPackageDirectory,
+                    arguments,
+                    _npmController.PathToNpm));
         }
     }
 }

@@ -42,6 +42,8 @@ namespace Microsoft.NodejsTools {
         protected override void Dispose(bool disposing) {
             _snapshot = null;
             _position = 0;
+
+            base.Dispose(disposing);
         }
 
         public override int Peek() {

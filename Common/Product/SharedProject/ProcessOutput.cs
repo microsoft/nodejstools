@@ -184,23 +184,20 @@ namespace Microsoft.VisualStudioTools.Project {
                     redirector,
                     quoteArgs,
                     outputEncoding,
-                    errorEncoding
-                );
+                    errorEncoding);
             }
 
-            var psi = new ProcessStartInfo(filename);
-            if (quoteArgs) {
-                psi.Arguments = string.Join(" ",
-                    arguments.Where(a => a != null).Select(QuoteSingleArgument));
-            } else {
-                psi.Arguments = string.Join(" ", arguments.Where(a => a != null));
-            }
-            psi.WorkingDirectory = workingDirectory;
-            psi.CreateNoWindow = !visible;
-            psi.UseShellExecute = false;
-            psi.RedirectStandardError = !visible || (redirector != null);
-            psi.RedirectStandardOutput = !visible || (redirector != null);
-            psi.RedirectStandardInput = !visible;
+            var psi = new ProcessStartInfo("cmd.exe") { 
+                Arguments = string.Format(@"/S /C pushd {0} & {1} {2}",
+                    QuoteSingleArgument(workingDirectory),
+                    QuoteSingleArgument(filename),
+                    GetArguments(arguments, quoteArgs)),
+                CreateNoWindow = !visible,
+                UseShellExecute = false,
+                RedirectStandardError = !visible || (redirector != null),
+                RedirectStandardOutput = !visible || (redirector != null),
+                RedirectStandardInput = !visible
+            };
             psi.StandardOutputEncoding = outputEncoding ?? psi.StandardOutputEncoding;
             psi.StandardErrorEncoding = errorEncoding ?? outputEncoding ?? psi.StandardErrorEncoding;
             if (env != null) {
@@ -237,27 +234,18 @@ namespace Microsoft.VisualStudioTools.Project {
         ) {
             var outFile = Path.GetTempFileName();
             var errFile = Path.GetTempFileName();
-            var psi = new ProcessStartInfo("cmd.exe");
-            psi.CreateNoWindow = true;
-            psi.WindowStyle = ProcessWindowStyle.Hidden;
-            psi.UseShellExecute = true;
-            psi.Verb = "runas";
-
-            string args;
-            if (quoteArgs) {
-                args = string.Join(" ", arguments.Where(a => a != null).Select(QuoteSingleArgument));
-            } else {
-                args = string.Join(" ", arguments.Where(a => a != null));
-            }
-            psi.Arguments = string.Format("/S /C \"{0} {1} >>{2} 2>>{3}\"",
-                QuoteSingleArgument(filename),
-                args,
-                QuoteSingleArgument(outFile),
-                QuoteSingleArgument(errFile)
-            );
-            psi.WorkingDirectory = workingDirectory;
-            psi.CreateNoWindow = true;
-            psi.UseShellExecute = true;
+            var psi = new ProcessStartInfo("cmd.exe") {
+                WindowStyle = ProcessWindowStyle.Hidden,
+                Verb = "runas",
+                CreateNoWindow = true,
+                UseShellExecute = true,
+                Arguments = string.Format(@"/S /C pushd {0} & ""{1} {2} >>{3} 2>>{4}""",
+                    QuoteSingleArgument(workingDirectory),
+                    QuoteSingleArgument(filename),
+                    GetArguments(arguments, quoteArgs),
+                    QuoteSingleArgument(outFile),
+                    QuoteSingleArgument(errFile))
+            };
 
             var process = new Process();
             process.StartInfo = psi;
@@ -314,6 +302,14 @@ namespace Microsoft.VisualStudioTools.Project {
                 };
             }
             return result;
+        }
+
+        private static string GetArguments(IEnumerable<string> arguments, bool quoteArgs) {
+            if (quoteArgs) {
+                return string.Join(" ", arguments.Where(a => a != null).Select(QuoteSingleArgument));
+            } else {
+                return string.Join(" ", arguments.Where(a => a != null));
+            }
         }
 
         internal static IEnumerable<string> SplitLines(string source) {

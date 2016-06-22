@@ -31,8 +31,6 @@ namespace Microsoft.NodejsTools.Options {
         private AnalysisLevel _level;
         private int _analysisLogMax;
         private bool _saveToDisk;
-        private bool _onlyTabOrEnterToCommit;
-        private bool _showCompletionListAfterCharacterTyped;
 
         private readonly Lazy<bool> _enableES6Preview = new Lazy<bool>(() => {
             Version version;
@@ -67,10 +65,7 @@ namespace Microsoft.NodejsTools.Options {
                 var oldState = _saveToDisk;
                 _saveToDisk = value;
                 if (oldState != _saveToDisk) {
-                    var changed = SaveToDiskChanged;
-                    if (changed != null) {
-                        changed(this, EventArgs.Empty);
-                    }
+                    SaveToDiskChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
@@ -83,16 +78,13 @@ namespace Microsoft.NodejsTools.Options {
                 var oldLevel = _level;
                 _level = value;
 
-                // Fallback to full intellisense (High) if the ES6 intellisense preview isn't enabled
+                // Fallback to quick intellisense (medium) if the ES6 intellisense preview isn't enabled
                 if (_level == AnalysisLevel.Preview && !EnableES6Preview) {
-                    _level = AnalysisLevel.NodeLsHigh;
+                    _level = AnalysisLevel.NodeLsMedium;
                 }
 
                 if (oldLevel != _level) {
-                    var changed = AnalysisLevelChanged;
-                    if (changed != null) {
-                        changed(this, EventArgs.Empty);
-                    }
+                    AnalysisLevelChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
@@ -105,51 +97,24 @@ namespace Microsoft.NodejsTools.Options {
                 var oldMax = _analysisLogMax;
                 _analysisLogMax = value;
                 if (oldMax != _analysisLogMax) {
-                    var changed = AnalysisLogMaximumChanged;
-                    if (changed != null) {
-                        changed(this, EventArgs.Empty);
-                    }
+                    AnalysisLogMaximumChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
 
-        internal bool OnlyTabOrEnterToCommit {
-            get {
-                return _onlyTabOrEnterToCommit;
-            }
-            set {
-                var oldSetting = _onlyTabOrEnterToCommit;
-                _onlyTabOrEnterToCommit = value;
-                if (oldSetting != _onlyTabOrEnterToCommit) {
-                    var changed = OnlyTabOrEnterToCommitChanged;
-                    if (changed != null) {
-                        changed(this, EventArgs.Empty);
-                    }
-                }
-            }
-        }
+        internal bool OnlyTabOrEnterToCommit { get; set; }
 
-        internal bool ShowCompletionListAfterCharacterTyped {
-            get {
-                return _showCompletionListAfterCharacterTyped;
-            }
-            set {
-                var oldSetting = _showCompletionListAfterCharacterTyped;
-                _showCompletionListAfterCharacterTyped = value;
-                if (oldSetting != _showCompletionListAfterCharacterTyped) {
-                    var changed = ShowCompletionListAfterCharacterTypedChanged;
-                    if (changed != null) {
-                        changed(this, EventArgs.Empty);
-                    }
-                }
-            }
-        }
+        internal bool ShowCompletionListAfterCharacterTyped { get; set; }
+
+        internal bool EnableAutomaticTypingsAcquisition { get; set; }
+
+        internal bool ShowTypingsInfoBar { get; set; }
+
+        internal bool SaveChangesToConfigFile { get; set; }
 
         public event EventHandler<EventArgs> AnalysisLevelChanged;
         public event EventHandler<EventArgs> AnalysisLogMaximumChanged;
         public event EventHandler<EventArgs> SaveToDiskChanged;
-        public event EventHandler<EventArgs> OnlyTabOrEnterToCommitChanged;
-        public event EventHandler<EventArgs> ShowCompletionListAfterCharacterTypedChanged;
 
         /// <summary>
         /// Resets settings back to their defaults. This should be followed by
@@ -166,6 +131,9 @@ namespace Microsoft.NodejsTools.Options {
         private const string SaveToDiskSetting = "SaveToDisk";
         private const string OnlyTabOrEnterToCommitSetting = "OnlyTabOrEnterToCommit";
         private const string ShowCompletionListAfterCharacterTypedSetting = "ShowCompletionListAfterCharacterTyped";
+        private const string EnableAutomaticTypingsAcquisitionSetting = "EnableAutomaticTypingsAcquisition";
+        private const string ShowTypingsInfoBarSetting = "ShowTypingsInfoBar";
+        private const string SaveChangesToConfigFileSetting = "SaveChangesToConfigFile";
 
         public override void LoadSettingsFromStorage() {
             // Load settings from storage.
@@ -174,6 +142,10 @@ namespace Microsoft.NodejsTools.Options {
             SaveToDisk = LoadBool(SaveToDiskSetting) ?? true;
             OnlyTabOrEnterToCommit = LoadBool(OnlyTabOrEnterToCommitSetting) ?? true;
             ShowCompletionListAfterCharacterTyped = LoadBool(ShowCompletionListAfterCharacterTypedSetting) ?? true;
+            EnableAutomaticTypingsAcquisition = LoadBool(EnableAutomaticTypingsAcquisitionSetting) ?? true;
+            ShowTypingsInfoBar = LoadBool(ShowTypingsInfoBarSetting) ?? true;
+            SaveChangesToConfigFile = LoadBool(SaveChangesToConfigFileSetting) ?? false;
+
 
             // Synchronize UI with backing properties.
             if (_window != null) {
@@ -198,6 +170,9 @@ namespace Microsoft.NodejsTools.Options {
             SaveBool(SaveToDiskSetting, SaveToDisk);
             SaveBool(OnlyTabOrEnterToCommitSetting, OnlyTabOrEnterToCommit);
             SaveBool(ShowCompletionListAfterCharacterTypedSetting, ShowCompletionListAfterCharacterTyped);
+            SaveBool(EnableAutomaticTypingsAcquisitionSetting, EnableAutomaticTypingsAcquisition);
+            SaveBool(ShowTypingsInfoBarSetting, ShowTypingsInfoBar);
+            SaveBool(SaveChangesToConfigFileSetting, SaveChangesToConfigFile);
         }
 
         private static string GetTypeScriptToolsVersion() {

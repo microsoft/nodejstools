@@ -22,6 +22,8 @@ using Microsoft.NodejsTools.Repl;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
+using Microsoft.VisualStudio.TextManager.Interop;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.NodejsTools.Intellisense {
     sealed partial class CompletionSource : ICompletionSource {
@@ -29,19 +31,18 @@ namespace Microsoft.NodejsTools.Intellisense {
 
         private readonly ITextBuffer _textBuffer;
         private readonly NodejsClassifier _classifier;
-        private readonly IServiceProvider _serviceProvider;
         private readonly IGlyphService _glyphService;
 
-        private static string[] _allowRequireTokens = new[] { "!", "!=", "!==", "%", "%=", "&", "&&", "&=", "(", ")", 
-            "*", "*=", "+", "++", "+=", ",", "-", "--", "-=",  "..", "...", "/", "/=", ":", ";", "<", "<<", "<<=", 
-            "<=", "=", "==", "===", ">", ">=", ">>", ">>=", ">>>", ">>>=", "?", "[", "^", "^=", "{", "|", "|=", "||", 
+        private static string[] _allowRequireTokens = new[] { "!", "!=", "!==", "%", "%=", "&", "&&", "&=", "(", ")",
+            "*", "*=", "+", "++", "+=", ",", "-", "--", "-=",  "..", "...", "/", "/=", ":", ";", "<", "<<", "<<=",
+            "<=", "=", "==", "===", ">", ">=", ">>", ">>=", ">>>", ">>>=", "?", "[", "^", "^=", "{", "|", "|=", "||",
             "}", "~", "in", "case", "new", "return", "throw", "typeof"
         };
 
         private static string[] _keywords = new[] {
-            "break", "case", "catch", "class", "const", "continue", "default", "delete", "do", "else", "eval", "extends", 
-            "false", "field", "final", "finally", "for", "function", "if", "import", "in", "instanceof", "new", "null", 
-            "package", "private", "protected", "public", "return", "super", "switch", "this", "throw", "true", "try", 
+            "break", "case", "catch", "class", "const", "continue", "default", "delete", "do", "else", "eval", "extends",
+            "false", "field", "final", "finally", "for", "function", "if", "import", "in", "instanceof", "new", "null",
+            "package", "private", "protected", "public", "return", "super", "switch", "this", "throw", "true", "try",
             "typeof", "var", "while", "with",
             "abstract", "debugger", "enum", "export", "goto", "implements", "native", "static", "synchronized", "throws",
             "transient", "volatile"
@@ -50,7 +51,6 @@ namespace Microsoft.NodejsTools.Intellisense {
         public CompletionSource(ITextBuffer textBuffer, NodejsClassifier classifier, IServiceProvider serviceProvider, IGlyphService glyphService) {
             _textBuffer = textBuffer;
             _classifier = classifier;
-            _serviceProvider = serviceProvider;
             _glyphService = glyphService;
         }
 
@@ -76,14 +76,14 @@ namespace Microsoft.NodejsTools.Intellisense {
             var provider = VsProjectAnalyzer.GetCompletions(
                 _textBuffer.CurrentSnapshot,
                 span,
-                session.GetTriggerPoint(buffer)
-            );
+                session.GetTriggerPoint(buffer));
 
             var completions = provider.GetCompletions(_glyphService);
             if (completions != null && completions.Completions.Count > 0) {
                 completionSets.Add(completions);
             }
         }
+
         private void AugmentCompletionSessionForRequire(SnapshotPoint triggerPoint, ICompletionSession session, IList<CompletionSet> completionSets) {
             var classifications = EnumerateClassificationsInReverse(_classifier, triggerPoint);
             bool quote = false;
@@ -274,7 +274,7 @@ namespace Microsoft.NodejsTools.Intellisense {
             var curLine = start.GetContainingLine();
             var spanEnd = start;
 
-            for (; ; ) {
+            for (;;) {
                 var classifications = classifier.GetClassificationSpans(new SnapshotSpan(curLine.Start, spanEnd));
                 for (int i = classifications.Count - 1; i >= 0; i--) {
                     yield return classifications[i];
@@ -288,6 +288,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                 spanEnd = curLine.End;
             }
         }
+
 
         #endregion
 

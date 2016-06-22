@@ -21,12 +21,10 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
-using Microsoft.NodejsTools.Analysis;
 using Microsoft.NodejsTools.Commands;
 using Microsoft.NodejsTools.Debugger.DataTips;
 using Microsoft.NodejsTools.Debugger.DebugEngine;
@@ -41,7 +39,6 @@ using Microsoft.NodejsTools.Repl;
 using Microsoft.NodejsTools.Telemetry;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
-using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -200,7 +197,7 @@ namespace Microsoft.NodejsTools {
                 delegate { NewProjectFromExistingWizard.IsAddNewProjectCmd = false; }
             );
 
-             var langService = new NodejsLanguageInfo(this);
+            var langService = new NodejsLanguageInfo(this);
             ((IServiceContainer)this).AddService(langService.GetType(), langService, true);
 
             ((IServiceContainer)this).AddService(typeof(ClipboardServiceBase), new ClipboardService(), true);
@@ -225,14 +222,12 @@ namespace Microsoft.NodejsTools {
             }
             RegisterCommands(commands, Guids.NodejsCmdSet);
 
-            IVsTextManager textMgr = (IVsTextManager)Instance.GetService(typeof(SVsTextManager));
+            IVsTextManager4 textMgr = (IVsTextManager4)Instance.GetService(typeof(SVsTextManager));
 
-            var langPrefs = new LANGPREFERENCES[1];
-            langPrefs[0].guidLang = typeof(NodejsLanguageInfo).GUID;
-            ErrorHandler.ThrowOnFailure(textMgr.GetUserPreferences(null, null, langPrefs, null));
+            LANGPREFERENCES3[] langPrefs = GetNodejsLanguagePreferencesFromTypeScript(textMgr);
             _langPrefs = new LanguagePreferences(langPrefs[0]);
 
-            var textManagerEvents2Guid = typeof(IVsTextManagerEvents2).GUID;
+            var textManagerEvents2Guid = typeof(IVsTextManagerEvents4).GUID;
             IConnectionPoint textManagerEvents2ConnectionPoint;
             ((IConnectionPointContainer)textMgr).FindConnectionPoint(ref textManagerEvents2Guid, out textManagerEvents2ConnectionPoint);
             uint cookie;
@@ -254,6 +249,15 @@ namespace Microsoft.NodejsTools {
             // The variable is inherited by child processes backing Test Explorer, and is used in
             // the NTVS test discoverer and test executor to connect back to VS.
             Environment.SetEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable, Process.GetCurrentProcess().Id.ToString());
+        }
+
+        public static LANGPREFERENCES3[] GetNodejsLanguagePreferencesFromTypeScript(IVsTextManager4 textMgr) {
+            var langPrefs = new LANGPREFERENCES3[1];
+            langPrefs[0].guidLang = Guids.TypeScriptLanguageInfo;
+            ErrorHandler.ThrowOnFailure(textMgr.GetUserPreferences4(null, langPrefs, null));
+            langPrefs[0].guidLang = typeof(NodejsLanguageInfo).GUID;
+            textMgr.SetUserPreferences4(null, langPrefs, null);
+            return langPrefs;
         }
 
         private void SubscribeToVsCommandEvents(
@@ -438,123 +442,6 @@ namespace Microsoft.NodejsTools {
 
         internal new object GetService(Type serviceType) {
             return base.GetService(serviceType);
-        }
-
-        public static string NodejsReferencePath {
-            get {
-                return Path.Combine(
-                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                    "nodejsref.js"
-                );
-            }
-        }
-
-        public string BrowseForFileOpen(IntPtr owner, string filter, string initialPath = null) {
-            if (string.IsNullOrEmpty(initialPath)) {
-                initialPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal) + Path.DirectorySeparatorChar;
-            }
-
-            IVsUIShell uiShell = GetService(typeof(SVsUIShell)) as IVsUIShell;
-            if (null == uiShell) {
-                using (var sfd = new System.Windows.Forms.OpenFileDialog()) {
-                    sfd.AutoUpgradeEnabled = true;
-                    sfd.Filter = filter;
-                    sfd.FileName = Path.GetFileName(initialPath);
-                    sfd.InitialDirectory = Path.GetDirectoryName(initialPath);
-                    DialogResult result;
-                    if (owner == IntPtr.Zero) {
-                        result = sfd.ShowDialog();
-                    } else {
-                        result = sfd.ShowDialog(NativeWindow.FromHandle(owner));
-                    }
-                    if (result == DialogResult.OK) {
-                        return sfd.FileName;
-                    } else {
-                        return null;
-                    }
-                }
-            }
-
-            if (owner == IntPtr.Zero) {
-                ErrorHandler.ThrowOnFailure(uiShell.GetDialogOwnerHwnd(out owner));
-            }
-
-            VSOPENFILENAMEW[] openInfo = new VSOPENFILENAMEW[1];
-            openInfo[0].lStructSize = (uint)Marshal.SizeOf(typeof(VSOPENFILENAMEW));
-            openInfo[0].pwzFilter = filter.Replace('|', '\0') + "\0";
-            openInfo[0].hwndOwner = owner;
-            openInfo[0].nMaxFileName = 260;
-            var pFileName = Marshal.AllocCoTaskMem(520);
-            openInfo[0].pwzFileName = pFileName;
-            openInfo[0].pwzInitialDir = Path.GetDirectoryName(initialPath);
-            var nameArray = (Path.GetFileName(initialPath) + "\0").ToCharArray();
-            Marshal.Copy(nameArray, 0, pFileName, nameArray.Length);
-            try {
-                int hr = uiShell.GetOpenFileNameViaDlg(openInfo);
-                if (hr == VSConstants.OLE_E_PROMPTSAVECANCELLED) {
-                    return null;
-                }
-                ErrorHandler.ThrowOnFailure(hr);
-                return Marshal.PtrToStringAuto(openInfo[0].pwzFileName);
-            } finally {
-                if (pFileName != IntPtr.Zero) {
-                    Marshal.FreeCoTaskMem(pFileName);
-                }
-            }
-        }
-
-        public string BrowseForFileSave(IntPtr owner, string filter, string initialPath = null) {
-            if (string.IsNullOrEmpty(initialPath)) {
-                initialPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal) + Path.DirectorySeparatorChar;
-            }
-
-            IVsUIShell uiShell = GetService(typeof(SVsUIShell)) as IVsUIShell;
-            if (null == uiShell) {
-                using (var sfd = new System.Windows.Forms.SaveFileDialog()) {
-                    sfd.AutoUpgradeEnabled = true;
-                    sfd.Filter = filter;
-                    sfd.FileName = Path.GetFileName(initialPath);
-                    sfd.InitialDirectory = Path.GetDirectoryName(initialPath);
-                    DialogResult result;
-                    if (owner == IntPtr.Zero) {
-                        result = sfd.ShowDialog();
-                    } else {
-                        result = sfd.ShowDialog(NativeWindow.FromHandle(owner));
-                    }
-                    if (result == DialogResult.OK) {
-                        return sfd.FileName;
-                    } else {
-                        return null;
-                    }
-                }
-            }
-
-            if (owner == IntPtr.Zero) {
-                ErrorHandler.ThrowOnFailure(uiShell.GetDialogOwnerHwnd(out owner));
-            }
-
-            VSSAVEFILENAMEW[] saveInfo = new VSSAVEFILENAMEW[1];
-            saveInfo[0].lStructSize = (uint)Marshal.SizeOf(typeof(VSSAVEFILENAMEW));
-            saveInfo[0].pwzFilter = filter.Replace('|', '\0') + "\0";
-            saveInfo[0].hwndOwner = owner;
-            saveInfo[0].nMaxFileName = 260;
-            var pFileName = Marshal.AllocCoTaskMem(520);
-            saveInfo[0].pwzFileName = pFileName;
-            saveInfo[0].pwzInitialDir = Path.GetDirectoryName(initialPath);
-            var nameArray = (Path.GetFileName(initialPath) + "\0").ToCharArray();
-            Marshal.Copy(nameArray, 0, pFileName, nameArray.Length);
-            try {
-                int hr = uiShell.GetSaveFileNameViaDlg(saveInfo);
-                if (hr == VSConstants.OLE_E_PROMPTSAVECANCELLED) {
-                    return null;
-                }
-                ErrorHandler.ThrowOnFailure(hr);
-                return Marshal.PtrToStringAuto(saveInfo[0].pwzFileName);
-            } finally {
-                if (pFileName != IntPtr.Zero) {
-                    Marshal.FreeCoTaskMem(pFileName);
-                }
-            }
         }
 
         public string BrowseForDirectory(IntPtr owner, string initialDirectory = null) {
@@ -750,7 +637,7 @@ namespace Microsoft.NodejsTools {
         internal VsProjectAnalyzer DefaultAnalyzer {
             get {
                 if (_analyzer == null) {
-                    _analyzer = new VsProjectAnalyzer();
+                    _analyzer = CreateLooseVsProjectAnalyzer();
                     LogLooseFileAnalysisLevel();
                     _analyzer.MaxLogLength = IntellisenseOptionsPage.AnalysisLogMax;
                     IntellisenseOptionsPage.AnalysisLevelChanged += IntellisenseOptionsPageAnalysisLevelChanged;
@@ -765,13 +652,28 @@ namespace Microsoft.NodejsTools {
         }
 
         private void IntellisenseOptionsPageAnalysisLevelChanged(object sender, EventArgs e) {
-            var analyzer = new VsProjectAnalyzer();
+            var analyzer = CreateLooseVsProjectAnalyzer();
             analyzer.SwitchAnalyzers(_analyzer);
             if (_analyzer.RemoveUser()) {
                 _analyzer.Dispose();
             }
             _analyzer = analyzer;
             LogLooseFileAnalysisLevel();
+        }
+
+        private VsProjectAnalyzer CreateLooseVsProjectAnalyzer() {
+            // In ES6 IntelliSense mode, rather than overriding the default JS editor,
+            // we throw to Salsa. If Salsa detects that it's not operating within the Node.js project context,
+            // it will throw to JSLS. This means that currently, loose files will be handled by the JSLS editor,
+            // rather than the NodeLS editor (which means that the loose project analyzer will not be invoked
+            // in these scenarios.)
+            //
+            // Because Salsa doesn't support the stitching together inputs from the surrounding text view,
+            // we do not throw to Salsa from the REPL window. However, in order to provide a workable editing
+            // experience within the REPL context, we initialize the loose analyzer with Quick IntelliSense
+            // during ES6 mode.
+            var analysisLevel = IntellisenseOptionsPage.AnalysisLevel == AnalysisLevel.Preview ? AnalysisLevel.NodeLsMedium : IntellisenseOptionsPage.AnalysisLevel;
+            return new VsProjectAnalyzer(analysisLevel, false);
         }
 
         private void LogLooseFileAnalysisLevel() {
@@ -782,41 +684,5 @@ namespace Microsoft.NodejsTools {
                 _logger.LogEvent(NodejsToolsLogEvent.AnalysisLevel, (int)val);
             }
         }
-
-
-#if UNIT_TEST_INTEGRATION
-        // var testCase = require('./test/test-doubled.js'); for(var x in testCase) { console.log(x); }
-        public static string EvaluateJavaScript(string code) {
-            // TODO: Escaping code
-            string args = "-e \"" + code + "\"";
-            var psi = new ProcessStartInfo(NodePath, args);
-            psi.RedirectStandardOutput = true;
-            psi.RedirectStandardError = true;
-            var proc = Process.Start(psi);
-            var outpReceiver = new OutputReceiver();
-            proc.OutputDataReceived += outpReceiver.DataRead;
-            proc.BeginErrorReadLine();
-            proc.BeginOutputReadLine();
-
-            return outpReceiver._data.ToString();
-        }
-
-        private void GetTestCases(string module) {
-            var testCases = EvaluateJavaScript(
-                String.Format("var testCase = require('{0}'); for(var x in testCase) { console.log(x); }", module));
-            foreach (var testCase in testCases.Split(new[] { "\r", "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)) {
-            }
-        }
-
-        class OutputReceiver {
-            internal readonly StringBuilder _data = new StringBuilder();
-            
-            public void DataRead(object sender, DataReceivedEventArgs e) {
-                if (e.Data != null) {
-                    _data.Append(e.Data);
-                }
-            }
-        }
-#endif
     }
 }

@@ -37,7 +37,7 @@ namespace TestAdapterTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Ignore")]
-        public void TestRun() {
+        public void Run() {
             
             var executor = new TestExecutor();
             var recorder = new MockTestExecutionRecorder();
@@ -57,7 +57,7 @@ namespace TestAdapterTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Ignore")]
-        public void TestRunAll() {
+        public void RunAll() {
             
             var executor = new TestExecutor();
             var recorder = new MockTestExecutionRecorder();
@@ -76,7 +76,7 @@ namespace TestAdapterTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestCancel() {
+        public void Cancel() {
             
             var executor = new TestExecutor();
             var recorder = new MockTestExecutionRecorder();

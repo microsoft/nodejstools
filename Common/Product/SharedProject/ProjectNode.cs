@@ -1124,6 +1124,9 @@ namespace Microsoft.VisualStudioTools.Project {
                     imageHandler.Close();
                     imageHandler = null;
                 }
+
+                _diskNodes.Clear();
+                _folderBeingCreated = null;
             } finally {
                 base.Dispose(disposing);
                 // Note that this isDisposed flag is separate from the base's
@@ -1600,6 +1603,12 @@ namespace Microsoft.VisualStudioTools.Project {
             if (taskProvider != null) {
                 taskProvider.Tasks.Clear();
             }
+
+            var autoObject = GetAutomationObject() as Automation.OAProject;
+            if (autoObject != null) {
+                autoObject.Dispose();
+            }
+            this.configProvider = null;
 
             try {
                 // Walk the tree and close all nodes.
@@ -2669,16 +2678,13 @@ namespace Microsoft.VisualStudioTools.Project {
                 return VSConstants.E_INVALIDARG;
             }
 
-            string message = String.Empty;
             string title = String.Empty;
-            OLEMSGICON icon = OLEMSGICON.OLEMSGICON_CRITICAL;
-            OLEMSGBUTTON buttons = OLEMSGBUTTON.OLEMSGBUTTON_OK;
             OLEMSGDEFBUTTON defaultButton = OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST;
 
             // File already exists in project... message box
-            message = SR.GetString(inProject ? SR.FileAlreadyInProject : SR.FileAlreadyExists, Path.GetFileName(computedNewFileName));
-            icon = OLEMSGICON.OLEMSGICON_QUERY;
-            buttons = OLEMSGBUTTON.OLEMSGBUTTON_YESNO;
+            string message = SR.GetString(inProject ? SR.FileAlreadyInProject : SR.FileAlreadyExists, Path.GetFileName(computedNewFileName));
+            OLEMSGICON icon = OLEMSGICON.OLEMSGICON_QUERY;
+            OLEMSGBUTTON buttons = OLEMSGBUTTON.OLEMSGBUTTON_YESNO;
             int msgboxResult = Utilities.ShowMessageBox(this.Site, title, message, icon, buttons, defaultButton);
             if (msgboxResult == NativeMethods.IDCANCEL) {
                 return (int)E_CANCEL_FILE_ADD;
@@ -2790,9 +2796,14 @@ namespace Microsoft.VisualStudioTools.Project {
             if (!IsProjectOpened)
                 return;
 
-            EnvDTE.Project automationObject = GetAutomationObject() as EnvDTE.Project;
+            var solutionBuild = (IVsSolutionBuildManager)GetService(typeof(SVsSolutionBuildManager));
+            IVsProjectCfg[] cfg = new IVsProjectCfg[1];
+            ErrorHandler.ThrowOnFailure(
+                solutionBuild.FindActiveProjectCfg(IntPtr.Zero, IntPtr.Zero, GetOuterHierarchy(), cfg));
 
-            SetConfiguration(Utilities.GetActiveConfigurationName(automationObject));
+            string name;
+            ErrorHandler.ThrowOnFailure(cfg[0].get_CanonicalName(out name));
+            SetConfiguration(name);
         }
 
         /// <summary>
@@ -4555,9 +4566,8 @@ If the files in the existing folder have the same names as files in the folder y
                 return VSConstants.E_NOTIMPL;
             }
             for (int cCount = 0; cCount < cComponents; cCount++) {
-                VSCOMPONENTSELECTORDATA selectorData = new VSCOMPONENTSELECTORDATA();
                 IntPtr ptr = rgpcsdComponents[cCount];
-                selectorData = (VSCOMPONENTSELECTORDATA)Marshal.PtrToStructure(ptr, typeof(VSCOMPONENTSELECTORDATA));
+                VSCOMPONENTSELECTORDATA selectorData = (VSCOMPONENTSELECTORDATA)Marshal.PtrToStructure(ptr, typeof(VSCOMPONENTSELECTORDATA));
                 if (null == references.AddReferenceFromSelectorData(selectorData)) {
                     //Skip further proccessing since a reference has to be added
                     pResult[0] = VSADDCOMPRESULT.ADDCOMPRESULT_Failure;
@@ -4828,7 +4838,12 @@ If the files in the existing folder have the same names as files in the folder y
 
             if (canceled != 1) {
                 // Set ourself as the project
-                return Marshal.QueryInterface(Marshal.GetIUnknownForObject(this), ref iid, out projectPointer);
+                IntPtr project = Marshal.GetIUnknownForObject(this);
+                try {
+                    return Marshal.QueryInterface(project, ref iid, out projectPointer);
+                } finally {
+                    Marshal.Release(project);
+                }
             }
 
             return VSConstants.OLE_E_PROMPTSAVECANCELLED;
@@ -5455,9 +5470,9 @@ If the files in the existing folder have the same names as files in the folder y
 
             Debug.Assert(Path.IsPathRooted(name));
 
-            HierarchyNode res;
-            _diskNodes.TryGetValue(name, out res);
-            return res;
+            HierarchyNode node;
+            _diskNodes.TryGetValue(name, out node);
+            return node;
         }
 
         /// <summary>
