@@ -24,7 +24,7 @@ We would love to have you as a contributor!
 * [Contributing to NTVS](https://github.com/Microsoft/nodejstools/wiki/Contributing)
 * [Build Instructions for NTVS](https://github.com/Microsoft/nodejstools/wiki/Build-Instructions)
 
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
 ## License
 [Apache License 2.0 (Apache)](https://github.com/Microsoft/nodejstools/blob/master/LICENSE)
-
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
