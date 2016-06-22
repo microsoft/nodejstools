@@ -74,7 +74,7 @@ namespace Microsoft.NodejsTools {
 
         internal const string NodeToolsProcessIdEnvironmentVariable = "_NTVS_PID";
 
-        private static string NtvsLocalAppData {
+        public static string NtvsLocalAppData {
             get {
                 return Path.Combine(
                     System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData),

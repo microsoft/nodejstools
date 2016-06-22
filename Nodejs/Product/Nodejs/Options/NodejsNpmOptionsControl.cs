@@ -36,38 +36,36 @@ namespace Microsoft.NodejsTools.Options {
         }
 
         private void ClearCacheButton_Click(object sender, EventArgs e) {
-            bool didClearNpmCache = DeleteCacheDirectory("npm cache", NodejsConstants.NpmCachePath);
-            bool didClearTools = DeleteCacheDirectory("NTVS external tools", NodejsConstants.ExternalToolsPath);
+            bool didClearNpmCache = TryDeleteCacheDirectory(NodejsConstants.NpmCachePath);
+            bool didClearTools = TryDeleteCacheDirectory(NodejsConstants.ExternalToolsPath);
 
-            _cacheClearedSuccessfully.Visible = (didClearNpmCache && didClearTools);
+            if (!didClearNpmCache || !didClearTools) {
+                MessageBox.Show(
+                   SR.GetString(SR.CacheDirectoryClearFailedCaption, NodejsConstants.NtvsLocalAppData),
+                   SR.GetString(SR.CacheDirectoryClearFailedTitle),
+                   MessageBoxButtons.OK,
+                   MessageBoxIcon.Information);
+            }
+
+            _cacheClearedSuccessfully.Visible = didClearNpmCache && didClearTools;
         }
 
-        private static bool DeleteCacheDirectory(string displayName, string cachePath) {
+        private static bool TryDeleteCacheDirectory(string cachePath) {
             try {
                 Directory.Delete(cachePath, true);
-               return true;
+                return true;
             } catch (DirectoryNotFoundException) {
                 // Directory has already been deleted. Do nothing.
                 return true;
-            } catch (IOException exception) {
+            } catch (IOException) {
                 // files are in use or path is too long
-                MessageBox.Show(
-                    string.Format("Cannot clear {0}. {1}", displayName, exception.Message),
-                    string.Format("Cannot Clear {0}", displayName),
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
+                return false;
             } catch (Exception exception) {
                 try {
                     ActivityLog.LogError(SR.ProductName, exception.ToString());
                 } catch (InvalidOperationException) {
                     // Activity Log is unavailable.
                 }
-
-                MessageBox.Show(
-                    string.Format("Cannot clear {0}. Try manually deleting the directory: {1}", displayName, cachePath),
-                    string.Format("Cannot Clear {0}", displayName),
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
             }
             return false;
         }
