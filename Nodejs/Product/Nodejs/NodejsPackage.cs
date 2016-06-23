@@ -586,7 +586,6 @@ namespace Microsoft.NodejsTools {
             if (forceCheckAndWarnIfNoneAvailable) {
                 shouldQueryServer = true;
             } else {
-                shouldQueryServer = true;
                 var options = GeneralOptionsPage;
                 // Ensure that we don't prompt the user on their very first project creation.
                 // Delay by 3 days by pretending we checked 4 days ago (the default of check
@@ -612,6 +611,7 @@ namespace Microsoft.NodejsTools {
                         break;
                     default:
                         Debug.Assert(false, String.Format("Unexpected SurveyNewsPolicy: {0}.", options.SurveyNewsCheck));
+                        shouldQueryServer = false;
                         break;
                 }
             }
