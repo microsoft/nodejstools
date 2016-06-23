@@ -112,7 +112,7 @@ namespace Microsoft.NodejsTools {
         }
 
         private async Task<bool> ExecuteTypingsTool(IEnumerable<string> arguments, Redirector redirector) {
-            string typingsTool = await EnsureTypingsToolInstalled();
+            string typingsTool = await EnsureTypingsToolInstalled(redirector);
             if (string.IsNullOrEmpty(typingsTool)) {
                 redirector?.WriteErrorLine(SR.GetString(SR.TypingsToolNotInstalledError));
                 return false;
@@ -129,22 +129,22 @@ namespace Microsoft.NodejsTools {
                 if (!process.IsStarted) {
                     // Process failed to start, and any exception message has
                     // already been sent through the redirector
-                    redirector?.WriteErrorLine("could not start 'typings'");
+                    redirector?.WriteErrorLine(SR.GetString(SR.TypingsToolCouldNotStart));
                     return false;
                 }
                 var i = await process;
                 if (i == 0) {
-                    redirector?.WriteLine(SR.GetString(SR.TypingsToolInstallCompleted));
+                    redirector?.WriteLine(SR.GetString(SR.TypingsToolTypingsInstallCompleted));
                     return true;
                 } else {
                     process.Kill();
-                    redirector?.WriteErrorLine(SR.GetString(SR.TypingsToolInstallErrorOccurred));
+                    redirector?.WriteErrorLine(SR.GetString(SR.TypingsToolTypingsInstallErrorOccurred));
                     return false;
                 }
             }
         }
 
-        private async Task<string> EnsureTypingsToolInstalled() {
+        private async Task<string> EnsureTypingsToolInstalled(Redirector redirector) {
             if (File.Exists(TypingsToolPath)) {
                 return TypingsToolPath;
             }
@@ -153,9 +153,10 @@ namespace Microsoft.NodejsTools {
                 return null;
             } 
             if (!await InstallTypingsTool()) {
+                redirector?.WriteErrorLine(SR.GetString(SR.TypingsToolInstallFailed));
                 return null;
             }
-            return await EnsureTypingsToolInstalled();
+            return await EnsureTypingsToolInstalled(redirector);
         }
 
         private async Task<bool> InstallTypingsTool() {
