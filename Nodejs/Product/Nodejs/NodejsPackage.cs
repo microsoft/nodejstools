@@ -582,7 +582,7 @@ namespace Microsoft.NodejsTools {
         }
 
         internal void CheckSurveyNews(bool forceCheckAndWarnIfNoneAvailable) {
-            if (ShouldQuerySurveryNewsServer(forceCheckAndWarnIfNoneAvailable)) {
+            if (forceCheckAndWarnIfNoneAvailable || ShouldQuerySurveryNewsServer()) {
                 var options = GeneralOptionsPage;
                 options.SurveyNewsLastCheck = DateTime.Now;
                 options.SaveSettingsToStorage();
@@ -590,11 +590,7 @@ namespace Microsoft.NodejsTools {
             }
         }
 
-        private bool ShouldQuerySurveryNewsServer(bool forceCheckAndWarnIfNoneAvailable) {
-            if (forceCheckAndWarnIfNoneAvailable) {
-                return true;
-            }
-
+        private bool ShouldQuerySurveryNewsServer() {
             var options = GeneralOptionsPage;
             // Ensure that we don't prompt the user on their very first project creation.
             // Delay by 3 days by pretending we checked 4 days ago (the default of check
