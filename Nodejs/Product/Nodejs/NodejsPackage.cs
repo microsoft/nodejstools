@@ -582,44 +582,37 @@ namespace Microsoft.NodejsTools {
         }
 
         internal void CheckSurveyNews(bool forceCheckAndWarnIfNoneAvailable) {
-            bool shouldQueryServer = false;
-            if (forceCheckAndWarnIfNoneAvailable) {
-                shouldQueryServer = true;
-            } else {
-                shouldQueryServer = true;
-                var options = GeneralOptionsPage;
-                // Ensure that we don't prompt the user on their very first project creation.
-                // Delay by 3 days by pretending we checked 4 days ago (the default of check
-                // once a week ensures we'll check again in 3 days).
-                if (options.SurveyNewsLastCheck == DateTime.MinValue) {
-                    options.SurveyNewsLastCheck = DateTime.Now - TimeSpan.FromDays(4);
-                    options.SaveSettingsToStorage();
-                }
-
-                var elapsedTime = DateTime.Now - options.SurveyNewsLastCheck;
-                switch (options.SurveyNewsCheck) {
-                    case SurveyNewsPolicy.Disabled:
-                        break;
-                    case SurveyNewsPolicy.CheckOnceDay:
-                        shouldQueryServer = elapsedTime.TotalDays >= 1;
-                        break;
-                    case SurveyNewsPolicy.CheckOnceWeek:
-                        shouldQueryServer = elapsedTime.TotalDays >= 7;
-                        break;
-                    case SurveyNewsPolicy.CheckOnceMonth:
-                        shouldQueryServer = elapsedTime.TotalDays >= 30;
-                        break;
-                    default:
-                        Debug.Assert(false, String.Format("Unexpected SurveyNewsPolicy: {0}.", options.SurveyNewsCheck));
-                        break;
-                }
-            }
-
-            if (shouldQueryServer) {
+            if (forceCheckAndWarnIfNoneAvailable || ShouldQuerySurveryNewsServer()) {
                 var options = GeneralOptionsPage;
                 options.SurveyNewsLastCheck = DateTime.Now;
                 options.SaveSettingsToStorage();
                 CheckSurveyNewsThread(new Uri(options.SurveyNewsFeedUrl), forceCheckAndWarnIfNoneAvailable);
+            }
+        }
+
+        private bool ShouldQuerySurveryNewsServer() {
+            var options = GeneralOptionsPage;
+            // Ensure that we don't prompt the user on their very first project creation.
+            // Delay by 3 days by pretending we checked 4 days ago (the default of check
+            // once a week ensures we'll check again in 3 days).
+            if (options.SurveyNewsLastCheck == DateTime.MinValue) {
+                options.SurveyNewsLastCheck = DateTime.Now - TimeSpan.FromDays(4);
+                options.SaveSettingsToStorage();
+            }
+
+            var elapsedTime = DateTime.Now - options.SurveyNewsLastCheck;
+            switch (options.SurveyNewsCheck) {
+                case SurveyNewsPolicy.Disabled:
+                    return false;
+                case SurveyNewsPolicy.CheckOnceDay:
+                    return elapsedTime.TotalDays >= 1;
+                case SurveyNewsPolicy.CheckOnceWeek:
+                    return elapsedTime.TotalDays >= 7;
+                case SurveyNewsPolicy.CheckOnceMonth:
+                    return elapsedTime.TotalDays >= 30;
+                default:
+                    Debug.Assert(false, String.Format("Unexpected SurveyNewsPolicy: {0}.", options.SurveyNewsCheck));
+                    return false;
             }
         }
 
