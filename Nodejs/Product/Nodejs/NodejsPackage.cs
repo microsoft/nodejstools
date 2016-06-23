@@ -599,6 +599,7 @@ namespace Microsoft.NodejsTools {
                 var elapsedTime = DateTime.Now - options.SurveyNewsLastCheck;
                 switch (options.SurveyNewsCheck) {
                     case SurveyNewsPolicy.Disabled:
+                        shouldQueryServer = false;
                         break;
                     case SurveyNewsPolicy.CheckOnceDay:
                         shouldQueryServer = elapsedTime.TotalDays >= 1;
