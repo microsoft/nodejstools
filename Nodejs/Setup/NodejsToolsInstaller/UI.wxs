@@ -19,6 +19,9 @@
         <Control Id="TextContinueWarning" Type="Text" X="48" Y="50" Width="194" Height="35" Text="!(loc.VSRequires2015Update3ContinueWarning)"/>
         <Control Id="Icon" Type="Icon" X="15" Y="15" Width="24" Height="24" ToolTip="!(loc.CancelDlgIconTooltip)" FixedSize="yes" IconSize="48" Text="WixUI_Ico_Exclam" />
       </Dialog>
+      <Publish Event="SpawnDialog" Dialog="CustomAdvancedWelcomeEulaDlg" Control="LicenseText" Value="VsPreUpdate3WarningDlg">
+        <![CDATA[VS_IS_2015_PRE_UPDATE_3="1" AND ContinueInstall<>"1"]]> 
+      </Publish> 
 
       <Dialog Id="CustomAdvancedWelcomeEulaDlg" Width="370" Height="270" Title="!(loc.AdvancedWelcomeEulaDlg_Title)">
         <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="!(loc.AdvancedWelcomeEulaDlgBannerBitmap)" />
