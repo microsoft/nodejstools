@@ -21,5 +21,8 @@
     <String Id="VWDExpressSetup_Rollback">Removing extension from !(loc.VWDProductName)...</String>
     <String Id="AcceptLicenseText">I agree to the license terms and conditions and to the</String>
     <String Id="PrivacyStatementLinkText">privacy statement</String>
-    <String Id="VSRequires2015Update2">NTVS requires Visual Studio 2015 Update 2 or later. Please install it from  http://go.microsoft.com/fwlink/?LinkID=808380</String> 
+    <String Id="VSRequires2015Update2">Node.js Tools requires Visual Studio 2015 Update 2 or later. Please install it from  http://go.microsoft.com/fwlink/?LinkID=808380</String> 
+    <String Id="VSRequires2015Update2ContinueWarning">Continuing your installation of Node.js Tools without installing Update 2 may result in a degraded IntelliSense experience.</String>
+    <String Id="DontInstallLabel">Don't install</String>
+    <String Id="InstallAnywayLabel">Install anyway</String>
 </WixLocalization>
