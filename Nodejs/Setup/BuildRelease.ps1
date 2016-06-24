@@ -170,13 +170,13 @@ if ($release -or $mockrelease) {
 }
 
 # Get the path to msbuild for a configuration
-function msbuild-exe($target, $config) {
-	$toolpath = Get-ItemProperty -Path "HKLM:\Software\Wow6432Node\Microsoft\MSBuild\ToolsVersions\$($target.VSTarget)" -EA 0
-	$target_exe = $toolpath.MSBuildToolsPath + "msbuild.exe"
-	if (-not (Test-Path $target_exe)) {
-		Throw "Visual Studio build tools not found for $($target.VSTarget)."
-	}
-	$target_exe
+function msbuild-exe($target) {
+    $toolpath = Get-ItemProperty -Path "HKLM:\Software\Wow6432Node\Microsoft\MSBuild\ToolsVersions\$($target.VSTarget)" -EA 0
+    $target_exe = $toolpath.MSBuildToolsPath + "msbuild.exe"
+    if (-not (Test-Path $target_exe)) {
+        Throw "Visual Studio build tools $($target.VSTarget) not found."
+    }
+    $target_exe
 }
 
 # This function is used to get options for each configuration
@@ -472,7 +472,7 @@ try {
         
         foreach ($i in $target_info) {
             if (-not $skipbuild) {
-				$target_msbuild_exe = msbuild-exe $i
+                $target_msbuild_exe = msbuild-exe $i
                 $target_msbuild_options = msbuild-options $i
                 if (-not $skipclean) {
                     & $target_msbuild_exe /t:Clean $global_msbuild_options $target_msbuild_options $build_project
@@ -525,8 +525,8 @@ try {
                 }
                 submit_symbols "$project_name$spacename" "$buildnumber $($i.VSName) $config" "binaries" $i.signed_bindir $symbol_contacts
                 submit_symbols "$project_name$spacename" "$buildnumber $($i.VSName) $config" "symbols" $i.symboldir $symbol_contacts
-				
-				$target_msbuild_exe = msbuild-exe $i
+
+                $target_msbuild_exe = msbuild-exe $i
                 $target_msbuild_options = msbuild-options $i
                 & $target_msbuild_exe $global_msbuild_options $target_msbuild_options `
                     /fl /flp:logfile=$($i.signed_logfile) `
