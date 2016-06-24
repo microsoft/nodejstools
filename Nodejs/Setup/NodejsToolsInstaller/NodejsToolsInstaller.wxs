@@ -146,7 +146,6 @@
         </InstallExecuteSequence>
         <InstallUISequence>
             <Show Dialog="CustomAdvancedWelcomeEulaDlg" Before="FindRelatedProducts">NOT Installed</Show>
-            <Show Dialog="VsPreUpdate3WarningDlg" After="FindRelatedProducts">VS_IS_2015_PRE_UPDATE_3</Show>
             <Show Dialog="CustomFeaturesDlg" After="CostFinalize">NOT Installed AND EasyInstall=0</Show>
             <Show Dialog="CustomExitDialog" OnExit="success" />
         </InstallUISequence>
