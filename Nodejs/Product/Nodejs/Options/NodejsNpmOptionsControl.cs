@@ -15,6 +15,7 @@
 //*********************************************************//
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.Project;
@@ -51,12 +52,31 @@ namespace Microsoft.NodejsTools.Options {
         }
 
         private static bool TryDeleteCacheDirectory(string cachePath) {
+            if (!Directory.Exists(cachePath)) {
+                return true;
+            }
+
             try {
-                Directory.Delete(cachePath, true);
-                return true;
-            } catch (DirectoryNotFoundException) {
-                // Directory has already been deleted. Do nothing.
-                return true;
+                // To handle long paths, nuke the directory contents with robocopy
+                string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                Directory.CreateDirectory(tempDirectory);
+                var psi = new ProcessStartInfo("cmd.exe", string.Format(@"/C robocopy /mir ""{0}"" ""{1}""", tempDirectory, cachePath)) {
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                using (var process = Process.Start(psi)) {
+                    process.WaitForExit(2000);
+                }
+
+                // Then delete the directory itself
+                try {
+                    Directory.Delete(cachePath);
+                } catch (DirectoryNotFoundException) {
+                    // noop
+                }
+
+                return !Directory.Exists(cachePath);
             } catch (IOException) {
                 // files are in use or path is too long
                 return false;
