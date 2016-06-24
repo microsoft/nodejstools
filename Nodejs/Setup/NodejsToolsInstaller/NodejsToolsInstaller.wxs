@@ -22,10 +22,10 @@
         <Property Id="ARPPRODUCTICON">AddRemoveProgramsIcon</Property>
 
         <!-- Conditions for install -->
-        <PropertyRef Id="VS_IS_2015_PRE_UPDATE_2"/> 
         <PropertyRef Id="NETFRAMEWORK45"/>
         <Condition Message="!(loc.NetFx45NotInstalled)"> NETFRAMEWORK45 OR Installed </Condition>
 
+        <PropertyRef Id="VS_IS_2015_PRE_UPDATE_3"/>
         <PropertyRef Id="VSINSTALLPATH"/>
         <PropertyRef Id="VWDINSTALLPATH"/>
         <PropertyRef Id="DEVENV_PATH"/>
@@ -146,6 +146,7 @@
         </InstallExecuteSequence>
         <InstallUISequence>
             <Show Dialog="CustomAdvancedWelcomeEulaDlg" Before="FindRelatedProducts">NOT Installed</Show>
+            <Show Dialog="VsPreUpdate3WarningDlg" After="FindRelatedProducts">VS_IS_2015_PRE_UPDATE_3</Show>
             <Show Dialog="CustomFeaturesDlg" After="CostFinalize">NOT Installed AND EasyInstall=0</Show>
             <Show Dialog="CustomExitDialog" OnExit="success" />
         </InstallUISequence>
