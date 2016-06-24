@@ -615,11 +615,14 @@ You will need to restart Visual Studio after installation.</value>
   <data name="RemoteDebugProxyFolderDoesNotExist" xml:space="preserve">
     <value>Could not find RemoteDebugProxyFolder</value>
   </data>
-  <data name="TypingsToolInstallCompleted" xml:space="preserve">
+  <data name="TypingsToolTypingsInstallCompleted" xml:space="preserve">
     <value>Successfully installed typing files for Intellisense.</value>
   </data>
   <data name="TypingsToolNotInstalledError" xml:space="preserve">
-    <value>Could not find Typings package manager tool used for Intellisense.</value>
+    <value>Could not find Typings package manager tool used for Intellisense</value>
+  </data>
+  <data name="TypingsToolTypingsInstallErrorOccurred" xml:space="preserve">
+    <value>An error occurred installing typings used for IntelliSense.</value>
   </data>
   <data name="TypingsInfoBarSpan1" xml:space="preserve">
     <value>Node.js IntelliSense added a </value>
@@ -644,5 +647,11 @@ You will need to restart Visual Studio after installation.</value>
   </data>
   <data name="StatusTypingsLoading" xml:space="preserve">
     <value>Loading Node.js IntelliSense typings for npm packages...</value>
+  </data>
+  <data name="TypingsToolInstallFailed" xml:space="preserve">
+    <value>Failed to install Typings tool used for IntelliSense. Please make sure Node.js is properly installed</value>
+  </data>
+  <data name="TypingsToolCouldNotStart" xml:space="preserve">
+    <value>Could not start Typings tool used for IntelliSense</value>
   </data>
 </root>

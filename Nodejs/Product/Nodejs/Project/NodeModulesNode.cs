@@ -193,31 +193,15 @@ namespace Microsoft.NodejsTools.Project {
 
         #region Logging and status bar updates
 
-#if DEV14_OR_LATER
-        // This is the package manager pane that ships with VS2015, and we should print there if available.
-        private static readonly Guid VSPackageManagerPaneGuid = new Guid("C7E31C31-1451-4E05-B6BE-D11B6829E8BB");
-#else
-        private static readonly Guid NpmOutputPaneGuid = new Guid("25764421-33B8-4163-BD02-A94E299D52D8");
-#endif
-
-        private OutputWindowRedirector GetNpmOutputPane() {
-            try {
-#if DEV14_OR_LATER
-                return OutputWindowRedirector.Get(_projectNode.Site, VSPackageManagerPaneGuid, "Bower/npm");
-#else
-                return OutputWindowRedirector.Get(_projectNode.Site, NpmOutputPaneGuid, SR.GetString(SR.NpmOutputPaneTitle));
-#endif
-            } catch (InvalidOperationException) {
-                return null;
+        private OutputWindowRedirector NpmOutputPane {
+            get {
+                return _projectNode.NpmOutputPane;
             }
         }
 
         private void ConditionallyShowNpmOutputPane() {
             if (NodejsPackage.Instance.NpmOptionsPage.ShowOutputWindowWhenExecutingNpm) {
-                var pane = GetNpmOutputPane();
-                if (null != pane) {
-                    pane.ShowAndActivate();
-                }
+                NpmOutputPane?.ShowAndActivate();
             }
         }
 
@@ -300,10 +284,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private void WriteNpmLogToOutputWindow(string logText) {
-            var pane = GetNpmOutputPane();
-            if (null != pane) {
-                pane.WriteLine(logText);
-            }
+            NpmOutputPane?.WriteLine(logText);
 
 #if INTEGRATE_WITH_ERROR_LIST
             WriteNpmErrorsToErrorList(args);

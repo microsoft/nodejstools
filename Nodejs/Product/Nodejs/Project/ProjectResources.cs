@@ -75,6 +75,7 @@ namespace Microsoft.NodejsTools.Project {
         internal const string NewVersionPackageCatalogNotRetrieved = "NewVersionPackageCatalogNotRetrieved";
         internal const string NewVersionUnknown = "NewVersionUnknown";
         internal const string NewVersionYes = "NewVersionYes";
+        internal const string NoKeywordsInPackage = "NoKeywordsInPackage";
         internal const string NodeExeArguments = "NodeExeArguments";
         internal const string NodeExeArgumentsDescription = "NodeExeArgumentsDescription";
         internal const string NodeExeArgumentsToolTip = "NodeExeArgumentsToolTip";
@@ -89,7 +90,6 @@ namespace Microsoft.NodejsTools.Project {
         internal const string NodejsPort = "NodejsPort";
         internal const string NodejsPortDescription = "NodejsPortDescription";
         internal const string NodejsPortToolTip = "NodejsPortToolTip";
-        internal const string NoKeywordsInPackage = "NoKeywordsInPackage";
         internal const string NpmCancelled = "NpmCancelled";
         internal const string NpmCancelledWithErrors = "NpmCancelledWithErrors";
         internal const string NpmCompletedWithErrors = "NpmCompletedWithErrors";
@@ -175,8 +175,8 @@ namespace Microsoft.NodejsTools.Project {
         internal const string ScriptFileToolTip = "ScriptFileTooltip";
         internal const string Seconds = "Seconds";
         internal const string StartBrowserToolTip = "StartBrowserToolTip";
-        internal const string StatusAnalysisLoaded = "StatusAnalysisLoaded";
         internal const string StatusAnalysisLoadFailed = "StatusAnalysisLoadFailed";
+        internal const string StatusAnalysisLoaded = "StatusAnalysisLoaded";
         internal const string StatusAnalysisLoading = "StatusAnalysisLoading";
         internal const string StatusAnalysisSaved = "StatusAnalysisSaved";
         internal const string StatusAnalysisSaving = "StatusAnalysisSaving";
@@ -189,14 +189,15 @@ namespace Microsoft.NodejsTools.Project {
         internal const string TypingsInfoBarSpan1 = "TypingsInfoBarSpan1";
         internal const string TypingsInfoBarSpan2 = "TypingsInfoBarSpan2";
         internal const string TypingsInfoBarSpan3 = "TypingsInfoBarSpan3";
-        internal const string TypingsToolInstallCompleted = "TypingsToolInstallCompleted";
-        internal const string TypingsToolInstallErrorOccurred = "TypingsToolInstallErrorOccurred";
-        internal const string TypingsToolNotInstalledError = "TypingsToolNotInstalledError";
         internal const string TypingsOpenOptionsText = "TypingsOpenOptionsText";
+        internal const string TypingsToolCouldNotStart = "TypingsToolCouldNotStart";
+        internal const string TypingsToolInstallFailed = "TypingsToolInstallFailed";
+        internal const string TypingsToolNotInstalledError = "TypingsToolNotInstalledError";
+        internal const string TypingsToolTypingsInstallCompleted = "TypingsToolTypingsInstallCompleted";
+        internal const string TypingsToolTypingsInstallErrorOccurred = "TypingsToolTypingsInstallErrorOccurred";
         internal const string UpgradedEnvironmentVariables = "UpgradedEnvironmentVariables";
         internal const string WorkingDirInvalidOrMissing = "WorkingDirInvalidOrMissing";
         internal const string WorkingDirToolTip = "WorkingDirToolTip";
-
         private static readonly Lazy<ResourceManager> _manager = new Lazy<ResourceManager>(
             () => new System.Resources.ResourceManager("Microsoft.NodejsTools.Resources", typeof(SR).Assembly),
             LazyThreadSafetyMode.ExecutionAndPublication

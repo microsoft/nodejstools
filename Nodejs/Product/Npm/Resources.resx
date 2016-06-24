@@ -132,12 +132,6 @@
   <data name="PackagesDownloadedXOfYMB" xml:space="preserve">
     <value>Downloaded {0}MB of the package list ({1}MB total)</value>
   </data>
-  <data name="CannotRetrieveLicenseEmptyCollection" xml:space="preserve">
-    <value>Cannot retrieve license from empty license collection.</value>
-  </data>
-  <data name="CannotRetrieveLicenseInvalidIndex" xml:space="preserve">
-    <value>Cannot retrieve license for index less than 0.</value>
-  </data>
   <data name="ErrCannotStartNpm" xml:space="preserve">
     <value>Error executing npm - unable to start the npm process</value>
   </data>
@@ -203,5 +197,8 @@
   <data name="InvalidPackageSemVersion" xml:space="preserve">
     <value>Semversion {0} for package {1} is invalid</value>
     <comment>args: semantic version, package name</comment>
+  </data>
+  <data name="CouldNotFindNpm" xml:space="preserve">
+    <value>Could not find npm. Please make sure Node.js is installed</value>
   </data>
 </root>
