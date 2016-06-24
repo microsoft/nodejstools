@@ -15,7 +15,6 @@
 //*********************************************************//
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -23,12 +22,12 @@ using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal class NpmController : AbstractNpmLogSource, INpmController {
-
         private IPackageCatalog _sRepoCatalog;
         private string _fullPathToRootPackageDirectory;
         private string _cachePath;
         private bool _showMissingDevOptionalSubPackages;
         private INpmPathProvider _npmPathProvider;
+        private INpmGlobalPackageProvider _globalPackageProvider;
         private IRootPackage _rootPackage;
         private IGlobalPackages _globalPackage;
         private readonly object _lock = new object();
@@ -41,7 +40,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         private readonly object _fileBitsLock = new object();
 
-
         private bool _isDisposed;
         private bool _isReloadingModules = false;
 
@@ -49,11 +47,13 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             string fullPathToRootPackageDirectory,
             string cachePath,
             bool showMissingDevOptionalSubPackages = false,
-            INpmPathProvider npmPathProvider = null) {
+            INpmPathProvider npmPathProvider = null,
+            INpmGlobalPackageProvider globalPackageProvider = null) {
             _fullPathToRootPackageDirectory = fullPathToRootPackageDirectory;
             _cachePath = cachePath;
             _showMissingDevOptionalSubPackages = showMissingDevOptionalSubPackages;
             _npmPathProvider = npmPathProvider;
+            _globalPackageProvider = globalPackageProvider ?? new NpmBinGlobalPackageProvider();
 
             _localWatcher = CreateModuleDirectoryWatcherIfDirectoryExists(_fullPathToRootPackageDirectory);
             _globalWatcher = CreateModuleDirectoryWatcherIfDirectoryExists(this.ListBaseDirectory);
@@ -127,11 +127,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                             _fullPathToRootPackageDirectory,
                             _showMissingDevOptionalSubPackages);
 
-                var command = new NpmBinCommand(_fullPathToRootPackageDirectory, true, PathToNpm);
+                GlobalPackages = await _globalPackageProvider.GetGlobalPackages(PathToNpm);
 
-                GlobalPackages = (await command.ExecuteAsync())
-                    ? RootPackageFactory.Create(command.BinDirectory)
-                    : null;
             } catch (IOException) {
                 // Can sometimes happen when packages are still installing because the file may still be used by another process
             } finally {
@@ -362,6 +359,18 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
                 _isDisposed = true;
             }
+        }
+    }
+
+    /// <summary>
+    /// Standard `INpmGlobalPackageProvider` that uses `npm bin` to get global packages.
+    /// </summary>
+    public class NpmBinGlobalPackageProvider : INpmGlobalPackageProvider {
+        public async Task<IGlobalPackages> GetGlobalPackages(string pathToNpm) {
+            var command = new NpmBinCommand(String.Empty, true, pathToNpm);
+            return (await command.ExecuteAsync())
+                ? RootPackageFactory.Create(command.BinDirectory)
+                : null;
         }
     }
 }

@@ -14,21 +14,30 @@
 //
 //*********************************************************//
 
+using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm.SPI;
 
 namespace Microsoft.NodejsTools.Npm {
-    public class NpmControllerFactory {
+    /// <summary>
+    /// Provides global packages for a given npm executable.
+    /// </summary>
+    public interface INpmGlobalPackageProvider {
+        Task<IGlobalPackages> GetGlobalPackages(string pathToNpm);
+    }
+
+    public static class NpmControllerFactory {
         public static INpmController Create(
             string fullPathToRootPackageDirectory,
             string cachePath,
             bool showMissingDevOptionalSubPackages = false,
             INpmPathProvider npmPathProvider = null,
-            bool useFallbackIfNpmNotFound = true) {
+            INpmGlobalPackageProvider globalPackageProvider = null) {
             return new NpmController(
                 fullPathToRootPackageDirectory,
                 cachePath,
                 showMissingDevOptionalSubPackages,
-                npmPathProvider);
+                npmPathProvider,
+                globalPackageProvider);
         }
     }
 }

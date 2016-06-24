@@ -1245,6 +1245,5 @@ namespace Microsoft.NodejsTools.Project {
             }
             return base.Build(config, target);
         }
-
     }
 }
