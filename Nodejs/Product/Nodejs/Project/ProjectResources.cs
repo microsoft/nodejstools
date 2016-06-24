@@ -31,6 +31,8 @@ namespace Microsoft.NodejsTools.Project {
         internal const string CatalogLoadingNoNpm = "CatalogLoadingNoNpm";
         internal const string CategoryStatus = "CategoryStatus";
         internal const string CategoryVersion = "CategoryVersion";
+        internal const string CacheDirectoryClearFailedTitle = "CacheDirectoryClearFailedTitle";
+        internal const string CacheDirectoryClearFailedCaption = "CacheDirectoryClearFailedCaption";
         internal const string ContinueWithoutAzureToolsUpgrade = "ContinueWithoutAzureToolsUpgrade";
         internal const string DebuggerConnectionClosed = "DebuggerConnectionClosed";
         internal const string DebuggerModuleUpdateFailed = "DebuggerModuleUpdateFailed";

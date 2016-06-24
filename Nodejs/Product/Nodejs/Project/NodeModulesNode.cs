@@ -138,7 +138,7 @@ namespace Microsoft.NodejsTools.Project {
         private static INpmController DefaultNpmController(string projectHome, NpmPathProvider pathProvider) {
             return NpmControllerFactory.Create(
                 projectHome,
-                NodejsPackage.Instance.NpmOptionsPage.NpmCachePath,
+                NodejsConstants.NpmCachePath,
                 false,
                 pathProvider);
         }

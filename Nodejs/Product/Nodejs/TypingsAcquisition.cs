@@ -36,25 +36,12 @@ namespace Microsoft.NodejsTools {
         private static SemaphoreSlim typingsToolGlobalWorkSemaphore = new SemaphoreSlim(1);
 
         /// <summary>
-        /// Path the the private package where the typings acquisition tool is installed.
-        /// </summary>
-        private static string NtvsExternalToolsPath {
-            get {
-                return Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    "Microsoft",
-                    "Node.js Tools",
-                    "ExternalTools");
-            }
-        }
-
-        /// <summary>
         /// Full path to the typings acquisition tool.
         /// </summary>
         private static string TypingsToolPath {
             get {
                 return Path.Combine(
-                    NtvsExternalToolsPath,
+                    NodejsConstants.ExternalToolsPath,
                     "node_modules",
                     ".bin",
                     TypingsToolExe);
@@ -161,11 +148,11 @@ namespace Microsoft.NodejsTools {
         private async Task<bool> InstallTypingsTool() {
             _didTryToInstallTypingsTool = true;
 
-            Directory.CreateDirectory(NtvsExternalToolsPath);
+            Directory.CreateDirectory(NodejsConstants.ExternalToolsPath);
 
             // install typings
             using (var commander = _npmController.CreateNpmCommander()) {
-                return await commander.InstallPackageToFolderByVersionAsync(NtvsExternalToolsPath, TypingsTool, TypingsToolVersion, false);
+                return await commander.InstallPackageToFolderByVersionAsync(NodejsConstants.ExternalToolsPath, TypingsTool, TypingsToolVersion, false);
             }
         }
 

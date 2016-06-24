@@ -14,8 +14,6 @@
 //
 //*********************************************************//
 
-using System;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
@@ -46,17 +44,6 @@ namespace Microsoft.NodejsTools.Options {
         /// npm commands are being executed.
         /// </summary>
         public bool ShowOutputWindowWhenExecutingNpm { get; set; }
-
-        public string NpmCachePath {
-            get {
-                return Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    "Microsoft",
-                    "Node.js Tools",
-                    "NpmCache"
-                    );
-            }
-        }
 
         /// <summary>
         /// Resets settings back to their defaults. This should be followed by
