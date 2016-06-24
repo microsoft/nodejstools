@@ -7,6 +7,22 @@
       <ProgressText Action="VWDSetup">Updating extension registration with Visual Studio Web Express...</ProgressText>
       <ProgressText Action="VWDSetup_Rollback">Removing extension registration with Visual Studio Web Express...</ProgressText>
 
+      <Dialog Id="VsPreUpdate2WarningDlg" Width="260" Height="120" Title="!(loc.CancelDlg_Title)">
+        <Control Id="AbortInstall" Type="PushButton" X="136" Y="90" Width="56" Height="17" Default="yes" Cancel="yes" Text="!(loc.DontInstallLabel)">
+          <Publish Event="EndDialog" Value="Exit">1</Publish>
+        </Control>
+        <Control Id="ContinueInstall" Type="PushButton" X="68" Y="90" Width="64" Height="17" Text="!(loc.InstallAnywayLabel)">
+          <Publish Property="ContinueInstall" Value="1">1</Publish>
+          <Publish Event="EndDialog" Value="Return">1</Publish>
+        </Control>
+        <Control Id="TextVersionWarning" Type="Text" X="48" Y="15" Width="194" Height="45" Text="!(loc.VSRequires2015Update2)" />
+        <Control Id="TextContinueWarning" Type="Text" X="48" Y="50" Width="194" Height="35" Text="!(loc.VSRequires2015Update2ContinueWarning)"/>
+        <Control Id="Icon" Type="Icon" X="15" Y="15" Width="24" Height="24" ToolTip="!(loc.CancelDlgIconTooltip)" FixedSize="yes" IconSize="48" Text="WixUI_Ico_Exclam" />
+      </Dialog>
+      <Publish Event="SpawnDialog" Dialog="CustomAdvancedWelcomeEulaDlg" Control="LicenseText" Value="VsPreUpdate2WarningDlg">
+        <![CDATA[VS_IS_2015_PRE_UPDATE_2="1" AND ContinueInstall<>"1"]]>
+      </Publish>
+
       <Dialog Id="CustomAdvancedWelcomeEulaDlg" Width="370" Height="270" Title="!(loc.AdvancedWelcomeEulaDlg_Title)">
         <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="!(loc.AdvancedWelcomeEulaDlgBannerBitmap)" />
         <Control Id="Title" Type="Text" X="20" Y="10" Width="300" Height="24" Transparent="yes" NoPrefix="yes" Text="!(loc.AdvancedWelcomeEulaDlgTitle)" />
@@ -152,6 +168,7 @@
     </UI>
 
     <Property Id="EasyInstall" Value="0" />
+    <Property Id="ContinueInstall" Value="0"/>
     <UIRef Id="WixUI_Common" />
 
     <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
