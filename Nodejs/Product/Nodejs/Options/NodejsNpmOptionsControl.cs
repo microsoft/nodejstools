@@ -66,12 +66,12 @@ namespace Microsoft.NodejsTools.Options {
                 };
 
                 using (var process = Process.Start(psi)) {
-                    process.WaitForExit(2000);
+                    process.WaitForExit(10000);
                 }
 
                 // Then delete the directory itself
                 try {
-                    Directory.Delete(cachePath);
+                    Directory.Delete(cachePath, true);
                 } catch (DirectoryNotFoundException) {
                     // noop
                 }
