@@ -66,11 +66,9 @@
   <Fragment>
     <Property Id="VS_IS_2015_PRE_UPDATE_3" Secure="yes">
       <?if "$(var.VSTargetVersion)"="14.0" ?>
-        <RegistrySearch Id="VSPrereleaseInstallDir" Root="HKLM" Key="Software\Microsoft\VisualStudio\$(var.VSTargetVersion)\Setup\VS" Name="ProductDir" Type="directory">
-          <DirectorySearch Id="VSPrereleaseInstallDir_Common7_IDE" Path="Common7\IDE" Depth="1">
-            <FileSearch Id="VSPrerelease_Common7_IDE_msenv_dll" Name="msenv.dll" MinVersion="14.0.0.0" MaxVersion="14.0.25414.0"/>
-          </DirectorySearch>
-        </RegistrySearch>
+        <DirectorySearch Id="VSPreUpdate3InstallDir_Common7_IDE" Path="[VSINSTALLPATH]" Depth="1">
+          <FileSearch Id="VSPreUpdate3_Common7_IDE_msenv_dll" Name="msenv.dll" MinVersion="14.0.0.0" MaxVersion="14.0.25414.0"/>
+        </DirectorySearch>
       <?endif ?>
     </Property>
   </Fragment>
