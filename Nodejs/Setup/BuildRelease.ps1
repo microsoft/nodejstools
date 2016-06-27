@@ -171,7 +171,7 @@ if ($release -or $mockrelease) {
 
 # Get the path to msbuild for a configuration
 function msbuild-exe($target) {
-    $msbuild_reg = Get-ItemProperty -Path "HKLM:\Software\Microsoft\MSBuild\ToolsVersions\$($target.VSTarget)" -EA 0
+    $msbuild_reg = Get-ItemProperty -Path "HKLM:\Software\Wow6432Node\Microsoft\MSBuild\ToolsVersions\$($target.VSTarget)" -EA 0
     if (-not $msbuild_reg) {
         Throw "Visual Studio build tools $($target.VSTarget) not found."
     }
