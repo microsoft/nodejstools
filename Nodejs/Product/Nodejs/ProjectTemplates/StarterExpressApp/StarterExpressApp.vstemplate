@@ -15,6 +15,9 @@
   </TemplateData>
   <TemplateContent>
     <Project File="StarterExpressApp.njsproj" ReplaceParameters="true">
+      <Folder Name="bin">
+        <ProjectItem ReplaceParameters="true">www</ProjectItem>
+      </Folder>
       <Folder Name="public">
         <Folder Name="fonts">
           <ProjectItem>glyphicons-halflings-regular.eot</ProjectItem>
