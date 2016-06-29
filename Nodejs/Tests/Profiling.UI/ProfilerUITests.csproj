@@ -133,5 +133,8 @@
       <Name>TestUtilities.UI.Nodejs</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+  </ItemGroup>
   <Import Project="..\TestProjectAfter.settings" />
 </Project>

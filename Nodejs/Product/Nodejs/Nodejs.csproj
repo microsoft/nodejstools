@@ -178,6 +178,10 @@
       <Private>false</Private>
       <HintPath>$(DevEnvDir)Extensions\Microsoft\Windows Azure Tools\Common\Microsoft.VisualStudio.WindowsAzure.CommonAzureTools.Contracts.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.VisualStudio.Workspace, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Workspaces.14.0.719-pre-g3a6acd5580\lib\net45\Microsoft.VisualStudio.Workspace.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -910,6 +914,7 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubPath>ItemTemplates</VSIXSubPath>
     </Content>
+    <None Include="app.config" />
     <None Include="Theme\contrast.vstheme">
       <SubType>Designer</SubType>
     </None>
