@@ -910,6 +910,7 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubPath>ItemTemplates</VSIXSubPath>
     </Content>
+    <ZipProject Include="ProjectTemplates\StarterExpressApp\www" />
     <None Include="Theme\contrast.vstheme">
       <SubType>Designer</SubType>
     </None>
@@ -1064,7 +1065,6 @@
     <ZipProject Include="ProjectTemplates\StarterExpressApp\StarterExpressApp.vstemplate">
       <SubType>Designer</SubType>
     </ZipProject>
-    <ZipProject Include="ProjectTemplates\StarterExpressApp\user.js" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptStarterExpressApp\_references.js" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptStarterExpressApp\app.ts" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptStarterExpressApp\bootstrap.css" />
