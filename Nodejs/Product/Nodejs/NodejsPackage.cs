@@ -665,7 +665,7 @@ namespace Microsoft.NodejsTools {
             // it will throw to JSLS. This means that currently, loose files will be handled by the JSLS editor,
             // rather than the NodeLS editor (which means that the loose project analyzer will not be invoked
             // in these scenarios.)
-            //git sta
+            //
             // Because Salsa doesn't support the stitching together inputs from the surrounding text view,
             // we do not throw to Salsa from the REPL window. However, in order to provide a workable editing
             // experience within the REPL context, we initialize the loose analyzer with Quick IntelliSense
