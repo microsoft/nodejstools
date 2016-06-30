@@ -15,24 +15,30 @@
 //*********************************************************//
 
 using System;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
-using Microsoft.NodejsTools;
-using Microsoft.NodejsTools.Analysis;
 using Microsoft.NodejsTools.Logging;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Commands {
-    /// <summary>
-    /// Provides the command for starting a file or the start item of a project in the REPL window.
-    /// </summary>
     internal sealed class DiagnosticsCommand : Command {
+        private static readonly string[] interestingDteProperties = new[] {
+            "StartupFile",
+            "WorkingDirectory",
+            "PublishUrl",
+            "SearchPath",
+            "CommandLineArguments"
+        };
+
         public DiagnosticsCommand(IServiceProvider serviceProvider) { }
+
+        public override int CommandId {
+            get { return (int)PkgCmdId.cmdidDiagnostics; }
+        }
 
         public override void DoCommand(object sender, EventArgs args) {
             var dlg = new DiagnosticsForm("Gathering data...");
@@ -52,120 +58,84 @@ namespace Microsoft.NodejsTools.Commands {
         }
 
         private string GetData() {
-
-            StringBuilder res = new StringBuilder();
+            var res = new StringBuilder();
             res.AppendLine("Use Ctrl-C to copy contents");
             res.AppendLine();
+            res.AppendLine(GetSolutionInfo());
+            res.AppendLine(GetEventsAndStatsInfo());
+            res.AppendLine(GetLoadedAssemblyInfo());
+            res.AppendLine(GetAnalysisLevelInfo());
+            return res.ToString();
+        }
+
+        private static string GetSolutionInfo() {
+            var res = new StringBuilder();
 
             var dte = (EnvDTE.DTE)NodejsPackage.GetGlobalService(typeof(EnvDTE.DTE));
             res.AppendLine("Projects: ");
 
-            var projects = dte.Solution.Projects;
-            var interestingDteProperties = new[] { "StartupFile", "WorkingDirectory", "PublishUrl", "SearchPath", "CommandLineArguments" };
-            //var interestingProjectProperties = new[] { "AnalysisLevel" };
-
-            foreach (EnvDTE.Project project in projects) {
-                string name;
-                try {
-                    // Some projects will throw rather than give us a unique
-                    // name. They are not ours, so we will ignore them.
-                    name = project.UniqueName;
-                } catch (Exception ex) {
-                    if (ex.IsCriticalException()) {
-                        throw;
-                    }
-                    bool isNodejsProject = false;
-                    try {
-                        isNodejsProject = Utilities.GuidEquals(Guids.NodejsProjectFactoryString, project.Kind);
-                    } catch (Exception ex2) {
-                        if (ex2.IsCriticalException()) {
-                            throw;
-                        }
-                    }
-                    if (isNodejsProject) {
-                        // Actually, it was one of our projects, so we do care
-                        // about the exception. We'll add it to the output,
-                        // rather than crashing.
-                        res.AppendLine("    Project: " + ex.Message);
-                        res.AppendLine("        Kind: Node.js");
-                    }
-                    continue;
-                }
-                res.AppendLine("    Project: " + name);
-
-                if (Utilities.GuidEquals(Guids.NodejsBaseProjectFactoryString, project.Kind)) {
-                    res.AppendLine("        Kind: Node.js");
-
-                    foreach (var prop in interestingDteProperties) {
-                        res.AppendLine("        " + prop + ": " + GetProjectProperty(project, prop));
-                    }
-                    var njsProj = project.GetNodejsProject();
-                    if (njsProj != null) {
-                        var jsAnalyzer = njsProj.Analyzer;
-                        if (jsAnalyzer != null) {
-                            res.AppendLine("Analysis Log: ");
-
-                            using (StringWriter writer = new StringWriter(res)) {
-                                jsAnalyzer.DumpLog(writer);
-                            }
-                        }
-
-                        //foreach (var prop in interestingProjectProperties) {
-                        //    var propValue = njsProj.GetProjectProperty(prop);
-                        //    if (propValue != null) {
-                        //        res.AppendLine("        " + prop + ": " + propValue);
-                        //    }
-                        //}
-                    }
-                } else {
-                    res.AppendLine("        Kind: " + project.Kind);
-                }
-
-                res.AppendLine();
-
-
+            foreach (EnvDTE.Project project in dte.Solution.Projects) {
+                res.AppendLine(GetProjectInfo(project));
             }
 
+            return res.ToString();
+        }
+
+        private static string GetProjectInfo(EnvDTE.Project project) {
+            var res = new StringBuilder();
+            string name;
             try {
-                res.AppendLine("Logged events/stats:");
-                var inMemLogger = NodejsPackage.Instance.GetComponentModel().GetService<InMemoryLogger>();
-                res.AppendLine(inMemLogger.ToString());
-                res.AppendLine();
+                // Some projects will throw rather than give us a unique
+                // name. They are not ours, so we will ignore them.
+                name = project.UniqueName;
             } catch (Exception ex) {
                 if (ex.IsCriticalException()) {
                     throw;
                 }
-                res.AppendLine("  Failed to access event log.");
-                res.AppendLine(ex.ToString());
-                res.AppendLine();
-            }
-
-            res.AppendLine("Loaded assemblies:");
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().OrderBy(assem => assem.FullName)) {
-                var assemFileVersion = assembly.GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false).OfType<AssemblyFileVersionAttribute>().FirstOrDefault();
-
-                res.AppendLine(string.Format("  {0}, FileVersion={1}",
-                    assembly.FullName,
-                    assemFileVersion == null ? "(null)" : assemFileVersion.Version
-                ));
-            }
-            res.AppendLine();
-            
-
-            res.AppendLine(String.Format("Analysis Level: {0}", NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel.ToString()));
-            res.AppendLine();
-            if(NodejsPackage.Instance._analyzer != null) {
-                var jsAnalyzer = NodejsPackage.Instance._analyzer;
-                res.AppendLine("Default Analysis Log: ");
-
-                using (StringWriter writer = new StringWriter(res)) {
-                    jsAnalyzer.DumpLog(writer);
+                bool isNodejsProject = false;
+                try {
+                    isNodejsProject = Utilities.GuidEquals(Guids.NodejsProjectFactoryString, project.Kind);
+                } catch (Exception ex2) {
+                    if (ex2.IsCriticalException()) {
+                        throw;
+                    }
                 }
+                if (isNodejsProject) {
+                    // Actually, it was one of our projects, so we do care
+                    // about the exception. We'll add it to the output,
+                    // rather than crashing.
+                    res.AppendLine("    Project: " + ex.Message);
+                    res.AppendLine("        Kind: Node.js");
+                }
+                return res.ToString();
             }
+            res.AppendLine("    Project: " + name);
+            res.AppendLine(GetProjectPropertiesInfo(project));
+            return res.ToString();
+        }
 
-            res.AppendLine(String.Format("IntelliSense Completion Only Tab or Enter to Commit: {0}", NodejsPackage.Instance.IntellisenseOptionsPage.OnlyTabOrEnterToCommit));
-            res.AppendLine();
+        private static string GetProjectPropertiesInfo(EnvDTE.Project project) {
+            var res = new StringBuilder();
+            if (Utilities.GuidEquals(Guids.NodejsBaseProjectFactoryString, project.Kind)) {
+                res.AppendLine("        Kind: Node.js");
 
+                foreach (var prop in interestingDteProperties) {
+                    res.AppendLine("        " + prop + ": " + GetProjectProperty(project, prop));
+                }
+                var njsProj = project.GetNodejsProject();
+                if (njsProj != null) {
+                    var jsAnalyzer = njsProj.Analyzer;
+                    if (jsAnalyzer != null) {
+                        res.AppendLine("Analysis Log: ");
+
+                        using (StringWriter writer = new StringWriter(res)) {
+                            jsAnalyzer.DumpLog(writer);
+                        }
+                    }
+                }
+            } else {
+                res.AppendLine("        Kind: " + project.Kind);
+            }
             return res.ToString();
         }
 
@@ -181,8 +151,51 @@ namespace Microsoft.NodejsTools.Commands {
             return "<undefined>";
         }
 
-        public override int CommandId {
-            get { return (int)PkgCmdId.cmdidDiagnostics; }
+        private static string GetEventsAndStatsInfo() {
+            var res = new StringBuilder();
+            res.AppendLine("Logged events/stats:");
+
+            try {
+                var inMemLogger = NodejsPackage.Instance.GetComponentModel().GetService<InMemoryLogger>();
+                res.AppendLine(inMemLogger.ToString());
+            } catch (Exception ex) {
+                if (ex.IsCriticalException()) {
+                    throw;
+                }
+                res.AppendLine("  Failed to access event log.");
+                res.AppendLine(ex.ToString());
+            }
+            return res.ToString();
+        }
+
+        private static string GetLoadedAssemblyInfo() {
+            var res = new StringBuilder();
+            res.AppendLine("Loaded assemblies:");
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().OrderBy(assem => assem.FullName)) {
+                var assemFileVersion = assembly.GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false).OfType<AssemblyFileVersionAttribute>().FirstOrDefault();
+
+                res.AppendLine(string.Format("  {0}, FileVersion={1}",
+                    assembly.FullName,
+                    assemFileVersion == null ? "(null)" : assemFileVersion.Version));
+            }
+            return res.ToString();
+        }
+
+        private static string GetAnalysisLevelInfo() {
+            var res = new StringBuilder();
+            res.AppendLine(String.Format("Analysis Level: {0}", NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel.ToString()));
+            res.AppendLine();
+            if (NodejsPackage.Instance._analyzer != null) {
+                var jsAnalyzer = NodejsPackage.Instance._analyzer;
+                res.AppendLine("Default Analysis Log: ");
+
+                using (var writer = new StringWriter(res)) {
+                    jsAnalyzer.DumpLog(writer);
+                }
+            }
+
+            res.AppendLine(string.Format("IntelliSense Completion Only Tab or Enter to Commit: {0}", NodejsPackage.Instance.IntellisenseOptionsPage.OnlyTabOrEnterToCommit));
+            return res.ToString();
         }
     }
 }
