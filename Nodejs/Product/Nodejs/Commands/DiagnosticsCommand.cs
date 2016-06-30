@@ -23,6 +23,7 @@ using System.Threading;
 using Microsoft.NodejsTools.Logging;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
+using System.Collections.Generic;
 
 namespace Microsoft.NodejsTools.Commands {
     internal sealed class DiagnosticsCommand : Command {
@@ -131,6 +132,7 @@ namespace Microsoft.NodejsTools.Commands {
             return res.ToString();
         }
 
+
         private static string GetNodeJsProjectProperties(Project.NodejsProjectNode project) {
             var res = new StringBuilder();
 
@@ -141,9 +143,73 @@ namespace Microsoft.NodejsTools.Commands {
                     jsAnalyzer.DumpLog(writer);
                 }
             }
+            res.AppendLine("Files:");
+            res.AppendLine(Indent(4, GetProjectFileInfo(project)));
+            return res.ToString();
+        }
+
+        /// <summary>
+        /// Stores information about a collection of files of a given type.
+        /// </summary>
+        private class FileTypeInfo {
+            private int _count = 0;
+            private int _maxLineLength = 0;
+            private int _totalLineLength = 0;
+
+            public int Count {
+                get { return _count; }
+            }
+
+            public int MaxLineLength {
+                get { return _maxLineLength; }
+            }
+
+            public int AverageLineLength {
+                get { return _count > 0 ? _totalLineLength / _count : 0; }
+            }
+
+            public void UpdateForFile(string file) {
+                try {
+                    int length = File.ReadLines(file).Count();
+                    ++_count;
+                    _totalLineLength += length;
+                    _maxLineLength = Math.Max(_maxLineLength, length);
+                } catch (IOException) {
+                    // noop
+                }
+            }
+        }
+
+        private static string GetProjectFileInfo(Project.NodejsProjectNode project) {
+            var fileTypeInfo = new Dictionary<string, FileTypeInfo>();
+            foreach (var node in project.DiskNodes) {
+                if (node.Value.ItemNode?.IsExcluded ?? true) {
+                    continue;
+                }
+                var file = node.Key;
+                var ext = Path.GetExtension(file).ToLowerInvariant();
+                if (string.IsNullOrWhiteSpace(ext)) {
+                    continue;
+                }
+
+                FileTypeInfo record;
+                if (!fileTypeInfo.TryGetValue(ext, out record)) {
+                    record = fileTypeInfo[ext] = new FileTypeInfo();
+                }
+                record.UpdateForFile(file);
+            }
+
+            var res = new StringBuilder();
+            foreach (var entry in fileTypeInfo) {
+                res.AppendLine(entry.Key + ":");
+                res.AppendLine(Indent(4, "Number of Files: " + entry.Value.Count));
+                res.AppendLine(Indent(4, "Average Line Count: " + entry.Value.AverageLineLength));
+                res.AppendLine(Indent(4, "Max Line Count: " + entry.Value.MaxLineLength));
+            }
 
             return res.ToString();
         }
+
         private static string GetProjectProperty(EnvDTE.Project project, string name) {
             try {
                 var item = project.Properties.Item(name);
