@@ -241,6 +241,8 @@ namespace Microsoft.NodejsTools {
             MakeDebuggerContextAvailable();
 
             IntellisenseOptionsPage.AnalysisLogMaximumChanged += IntellisenseOptionsPage_AnalysisLogMaximumChanged;
+            IntellisenseOptionsPage.AnalysisLevelChanged += IntellisenseOptionsPageAnalysisLevelChanged;
+            IntellisenseOptionsPage.SaveToDiskChanged += IntellisenseOptionsPageSaveToDiskChanged;
 
             InitializeLogging();
 
@@ -633,25 +635,28 @@ namespace Microsoft.NodejsTools {
                     _analyzer = CreateLooseVsProjectAnalyzer();
                     LogLooseFileAnalysisLevel();
                     _analyzer.MaxLogLength = IntellisenseOptionsPage.AnalysisLogMax;
-                    IntellisenseOptionsPage.AnalysisLevelChanged += IntellisenseOptionsPageAnalysisLevelChanged;
-                    IntellisenseOptionsPage.SaveToDiskChanged += IntellisenseOptionsPageSaveToDiskChanged;
                 }
                 return _analyzer;
             }
         }
 
         private void IntellisenseOptionsPageSaveToDiskChanged(object sender, EventArgs e) {
-            _analyzer.SaveToDisk = IntellisenseOptionsPage.SaveToDisk;
+            if (_analyzer != null) {
+                _analyzer.SaveToDisk = IntellisenseOptionsPage.SaveToDisk;
+            }
         }
 
         private void IntellisenseOptionsPageAnalysisLevelChanged(object sender, EventArgs e) {
-            var analyzer = CreateLooseVsProjectAnalyzer();
-            analyzer.SwitchAnalyzers(_analyzer);
-            if (_analyzer.RemoveUser()) {
-                _analyzer.Dispose();
+            if (_analyzer != null) {
+                var analyzer = CreateLooseVsProjectAnalyzer();
+                analyzer.SwitchAnalyzers(_analyzer);
+                if (_analyzer.RemoveUser()) {
+                    _analyzer.Dispose();
+                }
+                _analyzer = analyzer;
+                LogLooseFileAnalysisLevel();
             }
-            _analyzer = analyzer;
-            LogLooseFileAnalysisLevel();
+            TelemetryLogger.LogIntelliSenseLevelChanged(IntellisenseOptionsPage.AnalysisLevel);
         }
 
         private VsProjectAnalyzer CreateLooseVsProjectAnalyzer() {
@@ -660,7 +665,7 @@ namespace Microsoft.NodejsTools {
             // it will throw to JSLS. This means that currently, loose files will be handled by the JSLS editor,
             // rather than the NodeLS editor (which means that the loose project analyzer will not be invoked
             // in these scenarios.)
-            //
+            //git sta
             // Because Salsa doesn't support the stitching together inputs from the surrounding text view,
             // we do not throw to Salsa from the REPL window. However, in order to provide a workable editing
             // experience within the REPL context, we initialize the loose analyzer with Quick IntelliSense
@@ -671,8 +676,7 @@ namespace Microsoft.NodejsTools {
 
         private void LogLooseFileAnalysisLevel() {
             var analyzer = _analyzer;
-            if(analyzer != null)
-            {
+            if (analyzer != null) {
                 var val = analyzer.AnalysisLevel;
                 _logger.LogEvent(NodejsToolsLogEvent.AnalysisLevel, (int)val);
             }

@@ -35,6 +35,7 @@ using Microsoft.VisualStudioTools.Project.Automation;
 using MSBuild = Microsoft.Build.Evaluation;
 using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
 using Microsoft.NodejsTools.Options;
+using Microsoft.NodejsTools.Telemetry;
 #if DEV14_OR_LATER
 using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Imaging;
@@ -605,9 +606,11 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private static void LogAnalysisLevel(VsProjectAnalyzer analyzer) {
+        private void LogAnalysisLevel(VsProjectAnalyzer analyzer) {
             if (analyzer != null) {
-                NodejsPackage.Instance.Logger.LogEvent(Logging.NodejsToolsLogEvent.AnalysisLevel, (int)analyzer.AnalysisLevel);
+                var level = analyzer.AnalysisLevel;
+                NodejsPackage.Instance.Logger.LogEvent(Logging.NodejsToolsLogEvent.AnalysisLevel, (int)level);
+                NodejsPackage.Instance.TelemetryLogger.LogIntelliSenseActivatedForProject(ProjectGuid, level);
             }
         }
 
