@@ -122,6 +122,22 @@
     <Reference Include="Microsoft.VisualStudio.TextManager.Interop.12.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
+    <Reference Include="Microsoft.VisualStudio.Validation, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Validation.14.1.144\lib\net45\Microsoft.VisualStudio.Validation.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Workspace, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Workspaces.14.0.723-pre-g99eb5f2f86\lib\net46\Microsoft.VisualStudio.Workspace.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Workspace.Extensions, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Workspaces.14.0.723-pre-g99eb5f2f86\lib\net46\Microsoft.VisualStudio.Workspace.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Workspace.Extensions.VS, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Workspaces.14.0.723-pre-g99eb5f2f86\lib\net46\Microsoft.VisualStudio.Workspace.Extensions.VS.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
@@ -177,10 +193,6 @@
       <SpecificVersion>False</SpecificVersion>
       <Private>false</Private>
       <HintPath>$(DevEnvDir)Extensions\Microsoft\Windows Azure Tools\Common\Microsoft.VisualStudio.WindowsAzure.CommonAzureTools.Contracts.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Workspace, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Workspaces.14.0.719-pre-g3a6acd5580\lib\net45\Microsoft.VisualStudio.Workspace.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -269,6 +281,7 @@
     <Compile Include="Commands\SurveyNewsCommand.cs" />
     <Compile Include="Debugger\DataTips\DataTipTextManagerEvents.cs" />
     <Compile Include="Debugger\DebugEngine\AD7EvalErrorProperty.cs" />
+    <Compile Include="Debugger\NodeDebugProvider.cs" />
     <Compile Include="Logging\LiveLogger.cs" />
     <Compile Include="Debugger\FilePosition.cs" />
     <Compile Include="Debugger\FuzzyLogicFileNameMapper.cs" />
