@@ -2,7 +2,6 @@
 <Project ToolsVersion="15.0" DefaultTargets="Build"
          xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <Import Project="..\SetupProjectBefore.settings" />
-    <Import Project="packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets"/>
 
     <PropertyGroup>
         <!-- Define properties that drive the manifest creation here. -->
@@ -11,6 +10,7 @@
         <BuildNumber>$(VSTarget).$(BuildNumber)</BuildNumber>
         <TargetName>$(MSBuildProjectName)</TargetName>
     </PropertyGroup>
+    
 
     <PropertyGroup>
         <!-- RTVS uses BuildVersion as 'major.minor.build.revision' and BuildNumber is 'build.revision'.
@@ -27,6 +27,6 @@
         <MergeManifest Include="C:\src\nodejstools\BuildOutput\Debug14.0\Setup\*.json"/>
     </ItemGroup>
 
+    <Import Project="packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets"/>
     <Import Project="..\SetupProjectAfter.settings" />
-
 </Project>
