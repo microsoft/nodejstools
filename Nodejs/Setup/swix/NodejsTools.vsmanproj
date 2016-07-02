@@ -30,6 +30,8 @@
 
     <ItemGroup>
         <ProjectReference Include="Microsoft.VisualStudio.NodejsTools.Nodejs.vsix.swixproj" />
+        <ProjectReference Include="Microsoft.VisualStudio.NodejsTools.Profiling.vsix.swixproj" />
+        <ProjectReference Include="Microsoft.VisualStudio.NodejsTools.InteractiveWindow.vsix.swixproj" />
     </ItemGroup>
 
     <Import Project="$(NuGetPackageRoot)\MicroBuild.Core\0.2.0\build\MicroBuild.Core.targets"

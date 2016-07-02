@@ -16,7 +16,7 @@
     </PropertyGroup> 
     
     <ItemGroup> 
-        <Package Include="Nodejs_files.swr" /> 
+        <Package Include="InteractiveWindow_files.swr" /> 
     </ItemGroup>
   <!--</Target>-->
   
