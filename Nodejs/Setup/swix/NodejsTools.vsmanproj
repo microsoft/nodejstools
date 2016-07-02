@@ -1,17 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build"
          xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props"
-            Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-
-    <PropertyGroup Condition="'$(NuGetPackageRoot)' == ''">
-        <NuGetPackageRoot>packages\</NuGetPackageRoot>
-    </PropertyGroup>
-    <ImportGroup>
-        <Import Project="$(NuGetPackageRoot)\MicroBuild.Core\0.2.0\build\MicroBuild.Core.props"
-                Condition="Exists('$(NuGetPackageRoot)\MicroBuild.Core\0.2.0\build\MicroBuild.Core.props')" />
-    </ImportGroup>
-
     <Import Project="..\SetupProjectBefore.settings" />
     <Import Project="packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets"/>
 
@@ -19,6 +8,8 @@
         <!-- Define properties that drive the manifest creation here. -->
         <FinalizeManifest>true</FinalizeManifest>
         <FinalizeSkipLayout>true</FinalizeSkipLayout>
+        <BuildNumber>$(VSTarget).$(BuildNumber)</BuildNumber>
+        <TargetName>$(MSBuildProjectName)</TargetName>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -29,13 +20,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="Microsoft.VisualStudio.NodejsTools.Nodejs.vsix.swixproj" />
-        <ProjectReference Include="Microsoft.VisualStudio.NodejsTools.Profiling.vsix.swixproj" />
-        <ProjectReference Include="Microsoft.VisualStudio.NodejsTools.InteractiveWindow.vsix.swixproj" />
+        <ProjectReference Include="*.swixproj" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <MergeManifest Include="C:\src\nodejstools\BuildOutput\Debug14.0\Setup\*.json"/>
     </ItemGroup>
 
-    <Import Project="$(NuGetPackageRoot)\MicroBuild.Core\0.2.0\build\MicroBuild.Core.targets"
-        Condition="Exists('$(NuGetPackageRoot)\MicroBuild.Core\0.2.0\build\MicroBuild.Core.targets')" />
     <Import Project="..\SetupProjectAfter.settings" />
 
 </Project>
