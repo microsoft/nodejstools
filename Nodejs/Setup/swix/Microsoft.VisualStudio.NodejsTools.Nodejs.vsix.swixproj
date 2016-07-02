@@ -2,6 +2,8 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\SetupProjectBefore.settings" />
   <Import Project="packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets"/>
+  <Target Name="GetNativeManifest"/>
+
   <!--<Target Name="Build">-->
     <PropertyGroup> 
         <OutputArchitecture>neutral</OutputArchitecture> 
