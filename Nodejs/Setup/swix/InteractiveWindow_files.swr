@@ -6,4 +6,4 @@ package name=Microsoft.VisualStudio.NodejsTools.InteractiveWindow
     vs.package.vsixId=29102E6C-34F2-4FF1-BA2F-C02ADE3846E8
 
 vs.payloads
-    vs.payload source=C:\src\nodejstools\BuildOutput\Debug14.0\Binaries\InteractiveWindow\Microsoft.NodejsTools.InteractiveWindow.vsix
+    vs.payload source=$(BuildOutputRoot)\Binaries\InteractiveWindow\Microsoft.NodejsTools.InteractiveWindow.vsix

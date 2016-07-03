@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\SetupProjectBefore.settings" />
-  <Import Project="packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets"/>
   <Target Name="GetNativeManifest"/>
 
   <!--<Target Name="Build">-->
     <PropertyGroup> 
         <OutputArchitecture>neutral</OutputArchitecture> 
         <OutputLocalized>false</OutputLocalized> 
-        <OutputType>manifest</OutputType> 
+        <OutputType>manifest</OutputType>
     </PropertyGroup> 
     
     <PropertyGroup> 
-        <PackagePreprocessorDefinitions>$(PackagePreprocessorDefinitions)</PackagePreprocessorDefinitions>
+        <PackagePreprocessorDefinitions>$(PackagePreprocessorDefinitions);BuildOutputRoot=$(BuildOutputRoot)</PackagePreprocessorDefinitions>
     </PropertyGroup> 
     
     <ItemGroup> 
-        <Package Include="Nodejs_files.swr" /> 
+        <Package Include="Profiling_files.swr" /> 
     </ItemGroup>
   <!--</Target>-->
   
+  <Import Project="packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets"/>
   <!--<Import Project="$(_NTBINDIR)\tools\wix4\wix.props"/> -->
   <!--<Import Project="$(_NTBINDIR)\tools\wix4\wix.targets"/> -->
 </Project>

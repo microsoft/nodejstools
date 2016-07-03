@@ -6,4 +6,4 @@ package name=Microsoft.VisualStudio.NodejsTools.Nodejs
     vs.package.vsixId=FE8A8C3D-328A-476D-99F9-2A24B75F8C7F
 
 vs.payloads
-    vs.payload source=C:\src\nodejstools\BuildOutput\Debug14.0\Binaries\Nodejs\Microsoft.NodejsTools.vsix
+    vs.payload source=$(BuildOutputRoot)\Binaries\Nodejs\Microsoft.NodejsTools.vsix

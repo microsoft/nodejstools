@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="GetNativeManifest"/>
+  <Import Project="..\SetupProjectBefore.settings" />
+
+    <PropertyGroup> 
+        <OutputArchitecture>neutral</OutputArchitecture> 
+        <OutputLocalized>false</OutputLocalized> 
+        <OutputType>Vsix</OutputType>
+        <PackageType>.vsix</PackageType>
+        <IsPackage>true</IsPackage>
+        <!--<OutputType>manifest</OutputType>-->
+    </PropertyGroup> 
+
+    <PropertyGroup> 
+        <PackagePreprocessorDefinitions>$(PackagePreprocessorDefinitions);BuildOutputRoot=$(BuildOutputRoot)</PackagePreprocessorDefinitions>
+    </PropertyGroup> 
+
+    <ItemGroup> 
+        <Package Include="Targets_files.swr" /> 
+    </ItemGroup>
+  <Import Project="packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets"/>
+</Project>
