@@ -1715,6 +1715,10 @@
     <CopyVsixExtensionLocation>
     </CopyVsixExtensionLocation>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <CreateVsixContainer>True</CreateVsixContainer>
+    <CopyVsixExtensionFiles>True</CopyVsixExtensionFiles>
+  </PropertyGroup>
   <Import Project="$(BuildRoot)\Common\Product\SharedProject\SharedProject.proj" />
   <Import Project="..\ProjectAfter.settings" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
