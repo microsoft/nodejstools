@@ -15,6 +15,7 @@
 //*********************************************************//
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -23,7 +24,6 @@ using System.Threading;
 using Microsoft.NodejsTools.Logging;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
-using System.Collections.Generic;
 
 namespace Microsoft.NodejsTools.Commands {
     internal sealed class DiagnosticsCommand : Command {
