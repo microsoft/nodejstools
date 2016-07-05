@@ -656,7 +656,7 @@ namespace Microsoft.NodejsTools {
                 _analyzer = analyzer;
                 LogLooseFileAnalysisLevel();
             }
-            TelemetryLogger.LogIntelliSenseLevelChanged(IntellisenseOptionsPage.AnalysisLevel);
+            TelemetryLogger.LogAnalysisLevelChanged(IntellisenseOptionsPage.AnalysisLevel);
         }
 
         private VsProjectAnalyzer CreateLooseVsProjectAnalyzer() {

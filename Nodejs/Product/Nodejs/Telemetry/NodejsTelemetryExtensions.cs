@@ -21,18 +21,18 @@ namespace Microsoft.NodejsTools.Telemetry {
     /// Extensions for logging telemetry events.
     /// </summary>
     internal static class NodejsTelemetryExtensions {
-        public static void LogIntelliSenseActivatedForProject(this ITelemetryLogger logger, Guid projectGuid, Options.AnalysisLevel newAnalysisLevel) {
+        public static void LogAnalysisActivatedForProject(this ITelemetryLogger logger, Guid projectGuid, Options.AnalysisLevel newAnalysisLevel) {
             logger.ReportEvent(
-                TelemetryEvents.IntelliSenseActivatedForProject,
+                TelemetryEvents.AnalysisActivatedForProject,
                 new DataPointCollection(
                     new DataPoint(TelemetryProperties.ProjectGuid, projectGuid.ToString("B")),
-                    new DataPoint(TelemetryProperties.IntelliSenseLevel, newAnalysisLevel.ToString())));
+                    new DataPoint(TelemetryProperties.AnalysisLevel, newAnalysisLevel.ToString())));
         }
 
-        public static void LogIntelliSenseLevelChanged(this ITelemetryLogger logger, Options.AnalysisLevel newAnalysisLevel) {
+        public static void LogAnalysisLevelChanged(this ITelemetryLogger logger, Options.AnalysisLevel newAnalysisLevel) {
             logger.ReportEvent(
-                TelemetryEvents.IntelliSenseLevelChanged,
-                TelemetryProperties.IntelliSenseLevel,
+                TelemetryEvents.AnalysisLevelChanged,
+                TelemetryProperties.AnalysisLevel,
                 newAnalysisLevel.ToString());
         }
 

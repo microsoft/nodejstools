@@ -610,7 +610,7 @@ namespace Microsoft.NodejsTools.Project {
             if (analyzer != null) {
                 var level = analyzer.AnalysisLevel;
                 NodejsPackage.Instance.Logger.LogEvent(Logging.NodejsToolsLogEvent.AnalysisLevel, (int)level);
-                NodejsPackage.Instance.TelemetryLogger.LogIntelliSenseActivatedForProject(ProjectGuid, level);
+                NodejsPackage.Instance.TelemetryLogger.LogAnalysisActivatedForProject(ProjectGuid, level);
             }
         }
 

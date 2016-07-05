@@ -20,6 +20,6 @@ namespace Microsoft.NodejsTools.Telemetry {
     /// </summary>
     internal static class TelemetryProperties {
         public const string ProjectGuid = "ProjectGuid";
-        public const string IntelliSenseLevel = "IntelliSenseLevel";
+        public const string AnalysisLevel = "AnalysisLevel";
     }
 }
