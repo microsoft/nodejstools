@@ -241,6 +241,8 @@ namespace Microsoft.NodejsTools {
             MakeDebuggerContextAvailable();
 
             IntellisenseOptionsPage.AnalysisLogMaximumChanged += IntellisenseOptionsPage_AnalysisLogMaximumChanged;
+            IntellisenseOptionsPage.AnalysisLevelChanged += IntellisenseOptionsPageAnalysisLevelChanged;
+            IntellisenseOptionsPage.SaveToDiskChanged += IntellisenseOptionsPageSaveToDiskChanged;
 
             InitializeLogging();
 
@@ -633,25 +635,28 @@ namespace Microsoft.NodejsTools {
                     _analyzer = CreateLooseVsProjectAnalyzer();
                     LogLooseFileAnalysisLevel();
                     _analyzer.MaxLogLength = IntellisenseOptionsPage.AnalysisLogMax;
-                    IntellisenseOptionsPage.AnalysisLevelChanged += IntellisenseOptionsPageAnalysisLevelChanged;
-                    IntellisenseOptionsPage.SaveToDiskChanged += IntellisenseOptionsPageSaveToDiskChanged;
                 }
                 return _analyzer;
             }
         }
 
         private void IntellisenseOptionsPageSaveToDiskChanged(object sender, EventArgs e) {
-            _analyzer.SaveToDisk = IntellisenseOptionsPage.SaveToDisk;
+            if (_analyzer != null) {
+                _analyzer.SaveToDisk = IntellisenseOptionsPage.SaveToDisk;
+            }
         }
 
         private void IntellisenseOptionsPageAnalysisLevelChanged(object sender, EventArgs e) {
-            var analyzer = CreateLooseVsProjectAnalyzer();
-            analyzer.SwitchAnalyzers(_analyzer);
-            if (_analyzer.RemoveUser()) {
-                _analyzer.Dispose();
+            if (_analyzer != null) {
+                var analyzer = CreateLooseVsProjectAnalyzer();
+                analyzer.SwitchAnalyzers(_analyzer);
+                if (_analyzer.RemoveUser()) {
+                    _analyzer.Dispose();
+                }
+                _analyzer = analyzer;
+                LogLooseFileAnalysisLevel();
             }
-            _analyzer = analyzer;
-            LogLooseFileAnalysisLevel();
+            TelemetryLogger.LogAnalysisLevelChanged(IntellisenseOptionsPage.AnalysisLevel);
         }
 
         private VsProjectAnalyzer CreateLooseVsProjectAnalyzer() {
@@ -671,8 +676,7 @@ namespace Microsoft.NodejsTools {
 
         private void LogLooseFileAnalysisLevel() {
             var analyzer = _analyzer;
-            if(analyzer != null)
-            {
+            if (analyzer != null) {
                 var val = analyzer.AnalysisLevel;
                 _logger.LogEvent(NodejsToolsLogEvent.AnalysisLevel, (int)val);
             }
