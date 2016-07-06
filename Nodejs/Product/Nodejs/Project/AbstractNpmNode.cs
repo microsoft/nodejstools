@@ -124,7 +124,7 @@ namespace Microsoft.NodejsTools.Project {
             for (var current = parent.FirstChild; null != current; current = current.NextSibling) {
                 var dep = current as DependencyNode;
                 if (null == dep) {
-                    if (!(current is GlobalModulesNode) && !(current is LocalModulesNode)) {
+                    if (!(current is LocalModulesNode)) {
                         remove.Add(current);
                     }
                     continue;

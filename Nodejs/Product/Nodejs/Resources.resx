@@ -300,9 +300,6 @@
   <data name="NpmNodePathDescription" xml:space="preserve">
     <value>Base path in which npm packages are installed.</value>
   </data>
-  <data name="PackageInstallationGlobal" xml:space="preserve">
-    <value>Global</value>
-  </data>
   <data name="PackageInstallationLocal" xml:space="preserve">
     <value>Local</value>
   </data>
@@ -405,12 +402,6 @@
   </data>
   <data name="PackageInstalledLocallyOldVersion" xml:space="preserve">
     <value>Old version {0} installed locally</value>
-  </data>
-  <data name="PackageInstalledGlobally" xml:space="preserve">
-    <value>Installed globally</value>
-  </data>
-  <data name="PackageInstalledGloballyOldVersion" xml:space="preserve">
-    <value>Old version {0} installed globally</value>
   </data>
   <data name="NpmCancelledWithErrors" xml:space="preserve">
     <value>{0} cancelled with errors - see Output window for details</value>

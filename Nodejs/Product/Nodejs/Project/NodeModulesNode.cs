@@ -46,7 +46,6 @@ namespace Microsoft.NodejsTools.Project {
 
         #region Member variables
 
-        private readonly GlobalModulesNode _globalModulesNode;
         private readonly LocalModulesNode _devModulesNode;
         private readonly LocalModulesNode _optionalModulesNode;
 
@@ -68,9 +67,6 @@ namespace Microsoft.NodejsTools.Project {
             : base(root) {
             _npmController = DefaultNpmController(_projectNode.ProjectHome, new NpmPathProvider(this));
             RegisterWithNpmController(_npmController);
-
-            _globalModulesNode = new GlobalModulesNode(root, this);
-            AddChild(_globalModulesNode);
 
             _devModulesNode = new LocalModulesNode(root, this, "dev", "DevelopmentModules", DependencyType.Development);
             AddChild(_devModulesNode);
@@ -105,7 +101,6 @@ namespace Microsoft.NodejsTools.Project {
 
                 _devModulesNode.Dispose();
                 _optionalModulesNode.Dispose();
-                _globalModulesNode.Dispose();
 
                 _isDisposed = true;
             }
@@ -380,15 +375,6 @@ namespace Microsoft.NodejsTools.Project {
             ReloadDevPackageHierarchy(controller);
             ReloadOptionalPackageHierarchy(controller);
             ReloadRootPackageHierarchy(controller);
-            ReloadGlobalPackageHierarchy(controller);
-        }
-
-        private void ReloadGlobalPackageHierarchy(INpmController controller) {
-            var global = controller.GlobalPackages;
-            if (global != null && global.Modules != null) {
-                _globalModulesNode.GlobalPackages = global;
-                ReloadHierarchy(_globalModulesNode, global.Modules);
-            }
         }
 
         private void ReloadRootPackageHierarchy(INpmController controller) {

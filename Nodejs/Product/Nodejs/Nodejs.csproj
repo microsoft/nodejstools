@@ -552,7 +552,6 @@
     </Compile>
     <Compile Include="Options\SurveyNewsPolicy.cs" />
     <Compile Include="Project\AbstractNpmNode.cs" />
-    <Compile Include="Project\GlobalModulesNode.cs" />
     <Compile Include="Project\ImportWizard\StartupPage.xaml.cs">
       <DependentUpon>StartupPage.xaml</DependentUpon>
     </Compile>
