@@ -141,7 +141,6 @@ namespace Microsoft.NodejsTools.Commands {
             return res.ToString();
         }
 
-
         private static string GetNodeJsProjectProperties(Project.NodejsProjectNode project) {
             var res = new StringBuilder();
 
