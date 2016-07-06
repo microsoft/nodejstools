@@ -152,6 +152,7 @@ namespace Microsoft.NodejsTools.Commands {
                     jsAnalyzer.DumpLog(writer);
                 }
             }
+            res.AppendLine(GetProjectNpmInfo(project));
             res.AppendLine(GetProjectFileInfo(project));
             return res.ToString();
         }
@@ -213,6 +214,19 @@ namespace Microsoft.NodejsTools.Commands {
                 res.AppendLine(Indent(2, "Average Line Count: " + entry.Value.AverageLineLength));
                 res.AppendLine(Indent(2, "Max Line Count: " + entry.Value.MaxLineLength));
             }
+
+            return res.ToString();
+        }
+
+        private static string GetProjectNpmInfo(Project.NodejsProjectNode project) {
+            var modules = project?.ModulesNode?.RootPackage?.Modules;
+            if (modules == null) {
+                return "";
+            }
+
+            var res = new StringBuilder();
+            res.AppendLine("Npm Info:");
+            res.AppendLine(Indent(1, string.Format("Number of Top Level Modules: " + modules.Count())));
 
             return res.ToString();
         }
