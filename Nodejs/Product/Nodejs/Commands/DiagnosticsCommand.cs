@@ -35,6 +35,15 @@ namespace Microsoft.NodejsTools.Commands {
             "CommandLineArguments"
         };
 
+        private static readonly string[] interestingFileExtensions = new[] {
+            ".js",
+            ".jsx",
+            ".tsx",
+            ".d.ts",
+            ".ts",
+            ".html"
+        };
+
         public DiagnosticsCommand(IServiceProvider serviceProvider) { }
 
         public override int CommandId {
@@ -76,7 +85,7 @@ namespace Microsoft.NodejsTools.Commands {
             res.AppendLine("Projects:");
 
             foreach (EnvDTE.Project project in dte.Solution.Projects) {
-                res.AppendLine(Indent(4, GetProjectInfo(project)));
+                res.AppendLine(Indent(1, GetProjectInfo(project)));
             }
 
             return res.ToString();
@@ -106,12 +115,12 @@ namespace Microsoft.NodejsTools.Commands {
                     // about the exception. We'll add it to the output,
                     // rather than crashing.
                     res.AppendLine("Project: " + ex.Message);
-                    res.AppendLine(Indent(8, "Kind: Node.js"));
+                    res.AppendLine(Indent(2, "Kind: Node.js"));
                 }
                 return res.ToString();
             }
             res.AppendLine("Project: " + name);
-            res.AppendLine(Indent(4, GetProjectPropertiesInfo(project)));
+            res.AppendLine(Indent(1, GetProjectPropertiesInfo(project)));
             return res.ToString();
         }
 
@@ -143,8 +152,7 @@ namespace Microsoft.NodejsTools.Commands {
                     jsAnalyzer.DumpLog(writer);
                 }
             }
-            res.AppendLine("Files:");
-            res.AppendLine(Indent(4, GetProjectFileInfo(project)));
+            res.AppendLine(GetProjectFileInfo(project));
             return res.ToString();
         }
 
@@ -183,28 +191,27 @@ namespace Microsoft.NodejsTools.Commands {
         private static string GetProjectFileInfo(Project.NodejsProjectNode project) {
             var fileTypeInfo = new Dictionary<string, FileTypeInfo>();
             foreach (var node in project.DiskNodes) {
-                if (node.Value.ItemNode?.IsExcluded ?? true) {
-                    continue;
-                }
                 var file = node.Key;
-                var ext = Path.GetExtension(file).ToLowerInvariant();
-                if (string.IsNullOrWhiteSpace(ext)) {
-                    continue;
-                }
+                var matchedExt = interestingFileExtensions.Where(ext => file.EndsWith(ext, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
-                FileTypeInfo record;
-                if (!fileTypeInfo.TryGetValue(ext, out record)) {
-                    record = fileTypeInfo[ext] = new FileTypeInfo();
+                if (!string.IsNullOrEmpty(matchedExt)) {
+                    var recordKey = string.Format("{0} ({1})", matchedExt, node.Value.ItemNode?.IsExcluded ?? true ? "excluded from project" : "included in project");
+                    FileTypeInfo record;
+                    if (!fileTypeInfo.TryGetValue(recordKey, out record)) {
+                        record = fileTypeInfo[recordKey] = new FileTypeInfo();
+                    }
+                    record.UpdateForFile(file);
                 }
-                record.UpdateForFile(file);
             }
 
             var res = new StringBuilder();
+
+            res.AppendLine("Project Info:");
             foreach (var entry in fileTypeInfo) {
-                res.AppendLine(entry.Key + ":");
-                res.AppendLine(Indent(4, "Number of Files: " + entry.Value.Count));
-                res.AppendLine(Indent(4, "Average Line Count: " + entry.Value.AverageLineLength));
-                res.AppendLine(Indent(4, "Max Line Count: " + entry.Value.MaxLineLength));
+                res.AppendLine(Indent(1, entry.Key + ":"));
+                res.AppendLine(Indent(2, "Number of Files: " + entry.Value.Count));
+                res.AppendLine(Indent(2, "Average Line Count: " + entry.Value.AverageLineLength));
+                res.AppendLine(Indent(2, "Max Line Count: " + entry.Value.MaxLineLength));
             }
 
             return res.ToString();
@@ -233,7 +240,7 @@ namespace Microsoft.NodejsTools.Commands {
                 if (ex.IsCriticalException()) {
                     throw;
                 }
-                res.AppendLine(Indent(4, "Failed to access event log."));
+                res.AppendLine(Indent(1, "Failed to access event log."));
                 res.AppendLine(ex.ToString());
             }
             return res.ToString();
@@ -245,7 +252,7 @@ namespace Microsoft.NodejsTools.Commands {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().OrderBy(assem => assem.FullName)) {
                 var assemFileVersion = assembly.GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false).OfType<AssemblyFileVersionAttribute>().FirstOrDefault();
 
-                res.AppendLine(Indent(4, string.Format("{0}, FileVersion={1}",
+                res.AppendLine(Indent(1, string.Format("{0}, FileVersion={1}",
                     assembly.FullName,
                     assemFileVersion == null ? "(null)" : assemFileVersion.Version)));
             }
@@ -270,7 +277,7 @@ namespace Microsoft.NodejsTools.Commands {
         }
 
         private static string Indent(int count, string text) {
-            var indent = new string(' ', count);
+            var indent = new string(' ', count * 4);
             var lines = text.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
             var indentedText = lines.Select(line =>
                 string.IsNullOrWhiteSpace(line) ? line : indent + line);
