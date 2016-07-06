@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Security;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudioTools.Project;
@@ -112,7 +113,9 @@ namespace Microsoft.NodejsTools {
                 null,
                 false,
                 redirector,
-                quoteArgs: true)) {
+                quoteArgs: true,
+                outputEncoding: Encoding.UTF8,
+                errorEncoding: Encoding.UTF8)) {
                 if (!process.IsStarted) {
                     // Process failed to start, and any exception message has
                     // already been sent through the redirector
