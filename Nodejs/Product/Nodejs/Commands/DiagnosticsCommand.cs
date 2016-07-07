@@ -27,7 +27,7 @@ using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Commands {
     internal sealed class DiagnosticsCommand : Command {
-        private static readonly string[] interestingDteProperties = new[] {
+        private static readonly string[] _interestingDteProperties = new[] {
             "StartupFile",
             "WorkingDirectory",
             "PublishUrl",
@@ -35,7 +35,7 @@ namespace Microsoft.NodejsTools.Commands {
             "CommandLineArguments"
         };
 
-        private static readonly string[] interestingFileExtensions = new[] {
+        private static readonly string[] _interestingFileExtensions = new[] {
             ".js",
             ".jsx",
             ".tsx",
@@ -128,7 +128,7 @@ namespace Microsoft.NodejsTools.Commands {
             var res = new StringBuilder();
             if (Utilities.GuidEquals(Guids.NodejsBaseProjectFactoryString, project.Kind)) {
                 res.AppendLine("Kind: Node.js");
-                foreach (var prop in interestingDteProperties) {
+                foreach (var prop in _interestingDteProperties) {
                     res.AppendLine(prop + ": " + GetProjectProperty(project, prop));
                 }
                 var njsProj = project.GetNodejsProject();
@@ -192,7 +192,7 @@ namespace Microsoft.NodejsTools.Commands {
             var fileTypeInfo = new Dictionary<string, FileTypeInfo>();
             foreach (var node in project.DiskNodes) {
                 var file = node.Key;
-                var matchedExt = interestingFileExtensions.Where(ext => file.EndsWith(ext, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                var matchedExt = _interestingFileExtensions.Where(ext => file.EndsWith(ext, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
                 if (!string.IsNullOrEmpty(matchedExt)) {
                     var recordKey = string.Format("{0} ({1})", matchedExt, node.Value.ItemNode?.IsExcluded ?? true ? "excluded from project" : "included in project");
