@@ -224,9 +224,10 @@ namespace Microsoft.NodejsTools.Commands {
             }
 
             var res = new StringBuilder();
-            res.AppendLine("Npm Info:");
-            res.AppendLine(Indent(1, string.Format("Number of Top Level Modules: " + modules.Count())));
-
+            res.AppendLine(string.Format("Top Level Node Packages ({0}):", modules.Count()));
+            foreach (var module in modules) {
+                res.AppendLine(Indent(1, string.Format("{0} {1} ", module.Name, module.Version)));
+            }
             return res.ToString();
         }
 
