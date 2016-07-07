@@ -340,18 +340,15 @@ namespace Microsoft.NodejsTools.NpmUI {
 
             if (filtered.Any()) {
                 IRootPackage rootPackage = null;
-                IGlobalPackages globalPackages = null;
                 var controller = _npmController;
                 if (controller != null) {
                     rootPackage = controller.RootPackage;
-                    globalPackages = controller.GlobalPackages;
                 }
 
                 newItems.AddRange(filtered.Select(package => new ReadOnlyPackageCatalogEntryViewModel(
                     package,
                     rootPackage != null ? rootPackage.Modules[package.Name] : null,
-                    globalPackages != null ? globalPackages.Modules[package.Name] : null
-                    )));
+                    null)));
             }
 
             await _dispatcher.BeginInvoke((Action)(() => {

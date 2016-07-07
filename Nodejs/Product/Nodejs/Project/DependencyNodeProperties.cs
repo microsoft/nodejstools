@@ -195,14 +195,6 @@ namespace Microsoft.NodejsTools.Project {
                                 ? SR.GetString(SR.LinkStatusNotLinkedToProject)
                                 : SR.GetString(SR.LinkStatusLinkedToProject);
                         }
-                    } else {
-                        var global = controller.GlobalPackages;
-                        if (null != global) {
-                            var installed = global.Modules[package.Name];
-                            return null == installed || installed.Version != package.Version
-                                ? SR.GetString(SR.LinkStatusLocallyInstalled)
-                                : SR.GetString(SR.LinkStatusLinkedFromGlobal);
-                        }
                     }
                 }
 

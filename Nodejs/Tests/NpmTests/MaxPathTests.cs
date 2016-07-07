@@ -44,28 +44,6 @@ namespace NpmTests {
             }
         }
 
-        [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void InstallUninstallMaxPathGlobalModule() {
-            var controller = NpmControllerFactory.Create(string.Empty, string.Empty);
-
-            using (var commander = controller.CreateNpmCommander()) {
-                commander.InstallGlobalPackageByVersionAsync("yo", "^1.2.0").Wait();
-            }
-
-            Assert.IsNotNull(controller.GlobalPackages, "Cannot retrieve global packages after install");
-            Assert.IsTrue(controller.GlobalPackages.Modules.Contains("yo"), "Global package failed to install");
-
-            using (var commander = controller.CreateNpmCommander()) {
-                commander.UninstallGlobalPackageAsync("yo").Wait();
-            }
-
-            // Command has completed, but need to wait for all files/folders to be deleted.
-            Thread.Sleep(5000);
-
-            Assert.IsNotNull(controller.GlobalPackages, "Cannot retrieve global packages after uninstall");
-            Assert.IsFalse(controller.GlobalPackages.Modules.Contains("yo"), "Global package failed to uninstall");
-        }
-
         void controller_OutputLogged(object sender, NpmLogEventArgs e) {
             Debug.WriteLine(e.LogText);
         }

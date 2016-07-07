@@ -184,9 +184,6 @@ namespace Microsoft.Nodejs.Tests.UI {
                 packageMock.Object
             };
 
-            var globalPackages = new Mock<IGlobalPackages>();
-            globalPackages.Setup(mock => mock.Modules).Returns((new Mock<INodeModules>()).Object);
-
             var rootPackage = new Mock<IRootPackage>();
             rootPackage.Setup(mock => mock.Modules).Returns((new Mock<INodeModules>()).Object);
 
@@ -194,7 +191,6 @@ namespace Microsoft.Nodejs.Tests.UI {
 
             npmControllerMock.Setup(mock => mock.MostRecentlyLoadedCatalog).Returns(new MockPackageCatalog(packageList));
 
-            npmControllerMock.Setup(mock => mock.GlobalPackages).Returns(globalPackages.Object);
             npmControllerMock.Setup(mock => mock.RootPackage).Returns(rootPackage.Object);
 
             return npmControllerMock;
