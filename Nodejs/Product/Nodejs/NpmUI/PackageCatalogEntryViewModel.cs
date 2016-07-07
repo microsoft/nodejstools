@@ -31,7 +31,7 @@ namespace Microsoft.NodejsTools.NpmUI {
         private readonly List<string> _homepages;
         private readonly string _keywords;
 
-        private readonly SemverVersion? _localVersion, _globalVersion;
+        private readonly SemverVersion? _localVersion;
 
         protected PackageCatalogEntryViewModel(
             string name,
@@ -41,8 +41,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             string description,
             IEnumerable<string> homepages,
             string keywords,
-            SemverVersion? localVersion,
-            SemverVersion? globalVersion
+            SemverVersion? localVersion
         ) {
             _name = name;
             _version = version;
@@ -52,7 +51,6 @@ namespace Microsoft.NodejsTools.NpmUI {
             _homepages = homepages != null ? homepages.ToList() : new List<string>();
             _keywords = keywords;
             _localVersion = localVersion;
-            _globalVersion = globalVersion;
         }
 
         public virtual string Name { 
@@ -93,33 +91,21 @@ namespace Microsoft.NodejsTools.NpmUI {
             get { return _localVersion.HasValue; } 
         }
         
-        public bool IsInstalledGlobally { 
-            get { return _globalVersion.HasValue; } 
-        }
-        
         public bool IsLocalInstallOutOfDate { 
             get { return _localVersion.HasValue && _localVersion < _version; } 
-        }
-        
-        public bool IsGlobalInstallOutOfDate { 
-            get { return _globalVersion.HasValue && _globalVersion < _version; } 
         }
         
         public string LocalVersion { 
             get { return ToString(_localVersion); } 
         }
-        
-        public string GlobalVersion { 
-            get { return ToString(_globalVersion); } 
-        }
-
+       
         private static string ToString(SemverVersion? version) {
             return version.HasValue ? version.ToString() : string.Empty;
         }
     }
 
     internal class ReadOnlyPackageCatalogEntryViewModel : PackageCatalogEntryViewModel {
-        public ReadOnlyPackageCatalogEntryViewModel(IPackage package, IPackage localInstall, IPackage globalInstall)
+        public ReadOnlyPackageCatalogEntryViewModel(IPackage package, IPackage localInstall)
             : base(
                 package.Name ?? string.Empty,
                 package.Version,
@@ -130,8 +116,7 @@ namespace Microsoft.NodejsTools.NpmUI {
                 (package.Keywords != null && package.Keywords.Any())
                     ? string.Join(", ", package.Keywords)
                     : SR.GetString(SR.NoKeywordsInPackage),
-                localInstall != null ? (SemverVersion?)localInstall.Version : null,
-                globalInstall != null ? (SemverVersion?)globalInstall.Version : null
+                localInstall != null ? (SemverVersion?)localInstall.Version : null
             ) {
             if (string.IsNullOrEmpty(Name)) {
                 throw new ArgumentNullException("package.Name");

@@ -346,8 +346,7 @@ namespace Microsoft.NodejsTools.NpmUI {
 
                 newItems.AddRange(filtered.Select(package => new ReadOnlyPackageCatalogEntryViewModel(
                     package,
-                    rootPackage != null ? rootPackage.Modules[package.Name] : null,
-                    null)));
+                    rootPackage != null ? rootPackage.Modules[package.Name] : null)));
             }
 
             await _dispatcher.BeginInvoke((Action)(() => {
