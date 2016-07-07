@@ -481,7 +481,7 @@ namespace Microsoft.NodejsTools.Project {
             return base.ExecCommandOnNode(cmdGroup, cmd, nCmdexecopt, pvaIn, pvaOut);
         }
 
-        public void ManageModules(DependencyType dependencyType = DependencyType.Standard, bool isGlobal = false) {
+        public void ManageModules(DependencyType dependencyType = DependencyType.Standard) {
             CheckNotDisposed();
 
             if (NpmController.RootPackage == null) {
@@ -493,7 +493,7 @@ namespace Microsoft.NodejsTools.Project {
             }
 
             using (var executeVm = new NpmOutputViewModel(NpmController))
-            using (var manager = new NpmPackageInstallWindow(NpmController, executeVm, dependencyType, isGlobal)) {
+            using (var manager = new NpmPackageInstallWindow(NpmController, executeVm, dependencyType)) {
                 manager.Owner = System.Windows.Application.Current.MainWindow;
                 manager.ShowModal();
             }

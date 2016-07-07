@@ -180,12 +180,6 @@ namespace Microsoft.NodejsTools.NpmUI {
             QueueCommand(new QueuedNpmCommandInfo(name, version, type));
         }
 
-        public void QueueInstallGlobalPackage(
-            string name,
-            string version) {
-            QueueCommand(new QueuedNpmCommandInfo(name, version));
-        }
-
         private async void Execute(QueuedNpmCommandInfo info) {
             IsExecutingCommand = true;
             INpmCommander cmdr = null;
@@ -201,11 +195,7 @@ namespace Microsoft.NodejsTools.NpmUI {
 
                 if (info.IsFreeformArgumentCommand) {
                     await cmdr.ExecuteNpmCommandAsync(info.Arguments);
-                } else if (info.IsGlobalInstall) {
-                    await cmdr.InstallGlobalPackageByVersionAsync(
-                            info.Name,
-                            info.Version);
-                } else {
+                }  else {
                     await cmdr.InstallPackageByVersionAsync(
                                 info.Name,
                                 info.Version,
@@ -385,20 +375,11 @@ namespace Microsoft.NodejsTools.NpmUI {
 
             public QueuedNpmCommandInfo(
                 string name,
-                string version) {
+                string version,
+                DependencyType depType) {
                 Name = name;
                 Version = version;
-                IsGlobalInstall = true;
                 IsFreeformArgumentCommand = false;
-            }
-
-            public QueuedNpmCommandInfo(
-                string name,
-                string version,
-                DependencyType depType)
-                : this(name, version) {
-                DependencyType = depType;
-                IsGlobalInstall = false;
             }
 
             public bool IsFreeformArgumentCommand { get; private set; }
@@ -408,7 +389,6 @@ namespace Microsoft.NodejsTools.NpmUI {
             public string Name { get; private set; }
             public string Version { get; private set; }
             public DependencyType DependencyType { get; private set; }
-            public bool IsGlobalInstall { get; private set; }
 
             public bool Equals(QueuedNpmCommandInfo other) {
                 return null != other && StringComparer.CurrentCulture.Compare(ToString(), other.ToString()) == 0;
@@ -431,7 +411,7 @@ namespace Microsoft.NodejsTools.NpmUI {
                         Name,
                         Version,
                         DependencyType,
-                        IsGlobalInstall,
+                        false,
                         true));
                 }
                 return buff.ToString();

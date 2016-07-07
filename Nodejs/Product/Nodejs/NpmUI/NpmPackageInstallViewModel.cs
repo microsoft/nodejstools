@@ -34,8 +34,7 @@ namespace Microsoft.NodejsTools.NpmUI {
         internal enum Indices {
             IndexStandard = 0,
             IndexDev = 1,
-            IndexOptional = 2,
-            IndexGlobal = 3
+            IndexOptional = 2
         }
 
         internal enum FilterState {
@@ -405,7 +404,6 @@ namespace Microsoft.NodejsTools.NpmUI {
             set {
                 _selectedDependencyTypeIndex = value;
                 OnPropertyChanged();
-                OnPropertyChanged("GlobalWarningVisibility");
             }
         }
 
@@ -417,21 +415,12 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
         }
 
-        public Visibility GlobalWarningVisibility {
-            get {
-                return Indices.IndexGlobal == (Indices) SelectedDependencyTypeIndex
-                    ? Visibility.Visible
-                    : Visibility.Collapsed;
-            }
-        }
-
         internal bool CanInstall(PackageCatalogEntryViewModel package) {
             return package != null;
         }
 
         internal void Install(PackageCatalogEntryViewModel package) {
             var type = DependencyType.Standard;
-            var isGlobal = false;
             switch ((Indices)SelectedDependencyTypeIndex) {
                 case Indices.IndexDev:
                     type = DependencyType.Development;
@@ -439,10 +428,6 @@ namespace Microsoft.NodejsTools.NpmUI {
 
                 case Indices.IndexOptional:
                     type = DependencyType.Optional;
-                    break;
-
-                case Indices.IndexGlobal:
-                    isGlobal = true;
                     break;
             }
 
@@ -453,7 +438,7 @@ namespace Microsoft.NodejsTools.NpmUI {
                         package.Name, 
                         selectedVersion, 
                         type, 
-                        isGlobal, 
+                        false, 
                         SaveToPackageJson, 
                         Arguments));
             }
