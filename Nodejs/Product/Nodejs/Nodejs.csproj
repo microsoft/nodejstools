@@ -127,16 +127,16 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Workspace, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Workspaces.14.0.723-pre-g99eb5f2f86\lib\net46\Microsoft.VisualStudio.Workspace.dll</HintPath>
-      <Private>True</Private>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Common\Microsoft.VisualStudio.Workspaces.14.0.723-pre-g99eb5f2f86\Microsoft.VisualStudio.Workspace.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Workspace.Extensions, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Workspaces.14.0.723-pre-g99eb5f2f86\lib\net46\Microsoft.VisualStudio.Workspace.Extensions.dll</HintPath>
-      <Private>True</Private>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Common\Microsoft.VisualStudio.Workspaces.14.0.723-pre-g99eb5f2f86\Microsoft.VisualStudio.Workspace.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Workspace.Extensions.VS, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Workspaces.14.0.723-pre-g99eb5f2f86\lib\net46\Microsoft.VisualStudio.Workspace.Extensions.VS.dll</HintPath>
-      <Private>True</Private>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Common\Microsoft.VisualStudio.Workspaces.14.0.723-pre-g99eb5f2f86\Microsoft.VisualStudio.Workspace.Extensions.VS.dll</HintPath>
     </Reference>
     <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>True</EmbedInteropTypes>
