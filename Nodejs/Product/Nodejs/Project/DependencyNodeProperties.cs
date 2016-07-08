@@ -143,14 +143,6 @@ namespace Microsoft.NodejsTools.Project {
 
         internal bool IsGlobalInstall {
             get {
-                var node = DependencyNode as HierarchyNode;
-                while (null != node) {
-                    if (node is GlobalModulesNode) {
-                        return true;
-                    }
-
-                    node = node.Parent;
-                }
                 return false;
             }
         }
