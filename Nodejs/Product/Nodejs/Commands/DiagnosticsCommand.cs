@@ -35,7 +35,7 @@ namespace Microsoft.NodejsTools.Commands {
             "CommandLineArguments"
         };
 
-        private static readonly string[] _interestingFileExtensions = new[] {
+        public static readonly string[] InterestingTelemetryFileExtensions = new[] {
             ".js",
             ".jsx",
             ".tsx",
@@ -192,7 +192,7 @@ namespace Microsoft.NodejsTools.Commands {
             var fileTypeInfo = new Dictionary<string, FileTypeInfo>();
             foreach (var node in project.DiskNodes) {
                 var file = node.Key;
-                var matchedExt = _interestingFileExtensions.Where(ext => file.EndsWith(ext, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                var matchedExt = InterestingTelemetryFileExtensions.Where(ext => file.EndsWith(ext, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
                 if (!string.IsNullOrEmpty(matchedExt)) {
                     var recordKey = string.Format("{0} ({1})", matchedExt, node.Value.ItemNode?.IsExcluded ?? true ? "excluded from project" : "included in project");

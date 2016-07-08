@@ -42,5 +42,14 @@ namespace Microsoft.NodejsTools.Telemetry {
                 TelemetryProperties.ProjectGuid,
                 projectGuid.ToString("B"));
         }
+
+        public static void LogFileTypeInfoForProject(this ITelemetryLogger logger, Guid projectGuid, string extension, int fileCount) {
+            logger.ReportEvent(
+                TelemetryEvents.FileTypeInfoForProject,
+                new DataPointCollection(
+                    new DataPoint(TelemetryProperties.ProjectGuid, projectGuid.ToString("B")),
+                    new DataPoint(TelemetryProperties.FileType, extension),
+                    new DataPoint(TelemetryProperties.FileCount, fileCount)));
+        }
     }
 }

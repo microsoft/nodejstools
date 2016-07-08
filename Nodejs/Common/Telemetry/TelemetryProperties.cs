@@ -19,7 +19,9 @@ namespace Microsoft.NodejsTools.Telemetry {
     /// Property names for telemetry events
     /// </summary>
     internal static class TelemetryProperties {
-        public const string ProjectGuid = "ProjectGuid";
         public const string AnalysisLevel = "AnalysisLevel";
+        public const string FileType = "FileType";
+        public const string FileCount = "FileCount";
+        public const string ProjectGuid = "ProjectGuid";
     }
 }
