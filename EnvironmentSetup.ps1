@@ -22,12 +22,12 @@
 [CmdletBinding()]
 param(
     [string[]] $vstarget,
-    [switch] $includeMicrobuild,
+    [switch] $microbuild,
     [switch] $skipTestHost
 )
 
-If (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(`
-    [Security.Principal.WindowsBuiltInRole] "Administrator")) {
+If ((-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(`
+    [Security.Principal.WindowsBuiltInRole] "Administrator")) -and (-not $microbuild)) {
     Throw "You do not have Administrator rights to run this script. Please re-run as an Administrator."
 }
 
@@ -35,11 +35,22 @@ $rootDir = $PSScriptRoot
 Write-Output "Repository root: $($rootDir)"
 Write-Output ""
 
+
 Import-Module -Force $rootDir\Build\VisualStudioHelpers.psm1
 $target_versions = get_target_vs_versions $vstarget
 
 Write-Output "Setting up NTVS development environment for $([String]::Join(", ", ($target_versions | % { $_.name })))"
 Write-Output "============================================================"
+$packagedir = if ($env:BUILD_BINARIESDIRECTORY) { "$env:BUILD_BINARIESDIRECTORY" } else { "$rootdir\packages" }
+
+if ($microbuild) {
+    Write-Output ""
+    Write-Output "Installing Nuget MicroBuild packages"
+
+    & "$rootdir\Nodejs\.nuget\nuget.exe" restore "$rootdir\Nodejs\Setup\swix\packages.config" -PackagesDirectory "$packagedir"
+    exit
+}
+
 
 # Disable strong name verification for the Node.js Tools binaries
 $skipVerificationKey = If ( $ENV:PROCESSOR_ARCHITECTURE -eq "AMD64") {"EnableSkipVerification.reg" } Else {"EnableSkipVerification86.reg" }
@@ -58,13 +69,6 @@ foreach ($version in $target_versions) {
     Write-Output "    $($from) -> $($to)"
     New-Item -Force $to > $null
     Copy-Item -Force $from $to
-}
-
-if ($includeMicrobuild) {
-    Write-Output ""
-    Write-Output "Installing Nuget MicroBuild packages"
-
-    & "$rootdir\Nodejs\.nuget\nuget.exe" restore "$rootdir\Nodejs\Setup\swix\packages.config" -PackagesDirectory "$rootdir\packages"
 }
 
 # Install VSTestHost
