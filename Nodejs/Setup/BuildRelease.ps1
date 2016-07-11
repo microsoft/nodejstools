@@ -222,9 +222,10 @@ function after-build-all($buildroot, $outdir) {
         Copy-Item -Force "$buildroot\Nodejs\Prerequisites\*.reg" $outdir
     }
     
-    Copy-Item -Force "$outdir\**.vsman" "$env:BUILD_STAGINGDIRECTORY\vsdrop"
-    Copy-Item -Force "$outdir\**.json" "$env:BUILD_STAGINGDIRECTORY\vsdrop"
-    Copy-Item -Force "$outdir\**.vsix" "$env:BUILD_STAGINGDIRECTORY\vsdrop"
+    $vsdrop = mkdir "$env:BUILD_STAGINGDIRECTORY\vsdrop" -Force
+    Copy-Item -Force "$outdir\**.vsman" $vsdrop
+    Copy-Item -Force "$outdir\**.json" $vsdrop
+    Copy-Item -Force "$outdir\**.vsix" $vsdrop
 }
 
 # Add product name mappings here
