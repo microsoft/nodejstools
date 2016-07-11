@@ -24,6 +24,6 @@
         <MergeManifest Include="$(BuildRoot)\Nodejs\Setup\swix\sideload.json"/>
     </ItemGroup>
 
-    <Import Project="packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets"/>
+    <Import Project="$(PackagesPath)\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets"/>
     <Import Project="..\SetupProjectAfter.settings" />
 </Project>
