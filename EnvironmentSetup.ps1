@@ -21,7 +21,9 @@
 
 [CmdletBinding()]
 param(
-    [string[]] $vstarget
+    [string[]] $vstarget,
+    [switch] $includeMicrobuild,
+    [switch] $skipTestHost
 )
 
 If (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(`
@@ -58,23 +60,32 @@ foreach ($version in $target_versions) {
     Copy-Item -Force $from $to
 }
 
-# Install VSTestHost
-Write-Output ""
-Write-Output "Installing VSTestHost automation"
-$vsTestHostLocation = "$rootDir\Common\Tests\Prerequisites\VSTestHost.msi"
-Write-Output "    $($vsTestHostLocation)"
+if ($includeMicrobuild) {
+    Write-Output ""
+    Write-Output "Installing Nuget MicroBuild packages"
 
-# Check installed VSTestHost versions
+    & "$rootdir\Nodejs\.nuget\nuget.exe" restore "$rootdir\Nodejs\Setup\swix\packages.config" -PackagesDirectory "$rootdir\packages"
+}
+
+# Install VSTestHost
 $shouldInstallVSTestHost = $false
-$gacDir = "${env:windir}\Microsoft.NET\assembly\GAC_MSIL"
-foreach ($version in $target_versions) {
-    $currentVSTestHost = ls $gacDir -Recurse | ?{$_.Name -eq "Microsoft.VisualStudioTools.VSTestHost.$($version.number).dll"}
-    
-    $targetVSTestHostVersion = "$($version.number).1.0"
-    if ((-not $currentVSTestHost) -or ($currentVSTestHost.VersionInfo.FileVersion -ne $targetVSTestHostVersion)) {
-        Write-Warning "VSTestHost already installed. Overriding VSTestHost version $($currentVSTestHost.VersionInfo.FileVersion) with target VSTestHostVersion $targetVSTestHostVersion"
-        $shouldInstallVSTestHost = $true
-        break
+if (-not $skipTestHost) {
+    Write-Output ""
+    Write-Output "Installing VSTestHost automation"
+    $vsTestHostLocation = "$rootDir\Common\Tests\Prerequisites\VSTestHost.msi"
+    Write-Output "    $($vsTestHostLocation)"
+
+    # Check installed VSTestHost versions
+    $gacDir = "${env:windir}\Microsoft.NET\assembly\GAC_MSIL"
+    foreach ($version in $target_versions) {
+        $currentVSTestHost = ls $gacDir -Recurse | ?{$_.Name -eq "Microsoft.VisualStudioTools.VSTestHost.$($version.number).dll"}
+        
+        $targetVSTestHostVersion = "$($version.number).1.0"
+        if ((-not $currentVSTestHost) -or ($currentVSTestHost.VersionInfo.FileVersion -ne $targetVSTestHostVersion)) {
+            Write-Warning "VSTestHost already installed. Overriding VSTestHost version $($currentVSTestHost.VersionInfo.FileVersion) with target VSTestHostVersion $targetVSTestHostVersion"
+            $shouldInstallVSTestHost = $true
+            break
+        }
     }
 }
 
