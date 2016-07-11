@@ -551,8 +551,6 @@ try {
                     /p:SignedBinariesPath=$($i.signed_bindir) `
                     /p:RezipVSIXFiles=true `
                     $setup_swix_project
-                    
-                Copy-Item -Recurse -Force "$buildroot\BuildOutput\$($target.config)$($target.VSTarget)\Setup\Microsoft.NodejsTools.Targets.vsix" $i.signed_unsigned_msidir
             }
 
             $jobs = @()
