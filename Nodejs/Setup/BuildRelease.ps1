@@ -141,6 +141,7 @@ $version_file = gi "$buildroot\Nodejs\Product\AssemblyVersion.cs"
 
 $build_project = gi "$buildroot\Nodejs\dirs.proj"
 $setup_project = gi "$buildroot\Nodejs\Setup\setup.proj"
+$setup_swix_project = gi "$buildroot\Nodejs\Setup\setup-swix.proj"
 
 # Project metadata
 $project_name = "Node.js Tools for Visual Studio"
@@ -148,7 +149,7 @@ $project_url = "http://nodejstools.codeplex.com"
 $project_keywords = "NTVS; Visual Studio; Node.js"
 
 # These people are able to approve code signing operations
-$approvers = "smortaz", "dinov", "stevdo", "pminaev", "gilbertw", "huvalo", "jinglou", "sitani", "crwilcox"
+$approvers = "smortaz", "dinov", "stevdo", "pminaev", "gilbertw", "huvalo", "jinglou", "crwilcox"
 
 # These people are the contacts for the symbols uploaded to the symbol server
 $symbol_contacts = "$env:username;dinov;smortaz;gilbertw;jinglou"
@@ -204,6 +205,10 @@ function msbuild-options($target, $config) {
 # This function is invoked after each target is built.
 function after-build($buildroot, $target) {
     Copy-Item -Force "$buildroot\Nodejs\Prerequisites\*.reg" $($target.destdir)
+    
+    $setup15 = mkdir "$($target.destdir)\Setup15" -Force
+    Copy-Item -Recurse -Force "$buildroot\BuildOutput\$($target.config)$($target.VSTarget)\Setup\*.json" $setup15
+    Copy-Item -Recurse -Force "$buildroot\BuildOutput\$($target.config)$($target.VSTarget)\Setup\*.vsman" $setup15
 
     if ($copytests) {
         Copy-Item -Recurse -Force "$buildroot\BuildOutput\$($target.config)$($target.VSTarget)\Tests" "$($target.destdir)\Tests"
@@ -225,6 +230,15 @@ function after-build-all($buildroot, $outdir) {
 #   {3} will be replaced by the config ('Debug') marker preceded by a space
 $installer_names = @{
     'NodejsToolsInstaller.msi'="NTVS{1}{2}{3}.msi";
+    'Microsoft.NodejsTools.vsix' = 'Microsoft.NodejsTools.vsix';
+    'Microsoft.NodejsTools.Profiling.vsix' = 'Microsoft.NodejsTools.Profiling.vsix';
+    'Microsoft.NodejsTools.InteractiveWindow.vsix' = 'Microsoft.NodejsTools.InteractiveWindow.vsix';
+    'Microsoft.VisualStudio.NodejsTools.Targets.vsix' = 'Microsoft.NodejsTools.Targets.vsix';
+    'NodejsTools.vsman' = 'NodejsTools.vsman';
+    'Microsoft.VisualStudio.NodejsTools.Nodejs.json' = 'Microsoft.VisualStudio.NodejsTools.Nodejs.json';
+    'Microsoft.VisualStudio.NodejsTools.Profiling.json' = 'Microsoft.VisualStudio.NodejsTools.Profiling.json';
+    'Microsoft.VisualStudio.NodejsTools.InteractiveWindow.json' = 'Microsoft.VisualStudio.NodejsTools.InteractiveWindow.json';
+    'Microsoft.VisualStudio.NodejsTools.Targets.json' = 'Microsoft.VisualStudio.NodejsTools.Targets.json';
 }
 
 # Add list of files requiring signing here
@@ -524,8 +538,16 @@ try {
                 msbuild $global_msbuild_options $target_msbuild_options `
                     /fl /flp:logfile=$($i.signed_logfile) `
                     /p:SignedBinariesPath=$($i.signed_bindir) `
-                    /p:RezipVSIXFiles=true `
+                    /p:RezipVSIXFiles=false `
                     $setup_project
+
+                msbuild $global_msbuild_options $target_msbuild_options `
+                    /fl /flp:logfile=$($i.signed_logfile) `
+                    /p:SignedBinariesPath=$($i.signed_bindir) `
+                    /p:RezipVSIXFiles=true `
+                    $setup_swix_project
+                    
+                Copy-Item -Recurse -Force "$buildroot\BuildOutput\$($target.config)$($target.VSTarget)\Setup\Microsoft.NodejsTools.Targets.vsix" $i.signed_unsigned_msidir
             }
 
             $jobs = @()
@@ -581,7 +603,7 @@ try {
             
             if ($i.VSName) {$fmt.VSName = " $($i.VSName)"} else {$fmt.VSName = ""}
             
-            Get-ChildItem "$($i.final_msidir)\*.msi", "$($i.final_msidir)\*.vsix" | `
+            Get-ChildItem "$($i.final_msidir)\*.msi", "$($i.final_msidir)\*.vsix", "$($i.destdir)\Setup15\*.json", "$($i.destdir)\Setup15\*.vsman" | `
                 ?{ $installer_names[$_.Name] } | `
                 %{ @{
                     src=$_;

@@ -15,7 +15,7 @@
   
   <ItemGroup>
     <ProjectFile Include="..\Product\dirs.proj"/>
-    <!--<ProjectFile Include="setup.proj"/>-->
+    <ProjectFile Include="setup.proj"/>
     <ProjectFile Include="setup-swix.proj"/>
   </ItemGroup>
 

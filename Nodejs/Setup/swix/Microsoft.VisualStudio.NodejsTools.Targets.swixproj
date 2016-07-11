@@ -2,6 +2,25 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Target Name="GetNativeManifest"/>
   <Import Project="..\SetupProjectBefore.settings" />
+  <!--<Import Project="..\..\..\Build\Common.Build.Wix.targets" />-->
+  <Target Name="_CopyWixOutputsToPath"
+          AfterTargets="AfterBuild"
+          Condition="'$(CopyOutputsToPath)' != '' and $(OutputType) == 'Vsix'">
+    <PropertyGroup>
+      <CopyOutputsToPath Condition="!HasTrailingSlash($(CopyOutputsToPath))">$(CopyOutputsToPath)\</CopyOutputsToPath>
+      <_PathSuffix Condition="'$(SignedBinariesPath)' != ''">SignedBinariesUnsignedMsi\</_PathSuffix>
+      <_PathSuffix Condition="'$(SignedBinariesPath)' == ''">UnsignedMsi\</_PathSuffix>
+    </PropertyGroup>
+
+    <MakeDir Directories="$(CopyOutputsToPath)$(_PathSuffix)"
+             ContinueOnError="true" />
+
+    <Message Text="$(CopyOutputsToPath)$(_PathSuffix)$(TargetName)$(TargetExt)"/>
+    <Message Text="$(TargetPath)"/>
+    <Copy SourceFiles="$(TargetPath)"
+          DestinationFiles="$(CopyOutputsToPath)$(_PathSuffix)$(TargetName)$(TargetExt)"
+          SkipUnchangedFiles="true" />
+  </Target>
 
     <PropertyGroup> 
         <OutputArchitecture>neutral</OutputArchitecture> 
@@ -9,6 +28,9 @@
         <OutputType>Vsix</OutputType>
         <PackageType>.vsix</PackageType>
         <IsPackage>true</IsPackage>
+        <TargetName>Microsoft.VisualStudio.NodejsTools.Targets</TargetName>
+        <TargetExt>.vsix</TargetExt>
+        <TargetPath>$(BuildOutputRoot)Setup\Microsoft.VisualStudio.NodejsTools.Targets.vsix</TargetPath>
         <!--<OutputType>manifest</OutputType>-->
     </PropertyGroup> 
 
@@ -19,5 +41,6 @@
     <ItemGroup> 
         <Package Include="Targets_files.swr" /> 
     </ItemGroup>
-  <Import Project="packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets"/>
+  <Import Project="$(PackagesPath)\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets"/>
+  <!--<Import Project="..\SetupProjectAfter.settings" />-->
 </Project>
