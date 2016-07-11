@@ -570,10 +570,9 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         /// <summary>
-        /// Log generic 
+        /// Log generic characteristics about the project, including number of files of each type in the project.
         /// </summary>
         private void LogProjectInformation() {
-            // Compute number of included files of each type in the project.
             var fileTypeInfo = new Dictionary<string, int>();
             foreach (var node in this.DiskNodes) {
                 if (node.Value?.ItemNode?.IsExcluded ?? true) {
