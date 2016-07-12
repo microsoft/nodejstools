@@ -366,20 +366,16 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
 
         private class QueuedNpmCommandInfo : EventArgs {
-
-            public QueuedNpmCommandInfo(
-                string arguments) {
+            public QueuedNpmCommandInfo(string arguments) {
                 Name = arguments;
                 IsFreeformArgumentCommand = true;
             }
 
-            public QueuedNpmCommandInfo(
-                string name,
-                string version,
-                DependencyType depType) {
+            public QueuedNpmCommandInfo(string name,string version, DependencyType depType) {
                 Name = name;
                 Version = version;
                 IsFreeformArgumentCommand = false;
+                DependencyType = depType;
             }
 
             public bool IsFreeformArgumentCommand { get; private set; }
