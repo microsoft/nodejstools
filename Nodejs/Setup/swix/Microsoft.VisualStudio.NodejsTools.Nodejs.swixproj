@@ -3,23 +3,19 @@
   <Import Project="..\SetupProjectBefore.settings" />
   <Target Name="GetNativeManifest"/>
 
-  <!--<Target Name="Build">-->
-    <PropertyGroup> 
-        <OutputArchitecture>neutral</OutputArchitecture> 
-        <OutputLocalized>false</OutputLocalized> 
-        <OutputType>manifest</OutputType> 
-    </PropertyGroup> 
-    
-    <PropertyGroup> 
-        <PackagePreprocessorDefinitions>$(PackagePreprocessorDefinitions);BuildOutputRoot=$(BuildOutputRoot)</PackagePreprocessorDefinitions>
-    </PropertyGroup> 
-    
-    <ItemGroup> 
-        <Package Include="Nodejs_files.swr" /> 
-    </ItemGroup>
-  <!--</Target>-->
-  
+  <PropertyGroup> 
+    <OutputArchitecture>neutral</OutputArchitecture> 
+    <OutputLocalized>false</OutputLocalized> 
+    <OutputType>manifest</OutputType> 
+  </PropertyGroup> 
+
+  <PropertyGroup> 
+    <PackagePreprocessorDefinitions>$(PackagePreprocessorDefinitions);BuildOutputRoot=$(BuildOutputRoot)</PackagePreprocessorDefinitions>
+  </PropertyGroup> 
+
+  <ItemGroup> 
+    <Package Include="Nodejs_files.swr" /> 
+  </ItemGroup>
+
   <Import Project="$(PackagesPath)\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets"/>
-  <!--<Import Project="$(_NTBINDIR)\tools\wix4\wix.props"/> -->
-  <!--<Import Project="$(_NTBINDIR)\tools\wix4\wix.targets"/> -->
 </Project>

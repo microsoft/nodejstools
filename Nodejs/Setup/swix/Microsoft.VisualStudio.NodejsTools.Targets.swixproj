@@ -3,6 +3,7 @@
   <Target Name="GetNativeManifest"/>
   <Import Project="..\SetupProjectBefore.settings" />
   <!--<Import Project="..\..\..\Build\Common.Build.Wix.targets" />-->
+  
   <Target Name="_CopyWixOutputsToPath"
           AfterTargets="AfterBuild"
           Condition="'$(CopyOutputsToPath)' != '' and $(OutputType) == 'Vsix'">
@@ -22,25 +23,26 @@
           SkipUnchangedFiles="true" />
   </Target>
 
-    <PropertyGroup> 
-        <OutputArchitecture>neutral</OutputArchitecture> 
-        <OutputLocalized>false</OutputLocalized> 
-        <OutputType>Vsix</OutputType>
-        <PackageType>.vsix</PackageType>
-        <IsPackage>true</IsPackage>
-        <TargetName>Microsoft.VisualStudio.NodejsTools.Targets</TargetName>
-        <TargetExt>.vsix</TargetExt>
-        <TargetPath>$(BuildOutputRoot)Setup\Microsoft.VisualStudio.NodejsTools.Targets.vsix</TargetPath>
-        <!--<OutputType>manifest</OutputType>-->
-    </PropertyGroup> 
+  <PropertyGroup> 
+      <OutputArchitecture>neutral</OutputArchitecture> 
+      <OutputLocalized>false</OutputLocalized> 
+      <OutputType>Vsix</OutputType>
+      <PackageType>.vsix</PackageType>
+      <IsPackage>true</IsPackage>
+      <TargetName>Microsoft.VisualStudio.NodejsTools.Targets</TargetName>
+      <TargetExt>.vsix</TargetExt>
+      <TargetPath>$(BuildOutputRoot)Setup\Microsoft.VisualStudio.NodejsTools.Targets.vsix</TargetPath>
+      <!--<OutputType>manifest</OutputType>-->
+  </PropertyGroup> 
 
-    <PropertyGroup> 
-        <PackagePreprocessorDefinitions>$(PackagePreprocessorDefinitions);BuildOutputRoot=$(BuildOutputRoot)</PackagePreprocessorDefinitions>
-    </PropertyGroup> 
+  <PropertyGroup> 
+      <PackagePreprocessorDefinitions>$(PackagePreprocessorDefinitions);BuildOutputRoot=$(BuildOutputRoot)</PackagePreprocessorDefinitions>
+  </PropertyGroup> 
 
-    <ItemGroup> 
-        <Package Include="Targets_files.swr" /> 
-    </ItemGroup>
+  <ItemGroup> 
+      <Package Include="Targets_files.swr" /> 
+  </ItemGroup>
+  
   <Import Project="$(PackagesPath)\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets"/>
   <!--<Import Project="..\SetupProjectAfter.settings" />-->
 </Project>
