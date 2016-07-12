@@ -6,4 +6,4 @@ package name=Microsoft.VisualStudio.NodejsTools.Profiling
     vs.package.vsixId=B515653F-FB69-4B64-9D3F-F1FCF8421DD0
 
 vs.payloads
-    vs.payload source=!(bindpath.sources)\Binaries\Profiling\Microsoft.NodejsTools.Profiling.vsix
+    vs.payload source="$(BuildOutputRoot)\Binaries\Profiling\Microsoft.NodejsTools.Profiling.vsix"
