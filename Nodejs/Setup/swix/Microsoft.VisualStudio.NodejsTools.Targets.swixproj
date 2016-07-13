@@ -29,9 +29,9 @@
       <OutputType>Vsix</OutputType>
       <PackageType>.vsix</PackageType>
       <IsPackage>true</IsPackage>
-      <TargetName>Microsoft.VisualStudio.NodejsTools.Targets</TargetName>
+      <TargetName>Microsoft.NodejsTools.Targets</TargetName>
       <TargetExt>.vsix</TargetExt>
-      <TargetPath>$(BuildOutputRoot)Setup\Microsoft.VisualStudio.NodejsTools.Targets.vsix</TargetPath>
+      <TargetPath>$(BuildOutputRoot)Setup\Microsoft.NodejsTools.Targets.vsix</TargetPath>
       <!--<OutputType>manifest</OutputType>-->
   </PropertyGroup> 
 
