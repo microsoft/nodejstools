@@ -246,17 +246,8 @@
   <data name="PackageTypeLocalSubpackage" xml:space="preserve">
     <value>Local sub-package</value>
   </data>
-  <data name="PackageTypeGlobal" xml:space="preserve">
-    <value>Global</value>
-  </data>
-  <data name="PackageTypeGlobalSubpackage" xml:space="preserve">
-    <value>Global sub-package</value>
-  </data>
   <data name="LinkStatusLocallyInstalled" xml:space="preserve">
     <value>Installed locally</value>
-  </data>
-  <data name="LinkStatusLinkedFromGlobal" xml:space="preserve">
-    <value>Installed locally or linked from global packages</value>
   </data>
   <data name="LinkStatusNotLinkedToProject" xml:space="preserve">
     <value>Not linked to project</value>
@@ -306,20 +297,11 @@
   <data name="PropertiesClassLocalPackage" xml:space="preserve">
     <value>Local Package Properties</value>
   </data>
-  <data name="PropertiesClassGlobalPackage" xml:space="preserve">
-    <value>Global Package Properties</value>
-  </data>
   <data name="PropertiesClassLocalSubPackage" xml:space="preserve">
     <value>Local Sub-Package Properties</value>
   </data>
-  <data name="PropertiesClassGlobalSubPackage" xml:space="preserve">
-    <value>Global Sub-Package Properties</value>
-  </data>
   <data name="PropertiesClassNpm" xml:space="preserve">
     <value>npm Packages Properties</value>
-  </data>
-  <data name="PropertiesClassGlobal" xml:space="preserve">
-    <value>Global npm Packages Properties</value>
   </data>
   <data name="ScriptArgumentsToolTip" xml:space="preserve">
     <value>Specifies the arguments passed to the script on launch.</value>

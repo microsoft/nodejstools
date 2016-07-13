@@ -51,7 +51,6 @@ namespace Microsoft.NodejsTools.Project {
         internal const string InsertSnippet = "InsertSnippet";
         internal const string InvalidPortNumber = "InvalidPortNumber";
         internal const string LaunchUrlToolTip = "LaunchUrlToolTip";
-        internal const string LinkStatusLinkedFromGlobal = "LinkStatusLinkedFromGlobal";
         internal const string LinkStatusLinkedToProject = "LinkStatusLinkedToProject";
         internal const string LinkStatusLocallyInstalled = "LinkStatusLocallyInstalled";
         internal const string LinkStatusNotApplicableSubPackages = "LinkStatusNotApplicableSubPackages";
@@ -153,13 +152,8 @@ namespace Microsoft.NodejsTools.Project {
         internal const string PackageInstalledLocally = "PackageInstalledLocally";
         internal const string PackageInstalledLocallyOldVersion = "PackageInstalledLocallyOldVersion";
         internal const string PackageMatchCount = "PackageMatchCount";
-        internal const string PackageTypeGlobal = "PackageTypeGlobal";
-        internal const string PackageTypeGlobalSubpackage = "PackageTypeGlobalSubpackage";
         internal const string PackageTypeLocal = "PackageTypeLocal";
         internal const string PackageTypeLocalSubpackage = "PackageTypeLocalSubpackage";
-        internal const string PropertiesClassGlobal = "PropertiesClassGlobal";
-        internal const string PropertiesClassGlobalPackage = "PropertiesClassGlobalPackage";
-        internal const string PropertiesClassGlobalSubPackage = "PropertiesClassGlobalSubPackage";
         internal const string PropertiesClassLocalPackage = "PropertiesClassLocalPackage";
         internal const string PropertiesClassLocalSubPackage = "PropertiesClassLocalSubPackage";
         internal const string PropertiesClassNpm = "PropertiesClassNpm";

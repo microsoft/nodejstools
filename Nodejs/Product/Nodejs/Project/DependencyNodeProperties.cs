@@ -33,9 +33,8 @@ namespace Microsoft.NodejsTools.Project {
 
         public override string GetClassName() {
             return SR.GetString(IsSubPackage
-                ? (IsGlobalInstall ? SR.PropertiesClassGlobalSubPackage : SR.PropertiesClassLocalSubPackage)
-                : (IsGlobalInstall ? SR.PropertiesClassGlobalPackage : SR.PropertiesClassLocalPackage)
-            );
+                ? SR.PropertiesClassLocalSubPackage
+                : SR.PropertiesClassLocalPackage);
         }
 
         [SRCategoryAttribute(SR.General)]
@@ -141,12 +140,6 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        internal bool IsGlobalInstall {
-            get {
-                return false;
-            }
-        }
-
         internal bool IsSubPackage {
             get {
                 var node = DependencyNode as HierarchyNode;
@@ -162,12 +155,6 @@ namespace Microsoft.NodejsTools.Project {
         [SRDescriptionAttribute(SR.NpmPackageTypeDescription)]
         public string PackageType {
             get {
-                if (IsGlobalInstall) {
-                    return IsSubPackage
-                        ? SR.GetString(SR.PackageTypeGlobalSubpackage)
-                        : SR.GetString(SR.PackageTypeGlobal);
-                }
-
                 return IsSubPackage
                     ? SR.GetString(SR.PackageTypeLocalSubpackage)
                     : SR.GetString(SR.PackageTypeLocal);
@@ -183,29 +170,6 @@ namespace Microsoft.NodejsTools.Project {
                 if (IsSubPackage) {
                     return SR.GetString(SR.LinkStatusNotApplicableSubPackages);
                 }
-
-                var package = Package;
-                var controller = DependencyNode.NpmController;
-                if (null != controller && null != package) {
-                    if (IsGlobalInstall) {
-                        var root = controller.RootPackage;
-                        if (null != root) {
-                            var local = root.Modules[package.Name];
-                            return null == local || local.Version != package.Version
-                                ? SR.GetString(SR.LinkStatusNotLinkedToProject)
-                                : SR.GetString(SR.LinkStatusLinkedToProject);
-                        }
-                    } else {
-                        var global = controller.GlobalPackages;
-                        if (null != global) {
-                            var installed = global.Modules[package.Name];
-                            return null == installed || installed.Version != package.Version
-                                ? SR.GetString(SR.LinkStatusLocallyInstalled)
-                                : SR.GetString(SR.LinkStatusLinkedFromGlobal);
-                        }
-                    }
-                }
-
                 return SR.GetString(SR.LinkStatusUnknown);
             }
         }
