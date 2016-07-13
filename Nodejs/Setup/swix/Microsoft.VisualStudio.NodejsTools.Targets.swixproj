@@ -2,8 +2,18 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Target Name="GetNativeManifest"/>
   <Import Project="..\SetupProjectBefore.settings" />
-  <!--<Import Project="..\..\..\Build\Common.Build.Wix.targets" />-->
   
+  <PropertyGroup> 
+    <OutputArchitecture>neutral</OutputArchitecture> 
+    <OutputLocalized>false</OutputLocalized> 
+    <OutputType>Vsix</OutputType>
+    <PackageType>.vsix</PackageType>
+    <IsPackage>true</IsPackage>
+    <TargetName>Microsoft.NodejsTools.Targets</TargetName>
+    <TargetExt>.vsix</TargetExt>
+    <TargetPath>$(BuildOutputRoot)Setup\Microsoft.NodejsTools.Targets.vsix</TargetPath>
+  </PropertyGroup> 
+
   <Target Name="_CopyWixOutputsToPath"
           AfterTargets="AfterBuild"
           Condition="'$(CopyOutputsToPath)' != '' and $(OutputType) == 'Vsix'">
@@ -22,18 +32,6 @@
           DestinationFiles="$(CopyOutputsToPath)$(_PathSuffix)$(TargetName)$(TargetExt)"
           SkipUnchangedFiles="true" />
   </Target>
-
-  <PropertyGroup> 
-      <OutputArchitecture>neutral</OutputArchitecture> 
-      <OutputLocalized>false</OutputLocalized> 
-      <OutputType>Vsix</OutputType>
-      <PackageType>.vsix</PackageType>
-      <IsPackage>true</IsPackage>
-      <TargetName>Microsoft.NodejsTools.Targets</TargetName>
-      <TargetExt>.vsix</TargetExt>
-      <TargetPath>$(BuildOutputRoot)Setup\Microsoft.NodejsTools.Targets.vsix</TargetPath>
-      <!--<OutputType>manifest</OutputType>-->
-  </PropertyGroup> 
 
   <PropertyGroup> 
       <PackagePreprocessorDefinitions>$(PackagePreprocessorDefinitions);BuildOutputRoot=$(BuildOutputRoot)</PackagePreprocessorDefinitions>
