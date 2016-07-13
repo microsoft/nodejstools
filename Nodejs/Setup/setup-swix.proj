@@ -17,7 +17,7 @@
     <ProjectFile Include="swix\Microsoft.VisualStudio.NodejsTools.NodejsTools.swixproj"/>
     <ProjectFile Include="swix\Microsoft.VisualStudio.NodejsTools.Profiling.swixproj"/>
     <ProjectFile Include="swix\Microsoft.VisualStudio.NodejsTools.InteractiveWindow.swixproj"/>
-    <ProjectFile Include="swix\Microsoft.VisualStudio.NodejsTools.Targets.swixproj"/>
+    <ProjectFile Include="swix\Microsoft.NodejsTools.Targets.swixproj"/>
     <ProjectFile Include="swix\NodejsTools.vsmanproj"/>
     <ProjectFile Include="swix\NodejsTools_sideload.vsmanproj"/>
   </ItemGroup>

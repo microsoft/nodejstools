@@ -34,11 +34,11 @@
   </Target>
 
   <PropertyGroup> 
-      <PackagePreprocessorDefinitions>$(PackagePreprocessorDefinitions);BuildOutputRoot=$(BuildOutputRoot)</PackagePreprocessorDefinitions>
+    <PackagePreprocessorDefinitions>$(PackagePreprocessorDefinitions);BuildOutputRoot=$(BuildOutputRoot)</PackagePreprocessorDefinitions>
   </PropertyGroup> 
 
   <ItemGroup> 
-      <Package Include="Targets_files.swr" /> 
+    <Package Include="Targets_files.swr" /> 
   </ItemGroup>
   
   <Import Project="$(PackagesPath)\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets"/>
