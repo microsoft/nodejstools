@@ -174,8 +174,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             return type;
         }
 
-        public Task<bool> UninstallPackageAsync(string packageName) {
-            return DoCommandExecute(true,
+        public async Task<bool> UninstallPackageAsync(string packageName) {
+            return await DoCommandExecute(true,
                 new NpmUninstallCommand(
                     _npmController.FullPathToRootPackageDirectory,
                     packageName,
@@ -199,8 +199,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             return await UpdatePackagesAsync(new List<IPackage>());
         }
 
-        public Task<bool> UpdatePackagesAsync(IEnumerable<IPackage> packages) {
-            return DoCommandExecute(true,
+        public async Task<bool> UpdatePackagesAsync(IEnumerable<IPackage> packages) {
+            return await DoCommandExecute(true,
                 new NpmUpdateCommand(
                     _npmController.FullPathToRootPackageDirectory,
                     packages,
