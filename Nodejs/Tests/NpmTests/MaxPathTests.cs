@@ -25,28 +25,27 @@ namespace NpmTests {
         
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
         public void InstallUninstallMaxPathGlobalModule() {
-            INpmController controller;
             using (var manager = new TemporaryFileManager()) {
                 var rootDir = FilesystemPackageJsonTestHelpers.CreateRootPackage(manager, PkgSimple);
-                controller = NpmControllerFactory.Create(rootDir, string.Empty);
+                var controller = NpmControllerFactory.Create(rootDir, string.Empty);
+
+                using (var commander = controller.CreateNpmCommander()) {
+                    commander.InstallPackageByVersionAsync("yo", "^1.2.0", DependencyType.Standard, false).Wait();
+                }
+
+                Assert.IsNotNull(controller.RootPackage, "Cannot retrieve packages after install");
+                Assert.IsTrue(controller.RootPackage.Modules.Contains("yo"), "Package failed to install");
+
+                using (var commander = controller.CreateNpmCommander()) {
+                    commander.UninstallPackageAsync("yo").Wait();
+                }
+
+                // Command has completed, but need to wait for all files/folders to be deleted.
+                Thread.Sleep(5000);
+
+                Assert.IsNotNull(controller.RootPackage, "Cannot retrieve packages after uninstall");
+                Assert.IsFalse(controller.RootPackage.Modules.Contains("yo"), "Package failed to uninstall");
             }
-
-            using (var commander = controller.CreateNpmCommander()) {
-                commander.InstallPackageByVersionAsync("yo", "^1.2.0", DependencyType.Standard, false).Wait();
-            }
-
-            Assert.IsNotNull(controller.RootPackage, "Cannot retrieve global packages after install");
-            Assert.IsTrue(controller.RootPackage.Modules.Contains("yo"), "Global package failed to install");
-
-            using (var commander = controller.CreateNpmCommander()) {
-                commander.UninstallPackageAsync("yo").Wait();
-            }
-
-            // Command has completed, but need to wait for all files/folders to be deleted.
-            Thread.Sleep(5000);
-
-            Assert.IsNotNull(controller.RootPackage, "Cannot retrieve global packages after uninstall");
-            Assert.IsFalse(controller.RootPackage.Modules.Contains("yo"), "Global package failed to uninstall");
         }
     }
 }
