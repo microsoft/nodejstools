@@ -29,12 +29,28 @@ using SR = Microsoft.NodejsTools.Project.SR;
 
 namespace Microsoft.NodejsTools {
     internal class TypingsAcquisition {
-        private const string TypingsTool = "typings";
-        private const string TypingsToolVersion = "1.0.5"; // Lock to stable version of the 'typings' tool with known behavior.
+        private const string TypingsTool = "ntvs_install_typings";
         private const string TypingsToolExe = TypingsTool + ".cmd";
+
         private const string TypingsDirectoryName = "typings";
 
         private static SemaphoreSlim typingsToolGlobalWorkSemaphore = new SemaphoreSlim(1);
+
+        /// <summary>
+        /// Full path to the local copy of the typings acquision tool.
+        /// </summary>
+        private static string LocalTypingsToolPath {
+            get {
+                string codeBase = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
+                var uri = new UriBuilder(codeBase);
+                var path = Uri.UnescapeDataString(uri.Path);
+                var root = Path.GetDirectoryName(path);
+
+                return Path.Combine(
+                    root,
+                    "TypingsAcquisitionTool");
+            }
+        }
 
         /// <summary>
         /// Full path to the typings acquisition tool.
@@ -78,7 +94,7 @@ namespace Microsoft.NodejsTools {
             if (!File.Exists(Path.Combine(_pathToRootProjectDirectory, "typings.json"))) {
                 return true;
             }
-            return await ExecuteTypingsTool(new[] { "install" }, redirector);
+            return await ExecuteTypingsTool(new string[] { }, redirector);
         }
 
         private async Task<bool> DownloadTypingsForPackages(IEnumerable<string> packages, Redirector redirector) {
@@ -156,16 +172,20 @@ namespace Microsoft.NodejsTools {
 
             // install typings
             using (var commander = _npmController.CreateNpmCommander()) {
-                return await commander.InstallPackageToFolderByVersionAsync(NodejsConstants.ExternalToolsPath, TypingsTool, TypingsToolVersion, false);
+                return await commander.InstallPackageToFolderByVersionAsync(
+                    NodejsConstants.ExternalToolsPath,
+                    string.Format(@"""{0}""", LocalTypingsToolPath),
+                    string.Empty,
+                    false);
             }
         }
 
         private static IEnumerable<string> GetTypingsToolInstallArguments(IEnumerable<string> packages) {
-            var arguments = new[] { "install" }.Concat(packages.Select(name => string.Format("dt~{0}", name)));
+            var arguments = packages;
             if (NodejsPackage.Instance.IntellisenseOptionsPage.SaveChangesToConfigFile) {
-                arguments = arguments.Concat(new[] { "--save" });
+                return arguments.Concat(new[] { "--save" });
             }
-            return arguments.Concat(new[] { "--global" });
+            return arguments;
         }
 
         private static IEnumerable<string> CurrentTypingsPackages(string pathToRootProjectDirectory) {
