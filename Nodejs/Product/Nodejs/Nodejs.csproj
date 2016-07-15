@@ -735,6 +735,18 @@
     </ConditionalEmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="TypingsAquisitionTool\index.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="TypingsAquisitionTool\package.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="TypingsAquisitionTool\bin\install_typings">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <ZipProject Include="ProjectTemplates\CloudService\CloudService.ccproj" />
     <ZipProject Include="ProjectTemplates\CloudService\ServiceConfiguration.Cloud.cscfg" />
     <ZipProject Include="ProjectTemplates\CloudService\ServiceConfiguration.Local.cscfg" />
@@ -1699,6 +1711,7 @@
     <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\startup.ts" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\server.ts" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <!--
     To specify a different registry root to register your package, uncomment the TargetRegistryRoot
