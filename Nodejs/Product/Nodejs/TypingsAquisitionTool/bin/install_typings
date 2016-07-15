@@ -25,7 +25,7 @@ var runAll = function (promises) {
 /**
  * Installs the typings for `packageName` with `options`.
  */
-var installPackage = function (packageName, options) {
+var installTypingsForPackage = function (packageName, options) {
     return typings.installDependenciesRaw(["dt~" + packageName], options)
         .then(function () {
             console.log("Acquired typings for '" + packageName + "'");
@@ -38,9 +38,9 @@ var installPackage = function (packageName, options) {
 /**
  * Installs the typings for the current project.
  */
-var installForProject = function(options) {
+var installTypingsForProject = function(options) {
     return typings.install(options)
-     .then(function () {
+        .then(function () {
             console.log("Acquired typings for project");
         })
         .catch(function (e) {
@@ -67,9 +67,9 @@ var options = {
 var packagesToInstall = argv._;
 
 if (!packagesToInstall.length) { // top level package install
-    installForProject(options)
+    installTypingsForProject(options)
 } else {
     runAll(packagesToInstall.map(function (name) {
-        return installPackage(name, options);
+        return installTypingsForPackage(name, options);
     }));
 }
