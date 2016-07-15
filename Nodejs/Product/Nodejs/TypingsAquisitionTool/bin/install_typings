@@ -28,10 +28,10 @@ var runAll = function (promises) {
 var installPackage = function (packageName, options) {
     return typings.installDependenciesRaw(["dt~" + packageName], options)
         .then(function () {
-            console.log("Acqired typings for '" + packageName + "'");
+            console.log("Acquired typings for '" + packageName + "'");
         })
         .catch(function (e) {
-            console.error("Could not acqire typings for '" + packageName + "'");
+            console.error("Could not acquire typings for '" + packageName + "'");
         });
 };
 
@@ -41,10 +41,10 @@ var installPackage = function (packageName, options) {
 var installForProject = function(options) {
     return typings.install(options)
      .then(function () {
-            console.log("Acqired typings for project");
+            console.log("Acquired typings for project");
         })
         .catch(function (e) {
-            console.error("Could not acqire typings for project");
+            console.error("Could not acquire typings for project");
         });
 };
 
