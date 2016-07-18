@@ -134,7 +134,7 @@
         <Description>A basic Node.js Express 4 application for Microsoft Azure.</Description>
         <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="404" />
         <ProjectType>JavaScript</ProjectType>
-        <TemplateID>Microsoft.JavaScript.ExpressApp</TemplateID>
+        <TemplateID>Microsoft.JavaScript.AzureExpressApp</TemplateID>
         <SortOrder>150</SortOrder>
         <CreateNewFolder>true</CreateNewFolder>
         <DefaultName>ExpressApp</DefaultName>
@@ -337,7 +337,7 @@
         <Description>A basic Node.js Express 3 application for Microsoft Azure.</Description>
         <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="410" />
         <ProjectType>TypeScript</ProjectType>
-        <TemplateID>Microsoft.TypeScript.ExpressApp</TemplateID>
+        <TemplateID>Microsoft.TypeScript.AzureExpressApp</TemplateID>
         <SortOrder>145</SortOrder>
         <CreateNewFolder>true</CreateNewFolder>
         <DefaultName>ExpressApp</DefaultName>
@@ -440,7 +440,7 @@
         <Description>An empty Node.js application for Microsoft Azure.</Description>
         <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="410" />
         <ProjectType>TypeScript</ProjectType>
-        <TemplateID>Microsoft.TypeScript.NodejsWebApp</TemplateID>
+        <TemplateID>Microsoft.TypeScript.NodejsAzureWebApp</TemplateID>
         <SortOrder>140</SortOrder>
         <CreateNewFolder>true</CreateNewFolder>
         <DefaultName>NodejsWebApp</DefaultName>
