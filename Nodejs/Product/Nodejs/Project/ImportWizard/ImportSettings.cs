@@ -208,9 +208,7 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
                     using (var writer = GetDefaultWriter(projectPath)) {
                         WriteProjectXml(writer, projectPath, sourcePath, filters, startupFile, true, out projectGuid);
                     }
-                    if (NodejsPackage.Instance != null) {
-                        NodejsPackage.Instance.TelemetryLogger.ReportEvent(TelemetryEvents.ProjectImported, TelemetryProperties.ProjectGuid, projectGuid.ToString("B"));
-                    }
+                    NodejsPackage.Instance?.TelemetryLogger.LogProjectImported(projectGuid);
                     success = true;
                     return projectPath;
                 } finally {

@@ -158,22 +158,6 @@
                                            Visibility="Collapsed">
                                     <Run xml:space="preserve">; </Run>
                                 </TextBlock>
-
-                                <TextBlock Grid.Column="3"
-                                           x:Name="GlobalInstallMessage"
-                                           Visibility="Collapsed"
-                                           FontWeight="Bold">
-                                    Installed globally
-                                </TextBlock>
-                                <TextBlock Grid.Column="3"
-                                           x:Name="GlobalInstallOutOfDateMessage"
-                                           Visibility="Collapsed"
-                                           FontWeight="Bold"
-                                           Foreground="Red">
-                                    <Run>Old version</Run>
-                                    <Run Text="{Binding GlobalVersion,Mode=OneWay}" />
-                                    <Run>installed globally</Run>
-                                </TextBlock>
                             </Grid>
 
                             <Separator Grid.Row="3" Margin="0 4 0 2" />
@@ -187,17 +171,9 @@
                                 <Setter TargetName="LocalInstallMessage" Property="Visibility" Value="Collapsed" />
                                 <Setter TargetName="LocalInstallOutOfDateMessage" Property="Visibility" Value="Visible" />
                             </DataTrigger>
-                            <DataTrigger Binding="{Binding IsInstalledGlobally}" Value="true">
-                                <Setter TargetName="GlobalInstallMessage" Property="Visibility" Value="Visible" />
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding IsGlobalInstallOutOfDate}" Value="true">
-                                <Setter TargetName="GlobalInstallMessage" Property="Visibility" Value="Collapsed" />
-                                <Setter TargetName="GlobalInstallOutOfDateMessage" Property="Visibility" Value="Visible" />
-                            </DataTrigger>
                             <MultiDataTrigger>
                                 <MultiDataTrigger.Conditions>
                                     <Condition Binding="{Binding IsInstalledLocally}" Value="true" />
-                                    <Condition Binding="{Binding IsInstalledGlobally}" Value="true" />
                                 </MultiDataTrigger.Conditions>
                                 <Setter TargetName="InstallMessageSeparator" Property="Visibility" Value="Visible" />
                             </MultiDataTrigger>
@@ -447,14 +423,6 @@
                             <ColumnDefinition Width="auto"/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-                        <Border Style="{StaticResource TooltipBorder}"
-                        Visibility="{Binding GlobalWarningVisibility}" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2">
-                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Stretch"
-                               Foreground="{DynamicResource {x:Static wpf:Controls.TooltipTextKey}}" TextWrapping="Wrap">
-                        <Run FontWeight="Bold">Warning:</Run> Global installs
-                        will affect other apps that use packages via 'npm link'.
-                            </TextBlock>
-                        </Border>
 
                         <TextBlock Grid.Row="1" FontWeight="Bold" Margin="0 4 0 4">Options</TextBlock>
                         <Label Grid.Row="5" HorizontalAlignment="Right" VerticalAlignment="Center">Other npm arguments</Label>
@@ -474,7 +442,6 @@
                             <ComboBoxItem Tag="St" IsSelected="True">Standard</ComboBoxItem>
                             <ComboBoxItem Tag="Dev">Development</ComboBoxItem>
                             <ComboBoxItem Tag="Opt">Optional</ComboBoxItem>
-                            <ComboBoxItem Tag="Global">Global</ComboBoxItem>
                         </ComboBox>
 
                         <Label Grid.Row="4" HorizontalAlignment="Right" VerticalAlignment="Center">Selected version</Label>

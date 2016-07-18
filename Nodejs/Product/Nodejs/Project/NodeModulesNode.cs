@@ -46,7 +46,6 @@ namespace Microsoft.NodejsTools.Project {
 
         #region Member variables
 
-        private readonly GlobalModulesNode _globalModulesNode;
         private readonly LocalModulesNode _devModulesNode;
         private readonly LocalModulesNode _optionalModulesNode;
 
@@ -68,9 +67,6 @@ namespace Microsoft.NodejsTools.Project {
             : base(root) {
             _npmController = DefaultNpmController(_projectNode.ProjectHome, new NpmPathProvider(this));
             RegisterWithNpmController(_npmController);
-
-            _globalModulesNode = new GlobalModulesNode(root, this);
-            AddChild(_globalModulesNode);
 
             _devModulesNode = new LocalModulesNode(root, this, "dev", "DevelopmentModules", DependencyType.Development);
             AddChild(_devModulesNode);
@@ -105,7 +101,6 @@ namespace Microsoft.NodejsTools.Project {
 
                 _devModulesNode.Dispose();
                 _optionalModulesNode.Dispose();
-                _globalModulesNode.Dispose();
 
                 _isDisposed = true;
             }
@@ -380,15 +375,6 @@ namespace Microsoft.NodejsTools.Project {
             ReloadDevPackageHierarchy(controller);
             ReloadOptionalPackageHierarchy(controller);
             ReloadRootPackageHierarchy(controller);
-            ReloadGlobalPackageHierarchy(controller);
-        }
-
-        private void ReloadGlobalPackageHierarchy(INpmController controller) {
-            var global = controller.GlobalPackages;
-            if (global != null && global.Modules != null) {
-                _globalModulesNode.GlobalPackages = global;
-                ReloadHierarchy(_globalModulesNode, global.Modules);
-            }
         }
 
         private void ReloadRootPackageHierarchy(INpmController controller) {
@@ -495,7 +481,7 @@ namespace Microsoft.NodejsTools.Project {
             return base.ExecCommandOnNode(cmdGroup, cmd, nCmdexecopt, pvaIn, pvaOut);
         }
 
-        public void ManageModules(DependencyType dependencyType = DependencyType.Standard, bool isGlobal = false) {
+        public void ManageModules(DependencyType dependencyType = DependencyType.Standard) {
             CheckNotDisposed();
 
             if (NpmController.RootPackage == null) {
@@ -507,7 +493,7 @@ namespace Microsoft.NodejsTools.Project {
             }
 
             using (var executeVm = new NpmOutputViewModel(NpmController))
-            using (var manager = new NpmPackageInstallWindow(NpmController, executeVm, dependencyType, isGlobal)) {
+            using (var manager = new NpmPackageInstallWindow(NpmController, executeVm, dependencyType)) {
                 manager.Owner = System.Windows.Application.Current.MainWindow;
                 manager.ShowModal();
             }
@@ -569,18 +555,11 @@ namespace Microsoft.NodejsTools.Project {
             DoPreCommandActions();
             try {
                 using (var commander = NpmController.CreateNpmCommander()) {
-                    if (node.GetPropertiesObject().IsGlobalInstall) {
-                        //  I genuinely can't see a way this would ever happen but, just to be on the safe side...
-                        await commander.InstallGlobalPackageByVersionAsync(
-                            package.Name,
-                            null == dep ? "*" : dep.VersionRangeText);
-                    } else {
-                        await commander.InstallPackageByVersionAsync(
-                            package.Name,
-                            null == dep ? "*" : dep.VersionRangeText,
-                            DependencyType.Standard,
-                            false);
-                    }
+                    await commander.InstallPackageByVersionAsync(
+                        package.Name,
+                        null == dep ? "*" : dep.VersionRangeText,
+                        DependencyType.Standard,
+                        false);
                 }
             } catch (NpmNotFoundException nnfe) {
                 ErrorHelper.ReportNpmNotInstalled(null, nnfe);
@@ -597,13 +576,7 @@ namespace Microsoft.NodejsTools.Project {
                         await commander.UpdatePackagesAsync();
                     } else {
                         var valid = nodes.OfType<DependencyNode>().Where(CheckValidCommandTarget).ToList();
-
-                        var list = valid.Where(node => node.GetPropertiesObject().IsGlobalInstall).Select(node => node.Package).ToList();
-                        if (list.Count > 0) {
-                            await commander.UpdateGlobalPackagesAsync(list);
-                        }
-
-                        list = valid.Where(node => !node.GetPropertiesObject().IsGlobalInstall).Select(node => node.Package).ToList();
+                        var list = valid.Select(node => node.Package).ToList();
                         if (list.Count > 0) {
                             await commander.UpdatePackagesAsync(list);
                         }
@@ -627,11 +600,7 @@ namespace Microsoft.NodejsTools.Project {
             DoPreCommandActions();
             try {
                 using (var commander = NpmController.CreateNpmCommander()) {
-                    if (node.GetPropertiesObject().IsGlobalInstall) {
-                        await commander.UpdateGlobalPackagesAsync(new[] { node.Package });
-                    } else {
-                        await commander.UpdatePackagesAsync(new[] { node.Package });
-                    }
+                    await commander.UpdatePackagesAsync(new[] { node.Package });
                 }
             } catch (NpmNotFoundException nnfe) {
                 ErrorHelper.ReportNpmNotInstalled(null, nnfe);
@@ -646,11 +615,7 @@ namespace Microsoft.NodejsTools.Project {
                 var selected = _projectNode.GetSelectedNodes();
                 using (var commander = NpmController.CreateNpmCommander()) {
                     foreach (var node in selected.OfType<DependencyNode>().Where(CheckValidCommandTarget)) {
-                        if (node.GetPropertiesObject().IsGlobalInstall) {
-                            await commander.UninstallGlobalPackageAsync(node.Package.Name);
-                        } else {
-                            await commander.UninstallPackageAsync(node.Package.Name);
-                        }
+                        await commander.UninstallPackageAsync(node.Package.Name);
                     }
                 }
             } catch (NpmNotFoundException nnfe) {
@@ -667,11 +632,7 @@ namespace Microsoft.NodejsTools.Project {
             DoPreCommandActions();
             try {
                 using (var commander = NpmController.CreateNpmCommander()) {
-                    if (node.GetPropertiesObject().IsGlobalInstall) {
-                        await commander.UninstallGlobalPackageAsync(node.Package.Name);
-                    } else {
-                        await commander.UninstallPackageAsync(node.Package.Name);
-                    }
+                    await commander.UninstallPackageAsync(node.Package.Name);
                 }
             } catch (NpmNotFoundException nnfe) {
                 ErrorHelper.ReportNpmNotInstalled(null, nnfe);
