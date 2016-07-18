@@ -557,7 +557,7 @@ try {
                     /p:RezipVSIXFiles=false `
                     $setup_project
 
-                msbuild $global_msbuild_options $target_msbuild_options `
+                & $target_msbuild_exe $global_msbuild_options $target_msbuild_options `
                     /fl /flp:logfile=$($i.signed_logfile) `
                     /p:SignedBinariesPath=$($i.signed_bindir) `
                     /p:RezipVSIXFiles=true `
