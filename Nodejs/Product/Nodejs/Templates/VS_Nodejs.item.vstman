@@ -21,48 +21,6 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\AddWebSiteAzureExpressApp.zip</RelativePathOnDisk>
-    <TemplateFileName>AddWebSiteAzureExpressApp.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>Basic Azure Node.js Express 3 Application</Name>
-        <Description>A basic Node.js Express 3 application for Microsoft Azure.</Description>
-        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="404" />
-        <ProjectType>Web</ProjectType>
-        <ProjectSubType>JavaScript</ProjectSubType>
-        <TemplateID>Microsoft.JavaScript.AddWebSiteAzureExpressApp</TemplateID>
-        <SortOrder>145</SortOrder>
-        <CreateNewFolder>true</CreateNewFolder>
-        <DefaultName>ExpressApp</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-        <PreviewImage>Preview.png</PreviewImage>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\AddWebSiteAzureNodejsApp.zip</RelativePathOnDisk>
-    <TemplateFileName>AddWebSiteAzureNodejsApp.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>Blank Azure Node.js Web Application</Name>
-        <Description>An empty Node.js application for Microsoft Azure.</Description>
-        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="404" />
-        <ProjectType>Web</ProjectType>
-        <ProjectSubType>JavaScript</ProjectSubType>
-        <TemplateID>Microsoft.Web.JavaScript.AddWebSiteAzureNodejsApp</TemplateID>
-        <SortOrder>140</SortOrder>
-        <CreateNewFolder>true</CreateNewFolder>
-        <DefaultName>NodejsWebApp</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-        <PreviewImage>Preview.png</PreviewImage>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
     <RelativePathOnDisk>JavaScript\Node.js\AddWebSiteAzureNodejsApp.zip</RelativePathOnDisk>
     <TemplateFileName>AddWebSiteAzureNodejsApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
@@ -95,48 +53,6 @@
         <ProjectSubType>JavaScript</ProjectSubType>
         <TemplateID>Microsoft.JavaScript.AddWebSiteAzureStarterExpressApp</TemplateID>
         <SortOrder>146</SortOrder>
-        <CreateNewFolder>true</CreateNewFolder>
-        <DefaultName>ExpressApp</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-        <PreviewImage>Preview.png</PreviewImage>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\AddWebSiteAzureStarterExpressApp.zip</RelativePathOnDisk>
-    <TemplateFileName>AddWebSiteAzureStarterExpressApp.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>Starter Azure Node.js Express 3 Application</Name>
-        <Description>A project for creating an application for Microsoft Azure using the Express 3 web framework with the Jade template engine. It features sample pages that use the Twitter Bootstrap framework for responsive web design.</Description>
-        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="404" />
-        <ProjectType>Web</ProjectType>
-        <ProjectSubType>JavaScript</ProjectSubType>
-        <TemplateID>Microsoft.JavaScript.AddWebSiteAzureStarterExpressApp</TemplateID>
-        <SortOrder>146</SortOrder>
-        <CreateNewFolder>true</CreateNewFolder>
-        <DefaultName>ExpressApp</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-        <PreviewImage>Preview.png</PreviewImage>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\AddWebSiteExpressApp.zip</RelativePathOnDisk>
-    <TemplateFileName>AddWebSiteExpressApp.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>Basic Node.js Express 3 Application</Name>
-        <Description>A basic Node.js Express 3 application.</Description>
-        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="406" />
-        <ProjectType>Web</ProjectType>
-        <ProjectSubType>JavaScript</ProjectSubType>
-        <TemplateID>Microsoft.JavaScript.AddWebSiteExpressApp</TemplateID>
-        <SortOrder>135</SortOrder>
         <CreateNewFolder>true</CreateNewFolder>
         <DefaultName>ExpressApp</DefaultName>
         <ProvideDefaultName>true</ProvideDefaultName>
@@ -189,27 +105,6 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\AddWebSiteNodejsWebApp.zip</RelativePathOnDisk>
-    <TemplateFileName>AddWebSiteNodejsWebApp.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>Blank Node.js Web Application</Name>
-        <Description>An empty Node.js web application.</Description>
-        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="406" />
-        <ProjectType>Web</ProjectType>
-        <ProjectSubType>JavaScript</ProjectSubType>
-        <TemplateID>Microsoft.Web.JavaScript.AddWebSiteNodejsWebApp</TemplateID>
-        <SortOrder>130</SortOrder>
-        <CreateNewFolder>true</CreateNewFolder>
-        <DefaultName>NodejsWebApp</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-        <PreviewImage>Preview.png</PreviewImage>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
     <RelativePathOnDisk>JavaScript\Node.js\AddWebSiteStarterExpressApp.zip</RelativePathOnDisk>
     <TemplateFileName>AddWebSiteStarterExpressApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
@@ -221,47 +116,6 @@
         <ProjectSubType>JavaScript</ProjectSubType>
         <TemplateID>Microsoft.JavaScript.AddWebSiteStarterExpressApp</TemplateID>
         <SortOrder>136</SortOrder>
-        <CreateNewFolder>true</CreateNewFolder>
-        <DefaultName>ExpressApp</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-        <PreviewImage>Preview.png</PreviewImage>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\AddWebSiteStarterExpressApp.zip</RelativePathOnDisk>
-    <TemplateFileName>AddWebSiteStarterExpressApp.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>Starter Node.js Express 3 Application</Name>
-        <Description>A project for creating an application using the Express 3 web framework with the Jade template engine. It features sample pages that use the Twitter Bootstrap framework for responsive web design.</Description>
-        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="406" />
-        <ProjectType>Web</ProjectType>
-        <ProjectSubType>JavaScript</ProjectSubType>
-        <TemplateID>Microsoft.JavaScript.AddWebSiteStarterExpressApp</TemplateID>
-        <SortOrder>136</SortOrder>
-        <CreateNewFolder>true</CreateNewFolder>
-        <DefaultName>ExpressApp</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-        <PreviewImage>Preview.png</PreviewImage>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\AzureExpress4App.zip</RelativePathOnDisk>
-    <TemplateFileName>ExpressApp.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>Basic Azure Node.js Express 4 Application</Name>
-        <Description>A basic Node.js Express 4 application for Microsoft Azure.</Description>
-        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="404" />
-        <ProjectType>JavaScript</ProjectType>
-        <TemplateID>Microsoft.JavaScript.ExpressApp</TemplateID>
-        <SortOrder>150</SortOrder>
         <CreateNewFolder>true</CreateNewFolder>
         <DefaultName>ExpressApp</DefaultName>
         <ProvideDefaultName>true</ProvideDefaultName>
@@ -312,26 +166,6 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\AzureNodejsApp.zip</RelativePathOnDisk>
-    <TemplateFileName>AzureNodejsApp.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>Blank Azure Node.js Web Application</Name>
-        <Description>An empty Node.js application for Microsoft Azure.</Description>
-        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="404" />
-        <ProjectType>JavaScript</ProjectType>
-        <TemplateID>Microsoft.JavaScript.AzureNodejsApp</TemplateID>
-        <SortOrder>140</SortOrder>
-        <CreateNewFolder>true</CreateNewFolder>
-        <DefaultName>NodejsWebApp</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-        <PreviewImage>Preview.png</PreviewImage>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
     <RelativePathOnDisk>JavaScript\Node.js\AzureNodejsWorker.zip</RelativePathOnDisk>
     <TemplateFileName>Worker.vstemplate</TemplateFileName>
     <VSTemplateHeader>
@@ -345,47 +179,6 @@
         <SortOrder>150</SortOrder>
         <CreateNewFolder>true</CreateNewFolder>
         <DefaultName>NodejsWorker</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-        <PreviewImage>Preview.png</PreviewImage>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\AzureNodejsWorker.zip</RelativePathOnDisk>
-    <TemplateFileName>Worker.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>Blank Azure Node.js Worker Role</Name>
-        <Description>An empty Node.js worker role for Microsoft Azure.</Description>
-        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="407" />
-        <ProjectType>JavaScript</ProjectType>
-        <TemplateID>Microsoft.JavaScript.AzureNodejsWorker</TemplateID>
-        <Hidden>true</Hidden>
-        <SortOrder>150</SortOrder>
-        <CreateNewFolder>true</CreateNewFolder>
-        <DefaultName>NodejsWorker</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-        <PreviewImage>Preview.png</PreviewImage>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\AzureStarterExpressApp.zip</RelativePathOnDisk>
-    <TemplateFileName>AzureStarterExpressApp.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>Starter Azure Node.js Express 3 Application</Name>
-        <Description>A project for creating an application for Microsoft Azure using the Express 3 web framework with the Jade template engine. It features sample pages that use the Twitter Bootstrap framework for responsive web design.</Description>
-        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="404" />
-        <ProjectType>JavaScript</ProjectType>
-        <TemplateID>Microsoft.JavaScript.AzureStarterExpressApp</TemplateID>
-        <SortOrder>146</SortOrder>
-        <CreateNewFolder>true</CreateNewFolder>
-        <DefaultName>ExpressApp</DefaultName>
         <ProvideDefaultName>true</ProvideDefaultName>
         <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
         <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
@@ -437,49 +230,6 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\CloudService.zip</RelativePathOnDisk>
-    <TemplateFileName>CloudService.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>Azure Cloud Service</Name>
-        <Description>A project for creating a scalable service that runs on Microsoft Azure.</Description>
-        <ProjectType>JavaScript</ProjectType>
-        <TemplateGroupID>CloudServiceProject</TemplateGroupID>
-        <TemplateID>Microsoft.CloudServiceProject.CloudService_js</TemplateID>
-        <RequiredFrameworkVersion>3.5</RequiredFrameworkVersion>
-        <SortOrder>30</SortOrder>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <CreateNewFolder>true</CreateNewFolder>
-        <DefaultName>AzureCloudService</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <Icon>cloudservice.ico</Icon>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-        <LocationField>Enabled</LocationField>
-        <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\Express4App.zip</RelativePathOnDisk>
-    <TemplateFileName>ExpressApp.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>Basic Node.js Express 4 Application</Name>
-        <Description>A basic Node.js Express 4 application.</Description>
-        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="406" />
-        <ProjectType>JavaScript</ProjectType>
-        <TemplateID>Microsoft.JavaScript.ExpressApp</TemplateID>
-        <SortOrder>140</SortOrder>
-        <CreateNewFolder>true</CreateNewFolder>
-        <DefaultName>ExpressApp</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-        <PreviewImage>Preview.png</PreviewImage>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
     <RelativePathOnDisk>JavaScript\Node.js\Express4App.zip</RelativePathOnDisk>
     <TemplateFileName>ExpressApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
@@ -519,25 +269,6 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\FromExistingCode.zip</RelativePathOnDisk>
-    <TemplateFileName>FromExistingCode.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>From Existing Node.js code</Name>
-        <Description>Creates a new Node.js project from existing code.</Description>
-        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="408" />
-        <ProjectType>JavaScript</ProjectType>
-        <TemplateID>Microsoft.JavaScript.NodejsFromExistingCode</TemplateID>
-        <SortOrder>120</SortOrder>
-        <CreateNewFolder>false</CreateNewFolder>
-        <DefaultName>NodejsApp</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
     <RelativePathOnDisk>JavaScript\Node.js\NodejsConsoleApp.zip</RelativePathOnDisk>
     <TemplateFileName>NodejsConsoleApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
@@ -550,46 +281,6 @@
         <SortOrder>125</SortOrder>
         <CreateNewFolder>true</CreateNewFolder>
         <DefaultName>NodejsConsoleApp</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-        <PreviewImage>Preview.png</PreviewImage>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\NodejsConsoleApp.zip</RelativePathOnDisk>
-    <TemplateFileName>NodejsConsoleApp.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>Blank Node.js Console Application</Name>
-        <Description>An empty Node.js application.</Description>
-        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="405" />
-        <ProjectType>JavaScript</ProjectType>
-        <TemplateID>Microsoft.JavaScript.NodejsConsoleApp</TemplateID>
-        <SortOrder>125</SortOrder>
-        <CreateNewFolder>true</CreateNewFolder>
-        <DefaultName>NodejsConsoleApp</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-        <PreviewImage>Preview.png</PreviewImage>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\NodejsWebApp.zip</RelativePathOnDisk>
-    <TemplateFileName>NodejsWebApp.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>Blank Node.js Web Application</Name>
-        <Description>An empty Node.js Web application.</Description>
-        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="406" />
-        <ProjectType>JavaScript</ProjectType>
-        <TemplateID>Microsoft.JavaScript.NodejsWebApp</TemplateID>
-        <SortOrder>130</SortOrder>
-        <CreateNewFolder>true</CreateNewFolder>
-        <DefaultName>NodejsWebApp</DefaultName>
         <ProvideDefaultName>true</ProvideDefaultName>
         <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
         <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
@@ -638,26 +329,6 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\StarterExpressApp.zip</RelativePathOnDisk>
-    <TemplateFileName>StarterExpressApp.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>Starter Node.js Express 3 Application</Name>
-        <Description>A project for creating an application using the Express 3 web framework with the Jade template engine. It features sample pages that use the Twitter Bootstrap framework for responsive web design.</Description>
-        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="406" />
-        <ProjectType>JavaScript</ProjectType>
-        <TemplateID>Microsoft.JavaScript.StarterExpressApp</TemplateID>
-        <SortOrder>136</SortOrder>
-        <CreateNewFolder>true</CreateNewFolder>
-        <DefaultName>ExpressApp</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-        <PreviewImage>Preview.png</PreviewImage>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
     <RelativePathOnDisk>JavaScript\Node.js\TypeScriptAzureExpressApp.zip</RelativePathOnDisk>
     <TemplateFileName>TypeScriptExpressApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
@@ -667,47 +338,6 @@
         <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="410" />
         <ProjectType>TypeScript</ProjectType>
         <TemplateID>Microsoft.TypeScript.ExpressApp</TemplateID>
-        <SortOrder>145</SortOrder>
-        <CreateNewFolder>true</CreateNewFolder>
-        <DefaultName>ExpressApp</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-        <PreviewImage>Preview.png</PreviewImage>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\TypeScriptAzureExpressApp.zip</RelativePathOnDisk>
-    <TemplateFileName>TypeScriptExpressApp.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>Basic Azure Node.js Express 3 Application</Name>
-        <Description>A basic Node.js Express 3 application for Microsoft Azure.</Description>
-        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="410" />
-        <ProjectType>TypeScript</ProjectType>
-        <TemplateID>Microsoft.TypeScript.ExpressApp</TemplateID>
-        <SortOrder>145</SortOrder>
-        <CreateNewFolder>true</CreateNewFolder>
-        <DefaultName>ExpressApp</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-        <PreviewImage>Preview.png</PreviewImage>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\TypeScriptAzureExpressWebRole.zip</RelativePathOnDisk>
-    <TemplateFileName>TypeScriptExpressApp.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>Basic Azure Node.js Express 3 Application</Name>
-        <Description>A basic Node.js Express 3 application for Microsoft Azure.</Description>
-        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="410" />
-        <ProjectType>JavaScript</ProjectType>
-        <TemplateID>Microsoft.JavaScript.TypeScriptExpressApp</TemplateID>
-        <Hidden>true</Hidden>
         <SortOrder>145</SortOrder>
         <CreateNewFolder>true</CreateNewFolder>
         <DefaultName>ExpressApp</DefaultName>
@@ -761,48 +391,6 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\TypeScriptAzureNodejsWorker.zip</RelativePathOnDisk>
-    <TemplateFileName>Worker.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>Blank Azure Node.js Worker Role</Name>
-        <Description>An empty Node.js worker role for Microsoft Azure.</Description>
-        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="413" />
-        <ProjectType>TypeScript</ProjectType>
-        <TemplateID>Microsoft.TypeScript.AzureNodejsWorker</TemplateID>
-        <Hidden>true</Hidden>
-        <SortOrder>150</SortOrder>
-        <CreateNewFolder>true</CreateNewFolder>
-        <DefaultName>NodejsWorker</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-        <PreviewImage>Preview.png</PreviewImage>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\TypeScriptAzureNodejsWorkerRole.zip</RelativePathOnDisk>
-    <TemplateFileName>Worker.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>Blank Azure Node.js Worker Role</Name>
-        <Description>An empty Node.js worker role for Microsoft Azure.</Description>
-        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="413" />
-        <ProjectType>JavaScript</ProjectType>
-        <TemplateID>Microsoft.JavaScript.TypeScriptAzureNodejsWorker</TemplateID>
-        <Hidden>true</Hidden>
-        <SortOrder>150</SortOrder>
-        <CreateNewFolder>true</CreateNewFolder>
-        <DefaultName>NodejsWorker</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-        <PreviewImage>Preview.png</PreviewImage>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
     <RelativePathOnDisk>JavaScript\Node.js\TypeScriptAzureNodejsWorkerRole.zip</RelativePathOnDisk>
     <TemplateFileName>Worker.vstemplate</TemplateFileName>
     <VSTemplateHeader>
@@ -844,26 +432,6 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\TypeScriptAzureStarterExpressApp.zip</RelativePathOnDisk>
-    <TemplateFileName>TypeScriptAzureStarterExpressApp.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>Starter Azure Node.js Express 3 Application</Name>
-        <Description>A project for creating an application for Microsoft Azure using the Express 3 web framework with the Jade template engine. It features sample pages that use the Twitter Bootstrap framework for responsive web design.</Description>
-        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="410" />
-        <ProjectType>TypeScript</ProjectType>
-        <TemplateID>Microsoft.TypeScript.AzureStarterExpressApp</TemplateID>
-        <SortOrder>146</SortOrder>
-        <CreateNewFolder>true</CreateNewFolder>
-        <DefaultName>ExpressApp</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-        <PreviewImage>Preview.png</PreviewImage>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
     <RelativePathOnDisk>JavaScript\Node.js\TypeScriptAzureWebApp.zip</RelativePathOnDisk>
     <TemplateFileName>TypeScriptWebApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
@@ -874,49 +442,6 @@
         <ProjectType>TypeScript</ProjectType>
         <TemplateID>Microsoft.TypeScript.NodejsWebApp</TemplateID>
         <SortOrder>140</SortOrder>
-        <CreateNewFolder>true</CreateNewFolder>
-        <DefaultName>NodejsWebApp</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-        <PreviewImage>Preview.png</PreviewImage>
-        <TemplateGroupID>Node.jss</TemplateGroupID>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\TypeScriptAzureWebApp.zip</RelativePathOnDisk>
-    <TemplateFileName>TypeScriptWebApp.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>Blank Azure Node.js Web Application</Name>
-        <Description>An empty Node.js application for Microsoft Azure.</Description>
-        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="410" />
-        <ProjectType>TypeScript</ProjectType>
-        <TemplateID>Microsoft.TypeScript.NodejsWebApp</TemplateID>
-        <SortOrder>140</SortOrder>
-        <CreateNewFolder>true</CreateNewFolder>
-        <DefaultName>NodejsWebApp</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-        <PreviewImage>Preview.png</PreviewImage>
-        <TemplateGroupID>Node.jss</TemplateGroupID>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\TypeScriptAzureWebRole.zip</RelativePathOnDisk>
-    <TemplateFileName>TypeScriptWebApp.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>Blank Azure Node.js Web Application</Name>
-        <Description>An empty Node.js application for Microsoft Azure.</Description>
-        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="410" />
-        <ProjectType>JavaScript</ProjectType>
-        <TemplateID>Microsoft.JavaScript.TypeScriptNodejsWebApp</TemplateID>
-        <SortOrder>140</SortOrder>
-        <Hidden>true</Hidden>
         <CreateNewFolder>true</CreateNewFolder>
         <DefaultName>NodejsWebApp</DefaultName>
         <ProvideDefaultName>true</ProvideDefaultName>
@@ -970,46 +495,6 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\TypeScriptConsoleApp.zip</RelativePathOnDisk>
-    <TemplateFileName>NodejsConsoleApp.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>Blank Node.js Console Application</Name>
-        <Description>An empty Node.js application.</Description>
-        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="411" />
-        <ProjectType>TypeScript</ProjectType>
-        <TemplateID>Microsoft.TypeScript.NodejsConsoleApp</TemplateID>
-        <SortOrder>125</SortOrder>
-        <CreateNewFolder>true</CreateNewFolder>
-        <DefaultName>NodejsConsoleApp</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-        <PreviewImage>Preview.png</PreviewImage>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\TypeScriptExpressApp.zip</RelativePathOnDisk>
-    <TemplateFileName>ExpressApp.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>Basic Node.js Express 3 Application</Name>
-        <Description>A basic Node.js Express 3 application.</Description>
-        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="412" />
-        <ProjectType>TypeScript</ProjectType>
-        <TemplateID>Microsoft.TypeScript.ExpressApp</TemplateID>
-        <SortOrder>135</SortOrder>
-        <CreateNewFolder>true</CreateNewFolder>
-        <DefaultName>ExpressApp</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-        <PreviewImage>Preview.png</PreviewImage>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
     <RelativePathOnDisk>JavaScript\Node.js\TypeScriptExpressApp.zip</RelativePathOnDisk>
     <TemplateFileName>ExpressApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
@@ -1049,25 +534,6 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\TypeScriptFromExistingCode.zip</RelativePathOnDisk>
-    <TemplateFileName>FromExistingCode.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>From Existing Node.js code</Name>
-        <Description>Creates a new Node.js project from existing code.</Description>
-        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="409" />
-        <ProjectType>TypeScript</ProjectType>
-        <TemplateID>Microsoft.TypeScript.NodejsFromExistingCode</TemplateID>
-        <SortOrder>120</SortOrder>
-        <CreateNewFolder>false</CreateNewFolder>
-        <DefaultName>NodejsApp</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
     <RelativePathOnDisk>JavaScript\Node.js\TypeScriptStarterExpressApp.zip</RelativePathOnDisk>
     <TemplateFileName>TypeScriptStarterExpressApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
@@ -1084,47 +550,6 @@
         <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
         <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
         <PreviewImage>Preview.png</PreviewImage>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\TypeScriptStarterExpressApp.zip</RelativePathOnDisk>
-    <TemplateFileName>TypeScriptStarterExpressApp.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>Starter Node.js Express 3 Application</Name>
-        <Description>A project for creating an application using the Express 3 web framework with the Jade template engine. It features sample pages that use the Twitter Bootstrap framework for responsive web design.</Description>
-        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="412" />
-        <ProjectType>TypeScript</ProjectType>
-        <TemplateID>Microsoft.TypeScript.StarterExpressApp</TemplateID>
-        <SortOrder>136</SortOrder>
-        <CreateNewFolder>true</CreateNewFolder>
-        <DefaultName>ExpressApp</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-        <PreviewImage>Preview.png</PreviewImage>
-      </TemplateData>
-    </VSTemplateHeader>
-  </VSTemplateContainer>
-  <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\TypeScriptWebApp.zip</RelativePathOnDisk>
-    <TemplateFileName>NodejsWebApp.vstemplate</TemplateFileName>
-    <VSTemplateHeader>
-      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
-        <Name>Blank Node.js Web Application</Name>
-        <Description>An empty Node.js application.</Description>
-        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="412" />
-        <ProjectType>TypeScript</ProjectType>
-        <TemplateID>Microsoft.TypeScript.NodejsWebApp</TemplateID>
-        <SortOrder>130</SortOrder>
-        <CreateNewFolder>true</CreateNewFolder>
-        <DefaultName>NodejsWebApp</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
-        <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-        <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-        <PreviewImage>Preview.png</PreviewImage>
-        <TemplateGroupID>Node.jss</TemplateGroupID>
       </TemplateData>
     </VSTemplateHeader>
   </VSTemplateContainer>
