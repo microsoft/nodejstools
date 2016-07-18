@@ -7,7 +7,7 @@
     <TemplateID>Microsoft.JavaScript.ExpressApp</TemplateID>
     <SortOrder>150</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
-    <DefaultName>ExpressApp</DefaultName>
+    <DefaultName>AzureExpressApp</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
     <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
     <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
