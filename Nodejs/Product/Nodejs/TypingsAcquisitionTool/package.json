@@ -1,5 +1,5 @@
 {
-  "name": "ntvs-typings-aquisition-tool",
+  "name": "ntvs-typings-acquisition-tool",
   "author": "Microsoft",
   "version": "1.0.0",
   "description": "Internal tool that aquires typings to power Node Js Tools For Visual Studio IntelliSense",
