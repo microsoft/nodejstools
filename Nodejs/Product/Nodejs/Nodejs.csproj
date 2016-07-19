@@ -1342,6 +1342,10 @@
     <Content Include="TestFrameworks\Tape\tape.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="VSTemplateStore.pkgdef">
+      <IncludeInVSIX>false</IncludeInVSIX>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <VSCTCompile Include="NodejsTools.vsct">
       <ResourceName>1000</ResourceName>
       <SubType>Designer</SubType>
