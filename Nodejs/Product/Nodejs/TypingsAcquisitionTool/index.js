@@ -5,7 +5,7 @@ var typings = require('typings-core');
  */
 module.exports.runAll = function (promises) {
     return promises.reduce(function (p1, p2) {
-        return p1.then(function (_) {
+        return p1.then(function () {
             return p2;
         });
     });
