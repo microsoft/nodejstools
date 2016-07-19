@@ -3,6 +3,7 @@
   branches:
     only:
     - master
+    - v1.2.x
   skip_tags: true
   image: Visual Studio 2015
   environment:
