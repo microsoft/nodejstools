@@ -735,15 +735,15 @@
     </ConditionalEmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="TypingsAquisitionTool\index.js">
+    <Content Include="TypingsAcquisitionTool\index.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="TypingsAquisitionTool\package.json">
+    <Content Include="TypingsAcquisitionTool\package.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="TypingsAquisitionTool\bin\install_typings">
+    <Content Include="TypingsAcquisitionTool\bin\install_typings">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>

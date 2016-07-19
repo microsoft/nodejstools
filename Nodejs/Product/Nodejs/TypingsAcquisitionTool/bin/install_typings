@@ -7,10 +7,9 @@
     from being aquired.
 */
 "use strict";
-var typingsTool = require('../index');
 var events = require('events');
 var minimist = require('minimist');
-
+var typingsTool = require('../index');
 
 var argv = minimist(process.argv.slice(2), {
     boolean: ['save', 'verbose'],
@@ -28,7 +27,8 @@ var options = {
 
 var packagesToInstall = argv._;
 
-if (!packagesToInstall.length) { // top level package install
+if (!packagesToInstall.length) {
+    // top level package install
     typingsTool.installTypingsForProject(options)
 } else {
     typingsTool.runAll(packagesToInstall.map(function (name) {
