@@ -15,11 +15,8 @@
 //*********************************************************//
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -27,9 +24,8 @@ namespace NpmTests {
     [TestClass]
     [DeploymentItem(@"TestData\NpmPackageJsonData\", "NpmPackageJsonData")]
     public class ProblematicPackageJsonTests : AbstractPackageJsonTests {
-
         [TestMethod, Priority(0)]
-        public void TestFreshPackageJsonParseFromResource() {
+        public void FreshPackageJsonParseFromResource() {
             var pkg = LoadFromResource("NpmTests.TestData.fresh_package.json");
             Assert.IsNotNull(pkg, "Fresh package should not be null.");
         }
@@ -43,7 +39,7 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestFreshPackageParseFromFile() {
+        public void FreshPackageParseFromFile() {
             TestParseFromFile("fresh_package.json");
         }
 
@@ -53,99 +49,89 @@ namespace NpmTests {
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(PackageJsonException))]
-        public void TestParseDoubleColon() {
+        public void ParseDoubleColon() {
             TestFreshPackage("doublecolon");
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(PackageJsonException))]
-        public void TestParseDoubleComma() {
+        public void ParseDoubleComma() {
             TestFreshPackage("doublecomma");
         }
 
         [TestMethod, Priority(0), TestCategory("Ignore")]
         [ExpectedException(typeof(PackageJsonException))]
-        public void TestParseDuplicateProperty() {
+        public void ParseDuplicateProperty() {
             TestFreshPackage("duplicateproperty");
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(PackageJsonException))]
-        public void TestParseLeadingBrace() {
+        public void ParseLeadingBrace() {
             TestFreshPackage("leadingbrace");
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(PackageJsonException))]
-        public void TestParseLeadingLetter() {
+        public void ParseLeadingLetter() {
             TestFreshPackage("leadingletter");
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(PackageJsonException))]
-        public void TestParseLeadingSquareBrace() {
+        public void ParseLeadingSquareBrace() {
             TestFreshPackage("leadingsquarebrace");
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(PackageJsonException))]
-        public void TestParseMissingColon() {
+        public void ParseMissingColon() {
             TestFreshPackage("missingcolon");
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(PackageJsonException))]
-        public void TestParseMissingComma() {
+        public void ParseMissingComma() {
             TestFreshPackage("missingcomma");
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(PackageJsonException))]
-        public void TestParseMissingLeadingBrace() {
+        public void ParseMissingLeadingBrace() {
             TestFreshPackage("missingleadingbrace");
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(PackageJsonException))]
-        public void TestParseMissingLeadingListBrace() {
+        public void ParseMissingLeadingListBrace() {
             TestFreshPackage("missingleadinglistbrace");
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(PackageJsonException))]
-        public void TestParseMissingLeadingPropNameQuote() {
+        public void ParseMissingLeadingPropNameQuote() {
             TestFreshPackage("missingleadingpropnamequote");
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(PackageJsonException))]
-        public void TestParseMissingOnePropNameQuote() {
+        public void ParseMissingOnePropNameQuote() {
             TestFreshPackage("missingonepropnamequote");
         }
 
         [TestMethod, Priority(0)]
-        public void TestParseMissingPropNameQuotes() {
+        public void ParseMissingPropNameQuotes() {
             TestFreshPackage("missingpropnamequotes");
-        }
-
-        [TestMethod, Priority(0), TestCategory("Ignore")]
-        public void TestParseMissingTrailingBrace() {
-            TestFreshPackage("missingtrailingbrace");
-        }
-
-        [TestMethod, Priority(0), TestCategory("Ignore")]
-        public void TestParseMissingTrailingListBrace() {
-            TestFreshPackage("missingtrailinglistbrace");
         }
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(PackageJsonException))]
-        public void TestParseUnescapedQuote() {
+        public void ParseUnescapedQuote() {
             TestFreshPackage("unescapedquote");
         }
 
         [TestMethod, Priority(0)]
-        public void TestParseCppStyleComment_WorkItem563() {
+        public void ParseCppStyleComment_WorkItem563() {
             var buff = new StringBuilder(@"{
   ""name"": ""angular-app-server"",
   ""description"": ""Back end server to support our angular app"",
@@ -182,7 +168,7 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void TestParseFromEveryCharValue() {
+        public void ParseFromEveryCharValue() {
             var buff = new StringBuilder();
             var ch = (char)0;
             do {

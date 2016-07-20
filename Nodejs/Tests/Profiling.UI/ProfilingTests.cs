@@ -259,7 +259,7 @@ namespace ProfilingUITests {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestStartAnalysisDebugMenu() {
+        public void StartAnalysisDebugMenu() {
             EnvDTE.Project project;
             INodeProfiling profiling;
             using (new JustMyCodeSetting(false))
@@ -294,7 +294,7 @@ namespace ProfilingUITests {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestStartAnalysisDebugMenuNoProject() {
+        public void StartAnalysisDebugMenuNoProject() {
             using (new JustMyCodeSetting(false))
             using (var app = new NodejsVisualStudioApp()) {
                 bool ok = true;
@@ -385,7 +385,7 @@ namespace ProfilingUITests {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void TestMultipleSessions() {
+        public void MultipleSessions() {
             EnvDTE.Project project;
             INodeProfiling profiling;
             using (new JustMyCodeSetting(false))
@@ -458,7 +458,7 @@ namespace ProfilingUITests {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestMultipleSessions2() {
+        public void MultipleSessions2() {
             EnvDTE.Project project;
             INodeProfiling profiling;
             using (new JustMyCodeSetting(false))
@@ -726,7 +726,7 @@ namespace ProfilingUITests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestSaveDirtySession() {
+        public void SaveDirtySession() {
             EnvDTE.Project project;
             INodeProfiling profiling;
             using (new JustMyCodeSetting(false))
@@ -766,7 +766,7 @@ namespace ProfilingUITests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestDeleteReport() {
+        public void DeleteReport() {
             EnvDTE.Project project;
             INodeProfiling profiling;
             using (new JustMyCodeSetting(false))
@@ -792,7 +792,7 @@ namespace ProfilingUITests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestCompareReports() {
+        public void CompareReports() {
             EnvDTE.Project project;
             INodeProfiling profiling;
             using (new JustMyCodeSetting(false))
@@ -860,7 +860,7 @@ namespace ProfilingUITests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestRemoveReport() {
+        public void RemoveReport() {
             EnvDTE.Project project;
             INodeProfiling profiling;
             using (new JustMyCodeSetting(false))
@@ -886,7 +886,7 @@ namespace ProfilingUITests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestOpenReport() {
+        public void OpenReport() {
             EnvDTE.Project project;
             INodeProfiling profiling;
             using (new JustMyCodeSetting(false))
@@ -912,7 +912,7 @@ namespace ProfilingUITests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestOpenReportCtxMenu() {
+        public void OpenReportCtxMenu() {
             EnvDTE.Project project;
             INodeProfiling profiling;
             using (new JustMyCodeSetting(false))
@@ -937,7 +937,7 @@ namespace ProfilingUITests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestTargetPropertiesForProject() {
+        public void TargetPropertiesForProject() {
             EnvDTE.Project project;
             INodeProfiling profiling;
             using (new JustMyCodeSetting(false))
@@ -968,7 +968,7 @@ namespace ProfilingUITests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestTargetPropertiesForExecutable() {
+        public void TargetPropertiesForExecutable() {
             EnvDTE.Project project;
             INodeProfiling profiling;
             using (new JustMyCodeSetting(false))
@@ -1012,7 +1012,7 @@ namespace ProfilingUITests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestStopProfiling() {
+        public void StopProfiling() {
             EnvDTE.Project project;
             INodeProfiling profiling;
             using (new JustMyCodeSetting(false))
@@ -1047,7 +1047,7 @@ namespace ProfilingUITests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void TestTwoProfilesAtTheSameTime() {
+        public void TwoProfilesAtTheSameTime() {
             EnvDTE.Project project;
             INodeProfiling profiling;
             using (new JustMyCodeSetting(false))
@@ -1260,7 +1260,7 @@ namespace ProfilingUITests {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void TestJustMyCode() {
+        public void JustMyCode() {
             EnvDTE.Project project;
             INodeProfiling profiling;
             using (new JustMyCodeSetting(true))
@@ -1288,7 +1288,7 @@ namespace ProfilingUITests {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void TestJustMyCodeOff() {
+        public void JustMyCodeOff() {
             EnvDTE.Project project;
             INodeProfiling profiling;
             using (new JustMyCodeSetting(false))
@@ -1315,7 +1315,7 @@ namespace ProfilingUITests {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void TestProjectProperties() {
+        public void ProjectProperties() {
             EnvDTE.Project project;
             INodeProfiling profiling;
             using (new JustMyCodeSetting(false))
@@ -1349,7 +1349,7 @@ namespace ProfilingUITests {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void TestBrowserLaunch() {
+        public void BrowserLaunch() {
             EnvDTE.Project project;
             INodeProfiling profiling;
             using (new JustMyCodeSetting(false))

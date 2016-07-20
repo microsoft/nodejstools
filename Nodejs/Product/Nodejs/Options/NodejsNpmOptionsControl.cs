@@ -15,25 +15,20 @@
 //*********************************************************//
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.Options {
     public partial class NodejsNpmOptionsControl : UserControl {
-
-        private string _npmCachePath;
-
         public NodejsNpmOptionsControl() {
             InitializeComponent();
         }
 
-
         internal void SyncControlWithPageSettings(NodejsNpmOptionsPage page) {
             _showOutputWhenRunningNpm.Checked = page.ShowOutputWindowWhenExecutingNpm;
-            _npmCachePath = page.NpmCachePath;
             _cacheClearedSuccessfully.Visible = false;
         }
 
@@ -42,34 +37,57 @@ namespace Microsoft.NodejsTools.Options {
         }
 
         private void ClearCacheButton_Click(object sender, EventArgs e) {
-            try {
-                Directory.Delete(_npmCachePath, true);                    
-                _cacheClearedSuccessfully.Visible = true;
-            } catch (DirectoryNotFoundException) {
-                // Directory has already been deleted. Do nothing.
-                _cacheClearedSuccessfully.Visible = true;
-            } catch (IOException exception) {
-                // files are in use or path is too long
+            bool didClearNpmCache = TryDeleteCacheDirectory(NodejsConstants.NpmCachePath);
+            bool didClearTools = TryDeleteCacheDirectory(NodejsConstants.ExternalToolsPath);
+
+            if (!didClearNpmCache || !didClearTools) {
                 MessageBox.Show(
-                           string.Format("Cannot clear npm cache. {0}", exception.Message),
-                           "Cannot Clear npm Cache",
-                           MessageBoxButtons.OK,
-                           MessageBoxIcon.Information
-                       );
+                   SR.GetString(SR.CacheDirectoryClearFailedCaption, NodejsConstants.NtvsLocalAppData),
+                   SR.GetString(SR.CacheDirectoryClearFailedTitle),
+                   MessageBoxButtons.OK,
+                   MessageBoxIcon.Information);
+            }
+
+            _cacheClearedSuccessfully.Visible = didClearNpmCache && didClearTools;
+        }
+
+        private static bool TryDeleteCacheDirectory(string cachePath) {
+            if (!Directory.Exists(cachePath)) {
+                return true;
+            }
+
+            try {
+                // To handle long paths, nuke the directory contents with robocopy
+                string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                Directory.CreateDirectory(tempDirectory);
+                var psi = new ProcessStartInfo("cmd.exe", string.Format(@"/C robocopy /mir ""{0}"" ""{1}""", tempDirectory, cachePath)) {
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                using (var process = Process.Start(psi)) {
+                    process.WaitForExit(10000);
+                }
+
+                // Then delete the directory itself
+                try {
+                    Directory.Delete(cachePath, true);
+                } catch (DirectoryNotFoundException) {
+                    // noop
+                }
+
+                return !Directory.Exists(cachePath);
+            } catch (IOException) {
+                // files are in use or path is too long
+                return false;
             } catch (Exception exception) {
                 try {
                     ActivityLog.LogError(SR.ProductName, exception.ToString());
                 } catch (InvalidOperationException) {
                     // Activity Log is unavailable.
                 }
-
-                MessageBox.Show(
-                           string.Format("Cannot clear npm cache. Try manually deleting the directory: {0}", _npmCachePath),
-                           "Cannot Clear npm Cache",
-                           MessageBoxButtons.OK,
-                           MessageBoxIcon.Information
-                       );
             }
+            return false;
         }
     }
 }

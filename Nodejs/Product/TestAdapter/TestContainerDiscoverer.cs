@@ -428,7 +428,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 ProjectInfo projectInfo;
                 string projectPath;
                 if (e.Project.TryGetProjectPath(out projectPath) &&
-                    !string.IsNullOrEmpty(projectPath) &&
                     _knownProjects.TryGetValue(projectPath, out projectInfo)) {
                     _knownProjects.Remove(projectPath);
 
@@ -551,13 +550,11 @@ namespace Microsoft.NodejsTools.TestAdapter {
             if (project != null &&
                 project.TryGetProjectPath(out projectPath) &&
                 _knownProjects.TryGetValue(projectPath, out projectInfo) &&
+                projectInfo != null &&
                 projectInfo.HasRequestedContainers) {
 
                 if (!_building || !_detectingChanges) {
-                    var evt = TestContainersUpdated;
-                    if (evt != null) {
-                        evt(this, EventArgs.Empty);
-                    }
+                    TestContainersUpdated?.Invoke(this, EventArgs.Empty);
                     return true;
                 }
             }

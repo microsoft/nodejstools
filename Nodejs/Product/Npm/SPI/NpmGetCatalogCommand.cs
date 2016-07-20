@@ -28,7 +28,6 @@ using SQLite;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal class NpmGetCatalogCommand : NpmCommand, IPackageCatalog {
-        private IDictionary<string, IPackage> _byName = new Dictionary<string, IPackage>();
         private readonly bool _forceDownload;
         private readonly string _cachePath;
         private Uri _registryUrl;
@@ -298,11 +297,6 @@ etc.
                     builder.AddKeyword(keyword);
                 }
             }
-        }
-
-        private static string GetJsonStringFromToken(JToken token) {
-            string keywords = token != null ? token.ToString() : null;
-            return keywords;
         }
 
         private static void AddHomepage(NodeModuleBuilder builder, JToken homepage) {

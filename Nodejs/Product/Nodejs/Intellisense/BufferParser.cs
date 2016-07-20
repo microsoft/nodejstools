@@ -16,21 +16,14 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Threading;
-using System.Windows;
-using System.Windows.Threading;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Editor;
 
 namespace Microsoft.NodejsTools.Intellisense {
     sealed partial class VsProjectAnalyzer {
-
-        class BufferParser {
+        class BufferParser : IDisposable {
             internal VsProjectAnalyzer _parser;
             private readonly Timer _timer;
             private IList<ITextBuffer> _buffers;
@@ -49,18 +42,6 @@ namespace Microsoft.NodejsTools.Intellisense {
                 AttachedViews = 1;
 
                 InitBuffer(buffer);
-            }
-
-            public void StopMonitoring() {
-                foreach (var buffer in _buffers) {
-                    buffer.ChangedLowPriority -= BufferChangedLowPriority;
-                    buffer.Properties.RemoveProperty(typeof(BufferParser));
-                    if (_document != null) {
-                        _document.EncodingChanged -= EncodingChanged;
-                        _document = null;
-                    }
-                }
-                _timer.Dispose();
             }
 
             public ITextBuffer[] Buffers {
@@ -270,6 +251,28 @@ namespace Microsoft.NodejsTools.Intellisense {
                     return _document;
                 }
             }
+
+            #region IDisposable
+            private bool disposedValue = false;
+
+            protected virtual void Dispose(bool disposing) {
+                if (!disposedValue) {
+                    if (disposing) {
+                        foreach (var buffer in _buffers.ToArray()) {
+                            RemoveBuffer(buffer);
+                        }
+
+                        _timer.Dispose();
+                    }
+
+                    disposedValue = true;
+                }
+            }
+
+            public void Dispose() {
+                Dispose(true);
+            }
+            #endregion
         }
     }
 }

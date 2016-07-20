@@ -3,6 +3,7 @@
   branches:
     only:
     - master
+    - v1.2.x
   skip_tags: true
   image: Visual Studio 2015
   environment:
@@ -34,12 +35,16 @@
 
         msiexec /package C:\projects\nodejstools\Common\Tests\Prerequisites\VSTestHost.msi /quiet
 
-        powershell -ExecutionPolicy RemoteSigned C:\projects\nodejstools\Nodejs\Setup\BuildRelease.ps1 C:\NTVS_Out -skipcopy -skipdebug -skipclean -vsTarget $env:vs_version
+        powershell -ExecutionPolicy RemoteSigned C:\projects\nodejstools\Nodejs\Setup\BuildRelease.ps1 .\NTVS_Out -skipcopy -skipdebug -skipclean -vsTarget $env:vs_version
   test_script: &default_test_script
     - ps: >-
         $testsettings_version = $env:vs_version -replace '11.0', '12.0'
 
         vstest.console /TestCaseFilter:"TestCategory!=AppVeyorIgnore&TestCategory!=Ignore" /logger:Appveyor $("C:\projects\nodejstools\BuildOutput\Release" + $env:vs_version + "\Tests\NpmTests.dll") $("C:\projects\nodejstools\BuildOutput\Release" + $env:vs_version + "\Tests\NodeTests.dll") $("C:\projects\nodejstools\BuildOutput\Release" + $env:vs_version + "\Tests\ProfilerTests.dll") $("C:\projects\nodejstools\BuildOutput\Release" + $env:vs_version + "\Tests\JSAnalysisTests.dll") /settings:$("C:\projects\nodejstools\Build\default." + $testsettings_version + "Exp.testsettings")
+  artifacts: &default_artifacts
+    - path: NTVS_Out
+      name: NtvsOut
+      type: zip
 -
   version: 1.0.{build}
   branches:
@@ -61,3 +66,4 @@
   install: *default_install_script
   build_script: *default_build_script
   test_script: *default_test_script
+  artifacts: *default_artifacts

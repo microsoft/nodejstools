@@ -29,12 +29,9 @@ namespace Microsoft.NodejsTools.Project {
     /// </summary>
     [Guid("1CCB584B-2876-4416-99B0-60C91B938147")]
     internal class NodejsLibraryManager : LibraryManager {
-        private readonly NodejsPackage/*!*/ _package;
 
         public NodejsLibraryManager(NodejsPackage/*!*/ package)
-            : base(package) {
-            _package = package;
-        }
+            : base(package) { }
 
         protected override LibraryNode CreateLibraryNode(LibraryNode parent, IScopeNode subItem, string namePrefix, IVsHierarchy hierarchy, uint itemid) {
             return new NodeLibraryNode(parent, subItem, namePrefix, hierarchy, itemid);

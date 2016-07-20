@@ -14,12 +14,11 @@
 //
 //*********************************************************//
 
-using System;
 using System.Runtime.InteropServices;
 
 namespace Microsoft.NodejsTools.Options {
     [ComVisible(true)]
-    public class NodejsFormattingSpacingOptionsPage : NodejsDialogPage {
+    public class NodejsFormattingSpacingOptionsPage : NodejsFormattingDialogPage {
         private NodejsFormattingSpacingOptionsControl _window;
 
         public NodejsFormattingSpacingOptionsPage()
@@ -54,12 +53,12 @@ namespace Microsoft.NodejsTools.Options {
             SpaceAfterOpeningAndBeforeClosingNonEmptyParens = false;
         }
 
-        private const string SpaceAfterCommaSetting = "SpaceAfterComma";
-        private const string SpaceAfterSemicolonInForSetting = "SpaceAfterSemicolonInFor";
-        private const string SpaceBeforeAndAfterBinaryOperatorSetting = "SpaceBeforeAndAfterBinaryOperator";
-        private const string SpaceAfterKeywordsInControlFlowSetting = "SpaceAfterKeywordsInControlFlow";
-        private const string SpaceAfterFunctionKeywordForAnonymousFunctionsSetting = "SpaceAfterFunctionKeywordForAnonymousFunctions";
-        private const string SpaceAfterOpeningAndBeforeClosingNonEmptyParensSetting = "SpaceAfterOpeningAndBeforeClosingNonEmptyParens";
+        private const string SpaceAfterCommaSetting = TypeScriptRegistrySwitches.InsertSpaceAfterCommaDelimiter;
+        private const string SpaceAfterSemicolonInForSetting = TypeScriptRegistrySwitches.InsertSpaceAfterSemicolonInForStatements;
+        private const string SpaceBeforeAndAfterBinaryOperatorSetting = TypeScriptRegistrySwitches.InsertSpaceBeforeAndAfterBinaryOperators;
+        private const string SpaceAfterKeywordsInControlFlowSetting = TypeScriptRegistrySwitches.InsertSpaceAfterKeywordsInControlFlowStatements;
+        private const string SpaceAfterFunctionKeywordForAnonymousFunctionsSetting = TypeScriptRegistrySwitches.InsertSpaceAfterFunctionKeywordForAnonymousFunctions;
+        private const string SpaceAfterOpeningAndBeforeClosingNonEmptyParensSetting = TypeScriptRegistrySwitches.InsertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis;
 
         public override void LoadSettingsFromStorage() {
             // Load settings from storage.

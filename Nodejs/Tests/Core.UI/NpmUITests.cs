@@ -43,7 +43,7 @@ namespace Microsoft.Nodejs.Tests.UI {
     public class NpmUITests : NodejsProjectTest {
         [TestMethod, Priority(0), TestCategory("Npm UI")]
         [HostType("VSTestHost")]
-        public void TestNpmUIInitialization() {
+        public void NpmUIInitialization() {
             using (var app = new VisualStudioApp()) {
                 // Initialize call is required because NTVS does not autoload its package
                 // We may not be on UI thread, but Dev11 and Dev12 know how to sort that out.
@@ -58,7 +58,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Npm UI")]
         [HostType("VSTestHost")]
-        public void TestNpmUIArrowKeyBehavior() {
+        public void NpmUIArrowKeyBehavior() {
             using (var app = new VisualStudioApp()) {
                 app.ServiceProvider.GetUIThread().Invoke(() => {
                     NpmPackageInstallWindow npmWindow = OpenNpmWindowAndWaitForReady();
@@ -109,7 +109,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Npm UI")]
         [HostType("VSTestHost")]
-        public void TestNpmUITabKeyBehavior() {
+        public void NpmUITabKeyBehavior() {
             using (var app = new VisualStudioApp()) {
                 app.ServiceProvider.GetUIThread().Invoke(() => {
                     NpmPackageInstallWindow npmWindow = OpenNpmWindowAndWaitForReady();
@@ -184,9 +184,6 @@ namespace Microsoft.Nodejs.Tests.UI {
                 packageMock.Object
             };
 
-            var globalPackages = new Mock<IGlobalPackages>();
-            globalPackages.Setup(mock => mock.Modules).Returns((new Mock<INodeModules>()).Object);
-
             var rootPackage = new Mock<IRootPackage>();
             rootPackage.Setup(mock => mock.Modules).Returns((new Mock<INodeModules>()).Object);
 
@@ -194,7 +191,6 @@ namespace Microsoft.Nodejs.Tests.UI {
 
             npmControllerMock.Setup(mock => mock.MostRecentlyLoadedCatalog).Returns(new MockPackageCatalog(packageList));
 
-            npmControllerMock.Setup(mock => mock.GlobalPackages).Returns(globalPackages.Object);
             npmControllerMock.Setup(mock => mock.RootPackage).Returns(rootPackage.Object);
 
             return npmControllerMock;

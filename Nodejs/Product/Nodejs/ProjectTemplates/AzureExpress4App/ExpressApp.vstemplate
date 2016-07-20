@@ -4,7 +4,7 @@
     <Description>A basic Node.js Express 4 application for Microsoft Azure.</Description>
     <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="404" />
     <ProjectType>JavaScript</ProjectType>
-    <TemplateID>Microsoft.JavaScript.ExpressApp</TemplateID>
+    <TemplateID>Microsoft.JavaScript.AzureExpressApp</TemplateID>
     <SortOrder>150</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
     <DefaultName>ExpressApp</DefaultName>
@@ -43,6 +43,7 @@
       <ProjectItem OpenInEditor="true">app.js</ProjectItem>
       <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
       <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
+      <ProjectItem>typings.json</ProjectItem>
     </Project>
   </TemplateContent>
   <WizardExtension>

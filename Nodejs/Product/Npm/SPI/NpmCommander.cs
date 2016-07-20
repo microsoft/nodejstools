@@ -128,15 +128,16 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     _npmController.PathToNpm));
         }
 
-        private async Task<bool> InstallPackageByVersionAsync(
+        private Task<bool> InstallPackageByVersionAsync(
+            string pathToRootDirectory,
             string packageName,
             string versionRange,
             DependencyType type,
             bool global,
             bool saveToPackageJson) {
-            return await DoCommandExecute(true,
+            return DoCommandExecute(true,
                 new NpmInstallCommand(
-                    _npmController.FullPathToRootPackageDirectory,
+                    pathToRootDirectory,
                     packageName,
                     versionRange,
                     type,
@@ -145,16 +146,16 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     _npmController.PathToNpm));
         }
 
-        public async Task<bool> InstallPackageByVersionAsync(
+        public Task<bool> InstallPackageByVersionAsync(
             string packageName,
             string versionRange,
             DependencyType type,
             bool saveToPackageJson) {
-            return await InstallPackageByVersionAsync(packageName, versionRange, type, false, saveToPackageJson);
+            return InstallPackageByVersionAsync(_npmController.FullPathToRootPackageDirectory, packageName, versionRange, type, false, saveToPackageJson);
         }
 
-        public async Task<bool> InstallGlobalPackageByVersionAsync(string packageName, string versionRange) {
-            return await InstallPackageByVersionAsync(packageName, versionRange, DependencyType.Standard, true, false);
+        public Task<bool> InstallPackageToFolderByVersionAsync(string pathToRootDirectory, string packageName, string versionRange, bool saveToPackageJson) {
+            return InstallPackageByVersionAsync(pathToRootDirectory, packageName, versionRange, DependencyType.Standard, false, saveToPackageJson);
         }
 
         private DependencyType GetDependencyType(string packageName) {
@@ -173,22 +174,14 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             return type;
         }
 
-        private async Task<bool> UninstallPackageAsync(string packageName, bool global) {
+        public async Task<bool> UninstallPackageAsync(string packageName) {
             return await DoCommandExecute(true,
                 new NpmUninstallCommand(
                     _npmController.FullPathToRootPackageDirectory,
                     packageName,
                     GetDependencyType(packageName),
-                    global,
+                    false,
                     _npmController.PathToNpm));
-        }
-
-        public async Task<bool> UninstallPackageAsync(string packageName) {
-            return await UninstallPackageAsync(packageName, false);
-        }
-
-        public async Task<bool> UninstallGlobalPackageAsync(string packageName) {
-            return await UninstallPackageAsync(packageName, true);
         }
 
         public async Task<IPackageCatalog> GetCatalogAsync(bool forceDownload, IProgress<string> progress) {
@@ -206,21 +199,13 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             return await UpdatePackagesAsync(new List<IPackage>());
         }
 
-        private async Task<bool> UpdatePackagesAsync(IEnumerable<IPackage> packages, bool global) {
+        public async Task<bool> UpdatePackagesAsync(IEnumerable<IPackage> packages) {
             return await DoCommandExecute(true,
                 new NpmUpdateCommand(
                     _npmController.FullPathToRootPackageDirectory,
                     packages,
-                    global,
+                    false,
                     _npmController.PathToNpm));
-        }
-
-        public async Task<bool> UpdatePackagesAsync(IEnumerable<IPackage> packages) {
-            return await UpdatePackagesAsync(packages, false);
-        }
-
-        public async Task<bool> UpdateGlobalPackagesAsync(IEnumerable<IPackage> packages) {
-            return await UpdatePackagesAsync(packages, true);
         }
 
         public async Task<bool> ExecuteNpmCommandAsync(string arguments) {

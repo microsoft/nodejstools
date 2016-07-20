@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <Choose>
     <When Condition=" '$(VisualStudioVersion)'=='15.0'  Or '$(TargetVisualStudioVersion)'=='VS150' ">
@@ -116,6 +116,12 @@
     <Reference Include="envdte80, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
+    <Reference Include="microsoft.visualstudio.textmanager.interop.11.0, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.TextManager.Interop.12.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
@@ -155,12 +161,8 @@
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.8.0" />
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.9.0" />
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.10.0" />
-    <Reference Include="Microsoft.VisualStudio.Shell.Interop.11.0">
-      <EmbedInteropTypes>true</EmbedInteropTypes>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Shell.Interop.12.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" Condition="'$(VSTarget)' != '11.0'">
-      <EmbedInteropTypes>true</EmbedInteropTypes>
-    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Shell.Interop.11.0" />
+    <Reference Include="Microsoft.VisualStudio.Shell.Interop.12.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.TemplateWizardInterface, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Text.Data, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Text.Logic, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
@@ -309,7 +311,6 @@
     <Compile Include="Logging\INodejsToolsLogger.cs" />
     <Compile Include="Logging\NodejsToolsLogEvent.cs" />
     <Compile Include="Logging\NodejsToolsLogger.cs" />
-    <Compile Include="Navigation\DropDownBarClient.cs" />
     <Compile Include="Debugger\DataTips\DataTipTextViewFilter.cs" />
     <Compile Include="NodejsPackage.Debugger.cs" />
     <Compile Include="NpmUI\NpmOutputWindow.xaml.cs">
@@ -322,8 +323,19 @@
     </Compile>
     <Compile Include="NpmUI\PackageCatalogEntryViewModel.cs" />
     <Compile Include="Options\AnalysisLevel.cs" />
+    <Compile Include="Options\NodejsFormattingDialogPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Options\TypeScriptRegistrySwitches.cs" />
+    <Compile Include="Options\TypingsInfoBar.cs" />
     <Compile Include="Options\NodejsDiagnosticsOptionsPage.cs">
       <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Options\NodeLsIntellisenseOptionsControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Options\NodeLsIntellisenseOptionsControl.Designer.cs">
+      <DependentUpon>NodeLsIntellisenseOptionsControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Options\NodejsNpmOptionsPage.cs">
       <SubType>Component</SubType>
@@ -351,6 +363,12 @@
     </Compile>
     <Compile Include="Options\NodejsIntellisenseOptionsPage.cs">
       <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Options\SalsaLsIntellisenseOptionsControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Options\SalsaLsIntellisenseOptionsControl.Designer.cs">
+      <DependentUpon>SalsaLsIntellisenseOptionsControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Outlining\JavaScriptOutliningTaggerProvider.cs" />
     <Compile Include="Project\AzureToolsContracts.cs" />
@@ -534,7 +552,6 @@
     </Compile>
     <Compile Include="Options\SurveyNewsPolicy.cs" />
     <Compile Include="Project\AbstractNpmNode.cs" />
-    <Compile Include="Project\GlobalModulesNode.cs" />
     <Compile Include="Project\ImportWizard\StartupPage.xaml.cs">
       <DependentUpon>StartupPage.xaml</DependentUpon>
     </Compile>
@@ -666,6 +683,7 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="NodejsPackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Telemetry\NodejsTelemetryExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <TelemetryFiles Include="..\..\Common\Telemetry\*.cs" />
@@ -677,6 +695,10 @@
   <ItemGroup>
     <EmbeddedResource Include="Commands\DiagnosticsForm.resx">
       <DependentUpon>DiagnosticsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Options\NodeLsIntellisenseOptionsControl.resx">
+      <DependentUpon>NodeLsIntellisenseOptionsControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Options\NodejsNpmOptionsControl.resx">
       <DependentUpon>NodejsNpmOptionsControl.cs</DependentUpon>
@@ -700,6 +722,9 @@
     <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.resx">
       <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Options\SalsaLsIntellisenseOptionsControl.resx">
+      <DependentUpon>SalsaLsIntellisenseOptionsControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.resx">
       <DependentUpon>NodejsGeneralPropertyPageControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -710,6 +735,18 @@
     </ConditionalEmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="TypingsAcquisitionTool\index.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="TypingsAcquisitionTool\package.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="TypingsAcquisitionTool\bin\install_typings">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <ZipProject Include="ProjectTemplates\CloudService\CloudService.ccproj" />
     <ZipProject Include="ProjectTemplates\CloudService\ServiceConfiguration.Cloud.cscfg" />
     <ZipProject Include="ProjectTemplates\CloudService\ServiceConfiguration.Local.cscfg" />
@@ -876,6 +913,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <ZipItem Include="Templates\Files\TapeUnitTest\UnitTest.js" />
+    <ZipItem Include="Templates\Files\TapeUnitTest\UnitTest.vstemplate" />
+    <ZipItem Include="Templates\Files\TypeScriptTapeUnitTest\UnitTest.vstemplate" />
+    <ZipItem Include="Templates\Files\TypeScriptTapeUnitTest\UnitTest.ts" />
     <Content Include="Templates\VS_Nodejs.item.vstman">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -894,12 +935,6 @@
     <TransformedZipProject Include="ProjectTemplates\AddWebSiteExpressApp\AddWebSiteExpressApp.vstemplate.base">
       <SubType>Designer</SubType>
     </TransformedZipProject>
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\AzureExpressApp.njsproj">
-      <SubType>Designer</SubType>
-    </ZipProject>
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\AzureExpressApp.vstemplate">
-      <SubType>Designer</SubType>
-    </ZipProject>
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\AddWebSiteAzureExpressApp.njsproj">
       <SubType>Designer</SubType>
     </ZipProject>
@@ -909,7 +944,6 @@
     <ZipProject Include="ProjectTemplates\NodejsWebApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\AddWebSiteNodejsWebApp\Preview.png" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\Preview.png" />
@@ -956,9 +990,6 @@
     <ZipProject Include="ProjectTemplates\FromExistingCode\FromExistingCode.vstemplate">
       <SubType>Designer</SubType>
     </ZipProject>
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\app.js" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\index.js" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\user.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\app.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\index.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\user.js" />
@@ -966,6 +997,13 @@
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\index.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\user.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\server.js" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\typings.json" />
+    <ZipProject Include="ProjectTemplates\AzureExpress4App\typings.json" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteAzureStarterExpressApp\typings.json" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\typings.json" />
+    <ZipProject Include="ProjectTemplates\AddWebSiteStarterExpressApp\typings.json" />
+    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\typings.json" />
+    <ZipProject Include="ProjectTemplates\StarterExpressApp\typings.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\README.md" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\app.ts" />
@@ -1184,6 +1222,7 @@
     <ZipProject Include="ProjectTemplates\Express4App\ExpressApp.vstemplate">
       <SubType>Designer</SubType>
     </ZipProject>
+    <ZipProject Include="ProjectTemplates\Express4App\typings.json" />
     <ZipProject Include="ProjectTemplates\Express4App\index.js" />
     <ZipProject Include="ProjectTemplates\Express4App\Preview.png" />
     <ZipProject Include="ProjectTemplates\Express4App\users.js" />
@@ -1312,6 +1351,9 @@
     <None Include="Theme\Microsoft.NodejsTools.theme.v12.0.pkgdef" />
     <None Include="Theme\Microsoft.NodejsTools.theme.v14.0.pkgdef" />
     <None Include="Theme\Microsoft.NodejsTools.theme.v15.0.pkgdef" />
+    <Content Include="TestFrameworks\Tape\tape.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="VSTemplateStore.pkgdef">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -1331,13 +1373,7 @@
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\AzureNodejsApp.vstemplate">
       <SubType>Designer</SubType>
     </ZipProject>
-    <ZipProject Include="ProjectTemplates\ExpressApp\ExpressApp.njsproj">
-      <SubType>Designer</SubType>
-    </ZipProject>
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\server.js" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\ExpressApp.vstemplate">
-      <SubType>Designer</SubType>
-    </ZipProject>
     <TransformedZipProject Include="ProjectTemplates\AddWebSiteAzureNodejsApp\AddWebSiteAzureNodejsApp.vstemplate.base">
       <SubType>Designer</SubType>
     </TransformedZipProject>
@@ -1392,26 +1428,8 @@
     <ZipProject Include="ProjectTemplates\NodejsWebApp\package.json" />
     <ZipProject Include="ProjectTemplates\NodejsWebApp\README.md" />
     <ZipProject Include="ProjectTemplates\AddWebSiteNodejsWebApp\WebApplication.webproj" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\package.json" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\README.md" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\style.styl" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\index.jade" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\layout.jade" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\Preview.png" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\app.js" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\index.js" />
-    <ZipProject Include="ProjectTemplates\ExpressApp\user.js" />
     <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\package.json" />
     <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\README.md" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\package.json" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\README.md" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\Web.config" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\Web.Debug.config" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\setup_web.cmd" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\download.ps1" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\ChangeConfig.ps1" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\node.cmd" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\iisnode.yml" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\ChangeConfig.ps1" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\download.ps1" />
     <ZipProject Include="ProjectTemplates\AddWebSiteAzureExpressApp\package.json" />
@@ -1426,9 +1444,6 @@
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\app.js" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\NodejsConsoleApp.njsproj" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\NodejsConsoleApp.vstemplate" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\index.jade" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\layout.jade" />
-    <ZipProject Include="ProjectTemplates\AzureExpressApp\style.styl" />
     <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\index.jade" />
     <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\layout.jade" />
     <ZipProject Include="ProjectTemplates\AddWebSiteExpressApp\style.styl" />

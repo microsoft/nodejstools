@@ -1,0 +1,37 @@
+#!/usr/bin/env node
+/**
+    Tool to aquire typings used for NTVS IntelliSense.
+
+    This is a simple wrapper around `typings-core`, with the main
+    difference being that missing packages do not stop other typings
+    from being aquired.
+*/
+"use strict";
+var events = require('events');
+var minimist = require('minimist');
+var typingsTool = require('../index');
+
+var argv = minimist(process.argv.slice(2), {
+    boolean: ['save', 'verbose'],
+    string: ['cwd']
+});
+
+var emitter = new events.EventEmitter();
+
+var options = {
+    save: argv.save,
+    global: true,
+    emitter: emitter,
+    cwd: argv.cwd || process.cwd()
+};
+
+var packagesToInstall = argv._;
+
+if (!packagesToInstall.length) {
+    // top level package install
+    typingsTool.installTypingsForProject(options)
+} else {
+    typingsTool.runAll(packagesToInstall.map(function (name) {
+        return typingsTool.installTypingsForPackage(name, options);
+    }));
+}

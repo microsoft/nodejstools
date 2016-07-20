@@ -161,7 +161,7 @@ namespace Microsoft.NodejsTools.Parsing
         public static int Compare(SourceLocation left, SourceLocation right)
         {
             if (left < right) return -1;
-            if (right > left) return 1;
+            if (left > right) return 1;
 
             return 0;
         }

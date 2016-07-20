@@ -33,12 +33,8 @@ namespace Microsoft.NodejsTools.Project {
             get { return Node as AbstractNpmNode; }
         }
 
-        private bool IsGlobalNode {
-            get { return NpmNode is GlobalModulesNode; }
-        }
-
         public override string GetClassName() {
-            return SR.GetString(IsGlobalNode ? SR.PropertiesClassGlobal : SR.PropertiesClassNpm);
+            return SR.GetString(SR.PropertiesClassNpm);
         }
 
         [SRCategoryAttribute(SR.General)]
@@ -46,7 +42,7 @@ namespace Microsoft.NodejsTools.Project {
         [SRDescriptionAttribute(SR.NpmNodePackageInstallationDescription)]
         public string PackageInstallation {
             get {
-                return SR.GetString(IsGlobalNode ? SR.PackageInstallationGlobal : SR.PackageInstallationLocal);
+                return SR.GetString(SR.PackageInstallationLocal);
             }
         }
 
@@ -62,14 +58,6 @@ namespace Microsoft.NodejsTools.Project {
                         var root = local.RootPackage;
                         if (null != root) {
                             return root.Path;
-                        }
-                    } else {
-                        var glob = node as GlobalModulesNode;
-                        if (null != glob) {
-                            var packages = glob.GlobalPackages;
-                            if (null != packages) {
-                                return packages.Path;
-                            }
                         }
                     }
                 }

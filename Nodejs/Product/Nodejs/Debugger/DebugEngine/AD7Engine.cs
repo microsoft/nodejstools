@@ -560,6 +560,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                     debugPort
                 );
 
+            LiveLogger.WriteLine("AD7Engine starting NodeDebugger");
             _process.Start(false);
 
             AttachEvents(_process);
@@ -950,8 +951,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
             uint attributes;
             var riidEvent = new Guid(iidEvent);
-
-            EngineUtils.RequireOk(eventObject.GetAttributes(out attributes));
+            var attributesResult = eventObject.GetAttributes(out attributes);
+            if (attributesResult == VSConstants.RPC_E_DISCONNECTED) {
+                return;
+            }
+            EngineUtils.RequireOk(attributesResult);
 
             if ((attributes & (uint)enum_EVENTATTRIBUTES.EVENT_STOPPING) != 0 && thread == null) {
                 Debug.Fail("A thread must be provided for a stopping event");
@@ -959,7 +963,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             }
 
             try {
-                EngineUtils.RequireOk(events.Event(this, null, program, thread, eventObject, ref riidEvent, attributes));
+                var eventResult = events.Event(this, null, program, thread, eventObject, ref riidEvent, attributes);
+                if (eventResult == VSConstants.RPC_E_DISCONNECTED) {
+                    return;
+                }
+                EngineUtils.RequireOk(eventResult);
             } catch (InvalidCastException) {
                 // COM object has gone away
             }
@@ -970,6 +978,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         private void AttachEvents(NodeDebugger process) {
+            LiveLogger.WriteLine("AD7Engine attaching events to NodeDebugger");
+
             process.ProcessLoaded += OnProcessLoaded;
             process.ModuleLoaded += OnModuleLoaded;
             process.ThreadCreated += OnThreadCreated;
@@ -1239,7 +1249,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             }
 
             DebuggerClient.RunWithRequestExceptionsHandled(async () => {
-                if (!await Process.UpdateModuleSourceAsync(module).ConfigureAwait(false)) {
+                var currentProcess = Process;
+                if (currentProcess == null || !await currentProcess.UpdateModuleSourceAsync(module).ConfigureAwait(false)) {
                     var statusBar = (IVsStatusbar)ServiceProvider.GlobalProvider.GetService(typeof(SVsStatusbar));
                     statusBar.SetText(SR.GetString(SR.DebuggerModuleUpdateFailed));
                 }
