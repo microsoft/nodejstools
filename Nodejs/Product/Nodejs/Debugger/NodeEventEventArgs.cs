@@ -19,14 +19,10 @@ using System.Collections.Generic;
 
 namespace Microsoft.NodejsTools.Debugger {
     sealed class NodeEventEventArgs : EventArgs {
-        private readonly Dictionary<string, object> _data;
+        public readonly Dictionary<string, object> Data;
 
         public NodeEventEventArgs(Dictionary<string, object> data) {
-            _data = data;
-        }
-
-        public Dictionary<string, object> Data {
-            get { return _data; }
+            Data = data;
         }
     }
 }

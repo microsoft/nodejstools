@@ -14,26 +14,13 @@
 //
 //*********************************************************//
 
-
 namespace Microsoft.NodejsTools.Debugger {
-    class NodeException {
-        private readonly string _typeName, _description;
+    sealed class NodeException {
+        public readonly string TypeName, Description;
 
         public NodeException(string typeName, string description) {
-            _typeName = typeName;
-            _description = description;
-        }
-
-        public string TypeName {
-            get {
-                return _typeName;
-            }
-        }
-
-        public string Description {
-            get {
-                return _description;
-            }
+            TypeName = typeName;
+            Description = description;
         }
     }
 }

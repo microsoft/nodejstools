@@ -17,18 +17,16 @@
 using System.Collections.Generic;
 
 namespace Microsoft.NodejsTools.Debugger {
-    class NodeThread {
+    sealed class NodeThread {
         private readonly int _identity;
         private readonly NodeDebugger _process;
         private readonly bool _isWorkerThread;
-        private string _name;
-        private IList<NodeStackFrame> _frames;
 
         internal NodeThread(NodeDebugger process, int identity, bool isWorkerThread) {
             _process = process;
             _identity = identity;
             _isWorkerThread = isWorkerThread;
-            _name = "main thread";
+            Name = "main thread";
         }
 
         public void StepInto() {
@@ -57,24 +55,17 @@ namespace Microsoft.NodejsTools.Debugger {
             _process.SendClearStepping(_identity);
         }
 
-        public IList<NodeStackFrame> Frames {
-            get {
-                return _frames;
-            }
-            set {
-                _frames = value;
-            }
-        }
+        public IList<NodeStackFrame> Frames { get; set; }
 
         public int CallstackDepth {
             get {
-                return _frames != null ? _frames.Count : 0;
+                return Frames != null ? Frames.Count : 0;
             }
         }
 
         public NodeStackFrame TopStackFrame {
             get {
-                return _frames != null && _frames.Count > 0 ? _frames[0] : null;
+                return Frames != null && Frames.Count > 0 ? Frames[0] : null;
             }
         }
 
@@ -84,14 +75,7 @@ namespace Microsoft.NodejsTools.Debugger {
             }
         }
 
-        public string Name {
-            get {
-                return _name;
-            }
-            set {
-                _name = value;
-            }
-        }
+        public string Name { get; set; }
 
         internal int Id {
             get {
