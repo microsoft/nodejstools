@@ -48,7 +48,7 @@ namespace Microsoft.NodejsTools {
 
                 return Path.Combine(
                     root,
-                    "TypingsAquisitionTool");
+                    "TypingsAcquisitionTool");
             }
         }
 
