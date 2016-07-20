@@ -40,7 +40,7 @@ namespace Microsoft.NodejsTools {
         }
 
         public int GetCodeWindowManager(IVsCodeWindow pCodeWin, out IVsCodeWindowManager ppCodeWinMgr) {
-            ppCodeWinMgr = new CodeWindowManager(_componentModel.GetService<IVsEditorAdaptersFactoryService>());
+            ppCodeWinMgr = null;
             return VSConstants.S_OK;
         }
 
