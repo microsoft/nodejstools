@@ -17,17 +17,11 @@
 using System;
 
 namespace Microsoft.NodejsTools.Debugger {
-    class ModuleLoadedEventArgs : EventArgs {
-        private readonly NodeModule _module;
+    sealed class ModuleLoadedEventArgs : EventArgs {
+        public readonly NodeModule Module;
 
         public ModuleLoadedEventArgs(NodeModule module) {
-            _module = module;
-        }
-
-        public NodeModule Module {
-            get {
-                return _module;
-            }
+            Module = module;
         }
     }
 }

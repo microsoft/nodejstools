@@ -17,17 +17,11 @@
 using System;
 
 namespace Microsoft.NodejsTools.Debugger {
-    class ProcessExitedEventArgs : EventArgs {
-        private readonly int _exitCode;
+    sealed class ProcessExitedEventArgs : EventArgs {
+        public readonly int ExitCode;
 
         public ProcessExitedEventArgs(int exitCode) {
-            _exitCode = exitCode;
-        }
-
-        public int ExitCode {
-            get {
-                return _exitCode;
-            }
+            ExitCode = exitCode;
         }
     }
 }

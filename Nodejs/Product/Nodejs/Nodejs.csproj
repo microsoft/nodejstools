@@ -249,7 +249,6 @@
     <Compile Include="Classifier\TokenCache.cs" />
     <Compile Include="Classifier\TokenCategory.cs" />
     <Compile Include="Classifier\TokenInfo.cs" />
-    <Compile Include="CodeWindowManager.cs" />
     <Compile Include="Commands\AzureExplorerAttachDebuggerCommand.cs" />
     <Compile Include="Commands\DiagnosticsCommand.cs" />
     <Compile Include="Commands\DiagnosticsForm.cs">
@@ -664,7 +663,6 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="Guids.cs" />
     <Compile Include="JsonListener.cs" />
-    <Compile Include="Navigation\CodeWindowManager.cs" />
     <Compile Include="NodejsConstants.cs" />
     <Compile Include="NodejsEditorFactory.cs" />
     <Compile Include="NodejsProject.cs" />
