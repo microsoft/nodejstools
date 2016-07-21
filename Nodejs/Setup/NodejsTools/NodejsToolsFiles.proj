@@ -150,6 +150,15 @@
         <File Include="Snippets\1033\SnippetsIndex.xml">
             <InstallDirectory>Snippets_1033</InstallDirectory>
         </File>
+        
+        <File Include="TypingsAcquisitionTool\index.js;
+                       TypingsAcquisitionTool\package.json">
+            <InstallDirectory>TypingsAcquisitionTool</InstallDirectory>
+        </File>
+        
+        <File Include="TypingsAcquisitionTool\bin\install_typings">
+            <InstallDirectory>TypingsAcquisitionToolBin</InstallDirectory>
+        </File>
 
         <!--Unit test framework support files-->
         <File Include="TestFrameworks\find_tests.js;
