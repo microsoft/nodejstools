@@ -1,6 +1,6 @@
 ﻿<VSTemplateManifest Version="1.0" xmlns="http://schemas.microsoft.com/developer/vstemplatemanifest/2015">
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\1033\AddWebSiteAzureExpressApp.zip</RelativePathOnDisk>
+    <RelativePathOnDisk>JavaScript\Node.js\AddWebSiteAzureExpressApp.zip</RelativePathOnDisk>
     <TemplateFileName>AddWebSiteAzureExpressApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
       <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
@@ -21,7 +21,7 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\1033\AddWebSiteAzureNodejsApp.zip</RelativePathOnDisk>
+    <RelativePathOnDisk>JavaScript\Node.js\AddWebSiteAzureNodejsApp.zip</RelativePathOnDisk>
     <TemplateFileName>AddWebSiteAzureNodejsApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
       <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
@@ -42,7 +42,7 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\1033\AddWebSiteAzureStarterExpressApp.zip</RelativePathOnDisk>
+    <RelativePathOnDisk>JavaScript\Node.js\AddWebSiteAzureStarterExpressApp.zip</RelativePathOnDisk>
     <TemplateFileName>AddWebSiteAzureStarterExpressApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
       <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
@@ -63,7 +63,7 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\1033\AddWebSiteExpressApp.zip</RelativePathOnDisk>
+    <RelativePathOnDisk>JavaScript\Node.js\AddWebSiteExpressApp.zip</RelativePathOnDisk>
     <TemplateFileName>AddWebSiteExpressApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
       <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
@@ -84,7 +84,7 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\1033\AddWebSiteNodejsWebApp.zip</RelativePathOnDisk>
+    <RelativePathOnDisk>JavaScript\Node.js\AddWebSiteNodejsWebApp.zip</RelativePathOnDisk>
     <TemplateFileName>AddWebSiteNodejsWebApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
       <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
@@ -105,7 +105,7 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\1033\AddWebSiteStarterExpressApp.zip</RelativePathOnDisk>
+    <RelativePathOnDisk>JavaScript\Node.js\AddWebSiteStarterExpressApp.zip</RelativePathOnDisk>
     <TemplateFileName>AddWebSiteStarterExpressApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
       <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
@@ -126,7 +126,7 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\1033\AzureExpress4App.zip</RelativePathOnDisk>
+    <RelativePathOnDisk>JavaScript\Node.js\AzureExpress4App.zip</RelativePathOnDisk>
     <TemplateFileName>ExpressApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
       <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
@@ -146,7 +146,7 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\1033\AzureNodejsApp.zip</RelativePathOnDisk>
+    <RelativePathOnDisk>JavaScript\Node.js\AzureNodejsApp.zip</RelativePathOnDisk>
     <TemplateFileName>AzureNodejsApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
       <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
@@ -166,7 +166,7 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\1033\AzureNodejsWorker.zip</RelativePathOnDisk>
+    <RelativePathOnDisk>JavaScript\Node.js\AzureNodejsWorker.zip</RelativePathOnDisk>
     <TemplateFileName>Worker.vstemplate</TemplateFileName>
     <VSTemplateHeader>
       <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
@@ -187,7 +187,7 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\1033\AzureStarterExpressApp.zip</RelativePathOnDisk>
+    <RelativePathOnDisk>JavaScript\Node.js\AzureStarterExpressApp.zip</RelativePathOnDisk>
     <TemplateFileName>AzureStarterExpressApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
       <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
@@ -207,7 +207,7 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\1033\CloudService.zip</RelativePathOnDisk>
+    <RelativePathOnDisk>JavaScript\Node.js\CloudService.zip</RelativePathOnDisk>
     <TemplateFileName>CloudService.vstemplate</TemplateFileName>
     <VSTemplateHeader>
       <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
@@ -230,7 +230,7 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\1033\Express4App.zip</RelativePathOnDisk>
+    <RelativePathOnDisk>JavaScript\Node.js\Express4App.zip</RelativePathOnDisk>
     <TemplateFileName>ExpressApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
       <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
@@ -250,7 +250,7 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\1033\FromExistingCode.zip</RelativePathOnDisk>
+    <RelativePathOnDisk>JavaScript\Node.js\FromExistingCode.zip</RelativePathOnDisk>
     <TemplateFileName>FromExistingCode.vstemplate</TemplateFileName>
     <VSTemplateHeader>
       <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
@@ -269,7 +269,7 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\1033\NodejsConsoleApp.zip</RelativePathOnDisk>
+    <RelativePathOnDisk>JavaScript\Node.js\NodejsConsoleApp.zip</RelativePathOnDisk>
     <TemplateFileName>NodejsConsoleApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
       <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
@@ -289,7 +289,7 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\1033\NodejsWebApp.zip</RelativePathOnDisk>
+    <RelativePathOnDisk>JavaScript\Node.js\NodejsWebApp.zip</RelativePathOnDisk>
     <TemplateFileName>NodejsWebApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
       <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
@@ -309,7 +309,7 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\1033\StarterExpressApp.zip</RelativePathOnDisk>
+    <RelativePathOnDisk>JavaScript\Node.js\StarterExpressApp.zip</RelativePathOnDisk>
     <TemplateFileName>StarterExpressApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
       <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
@@ -329,7 +329,7 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\1033\TypeScriptAzureExpressApp.zip</RelativePathOnDisk>
+    <RelativePathOnDisk>JavaScript\Node.js\TypeScriptAzureExpressApp.zip</RelativePathOnDisk>
     <TemplateFileName>TypeScriptExpressApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
       <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
@@ -349,7 +349,7 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\1033\TypeScriptAzureExpressWebRole.zip</RelativePathOnDisk>
+    <RelativePathOnDisk>JavaScript\Node.js\TypeScriptAzureExpressWebRole.zip</RelativePathOnDisk>
     <TemplateFileName>TypeScriptExpressApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
       <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
@@ -370,7 +370,7 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\1033\TypeScriptAzureNodejsWorker.zip</RelativePathOnDisk>
+    <RelativePathOnDisk>JavaScript\Node.js\TypeScriptAzureNodejsWorker.zip</RelativePathOnDisk>
     <TemplateFileName>Worker.vstemplate</TemplateFileName>
     <VSTemplateHeader>
       <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
@@ -391,7 +391,7 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\1033\TypeScriptAzureNodejsWorkerRole.zip</RelativePathOnDisk>
+    <RelativePathOnDisk>JavaScript\Node.js\TypeScriptAzureNodejsWorkerRole.zip</RelativePathOnDisk>
     <TemplateFileName>Worker.vstemplate</TemplateFileName>
     <VSTemplateHeader>
       <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
@@ -412,7 +412,7 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\1033\TypeScriptAzureStarterExpressApp.zip</RelativePathOnDisk>
+    <RelativePathOnDisk>JavaScript\Node.js\TypeScriptAzureStarterExpressApp.zip</RelativePathOnDisk>
     <TemplateFileName>TypeScriptAzureStarterExpressApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
       <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
@@ -432,7 +432,7 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\1033\TypeScriptAzureWebApp.zip</RelativePathOnDisk>
+    <RelativePathOnDisk>JavaScript\Node.js\TypeScriptAzureWebApp.zip</RelativePathOnDisk>
     <TemplateFileName>TypeScriptWebApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
       <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
@@ -453,7 +453,7 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\1033\TypeScriptAzureWebRole.zip</RelativePathOnDisk>
+    <RelativePathOnDisk>JavaScript\Node.js\TypeScriptAzureWebRole.zip</RelativePathOnDisk>
     <TemplateFileName>TypeScriptWebApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
       <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
@@ -475,7 +475,7 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\1033\TypeScriptConsoleApp.zip</RelativePathOnDisk>
+    <RelativePathOnDisk>JavaScript\Node.js\TypeScriptConsoleApp.zip</RelativePathOnDisk>
     <TemplateFileName>NodejsConsoleApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
       <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
@@ -495,7 +495,7 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\1033\TypeScriptExpressApp.zip</RelativePathOnDisk>
+    <RelativePathOnDisk>JavaScript\Node.js\TypeScriptExpressApp.zip</RelativePathOnDisk>
     <TemplateFileName>ExpressApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
       <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
@@ -515,7 +515,7 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\1033\TypeScriptFromExistingCode.zip</RelativePathOnDisk>
+    <RelativePathOnDisk>JavaScript\Node.js\TypeScriptFromExistingCode.zip</RelativePathOnDisk>
     <TemplateFileName>FromExistingCode.vstemplate</TemplateFileName>
     <VSTemplateHeader>
       <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
@@ -534,7 +534,7 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\1033\TypeScriptStarterExpressApp.zip</RelativePathOnDisk>
+    <RelativePathOnDisk>JavaScript\Node.js\TypeScriptStarterExpressApp.zip</RelativePathOnDisk>
     <TemplateFileName>TypeScriptStarterExpressApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
       <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
@@ -554,7 +554,7 @@
     </VSTemplateHeader>
   </VSTemplateContainer>
   <VSTemplateContainer TemplateType="Project">
-    <RelativePathOnDisk>JavaScript\Node.js\1033\TypeScriptWebApp.zip</RelativePathOnDisk>
+    <RelativePathOnDisk>JavaScript\Node.js\TypeScriptWebApp.zip</RelativePathOnDisk>
     <TemplateFileName>NodejsWebApp.vstemplate</TemplateFileName>
     <VSTemplateHeader>
       <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">

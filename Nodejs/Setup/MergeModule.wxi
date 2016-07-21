@@ -37,12 +37,6 @@
             <Directory Id="Dir_$(var.key)JavaScriptProjectTemplates" Name="JavaScript">
                 <Directory Id="Dir_$(var.key)ProjectTemplates" Name="Node.js">
                     <Directory Id="Dir_$(var.key)WebProjectTemplates" Name="Web" />
-                    <Directory Id="Dir_$(var.key)NodeJavaScript1033ProjectTemplates" Name="1033" />
-                </Directory>
-            </Directory>
-            <Directory Id="Dir_$(var.key)TypeScriptProjectTemplates" Name="TypeScript">
-                <Directory Id="Dir_$(var.key)TypeScriptNodeProjectTemplates" Name="Node.js">
-                    <Directory Id="Dir_$(var.key)NodeTypeScript1033ProjectTemplates" Name="1033" />
                 </Directory>
             </Directory>
         </Directory>
