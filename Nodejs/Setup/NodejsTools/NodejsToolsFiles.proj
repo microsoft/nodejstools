@@ -18,6 +18,7 @@
         <File Include="Microsoft.NodejsTools.Analysis.dll" />
         <File Include="Microsoft.NodejsTools.TestAdapter.dll" />
         <File Include="Microsoft.NodejsTools.Telemetry.$(VSTarget).dll" />
+        <File Include="Microsoft.NodejsTools.TypeScriptSourceMapReader.dll" />
 
         <!-- Support Files -->
         <File Include="all.json" />

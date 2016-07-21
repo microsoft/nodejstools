@@ -28,7 +28,8 @@ using Microsoft.NodejsTools.Debugger.Communication;
 using Microsoft.NodejsTools.Debugger.Events;
 using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.NodejsTools.Logging;
-using Microsoft.NodejsTools.SourceMapping;
+using Microsoft.NodejsTools.TypeScriptSourceMapReader;
+using Microsoft.VisualStudio.Debugger.Symbols;
 using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.Debugger {
@@ -45,7 +46,6 @@ namespace Microsoft.NodejsTools.Debugger {
         private readonly ExceptionHandler _exceptionHandler;
         private readonly Dictionary<string, NodeModule> _modules = new Dictionary<string, NodeModule>(StringComparer.OrdinalIgnoreCase);
         private readonly EvaluationResultFactory _resultFactory;
-        private readonly SourceMapper _sourceMapper;
         private readonly Dictionary<int, NodeThread> _threads = new Dictionary<int, NodeThread>();
         private readonly TimeSpan _timeout = TimeSpan.FromSeconds(5);
         private bool _attached;
@@ -59,6 +59,9 @@ namespace Microsoft.NodejsTools.Debugger {
         private NodeProcess _process;
         private int _steppingCallstackDepth;
         private SteppingKind _steppingMode;
+        private SourceMapReader _sourceMapReader;
+        private Dictionary<string,DecodedSourceMap> _decodedSourceMaps;
+        private Dictionary<string, string> _sourceMapFiles;
 
         private NodeDebugger() {
             _connection = new DebuggerConnection(new NetworkClientFactory());
@@ -71,8 +74,10 @@ namespace Microsoft.NodejsTools.Debugger {
 
             _resultFactory = new EvaluationResultFactory();
             _exceptionHandler = new ExceptionHandler();
-            _sourceMapper = new SourceMapper();
             _fileNameMapper = new LocalFileNameMapper();
+            _sourceMapReader = new SourceMapReader();
+            _decodedSourceMaps = new Dictionary<string, DecodedSourceMap>();
+            _sourceMapFiles = new Dictionary<string, string>();            
         }
 
         public NodeDebugger(
@@ -427,11 +432,12 @@ namespace Microsoft.NodejsTools.Debugger {
             get { return Interlocked.Increment(ref _commandId); }
         }
 
-        /// <summary>
-        /// Gets a source mapper.
-        /// </summary>
-        public SourceMapper SourceMapper {
-            get { return _sourceMapper; }
+        public Dictionary<string, DecodedSourceMap> DecodedSourceMaps {
+            get { return _decodedSourceMaps; }
+        }
+
+        public SourceMapReader SourceMapReader {
+            get { return _sourceMapReader; }
         }
 
         /// <summary>
@@ -649,9 +655,9 @@ namespace Microsoft.NodejsTools.Debugger {
                     }
 
                     SetBreakpointCommand result = await SetBreakpointAsync(breakpoint, cancellationToken: cancellationToken).ConfigureAwait(false);
-                    
+
                     // Treat rebound breakpoint binding as fully bound
-                    NodeBreakpointBinding reboundbreakpointBinding = CreateBreakpointBinding(breakpoint, result.BreakpointId, result.ScriptId, breakpoint.GetPosition(SourceMapper).FileName, result.Line, result.Column, true);
+                    NodeBreakpointBinding reboundbreakpointBinding = CreateBreakpointBinding(breakpoint, result.BreakpointId, result.ScriptId, breakpoint.GetPosition(result.Module.JavaScriptFileName).FileName, result.Line, result.Column, true);
                     HandleBindBreakpointSuccess(reboundbreakpointBinding, breakpoint);
 
                     // Handle invalid-line fixup (second bind matches current line)
@@ -711,7 +717,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
                 var lookupCommand = new LookupCommand(CommandId, _resultFactory, new[] { exception.ErrorNumber.Value });
                 string errorCodeFromLookup = null;
-                
+
                 if (await TrySendRequestAsync(lookupCommand).ConfigureAwait(false)) {
                     errorCodeFromLookup = lookupCommand.Results[errorNumber][0].StringValue;
                     _errorCodes[errorNumber] = errorCodeFromLookup;
@@ -781,14 +787,34 @@ namespace Microsoft.NodejsTools.Debugger {
                 int line = stackFrame.Line;
                 int column = stackFrame.Column;
                 string functionName = stackFrame.FunctionName;
+                int lineEnd = stackFrame.EndLine;
+
+                string name = "";
 
                 // Map file position to original, if required
                 if (module.JavaScriptFileName != module.FileName) {
-                    SourceMapInfo mapping = SourceMapper.MapToOriginal(module.JavaScriptFileName, line, column);
-                    if (mapping != null) {
-                        line = mapping.Line;
-                        column = mapping.Column;
-                        functionName = string.IsNullOrEmpty(mapping.Name) ? functionName : mapping.Name;
+                    DecodedSourceMap decodedSourceMap = null;
+                    DkmTextSpan? tsSpan = null;
+                    string jsFileName = module.JavaScriptFileName;
+                    string sourceMapFilename = SourceMapFileHelper.FindSourceMapFile(jsFileName);
+                    SourceMapSourceInfo sourceInfo = null;
+                    if (!string.IsNullOrEmpty(sourceMapFilename)) {
+
+                        if (DecodedSourceMaps.ContainsKey(sourceMapFilename)) {
+                            decodedSourceMap = DecodedSourceMaps[sourceMapFilename];
+                        } else {
+                            decodedSourceMap = SourceMapReader.LoadSourceMap(jsFileName, sourceMapFilename);
+                            DecodedSourceMaps.Add(sourceMapFilename, decodedSourceMap);
+                            _sourceMapFiles.Add(jsFileName, sourceMapFilename);
+                        }
+
+                        tsSpan = decodedSourceMap.MapJsSourcePosition(new DkmTextSpan(line + 1, line + 1, column + 1, column + 1), out sourceInfo, out name);
+                    }
+
+                    if (decodedSourceMap != null) {
+                        line = tsSpan.Value.StartLine - 1;
+                        column = tsSpan.Value.StartColumn - 1;
+                        functionName = string.IsNullOrEmpty(name) ? functionName : name;
                     }
                 }
 
@@ -959,8 +985,8 @@ namespace Microsoft.NodejsTools.Debugger {
 
         public async Task<NodeBreakpointBinding> BindBreakpointAsync(NodeBreakpoint breakpoint, CancellationToken cancellationToken = new CancellationToken()) {
             SetBreakpointCommand result = await SetBreakpointAsync(breakpoint, cancellationToken: cancellationToken).ConfigureAwait(false);
-
-            var position = breakpoint.GetPosition(SourceMapper);
+            
+            var position = breakpoint.GetPosition(result.Module.JavaScriptFileName);
             bool fullyBound = (result.ScriptId.HasValue && result.Line == position.Line);
             NodeBreakpointBinding breakpointBinding = CreateBreakpointBinding(breakpoint, result.BreakpointId, result.ScriptId, position.FileName, result.Line, result.Column, fullyBound);
 
@@ -996,7 +1022,7 @@ namespace Microsoft.NodejsTools.Debugger {
             // Try to find module
             NodeModule module = GetModuleForFilePath(breakpoint.Target.FileName);
 
-            var setBreakpointCommand = new SetBreakpointCommand(CommandId, module, breakpoint, withoutPredicate, IsRemote, SourceMapper);
+            var setBreakpointCommand = new SetBreakpointCommand(CommandId, module, breakpoint, withoutPredicate, IsRemote);
             await TrySendRequestAsync(setBreakpointCommand, cancellationToken).ConfigureAwait(false);
 
             return setBreakpointCommand;
@@ -1005,10 +1031,13 @@ namespace Microsoft.NodejsTools.Debugger {
         private NodeBreakpointBinding CreateBreakpointBinding(NodeBreakpoint breakpoint, int breakpointId, int? scriptId, string filename, int line, int column, bool fullyBound) {
             var position = new FilePosition(filename, line, column);
             FilePosition target = position;
+            string name;
+            SourceMapSourceInfo sourceMapSourceInfo;
+            DecodedSourceMap decodedSourceMap = DecodedSourceMaps[_sourceMapFiles[filename]];
+            DkmTextSpan tsSpan = decodedSourceMap.MapJsSourcePosition(new DkmTextSpan(line + 1, line + 1, column + 1, column + 1), out sourceMapSourceInfo, out name);
 
-            SourceMapInfo mapping = SourceMapper.MapToOriginal(filename, line, column);
-            if (mapping != null) {
-                target = new FilePosition(breakpoint.Target.FileName, mapping.Line, mapping.Column);
+            if(decodedSourceMap != null) {
+                target = new FilePosition(breakpoint.Target.FileName, tsSpan.StartLine - 1, tsSpan.StartColumn - 1);
             }
 
             NodeBreakpointBinding breakpointBinding = breakpoint.CreateBinding(target, position, breakpointId, scriptId, fullyBound);
@@ -1048,7 +1077,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
         internal async Task<int?> GetBreakpointHitCountAsync(int breakpointId, CancellationToken cancellationToken = new CancellationToken()) {
             var listBreakpointsCommand = new ListBreakpointsCommand(CommandId);
-            
+
             int hitCount;
             if (await TrySendRequestAsync(listBreakpointsCommand, cancellationToken).ConfigureAwait(false) &&
                 listBreakpointsCommand.Breakpoints.TryGetValue(breakpointId, out hitCount)) {
@@ -1159,7 +1188,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 return false;
             }
         }
-        
+
         #endregion
 
         #region Debugging Events
@@ -1198,7 +1227,7 @@ namespace Microsoft.NodejsTools.Debugger {
         private bool GetOrAddModule(NodeModule module, out NodeModule value, NodeStackFrame stackFrame = null) {
             value = null;
             string javaScriptFileName = module.JavaScriptFileName;
-            int? line = null, column = null;
+            int line = 0, column = 0;
 
             if (string.IsNullOrEmpty(javaScriptFileName) ||
                 javaScriptFileName == NodeVariableType.UnknownModule ||
@@ -1210,11 +1239,33 @@ namespace Microsoft.NodejsTools.Debugger {
             javaScriptFileName = FileNameMapper.GetLocalFileName(javaScriptFileName);
 
             // Try to get mapping for JS file
-            if(stackFrame != null) {
+            if (stackFrame != null) {
                 line = stackFrame.Line;
                 column = stackFrame.Column;
             }
-            string originalFileName = SourceMapper.GetOriginalFileName(javaScriptFileName, line, column);
+
+            SourceMapSourceInfo sourceInfo = null;        
+            string sourceMapFilename = SourceMapFileHelper.FindSourceMapFile(javaScriptFileName);            
+
+            if (!string.IsNullOrEmpty(sourceMapFilename)) {
+
+                DecodedSourceMap decodedSourceMap;
+                if (DecodedSourceMaps.ContainsKey(sourceMapFilename)) {
+                    decodedSourceMap = DecodedSourceMaps[sourceMapFilename];
+                } else {
+                    decodedSourceMap = SourceMapReader.LoadSourceMap(javaScriptFileName, sourceMapFilename);
+                    DecodedSourceMaps.Add(sourceMapFilename, decodedSourceMap);
+                    _sourceMapFiles.Add(javaScriptFileName, sourceMapFilename);
+                }
+
+                string name;
+                decodedSourceMap.MapJsSourcePosition(new DkmTextSpan((int)line + 1, (int)line + 1, (int)column + 1, (int)column + 1), out sourceInfo, out name);
+            }
+
+            string originalFileName = null;
+            if (sourceInfo != null) {
+                originalFileName = sourceInfo.tsFilePath;
+            }
 
             if (originalFileName == null) {
                 module = new NodeModule(module.Id, javaScriptFileName);
@@ -1253,8 +1304,6 @@ namespace Microsoft.NodejsTools.Debugger {
 
         internal void Close() {
         }
-
-
 
         #region IDisposable
 

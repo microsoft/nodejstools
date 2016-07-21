@@ -15,17 +15,10 @@
 //*********************************************************//
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-
 using MSBuild = Microsoft.Build.Evaluation;
-
-using Microsoft.NodejsTools;
 using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools;
 
