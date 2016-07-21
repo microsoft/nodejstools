@@ -41,7 +41,7 @@
                 </Directory>
             </Directory>
             <Directory Id="Dir_$(var.key)TypeScriptProjectTemplates" Name="TypeScript">
-                <Directory Id="Dir_$(var.key)TypeScriptProjectTemplates" Name="Node.js">
+                <Directory Id="Dir_$(var.key)TypeScriptNodeProjectTemplates" Name="Node.js">
                     <Directory Id="Dir_$(var.key)NodeTypeScript1033ProjectTemplates" Name="1033" />
                 </Directory>
             </Directory>
