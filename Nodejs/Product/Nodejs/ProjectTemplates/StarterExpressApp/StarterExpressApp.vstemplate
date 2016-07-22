@@ -9,7 +9,7 @@
     <CreateNewFolder>true</CreateNewFolder>
     <DefaultName>ExpressApp</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
-    <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
+    <NumberOfParentCategoriesToRollUp>2</NumberOfParentCategoriesToRollUp>
     <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
     <PreviewImage>Preview.png</PreviewImage>
   </TemplateData>

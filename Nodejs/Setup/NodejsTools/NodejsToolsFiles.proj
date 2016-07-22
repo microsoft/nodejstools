@@ -64,9 +64,6 @@
                                ItemTemplates\JavaScript\TypeScriptMochaUnitTest.zip;
                                ItemTemplates\JavaScript\DockerfileTemplate.zip"/>
                                
-        <File Include="Templates\VS_Nodejs.item.vstman">
-            <InstallDirectory>AllItemTemplates</InstallDirectory>
-        </File>
 
         <ProjectTemplate Include="ProjectTemplates\JavaScript\Node.js\1033\AzureExpress4App.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\AzureStarterExpressApp.zip;
@@ -96,10 +93,6 @@
                                   ProjectTemplates\TypeScript\Node.js\1033\TypeScriptAzureNodejsWorker.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\TypeScriptAzureNodejsWorkerRole.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\CloudService.zip;"/>
-        
-        <File Include="ProjectTemplates\VS_Nodejs.project.vstman">
-            <InstallDirectory>AllProjectTemplates</InstallDirectory>
-        </File>
 
         <File Include="ItemTemplates\CloudService\NETFramework4\Web Role\Node.js\CloudServiceWebRole.zip;
                        ItemTemplates\CloudService\NETFramework4\Web Role\Node.js\CloudServiceExpressWebRole.zip;
