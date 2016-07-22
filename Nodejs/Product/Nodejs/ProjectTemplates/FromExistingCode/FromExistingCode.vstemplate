@@ -9,7 +9,7 @@
     <CreateNewFolder>false</CreateNewFolder>
     <DefaultName>NodejsApp</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
-    <NumberOfParentCategoriesToRollUp>2</NumberOfParentCategoriesToRollUp>
+    <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
     <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
   </TemplateData>
   <TemplateContent>

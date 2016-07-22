@@ -1,0 +1,157 @@
+﻿<VSTemplateManifest Version="1.0" xmlns="http://schemas.microsoft.com/developer/vstemplatemanifest/2015">
+  <VSTemplateContainer TemplateType="Item">
+    <RelativePathOnDisk>CloudService\NETFramework4\Web Role\Node.js\CloudServiceExpressWebRole.zip</RelativePathOnDisk>
+    <TemplateFileName>ExpressWebRole.vstemplate</TemplateFileName>
+    <VSTemplateHeader>
+      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+        <Name>Express Web Role</Name>
+        <Description>Service with a web interface using the Express web framework.</Description>
+        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="404" />
+        <ProjectType>CloudServiceProject</ProjectType>
+        <DefaultName>WebRole</DefaultName>
+        <SortOrder>22</SortOrder>
+      </TemplateData>
+    </VSTemplateHeader>
+  </VSTemplateContainer>
+  <VSTemplateContainer TemplateType="Item">
+    <RelativePathOnDisk>CloudService\NETFramework4\Web Role\Node.js\CloudServiceTypeScriptExpressWebRole.zip</RelativePathOnDisk>
+    <TemplateFileName>TypeScriptExpressWebRole.vstemplate</TemplateFileName>
+    <VSTemplateHeader>
+      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+        <Name>TypeScript Express Web Role</Name>
+        <Description>Service with a web interface using the Express web framework with TypeScript.</Description>
+        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="410" />
+        <ProjectType>CloudServiceProject</ProjectType>
+        <DefaultName>WebRole</DefaultName>
+        <SortOrder>32</SortOrder>
+      </TemplateData>
+    </VSTemplateHeader>
+  </VSTemplateContainer>
+  <VSTemplateContainer TemplateType="Item">
+    <RelativePathOnDisk>CloudService\NETFramework4\Web Role\Node.js\CloudServiceTypeScriptWebRole.zip</RelativePathOnDisk>
+    <TemplateFileName>TypeScriptWebRole.vstemplate</TemplateFileName>
+    <VSTemplateHeader>
+      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+        <Name>TypeScript Web Role</Name>
+        <Description>Service with a web interface using TypeScript.</Description>
+        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="410" />
+        <ProjectType>CloudServiceProject</ProjectType>
+        <DefaultName>WebRole</DefaultName>
+        <SortOrder>31</SortOrder>
+      </TemplateData>
+    </VSTemplateHeader>
+  </VSTemplateContainer>
+  <VSTemplateContainer TemplateType="Item">
+    <RelativePathOnDisk>CloudService\NETFramework4\Web Role\Node.js\CloudServiceWebRole.zip</RelativePathOnDisk>
+    <TemplateFileName>WebRole.vstemplate</TemplateFileName>
+    <VSTemplateHeader>
+      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+        <Name>Web Role</Name>
+        <Description>Node.js service with a web interface.</Description>
+        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="404" />
+        <ProjectType>CloudServiceProject</ProjectType>
+        <DefaultName>WebRole</DefaultName>
+        <SortOrder>21</SortOrder>
+      </TemplateData>
+    </VSTemplateHeader>
+  </VSTemplateContainer>
+  <VSTemplateContainer TemplateType="Item">
+    <RelativePathOnDisk>CloudService\NETFramework4\Worker Role\Node.js\CloudServiceTypeScriptWorkerRole.zip</RelativePathOnDisk>
+    <TemplateFileName>TypeScriptWorkerRole.vstemplate</TemplateFileName>
+    <VSTemplateHeader>
+      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+        <Name>TypeScript Worker Role</Name>
+        <Description>Node.js background processing service using TypeScript.</Description>
+        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="413" />
+        <ProjectType>CloudServiceProject</ProjectType>
+        <DefaultName>WorkerRole</DefaultName>
+        <SortOrder>30</SortOrder>
+      </TemplateData>
+    </VSTemplateHeader>
+  </VSTemplateContainer>
+  <VSTemplateContainer TemplateType="Item">
+    <RelativePathOnDisk>CloudService\NETFramework4\Worker Role\Node.js\CloudServiceWorkerRole.zip</RelativePathOnDisk>
+    <TemplateFileName>WorkerRole.vstemplate</TemplateFileName>
+    <VSTemplateHeader>
+      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+        <Name>Worker Role</Name>
+        <Description>Node.js background processing service.</Description>
+        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="407" />
+        <ProjectType>CloudServiceProject</ProjectType>
+        <DefaultName>WorkerRole</DefaultName>
+        <SortOrder>20</SortOrder>
+      </TemplateData>
+    </VSTemplateHeader>
+  </VSTemplateContainer>
+  <VSTemplateContainer TemplateType="Item">
+    <RelativePathOnDisk>JavaScript\DockerfileTemplate.zip</RelativePathOnDisk>
+    <TemplateFileName>Dockerfile.vstemplate</TemplateFileName>
+    <VSTemplateHeader>
+      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+        <Name Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3054" />
+        <Description Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3053" />
+        <ProjectType>Node.js</ProjectType>
+        <ProjectSubType>Docker</ProjectSubType>
+        <DefaultName>Dockerfile</DefaultName>
+        <AppendDefaultFileExtension>false</AppendDefaultFileExtension>
+        <SortOrder>500</SortOrder>
+      </TemplateData>
+    </VSTemplateHeader>
+  </VSTemplateContainer>
+  <VSTemplateContainer TemplateType="Item">
+    <RelativePathOnDisk>JavaScript\MochaUnitTest.zip</RelativePathOnDisk>
+    <TemplateFileName>UnitTest.vstemplate</TemplateFileName>
+    <VSTemplateHeader>
+      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+        <Name Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3049" />
+        <Description Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3050" />
+        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="403" />
+        <ProjectType>Node.js</ProjectType>
+        <DefaultName>UnitTest.js</DefaultName>
+        <SortOrder>320</SortOrder>
+      </TemplateData>
+    </VSTemplateHeader>
+  </VSTemplateContainer>
+  <VSTemplateContainer TemplateType="Item">
+    <RelativePathOnDisk>JavaScript\TypeScriptMochaUnitTest.zip</RelativePathOnDisk>
+    <TemplateFileName>UnitTest.vstemplate</TemplateFileName>
+    <VSTemplateHeader>
+      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+        <Name Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3052" />
+        <Description Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3051" />
+        <Icon Package="{2ffe45c4-5c73-493c-b187-f2e955ff875e}" ID="3" />
+        <ProjectType>Node.js</ProjectType>
+        <DefaultName>UnitTest.ts</DefaultName>
+        <SortOrder>330</SortOrder>
+      </TemplateData>
+    </VSTemplateHeader>
+  </VSTemplateContainer>
+  <VSTemplateContainer TemplateType="Item">
+    <RelativePathOnDisk>JavaScript\TypeScriptUnitTest.zip</RelativePathOnDisk>
+    <TemplateFileName>UnitTest.vstemplate</TemplateFileName>
+    <VSTemplateHeader>
+      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+        <Name Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3047" />
+        <Description Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3046" />
+        <Icon Package="{2ffe45c4-5c73-493c-b187-f2e955ff875e}" ID="3" />
+        <ProjectType>Node.js</ProjectType>
+        <DefaultName>UnitTest.ts</DefaultName>
+        <SortOrder>310</SortOrder>
+      </TemplateData>
+    </VSTemplateHeader>
+  </VSTemplateContainer>
+  <VSTemplateContainer TemplateType="Item">
+    <RelativePathOnDisk>JavaScript\UnitTest.zip</RelativePathOnDisk>
+    <TemplateFileName>UnitTest.vstemplate</TemplateFileName>
+    <VSTemplateHeader>
+      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+        <Name Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3009" />
+        <Description Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3015" />
+        <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="403" />
+        <ProjectType>Node.js</ProjectType>
+        <DefaultName>UnitTest.js</DefaultName>
+        <SortOrder>300</SortOrder>
+      </TemplateData>
+    </VSTemplateHeader>
+  </VSTemplateContainer>
+</VSTemplateManifest>

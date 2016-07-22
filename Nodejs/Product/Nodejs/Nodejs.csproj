@@ -907,10 +907,19 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="ProjectTemplates\VS_Nodejs.project.vstman">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <ZipItem Include="Templates\Files\TapeUnitTest\UnitTest.js" />
     <ZipItem Include="Templates\Files\TapeUnitTest\UnitTest.vstemplate" />
     <ZipItem Include="Templates\Files\TypeScriptTapeUnitTest\UnitTest.vstemplate" />
     <ZipItem Include="Templates\Files\TypeScriptTapeUnitTest\UnitTest.ts" />
+    <Content Include="Templates\VS_Nodejs.item.vstman">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <VSIXSubPath>ItemTemplates</VSIXSubPath>
+    </Content>
     <None Include="Theme\contrast.vstheme">
       <SubType>Designer</SubType>
     </None>
