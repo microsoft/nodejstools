@@ -521,17 +521,21 @@ namespace Microsoft.NodejsTools.Project {
             return true;
         }
 
-        public async System.Threading.Tasks.Task InstallMissingModules() {
+        private async System.Threading.Tasks.Task RunNpmCommand(Func<INpmCommander, System.Threading.Tasks.Task> impl) {
             DoPreCommandActions();
             try {
                 using (var commander = NpmController.CreateNpmCommander()) {
-                    await commander.Install();
+                    await impl(commander);
                 }
             } catch (NpmNotFoundException nnfe) {
                 ErrorHelper.ReportNpmNotInstalled(null, nnfe);
             } finally {
                 AllowCommands();
             }
+        }
+
+        public System.Threading.Tasks.Task InstallMissingModules() {
+            return RunNpmCommand(commander => commander.Install());
         }
 
         public async System.Threading.Tasks.Task InstallMissingModule(DependencyNode node) {
@@ -552,41 +556,27 @@ namespace Microsoft.NodejsTools.Project {
             var package = node.Package;
             var dep = root.PackageJson.AllDependencies[package.Name];
 
-            DoPreCommandActions();
-            try {
-                using (var commander = NpmController.CreateNpmCommander()) {
-                    await commander.InstallPackageByVersionAsync(
-                        package.Name,
-                        null == dep ? "*" : dep.VersionRangeText,
-                        DependencyType.Standard,
-                        false);
-                }
-            } catch (NpmNotFoundException nnfe) {
-                ErrorHelper.ReportNpmNotInstalled(null, nnfe);
-            } finally {
-                AllowCommands();
-            }
+            await RunNpmCommand(async commander => {
+                await commander.InstallPackageByVersionAsync(
+                    package.Name,
+                    null == dep ? "*" : dep.VersionRangeText,
+                    DependencyType.Standard,
+                    false);
+            });
         }
 
-        internal async System.Threading.Tasks.Task UpdateModules(IList<HierarchyNode> nodes) {
-            DoPreCommandActions();
-            try {
-                using (var commander = NpmController.CreateNpmCommander()) {
-                    if (nodes.Count == 1 && nodes[0] == this) {
-                        await commander.UpdatePackagesAsync();
-                    } else {
-                        var valid = nodes.OfType<DependencyNode>().Where(CheckValidCommandTarget).ToList();
-                        var list = valid.Select(node => node.Package).ToList();
-                        if (list.Count > 0) {
-                            await commander.UpdatePackagesAsync(list);
-                        }
+        internal System.Threading.Tasks.Task UpdateModules(IList<HierarchyNode> nodes) {
+            return RunNpmCommand(async commander => {
+                if (nodes.Count == 1 && nodes[0] == this) {
+                    await commander.UpdatePackagesAsync();
+                } else {
+                    var valid = nodes.OfType<DependencyNode>().Where(CheckValidCommandTarget).ToList();
+                    var list = valid.Select(node => node.Package).ToList();
+                    if (list.Count > 0) {
+                        await commander.UpdatePackagesAsync(list);
                     }
                 }
-            } catch (NpmNotFoundException nnfe) {
-                ErrorHelper.ReportNpmNotInstalled(null, nnfe);
-            } finally {
-                AllowCommands();
-            }
+            });
         }
 
         public void UpdateModules() {
@@ -597,48 +587,29 @@ namespace Microsoft.NodejsTools.Project {
             if (!CheckValidCommandTarget(node)) {
                 return;
             }
-            DoPreCommandActions();
-            try {
-                using (var commander = NpmController.CreateNpmCommander()) {
-                    await commander.UpdatePackagesAsync(new[] { node.Package });
-                }
-            } catch (NpmNotFoundException nnfe) {
-                ErrorHelper.ReportNpmNotInstalled(null, nnfe);
-            } finally {
-                AllowCommands();
-            }
+            await RunNpmCommand(async commander => {
+                await commander.UpdatePackagesAsync(new[] { node.Package });
+            });
         }
 
-        public async System.Threading.Tasks.Task UninstallModules() {
-            DoPreCommandActions();
-            try {
-                var selected = _projectNode.GetSelectedNodes();
-                using (var commander = NpmController.CreateNpmCommander()) {
-                    foreach (var node in selected.OfType<DependencyNode>().Where(CheckValidCommandTarget)) {
-                        await commander.UninstallPackageAsync(node.Package.Name);
-                    }
+
+        public System.Threading.Tasks.Task UninstallModules() {
+            var selected = _projectNode.GetSelectedNodes();
+            return RunNpmCommand(async commander => {
+                foreach (var node in selected.OfType<DependencyNode>().Where(CheckValidCommandTarget)) {
+                    await commander.UninstallPackageAsync(node.Package.Name);
                 }
-            } catch (NpmNotFoundException nnfe) {
-                ErrorHelper.ReportNpmNotInstalled(null, nnfe);
-            } finally {
-                AllowCommands();
-            }
+            });
         }
 
         public async System.Threading.Tasks.Task UninstallModule(DependencyNode node) {
             if (!CheckValidCommandTarget(node)) {
                 return;
             }
-            DoPreCommandActions();
-            try {
-                using (var commander = NpmController.CreateNpmCommander()) {
-                    await commander.UninstallPackageAsync(node.Package.Name);
-                }
-            } catch (NpmNotFoundException nnfe) {
-                ErrorHelper.ReportNpmNotInstalled(null, nnfe);
-            } finally {
-                AllowCommands();
-            }
+
+            await RunNpmCommand(async commander => {
+                await commander.UninstallPackageAsync(node.Package.Name);
+            });
         }
 
         #endregion
