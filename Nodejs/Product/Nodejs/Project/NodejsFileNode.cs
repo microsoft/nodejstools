@@ -35,12 +35,13 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         protected override void OnParentSet(HierarchyNode parent) {
-            if (ProjectMgr == null || ProjectMgr.Analyzer == null || !ProjectMgr.ShouldAcquireTypingsAutomatically) {
+            if (ProjectMgr == null || ProjectMgr.Analyzer == null) {
                 return;
             }
 
             if (Url.EndsWith(NodejsConstants.TypeScriptDeclarationExtension, StringComparison.OrdinalIgnoreCase)
-              && Url.StartsWith(Path.Combine(ProjectMgr.ProjectFolder, @"typings\"), StringComparison.OrdinalIgnoreCase)) {
+              && Url.StartsWith(Path.Combine(ProjectMgr.ProjectFolder, @"typings\"), StringComparison.OrdinalIgnoreCase)
+              && ProjectMgr.ShouldAcquireTypingsAutomatically) {
                 ProjectMgr.Site.GetUIThread().Invoke(() => {
                     this.IncludeInProject(true);
                 });
