@@ -15,8 +15,6 @@
 //*********************************************************//
 
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 // If you get compiler errors CS0579, "Duplicate '<attributename>' attribute", check your
 // Properties\AssemblyInfo.cs file and remove any lines duplicating the ones below.
@@ -34,6 +32,11 @@ class AssemblyVersionInfo {
     // Servicing branches and minor releases should retain the value.
     public const string ReleaseVersion = "1.0";
 
+    // This version string (and the comment for StableVersion) should be
+    // updated manually between minor releases.
+    // Servicing branches should retain the value
+    public const string MinorVersion = "0";
+
     // This version string (and the comment for Version) should be updated
     // manually between minor releases (e.g. from 1.0 to 1.1).
     // Servicing branches and prereleases should retain the value.
@@ -42,13 +45,7 @@ class AssemblyVersionInfo {
     // This version should never change from "4100.00"; BuildRelease.ps1
     // will replace it with a generated value.
     public const string BuildNumber = "4100.00";
-#if DEV11
-    public const string VSMajorVersion = "11";
-    const string VSVersionSuffix = "2012";
-#elif DEV12
-    public const string VSMajorVersion = "12";
-    const string VSVersionSuffix = "2013";
-#elif DEV14
+#if DEV14
     public const string VSMajorVersion = "14";
     const string VSVersionSuffix = "2015";
 #elif DEV15
@@ -61,7 +58,7 @@ class AssemblyVersionInfo {
     public const string VSVersion = VSMajorVersion + ".0";
 
     // Defaults to "1.0.0.(2012|2013|2015)"
-    public const string StableVersion = ReleaseVersion + "." + VSVersionSuffix;
+    public const string StableVersion = ReleaseVersion + "." + MinorVersion + "." + VSVersionSuffix;
 
     // Defaults to "1.2.4100.00"
     public const string Version = FileVersion + "." + BuildNumber;
