@@ -15,9 +15,9 @@ NTVS supports **editing**, **Intellisense**, **profiling**, **npm**, **TypeScrip
 * [**Microsoft/nodejs-guidelines**](https://github.com/Microsoft/nodejs-guidelines) includes other tips for working with Node.js.
 
 ## Releases
-* **[Node.js Tools 1.1](http://aka.ms/ntvslateststable)** - Stable NTVS release (available for Visual Studio 2012, 2013, and 2015)
-* **[Node.js Tools 1.2 RC](http://aka.ms/ntvslatest)** - Preview build with better ES6 Support and other improvements (available for Visual Studio 2015 Update 3 RTM)
+* **[Node.js Tools 1.2](http://aka.ms/ntvslateststable)** - Latest and greatest NTVS release (available for Visual Studio 2015 Update 3 RTM)
 * **[Dev Builds](https://github.com/Microsoft/nodejstools/releases)** - Includes the most recent changes and bugfixes (available for Visual Studio 2015 and VS 15)
+* **[Node.js Tools 1.1](https://github.com/Microsoft/nodejstools/releases/tag/v1.1.1)** - Legacy NTVS release for Visual Studio 2012, 2013, and 2015
 
 ## Contributions
 We would love to have you as a contributor!
