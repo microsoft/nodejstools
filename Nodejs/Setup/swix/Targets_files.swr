@@ -1,0 +1,8 @@
+use vs
+
+package name="Microsoft.VisualStudio.NodejsTools.Targets"
+    version=1.2
+
+folder "InstallFolder:\"
+    folder "MSBuild\Microsoft\VisualStudio\v15.0\Node.js Tools"
+        file source=$(BuildOutputRoot)\Binaries\Nodejs\Microsoft.NodejsTools.targets

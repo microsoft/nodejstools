@@ -1,0 +1,9 @@
+use vs
+
+package name=Microsoft.VisualStudio.NodejsTools.Profiling
+    version=1.2
+    vs.package.type=vsix
+    vs.package.vsixId=B515653F-FB69-4B64-9D3F-F1FCF8421DD0
+
+vs.payloads
+    vs.payload source="$(BuildOutputRoot)\Binaries\Profiling\Microsoft.NodejsTools.Profiling.vsix"

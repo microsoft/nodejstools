@@ -7,9 +7,9 @@
     <TemplateID>Microsoft.JavaScript.NodejsFromExistingCode</TemplateID>
     <SortOrder>120</SortOrder>
     <CreateNewFolder>false</CreateNewFolder>
-    <DefaultName>NodejsApp</DefaultName>
+    <DefaultName>FromExistingCode</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
-    <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
+    <NumberOfParentCategoriesToRollUp>2</NumberOfParentCategoriesToRollUp>
     <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
   </TemplateData>
   <TemplateContent>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build"
+         xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Import Project="..\SetupProjectBefore.settings" />
+
+    <PropertyGroup>
+        <!-- Define properties that drive the manifest creation here. -->
+        <FinalizeManifest>true</FinalizeManifest>
+        <FinalizeSkipLayout>true</FinalizeSkipLayout>
+        <BuildNumber>$(VSTarget).$(BuildNumber)</BuildNumber>
+        <TargetName>$(MSBuildProjectName)</TargetName>
+    </PropertyGroup>
+    
+
+    <PropertyGroup>
+        <!-- RTVS uses BuildVersion as 'major.minor.build.revision' and BuildNumber is 'build.revision'.
+             But VS Manifest task wants BuildNumber to be 'major.minor.build.revision' -->
+        <BuildNumber>$(BuildVersion)</BuildNumber>
+        <OutputPath>$(BinDirectory)\$(Configuration)\</OutputPath>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <MergeManifest Include="$(BuildOutputRoot)\Setup\Microsoft.VisualStudio.NodejsTools.*.json"/>
+        <MergeManifest Include="$(BuildRoot)\Nodejs\Setup\swix\sideload.json"/>
+    </ItemGroup>
+
+    <Import Project="$(PackagesPath)\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets"/>
+    <Import Project="..\SetupProjectAfter.settings" />
+</Project>

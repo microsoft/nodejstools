@@ -180,6 +180,14 @@
   <PropertyGroup>
     <DelaySign>true</DelaySign>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <CreateVsixContainer>True</CreateVsixContainer>
+    <CopyVsixExtensionFiles>True</CopyVsixExtensionFiles>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <CopyVsixExtensionFiles>True</CopyVsixExtensionFiles>
+    <CreateVsixContainer>True</CreateVsixContainer>
+  </PropertyGroup>
   <Import Project="$(BuildRoot)\Common\Product\ReplWindow\ReplWindow.proj" />
   <Import Project="..\ProjectAfter.settings" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
