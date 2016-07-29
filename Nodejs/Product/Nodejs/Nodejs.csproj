@@ -965,11 +965,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="FileTemplates\NewItem\EmptyTs.ts">
+    <Content Include="FileTemplates\EmptyTs.ts">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="FileTemplates\NewItem\EmptyHtml.html">
+    <Content Include="FileTemplates\EmptyHtml.html">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -1391,11 +1391,11 @@
       <ResourceName>1000</ResourceName>
       <SubType>Designer</SubType>
     </VSCTCompile>
-    <Content Include="FileTemplates\NewItem\EmptyJs.js">
+    <Content Include="FileTemplates\EmptyJs.js">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="FileTemplates\NewItem\TextFile.txt">
+    <Content Include="FileTemplates\TextFile.txt">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -1431,7 +1431,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="FileTemplates\NewItem\NewItems.vsdir">
+    <Content Include="FileTemplates\NewItems.vsdir">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -1488,27 +1488,27 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\README.md" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\style.styl" />
-    <Content Include="FileTemplates\NewItem\EmptyJade.jade">
+    <Content Include="FileTemplates\EmptyJade.jade">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="FileTemplates\NewItem\EmptyJson.json">
+    <Content Include="FileTemplates\EmptyJson.json">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="FileTemplates\NewItem\EmptyStyl.styl">
+    <Content Include="FileTemplates\EmptyStyl.styl">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="FileTemplates\NewItem\EmptyXml.xml">
+    <Content Include="FileTemplates\EmptyXml.xml">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="FileTemplates\NewItem\EmptyCss.css">
+    <Content Include="FileTemplates\EmptyCss.css">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="FileTemplates\NewItem\EmptyLess.less">
+    <Content Include="FileTemplates\EmptyLess.less">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
