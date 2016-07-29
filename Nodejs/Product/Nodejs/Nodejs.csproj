@@ -911,15 +911,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <ZipItem Include="Templates\Files\TapeUnitTest\UnitTest.js" />
-    <ZipItem Include="Templates\Files\TapeUnitTest\UnitTest.vstemplate" />
-    <ZipItem Include="Templates\Files\TypeScriptTapeUnitTest\UnitTest.vstemplate" />
-    <ZipItem Include="Templates\Files\TypeScriptTapeUnitTest\UnitTest.ts" />
-    <Content Include="Templates\VS_Nodejs.item.vstman">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <VSIXSubPath>ItemTemplates</VSIXSubPath>
-    </Content>
     <None Include="Theme\contrast.vstheme">
       <SubType>Designer</SubType>
     </None>
@@ -1309,15 +1300,66 @@
     <ZipProject Include="ProjectTemplates\AzureNodejsWorker\package.json" />
     <ZipProject Include="ProjectTemplates\AzureNodejsWorker\README.md" />
     <ZipProject Include="ProjectTemplates\AzureNodejsWorker\setup_worker.cmd" />
-    <ZipItem Include="Templates\Files\MochaUnitTest\UnitTest.vstemplate">
-      <SubType>Designer</SubType>
-    </ZipItem>
-    <ZipItem Include="Templates\Files\MochaUnitTest\UnitTest.js" />
-    <ZipItem Include="Templates\Files\TypeScriptMochaUnitTest\UnitTest.ts" />
-    <ZipItem Include="Templates\Files\TypeScriptMochaUnitTest\UnitTest.vstemplate">
-      <SubType>Designer</SubType>
-    </ZipItem>
-    <ZipItem Include="Templates\Files\UnitTest\UnitTest.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ItemTemplates\MochaUnitTest\UnitTest.vstemplate">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="ItemTemplates\MochaUnitTest\UnitTest.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="ItemTemplates\TypeScriptMochaUnitTest\UnitTest.vstemplate">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="ItemTemplates\TypeScriptMochaUnitTest\UnitTest.ts">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="ItemTemplates\UnitTest\UnitTest.vstemplate">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="ItemTemplates\UnitTest\UnitTest.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="ItemTemplates\TypeScriptUnitTest\UnitTest.vstemplate">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="ItemTemplates\TypeScriptUnitTest\UnitTest.ts">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="ItemTemplates\DockerfileTemplate\Dockerfile.vstemplate">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="ItemTemplates\DockerfileTemplate\Dockerfile">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="ItemTemplates\TapeUnitTest\UnitTest.vstemplate">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="ItemTemplates\TapeUnitTest\UnitTest.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="ItemTemplates\TypeScriptTapeUnitTest\UnitTest.vstemplate">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="ItemTemplates\TypeScriptTapeUnitTest\UnitTest.ts">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="TestFrameworks\find_tests.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -1334,17 +1376,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <ZipItem Include="Templates\Files\UnitTest\UnitTest.vstemplate">
-      <SubType>Designer</SubType>
-    </ZipItem>
-    <ZipItem Include="Templates\Files\TypeScriptUnitTest\UnitTest.ts" />
-    <ZipItem Include="Templates\Files\TypeScriptUnitTest\UnitTest.vstemplate">
-      <SubType>Designer</SubType>
-    </ZipItem>
-    <ZipItem Include="Templates\Files\DockerfileTemplate\Dockerfile" />
-    <ZipItem Include="Templates\Files\DockerfileTemplate\Dockerfile.vstemplate">
-      <SubType>Designer</SubType>
-    </ZipItem>
     <None Include="Theme\Microsoft.NodejsTools.theme.v11.0.pkgdef" />
     <None Include="Theme\Microsoft.NodejsTools.theme.v12.0.pkgdef" />
     <None Include="Theme\Microsoft.NodejsTools.theme.v14.0.pkgdef" />
@@ -1572,18 +1603,18 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <_WebRoleZipItem Include="Templates\Files\CloudServiceWebRole\WebRole.vstemplate" />
-    <_WebRoleZipItem Include="Templates\Files\CloudServiceWebRole\roletemplatedata.xml" />
-    <_WebRoleZipItem Include="Templates\Files\CloudServiceTypeScriptWebRole\roletemplatedata.xml" />
-    <_WebRoleZipItem Include="Templates\Files\CloudServiceTypeScriptWebRole\TypeScriptWebRole.vstemplate" />
-    <_WebRoleZipItem Include="Templates\Files\CloudServiceExpressWebRole\ExpressWebRole.vstemplate" />
-    <_WebRoleZipItem Include="Templates\Files\CloudServiceExpressWebRole\roletemplatedata.xml" />
-    <_WebRoleZipItem Include="Templates\Files\CloudServiceTypeScriptExpressWebRole\roletemplatedata.xml" />
-    <_WebRoleZipItem Include="Templates\Files\CloudServiceTypeScriptExpressWebRole\TypeScriptExpressWebRole.vstemplate" />
-    <_WorkerRoleZipItem Include="Templates\Files\CloudServiceTypeScriptWorkerRole\roletemplatedata.xml" />
-    <_WorkerRoleZipItem Include="Templates\Files\CloudServiceTypeScriptWorkerRole\TypeScriptWorkerRole.vstemplate" />
-    <_WorkerRoleZipItem Include="Templates\Files\CloudServiceWorkerRole\roletemplatedata.xml" />
-    <_WorkerRoleZipItem Include="Templates\Files\CloudServiceWorkerRole\WorkerRole.vstemplate" />
+    <_WebRoleZipItem Include="ItemTemplates\Files\CloudServiceWebRole\WebRole.vstemplate" />
+    <_WebRoleZipItem Include="ItemTemplates\Files\CloudServiceWebRole\roletemplatedata.xml" />
+    <_WebRoleZipItem Include="ItemTemplates\Files\CloudServiceTypeScriptWebRole\roletemplatedata.xml" />
+    <_WebRoleZipItem Include="ItemTemplates\Files\CloudServiceTypeScriptWebRole\TypeScriptWebRole.vstemplate" />
+    <_WebRoleZipItem Include="ItemTemplates\Files\CloudServiceExpressWebRole\ExpressWebRole.vstemplate" />
+    <_WebRoleZipItem Include="ItemTemplates\Files\CloudServiceExpressWebRole\roletemplatedata.xml" />
+    <_WebRoleZipItem Include="ItemTemplates\Files\CloudServiceTypeScriptExpressWebRole\roletemplatedata.xml" />
+    <_WebRoleZipItem Include="ItemTemplates\Files\CloudServiceTypeScriptExpressWebRole\TypeScriptExpressWebRole.vstemplate" />
+    <_WorkerRoleZipItem Include="ItemTemplates\Files\CloudServiceTypeScriptWorkerRole\roletemplatedata.xml" />
+    <_WorkerRoleZipItem Include="ItemTemplates\Files\CloudServiceTypeScriptWorkerRole\TypeScriptWorkerRole.vstemplate" />
+    <_WorkerRoleZipItem Include="ItemTemplates\Files\CloudServiceWorkerRole\roletemplatedata.xml" />
+    <_WorkerRoleZipItem Include="ItemTemplates\Files\CloudServiceWorkerRole\WorkerRole.vstemplate" />
     <ZipItem Include="@(_WebRoleZipItem)">
       <OutputSubPath>NETFramework4\Web Role\Node.js</OutputSubPath>
       <Language>CloudService</Language>
@@ -1760,26 +1791,17 @@
       copy /y $(OutDir)..\WebRole\Microsoft.NodejsTools.WebRole.dll $(OutDir)Debugger\RemoteDebug\
     </PostBuildEvent>
   </PropertyGroup>
-  
   <!-- We build these assemblies into separate folders to avoid incremental cleaning issues,
 
        but then CreatePkgDef can't find them for the ProvideCodeBase attributes. So we copy
 
        into the NodejsTools output folder temporarily to generate the pkgdef file. -->
-
   <Target Name="_CopyForCreatePkgDef" BeforeTargets="GeneratePkgDef">
-
     <Copy SourceFiles="$(OutputPath)..\Analysis\Microsoft.NodejsTools.Analysis.dll;$(OutputPath)..\ProjectWizard\Microsoft.NodejsTools.ProjectWizard.dll;$(OutputPath)..\Npm\Microsoft.NodejsTools.Npm.dll;$(OutputPath)..\PressAnyKey\Microsoft.NodejsTools.PressAnyKey.exe;$(OutputPath)..\TestAdapter\Microsoft.NodejsTools.TestAdapter.dll;" DestinationFolder="$(OutputPath)">
-
       <Output TaskParameter="CopiedFiles" ItemName="_CopiedForCreatePkgdef" />
-
     </Copy>
-
   </Target>
-
   <Target Name="_DeleteAfterCreatePkgDef" AfterTargets="GeneratePkgDef">
-
     <Delete Files="@(_CopiedForCreatePkgdef)" />
-
   </Target>
 </Project>
