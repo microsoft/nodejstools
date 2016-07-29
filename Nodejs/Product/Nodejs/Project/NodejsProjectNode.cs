@@ -564,6 +564,37 @@ namespace Microsoft.NodejsTools.Project {
                 // scan for files which were loaded from cached analysis but no longer
                 // exist and remove them.
                 _analyzer.ReloadComplete();
+
+                Task.Factory.StartNew(LogProjectInformation);
+            }
+        }
+
+        /// <summary>
+        /// Log generic characteristics about the project, including number of files of each type in the project.
+        /// </summary>
+        private void LogProjectInformation() {
+            var fileTypeInfo = new Dictionary<string, int>();
+            foreach (var node in this.DiskNodes) {
+                if (node.Value?.ItemNode?.IsExcluded ?? true) {
+                    continue;
+                }
+
+                var file = node.Key;
+                var matchedExt = Commands.DiagnosticsCommand.InterestingTelemetryFileExtensions
+                    .Where(ext => file.EndsWith(ext, StringComparison.OrdinalIgnoreCase))
+                    .FirstOrDefault();
+
+                if (!string.IsNullOrEmpty(matchedExt)) {
+                    if (fileTypeInfo.ContainsKey(matchedExt)) {
+                        ++fileTypeInfo[matchedExt];
+                    } else {
+                        fileTypeInfo[matchedExt] = 1;
+                    }
+                }
+            }
+
+            foreach (var pair in fileTypeInfo) {
+                NodejsPackage.Instance.TelemetryLogger.LogFileTypeInfoForProject(ProjectGuid, pair.Key, pair.Value);
             }
         }
 
