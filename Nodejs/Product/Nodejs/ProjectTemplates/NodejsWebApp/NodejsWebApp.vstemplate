@@ -8,7 +8,7 @@
     <SortOrder>130</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
     <DefaultName>NodejsWebApp</DefaultName>
-      <ProvideDefaultName>true</ProvideDefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
     <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
     <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
     <PreviewImage>Preview.png</PreviewImage>
