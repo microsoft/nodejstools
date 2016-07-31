@@ -35,10 +35,8 @@ namespace Microsoft.NodejsTools.ProjectWizard {
 
         public void RunStarted(object automationObject, Dictionary<string, string> replacementsDictionary, WizardRunKind runKind, object[] customParams) {
             try {
-                /* Commenting these lines out allows the Wizard to create folders for the FromExisting
-                 * Code project, allowing subsequent projects of the type to generate appropriate names.
-                 * 
-                 * - Austin Hull */
+                // Commenting these lines out allows the Wizard to create folders for the FromExisting
+                // Code project, allowing subsequent projects of the type to generate appropriate names.
 
                 //Directory.Delete(replacementsDictionary["$destinationdirectory$"]);
                 //Directory.Delete(replacementsDictionary["$solutiondirectory$"]);
