@@ -1,0 +1,17 @@
+{
+  "name": "$npmsafeprojectname$",
+  "version": "0.0.0",
+  "description": "$projectname$",
+  "main": "lib/index",
+  "author": {
+    "name": "$username$",
+    "email": ""
+  },
+  "typings": "lib/index",
+  "files": [
+    "lib/"
+  ],
+  "devDependencies": {
+    "typescript": "^1.8.10"
+  }
+}
