@@ -41,17 +41,17 @@
         <File Include="NodeJS_200x.png" />
 
         <!-- Templates -->
-        <File Include="FileTemplates\NewItems.vsdir;
-                       FileTemplates\TextFile.txt;
-                       FileTemplates\EmptyJs.js;
-                       FileTemplates\EmptyXml.xml;
-                       FileTemplates\EmptyTs.ts;
-                       FileTemplates\EmptyStyl.styl;
-                       FileTemplates\EmptyLess.less;
-                       FileTemplates\EmptyJson.json;
-                       FileTemplates\EmptyJade.jade;
-                       FileTemplates\EmptyCss.css;
-                       FileTemplates\EmptyHtml.html">
+        <File Include="FileTemplates\NewItem\NewItems.vsdir;
+                       FileTemplates\NewItem\TextFile.txt;
+                       FileTemplates\NewItem\EmptyJs.js;
+                       FileTemplates\NewItem\EmptyXml.xml;
+                       FileTemplates\NewItem\EmptyTs.ts;
+                       FileTemplates\NewItem\EmptyStyl.styl;
+                       FileTemplates\NewItem\EmptyLess.less;
+                       FileTemplates\NewItem\EmptyJson.json;
+                       FileTemplates\NewItem\EmptyJade.jade;
+                       FileTemplates\NewItem\EmptyCss.css;
+                       FileTemplates\NewItem\EmptyHtml.html">
 
             <InstallDirectory>FileTemplatesNewItem</InstallDirectory>
         </File>
