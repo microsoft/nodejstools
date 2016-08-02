@@ -56,33 +56,17 @@
             <InstallDirectory>FileTemplatesNewItem</InstallDirectory>
         </File>
 
-        <ItemTemplate Include="ItemTemplates\UnitTest\*"
-          <TemplateName>UnitTest</TemplateName>
-        </ItemTemplate>
-        
-        <ItemTemplate Include="ItemTemplates\MochaUnitTest\*"
-          <TemplateName>MochaUnitTest</TemplateName>
-        </ItemTemplate>
-        
-        <ItemTemplate Include="ItemTemplates\TapeUnitTest\*"
-          <TemplateName>TapeUnitTest</TemplateName>
-        </ItemTemplate>
-        
-        <ItemTemplate Include="ItemTemplates\TypeScriptMochaUnitTest\*"
-          <TemplateName>TypeScriptMochaUnitTest</TemplateName>
-        </ItemTemplate>
-        
-        <ItemTemplate Include="ItemTemplates\TypeScriptTapeUnitTest\*"
-          <TemplateName>TypeScriptTapeUnitTest</TemplateName>
-        </ItemTemplate>
-        
-        <ItemTemplate Include="ItemTemplates\TypeScriptUnitTest\*"
-          <TemplateName>TypeScriptUnitTest</TemplateName>
-        </ItemTemplate>
-        
-        <ItemTemplate Include="ItemTemplates\DockerFileTemplate\*"
-          <TemplateName>DockerFileTemplate</TemplateName>
-        </ItemTemplate>
+        <ItemTemplate Include="ItemTemplates\JavaScript\UnitTest.zip;
+                               ItemTemplates\JavaScript\TapeUnitTest.zip;
+                               ItemTemplates\JavaScript\MochaUnitTest.zip;
+                               ItemTemplates\JavaScript\TypeScriptUnitTest.zip;
+                               ItemTemplates\JavaScript\TypeScriptTapeUnitTest.zip;
+                               ItemTemplates\JavaScript\TypeScriptMochaUnitTest.zip;
+                               ItemTemplates\JavaScript\DockerfileTemplate.zip"/>
+                               
+        <File Include="Templates\VS_Nodejs.item.vstman">
+            <InstallDirectory>AllItemTemplates</InstallDirectory>
+        </File>
 
         <ProjectTemplate Include="ProjectTemplates\JavaScript\Node.js\1033\AzureExpress4App.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\AzureStarterExpressApp.zip;
