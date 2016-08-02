@@ -43,6 +43,7 @@ Write-Output "Setting up NTVS development environment for $([String]::Join(", ",
 Write-Output "============================================================"
 $packagedir = if ($env:BUILD_BINARIESDIRECTORY) { "$env:BUILD_BINARIESDIRECTORY" } else { "$rootdir\packages" }
 
+# Install microbuild packages
 if ($microbuild) {
     Write-Output ""
     Write-Output "Installing Nuget MicroBuild packages"
@@ -50,7 +51,6 @@ if ($microbuild) {
     & "$rootdir\Nodejs\.nuget\nuget.exe" restore "$rootdir\Nodejs\Setup\swix\packages.config" -PackagesDirectory "$packagedir"
     exit
 }
-
 
 # Disable strong name verification for the Node.js Tools binaries
 $skipVerificationKey = If ( $ENV:PROCESSOR_ARCHITECTURE -eq "AMD64") {"EnableSkipVerification.reg" } Else {"EnableSkipVerification86.reg" }

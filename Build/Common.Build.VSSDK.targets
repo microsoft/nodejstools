@@ -200,7 +200,7 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="_RezipSingleVSIX_Dev12" DependsOnTargets="_GetRezipVSIXFiles" BeforeTargets="Build" Inputs="@(VSIX)" Outputs="%(VSIX.Container)" Condition="'$(VSTarget)' == '15.0'">
+  <Target Name="_RezipSingleVSIX_Dev15" DependsOnTargets="_GetRezipVSIXFiles" BeforeTargets="Build" Inputs="@(VSIX)" Outputs="%(VSIX.Container)" Condition="'$(VSTarget)' == '15.0'">
     <Message Text="Rezipping %(VSIX.SourceDir)" Importance="high" />
     
     <ItemGroup>
@@ -227,39 +227,6 @@
       <_PathSuffix Condition="'$(SignedBinariesPath)' == ''">UnsignedMsi\</_PathSuffix>
     </PropertyGroup>
     
-    <MakeDir Directories="$(CopyOutputsToPath)$(_PathSuffix)"
-             Condition="'$(CopyOutputsToPath)' != ''" />
-    <Copy SourceFiles="$(_Container)"
-          DestinationFolder="$(CopyOutputsToPath)$(_PathSuffix)"
-          Condition="'$(CopyOutputsToPath)' != ''" />
-  </Target>
-
-  <Target Name="_RezipSingleVSIX_Dev10_11" DependsOnTargets="_GetRezipVSIXFiles" BeforeTargets="Build" Inputs="@(VSIX)" Outputs="%(VSIX.Container)" Condition="'$(VSTarget)' == '10.0' or '$(VSTarget)' == '11.0'">
-    <Message Text="Rezipping %(VSIX.SourceDir)" Importance="high" />
-    
-    <ItemGroup>
-      <_VSIXSourceItems Include="%(VSIX.SourceDir)**\*" />
-      <_VSIXSourceItems>
-        <TargetPath>%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
-      </_VSIXSourceItems>
-    </ItemGroup>
-
-    <PropertyGroup>
-      <_Container>%(VSIX.Container)</_Container>
-    </PropertyGroup>
-
-    <CreateZipPackage Files="@(_VSIXSourceItems)"
-                      ZipPackage="$(_Container)">
-      <Output TaskParameter="ZipPackage" ItemName="FileWrites" />
-    </CreateZipPackage>
-
-    <!-- Copy rezipped VSIX to output if necessary -->
-    <PropertyGroup Condition="'$(CopyOutputsToPath)' != ''">
-      <CopyOutputsToPath Condition="!HasTrailingSlash($(CopyOutputsToPath))">$(CopyOutputsToPath)\</CopyOutputsToPath>
-      <_PathSuffix Condition="'$(SignedBinariesPath)' != ''">SignedBinariesUnsignedMsi\</_PathSuffix>
-      <_PathSuffix Condition="'$(SignedBinariesPath)' == ''">UnsignedMsi\</_PathSuffix>
-    </PropertyGroup>
-
     <MakeDir Directories="$(CopyOutputsToPath)$(_PathSuffix)"
              Condition="'$(CopyOutputsToPath)' != ''" />
     <Copy SourceFiles="$(_Container)"

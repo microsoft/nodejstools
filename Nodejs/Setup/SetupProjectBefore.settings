@@ -8,4 +8,5 @@
 
   <Target Name="Build"></Target>
   <Target Name="Clean"></Target>
+  <Target Name="GetNativeManifest"/>
 </Project>
