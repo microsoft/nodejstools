@@ -22,7 +22,7 @@
         "Microsoft.VisualStudio.NodejsTools.InteractiveWindow": {
           "version": "1.2"
         },
-        "Microsoft.VisualStudio.NodejsTools.Nodejs": {
+        "Microsoft.VisualStudio.NodejsTools.NodejsTools": {
           "version": "1.2"
         },
         "Microsoft.VisualStudio.NodejsTools.Profiling": {
