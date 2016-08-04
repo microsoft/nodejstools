@@ -23,8 +23,8 @@ namespace Microsoft.NodejsTools {
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", State = enum_EXCEPTION_STATE.EXCEPTION_NONE)]
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", State = enum_EXCEPTION_STATE.EXCEPTION_NONE)]
 #if DEV14_OR_LATER
-    // VS2015's exception manager uses a different nesting structure, so it's necessary to register Error() explicitly.
-    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error()", State = enum_EXCEPTION_STATE.EXCEPTION_NONE)]
+    // VS2015's exception manager uses a different nesting structure, so it's necessary to register Error explicitly.
+    [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error", State = enum_EXCEPTION_STATE.EXCEPTION_NONE)]
 #endif
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EACCES)", State = enum_EXCEPTION_STATE.EXCEPTION_NONE)]
     [ProvideDebugException(AD7Engine.DebugEngineId, "Node.js Exceptions", "Error", "Error(EADDRINUSE)", State = enum_EXCEPTION_STATE.EXCEPTION_NONE)]
