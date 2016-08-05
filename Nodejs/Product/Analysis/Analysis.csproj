@@ -169,7 +169,7 @@
     <Compile Include="Helpers.cs" />
     <Compile Include="JavaScript\activationobject.cs" />
     <Compile Include="JavaScript\arrayliteral.cs" />
-    <Compile Include="JavaScript\CacheDict.cs" />
+    <Compile Include="JavaScript\StringInternPool.cs" />
     <Compile Include="JavaScript\EncodedSpan.cs" />
     <Compile Include="JavaScript\Node.cs" />
     <Compile Include="JavaScript\binaryop.cs" />

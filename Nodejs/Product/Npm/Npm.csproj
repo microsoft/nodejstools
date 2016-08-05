@@ -92,7 +92,6 @@
     <Compile Include="IDependency.cs" />
     <Compile Include="IDependencyUrl.cs" />
     <Compile Include="IFiles.cs" />
-    <Compile Include="IGlobalPackages.cs" />
     <Compile Include="IKeywords.cs" />
     <Compile Include="ILicense.cs" />
     <Compile Include="ILicenses.cs" />
@@ -147,7 +146,6 @@
     <Compile Include="SPI\Dependencies.cs" />
     <Compile Include="SPI\Dependency.cs" />
     <Compile Include="SPI\DependencyUrl.cs" />
-    <Compile Include="SPI\GlobalPackages.cs" />
     <Compile Include="SPI\Keywords.cs" />
     <Compile Include="SPI\Man.cs" />
     <Compile Include="SPI\NodeModules.cs" />
@@ -155,7 +153,6 @@
     <Compile Include="SPI\NpmCommand.cs" />
     <Compile Include="SPI\NpmController.cs" />
     <Compile Include="SPI\NpmInstallCommand.cs" />
-    <Compile Include="SPI\NpmBinCommand.cs" />
     <Compile Include="SPI\NpmUninstallCommand.cs" />
     <Compile Include="SPI\NpmUpdateCommand.cs" />
     <Compile Include="SPI\Package.cs" />

@@ -246,17 +246,8 @@
   <data name="PackageTypeLocalSubpackage" xml:space="preserve">
     <value>Local sub-package</value>
   </data>
-  <data name="PackageTypeGlobal" xml:space="preserve">
-    <value>Global</value>
-  </data>
-  <data name="PackageTypeGlobalSubpackage" xml:space="preserve">
-    <value>Global sub-package</value>
-  </data>
   <data name="LinkStatusLocallyInstalled" xml:space="preserve">
     <value>Installed locally</value>
-  </data>
-  <data name="LinkStatusLinkedFromGlobal" xml:space="preserve">
-    <value>Installed locally or linked from global packages</value>
   </data>
   <data name="LinkStatusNotLinkedToProject" xml:space="preserve">
     <value>Not linked to project</value>
@@ -300,29 +291,17 @@
   <data name="NpmNodePathDescription" xml:space="preserve">
     <value>Base path in which npm packages are installed.</value>
   </data>
-  <data name="PackageInstallationGlobal" xml:space="preserve">
-    <value>Global</value>
-  </data>
   <data name="PackageInstallationLocal" xml:space="preserve">
     <value>Local</value>
   </data>
   <data name="PropertiesClassLocalPackage" xml:space="preserve">
     <value>Local Package Properties</value>
   </data>
-  <data name="PropertiesClassGlobalPackage" xml:space="preserve">
-    <value>Global Package Properties</value>
-  </data>
   <data name="PropertiesClassLocalSubPackage" xml:space="preserve">
     <value>Local Sub-Package Properties</value>
   </data>
-  <data name="PropertiesClassGlobalSubPackage" xml:space="preserve">
-    <value>Global Sub-Package Properties</value>
-  </data>
   <data name="PropertiesClassNpm" xml:space="preserve">
     <value>npm Packages Properties</value>
-  </data>
-  <data name="PropertiesClassGlobal" xml:space="preserve">
-    <value>Global npm Packages Properties</value>
   </data>
   <data name="ScriptArgumentsToolTip" xml:space="preserve">
     <value>Specifies the arguments passed to the script on launch.</value>
@@ -405,12 +384,6 @@
   </data>
   <data name="PackageInstalledLocallyOldVersion" xml:space="preserve">
     <value>Old version {0} installed locally</value>
-  </data>
-  <data name="PackageInstalledGlobally" xml:space="preserve">
-    <value>Installed globally</value>
-  </data>
-  <data name="PackageInstalledGloballyOldVersion" xml:space="preserve">
-    <value>Old version {0} installed globally</value>
   </data>
   <data name="NpmCancelledWithErrors" xml:space="preserve">
     <value>{0} cancelled with errors - see Output window for details</value>
@@ -556,6 +529,12 @@ We recommend installing the latest version of Microsoft Azure Tools for Visual S
   <data name="AzureToolsUpgradeRecommended" xml:space="preserve">
     <value>Your version of Microsoft Azure Tools is not supported by Node.js Tools for Visual Studio.</value>
   </data>
+  <data name="CacheDirectoryClearFailedTitle" xml:space="preserve">
+    <value>Could Not Clear Node.js Cache Directory</value>
+  </data>
+  <data name="CacheDirectoryClearFailedCaption" xml:space="preserve">
+    <value>Could not clear Node.js cache directory. Try manually deleting the directory: {0}</value>
+  </data>
   <data name="ContinueWithoutAzureToolsUpgrade" xml:space="preserve">
     <value>&amp;Continue
 Some manual steps will be required to configure your project.</value>
@@ -609,11 +588,14 @@ You will need to restart Visual Studio after installation.</value>
   <data name="RemoteDebugProxyFolderDoesNotExist" xml:space="preserve">
     <value>Could not find RemoteDebugProxyFolder</value>
   </data>
-  <data name="TypingsToolInstallCompleted" xml:space="preserve">
+  <data name="TypingsToolTypingsInstallCompleted" xml:space="preserve">
     <value>Successfully installed typing files for Intellisense.</value>
   </data>
   <data name="TypingsToolNotInstalledError" xml:space="preserve">
-    <value>Could not find Typings package manager tool used for Intellisense.</value>
+    <value>Could not find Typings package manager tool used for Intellisense</value>
+  </data>
+  <data name="TypingsToolTypingsInstallErrorOccurred" xml:space="preserve">
+    <value>An error occurred installing typings used for IntelliSense.</value>
   </data>
   <data name="TypingsInfoBarSpan1" xml:space="preserve">
     <value>Node.js IntelliSense added a </value>
@@ -638,5 +620,11 @@ You will need to restart Visual Studio after installation.</value>
   </data>
   <data name="StatusTypingsLoading" xml:space="preserve">
     <value>Loading Node.js IntelliSense typings for npm packages...</value>
+  </data>
+  <data name="TypingsToolInstallFailed" xml:space="preserve">
+    <value>Failed to install Typings tool used for IntelliSense. Please make sure Node.js is properly installed</value>
+  </data>
+  <data name="TypingsToolCouldNotStart" xml:space="preserve">
+    <value>Could not start Typings tool used for IntelliSense</value>
   </data>
 </root>

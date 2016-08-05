@@ -241,6 +241,8 @@ namespace Microsoft.NodejsTools {
             MakeDebuggerContextAvailable();
 
             IntellisenseOptionsPage.AnalysisLogMaximumChanged += IntellisenseOptionsPage_AnalysisLogMaximumChanged;
+            IntellisenseOptionsPage.AnalysisLevelChanged += IntellisenseOptionsPageAnalysisLevelChanged;
+            IntellisenseOptionsPage.SaveToDiskChanged += IntellisenseOptionsPageSaveToDiskChanged;
 
             InitializeLogging();
 
@@ -582,44 +584,37 @@ namespace Microsoft.NodejsTools {
         }
 
         internal void CheckSurveyNews(bool forceCheckAndWarnIfNoneAvailable) {
-            bool shouldQueryServer = false;
-            if (forceCheckAndWarnIfNoneAvailable) {
-                shouldQueryServer = true;
-            } else {
-                shouldQueryServer = true;
-                var options = GeneralOptionsPage;
-                // Ensure that we don't prompt the user on their very first project creation.
-                // Delay by 3 days by pretending we checked 4 days ago (the default of check
-                // once a week ensures we'll check again in 3 days).
-                if (options.SurveyNewsLastCheck == DateTime.MinValue) {
-                    options.SurveyNewsLastCheck = DateTime.Now - TimeSpan.FromDays(4);
-                    options.SaveSettingsToStorage();
-                }
-
-                var elapsedTime = DateTime.Now - options.SurveyNewsLastCheck;
-                switch (options.SurveyNewsCheck) {
-                    case SurveyNewsPolicy.Disabled:
-                        break;
-                    case SurveyNewsPolicy.CheckOnceDay:
-                        shouldQueryServer = elapsedTime.TotalDays >= 1;
-                        break;
-                    case SurveyNewsPolicy.CheckOnceWeek:
-                        shouldQueryServer = elapsedTime.TotalDays >= 7;
-                        break;
-                    case SurveyNewsPolicy.CheckOnceMonth:
-                        shouldQueryServer = elapsedTime.TotalDays >= 30;
-                        break;
-                    default:
-                        Debug.Assert(false, String.Format("Unexpected SurveyNewsPolicy: {0}.", options.SurveyNewsCheck));
-                        break;
-                }
-            }
-
-            if (shouldQueryServer) {
+            if (forceCheckAndWarnIfNoneAvailable || ShouldQuerySurveryNewsServer()) {
                 var options = GeneralOptionsPage;
                 options.SurveyNewsLastCheck = DateTime.Now;
                 options.SaveSettingsToStorage();
                 CheckSurveyNewsThread(new Uri(options.SurveyNewsFeedUrl), forceCheckAndWarnIfNoneAvailable);
+            }
+        }
+
+        private bool ShouldQuerySurveryNewsServer() {
+            var options = GeneralOptionsPage;
+            // Ensure that we don't prompt the user on their very first project creation.
+            // Delay by 3 days by pretending we checked 4 days ago (the default of check
+            // once a week ensures we'll check again in 3 days).
+            if (options.SurveyNewsLastCheck == DateTime.MinValue) {
+                options.SurveyNewsLastCheck = DateTime.Now - TimeSpan.FromDays(4);
+                options.SaveSettingsToStorage();
+            }
+
+            var elapsedTime = DateTime.Now - options.SurveyNewsLastCheck;
+            switch (options.SurveyNewsCheck) {
+                case SurveyNewsPolicy.Disabled:
+                    return false;
+                case SurveyNewsPolicy.CheckOnceDay:
+                    return elapsedTime.TotalDays >= 1;
+                case SurveyNewsPolicy.CheckOnceWeek:
+                    return elapsedTime.TotalDays >= 7;
+                case SurveyNewsPolicy.CheckOnceMonth:
+                    return elapsedTime.TotalDays >= 30;
+                default:
+                    Debug.Assert(false, String.Format("Unexpected SurveyNewsPolicy: {0}.", options.SurveyNewsCheck));
+                    return false;
             }
         }
 
@@ -640,25 +635,28 @@ namespace Microsoft.NodejsTools {
                     _analyzer = CreateLooseVsProjectAnalyzer();
                     LogLooseFileAnalysisLevel();
                     _analyzer.MaxLogLength = IntellisenseOptionsPage.AnalysisLogMax;
-                    IntellisenseOptionsPage.AnalysisLevelChanged += IntellisenseOptionsPageAnalysisLevelChanged;
-                    IntellisenseOptionsPage.SaveToDiskChanged += IntellisenseOptionsPageSaveToDiskChanged;
                 }
                 return _analyzer;
             }
         }
 
         private void IntellisenseOptionsPageSaveToDiskChanged(object sender, EventArgs e) {
-            _analyzer.SaveToDisk = IntellisenseOptionsPage.SaveToDisk;
+            if (_analyzer != null) {
+                _analyzer.SaveToDisk = IntellisenseOptionsPage.SaveToDisk;
+            }
         }
 
         private void IntellisenseOptionsPageAnalysisLevelChanged(object sender, EventArgs e) {
-            var analyzer = CreateLooseVsProjectAnalyzer();
-            analyzer.SwitchAnalyzers(_analyzer);
-            if (_analyzer.RemoveUser()) {
-                _analyzer.Dispose();
+            if (_analyzer != null) {
+                var analyzer = CreateLooseVsProjectAnalyzer();
+                analyzer.SwitchAnalyzers(_analyzer);
+                if (_analyzer.RemoveUser()) {
+                    _analyzer.Dispose();
+                }
+                _analyzer = analyzer;
+                LogLooseFileAnalysisLevel();
             }
-            _analyzer = analyzer;
-            LogLooseFileAnalysisLevel();
+            TelemetryLogger.LogAnalysisLevelChanged(IntellisenseOptionsPage.AnalysisLevel);
         }
 
         private VsProjectAnalyzer CreateLooseVsProjectAnalyzer() {
@@ -678,8 +676,7 @@ namespace Microsoft.NodejsTools {
 
         private void LogLooseFileAnalysisLevel() {
             var analyzer = _analyzer;
-            if(analyzer != null)
-            {
+            if (analyzer != null) {
                 var val = analyzer.AnalysisLevel;
                 _logger.LogEvent(NodejsToolsLogEvent.AnalysisLevel, (int)val);
             }

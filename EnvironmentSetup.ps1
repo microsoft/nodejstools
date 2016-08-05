@@ -21,11 +21,13 @@
 
 [CmdletBinding()]
 param(
-    [string[]] $vstarget
+    [string[]] $vstarget,
+    [switch] $microbuild,
+    [switch] $skipTestHost
 )
 
-If (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(`
-    [Security.Principal.WindowsBuiltInRole] "Administrator")) {
+If ((-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(`
+    [Security.Principal.WindowsBuiltInRole] "Administrator")) -and (-not $microbuild)) {
     Throw "You do not have Administrator rights to run this script. Please re-run as an Administrator."
 }
 
@@ -33,11 +35,22 @@ $rootDir = $PSScriptRoot
 Write-Output "Repository root: $($rootDir)"
 Write-Output ""
 
+
 Import-Module -Force $rootDir\Build\VisualStudioHelpers.psm1
 $target_versions = get_target_vs_versions $vstarget
 
 Write-Output "Setting up NTVS development environment for $([String]::Join(", ", ($target_versions | % { $_.name })))"
 Write-Output "============================================================"
+$packagedir = if ($env:BUILD_BINARIESDIRECTORY) { "$env:BUILD_BINARIESDIRECTORY" } else { "$rootdir\packages" }
+
+# Install microbuild packages
+if ($microbuild) {
+    Write-Output ""
+    Write-Output "Installing Nuget MicroBuild packages"
+
+    & "$rootdir\Nodejs\.nuget\nuget.exe" restore "$rootdir\Nodejs\Setup\swix\packages.config" -PackagesDirectory "$packagedir"
+    exit
+}
 
 # Disable strong name verification for the Node.js Tools binaries
 $skipVerificationKey = If ( $ENV:PROCESSOR_ARCHITECTURE -eq "AMD64") {"EnableSkipVerification.reg" } Else {"EnableSkipVerification86.reg" }
@@ -51,7 +64,7 @@ Write-Output "Copying required files"
 foreach ($version in $target_versions) {    
     # Copy Microsoft.NodejsTools.targets file to relevant location
     $from = "$rootDir\Nodejs\Product\Nodejs\Microsoft.NodejsTools.targets"
-    $to = "${env:ProgramFiles(x86)}\MSBuild\Microsoft\VisualStudio\$($version.number)\Node.js Tools\Microsoft.NodejsTools.targets"
+    $to = "${env:ProgramFiles(x86)}\MSBuild\Microsoft\VisualStudio\v$($version.number)\Node.js Tools\Microsoft.NodejsTools.targets"
     
     Write-Output "    $($from) -> $($to)"
     New-Item -Force $to > $null
@@ -59,22 +72,24 @@ foreach ($version in $target_versions) {
 }
 
 # Install VSTestHost
-Write-Output ""
-Write-Output "Installing VSTestHost automation"
-$vsTestHostLocation = "$rootDir\Common\Tests\Prerequisites\VSTestHost.msi"
-Write-Output "    $($vsTestHostLocation)"
-
-# Check installed VSTestHost versions
 $shouldInstallVSTestHost = $false
-$gacDir = "${env:windir}\Microsoft.NET\assembly\GAC_MSIL"
-foreach ($version in $target_versions) {
-    $currentVSTestHost = ls $gacDir -Recurse | ?{$_.Name -eq "Microsoft.VisualStudioTools.VSTestHost.$($version.number).dll"}
-    
-    $targetVSTestHostVersion = "$($version.number).1.0"
-    if ((-not $currentVSTestHost) -or ($currentVSTestHost.VersionInfo.FileVersion -ne $targetVSTestHostVersion)) {
-        Write-Warning "VSTestHost already installed. Overriding VSTestHost version $($currentVSTestHost.VersionInfo.FileVersion) with target VSTestHostVersion $targetVSTestHostVersion"
-        $shouldInstallVSTestHost = $true
-        break
+if (-not $skipTestHost) {
+    Write-Output ""
+    Write-Output "Installing VSTestHost automation"
+    $vsTestHostLocation = "$rootDir\Common\Tests\Prerequisites\VSTestHost.msi"
+    Write-Output "    $($vsTestHostLocation)"
+
+    # Check installed VSTestHost versions
+    $gacDir = "${env:windir}\Microsoft.NET\assembly\GAC_MSIL"
+    foreach ($version in $target_versions) {
+        $currentVSTestHost = ls $gacDir -Recurse | ?{$_.Name -eq "Microsoft.VisualStudioTools.VSTestHost.$($version.number).dll"}
+        
+        $targetVSTestHostVersion = "$($version.number).1.0"
+        if ((-not $currentVSTestHost) -or ($currentVSTestHost.VersionInfo.FileVersion -ne $targetVSTestHostVersion)) {
+            Write-Warning "VSTestHost already installed. Overriding VSTestHost version $($currentVSTestHost.VersionInfo.FileVersion) with target VSTestHostVersion $targetVSTestHostVersion"
+            $shouldInstallVSTestHost = $true
+            break
+        }
     }
 }
 

@@ -31,6 +31,8 @@ namespace Microsoft.NodejsTools.Project {
         internal const string CatalogLoadingNoNpm = "CatalogLoadingNoNpm";
         internal const string CategoryStatus = "CategoryStatus";
         internal const string CategoryVersion = "CategoryVersion";
+        internal const string CacheDirectoryClearFailedTitle = "CacheDirectoryClearFailedTitle";
+        internal const string CacheDirectoryClearFailedCaption = "CacheDirectoryClearFailedCaption";
         internal const string ContinueWithoutAzureToolsUpgrade = "ContinueWithoutAzureToolsUpgrade";
         internal const string DebuggerConnectionClosed = "DebuggerConnectionClosed";
         internal const string DebuggerModuleUpdateFailed = "DebuggerModuleUpdateFailed";
@@ -49,7 +51,6 @@ namespace Microsoft.NodejsTools.Project {
         internal const string InsertSnippet = "InsertSnippet";
         internal const string InvalidPortNumber = "InvalidPortNumber";
         internal const string LaunchUrlToolTip = "LaunchUrlToolTip";
-        internal const string LinkStatusLinkedFromGlobal = "LinkStatusLinkedFromGlobal";
         internal const string LinkStatusLinkedToProject = "LinkStatusLinkedToProject";
         internal const string LinkStatusLocallyInstalled = "LinkStatusLocallyInstalled";
         internal const string LinkStatusNotApplicableSubPackages = "LinkStatusNotApplicableSubPackages";
@@ -73,6 +74,7 @@ namespace Microsoft.NodejsTools.Project {
         internal const string NewVersionPackageCatalogNotRetrieved = "NewVersionPackageCatalogNotRetrieved";
         internal const string NewVersionUnknown = "NewVersionUnknown";
         internal const string NewVersionYes = "NewVersionYes";
+        internal const string NoKeywordsInPackage = "NoKeywordsInPackage";
         internal const string NodeExeArguments = "NodeExeArguments";
         internal const string NodeExeArgumentsDescription = "NodeExeArgumentsDescription";
         internal const string NodeExeArgumentsToolTip = "NodeExeArgumentsToolTip";
@@ -87,7 +89,6 @@ namespace Microsoft.NodejsTools.Project {
         internal const string NodejsPort = "NodejsPort";
         internal const string NodejsPortDescription = "NodejsPortDescription";
         internal const string NodejsPortToolTip = "NodejsPortToolTip";
-        internal const string NoKeywordsInPackage = "NoKeywordsInPackage";
         internal const string NpmCancelled = "NpmCancelled";
         internal const string NpmCancelledWithErrors = "NpmCancelledWithErrors";
         internal const string NpmCompletedWithErrors = "NpmCompletedWithErrors";
@@ -147,20 +148,12 @@ namespace Microsoft.NodejsTools.Project {
         internal const string PackageCatalogRefreshFailed = "PackageCatalogRefreshFailed";
         internal const string PackageCatalogRefreshing = "PackageCatalogRefreshing";
         internal const string PackageCount = "PackageCount";
-        internal const string PackageInstallationGlobal = "PackageInstallationGlobal";
         internal const string PackageInstallationLocal = "PackageInstallationLocal";
-        internal const string PackageInstalledGlobally = "PackageInstalledGlobally";
-        internal const string PackageInstalledGloballyOldVersion = "PackageInstalledGloballyOldVersion";
         internal const string PackageInstalledLocally = "PackageInstalledLocally";
         internal const string PackageInstalledLocallyOldVersion = "PackageInstalledLocallyOldVersion";
         internal const string PackageMatchCount = "PackageMatchCount";
-        internal const string PackageTypeGlobal = "PackageTypeGlobal";
-        internal const string PackageTypeGlobalSubpackage = "PackageTypeGlobalSubpackage";
         internal const string PackageTypeLocal = "PackageTypeLocal";
         internal const string PackageTypeLocalSubpackage = "PackageTypeLocalSubpackage";
-        internal const string PropertiesClassGlobal = "PropertiesClassGlobal";
-        internal const string PropertiesClassGlobalPackage = "PropertiesClassGlobalPackage";
-        internal const string PropertiesClassGlobalSubPackage = "PropertiesClassGlobalSubPackage";
         internal const string PropertiesClassLocalPackage = "PropertiesClassLocalPackage";
         internal const string PropertiesClassLocalSubPackage = "PropertiesClassLocalSubPackage";
         internal const string PropertiesClassNpm = "PropertiesClassNpm";
@@ -173,8 +166,8 @@ namespace Microsoft.NodejsTools.Project {
         internal const string ScriptFileToolTip = "ScriptFileTooltip";
         internal const string Seconds = "Seconds";
         internal const string StartBrowserToolTip = "StartBrowserToolTip";
-        internal const string StatusAnalysisLoaded = "StatusAnalysisLoaded";
         internal const string StatusAnalysisLoadFailed = "StatusAnalysisLoadFailed";
+        internal const string StatusAnalysisLoaded = "StatusAnalysisLoaded";
         internal const string StatusAnalysisLoading = "StatusAnalysisLoading";
         internal const string StatusAnalysisSaved = "StatusAnalysisSaved";
         internal const string StatusAnalysisSaving = "StatusAnalysisSaving";
@@ -187,14 +180,15 @@ namespace Microsoft.NodejsTools.Project {
         internal const string TypingsInfoBarSpan1 = "TypingsInfoBarSpan1";
         internal const string TypingsInfoBarSpan2 = "TypingsInfoBarSpan2";
         internal const string TypingsInfoBarSpan3 = "TypingsInfoBarSpan3";
-        internal const string TypingsToolInstallCompleted = "TypingsToolInstallCompleted";
-        internal const string TypingsToolInstallErrorOccurred = "TypingsToolInstallErrorOccurred";
-        internal const string TypingsToolNotInstalledError = "TypingsToolNotInstalledError";
         internal const string TypingsOpenOptionsText = "TypingsOpenOptionsText";
+        internal const string TypingsToolCouldNotStart = "TypingsToolCouldNotStart";
+        internal const string TypingsToolInstallFailed = "TypingsToolInstallFailed";
+        internal const string TypingsToolNotInstalledError = "TypingsToolNotInstalledError";
+        internal const string TypingsToolTypingsInstallCompleted = "TypingsToolTypingsInstallCompleted";
+        internal const string TypingsToolTypingsInstallErrorOccurred = "TypingsToolTypingsInstallErrorOccurred";
         internal const string UpgradedEnvironmentVariables = "UpgradedEnvironmentVariables";
         internal const string WorkingDirInvalidOrMissing = "WorkingDirInvalidOrMissing";
         internal const string WorkingDirToolTip = "WorkingDirToolTip";
-
         private static readonly Lazy<ResourceManager> _manager = new Lazy<ResourceManager>(
             () => new System.Resources.ResourceManager("Microsoft.NodejsTools.Resources", typeof(SR).Assembly),
             LazyThreadSafetyMode.ExecutionAndPublication

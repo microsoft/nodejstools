@@ -15,16 +15,11 @@
 //*********************************************************//
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudioTools.Project;
-using Microsoft.Win32;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal abstract class NpmCommand : AbstractNpmLogSource {
@@ -78,12 +73,14 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         public virtual async Task<bool> ExecuteAsync() {
             OnCommandStarted();
+            var redirector = new NpmCommandRedirector(this);
+
             try {
                 GetPathToNpm();
             } catch (NpmNotFoundException) {
+                redirector.WriteErrorLine(Resources.CouldNotFindNpm);
                 return false;
             }
-            var redirector = new NpmCommandRedirector(this);
             redirector.WriteLine(
                 string.Format("===={0}====\r\n\r\n",
                 string.Format(Resources.ExecutingCommand, Arguments)));

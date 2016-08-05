@@ -22,13 +22,11 @@
         <Property Id="ARPPRODUCTICON">AddRemoveProgramsIcon</Property>
 
         <!-- Conditions for install -->
-        <PropertyRef Id="VS_IS_2015_PRE_UPDATE_2"/> 
-        <Condition Message="!(loc.VSRequires2015Update2)"> NOT VS_IS_2015_PRE_UPDATE_2 </Condition> 
-        
         <PropertyRef Id="NETFRAMEWORK45"/>
         <Condition Message="!(loc.NetFx45NotInstalled)"> NETFRAMEWORK45 OR Installed </Condition>
 
         <PropertyRef Id="VSINSTALLPATH"/>
+        <PropertyRef Id="VS_IS_2015_PRE_UPDATE_3"/>
         <PropertyRef Id="VWDINSTALLPATH"/>
         <PropertyRef Id="DEVENV_PATH"/>
         <PropertyRef Id="VWDEXPRESS_PATH"/>
@@ -135,9 +133,9 @@
         </Feature>
         
         <!-- Execute devenv /setup -->
-        <CustomAction Id="DevEnvSetup" Property="DEVENV_PATH" ExeCommand="/setup" Execute="deferred" Return="check" Impersonate="no" />
+        <CustomAction Id="DevEnvSetup" Property="DEVENV_PATH" ExeCommand="/setup /clearCache /allowDuringSetup" Execute="deferred" Return="check" Impersonate="no" />
         <CustomAction Id="DevEnvSetup_Rollback" Property="DEVENV_PATH" ExeCommand="/setup" Execute="rollback" Return="check" Impersonate="no" />
-        <CustomAction Id="VWDExpressSetup" Property="VWDEXPRESS_PATH" ExeCommand="/setup" Execute="deferred" Return="check" Impersonate="no" />
+        <CustomAction Id="VWDExpressSetup" Property="VWDEXPRESS_PATH" ExeCommand="/setup /clearCache /allowDuringSetup" Execute="deferred" Return="check" Impersonate="no" />
         <CustomAction Id="VWDExpressSetup_Rollback" Property="VWDEXPRESS_PATH" ExeCommand="/setup" Execute="rollback" Return="check" Impersonate="no" />
 
         <InstallExecuteSequence>
@@ -148,6 +146,7 @@
         </InstallExecuteSequence>
         <InstallUISequence>
             <Show Dialog="CustomAdvancedWelcomeEulaDlg" Before="FindRelatedProducts">NOT Installed</Show>
+            <Show Dialog="VsPreUpdate3WarningDlg" Before="CostInitialize">VS_IS_2015_PRE_UPDATE_3 AND NOT Installed</Show>
             <Show Dialog="CustomFeaturesDlg" After="CostFinalize">NOT Installed AND EasyInstall=0</Show>
             <Show Dialog="CustomExitDialog" OnExit="success" />
         </InstallUISequence>

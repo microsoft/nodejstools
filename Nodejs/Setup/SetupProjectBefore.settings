@@ -5,4 +5,8 @@
     <IntermediateOutputPathSuffix>obj\Setup_$(MSBuildProjectName)\</IntermediateOutputPathSuffix>
   </PropertyGroup>
   <Import Project="$(BuildRoot)\Build\Common.Build.settings" />
+
+  <Target Name="Build"></Target>
+  <Target Name="Clean"></Target>
+  <Target Name="GetNativeManifest"/>
 </Project>

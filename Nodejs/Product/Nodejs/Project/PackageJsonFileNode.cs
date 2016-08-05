@@ -14,20 +14,12 @@
 //
 //*********************************************************//
 
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Web.Script.Serialization;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Project {
-    class PackageJsonFileNode : CommonNonCodeFileNode {
-
+    sealed class PackageJsonFileNode : CommonNonCodeFileNode {
         private FileSystemWatcher _watcher;
 
         public PackageJsonFileNode(NodejsProjectNode root, ProjectElement e)
@@ -64,6 +56,7 @@ namespace Microsoft.NodejsTools.Project {
         protected override void Dispose(bool disposing) {
             if (_watcher != null) {
                 _watcher.Changed -= FileContentsChanged;
+                _watcher.Dispose();
             } else {
                 ProjectMgr?.UnregisterFileChangeNotification(this);
             }

@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Security;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudioTools.Project;
@@ -28,23 +29,26 @@ using SR = Microsoft.NodejsTools.Project.SR;
 
 namespace Microsoft.NodejsTools {
     internal class TypingsAcquisition {
-        private const string TypingsTool = "typings";
-        private const string TypingsToolVersion = "1.0.5"; // Lock to stable version of the 'typings' tool with known behavior.
+        private const string TypingsTool = "ntvs_install_typings";
         private const string TypingsToolExe = TypingsTool + ".cmd";
+
         private const string TypingsDirectoryName = "typings";
 
         private static SemaphoreSlim typingsToolGlobalWorkSemaphore = new SemaphoreSlim(1);
 
         /// <summary>
-        /// Path the the private package where the typings acquisition tool is installed.
+        /// Full path to the local copy of the typings acquision tool.
         /// </summary>
-        private static string NtvsExternalToolsPath {
+        private static string LocalTypingsToolPath {
             get {
+                string codeBase = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
+                var uri = new UriBuilder(codeBase);
+                var path = Uri.UnescapeDataString(uri.Path);
+                var root = Path.GetDirectoryName(path);
+
                 return Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    "Microsoft",
-                    "Node.js Tools",
-                    "ExternalTools");
+                    root,
+                    "TypingsAcquisitionTool");
             }
         }
 
@@ -54,7 +58,7 @@ namespace Microsoft.NodejsTools {
         private static string TypingsToolPath {
             get {
                 return Path.Combine(
-                    NtvsExternalToolsPath,
+                    NodejsConstants.ExternalToolsPath,
                     "node_modules",
                     ".bin",
                     TypingsToolExe);
@@ -90,7 +94,7 @@ namespace Microsoft.NodejsTools {
             if (!File.Exists(Path.Combine(_pathToRootProjectDirectory, "typings.json"))) {
                 return true;
             }
-            return await ExecuteTypingsTool(new[] { "install" }, redirector);
+            return await ExecuteTypingsTool(new string[] { }, redirector);
         }
 
         private async Task<bool> DownloadTypingsForPackages(IEnumerable<string> packages, Redirector redirector) {
@@ -112,7 +116,7 @@ namespace Microsoft.NodejsTools {
         }
 
         private async Task<bool> ExecuteTypingsTool(IEnumerable<string> arguments, Redirector redirector) {
-            string typingsTool = await EnsureTypingsToolInstalled();
+            string typingsTool = await EnsureTypingsToolInstalled(redirector);
             if (string.IsNullOrEmpty(typingsTool)) {
                 redirector?.WriteErrorLine(SR.GetString(SR.TypingsToolNotInstalledError));
                 return false;
@@ -125,26 +129,28 @@ namespace Microsoft.NodejsTools {
                 null,
                 false,
                 redirector,
-                quoteArgs: true)) {
+                quoteArgs: true,
+                outputEncoding: Encoding.UTF8,
+                errorEncoding: Encoding.UTF8)) {
                 if (!process.IsStarted) {
                     // Process failed to start, and any exception message has
                     // already been sent through the redirector
-                    redirector?.WriteErrorLine("could not start 'typings'");
+                    redirector?.WriteErrorLine(SR.GetString(SR.TypingsToolCouldNotStart));
                     return false;
                 }
                 var i = await process;
                 if (i == 0) {
-                    redirector?.WriteLine(SR.GetString(SR.TypingsToolInstallCompleted));
+                    redirector?.WriteLine(SR.GetString(SR.TypingsToolTypingsInstallCompleted));
                     return true;
                 } else {
                     process.Kill();
-                    redirector?.WriteErrorLine(SR.GetString(SR.TypingsToolInstallErrorOccurred));
+                    redirector?.WriteErrorLine(SR.GetString(SR.TypingsToolTypingsInstallErrorOccurred));
                     return false;
                 }
             }
         }
 
-        private async Task<string> EnsureTypingsToolInstalled() {
+        private async Task<string> EnsureTypingsToolInstalled(Redirector redirector) {
             if (File.Exists(TypingsToolPath)) {
                 return TypingsToolPath;
             }
@@ -153,28 +159,33 @@ namespace Microsoft.NodejsTools {
                 return null;
             } 
             if (!await InstallTypingsTool()) {
+                redirector?.WriteErrorLine(SR.GetString(SR.TypingsToolInstallFailed));
                 return null;
             }
-            return await EnsureTypingsToolInstalled();
+            return await EnsureTypingsToolInstalled(redirector);
         }
 
         private async Task<bool> InstallTypingsTool() {
             _didTryToInstallTypingsTool = true;
 
-            Directory.CreateDirectory(NtvsExternalToolsPath);
+            Directory.CreateDirectory(NodejsConstants.ExternalToolsPath);
 
             // install typings
             using (var commander = _npmController.CreateNpmCommander()) {
-                return await commander.InstallPackageToFolderByVersionAsync(NtvsExternalToolsPath, TypingsTool, TypingsToolVersion, false);
+                return await commander.InstallPackageToFolderByVersionAsync(
+                    NodejsConstants.ExternalToolsPath,
+                    string.Format(@"""{0}""", LocalTypingsToolPath),
+                    string.Empty,
+                    false);
             }
         }
 
         private static IEnumerable<string> GetTypingsToolInstallArguments(IEnumerable<string> packages) {
-            var arguments = new[] { "install" }.Concat(packages.Select(name => string.Format("dt~{0}", name)));
+            var arguments = packages;
             if (NodejsPackage.Instance.IntellisenseOptionsPage.SaveChangesToConfigFile) {
-                arguments = arguments.Concat(new[] { "--save" });
+                return arguments.Concat(new[] { "--save" });
             }
-            return arguments.Concat(new[] { "--global" });
+            return arguments;
         }
 
         private static IEnumerable<string> CurrentTypingsPackages(string pathToRootProjectDirectory) {

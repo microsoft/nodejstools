@@ -35,6 +35,7 @@ using Microsoft.VisualStudioTools.Project.Automation;
 using MSBuild = Microsoft.Build.Evaluation;
 using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
 using Microsoft.NodejsTools.Options;
+using Microsoft.NodejsTools.Telemetry;
 #if DEV14_OR_LATER
 using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Imaging;
@@ -159,7 +160,7 @@ namespace Microsoft.NodejsTools.Project {
             var typingsPath = Path.Combine(this.ProjectHome, "typings");
             bool hadExistingTypingsFolder = Directory.Exists(typingsPath);
             TypingsAcquirer
-                .AcquireTypings(packages, null /*redirector*/)
+                .AcquireTypings(packages, NpmOutputPane)
                 .ContinueWith(x => {
                     if (NodejsPackage.Instance.IntellisenseOptionsPage.ShowTypingsInfoBar &&
                         x.Result &&
@@ -605,9 +606,11 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private static void LogAnalysisLevel(VsProjectAnalyzer analyzer) {
+        private void LogAnalysisLevel(VsProjectAnalyzer analyzer) {
             if (analyzer != null) {
-                NodejsPackage.Instance.Logger.LogEvent(Logging.NodejsToolsLogEvent.AnalysisLevel, (int)analyzer.AnalysisLevel);
+                var level = analyzer.AnalysisLevel;
+                NodejsPackage.Instance.Logger.LogEvent(Logging.NodejsToolsLogEvent.AnalysisLevel, (int)level);
+                NodejsPackage.Instance.TelemetryLogger.LogAnalysisActivatedForProject(ProjectGuid, level);
             }
         }
 
@@ -1246,5 +1249,18 @@ namespace Microsoft.NodejsTools.Project {
             return base.Build(config, target);
         }
 
+
+        // This is the package manager pane that ships with VS2015, and we should print there if available.
+        private static readonly Guid VSPackageManagerPaneGuid = new Guid("C7E31C31-1451-4E05-B6BE-D11B6829E8BB");
+
+        internal OutputWindowRedirector NpmOutputPane {
+            get {
+                try {
+                    return OutputWindowRedirector.Get(Site, VSPackageManagerPaneGuid, "Bower/npm");
+                } catch (InvalidOperationException) {
+                    return null;
+                }
+            }
+        }
     }
 }

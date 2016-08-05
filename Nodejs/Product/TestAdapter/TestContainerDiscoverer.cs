@@ -428,7 +428,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 ProjectInfo projectInfo;
                 string projectPath;
                 if (e.Project.TryGetProjectPath(out projectPath) &&
-                    !string.IsNullOrEmpty(projectPath) &&
                     _knownProjects.TryGetValue(projectPath, out projectInfo)) {
                     _knownProjects.Remove(projectPath);
 
@@ -549,7 +548,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
             string projectPath;
             if (project != null &&
                 project.TryGetProjectPath(out projectPath) &&
-                !string.IsNullOrEmpty(projectPath) &&
                 _knownProjects.TryGetValue(projectPath, out projectInfo) &&
                 projectInfo != null &&
                 projectInfo.HasRequestedContainers) {

@@ -94,6 +94,7 @@ namespace Microsoft.NodejsTools.LogParsing {
             _nodeVersion = nodeVersion;
         }
 
+        [STAThread]
         public static int Main(string[] args) {
             if (args.Length < 2) {
                 Console.WriteLine("Usage: [/jmc] [/v:<node version>] <v8.log path> <output.vspx path> [<start time> <execution time>]");

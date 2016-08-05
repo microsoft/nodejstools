@@ -1,34 +1,27 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Vsix xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="1.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2010">
-  <Identifier Id="29102E6C-34F2-4FF1-BA2F-C02ADE3846E8">
-    <Name>Node.js Tools - Interactive Window</Name>
-    <Author>Microsoft</Author>
-    <Version>1.2</Version>
-    <Description xml:space="preserve">Node.js Tools - Interactive Window</Description>
-    <MoreInfoUrl>http://go.microsoft.com/fwlink/?LinkId=785971</MoreInfoUrl>
+﻿<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+  <Metadata>
+    <Identity Id="29102E6C-34F2-4FF1-BA2F-C02ADE3846E8" Version="1.2" Language="en-US" Publisher="Microsoft" />
+    <DisplayName>Node.js Tools - Interactive Window</DisplayName>
+    <Description xml:space="preserve">Node.js Tools - Interactive Window.</Description>
+    <MoreInfo>http://go.microsoft.com/fwlink/?LinkId=785971</MoreInfo>
     <GettingStartedGuide>http://go.microsoft.com/fwlink/?LinkId=785972</GettingStartedGuide>
-    <Locale>1033</Locale>
-    <InstalledByMsi>true</InstalledByMsi>
     <Icon>NodeJS.ico</Icon>
     <PreviewImage>NodeJS_200x.png</PreviewImage>
-    <SystemComponent>false</SystemComponent>
-    <SupportedProducts>
-      <VisualStudio Version="11.0">
-        <Edition>Pro</Edition>
-        <Edition>VWDExpress</Edition>
-      </VisualStudio>
-    </SupportedProducts>
-    <SupportedFrameworkRuntimeEdition MinVersion="4.0" />
-  </Identifier>
-  <References>
-    <Reference Id="Microsoft.VisualStudio.MPF" MinVersion="10.0">
-      <Name>Visual Studio MPF</Name>
-    </Reference>
-  </References>
-  <Content>
-    <VsPackage>|%CurrentProject%;PkgdefProjectOutputGroup|</VsPackage>
-    <MefComponent>|%CurrentProject%|</MefComponent>
-    <Assembly AssemblyName="|%CurrentProject%;_GetAssemblyName|">|%CurrentProject%|</Assembly>
-  </Content>
-
-</Vsix>
+  </Metadata>
+  <!-- Version="11.0" specifies the minimum (not the maximum) version, and the
+       Id specifications are minimums; any SKU equal or 'higher' will accept
+       them. -->
+  <Installation>
+    <InstallationTarget Version="[14.0.0,16.0)" Id="Microsoft.VisualStudio.Community" />
+    <InstallationTarget Version="[14.0.0,16.0)" Id="Microsoft.VisualStudio.Pro" />
+    <InstallationTarget Version="[14.0.0,16.0)" Id="Microsoft.VisualStudio.Enterprise" />
+    <InstallationTarget Version="[14.0.0,16.0)" Id="Microsoft.VisualStudio.VSWinExpress" />
+    <InstallationTarget Version="[14.0.0,16.0)" Id="Microsoft.VisualStudio.VWDExpress" />
+    <InstallationTarget Version="[14.0.0,16.0)" Id="Microsoft.VisualStudio.VSWinDesktopExpress" />
+  </Installation>
+  <Assets>
+    <Asset Type="Microsoft.VisualStudio.Package" Path="|%CurrentProject%|" d:Source="Project" d:ProjectName="%CurrentProject%" />
+    <Asset Type="Microsoft.VisualStudio.Assembly" Path="|%CurrentProject%|" />
+    <Asset Type="Microsoft.VisualStudio.MefComponent" Path="|%CurrentProject%|" />
+  </Assets>
+</PackageManifest>

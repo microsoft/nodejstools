@@ -15,7 +15,6 @@
 //*********************************************************//
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Npm {
@@ -28,14 +27,10 @@ namespace Microsoft.NodejsTools.Npm {
         
         IRootPackage RootPackage { get; }
         
-        IGlobalPackages GlobalPackages { get; }
-        
         INpmCommander CreateNpmCommander();
 
         Task<IPackageCatalog> GetRepositoryCatalogAsync(bool forceDownload, IProgress<string> progress);
 
         IPackageCatalog MostRecentlyLoadedCatalog { get; }
-
-        string ListBaseDirectory { get; }
     }
 }

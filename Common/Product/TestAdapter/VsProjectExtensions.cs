@@ -51,7 +51,7 @@ namespace Microsoft.VisualStudioTools.TestAdapter {
         public static bool TryGetProjectPath(this IVsProject project, out string path) {
             ValidateArg.NotNull(project, "project");
 
-            return ErrorHandler.Succeeded(project.GetMkDocument(VSConstants.VSITEMID_ROOT, out path));
+            return ErrorHandler.Succeeded(project.GetMkDocument(VSConstants.VSITEMID_ROOT, out path)) && !string.IsNullOrEmpty(path);
         }
 
         private static string GetAggregateProjectTypeGuids(this IVsProject project) {
