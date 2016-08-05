@@ -1,0 +1,17 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <Import Project="SetupProjectBefore.settings" />
+  
+  <ItemGroup>
+    <ProjectFile Include="swix\Microsoft.VisualStudio.NodejsTools.NodejsTools.swixproj"/>
+    <ProjectFile Include="swix\Microsoft.VisualStudio.NodejsTools.Profiling.swixproj"/>
+    <ProjectFile Include="swix\Microsoft.VisualStudio.NodejsTools.InteractiveWindow.swixproj"/>
+    <ProjectFile Include="swix\Microsoft.VisualStudio.NodejsTools.Targets.swixproj"/>
+    <ProjectFile Include="swix\NodejsTools.vsmanproj"/>
+    <ProjectFile Include="swix\NodejsTools_sideload.vsmanproj"/>
+  </ItemGroup>
+
+  <Import Project="$(TargetsPath)\Common.Build.Traversal.targets" />
+
+  <Import Project="$(TargetsPath)\Common.Build.VSSDK.targets" Condition="'$(SignedBinariesPath)' != ''"/>
+</Project>
