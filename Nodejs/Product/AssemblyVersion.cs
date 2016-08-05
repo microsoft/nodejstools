@@ -32,11 +32,6 @@ class AssemblyVersionInfo {
     // Servicing branches and minor releases should retain the value.
     public const string ReleaseVersion = "1.0";
 
-    // This version string (and the comment for StableVersion) should be
-    // updated manually between minor releases.
-    // Servicing branches should retain the value
-    public const string MinorVersion = "0";
-
     // This version string (and the comment for Version) should be updated
     // manually between minor releases (e.g. from 1.0 to 1.1).
     // Servicing branches and prereleases should retain the value.
@@ -58,7 +53,7 @@ class AssemblyVersionInfo {
     public const string VSVersion = VSMajorVersion + ".0";
 
     // Defaults to "1.0.0.(2012|2013|2015)"
-    public const string StableVersion = ReleaseVersion + "." + MinorVersion + "." + VSVersionSuffix;
+    public const string StableVersion = ReleaseVersion + ".0." + VSVersionSuffix;
 
     // Defaults to "1.2.4100.00"
     public const string Version = FileVersion + "." + BuildNumber;
