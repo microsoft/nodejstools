@@ -34,12 +34,6 @@ namespace Microsoft.NodejsTools.ProjectWizard {
         public void RunFinished() { }
 
         public void RunStarted(object automationObject, Dictionary<string, string> replacementsDictionary, WizardRunKind runKind, object[] customParams) {
-            try {
-                // Regardless of whether or not an exception is thrown, created
-                // directories shall remain.
-            } catch {
-                // If it fails (doesn't exist/contains files/read-only), let the directory stay.
-            }
 
             var dte = automationObject as DTE;
             if (dte == null) {
