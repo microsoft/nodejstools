@@ -349,9 +349,7 @@ bar""
                 int indentSize = 4,
                 int tabSize = 4) {
                     _options.AddRange(new[] {
-#if DEV12_OR_LATER
                     new OptionHolder("TextEditor", "Node.js", "BraceCompletion", braceCompletion),
-#endif
                     new OptionHolder("TextEditor", "Node.js", "InsertTabs", insertTabs),
                     new OptionHolder("TextEditor", "Node.js", "IndentSize", indentSize),
                     new OptionHolder("TextEditor", "Node.js", "TabSize", tabSize)

@@ -22,9 +22,6 @@ using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio;
 using Microsoft.NodejsTools;
-#if DEV11
-using Microsoft.VisualStudio.Shell.Interop;
-#endif
 
 namespace Microsoft.NodejsTools.Project {
     //Set the projectsTemplatesDirectory to a non-existant path to prevent VS from including the working directory as a valid template path

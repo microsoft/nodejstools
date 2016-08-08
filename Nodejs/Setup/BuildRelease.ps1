@@ -21,7 +21,7 @@
     [Optional] The VS version to build for. If omitted, builds for all versions
     that are installed.
     
-    Valid values: "11.0", "12.0", "14.0", "15.0"
+    Valid values: "14.0", "15.0"
 
 .Parameter name
     [Optional] A suffix to append to the name of the build.
@@ -187,7 +187,7 @@ function msbuild-exe($target) {
 # This function is used to get options for each configuration
 #
 # $target contains the following members:
-#   VSTarget            e.g. 12.0
+#   VSTarget            e.g. 14.0
 #   VSName              e.g. VS 2013
 #   config              Name of the build configuration
 #   msi_version         X.Y.Z.W installer version
@@ -272,8 +272,6 @@ $managed_files = (
     "Microsoft.NodejsTools.Npm.dll",
     "Microsoft.NodejsTools.TestAdapter.dll",
     "Microsoft.NodejsTools.PressAnyKey.exe",
-    "Microsoft.NodejsTools.Telemetry.11.0.dll",
-    "Microsoft.NodejsTools.Telemetry.12.0.dll",
     "Microsoft.NodejsTools.Telemetry.14.0.dll",
     "Microsoft.NodejsTools.Telemetry.15.0.dll"
 )
@@ -282,9 +280,7 @@ $native_files = @()
 
 $supported_vs_versions = (
     @{number="15.0"; name="VS 15"; build_by_default=$true},    
-    @{number="14.0"; name="VS 2015"; build_by_default=$true},
-    @{number="12.0"; name="VS 2013"; build_by_default=$true},
-    @{number="11.0"; name="VS 2012"; build_by_default=$true}
+    @{number="14.0"; name="VS 2015"; build_by_default=$true}
 )
 
 # #############################################################################
