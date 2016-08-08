@@ -10,10 +10,17 @@
     <TargetName>Microsoft.VisualStudio.NodejsTools.Targets</TargetName>
     <TargetPath>$(BuildOutputRoot)Setup\Microsoft.VisualStudio.NodejsTools.Targets.vsix</TargetPath>
   </PropertyGroup> 
+  
+  <Target Name="_CopyWixOutputsToPath"
+          AfterTargets="AfterBuild"
+          Condition="$(OutputType) == 'Vsix'">
+          
+    <Message Text="SignedBinariesPathss $(SignedBinariesPath)"/>
+  </Target>
 
   <PropertyGroup> 
     <WebRoleDllPath Condition="'$(SignedBinariesPath)' != ''">$(SignedBinariesPath)</WebRoleDllPath>
-    <WebRoleDllPath Condition="'$(SignedBinariesPath)' == ''">$(BuildOutputRoot)\Binaries\Nodejs\Debugger\RemoteDebug</WebRoleDllPath>
+    <WebRoleDllPath Condition="'$(SignedBinariesPath)' == ''">$(BuildOutputRoot)\Binaries\WebRole</WebRoleDllPath>
     <PackagePreprocessorDefinitions>$(PackagePreprocessorDefinitions);BuildOutputRoot=$(BuildOutputRoot);WebRoleDllPath=$(WebRoleDllPath)</PackagePreprocessorDefinitions>
   </PropertyGroup> 
 
