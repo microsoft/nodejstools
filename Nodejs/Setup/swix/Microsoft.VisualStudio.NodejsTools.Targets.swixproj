@@ -31,7 +31,7 @@
   </Target>
 
   <PropertyGroup> 
-    <PackagePreprocessorDefinitions>$(PackagePreprocessorDefinitions);BuildOutputRoot=$(BuildOutputRoot)</PackagePreprocessorDefinitions>
+    <PackagePreprocessorDefinitions>$(PackagePreprocessorDefinitions);BuildOutputRoot=$(BuildOutputRoot);SignedBinariesPath=$(SignedBinariesPath)</PackagePreprocessorDefinitions>
   </PropertyGroup> 
 
   <ItemGroup> 
