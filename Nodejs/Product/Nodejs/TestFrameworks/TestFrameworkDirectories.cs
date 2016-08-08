@@ -14,21 +14,20 @@
 //
 //*********************************************************//
 
-
 using System;
 using System.Collections.Generic;
 using System.IO;
 
 namespace Microsoft.NodejsTools.TestFrameworks {
     class TestFrameworkDirectories {
+        public const string ExportRunnerFramework = "ExportRunner";
+        private const string TestFrameworksDirectory = "TestFrameworks";
+
         private readonly Dictionary<string, string> _frameworkDirectories;
-        public const string ExportRunnerFramework = "ExportRunner"; 
 
         public TestFrameworkDirectories() {
-            string installFolder = GetExecutingAssemblyPath();
             _frameworkDirectories = new Dictionary<string, string>(System.StringComparer.OrdinalIgnoreCase);
-            string baseTestframeworkFolder = installFolder + @"\TestFrameworks";
-            foreach (string directory in Directory.GetDirectories(baseTestframeworkFolder)) {
+            foreach (string directory in Directory.GetDirectories(GetBaseTestframeworkFolder())) {
                 string name = Path.GetFileName(directory);
                 _frameworkDirectories.Add(name, directory);
             }
@@ -47,7 +46,17 @@ namespace Microsoft.NodejsTools.TestFrameworks {
             return new List<string>(_frameworkDirectories.Values);
         }
 
-        private string GetExecutingAssemblyPath() {
+        private static string GetBaseTestframeworkFolder() {
+            string installFolder = GetExecutingAssemblyPath();
+            string baseDirectory = Path.Combine(installFolder, TestFrameworksDirectory);
+#if DEBUG
+            // To allow easier debugging of the test adapter, try to use the local directory as a fallback.
+            baseDirectory = Directory.Exists(baseDirectory) ? baseDirectory : Path.Combine(Directory.GetCurrentDirectory(), TestFrameworksDirectory);
+#endif
+            return baseDirectory;
+        }
+
+        private static string GetExecutingAssemblyPath() {
             string codeBase = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
             UriBuilder uri = new UriBuilder(codeBase);
             string path = Uri.UnescapeDataString(uri.Path);
