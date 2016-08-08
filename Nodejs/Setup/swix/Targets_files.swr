@@ -6,4 +6,4 @@ package name="Microsoft.VisualStudio.NodejsTools.Targets"
 folder "InstallFolder:\"
     folder "MSBuild\Microsoft\VisualStudio\v15.0\Node.js Tools"
         file source=$(BuildOutputRoot)\Binaries\Nodejs\Microsoft.NodejsTools.targets
-        file source=$(SignedBinariesPath)\Microsoft.NodejsTools.WebRole.dll
+        file source=$(WebRoleDllPath)\Microsoft.NodejsTools.WebRole.dll
