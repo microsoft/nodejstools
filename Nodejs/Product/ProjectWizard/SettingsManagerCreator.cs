@@ -25,11 +25,7 @@ using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
 namespace Microsoft.VisualStudioTools {
     static class SettingsManagerCreator {
-#if DEV11
-        const string VSVersion = "11.0";
-#elif DEV12
-        const string VSVersion = "12.0";
-#elif DEV14
+#if DEV14
         const string VSVersion = "14.0";
 #elif DEV15
         const string VSVersion = "15.0";

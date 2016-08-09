@@ -50,7 +50,7 @@ namespace Microsoft.NodejsTools.Parsing
         private readonly ErrorSink _errorSink;
         private readonly CodeSettings _settings;
 
-        private static CacheDict<string, string> _internTable = new CacheDict<string, string>(4096);
+        private static StringInternPool _internTable = new StringInternPool(4096);
 
         #endregion
 
@@ -80,10 +80,8 @@ namespace Microsoft.NodejsTools.Parsing
         // Whether the current multiline comment is a doclet.
         public bool IsDoclet { get; private set; }
 
-        internal string Identifier
-        {
-            get
-            {
+        internal string Identifier {
+            get {
                 return _identifier.Length > 0
                     ? InternString(_identifier.ToString()) :
                     CurrentTokenString();
@@ -92,12 +90,7 @@ namespace Microsoft.NodejsTools.Parsing
 
         private static string InternString(string value) {
             lock (_internTable) {
-                string res;
-                if (_internTable.TryGetValue(value, out res)) {
-                    return res;
-                }
-                _internTable.Add(value, value);
-                return value;
+                return _internTable.Intern(value);
             }
         }
 

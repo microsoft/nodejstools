@@ -12,7 +12,6 @@
     <SccProvider>SAK</SccProvider>
     <SccAuxPath>SAK</SccAuxPath>
     <SccLocalPath>SAK</SccLocalPath>
-    <VsTarget Condition="'$(VsTarget)' == ''">11.0</VsTarget>
     <DefineConstants>
       $(DefineConstants);
       ProductSuffix=Profiling

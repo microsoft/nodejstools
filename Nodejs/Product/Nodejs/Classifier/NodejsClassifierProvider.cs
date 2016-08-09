@@ -77,11 +77,7 @@ namespace Microsoft.NodejsTools.Classifier {
 
         [Export]
         [Name(NodejsPredefinedClassificationTypeNames.Operator)]
-#if DEV11_OR_LATER
         [BaseDefinition(PredefinedClassificationTypeNames.Operator)]
-#else
-        [BaseDefinition(PredefinedClassificationTypeNames.FormalLanguage)]
-#endif
         internal static ClassificationTypeDefinition OperatorClassificationDefinition = null; // Set via MEF
 
         #endregion
