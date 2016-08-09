@@ -12,8 +12,6 @@
     <WebRoleDll Condition="'$(SignedBinariesPath)' != ''">$(SignedBinariesPath)\Microsoft.NodejsTools.WebRole.dll</WebRoleDllPath>
     <WebRoleDll Condition="'$(SignedBinariesPath)' == ''">$(BuildOutputRoot)\Binaries\WebRole\Microsoft.NodejsTools.WebRole.dll</WebRoleDllPath>
     <PackagePreprocessorDefinitions>$(PackagePreprocessorDefinitions);BuildOutputRoot=$(BuildOutputRoot);WebRoleDll=$(WebRoleDll)</PackagePreprocessorDefinitions>
-    <!--Retrigger a build on webrole.dll to pick up signed version-->
-    <MSBuildAllProjects>$(WebRoleDll)</MSBuildAllProjects>
   </PropertyGroup> 
   
   <Target Name="_CopyWixOutputsToPath"
