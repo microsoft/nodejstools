@@ -9,7 +9,7 @@
   </PropertyGroup> 
 
   <PropertyGroup> 
-    <PackagePreprocessorDefinitions>$(PackagePreprocessorDefinitions);BuildOutputRoot=$(BuildOutputRoot);BuildVersion=$(BuildVersion)</PackagePreprocessorDefinitions>
+    <PackagePreprocessorDefinitions>$(PackagePreprocessorDefinitions);BuildOutputRoot=$(BuildOutputRoot);BuildVersion=$(MsiVersion)</PackagePreprocessorDefinitions>
   </PropertyGroup> 
 
   <ItemGroup> 
