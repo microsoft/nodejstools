@@ -9,8 +9,8 @@
     <IsPackage>true</IsPackage>
     <TargetName>Microsoft.VisualStudio.NodejsTools.Targets</TargetName>
     <TargetPath>$(BuildOutputRoot)Setup\Microsoft.VisualStudio.NodejsTools.Targets.vsix</TargetPath>
-    <WebRoleDll Condition="'$(SignedBinariesPath)' != ''">$(SignedBinariesPath)\Microsoft.NodejsTools.WebRole.dll</WebRoleDllPath>
-    <WebRoleDll Condition="'$(SignedBinariesPath)' == ''">$(BuildOutputRoot)\Binaries\WebRole\Microsoft.NodejsTools.WebRole.dll</WebRoleDllPath>
+    <WebRoleDll Condition="'$(SignedBinariesPath)' != ''">$(SignedBinariesPath)\Microsoft.NodejsTools.WebRole.dll</WebRoleDll>
+    <WebRoleDll Condition="'$(SignedBinariesPath)' == ''">$(BuildOutputRoot)\Binaries\WebRole\Microsoft.NodejsTools.WebRole.dll</WebRoleDll>
     <PackagePreprocessorDefinitions>$(PackagePreprocessorDefinitions);BuildOutputRoot=$(BuildOutputRoot);WebRoleDll=$(WebRoleDll)</PackagePreprocessorDefinitions>
   </PropertyGroup> 
   
