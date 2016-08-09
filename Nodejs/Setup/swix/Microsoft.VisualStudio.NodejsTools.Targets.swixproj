@@ -11,7 +11,7 @@
     <TargetPath>$(BuildOutputRoot)Setup\Microsoft.VisualStudio.NodejsTools.Targets.vsix</TargetPath>
     <WebRoleDll Condition="'$(SignedBinariesPath)' != ''">$(SignedBinariesPath)\Microsoft.NodejsTools.WebRole.dll</WebRoleDll>
     <WebRoleDll Condition="'$(SignedBinariesPath)' == ''">$(BuildOutputRoot)\Binaries\WebRole\Microsoft.NodejsTools.WebRole.dll</WebRoleDll>
-    <PackagePreprocessorDefinitions>$(PackagePreprocessorDefinitions);BuildOutputRoot=$(BuildOutputRoot);BuildVersion=$(BuildVersion);WebRoleDll=$(WebRoleDll)</PackagePreprocessorDefinitions>
+    <PackagePreprocessorDefinitions>$(PackagePreprocessorDefinitions);BuildOutputRoot=$(BuildOutputRoot);BuildVersion=$(Build.BuildNumber);WebRoleDll=$(WebRoleDll)</PackagePreprocessorDefinitions>
     <!--Retrigger a build on webrole.dll to pick up signed version. TODO: see if there's a better way to do this.-->
     <MSBuildAllProjects>$(WebRoleDll)</MSBuildAllProjects>
   </PropertyGroup> 
