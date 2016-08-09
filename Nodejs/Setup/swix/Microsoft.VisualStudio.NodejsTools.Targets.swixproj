@@ -9,6 +9,9 @@
     <IsPackage>true</IsPackage>
     <TargetName>Microsoft.VisualStudio.NodejsTools.Targets</TargetName>
     <TargetPath>$(BuildOutputRoot)Setup\Microsoft.VisualStudio.NodejsTools.Targets.vsix</TargetPath>
+    <WebRoleDllPath Condition="'$(SignedBinariesPath)' != ''">$(SignedBinariesPath)</WebRoleDllPath>
+    <WebRoleDllPath Condition="'$(SignedBinariesPath)' == ''">$(BuildOutputRoot)\Binaries\WebRole</WebRoleDllPath>
+    <PackagePreprocessorDefinitions>$(PackagePreprocessorDefinitions);BuildOutputRoot=$(BuildOutputRoot);WebRoleDllPath=$(WebRoleDllPath)</PackagePreprocessorDefinitions>
   </PropertyGroup> 
   
   <Target Name="_CopyWixOutputsToPath"
@@ -25,16 +28,14 @@
 
     <Message Text="$(CopyOutputsToPath)$(_PathSuffix)$(TargetName)$(TargetExt)"/>
     <Message Text="$(TargetPath)"/>
+    
+    <Message Text="SignedBinariesPath: $(SignedBinariesPath)"/>
+    <Message Text="WebRoleDllPath: $(WebRoleDllPath)"/>
+
     <Copy SourceFiles="$(TargetPath)"
           DestinationFiles="$(CopyOutputsToPath)$(_PathSuffix)$(TargetName)$(TargetExt)"
           SkipUnchangedFiles="true" />
-  </Target>
-
-  <PropertyGroup> 
-    <WebRoleDllPath Condition="'$(SignedBinariesPath)' != ''">$(SignedBinariesPath)</WebRoleDllPath>
-    <WebRoleDllPath Condition="'$(SignedBinariesPath)' == ''">$(BuildOutputRoot)\Binaries\WebRole</WebRoleDllPath>
-    <PackagePreprocessorDefinitions>$(PackagePreprocessorDefinitions);BuildOutputRoot=$(BuildOutputRoot);WebRoleDllPath=$(WebRoleDllPath)</PackagePreprocessorDefinitions>
-  </PropertyGroup> 
+  </Target> 
 
   <ItemGroup> 
     <Package Include="Targets_files.swr" /> 
