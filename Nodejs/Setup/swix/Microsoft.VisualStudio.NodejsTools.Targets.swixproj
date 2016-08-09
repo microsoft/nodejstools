@@ -9,6 +9,11 @@
     <IsPackage>true</IsPackage>
     <TargetName>Microsoft.VisualStudio.NodejsTools.Targets</TargetName>
     <TargetPath>$(BuildOutputRoot)Setup\Microsoft.VisualStudio.NodejsTools.Targets.vsix</TargetPath>
+    <WebRoleDll Condition="'$(SignedBinariesPath)' != ''">$(SignedBinariesPath)\Microsoft.NodejsTools.WebRole.dll</WebRoleDll>
+    <WebRoleDll Condition="'$(SignedBinariesPath)' == ''">$(BuildOutputRoot)\Binaries\WebRole\Microsoft.NodejsTools.WebRole.dll</WebRoleDll>
+    <PackagePreprocessorDefinitions>$(PackagePreprocessorDefinitions);BuildOutputRoot=$(BuildOutputRoot);BuildVersion=$(Build.BuildNumber);WebRoleDll=$(WebRoleDll)</PackagePreprocessorDefinitions>
+    <!--Retrigger a build on webrole.dll to pick up signed version. TODO: see if there's a better way to do this.-->
+    <MSBuildAllProjects>$(WebRoleDll)</MSBuildAllProjects>
   </PropertyGroup> 
   
   <Target Name="_CopyWixOutputsToPath"
@@ -25,14 +30,11 @@
 
     <Message Text="$(CopyOutputsToPath)$(_PathSuffix)$(TargetName)$(TargetExt)"/>
     <Message Text="$(TargetPath)"/>
+
     <Copy SourceFiles="$(TargetPath)"
           DestinationFiles="$(CopyOutputsToPath)$(_PathSuffix)$(TargetName)$(TargetExt)"
           SkipUnchangedFiles="true" />
-  </Target>
-
-  <PropertyGroup> 
-    <PackagePreprocessorDefinitions>$(PackagePreprocessorDefinitions);BuildOutputRoot=$(BuildOutputRoot)</PackagePreprocessorDefinitions>
-  </PropertyGroup> 
+  </Target> 
 
   <ItemGroup> 
     <Package Include="Targets_files.swr" /> 

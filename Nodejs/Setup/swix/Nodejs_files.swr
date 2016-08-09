@@ -1,7 +1,7 @@
 use vs
 
 package name=Microsoft.VisualStudio.NodejsTools.NodejsTools
-    version=1.2
+    version=$(BuildVersion)
     vs.package.type=vsix
     vs.package.vsixId=FE8A8C3D-328A-476D-99F9-2A24B75F8C7F
 

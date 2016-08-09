@@ -242,6 +242,19 @@ function after-build-all($buildroot, $outdir) {
     Copy-Item -Force "$outdir\**.vsix" $vsdrop
 }
 
+# Manually clean up an output directory
+function clean-outdir($outdir) {
+    if ((Test-Path $outdir) -and (Get-ChildItem $outdir)) {
+        Write-Output "Cleaning previous release in $outdir"
+        del -Recurse -Force $outdir\* -EA 0
+        while (Get-ChildItem $outdir) {
+            Write-Output "Failed to clean release. Retrying in five seconds. (Press Ctrl+C to abort)"
+            Sleep -Seconds 5
+            del -Recurse -Force $outdir\* -EA 0
+        }
+    }
+}
+
 # Add product name mappings here
 #   {0} will be replaced by the major version preceded by a space
 #   {1} will be replaced by the build name preceded by a space
@@ -423,15 +436,9 @@ Write-Output "============================================================"
 Write-Output ""
 
 if (-not $skipclean) {
-    if ((Test-Path $outdir) -and (Get-ChildItem $outdir)) {
-        Write-Output "Cleaning previous release in $outdir"
-        del -Recurse -Force $outdir\* -EA 0
-        while (Get-ChildItem $outdir) {
-            Write-Output "Failed to clean release. Retrying in five seconds. (Press Ctrl+C to abort)"
-            Sleep -Seconds 5
-            del -Recurse -Force $outdir\* -EA 0
-        }
-    }
+    clean-outdir $outdir
+    clean-outdir $buildroot\BuildOutput
+    
     if (-not (Test-Path $outdir)) {
         mkdir $outdir -EA 0 | Out-Null
         if (-not $?) {
