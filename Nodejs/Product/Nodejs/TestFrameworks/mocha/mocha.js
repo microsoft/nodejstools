@@ -65,7 +65,10 @@ var run_tests = function (testName, testFile, workingFolder, projectFolder) {
     var mocha = initializeMocha(Mocha, projectFolder);
 
     if (testName) {
-        mocha.grep(testName);
+        if (typeof mocha.fgrep === 'function')
+            mocha.fgrep(testName); // since Mocha 3.0.0
+        else
+            mocha.grep(testName); // prior Mocha 3.0.0
     }
     mocha.addFile(testFile);
 
