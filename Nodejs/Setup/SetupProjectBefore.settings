@@ -1,24 +1,5 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <!-- 0.1.YMMDD.HHMM -->
-    <Year Condition="'$(Year)' == ''">$([System.DateTime]::Now.Year)</Year>
-    <YearMinus4>$([MSBuild]::Subtract($(Year), 4))</YearMinus4>
-    <YearMinus4String>$(YearMinus4.ToString())</YearMinus4String>
-    <LastDigitOfYear>$(YearMinus4String.Substring(3,1))</LastDigitOfYear>
-    <Date Condition="'$(Date)' == ''">$([System.DateTime]::Now.ToString("MMdd"))</Date>
-    <Time Condition="'$(Time)' == ''">$([System.DateTime]::Now.ToString("HHmm"))</Time>
-
-    <MajorVersion>1</MajorVersion>
-    <MinorVersion>2</MinorVersion>
-    <Build>$(LastDigitOfYear)$(Date)</Build>
-    <Revision>$(Time)</Revision>
-    <BuildNumber Condition="'$(BuildNumber)' == ''">$(Build).$(Revision)</BuildNumber>
-
-    <AssemblyVersion>$(MajorVersion).$(MinorVersion).$(BuildNumber)</AssemblyVersion>
-    <BuildVersion>$(MajorVersion).$(MinorVersion).$(Build).$(Revision)</BuildVersion>
-  </PropertyGroup>
-
-  <PropertyGroup>
     <BuildRoot Condition="'$(BuildRoot)' == ''">$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), build.root))</BuildRoot>
     <OutputPathSuffix>Setup</OutputPathSuffix>
     <IntermediateOutputPathSuffix>obj\Setup_$(MSBuildProjectName)\</IntermediateOutputPathSuffix>
