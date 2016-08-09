@@ -14,7 +14,6 @@
   -->
   
   <ItemGroup>
-    <ProjectFile Include="..\Product\dirs.proj"/>
     <ProjectFile Include="setup.proj"/>
     <ProjectFile Condition="$(VSTarget)=='15.0'" Include="setup-swix.proj"/>
   </ItemGroup>
