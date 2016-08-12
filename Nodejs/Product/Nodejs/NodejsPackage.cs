@@ -381,42 +381,6 @@ namespace Microsoft.NodejsTools {
             }
         }
 
-        private static Lazy<string> remoteDebugProxyFolder = new Lazy<string>(() => {
-            const string ROOT_KEY = "Software\\Microsoft\\NodeJSTools\\" + AssemblyVersionInfo.VSVersion;
-
-            // Try HKCU
-            try {
-                using (RegistryKey node = Registry.CurrentUser.OpenSubKey(ROOT_KEY)) {
-                    if (node != null) {
-                        var value = (string)node.GetValue("RemoteDebugProxyFolder");
-                        if (value != null)
-                            return value;
-                    }
-                }
-            } catch (Exception) {
-            }
-
-            // Try HKLM
-            try {
-                using (RegistryKey node = Registry.LocalMachine.OpenSubKey(ROOT_KEY)) {
-                    if (node != null) {
-                        var value = (string)node.GetValue("RemoteDebugProxyFolder");
-                        if (value != null)
-                            return value;
-                    }
-                }
-            } catch (Exception) {
-            }
-
-            return null;
-        });
-
-        public static string RemoteDebugProxyFolder {
-            get {
-                return remoteDebugProxyFolder.Value;
-            }
-        }
-
         private IContentType ReplContentType {
             get {
                 if (_contentType == null) {

@@ -17,6 +17,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Windows.Forms;
 using Microsoft.VisualStudioTools;
 using Microsoft.NodejsTools.Project;
@@ -25,9 +26,17 @@ namespace Microsoft.NodejsTools.Commands {
     internal sealed class OpenRemoteDebugProxyFolderCommand : Command {
         private const string remoteDebugJsFileName = "RemoteDebug.js";
 
+        private static string RemoteDebugProxyFolder {
+            get {
+                return Path.Combine(
+                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                    "RemoteDebug");
+            }
+        }
+
         public override void DoCommand(object sender, EventArgs args) {
             // Open explorer to folder
-            var remoteDebugProxyFolder = NodejsPackage.RemoteDebugProxyFolder;
+            var remoteDebugProxyFolder = RemoteDebugProxyFolder;
             if (string.IsNullOrWhiteSpace(remoteDebugProxyFolder)) {
                 MessageBox.Show(SR.GetString(SR.RemoteDebugProxyFolderDoesNotExist), SR.ProductName);
                 return;
