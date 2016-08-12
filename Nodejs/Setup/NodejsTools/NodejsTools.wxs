@@ -40,12 +40,7 @@
 
         <DirectoryRef Id="TARGETDIR">
             <Directory Id="Dir_StartMenu" />
-        </DirectoryRef>
-
-        <Component Id="Comp_RemoteDebug" Directory="Dir_VSInstallLocation" Guid="*">
-            <RegistryValue Root='HKMU' Key='SOFTWARE\Microsoft\NodejsTools\$(var.VSTargetVersion)' Type='string' Value='Readme' KeyPath='yes' />
-            <RegistryValue Root='HKMU' Key='SOFTWARE\Microsoft\NodejsTools\$(var.VSTargetVersion)' Type='string' Name='RemoteDebugProxyFolder' Value='[Dir_VSRemoteDebug]' />                          
-        </Component>       
+        </DirectoryRef>   
         
         <!-- Per user components -->
         <Component Id="PerUserInstallRegistry" Directory="Dir_VSInstallLocation" Guid="*">
