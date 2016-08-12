@@ -25,12 +25,9 @@
 
     <CodeCoverageEnabled Condition="'$(CodeCoverageEnabled)'==''">true</CodeCoverageEnabled>
 
-    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">14.0</VisualStudioVersion>
     <VSTarget Condition="$(VSTarget)=='' and '$(VisualStudioVersion)'=='15.0'">15.0</VSTarget>    
-    <VSTarget Condition="$(VSTarget)=='' and '$(VisualStudioVersion)'=='14.0'">14.0</VSTarget>
-    <VSTarget Condition="$(VSTarget)=='' and '$(VisualStudioVersion)'=='12.0'">12.0</VSTarget>
-    <VSTarget Condition="$(VSTarget)=='' and '$(VisualStudioVersion)'=='11.0'">11.0</VSTarget>
-    <VSTarget Condition="$(VSTarget)==''">10.0</VSTarget>
+    <VSTarget Condition="$(VSTarget)==''">14.0</VSTarget>
     <BuildingInsideVisualStudio Condition="'$(BuildingInsideVisualStudio)' == ''">false</BuildingInsideVisualStudio>
     
     <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)' == ''">v4.6</TargetFrameworkVersion>
@@ -89,7 +86,6 @@
   </PropertyGroup>
 
 
-
   <PropertyGroup>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -116,12 +112,6 @@
     <VSMajorVersion>$([System.Double]::Parse($(VSTarget)))</VSMajorVersion>
     <_VSUpdateVersion Condition="$(VSUpdateVersion)=='' and $(VisualStudioVersion)!='10.0'">$([MSBuild]::GetRegistryValueFromView('HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\DevDiv\vs\Servicing\$(VSTarget)\devenv', 'UpdateVersion', null, RegistryView.Registry32))</_VSUpdateVersion>
     <VSUpdateVersion Condition="$(VSUpdateVersion)=='' and $(_VSUpdateVersion)!=''">$([System.Int32]::Parse($(_VSUpdateVersion.Substring($([MSBuild]::Add(1, $(_VSUpdateVersion.LastIndexOf(`.`))))))))</VSUpdateVersion>
-    
-    <!-- Features default to true for release builds -->
-    <FeatureAzureRemoteDebug>$(ReleaseBuild)</FeatureAzureRemoteDebug>
-    
-    <!-- Enable features based on VS versions -->
-    <FeatureAzureRemoteDebug Condition="$(VSMajorVersion) > 12 or ($(VSMajorVersion) == 12 and $(VSUpdateVersion) >= 30723)">true</FeatureAzureRemoteDebug>
   </PropertyGroup>
   
   <ItemDefinitionGroup>
@@ -143,7 +133,6 @@
   </ItemDefinitionGroup>
 
   <Import Project="$(TargetsPath)\Common.Build.CSharp.settings" Condition="'$(MSBuildProjectExtension)' == '.csproj' or '$(MSBuildProjectExtension)' == '.tmp_proj'" />
-  <Import Project="$(TargetsPath)\Common.Build.Cpp.settings" Condition="'$(MSBuildProjectExtension)' == '.vcxproj'" />
   <Import Project="$(TargetsPath)\Common.Build.Wix.settings" Condition="'$(MSBuildProjectExtension)' == '.wixproj'" />
   <Import Project="$(TargetsPath)\CodeCoverage.proj" />
 
