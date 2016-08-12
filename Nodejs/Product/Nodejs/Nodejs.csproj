@@ -1685,7 +1685,7 @@
   </Target>
   <PropertyGroup>
     <PostBuildEvent>
-      copy /y $(OutDir)..\WebRole\Microsoft.NodejsTools.WebRole.dll $(OutDir)Debugger\RemoteDebug\
+      copy /y $(OutDir)..\WebRole\Microsoft.NodejsTools.WebRole.dll $(OutDir)RemoteDebug\
     </PostBuildEvent>
   </PropertyGroup>
   <!-- We build these assemblies into separate folders to avoid incremental cleaning issues,
