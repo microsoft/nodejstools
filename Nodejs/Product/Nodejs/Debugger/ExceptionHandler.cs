@@ -84,117 +84,14 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         private Dictionary<string, ExceptionHitTreatment> GetDefaultExceptionTreatments() {
-            // Keep exception types in sync with those declared in ProvideDebugExceptionAttribute's in NodePackage.Debugger.cs
-#if FALSE
-            string[] exceptionTypes = {
-            };
-#endif
-
-            string[] breakNeverTypes = {
-                // should probably be break on unhandled when we have just my code support
-                "Error",
-                "Error(EACCES)",
-                "Error(EADDRINUSE)",
-                "Error(EADDRNOTAVAIL)",
-                "Error(EAFNOSUPPORT)",
-                "Error(EAGAIN)",
-                "Error(EWOULDBLOCK)",
-                "Error(EALREADY)",
-                "Error(EBADF)",
-                "Error(EBADMSG)",
-                "Error(EBUSY)",
-                "Error(ECANCELED)",
-                "Error(ECHILD)",
-                "Error(ECONNABORTED)",
-                "Error(ECONNREFUSED)",
-                "Error(ECONNRESET)",
-                "Error(EDEADLK)",
-                "Error(EDESTADDRREQ)",
-                "Error(EDOM)",
-                "Error(EEXIST)",
-                "Error(EFAULT)",
-                "Error(EFBIG)",
-                "Error(EHOSTUNREACH)",
-                "Error(EIDRM)",
-                "Error(EILSEQ)",
-                "Error(EINPROGRESS)",
-                "Error(EINTR)",
-                "Error(EINVAL)",
-                "Error(EIO)",
-                "Error(EISCONN)",
-                "Error(EISDIR)",
-                "Error(ELOOP)",
-                "Error(EMFILE)",
-                "Error(EMLINK)",
-                "Error(EMSGSIZE)",
-                "Error(ENAMETOOLONG)",
-                "Error(ENETDOWN)",
-                "Error(ENETRESET)",
-                "Error(ENETUNREACH)",
-                "Error(ENFILE)",
-                "Error(ENOBUFS)",
-                "Error(ENODATA)",
-                "Error(ENODEV)",
-                "Error(ENOENT)",
-                "Error(ENOEXEC)",
-                "Error(ENOLINK)",
-                "Error(ENOLCK)",
-                "Error(ENOMEM)",
-                "Error(ENOMSG)",
-                "Error(ENOPROTOOPT)",
-                "Error(ENOSPC)",
-                "Error(ENOSR)",
-                "Error(ENOSTR)",
-                "Error(ENOSYS)",
-                "Error(ENOTCONN)",
-                "Error(ENOTDIR)",
-                "Error(ENOTEMPTY)",
-                "Error(ENOTSOCK)",
-                "Error(ENOTSUP)",
-                "Error(ENOTTY)",
-                "Error(ENXIO)",
-                "Error(EOVERFLOW)",
-                "Error(EPERM)",
-                "Error(EPIPE)",
-                "Error(EPROTO)",
-                "Error(EPROTONOSUPPORT)",
-                "Error(EPROTOTYPE)",
-                "Error(ERANGE)",
-                "Error(EROFS)",
-                "Error(ESPIPE)",
-                "Error(ESRCH)",
-                "Error(ETIME)",
-                "Error(ETIMEDOUT)",
-                "Error(ETXTBSY)",
-                "Error(EXDEV)",
-                "Error(MODULE_NOT_FOUND)",
-                "Error(SIGHUP)",
-                "Error(SIGINT)",
-                "Error(SIGILL)",
-                "Error(SIGABRT)",
-                "Error(SIGFPE)",
-                "Error(SIGKILL)",
-                "Error(SIGSEGV)",
-                "Error(SIGTERM)",
-                "Error(SIGBREAK)",
-                "Error(SIGWINCH)",
-                "EvalError",
-                "RangeError",
-                "ReferenceError",
-                "SyntaxError",
-                "TypeError",
-                "URIError",
-            };
-
             var defaultExceptionTreatments = new Dictionary<string, ExceptionHitTreatment>();
-#if FALSE
-            foreach (string exceptionType in exceptionTypes) {
-                defaultExceptionTreatments[exceptionType] = ExceptionHitTreatment.BreakAlways;
-            }
-#endif
 
-            foreach (string exceptionType in breakNeverTypes) {
-                defaultExceptionTreatments[exceptionType] = ExceptionHitTreatment.BreakNever;
+            // Get exception names from in NodePackage.Debugger.cs
+            foreach (var attr in System.Attribute.GetCustomAttributes(typeof(NodejsPackage))) {
+                var debugAttr = attr as ProvideNodeDebugExceptionAttribute;
+                if (debugAttr != null && !string.IsNullOrEmpty(debugAttr.ExceptionName)) {
+                    defaultExceptionTreatments[debugAttr.ExceptionName] = ExceptionHitTreatment.BreakNever;
+                }
             }
 
             return defaultExceptionTreatments;
