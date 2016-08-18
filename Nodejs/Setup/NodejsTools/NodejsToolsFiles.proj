@@ -63,28 +63,22 @@
                                ItemTemplates\JavaScript\DockerfileTemplate.zip"/>
 
         <ProjectTemplate Include="ProjectTemplates\JavaScript\Node.js\1033\AzureExpress4App.zip;
-                                  ProjectTemplates\JavaScript\Node.js\1033\AzureStarterExpressApp.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\AzureNodejsApp.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\Express4App.zip;
-                                  ProjectTemplates\JavaScript\Node.js\1033\StarterExpressApp.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\FromExistingCode.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\NodejsWebApp.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\NodejsConsoleApp.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\AzureNodejsWorker.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\AddWebSiteAzureExpressApp.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\AddWebSiteAzureNodejsApp.zip;
-                                  ProjectTemplates\JavaScript\Node.js\1033\AddWebSiteAzureStarterExpressApp.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\AddWebSiteExpressApp.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\AddWebSiteNodejsWebApp.zip;
-                                  ProjectTemplates\JavaScript\Node.js\1033\AddWebSiteStarterExpressApp.zip;
                                   ProjectTemplates\TypeScript\Node.js\1033\TypeScriptAzureExpressApp.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\TypeScriptAzureExpressWebRole.zip;
-                                  ProjectTemplates\TypeScript\Node.js\1033\TypeScriptAzureStarterExpressApp.zip;
                                   ProjectTemplates\TypeScript\Node.js\1033\TypeScriptAzureWebApp.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\TypeScriptAzureWebRole.zip;
                                   ProjectTemplates\TypeScript\Node.js\1033\TypeScriptConsoleApp.zip;
                                   ProjectTemplates\TypeScript\Node.js\1033\TypeScriptExpressApp.zip;
-                                  ProjectTemplates\TypeScript\Node.js\1033\TypeScriptStarterExpressApp.zip;
                                   ProjectTemplates\TypeScript\Node.js\1033\TypeScriptWebApp.zip;
                                   ProjectTemplates\TypeScript\Node.js\1033\TypeScriptFromExistingCode.zip;
                                   ProjectTemplates\TypeScript\Node.js\1033\TypeScriptAzureNodejsWorker.zip;

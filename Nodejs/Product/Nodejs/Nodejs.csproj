@@ -1016,10 +1016,10 @@
     </TypeScriptProject>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\index.ts" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\Preview.png" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\TypeScriptAzureWebApp\TypeScriptWebApp.vstemplate">
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\TypeScriptWebApp.vstemplate">
       <SubType>Designer</SubType>
     </TypeScriptProject>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\TypeScriptAzureWebApp\Preview.png" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Preview.png" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\TypeScriptExpressApp.vstemplate">
       <SubType>Designer</SubType>
     </TypeScriptProject>
@@ -1214,18 +1214,18 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\TypeScriptAzureWebApp\TypeScriptWebApp.njsproj">
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\TypeScriptWebApp.njsproj">
       <SubType>Designer</SubType>
     </TypeScriptProject>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\TypeScriptAzureWebApp\package.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\TypeScriptAzureWebApp\README.md" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\TypeScriptAzureWebApp\ChangeConfig.ps1" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\TypeScriptAzureWebApp\download.ps1" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\TypeScriptAzureWebApp\node.cmd" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\TypeScriptAzureWebApp\Web.Debug.config" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\TypeScriptAzureWebApp\Web.config" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\TypeScriptAzureWebApp\setup_web.cmd" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\TypeScriptAzureWebApp\iisnode.yml" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\package.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\README.md" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\ChangeConfig.ps1" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\download.ps1" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\node.cmd" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Web.Debug.config" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Web.config" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\setup_web.cmd" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\iisnode.yml" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\TypeScriptExpressApp.njsproj">
       <SubType>Designer</SubType>
     </TypeScriptProject>
@@ -1373,7 +1373,7 @@
     <ProjectReference2 Include="..\TestAdapter\TestAdapter.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\TypeScriptAzureWebApp\server.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\server.ts" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\app.ts" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\express.d.ts" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\index.ts" />
