@@ -1,4 +1,4 @@
-﻿//*********************************************************//
+//*********************************************************//
 //    Copyright (c) Microsoft. All rights reserved.
 //    
 //    Apache 2.0 License
@@ -36,6 +36,11 @@ namespace Microsoft.NodejsTools {
         public const int cmdidDiagnostics                   = 0x208;
         public const int cmdidSetAsContent                  = 0x209;
         public const int cmdidSetAsCompile                  = 0x210;
+		public const int cmdidAddNewJavaScriptFileCommand   = 0x211;  
+		public const int cmdidAddNewTypeScriptFileCommand   = 0x212;  
+		public const int cmdidAddNewHTMLFileCommand         = 0x213;  
+		public const int cmdidAddNewCSSFileCommand          = 0x214;  
+
 
         public const int cmdidNpmManageModules              = 0x300;
         public const int cmdidNpmInstallModules             = 0x301;
@@ -47,3 +52,4 @@ namespace Microsoft.NodejsTools {
         public const int menuIdNpm                          = 0x3000;
     }
 }
+
