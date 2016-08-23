@@ -249,7 +249,7 @@ etc.
 
                 var versions = module["versions"];
                 if (versions != null) {
-                    builder.AvailableVersions = GetVersions(builder.Name, versions);
+                    builder.AvailableVersions = GetVersions(versions);
                 }
 
                 AddKeywords(builder, module["keywords"]);
@@ -281,7 +281,7 @@ etc.
 
         }
 
-        private IEnumerable<SemverVersion> GetVersions(string name, JToken versionsToken) {
+        private IEnumerable<SemverVersion> GetVersions(JToken versionsToken) {
             var versionStrings = versionsToken.OfType<JProperty>().Select(v => (string)v.Name);
             foreach (var versionString in versionStrings) {
                 if (!string.IsNullOrEmpty(versionString)) {
