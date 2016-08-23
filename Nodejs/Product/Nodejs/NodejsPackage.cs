@@ -241,6 +241,8 @@ namespace Microsoft.NodejsTools {
             MakeDebuggerContextAvailable();
 
             IntellisenseOptionsPage.AnalysisLogMaximumChanged += IntellisenseOptionsPage_AnalysisLogMaximumChanged;
+            IntellisenseOptionsPage.AnalysisLevelChanged += IntellisenseOptionsPageAnalysisLevelChanged;
+            IntellisenseOptionsPage.SaveToDiskChanged += IntellisenseOptionsPageSaveToDiskChanged;
 
             InitializeLogging();
 
@@ -376,42 +378,6 @@ namespace Microsoft.NodejsTools {
         internal LanguagePreferences LangPrefs {
             get {
                 return _langPrefs;
-            }
-        }
-
-        private static Lazy<string> remoteDebugProxyFolder = new Lazy<string>(() => {
-            const string ROOT_KEY = "Software\\Microsoft\\NodeJSTools\\" + AssemblyVersionInfo.VSVersion;
-
-            // Try HKCU
-            try {
-                using (RegistryKey node = Registry.CurrentUser.OpenSubKey(ROOT_KEY)) {
-                    if (node != null) {
-                        var value = (string)node.GetValue("RemoteDebugProxyFolder");
-                        if (value != null)
-                            return value;
-                    }
-                }
-            } catch (Exception) {
-            }
-
-            // Try HKLM
-            try {
-                using (RegistryKey node = Registry.LocalMachine.OpenSubKey(ROOT_KEY)) {
-                    if (node != null) {
-                        var value = (string)node.GetValue("RemoteDebugProxyFolder");
-                        if (value != null)
-                            return value;
-                    }
-                }
-            } catch (Exception) {
-            }
-
-            return null;
-        });
-
-        public static string RemoteDebugProxyFolder {
-            get {
-                return remoteDebugProxyFolder.Value;
             }
         }
 
@@ -633,25 +599,28 @@ namespace Microsoft.NodejsTools {
                     _analyzer = CreateLooseVsProjectAnalyzer();
                     LogLooseFileAnalysisLevel();
                     _analyzer.MaxLogLength = IntellisenseOptionsPage.AnalysisLogMax;
-                    IntellisenseOptionsPage.AnalysisLevelChanged += IntellisenseOptionsPageAnalysisLevelChanged;
-                    IntellisenseOptionsPage.SaveToDiskChanged += IntellisenseOptionsPageSaveToDiskChanged;
                 }
                 return _analyzer;
             }
         }
 
         private void IntellisenseOptionsPageSaveToDiskChanged(object sender, EventArgs e) {
-            _analyzer.SaveToDisk = IntellisenseOptionsPage.SaveToDisk;
+            if (_analyzer != null) {
+                _analyzer.SaveToDisk = IntellisenseOptionsPage.SaveToDisk;
+            }
         }
 
         private void IntellisenseOptionsPageAnalysisLevelChanged(object sender, EventArgs e) {
-            var analyzer = CreateLooseVsProjectAnalyzer();
-            analyzer.SwitchAnalyzers(_analyzer);
-            if (_analyzer.RemoveUser()) {
-                _analyzer.Dispose();
+            if (_analyzer != null) {
+                var analyzer = CreateLooseVsProjectAnalyzer();
+                analyzer.SwitchAnalyzers(_analyzer);
+                if (_analyzer.RemoveUser()) {
+                    _analyzer.Dispose();
+                }
+                _analyzer = analyzer;
+                LogLooseFileAnalysisLevel();
             }
-            _analyzer = analyzer;
-            LogLooseFileAnalysisLevel();
+            TelemetryLogger.LogAnalysisLevelChanged(IntellisenseOptionsPage.AnalysisLevel);
         }
 
         private VsProjectAnalyzer CreateLooseVsProjectAnalyzer() {
@@ -671,8 +640,7 @@ namespace Microsoft.NodejsTools {
 
         private void LogLooseFileAnalysisLevel() {
             var analyzer = _analyzer;
-            if(analyzer != null)
-            {
+            if (analyzer != null) {
                 var val = analyzer.AnalysisLevel;
                 _logger.LogEvent(NodejsToolsLogEvent.AnalysisLevel, (int)val);
             }

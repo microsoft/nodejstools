@@ -30,7 +30,7 @@
 
   <Target Name="_CopyWixOutputsToPath"
           AfterTargets="AfterBuild"
-          Condition="'$(CopyOutputsToPath)' != '' and $(OutputType) == 'Package'">
+          Condition="'$(CopyOutputsToPath)' != '' and ($(OutputType) == 'Package' or $(OutputType) == 'Vsix')">
     <PropertyGroup>
       <CopyOutputsToPath Condition="!HasTrailingSlash($(CopyOutputsToPath))">$(CopyOutputsToPath)\</CopyOutputsToPath>
       <_PathSuffix Condition="'$(SignedBinariesPath)' != ''">SignedBinariesUnsignedMsi\</_PathSuffix>

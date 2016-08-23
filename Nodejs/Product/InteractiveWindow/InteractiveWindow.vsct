@@ -245,10 +245,6 @@
             bitmap strip containing the bitmaps and then there are the numeric ids of the elements used 
             inside a button definition. An important aspect of this declaration is that the element id 
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
-            <Bitmap guid="guidReplToolbarImages" href="..\..\..\Common\Product\Icons\Dev11.0\ReplToolBarImages.bmp" usedList="bmpCancelEval, bmpResetSession, bmpClearScreen"
-                    Condition="Defined(DEV11)"/>
-            <Bitmap guid="guidReplToolbarImages" href="..\..\..\Common\Product\Icons\Dev12.0\ReplToolBarImages.bmp" usedList="bmpCancelEval, bmpResetSession, bmpClearScreen"
-                    Condition="Defined(DEV12)"/>
             <Bitmap guid="guidReplToolbarImages" href="..\..\..\Common\Product\Icons\Dev14.0\ReplToolBarImages.bmp" usedList="bmpCancelEval, bmpResetSession, bmpClearScreen"
                     Condition="Defined(DEV14)"/>
             <Bitmap guid="guidReplToolbarImages" href="..\..\..\Common\Product\Icons\Dev15.0\ReplToolBarImages.bmp" usedList="bmpCancelEval, bmpResetSession, bmpClearScreen"
@@ -301,12 +297,13 @@
             <IDSymbol name="cmdidReplSearchHistoryNext" value="0x010A"/>
             <IDSymbol name="cmdidReplSearchHistoryPrevious" value="0x010B"/>
 
-          <!-- Groups -->
+            <!-- Groups -->
             <IDSymbol name="ConsoleMenuGroup" value="0x1050" />
             <IDSymbol name="ConsoleMenuEditGroup" value="0x1051" />
             <IDSymbol name="ConsoleMenuClearGroup" value="0x1052" />
             <IDSymbol name="CodeFileGroup" value="0x1053" />
             <IDSymbol name="replToolbarGroup" value="0x1054"/>
+            <IDSymbol name="MyNewGroup" value="0x1055"/>
 
             <!-- Menus -->
             <IDSymbol name="menuIdReplToolbar" value="0x2000"/>

@@ -17,25 +17,13 @@
 using System;
 
 namespace Microsoft.NodejsTools.Debugger {
-    class BreakpointHitEventArgs : EventArgs {
-        private readonly NodeBreakpointBinding _breakpointBinding;
-        private readonly NodeThread _thread;
+    sealed class BreakpointHitEventArgs : EventArgs {
+        public readonly NodeBreakpointBinding BreakpointBinding;
+        public readonly NodeThread Thread;
 
         public BreakpointHitEventArgs(NodeBreakpointBinding breakpoint, NodeThread thread) {
-            _breakpointBinding = breakpoint;
-            _thread = thread;
-        }
-
-        public NodeBreakpointBinding BreakpointBinding {
-            get {
-                return _breakpointBinding;
-            }
-        }
-
-        public NodeThread Thread {
-            get {
-                return _thread;
-            }
+            BreakpointBinding = breakpoint;
+            Thread = thread;
         }
     }
 }

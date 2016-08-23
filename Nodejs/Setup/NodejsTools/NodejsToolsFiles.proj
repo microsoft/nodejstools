@@ -22,8 +22,6 @@
         <!-- Support Files -->
         <File Include="all.json" />
         <File Include="Newtonsoft.Json.dll"/>
-        <File Include="Microsoft.ApplicationInsights.dll" Condition="'$(VSTarget)' == '11.0' Or '$(VSTarget)' == '12.0'"/>
-        <File Include="Microsoft.ApplicationInsights.PersistenceChannel.dll" Condition="'$(VSTarget)' == '11.0' Or '$(VSTarget)' == '12.0'"/>
         <File Include="sqlite3.dll" />
         <File Include="visualstudio_nodejs_repl.js"/>
         <File Include="nodejsref.js"/>
@@ -63,26 +61,19 @@
                                ItemTemplates\JavaScript\TypeScriptTapeUnitTest.zip;
                                ItemTemplates\JavaScript\TypeScriptMochaUnitTest.zip;
                                ItemTemplates\JavaScript\DockerfileTemplate.zip"/>
-                               
-        <File Include="Templates\VS_Nodejs.item.vstman">
-            <InstallDirectory>AllItemTemplates</InstallDirectory>
-        </File>
 
         <ProjectTemplate Include="ProjectTemplates\JavaScript\Node.js\1033\AzureExpress4App.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\AzureStarterExpressApp.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\AzureNodejsApp.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\Express4App.zip;
-                                  ProjectTemplates\JavaScript\Node.js\1033\StarterExpressApp.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\FromExistingCode.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\NodejsWebApp.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\NodejsConsoleApp.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\AzureNodejsWorker.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\AddWebSiteAzureExpressApp.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\AddWebSiteAzureNodejsApp.zip;
-                                  ProjectTemplates\JavaScript\Node.js\1033\AddWebSiteAzureStarterExpressApp.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\AddWebSiteExpressApp.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\AddWebSiteNodejsWebApp.zip;
-                                  ProjectTemplates\JavaScript\Node.js\1033\AddWebSiteStarterExpressApp.zip;
                                   ProjectTemplates\TypeScript\Node.js\1033\TypeScriptAzureExpressApp.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\TypeScriptAzureExpressWebRole.zip;
                                   ProjectTemplates\TypeScript\Node.js\1033\TypeScriptAzureStarterExpressApp.zip;
@@ -90,16 +81,11 @@
                                   ProjectTemplates\JavaScript\Node.js\1033\TypeScriptAzureWebRole.zip;
                                   ProjectTemplates\TypeScript\Node.js\1033\TypeScriptConsoleApp.zip;
                                   ProjectTemplates\TypeScript\Node.js\1033\TypeScriptExpressApp.zip;
-                                  ProjectTemplates\TypeScript\Node.js\1033\TypeScriptStarterExpressApp.zip;
                                   ProjectTemplates\TypeScript\Node.js\1033\TypeScriptWebApp.zip;
                                   ProjectTemplates\TypeScript\Node.js\1033\TypeScriptFromExistingCode.zip;
                                   ProjectTemplates\TypeScript\Node.js\1033\TypeScriptAzureNodejsWorker.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\TypeScriptAzureNodejsWorkerRole.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\CloudService.zip;"/>
-        
-        <File Include="ProjectTemplates\VS_Nodejs.project.vstman">
-            <InstallDirectory>AllProjectTemplates</InstallDirectory>
-        </File>
 
         <File Include="ItemTemplates\CloudService\NETFramework4\Web Role\Node.js\CloudServiceWebRole.zip;
                        ItemTemplates\CloudService\NETFramework4\Web Role\Node.js\CloudServiceExpressWebRole.zip;
@@ -150,6 +136,15 @@
         <File Include="Snippets\1033\SnippetsIndex.xml">
             <InstallDirectory>Snippets_1033</InstallDirectory>
         </File>
+        
+        <File Include="TypingsAcquisitionTool\index.js;
+                       TypingsAcquisitionTool\package.json">
+            <InstallDirectory>TypingsAcquisitionTool</InstallDirectory>
+        </File>
+        
+        <File Include="TypingsAcquisitionTool\bin\install_typings">
+            <InstallDirectory>TypingsAcquisitionToolBin</InstallDirectory>
+        </File>
 
         <!--Unit test framework support files-->
         <File Include="TestFrameworks\find_tests.js;
@@ -171,8 +166,8 @@
         
         <!-- Remote Debug files -->
         <File Include="License.html;
-                       Debugger\RemoteDebug\RemoteDebug.js;
-                       Debugger\RemoteDebug\Microsoft.NodejsTools.WebRole.dll">
+                       RemoteDebug\RemoteDebug.js;
+                       RemoteDebug\Microsoft.NodejsTools.WebRole.dll">
             <InstallDirectory>RemoteDebug</InstallDirectory>
         </File>
 

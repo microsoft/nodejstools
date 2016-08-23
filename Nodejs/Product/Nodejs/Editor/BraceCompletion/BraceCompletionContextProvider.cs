@@ -13,7 +13,6 @@
 //    permissions and limitations under the License.
 //
 //*********************************************************//
-#if DEV12_OR_LATER
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using Microsoft.NodejsTools.Classifier;
@@ -66,4 +65,3 @@ namespace Microsoft.NodejsTools.Editor.BraceCompletion {
         }
     }
 }
-#endif

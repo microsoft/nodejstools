@@ -21,7 +21,7 @@
     [Optional] The VS version to build for. If omitted, builds for all versions
     that are installed.
     
-    Valid values: "11.0", "12.0", "14.0", "15.0"
+    Valid values: "14.0", "15.0"
 
 .Parameter name
     [Optional] A suffix to append to the name of the build.
@@ -141,10 +141,11 @@ $version_file = gi "$buildroot\Nodejs\Product\AssemblyVersion.cs"
 
 $build_project = gi "$buildroot\Nodejs\dirs.proj"
 $setup_project = gi "$buildroot\Nodejs\Setup\setup.proj"
+$setup_swix_project = gi "$buildroot\Nodejs\Setup\setup-swix.proj"
 
 # Project metadata
 $project_name = "Node.js Tools for Visual Studio"
-$project_url = "http://nodejstools.codeplex.com"
+$project_url = "https://github.com/Microsoft/nodejstools"
 $project_keywords = "NTVS; Visual Studio; Node.js"
 
 # These people are able to approve code signing operations
@@ -169,10 +170,24 @@ if ($release -or $mockrelease) {
     $global_msbuild_options += "/p:ReleaseBuild=true"
 }
 
+# Get the path to msbuild for a configuration
+function msbuild-exe($target) {
+    $msbuild_reg = Get-ItemProperty -Path "HKLM:\Software\Wow6432Node\Microsoft\MSBuild\ToolsVersions\$($target.VSTarget)" -EA 0
+    if (-not $msbuild_reg) {
+        Throw "Visual Studio build tools $($target.VSTarget) not found."
+    }
+    
+    $target_exe = $msbuild_reg.MSBuildToolsPath + "msbuild.exe"
+    if (-not (Test-Path -Path $target_exe)) {
+        Throw "Visual Studio build tools $($target.VSTarget) not found."
+    }
+    $target_exe
+}
+
 # This function is used to get options for each configuration
 #
 # $target contains the following members:
-#   VSTarget            e.g. 12.0
+#   VSTarget            e.g. 14.0
 #   VSName              e.g. VS 2013
 #   config              Name of the build configuration
 #   msi_version         X.Y.Z.W installer version
@@ -190,7 +205,7 @@ if ($release -or $mockrelease) {
 #   signed_bindir       Output directory for signed binaries
 #   signed_msidir       Output directory for signed installers
 #   signed_unsigned_msidir  Output directory for unsigned installers containing signed binaries
-function msbuild-options($target, $config) {
+function msbuild-options($target) {
     @(
         "/p:VSTarget=$($target.VSTarget)",
         "/p:VisualStudioVersion=$($target.VSTarget)",
@@ -204,6 +219,10 @@ function msbuild-options($target, $config) {
 # This function is invoked after each target is built.
 function after-build($buildroot, $target) {
     Copy-Item -Force "$buildroot\Nodejs\Prerequisites\*.reg" $($target.destdir)
+    
+    $setup15 = mkdir "$($target.destdir)\Setup15" -Force
+    Copy-Item -Recurse -Force "$buildroot\BuildOutput\$($target.config)$($target.VSTarget)\Setup\*.json" $setup15
+    Copy-Item -Recurse -Force "$buildroot\BuildOutput\$($target.config)$($target.VSTarget)\Setup\*.vsman" $setup15
 
     if ($copytests) {
         Copy-Item -Recurse -Force "$buildroot\BuildOutput\$($target.config)$($target.VSTarget)\Tests" "$($target.destdir)\Tests"
@@ -216,6 +235,24 @@ function after-build-all($buildroot, $outdir) {
     if (-not $release) {
         Copy-Item -Force "$buildroot\Nodejs\Prerequisites\*.reg" $outdir
     }
+    
+    $vsdrop = mkdir "$env:BUILD_STAGINGDIRECTORY\vsdrop" -Force
+    Copy-Item -Force "$outdir\**.vsman" $vsdrop
+    Copy-Item -Force "$outdir\**.json" $vsdrop
+    Copy-Item -Force "$outdir\**.vsix" $vsdrop
+}
+
+# Manually clean up an output directory
+function clean-outdir($outdir) {
+    if ((Test-Path $outdir) -and (Get-ChildItem $outdir)) {
+        Write-Output "Cleaning previous release in $outdir"
+        del -Recurse -Force $outdir\* -EA 0
+        while (Get-ChildItem $outdir) {
+            Write-Output "Failed to clean release. Retrying in five seconds. (Press Ctrl+C to abort)"
+            Sleep -Seconds 5
+            del -Recurse -Force $outdir\* -EA 0
+        }
+    }
 }
 
 # Add product name mappings here
@@ -225,6 +262,15 @@ function after-build-all($buildroot, $outdir) {
 #   {3} will be replaced by the config ('Debug') marker preceded by a space
 $installer_names = @{
     'NodejsToolsInstaller.msi'="NTVS{1}{2}{3}.msi";
+    'Microsoft.NodejsTools.vsix' = 'Microsoft.NodejsTools.vsix';
+    'Microsoft.NodejsTools.Profiling.vsix' = 'Microsoft.NodejsTools.Profiling.vsix';
+    'Microsoft.NodejsTools.InteractiveWindow.vsix' = 'Microsoft.NodejsTools.InteractiveWindow.vsix';
+    'Microsoft.VisualStudio.NodejsTools.Targets.vsix' = 'Microsoft.VisualStudio.NodejsTools.Targets.vsix';
+    'NodejsTools.vsman' = 'NodejsTools.vsman';
+    'Microsoft.VisualStudio.NodejsTools.NodejsTools.json' = 'Microsoft.VisualStudio.NodejsTools.NodejsTools.json';
+    'Microsoft.VisualStudio.NodejsTools.Profiling.json' = 'Microsoft.VisualStudio.NodejsTools.Profiling.json';
+    'Microsoft.VisualStudio.NodejsTools.InteractiveWindow.json' = 'Microsoft.VisualStudio.NodejsTools.InteractiveWindow.json';
+    'Microsoft.VisualStudio.NodejsTools.Targets.json' = 'Microsoft.VisualStudio.NodejsTools.Targets.json';
 }
 
 # Add list of files requiring signing here
@@ -239,8 +285,6 @@ $managed_files = (
     "Microsoft.NodejsTools.Npm.dll",
     "Microsoft.NodejsTools.TestAdapter.dll",
     "Microsoft.NodejsTools.PressAnyKey.exe",
-    "Microsoft.NodejsTools.Telemetry.11.0.dll",
-    "Microsoft.NodejsTools.Telemetry.12.0.dll",
     "Microsoft.NodejsTools.Telemetry.14.0.dll",
     "Microsoft.NodejsTools.Telemetry.15.0.dll"
 )
@@ -249,9 +293,7 @@ $native_files = @()
 
 $supported_vs_versions = (
     @{number="15.0"; name="VS 15"; build_by_default=$true},    
-    @{number="14.0"; name="VS 2015"; build_by_default=$true},
-    @{number="12.0"; name="VS 2013"; build_by_default=$true},
-    @{number="11.0"; name="VS 2012"; build_by_default=$true}
+    @{number="14.0"; name="VS 2015"; build_by_default=$true}
 )
 
 # #############################################################################
@@ -261,11 +303,6 @@ $supported_vs_versions = (
 #
 # #############################################################################
 # #############################################################################
-
-
-if (-not (Get-Command msbuild -EA 0)) {
-    Throw "Visual Studio build tools are required."
-}
 
 if (-not $outdir -and -not $release) {
     if (-not $outdir) {
@@ -399,15 +436,9 @@ Write-Output "============================================================"
 Write-Output ""
 
 if (-not $skipclean) {
-    if ((Test-Path $outdir) -and (Get-ChildItem $outdir)) {
-        Write-Output "Cleaning previous release in $outdir"
-        del -Recurse -Force $outdir\* -EA 0
-        while (Get-ChildItem $outdir) {
-            Write-Output "Failed to clean release. Retrying in five seconds. (Press Ctrl+C to abort)"
-            Sleep -Seconds 5
-            del -Recurse -Force $outdir\* -EA 0
-        }
-    }
+    clean-outdir $outdir
+    clean-outdir $buildroot\BuildOutput
+    
     if (-not (Test-Path $outdir)) {
         mkdir $outdir -EA 0 | Out-Null
         if (-not $?) {
@@ -467,11 +498,12 @@ try {
         
         foreach ($i in $target_info) {
             if (-not $skipbuild) {
+                $target_msbuild_exe = msbuild-exe $i
                 $target_msbuild_options = msbuild-options $i
                 if (-not $skipclean) {
-                    msbuild /t:Clean $global_msbuild_options $target_msbuild_options $build_project
+                    & $target_msbuild_exe /t:Clean $global_msbuild_options $target_msbuild_options $build_project
                 }
-                msbuild $global_msbuild_options $target_msbuild_options /fl /flp:logfile=$($i.logfile) $build_project
+                & $target_msbuild_exe $global_msbuild_options $target_msbuild_options /fl /flp:logfile=$($i.logfile) $build_project
 
                 if (-not $?) {
                     Write-Error "Build failed: $($i.VSName) $config"
@@ -520,12 +552,19 @@ try {
                 submit_symbols "$project_name$spacename" "$buildnumber $($i.VSName) $config" "binaries" $i.signed_bindir $symbol_contacts
                 submit_symbols "$project_name$spacename" "$buildnumber $($i.VSName) $config" "symbols" $i.symboldir $symbol_contacts
 
+                $target_msbuild_exe = msbuild-exe $i
                 $target_msbuild_options = msbuild-options $i
-                msbuild $global_msbuild_options $target_msbuild_options `
+                & $target_msbuild_exe $global_msbuild_options $target_msbuild_options `
+                    /fl /flp:logfile=$($i.signed_logfile) `
+                    /p:SignedBinariesPath=$($i.signed_bindir) `
+                    /p:RezipVSIXFiles=false `
+                    $setup_project
+
+                & $target_msbuild_exe $global_msbuild_options $target_msbuild_options `
                     /fl /flp:logfile=$($i.signed_logfile) `
                     /p:SignedBinariesPath=$($i.signed_bindir) `
                     /p:RezipVSIXFiles=true `
-                    $setup_project
+                    $setup_swix_project
             }
 
             $jobs = @()
@@ -581,7 +620,7 @@ try {
             
             if ($i.VSName) {$fmt.VSName = " $($i.VSName)"} else {$fmt.VSName = ""}
             
-            Get-ChildItem "$($i.final_msidir)\*.msi", "$($i.final_msidir)\*.vsix" | `
+            Get-ChildItem "$($i.final_msidir)\*.msi", "$($i.final_msidir)\*.vsix", "$($i.destdir)\Setup15\*.json", "$($i.destdir)\Setup15\*.vsman" | `
                 ?{ $installer_names[$_.Name] } | `
                 %{ @{
                     src=$_;

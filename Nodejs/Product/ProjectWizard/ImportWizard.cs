@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
+using System.Diagnostics;
 using EnvDTE;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
@@ -33,12 +34,6 @@ namespace Microsoft.NodejsTools.ProjectWizard {
         public void RunFinished() { }
 
         public void RunStarted(object automationObject, Dictionary<string, string> replacementsDictionary, WizardRunKind runKind, object[] customParams) {
-            try {
-                Directory.Delete(replacementsDictionary["$destinationdirectory$"]);
-                Directory.Delete(replacementsDictionary["$solutiondirectory$"]);
-            } catch {
-                // If it fails (doesn't exist/contains files/read-only), let the directory stay.
-            }
 
             var dte = automationObject as DTE;
             if (dte == null) {
@@ -68,13 +63,13 @@ namespace Microsoft.NodejsTools.ProjectWizard {
                     if (String.IsNullOrWhiteSpace(solnName)) {
                         // Create directory is unchecked, destinationdirectory is the
                         // directory name the user entered plus the project name, we want
-                        // to remove the project name.
+                        // to remove the solution directory.
                         directory = Path.GetDirectoryName(replacementsDictionary["$destinationdirectory$"]);
                     } else {
                         // Create directory is checked, the destinationdirectory is the
                         // directory the user entered plus the project name plus the
-                        // solution name - we want to remove both extra folders
-                        directory = Path.GetDirectoryName(Path.GetDirectoryName(replacementsDictionary["$destinationdirectory$"]));
+                        // solution name.
+                        directory = Path.GetDirectoryName(replacementsDictionary["$destinationdirectory$"]);
                     }
 
                     var context = addingNewProject ? 

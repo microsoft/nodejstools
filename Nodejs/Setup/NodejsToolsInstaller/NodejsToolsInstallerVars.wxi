@@ -1,22 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Include>
-  <?if "$(var.VSTargetVersion)" = "11.0" ?>
-    <?define InstallerUpgradeGuid=9291B031-A6DD-4AC2-A99C-421076160394?>
-    <?define Comp_InstallLocationGuid=8C72E7BA-8D13-4768-A6FA-9362D2CF9BE8?>
-    <?define Comp_AllUserInstallDirItemGuid=133E49D5-31D9-4726-876C-243078F399BF?>
-    <?define Comp_InstallDirItemGuid=32ADB1E0-C9AE-4847-A731-423DFA1DF097?>
-    <?define Comp_NjsProjRegistrationGuid=428F728A-7A33-42D4-8692-B38E146BD21A?>
-    <?define Comp_ProgramMenuFolder=C7D8A133-EE6E-4A24-B200-3902AAB4D5CD?>
-    <?define Comp_NjsPerfRegistrationGuid=3A0DE583-354F-449A-AF25-9C05766035C9?>
-  <?elseif "$(var.VSTargetVersion)" = "12.0" ?>
-    <?define InstallerUpgradeGuid=58AFA70A-C693-4A9A-894F-F16E9495DA9D?>  
-    <?define Comp_InstallLocationGuid=5003C0DF-725F-452E-962A-7373BA146099?>
-    <?define Comp_AllUserInstallDirItemGuid=DEAD96CB-1E67-4BDC-99C6-79ADE9A2F927?>
-    <?define Comp_InstallDirItemGuid=D3596841-CDE9-426E-901E-3A4580BA39A2?>
-    <?define Comp_NjsProjRegistrationGuid=566FD245-A9F5-432D-B98E-77DEE9DC442F?>
-    <?define Comp_ProgramMenuFolder=8DD244BE-0E12-4154-9E12-E46B1E87499E?>
-    <?define Comp_NjsPerfRegistrationGuid=CD1F26B8-C6EE-4711-AE83-3AEC2B567874?>
-  <?elseif "$(var.VSTargetVersion)" = "14.0" ?>
+  <?if "$(var.VSTargetVersion)" = "14.0" ?>
     <?define InstallerUpgradeGuid=08FBC8DA-20FB-4E06-A4CE-2FBC02349C58?>  
     <?define Comp_InstallLocationGuid=331A9B17-DE3B-4772-A8C7-71F3AD9E6A55?>
     <?define Comp_AllUserInstallDirItemGuid=1C38E660-2010-49A6-9FAF-443E1A6F9D6A?>

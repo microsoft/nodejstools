@@ -15,7 +15,6 @@
 //*********************************************************//
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -23,18 +22,15 @@ using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal class NpmController : AbstractNpmLogSource, INpmController {
-
         private IPackageCatalog _sRepoCatalog;
         private string _fullPathToRootPackageDirectory;
         private string _cachePath;
         private bool _showMissingDevOptionalSubPackages;
         private INpmPathProvider _npmPathProvider;
         private IRootPackage _rootPackage;
-        private IGlobalPackages _globalPackage;
         private readonly object _lock = new object();
 
         private readonly FileSystemWatcher _localWatcher;
-        private readonly FileSystemWatcher _globalWatcher;
 
         private Timer _fileSystemWatcherTimer;
         private int _refreshRetryCount;
@@ -56,7 +52,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             _npmPathProvider = npmPathProvider;
 
             _localWatcher = CreateModuleDirectoryWatcherIfDirectoryExists(_fullPathToRootPackageDirectory);
-            _globalWatcher = CreateModuleDirectoryWatcherIfDirectoryExists(this.ListBaseDirectory);
 
             try {
                 ReloadModules();
@@ -100,18 +95,19 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         public void Refresh() {
-            RefreshAsync().ContinueWith(t => {
-                var ex = t.Exception;
+            try {
+                RefreshImplementation();
+            } catch (Exception ex) {
                 if (ex != null) {
                     OnOutputLogged(ex.ToString());
 #if DEBUG
                     Debug.Fail(ex.ToString());
 #endif
                 }
-            });
+            }
         }
 
-        public async Task RefreshAsync() {
+        private void RefreshImplementation() {
             OnStartingRefresh();
             try {
                 lock (_fileBitsLock) {
@@ -126,12 +122,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 RootPackage = RootPackageFactory.Create(
                             _fullPathToRootPackageDirectory,
                             _showMissingDevOptionalSubPackages);
-
-                var command = new NpmBinCommand(_fullPathToRootPackageDirectory, true, PathToNpm);
-
-                GlobalPackages = (await command.ExecuteAsync())
-                    ? RootPackageFactory.Create(command.BinDirectory)
-                    : null;
+                return;
             } catch (IOException) {
                 // Can sometimes happen when packages are still installing because the file may still be used by another process
             } finally {
@@ -141,24 +132,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 if (RootPackage == null) {
                     OnOutputLogged("Error - Cannot load local packages.");
                 }
-                if (GlobalPackages == null) {
-                    OnOutputLogged("Error - Cannot load global packages.");
-                }
                 OnFinishedRefresh();
-            }
-        }
-
-        public string ListBaseDirectory {
-            get {
-                var command = new NpmBinCommand(_fullPathToRootPackageDirectory, true, PathToNpm);
-
-                // TODO - use GetAwaiter().GetResult() instead. 
-                // https://nodejstools.codeplex.com/workitem/1849
-                if (Task.Run(async () => { return await command.ExecuteAsync(); }).Result) {
-                    return command.BinDirectory;
-                }
-
-                return null;
             }
         }
 
@@ -172,19 +146,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             private set {
                 lock (_lock) {
                     _rootPackage = value;
-                }
-            }
-        }
-
-        public IGlobalPackages GlobalPackages {
-            get {
-                lock (_lock) {
-                    return _globalPackage;
-                }
-            }
-            private set {
-                lock (_lock) {
-                    _globalPackage = value;
                 }
             }
         }
@@ -343,13 +304,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                         _localWatcher.Created -= Watcher_Modified;
                         _localWatcher.Deleted -= Watcher_Modified;
                         _localWatcher.Dispose();
-                    }
-
-                    if (_globalWatcher != null) {
-                        _globalWatcher.Changed -= Watcher_Modified;
-                        _globalWatcher.Created -= Watcher_Modified;
-                        _globalWatcher.Deleted -= Watcher_Modified;
-                        _globalWatcher.Dispose();
                     }
                 }
 

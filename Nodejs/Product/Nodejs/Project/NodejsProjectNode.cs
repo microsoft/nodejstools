@@ -35,6 +35,7 @@ using Microsoft.VisualStudioTools.Project.Automation;
 using MSBuild = Microsoft.Build.Evaluation;
 using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
 using Microsoft.NodejsTools.Options;
+using Microsoft.NodejsTools.Telemetry;
 #if DEV14_OR_LATER
 using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Imaging;
@@ -605,9 +606,11 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private static void LogAnalysisLevel(VsProjectAnalyzer analyzer) {
+        private void LogAnalysisLevel(VsProjectAnalyzer analyzer) {
             if (analyzer != null) {
-                NodejsPackage.Instance.Logger.LogEvent(Logging.NodejsToolsLogEvent.AnalysisLevel, (int)analyzer.AnalysisLevel);
+                var level = analyzer.AnalysisLevel;
+                NodejsPackage.Instance.Logger.LogEvent(Logging.NodejsToolsLogEvent.AnalysisLevel, (int)level);
+                NodejsPackage.Instance.TelemetryLogger.LogAnalysisActivatedForProject(ProjectGuid, level);
             }
         }
 
@@ -1133,6 +1136,11 @@ namespace Microsoft.NodejsTools.Project {
                             }
                         }
                         break;
+						case PkgCmdId.cmdidAddNewJavaScriptFileCommand: 
+					case PkgCmdId.cmdidAddNewTypeScriptFileCommand: 
+					case PkgCmdId.cmdidAddNewHTMLFileCommand: 
+					case PkgCmdId.cmdidAddNewCSSFileCommand: 
+						return QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED; 
                 }
             }
 
@@ -1202,6 +1210,27 @@ namespace Microsoft.NodejsTools.Project {
                         );
                         handled = true;
                         return VSConstants.S_OK;
+						
+					case PkgCmdId.cmdidAddNewJavaScriptFileCommand:
+                        NewFileMenuGroup.NewFileUtilities.CreateNewJavaScriptFile(projectNode: this, containerId: selectedNodes[0].ID);
+                        handled = true;
+                        return VSConstants.S_OK;
+
+                    case PkgCmdId.cmdidAddNewTypeScriptFileCommand:
+                        NewFileMenuGroup.NewFileUtilities.CreateNewTypeScriptFile(projectNode: this, containerId: selectedNodes[0].ID);
+                        handled = true;
+                        return VSConstants.S_OK;
+
+                    case PkgCmdId.cmdidAddNewHTMLFileCommand:
+                        NewFileMenuGroup.NewFileUtilities.CreateNewHTMLFile(projectNode: this, containerId: selectedNodes[0].ID);
+                        handled = true;
+                        return VSConstants.S_OK;
+
+                    case PkgCmdId.cmdidAddNewCSSFileCommand:
+                        NewFileMenuGroup.NewFileUtilities.CreateNewCSSFile(projectNode: this, containerId: selectedNodes[0].ID);
+                        handled = true;
+                        return VSConstants.S_OK;
+
                 }
             }
 

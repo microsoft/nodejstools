@@ -428,7 +428,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 ProjectInfo projectInfo;
                 string projectPath;
                 if (e.Project.TryGetProjectPath(out projectPath) &&
-                    !string.IsNullOrEmpty(projectPath) &&
                     _knownProjects.TryGetValue(projectPath, out projectInfo)) {
                     _knownProjects.Remove(projectPath);
 
@@ -492,12 +491,11 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
                         OnTestContainersChanged(e.Project);
                         break;
-#if DEV12_OR_LATER
+
                     // Dev12 renames files instead of overwriting them when
                     // saving, so we need to listen for renames where the new
                     // path is part of the project.
                     case TestFileChangedReason.Renamed:
-#endif
                     case TestFileChangedReason.Changed:
                         OnTestContainersChanged(GetTestProjectFromFile(e.File));
                         break;
@@ -550,7 +548,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
             string projectPath;
             if (project != null &&
                 project.TryGetProjectPath(out projectPath) &&
-                !string.IsNullOrEmpty(projectPath) &&
                 _knownProjects.TryGetValue(projectPath, out projectInfo) &&
                 projectInfo != null &&
                 projectInfo.HasRequestedContainers) {

@@ -6,14 +6,15 @@
     <ProjectType>JavaScript</ProjectType>
     <TemplateID>Microsoft.JavaScript.NodejsFromExistingCode</TemplateID>
     <SortOrder>120</SortOrder>
-    <CreateNewFolder>false</CreateNewFolder>
-    <DefaultName>NodejsApp</DefaultName>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>FromExistingCode</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
     <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
     <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
   </TemplateData>
   <TemplateContent>
     <Project File="FromExistingCode.njsproj" ReplaceParameters="true">
+      <Folder Name="$safeprojectname$"></Folder>
     </Project>
   </TemplateContent>
   <WizardExtension>

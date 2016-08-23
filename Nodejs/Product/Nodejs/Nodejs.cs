@@ -92,10 +92,12 @@ namespace Microsoft.NodejsTools {
 
             // If we didn't find node.js in the registry we should look at the user's path.
             foreach (var dir in Environment.GetEnvironmentVariable("PATH").Split(Path.PathSeparator)) {
-                var execPath = Path.Combine(dir, executable);
-                if (File.Exists(execPath)) {
-                    return execPath;
-                }
+                try {
+                    var execPath = Path.Combine(dir, executable);
+                    if (File.Exists(execPath)) {
+                        return execPath;
+                    }
+                } catch (ArgumentException) { /*noop*/ }
             }
 
             // It wasn't in the users path.  Check Program Files for the nodejs folder.

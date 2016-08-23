@@ -423,6 +423,12 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
+        public Dictionary<string, HierarchyNode> DiskNodes {
+            get {
+                return _diskNodes;
+            }
+        }
+
         #region overridden properties
 
         public override bool CanOpenCommandPrompt {

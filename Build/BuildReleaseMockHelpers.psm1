@@ -92,8 +92,8 @@ job.SelectCertificate(67)"
     }
     if ($certificates -match "vsix") {
         $msg = "$msg
-job.SelectCertificate(100040160)"
-        $job.SelectCertificate("100040160")   # Microsoft OPC Publisher (VSIX)
+job.SelectCertificate(160)"
+        $job.SelectCertificate("160")   # Microsoft OPC Publisher (VSIX)
     }
     
     foreach ($approver in $approvers) {

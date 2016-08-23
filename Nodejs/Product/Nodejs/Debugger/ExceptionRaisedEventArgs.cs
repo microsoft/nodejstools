@@ -18,32 +18,14 @@ using System;
 
 namespace Microsoft.NodejsTools.Debugger {
     class ExceptionRaisedEventArgs : EventArgs {
-        private readonly NodeException _exception;
-        private readonly NodeThread _thread;
-        private readonly bool _isUnhandled;
+        public readonly NodeThread Thread;
+        public readonly NodeException Exception;
+        public readonly bool IsUnhandled;
 
         public ExceptionRaisedEventArgs(NodeThread thread, NodeException exception, bool isUnhandled) {
-            _thread = thread;
-            _exception = exception;
-            _isUnhandled = isUnhandled;
-        }
-
-        public NodeException Exception {
-            get {
-                return _exception;
-            }
-        }
-
-        public NodeThread Thread {
-            get {
-                return _thread;
-            }
-        }
-
-        public bool IsUnhandled {
-            get {
-                return _isUnhandled;
-            }
+            Thread = thread;
+            Exception = exception;
+            IsUnhandled = isUnhandled;
         }
     }
 }

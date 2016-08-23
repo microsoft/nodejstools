@@ -133,9 +133,9 @@
         </Feature>
         
         <!-- Execute devenv /setup -->
-        <CustomAction Id="DevEnvSetup" Property="DEVENV_PATH" ExeCommand="/setup" Execute="deferred" Return="check" Impersonate="no" />
+        <CustomAction Id="DevEnvSetup" Property="DEVENV_PATH" ExeCommand="/setup /clearCache /allowDuringSetup" Execute="deferred" Return="check" Impersonate="no" />
         <CustomAction Id="DevEnvSetup_Rollback" Property="DEVENV_PATH" ExeCommand="/setup" Execute="rollback" Return="check" Impersonate="no" />
-        <CustomAction Id="VWDExpressSetup" Property="VWDEXPRESS_PATH" ExeCommand="/setup" Execute="deferred" Return="check" Impersonate="no" />
+        <CustomAction Id="VWDExpressSetup" Property="VWDEXPRESS_PATH" ExeCommand="/setup /clearCache /allowDuringSetup" Execute="deferred" Return="check" Impersonate="no" />
         <CustomAction Id="VWDExpressSetup_Rollback" Property="VWDEXPRESS_PATH" ExeCommand="/setup" Execute="rollback" Return="check" Impersonate="no" />
 
         <InstallExecuteSequence>

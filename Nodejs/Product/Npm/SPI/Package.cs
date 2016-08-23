@@ -49,8 +49,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         public bool IsListedInParentPackageJson {
             get {
                 IPackageJson parentPackageJson = _parent.PackageJson;
-                return _parent is IGlobalPackages ||
-                       (null != parentPackageJson && parentPackageJson.AllDependencies.Contains(Name));
+                return (null != parentPackageJson && parentPackageJson.AllDependencies.Contains(Name));
             }
         }
 

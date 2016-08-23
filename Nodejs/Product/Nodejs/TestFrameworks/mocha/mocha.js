@@ -1,4 +1,5 @@
-﻿var EOL = require('os').EOL;
+"use strict";
+var EOL = require('os').EOL;
 var fs = require('fs');
 var path = require('path');
 
@@ -64,7 +65,10 @@ var run_tests = function (testName, testFile, workingFolder, projectFolder) {
     var mocha = initializeMocha(Mocha, projectFolder);
 
     if (testName) {
-        mocha.grep(testName);
+        if (typeof mocha.fgrep === 'function')
+            mocha.fgrep(testName); // since Mocha 3.0.0
+        else
+            mocha.grep(testName); // prior Mocha 3.0.0
     }
     mocha.addFile(testFile);
 
@@ -129,13 +133,13 @@ function getMochaOptions(projectFolder) {
     var mochaOptions = defaultMochaOptions;
     try {
         var optionsPath = path.join(projectFolder, 'test', 'mocha.json');
-        var options = require(optionsPath);
-        options = options || {};
+        var options = require(optionsPath) || {};
         for (var opt in options) {
             mochaOptions[opt] = options[opt];
         }
+        console.log("Found mocha.json file. Using Mocha settings: ", mochaOptions);
     } catch (ex) {
-        console.log("mocha.json options file not found. Using default values:", mochaOptions);
+        console.log("Using default Mocha settings");
     }
 
     // set timeout to 10 minutes, because the default of 2 sec is too short for debugging scenarios

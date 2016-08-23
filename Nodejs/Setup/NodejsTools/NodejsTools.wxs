@@ -12,6 +12,9 @@
             <Directory Id="Dir_$(var.key)InstallLocationFileTemplates" Name="FileTemplates">
                 <Directory Id="Dir_$(var.key)FileTemplatesNewItem" Name="NewItem" />
             </Directory>
+            <Directory Id="Dir_$(var.key)TypingsAcquisitionTool" Name="TypingsAcquisitionTool">
+                <Directory Id="Dir_$(var.key)TypingsAcquisitionToolBin" Name="bin" />
+            </Directory>
             <Directory Id="Dir_$(var.key)TestFrameworks" Name="TestFrameworks">
                 <Directory Id="Dir_$(var.key)TestFrameworksExportRunner" Name="ExportRunner" />
                 <Directory Id="Dir_$(var.key)TestFrameworksMocha" Name="Mocha" />
@@ -37,12 +40,7 @@
 
         <DirectoryRef Id="TARGETDIR">
             <Directory Id="Dir_StartMenu" />
-        </DirectoryRef>
-
-        <Component Id="Comp_RemoteDebug" Directory="Dir_VSInstallLocation" Guid="*">
-            <RegistryValue Root='HKMU' Key='SOFTWARE\Microsoft\NodejsTools\$(var.VSTargetVersion)' Type='string' Value='Readme' KeyPath='yes' />
-            <RegistryValue Root='HKMU' Key='SOFTWARE\Microsoft\NodejsTools\$(var.VSTargetVersion)' Type='string' Name='RemoteDebugProxyFolder' Value='[Dir_VSRemoteDebug]' />                          
-        </Component>       
+        </DirectoryRef>   
         
         <!-- Per user components -->
         <Component Id="PerUserInstallRegistry" Directory="Dir_VSInstallLocation" Guid="*">
