@@ -249,7 +249,7 @@ etc.
 
                 var versions = module["versions"];
                 if (versions != null) {
-                    builder.AvailableVersions = GetVersions(versions);
+                    builder.AvailableVersions = GetVersions(builder.Name, versions);
                 }
 
                 AddKeywords(builder, module["keywords"]);
@@ -281,14 +281,19 @@ etc.
 
         }
 
-        private IEnumerable<SemverVersion> GetVersions(JToken versionsToken) {
-            IEnumerable<string> versionStrings = versionsToken.OfType<JProperty>().Select(v => (string)v.Name);
+        private IEnumerable<SemverVersion> GetVersions(string name, JToken versionsToken) {
+            var versionStrings = versionsToken.OfType<JProperty>().Select(v => (string)v.Name);
             foreach (var versionString in versionStrings) {
                 if (!string.IsNullOrEmpty(versionString)) {
-                    yield return SemverVersion.Parse(versionString);
+                    SemverVersion ver;
+                    try {
+                        ver = SemverVersion.Parse(versionString);
+                    } catch (SemverVersionFormatException) {
+                        continue;
+                    }
+                    yield return ver;
                 }
             }
-
         }
 
         private static void AddKeywords(NodeModuleBuilder builder, JToken keywords) {
