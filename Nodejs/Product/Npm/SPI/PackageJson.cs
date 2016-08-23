@@ -27,7 +27,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             Keywords = LoadKeywords(package);
             Homepages = LoadHomepages(package);
             Files = LoadFiles(package);
-            Man = LoadMan(package);
             Dependencies = LoadDependencies(package);
             DevDependencies = LoadDevDependencies(package);
             BundledDependencies = LoadBundledDependencies(package);
@@ -74,14 +73,6 @@ The following error occurred:
                 return new PkgFiles(package);
             } catch (RuntimeBinderException rbe) {
                 throw WrapRuntimeBinderException("files", rbe);
-            }
-        }
-
-        private static IMan LoadMan(dynamic package) {
-            try {
-                return new Man(package);
-            } catch (RuntimeBinderException rbe) {
-                throw WrapRuntimeBinderException("man", rbe);
             }
         }
 
@@ -153,8 +144,6 @@ The following error occurred:
         public ILicenses Licenses { get; private set; }
 
         public IFiles Files { get; private set; }
-
-        public IMan Man { get; private set; }
 
         public IDependencies Dependencies { get; private set; }
         public IDependencies DevDependencies { get; private set; }

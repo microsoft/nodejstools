@@ -25,7 +25,6 @@ namespace Microsoft.NodejsTools.Npm {
         IKeywords Keywords { get; }
         IHomepages Homepages { get; }
         IFiles Files { get; }
-        IMan Man { get; }
         IDependencies Dependencies { get; }
         IDependencies DevDependencies { get; }
         IBundledDependencies BundledDependencies { get; }
