@@ -25,6 +25,7 @@ namespace Microsoft.NodejsTools.Jade {
         public const string JadeLanguageName = "Jade";
         public const string JadeContentType = "jade";
         public const string JadeFileExtension = ".jade";
+        public const string PugFileExtension = ".pug";
 
         /// <summary>
         /// Exports the Jade content type
@@ -41,5 +42,13 @@ namespace Microsoft.NodejsTools.Jade {
         [ContentType(JadeContentType)]
         [FileExtension(JadeFileExtension)]
         public FileExtensionToContentTypeDefinition IJadeFileExtension { get; set; }
+
+        /// <summary>
+        /// Exports the Pug file extension
+        /// </summary>
+        [Export(typeof(FileExtensionToContentTypeDefinition))]
+        [ContentType(JadeContentType)]
+        [FileExtension(PugFileExtension)]
+        public FileExtensionToContentTypeDefinition IPugFileExtension { get; set; }
     }
 }
