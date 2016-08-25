@@ -258,7 +258,11 @@ namespace Microsoft.NodejsTools {
         public static LANGPREFERENCES3[] GetNodejsLanguagePreferencesFromTypeScript(IVsTextManager4 textMgr) {
             var langPrefs = new LANGPREFERENCES3[1];
             langPrefs[0].guidLang = Guids.TypeScriptLanguageInfo;
-            ErrorHandler.ThrowOnFailure(textMgr.GetUserPreferences4(null, langPrefs, null));
+            int hr = textMgr.GetUserPreferences4(null, langPrefs, null);
+            if (ErrorHandler.Failed(hr)) {
+                MessageBox.Show(Project.SR.GetString(Project.SR.CouldNotGetTypeScriptLanguagePreferences), Project.SR.ProductName);
+                ErrorHandler.ThrowOnFailure(hr);
+            }
             langPrefs[0].guidLang = typeof(NodejsLanguageInfo).GUID;
             textMgr.SetUserPreferences4(null, langPrefs, null);
             return langPrefs;
