@@ -16,10 +16,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
-namespace Microsoft.NodejsTools.Parsing
-{
+namespace Microsoft.NodejsTools.Parsing {
     [Serializable]
     internal class UnaryOperator : Expression
     {

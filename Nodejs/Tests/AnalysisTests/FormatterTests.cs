@@ -15,7 +15,6 @@
 //*********************************************************//
 
 using System;
-using System.IO;
 using System.Text;
 using Microsoft.NodejsTools.Formatting;
 using Microsoft.NodejsTools.Parsing;

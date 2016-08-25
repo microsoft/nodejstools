@@ -15,11 +15,7 @@
 //*********************************************************//
 
 using System.ComponentModel.Composition;
-using System.Reflection;
 using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Media.Imaging;
-using Microsoft.VisualStudio;
 
 namespace Microsoft.NodejsTools.Repl {
 #if INTERACTIVE_WINDOW

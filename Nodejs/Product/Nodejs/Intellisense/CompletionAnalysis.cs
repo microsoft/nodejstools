@@ -19,9 +19,7 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.VisualStudio.Language.Intellisense;
-using Microsoft.VisualStudio.Language.StandardClassification;
 using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Classification;
 
 namespace Microsoft.NodejsTools.Intellisense {
     /// <summary>

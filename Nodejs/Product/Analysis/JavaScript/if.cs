@@ -16,10 +16,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace Microsoft.NodejsTools.Parsing
-{
+namespace Microsoft.NodejsTools.Parsing {
     [Serializable]
     internal sealed class IfNode : Statement
     {

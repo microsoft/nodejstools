@@ -15,7 +15,6 @@
 //*********************************************************//
 
 using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Classification;
 
 namespace Microsoft.NodejsTools.Jade {
     /// <summary>

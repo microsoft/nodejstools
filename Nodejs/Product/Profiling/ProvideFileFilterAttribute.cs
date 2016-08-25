@@ -15,7 +15,6 @@
 //*********************************************************//
 
 using System;
-using System.IO;
 using Microsoft.VisualStudio.Shell;
 
 namespace Microsoft.VisualStudioTools {

@@ -14,14 +14,7 @@
 //
 //*********************************************************//
 
-using System;
-using System.IO;
-using System.Windows.Automation;
-using EnvDTE;
-using Microsoft.NodejsTools;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.VisualStudioTools;
-using TestUtilities;
 using TestUtilities.UI;
 
 namespace Microsoft.Nodejs.Tests.UI {

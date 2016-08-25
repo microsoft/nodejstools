@@ -14,7 +14,6 @@
 //
 //*********************************************************//
 
-using System;
 
 namespace Microsoft.NodejsTools.Analysis {
     internal static class AnalysisExtensions {

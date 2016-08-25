@@ -19,8 +19,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-
-using Microsoft.NodejsTools;
 using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.SourceMapping {

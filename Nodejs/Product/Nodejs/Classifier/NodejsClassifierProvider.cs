@@ -16,9 +16,6 @@
 
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Windows.Media;
-using Microsoft.NodejsTools;
-using Microsoft.NodejsTools.Classifier;
 using Microsoft.NodejsTools.Parsing;
 using Microsoft.VisualStudio.Language.StandardClassification;
 using Microsoft.VisualStudio.Text;

@@ -15,20 +15,12 @@
 //*********************************************************//
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestWindow.Extensibility;
-using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.TestAdapter;
 using MSBuild = Microsoft.Build.Evaluation;
 

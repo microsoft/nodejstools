@@ -17,7 +17,6 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.NodejsTools.Analysis;
-using Microsoft.NodejsTools.Analysis.Values;
 using Microsoft.NodejsTools.Parsing;
 using Microsoft.VisualStudio.Text;
 

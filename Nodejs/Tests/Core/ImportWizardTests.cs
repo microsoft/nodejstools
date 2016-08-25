@@ -20,7 +20,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Threading;
 using System.Xml.Linq;
-using Microsoft.NodejsTools;
 using Microsoft.NodejsTools.Project.ImportWizard;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;

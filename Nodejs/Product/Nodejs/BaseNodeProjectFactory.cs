@@ -21,7 +21,6 @@ using Microsoft.Build.Construction;
 using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Project;
-using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 using SR = Microsoft.NodejsTools.Project.SR;
 
 namespace Microsoft.NodejsTools {

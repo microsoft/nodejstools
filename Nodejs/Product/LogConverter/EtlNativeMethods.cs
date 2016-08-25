@@ -15,7 +15,6 @@
 //*********************************************************//
 
 using System;
-using System.ComponentModel;
 using System.Runtime.InteropServices;
 
 namespace Microsoft.NodejsTools.LogGeneration {

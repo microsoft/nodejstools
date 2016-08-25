@@ -16,8 +16,6 @@
 
 using System;
 using System.Diagnostics;
-using System.IO;
-using System.Windows.Forms;
 using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.Commands {

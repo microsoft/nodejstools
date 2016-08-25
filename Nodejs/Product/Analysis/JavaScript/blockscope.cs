@@ -14,11 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Reflection;
 
-namespace Microsoft.NodejsTools.Parsing
-{
+namespace Microsoft.NodejsTools.Parsing {
     internal class BlockScope : ActivationObject
     {
         public BlockScope(Statement node, ActivationObject parent, ErrorSink errorSink)

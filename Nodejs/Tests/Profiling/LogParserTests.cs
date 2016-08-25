@@ -14,8 +14,6 @@
 //
 //*********************************************************//
 
-using System;
-using Microsoft.NodejsTools.LogGeneration;
 using Microsoft.NodejsTools.LogParsing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;

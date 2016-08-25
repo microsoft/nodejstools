@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Microsoft.NodejsTools.Classifier {
+﻿namespace Microsoft.NodejsTools.Classifier {
     class NodejsPredefinedClassificationTypeNames {
         /// <summary>
         /// Open grouping classification.  Used for (, [, {, ), ], and }...  A subtype of the Python

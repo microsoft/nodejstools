@@ -14,7 +14,6 @@
 //
 //*********************************************************//
 
-using System;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.TextManager.Interop;
 

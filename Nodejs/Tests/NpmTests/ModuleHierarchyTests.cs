@@ -15,7 +15,6 @@
 //*********************************************************//
 
 using System;
-using System.Diagnostics;
 using System.Linq;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.Npm.SPI;

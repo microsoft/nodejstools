@@ -14,12 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Globalization;
-using System.Text;
 
-namespace Microsoft.NodejsTools.Parsing
-{
+namespace Microsoft.NodejsTools.Parsing {
 #if FALSE
     /// <summary>
     /// CssFallback encodes invalid encoder characters as Unicode escapes:

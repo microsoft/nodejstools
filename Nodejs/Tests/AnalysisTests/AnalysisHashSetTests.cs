@@ -17,8 +17,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.NodejsTools.Analysis.AnalysisSetDetails;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

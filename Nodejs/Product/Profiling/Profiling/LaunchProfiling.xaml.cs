@@ -14,9 +14,7 @@
 //
 //*********************************************************//
 
-using System;
 using System.Windows;
-using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.Win32;
 
 namespace Microsoft.NodejsTools.Profiling {

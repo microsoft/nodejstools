@@ -13,14 +13,12 @@
 //    permissions and limitations under the License.
 //
 //*********************************************************//
-using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using Microsoft.NodejsTools.Formatting;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.BraceCompletion;
 using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.Text.Editor.OptionsExtensionMethods;
 using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.Editor.BraceCompletion {

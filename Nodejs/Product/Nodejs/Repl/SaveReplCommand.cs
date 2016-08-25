@@ -20,8 +20,6 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.NodejsTools;
-using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Text;
 
 namespace Microsoft.NodejsTools.Repl {

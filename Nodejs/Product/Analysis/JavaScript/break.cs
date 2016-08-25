@@ -15,10 +15,8 @@
 // limitations under the License.
 
 using System;
-using System.Text;
 
-namespace Microsoft.NodejsTools.Parsing
-{
+namespace Microsoft.NodejsTools.Parsing {
     [Serializable]
     internal sealed class Break : Statement
     {

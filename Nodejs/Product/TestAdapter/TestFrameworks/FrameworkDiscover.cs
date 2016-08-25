@@ -16,9 +16,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
-
-using Microsoft.VisualStudioTools.Project;
 using Microsoft.NodejsTools.TestFrameworks;
 
 namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
