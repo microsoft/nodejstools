@@ -16,8 +16,6 @@
 
 using System;
 using System.Reflection;
-using Microsoft.NodejsTools;
-using Microsoft.NodejsTools.Options;
 using Microsoft.VisualStudioTools.VSTestHost;
 
 namespace Microsoft.Nodejs.Tests.UI {

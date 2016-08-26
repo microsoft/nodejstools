@@ -16,7 +16,6 @@
 
 using System.Collections.Generic;
 using Microsoft.NodejsTools.Npm.SQLiteTables;
-using Microsoft.Win32;
 using Newtonsoft.Json;
 using SQLite;
 

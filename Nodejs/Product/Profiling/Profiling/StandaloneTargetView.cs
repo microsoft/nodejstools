@@ -15,12 +15,9 @@
 //*********************************************************//
 
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using Microsoft.NodejsTools;
 using Microsoft.VisualStudio.ComponentModelHost;
 
 namespace Microsoft.NodejsTools.Profiling {

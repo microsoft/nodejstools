@@ -15,11 +15,8 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Microsoft.NodejsTools.Parsing
-{
+namespace Microsoft.NodejsTools.Parsing {
     /// <summary>
     /// Old-style const-statement, pre-ES6, for those browsers that basically implemented
     /// a var that can't be assigned to outside the declaration. Have to set the 

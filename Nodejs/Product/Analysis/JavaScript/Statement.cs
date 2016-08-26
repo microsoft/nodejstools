@@ -15,10 +15,8 @@
 //*********************************************************//
 
 using System;
-using System.Diagnostics;
 
-namespace Microsoft.NodejsTools.Parsing
-{
+namespace Microsoft.NodejsTools.Parsing {
     [Serializable]
     internal abstract class Statement : Node
     {

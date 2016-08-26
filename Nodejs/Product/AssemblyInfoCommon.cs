@@ -3,8 +3,6 @@
 // </copyright>
 
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 // The following assembly information is common to all Node.js Tools for Visual Studio assemblies.
 // If you get compiler errors CS0579, "Duplicate '<attributename>' attribute", check your 

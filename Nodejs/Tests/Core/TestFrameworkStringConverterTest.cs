@@ -19,7 +19,6 @@ using System.ComponentModel;
 
 using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.VisualStudioTools.Project;
 
 namespace NodejsTests {
 

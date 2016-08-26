@@ -15,7 +15,6 @@
 //*********************************************************//
 
 using System;
-using System.IO;
 
 namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
     class NodejsTestInfo {

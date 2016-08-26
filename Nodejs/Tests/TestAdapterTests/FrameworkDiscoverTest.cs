@@ -13,7 +13,6 @@
 //    permissions and limitations under the License.
 //
 //*********************************************************//
-using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.NodejsTools.TestAdapter.TestFrameworks;
 using Microsoft.NodejsTools.TestFrameworks;

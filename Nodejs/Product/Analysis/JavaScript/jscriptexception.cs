@@ -15,15 +15,12 @@
 // limitations under the License.
 
 using System;
-using System.Diagnostics;
-using System.Globalization;
 using System.Runtime.Serialization;
 using System.Security;
 using System.Security.Permissions;
 using Microsoft.Ajax.Utilities;
 
-namespace Microsoft.NodejsTools.Parsing
-{
+namespace Microsoft.NodejsTools.Parsing {
 
     //-------------------------------------------------------------------------------------------------------
     // JScriptException

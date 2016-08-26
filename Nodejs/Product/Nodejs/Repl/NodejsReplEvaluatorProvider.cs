@@ -15,7 +15,6 @@
 //*********************************************************//
 
 using System.ComponentModel.Composition;
-using Microsoft.NodejsTools.Repl;
 
 namespace Microsoft.NodejsTools.Repl {
     [Export(typeof(IReplEvaluatorProvider))]

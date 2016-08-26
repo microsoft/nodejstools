@@ -15,9 +15,7 @@
 //*********************************************************//
 
 using System;
-using System.Threading;
 using System.Windows.Automation;
-using System.Windows.Input;
 using EnvDTE;
 
 namespace TestUtilities.UI.Nodejs {

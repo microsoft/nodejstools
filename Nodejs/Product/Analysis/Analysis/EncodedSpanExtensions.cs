@@ -14,7 +14,6 @@
 //
 //*********************************************************//
 
-using System;
 using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis {

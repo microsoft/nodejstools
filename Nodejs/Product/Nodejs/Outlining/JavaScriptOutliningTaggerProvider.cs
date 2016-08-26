@@ -25,7 +25,6 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Utilities;
-using FunctionExpression = Microsoft.NodejsTools.Parsing.FunctionExpression;
 using FunctionObject = Microsoft.NodejsTools.Parsing.FunctionObject;
 
 namespace Microsoft.NodejsTools.Outlining {

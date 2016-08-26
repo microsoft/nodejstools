@@ -17,7 +17,6 @@
 using System;
 using System.Diagnostics;
 using System.Windows.Forms;
-using Microsoft.NodejsTools.Project;
 
 namespace Microsoft.NodejsTools.Options {
     public partial class NodeLsIntellisenseOptionsControl : UserControl {

@@ -16,11 +16,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Reflection;
 
-namespace Microsoft.NodejsTools.Parsing
-{
+namespace Microsoft.NodejsTools.Parsing {
     internal sealed class GlobalScope : ActivationObject
     {
         private HashSet<string> m_globalProperties;

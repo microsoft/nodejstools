@@ -17,9 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio.Shell.Interop;

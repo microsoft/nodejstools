@@ -14,15 +14,10 @@
 //
 //*********************************************************//
 
-using System;
 using System.IO;
 using System.Windows.Input;
-using System.Windows.Threading;
-using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.VisualStudio.Text.Operations;
-using Microsoft.VisualStudioTools;
 using TestUtilities;
 using TestUtilities.SharedProject;
 using TestUtilities.UI;

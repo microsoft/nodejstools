@@ -16,27 +16,16 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Interop;
 using System.Windows.Threading;
-using Microsoft.NodejsTools;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.NpmUI;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudioTools;
 using Moq;
 using NpmTests;
-using TestUtilities;
-using TestUtilities.SharedProject;
 using TestUtilities.UI;
-using TestUtilities.UI.Nodejs;
 
 namespace Microsoft.Nodejs.Tests.UI {
     [TestClass]

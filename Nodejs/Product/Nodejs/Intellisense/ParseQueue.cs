@@ -15,17 +15,10 @@
 //*********************************************************//
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
-using System.Linq;
 using System.Threading;
-using System.Windows;
-using System.Windows.Threading;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Editor;
 
 namespace Microsoft.NodejsTools.Intellisense {
     sealed partial class VsProjectAnalyzer {

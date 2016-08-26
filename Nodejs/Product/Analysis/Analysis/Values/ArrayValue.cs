@@ -15,7 +15,6 @@
 //*********************************************************//
 
 using System;
-using System.Linq;
 using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Analysis.Values {

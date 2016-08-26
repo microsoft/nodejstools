@@ -15,15 +15,8 @@
 //*********************************************************//
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.NodejsTools.Debugger.Commands;
-using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
-using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     internal class AD7EvalErrorProperty : IDebugProperty2 {
