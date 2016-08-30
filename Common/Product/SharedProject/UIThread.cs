@@ -26,6 +26,9 @@ namespace Microsoft.VisualStudioTools {
         private readonly Thread _uiThread;
 
         private UIThread() {
+            if (SynchronizationContext.Current == null) {
+                SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+            }
             _scheduler = TaskScheduler.FromCurrentSynchronizationContext();
             _factory = new TaskFactory(_scheduler);
             _uiThread = Thread.CurrentThread;
