@@ -16,7 +16,6 @@
 
 using System;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace Microsoft.NodejsTools.NpmUI {
     /// <summary>

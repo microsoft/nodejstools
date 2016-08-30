@@ -23,7 +23,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudioTools.Project;
-using Microsoft.Win32;
 
 namespace Microsoft.NodejsTools.Npm {
     public static class NpmHelpers {

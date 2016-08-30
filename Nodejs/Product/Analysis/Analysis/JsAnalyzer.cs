@@ -15,15 +15,12 @@
 //*********************************************************//
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
-using System.Security;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
@@ -31,7 +28,6 @@ using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Analysis.Values;
 using Microsoft.NodejsTools.Parsing;
 using Microsoft.VisualStudioTools;
-using Microsoft.Win32;
 
 namespace Microsoft.NodejsTools.Analysis {
     /// <summary>

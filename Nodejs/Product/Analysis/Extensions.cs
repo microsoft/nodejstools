@@ -33,12 +33,10 @@ namespace System.Runtime.CompilerServices
 
 #endif
 
-namespace Microsoft.NodejsTools.Parsing
-{
+namespace Microsoft.NodejsTools.Parsing {
     using System;
     using System.Collections.Generic;
     using System.Globalization;
-    using System.Linq;
 
     internal static class AjaxMinExtensions
     {

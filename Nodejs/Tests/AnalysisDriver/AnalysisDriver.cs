@@ -22,7 +22,6 @@ using System.Linq;
 using System.Text;
 using AnalysisTests;
 using Microsoft.NodejsTools.Analysis;
-using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualBasic.FileIO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

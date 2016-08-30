@@ -17,12 +17,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.NodejsTools.Analysis.Analyzer;
 using Microsoft.NodejsTools.Analysis.Values;
 using Microsoft.NodejsTools.Parsing;
 using System.IO;
-using System.Diagnostics;
 
 namespace Microsoft.NodejsTools.Analysis {
     partial class NodejsModuleBuilder {

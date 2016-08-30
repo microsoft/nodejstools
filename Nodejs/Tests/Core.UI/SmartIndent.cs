@@ -16,7 +16,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
 using EnvDTE;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudioTools.VSTestHost;

@@ -15,11 +15,8 @@
 // limitations under the License.
 
 using System;
-using System.Globalization;
-using System.Text.RegularExpressions;
 
-namespace Microsoft.NodejsTools.Parsing
-{
+namespace Microsoft.NodejsTools.Parsing {
     [Serializable]
     internal sealed class RegExpLiteral : Expression
     {

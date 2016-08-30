@@ -14,13 +14,9 @@
 //
 //*********************************************************//
 
-using System.Collections.Generic;
 
-using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Tagging;
-using System.Diagnostics.Contracts;
 using System.Diagnostics;
-using System.Collections;
 using System;
 using System.Text;
 using Microsoft.VisualStudioTools.Project;

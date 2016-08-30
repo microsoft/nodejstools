@@ -15,7 +15,6 @@
 //*********************************************************//
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.NodejsTools.Analysis;
 using Microsoft.VisualStudio.Language.Intellisense;

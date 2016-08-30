@@ -15,7 +15,6 @@
 //*********************************************************//
 
 using System;
-using System.Linq;
 using System.Threading;
 using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.VisualStudio;

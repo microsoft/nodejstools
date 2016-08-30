@@ -283,27 +283,6 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void ReadEmptyManEmpty() {
-            CheckEmptyArray(LoadFrom(PkgSimple).Man);
-        }
-
-        [TestMethod, Priority(0)]
-        public void ReadSingleMan() {
-            CheckStringArrayContents(
-                LoadFrom(PkgLargeNonCompliant).Man,
-                1,
-                new[] { "./man/foo.1" });
-        }
-
-        [TestMethod, Priority(0)]
-        public void ReadMultiMan() {
-            CheckStringArrayContents(
-                LoadFrom(PkgLargeCompliant).Man,
-                2,
-                new[] { "./man/foo.1", "./man/bar.1" });
-        }
-
-        [TestMethod, Priority(0)]
         public void ReadEmptyAuthor() {
             Assert.IsNull(LoadFrom(PkgSimple).Author);
         }

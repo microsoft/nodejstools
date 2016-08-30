@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Microsoft.NodejsTools {
+﻿namespace Microsoft.NodejsTools {
     class ReferenceCode {
         internal const string PathRelativeBody = @"    
     // switch to forward slashes

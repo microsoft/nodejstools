@@ -269,7 +269,6 @@
       <LastGenOutput>JScript.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="..\ProjectAfter.settings" />
   <PropertyGroup>
     <PreBuildEvent>

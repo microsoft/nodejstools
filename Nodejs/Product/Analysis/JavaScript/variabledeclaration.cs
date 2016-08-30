@@ -16,11 +16,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
 
-namespace Microsoft.NodejsTools.Parsing
-{
+namespace Microsoft.NodejsTools.Parsing {
     [Serializable]
     internal sealed class VariableDeclaration : Statement, INameDeclaration, INameReference
     {

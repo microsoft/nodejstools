@@ -16,7 +16,6 @@
 
 using System;
 using System.IO;
-using System.Text;
 using Microsoft.NodejsTools.Options;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudioTools;

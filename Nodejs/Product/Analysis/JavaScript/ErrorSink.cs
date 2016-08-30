@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Ajax.Utilities;
-using Microsoft.NodejsTools.Parsing;
 
 namespace Microsoft.NodejsTools.Parsing {
     internal class ErrorSink {

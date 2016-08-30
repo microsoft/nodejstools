@@ -20,7 +20,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools;
-using Microsoft.VisualStudioTools.Project;
 using SR = Microsoft.NodejsTools.Project.SR;
 
 namespace Microsoft.NodejsTools.Jade {

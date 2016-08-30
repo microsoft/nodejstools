@@ -14,10 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Reflection;
 
-namespace Microsoft.NodejsTools.Parsing
-{
+namespace Microsoft.NodejsTools.Parsing {
     internal sealed class WithScope : BlockScope
     {
         public WithScope(Statement node, ActivationObject parent, ErrorSink errorSink)

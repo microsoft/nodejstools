@@ -30,7 +30,7 @@ namespace Microsoft.NodejsTools.Jade {
         }
 
         public int GetFileExtensions(out string pbstrExtensions) {
-            pbstrExtensions = JadeContentTypeDefinition.JadeFileExtension;
+            pbstrExtensions = string.Join(";", new[] { JadeContentTypeDefinition.JadeFileExtension, JadeContentTypeDefinition.PugFileExtension });
             return VSConstants.S_OK;
         }
 

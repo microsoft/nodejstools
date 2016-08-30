@@ -15,17 +15,14 @@
 //*********************************************************//
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading;
 using System.Windows.Automation;
 using EnvDTE;
 using Microsoft.NodejsTools;
 using Microsoft.NodejsTools.Project;
-using Microsoft.NodejsTools.Repl;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;

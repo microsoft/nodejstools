@@ -15,7 +15,6 @@
 //*********************************************************//
 
 using System;
-using System.Collections.Generic;
 using Microsoft.NodejsTools.Analysis;
 
 namespace Microsoft.NodejsTools.Parsing {
