@@ -344,13 +344,13 @@
     </Compile>
     <Compile Include="Outlining\JavaScriptOutliningTaggerProvider.cs" />
     <Compile Include="Project\AzureToolsContracts.cs" />
-    <Compile Include="Project\NewFileMenuGroup\NewFileUtilities.cs" />  
-    <Compile Include="Project\NewFileMenuGroup\NewFileNameForm.cs">  
-      <SubType>Form</SubType>  
+    <Compile Include="Project\NewFileMenuGroup\NewFileUtilities.cs" />
+    <Compile Include="Project\NewFileMenuGroup\NewFileNameForm.cs">
+      <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Project\NewFileMenuGroup\NewFileNameForm.Designer.cs">  
+    <Compile Include="Project\NewFileMenuGroup\NewFileNameForm.Designer.cs">
       <DependentUpon>NewFileNameForm.cs</DependentUpon>
-    </Compile>  
+    </Compile>
     <Compile Include="Project\DependencyNodeProperties.cs" />
     <Compile Include="Project\LocalModulesNode.cs" />
     <Compile Include="Project\NodejsFolderNode.cs" />
@@ -700,7 +700,7 @@
     <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.resx">
       <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Project\NewFileNameForm.resx" /> 
+    <EmbeddedResource Include="Project\NewFileNameForm.resx" />
     <EmbeddedResource Include="Options\SalsaLsIntellisenseOptionsControl.resx">
       <DependentUpon>SalsaLsIntellisenseOptionsControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -1153,10 +1153,6 @@
     </ZipItem>
     <ZipItem Include="Templates\Files\TypeScriptUnitTest\UnitTest.ts" />
     <ZipItem Include="Templates\Files\TypeScriptUnitTest\UnitTest.vstemplate">
-      <SubType>Designer</SubType>
-    </ZipItem>
-    <ZipItem Include="Templates\Files\DockerfileTemplate\Dockerfile" />
-    <ZipItem Include="Templates\Files\DockerfileTemplate\Dockerfile.vstemplate">
       <SubType>Designer</SubType>
     </ZipItem>
     <None Include="Theme\Microsoft.NodejsTools.theme.v14.0.pkgdef" />

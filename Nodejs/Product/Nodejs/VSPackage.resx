@@ -276,12 +276,6 @@
   <data name="3052" xml:space="preserve">
     <value>TypeScript Mocha UnitTest file</value>
   </data>
-  <data name="3053" xml:space="preserve">
-    <value>Dockerfile based on node:latest</value>
-  </data>
-  <data name="3054" xml:space="preserve">
-    <value>Dockerfile</value>
-  </data>
   <data name="3055" xml:space="preserve">
     <value>JavaScript Tape UnitTest file</value>
   </data>

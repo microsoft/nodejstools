@@ -59,8 +59,7 @@
                                ItemTemplates\JavaScript\MochaUnitTest.zip;
                                ItemTemplates\JavaScript\TypeScriptUnitTest.zip;
                                ItemTemplates\JavaScript\TypeScriptTapeUnitTest.zip;
-                               ItemTemplates\JavaScript\TypeScriptMochaUnitTest.zip;
-                               ItemTemplates\JavaScript\DockerfileTemplate.zip"/>
+                               ItemTemplates\JavaScript\TypeScriptMochaUnitTest.zip;"/>
 
         <ProjectTemplate Include="ProjectTemplates\JavaScript\Node.js\1033\AzureExpress4App.zip;
                                   ProjectTemplates\JavaScript\Node.js\1033\AzureStarterExpressApp.zip;
