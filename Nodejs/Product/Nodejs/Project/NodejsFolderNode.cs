@@ -100,14 +100,7 @@ namespace Microsoft.NodejsTools.Project {
 
         public override string Caption {
             get {
-                var res = base.Caption;
-
-                if (NodejsPackage.Instance.GeneralOptionsPage.ShowBrowserAndNodeLabels &&
-                    NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel != AnalysisLevel.Preview &&
-                    _containsNodeOrBrowserFiles) {
-                    res = AppendLabel(res, ContentType);
-                }
-                return res;
+                return base.Caption;
             }
         }
 

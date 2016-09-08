@@ -303,12 +303,6 @@
     <Compile Include="Options\NodejsDiagnosticsOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Options\NodeLsIntellisenseOptionsControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Options\NodeLsIntellisenseOptionsControl.Designer.cs">
-      <DependentUpon>NodeLsIntellisenseOptionsControl.cs</DependentUpon>
-    </Compile>
     <Compile Include="Options\NodejsNpmOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -673,10 +667,6 @@
   <ItemGroup>
     <EmbeddedResource Include="Commands\DiagnosticsForm.resx">
       <DependentUpon>DiagnosticsForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Options\NodeLsIntellisenseOptionsControl.resx">
-      <DependentUpon>NodeLsIntellisenseOptionsControl.cs</DependentUpon>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Options\NodejsNpmOptionsControl.resx">
       <DependentUpon>NodejsNpmOptionsControl.cs</DependentUpon>
