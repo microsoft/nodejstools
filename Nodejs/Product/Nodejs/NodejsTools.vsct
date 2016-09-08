@@ -91,6 +91,13 @@
               <CommandFlag>DynamicVisibility</CommandFlag>
           If you do not want an image next to your command, remove the Icon node or set it to <Icon guid="guidOfficeIcon" id="msotcidNoIcon" /> -->
 
+       <Button guid="guidNodeToolsCmdSet" id="cmdidSendFeedback" priority="0x0500" type="Button">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_HELP_SUPPORT"/>
+        <Strings>
+          <ButtonText>Report Node.js Tools Issue or Send Feedback</ButtonText>
+        </Strings>
+      </Button>
+        
       <Button guid="guidNodeToolsCmdSet" id="cmdidAddNewJavaScriptFileCommand" priority="0x0550" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="AddNewFileGroup"/>
         <Strings>
@@ -400,6 +407,7 @@
       <IDSymbol name="cmdidAddNewTypeScriptFileCommand" value="0x0212" />
       <IDSymbol name="cmdidAddNewHTMLFileCommand" value="0x0213" />
       <IDSymbol name="cmdidAddNewCSSFileCommand" value="0x0214" />
+      <IDSymbol name="cmdidSendFeedback" value="0x0215" />
 
       <!-- Shared commands, defined in CommonConstants.cs -->
       <IDSymbol name="cmdidAddExistingFolder" value="0x10001" />

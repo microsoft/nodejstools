@@ -230,6 +230,7 @@
       <DependentUpon>DiagnosticsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Commands\ImportWizardCommand.cs" />
+    <Compile Include="Commands\SendFeedbackCommand.cs" />
     <Compile Include="Commands\OpenReplWindowCommand.cs" />
     <Compile Include="Commands\OpenRemoteDebugDocumentationCommand.cs" />
     <Compile Include="Commands\OpenRemoteDebugProxyFolderCommand.cs" />

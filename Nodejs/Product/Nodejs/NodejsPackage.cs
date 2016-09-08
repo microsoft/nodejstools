@@ -215,7 +215,8 @@ namespace Microsoft.NodejsTools {
                 new OpenRemoteDebugDocumentationCommand(),
                 new SurveyNewsCommand(),
                 new ImportWizardCommand(),
-                new DiagnosticsCommand(this)
+                new DiagnosticsCommand(this),
+                new SendFeedbackCommand()
             };
             try {
                 commands.Add(new AzureExplorerAttachDebuggerCommand());
