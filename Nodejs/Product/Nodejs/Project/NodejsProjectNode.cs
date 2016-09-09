@@ -111,8 +111,7 @@ namespace Microsoft.NodejsTools.Project {
         internal bool ShouldAcquireTypingsAutomatically {
             get {
 #if DEV14
-                if (NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel != AnalysisLevel.Preview ||
-                    !NodejsPackage.Instance.IntellisenseOptionsPage.EnableAutomaticTypingsAcquisition) {
+                if (!NodejsPackage.Instance.IntellisenseOptionsPage.EnableAutomaticTypingsAcquisition) {
                     return false;
                 }
 
@@ -530,9 +529,6 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override int InitializeForOuter(string filename, string location, string name, uint flags, ref Guid iid, out IntPtr projectPointer, out int canceled) {
-            NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevelChanged += IntellisenseOptionsPageAnalysisLevelChanged;
-            NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMaximumChanged += AnalysisLogMaximumChanged;
-            NodejsPackage.Instance.IntellisenseOptionsPage.SaveToDiskChanged += IntellisenseOptionsPageSaveToDiskChanged;
             NodejsPackage.Instance.GeneralOptionsPage.ShowBrowserAndNodeLabelsChanged += ShowBrowserAndNodeLabelsChanged;
 
             return base.InitializeForOuter(filename, location, name, flags, ref iid, out projectPointer, out canceled);
@@ -568,8 +564,8 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private VsProjectAnalyzer CreateNewAnalyser() {
-            var analyzer = new VsProjectAnalyzer(NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel, NodejsPackage.Instance.IntellisenseOptionsPage.SaveToDisk, ProjectFolder);
-            analyzer.MaxLogLength = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMax;
+            var analyzer = new VsProjectAnalyzer(AnalysisLevel.Preview, false, ProjectFolder);
+            analyzer.MaxLogLength = 100;
             LogAnalysisLevel(analyzer);
             return analyzer;
         }
@@ -611,36 +607,6 @@ namespace Microsoft.NodejsTools.Project {
                 var level = analyzer.AnalysisLevel;
                 NodejsPackage.Instance.Logger.LogEvent(Logging.NodejsToolsLogEvent.AnalysisLevel, (int)level);
                 NodejsPackage.Instance.TelemetryLogger.LogAnalysisActivatedForProject(ProjectGuid, level);
-            }
-        }
-
-        private void IntellisenseOptionsPageAnalysisLevelChanged(object sender, EventArgs e) {
-            var oldAnalyzer = _analyzer;
-            _analyzer = null;
-
-            var analyzer = CreateNewAnalyser();
-            Reanalyze(this, analyzer);
-            if (oldAnalyzer != null) {
-                analyzer.SwitchAnalyzers(oldAnalyzer);
-                if (oldAnalyzer.RemoveUser()) {
-                    oldAnalyzer.Dispose();
-                }
-            }
-            _analyzer = analyzer;
-#if DEV14
-            TryToAcquireCurrentTypings();
-#endif
-        }
-
-        private void AnalysisLogMaximumChanged(object sender, EventArgs e) {
-            if (_analyzer != null) {
-                _analyzer.MaxLogLength = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMax;
-            }
-        }
-
-        private void IntellisenseOptionsPageSaveToDiskChanged(object sender, EventArgs e) {
-            if (_analyzer != null) {
-                _analyzer.SaveToDisk = NodejsPackage.Instance.IntellisenseOptionsPage.SaveToDisk;
             }
         }
 
@@ -1066,9 +1032,6 @@ namespace Microsoft.NodejsTools.Project {
                     _idleNodeModulesTimer = null;
                 }
 
-                NodejsPackage.Instance.IntellisenseOptionsPage.SaveToDiskChanged -= IntellisenseOptionsPageSaveToDiskChanged;
-                NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevelChanged -= IntellisenseOptionsPageAnalysisLevelChanged;
-                NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLogMaximumChanged -= AnalysisLogMaximumChanged;
                 NodejsPackage.Instance.GeneralOptionsPage.ShowBrowserAndNodeLabelsChanged -= ShowBrowserAndNodeLabelsChanged;
 
                 OnDispose?.Invoke(this, EventArgs.Empty);

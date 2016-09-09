@@ -17,47 +17,18 @@
 using System;
 using System.Diagnostics;
 using System.Windows.Forms;
-using Microsoft.NodejsTools.Project;
 
 namespace Microsoft.NodejsTools.Options {
     public partial class NodejsIntellisenseOptionsControl : UserControl {
-        private static readonly object _ecmaScript5 = SR.GetString(SR.EcmaScript5);
-        private static readonly object _ecmaScript6 = SR.GetString(SR.EcmaScript6);
-
         public NodejsIntellisenseOptionsControl() {
             InitializeComponent();
-            _intelliSenseModeDropdown.Enabled = NodejsPackage.Instance.IntellisenseOptionsPage.EnableES6Preview;
-            _intelliSenseModeDropdown.Items.AddRange(new[] {
-                _ecmaScript6,
-                _ecmaScript5
-            });
-        }
-
-        internal AnalysisLevel AnalysisLevel {
-            get {
-                if (_intelliSenseModeDropdown.SelectedItem == _ecmaScript6) {
-                    return AnalysisLevel.Preview;
-                } else {
-                    return _nodejsES5IntelliSenseOptionsControl.AnalysisLevel;
-                }
-            }
-            set {
-                _intelliSenseModeDropdown.SelectedItem = 
-                    value == AnalysisLevel.Preview ? _ecmaScript6 : _ecmaScript5;
-
-                _nodejsES5IntelliSenseOptionsControl.AnalysisLevel = value;
-            }
         }
 
         internal void SyncPageWithControlSettings(NodejsIntellisenseOptionsPage page) {
-            page.AnalysisLevel = AnalysisLevel;
-            _nodejsES5IntelliSenseOptionsControl.SyncPageWithControlSettings(page);
             _salsaLsIntellisenseOptionsControl.SyncPageWithControlSettings(page);
         }
 
         internal void SyncControlWithPageSettings(NodejsIntellisenseOptionsPage page) {
-            AnalysisLevel = page.AnalysisLevel;
-            _nodejsES5IntelliSenseOptionsControl.SyncControlWithPageSettings(page);
             _salsaLsIntellisenseOptionsControl.SyncControlWithPageSettings(page);
         }
 
@@ -66,16 +37,9 @@ namespace Microsoft.NodejsTools.Options {
         }
 
         private void _intelliSenseModeDropdown_SelectedValueChanged(object sender, EventArgs e) {
-            bool isES6PreviewIntelliSense = _intelliSenseModeDropdown.SelectedItem == _ecmaScript6;
-            _nodejsES5IntelliSenseOptionsControl.Visible = !isES6PreviewIntelliSense;
-            _es5DeprecatedWarning.Visible = !isES6PreviewIntelliSense;
-
-            // Enables us to auto-size the IntelliSense selection area without reflowing the entire page
-            _es6BottomPadding.Visible = isES6PreviewIntelliSense;
-
             // IntelliSense Options are controlled by the built-in language service in DEV15+
 #if DEV14
-            _salsaLsIntellisenseOptionsControl.Visible = isES6PreviewIntelliSense;
+            _salsaLsIntellisenseOptionsControl.Visible = true;
 #else
             _salsaLsIntellisenseOptionsControl.Visible = false;
 #endif

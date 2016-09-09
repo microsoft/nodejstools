@@ -76,10 +76,6 @@ namespace Microsoft.NodejsTools {
     [ProvideDebugPortSupplier("Node remote debugging", typeof(NodeRemoteDebugPortSupplier), NodeRemoteDebugPortSupplier.PortSupplierId)]
     [ProvideMenuResource(1000, 1)]                              // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideBraceCompletion(NodejsConstants.Nodejs)]
-    [ProvideEditorExtension2(typeof(NodejsEditorFactory), NodeJsFileType, 50, "*:1", ProjectGuid = "{78D985FC-2CA0-4D08-9B6B-35ACD5E5294A}", NameResourceID = 102, DefaultName = "server", TemplateDir = ".\\NullPath")]
-    [ProvideEditorExtension2(typeof(NodejsEditorFactoryPromptForEncoding), NodeJsFileType, 50, "*:1", ProjectGuid = "{78D985FC-2CA0-4D08-9B6B-35ACD5E5294A}", NameResourceID = 113, DefaultName = "server")]
-    [ProvideEditorLogicalView(typeof(NodejsEditorFactory), VSConstants.LOGVIEWID.TextView_string)]
-    [ProvideEditorLogicalView(typeof(NodejsEditorFactoryPromptForEncoding), VSConstants.LOGVIEWID.TextView_string)]
     [ProvideProjectItem(typeof(BaseNodeProjectFactory), NodejsConstants.Nodejs, "FileTemplates\\NewItem", 0)]
     [ProvideLanguageTemplates("{349C5851-65DF-11DA-9384-00065B846F21}", NodejsConstants.JavaScript, Guids.NodejsPackageString, "Web", "Node.js Project Templates", "{" + Guids.NodejsBaseProjectFactoryString + "}", ".js", NodejsConstants.Nodejs, "{" + Guids.NodejsBaseProjectFactoryString + "}")]
     [ProvideTextEditorAutomation(NodejsConstants.Nodejs, 106, 102, ProfileMigrationType.PassThrough)]
@@ -93,7 +89,9 @@ namespace Microsoft.NodejsTools {
     [ProvideLanguageEditorOptionPage(typeof(NodejsFormattingSpacingOptionsPage), NodejsConstants.Nodejs, "Formatting", "Spacing", "3042")]
     [ProvideLanguageEditorOptionPage(typeof(NodejsFormattingBracesOptionsPage), NodejsConstants.Nodejs, "Formatting", "Braces", "3043")]
     [ProvideLanguageEditorOptionPage(typeof(NodejsFormattingGeneralOptionsPage), NodejsConstants.Nodejs, "Formatting", "General", "3044")]
+#if DEV14
     [ProvideLanguageEditorOptionPage(typeof(NodejsIntellisenseOptionsPage), NodejsConstants.Nodejs, "IntelliSense", "", "3048")]
+#endif
     [ProvideLanguageEditorOptionPage(typeof(NodejsAdvancedEditorOptionsPage), NodejsConstants.Nodejs, "Advanced", "", "3050")]
     [ProvideCodeExpansions(Guids.NodejsLanguageInfoString, false, 106, "Nodejs", @"Snippets\%LCID%\SnippetsIndex.xml", @"Snippets\%LCID%\Nodejs\")]
     [ProvideCodeExpansionPath("Nodejs", "Test", @"Snippets\%LCID%\Test\")]
@@ -204,8 +202,6 @@ namespace Microsoft.NodejsTools {
             ((IServiceContainer)this).AddService(typeof(ClipboardServiceBase), new ClipboardService(), true);
 
             RegisterProjectFactory(new NodejsProjectFactory(this));
-            RegisterEditorFactory(new NodejsEditorFactory(this));
-            RegisterEditorFactory(new NodejsEditorFactoryPromptForEncoding(this));
             RegisterEditorFactory(new JadeEditorFactory(this));
 
             // Add our command handlers for menu (commands must exist in the .vsct file)
@@ -241,10 +237,6 @@ namespace Microsoft.NodejsTools {
             textManagerEventsConnectionPoint.Advise(new DataTipTextManagerEvents(this), out cookie);
 
             MakeDebuggerContextAvailable();
-
-            IntellisenseOptionsPage.AnalysisLogMaximumChanged += IntellisenseOptionsPage_AnalysisLogMaximumChanged;
-            IntellisenseOptionsPage.AnalysisLevelChanged += IntellisenseOptionsPageAnalysisLevelChanged;
-            IntellisenseOptionsPage.SaveToDiskChanged += IntellisenseOptionsPageSaveToDiskChanged;
 
             InitializeLogging();
 
@@ -283,19 +275,12 @@ namespace Microsoft.NodejsTools {
             _subscribedCommandEvents.Add(targetEvent);
         }
 
-
-        private void IntellisenseOptionsPage_AnalysisLogMaximumChanged(object sender, EventArgs e) {
-            if (_analyzer != null) {
-                _analyzer.MaxLogLength = IntellisenseOptionsPage.AnalysisLogMax;
-            }
-        }
-
         private void InitializeLogging() {
             _logger = new NodejsToolsLogger(ComponentModel.GetExtensions<INodejsToolsLogger>().ToArray());
 
             // log interesting stats on startup
             _logger.LogEvent(NodejsToolsLogEvent.SurveyNewsFrequency, GeneralOptionsPage.SurveyNewsCheck);
-            _logger.LogEvent(NodejsToolsLogEvent.AnalysisLevel, IntellisenseOptionsPage.AnalysisLevel);
+            _logger.LogEvent(NodejsToolsLogEvent.AnalysisLevel, AnalysisLevel.Preview);
         }
 
         private void InitializeTelemetry() {
@@ -589,11 +574,11 @@ namespace Microsoft.NodejsTools {
         }
 
         internal static void NavigateTo(string filename, int line, int col) {
-            VsUtilities.NavigateTo(Instance, filename, NodejsProjectNode.IsNodejsFile(filename) ? typeof(NodejsEditorFactory).GUID : Guid.Empty, line, col);
+            VsUtilities.NavigateTo(Instance, filename, Guid.Empty, line, col);
         }
 
         internal static void NavigateTo(string filename, int pos) {
-            VsUtilities.NavigateTo(Instance, filename, NodejsProjectNode.IsNodejsFile(filename) ? typeof(NodejsEditorFactory).GUID : Guid.Empty, pos);
+            VsUtilities.NavigateTo(Instance, filename, Guid.Empty, pos);
         }
 
         /// <summary>
@@ -604,29 +589,10 @@ namespace Microsoft.NodejsTools {
                 if (_analyzer == null) {
                     _analyzer = CreateLooseVsProjectAnalyzer();
                     LogLooseFileAnalysisLevel();
-                    _analyzer.MaxLogLength = IntellisenseOptionsPage.AnalysisLogMax;
+                    _analyzer.MaxLogLength = 100;
                 }
                 return _analyzer;
             }
-        }
-
-        private void IntellisenseOptionsPageSaveToDiskChanged(object sender, EventArgs e) {
-            if (_analyzer != null) {
-                _analyzer.SaveToDisk = IntellisenseOptionsPage.SaveToDisk;
-            }
-        }
-
-        private void IntellisenseOptionsPageAnalysisLevelChanged(object sender, EventArgs e) {
-            if (_analyzer != null) {
-                var analyzer = CreateLooseVsProjectAnalyzer();
-                analyzer.SwitchAnalyzers(_analyzer);
-                if (_analyzer.RemoveUser()) {
-                    _analyzer.Dispose();
-                }
-                _analyzer = analyzer;
-                LogLooseFileAnalysisLevel();
-            }
-            TelemetryLogger.LogAnalysisLevelChanged(IntellisenseOptionsPage.AnalysisLevel);
         }
 
         private VsProjectAnalyzer CreateLooseVsProjectAnalyzer() {
@@ -640,7 +606,7 @@ namespace Microsoft.NodejsTools {
             // we do not throw to Salsa from the REPL window. However, in order to provide a workable editing
             // experience within the REPL context, we initialize the loose analyzer with Quick IntelliSense
             // during ES6 mode.
-            var analysisLevel = IntellisenseOptionsPage.AnalysisLevel == AnalysisLevel.Preview ? AnalysisLevel.NodeLsMedium : IntellisenseOptionsPage.AnalysisLevel;
+            var analysisLevel = AnalysisLevel.NodeLsMedium;
             return new VsProjectAnalyzer(analysisLevel, false);
         }
 

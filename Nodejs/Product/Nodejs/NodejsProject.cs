@@ -540,15 +540,8 @@ namespace Microsoft.NodejsTools {
 
         private int OpenWithNodejsEditor(uint selectionItemId) {
             // If the item type of this file is not compile, we don't actually want to open with Nodejs and should instead use the default.
-            Guid ourEditor;
+            Guid ourEditor = Guid.Empty;
             var properties = GetExtensionObject(_innerVsHierarchy, selectionItemId).Properties;
-            try {
-                var itemType = properties.Item("ItemType").Value;
-                ourEditor = (string)itemType == ProjectFileConstants.Compile && !IsES6IntellisensePreview() ? Guids.NodejsEditorFactory : Guid.Empty;
-            } catch (ArgumentException) {
-                // no item type, file is excluded from project.
-                ourEditor = Guids.NodejsEditorFactory;
-            }
             
             Guid view = Guid.Empty;
             IVsWindowFrame frame;
@@ -570,11 +563,6 @@ namespace Microsoft.NodejsTools {
                 hr = frame.Show();
             }
             return hr;
-        }
-
-        private bool IsES6IntellisensePreview() {
-            // If the analysis level is set to preview then use the TypeScript language service for node.js
-            return NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel == Options.AnalysisLevel.Preview;
         }
 
         #region IVsProject Members
@@ -600,7 +588,7 @@ namespace Microsoft.NodejsTools {
             }
 
             if (!isClientCode && _innerProject3 != null && IsJavaScriptFile(pszItemName)) {
-                Guid ourEditor = IsES6IntellisensePreview() ? Guid.Empty : typeof(NodejsEditorFactory).GUID;
+                Guid ourEditor = Guid.Empty;
                 Guid view = Guid.Empty;
                 return _innerProject3.AddItemWithSpecific(
                     itemidLoc,
@@ -640,7 +628,7 @@ namespace Microsoft.NodejsTools {
         public int OpenItem(uint itemid, ref Guid rguidLogicalView, IntPtr punkDocDataExisting, out IVsWindowFrame ppWindowFrame) {
             if (_innerProject3 != null && IsJavaScriptFile(GetItemName(_innerVsHierarchy, itemid))) {
                 // force .js files opened w/o an editor type to be opened w/ our editor factory.
-                Guid guid = IsES6IntellisensePreview() ? Guid.Empty : typeof(NodejsEditorFactory).GUID;
+                Guid guid = Guid.Empty;
                 Guid view = Guid.Empty;
                 int hr = _innerProject3.OpenItemWithSpecific(
                     itemid,
@@ -675,7 +663,7 @@ namespace Microsoft.NodejsTools {
                     // force .js files opened w/o an editor type to be opened w/ our editor factory.
                     // If the item type of this file is not compile, we don't actually want to open with Nodejs and should instead use the default.
                     var itemType = GetExtensionObject(_innerVsHierarchy, itemid).Properties.Item("ItemType").Value;
-                    Guid guid = (string)itemType == ProjectFileConstants.Compile && !IsES6IntellisensePreview() ? Guids.NodejsEditorFactory : Guid.Empty;
+                    Guid guid = Guid.Empty;
 
                     return _innerProject3.ReopenItem(
                         itemid,
