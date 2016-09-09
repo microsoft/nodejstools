@@ -21,6 +21,5 @@ namespace Microsoft.NodejsTools.Telemetry {
     internal static class TelemetryEvents {
         public const string ProjectImported = "ProjectImported";
         public const string AnalysisActivatedForProject = "AnalysisActivatedForProject";
-        public const string AnalysisLevelChanged = "AnalysisLevelChanged";
     }
 }
