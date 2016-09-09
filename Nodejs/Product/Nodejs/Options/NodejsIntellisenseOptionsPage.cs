@@ -25,17 +25,7 @@ using Microsoft.VisualStudioTools;
 namespace Microsoft.NodejsTools.Options {
     [ComVisible(true)]
     public class NodejsIntellisenseOptionsPage : NodejsDialogPage {
-        private static readonly Version _typeScriptMinVersionForES6Preview = new Version("1.6");
-
         private NodejsIntellisenseOptionsControl _window;
-
-        private readonly Lazy<bool> _enableES6Preview = new Lazy<bool>(() => {
-            Version version;
-            var versionString = GetTypeScriptToolsVersion();
-            return !string.IsNullOrEmpty(versionString)
-                && Version.TryParse(versionString, out version)
-                && version.CompareTo(_typeScriptMinVersionForES6Preview) > -1;
-        });
 
         public NodejsIntellisenseOptionsPage()
             : base("IntelliSense")
@@ -52,14 +42,6 @@ namespace Microsoft.NodejsTools.Options {
             }
         }
 
-        internal bool EnableES6Preview {
-            get { return _enableES6Preview.Value; }
-        }
-
-        internal bool OnlyTabOrEnterToCommit { get; set; }
-
-        internal bool ShowCompletionListAfterCharacterTyped { get; set; }
-
         internal bool EnableAutomaticTypingsAcquisition { get; set; }
 
         internal bool ShowTypingsInfoBar { get; set; }
@@ -74,20 +56,15 @@ namespace Microsoft.NodejsTools.Options {
         public override void ResetSettings() {
         }
 
-        private const string OnlyTabOrEnterToCommitSetting = "OnlyTabOrEnterToCommit";
-        private const string ShowCompletionListAfterCharacterTypedSetting = "ShowCompletionListAfterCharacterTyped";
         private const string EnableAutomaticTypingsAcquisitionSetting = "EnableAutomaticTypingsAcquisition";
         private const string ShowTypingsInfoBarSetting = "ShowTypingsInfoBar";
         private const string SaveChangesToConfigFileSetting = "SaveChangesToConfigFile";
 
         public override void LoadSettingsFromStorage() {
             // Load settings from storage.
-            OnlyTabOrEnterToCommit = LoadBool(OnlyTabOrEnterToCommitSetting) ?? true;
-            ShowCompletionListAfterCharacterTyped = LoadBool(ShowCompletionListAfterCharacterTypedSetting) ?? true;
             EnableAutomaticTypingsAcquisition = LoadBool(EnableAutomaticTypingsAcquisitionSetting) ?? true;
             ShowTypingsInfoBar = LoadBool(ShowTypingsInfoBarSetting) ?? true;
             SaveChangesToConfigFile = LoadBool(SaveChangesToConfigFileSetting) ?? false;
-
 
             // Synchronize UI with backing properties.
             if (_window != null) {
@@ -107,8 +84,6 @@ namespace Microsoft.NodejsTools.Options {
             }
 
             // Save settings.
-            SaveBool(OnlyTabOrEnterToCommitSetting, OnlyTabOrEnterToCommit);
-            SaveBool(ShowCompletionListAfterCharacterTypedSetting, ShowCompletionListAfterCharacterTyped);
             SaveBool(EnableAutomaticTypingsAcquisitionSetting, EnableAutomaticTypingsAcquisition);
             SaveBool(ShowTypingsInfoBarSetting, ShowTypingsInfoBar);
             SaveBool(SaveChangesToConfigFileSetting, SaveChangesToConfigFile);

@@ -286,8 +286,6 @@ namespace Microsoft.NodejsTools.Commands {
                     jsAnalyzer.DumpLog(writer);
                 }
             }
-
-            res.AppendLine(string.Format("IntelliSense Completion Only Tab or Enter to Commit: {0}", NodejsPackage.Instance.IntellisenseOptionsPage.OnlyTabOrEnterToCommit));
             return res.ToString();
         }
 
