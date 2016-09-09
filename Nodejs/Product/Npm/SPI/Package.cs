@@ -28,8 +28,9 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             string fullPathToRootDirectory,
             bool showMissingDevOptionalSubPackages,
             Dictionary<string, ModuleInfo> allModules = null,
-            int depth = 0)
-            : base(fullPathToRootDirectory, showMissingDevOptionalSubPackages, allModules, depth) {
+            int depth = 0,
+            int maxDepth = 1)
+            : base(fullPathToRootDirectory, showMissingDevOptionalSubPackages, allModules, depth, maxDepth) {
             _parent = parent;
         }
 

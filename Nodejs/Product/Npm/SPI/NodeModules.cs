@@ -48,13 +48,13 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                         // _requiredBy dependencies that begin with hash characters represent top-level dependencies
                         foreach (var requiredBy in packageJson.RequiredBy) {
                             if (requiredBy.StartsWith("#") || requiredBy == "/") {
-                                AddTopLevelModule(parent, showMissingDevOptionalSubPackages, moduleDir, depth);
+                                AddTopLevelModule(parent, showMissingDevOptionalSubPackages, moduleDir, depth, maxDepth);
                                 break;
                             }
                         }
                     } else {
                         // This dependency is a top-level dependency not added by npm v3
-                        AddTopLevelModule(parent, showMissingDevOptionalSubPackages, moduleDir, depth);
+                        AddTopLevelModule(parent, showMissingDevOptionalSubPackages, moduleDir, depth, maxDepth);
                     }
                 }
             }
@@ -71,7 +71,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                     // try to find folder by recursing up tree
                     do {
                         moduleDir = Path.Combine(moduleDir, dependency.Name);
-                        if (AddModuleIfNotExists(parent, moduleDir, showMissingDevOptionalSubPackages, depth, dependency)) {
+                        if (AddModuleIfNotExists(parent, moduleDir, showMissingDevOptionalSubPackages, depth, maxDepth, dependency)) {
                             break;
                         }
 
@@ -84,12 +84,12 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             _packagesSorted.Sort(new PackageComparer());
         }
 
-        private void AddTopLevelModule(IRootPackage parent, bool showMissingDevOptionalSubPackages, string moduleDir, int depth) {
+        private void AddTopLevelModule(IRootPackage parent, bool showMissingDevOptionalSubPackages, string moduleDir, int depth, int maxDepth) {
             Debug.Assert(depth == 0, "Depth should be 0 when adding a top level dependency");
-            AddModuleIfNotExists(parent, moduleDir, showMissingDevOptionalSubPackages, depth);
+            AddModuleIfNotExists(parent, moduleDir, showMissingDevOptionalSubPackages, depth, maxDepth);
         }
 
-        private bool AddModuleIfNotExists(IRootPackage parent, string moduleDir, bool showMissingDevOptionalSubPackages, int depth, IDependency dependency = null) {
+        private bool AddModuleIfNotExists(IRootPackage parent, string moduleDir, bool showMissingDevOptionalSubPackages, int depth, int maxDepth, IDependency dependency = null) {
             depth++;
 
             ModuleInfo moduleInfo;
@@ -124,7 +124,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
                 moduleInfo.RequiredBy.Add(parent.Path);
 
-                var pkg = new Package(parent, moduleDir, showMissingDevOptionalSubPackages, _allModules, depth);
+                var pkg = new Package(parent, moduleDir, showMissingDevOptionalSubPackages, _allModules, depth, maxDepth);
                 if (dependency != null) {
                     pkg.RequestedVersionRange = dependency.VersionRangeText;
                 }
