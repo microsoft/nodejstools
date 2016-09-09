@@ -22,10 +22,14 @@ using System.Linq;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal class NodeModules : AbstractNodeModules {
-        private Dictionary<string, ModuleInfo> _allModules;
+        private readonly Dictionary<string, ModuleInfo> _allModules;
         private static readonly string[] _ignoredDirectories = { @"\.bin", @"\.staging" };
 
-        public NodeModules(IRootPackage parent, bool showMissingDevOptionalSubPackages, Dictionary<string, ModuleInfo> allModulesToDepth = null, int depth = 0) {
+        public NodeModules(IRootPackage parent, bool showMissingDevOptionalSubPackages, Dictionary<string, ModuleInfo> allModulesToDepth = null, int depth = 0, int maxDepth = 1) {
+            if (depth >= maxDepth) {
+                return;
+            }
+
             var modulesBase = Path.Combine(parent.Path, NodejsConstants.NodeModulesFolder);
 
             _allModules = allModulesToDepth ?? new Dictionary<string, ModuleInfo>();
