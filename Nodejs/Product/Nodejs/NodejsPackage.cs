@@ -76,10 +76,6 @@ namespace Microsoft.NodejsTools {
     [ProvideDebugPortSupplier("Node remote debugging", typeof(NodeRemoteDebugPortSupplier), NodeRemoteDebugPortSupplier.PortSupplierId)]
     [ProvideMenuResource(1000, 1)]                              // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideBraceCompletion(NodejsConstants.Nodejs)]
-    [ProvideEditorExtension2(typeof(NodejsEditorFactory), NodeJsFileType, 50, "*:1", ProjectGuid = "{78D985FC-2CA0-4D08-9B6B-35ACD5E5294A}", NameResourceID = 102, DefaultName = "server", TemplateDir = ".\\NullPath")]
-    [ProvideEditorExtension2(typeof(NodejsEditorFactoryPromptForEncoding), NodeJsFileType, 50, "*:1", ProjectGuid = "{78D985FC-2CA0-4D08-9B6B-35ACD5E5294A}", NameResourceID = 113, DefaultName = "server")]
-    [ProvideEditorLogicalView(typeof(NodejsEditorFactory), VSConstants.LOGVIEWID.TextView_string)]
-    [ProvideEditorLogicalView(typeof(NodejsEditorFactoryPromptForEncoding), VSConstants.LOGVIEWID.TextView_string)]
     [ProvideProjectItem(typeof(BaseNodeProjectFactory), NodejsConstants.Nodejs, "FileTemplates\\NewItem", 0)]
     [ProvideLanguageTemplates("{349C5851-65DF-11DA-9384-00065B846F21}", NodejsConstants.JavaScript, Guids.NodejsPackageString, "Web", "Node.js Project Templates", "{" + Guids.NodejsBaseProjectFactoryString + "}", ".js", NodejsConstants.Nodejs, "{" + Guids.NodejsBaseProjectFactoryString + "}")]
     [ProvideTextEditorAutomation(NodejsConstants.Nodejs, 106, 102, ProfileMigrationType.PassThrough)]
@@ -206,8 +202,6 @@ namespace Microsoft.NodejsTools {
             ((IServiceContainer)this).AddService(typeof(ClipboardServiceBase), new ClipboardService(), true);
 
             RegisterProjectFactory(new NodejsProjectFactory(this));
-            RegisterEditorFactory(new NodejsEditorFactory(this));
-            RegisterEditorFactory(new NodejsEditorFactoryPromptForEncoding(this));
             RegisterEditorFactory(new JadeEditorFactory(this));
 
             // Add our command handlers for menu (commands must exist in the .vsct file)
@@ -579,11 +573,11 @@ namespace Microsoft.NodejsTools {
         }
 
         internal static void NavigateTo(string filename, int line, int col) {
-            VsUtilities.NavigateTo(Instance, filename, NodejsProjectNode.IsNodejsFile(filename) ? typeof(NodejsEditorFactory).GUID : Guid.Empty, line, col);
+            VsUtilities.NavigateTo(Instance, filename, Guid.Empty, line, col);
         }
 
         internal static void NavigateTo(string filename, int pos) {
-            VsUtilities.NavigateTo(Instance, filename, NodejsProjectNode.IsNodejsFile(filename) ? typeof(NodejsEditorFactory).GUID : Guid.Empty, pos);
+            VsUtilities.NavigateTo(Instance, filename, Guid.Empty, pos);
         }
 
         /// <summary>

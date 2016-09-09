@@ -540,15 +540,8 @@ namespace Microsoft.NodejsTools {
 
         private int OpenWithNodejsEditor(uint selectionItemId) {
             // If the item type of this file is not compile, we don't actually want to open with Nodejs and should instead use the default.
-            Guid ourEditor;
+            Guid ourEditor = Guid.Empty;
             var properties = GetExtensionObject(_innerVsHierarchy, selectionItemId).Properties;
-            try {
-                var itemType = properties.Item("ItemType").Value;
-                ourEditor = Guid.Empty;
-            } catch (ArgumentException) {
-                // no item type, file is excluded from project.
-                ourEditor = Guids.NodejsEditorFactory;
-            }
             
             Guid view = Guid.Empty;
             IVsWindowFrame frame;
