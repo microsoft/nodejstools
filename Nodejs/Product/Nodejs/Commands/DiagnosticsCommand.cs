@@ -22,6 +22,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using Microsoft.NodejsTools.Logging;
+using Microsoft.NodejsTools.Options;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 
@@ -74,7 +75,6 @@ namespace Microsoft.NodejsTools.Commands {
             res.AppendLine(GetSolutionInfo());
             res.AppendLine(GetEventsAndStatsInfo());
             res.AppendLine(GetLoadedAssemblyInfo());
-            res.AppendLine(GetAnalysisLevelInfo());
             return res.ToString();
         }
 
@@ -270,23 +270,6 @@ namespace Microsoft.NodejsTools.Commands {
                     assembly.FullName,
                     assemFileVersion == null ? "(null)" : assemFileVersion.Version)));
             }
-            return res.ToString();
-        }
-
-        private static string GetAnalysisLevelInfo() {
-            var res = new StringBuilder();
-            res.AppendLine(String.Format("Analysis Level: {0}", NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel.ToString()));
-            res.AppendLine();
-            if (NodejsPackage.Instance._analyzer != null) {
-                var jsAnalyzer = NodejsPackage.Instance._analyzer;
-                res.AppendLine("Default Analysis Log: ");
-
-                using (var writer = new StringWriter(res)) {
-                    jsAnalyzer.DumpLog(writer);
-                }
-            }
-
-            res.AppendLine(string.Format("IntelliSense Completion Only Tab or Enter to Commit: {0}", NodejsPackage.Instance.IntellisenseOptionsPage.OnlyTabOrEnterToCommit));
             return res.ToString();
         }
 

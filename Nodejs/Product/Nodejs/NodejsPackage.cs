@@ -93,7 +93,9 @@ namespace Microsoft.NodejsTools {
     [ProvideLanguageEditorOptionPage(typeof(NodejsFormattingSpacingOptionsPage), NodejsConstants.Nodejs, "Formatting", "Spacing", "3042")]
     [ProvideLanguageEditorOptionPage(typeof(NodejsFormattingBracesOptionsPage), NodejsConstants.Nodejs, "Formatting", "Braces", "3043")]
     [ProvideLanguageEditorOptionPage(typeof(NodejsFormattingGeneralOptionsPage), NodejsConstants.Nodejs, "Formatting", "General", "3044")]
+#if DEV14
     [ProvideLanguageEditorOptionPage(typeof(NodejsIntellisenseOptionsPage), NodejsConstants.Nodejs, "IntelliSense", "", "3048")]
+#endif
     [ProvideLanguageEditorOptionPage(typeof(NodejsAdvancedEditorOptionsPage), NodejsConstants.Nodejs, "Advanced", "", "3050")]
     [ProvideCodeExpansions(Guids.NodejsLanguageInfoString, false, 106, "Nodejs", @"Snippets\%LCID%\SnippetsIndex.xml", @"Snippets\%LCID%\Nodejs\")]
     [ProvideCodeExpansionPath("Nodejs", "Test", @"Snippets\%LCID%\Test\")]
@@ -241,10 +243,6 @@ namespace Microsoft.NodejsTools {
 
             MakeDebuggerContextAvailable();
 
-            IntellisenseOptionsPage.AnalysisLogMaximumChanged += IntellisenseOptionsPage_AnalysisLogMaximumChanged;
-            IntellisenseOptionsPage.AnalysisLevelChanged += IntellisenseOptionsPageAnalysisLevelChanged;
-            IntellisenseOptionsPage.SaveToDiskChanged += IntellisenseOptionsPageSaveToDiskChanged;
-
             InitializeLogging();
 
             InitializeTelemetry();
@@ -282,19 +280,12 @@ namespace Microsoft.NodejsTools {
             _subscribedCommandEvents.Add(targetEvent);
         }
 
-
-        private void IntellisenseOptionsPage_AnalysisLogMaximumChanged(object sender, EventArgs e) {
-            if (_analyzer != null) {
-                _analyzer.MaxLogLength = IntellisenseOptionsPage.AnalysisLogMax;
-            }
-        }
-
         private void InitializeLogging() {
             _logger = new NodejsToolsLogger(ComponentModel.GetExtensions<INodejsToolsLogger>().ToArray());
 
             // log interesting stats on startup
             _logger.LogEvent(NodejsToolsLogEvent.SurveyNewsFrequency, GeneralOptionsPage.SurveyNewsCheck);
-            _logger.LogEvent(NodejsToolsLogEvent.AnalysisLevel, IntellisenseOptionsPage.AnalysisLevel);
+            _logger.LogEvent(NodejsToolsLogEvent.AnalysisLevel, AnalysisLevel.Preview);
         }
 
         private void InitializeTelemetry() {
@@ -603,29 +594,10 @@ namespace Microsoft.NodejsTools {
                 if (_analyzer == null) {
                     _analyzer = CreateLooseVsProjectAnalyzer();
                     LogLooseFileAnalysisLevel();
-                    _analyzer.MaxLogLength = IntellisenseOptionsPage.AnalysisLogMax;
+                    _analyzer.MaxLogLength = 100;
                 }
                 return _analyzer;
             }
-        }
-
-        private void IntellisenseOptionsPageSaveToDiskChanged(object sender, EventArgs e) {
-            if (_analyzer != null) {
-                _analyzer.SaveToDisk = IntellisenseOptionsPage.SaveToDisk;
-            }
-        }
-
-        private void IntellisenseOptionsPageAnalysisLevelChanged(object sender, EventArgs e) {
-            if (_analyzer != null) {
-                var analyzer = CreateLooseVsProjectAnalyzer();
-                analyzer.SwitchAnalyzers(_analyzer);
-                if (_analyzer.RemoveUser()) {
-                    _analyzer.Dispose();
-                }
-                _analyzer = analyzer;
-                LogLooseFileAnalysisLevel();
-            }
-            TelemetryLogger.LogAnalysisLevelChanged(IntellisenseOptionsPage.AnalysisLevel);
         }
 
         private VsProjectAnalyzer CreateLooseVsProjectAnalyzer() {
@@ -639,7 +611,7 @@ namespace Microsoft.NodejsTools {
             // we do not throw to Salsa from the REPL window. However, in order to provide a workable editing
             // experience within the REPL context, we initialize the loose analyzer with Quick IntelliSense
             // during ES6 mode.
-            var analysisLevel = IntellisenseOptionsPage.AnalysisLevel == AnalysisLevel.Preview ? AnalysisLevel.NodeLsMedium : IntellisenseOptionsPage.AnalysisLevel;
+            var analysisLevel = AnalysisLevel.NodeLsMedium;
             return new VsProjectAnalyzer(analysisLevel, false);
         }
 

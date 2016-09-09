@@ -29,13 +29,6 @@ namespace Microsoft.NodejsTools.Telemetry {
                     new DataPoint(TelemetryProperties.AnalysisLevel, newAnalysisLevel.ToString())));
         }
 
-        public static void LogAnalysisLevelChanged(this ITelemetryLogger logger, Options.AnalysisLevel newAnalysisLevel) {
-            logger.ReportEvent(
-                TelemetryEvents.AnalysisLevelChanged,
-                TelemetryProperties.AnalysisLevel,
-                newAnalysisLevel.ToString());
-        }
-
         public static void LogProjectImported(this ITelemetryLogger logger, Guid projectGuid) {
             logger.ReportEvent(
                 TelemetryEvents.ProjectImported,

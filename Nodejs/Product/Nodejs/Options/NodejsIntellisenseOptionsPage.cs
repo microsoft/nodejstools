@@ -25,20 +25,7 @@ using Microsoft.VisualStudioTools;
 namespace Microsoft.NodejsTools.Options {
     [ComVisible(true)]
     public class NodejsIntellisenseOptionsPage : NodejsDialogPage {
-        private static readonly Version _typeScriptMinVersionForES6Preview = new Version("1.6");
-
         private NodejsIntellisenseOptionsControl _window;
-        private AnalysisLevel _level;
-        private int _analysisLogMax;
-        private bool _saveToDisk;
-
-        private readonly Lazy<bool> _enableES6Preview = new Lazy<bool>(() => {
-            Version version;
-            var versionString = GetTypeScriptToolsVersion();
-            return !string.IsNullOrEmpty(versionString)
-                && Version.TryParse(versionString, out version)
-                && version.CompareTo(_typeScriptMinVersionForES6Preview) > -1;
-        });
 
         public NodejsIntellisenseOptionsPage()
             : base("IntelliSense")
@@ -55,66 +42,11 @@ namespace Microsoft.NodejsTools.Options {
             }
         }
 
-        internal bool EnableES6Preview {
-            get { return _enableES6Preview.Value; }
-        }
-
-        internal bool SaveToDisk {
-            get { return _saveToDisk; }
-            set {
-                var oldState = _saveToDisk;
-                _saveToDisk = value;
-                if (oldState != _saveToDisk) {
-                    SaveToDiskChanged?.Invoke(this, EventArgs.Empty);
-                }
-            }
-        }
-
-        internal AnalysisLevel AnalysisLevel {
-            get {
-                return _level;
-            }
-            set {
-                var oldLevel = _level;
-                _level = value;
-
-                // Fallback to quick intellisense (medium) if the ES6 intellisense preview isn't enabled
-                if (_level == AnalysisLevel.Preview && !EnableES6Preview) {
-                    _level = AnalysisLevel.NodeLsMedium;
-                }
-
-                if (oldLevel != _level) {
-                    AnalysisLevelChanged?.Invoke(this, EventArgs.Empty);
-                }
-            }
-        }
-
-        internal int AnalysisLogMax {
-            get {
-                return _analysisLogMax;
-            }
-            set {
-                var oldMax = _analysisLogMax;
-                _analysisLogMax = value;
-                if (oldMax != _analysisLogMax) {
-                    AnalysisLogMaximumChanged?.Invoke(this, EventArgs.Empty);
-                }
-            }
-        }
-
-        internal bool OnlyTabOrEnterToCommit { get; set; }
-
-        internal bool ShowCompletionListAfterCharacterTyped { get; set; }
-
         internal bool EnableAutomaticTypingsAcquisition { get; set; }
 
         internal bool ShowTypingsInfoBar { get; set; }
 
         internal bool SaveChangesToConfigFile { get; set; }
-
-        public event EventHandler<EventArgs> AnalysisLevelChanged;
-        public event EventHandler<EventArgs> AnalysisLogMaximumChanged;
-        public event EventHandler<EventArgs> SaveToDiskChanged;
 
         /// <summary>
         /// Resets settings back to their defaults. This should be followed by
@@ -122,30 +54,17 @@ namespace Microsoft.NodejsTools.Options {
         /// values.
         /// </summary>
         public override void ResetSettings() {
-            AnalysisLevel = AnalysisLevel.Preview;
-            AnalysisLogMax = 100;
         }
 
-        private const string AnalysisLevelSetting = "AnalysisLevel";
-        private const string AnalysisLogMaximumSetting = "AnalysisLogMaximum";
-        private const string SaveToDiskSetting = "SaveToDisk";
-        private const string OnlyTabOrEnterToCommitSetting = "OnlyTabOrEnterToCommit";
-        private const string ShowCompletionListAfterCharacterTypedSetting = "ShowCompletionListAfterCharacterTyped";
         private const string EnableAutomaticTypingsAcquisitionSetting = "EnableAutomaticTypingsAcquisition";
         private const string ShowTypingsInfoBarSetting = "ShowTypingsInfoBar";
         private const string SaveChangesToConfigFileSetting = "SaveChangesToConfigFile";
 
         public override void LoadSettingsFromStorage() {
             // Load settings from storage.
-            AnalysisLevel = LoadEnum<AnalysisLevel>(AnalysisLevelSetting) ?? AnalysisLevel.Preview;
-            AnalysisLogMax = LoadInt(AnalysisLogMaximumSetting) ?? 100;
-            SaveToDisk = LoadBool(SaveToDiskSetting) ?? true;
-            OnlyTabOrEnterToCommit = LoadBool(OnlyTabOrEnterToCommitSetting) ?? true;
-            ShowCompletionListAfterCharacterTyped = LoadBool(ShowCompletionListAfterCharacterTypedSetting) ?? true;
             EnableAutomaticTypingsAcquisition = LoadBool(EnableAutomaticTypingsAcquisitionSetting) ?? true;
             ShowTypingsInfoBar = LoadBool(ShowTypingsInfoBarSetting) ?? true;
             SaveChangesToConfigFile = LoadBool(SaveChangesToConfigFileSetting) ?? false;
-
 
             // Synchronize UI with backing properties.
             if (_window != null) {
@@ -165,11 +84,6 @@ namespace Microsoft.NodejsTools.Options {
             }
 
             // Save settings.
-            SaveEnum(AnalysisLevelSetting, AnalysisLevel);
-            SaveInt(AnalysisLogMaximumSetting, AnalysisLogMax);
-            SaveBool(SaveToDiskSetting, SaveToDisk);
-            SaveBool(OnlyTabOrEnterToCommitSetting, OnlyTabOrEnterToCommit);
-            SaveBool(ShowCompletionListAfterCharacterTypedSetting, ShowCompletionListAfterCharacterTyped);
             SaveBool(EnableAutomaticTypingsAcquisitionSetting, EnableAutomaticTypingsAcquisition);
             SaveBool(ShowTypingsInfoBarSetting, ShowTypingsInfoBar);
             SaveBool(SaveChangesToConfigFileSetting, SaveChangesToConfigFile);

@@ -1075,41 +1075,6 @@ namespace Microsoft.NodejsTools.Intellisense {
         ) {
             // There are some scenarios during ES6 Mode where a textview is still opened using NodeLS.
             // In these cases, we do not properly parse ES6 syntax, and therefore do not want to display errors. 
-            if (NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel == AnalysisLevel.Preview) {
-                return;
-            }
-
-            // Update the warn-on-launch state for this entry
-            bool changed = false;
-            lock (_hasParseErrors) {
-                if (errorSink.Errors.Any() ? _hasParseErrors.Add(entry) : _hasParseErrors.Remove(entry)) {
-                    changed = true;
-                }
-            }
-            if (changed) {
-                OnShouldWarnOnLaunchChanged(entry);
-            }
-
-            var f = new TaskProviderItemFactory(snapshot);
-
-            // Update the parser warnings/errors
-            if (errorSink.Warnings.Any() || errorSink.Errors.Any()) {
-                TaskProvider.ReplaceItems(
-                    entry,
-                    ParserTaskMoniker,
-                    errorSink.Warnings
-                        .Where(ShouldIncludeWarning)
-                        .Select(er => f.FromParseWarning(er))
-                        .Concat(errorSink.Errors.Select(er => f.FromParseError(er)))
-                        .ToList()
-                );
-            } else {
-                TaskProvider.Clear(entry, ParserTaskMoniker);
-            }
-#if FALSE
-            // Add a handler for the next complete analysis
-            _unresolvedSquiggles.ListenForNextNewAnalysis(entry as IJsProjectEntry);
-#endif
         }
 
         private bool ShouldIncludeWarning(ErrorResult error) {

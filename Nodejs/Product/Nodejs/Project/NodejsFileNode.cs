@@ -99,7 +99,6 @@ namespace Microsoft.NodejsTools.Project {
 
             ProjectMgr.Analyzer.AnalyzeFile(Url, ShouldAnalyze);
 
-            UpdateParentContentType();
             ItemNode.ItemTypeChanged += ItemNode_ItemTypeChanged;
 
             if (ProjectMgr.ShouldAcquireTypingsAutomatically) {
@@ -117,7 +116,6 @@ namespace Microsoft.NodejsTools.Project {
             ProjectMgr.Analyzer.AnalyzeFile(Url, false);
             var excludeFromProject = base.ExcludeFromProject();
 
-            UpdateParentContentType();
             ItemNode.ItemTypeChanged -= ItemNode_ItemTypeChanged;
 
             return excludeFromProject;
@@ -151,15 +149,6 @@ namespace Microsoft.NodejsTools.Project {
             // item type node was changed...
             // if we have changed the type from compile to anything else, we should scrub
             ProjectMgr.Analyzer.AnalyzeFile(Url, ShouldAnalyze);
-
-            UpdateParentContentType();
-        }
-
-        private void UpdateParentContentType() {
-            var parent = this.Parent as NodejsFolderNode;
-            if (parent != null) {
-                parent.UpdateContentType();
-            }
         }
 
         public new NodejsProjectNode ProjectMgr {

@@ -195,9 +195,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                         }
                         break;
                     default:
-                        if (IsIdentifierFirstChar(ch) && _activeSession == null
-                            && NodejsPackage.Instance.LangPrefs.AutoListMembers
-                            && NodejsPackage.Instance.IntellisenseOptionsPage.ShowCompletionListAfterCharacterTyped) {
+                        if (IsIdentifierFirstChar(ch) && _activeSession == null && NodejsPackage.Instance.LangPrefs.AutoListMembers) {
                             TriggerCompletionSession(false);
                         }
                         break;
@@ -503,9 +501,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                                 committedBy = "\"";
                             }
                         } else {
-                            committedBy = NodejsPackage.Instance != null && NodejsPackage.Instance.IntellisenseOptionsPage.OnlyTabOrEnterToCommit ?
-                                string.Empty :
-                                NodejsConstants.DefaultIntellisenseCompletionCommittedBy;
+                            committedBy = NodejsConstants.DefaultIntellisenseCompletionCommittedBy;
                         }
 
                         if (committedBy.IndexOf(ch) != -1) {
@@ -648,8 +644,7 @@ namespace Microsoft.NodejsTools.Intellisense {
                         case VSConstants.VSStd2KCmdID.COMPLETEWORD:
                             ForceCompletions = true;
                             try {
-                                TriggerCompletionSession((VSConstants.VSStd2KCmdID)nCmdID == VSConstants.VSStd2KCmdID.COMPLETEWORD
-                                    && !NodejsPackage.Instance.IntellisenseOptionsPage.OnlyTabOrEnterToCommit);
+                                TriggerCompletionSession(false);
                             } finally {
                                 ForceCompletions = false;
                             }
