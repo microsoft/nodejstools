@@ -123,6 +123,7 @@
     <Compile Include="OutliningTests.cs" />
     <Compile Include="ProjectPropertiesTests.cs" />
     <Compile Include="BraceCompletion.cs" />
+    <Compile Include="ProjectTests.cs" />
     <Compile Include="SmartIndent.cs" />
     <Compile Include="BasicProjectTests.cs" />
     <Compile Include="NodejsProjectProcessor.cs" />
