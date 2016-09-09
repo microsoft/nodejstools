@@ -22,9 +22,9 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using Microsoft.NodejsTools.Logging;
+using Microsoft.NodejsTools.Options;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
-using Microsoft.NodejsTools.Options;
 
 namespace Microsoft.NodejsTools.Commands {
     internal sealed class DiagnosticsCommand : Command {
@@ -75,7 +75,6 @@ namespace Microsoft.NodejsTools.Commands {
             res.AppendLine(GetSolutionInfo());
             res.AppendLine(GetEventsAndStatsInfo());
             res.AppendLine(GetLoadedAssemblyInfo());
-            res.AppendLine(GetAnalysisLevelInfo());
             return res.ToString();
         }
 
@@ -270,21 +269,6 @@ namespace Microsoft.NodejsTools.Commands {
                 res.AppendLine(Indent(1, string.Format("{0}, FileVersion={1}",
                     assembly.FullName,
                     assemFileVersion == null ? "(null)" : assemFileVersion.Version)));
-            }
-            return res.ToString();
-        }
-
-        private static string GetAnalysisLevelInfo() {
-            var res = new StringBuilder();
-            res.AppendLine(String.Format("Analysis Level: {0}", AnalysisLevel.Preview.ToString()));
-            res.AppendLine();
-            if (NodejsPackage.Instance._analyzer != null) {
-                var jsAnalyzer = NodejsPackage.Instance._analyzer;
-                res.AppendLine("Default Analysis Log: ");
-
-                using (var writer = new StringWriter(res)) {
-                    jsAnalyzer.DumpLog(writer);
-                }
             }
             return res.ToString();
         }
