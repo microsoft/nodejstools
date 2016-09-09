@@ -638,7 +638,6 @@
     <Compile Include="Guids.cs" />
     <Compile Include="JsonListener.cs" />
     <Compile Include="NodejsConstants.cs" />
-    <Compile Include="NodejsEditorFactory.cs" />
     <Compile Include="NodejsProject.cs" />
     <Compile Include="NodejsProjectFactory.cs" />
     <Compile Include="PkgCmdId.cs" />
