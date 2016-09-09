@@ -29,7 +29,6 @@
             this.outerLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.advancedOptionsLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this._salsaLsIntellisenseOptionsControl = new Microsoft.NodejsTools.Options.SalsaLsIntellisenseOptionsControl();
-            this.horizontalDivider = new System.Windows.Forms.Label();
             toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.outerLayoutPanel.SuspendLayout();
             this.advancedOptionsLayoutPanel.SuspendLayout();
@@ -39,7 +38,6 @@
             // 
             resources.ApplyResources(this.outerLayoutPanel, "outerLayoutPanel");
             this.outerLayoutPanel.Controls.Add(this.advancedOptionsLayoutPanel, 0, 2);
-            this.outerLayoutPanel.Controls.Add(this.horizontalDivider, 0, 1);
             this.outerLayoutPanel.Name = "outerLayoutPanel";
             // 
             // advancedOptionsLayoutPanel
@@ -52,13 +50,6 @@
             // 
             resources.ApplyResources(this._salsaLsIntellisenseOptionsControl, "_salsaLsIntellisenseOptionsControl");
             this._salsaLsIntellisenseOptionsControl.Name = "_salsaLsIntellisenseOptionsControl";
-            // 
-            // horizontalDivider
-            // 
-            this.horizontalDivider.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            resources.ApplyResources(this.horizontalDivider, "horizontalDivider");
-            this.horizontalDivider.ForeColor = System.Drawing.SystemColors.Control;
-            this.horizontalDivider.Name = "horizontalDivider";
             // 
             // NodejsIntellisenseOptionsControl
             // 
@@ -80,6 +71,5 @@
         private System.Windows.Forms.TableLayoutPanel outerLayoutPanel;
         private System.Windows.Forms.TableLayoutPanel advancedOptionsLayoutPanel;
         private SalsaLsIntellisenseOptionsControl _salsaLsIntellisenseOptionsControl;
-        private System.Windows.Forms.Label horizontalDivider;
     }
 }
