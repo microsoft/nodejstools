@@ -22,7 +22,6 @@ using Microsoft.NodejsTools.Analysis;
 using Microsoft.NodejsTools.Editor.Core;
 using Microsoft.NodejsTools.Formatting;
 using Microsoft.NodejsTools.Intellisense;
-using Microsoft.NodejsTools.Outlining;
 using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
@@ -80,7 +79,6 @@ namespace Microsoft.NodejsTools {
             // disable JavaScript language services auto formatting features, this is because
             // they are not aware that we have an extra level of indentation
             if (pguidCmdGroup == VSConstants.VSStd2K) {
-                JavaScriptOutliningTaggerProvider.OutliningTagger tagger;
                 switch ((VSConstants.VSStd2KCmdID)nCmdID) {
                     case VSConstants.VSStd2KCmdID.FORMATSELECTION: FormatSelection(); return VSConstants.S_OK;
                     case VSConstants.VSStd2KCmdID.FORMATDOCUMENT: FormatDocument(); return VSConstants.S_OK;
@@ -134,20 +132,6 @@ namespace Microsoft.NodejsTools {
                         if (_textView.CommentOrUncommentBlock(comment: false)) {
                             return VSConstants.S_OK;
                         }
-                        break;
-                    case VSConstants.VSStd2KCmdID.OUTLN_STOP_HIDING_ALL:
-                        tagger = _textView.GetOutliningTagger();
-                        if (tagger != null) {
-                            tagger.Disable();
-                        }
-                        // let VS get the event as well
-                        break;
-                    case VSConstants.VSStd2KCmdID.OUTLN_START_AUTOHIDING:
-                        tagger = _textView.GetOutliningTagger();
-                        if (tagger != null) {
-                            tagger.Enable();
-                        }
-                        // let VS get the event as well
                         break;
                 }
             } else if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97) {
@@ -679,7 +663,6 @@ namespace Microsoft.NodejsTools {
                     }
                 }
             } else if (pguidCmdGroup == VSConstants.VSStd2K) {
-                JavaScriptOutliningTaggerProvider.OutliningTagger tagger;
                 for (int i = 0; i < cCmds; i++) {
                     switch ((VSConstants.VSStd2KCmdID)prgCmds[i].cmdID) {
                         case VSConstants.VSStd2KCmdID.FORMATDOCUMENT:
@@ -696,20 +679,6 @@ namespace Microsoft.NodejsTools {
                         case VSConstants.VSStd2KCmdID.UNCOMMENT_BLOCK:
                         case VSConstants.VSStd2KCmdID.UNCOMMENTBLOCK:
                             prgCmds[i].cmdf = (uint)(OLECMDF.OLECMDF_ENABLED | OLECMDF.OLECMDF_SUPPORTED);
-                            return VSConstants.S_OK;
-
-                        case VSConstants.VSStd2KCmdID.OUTLN_STOP_HIDING_ALL:
-                            tagger = _textView.GetOutliningTagger();
-                            if (tagger != null && tagger.Enabled) {
-                                prgCmds[i].cmdf = (uint)(OLECMDF.OLECMDF_ENABLED | OLECMDF.OLECMDF_SUPPORTED);
-                            }
-                            return VSConstants.S_OK;
-
-                        case VSConstants.VSStd2KCmdID.OUTLN_START_AUTOHIDING:
-                            tagger = _textView.GetOutliningTagger();
-                            if (tagger != null && !tagger.Enabled) {
-                                prgCmds[i].cmdf = (uint)(OLECMDF.OLECMDF_ENABLED | OLECMDF.OLECMDF_SUPPORTED);
-                            }
                             return VSConstants.S_OK;
                     }
                 }
