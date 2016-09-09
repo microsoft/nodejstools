@@ -15,14 +15,13 @@
 //*********************************************************//
 
 using System;
-using Microsoft.VisualStudioTools;
 using System.Diagnostics;
+using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.Commands {
     internal sealed class SendFeedbackCommand : Command {
         public override void DoCommand(object sender, EventArgs args) {
-            var uri = new Uri(@"https://aka.ms/ntvs-feedback");
-            Process.Start(new ProcessStartInfo(uri.AbsoluteUri));
+            Process.Start(@"https://aka.ms/ntvs-feedback");
         }
 
         public override int CommandId {

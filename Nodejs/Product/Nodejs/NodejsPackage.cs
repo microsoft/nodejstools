@@ -212,7 +212,8 @@ namespace Microsoft.NodejsTools {
                 new SurveyNewsCommand(),
                 new ImportWizardCommand(),
                 new DiagnosticsCommand(this),
-                new SendFeedbackCommand()
+                new SendFeedbackCommand(),
+                new ShowDocumentationCommand()
             };
             try {
                 commands.Add(new AzureExplorerAttachDebuggerCommand());

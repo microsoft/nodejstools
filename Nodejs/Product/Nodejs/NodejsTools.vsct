@@ -36,6 +36,10 @@
         <Parent guid="guidNodeToolsCmdSet" id="RemoteDebugProxyMenu"/>
       </Group>
 
+      <Group guid="guidNodeToolsCmdSet" id="NtvsHelpGroup" priority="0x0500">
+        <Parent guid="guidNodeToolsCmdSet" id="ToolsMenu"/>
+      </Group>
+
       <Group guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJWIN_SCOPE" priority="0x0500">
         <Parent guid="guidNodeToolsNpmCmdSet" id="NpmMenu"/>
       </Group>
@@ -90,13 +94,6 @@
               <CommandFlag>DefaultInvisible</CommandFlag>
               <CommandFlag>DynamicVisibility</CommandFlag>
           If you do not want an image next to your command, remove the Icon node or set it to <Icon guid="guidOfficeIcon" id="msotcidNoIcon" /> -->
-
-       <Button guid="guidNodeToolsCmdSet" id="cmdidSendFeedback" priority="0x0500" type="Button">
-        <Parent guid="guidSHLMainMenu" id="IDG_VS_HELP_SUPPORT"/>
-        <Strings>
-          <ButtonText>Report Node.js Tools Issue or Send Feedback</ButtonText>
-        </Strings>
-      </Button>
         
       <Button guid="guidNodeToolsCmdSet" id="cmdidAddNewJavaScriptFileCommand" priority="0x0550" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="AddNewFileGroup"/>
@@ -225,11 +222,27 @@
         </Strings>
       </Button>
 
+      <Button guid="guidNodeToolsCmdSet" id="cmdidDocumentation" priority="0x004" type="Button">
+        <Parent guid="guidNodeToolsCmdSet" id="NtvsHelpGroup"/>
+        <Strings>
+          <ButtonText>&amp;Documentation...</ButtonText>
+          <CommandName>Documentation...</CommandName>
+        </Strings>
+      </Button>
+
       <Button guid="guidNodeToolsCmdSet" id="cmdidSurveyNews" priority="0x005" type="Button">
-        <Parent guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup"/>
+        <Parent guid="guidNodeToolsCmdSet" id="NtvsHelpGroup"/>
         <Strings>
           <ButtonText>Survey/&amp;News...</ButtonText>
           <CommandName>Survey/News...</CommandName>
+        </Strings>
+      </Button>
+
+      <Button guid="guidNodeToolsCmdSet" id="cmdidSendFeedback" priority="0x006" type="Button">
+        <Parent guid="guidNodeToolsCmdSet" id="NtvsHelpGroup"/>
+        <Strings>
+          <ButtonText>&amp;Report Issue or Send Feedback...</ButtonText>
+          <CommandName>Report Issue or Send Feedback...</CommandName>
         </Strings>
       </Button>
 
@@ -408,6 +421,7 @@
       <IDSymbol name="cmdidAddNewHTMLFileCommand" value="0x0213" />
       <IDSymbol name="cmdidAddNewCSSFileCommand" value="0x0214" />
       <IDSymbol name="cmdidSendFeedback" value="0x0215" />
+      <IDSymbol name="cmdidDocumentation" value="0x0216" />
 
       <!-- Shared commands, defined in CommonConstants.cs -->
       <IDSymbol name="cmdidAddExistingFolder" value="0x10001" />
@@ -420,6 +434,7 @@
       <IDSymbol name="CodeFileGroup" value="0x1012" />
       <IDSymbol name="AzureExplorerCommandsGroup" value="0x1015" />
       <IDSymbol name="AddNewFileGroup" value="0x1016"/>
+      <IDSymbol name="NtvsHelpGroup" value="0x1017" />
 
       <!-- Menus -->
       <IDSymbol name="ToolsMenu" value ="0x2001" />

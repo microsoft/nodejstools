@@ -36,7 +36,7 @@ namespace Microsoft.NodejsTools {
         public const int cmdidAddNewHTMLFileCommand         = 0x213;
         public const int cmdidAddNewCSSFileCommand          = 0x214;
         public const int cmdidSendFeedback                  = 0x215;
-
+        public const int cmdidShowDocumentation             = 0x216;
 
         public const int cmdidNpmManageModules              = 0x300;
         public const int cmdidNpmInstallModules             = 0x301;
