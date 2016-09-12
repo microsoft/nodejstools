@@ -44,7 +44,6 @@
                        FileTemplates\NewItem\EmptyJs.js;
                        FileTemplates\NewItem\EmptyXml.xml;
                        FileTemplates\NewItem\EmptyTs.ts;
-                       FileTemplates\NewItem\EmptyStyl.styl;
                        FileTemplates\NewItem\EmptyLess.less;
                        FileTemplates\NewItem\EmptyJson.json;
                        FileTemplates\NewItem\EmptyJade.jade;

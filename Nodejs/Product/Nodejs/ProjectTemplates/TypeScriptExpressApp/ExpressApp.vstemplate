@@ -19,7 +19,7 @@
         <Folder Name="images"/>
         <Folder Name="javascripts"/>
         <Folder Name="stylesheets">
-          <ProjectItem>style.styl</ProjectItem>
+          <ProjectItem>main.css</ProjectItem>
         </Folder>
       </Folder>
       <Folder Name="routes">
@@ -34,9 +34,6 @@
         <Folder Name="typings">
           <Folder Name="express">
             <ProjectItem>express.d.ts</ProjectItem>
-          </Folder>
-          <Folder Name="stylus">
-            <ProjectItem>stylus.d.ts</ProjectItem>
           </Folder>
         </Folder>
       </Folder>

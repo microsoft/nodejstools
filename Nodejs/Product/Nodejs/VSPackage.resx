@@ -195,15 +195,6 @@
   <data name="3025" xml:space="preserve">
     <value>JSON</value>
   </data>
-  <data name="3026" xml:space="preserve">
-    <value>Stylus file</value>
-  </data>
-  <data name="3027" xml:space="preserve">
-    <value>An empty Stylus file</value>
-  </data>
-  <data name="3028" xml:space="preserve">
-    <value>Stylus</value>
-  </data>
   <data name="3029" xml:space="preserve">
     <value>CSS file</value>
   </data>
