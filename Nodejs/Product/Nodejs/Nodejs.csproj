@@ -727,7 +727,7 @@
     <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\package.json" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\README.md" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\setup_web.cmd" />
-    <Content Include="ProjectTemplates\TypeScriptAzureExpressWebRole\main.css" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\main.css" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\TypeScriptExpressApp.njsproj" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\Web.config" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\Web.Debug.config" />
@@ -1018,7 +1018,7 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\layout.jade" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\README.md" />
-    <Content Include="ProjectTemplates\TypeScriptExpressApp\main.css" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\main.css" />
     <Content Include="FileTemplates\NewItem\EmptyJade.jade">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -1058,7 +1058,7 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\layout.jade" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\README.md" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressApp\main.css" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\main.css" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\ChangeConfig.ps1" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\download.ps1" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\node.cmd" />
