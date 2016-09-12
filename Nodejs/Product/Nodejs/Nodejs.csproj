@@ -338,7 +338,6 @@
     <Compile Include="Options\SalsaLsIntellisenseOptionsControl.Designer.cs">
       <DependentUpon>SalsaLsIntellisenseOptionsControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Outlining\JavaScriptOutliningTaggerProvider.cs" />
     <Compile Include="Project\AzureToolsContracts.cs" />
     <Compile Include="Project\NewFileMenuGroup\NewFileUtilities.cs" />
     <Compile Include="Project\NewFileMenuGroup\NewFileNameForm.cs">
