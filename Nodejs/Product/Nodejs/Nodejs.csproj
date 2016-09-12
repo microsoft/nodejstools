@@ -312,15 +312,6 @@
     <Compile Include="Options\NodejsNpmOptionsControl.Designer.cs">
       <DependentUpon>NodejsNpmOptionsControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Options\NodejsAdvancedEditorOptionsControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Options\NodejsAdvancedEditorOptionsControl.Designer.cs">
-      <DependentUpon>NodejsAdvancedEditorOptionsControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Options\NodejsAdvancedEditorOptionsPage.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Options\NodejsIntellisenseOptionsControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -668,9 +659,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Options\NodejsNpmOptionsControl.resx">
       <DependentUpon>NodejsNpmOptionsControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Options\NodejsAdvancedEditorOptionsControl.resx">
-      <DependentUpon>NodejsAdvancedEditorOptionsControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Options\NodejsIntellisenseOptionsControl.resx">
       <DependentUpon>NodejsIntellisenseOptionsControl.cs</DependentUpon>
