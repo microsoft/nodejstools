@@ -114,7 +114,6 @@
   <ItemGroup>
     <Compile Include="AzureProjectTests.cs" />
     <Compile Include="BasicIntellisense.cs" />
-    <Compile Include="SnippetsTests.cs" />
     <Compile Include="ClassificationTests.cs" />
     <Compile Include="DebuggerUITests.cs" />
     <Compile Include="JadeUITests.cs" />
@@ -124,12 +123,12 @@
     <Compile Include="OutliningTests.cs" />
     <Compile Include="ProjectPropertiesTests.cs" />
     <Compile Include="BraceCompletion.cs" />
+    <Compile Include="ProjectTests.cs" />
     <Compile Include="SmartIndent.cs" />
     <Compile Include="BasicProjectTests.cs" />
     <Compile Include="NodejsProjectProcessor.cs" />
     <Compile Include="NodejsProjectTest.cs" />
     <Compile Include="NodejsTestDefintions.cs" />
-    <Compile Include="ProjectTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReplWindowTests.cs" />
     <Compile Include="RequireIntellisense.cs" />

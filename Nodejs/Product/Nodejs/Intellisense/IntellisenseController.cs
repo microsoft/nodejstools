@@ -49,8 +49,6 @@ namespace Microsoft.NodejsTools.Intellisense {
         private IQuickInfoSession _quickInfoSession;
         private IOleCommandTarget _oldTarget;
         private IEditorOperations _editOps;
-        private static string[] _allStandardSnippetTypes = { ExpansionClient.Expansion, ExpansionClient.SurroundsWith };
-        private static string[] _surroundsWithSnippetTypes = { ExpansionClient.SurroundsWith };
         [ThreadStatic]
         internal static bool ForceCompletions;
 
@@ -636,10 +634,6 @@ namespace Microsoft.NodejsTools.Intellisense {
                                 return VSConstants.S_OK;
                             }
                             break;
-                        case VSConstants.VSStd2KCmdID.SURROUNDWITH:
-                        case VSConstants.VSStd2KCmdID.INSERTSNIPPET:
-                            TriggerSnippet(nCmdID);
-                            return VSConstants.S_OK;
                         case VSConstants.VSStd2KCmdID.SHOWMEMBERLIST:
                         case VSConstants.VSStd2KCmdID.COMPLETEWORD:
                             ForceCompletions = true;
@@ -652,34 +646,6 @@ namespace Microsoft.NodejsTools.Intellisense {
                     }
             }
             return _oldTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-        }
-
-        private void TriggerSnippet(uint nCmdID) {
-            if (_expansionMgr != null) {
-                string prompt;
-                string[] snippetTypes;
-                if ((VSConstants.VSStd2KCmdID)nCmdID == VSConstants.VSStd2KCmdID.SURROUNDWITH) {
-                    prompt = SR.GetString(SR.SurroundWith);
-                    snippetTypes = _surroundsWithSnippetTypes;
-                } else {
-                    prompt = SR.GetString(SR.InsertSnippet);
-                    snippetTypes = _allStandardSnippetTypes;
-                }
-
-                _expansionMgr.InvokeInsertionUI(
-                    GetViewAdapter(),
-                    _expansionClient,
-                    Guids.NodejsLanguageInfo,
-                    snippetTypes,
-                    snippetTypes.Length,
-                    0,
-                    null,
-                    0,
-                    0,
-                    prompt,
-                    ">"
-                );
-            }
         }
 
         private bool TryTriggerExpansion() {

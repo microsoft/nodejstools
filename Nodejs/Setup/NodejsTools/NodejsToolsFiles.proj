@@ -94,44 +94,6 @@
           <InstallDirectory>ItemTemplates_CloudService_WorkerRole</InstallDirectory>
         </File>
         
-        <!-- Snippets -->
-        <File Include= "Snippets\1033\Nodejs\cl.snippet;
-                        Snippets\1033\Nodejs\dowhile.snippet;
-                        Snippets\1033\Nodejs\else.snippet;
-                        Snippets\1033\Nodejs\express_delete.snippet;
-                        Snippets\1033\Nodejs\express_get.snippet;
-                        Snippets\1033\Nodejs\express_post.snippet;
-                        Snippets\1033\Nodejs\express_put.snippet;
-                        Snippets\1033\Nodejs\for.snippet;
-                        Snippets\1033\Nodejs\forin.snippet;
-                        Snippets\1033\Nodejs\forprops.snippet;
-                        Snippets\1033\Nodejs\forr.snippet;
-                        Snippets\1033\Nodejs\function.snippet;
-                        Snippets\1033\Nodejs\if.snippet;
-                        Snippets\1033\Nodejs\iife.snippet;
-                        Snippets\1033\Nodejs\parse.snippet;
-                        Snippets\1033\Nodejs\readfile.snippet;
-                        Snippets\1033\Nodejs\readstream.snippet;
-                        Snippets\1033\Nodejs\require.snippet;
-                        Snippets\1033\Nodejs\server.snippet;
-                        Snippets\1033\Nodejs\stringify.snippet;
-                        Snippets\1033\Nodejs\switch.snippet;
-                        Snippets\1033\Nodejs\try.snippet;
-                        Snippets\1033\Nodejs\tryf.snippet;
-                        Snippets\1033\Nodejs\while.snippet;
-                        Snippets\1033\Nodejs\with.snippet" >
-            <InstallDirectory>Snippets_1033_Nodejs</InstallDirectory>
-        </File>
-
-        <File Include="Snippets\1033\Test\describe.snippet;
-                       Snippets\1033\Test\it.snippet">
-            <InstallDirectory>Snippets_1033_Test</InstallDirectory>
-        </File>
-       
-        <File Include="Snippets\1033\SnippetsIndex.xml">
-            <InstallDirectory>Snippets_1033</InstallDirectory>
-        </File>
-        
         <File Include="TypingsAcquisitionTool\index.js;
                        TypingsAcquisitionTool\package.json">
             <InstallDirectory>TypingsAcquisitionTool</InstallDirectory>

@@ -36,9 +36,6 @@ namespace Microsoft.NodejsTools.Intellisense {
         private bool _sessionEnded, _selectEndSpan;
         private ITrackingPoint _selectionStart, _selectionEnd;
 
-        public const string SurroundsWith = "SurroundsWith";
-        public const string Expansion = "Expansion";
-
         public ExpansionClient(ITextView textView, IVsEditorAdaptersFactoryService adapterFactory, IServiceProvider serviceProvider) {
             _textView = textView;
             _serviceProvider = serviceProvider;
