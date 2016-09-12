@@ -88,43 +88,5 @@ namespace Microsoft.NodejsTools.Options {
             SaveBool(ShowTypingsInfoBarSetting, ShowTypingsInfoBar);
             SaveBool(SaveChangesToConfigFileSetting, SaveChangesToConfigFile);
         }
-
-        private static string GetTypeScriptToolsVersion() {
-            var toolsVersion = string.Empty;
-            try {
-                object installDirAsObject = null;
-                var shell = NodejsPackage.Instance.GetService(typeof(SVsShell)) as IVsShell;
-                if (shell != null) {
-                    shell.GetProperty((int)__VSSPROPID.VSSPROPID_InstallDirectory, out installDirAsObject);
-                }
-
-                var idePath = CommonUtils.NormalizeDirectoryPath((string)installDirAsObject) ?? string.Empty;
-                if (string.IsNullOrEmpty(idePath)) {
-                    return toolsVersion;
-                }
-
-                var typeScriptServicesPath = Path.Combine(idePath, @"CommonExtensions\Microsoft\TypeScript\typescriptServices.js");
-                if (!File.Exists(typeScriptServicesPath)) {
-                    return toolsVersion;
-                }
-
-                var regex = new Regex(@"toolsVersion = ""(?<version>\d.\d?)"";");
-                var fileText = File.ReadAllText(typeScriptServicesPath);
-                var match = regex.Match(fileText);
-
-                var version = match.Groups["version"].Value;
-                if (!string.IsNullOrWhiteSpace(version)) {
-                    toolsVersion = version;
-                }
-            } catch (Exception ex) {
-                if (ex.IsCriticalException()) {
-                    throw;
-                }
-
-                Debug.WriteLine(string.Format("Failed to obtain TypeScript tools version: {0}", ex.ToString()));
-            }
-
-            return toolsVersion;
-        }
     }
 }
