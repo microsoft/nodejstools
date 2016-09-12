@@ -812,7 +812,6 @@
       <SubType>Designer</SubType>
     </ZipProject>
     <ZipProject Include="ProjectTemplates\AzureExpress4App\typings.json" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\typings.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\README.md" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\app.ts" />
@@ -848,58 +847,6 @@
       <Link>Resources\Icons\TSProject_SolutionExplorerNode.png</Link>
       <LogicalName>Microsoft.VisualStudioTools.Resources.Icons.TSProject_SolutionExplorerNode.png</LogicalName>
     </EmbeddedResource>
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\_references.js" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\app.js" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\bootstrap.css" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\bootstrap.js" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\bootstrap.min.css" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\bootstrap.min.js" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\glyphicons-halflings-regular.svg" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\index.js" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\jquery-1.10.2.intellisense.js" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\jquery-1.10.2.js" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\jquery-1.10.2.min.js" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\jquery.validate-vsdoc.js" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\jquery.validate.js" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\jquery.validate.min.js" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\jquery.validate.unobtrusive.js" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\jquery.validate.unobtrusive.min.js" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\modernizr-2.6.2.js" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\Preview.png" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\respond.js" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\respond.min.js" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\AzureStarterExpressApp.njsproj">
-      <SubType>Designer</SubType>
-    </ZipProject>
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\AzureStarterExpressApp.vstemplate">
-      <SubType>Designer</SubType>
-    </ZipProject>
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\user.js" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\_references.js" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\bootstrap.css" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\bootstrap.js" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\bootstrap.min.css" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\bootstrap.min.js" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\glyphicons-halflings-regular.svg" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\jquery-1.10.2.intellisense.js" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\jquery-1.10.2.js" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\jquery-1.10.2.min.js" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\jquery.validate-vsdoc.js" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\jquery.validate.js" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\jquery.validate.min.js" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\jquery.validate.unobtrusive.js" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\jquery.validate.unobtrusive.min.js" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\modernizr-2.6.2.js" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\Preview.png" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\respond.js" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\respond.min.js" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\TypeScriptAzureStarterExpressApp.njsproj">
-      <SubType>Designer</SubType>
-    </TypeScriptProject>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\TypeScriptAzureStarterExpressApp.vstemplate">
-      <SubType>Designer</SubType>
-    </TypeScriptProject>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\user.js" />
     <ZipProject Include="ProjectTemplates\CloudService\cloudservice.ico" />
     <ZipProject Include="ProjectTemplates\CloudService\CloudService.vstemplate" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\Preview.png" />
@@ -1132,45 +1079,11 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Worker.vstemplate">
       <SubType>Designer</SubType>
     </TypeScriptProject>
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\about.jade" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\contact.jade" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\glyphicons-halflings-regular.eot" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\glyphicons-halflings-regular.ttf" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\glyphicons-halflings-regular.woff" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\index.jade" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\jquery-1.10.2.min.map" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\layout.jade" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\package.json" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\README.md" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\style.styl" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\Web.config" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\Web.Debug.config" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\setup_web.cmd" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\node.cmd" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\download.ps1" />
-    <ZipProject Include="ProjectTemplates\AzureStarterExpressApp\ChangeConfig.ps1" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\download.ps1" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\node.cmd" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\README.md" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\setup_worker.cmd" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\about.jade" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\contact.jade" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\glyphicons-halflings-regular.eot" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\glyphicons-halflings-regular.ttf" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\glyphicons-halflings-regular.woff" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\index.jade" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\jquery-1.10.2.min.map" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\layout.jade" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\package.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\README.md" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\style.styl" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\ChangeConfig.ps1" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\download.ps1" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\node.cmd" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\setup_web.cmd" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\Web.config" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\Web.Debug.config" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -1296,10 +1209,6 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\user.ts" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\stylus.d.ts" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\stylus.d.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\app.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\express.d.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\index.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureStarterExpressApp\stylus.d.ts" />
   </ItemGroup>
   <ItemGroup>
     <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\app.ts" />
