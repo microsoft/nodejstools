@@ -87,7 +87,6 @@
     <Compile Include="BaselineCompare.cs" />
     <Compile Include="NodePathResolutionTests.cs" />
     <Compile Include="MultiLineCommentTests.cs" />
-    <Compile Include="CommentBlockTests.cs" />
     <Compile Include="Debugger\BaseDebuggerTests.cs" />
     <Compile Include="Debugger\Commands\BacktraceCommandTests.cs" />
     <Compile Include="Debugger\Commands\ChangeBreakpointCommandTests.cs" />

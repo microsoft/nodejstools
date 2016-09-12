@@ -120,19 +120,6 @@ namespace Microsoft.NodejsTools {
                         break;
                     case VSConstants.VSStd2KCmdID.PASTE:
                         return Paste(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut, out hr);
-
-                    case VSConstants.VSStd2KCmdID.COMMENT_BLOCK:
-                    case VSConstants.VSStd2KCmdID.COMMENTBLOCK:
-                        if (_textView.CommentOrUncommentBlock(comment: true)) {
-                            return VSConstants.S_OK;
-                        }
-                        break;
-                    case VSConstants.VSStd2KCmdID.UNCOMMENT_BLOCK:
-                    case VSConstants.VSStd2KCmdID.UNCOMMENTBLOCK:
-                        if (_textView.CommentOrUncommentBlock(comment: false)) {
-                            return VSConstants.S_OK;
-                        }
-                        break;
                 }
             } else if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97) {
                 switch ((VSConstants.VSStd97CmdID)nCmdID) {
