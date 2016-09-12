@@ -35,9 +35,6 @@
           <Folder Name="express">
             <ProjectItem>express.d.ts</ProjectItem>
           </Folder>
-          <Folder Name="stylus">
-            <ProjectItem>stylus.d.ts</ProjectItem>
-          </Folder>
         </Folder>
       </Folder>
       <ProjectItem OpenInEditor="true">app.ts</ProjectItem>
