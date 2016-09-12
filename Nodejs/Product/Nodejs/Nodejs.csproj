@@ -230,9 +230,11 @@
       <DependentUpon>DiagnosticsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Commands\ImportWizardCommand.cs" />
+    <Compile Include="Commands\SendFeedbackCommand.cs" />
     <Compile Include="Commands\OpenReplWindowCommand.cs" />
     <Compile Include="Commands\OpenRemoteDebugDocumentationCommand.cs" />
     <Compile Include="Commands\OpenRemoteDebugProxyFolderCommand.cs" />
+    <Compile Include="Commands\ShowDocumentationCommand.cs" />
     <Compile Include="Commands\SurveyNewsCommand.cs" />
     <Compile Include="Debugger\DataTips\DataTipTextManagerEvents.cs" />
     <Compile Include="Debugger\DebugEngine\AD7EvalErrorProperty.cs" />
@@ -336,7 +338,6 @@
     <Compile Include="Options\SalsaLsIntellisenseOptionsControl.Designer.cs">
       <DependentUpon>SalsaLsIntellisenseOptionsControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Outlining\JavaScriptOutliningTaggerProvider.cs" />
     <Compile Include="Project\AzureToolsContracts.cs" />
     <Compile Include="Project\NewFileMenuGroup\NewFileUtilities.cs" />
     <Compile Include="Project\NewFileMenuGroup\NewFileNameForm.cs">
