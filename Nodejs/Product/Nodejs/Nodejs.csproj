@@ -721,8 +721,8 @@
     <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\ChangeConfig.ps1" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\download.ps1" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\iisnode.yml" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\index.jade" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\layout.jade" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\index.pug" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\layout.pug" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\node.cmd" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\package.json" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureExpressWebRole\README.md" />
@@ -747,15 +747,15 @@
     <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\TypeScriptWebApp.njsproj" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\Web.config" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\Web.Debug.config" />
-    <ZipProject Include="ProjectTemplates\Express4App\index.jade" />
-    <ZipProject Include="ProjectTemplates\Express4App\layout.jade" />
+    <ZipProject Include="ProjectTemplates\Express4App\index.pug" />
+    <ZipProject Include="ProjectTemplates\Express4App\layout.pug" />
     <ZipProject Include="ProjectTemplates\Express4App\package.json" />
     <ZipProject Include="ProjectTemplates\Express4App\README.md" />
     <ZipProject Include="ProjectTemplates\Express4App\main.css" />
-    <ZipProject Include="ProjectTemplates\Express4App\error.jade" />
-    <ZipProject Include="ProjectTemplates\AzureExpress4App\error.jade" />
-    <ZipProject Include="ProjectTemplates\AzureExpress4App\index.jade" />
-    <ZipProject Include="ProjectTemplates\AzureExpress4App\layout.jade" />
+    <ZipProject Include="ProjectTemplates\Express4App\error.pug" />
+    <ZipProject Include="ProjectTemplates\AzureExpress4App\error.pug" />
+    <ZipProject Include="ProjectTemplates\AzureExpress4App\index.pug" />
+    <ZipProject Include="ProjectTemplates\AzureExpress4App\layout.pug" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\package.json" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\README.md" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\main.css" />
@@ -1014,12 +1014,12 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\ExpressApp.njsproj">
       <SubType>Designer</SubType>
     </TypeScriptProject>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\index.jade" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\layout.jade" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\index.pug" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\layout.pug" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\README.md" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\main.css" />
-    <Content Include="FileTemplates\NewItem\EmptyJade.jade">
+    <Content Include="FileTemplates\NewItem\EmptyJade.pug">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -1054,8 +1054,8 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\TypeScriptExpressApp.njsproj">
       <SubType>Designer</SubType>
     </TypeScriptProject>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\index.jade" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\layout.jade" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\index.pug" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\layout.pug" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\README.md" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\main.css" />

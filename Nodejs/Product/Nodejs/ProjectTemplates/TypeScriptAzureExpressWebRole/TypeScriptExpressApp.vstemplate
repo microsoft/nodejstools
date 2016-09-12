@@ -28,8 +28,8 @@
         <ProjectItem>user.ts</ProjectItem>        
       </Folder>
       <Folder Name="views">
-        <ProjectItem>index.jade</ProjectItem>        
-        <ProjectItem>layout.jade</ProjectItem>        
+        <ProjectItem>index.pug</ProjectItem>        
+        <ProjectItem>layout.pug</ProjectItem>        
       </Folder>
       <Folder Name="Scripts">
         <Folder Name="typings">
