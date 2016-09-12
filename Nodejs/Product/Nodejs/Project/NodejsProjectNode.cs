@@ -1173,8 +1173,8 @@ namespace Microsoft.NodejsTools.Project {
                         );
                         handled = true;
                         return VSConstants.S_OK;
-						
-					case PkgCmdId.cmdidAddNewJavaScriptFileCommand:
+
+                    case PkgCmdId.cmdidAddNewJavaScriptFileCommand:
                         NewFileMenuGroup.NewFileUtilities.CreateNewJavaScriptFile(projectNode: this, containerId: selectedNodes[0].ID);
                         handled = true;
                         return VSConstants.S_OK;
