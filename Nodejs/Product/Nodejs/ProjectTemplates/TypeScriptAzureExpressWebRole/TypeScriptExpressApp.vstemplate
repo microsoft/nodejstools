@@ -20,7 +20,7 @@
         <Folder Name="images"/>
         <Folder Name="javascripts"/>
         <Folder Name="stylesheets">
-          <ProjectItem>style.styl</ProjectItem>
+          <ProjectItem>main.css</ProjectItem>
         </Folder>
       </Folder>
       <Folder Name="routes">
