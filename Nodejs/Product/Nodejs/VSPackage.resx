@@ -178,13 +178,13 @@
     <value>TypeScript</value>
   </data>
   <data name="3020" xml:space="preserve">
-    <value>Jade file</value>
+    <value>Pug file</value>
   </data>
   <data name="3021" xml:space="preserve">
-    <value>An empty Jade file</value>
+    <value>An empty Pug file</value>
   </data>
   <data name="3022" xml:space="preserve">
-    <value>Jade</value>
+    <value>Pug</value>
   </data>
   <data name="3023" xml:space="preserve">
     <value>JSON file</value>
@@ -232,7 +232,7 @@
     <value>Stylesheet</value>
   </data>
   <data name="3041" xml:space="preserve">
-    <value>Jade</value>
+    <value>Pug</value>
   </data>
   <data name="3042" xml:space="preserve">
     <value>Spacing</value>
@@ -244,7 +244,7 @@
     <value>General</value>
   </data>
   <data name="3045" xml:space="preserve">
-    <value>Jade Editor</value>
+    <value>Pug Editor</value>
   </data>
   <data name="3046" xml:space="preserve">
     <value>A basic TypeScript UnitTest file</value>

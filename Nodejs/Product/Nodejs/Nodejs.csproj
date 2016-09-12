@@ -1019,7 +1019,7 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\README.md" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\main.css" />
-    <Content Include="FileTemplates\NewItem\EmptyJade.pug">
+    <Content Include="FileTemplates\NewItem\EmptyPug.pug">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
