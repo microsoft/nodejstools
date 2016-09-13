@@ -92,7 +92,6 @@ namespace Microsoft.NodejsTools {
 #if DEV14
     [ProvideLanguageEditorOptionPage(typeof(NodejsIntellisenseOptionsPage), NodejsConstants.Nodejs, "IntelliSense", "", "3048")]
 #endif
-    [ProvideLanguageEditorOptionPage(typeof(NodejsAdvancedEditorOptionsPage), NodejsConstants.Nodejs, "Advanced", "", "3050")]
     internal sealed partial class NodejsPackage : CommonPackage {
         internal const string NodeExpressionEvaluatorGuid = "{F16F2A71-1C45-4BAB-BECE-09D28CFDE3E6}";
         private IContentType _contentType;
@@ -155,12 +154,6 @@ namespace Microsoft.NodejsTools {
         public NodejsIntellisenseOptionsPage IntellisenseOptionsPage {
             get {
                 return (NodejsIntellisenseOptionsPage)GetDialogPage(typeof(NodejsIntellisenseOptionsPage));
-            }
-        }
-
-        public NodejsAdvancedEditorOptionsPage AdvancedEditorOptionsPage {
-            get {
-                return (NodejsAdvancedEditorOptionsPage)GetDialogPage(typeof(NodejsAdvancedEditorOptionsPage));
             }
         }
 
