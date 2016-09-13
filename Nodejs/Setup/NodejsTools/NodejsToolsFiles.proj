@@ -46,7 +46,7 @@
                        FileTemplates\NewItem\EmptyTs.ts;
                        FileTemplates\NewItem\EmptyLess.less;
                        FileTemplates\NewItem\EmptyJson.json;
-                       FileTemplates\NewItem\EmptyJade.jade;
+                       FileTemplates\NewItem\EmptyPug.pug;
                        FileTemplates\NewItem\EmptyCss.css;
                        FileTemplates\NewItem\EmptyHtml.html">
 

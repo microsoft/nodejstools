@@ -24,8 +24,8 @@ namespace Microsoft.Nodejs.Tests.UI {
         [HostType("VSTestHost")]
         public void InsertTabs() {
             using (new OptionHolder("TextEditor", "Jade", "InsertTabs", true)) {
-                using (var solution = Project("TabsSpaces", Content("quox.jade", "ul\r\n    li A\r\n    li B")).Generate().ToVs()) {
-                    var jadeFile = solution.OpenItem("TabsSpaces", "quox.jade");
+                using (var solution = Project("TabsSpaces", Content("quox.pug", "ul\r\n    li A\r\n    li B")).Generate().ToVs()) {
+                    var jadeFile = solution.OpenItem("TabsSpaces", "quox.pug");
                     jadeFile.MoveCaret(1, 1);
                     Keyboard.Type("\t");
                     Assert.AreEqual(jadeFile.Text, "\tul\r\n    li A\r\n    li B");
@@ -37,8 +37,8 @@ namespace Microsoft.Nodejs.Tests.UI {
         [HostType("VSTestHost")]
         public void InsertSpaces() {
             using (new OptionHolder("TextEditor", "Jade", "InsertTabs", false)) {
-                using (var solution = Project("TabsSpaces", Content("quox.jade", "ul\r\n    li A\r\n    li B")).Generate().ToVs()) {
-                    var jadeFile = solution.OpenItem("TabsSpaces", "quox.jade");
+                using (var solution = Project("TabsSpaces", Content("quox.pug", "ul\r\n    li A\r\n    li B")).Generate().ToVs()) {
+                    var jadeFile = solution.OpenItem("TabsSpaces", "quox.pug");
                     jadeFile.MoveCaret(1, 1);
                     Keyboard.Type("\t");
                     Assert.AreEqual(jadeFile.Text, "    ul\r\n    li A\r\n    li B");

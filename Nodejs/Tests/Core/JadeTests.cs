@@ -37,117 +37,117 @@ namespace NodejsTests {
 
         [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File01() {
-            Tokenize("001.jade");
+            Tokenize("001.pug");
         }
 
         [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File02() {
-            Tokenize("002.jade");
+            Tokenize("002.pug");
         }
 
         [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File03() {
-            Tokenize("003.jade");
+            Tokenize("003.pug");
         }
 
         [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File04() {
-            Tokenize("004.jade");
+            Tokenize("004.pug");
         }
 
         [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File05() {
-            Tokenize("005.jade");
+            Tokenize("005.pug");
         }
 
         [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File06() {
-            Tokenize("006.jade");
+            Tokenize("006.pug");
         }
 
         [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File07() {
-            Tokenize("007.jade");
+            Tokenize("007.pug");
         }
 
         [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File08() {
-            Tokenize("008.jade");
+            Tokenize("008.pug");
         }
 
         [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File09() {
-            Tokenize("009.jade");
+            Tokenize("009.pug");
         }
 
         [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File10() {
-            Tokenize("010.jade");
+            Tokenize("010.pug");
         }
 
         [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File11() {
-            Tokenize("011.jade");
+            Tokenize("011.pug");
         }
 
         [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File12() {
-            Tokenize("012.jade");
+            Tokenize("012.pug");
         }
 
         [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File13() {
-            Tokenize("013.jade");
+            Tokenize("013.pug");
         }
 
         [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File14() {
-            Tokenize("014.jade");
+            Tokenize("014.pug");
         }
 
         [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File15() {
-            Tokenize("015.jade");
+            Tokenize("015.pug");
         }
 
         [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File16() {
-            Tokenize("016.jade");
+            Tokenize("016.pug");
         }
 
         [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File17() {
-            Tokenize("017.jade");
+            Tokenize("017.pug");
         }
 
         [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File18() {
-            Tokenize("018.jade");
+            Tokenize("018.pug");
         }
 
         [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File19() {
-            Tokenize("019.jade");
+            Tokenize("019.pug");
         }
 
         [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File20() {
-            Tokenize("020.jade");
+            Tokenize("020.pug");
         }
 
         [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File21() {
-            Tokenize("021.jade");
+            Tokenize("021.pug");
         }
 
         [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File22() {
-            Tokenize("022.jade");
+            Tokenize("022.pug");
         }
 
         [TestMethod, Priority(0)]
         public void JadeTokenizerTest_File23() {
-            Tokenize("023.jade");
+            Tokenize("023.pug");
         }
 
         private void Tokenize(string fileName) {

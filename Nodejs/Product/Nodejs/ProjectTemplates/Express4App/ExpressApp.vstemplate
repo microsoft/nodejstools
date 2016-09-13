@@ -27,9 +27,9 @@
         <ProjectItem>users.js</ProjectItem>
       </Folder>
       <Folder Name="views">
-        <ProjectItem>index.jade</ProjectItem>
-        <ProjectItem>layout.jade</ProjectItem>
-        <ProjectItem>error.jade</ProjectItem>
+        <ProjectItem>index.pug</ProjectItem>
+        <ProjectItem>layout.pug</ProjectItem>
+        <ProjectItem>error.pug</ProjectItem>
       </Folder>
       <Folder Name="bin">
         <ProjectItem ReplaceParameters="true">www</ProjectItem>

@@ -38,8 +38,8 @@
     <Content Include="package.json" />
     <Content Include="public\stylesheets\main.css" />
     <Content Include="README.md" />
-    <Content Include="views\index.jade" />
-    <Content Include="views\layout.jade" />
+    <Content Include="views\index.pug" />
+    <Content Include="views\layout.pug" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="public\" />
