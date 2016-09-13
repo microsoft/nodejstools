@@ -17,48 +17,16 @@
 using System;
 using System.IO;
 using System.Reflection;
-using Microsoft.Win32;
 
 namespace Microsoft.NodejsTools {
     public static class NodejsToolsInstallPath {
         private static string GetFromAssembly(Assembly assembly, string filename) {
             string path = Path.Combine(
                 Path.GetDirectoryName(assembly.Location),
-                filename
-            );
+                filename);
             if (File.Exists(path)) {
                 return path;
             }
-            return string.Empty;
-        }
-
-        private static string GetFromRegistry(string filename) {
-            const string ROOT_KEY = "Software\\Microsoft\\NodejsTools\\" + AssemblyVersionInfo.VSVersion;
-
-            string installDir = null;
-            using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
-            using (var configKey = baseKey.OpenSubKey(ROOT_KEY)) {
-                if (configKey != null) {
-                    installDir = configKey.GetValue("InstallDir") as string;
-                }
-            }
-
-            if (string.IsNullOrEmpty(installDir)) {
-                using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry32))
-                using (var configKey = baseKey.OpenSubKey(ROOT_KEY)) {
-                    if (configKey != null) {
-                        installDir = configKey.GetValue("InstallDir") as string;
-                    }
-                }
-            }
-
-            if (!String.IsNullOrEmpty(installDir)) {
-                var path = Path.Combine(installDir, filename);
-                if (File.Exists(path)) {
-                    return path;
-                }
-            }
-
             return string.Empty;
         }
 
@@ -68,14 +36,7 @@ namespace Microsoft.NodejsTools {
                 return path;
             }
 
-            path = GetFromRegistry(filename);
-            if (!string.IsNullOrEmpty(path)) {
-                return path;
-            }
-
-            throw new InvalidOperationException(
-                "Unable to determine Node.js Tools installation path"
-            );
+            throw new InvalidOperationException("Unable to determine Node.js Tools installation path");
         }
     }
 }
