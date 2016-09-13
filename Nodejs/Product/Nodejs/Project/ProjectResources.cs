@@ -182,6 +182,7 @@ namespace Microsoft.NodejsTools.Project {
         internal const string TypingsInfoBarSpan2 = "TypingsInfoBarSpan2";
         internal const string TypingsInfoBarSpan3 = "TypingsInfoBarSpan3";
         internal const string TypingsOpenOptionsText = "TypingsOpenOptionsText";
+        internal const string TypeScriptMinVersionNotInstalled = "TypeScriptMinVersionNotInstalled";
         internal const string TypingsToolCouldNotStart = "TypingsToolCouldNotStart";
         internal const string TypingsToolInstallFailed = "TypingsToolInstallFailed";
         internal const string TypingsToolNotInstalledError = "TypingsToolNotInstalledError";
