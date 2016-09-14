@@ -19,7 +19,6 @@
         <File Include="Microsoft.NodejsTools.Telemetry.$(VSTarget).dll" />
 
         <!-- Support Files -->
-        <File Include="all.json" />
         <File Include="Newtonsoft.Json.dll"/>
         <File Include="sqlite3.dll" />
         <File Include="visualstudio_nodejs_repl.js"/>
