@@ -143,14 +143,6 @@ namespace Microsoft.NodejsTools.Commands {
 
         private static string GetNodeJsProjectProperties(Project.NodejsProjectNode project) {
             var res = new StringBuilder();
-
-            var jsAnalyzer = project.Analyzer;
-            if (jsAnalyzer != null) {
-                res.AppendLine("Analysis Log: ");
-                using (var writer = new StringWriter(res)) {
-                    jsAnalyzer.DumpLog(writer);
-                }
-            }
             res.AppendLine(GetProjectNpmInfo(project));
             res.AppendLine(GetProjectFileInfo(project));
             return res.ToString();

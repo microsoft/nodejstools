@@ -214,13 +214,6 @@
     </Compile>
     <Compile Include="Azure\WebSiteServiceShims.cs" />
     <Compile Include="ClassifierProviderMetadata.cs" />
-    <Compile Include="Classifier\NodejsClassifier.cs" />
-    <Compile Include="Classifier\NodejsClassifierProvider.cs" />
-    <Compile Include="Classifier\NodejsPredefinedClassificationTypeNames.cs" />
-    <Compile Include="Classifier\SnapshotSpanSourceCodeReader.cs" />
-    <Compile Include="Classifier\TokenCache.cs" />
-    <Compile Include="Classifier\TokenCategory.cs" />
-    <Compile Include="Classifier\TokenInfo.cs" />
     <Compile Include="Commands\AzureExplorerAttachDebuggerCommand.cs" />
     <Compile Include="Commands\DiagnosticsCommand.cs" />
     <Compile Include="Commands\DiagnosticsForm.cs">
@@ -246,39 +239,6 @@
     <Compile Include="Debugger\LocalFileNameMapper.cs" />
     <Compile Include="Debugger\NodeProcess.cs" />
     <Compile Include="Debugger\ScriptTree.cs" />
-    <Compile Include="Editor\BraceCompletion\BraceKind.cs" />
-    <Compile Include="Editor\BraceCompletion\BraceCompletionContext.cs" />
-    <Compile Include="Editor\BraceCompletion\BraceCompletionContextProvider.cs" />
-    <Compile Include="Editor\EditorExtensions.cs" />
-    <Compile Include="Intellisense\ExpansionClient.cs" />
-    <Compile Include="Intellisense\AnalysisPriority.cs" />
-    <Compile Include="Intellisense\AnalysisQueue.cs" />
-    <Compile Include="Intellisense\BufferParser.cs" />
-    <Compile Include="Intellisense\CollectingErrorSink.cs" />
-    <Compile Include="Intellisense\CompletionAnalysis.cs" />
-    <Compile Include="Intellisense\CompletionComparer.cs" />
-    <Compile Include="Intellisense\EntryEventArgs.cs" />
-    <Compile Include="Intellisense\ExpressionAnalysis.cs" />
-    <Compile Include="Intellisense\FileEventArgs.cs" />
-    <Compile Include="Intellisense\FuzzyCompletionSet.cs" />
-    <Compile Include="Intellisense\FuzzyStringMatcher.cs" />
-    <Compile Include="Intellisense\IContentTypeMetadata.cs" />
-    <Compile Include="Intellisense\IntellisenseController.cs" />
-    <Compile Include="Intellisense\IntellisenseControllerProvider.cs" />
-    <Compile Include="Intellisense\NodejsParameter.cs" />
-    <Compile Include="Intellisense\NodejsSignature.cs" />
-    <Compile Include="Intellisense\NormalCompletionAnalysis.cs" />
-    <Compile Include="Intellisense\ParseQueue.cs" />
-    <Compile Include="Intellisense\QuickInfoSource.cs" />
-    <Compile Include="Intellisense\QuickInfoSourceProvider.cs" />
-    <Compile Include="Intellisense\RequireCompletionAnalysis.cs" />
-    <Compile Include="Intellisense\ReverseExpressionParser.cs" />
-    <Compile Include="Intellisense\SignatureAnalysis.cs" />
-    <Compile Include="Intellisense\SignatureHelpSource.cs" />
-    <Compile Include="Intellisense\SignatureHelpSourceProvider.cs" />
-    <Compile Include="Intellisense\VsProjectAnalyzer.cs" />
-    <Compile Include="Intellisense\SnapshotCookie.cs" />
-    <Compile Include="Intellisense\TaskProvider.cs" />
     <Compile Include="Logging\InMemoryLogger.cs" />
     <Compile Include="Logging\INodejsToolsLogger.cs" />
     <Compile Include="Logging\NodejsToolsLogEvent.cs" />
@@ -389,7 +349,6 @@
     <Compile Include="Options\NodejsFormattingSpacingOptionsControl.Designer.cs">
       <DependentUpon>NodejsFormattingSpacingOptionsControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Project\PackageJsonFileNode.cs" />
     <Compile Include="Project\ProjectResources.cs" />
     <Compile Include="Repl\NpmReplCommand.cs" />
     <Compile Include="TaggerProviderMetadata.cs" />
@@ -432,12 +391,6 @@
     <Compile Include="Debugger\Serialization\NodePropertyType.cs" />
     <Compile Include="Debugger\Serialization\NodePrototypeVariable.cs" />
     <Compile Include="Debugger\Serialization\NodeVariableType.cs" />
-    <Compile Include="EditFilter.cs" />
-    <Compile Include="Intellisense\CompletionInfo.cs" />
-    <Compile Include="Intellisense\CompletionSource.cs" />
-    <Compile Include="Intellisense\CompletionSourceProvider.cs" />
-    <Compile Include="Intellisense\RequireCompletionCache.cs" />
-    <Compile Include="Intellisense\TextViewCreationListener.cs" />
     <Compile Include="Jade\Classifier\IClassificationContextNameProvider.cs" />
     <Compile Include="Jade\Classifier\ICompositeToken.cs" />
     <Compile Include="Jade\Classifier\JadeClassificationDefinitions.cs" />
@@ -1157,11 +1110,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Analysis\Analysis.csproj">
-      <Project>{dfdb930e-1162-4514-a91d-c8595a807f13}</Project>
-      <Name>Analysis</Name>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </ProjectReference>
     <ProjectReference Include="..\InteractiveWindow\InteractiveWindow.csproj">
       <Project>{24a3887f-da50-4989-8d6c-4a5b04d5d457}</Project>
       <Name>InteractiveWindow</Name>

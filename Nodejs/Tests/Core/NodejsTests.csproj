@@ -86,7 +86,6 @@
     <Compile Include="AzureTests.cs" />
     <Compile Include="BaselineCompare.cs" />
     <Compile Include="NodePathResolutionTests.cs" />
-    <Compile Include="MultiLineCommentTests.cs" />
     <Compile Include="Debugger\BaseDebuggerTests.cs" />
     <Compile Include="Debugger\Commands\BacktraceCommandTests.cs" />
     <Compile Include="Debugger\Commands\ChangeBreakpointCommandTests.cs" />
@@ -104,7 +103,6 @@
     <Compile Include="Debugger\Commands\DisconnectCommandTests.cs" />
     <Compile Include="Debugger\Communication\DebuggerClientTests.cs" />
     <Compile Include="Debugger\Communication\DebuggerConnectionTests.cs" />
-    <Compile Include="Debugger\DataTipTests.cs" />
     <Compile Include="Debugger\DebuggerTests.cs" />
     <Compile Include="Debugger\Events\CompileScriptEventTests.cs" />
     <Compile Include="Debugger\Events\BreakpointEventTests.cs" />
@@ -118,7 +116,6 @@
     <Compile Include="Debugger\Serialization\LookupVariableTests.cs" />
     <Compile Include="Debugger\Serialization\EvaluationVariableTests.cs" />
     <Compile Include="Debugger\Serialization\BacktraceVariableTests.cs" />
-    <Compile Include="TypeScriptFormatterTests.cs" />
     <Compile Include="ImportWizardTests.cs" />
     <Compile Include="JadeTests.cs" />
     <Compile Include="LauncherTests.cs" />
@@ -147,10 +144,6 @@
     <ProjectReference Include="$(BuildRoot)\Common\Tests\Utilities\TestUtilities.csproj">
       <Project>{d092d54e-ff29-4d32-9aee-4ef704c92f67}</Project>
       <Name>TestUtilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Product\Analysis\Analysis.csproj">
-      <Project>{dfdb930e-1162-4514-a91d-c8595a807f13}</Project>
-      <Name>Analysis</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Product\Nodejs\Nodejs.csproj">
       <Project>{32ec5259-98da-40ca-9e2d-1b1b2e966f88}</Project>
