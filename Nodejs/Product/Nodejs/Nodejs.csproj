@@ -1149,9 +1149,7 @@
     <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\startup.ts" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\server.ts" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="RemoteDebug\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <!--
     To specify a different registry root to register your package, uncomment the TargetRegistryRoot

@@ -141,24 +141,6 @@ namespace Microsoft.NodejsTools {
             }
         }
 
-        public NodejsFormattingSpacingOptionsPage FormattingSpacingOptionsPage {
-            get {
-                return (NodejsFormattingSpacingOptionsPage)GetDialogPage(typeof(NodejsFormattingSpacingOptionsPage));
-            }
-        }
-
-        public NodejsFormattingBracesOptionsPage FormattingBracesOptionsPage {
-            get {
-                return (NodejsFormattingBracesOptionsPage)GetDialogPage(typeof(NodejsFormattingBracesOptionsPage));
-            }
-        }
-
-        public NodejsFormattingGeneralOptionsPage FormattingGeneralOptionsPage {
-            get {
-                return (NodejsFormattingGeneralOptionsPage)GetDialogPage(typeof(NodejsFormattingGeneralOptionsPage));
-            }
-        }
-
         public NodejsIntellisenseOptionsPage IntellisenseOptionsPage {
             get {
                 return (NodejsIntellisenseOptionsPage)GetDialogPage(typeof(NodejsIntellisenseOptionsPage));
