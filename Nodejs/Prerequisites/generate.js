@@ -11,7 +11,6 @@ var assemblies = [
     'DebuggerTests',
     'DebuggerUITests',
     'ProfilingUITests',
-    'ReferenceGenerator',
     'ReplWindowUITests',
     'TestSccPackage',
     'SharedProjectTests',

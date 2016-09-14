@@ -13,9 +13,7 @@
   </PropertyGroup>
   -->
   
-  <ItemGroup>
-    <ProjectFile Include="ReferenceGenerator\ReferenceGenerator.csproj"/>
-    
+  <ItemGroup>    
     <ProjectFile Include="InteractiveWindow\InteractiveWindow.csproj"/>
     
     <ProjectFile Include="Npm\Npm.csproj"/>
