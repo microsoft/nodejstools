@@ -2,7 +2,10 @@
  * GET home page.
  */
 import express = require('express');
+const router = express.Router();
 
-export function index(req: express.Request, res: express.Response) {
+router.get('/', (req: express.Request, res: express.Response) => {
     res.render('index', { title: 'Express' });
-};
+});
+
+export default router;
