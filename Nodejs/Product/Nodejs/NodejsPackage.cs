@@ -30,7 +30,6 @@ using Microsoft.NodejsTools.Commands;
 using Microsoft.NodejsTools.Debugger.DataTips;
 using Microsoft.NodejsTools.Debugger.DebugEngine;
 using Microsoft.NodejsTools.Debugger.Remote;
-using Microsoft.NodejsTools.Intellisense;
 using Microsoft.NodejsTools.Jade;
 using Microsoft.NodejsTools.Logging;
 using Microsoft.NodejsTools.Options;
@@ -96,13 +95,11 @@ namespace Microsoft.NodejsTools {
     internal sealed partial class NodejsPackage : CommonPackage {
         internal const string NodeExpressionEvaluatorGuid = "{F16F2A71-1C45-4BAB-BECE-09D28CFDE3E6}";
         private IContentType _contentType;
-        internal const string NodeJsFileType = ".njs";
         internal static NodejsPackage Instance;
         private string _surveyNewsUrl;
         private object _surveyNewsUrlLock = new object();
         internal HashSet<ITextBuffer> ChangedBuffers = new HashSet<ITextBuffer>();
         private LanguagePreferences _langPrefs;
-        internal VsProjectAnalyzer _analyzer;
         private NodejsToolsLogger _logger;
         private ITelemetryLogger _telemetryLogger;
         // Hold references for the subscribed events. Otherwise the callbacks will be garbage collected
@@ -141,24 +138,6 @@ namespace Microsoft.NodejsTools {
         public NodejsNpmOptionsPage NpmOptionsPage {
             get {
                 return (NodejsNpmOptionsPage)GetDialogPage(typeof(NodejsNpmOptionsPage));
-            }
-        }
-
-        public NodejsFormattingSpacingOptionsPage FormattingSpacingOptionsPage {
-            get {
-                return (NodejsFormattingSpacingOptionsPage)GetDialogPage(typeof(NodejsFormattingSpacingOptionsPage));
-            }
-        }
-
-        public NodejsFormattingBracesOptionsPage FormattingBracesOptionsPage {
-            get {
-                return (NodejsFormattingBracesOptionsPage)GetDialogPage(typeof(NodejsFormattingBracesOptionsPage));
-            }
-        }
-
-        public NodejsFormattingGeneralOptionsPage FormattingGeneralOptionsPage {
-            get {
-                return (NodejsFormattingGeneralOptionsPage)GetDialogPage(typeof(NodejsFormattingGeneralOptionsPage));
             }
         }
 
@@ -291,7 +270,6 @@ namespace Microsoft.NodejsTools {
 
             // log interesting stats on startup
             _logger.LogEvent(NodejsToolsLogEvent.SurveyNewsFrequency, GeneralOptionsPage.SurveyNewsCheck);
-            _logger.LogEvent(NodejsToolsLogEvent.AnalysisLevel, AnalysisLevel.Preview);
         }
 
         private void InitializeTelemetry() {
@@ -590,43 +568,6 @@ namespace Microsoft.NodejsTools {
 
         internal static void NavigateTo(string filename, int pos) {
             VsUtilities.NavigateTo(Instance, filename, Guid.Empty, pos);
-        }
-
-        /// <summary>
-        /// The analyzer which is used for loose files.
-        /// </summary>
-        internal VsProjectAnalyzer DefaultAnalyzer {
-            get {
-                if (_analyzer == null) {
-                    _analyzer = CreateLooseVsProjectAnalyzer();
-                    LogLooseFileAnalysisLevel();
-                    _analyzer.MaxLogLength = 100;
-                }
-                return _analyzer;
-            }
-        }
-
-        private VsProjectAnalyzer CreateLooseVsProjectAnalyzer() {
-            // In ES6 IntelliSense mode, rather than overriding the default JS editor,
-            // we throw to Salsa. If Salsa detects that it's not operating within the Node.js project context,
-            // it will throw to JSLS. This means that currently, loose files will be handled by the JSLS editor,
-            // rather than the NodeLS editor (which means that the loose project analyzer will not be invoked
-            // in these scenarios.)
-            //
-            // Because Salsa doesn't support the stitching together inputs from the surrounding text view,
-            // we do not throw to Salsa from the REPL window. However, in order to provide a workable editing
-            // experience within the REPL context, we initialize the loose analyzer with Quick IntelliSense
-            // during ES6 mode.
-            var analysisLevel = AnalysisLevel.NodeLsMedium;
-            return new VsProjectAnalyzer(analysisLevel, false);
-        }
-
-        private void LogLooseFileAnalysisLevel() {
-            var analyzer = _analyzer;
-            if (analyzer != null) {
-                var val = analyzer.AnalysisLevel;
-                _logger.LogEvent(NodejsToolsLogEvent.AnalysisLevel, (int)val);
-            }
         }
 
         private static string GetTypeScriptToolsVersion() {

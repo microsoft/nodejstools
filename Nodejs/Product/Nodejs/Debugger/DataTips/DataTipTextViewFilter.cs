@@ -15,8 +15,6 @@
 //*********************************************************//
 
 using System;
-using Microsoft.NodejsTools.Intellisense;
-using Microsoft.NodejsTools.Parsing;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.OLE.Interop;
@@ -60,53 +58,8 @@ namespace Microsoft.NodejsTools.Debugger.DataTips {
 
         #endregion
 
-        // Assume that all function calls have side effects, and nothing else does.
-        private class SideEffectsDetectingVisitor : AstVisitor {
-            public bool HasSideEffects { get; private set; }
-
-            public override void PostWalk(CallNode node) {
-                base.PostWalk(node);
-                if (!node.InBrackets) {
-                    HasSideEffects = true;
-                }
-            }
-        }
-
         internal static TextSpan? GetDataTipSpan(IWpfTextView wpfTextView, TextSpan selection) {
-            // Adjust the span to expression boundaries.
-            var snapshot = wpfTextView.TextSnapshot;
-            var start = LineAndColumnNumberToSnapshotPoint(snapshot, selection.iStartLine, selection.iStartIndex);
-            var end = LineAndColumnNumberToSnapshotPoint(snapshot, selection.iEndLine, selection.iEndIndex);
-
-            // If this is a zero-length span (which it usually is, unless there's selection), adjust it
-            // to cover one char to the right, since an empty span at the beginning of the expression does
-            // not count as belonging to that expression;
-            if (start == end && start.Position != snapshot.Length) {
-                end += 1;
-            }
-
-            var snapshotSpan = new SnapshotSpan(start, end);
-            var trackingSpan = snapshot.CreateTrackingSpan(snapshotSpan.Span, SpanTrackingMode.EdgeExclusive);
-            var rep = new ReverseExpressionParser(snapshot, wpfTextView.TextBuffer, trackingSpan);
-            var exprSpan = rep.GetExpressionRange(forCompletion: false);
-            if (exprSpan == null) {
-                return null;
-            }
-
-            // Check whether this is an expression with side effects - if it does, we don't want to show a data tip for it.
-            string text = exprSpan.Value.GetText();
-            var ast = new JSParser(text).Parse(new CodeSettings());
-
-            var sideEffectsDetectingVisitor = new SideEffectsDetectingVisitor();
-            ast.Walk(sideEffectsDetectingVisitor);
-            if (sideEffectsDetectingVisitor.HasSideEffects) {
-                return null;
-            }
-
-            TextSpan dataTipSpan;
-            SnapshotPointToLineAndColumnNumber(exprSpan.Value.Start, out dataTipSpan.iStartLine, out dataTipSpan.iStartIndex);
-            SnapshotPointToLineAndColumnNumber(exprSpan.Value.End, out dataTipSpan.iEndLine, out dataTipSpan.iEndIndex);
-            return dataTipSpan;
+            return null;
         }
 
         public int GetDataTipText(TextSpan[] pSpan, out string pbstrText) {

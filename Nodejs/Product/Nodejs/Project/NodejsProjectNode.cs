@@ -24,7 +24,6 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.NodejsTools.Intellisense;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.ProjectWizard;
 using Microsoft.VisualStudio;
@@ -35,7 +34,6 @@ using Microsoft.VisualStudioTools.Project.Automation;
 using MSBuild = Microsoft.Build.Evaluation;
 using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
 using Microsoft.NodejsTools.Options;
-using Microsoft.NodejsTools.Telemetry;
 #if DEV14_OR_LATER
 using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Imaging;
@@ -43,12 +41,10 @@ using Microsoft.VisualStudio.Imaging;
 
 namespace Microsoft.NodejsTools.Project {
     class NodejsProjectNode : CommonProjectNode, VsWebSite.VSWebSite, INodePackageModulesCommands, IVsBuildPropertyStorage {
-        private VsProjectAnalyzer _analyzer;
         private readonly HashSet<string> _warningFiles = new HashSet<string>();
         private readonly HashSet<string> _errorFiles = new HashSet<string>();
         private string[] _analysisIgnoredDirs = new string[1] { NodejsConstants.NodeModulesStagingFolder };
         private int _maxFileSize = 1024 * 512;
-        internal readonly RequireCompletionCache _requireCompletionCache = new RequireCompletionCache();
         private string _intermediateOutputPath;
         private readonly Dictionary<NodejsProjectImageName, int> _imageIndexFromNameDictionary = new Dictionary<NodejsProjectImageName, int>();
 
@@ -58,10 +54,11 @@ namespace Microsoft.NodejsTools.Project {
 #endif
 
         // We delay analysis until things calm down in the node_modules folder.
-        internal readonly Queue<NodejsFileNode> DelayedAnalysisQueue = new Queue<NodejsFileNode>();
+#pragma warning disable 0414
         private readonly object _idleNodeModulesLock = new object();
         private volatile bool _isIdleNodeModules = false;
         private Timer _idleNodeModulesTimer;
+#pragma warning restore 0414
 
         public NodejsProjectNode(NodejsProjectPackage package)
             : base(
@@ -80,33 +77,14 @@ namespace Microsoft.NodejsTools.Project {
 
         }
 
-        public VsProjectAnalyzer Analyzer {
-            get {
-                return _analyzer;
-            }
-        }
-
         private void OnIdleNodeModules(object state) {
             lock (_idleNodeModulesLock) {
                 _isIdleNodeModules = true;
-            }
-
-            while (DelayedAnalysisQueue.Count > 0) {
-                lock (_idleNodeModulesLock) {
-                    if (!_isIdleNodeModules) {
-                        return;
-                    }
-                }
-                var fileNode = DelayedAnalysisQueue.Dequeue();
-                if (fileNode != null) {
-                    fileNode.Analyze();
-                }
             }
 #if DEV14
             TryToAcquireCurrentTypings();
 #endif
         }
-
 
         internal bool ShouldAcquireTypingsAutomatically {
             get {
@@ -223,12 +201,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 #endif
 
-        internal void EnqueueForDelayedAnalysis(NodejsFileNode fileNode) {
-            DelayedAnalysisQueue.Enqueue(fileNode);
-            RestartIdleNodeModulesTimer();
-        }
-
-        private void RestartIdleNodeModulesTimer() {
+        private void NodeModules_FinishedRefresh(object sender, EventArgs e) {
             lock (_idleNodeModulesLock) {
                 _isIdleNodeModules = false;
 
@@ -453,16 +426,6 @@ namespace Microsoft.NodejsTools.Project {
             return res;
         }
 
-        public override CommonFileNode CreateNonCodeFileNode(ProjectElement item) {
-            string fileName = item.Url;
-            if (Path.GetFileName(fileName).Equals(NodejsConstants.PackageJsonFile, StringComparison.OrdinalIgnoreCase) &&
-                !fileName.Contains(NodejsConstants.NodeModulesStagingFolder)) {
-                return new PackageJsonFileNode(this, item);
-            }
-
-            return base.CreateNonCodeFileNode(item);
-        }
-
         public override string GetProjectName() {
             return "NodeProject";
         }
@@ -541,11 +504,6 @@ namespace Microsoft.NodejsTools.Project {
                 // is not properly set before the FileNodes get created in base.Reload()
                 UpdateProjectNodeFromProjectProperties();
 
-                if (_analyzer != null && _analyzer.RemoveUser()) {
-                    _analyzer.Dispose();
-                }
-                _analyzer = CreateNewAnalyser();
-
                 base.Reload();
 
                 SyncFileSystem();
@@ -556,58 +514,11 @@ namespace Microsoft.NodejsTools.Project {
 #if DEV14
                 TryToAcquireTypings(new[] { "node" });
 #endif
-
-                // scan for files which were loaded from cached analysis but no longer
-                // exist and remove them.
-                _analyzer.ReloadComplete();
             }
-        }
-
-        private VsProjectAnalyzer CreateNewAnalyser() {
-            var analyzer = new VsProjectAnalyzer(AnalysisLevel.Preview, false, ProjectFolder);
-            analyzer.MaxLogLength = 100;
-            LogAnalysisLevel(analyzer);
-            return analyzer;
         }
 
         private void UpdateProjectNodeFromProjectProperties() {
             _intermediateOutputPath = Path.Combine(ProjectHome, GetProjectProperty("BaseIntermediateOutputPath"));
-
-            var ignoredPaths = GetProjectProperty(NodejsConstants.AnalysisIgnoredDirectories);
-
-            if (!string.IsNullOrWhiteSpace(ignoredPaths)) {
-                _analysisIgnoredDirs = _analysisIgnoredDirs.Append(ignoredPaths.Split(';').Select(x => '\\' + x + '\\').ToArray());
-            }
-
-            var maxFileSizeProp = GetProjectProperty(NodejsConstants.AnalysisMaxFileSize);
-            int maxFileSize;
-            if (maxFileSizeProp != null && Int32.TryParse(maxFileSizeProp, out maxFileSize)) {
-                _maxFileSize = maxFileSize;
-            }
-        }
-
-        private void Reanalyze(HierarchyNode node, VsProjectAnalyzer newAnalyzer) {
-            if (node != null) {
-                for (var child = node.FirstChild; child != null; child = child.NextSibling) {
-                    if (child is PackageJsonFileNode) {
-                        ((PackageJsonFileNode)child).AnalyzePackageJson(newAnalyzer);
-                    } else if (child is NodejsFileNode) {
-                        if (((NodejsFileNode)child).ShouldAnalyze) {
-                            newAnalyzer.AnalyzeFile(child.Url, !child.IsNonMemberItem);
-                        }
-                    }
-
-                    Reanalyze(child, newAnalyzer);
-                }
-            }
-        }
-
-        private void LogAnalysisLevel(VsProjectAnalyzer analyzer) {
-            if (analyzer != null) {
-                var level = analyzer.AnalysisLevel;
-                NodejsPackage.Instance.Logger.LogEvent(Logging.NodejsToolsLogEvent.AnalysisLevel, (int)level);
-                NodejsPackage.Instance.TelemetryLogger.LogAnalysisActivatedForProject(ProjectGuid, level);
-            }
         }
 
         private void ShowBrowserAndNodeLabelsChanged(object sender, EventArgs e) {
@@ -714,10 +625,6 @@ namespace Microsoft.NodejsTools.Project {
                 nestedModulesDepth = ModulesNode.NpmController.RootPackage.Modules.GetDepth(fileNode.Url);
             }
 
-            if (_analyzer != null && _analyzer.Limits.IsPathExceedNestingLimit(nestedModulesDepth)) {
-                return false;
-            }
-
             return true;
         }
 
@@ -740,6 +647,7 @@ namespace Microsoft.NodejsTools.Project {
                 ModulesNode = new NodeModulesNode(this);
                 AddChild(ModulesNode);
                 _idleNodeModulesTimer = new Timer(OnIdleNodeModules);
+                ModulesNode.NpmController.FinishedRefresh += NodeModules_FinishedRefresh;
             }
         }
 
@@ -816,58 +724,6 @@ namespace Microsoft.NodejsTools.Project {
             //Fire off the command to update the missing modules
             //  through NPM
             return ModulesNode.InstallMissingModules();
-        }
-
-        private void HookErrorsAndWarnings(VsProjectAnalyzer res) {
-            res.ErrorAdded += OnErrorAdded;
-            res.ErrorRemoved += OnErrorRemoved;
-            res.WarningAdded += OnWarningAdded;
-            res.WarningRemoved += OnWarningRemoved;
-        }
-
-        private void UnHookErrorsAndWarnings(VsProjectAnalyzer res) {
-            res.ErrorAdded -= OnErrorAdded;
-            res.ErrorRemoved -= OnErrorRemoved;
-            res.WarningAdded -= OnWarningAdded;
-            res.WarningRemoved -= OnWarningRemoved;
-        }
-
-        private void OnErrorAdded(object sender, FileEventArgs args) {
-            if (_diskNodes.ContainsKey(args.Filename)) {
-                _errorFiles.Add(args.Filename);
-            }
-        }
-
-        private void OnErrorRemoved(object sender, FileEventArgs args) {
-            _errorFiles.Remove(args.Filename);
-        }
-
-        private void OnWarningAdded(object sender, FileEventArgs args) {
-            if (_diskNodes.ContainsKey(args.Filename)) {
-                _warningFiles.Add(args.Filename);
-            }
-        }
-
-        private void OnWarningRemoved(object sender, FileEventArgs args) {
-            _warningFiles.Remove(args.Filename);
-        }
-
-        /// <summary>
-        /// File names within the project which contain errors.
-        /// </summary>
-        public HashSet<string> ErrorFiles {
-            get {
-                return _errorFiles;
-            }
-        }
-
-        /// <summary>
-        /// File names within the project which contain warnings.
-        /// </summary>
-        public HashSet<string> WarningFiles {
-            get {
-                return _warningFiles;
-            }
         }
 
         internal struct LongPathInfo {
@@ -1008,23 +864,6 @@ namespace Microsoft.NodejsTools.Project {
 
         protected override void Dispose(bool disposing) {
             if (disposing) {
-                if (_analyzer != null) {
-                    UnHookErrorsAndWarnings(_analyzer);
-                    if (WarningFiles.Count > 0 || ErrorFiles.Count > 0) {
-                        foreach (var file in WarningFiles.Concat(ErrorFiles)) {
-                            var node = FindNodeByFullPath(file) as NodejsFileNode;
-                            if (node != null) {
-                                //_analyzer.RemoveErrors(node.GetAnalysis(), suppressUpdate: false);
-                            }
-                        }
-                    }
-
-                    if (_analyzer.RemoveUser()) {
-                        _analyzer.Dispose();
-                    }
-                    _analyzer = null;
-                }
-
                 lock (_idleNodeModulesLock) {
                     if (_idleNodeModulesTimer != null) {
                         _idleNodeModulesTimer.Dispose();
@@ -1039,8 +878,6 @@ namespace Microsoft.NodejsTools.Project {
                 RemoveChild(ModulesNode);
                 ModulesNode?.Dispose();
                 ModulesNode = null;
-
-                DelayedAnalysisQueue.Clear();
 #if DEV14
                 _typingsAcquirer = null;
 #endif

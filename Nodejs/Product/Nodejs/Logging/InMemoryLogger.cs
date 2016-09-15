@@ -30,7 +30,6 @@ namespace Microsoft.NodejsTools.Logging {
         private int _debugLaunchCount, _normalLaunchCount;
 
         private SurveyNewsPolicy _surveyNewsPolicy;
-        private AnalysisLevel _analysisLevel;
 
         #region INodejsToolsLogger Members
 
@@ -50,13 +49,6 @@ namespace Microsoft.NodejsTools.Logging {
                         _surveyNewsPolicy = (SurveyNewsPolicy)val;
                     }
                     break;
-
-                case NodejsToolsLogEvent.AnalysisLevel:
-                    val = (int)argument;
-                    if (Enum.IsDefined(typeof(AnalysisLevel), val)) {
-                        _analysisLevel = (AnalysisLevel)val;
-                    }
-                    break;
             }
         }
 
@@ -64,7 +56,6 @@ namespace Microsoft.NodejsTools.Logging {
 
         public override string ToString() {
             StringBuilder res = new StringBuilder();
-            res.AppendLine("    Analysis Level: " + _analysisLevel);
             res.AppendLine("    SurveyNewsFrequency: " + _surveyNewsPolicy);
             res.AppendLine("    Debug Launches: " + _debugLaunchCount);
             res.AppendLine("    Normal Launches: " + _normalLaunchCount);

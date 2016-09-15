@@ -27,7 +27,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
-using Microsoft.NodejsTools.Parsing;
 using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio.Text;
 
@@ -85,50 +84,8 @@ namespace Microsoft.NodejsTools.Repl {
         }
 
         public bool CanExecuteText(string text) {
-            var errorSink = new ReplErrorSink(text);
-            var parser = new JSParser(text, errorSink);
-            parser.Parse(new CodeSettings());
-
-            return !errorSink.Unterminated;
-        }
-
-        class ReplErrorSink : ErrorSink {
-            public bool Unterminated;
-            public readonly string Text;
-
-            public ReplErrorSink(string text) {
-                Text = text;
-            }
-
-            public override void OnError(JScriptExceptionEventArgs e) {
-                switch (e.Exception.ErrorCode) {
-                    case JSError.NoCatch:
-                    case JSError.UnclosedFunction:
-                    case JSError.NoCommentEnd:
-                    case JSError.NoEndDebugDirective:
-                    case JSError.NoEndIfDirective:
-                    case JSError.NoLabel:
-                    case JSError.NoLeftCurly:
-                    case JSError.NoMemberIdentifier:
-                    case JSError.NoRightBracket:
-                    case JSError.NoRightParenthesis:
-                    case JSError.NoRightParenthesisOrComma:
-                    case JSError.NoRightCurly:
-                    case JSError.NoEqual:
-                    case JSError.NoCommaOrTypeDefinitionError:
-                    case JSError.NoComma:
-                    case JSError.ErrorEndOfFile:
-                        Unterminated = true;
-                        break;
-                    default:
-                        if (e.Exception.Span.Start == Text.Length) {
-                            // EOF error
-                            Unterminated = true;
-                        }
-                        break;
-                }
-            }
-
+            return true;
+         
         }
 
         public Task<ExecutionResult> ExecuteText(string text) {

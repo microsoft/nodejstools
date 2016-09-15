@@ -15,12 +15,10 @@
         <File Include="Microsoft.NodejsTools.PressAnyKey.exe" />
         <File Include="Microsoft.NodejsTools.Npm.dll" />
         <File Include="Microsoft.NodejsTools.ProjectWizard.dll" />
-        <File Include="Microsoft.NodejsTools.Analysis.dll" />
         <File Include="Microsoft.NodejsTools.TestAdapter.dll" />
         <File Include="Microsoft.NodejsTools.Telemetry.$(VSTarget).dll" />
 
         <!-- Support Files -->
-        <File Include="all.json" />
         <File Include="Newtonsoft.Json.dll"/>
         <File Include="sqlite3.dll" />
         <File Include="visualstudio_nodejs_repl.js"/>
