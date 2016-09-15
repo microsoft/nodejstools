@@ -34,10 +34,8 @@ using Microsoft.VisualStudioTools.Project.Automation;
 using MSBuild = Microsoft.Build.Evaluation;
 using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
 using Microsoft.NodejsTools.Options;
-#if DEV14_OR_LATER
 using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Imaging;
-#endif
 
 namespace Microsoft.NodejsTools.Project {
     class NodejsProjectNode : CommonProjectNode, VsWebSite.VSWebSite, INodePackageModulesCommands, IVsBuildPropertyStorage {
@@ -60,15 +58,7 @@ namespace Microsoft.NodejsTools.Project {
         private Timer _idleNodeModulesTimer;
 #pragma warning restore 0414
 
-        public NodejsProjectNode(NodejsProjectPackage package)
-            : base(
-                  package,
-#if DEV14_OR_LATER
-                  null
-#else
-                  Utilities.GetImageList(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream("Microsoft.NodejsTools.Resources.Icons.NodejsImageList.bmp"))
-#endif
-        ) {
+        public NodejsProjectNode(NodejsProjectPackage package) : base(package, null) {
             Type projectNodePropsType = typeof(NodejsProjectNodeProperties);
             AddCATIDMapping(projectNodePropsType, projectNodePropsType.GUID);
 #pragma warning disable 0612
@@ -236,9 +226,7 @@ namespace Microsoft.NodejsTools.Project {
             get { return _imageIndexFromNameDictionary; }
         }
 
-#if DEV14_OR_LATER
         [Obsolete]
-#endif
         private void InitNodejsProjectImages() {
             // HACK: https://nodejstools.codeplex.com/workitem/1268
 
@@ -280,16 +268,6 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-#if !DEV14_OR_LATER
-        public override int ImageIndex {
-            get {
-                if (string.Equals(GetProjectProperty(NodejsConstants.EnableTypeScript), "true", StringComparison.OrdinalIgnoreCase)) {
-                    return ImageIndexFromNameDictionary[NodejsProjectImageName.TypeScriptProjectFile];
-                }
-                return base.ImageIndex;
-            }
-        }
-#endif
         internal override string IssueTrackerUrl {
             get { return NodejsConstants.IssueTrackerUrl; }
         }

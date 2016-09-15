@@ -5,10 +5,8 @@ using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Project;
-#if DEV14_OR_LATER
 using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Imaging;
-#endif
 
 namespace Microsoft.NodejsTools.Project {
     internal abstract class AbstractNpmNode : HierarchyNode {

@@ -15,10 +15,8 @@
 //*********************************************************//
 
 using Microsoft.VisualStudioTools.Project;
-#if DEV14_OR_LATER
 using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Imaging;
-#endif
 
 namespace Microsoft.NodejsTools.Project {
     class NodejsTypeScriptFileNode : NodejsFileNode {
@@ -26,13 +24,11 @@ namespace Microsoft.NodejsTools.Project {
             : base(root, e) {
         }
 
-#if DEV14_OR_LATER
         protected override ImageMoniker CodeFileIconMoniker {
             get {
                 return KnownMonikers.TSFileNode;
             }
         }
-#endif
 
         protected override NodeProperties CreatePropertiesObject() {
             if (IsLinkFile) {

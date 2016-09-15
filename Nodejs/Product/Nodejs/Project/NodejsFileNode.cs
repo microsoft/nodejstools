@@ -18,10 +18,8 @@ using System;
 using System.IO;
 using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudioTools;
-#if DEV14_OR_LATER
 using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Imaging;
-#endif
 
 namespace Microsoft.NodejsTools.Project {
     class NodejsFileNode : CommonFileNode {
@@ -42,13 +40,11 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-#if DEV14_OR_LATER
         protected override ImageMoniker CodeFileIconMoniker {
             get {
                 return KnownMonikers.JSScript;
             }
         }
-#endif
 
         internal override int IncludeInProject(bool includeChildren) {
             if (!ItemNode.IsExcluded) {
