@@ -270,7 +270,6 @@ namespace Microsoft.NodejsTools {
 
             // log interesting stats on startup
             _logger.LogEvent(NodejsToolsLogEvent.SurveyNewsFrequency, GeneralOptionsPage.SurveyNewsCheck);
-            _logger.LogEvent(NodejsToolsLogEvent.AnalysisLevel, AnalysisLevel.Preview);
         }
 
         private void InitializeTelemetry() {

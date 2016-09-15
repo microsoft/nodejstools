@@ -86,7 +86,6 @@ namespace Microsoft.NodejsTools.Project {
 #endif
         }
 
-
         internal bool ShouldAcquireTypingsAutomatically {
             get {
 #if DEV14

@@ -251,7 +251,6 @@
       <DependentUpon>NpmPackageInstallWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="NpmUI\PackageCatalogEntryViewModel.cs" />
-    <Compile Include="Options\AnalysisLevel.cs" />
     <Compile Include="Options\NodejsFormattingDialogPage.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -1146,7 +1145,9 @@
     <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\startup.ts" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\server.ts" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="RemoteDebug\" />
+  </ItemGroup>
   <PropertyGroup>
     <!--
     To specify a different registry root to register your package, uncomment the TargetRegistryRoot
