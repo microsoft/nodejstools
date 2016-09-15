@@ -46,9 +46,6 @@ namespace Microsoft.NodejsTools {
         internal const string NodeModulesFolder = "node_modules";
         internal const string NodeModulesStagingFolder = "node_modules\\.staging\\";
         internal const string BowerComponentsFolder = "bower_components";
-        internal const string AnalysisIgnoredDirectories = "AnalysisIgnoredDirectories";
-        internal const string AnalysisMaxFileSize = "AnalysisMaxFileSize";
-        internal const string DefaultIntellisenseCompletionCommittedBy = "{}[]().,:;+-*/%&|^!~=<>?@#'\"\\";
 
         /// <summary>
         /// The name of the package.json file
@@ -58,9 +55,6 @@ namespace Microsoft.NodejsTools {
         internal const string DefaultPackageMainFile = "index.js";
 
         internal const string BaseRegistryKey = "NodejsTools";
-
-        internal const string NodejsHiddenUserModule = "nodejs_tools_for_visual_studio_hidden_usermodule_";
-        internal const string NodejsHiddenUserModuleInstance = "nodejs_tools_for_visual_studio_hidden_module_instance_";
 
         internal const string TypeScriptCfgProperty = "CfgPropertyPagesGuidsAddTypeScript";
 
