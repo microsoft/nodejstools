@@ -201,11 +201,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 #endif
 
-        internal void EnqueueForDelayedAnalysis(NodejsFileNode fileNode) {
-            RestartIdleNodeModulesTimer();
-        }
-
-        private void RestartIdleNodeModulesTimer() {
+        private void NodeModules_FinishedRefresh(object sender, EventArgs e) {
             lock (_idleNodeModulesLock) {
                 _isIdleNodeModules = false;
 
@@ -651,6 +647,7 @@ namespace Microsoft.NodejsTools.Project {
                 ModulesNode = new NodeModulesNode(this);
                 AddChild(ModulesNode);
                 _idleNodeModulesTimer = new Timer(OnIdleNodeModules);
+                ModulesNode.NpmController.FinishedRefresh += NodeModules_FinishedRefresh;
             }
         }
 
