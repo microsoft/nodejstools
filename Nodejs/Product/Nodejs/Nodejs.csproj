@@ -760,6 +760,12 @@
     <ZipItem Include="Templates\Files\TypeScriptTapeUnitTest\UnitTest.vstemplate" />
     <ZipItem Include="Templates\Files\TypeScriptTapeUnitTest\UnitTest.ts" />
     <None Include="app.config" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\express-serve-static-core.typings.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\express.typings.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\serve-static.typings.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\typings.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\mine.typings.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\www" />
     <None Include="Theme\contrast.vstheme">
       <SubType>Designer</SubType>
     </None>
@@ -1203,6 +1209,13 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="RemoteDebug\" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\express-serve-static-core.d.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\serve-static.d.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\mime.d.ts" />
   </ItemGroup>
   <PropertyGroup>
     <!--
