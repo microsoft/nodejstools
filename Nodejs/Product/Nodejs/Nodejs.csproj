@@ -515,7 +515,6 @@
     <Compile Include="Project\NodejsGeneralPropertyPageControl.Designer.cs">
       <DependentUpon>NodejsGeneralPropertyPageControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="ProvideBraceCompletion.cs" />
     <Compile Include="ProvideEditorExtension2Attribute.cs" />
     <Compile Include="ProvideLanguageTemplates.cs" />
     <Compile Include="Repl\ClearReplCommand.cs" />
