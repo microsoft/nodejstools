@@ -715,6 +715,12 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\typings.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\mine.typings.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\www" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\express-serve-static-core.typings.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\express.typings.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\serve-static.typings.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\mine.typings.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\www" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\typings.json" />
     <None Include="Theme\contrast.vstheme">
       <SubType>Designer</SubType>
     </None>
@@ -1148,7 +1154,6 @@
   <ItemGroup>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\server.ts" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\app.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\express.d.ts" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\index.ts" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\user.ts" />
   </ItemGroup>
@@ -1170,6 +1175,18 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\mime.d.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\express-serve-static-core.d.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\express.d.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\serve-static.d.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\mime.d.ts" />
   </ItemGroup>
   <PropertyGroup>
     <!--

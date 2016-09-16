@@ -1,7 +1,7 @@
 <VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
   <TemplateData>
-    <Name>Basic Azure Node.js Express 3 Application</Name>
-    <Description>A basic Node.js Express 3 application for Microsoft Azure.</Description>
+    <Name>Basic Azure Node.js Express 4 Application</Name>
+    <Description>A basic Node.js Express 4 application for Microsoft Azure.</Description>
     <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="410" />
     <ProjectType>TypeScript</ProjectType>
     <TemplateID>Microsoft.TypeScript.AzureExpressApp</TemplateID>
@@ -23,29 +23,44 @@
         </Folder>
       </Folder>
       <Folder Name="routes">
-        <ProjectItem>index.ts</ProjectItem>        
-        <ProjectItem>user.ts</ProjectItem>        
+        <ProjectItem>index.ts</ProjectItem>
+        <ProjectItem>user.ts</ProjectItem>
       </Folder>
       <Folder Name="views">
-        <ProjectItem>index.pug</ProjectItem>        
-        <ProjectItem>layout.pug</ProjectItem>        
+        <ProjectItem>index.pug</ProjectItem>
+        <ProjectItem>layout.pug</ProjectItem>
       </Folder>
-      <Folder Name="Scripts">
-        <Folder Name="typings">
+      <Folder Name="typings">
+        <Folder Name="globals">
           <Folder Name="express">
-            <ProjectItem>express.d.ts</ProjectItem>
+            <ProjectItem TargetFileName="index.d.ts">express.d.ts</ProjectItem>
+            <ProjectItem TargetFileName="typings.json">express.typings.json</ProjectItem>
+          </Folder>
+          <Folder Name="express-serve-static-core">
+            <ProjectItem TargetFileName="index.d.ts">express-serve-static-core.d.ts</ProjectItem>
+            <ProjectItem TargetFileName="typings.json">express-serve-static-core.typings.json</ProjectItem>
+          </Folder>
+          <Folder Name="mime">
+            <ProjectItem TargetFileName="index.d.ts">mime.d.ts</ProjectItem>
+            <ProjectItem TargetFileName="typings.json">mine.typings.json</ProjectItem>
+          </Folder>
+          <Folder Name="serve-static">
+            <ProjectItem TargetFileName="index.d.ts">serve-static.d.ts</ProjectItem>
+            <ProjectItem TargetFileName="typings.json">serve-static.typings.json</ProjectItem>
           </Folder>
         </Folder>
       </Folder>
       <ProjectItem OpenInEditor="true">app.ts</ProjectItem>
       <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
-      <ProjectItem ReplaceParameters="true">README.md</ProjectItem>      
+      <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
       <ProjectItem ReplaceParameters="true">Web.config</ProjectItem>
       <ProjectItem ReplaceParameters="true">Web.Debug.config</ProjectItem>
       <ProjectItem TargetFileName="bin\ChangeConfig.ps1">ChangeConfig.ps1</ProjectItem>
       <ProjectItem TargetFileName="bin\download.ps1">download.ps1</ProjectItem>
       <ProjectItem TargetFileName="bin\setup_web.cmd">setup_web.cmd</ProjectItem>
       <ProjectItem TargetFileName="bin\node.cmd">node.cmd</ProjectItem>
+      <ProjectItem TargetFileName="bin\www">www</ProjectItem>
+      <ProjectItem>typings.json</ProjectItem>
     </Project>
   </TemplateContent>
   <WizardExtension>
