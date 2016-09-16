@@ -467,13 +467,11 @@ namespace Microsoft.NodejsTools {
                         return res;
                     }
             }
-#if DEV14_OR_LATER
             switch((__VSHPROPID8)propId) {
                 case __VSHPROPID8.VSHPROPID_SupportsIconMonikers:
                     property = true;
                     return VSConstants.S_OK;
             }
-#endif
 
             return base.GetProperty(itemId, propId, out property);
         }

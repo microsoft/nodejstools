@@ -32,10 +32,8 @@ namespace Microsoft.NodejsTools {
     // Keep declared exceptions in sync with those given default values in NodeDebugger.GetDefaultExceptionTreatments()
     [ProvideNodeDebugException()]
     [ProvideNodeDebugException("Error")]
-#if DEV14_OR_LATER
     // VS2015's exception manager uses a different nesting structure, so it's necessary to register Error explicitly.
     [ProvideNodeDebugException("Error", "Error")]
-#endif
     [ProvideNodeDebugException("Error", "Error(EACCES)")]
     [ProvideNodeDebugException("Error", "Error(EADDRINUSE)")]
     [ProvideNodeDebugException("Error", "Error(EADDRNOTAVAIL)")]
