@@ -528,7 +528,6 @@
     <Compile Include="TestFrameworks\TestFrameworkDirectories.cs" />
     <Compile Include="TypingsAcquisition.cs" />
     <Compile Include="VsMenus.cs" />
-    <Compile Include="AzureSolutionListener.cs" />
     <Compile Include="BaseNodeProjectFactory.cs" />
     <Compile Include="Debugger\BreakpointBindingEventArgs.cs" />
     <Compile Include="Debugger\BreakpointHitEventArgs.cs" />
