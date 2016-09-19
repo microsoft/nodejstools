@@ -216,12 +216,24 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
             WaitHandle.WaitAll(new WaitHandle[] { _nodeProcess.WaitHandle });
 
+            var result = ParseTestResult(_nodeProcess.StandardOutputLines);
+
             bool runCancelled = _cancelRequested.WaitOne(0);
             RecordEnd(frameworkHandle, test, testResult,
-                string.Join(Environment.NewLine, _nodeProcess.StandardOutputLines),
-                string.Join(Environment.NewLine, _nodeProcess.StandardErrorLines),
-                (!runCancelled && _nodeProcess.ExitCode == 0) ? TestOutcome.Passed : TestOutcome.Failed);
+                result.stdOut,
+                result.stdErr,
+                (!runCancelled && result.passed) ? TestOutcome.Passed : TestOutcome.Failed);
             _nodeProcess.Dispose();
+        }
+
+        // TODO
+        private ResultObject ParseTestResult(IEnumerable<string> standardOutputLines)
+        {
+            ResultObject result = new ResultObject();
+            result.stdOut = "";
+            result.stdErr = "";
+            result.passed = false;
+            return result;
         }
 
         private NodejsProjectSettings LoadProjectSettings(string projectFile) {
@@ -289,6 +301,17 @@ namespace Microsoft.NodejsTools.TestAdapter {
             public string SearchPath { get; set; }
             public string WorkingDir { get; set; }
             public string ProjectRootDir { get; set; }
+        }
+        // TODO
+        class ResultObject
+        {
+            public ResultObject()
+            {
+            }
+
+            public bool passed { get; set; }
+            public string stdErr { get; set; }
+            public string stdOut { get; set; }
         }
     }
 }
