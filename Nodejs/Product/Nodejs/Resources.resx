@@ -589,10 +589,10 @@ You will need to restart Visual Studio after installation.</value>
     <value>Could not find RemoteDebugProxyFolder</value>
   </data>
   <data name="TypingsToolTypingsInstallCompleted" xml:space="preserve">
-    <value>Successfully installed typing files for Intellisense.</value>
+    <value>Successfully installed typing files for IntelliSense.</value>
   </data>
   <data name="TypingsToolNotInstalledError" xml:space="preserve">
-    <value>Could not find Typings package manager tool used for Intellisense</value>
+    <value>Could not find Typings package manager tool used for IntelliSense</value>
   </data>
   <data name="TypingsToolTypingsInstallErrorOccurred" xml:space="preserve">
     <value>An error occurred installing typings used for IntelliSense.</value>
