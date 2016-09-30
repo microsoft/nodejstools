@@ -613,7 +613,19 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         protected override ReferenceContainerNode CreateReferenceContainerNode() {
-            return null;
+            // Only create a reference node if the project is targeting UWP
+            if(GetProjectTypeGuids().Contains(Guids.NodejsUwpProjectFlavor)) {
+                return base.CreateReferenceContainerNode();
+            } else {
+                return null;
+            }
+        }
+
+        private string GetProjectTypeGuids()
+        {
+            string projectTypeGuids = "";
+            ErrorHandler.ThrowOnFailure(((IVsAggregatableProject)this).GetAggregateProjectTypeGuids(out projectTypeGuids));
+            return projectTypeGuids;
         }
 
         public NodeModulesNode ModulesNode { get; private set; }
