@@ -29,6 +29,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
+using Newtonsoft.Json.Linq;
 using MSBuild = Microsoft.Build.Evaluation;
 
 namespace Microsoft.NodejsTools.TestAdapter {
@@ -216,12 +217,20 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
             WaitHandle.WaitAll(new WaitHandle[] { _nodeProcess.WaitHandle });
 
+            var result = ParseTestResult(_nodeProcess.StandardOutputLines);
+
             bool runCancelled = _cancelRequested.WaitOne(0);
             RecordEnd(frameworkHandle, test, testResult,
-                string.Join(Environment.NewLine, _nodeProcess.StandardOutputLines),
-                string.Join(Environment.NewLine, _nodeProcess.StandardErrorLines),
-                (!runCancelled && _nodeProcess.ExitCode == 0) ? TestOutcome.Passed : TestOutcome.Failed);
+                result.stdout,
+                result.stderr,
+                (!runCancelled && result.passed) ? TestOutcome.Passed : TestOutcome.Failed);
             _nodeProcess.Dispose();
+        }
+
+        private ResultObject ParseTestResult(IEnumerable<string> standardOutputLines) {
+            JObject jsonResult = JObject.Parse(standardOutputLines.ElementAt(standardOutputLines.Count() - 1));
+            ResultObject result = jsonResult.ToObject<ResultObject>();
+            return result;
         }
 
         private NodejsProjectSettings LoadProjectSettings(string projectFile) {
@@ -290,5 +299,18 @@ namespace Microsoft.NodejsTools.TestAdapter {
             public string WorkingDir { get; set; }
             public string ProjectRootDir { get; set; }
         }
+        class ResultObject {
+            public ResultObject() {
+                title = String.Empty;
+                passed = false;
+                stdout = String.Empty;
+                stderr = String.Empty;
+            }
+            public string title { get; set; }
+            public bool passed { get; set; }
+            public string stdout { get; set; }
+            public string stderr { get; set; }
+        }
     }
+
 }
