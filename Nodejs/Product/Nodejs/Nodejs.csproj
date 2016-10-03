@@ -251,9 +251,6 @@
       <DependentUpon>NpmPackageInstallWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="NpmUI\PackageCatalogEntryViewModel.cs" />
-    <Compile Include="Options\NodejsFormattingDialogPage.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Options\TypeScriptRegistrySwitches.cs" />
     <Compile Include="Options\TypingsInfoBar.cs" />
     <Compile Include="Options\NodejsDiagnosticsOptionsPage.cs">
@@ -318,10 +315,15 @@
     <Compile Include="Debugger\SteppingKind.cs" />
     <Compile Include="Project\NodejsFileNodeProperties.cs" />
     <Compile Include="Jade\JadeEditorFactory.cs" />
+</ItemGroup>
+<ItemGroup Condition=" '$(VisualStudioVersion)'=='14.0'  Or '$(TargetVisualStudioVersion)'=='VS140' ">
+    <Compile Include="Options\NodejsFormattingDialogPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Options\NodejsFormattingBracesOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Options\NodejsFormattingSpacingOptionsPage.cs">
+    <Compile Include="Options\NodejsFormattingSpacingOptionsPage.cs" >
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Options\NodejsFormattingGeneralOptionsPage.cs">
@@ -345,6 +347,8 @@
     <Compile Include="Options\NodejsFormattingSpacingOptionsControl.Designer.cs">
       <DependentUpon>NodejsFormattingSpacingOptionsControl.cs</DependentUpon>
     </Compile>
+</ItemGroup>
+<ItemGroup>
     <Compile Include="Project\ProjectResources.cs" />
     <Compile Include="Repl\NpmReplCommand.cs" />
     <Compile Include="TaggerProviderMetadata.cs" />
