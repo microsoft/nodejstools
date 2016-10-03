@@ -47,8 +47,6 @@ namespace Microsoft.VisualStudio.Repl {
     [ProvideKeyBindingTable(ReplWindow.TypeGuid, 200)]        // Resource ID: "Interactive Console"
     [ProvideToolWindow(typeof(ReplWindow), Style = VsDockStyle.Linked, Orientation = ToolWindowOrientation.none, Window = ToolWindowGuids80.Outputwindow, MultiInstances = true)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [ProvideAutoLoad(Microsoft.VisualStudio.Shell.Interop.UIContextGuids.NoSolution)]
-    [ProvideAutoLoad(Microsoft.VisualStudio.Shell.Interop.UIContextGuids.SolutionExists)]
     [Guid(Guids.guidReplWindowPkgString)]
     internal sealed class ReplWindowPackage : Package, IVsToolWindowFactory {
         int IVsToolWindowFactory.CreateToolWindow(ref Guid toolWindowType, uint id) {
