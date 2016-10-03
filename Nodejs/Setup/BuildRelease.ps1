@@ -277,7 +277,6 @@ $installer_names = @{
 $managed_files = (
     "Microsoft.NodejsTools.NodeLogConverter.exe", 
     "Microsoft.NodejsTools.dll", 
-    "Microsoft.NodejsTools.Analysis.dll", 
     "Microsoft.NodejsTools.InteractiveWindow.dll",
     "Microsoft.NodejsTools.Profiling.dll",
     "Microsoft.NodejsTools.ProjectWizard.dll",

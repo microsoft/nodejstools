@@ -8,12 +8,9 @@ var fs = require('fs');
 var util = require('util');
 
 var assemblies = [
-    'AnalysisDriver',
     'DebuggerTests',
     'DebuggerUITests',
-    'JSAnalysisTests',
     'ProfilingUITests',
-    'ReferenceGenerator',
     'ReplWindowUITests',
     'TestSccPackage',
     'SharedProjectTests',
@@ -30,7 +27,6 @@ var assemblies = [
     'NpmTests',
     'MockVsTests',
     'Microsoft.NodejsTools',
-    'Microsoft.NodejsTools.Analysis',
     'Microsoft.NodejsTools.Profiling',
     'Microsoft.NodejsTools.ProjectWizard',
     'Microsoft.NodejsTools.NodeLogConverter',

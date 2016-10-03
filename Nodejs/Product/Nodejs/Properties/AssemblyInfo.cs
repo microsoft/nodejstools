@@ -34,7 +34,6 @@ using Microsoft.VisualStudio.Shell;
 [assembly: NeutralResourcesLanguage("en-US")]
 
 [assembly: ProvideCodeBase(AssemblyName = "Microsoft.NodejsTools", CodeBase = "Microsoft.NodejsTools.dll", Version = AssemblyVersionInfo.StableVersion)]
-[assembly: ProvideCodeBase(AssemblyName = "Microsoft.NodejsTools.Analysis", CodeBase = "Microsoft.NodejsTools.Analysis.dll", Version = AssemblyVersionInfo.StableVersion)]
 [assembly: ProvideCodeBase(AssemblyName = "Microsoft.NodejsTools.Npm", CodeBase = "Microsoft.NodejsTools.Npm.dll", Version = AssemblyVersionInfo.StableVersion)]
 [assembly: ProvideCodeBase(AssemblyName = "Microsoft.NodejsTools.PressAnyKey", CodeBase = "Microsoft.NodejsTools.PressAnyKey.exe", Version = AssemblyVersionInfo.StableVersion)]
 [assembly: ProvideCodeBase(AssemblyName = "Microsoft.NodejsTools.ProjectWizard", CodeBase = "Microsoft.NodejsTools.ProjectWizard.dll", Version = "1.0.0.0")]

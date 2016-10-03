@@ -69,7 +69,7 @@ namespace Microsoft.NodejsTools.Options {
             _showBrowserAndNodeLabels.Checked = page.ShowBrowserAndNodeLabels;
 
             // Disable the show "browser" and "node" labels option when the user is in ES6 IntelliSense Preview mode
-            _showBrowserAndNodeLabels.Enabled = NodejsPackage.Instance.IntellisenseOptionsPage.AnalysisLevel != AnalysisLevel.Preview;
+            _showBrowserAndNodeLabels.Enabled = false;
         }
 
         internal void SyncPageWithControlSettings(NodejsGeneralOptionsPage page) {

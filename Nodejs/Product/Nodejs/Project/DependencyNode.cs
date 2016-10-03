@@ -93,9 +93,7 @@ namespace Microsoft.NodejsTools.Project {
             get { return PkgCmdId.menuIdNpm; }
         }
 
-#if DEV14_OR_LATER
         [Obsolete]
-#endif
         public override object GetIconHandle(bool open) {
             int imageIndex = _projectNode.ImageIndexFromNameDictionary[NodejsProjectImageName.Dependency];
             if (Package.IsMissing) {

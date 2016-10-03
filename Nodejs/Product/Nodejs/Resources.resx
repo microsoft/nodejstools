@@ -589,10 +589,10 @@ You will need to restart Visual Studio after installation.</value>
     <value>Could not find RemoteDebugProxyFolder</value>
   </data>
   <data name="TypingsToolTypingsInstallCompleted" xml:space="preserve">
-    <value>Successfully installed typing files for Intellisense.</value>
+    <value>Successfully installed typing files for IntelliSense.</value>
   </data>
   <data name="TypingsToolNotInstalledError" xml:space="preserve">
-    <value>Could not find Typings package manager tool used for Intellisense</value>
+    <value>Could not find Typings package manager tool used for IntelliSense</value>
   </data>
   <data name="TypingsToolTypingsInstallErrorOccurred" xml:space="preserve">
     <value>An error occurred installing typings used for IntelliSense.</value>
@@ -629,5 +629,8 @@ You will need to restart Visual Studio after installation.</value>
   </data>
   <data name="CouldNotGetTypeScriptLanguagePreferences" xml:space="preserve">
     <value>Could not retrieve Typescript language preferences. NTVS is not able to load. Please ensure Typescript is properly installed.</value>
+  </data>
+  <data name="TypeScriptMinVersionNotInstalled" xml:space="preserve">
+    <value>Node.js Tools requires TypeScript for Visual Studio {0} or higher. Please ensure TypeScript is installed</value>
   </data>
 </root>

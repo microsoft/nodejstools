@@ -22,6 +22,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
@@ -29,7 +30,6 @@ using Microsoft.NodejsTools.Commands;
 using Microsoft.NodejsTools.Debugger.DataTips;
 using Microsoft.NodejsTools.Debugger.DebugEngine;
 using Microsoft.NodejsTools.Debugger.Remote;
-using Microsoft.NodejsTools.Intellisense;
 using Microsoft.NodejsTools.Jade;
 using Microsoft.NodejsTools.Logging;
 using Microsoft.NodejsTools.Options;
@@ -75,13 +75,7 @@ namespace Microsoft.NodejsTools {
     [ProvideProjectFactory(typeof(NodejsProjectFactory), null, null, null, null, ".\\NullPath", LanguageVsTemplate = NodejsConstants.JavaScript, SortPriority=0x17)]   // outer flavor, no file extension
     [ProvideDebugPortSupplier("Node remote debugging", typeof(NodeRemoteDebugPortSupplier), NodeRemoteDebugPortSupplier.PortSupplierId)]
     [ProvideMenuResource(1000, 1)]                              // This attribute is needed to let the shell know that this package exposes some menus.
-    [ProvideBraceCompletion(NodejsConstants.Nodejs)]
-    [ProvideEditorExtension2(typeof(NodejsEditorFactory), NodeJsFileType, 50, "*:1", ProjectGuid = "{78D985FC-2CA0-4D08-9B6B-35ACD5E5294A}", NameResourceID = 102, DefaultName = "server", TemplateDir = ".\\NullPath")]
-    [ProvideEditorExtension2(typeof(NodejsEditorFactoryPromptForEncoding), NodeJsFileType, 50, "*:1", ProjectGuid = "{78D985FC-2CA0-4D08-9B6B-35ACD5E5294A}", NameResourceID = 113, DefaultName = "server")]
-    [ProvideEditorLogicalView(typeof(NodejsEditorFactory), VSConstants.LOGVIEWID.TextView_string)]
-    [ProvideEditorLogicalView(typeof(NodejsEditorFactoryPromptForEncoding), VSConstants.LOGVIEWID.TextView_string)]
     [ProvideProjectItem(typeof(BaseNodeProjectFactory), NodejsConstants.Nodejs, "FileTemplates\\NewItem", 0)]
-    [ProvideLanguageTemplates("{349C5851-65DF-11DA-9384-00065B846F21}", NodejsConstants.JavaScript, Guids.NodejsPackageString, "Web", "Node.js Project Templates", "{" + Guids.NodejsBaseProjectFactoryString + "}", ".js", NodejsConstants.Nodejs, "{" + Guids.NodejsBaseProjectFactoryString + "}")]
     [ProvideTextEditorAutomation(NodejsConstants.Nodejs, 106, 102, ProfileMigrationType.PassThrough)]
     [ProvideLanguageService(typeof(JadeLanguageInfo), JadeContentTypeDefinition.JadeLanguageName, 3041, RequestStockColors = true, ShowSmartIndent = false, ShowCompletion = false, DefaultToInsertSpaces = true, HideAdvancedMembersByDefault = false, EnableAdvancedMembersOption = false, ShowDropDownOptions = false)]
     [ProvideEditorExtension2(typeof(JadeEditorFactory), JadeContentTypeDefinition.JadeFileExtension, 50, __VSPHYSICALVIEWATTRIBUTES.PVA_SupportsPreview, "*:1", ProjectGuid = VSConstants.CLSID.MiscellaneousFilesProject_string, NameResourceID = 3041, EditorNameResourceId = 3045)]
@@ -93,25 +87,32 @@ namespace Microsoft.NodejsTools {
     [ProvideLanguageEditorOptionPage(typeof(NodejsFormattingSpacingOptionsPage), NodejsConstants.Nodejs, "Formatting", "Spacing", "3042")]
     [ProvideLanguageEditorOptionPage(typeof(NodejsFormattingBracesOptionsPage), NodejsConstants.Nodejs, "Formatting", "Braces", "3043")]
     [ProvideLanguageEditorOptionPage(typeof(NodejsFormattingGeneralOptionsPage), NodejsConstants.Nodejs, "Formatting", "General", "3044")]
+#if DEV14
     [ProvideLanguageEditorOptionPage(typeof(NodejsIntellisenseOptionsPage), NodejsConstants.Nodejs, "IntelliSense", "", "3048")]
-    [ProvideLanguageEditorOptionPage(typeof(NodejsAdvancedEditorOptionsPage), NodejsConstants.Nodejs, "Advanced", "", "3050")]
-    [ProvideCodeExpansions(Guids.NodejsLanguageInfoString, false, 106, "Nodejs", @"Snippets\%LCID%\SnippetsIndex.xml", @"Snippets\%LCID%\Nodejs\")]
-    [ProvideCodeExpansionPath("Nodejs", "Test", @"Snippets\%LCID%\Test\")]
+#endif
     internal sealed partial class NodejsPackage : CommonPackage {
         internal const string NodeExpressionEvaluatorGuid = "{F16F2A71-1C45-4BAB-BECE-09D28CFDE3E6}";
         private IContentType _contentType;
-        internal const string NodeJsFileType = ".njs";
         internal static NodejsPackage Instance;
         private string _surveyNewsUrl;
         private object _surveyNewsUrlLock = new object();
         internal HashSet<ITextBuffer> ChangedBuffers = new HashSet<ITextBuffer>();
         private LanguagePreferences _langPrefs;
-        internal VsProjectAnalyzer _analyzer;
         private NodejsToolsLogger _logger;
         private ITelemetryLogger _telemetryLogger;
         // Hold references for the subscribed events. Otherwise the callbacks will be garbage collected
         // after the initialization
         private List<EnvDTE.CommandEvents> _subscribedCommandEvents = new List<EnvDTE.CommandEvents>();
+
+        private static readonly Version _minRequiredTypescriptVersion = new Version("1.8");
+
+        private readonly Lazy<bool> _hasRequiredTypescriptVersion = new Lazy<bool>(() => {
+            Version version;
+            var versionString = GetTypeScriptToolsVersion();
+            return !string.IsNullOrEmpty(versionString)
+                && Version.TryParse(versionString, out version)
+                && version.CompareTo(_minRequiredTypescriptVersion) > -1;
+        });
 
         /// <summary>
         /// Default constructor of the package.
@@ -138,33 +139,9 @@ namespace Microsoft.NodejsTools {
             }
         }
 
-        public NodejsFormattingSpacingOptionsPage FormattingSpacingOptionsPage {
-            get {
-                return (NodejsFormattingSpacingOptionsPage)GetDialogPage(typeof(NodejsFormattingSpacingOptionsPage));
-            }
-        }
-
-        public NodejsFormattingBracesOptionsPage FormattingBracesOptionsPage {
-            get {
-                return (NodejsFormattingBracesOptionsPage)GetDialogPage(typeof(NodejsFormattingBracesOptionsPage));
-            }
-        }
-
-        public NodejsFormattingGeneralOptionsPage FormattingGeneralOptionsPage {
-            get {
-                return (NodejsFormattingGeneralOptionsPage)GetDialogPage(typeof(NodejsFormattingGeneralOptionsPage));
-            }
-        }
-
         public NodejsIntellisenseOptionsPage IntellisenseOptionsPage {
             get {
                 return (NodejsIntellisenseOptionsPage)GetDialogPage(typeof(NodejsIntellisenseOptionsPage));
-            }
-        }
-
-        public NodejsAdvancedEditorOptionsPage AdvancedEditorOptionsPage {
-            get {
-                return (NodejsAdvancedEditorOptionsPage)GetDialogPage(typeof(NodejsAdvancedEditorOptionsPage));
             }
         }
 
@@ -192,6 +169,14 @@ namespace Microsoft.NodejsTools {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
 
+            if (!_hasRequiredTypescriptVersion.Value) {
+                MessageBox.Show(
+                   Project.SR.GetString(Project.SR.TypeScriptMinVersionNotInstalled, _minRequiredTypescriptVersion.ToString()),
+                   Project.SR.ProductName,
+                   MessageBoxButtons.OK,
+                   MessageBoxIcon.Error);
+            }
+
             SubscribeToVsCommandEvents(
                 (int)VSConstants.VSStd97CmdID.AddNewProject,
                 delegate { NewProjectFromExistingWizard.IsAddNewProjectCmd = true; },
@@ -204,8 +189,6 @@ namespace Microsoft.NodejsTools {
             ((IServiceContainer)this).AddService(typeof(ClipboardServiceBase), new ClipboardService(), true);
 
             RegisterProjectFactory(new NodejsProjectFactory(this));
-            RegisterEditorFactory(new NodejsEditorFactory(this));
-            RegisterEditorFactory(new NodejsEditorFactoryPromptForEncoding(this));
             RegisterEditorFactory(new JadeEditorFactory(this));
 
             // Add our command handlers for menu (commands must exist in the .vsct file)
@@ -215,7 +198,9 @@ namespace Microsoft.NodejsTools {
                 new OpenRemoteDebugDocumentationCommand(),
                 new SurveyNewsCommand(),
                 new ImportWizardCommand(),
-                new DiagnosticsCommand(this)
+                new DiagnosticsCommand(this),
+                new SendFeedbackCommand(),
+                new ShowDocumentationCommand()
             };
             try {
                 commands.Add(new AzureExplorerAttachDebuggerCommand());
@@ -240,10 +225,6 @@ namespace Microsoft.NodejsTools {
             textManagerEventsConnectionPoint.Advise(new DataTipTextManagerEvents(this), out cookie);
 
             MakeDebuggerContextAvailable();
-
-            IntellisenseOptionsPage.AnalysisLogMaximumChanged += IntellisenseOptionsPage_AnalysisLogMaximumChanged;
-            IntellisenseOptionsPage.AnalysisLevelChanged += IntellisenseOptionsPageAnalysisLevelChanged;
-            IntellisenseOptionsPage.SaveToDiskChanged += IntellisenseOptionsPageSaveToDiskChanged;
 
             InitializeLogging();
 
@@ -282,19 +263,11 @@ namespace Microsoft.NodejsTools {
             _subscribedCommandEvents.Add(targetEvent);
         }
 
-
-        private void IntellisenseOptionsPage_AnalysisLogMaximumChanged(object sender, EventArgs e) {
-            if (_analyzer != null) {
-                _analyzer.MaxLogLength = IntellisenseOptionsPage.AnalysisLogMax;
-            }
-        }
-
         private void InitializeLogging() {
             _logger = new NodejsToolsLogger(ComponentModel.GetExtensions<INodejsToolsLogger>().ToArray());
 
             // log interesting stats on startup
             _logger.LogEvent(NodejsToolsLogEvent.SurveyNewsFrequency, GeneralOptionsPage.SurveyNewsCheck);
-            _logger.LogEvent(NodejsToolsLogEvent.AnalysisLevel, IntellisenseOptionsPage.AnalysisLevel);
         }
 
         private void InitializeTelemetry() {
@@ -588,67 +561,49 @@ namespace Microsoft.NodejsTools {
         }
 
         internal static void NavigateTo(string filename, int line, int col) {
-            VsUtilities.NavigateTo(Instance, filename, NodejsProjectNode.IsNodejsFile(filename) ? typeof(NodejsEditorFactory).GUID : Guid.Empty, line, col);
+            VsUtilities.NavigateTo(Instance, filename, Guid.Empty, line, col);
         }
 
         internal static void NavigateTo(string filename, int pos) {
-            VsUtilities.NavigateTo(Instance, filename, NodejsProjectNode.IsNodejsFile(filename) ? typeof(NodejsEditorFactory).GUID : Guid.Empty, pos);
+            VsUtilities.NavigateTo(Instance, filename, Guid.Empty, pos);
         }
 
-        /// <summary>
-        /// The analyzer which is used for loose files.
-        /// </summary>
-        internal VsProjectAnalyzer DefaultAnalyzer {
-            get {
-                if (_analyzer == null) {
-                    _analyzer = CreateLooseVsProjectAnalyzer();
-                    LogLooseFileAnalysisLevel();
-                    _analyzer.MaxLogLength = IntellisenseOptionsPage.AnalysisLogMax;
+        private static string GetTypeScriptToolsVersion() {
+            var toolsVersion = string.Empty;
+            try {
+                object installDirAsObject = null;
+                var shell = NodejsPackage.Instance.GetService(typeof(SVsShell)) as IVsShell;
+                if (shell != null) {
+                    shell.GetProperty((int)__VSSPROPID.VSSPROPID_InstallDirectory, out installDirAsObject);
                 }
-                return _analyzer;
-            }
-        }
 
-        private void IntellisenseOptionsPageSaveToDiskChanged(object sender, EventArgs e) {
-            if (_analyzer != null) {
-                _analyzer.SaveToDisk = IntellisenseOptionsPage.SaveToDisk;
-            }
-        }
-
-        private void IntellisenseOptionsPageAnalysisLevelChanged(object sender, EventArgs e) {
-            if (_analyzer != null) {
-                var analyzer = CreateLooseVsProjectAnalyzer();
-                analyzer.SwitchAnalyzers(_analyzer);
-                if (_analyzer.RemoveUser()) {
-                    _analyzer.Dispose();
+                var idePath = CommonUtils.NormalizeDirectoryPath((string)installDirAsObject) ?? string.Empty;
+                if (string.IsNullOrEmpty(idePath)) {
+                    return toolsVersion;
                 }
-                _analyzer = analyzer;
-                LogLooseFileAnalysisLevel();
-            }
-            TelemetryLogger.LogAnalysisLevelChanged(IntellisenseOptionsPage.AnalysisLevel);
-        }
 
-        private VsProjectAnalyzer CreateLooseVsProjectAnalyzer() {
-            // In ES6 IntelliSense mode, rather than overriding the default JS editor,
-            // we throw to Salsa. If Salsa detects that it's not operating within the Node.js project context,
-            // it will throw to JSLS. This means that currently, loose files will be handled by the JSLS editor,
-            // rather than the NodeLS editor (which means that the loose project analyzer will not be invoked
-            // in these scenarios.)
-            //
-            // Because Salsa doesn't support the stitching together inputs from the surrounding text view,
-            // we do not throw to Salsa from the REPL window. However, in order to provide a workable editing
-            // experience within the REPL context, we initialize the loose analyzer with Quick IntelliSense
-            // during ES6 mode.
-            var analysisLevel = IntellisenseOptionsPage.AnalysisLevel == AnalysisLevel.Preview ? AnalysisLevel.NodeLsMedium : IntellisenseOptionsPage.AnalysisLevel;
-            return new VsProjectAnalyzer(analysisLevel, false);
-        }
+                var typeScriptServicesPath = Path.Combine(idePath, @"CommonExtensions\Microsoft\TypeScript\typescriptServices.js");
+                if (!File.Exists(typeScriptServicesPath)) {
+                    return toolsVersion;
+                }
 
-        private void LogLooseFileAnalysisLevel() {
-            var analyzer = _analyzer;
-            if (analyzer != null) {
-                var val = analyzer.AnalysisLevel;
-                _logger.LogEvent(NodejsToolsLogEvent.AnalysisLevel, (int)val);
+                var regex = new Regex(@"toolsVersion = ""(?<version>\d.\d?)"";");
+                var fileText = File.ReadAllText(typeScriptServicesPath);
+                var match = regex.Match(fileText);
+
+                var version = match.Groups["version"].Value;
+                if (!string.IsNullOrWhiteSpace(version)) {
+                    toolsVersion = version;
+                }
+            } catch (Exception ex) {
+                if (ex.IsCriticalException()) {
+                    throw;
+                }
+
+                Debug.WriteLine(string.Format("Failed to obtain TypeScript tools version: {0}", ex.ToString()));
             }
+
+            return toolsVersion;
         }
     }
 }
