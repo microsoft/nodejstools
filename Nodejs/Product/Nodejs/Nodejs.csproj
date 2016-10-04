@@ -1094,10 +1094,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="nodejsref.js">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <ZipProject Include="ProjectTemplates\NodejsWebApp\server.js" />
     <Content Include="visualstudio_nodejs_repl.js">
       <IncludeInVSIX>true</IncludeInVSIX>
