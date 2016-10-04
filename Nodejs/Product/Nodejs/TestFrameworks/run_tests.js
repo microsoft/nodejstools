@@ -1,10 +1,29 @@
 var framework;
+var readline = require('readline');
 var result = {
     "title": "",
     "passed": false,
     "stdOut": "",
     "stdErr": ""
 };
+var rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+try {
+    framework = require('./' + process.argv[2] + '/' + process.argv[2] + '.js');
+} catch (exception) {
+    console.log("NTVS_ERROR:Failed to load TestFramework (" + process.argv[2] + "), " + exception);
+    process.exit(1);
+}
+
+rl.on('line', (line) => {
+    var data = JSON.parse(line);
+    console.log(JSON.stringify(data));
+    result.title = data.testName.replace(' ', '::');
+    framework.run_tests(data.testName, data.testFile, data.workingFolder, data.projectFolder);
+});
 
 process.stdout.write = (function (write) {
     return function (string, encoding, fileDescriptor) {
@@ -20,18 +39,10 @@ process.stderr.write = (function (write) {
     };
 })(process.stderr.write);
 
-try {
-    framework = require('./' + process.argv[2] + '/' + process.argv[2] + '.js');
-} catch (exception) {
-    console.log("NTVS_ERROR:Failed to load TestFramework (" + process.argv[2] + "), " + exception);
-    process.exit(1);
-}
-
 process.on('exit', (code) => {
     result.passed = code === 0 ? true : false;
     console.log(JSON.stringify(result));
+    // clear stdOut and stdErr
+    result.stdErr = "";
+    result.stdOut = "";
 });
-
-result.title = process.argv[3].replace(' ', '::');
-
-framework.run_tests(process.argv[3], process.argv[4], process.argv[5], process.argv[6]);
