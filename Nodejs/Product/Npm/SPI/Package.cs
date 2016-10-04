@@ -25,12 +25,13 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         public Package(
             IRootPackage parent,
-            string fullPathToRootDirectory,
+            string fullPathToRootInstallDirectory,
+            string pathToPackageDirectory,
             bool showMissingDevOptionalSubPackages,
             Dictionary<string, ModuleInfo> allModules = null,
             int depth = 0,
             int maxDepth = 1)
-            : base(fullPathToRootDirectory, showMissingDevOptionalSubPackages, allModules, depth, maxDepth) {
+            : base(fullPathToRootInstallDirectory, pathToPackageDirectory, showMissingDevOptionalSubPackages, allModules, depth, maxDepth) {
             _parent = parent;
         }
 

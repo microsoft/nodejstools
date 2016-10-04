@@ -48,13 +48,13 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                         // _requiredBy dependencies that begin with hash characters represent top-level dependencies
                         foreach (var requiredBy in packageJson.RequiredBy) {
                             if (requiredBy.StartsWith("#") || requiredBy == "/") {
-                                AddTopLevelModule(parent, showMissingDevOptionalSubPackages, moduleDir, depth, maxDepth);
+                                AddTopLevelModule(parent, showMissingDevOptionalSubPackages, moduleDir, "", depth, maxDepth);
                                 break;
                             }
                         }
                     } else {
                         // This dependency is a top-level dependency not added by npm v3
-                        AddTopLevelModule(parent, showMissingDevOptionalSubPackages, moduleDir, depth, maxDepth);
+                        AddTopLevelModule(parent, showMissingDevOptionalSubPackages, moduleDir, "", depth, maxDepth);
                     }
                 }
             }
@@ -68,12 +68,15 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 foreach (var dependency in dependencies) {
                     var moduleDir = modulesBase;
 
+                    // Handle scoped modules
+                    var modulePath = Path.Combine(dependency.Name.Split('/'));
+
                     // try to find folder by recursing up tree
                     do {
-                        moduleDir = Path.Combine(moduleDir, dependency.Name);
-                        if (AddModuleIfNotExists(parent, moduleDir, showMissingDevOptionalSubPackages, depth, maxDepth, dependency)) {
+                        if (AddModuleIfNotExists(parent, moduleDir, modulePath, showMissingDevOptionalSubPackages, depth, maxDepth, dependency)) {
                             break;
                         }
+                        moduleDir = Path.Combine(moduleDir, modulePath);
 
                         var parentNodeModulesIndex = moduleDir.LastIndexOf(NodejsConstants.NodeModulesFolder, Math.Max(0, moduleDir.Length - NodejsConstants.NodeModulesFolder.Length - dependency.Name.Length - 1));
                         moduleDir = moduleDir.Substring(0, parentNodeModulesIndex + NodejsConstants.NodeModulesFolder.Length);
@@ -84,14 +87,15 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             _packagesSorted.Sort(new PackageComparer());
         }
 
-        private void AddTopLevelModule(IRootPackage parent, bool showMissingDevOptionalSubPackages, string moduleDir, int depth, int maxDepth) {
+        private void AddTopLevelModule(IRootPackage parent, bool showMissingDevOptionalSubPackages, string moduleDir, string modulePath, int depth, int maxDepth) {
             Debug.Assert(depth == 0, "Depth should be 0 when adding a top level dependency");
-            AddModuleIfNotExists(parent, moduleDir, showMissingDevOptionalSubPackages, depth, maxDepth);
+            AddModuleIfNotExists(parent, moduleDir, modulePath, showMissingDevOptionalSubPackages, depth, maxDepth);
         }
 
-        private bool AddModuleIfNotExists(IRootPackage parent, string moduleDir, bool showMissingDevOptionalSubPackages, int depth, int maxDepth, IDependency dependency = null) {
+        private bool AddModuleIfNotExists(IRootPackage parent, string rootDir, string modulePath, bool showMissingDevOptionalSubPackages, int depth, int maxDepth, IDependency dependency = null) {
             depth++;
 
+            var moduleDir = Path.Combine(rootDir, modulePath);
             ModuleInfo moduleInfo;
             _allModules.TryGetValue(moduleDir, out moduleInfo);
 
@@ -124,7 +128,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
                 moduleInfo.RequiredBy.Add(parent.Path);
 
-                var pkg = new Package(parent, moduleDir, showMissingDevOptionalSubPackages, _allModules, depth, maxDepth);
+                var pkg = new Package(parent, rootDir, modulePath, showMissingDevOptionalSubPackages, _allModules, depth, maxDepth);
                 if (dependency != null) {
                     pkg.RequestedVersionRange = dependency.VersionRangeText;
                 }

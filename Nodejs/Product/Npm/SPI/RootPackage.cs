@@ -20,17 +20,21 @@ using Microsoft.CSharp.RuntimeBinder;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal class RootPackage : IRootPackage {
+        private readonly string _pathToPackageDirectory;
+
         public RootPackage(
-            string fullPathToRootDirectory,
+            string fullPathToRootInstallDirectory,
+            string pathToPackageDirectory,
             bool showMissingDevOptionalSubPackages,
             Dictionary<string, ModuleInfo> allModules = null,
             int depth = 0,
             int maxDepth = 1) {
-            Path = fullPathToRootDirectory;
-            var packageJsonFile = System.IO.Path.Combine(fullPathToRootDirectory, "package.json");
+            _pathToPackageDirectory = pathToPackageDirectory;
+            Path = System.IO.Path.Combine(fullPathToRootInstallDirectory, pathToPackageDirectory);
+            var packageJsonFile = System.IO.Path.Combine(Path, "package.json");
             try {
                 if (packageJsonFile.Length < 260) {
-                    PackageJson = PackageJsonFactory.Create(new DirectoryPackageJsonSource(fullPathToRootDirectory));
+                    PackageJson = PackageJsonFactory.Create(new DirectoryPackageJsonSource(Path));
                 }
             } catch (RuntimeBinderException rbe) {
                 throw new PackageJsonException(
@@ -58,7 +62,15 @@ The following error was reported:
         }
 
         public string Name {
-            get { return null == PackageJson ? new DirectoryInfo(Path).Name : PackageJson.Name; }
+            get {
+                if (PackageJson != null) {
+                    return PackageJson.Name;
+                } else if (!string.IsNullOrEmpty(_pathToPackageDirectory)) {
+                    return _pathToPackageDirectory.Replace('\\', '/');
+                } else {
+                    return new DirectoryInfo(Path).Name;
+                }
+            }
         }
 
         public SemverVersion Version {
