@@ -233,6 +233,13 @@ namespace Microsoft.NodejsTools {
             // The variable is inherited by child processes backing Test Explorer, and is used in
             // the NTVS test discoverer and test executor to connect back to VS.
             Environment.SetEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable, Process.GetCurrentProcess().Id.ToString());
+
+#if DEV15
+            var root = Environment.GetEnvironmentVariable("VsInstallRoot");
+            if (!string.IsNullOrEmpty(root)) {
+                Environment.SetEnvironmentVariable(NodejsConstants.NodeToolsVsInstallRootEnvironmentVariable, root);
+            }
+#endif
         }
 
         public static LANGPREFERENCES3[] GetNodejsLanguagePreferencesFromTypeScript(IVsTextManager4 textMgr) {
