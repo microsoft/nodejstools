@@ -6,24 +6,6 @@ var result = {
     "stdOut": "",
     "stdErr": ""
 };
-var rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-
-try {
-    framework = require('./' + process.argv[2] + '/' + process.argv[2] + '.js');
-} catch (exception) {
-    console.log("NTVS_ERROR:Failed to load TestFramework (" + process.argv[2] + "), " + exception);
-    process.exit(1);
-}
-
-rl.on('line', (line) => {
-    var data = JSON.parse(line);
-    console.log(JSON.stringify(data));
-    result.title = data.testName.replace(' ', '::');
-    framework.run_tests(data.testName, data.testFile, data.workingFolder, data.projectFolder);
-});
 
 process.stdout.write = (function (write) {
     return function (string, encoding, fileDescriptor) {
@@ -38,6 +20,29 @@ process.stderr.write = (function (write) {
         write.apply(process.stderr, arguments);
     };
 })(process.stderr.write);
+
+var rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+rl.on('line', (line) => {
+    var data = JSON.parse(line);
+    result.title = data.testName.replace(' ', '::');
+    // get rid of leftover quotations from C#
+    for(var s in data) {
+        data[s] = data[s].replace(/['"]+/g, '');
+    }
+    // run the test
+    framework.run_tests(data.testName, data.testFile, data.workingFolder, data.projectFolder);
+});
+
+try {
+    framework = require('./' + process.argv[2] + '/' + process.argv[2] + '.js');
+} catch (exception) {
+    console.log("NTVS_ERROR:Failed to load TestFramework (" + process.argv[2] + "), " + exception);
+    process.exit(1);
+}
 
 process.on('exit', (code) => {
     result.passed = code === 0 ? true : false;

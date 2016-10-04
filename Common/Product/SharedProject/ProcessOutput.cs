@@ -424,7 +424,7 @@ namespace Microsoft.VisualStudioTools.Project {
                 if (_process.StartInfo.RedirectStandardInput) {
                     // Close standard input so that we don't get stuck trying to read input from the user.
                     try {
-                        _process.StandardInput.Close();
+                        //_process.StandardInput.Close();
                     } catch (InvalidOperationException) {
                         // StandardInput not available
                     }
@@ -496,6 +496,19 @@ namespace Microsoft.VisualStudioTools.Project {
         public string Arguments {
             get {
                 return _arguments;
+            }
+        }
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        public StreamWriter StandardInput {
+            get
+            {
+                if (_process == null) {
+                    return null;
+                }
+                return _process.StandardInput;
             }
         }
 
