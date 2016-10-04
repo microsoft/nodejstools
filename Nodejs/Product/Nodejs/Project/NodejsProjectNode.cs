@@ -272,6 +272,7 @@ namespace Microsoft.NodejsTools.Project {
             get { return NodejsConstants.IssueTrackerUrl; }
         }
 
+#if DEV14
         protected override void FinishProjectCreation(string sourceFolder, string destFolder) {
             foreach (MSBuild.ProjectItem item in this.BuildProject.Items) {
                 if (IsProjectTypeScriptSourceFile(item.EvaluatedInclude)) {
@@ -307,6 +308,7 @@ namespace Microsoft.NodejsTools.Project {
 
             base.FinishProjectCreation(sourceFolder, destFolder);
         }
+#endif
 
         protected override void AddNewFileNodeToHierarchy(HierarchyNode parentNode, string fileName) {
             base.AddNewFileNodeToHierarchy(parentNode, fileName);
