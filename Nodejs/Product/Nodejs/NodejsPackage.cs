@@ -27,7 +27,6 @@ using System.Threading;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.Commands;
-using Microsoft.NodejsTools.Debugger.DataTips;
 using Microsoft.NodejsTools.Debugger.DebugEngine;
 using Microsoft.NodejsTools.Debugger.Remote;
 using Microsoft.NodejsTools.Jade;
@@ -39,11 +38,9 @@ using Microsoft.NodejsTools.Repl;
 using Microsoft.NodejsTools.Telemetry;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
-using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
@@ -97,7 +94,6 @@ namespace Microsoft.NodejsTools {
         private string _surveyNewsUrl;
         private object _surveyNewsUrlLock = new object();
         internal HashSet<ITextBuffer> ChangedBuffers = new HashSet<ITextBuffer>();
-        private LanguagePreferences _langPrefs;
         private NodejsToolsLogger _logger;
         private ITelemetryLogger _telemetryLogger;
         // Hold references for the subscribed events. Otherwise the callbacks will be garbage collected
@@ -208,22 +204,6 @@ namespace Microsoft.NodejsTools {
             }
             RegisterCommands(commands, Guids.NodejsCmdSet);
 
-            IVsTextManager4 textMgr = (IVsTextManager4)Instance.GetService(typeof(SVsTextManager));
-
-            LANGPREFERENCES3[] langPrefs = GetNodejsLanguagePreferencesFromTypeScript(textMgr);
-            _langPrefs = new LanguagePreferences(langPrefs[0]);
-
-            var textManagerEvents2Guid = typeof(IVsTextManagerEvents4).GUID;
-            IConnectionPoint textManagerEvents2ConnectionPoint;
-            ((IConnectionPointContainer)textMgr).FindConnectionPoint(ref textManagerEvents2Guid, out textManagerEvents2ConnectionPoint);
-            uint cookie;
-            textManagerEvents2ConnectionPoint.Advise(_langPrefs, out cookie);
-
-            var textManagerEventsGuid = typeof(IVsTextManagerEvents).GUID;
-            IConnectionPoint textManagerEventsConnectionPoint;
-            ((IConnectionPointContainer)textMgr).FindConnectionPoint(ref textManagerEventsGuid, out textManagerEventsConnectionPoint);
-            textManagerEventsConnectionPoint.Advise(new DataTipTextManagerEvents(this), out cookie);
-
             MakeDebuggerContextAvailable();
 
             InitializeLogging();
@@ -240,19 +220,6 @@ namespace Microsoft.NodejsTools {
                 Environment.SetEnvironmentVariable(NodejsConstants.NodeToolsVsInstallRootEnvironmentVariable, root);
             }
 #endif
-        }
-
-        public static LANGPREFERENCES3[] GetNodejsLanguagePreferencesFromTypeScript(IVsTextManager4 textMgr) {
-            var langPrefs = new LANGPREFERENCES3[1];
-            langPrefs[0].guidLang = Guids.TypeScriptLanguageInfo;
-            int hr = textMgr.GetUserPreferences4(null, langPrefs, null);
-            if (ErrorHandler.Failed(hr)) {
-                MessageBox.Show(Project.SR.GetString(Project.SR.CouldNotGetTypeScriptLanguagePreferences), Project.SR.ProductName);
-                ErrorHandler.ThrowOnFailure(hr);
-            }
-            langPrefs[0].guidLang = typeof(NodejsLanguageInfo).GUID;
-            textMgr.SetUserPreferences4(null, langPrefs, null);
-            return langPrefs;
         }
 
         private void SubscribeToVsCommandEvents(
@@ -357,13 +324,6 @@ namespace Microsoft.NodejsTools {
                 directory = Path.GetDirectoryName(fileName);
             }
             return true;
-        }
-
-
-        internal LanguagePreferences LangPrefs {
-            get {
-                return _langPrefs;
-            }
         }
 
         private IContentType ReplContentType {

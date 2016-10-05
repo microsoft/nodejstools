@@ -121,7 +121,6 @@
     <Compile Include="OptionHolder.cs" />
     <Compile Include="ProjectPropertiesTests.cs" />
     <Compile Include="ProjectTests.cs" />
-    <Compile Include="SmartIndent.cs" />
     <Compile Include="BasicProjectTests.cs" />
     <Compile Include="NodejsProjectProcessor.cs" />
     <Compile Include="NodejsProjectTest.cs" />
