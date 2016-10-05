@@ -415,10 +415,10 @@ namespace Microsoft.VisualStudioTools.Project {
 
             if (_process != null) {
                 if (_process.StartInfo.RedirectStandardOutput) {
-                    _process.BeginOutputReadLine();
+                    //_process.BeginOutputReadLine();
                 }
                 if (_process.StartInfo.RedirectStandardError) {
-                    _process.BeginErrorReadLine();
+                    //_process.BeginErrorReadLine();
                 }
                 
                 if (_process.StartInfo.RedirectStandardInput) {
@@ -509,6 +509,20 @@ namespace Microsoft.VisualStudioTools.Project {
                     return null;
                 }
                 return _process.StandardInput;
+            }
+        }
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        public StreamReader StandardOutput {
+            get
+            {
+                if(_process == null || !_process.StartInfo.RedirectStandardOutput || _process.StartInfo.UseShellExecute) {
+                    return null;
+                }
+
+                return _process.StandardOutput;
             }
         }
 
