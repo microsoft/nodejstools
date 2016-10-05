@@ -21,8 +21,8 @@ using System.Windows.Forms;
 namespace Microsoft.NodejsTools.Options {
     [ComVisible(true)]
     public class NodejsGeneralOptionsPage : NodejsDialogPage {
-        private const string DefaultSurveyNewsFeedUrl = "http://go.microsoft.com/fwlink/?LinkId=328027";
-        private const string DefaultSurveyNewsIndexUrl = "http://go.microsoft.com/fwlink/?LinkId=328029";
+        private const string DefaultSurveyNewsFeedUrl = "https://go.microsoft.com/fwlink/?LinkId=328027";
+        private const string DefaultSurveyNewsIndexUrl = "https://go.microsoft.com/fwlink/?LinkId=328029";
         private const string SurveyNewsCheckSetting = "SurveyNewsCheck";
         private const string SurveyNewsLastCheckSetting = "SurveyNewsLastCheck";
         private const string SurveyNewsFeedUrlSetting = "SurveyNewsFeedUrl";

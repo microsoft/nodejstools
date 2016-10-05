@@ -33,7 +33,7 @@ namespace Microsoft.NodejsTools.Options {
         }
 
         private void _analysisPreviewFeedbackLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
-            Process.Start("http://go.microsoft.com/fwlink/?LinkID=808344");
+            Process.Start("https://go.microsoft.com/fwlink/?LinkID=808344");
         }
 
         private void _intelliSenseModeDropdown_SelectedValueChanged(object sender, EventArgs e) {
