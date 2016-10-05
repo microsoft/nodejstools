@@ -68,6 +68,7 @@ namespace Microsoft.NodejsTools {
         internal const string TypeScript = "TypeScript";
 
         internal const string NodeToolsProcessIdEnvironmentVariable = "_NTVS_PID";
+        internal const string NodeToolsVsInstallRootEnvironmentVariable = "_NTVS_VSINSTALLROOT";
 
         public static string NtvsLocalAppData {
             get {

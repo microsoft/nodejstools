@@ -46,7 +46,16 @@ namespace Microsoft.NodejsTools.TestAdapter {
             ValidateArg.NotNull(discoverySink, "discoverySink");
             ValidateArg.NotNull(logger, "logger");
 
-            using (var buildEngine = new MSBuild.ProjectCollection()) {
+            var env = new Dictionary<string, string>();
+#if DEV15
+            var root = Environment.GetEnvironmentVariable(NodejsConstants.NodeToolsVsInstallRootEnvironmentVariable);
+            if (!string.IsNullOrEmpty(root)) {
+                env["VsInstallRoot"] = root;
+                env["MSBuildExtensionsPath32"] = Path.Combine(root, "MSBuild");
+            }
+#endif
+
+            using (var buildEngine = new MSBuild.ProjectCollection(env)) {
                 try {
                     // Load all the test containers passed in (.njsproj msbuild files)
                     foreach (string source in sources) {
