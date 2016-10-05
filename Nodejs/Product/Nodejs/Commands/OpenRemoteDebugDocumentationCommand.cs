@@ -21,7 +21,7 @@ using Microsoft.VisualStudioTools;
 namespace Microsoft.NodejsTools.Commands {
     internal sealed class OpenRemoteDebugDocumentationCommand : Command {
         public override void DoCommand(object sender, EventArgs args) {
-            Process.Start("http://go.microsoft.com/fwlink/?LinkId=525504");
+            Process.Start("https://go.microsoft.com/fwlink/?LinkId=525504");
         }
 
         public override int CommandId {

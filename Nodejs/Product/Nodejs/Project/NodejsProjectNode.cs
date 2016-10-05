@@ -745,13 +745,13 @@ namespace Microsoft.NodejsTools.Project {
                 taskDialog.HyperlinkClicked += (sender, e) => {
                     switch (e.Url) {
                         case "#msdn":
-                            Process.Start("http://go.microsoft.com/fwlink/?LinkId=454508");
+                            Process.Start("https://go.microsoft.com/fwlink/?LinkId=454508");
                             break;
                         case "#uservoice":
-                            Process.Start("http://go.microsoft.com/fwlink/?LinkID=456509");
+                            Process.Start("https://go.microsoft.com/fwlink/?LinkID=456509");
                             break;
                         case "#help":
-                            Process.Start("http://go.microsoft.com/fwlink/?LinkId=456511");
+                            Process.Start("https://go.microsoft.com/fwlink/?LinkId=456511");
                             break;
                         default:
                             System.Windows.Clipboard.SetText(e.Url);
