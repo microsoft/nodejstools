@@ -27,22 +27,22 @@ var rl = readline.createInterface({
 });
 
 rl.on('line', (line) => {
-    var data = JSON.parse(line);
-    result.title = data.testName.replace(' ', '::');
+    var testInfo = JSON.parse(line);
+    result.title = testInfo.testName.replace(' ', '::');
     // get rid of leftover quotations from C#
-    for(var s in data) {
-        data[s] = data[s].replace(/['"]+/g, '');
+    for(var s in testInfo) {
+        testInfo[s] = testInfo[s].replace(/['"]+/g, '');
+    }
+
+    try {
+        framework = require('./' + testInfo.framework + '/' + testInfo.framework + '.js');
+    } catch (exception) {
+        console.log("NTVS_ERROR:Failed to load TestFramework (" + process.argv[2] + "), " + exception);
+        process.exit(1);
     }
     // run the test
-    framework.run_tests(data.testName, data.testFile, data.workingFolder, data.projectFolder);
+    framework.run_tests(testInfo.testName, testInfo.testFile, testInfo.workingFolder, testInfo.projectFolder);
 });
-
-try {
-    framework = require('./' + process.argv[2] + '/' + process.argv[2] + '.js');
-} catch (exception) {
-    console.log("NTVS_ERROR:Failed to load TestFramework (" + process.argv[2] + "), " + exception);
-    process.exit(1);
-}
 
 process.on('exit', (code) => {
     result.passed = code === 0 ? true : false;

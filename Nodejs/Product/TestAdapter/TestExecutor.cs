@@ -206,7 +206,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 frameworkHandle.SendMessage(TestMessageLevel.Informational, _nodeProcess.Arguments);
 #endif
                 // send test to run_tests.js
-                TestCaseObject testObject = new TestCaseObject(args[2], args[3], args[4], args[5]);
+                TestCaseObject testObject = new TestCaseObject(args[1], args[2], args[3], args[4], args[5]);
                 _nodeProcess.StandardInput.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(testObject));
 
                 _nodeProcess.Wait(TimeSpan.FromMilliseconds(500));
@@ -335,18 +335,21 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
         class TestCaseObject {
             public TestCaseObject() {
+                framework = String.Empty;
                 testName = String.Empty;
                 testFile = String.Empty;
                 workingFolder = String.Empty;
                 projectFolder = String.Empty;
             }
 
-            public TestCaseObject(string testName, string testFile, string workingFolder, string projectFolder) {
+            public TestCaseObject(string framework, string testName, string testFile, string workingFolder, string projectFolder) {
+                this.framework = framework;
                 this.testName = testName;
                 this.testFile = testFile;
                 this.workingFolder = workingFolder;
                 this.projectFolder = projectFolder;
             }
+            public string framework { get; set; }
             public string testName { get; set; }
             public string testFile { get; set; }
             public string workingFolder { get; set; }
