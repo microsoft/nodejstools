@@ -49,40 +49,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
     [ExtensionUri(TestExecutor.ExecutorUriString)]
     class TestExecutor : ITestExecutor {
-        class TestRedirector : Redirector {
-            public override void WriteErrorLine(string line) {
-                throw new NotImplementedException();
-            }
-
-            public override void WriteLine(string line) {
-                var result = ParseTestResult(line);
-                if (result == null) {
-                    return;
-                }
-
-                Console.WriteLine("TEST! " + result.ToString());
-            }
-
-            public override void Show() {
-                base.Show();
-            }
-
-            public override void ShowAndActivate() {
-                base.ShowAndActivate();
-            }
-
-            private ResultObject ParseTestResult(string line) {
-                JObject jsonResult = null;
-                try {
-                    jsonResult = JObject.Parse(line);
-                }
-                catch (Exception ex) {
-                    Console.WriteLine(ex.Message);
-                }
-                return jsonResult != null ? jsonResult.ToObject<ResultObject>() : null;
-            }
-        }
-
         public const string ExecutorUriString = "executor://NodejsTestExecutor/v1";
         public static readonly Uri ExecutorUri = new Uri(ExecutorUriString);
         //get from NodeRemoteDebugPortSupplier::PortSupplierId
@@ -92,7 +58,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
         private ProcessOutput _nodeProcess;
         private object _syncObject = new object();
-        private TestRedirector _testRedirector = new TestRedirector();
 
         public void Cancel() {
             //let us just kill the node process there, rather do it late, because VS engine process 
@@ -165,6 +130,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 }
             }
         }
+
         private static int GetFreePort() {
             return Enumerable.Range(new Random().Next(49152, 65536), 60000).Except(
                 from connection in IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpConnections()
@@ -224,6 +190,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 frameworkHandle.SendMessage(TestMessageLevel.Error, "Interpreter path does not exist: " + settings.NodeExePath);
                 return;
             }
+
             lock (_syncObject) {
                 _nodeProcess = ProcessOutput.Run(
                                         settings.NodeExePath,
@@ -240,8 +207,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
 #endif
                 // send test to run_tests.js
                 TestCaseObject testObject = new TestCaseObject(args[2], args[3], args[4], args[5]);
-                string o = Newtonsoft.Json.JsonConvert.SerializeObject(testObject);
-                _nodeProcess.StandardInput.WriteLine(o);
+                _nodeProcess.StandardInput.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(testObject));
 
                 _nodeProcess.Wait(TimeSpan.FromMilliseconds(500));
                 if (runContext.IsBeingDebugged && app != null) {
@@ -268,11 +234,19 @@ namespace Microsoft.NodejsTools.TestAdapter {
 #endif
                 }
             }
-
-
-
             WaitHandle.WaitAll(new WaitHandle[] { _nodeProcess.WaitHandle });
-            var result = ParseTestResult(_nodeProcess.StandardOutputLines);
+            // at this point the test is definitely done executing
+            ResultObject result = null;
+
+            using (StreamReader sr = _nodeProcess.StandardOutput) {
+                while(sr.Peek() >= 0) {
+                    result = ParseTestResult(sr.ReadLine());
+                    if(result == null) {
+                        continue;
+                    }
+                    break;
+                }
+            }
 
             bool runCancelled = _cancelRequested.WaitOne(0);
             RecordEnd(frameworkHandle, test, testResult,
@@ -282,9 +256,14 @@ namespace Microsoft.NodejsTools.TestAdapter {
             _nodeProcess.Dispose();
         }
 
-        private ResultObject ParseTestResult(IEnumerable<string> standardOutputLines) {
-            JObject jsonResult = JObject.Parse(standardOutputLines.ElementAt(standardOutputLines.Count() - 1));
-           return jsonResult.ToObject<ResultObject>();
+        private ResultObject ParseTestResult(string line) {
+            JObject jsonResult = null;
+            try {
+                jsonResult = JObject.Parse(line);
+            }
+            catch (Exception) {
+            }
+            return jsonResult != null ? jsonResult.ToObject<ResultObject>() : null;
         }
 
         private NodejsProjectSettings LoadProjectSettings(string projectFile) {
