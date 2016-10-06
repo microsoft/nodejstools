@@ -66,7 +66,9 @@ namespace Microsoft.NodejsTools {
     [ProvideOptionPage(typeof(NodejsGeneralOptionsPage), "Node.js Tools", "General", 114, 115, true)]
     [ProvideOptionPage(typeof(NodejsNpmOptionsPage), "Node.js Tools", "Npm", 114, 116, true)]
     [ProvideDebugEngine("Node.js Debugging", typeof(AD7ProgramProvider), typeof(AD7Engine), AD7Engine.DebugEngineId, setNextStatement: false, hitCountBp: true, justMyCodeStepping: false)]
+#if DEV14
     [ProvideLanguageService(typeof(NodejsLanguageInfo), NodejsConstants.Nodejs, 106, RequestStockColors = true, ShowSmartIndent = true, ShowCompletion = true, DefaultToInsertSpaces = true, HideAdvancedMembersByDefault = true, EnableAdvancedMembersOption = true, ShowDropDownOptions = true)]
+#endif
     [ProvideDebugLanguage(NodejsConstants.Nodejs, Guids.NodejsDebugLanguageString, NodeExpressionEvaluatorGuid, AD7Engine.DebugEngineId)]
     [WebSiteProject("JavaScript", "JavaScript")]
     [ProvideProjectFactory(typeof(NodejsProjectFactory), null, null, null, null, ".\\NullPath", LanguageVsTemplate = NodejsConstants.JavaScript, SortPriority=0x17)]   // outer flavor, no file extension
@@ -155,7 +157,7 @@ namespace Microsoft.NodejsTools {
 
         /////////////////////////////////////////////////////////////////////////////
         // Overridden Package Implementation
-        #region Package Members
+#region Package Members
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
@@ -178,10 +180,10 @@ namespace Microsoft.NodejsTools {
                 delegate { NewProjectFromExistingWizard.IsAddNewProjectCmd = true; },
                 delegate { NewProjectFromExistingWizard.IsAddNewProjectCmd = false; }
             );
-
+#if DEV14
             var langService = new NodejsLanguageInfo(this);
             ((IServiceContainer)this).AddService(langService.GetType(), langService, true);
-
+#endif
             ((IServiceContainer)this).AddService(typeof(ClipboardServiceBase), new ClipboardService(), true);
 
             RegisterProjectFactory(new NodejsProjectFactory(this));
@@ -293,7 +295,7 @@ namespace Microsoft.NodejsTools {
                 window = (IReplWindow2)provider.CreateReplWindow(
                     ReplContentType,
                     "Node.js Interactive Window",
-                    typeof(NodejsLanguageInfo).GUID,
+                    Guids.TypeScriptLanguageInfo,
                     NodejsReplEvaluatorProvider.NodeReplId
                 );
             }
@@ -329,13 +331,13 @@ namespace Microsoft.NodejsTools {
         private IContentType ReplContentType {
             get {
                 if (_contentType == null) {
-                    _contentType = ComponentModel.GetService<IContentTypeRegistryService>().GetContentType(NodejsConstants.Nodejs);
+                    _contentType = ComponentModel.GetService<IContentTypeRegistryService>().GetContentType("TypeScript");
                 }
                 return _contentType;
             }
         }
 
-        #endregion
+#endregion
 
         internal override VisualStudioTools.Navigation.LibraryManager CreateLibraryManager(CommonPackage package) {
             return new NodejsLibraryManager(this);
