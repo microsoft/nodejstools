@@ -32,7 +32,7 @@ namespace Microsoft.NodejsTools.ProjectWizard {
         private readonly bool _recommendUpgrade;
 
 #if DEV14
-        const string AzureToolsDownload = "http://go.microsoft.com/fwlink/?LinkID=517353";
+        const string AzureToolsDownload = "https://go.microsoft.com/fwlink/?LinkID=517353";
 #elif DEV15
         const string AzureToolsDownload = "https://go.microsoft.com/fwlink/?LinkId=746956";
 #else

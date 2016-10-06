@@ -20,16 +20,16 @@
       "language": "en-us",
       "dependencies": {
         "Microsoft.VisualStudio.NodejsTools.InteractiveWindow": {
-          "version": "1.2"
+          "version": "1.3"
         },
         "Microsoft.VisualStudio.NodejsTools.NodejsTools": {
-          "version": "1.2"
+          "version": "1.3"
         },
         "Microsoft.VisualStudio.NodejsTools.Profiling": {
-          "version": "1.2"
+          "version": "1.3"
         },
         "Microsoft.VisualStudio.NodejsTools.Targets": {
-          "version": "1.2"
+          "version": "1.3"
         }
       },
       "localizedResources": [

@@ -226,7 +226,6 @@
     <Compile Include="Commands\OpenRemoteDebugProxyFolderCommand.cs" />
     <Compile Include="Commands\ShowDocumentationCommand.cs" />
     <Compile Include="Commands\SurveyNewsCommand.cs" />
-    <Compile Include="Debugger\DataTips\DataTipTextManagerEvents.cs" />
     <Compile Include="Debugger\DebugEngine\AD7EvalErrorProperty.cs" />
     <Compile Include="Debugger\NodeDebugProvider.cs" />
     <Compile Include="Logging\LiveLogger.cs" />
@@ -240,7 +239,6 @@
     <Compile Include="Logging\INodejsToolsLogger.cs" />
     <Compile Include="Logging\NodejsToolsLogEvent.cs" />
     <Compile Include="Logging\NodejsToolsLogger.cs" />
-    <Compile Include="Debugger\DataTips\DataTipTextViewFilter.cs" />
     <Compile Include="NodejsPackage.Debugger.cs" />
     <Compile Include="NpmUI\NpmOutputWindow.xaml.cs">
       <DependentUpon>NpmOutputWindow.xaml</DependentUpon>
@@ -315,15 +313,15 @@
     <Compile Include="Debugger\SteppingKind.cs" />
     <Compile Include="Project\NodejsFileNodeProperties.cs" />
     <Compile Include="Jade\JadeEditorFactory.cs" />
-</ItemGroup>
-<ItemGroup Condition=" '$(VisualStudioVersion)'=='14.0'  Or '$(TargetVisualStudioVersion)'=='VS140' ">
+  </ItemGroup>
+  <ItemGroup Condition=" '$(VisualStudioVersion)'=='14.0'  Or '$(TargetVisualStudioVersion)'=='VS140' ">
     <Compile Include="Options\NodejsFormattingDialogPage.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Options\NodejsFormattingBracesOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Options\NodejsFormattingSpacingOptionsPage.cs" >
+    <Compile Include="Options\NodejsFormattingSpacingOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Options\NodejsFormattingGeneralOptionsPage.cs">
@@ -347,8 +345,8 @@
     <Compile Include="Options\NodejsFormattingSpacingOptionsControl.Designer.cs">
       <DependentUpon>NodejsFormattingSpacingOptionsControl.cs</DependentUpon>
     </Compile>
-</ItemGroup>
-<ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="Project\ProjectResources.cs" />
     <Compile Include="Repl\NpmReplCommand.cs" />
     <Compile Include="TaggerProviderMetadata.cs" />
@@ -524,8 +522,6 @@
     <Compile Include="Repl\INodejsReplSite.cs" />
     <Compile Include="Repl\SaveReplCommand.cs" />
     <Compile Include="Repl\VsNodejsReplSite.cs" />
-    <Compile Include="SmartIndent.cs" />
-    <Compile Include="SmartIndentProvider.cs" />
     <Compile Include="SourceMapping\SourceMap.cs" />
     <Compile Include="TestFrameworks\TestFrameworkDirectories.cs" />
     <Compile Include="TypingsAcquisition.cs" />
