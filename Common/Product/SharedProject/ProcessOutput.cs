@@ -500,7 +500,8 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
         /// <summary>
-        /// TODO
+        /// The StandardInput stream of the process or null if the process hasn't
+        /// started yet.
         /// </summary>
         public StreamWriter StandardInput {
             get
@@ -513,7 +514,8 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
         /// <summary>
-        /// TODO
+        /// The StandardOutput stream of the process or null if process hasn't started
+        /// or if conditions are not correct to use the stream.
         /// </summary>
         public StreamReader StandardOutput {
             get
