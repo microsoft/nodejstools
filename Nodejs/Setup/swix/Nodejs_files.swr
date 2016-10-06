@@ -8,3 +8,7 @@ package name=Microsoft.VisualStudio.NodejsTools.NodejsTools
 
 vs.payloads
     vs.payload source=$(BuildOutputRoot)\Binaries\Nodejs\Microsoft.NodejsTools.vsix
+
+vs.dependencies
+  vs.dependency id=Microsoft.VisualStudio.MinShell
+                version=[$(VSGeneralVersion),$(VSNextGeneralVersion))

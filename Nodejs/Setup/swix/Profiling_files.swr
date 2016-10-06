@@ -8,3 +8,7 @@ package name=Microsoft.VisualStudio.NodejsTools.Profiling
 
 vs.payloads
     vs.payload source="$(BuildOutputRoot)\Binaries\Profiling\Microsoft.NodejsTools.Profiling.vsix"
+
+vs.dependencies
+  vs.dependency id=Microsoft.VisualStudio.MinShell
+                version=[$(VSGeneralVersion),$(VSNextGeneralVersion))
