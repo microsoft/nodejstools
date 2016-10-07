@@ -57,6 +57,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
         private readonly ManualResetEvent _cancelRequested = new ManualResetEvent(false);
 
+        private static readonly char[] _needToBeQuoted = new[] { ' ', '"' };
         private ProcessStartInfo _psi;
         private Process _nodeProcess;
         private object _syncObject = new object();
