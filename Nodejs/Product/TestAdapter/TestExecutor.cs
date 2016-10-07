@@ -210,6 +210,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 // send test to run_tests.js
                 TestCaseObject testObject = new TestCaseObject(args[1], args[2], args[3], args[4], args[5]);
                 _nodeProcess.StandardInput.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(testObject));
+                _nodeProcess.StandardInput.Close();
 
                 _nodeProcess.Wait(TimeSpan.FromMilliseconds(500));
                 if (runContext.IsBeingDebugged && app != null) {
