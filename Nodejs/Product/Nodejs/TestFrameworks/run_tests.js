@@ -42,6 +42,9 @@ rl.on('line', (line) => {
     }
     // run the test
     framework.run_tests(testInfo.testName, testInfo.testFile, testInfo.workingFolder, testInfo.projectFolder);
+
+    // close readline interface
+    rl.close();
 });
 
 process.on('exit', (code) => {
