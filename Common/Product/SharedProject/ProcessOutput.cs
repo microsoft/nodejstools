@@ -415,16 +415,16 @@ namespace Microsoft.VisualStudioTools.Project {
 
             if (_process != null) {
                 if (_process.StartInfo.RedirectStandardOutput) {
-                    //_process.BeginOutputReadLine();
+                    _process.BeginOutputReadLine();
                 }
                 if (_process.StartInfo.RedirectStandardError) {
-                    //_process.BeginErrorReadLine();
+                    _process.BeginErrorReadLine();
                 }
                 
                 if (_process.StartInfo.RedirectStandardInput) {
                     // Close standard input so that we don't get stuck trying to read input from the user.
                     try {
-                        //_process.StandardInput.Close();
+                        _process.StandardInput.Close();
                     } catch (InvalidOperationException) {
                         // StandardInput not available
                     }
@@ -496,35 +496,6 @@ namespace Microsoft.VisualStudioTools.Project {
         public string Arguments {
             get {
                 return _arguments;
-            }
-        }
-
-        /// <summary>
-        /// The StandardInput stream of the process or null if the process hasn't
-        /// started yet.
-        /// </summary>
-        public StreamWriter StandardInput {
-            get
-            {
-                if (_process == null) {
-                    return null;
-                }
-                return _process.StandardInput;
-            }
-        }
-
-        /// <summary>
-        /// The StandardOutput stream of the process or null if process hasn't started
-        /// or if conditions are not correct to use the stream.
-        /// </summary>
-        public StreamReader StandardOutput {
-            get
-            {
-                if(_process == null || !_process.StartInfo.RedirectStandardOutput || _process.StartInfo.UseShellExecute) {
-                    return null;
-                }
-
-                return _process.StandardOutput;
             }
         }
 
