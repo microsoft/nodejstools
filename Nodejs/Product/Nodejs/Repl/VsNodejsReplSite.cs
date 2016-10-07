@@ -25,6 +25,7 @@ namespace Microsoft.NodejsTools.Repl {
         public CommonProjectNode GetStartupProject() {
             var nodeJsInstance = NodejsPackage.Instance;
             if (nodeJsInstance == null) {
+                // Node.js Tools package has not loaded yet. Expected if no NTVS project is open.
                 return null;
             }
             return NodejsPackage.GetStartupProject(nodeJsInstance);
@@ -33,6 +34,7 @@ namespace Microsoft.NodejsTools.Repl {
         public bool TryGetStartupFileAndDirectory(out string fileName, out string directory) {
             var nodeJsInstance = NodejsPackage.Instance;
             if (nodeJsInstance == null) {
+                // Node.js Tools package has not loaded yet. Expected if no NTVS project is open.
                 fileName = null;
                 directory = null;
                 return false;

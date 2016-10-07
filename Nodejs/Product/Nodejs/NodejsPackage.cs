@@ -331,7 +331,7 @@ namespace Microsoft.NodejsTools {
         private IContentType ReplContentType {
             get {
                 if (_contentType == null) {
-                    _contentType = ComponentModel.GetService<IContentTypeRegistryService>().GetContentType("TypeScript");
+                    _contentType = ComponentModel.GetService<IContentTypeRegistryService>().GetContentType(NodejsConstants.TypeScript);
                 }
                 return _contentType;
             }
