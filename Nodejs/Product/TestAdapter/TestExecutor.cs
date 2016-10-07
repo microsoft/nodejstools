@@ -144,10 +144,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
                     var workingDir = Path.GetDirectoryName(CommonUtils.GetAbsoluteFilePath(settings.WorkingDir, testInfo.ModulePath));
                     args.AddRange(GetInterpreterArgs(firstTest, workingDir, settings.ProjectRootDir));
 
-                    foreach (string s in args) {
-                        Console.WriteLine(s);
-                    }
-
                     // launch node process
                     _psi = new ProcessStartInfo("cmd.exe") {
                         Arguments = string.Format(@"/S /C pushd {0} & {1} {2}",
