@@ -57,7 +57,8 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
         private readonly ManualResetEvent _cancelRequested = new ManualResetEvent(false);
 
-        private ProcessOutput _nodeProcess;
+        private ProcessStartInfo _psi;
+        private Process _nodeProcess;
         private object _syncObject = new object();
 
         public void Cancel() {
@@ -288,6 +289,52 @@ namespace Microsoft.NodejsTools.TestAdapter {
                     proj.GetPropertyValue(NodejsConstants.NodeExePath));
 
             return projSettings;
+        }
+
+        private static string GetArguments(IEnumerable<string> arguments, bool quoteArgs) {
+            if (quoteArgs) {
+                return string.Join(" ", arguments.Where(a => a != null).Select(QuoteSingleArgument));
+            }
+            else {
+                return string.Join(" ", arguments.Where(a => a != null));
+            }
+        }
+
+        internal static string QuoteSingleArgument(string arg) {
+            if (string.IsNullOrEmpty(arg)) {
+                return "\"\"";
+            }
+            if (arg.IndexOfAny(_needToBeQuoted) < 0) {
+                return arg;
+            }
+
+            if (arg.StartsWith("\"") && arg.EndsWith("\"")) {
+                bool inQuote = false;
+                int consecutiveBackslashes = 0;
+                foreach (var c in arg) {
+                    if (c == '"') {
+                        if (consecutiveBackslashes % 2 == 0) {
+                            inQuote = !inQuote;
+                        }
+                    }
+
+                    if (c == '\\') {
+                        consecutiveBackslashes += 1;
+                    }
+                    else {
+                        consecutiveBackslashes = 0;
+                    }
+                }
+                if (!inQuote) {
+                    return arg;
+                }
+            }
+
+            var newArg = arg.Replace("\"", "\\\"");
+            if (newArg.EndsWith("\\")) {
+                newArg += "\\";
+            }
+            return "\"" + newArg + "\"";
         }
 
         private static void RecordEnd(IFrameworkHandle frameworkHandle, TestCase test, TestResult result, string stdout, string stderr, TestOutcome outcome) {
