@@ -290,10 +290,15 @@ namespace Microsoft.NodejsTools.TestAdapter {
             var result = GetTestResultFromProcess();
 
             bool runCancelled = _cancelRequested.WaitOne(0);
-            RecordEnd(frameworkHandle, test, testResult,
-                result.stdout,
-                result.stderr,
-                (!runCancelled && result.passed) ? TestOutcome.Passed : TestOutcome.Failed);
+            result = null;
+            if (result != null) {
+                RecordEnd(frameworkHandle, test, testResult,
+                    result.stdout,
+                    result.stderr,
+                    (!runCancelled && result.passed) ? TestOutcome.Passed : TestOutcome.Failed);
+            } else {
+                frameworkHandle.SendMessage(TestMessageLevel.Error, "Failed to obtain result for " + test.DisplayName + " from TestRunner");
+            }
         }
 
         private ResultObject ParseTestResult(string line) {
