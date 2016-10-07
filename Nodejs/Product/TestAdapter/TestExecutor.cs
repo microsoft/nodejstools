@@ -31,6 +31,7 @@ using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json.Linq;
 using MSBuild = Microsoft.Build.Evaluation;
+using Newtonsoft.Json;
 
 namespace Microsoft.NodejsTools.TestAdapter {
 
@@ -257,13 +258,13 @@ namespace Microsoft.NodejsTools.TestAdapter {
         }
 
         private ResultObject ParseTestResult(string line) {
-            JObject jsonResult = null;
+            ResultObject jsonResult = null;
             try {
-                jsonResult = JObject.Parse(line);
+                jsonResult = JsonConvert.DeserializeObject<ResultObject>(line);
             }
             catch (Exception) {
             }
-            return jsonResult != null ? jsonResult.ToObject<ResultObject>() : null;
+            return jsonResult;
         }
 
         private NodejsProjectSettings LoadProjectSettings(string projectFile) {
