@@ -35,7 +35,7 @@ using Newtonsoft.Json;
 
 namespace Microsoft.NodejsTools.TestAdapter {
 
-   class ResultObject {
+    class ResultObject {
         public ResultObject() {
             title = String.Empty;
             passed = false;
@@ -110,18 +110,80 @@ namespace Microsoft.NodejsTools.TestAdapter {
             // okay.
             using (var app = VisualStudioApp.FromEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable)) {
                 // .njsproj file path -> project settings
+
+                var projectToTests = new Dictionary<string, List<TestCase>>();
                 var sourceToSettings = new Dictionary<string, NodejsProjectSettings>();
+                NodejsProjectSettings settings = null;
 
+                // put tests into dictionary where key is their project working directory
+                // NOTE: Not sure if this is necessary, but it seems to me that if we were
+                // to run all tests over multiple projects in a solution, we would have to
+                // separate the tests by their project in order to launch the node process
+                // correctly (to make sure we are using the correct working folder).
                 foreach (var test in tests) {
-                    if (_cancelRequested.WaitOne(0)) {
-                        break;
+                    if (!sourceToSettings.TryGetValue(test.Source, out settings)) {
+                        sourceToSettings[test.Source] = settings = LoadProjectSettings(test.Source);
+                    }
+                    if (!projectToTests.ContainsKey(settings.WorkingDir)) {
+                        projectToTests[settings.WorkingDir] = new List<TestCase>();
+                    }
+                    projectToTests[settings.WorkingDir].Add(test);
+                }
+
+                foreach (KeyValuePair<string, List<TestCase>> entry in projectToTests) {
+                    List<string> args = new List<string>();
+                    TestCase firstTest = entry.Value.ElementAt(0);
+
+                    NodejsTestInfo testInfo = new NodejsTestInfo(firstTest.FullyQualifiedName);
+                    int port = 0;
+                    if (runContext.IsBeingDebugged && app != null) {
+                        app.GetDTE().Debugger.DetachAll();
+                        args.AddRange(GetDebugArgs(settings, out port));
                     }
 
-                    try {
-                        RunTestCase(app, frameworkHandle, runContext, test, sourceToSettings);
-                    } catch (Exception ex) {
-                        frameworkHandle.SendMessage(TestMessageLevel.Error, ex.ToString());
+                    var workingDir = Path.GetDirectoryName(CommonUtils.GetAbsoluteFilePath(settings.WorkingDir, testInfo.ModulePath));
+                    args.AddRange(GetInterpreterArgs(firstTest, workingDir, settings.ProjectRootDir));
+
+                    foreach (string s in args) {
+                        Console.WriteLine(s);
                     }
+
+                    // launch node process
+                    _psi = new ProcessStartInfo("cmd.exe") {
+                        Arguments = string.Format(@"/S /C pushd {0} & {1} {2}",
+                        QuoteSingleArgument(entry.Key),
+                        QuoteSingleArgument(settings.NodeExePath),
+                        GetArguments(args, true)),
+                        CreateNoWindow = true,
+                        UseShellExecute = false
+                    };
+                    _psi.RedirectStandardInput = true;
+                    _psi.RedirectStandardOutput = true;
+                    _nodeProcess = Process.Start(_psi);
+                    StreamWriter sw = _nodeProcess.StandardInput;
+
+                    foreach (TestCase test in entry.Value) {
+                        if (_cancelRequested.WaitOne(0)) {
+                            break;
+                        }
+
+                        //Debug.Fail("attach debugger");
+                        if (!File.Exists(settings.NodeExePath)) {
+                            frameworkHandle.SendMessage(TestMessageLevel.Error, "Interpreter path does not exist: " + settings.NodeExePath);
+                            return;
+                        }
+
+                        // call RunTestCase to run each test
+                        try {
+                            RunTestCase(app, frameworkHandle, runContext, test, sourceToSettings);
+                        }
+                        catch (Exception ex) {
+                            frameworkHandle.SendMessage(TestMessageLevel.Error, ex.ToString());
+                        }
+
+                    }
+                    // dispose node process
+                    _nodeProcess.Dispose();
                 }
             }
         }
@@ -195,50 +257,40 @@ namespace Microsoft.NodejsTools.TestAdapter {
             }
 
             lock (_syncObject) {
-                _nodeProcess = ProcessOutput.Run(
-                                        settings.NodeExePath,
-                                        args,
-                                        workingDir,
-                                        null,
-                                        false,
-                                        null,
-                                        false);
-
-#if DEBUG
-                frameworkHandle.SendMessage(TestMessageLevel.Informational, "cd " + workingDir);
-                frameworkHandle.SendMessage(TestMessageLevel.Informational, _nodeProcess.Arguments);
-#endif
+                //#if DEBUG
+                //                frameworkHandle.SendMessage(TestMessageLevel.Informational, "cd " + workingDir);
+                //                frameworkHandle.SendMessage(TestMessageLevel.Informational, _nodeProcess.Arguments);
+                //#endif
                 // send test to run_tests.js
                 TestCaseObject testObject = new TestCaseObject(args[1], args[2], args[3], args[4], args[5]);
                 _nodeProcess.StandardInput.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(testObject));
                 _nodeProcess.StandardInput.Close();
 
-                _nodeProcess.Wait(TimeSpan.FromMilliseconds(500));
-                if (runContext.IsBeingDebugged && app != null) {
-                    try {
-                        //the '#ping=0' is a special flag to tell VS node debugger not to connect to the port,
-                        //because a connection carries the consequence of setting off --debug-brk, and breakpoints will be missed.
-                        string qualifierUri = string.Format("tcp://localhost:{0}#ping=0", port);
-                        while (!app.AttachToProcess(_nodeProcess, NodejsRemoteDebugPortSupplierUnsecuredId, qualifierUri)) {
-                            if (_nodeProcess.Wait(TimeSpan.FromMilliseconds(500))) {
-                                break;
-                            }
-                        }
-#if DEBUG
-                    } catch (COMException ex) {
-                        frameworkHandle.SendMessage(TestMessageLevel.Error, "Error occurred connecting to debuggee.");
-                        frameworkHandle.SendMessage(TestMessageLevel.Error, ex.ToString());
-                        KillNodeProcess();
-                    }
-#else
-                    } catch (COMException) {
-                        frameworkHandle.SendMessage(TestMessageLevel.Error, "Error occurred connecting to debuggee.");
-                        KillNodeProcess();
-                    }
-#endif
-                }
+                //_nodeProcess.Wait(TimeSpan.FromMilliseconds(500));
+                //                if (runContext.IsBeingDebugged && app != null) {
+                //                    try {
+                //                        //the '#ping=0' is a special flag to tell VS node debugger not to connect to the port,
+                //                        //because a connection carries the consequence of setting off --debug-brk, and breakpoints will be missed.
+                //                        string qualifierUri = string.Format("tcp://localhost:{0}#ping=0", port);
+                //                        while (!app.AttachToProcess(_nodeProcess, NodejsRemoteDebugPortSupplierUnsecuredId, qualifierUri)) {
+                //                            if (_nodeProcess.Wait(TimeSpan.FromMilliseconds(500))) {
+                //                                break;
+                //                            }
+                //                        }
+                //#if DEBUG
+                //                    } catch (COMException ex) {
+                //                        frameworkHandle.SendMessage(TestMessageLevel.Error, "Error occurred connecting to debuggee.");
+                //                        frameworkHandle.SendMessage(TestMessageLevel.Error, ex.ToString());
+                //                        KillNodeProcess();
+                //                    }
+                //#else
+                //                    } catch (COMException) {
+                //                        frameworkHandle.SendMessage(TestMessageLevel.Error, "Error occurred connecting to debuggee.");
+                //                        KillNodeProcess();
+                //                    }
+                //#endif
+                //                }
             }
-            WaitHandle.WaitAll(new WaitHandle[] { _nodeProcess.WaitHandle });
             var result = GetTestResultFromProcess();
 
             bool runCancelled = _cancelRequested.WaitOne(0);
@@ -246,7 +298,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 result.stdout,
                 result.stderr,
                 (!runCancelled && result.passed) ? TestOutcome.Passed : TestOutcome.Failed);
-            _nodeProcess.Dispose();
         }
 
         private ResultObject ParseTestResult(string line) {
