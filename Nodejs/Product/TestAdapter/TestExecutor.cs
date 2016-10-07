@@ -236,18 +236,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 }
             }
             WaitHandle.WaitAll(new WaitHandle[] { _nodeProcess.WaitHandle });
-            // at this point the test is definitely done executing
-            ResultObject result = null;
-
-            using (StreamReader sr = _nodeProcess.StandardOutput) {
-                while(sr.Peek() >= 0) {
-                    result = ParseTestResult(sr.ReadLine());
-                    if(result == null) {
-                        continue;
-                    }
-                    break;
-                }
-            }
+            var result = GetTestResultFromProcess();
 
             bool runCancelled = _cancelRequested.WaitOne(0);
             RecordEnd(frameworkHandle, test, testResult,
@@ -265,6 +254,20 @@ namespace Microsoft.NodejsTools.TestAdapter {
             catch (Exception) {
             }
             return jsonResult;
+        }
+
+        private ResultObject GetTestResultFromProcess() {
+            ResultObject result = null;
+            using (StreamReader sr = _nodeProcess.StandardOutput) {
+                while (sr.Peek() >= 0) {
+                    result = ParseTestResult(sr.ReadLine());
+                    if (result == null) {
+                        continue;
+                    }
+                    break;
+                }
+            }
+            return result;
         }
 
         private NodejsProjectSettings LoadProjectSettings(string projectFile) {
