@@ -345,6 +345,7 @@
     <Compile Include="Options\NodejsFormattingSpacingOptionsControl.Designer.cs">
       <DependentUpon>NodejsFormattingSpacingOptionsControl.cs</DependentUpon>
     </Compile>
+	<Compile Include="NodejsLanguageInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Project\ProjectResources.cs" />
@@ -447,7 +448,6 @@
     <Compile Include="Jade\Tokens\Tokenizer.cs" />
     <Compile Include="LanguagePreferences.cs" />
     <Compile Include="Nodejs.cs" />
-    <Compile Include="NodejsLanguageInfo.cs" />
     <Compile Include="NodejsProjectConfig.cs" />
     <Compile Include="NodejsToolsInstallPath.cs" />
     <Compile Include="NpmUI\ErrorHelper.cs" />
