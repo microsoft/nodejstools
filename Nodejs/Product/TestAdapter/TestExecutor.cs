@@ -156,7 +156,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
                     _psi.RedirectStandardInput = true;
                     _psi.RedirectStandardOutput = true;
                     _nodeProcess = Process.Start(_psi);
-                    StreamWriter sw = _nodeProcess.StandardInput;
 
                     foreach (TestCase test in entry.Value) {
                         if (_cancelRequested.WaitOne(0)) {
@@ -171,7 +170,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
                         // call RunTestCase to run each test
                         try {
-                            RunTestCase(app, frameworkHandle, runContext, test, sourceToSettings);
+                            RunTestCase(app, frameworkHandle, runContext, test, sourceToSettings, _nodeProcess.StandardInput, _nodeProcess.StandardOutput);
                         }
                         catch (Exception ex) {
                             frameworkHandle.SendMessage(TestMessageLevel.Error, ex.ToString());
@@ -213,7 +212,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
             };
         }
 
-        private void RunTestCase(VisualStudioApp app, IFrameworkHandle frameworkHandle, IRunContext runContext, TestCase test, Dictionary<string, NodejsProjectSettings> sourceToSettings) {
+        private void RunTestCase(VisualStudioApp app, IFrameworkHandle frameworkHandle, IRunContext runContext, TestCase test, Dictionary<string, NodejsProjectSettings> sourceToSettings, StreamWriter standardInput, StreamReader standardOutput) {
             var testResult = new TestResult(test);
             frameworkHandle.RecordStart(test);
             testResult.StartTime = DateTimeOffset.Now;
@@ -259,8 +258,8 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 //#endif
                 // send test to run_tests.js
                 TestCaseObject testObject = new TestCaseObject(args[1], args[2], args[3], args[4], args[5]);
-                _nodeProcess.StandardInput.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(testObject));
-                _nodeProcess.StandardInput.Close();
+                standardInput.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(testObject));
+                standardInput.Close();
 
                 //_nodeProcess.Wait(TimeSpan.FromMilliseconds(500));
                 //                if (runContext.IsBeingDebugged && app != null) {
@@ -287,10 +286,10 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 //#endif
                 //                }
             }
-            var result = GetTestResultFromProcess();
+            var result = GetTestResultFromProcess(standardOutput);
 
             bool runCancelled = _cancelRequested.WaitOne(0);
-            result = null;
+
             if (result != null) {
                 RecordEnd(frameworkHandle, test, testResult,
                     result.stdout,
@@ -311,16 +310,14 @@ namespace Microsoft.NodejsTools.TestAdapter {
             return jsonResult;
         }
 
-        private ResultObject GetTestResultFromProcess() {
+        private ResultObject GetTestResultFromProcess(StreamReader sr) {
             ResultObject result = null;
-            using (StreamReader sr = _nodeProcess.StandardOutput) {
-                while (sr.Peek() >= 0) {
-                    result = ParseTestResult(sr.ReadLine());
-                    if (result == null) {
-                        continue;
-                    }
-                    break;
+            while (sr.Peek() >= 0) {
+                result = ParseTestResult(sr.ReadLine());
+                if (result == null) {
+                    continue;
                 }
+                break;
             }
             return result;
         }
