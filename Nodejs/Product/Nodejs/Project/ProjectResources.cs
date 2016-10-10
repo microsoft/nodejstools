@@ -34,7 +34,6 @@ namespace Microsoft.NodejsTools.Project {
         internal const string CacheDirectoryClearFailedTitle = "CacheDirectoryClearFailedTitle";
         internal const string CacheDirectoryClearFailedCaption = "CacheDirectoryClearFailedCaption";
         internal const string ContinueWithoutAzureToolsUpgrade = "ContinueWithoutAzureToolsUpgrade";
-        internal const string CouldNotGetTypeScriptLanguagePreferences = "CouldNotGetTypeScriptLanguagePreferences";
         internal const string DebuggerConnectionClosed = "DebuggerConnectionClosed";
         internal const string DebuggerModuleUpdateFailed = "DebuggerModuleUpdateFailed";
         internal const string DebuggerPort = "DebuggerPort";
