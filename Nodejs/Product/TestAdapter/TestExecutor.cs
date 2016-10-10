@@ -90,8 +90,61 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 return;
             }
             // launch node process here?
-            RunTestCases(receiver.Tests, runContext, frameworkHandle);
-            // dispose node process
+            // May be null, but this is handled by RunTestCase if it matters.
+            // No VS instance just means no debugging, but everything else is
+            // okay.
+            using (var app = VisualStudioApp.FromEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable)) {
+                // .njsproj file path -> project settings
+
+                var projectToTests = new Dictionary<string, List<TestCase>>();
+                var sourceToSettings = new Dictionary<string, NodejsProjectSettings>();
+                NodejsProjectSettings settings = null;
+
+                // put tests into dictionary where key is their project working directory
+                // NOTE: Not sure if this is necessary, but it seems to me that if we were
+                // to run all tests over multiple projects in a solution, we would have to
+                // separate the tests by their project in order to launch the node process
+                // correctly (to make sure we are using the correct working folder).
+                foreach (var test in receiver.Tests) {
+                    if (!sourceToSettings.TryGetValue(test.Source, out settings)) {
+                        sourceToSettings[test.Source] = settings = LoadProjectSettings(test.Source);
+                    }
+                    if (!projectToTests.ContainsKey(settings.WorkingDir)) {
+                        projectToTests[settings.WorkingDir] = new List<TestCase>();
+                    }
+                    projectToTests[settings.WorkingDir].Add(test);
+                }
+
+                foreach (KeyValuePair<string, List<TestCase>> entry in projectToTests) {
+                    List<string> args = new List<string>();
+                    TestCase firstTest = entry.Value.ElementAt(0);
+                    int port = 0;
+                    if (runContext.IsBeingDebugged && app != null) {
+                        app.GetDTE().Debugger.DetachAll();
+                        args.AddRange(GetDebugArgs(settings, out port));
+                    }
+
+                    args.AddRange(GetInterpreterArgs(firstTest, entry.Key, settings.ProjectRootDir));
+
+                    // launch node process
+                    _psi = new ProcessStartInfo("cmd.exe") {
+                        Arguments = string.Format(@"/S /C pushd {0} & {1} {2}",
+                        QuoteSingleArgument(entry.Key),
+                        QuoteSingleArgument(settings.NodeExePath),
+                        GetArguments(args, true)),
+                        CreateNoWindow = true,
+                        UseShellExecute = false
+                    };
+                    _psi.RedirectStandardInput = true;
+                    _psi.RedirectStandardOutput = true;
+                    _nodeProcess = Process.Start(_psi);
+
+                    RunTestCases(entry.Value, runContext, frameworkHandle);
+
+                    // dispose node process
+                    _nodeProcess.Dispose();
+                }
+            }
         }
 
         public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle) {
@@ -110,75 +163,19 @@ namespace Microsoft.NodejsTools.TestAdapter {
             // okay.
             using (var app = VisualStudioApp.FromEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable)) {
                 // .njsproj file path -> project settings
-
-                var projectToTests = new Dictionary<string, List<TestCase>>();
                 var sourceToSettings = new Dictionary<string, NodejsProjectSettings>();
-                NodejsProjectSettings settings = null;
 
-                // put tests into dictionary where key is their project working directory
-                // NOTE: Not sure if this is necessary, but it seems to me that if we were
-                // to run all tests over multiple projects in a solution, we would have to
-                // separate the tests by their project in order to launch the node process
-                // correctly (to make sure we are using the correct working folder).
                 foreach (var test in tests) {
-                    if (!sourceToSettings.TryGetValue(test.Source, out settings)) {
-                        sourceToSettings[test.Source] = settings = LoadProjectSettings(test.Source);
-                    }
-                    if (!projectToTests.ContainsKey(settings.WorkingDir)) {
-                        projectToTests[settings.WorkingDir] = new List<TestCase>();
-                    }
-                    projectToTests[settings.WorkingDir].Add(test);
-                }
-
-                foreach (KeyValuePair<string, List<TestCase>> entry in projectToTests) {
-                    List<string> args = new List<string>();
-                    TestCase firstTest = entry.Value.ElementAt(0);
-
-                    NodejsTestInfo testInfo = new NodejsTestInfo(firstTest.FullyQualifiedName);
-                    int port = 0;
-                    if (runContext.IsBeingDebugged && app != null) {
-                        app.GetDTE().Debugger.DetachAll();
-                        args.AddRange(GetDebugArgs(settings, out port));
+                    if (_cancelRequested.WaitOne(0)) {
+                        break;
                     }
 
-                    var workingDir = Path.GetDirectoryName(CommonUtils.GetAbsoluteFilePath(settings.WorkingDir, testInfo.ModulePath));
-                    args.AddRange(GetInterpreterArgs(firstTest, workingDir, settings.ProjectRootDir));
-
-                    // launch node process
-                    _psi = new ProcessStartInfo("cmd.exe") {
-                        Arguments = string.Format(@"/S /C pushd {0} & {1} {2}",
-                        QuoteSingleArgument(entry.Key),
-                        QuoteSingleArgument(settings.NodeExePath),
-                        GetArguments(args, true)),
-                        CreateNoWindow = true,
-                        UseShellExecute = false
-                    };
-                    _psi.RedirectStandardInput = true;
-                    _psi.RedirectStandardOutput = true;
-                    _nodeProcess = Process.Start(_psi);
-
-                    foreach (TestCase test in entry.Value) {
-                        if (_cancelRequested.WaitOne(0)) {
-                            break;
-                        }
-
-                        //Debug.Fail("attach debugger");
-                        if (!File.Exists(settings.NodeExePath)) {
-                            frameworkHandle.SendMessage(TestMessageLevel.Error, "Interpreter path does not exist: " + settings.NodeExePath);
-                            return;
-                        }
-
-                        // call RunTestCase to run each test
-                        try {
-                            RunTestCase(app, frameworkHandle, runContext, test, sourceToSettings, _nodeProcess.StandardInput, _nodeProcess.StandardOutput);
-                        }
-                        catch (Exception ex) {
-                            frameworkHandle.SendMessage(TestMessageLevel.Error, ex.ToString());
-                        }
-
+                    try {
+                        RunTestCase(app, frameworkHandle, runContext, test, sourceToSettings, _nodeProcess.StandardInput, _nodeProcess.StandardOutput);
                     }
-                    // dispose node process
-                    _nodeProcess.Dispose();
+                    catch (Exception ex) {
+                        frameworkHandle.SendMessage(TestMessageLevel.Error, ex.ToString());
+                    }
                 }
             }
         }
