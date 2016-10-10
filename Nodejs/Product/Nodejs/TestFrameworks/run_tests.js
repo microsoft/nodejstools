@@ -31,7 +31,7 @@ rl.on('line', (line) => {
     result.title = testInfo.testName.replace(' ', '::');
     // get rid of leftover quotations from C#
     for(var s in testInfo) {
-        testInfo[s] = testInfo[s].replace(/['"]+/g, '');
+        testInfo[s] = testInfo[s].replace(/["]+/g, '');
     }
 
     try {
