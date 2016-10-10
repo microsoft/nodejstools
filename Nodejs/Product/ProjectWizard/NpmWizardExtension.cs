@@ -43,12 +43,15 @@ namespace Microsoft.NodejsTools.ProjectWizard {
         }
 
         public void RunStarted(object automationObject, Dictionary<string, string> replacementsDictionary, WizardRunKind runKind, object[] customParams) {
+#if DEV14
+            replacementsDictionary.Add("$dev14$", "true");
+#endif
         }
 
         public bool ShouldAddProjectItem(string filePath) {
             return true;
         }
 
-        #endregion
+#endregion
     }
 }
