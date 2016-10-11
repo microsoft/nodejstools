@@ -18,11 +18,6 @@ using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Repl {
-#if INTERACTIVE_WINDOW
-    using IReplCommand = IInteractiveWindowCommand;
-    using IReplWindow = IInteractiveWindow;    
-#endif
-
     [Export(typeof(IReplCommand))]
     class ClearReplCommand : IReplCommand {
         #region IReplCommand Members

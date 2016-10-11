@@ -577,12 +577,6 @@ namespace Microsoft.NodejsTools {
                 string name;
                 GetCanonicalName(currentId, out name);
                 var nodeFolderNode = project.FindNodeByFullPath(name) as NodejsFolderNode;
-
-                if (nodeFolderNode != null) {
-                    if (nodeFolderNode.ContentType == FolderContentType.Browser) {
-                        isClientCode = true;
-                    }
-                }
             }
 
             if (!isClientCode && _innerProject3 != null && IsJavaScriptFile(pszItemName)) {
