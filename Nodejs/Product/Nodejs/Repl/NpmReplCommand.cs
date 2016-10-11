@@ -34,11 +34,6 @@ using SR = Microsoft.NodejsTools.Project.SR;
 using Task = System.Threading.Tasks.Task;
 
 namespace Microsoft.NodejsTools.Repl {
-#if INTERACTIVE_WINDOW
-    using IReplCommand = IInteractiveWindowCommand;
-    using IReplWindow = IInteractiveWindow;    
-#endif
-
     [Export(typeof(IReplCommand))]
     class NpmReplCommand : IReplCommand {
         #region IReplCommand Members

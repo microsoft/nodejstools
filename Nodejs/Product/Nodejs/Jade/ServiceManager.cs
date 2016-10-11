@@ -292,19 +292,6 @@ namespace Microsoft.NodejsTools.Jade {
             if (_propertyOwner != null) {
                 _propertyOwner.Properties.RemoveProperty(ServiceManagerId);
 
-#if NOT
-                var properties = _propertyOwner.Properties.PropertyList;
-                var sb = new StringBuilder();
-
-                foreach (var prop in properties)
-                {
-                    sb.Append(prop.Value.GetType().ToString());
-                    sb.Append("\r\n");
-                }
-
-                Debug.Assert(properties.Count == 0, String.Format("There are still {0} services attached to the buffer:\r\n {1}", properties.Count, sb.ToString()));
-#endif
-
                 _servicesByGuid.Clear();
                 _servicesByType.Clear();
                 _servicesByContentType.Clear();

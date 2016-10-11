@@ -198,39 +198,6 @@ namespace Microsoft.NodejsTools.Project {
                 NpmOutputPane?.ShowAndActivate();
             }
         }
-
-#if INTEGRATE_WITH_ERROR_LIST
-        private ErrorListProvider _errorListProvider;
-
-        private ErrorListProvider GetErrorListProvider() {
-            if (null == _errorListProvider) {
-                _errorListProvider = new ErrorListProvider(_projectNode.ProjectMgr.Site);
-            }
-            return _errorListProvider;
-        }
-
-        private void WriteNpmErrorsToErrorList(NpmLogEventArgs args) {
-            var provider = GetErrorListProvider();
-            foreach (var line in args.LogText.Split(new[] {'\n' })) {
-                var trimmed = line.Trim();
-                if (trimmed.StartsWith("npm ERR!")) {
-                    provider.Tasks.Add(new ErrorTask() {
-                        Category = TaskCategory.User,
-                        ErrorCategory = TaskErrorCategory.Error,
-                        Text = trimmed
-                    });
-                } else if (trimmed.StartsWith("npm WARN")) {
-                    provider.Tasks.Add(new ErrorTask() {
-                        Category = TaskCategory.User,
-                        ErrorCategory = TaskErrorCategory.Warning,
-                        Text = trimmed
-                    });
-                }
-            }
-        }
-
-#endif
-
         private void ForceUpdateStatusBarWithNpmActivity(string activity) {
             if (string.IsNullOrEmpty(activity) || string.IsNullOrEmpty(activity.Trim())) {
                 return;
@@ -279,10 +246,6 @@ namespace Microsoft.NodejsTools.Project {
 
         private void WriteNpmLogToOutputWindow(string logText) {
             NpmOutputPane?.WriteLine(logText);
-
-#if INTEGRATE_WITH_ERROR_LIST
-            WriteNpmErrorsToErrorList(args);
-#endif
         }
 
         private void WriteNpmLogToOutputWindow(NpmLogEventArgs args) {
