@@ -16,13 +16,9 @@
 
 using System;
 using System.IO;
-#if !NO_WINDOWS
 using System.Windows.Forms;
-#endif
 using Microsoft.Win32;
-#if !NO_WINDOWS
 using Microsoft.NodejsTools.Project;
-#endif
 using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools {
@@ -119,7 +115,6 @@ namespace Microsoft.NodejsTools {
             return null;
         }
 
-#if !NO_WINDOWS
         public static void ShowNodejsNotInstalled() {
             MessageBox.Show(
                 SR.GetString(SR.NodejsNotInstalled),
@@ -137,6 +132,5 @@ namespace Microsoft.NodejsTools {
                 MessageBoxIcon.Error
             );
         }
-#endif
     }
 }
