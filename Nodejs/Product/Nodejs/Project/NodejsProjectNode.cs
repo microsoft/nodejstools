@@ -914,11 +914,11 @@ namespace Microsoft.NodejsTools.Project {
                             }
                         }
                         break;
-						case PkgCmdId.cmdidAddNewJavaScriptFileCommand: 
-					case PkgCmdId.cmdidAddNewTypeScriptFileCommand: 
-					case PkgCmdId.cmdidAddNewHTMLFileCommand: 
-					case PkgCmdId.cmdidAddNewCSSFileCommand: 
-						return QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED; 
+                    case PkgCmdId.cmdidAddNewJavaScriptFileCommand: 
+                    case PkgCmdId.cmdidAddNewTypeScriptFileCommand: 
+                    case PkgCmdId.cmdidAddNewHTMLFileCommand: 
+                    case PkgCmdId.cmdidAddNewCSSFileCommand: 
+                        return QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED; 
                 }
             }
 
@@ -1060,7 +1060,7 @@ namespace Microsoft.NodejsTools.Project {
         internal OutputWindowRedirector NpmOutputPane {
             get {
                 try {
-                    return OutputWindowRedirector.Get(Site, VSPackageManagerPaneGuid, "Bower/npm");
+                    return OutputWindowRedirector.Get(Site, VSPackageManagerPaneGuid, SR.GetString(SR.NpmOutputPaneTitle));
                 } catch (InvalidOperationException) {
                     return null;
                 }

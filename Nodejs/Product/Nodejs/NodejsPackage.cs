@@ -294,7 +294,7 @@ namespace Microsoft.NodejsTools {
             if (window == null) {
                 window = (IReplWindow2)provider.CreateReplWindow(
                     ReplContentType,
-                    "Node.js Interactive Window",
+                    Project.SR.GetString(Project.SR.InteractiveWindowTitle),
                     Guids.TypeScriptLanguageInfo,
                     NodejsReplEvaluatorProvider.NodeReplId
                 );
