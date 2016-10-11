@@ -1429,6 +1429,12 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
         Array IVsReferenceManagerUser.GetProviderContexts() {
+            return this.GetProviderContexts();
+        }
+
+        #endregion
+
+        protected virtual Array GetProviderContexts() {
             var referenceManager = this.GetService(typeof(SVsReferenceManager)) as IVsReferenceManager;
 
             var contextProviders = new[] {
@@ -1438,8 +1444,6 @@ namespace Microsoft.VisualStudioTools.Project {
 
             return contextProviders;
         }
-
-        #endregion
 
         private IVsReferenceProviderContext CreateProjectReferenceProviderContext(IVsReferenceManager mgr) {
             var context = mgr.CreateProviderContext(VSConstants.ProjectReferenceProvider_Guid) as IVsProjectReferenceProviderContext;
@@ -1460,18 +1464,12 @@ namespace Microsoft.VisualStudioTools.Project {
         private IVsReferenceProviderContext CreateFileReferenceProviderContext(IVsReferenceManager mgr) {
             var context = mgr.CreateProviderContext(VSConstants.FileReferenceProvider_Guid) as IVsFileReferenceProviderContext;
 
-            context.BrowseFilter = "Component Files" + "\0*.winmd\0\0";
+            context.BrowseFilter = AddReferenceExtensions.Replace('|', '\0') + "\0";
             return context as IVsReferenceProviderContext;
         }
 
         private __VSREFERENCECHANGEOPERATIONRESULT AddReferences(IVsReferenceProviderContext context) {
-            var addedReferences = Enumerable.Empty<VSCOMPONENTSELECTORDATA>();
-
-            if (context.ProviderGuid == VSConstants.ProjectReferenceProvider_Guid) {
-                addedReferences = GetAddedReferences(context as IVsProjectReferenceProviderContext);
-            } else if (context.ProviderGuid == VSConstants.FileReferenceProvider_Guid) {
-                addedReferences = GetAddedReferences(context as IVsFileReferenceProviderContext);
-            }
+            var addedReferences = this.GetAddedReferences(context);
 
             var referenceContainer = this.GetReferenceContainer();
             foreach (var selectorData in addedReferences) {
@@ -1481,20 +1479,40 @@ namespace Microsoft.VisualStudioTools.Project {
             return __VSREFERENCECHANGEOPERATIONRESULT.VSREFERENCECHANGEOPERATIONRESULT_ALLOW;
         }
 
-        private __VSREFERENCECHANGEOPERATIONRESULT RemoveReferences(IVsReferenceProviderContext context) {
-            var removedReferences = Enumerable.Empty<ReferenceNode>();
+        protected virtual IEnumerable<VSCOMPONENTSELECTORDATA> GetAddedReferences(IVsReferenceProviderContext context) {
+            var addedReferences = Enumerable.Empty<VSCOMPONENTSELECTORDATA>();
 
             if (context.ProviderGuid == VSConstants.ProjectReferenceProvider_Guid) {
-                removedReferences = GetRemovedReferences(context as IVsProjectReferenceProviderContext);
-            } else if (context.ProviderGuid == VSConstants.FileReferenceProvider_Guid) {
-                removedReferences = GetRemovedReferences(context as IVsFileReferenceProviderContext);
+                addedReferences = GetAddedReferences(context as IVsProjectReferenceProviderContext);
             }
+            else if (context.ProviderGuid == VSConstants.FileReferenceProvider_Guid) {
+                addedReferences = GetAddedReferences(context as IVsFileReferenceProviderContext);
+            }
+
+            return addedReferences;
+        }
+
+        private __VSREFERENCECHANGEOPERATIONRESULT RemoveReferences(IVsReferenceProviderContext context) {
+            var removedReferences = this.GetRemovedReferences(context);
 
             foreach (var refNode in removedReferences) {
                 refNode.Remove(true /* delete from storage*/);
             }
 
             return __VSREFERENCECHANGEOPERATIONRESULT.VSREFERENCECHANGEOPERATIONRESULT_ALLOW;
+        }
+
+        protected virtual IEnumerable<ReferenceNode> GetRemovedReferences(IVsReferenceProviderContext context) {
+            var removedReferences = Enumerable.Empty<ReferenceNode>();
+
+            if (context.ProviderGuid == VSConstants.ProjectReferenceProvider_Guid) {
+                removedReferences = GetRemovedReferences(context as IVsProjectReferenceProviderContext);
+            }
+            else if (context.ProviderGuid == VSConstants.FileReferenceProvider_Guid) {
+                removedReferences = GetRemovedReferences(context as IVsFileReferenceProviderContext);
+            }
+
+            return removedReferences;
         }
 
         private IEnumerable<VSCOMPONENTSELECTORDATA> GetAddedReferences(IVsProjectReferenceProviderContext context) {
