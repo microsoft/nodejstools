@@ -23,6 +23,11 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.Text;
 
 namespace Microsoft.NodejsTools.Repl {
+#if INTERACTIVE_WINDOW
+    using IReplCommand = IInteractiveWindowCommand;
+    using IReplWindow = IInteractiveWindow;    
+#endif
+
     [Export(typeof(IReplCommand))]
     class SaveReplCommand : IReplCommand {
         #region IReplCommand Members
