@@ -4,7 +4,7 @@
     <Description Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3021"/>
     <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="417"/>
     <ProjectType>Node.js</ProjectType>
-    <DefaultName>EmptyPug.pug</DefaultName>
+    <DefaultName>Page.pug</DefaultName>
     <SortOrder>430</SortOrder>
   </TemplateData>
   <TemplateContent>

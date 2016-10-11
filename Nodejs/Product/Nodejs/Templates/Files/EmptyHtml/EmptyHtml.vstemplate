@@ -4,7 +4,7 @@
     <Description Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3033"/>
     <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="415"/>
     <ProjectType>Node.js</ProjectType>
-    <DefaultName>EmptyHtml.html</DefaultName>
+    <DefaultName>Page.html</DefaultName>
     <SortOrder>400</SortOrder>
   </TemplateData>
   <TemplateContent>

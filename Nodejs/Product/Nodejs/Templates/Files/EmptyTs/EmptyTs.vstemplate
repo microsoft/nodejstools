@@ -4,7 +4,7 @@
     <Description Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3018"/>
     <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3"/>
     <ProjectType>Node.js</ProjectType>
-    <DefaultName>EmptyTs.ts</DefaultName>
+    <DefaultName>TypeScript.ts</DefaultName>
     <SortOrder>200</SortOrder>
   </TemplateData>
   <TemplateContent>

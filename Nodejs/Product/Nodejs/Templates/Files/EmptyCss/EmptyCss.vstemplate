@@ -4,7 +4,7 @@
     <Description Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3030"/>
     <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="414"/>
     <ProjectType>Node.js</ProjectType>
-    <DefaultName>EmptyCss.css</DefaultName>
+    <DefaultName>StyleSheet.css</DefaultName>
     <SortOrder>410</SortOrder>
   </TemplateData>
   <TemplateContent>
