@@ -1,0 +1,13 @@
+<VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+  <TemplateData>
+    <Name Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3035"/>
+    <Description Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3036"/>
+    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="416"/>
+    <ProjectType>Node.js</ProjectType>
+    <DefaultName>EmptyXml.xml</DefaultName>
+    <SortOrder>490</SortOrder>
+  </TemplateData>
+  <TemplateContent>
+    <ProjectItem SubType="Code" TargetFileName="$fileinputname$.$fileinputextension$" ReplaceParameters="true">EmptyXml.xml</ProjectItem>
+  </TemplateContent>
+</VSTemplate>

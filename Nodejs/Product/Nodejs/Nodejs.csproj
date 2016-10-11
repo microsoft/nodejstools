@@ -635,6 +635,18 @@
     </ConditionalEmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ZipItem Include="Templates\Files\EmptyCss\EmptyCss.css" />
+    <ZipItem Include="Templates\Files\EmptyCss\EmptyCss.vstemplate" />
+    <ZipItem Include="Templates\Files\EmptyHtml\EmptyHtml.html" />
+    <ZipItem Include="Templates\Files\EmptyHtml\EmptyHtml.vstemplate" />
+    <ZipItem Include="Templates\Files\EmptyJson\EmptyJson.vstemplate" />
+    <ZipItem Include="Templates\Files\EmptyJs\EmptyJs.js" />
+    <ZipItem Include="Templates\Files\EmptyJs\EmptyJs.vstemplate" />
+    <ZipItem Include="Templates\Files\EmptyLess\EmptyLess.vstemplate" />
+    <ZipItem Include="Templates\Files\EmptyPug\EmptyPug.vstemplate" />
+    <ZipItem Include="Templates\Files\EmptyTs\EmptyTs.vstemplate" />
+    <ZipItem Include="Templates\Files\EmptyXml\EmptyXml.vstemplate" />
+    <ZipItem Include="Templates\Files\EmptyXml\EmptyXml.xml" />
     <Content Include="TypingsAcquisitionTool\index.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -704,6 +716,9 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\mine.typings.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\www" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\typings.json" />
+    <ZipItem Include="Templates\Files\EmptyJson\EmptyJson.json" />
+    <ZipItem Include="Templates\Files\EmptyLess\EmptyLess.less" />
+    <ZipItem Include="Templates\Files\EmptyPug\EmptyPug.pug" />
     <None Include="Theme\contrast.vstheme">
       <SubType>Designer</SubType>
     </None>
@@ -738,14 +753,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubPath>RemoteDebug</VSIXSubPath>
-    </Content>
-    <Content Include="FileTemplates\NewItem\EmptyTs.ts">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="FileTemplates\NewItem\EmptyHtml.html">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <ZipProject Include="ProjectTemplates\FromExistingCode\FromExistingCode.njsproj">
       <SubType>Designer</SubType>
@@ -904,14 +911,6 @@
       <ResourceName>1000</ResourceName>
       <SubType>Designer</SubType>
     </VSCTCompile>
-    <Content Include="FileTemplates\NewItem\EmptyJs.js">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="FileTemplates\NewItem\TextFile.txt">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\AzureNodejsApp.vstemplate">
       <SubType>Designer</SubType>
     </ZipProject>
@@ -921,10 +920,6 @@
       <TargetPath>Microsoft.NodejsTools.Developer.targets</TargetPath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
-    </Content>
-    <Content Include="FileTemplates\NewItem\NewItems.vsdir">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\ChangeConfig.ps1" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\download.ps1" />
@@ -959,26 +954,6 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\README.md" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\main.css" />
-    <Content Include="FileTemplates\NewItem\EmptyPug.pug">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="FileTemplates\NewItem\EmptyJson.json">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="FileTemplates\NewItem\EmptyXml.xml">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="FileTemplates\NewItem\EmptyCss.css">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="FileTemplates\NewItem\EmptyLess.less">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\TypeScriptWebApp.njsproj">
       <SubType>Designer</SubType>
     </TypeScriptProject>
@@ -1160,6 +1135,9 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\mime.d.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <ZipItem Include="Templates\Files\EmptyTs\EmptyTs.ts" />
   </ItemGroup>
   <PropertyGroup>
     <!--
