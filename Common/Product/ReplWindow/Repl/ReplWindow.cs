@@ -1172,7 +1172,7 @@ namespace Microsoft.VisualStudio.Repl {
             }
 
             ITextSnapshotLine langLine = langCaret.Value.GetContainingLine();
-            int? langIndentation = _languageIndenter.GetDesiredIndentation(langLine);
+            int? langIndentation = _languageIndenter?.GetDesiredIndentation(langLine);
 
             if (langIndentation != null) {
                 if (langCaret.Value == langLine.End) {

@@ -8,3 +8,7 @@ package name=Microsoft.VisualStudio.NodejsTools.InteractiveWindow
 
 vs.payloads
     vs.payload source=$(BuildOutputRoot)\Binaries\InteractiveWindow\Microsoft.NodejsTools.InteractiveWindow.vsix
+
+vs.dependencies
+  vs.dependency id=Microsoft.VisualStudio.MinShell
+                version=[15.0,16.0)
