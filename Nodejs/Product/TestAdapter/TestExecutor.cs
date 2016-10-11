@@ -89,7 +89,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
             if (_cancelRequested.WaitOne(0)) {
                 return;
             }
-            // launch node process here?
             // May be null, but this is handled by RunTestCase if it matters.
             // No VS instance just means no debugging, but everything else is
             // okay.
@@ -101,9 +100,8 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 NodejsProjectSettings settings = null;
 
                 // put tests into dictionary where key is their project working directory
-                // NOTE: Not sure if this is necessary, but it seems to me that if we were
-                // to run all tests over multiple projects in a solution, we would have to
-                // separate the tests by their project in order to launch the node process
+                // NOTE: It seems to me that if we were to run all tests over multiple projects in a solution, 
+                // we would have to separate the tests by their project in order to launch the node process
                 // correctly (to make sure we are using the correct working folder).
                 foreach (var test in receiver.Tests) {
                     if (!sourceToSettings.TryGetValue(test.Source, out settings)) {
@@ -115,6 +113,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                     projectToTests[settings.WorkingDir].Add(test);
                 }
 
+                // where key is the workingDir and value is a list of tests
                 foreach (KeyValuePair<string, List<TestCase>> entry in projectToTests) {
                     List<string> args = new List<string>();
                     TestCase firstTest = entry.Value.ElementAt(0);
@@ -127,18 +126,9 @@ namespace Microsoft.NodejsTools.TestAdapter {
                     args.AddRange(GetInterpreterArgs(firstTest, entry.Key, settings.ProjectRootDir));
 
                     // launch node process
-                    _psi = new ProcessStartInfo("cmd.exe") {
-                        Arguments = string.Format(@"/S /C pushd {0} & {1} {2}",
-                        QuoteSingleArgument(entry.Key),
-                        QuoteSingleArgument(settings.NodeExePath),
-                        GetArguments(args, true)),
-                        CreateNoWindow = true,
-                        UseShellExecute = false
-                    };
-                    _psi.RedirectStandardInput = true;
-                    _psi.RedirectStandardOutput = true;
-                    _nodeProcess = Process.Start(_psi);
+                    LaunchNodeProcess(entry.Key, settings.NodeExePath, args);
 
+                    // Run all test cases in a given project
                     RunTestCases(entry.Value, runContext, frameworkHandle);
 
                     // dispose node process
@@ -249,39 +239,41 @@ namespace Microsoft.NodejsTools.TestAdapter {
             }
 
             lock (_syncObject) {
-                //#if DEBUG
-                //                frameworkHandle.SendMessage(TestMessageLevel.Informational, "cd " + workingDir);
-                //                frameworkHandle.SendMessage(TestMessageLevel.Informational, _nodeProcess.Arguments);
-                //#endif
+#if DEBUG
+                frameworkHandle.SendMessage(TestMessageLevel.Informational, "cd " + workingDir);
+                //frameworkHandle.SendMessage(TestMessageLevel.Informational, _nodeProcess.Arguments);
+#endif
                 // send test to run_tests.js
                 TestCaseObject testObject = new TestCaseObject(args[1], args[2], args[3], args[4], args[5]);
-                standardInput.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(testObject));
-                standardInput.Close();
-
-                //_nodeProcess.Wait(TimeSpan.FromMilliseconds(500));
-                //                if (runContext.IsBeingDebugged && app != null) {
-                //                    try {
-                //                        //the '#ping=0' is a special flag to tell VS node debugger not to connect to the port,
-                //                        //because a connection carries the consequence of setting off --debug-brk, and breakpoints will be missed.
-                //                        string qualifierUri = string.Format("tcp://localhost:{0}#ping=0", port);
-                //                        while (!app.AttachToProcess(_nodeProcess, NodejsRemoteDebugPortSupplierUnsecuredId, qualifierUri)) {
-                //                            if (_nodeProcess.Wait(TimeSpan.FromMilliseconds(500))) {
-                //                                break;
-                //                            }
-                //                        }
-                //#if DEBUG
-                //                    } catch (COMException ex) {
-                //                        frameworkHandle.SendMessage(TestMessageLevel.Error, "Error occurred connecting to debuggee.");
-                //                        frameworkHandle.SendMessage(TestMessageLevel.Error, ex.ToString());
-                //                        KillNodeProcess();
-                //                    }
-                //#else
-                //                    } catch (COMException) {
-                //                        frameworkHandle.SendMessage(TestMessageLevel.Error, "Error occurred connecting to debuggee.");
-                //                        KillNodeProcess();
-                //                    }
-                //#endif
-                //                }
+                if (!_nodeProcess.HasExited) {
+                    standardInput.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(testObject));
+                    _nodeProcess.WaitForExit(5000);
+                }
+                //standardInput.Close();                
+                if (runContext.IsBeingDebugged && app != null) {
+                    try {
+                        //the '#ping=0' is a special flag to tell VS node debugger not to connect to the port,
+                        //because a connection carries the consequence of setting off --debug-brk, and breakpoints will be missed.
+                        string qualifierUri = string.Format("tcp://localhost:{0}#ping=0", port);
+                        //while (!app.AttachToProcess(_nodeProcess, NodejsRemoteDebugPortSupplierUnsecuredId, qualifierUri)) {
+                        //    if (_nodeProcess.Wait(TimeSpan.FromMilliseconds(500))) {
+                        //        break;
+                        //    }
+                        //}
+#if DEBUG
+                    }
+                    catch (COMException ex) {
+                        frameworkHandle.SendMessage(TestMessageLevel.Error, "Error occurred connecting to debuggee.");
+                        frameworkHandle.SendMessage(TestMessageLevel.Error, ex.ToString());
+                        KillNodeProcess();
+                    }
+#else
+                                    } catch (COMException) {
+                                        frameworkHandle.SendMessage(TestMessageLevel.Error, "Error occurred connecting to debuggee.");
+                                        KillNodeProcess();
+                                    }
+#endif
+                }
             }
             var result = GetTestResultFromProcess(standardOutput);
 
@@ -316,7 +308,22 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 }
                 break;
             }
+            sr.DiscardBufferedData();
             return result;
+        }
+
+        private void LaunchNodeProcess(string workingDir, string nodeExePath, List<string> args) {
+            _psi = new ProcessStartInfo("cmd.exe") {
+                Arguments = string.Format(@"/S /C pushd {0} & {1} {2}",
+                QuoteSingleArgument(workingDir),
+                QuoteSingleArgument(nodeExePath),
+                GetArguments(args, true)),
+                CreateNoWindow = true,
+                UseShellExecute = false
+            };
+            _psi.RedirectStandardInput = true;
+            _psi.RedirectStandardOutput = true;
+            _nodeProcess = Process.Start(_psi);
         }
 
         private NodejsProjectSettings LoadProjectSettings(string projectFile) {
@@ -390,8 +397,8 @@ namespace Microsoft.NodejsTools.TestAdapter {
             result.Duration = result.EndTime - result.StartTime;
             result.Outcome = outcome;
             result.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, stdout));
-            result.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, stderr));
-            result.Messages.Add(new TestResultMessage(TestResultMessage.AdditionalInfoCategory, stderr));
+            result.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, stderr));                 
+            result.Messages.Add(new TestResultMessage(TestResultMessage.AdditionalInfoCategory, stderr));            
 
             frameworkHandle.RecordResult(result);
             frameworkHandle.RecordEnd(test, outcome);
