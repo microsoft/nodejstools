@@ -18,13 +18,11 @@ using System;
 using System.Text;
 using System.Windows;
 using Microsoft.NodejsTools.Npm;
+using Microsoft.NodejsTools.Project;
 
 namespace Microsoft.NodejsTools.NpmUI
 {
     internal static class ErrorHelper {
-
-        private const string CaptionNpmNotInstalled = "npm Not Installed";
-
         private static Exception _lastNpmNotFoundException;
 
         public static string GetExceptionDetailsText(Exception e) {
@@ -74,28 +72,21 @@ namespace Microsoft.NodejsTools.NpmUI
                 }
             }
 
-            var message =
-                string.Format(@"Could not find npm.cmd. Ensure you have a recent version of node.js installed and have specified the location of node.exe in the project properties, or that it is available on your system PATH.
-
-The following error occurred trying to execute npm.cmd:
-
-{0}", nnfe.Message);
-
+            var message = SR.GetString(SR.NpmNotInstalledMessageText, nnfe.Message);
             if (null == owner) {
                 MessageBox.Show(
                     message,
-                    CaptionNpmNotInstalled,
+                    SR.GetString(SR.NpmNotInstalledMessageCaption),
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             } else {
                 MessageBox.Show(
                     owner,
                     message,
-                    CaptionNpmNotInstalled,
+                    SR.GetString(SR.NpmNotInstalledMessageCaption),
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
-
         }
     }
 }

@@ -486,7 +486,7 @@ namespace Microsoft.NodejsTools.Project {
             if (NpmController.RootPackage == null) {
                 NpmController.Refresh();
                 if (NpmController.RootPackage == null) {
-                    MessageBox.Show(String.Format("Unable to parse {0} from your project.  Please fix any errors and try again.", NodejsConstants.PackageJsonFile));
+                    MessageBox.Show(SR.GetString(SR.NodeModulesCouldNotParsePackageJsonErrorMessageText, NodejsConstants.PackageJsonFile));
                     return;
                 }
             }

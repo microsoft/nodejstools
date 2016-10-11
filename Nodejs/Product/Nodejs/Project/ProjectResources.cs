@@ -23,6 +23,11 @@ namespace Microsoft.NodejsTools.Project {
     internal class SR : CommonSR {
         internal const string NodejsToolsForVisualStudio = "NodejsToolsForVisualStudio";
 
+        internal const string NodeModulesCouldNotParsePackageJsonErrorMessageText = "NodeModulesCouldNotParsePackageJsonErrorMessageText";
+        internal const string NpmNotInstalledMessageText = "NpmNotInstalledMessageText";
+        internal const string NpmNotInstalledMessageCaption = "NpmNotInstalledMessageCaption";
+        internal const string ImportingProjectAccessErrorStatusText = "ImportingProjectAccessErrorStatusText";
+        internal const string ImportingProjectUnexpectedErrorMessage = "ImportingProjectUnexpectedErrorMessage";
         internal const string AzureToolsInstallInstructions = "AzureToolsInstallInstructions";
         internal const string AzureToolsRequired = "AzureToolsRequired";
         internal const string AzureToolsUpgradeInstructions = "AzureToolsUpgradeInstructions";
@@ -43,12 +48,18 @@ namespace Microsoft.NodejsTools.Project {
         internal const string EcmaScript6 = "EcmaScript6";
         internal const string EnvironmentVariables = "EnvironmentVariables";
         internal const string ErrorNoDte = "ErrorNoDte";
+        internal const string ImportingProjectStatusText = "ImportingProjectStatusText";
+        internal const string ImportingProjectErrorStatusText = "ImportingProjectErrorStatusText";
         internal const string IncludeNodeModulesCancelTitle = "IncludeNodeModulesCancelTitle";
         internal const string IncludeNodeModulesContent = "IncludeNodeModulesContent";
         internal const string IncludeNodeModulesIncludeDescription = "IncludeNodeModulesIncludeDescription";
         internal const string IncludeNodeModulesIncludeTitle = "IncludeNodeModulesIncludeTitle";
         internal const string IncludeNodeModulesInformation = "IncludeNodeModulesInformation";
         internal const string InsertSnippet = "InsertSnippet";
+        internal const string InteractiveWindowProcessExitedMessage = "InteractiveWindowProcessExitedMessage";
+        internal const string InteractiveWindowFailedToStartProcessErrorMessage = "InteractiveWindowFailedToStartProcessErrorMessage";
+        internal const string InteractiveWindowNoProcessErrorMessage = "InteractiveWindowNoProcessErrorMessage";
+        internal const string InteractiveWindowTitle = "InteractiveWindowTitle";
         internal const string InvalidPortNumber = "InvalidPortNumber";
         internal const string LaunchUrlToolTip = "LaunchUrlToolTip";
         internal const string LinkStatusLinkedToProject = "LinkStatusLinkedToProject";

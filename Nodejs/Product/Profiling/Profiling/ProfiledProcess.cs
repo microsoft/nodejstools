@@ -141,7 +141,7 @@ namespace Microsoft.NodejsTools.Profiling {
                             .Reverse()
                             .FirstOrDefault();
                         if (v8log == null) {
-                            MessageBox.Show(String.Format("v8 log file was not successfully saved to:\r\n{0}\r\n\r\nNo profiling data is available.", v8log));
+                            MessageBox.Show(string.Format(Resources.FailedToSaveV8LogMessageText, v8log));
                             return;
                         }
                     }
@@ -176,11 +176,7 @@ namespace Microsoft.NodejsTools.Profiling {
                 } catch {
                     // file in use, multiple node.exe's running, user trying
                     // to profile multiple times, etc...
-                    MessageBox.Show(string.Format(
-                        "Unable to delete '{0}'.\r\n\r\n" +
-                        "There is probably a second copy of node.exe running and the\r\n" +
-                        "results may be unavailable or incorrect.\r\n",
-                        v8log));
+                    MessageBox.Show(string.Format(Resources.UnableToDeleteV8Log, v8log));
                 }
             };
 

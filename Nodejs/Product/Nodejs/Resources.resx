@@ -630,4 +630,41 @@ You will need to restart Visual Studio after installation.</value>
   <data name="TypeScriptMinVersionNotInstalled" xml:space="preserve">
     <value>Node.js Tools requires TypeScript for Visual Studio {0} or higher. Please ensure TypeScript is installed</value>
   </data>
+  <data name="ImportingProjectStatusText" xml:space="preserve">
+    <value>Importing project...</value>
+  </data>
+  <data name="ImportingProjectErrorStatusText" xml:space="preserve">
+    <value>An error occurred and your project was not created.</value>
+  </data>
+  <data name="InteractiveWindowFailedToStartProcessErrorMessage" xml:space="preserve">
+    <value>Failed to start interactive process: {0}{1}{2}</value>
+  </data>
+  <data name="InteractiveWindowNoProcessErrorMessage" xml:space="preserve">
+    <value>Current interactive window is disconnected - please reset the process.</value>
+  </data>
+  <data name="InteractiveWindowProcessExitedMessage" xml:space="preserve">
+    <value>The process has exited</value>
+  </data>
+  <data name="InteractiveWindowTitle" xml:space="preserve">
+    <value>Node.js Interactive Window</value>
+  </data>
+  <data name="ImportingProjectAccessErrorStatusText" xml:space="preserve">
+    <value>Some file paths could not be accessed.{0}Try moving your source code to a location where you can read and write files.</value>
+  </data>
+  <data name="ImportingProjectUnexpectedErrorMessage" xml:space="preserve">
+    <value>An unexpected error {0} occurred while creating your project.</value>
+  </data>
+  <data name="NodeModulesCouldNotParsePackageJsonErrorMessageText" xml:space="preserve">
+    <value>Unable to parse {0} from your project.  Please fix any errors and try again.</value>
+  </data>
+  <data name="NpmNotInstalledMessageCaption" xml:space="preserve">
+    <value>npm Not Installed</value>
+  </data>
+  <data name="NpmNotInstalledMessageText" xml:space="preserve">
+    <value>Could not find npm.cmd. Ensure you have a recent version of node.js installed and have specified the location of node.exe in the project properties, or that it is available on your system PATH.
+
+The following error occurred trying to execute npm.cmd:
+
+{0}</value>
+  </data>
 </root>

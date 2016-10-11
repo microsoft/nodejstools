@@ -293,7 +293,7 @@ namespace Microsoft.NodejsTools.Profiling {
             var item = GetReport(itemid);
 
             if (!File.Exists(item.Filename)) {
-                MessageBox.Show(String.Format("Performance report no longer exists: {0}", item.Filename), Resources.NodejsToolsForVS);
+                MessageBox.Show(string.Format(Resources.PerformanceReportNoLongerExistsMessageText, item.Filename), Resources.NodejsToolsForVS);
             } else {
                 var dte = (EnvDTE.DTE)NodejsProfilingPackage.GetGlobalService(typeof(EnvDTE.DTE));
                 dte.ItemOperations.OpenFile(item.Filename);
