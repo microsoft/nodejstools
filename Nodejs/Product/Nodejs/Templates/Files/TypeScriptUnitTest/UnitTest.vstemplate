@@ -1,8 +1,8 @@
 ﻿<VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
   <TemplateData>
-    <Name Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3047" />
-    <Description Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3046" />
-    <Icon Package="{2ffe45c4-5c73-493c-b187-f2e955ff875e}" ID="3" />
+    <Name Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3047"/>
+    <Description Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3046"/>
+    <Icon Package="{2ffe45c4-5c73-493c-b187-f2e955ff875e}" ID="3"/>
     <ProjectType>Node.js</ProjectType>
     <DefaultName>UnitTest.ts</DefaultName>
     <SortOrder>310</SortOrder>

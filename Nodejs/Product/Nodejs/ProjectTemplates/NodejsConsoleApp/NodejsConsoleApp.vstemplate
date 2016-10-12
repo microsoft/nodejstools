@@ -1,8 +1,8 @@
 <VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
   <TemplateData>
-    <Name Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3071" />
-    <Description Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3072" />
-    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="405" />
+    <Name Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3071"/>
+    <Description Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3072"/>
+    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="405"/>
     <ProjectType>JavaScript</ProjectType>
     <TemplateID>Microsoft.JavaScript.NodejsConsoleApp</TemplateID>
     <SortOrder>125</SortOrder>
