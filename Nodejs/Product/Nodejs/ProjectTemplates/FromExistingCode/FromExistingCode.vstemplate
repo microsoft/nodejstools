@@ -1,7 +1,7 @@
 <VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
   <TemplateData>
-    <Name>From Existing Node.js code</Name>
-    <Description>Creates a new Node.js project from existing code.</Description>
+    <Name Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3069" />
+    <Description Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3070" />
     <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="408" />
     <ProjectType>JavaScript</ProjectType>
     <TemplateID>Microsoft.JavaScript.NodejsFromExistingCode</TemplateID>
