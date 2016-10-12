@@ -95,37 +95,37 @@ namespace Microsoft.NodejsTools.TestAdapter {
             using (var app = VisualStudioApp.FromEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable)) {
                 // .njsproj file path -> project settings
 
-                //var projectToTests = new Dictionary<string, List<TestCase>>();
+                var projectToTests = new Dictionary<string, List<TestCase>>();
                 var sourceToSettings = new Dictionary<string, NodejsProjectSettings>();
                 NodejsProjectSettings settings = null;
 
                 // put tests into dictionary where key is their project working directory
                 // NOTE: It seems to me that if we were to run all tests over multiple projects in a solution, 
                 // we would have to separate the tests by their project in order to launch the node process
-                // correctly (to make sure we are using the correct working folder).
+                // correctly (to make sure we are using the correct working folder) and also to run
+                // groups of tests by test suite.
 
-                //foreach (var test in receiver.Tests) {
-                //    if (!sourceToSettings.TryGetValue(test.Source, out settings)) {
-                //        sourceToSettings[test.Source] = settings = LoadProjectSettings(test.Source);
-                //    }
-                //    if (!projectToTests.ContainsKey(settings.WorkingDir)) {
-                //        projectToTests[settings.WorkingDir] = new List<TestCase>();
-                //    }
-                //    projectToTests[settings.WorkingDir].Add(test);
-                //}
+                foreach (var test in receiver.Tests) {
+                    if (!sourceToSettings.TryGetValue(test.Source, out settings)) {
+                        sourceToSettings[test.Source] = settings = LoadProjectSettings(test.Source);
+                    }
+                    if (!projectToTests.ContainsKey(settings.WorkingDir)) {
+                        projectToTests[settings.WorkingDir] = new List<TestCase>();
+                    }
+                    projectToTests[settings.WorkingDir].Add(test);
+                }
 
                 // where key is the workingDir and value is a list of tests
+                foreach (KeyValuePair<string, List<TestCase>> entry in projectToTests) {
+                    List<string> args = new List<string>();
+                    TestCase firstTest = entry.Value.ElementAt(0);
+                    int port = 0;
+                    if (runContext.IsBeingDebugged && app != null) {
+                        app.GetDTE().Debugger.DetachAll();
+                        args.AddRange(GetDebugArgs(settings, out port));
+                    }
 
-                //foreach (KeyValuePair<string, List<TestCase>> entry in projectToTests) {
-                //    List<string> args = new List<string>();
-                //    TestCase firstTest = entry.Value.ElementAt(0);
-                //    int port = 0;
-                //    if (runContext.IsBeingDebugged && app != null) {
-                //        app.GetDTE().Debugger.DetachAll();
-                //        args.AddRange(GetDebugArgs(settings, out port));
-                //    }
-
-                //    args.AddRange(GetInterpreterArgs(firstTest, entry.Key, settings.ProjectRootDir));
+                    //args.AddRange(GetInterpreterArgs(firstTest, entry.Key, settings.ProjectRootDir));
 
                     // eventually launch node process here
 
@@ -221,7 +221,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 return;
             }
 
-            
+
 
             NodejsTestInfo testInfo = new NodejsTestInfo(test.FullyQualifiedName);
             List<string> args = new List<string>();
@@ -405,72 +405,70 @@ namespace Microsoft.NodejsTools.TestAdapter {
             result.Duration = result.EndTime - result.StartTime;
             result.Outcome = outcome;
             result.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, stdout));
-            result.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, stderr));                 
-            result.Messages.Add(new TestResultMessage(TestResultMessage.AdditionalInfoCategory, stderr));            
+            result.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, stderr));
+            result.Messages.Add(new TestResultMessage(TestResultMessage.AdditionalInfoCategory, stderr));
 
             frameworkHandle.RecordResult(result);
             frameworkHandle.RecordEnd(test, outcome);
         }
-
-        class DataReceiver {
-            public readonly StringBuilder Data = new StringBuilder();
-
-            public void DataReceived(object sender, DataReceivedEventArgs e) {
-                if (e.Data != null) {
-                    Data.AppendLine(e.Data);
-                }
-            }
-        }
-
-        class TestReceiver : ITestCaseDiscoverySink {
-            public List<TestCase> Tests { get; private set; }
-
-            public TestReceiver() {
-                Tests = new List<TestCase>();
-            }
-
-            public void SendTestCase(TestCase discoveredTest) {
-                Tests.Add(discoveredTest);
-            }
-        }
-
-        class NodejsProjectSettings {
-            public NodejsProjectSettings() {
-                NodeExePath = String.Empty;
-                SearchPath = String.Empty;
-                WorkingDir = String.Empty;
-            }
-
-            public string NodeExePath { get; set; }
-            public string SearchPath { get; set; }
-            public string WorkingDir { get; set; }
-            public string ProjectRootDir { get; set; }
-        }
-
-        class TestCaseObject {
-            public TestCaseObject() {
-                framework = String.Empty;
-                testName = String.Empty;
-                testFile = String.Empty;
-                workingFolder = String.Empty;
-                projectFolder = String.Empty;
-            }
-
-            public TestCaseObject(string framework, string testName, string testFile, string workingFolder, string projectFolder) {
-                this.framework = framework;
-                this.testName = testName;
-                this.testFile = testFile;
-                this.workingFolder = workingFolder;
-                this.projectFolder = projectFolder;
-            }
-            public string framework { get; set; }
-            public string testName { get; set; }
-            public string testFile { get; set; }
-            public string workingFolder { get; set; }
-            public string projectFolder { get; set; }
-
-        }
-
     }
+}
+
+class DataReceiver {
+    public readonly StringBuilder Data = new StringBuilder();
+
+    public void DataReceived(object sender, DataReceivedEventArgs e) {
+        if (e.Data != null) {
+            Data.AppendLine(e.Data);
+        }
+    }
+}
+
+class TestReceiver : ITestCaseDiscoverySink {
+    public List<TestCase> Tests { get; private set; }
+
+    public TestReceiver() {
+        Tests = new List<TestCase>();
+    }
+
+    public void SendTestCase(TestCase discoveredTest) {
+        Tests.Add(discoveredTest);
+    }
+}
+
+class NodejsProjectSettings {
+    public NodejsProjectSettings() {
+        NodeExePath = String.Empty;
+        SearchPath = String.Empty;
+        WorkingDir = String.Empty;
+    }
+
+    public string NodeExePath { get; set; }
+    public string SearchPath { get; set; }
+    public string WorkingDir { get; set; }
+    public string ProjectRootDir { get; set; }
+}
+
+class TestCaseObject {
+    public TestCaseObject() {
+        framework = String.Empty;
+        testName = String.Empty;
+        testFile = String.Empty;
+        workingFolder = String.Empty;
+        projectFolder = String.Empty;
+    }
+
+    public TestCaseObject(string framework, string testName, string testFile, string workingFolder, string projectFolder) {
+        this.framework = framework;
+        this.testName = testName;
+        this.testFile = testFile;
+        this.workingFolder = workingFolder;
+        this.projectFolder = projectFolder;
+    }
+    public string framework { get; set; }
+    public string testName { get; set; }
+    public string testFile { get; set; }
+    public string workingFolder { get; set; }
+    public string projectFolder { get; set; }
 
 }
