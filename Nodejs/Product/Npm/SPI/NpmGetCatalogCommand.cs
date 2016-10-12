@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -239,7 +240,7 @@ etc.
                         try {
                             builder.LatestVersion = SemverVersion.Parse(latestVersion);
                         } catch (SemverVersionFormatException) {
-                            OnOutputLogged(String.Format(
+                            OnOutputLogged(string.Format(
                                 Resources.InvalidPackageSemVersion,
                                 latestVersion,
                                 builder.Name));
@@ -261,7 +262,7 @@ etc.
                 // Occurs if a JValue appears where we expect JProperty
                 return null;
             } catch (ArgumentException) {
-                OnOutputLogged(string.Format(Resources.ParsingError, builder.Name));
+                OnOutputLogged(string.Format(CultureInfo.CurrentCulture, Resources.ParsingError, builder.Name));
                 return null;
             }
             return package;
@@ -350,14 +351,14 @@ etc.
             string relativeUri, filename;
 
             if (refreshStartKey > 0) {
-                relativeUri = String.Format("-/all/since?stale=update_after&startkey={0}", refreshStartKey);
+                relativeUri = string.Format("-/all/since?stale=update_after&startkey={0}", refreshStartKey);
                 filename = Path.Combine(cachePath, "since_packages.json");
             } else {
                 relativeUri = "-/all";
                 filename = Path.Combine(cachePath, "all_packages.json");
             }
 
-            OnOutputLogged(string.Format(Resources.InfoPackageCacheWriteLocation, filename));
+            OnOutputLogged(string.Format(CultureInfo.CurrentCulture, Resources.InfoPackageCacheWriteLocation, filename));
 
             Uri packageUri;
             if (!Uri.TryCreate(registry, relativeUri, out packageUri)) {
@@ -379,7 +380,7 @@ etc.
                     totalLength = -1;
                 }
 
-                var progress = string.Format(Resources.PackagesDownloadStarting, packageUri.AbsoluteUri);
+                var progress = string.Format(CultureInfo.CurrentCulture, Resources.PackagesDownloadStarting, packageUri.AbsoluteUri);
                 OnOutputLogged(progress);
                 if (_progress != null) {
                     _progress.Report(progress);
@@ -468,7 +469,7 @@ etc.
                 }
 
                 Uri registryUrl = await GetRegistryUrl();
-                OnOutputLogged(string.Format(Resources.InfoRegistryUrl, registryUrl));
+                OnOutputLogged(string.Format(CultureInfo.CurrentCulture, Resources.InfoRegistryUrl, registryUrl));
 
                 try {
                     DbVersion version = null;
@@ -522,7 +523,7 @@ etc.
 
                     if (catalogUpdated) {
                         var fileInfo = new FileInfo(filename);
-                        OnOutputLogged(String.Format(Resources.InfoReadingBytesFromPackageCache, fileInfo.Length, filename, fileInfo.LastWriteTime));
+                        OnOutputLogged(string.Format(CultureInfo.CurrentCulture, Resources.InfoReadingBytesFromPackageCache, fileInfo.Length, filename, fileInfo.LastWriteTime));
 
                         using (var reader = new StreamReader(filename)) {
                             await Task.Run(() => ParseResultsAndAddToDatabase(reader, registryCacheFilePath, registryUrl.ToString()));
@@ -545,11 +546,11 @@ etc.
                     throw;
                 } finally {
                     if (ResultsCount == null) {
-                        OnOutputLogged(string.Format(Resources.DownloadOrParsingFailed, CachePath));
+                        OnOutputLogged(string.Format(CultureInfo.CurrentCulture, Resources.DownloadOrParsingFailed, CachePath));
                         SafeDeleteFolder(registryCacheDirectory);
                     } else if (ResultsCount <= 0) {
                         // Database file exists, but is corrupt. Delete database, so that we can download the file next time arround.
-                        OnOutputLogged(string.Format(Resources.DatabaseCorrupt, dbFilename));
+                        OnOutputLogged(string.Format(CultureInfo.CurrentCulture, Resources.DatabaseCorrupt, dbFilename));
                         SafeDeleteFolder(registryCacheDirectory);
                     }
 
@@ -559,10 +560,10 @@ etc.
 
             LastRefreshed = File.GetLastWriteTime(registryCacheFilePath);
 
-            OnOutputLogged(String.Format(Resources.InfoCurrentTime, DateTime.Now));
-            OnOutputLogged(String.Format(Resources.InfoLastRefreshed, LastRefreshed));
+            OnOutputLogged(string.Format(CultureInfo.CurrentCulture, Resources.InfoCurrentTime, DateTime.Now));
+            OnOutputLogged(string.Format(CultureInfo.CurrentCulture, Resources.InfoLastRefreshed, LastRefreshed));
             if (ResultsCount != null) {
-                OnOutputLogged(String.Format(Resources.InfoNumberOfResults, ResultsCount));
+                OnOutputLogged(string.Format(CultureInfo.CurrentCulture, Resources.InfoNumberOfResults, ResultsCount));
             }
 
             return true;
@@ -588,18 +589,18 @@ etc.
 
         private bool SafeDeleteFolder(string filename) {
             try {
-                OnOutputLogged(string.Format(Resources.InfoDeletingFile, filename));
+                OnOutputLogged(string.Format(CultureInfo.CurrentCulture, Resources.InfoDeletingFile, filename));
                 Directory.Delete(filename, true);
             } catch (DirectoryNotFoundException) {
                 // File has already been deleted. Do nothing.
             } catch (IOException exception) {
                 // files are in use or path is too long
                 OnOutputLogged(exception.Message);
-                OnOutputLogged(string.Format(Resources.FailedToDeleteFile, filename));
+                OnOutputLogged(string.Format(CultureInfo.CurrentCulture, Resources.FailedToDeleteFile, filename));
                 return false;
             } catch (Exception exception) {
                 OnOutputLogged(exception.ToString());
-                OnOutputLogged(string.Format(Resources.FailedToDeleteFile, filename));
+                OnOutputLogged(string.Format(CultureInfo.CurrentCulture, Resources.FailedToDeleteFile, filename));
                 return false;
             }
             return true;
@@ -611,7 +612,7 @@ etc.
 
         private async Task<string> UpdatePackageCache(Uri registry, string cachePath, long refreshStartKey = 0) {
             string pathToNpm = GetPathToNpm();
-            OnOutputLogged(String.Format(Resources.InfoNpmPathLocation, pathToNpm));
+            OnOutputLogged(string.Format(CultureInfo.InvariantCulture, Resources.InfoNpmPathLocation, pathToNpm));
 
             string filename = await DownloadPackageJsonCache(registry, cachePath, refreshStartKey);
             return filename;

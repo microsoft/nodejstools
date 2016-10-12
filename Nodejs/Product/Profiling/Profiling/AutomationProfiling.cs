@@ -15,6 +15,7 @@
 //*********************************************************//
 
 using System;
+using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
@@ -65,7 +66,7 @@ namespace Microsoft.NodejsTools.Profiling {
             if (interpreter.IndexOfAny(Path.GetInvalidPathChars()) == -1 && File.Exists(interpreter)) {
                 target.StandaloneTarget.InterpreterPath = interpreter;
             } else {
-                throw new InvalidOperationException(String.Format("Invalid interpreter: {0}", interpreter));
+                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Invalid interpreter: {0}", interpreter));
             }
 
             return NodejsProfilingPackage.Instance.ProfileTarget(target, openReport).GetAutomationObject();

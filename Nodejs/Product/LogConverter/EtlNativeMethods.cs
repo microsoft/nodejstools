@@ -15,6 +15,7 @@
 //*********************************************************//
 
 using System;
+using System.Globalization;
 using System.Runtime.InteropServices;
 
 namespace Microsoft.NodejsTools.LogGeneration {
@@ -187,7 +188,7 @@ namespace Microsoft.NodejsTools.LogGeneration {
         }
 
         public override string ToString() {
-            return String.Format("{0}/{1}/{2} {3}:{4}:{5}.{6}", wYear, wMonth, wDay, wHour, wMinute, wSecond, wMilliseconds);
+            return string.Format(CultureInfo.InvariantCulture, "{0}/{1}/{2} {3}:{4}:{5}.{6}", wYear, wMonth, wDay, wHour, wMinute, wSecond, wMilliseconds);
             //return ToDateTime().ToString();
         }
     }

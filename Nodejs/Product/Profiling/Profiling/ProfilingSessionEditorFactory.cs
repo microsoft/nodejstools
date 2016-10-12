@@ -182,10 +182,10 @@ namespace Microsoft.NodejsTools.Profiling {
                     fs.Close();
                 }
             } catch (IOException e) {
-                MessageBox.Show(string.Format(Resources.FailedToOpenFileErrorMessageText, e.Message), Resources.NodejsToolsForVS);
+                MessageBox.Show(string.Format(CultureInfo.CurrentCulture, Resources.FailedToOpenFileErrorMessageText, e.Message), Resources.NodejsToolsForVS);
                 return VSConstants.E_FAIL;
             } catch (InvalidOperationException e) {
-                MessageBox.Show(string.Format(Resources.FailedToReadPerformanceSessionMessageText, e.Message), Resources.NodejsToolsForVS);
+                MessageBox.Show(string.Format(CultureInfo.CurrentCulture, Resources.FailedToReadPerformanceSessionMessageText, e.Message), Resources.NodejsToolsForVS);
                 return VSConstants.E_FAIL;
             }
 

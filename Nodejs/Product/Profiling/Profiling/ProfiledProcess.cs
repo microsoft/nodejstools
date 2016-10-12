@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -38,7 +39,7 @@ namespace Microsoft.NodejsTools.Profiling {
 
         public ProfiledProcess(string exe, string interpreterArgs, string script, string scriptArgs, string dir, Dictionary<string, string> envVars, ProcessorArchitecture arch, string launchUrl, int? port, bool startBrowser, bool justMyCode) {
             if (arch != ProcessorArchitecture.X86 && arch != ProcessorArchitecture.Amd64) {
-                throw new InvalidOperationException(String.Format("Unsupported architecture: {0}", arch));
+                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Unsupported architecture: {0}", arch));
             }
             if (dir.EndsWith("\\", StringComparison.Ordinal)) {
                 dir = dir.Substring(0, dir.Length - 1);
@@ -80,7 +81,7 @@ namespace Microsoft.NodejsTools.Profiling {
                 }
             }
 
-            processInfo.Arguments = String.Format("{1} --prof \"{0}\" {2}", script, interpreterArgs, scriptArgs);
+            processInfo.Arguments = string.Format(CultureInfo.InvariantCulture, "{1} --prof \"{0}\" {2}", script, interpreterArgs, scriptArgs);
             _process = new Process();
             _process.StartInfo = processInfo;
         }

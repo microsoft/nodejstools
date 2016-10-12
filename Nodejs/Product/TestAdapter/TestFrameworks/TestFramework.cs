@@ -17,6 +17,7 @@
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Threading;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -152,14 +153,14 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
 
                     process.WaitForExit();
 #if DEBUG
-                    logger.SendMessage(TestMessageLevel.Informational, String.Format("  Process exited: {0}", process.ExitCode));
+                    logger.SendMessage(TestMessageLevel.Informational, string.Format(CultureInfo.InvariantCulture, "  Process exited: {0}", process.ExitCode));
 #endif
                 }
 #if DEBUG
-                logger.SendMessage(TestMessageLevel.Informational, String.Format("  StdOut:{0}", stdout));
+                logger.SendMessage(TestMessageLevel.Informational, string.Format(CultureInfo.InvariantCulture, "  StdOut:{0}", stdout));
 #endif
             } catch (FileNotFoundException e) {
-                logger.SendMessage(TestMessageLevel.Error, String.Format("Error starting node.exe.\n {0}", e));
+                logger.SendMessage(TestMessageLevel.Error, string.Format(CultureInfo.InvariantCulture, "Error starting node.exe.\n {0}", e));
             }
 
             return stdout;

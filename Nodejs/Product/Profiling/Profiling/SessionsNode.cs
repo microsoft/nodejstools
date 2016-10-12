@@ -24,6 +24,7 @@ using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
+using System.Globalization;
 
 namespace Microsoft.NodejsTools.Profiling {
     /// <summary>
@@ -102,7 +103,7 @@ namespace Microsoft.NodejsTools.Profiling {
         internal SessionNode OpenTarget(ProfilingTarget target, string filename) {
             for (int i = 0; i < _sessions.Count; i++) {
                 if (_sessions[i].Filename == filename) {
-                    throw new InvalidOperationException(String.Format("Performance '{0}' session is already open", filename));
+                    throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Performance '{0}' session is already open", filename));
                 }
             }
 
