@@ -2,11 +2,31 @@
 var EOL = require('os').EOL;
 var fs = require('fs');
 var path = require('path');
-
+var result = {
+    "title": "",
+    "passed": false,
+    "stdOut": "",
+    "stdErr": ""
+};
 // Choose 'tap' rather than 'min' or 'xunit'. The reason is that
 // 'min' produces undisplayable text to stdout and stderr under piped/redirect, 
 // and 'xunit' does not print the stack trace from the test.
 var defaultMochaOptions = { ui: 'tdd', reporter: 'tap', timeout: 2000 };
+
+function hook_stdout(callback) {
+    var old_write = process.stdout.write;
+
+    process.stdout.write = (function (write) {
+        return function (string, encoding, fd) {
+            callback(string, encoding, fd)
+            //write.apply(process.stdout, arguments)
+        }
+    })(process.stdout.write)
+
+    return function () {
+        process.stdout.write = old_write
+    }
+}
 
 var find_tests = function (testFileList, discoverResultFile, projectFolder) {
     var Mocha = detectMocha(projectFolder);
@@ -57,10 +77,15 @@ var find_tests = function (testFileList, discoverResultFile, projectFolder) {
 module.exports.find_tests = find_tests;
 
 var run_tests = function (testName, testFile, workingFolder, projectFolder) {
+    //var testResults = [];
     var Mocha = detectMocha(projectFolder);
     if (!Mocha) {
         return;
     }
+
+    var unhook = hook_stdout(function (string, encoding, fd) {
+        result.stdOut += string;
+    });
 
     var mocha = initializeMocha(Mocha, projectFolder);
 
@@ -70,10 +95,29 @@ var run_tests = function (testName, testFile, workingFolder, projectFolder) {
         else
             mocha.grep(testName); // prior Mocha 3.0.0
     }
+
     mocha.addFile(testFile);
 
-    mocha.run(function (code) {
-        process.exit(code);
+    // run tests
+    var runner = mocha.run(function (code) { });
+
+    runner.on('start', function () {
+    });
+    runner.on('test', function (test) {
+        result.title = test.title;
+    });
+    runner.on('end', function () {
+        unhook();
+        console.log(JSON.stringify(result));
+        process.exit(0);
+    });
+    runner.on('pass', function (test) {
+        result.passed = true;
+        //testResults.push(result);
+    });
+    runner.on('fail', function (test, err) {
+        result.passed = false;
+        //testResults.push(result);
     });
 };
 
