@@ -43,7 +43,7 @@ namespace Microsoft.NodejsTools.Repl {
             string npmArguments = arguments.Trim(' ', '\t');
 
             // Parse project name/directory in square brackets
-            if (npmArguments.StartsWith("[")) {
+            if (npmArguments.StartsWith("[", StringComparison.Ordinal)) {
                 var match = Regex.Match(npmArguments, @"(?:[[]\s*\""?\s*)(.*?)(?:\s*\""?\s*[]]\s*)");
                 projectPath = match.Groups[1].Value;
                 npmArguments = npmArguments.Substring(match.Length);
@@ -264,11 +264,11 @@ namespace Microsoft.NodejsTools.Repl {
                 var substring = string.Empty;
                 string outputString = string.Empty;
 
-                if (decodedString.StartsWith(ErrorText)) {
+                if (decodedString.StartsWith(ErrorText, StringComparison.Ordinal)) {
                     outputString += ErrorAnsiColor + decodedString.Substring(0, ErrorText.Length);
                     substring = decodedString.Length > ErrorText.Length ? decodedString.Substring(ErrorText.Length) : string.Empty;
                     this.HasErrors = true;
-                } else if (decodedString.StartsWith(WarningText)) {
+                } else if (decodedString.StartsWith(WarningText, StringComparison.Ordinal)) {
                     outputString += WarnAnsiColor + decodedString.Substring(0, WarningText.Length);
                     substring = decodedString.Length > WarningText.Length ? decodedString.Substring(WarningText.Length) : string.Empty;
                 } else {

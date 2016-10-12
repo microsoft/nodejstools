@@ -751,7 +751,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 }
 
                 string description = exceptionEvent.Description;
-                if (description.StartsWith("#<") && description.EndsWith(">")) {
+                if (description.StartsWith("#<", StringComparison.Ordinal) && description.EndsWith(">", StringComparison.Ordinal)) {
                     // Serialize exception object to get a proper description
                     var tokenSource = new CancellationTokenSource(_timeout);
                     var evaluateCommand = new EvaluateCommand(CommandId, _resultFactory, exceptionEvent.ExceptionId);
@@ -1202,7 +1202,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
             if (string.IsNullOrEmpty(javaScriptFileName) ||
                 javaScriptFileName == NodeVariableType.UnknownModule ||
-                javaScriptFileName.StartsWith("binding:")) {
+                javaScriptFileName.StartsWith("binding:", StringComparison.Ordinal)) {
                 return false;
             }
 

@@ -14,6 +14,7 @@
 //
 //*********************************************************//
 
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 
@@ -52,8 +53,8 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                 var id = (int)module["id"];
                 var source = (string)module["source"];
                 if (!string.IsNullOrEmpty(source) &&
-                    source.StartsWith(NodeConstants.ScriptWrapBegin) &&
-                    source.EndsWith(NodeConstants.ScriptWrapEnd)) {
+                    source.StartsWith(NodeConstants.ScriptWrapBegin, StringComparison.Ordinal) &&
+                    source.EndsWith(NodeConstants.ScriptWrapEnd, StringComparison.Ordinal)) {
                     source = source.Substring(
                         NodeConstants.ScriptWrapBegin.Length,
                         source.Length - NodeConstants.ScriptWrapBegin.Length - NodeConstants.ScriptWrapEnd.Length);

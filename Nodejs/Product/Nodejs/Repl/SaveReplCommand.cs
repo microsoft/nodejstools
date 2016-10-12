@@ -58,7 +58,7 @@ namespace Microsoft.NodejsTools.Repl {
             positions.Sort((x, y) => x.Key.CompareTo(y.Key));
             foreach (var buffer in positions) {
                 var bufferText = buffer.Value.CurrentSnapshot.GetText();
-                if (!bufferText.StartsWith(".")) {
+                if (!bufferText.StartsWith(".", StringComparison.Ordinal)) {
                     text.Append(bufferText);
                     text.Append(Environment.NewLine);
                 }

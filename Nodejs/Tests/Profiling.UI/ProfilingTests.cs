@@ -994,7 +994,7 @@ namespace ProfilingUITests {
                     perfTarget = new NodejsPerfTarget(app.WaitForDialog());
                     Assert.AreEqual(NodeExePath, perfTarget.InterpreterPath);
                     Assert.AreEqual("", perfTarget.Arguments);
-                    Assert.IsTrue(perfTarget.ScriptName.EndsWith("program.js"));
+                    Assert.IsTrue(perfTarget.ScriptName.EndsWith("program.js", StringComparison.Ordinal));
                     Assert.IsTrue(perfTarget.ScriptName.StartsWith(perfTarget.WorkingDir));
                 } finally {
                     if (perfTarget != null) {

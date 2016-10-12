@@ -239,7 +239,7 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
 
         private string Preprocess(string source) {
-            return source.EndsWith(Environment.NewLine) ? source.Substring(0, source.Length - Environment.NewLine.Length) : source;
+            return source.EndsWith(Environment.NewLine, StringComparison.Ordinal) ? source.Substring(0, source.Length - Environment.NewLine.Length) : source;
         }
 
         private void WriteLines(string text, bool forceError) {

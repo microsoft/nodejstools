@@ -40,7 +40,7 @@ namespace Microsoft.NodejsTools.Profiling {
             if (arch != ProcessorArchitecture.X86 && arch != ProcessorArchitecture.Amd64) {
                 throw new InvalidOperationException(String.Format("Unsupported architecture: {0}", arch));
             }
-            if (dir.EndsWith("\\")) {
+            if (dir.EndsWith("\\", StringComparison.Ordinal)) {
                 dir = dir.Substring(0, dir.Length - 1);
             }
             if (String.IsNullOrEmpty(dir)) {

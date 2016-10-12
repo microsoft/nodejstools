@@ -83,7 +83,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 if (funcName == "<module>") {
                     if (_stackFrame.FileName.IndexOfAny(Path.GetInvalidPathChars()) == -1) {
                         funcName = Path.GetFileName(_stackFrame.FileName) + " module";
-                    } else if (_stackFrame.FileName.EndsWith("<string>")) {
+                    } else if (_stackFrame.FileName.EndsWith("<string>", StringComparison.Ordinal)) {
                         funcName = "<exec or eval>";
                     } else {
                         funcName = _stackFrame.FileName + " unknown code";
@@ -110,7 +110,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             if ((dwFieldSpec & enum_FRAMEINFO_FLAGS.FIF_MODULE) != 0) {
                 if (_stackFrame.FileName.IndexOfAny(Path.GetInvalidPathChars()) == -1) {
                     frameInfo.m_bstrModule = Path.GetFileName(_stackFrame.FileName);
-                } else if (_stackFrame.FileName.EndsWith("<string>")) {
+                } else if (_stackFrame.FileName.EndsWith("<string>", StringComparison.Ordinal)) {
                     frameInfo.m_bstrModule = "<exec/eval>";
                 } else {
                     frameInfo.m_bstrModule = "<unknown>";

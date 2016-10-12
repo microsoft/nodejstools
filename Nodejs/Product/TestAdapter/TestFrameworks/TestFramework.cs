@@ -105,7 +105,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
         }
 
         private string WrapWithQuotes(string path) {
-            if (!path.StartsWith("\"") && !path.StartsWith("\'")) {
+            if (!path.StartsWith("\"", StringComparison.Ordinal) && !path.StartsWith("\'", StringComparison.Ordinal)) {
                 path = "\"" + path + "\"";
             }
             return path;

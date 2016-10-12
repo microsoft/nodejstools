@@ -14,6 +14,7 @@
 //
 //*********************************************************//
 
+using System;
 using System.Text.RegularExpressions;
 using Microsoft.VisualStudioTools.Project;
 
@@ -94,7 +95,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
 
                 case "error":
                     stringValue = variable.Value ?? variable.Text;
-                    if (!string.IsNullOrEmpty(stringValue) && stringValue.StartsWith("Error: ")) {
+                    if (!string.IsNullOrEmpty(stringValue) && stringValue.StartsWith("Error: ", StringComparison.Ordinal)) {
                         stringValue = stringValue.Substring(7);
                     }
                     typeName = NodeVariableType.Error;
@@ -126,7 +127,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
             // Generates a parent name
             const string prototypeSuffix = "." + NodeVariableType.Prototype;
             var parentName = parent.FullName;
-            if (parentName.EndsWith(prototypeSuffix)) {
+            if (parentName.EndsWith(prototypeSuffix, StringComparison.Ordinal)) {
                 parentName = parentName.Remove(parentName.Length - prototypeSuffix.Length);
             }
 

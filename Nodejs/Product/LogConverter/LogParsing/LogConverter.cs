@@ -380,7 +380,7 @@ namespace Microsoft.NodejsTools.LogParsing {
 
         private static ulong ParseAddress(string address) {
             ulong res;
-            if (address.StartsWith("0x") || address.StartsWith("0X")) {
+            if (address.StartsWith("0x", StringComparison.Ordinal) || address.StartsWith("0X", StringComparison.Ordinal)) {
                 if (UInt64.TryParse(address.Substring(2), NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture.NumberFormat, out res)) {
                     return res;
                 }
@@ -440,7 +440,7 @@ namespace Microsoft.NodejsTools.LogParsing {
             string methodName = location;
             List<int> pos = null;
 
-            if (location.Length >= 2 && location.StartsWith("\"") && location.EndsWith("\"")) {
+            if (location.Length >= 2 && location.StartsWith("\"", StringComparison.Ordinal) && location.EndsWith("\"", StringComparison.Ordinal)) {
                 // v8 usually includes quotes, strip them
                 location = location.Substring(1, location.Length - 2);
             }
