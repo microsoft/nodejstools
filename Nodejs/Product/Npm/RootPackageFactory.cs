@@ -19,11 +19,13 @@ using Microsoft.NodejsTools.Npm.SPI;
 namespace Microsoft.NodejsTools.Npm {
     public static class RootPackageFactory {
         public static IRootPackage Create(
-            string fullPathToRootDirectory,
+            string fullPathToRootInstallDirectory,
+            string pathToPackageDirectory,
             bool showMissingDevOptionalSubPackages = false,
             int maxDepth = 1) {
             return new RootPackage(
-                fullPathToRootDirectory,
+                fullPathToRootInstallDirectory,
+                pathToPackageDirectory,
                 showMissingDevOptionalSubPackages,
                 null,
                 0,

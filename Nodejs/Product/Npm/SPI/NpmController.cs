@@ -121,6 +121,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
                 RootPackage = RootPackageFactory.Create(
                             _fullPathToRootPackageDirectory,
+                            "",
                             _showMissingDevOptionalSubPackages);
                 return;
             } catch (IOException) {

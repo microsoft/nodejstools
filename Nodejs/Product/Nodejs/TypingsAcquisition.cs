@@ -112,7 +112,14 @@ namespace Microsoft.NodejsTools {
 
         private IEnumerable<string> GetNewTypingsToAcquire(IEnumerable<string> packages) {
             var currentTypings = _acquiredTypingsPackageNames.Value;
-            return packages.Where(package => !currentTypings.Contains(package));
+            return packages
+                .Where(name => {
+                    if (name.Contains('@')) { // We don't support typings for scoped modules
+                        return false;
+                    }
+                    return Uri.EscapeUriString(name).Equals(name, StringComparison.OrdinalIgnoreCase);
+                })
+                .Where(package => !currentTypings.Contains(package));
         }
 
         private async Task<bool> ExecuteTypingsTool(IEnumerable<string> arguments, Redirector redirector) {
