@@ -435,7 +435,7 @@ namespace Microsoft.NodejsTools.Profiling {
             var process = new ProfiledProcess(interpreter, interpreterArgs, script, scriptArgs, workingDir, env, arch, launchUrl, port, startBrowser, jmc);
 
             string baseName = Path.GetFileNameWithoutExtension(session.Filename);
-            string date = DateTime.Now.ToString("yyyyMMdd");
+            string date = DateTime.Now.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
             string outPath = Path.Combine(Path.GetDirectoryName(session.Filename), baseName + "_" + date + ".vspx");
 
             int count = 1;

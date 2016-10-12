@@ -120,7 +120,7 @@ namespace Microsoft.NodejsTools.Profiling {
             switch (prop) {
                 case __VSHPROPID.VSHPROPID_Expanded:
                     if (itemid == ReportsItemId) {
-                        _isReportsExpanded = Convert.ToBoolean(var);
+                        _isReportsExpanded = Convert.ToBoolean(var, CultureInfo.InvariantCulture);
                         break;
                     }
                     break;

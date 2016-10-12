@@ -141,7 +141,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         public override int GetDepth(string filepath) {
             var lastNodeModules = filepath.LastIndexOf(NodejsConstants.NodeModulesFolder + "\\", StringComparison.Ordinal);
-            var directoryToSearch = filepath.IndexOf("\\", lastNodeModules + NodejsConstants.NodeModulesFolder.Length + 1);
+            var directoryToSearch = filepath.IndexOf("\\", lastNodeModules + NodejsConstants.NodeModulesFolder.Length + 1, StringComparison.Ordinal);
             var directorySubString = directoryToSearch == -1 ? filepath : filepath.Substring(0, directoryToSearch);
 
             ModuleInfo value = null;
