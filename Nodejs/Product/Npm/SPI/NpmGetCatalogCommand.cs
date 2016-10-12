@@ -240,7 +240,7 @@ etc.
                         try {
                             builder.LatestVersion = SemverVersion.Parse(latestVersion);
                         } catch (SemverVersionFormatException) {
-                            OnOutputLogged(string.Format(
+                            OnOutputLogged(string.Format(CultureInfo.InvariantCulture,
                                 Resources.InvalidPackageSemVersion,
                                 latestVersion,
                                 builder.Name));
@@ -351,7 +351,7 @@ etc.
             string relativeUri, filename;
 
             if (refreshStartKey > 0) {
-                relativeUri = string.Format("-/all/since?stale=update_after&startkey={0}", refreshStartKey);
+                relativeUri = string.Format(CultureInfo.InvariantCulture, "-/all/since?stale=update_after&startkey={0}", refreshStartKey);
                 filename = Path.Combine(cachePath, "since_packages.json");
             } else {
                 relativeUri = "-/all";
@@ -397,13 +397,13 @@ etc.
 
                         if (totalDownloaded > nextNotification * ONE_MB) {
                             if (totalLength > 0) {
-                                progress = string.Format(
+                                progress = string.Format(CultureInfo.InvariantCulture,
                                     Resources.PackagesDownloadedXOfYMB,
                                     nextNotification,
                                     totalLength / ONE_MB + 1
                                 );
                             } else {
-                                progress = string.Format(
+                                progress = string.Format(CultureInfo.InvariantCulture,
                                     Resources.PackagesDownloadedXMB,
                                     nextNotification
                                 );

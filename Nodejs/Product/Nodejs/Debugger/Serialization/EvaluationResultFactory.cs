@@ -89,7 +89,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
                     break;
 
                 case "object":
-                    stringValue = variable.Class == NodeVariableType.Object ? "{...}" : string.Format("{{{0}}}", variable.Class);
+                    stringValue = variable.Class == NodeVariableType.Object ? "{...}" : string.Format(CultureInfo.InvariantCulture, "{{{0}}}", variable.Class);
                     typeName = NodeVariableType.Object;
                     type |= NodeExpressionType.Expandable;
                     break;
@@ -142,7 +142,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
             // Checks whether name points on array element
             int indexer;
             if (int.TryParse(name, out indexer)) {
-                name = string.Format("[{0}]", indexer);
+                name = string.Format(CultureInfo.InvariantCulture, "[{0}]", indexer);
                 fullName = parent.FullName + name;
             }
 

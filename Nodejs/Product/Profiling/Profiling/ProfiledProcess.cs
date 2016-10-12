@@ -142,7 +142,7 @@ namespace Microsoft.NodejsTools.Profiling {
                             .Reverse()
                             .FirstOrDefault();
                         if (v8log == null) {
-                            MessageBox.Show(string.Format(Resources.FailedToSaveV8LogMessageText, v8log));
+                            MessageBox.Show(string.Format(CultureInfo.CurrentCulture, Resources.FailedToSaveV8LogMessageText, v8log));
                             return;
                         }
                     }
@@ -177,7 +177,7 @@ namespace Microsoft.NodejsTools.Profiling {
                 } catch {
                     // file in use, multiple node.exe's running, user trying
                     // to profile multiple times, etc...
-                    MessageBox.Show(string.Format(Resources.UnableToDeleteV8Log, v8log));
+                    MessageBox.Show(string.Format(CultureInfo.CurrentCulture, Resources.UnableToDeleteV8Log, v8log));
                 }
             };
 

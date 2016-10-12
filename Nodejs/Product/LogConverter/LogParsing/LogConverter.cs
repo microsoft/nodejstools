@@ -604,14 +604,14 @@ namespace Microsoft.NodejsTools.LogParsing {
                             int shift = (_nodeVersion >= v012 ? 1 : 0);
                             var funcInfo = ExtractNamespaceAndMethodName(records[shift + 4]);
                             if (funcInfo.LineNumber != null && !String.IsNullOrWhiteSpace(funcInfo.Filename)) {
-                                pdbCode.Append(String.Format(@"
+                                pdbCode.Append(string.Format(CultureInfo.InvariantCulture, @"
 #line {0} ""{1}""
 public static void X{2:X}() {{
 }}
 ", funcInfo.LineNumber, funcInfo.Filename, methodToken));
                             } else {
                                 // we need to keep outputting methods just to keep tokens lined up.
-                                pdbCode.Append(String.Format(@"
+                                pdbCode.Append(String.Format(CultureInfo.InvariantCulture, @"
 public static void X{0:X}() {{
 }}
 ", methodToken));

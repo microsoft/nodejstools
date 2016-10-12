@@ -17,6 +17,7 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using Microsoft.VisualStudioTools.Project;
@@ -61,7 +62,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
             if (waitMode != null) {
                 var pidFile = Path.GetTempFileName();
-                _psi.Arguments = string.Format("{0} {1} {2} {3}",
+                _psi.Arguments = string.Format(CultureInfo.InvariantCulture, "{0} {1} {2} {3}",
                     waitMode,
                     ProcessOutput.QuoteSingleArgument(pidFile),
                     ProcessOutput.QuoteSingleArgument(_psi.FileName),

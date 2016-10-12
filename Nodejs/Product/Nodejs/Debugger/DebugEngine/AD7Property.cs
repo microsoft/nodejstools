@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -64,7 +65,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
             if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE)) {
                 string value = radix == 16 ? _evaluationResult.HexValue ?? _evaluationResult.StringValue : _evaluationResult.StringValue;
-                propertyInfo.bstrValue = _evaluationResult.Type.HasFlag(NodeExpressionType.String) ? string.Format("\"{0}\"", value) : value;
+                propertyInfo.bstrValue = _evaluationResult.Type.HasFlag(NodeExpressionType.String) ? string.Format(CultureInfo.InvariantCulture, "\"{0}\"", value) : value;
                 propertyInfo.dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE;
             }
 
@@ -262,7 +263,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                     .WaitAsync(timeout, tokenSource.Token);
             }
 
-            string expression = string.Format("{0} = {1}", _evaluationResult.FullName, value);
+            string expression = string.Format(CultureInfo.InvariantCulture, "{0} = {1}", _evaluationResult.FullName, value);
             return _evaluationResult.Frame.ExecuteTextAsync(expression, tokenSource.Token).WaitAsync(timeout, tokenSource.Token);
         }
 

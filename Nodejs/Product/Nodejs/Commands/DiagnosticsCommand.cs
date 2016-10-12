@@ -187,7 +187,7 @@ namespace Microsoft.NodejsTools.Commands {
                 var matchedExt = _interestingFileExtensions.Where(ext => file.EndsWith(ext, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
                 if (!string.IsNullOrEmpty(matchedExt)) {
-                    var recordKey = string.Format("{0} ({1})", matchedExt, node.Value.ItemNode?.IsExcluded ?? true ? "excluded from project" : "included in project");
+                    var recordKey = string.Format(CultureInfo.InvariantCulture, "{0} ({1})", matchedExt, node.Value.ItemNode?.IsExcluded ?? true ? "excluded from project" : "included in project");
                     FileTypeInfo record;
                     if (!fileTypeInfo.TryGetValue(recordKey, out record)) {
                         record = fileTypeInfo[recordKey] = new FileTypeInfo();

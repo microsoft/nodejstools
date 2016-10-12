@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.NodejsTools.Npm.SQLiteTables;
 using SQLite;
+using System.Globalization;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal class DatabasePackageCatalogFilter : IPackageCatalogFilter {
@@ -40,11 +41,11 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             using (var db = new SQLiteConnection(_dbFilename)) {
                 if (filterString.Length >= 3) {
                     return db.Query<CatalogEntry>(
-                        string.Format("SELECT * from CatalogEntry WHERE CatalogEntry MATCH 'name:{0}* OR description:{0}* OR keywords:{0}*' COLLATE NOCASE", escapedFilterString)).
+                        string.Format(CultureInfo.InvariantCulture, "SELECT * from CatalogEntry WHERE CatalogEntry MATCH 'name:{0}* OR description:{0}* OR keywords:{0}*' COLLATE NOCASE", escapedFilterString)).
                         OrderBy(entry => entry, new CatalogEntryComparer(filterString)).AsEnumerable().Select(entry => entry.ToPackage());
                 } else if (filterString.Length >= 1) {
                     return db.Query<CatalogEntry>(
-                        string.Format("SELECT * from CatalogEntry WHERE name MATCH '{0}*' COLLATE NOCASE", escapedFilterString)).
+                        string.Format(CultureInfo.InvariantCulture, "SELECT * from CatalogEntry WHERE name MATCH '{0}*' COLLATE NOCASE", escapedFilterString)).
                         OrderBy(entry => entry, new CatalogEntryComparer(filterString)).AsEnumerable().Select(entry => entry.ToPackage());
                 }
 

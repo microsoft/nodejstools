@@ -189,7 +189,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             } catch (InvalidOperationException) {
             } catch (IOException) {
             } catch (Exception e) {
-                LiveLogger.WriteLine(string.Format("Failed to write message {0}.", e), typeof(DebuggerConnection));
+                LiveLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Failed to write message {0}.", e), typeof(DebuggerConnection));
                 throw;
             }
         }
