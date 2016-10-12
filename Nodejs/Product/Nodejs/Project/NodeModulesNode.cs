@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using Microsoft.NodejsTools.Npm;
@@ -204,7 +205,7 @@ namespace Microsoft.NodejsTools.Project {
             }
 
             if (!activity.Contains("npm")) {
-                activity = string.Format("npm: {0}", activity);
+                activity = string.Format(CultureInfo.CurrentCulture, "npm: {0}", activity);
             }
 
             var statusBar = (IVsStatusbar)_projectNode.GetService(typeof(SVsStatusbar));

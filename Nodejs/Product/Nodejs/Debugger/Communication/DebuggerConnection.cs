@@ -15,6 +15,7 @@
 //*********************************************************//
 
 using System;
+using System.Globalization;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
@@ -76,7 +77,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             LiveLogger.WriteLine("Request: " + message, typeof(DebuggerConnection));
 
             var messageBody = _encoding.GetBytes(message);
-            var messageHeader = _encoding.GetBytes(string.Format("Content-Length: {0}\r\n\r\n", messageBody.Length));
+            var messageHeader = _encoding.GetBytes(string.Format(CultureInfo.InvariantCulture, "Content-Length: {0}\r\n\r\n", messageBody.Length));
             _packetsToSend.Add(messageHeader);
             _packetsToSend.Add(messageBody);
         }
@@ -297,11 +298,11 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             } catch (ObjectDisposedException) {
             } catch (InvalidOperationException) {
             } catch (DecoderFallbackException ex) {
-                LiveLogger.WriteLine(string.Format("Error decoding response body: {0}", ex), typeof(DebuggerConnection));
+                LiveLogger.WriteLine(string.Format(CultureInfo.InvariantCulture, "Error decoding response body: {0}", ex), typeof(DebuggerConnection));
             } catch (JsonReaderException ex) {
-                LiveLogger.WriteLine(string.Format("Error parsing JSON response: {0}", ex), typeof(DebuggerConnection));
+                LiveLogger.WriteLine(string.Format(CultureInfo.InvariantCulture, "Error parsing JSON response: {0}", ex), typeof(DebuggerConnection));
             } catch (Exception ex) {
-                LiveLogger.WriteLine(string.Format("Message processing failed: {0}", ex), typeof(DebuggerConnection));
+                LiveLogger.WriteLine(string.Format(CultureInfo.InvariantCulture, "Message processing failed: {0}", ex), typeof(DebuggerConnection));
                 throw;
             } finally {
                 LiveLogger.WriteLine("Connection was closed.", typeof(DebuggerConnection));

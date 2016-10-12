@@ -524,7 +524,7 @@ namespace Microsoft.NodejsTools {
                 case SurveyNewsPolicy.CheckOnceMonth:
                     return elapsedTime.TotalDays >= 30;
                 default:
-                    Debug.Assert(false, String.Format("Unexpected SurveyNewsPolicy: {0}.", options.SurveyNewsCheck));
+                    Debug.Assert(false, string.Format(CultureInfo.CurrentCulture, "Unexpected SurveyNewsPolicy: {0}.", options.SurveyNewsCheck));
                     return false;
             }
         }
@@ -569,7 +569,7 @@ namespace Microsoft.NodejsTools {
                     throw;
                 }
 
-                Debug.WriteLine(string.Format("Failed to obtain TypeScript tools version: {0}", ex.ToString()));
+                Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Failed to obtain TypeScript tools version: {0}", ex.ToString()));
             }
 
             return toolsVersion;

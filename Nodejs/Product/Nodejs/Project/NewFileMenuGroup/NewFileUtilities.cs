@@ -16,6 +16,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Microsoft.NodejsTools.Project.NewFileMenuGroup {
@@ -39,7 +40,7 @@ namespace Microsoft.NodejsTools.Project.NewFileMenuGroup {
             }
 
             if (templateFileName == null) {
-                Debug.Fail(String.Format("Invalid file type: {0}", fileType));
+                Debug.Fail(string.Format(CultureInfo.CurrentCulture, "Invalid file type: {0}", fileType));
             }
 
             return NodejsToolsInstallPath.GetFile("FileTemplates\\NewItem\\" + templateFileName);
@@ -57,7 +58,7 @@ namespace Microsoft.NodejsTools.Project.NewFileMenuGroup {
                 case NodejsConstants.CSS:
                     return "CSS.css";
                 default:
-                    Debug.Fail(String.Format("Invalid file type: {0}", fileType));
+                    Debug.Fail(string.Format(CultureInfo.CurrentCulture, "Invalid file type: {0}", fileType));
                     return null;
             }
         }

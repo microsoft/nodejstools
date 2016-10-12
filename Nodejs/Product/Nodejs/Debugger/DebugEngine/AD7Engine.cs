@@ -528,7 +528,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                                     if (dirMapping == null) {
                                         dirMapping = new List<string[]>();
                                     }
-                                    LiveLogger.WriteLine(String.Format("Mapping dir {0} to {1}", dirs[0], dirs[1]));
+                                    LiveLogger.WriteLine(string.Format("Mapping dir {0} to {1}", dirs[0], dirs[1]));
                                     dirMapping.Add(dirs);
                                 }
                                 break;

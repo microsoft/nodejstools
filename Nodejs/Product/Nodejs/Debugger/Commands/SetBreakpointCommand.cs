@@ -25,7 +25,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Debugger.Commands {
     sealed class SetBreakpointCommand : DebuggerCommand {
-        private static string _pathSeperatorCharacterGroup = string.Format("[{0}{1}]", Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        private static string _pathSeperatorCharacterGroup = string.Format(CultureInfo.InvariantCulture, "[{0}{1}]", Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 
         private readonly Dictionary<string, object> _arguments;
         private readonly NodeBreakpoint _breakpoint;
@@ -127,11 +127,11 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
         private static string CreateRemoteScriptRegExp(string filePath) {
             string fileName = Path.GetFileName(filePath) ?? string.Empty;
             string start = fileName == filePath ? "^" : _pathSeperatorCharacterGroup;
-            return string.Format("{0}{1}$", start, CreateCaseInsensitiveRegExpFromString(fileName));
+            return string.Format(CultureInfo.InvariantCulture, "{0}{1}$", start, CreateCaseInsensitiveRegExpFromString(fileName));
         }
 
         public static string CreateLocalScriptRegExp(string filePath) {
-            return string.Format("^{0}$", CreateCaseInsensitiveRegExpFromString(filePath));
+            return string.Format(CultureInfo.InvariantCulture, "^{0}$", CreateCaseInsensitiveRegExpFromString(filePath));
         }
 
         /// <summary>

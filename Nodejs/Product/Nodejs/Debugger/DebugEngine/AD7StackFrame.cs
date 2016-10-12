@@ -296,7 +296,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // that refers to this exact evaluation context. For example, in C++ the name is as follows: 
         // "{ function-name, source-file-name, module-file-name }"
         int IDebugExpressionContext2.GetName(out string pbstrName) {
-            pbstrName = String.Format("{{ {0} {1} }}", _stackFrame.FunctionName, _stackFrame.FileName);
+            pbstrName = string.Format("{{ {0} {1} }}", _stackFrame.FunctionName, _stackFrame.FileName);
             return VSConstants.S_OK;
         }
 

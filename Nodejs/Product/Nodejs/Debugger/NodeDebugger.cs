@@ -101,7 +101,7 @@ namespace Microsoft.NodejsTools.Debugger {
             _debuggerEndpointUri = new UriBuilder { Scheme = "tcp", Host = "localhost", Port = debuggerPortOrDefault }.Uri;
 
             // Node usage: node [options] [ -e script | script.js ] [arguments]
-            string allArgs = String.Format(
+            string allArgs = string.Format(
                 "--debug-brk={0} --nolazy {1} {2}",
                 debuggerPortOrDefault,
                 interpreterOptions,

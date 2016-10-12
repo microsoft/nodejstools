@@ -61,7 +61,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
             if (waitMode != null) {
                 var pidFile = Path.GetTempFileName();
-                _psi.Arguments = String.Format("{0} {1} {2} {3}",
+                _psi.Arguments = string.Format("{0} {1} {2} {3}",
                     waitMode,
                     ProcessOutput.QuoteSingleArgument(pidFile),
                     ProcessOutput.QuoteSingleArgument(_psi.FileName),

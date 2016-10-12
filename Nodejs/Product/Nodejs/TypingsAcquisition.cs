@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Globalization;
 using System.IO;
 using System.Security;
 using System.Text;
@@ -174,7 +175,7 @@ namespace Microsoft.NodejsTools {
             using (var commander = _npmController.CreateNpmCommander()) {
                 return await commander.InstallPackageToFolderByVersionAsync(
                     NodejsConstants.ExternalToolsPath,
-                    string.Format(@"""{0}""", LocalTypingsToolPath),
+                    string.Format(CultureInfo.InvariantCulture, @"""{0}""", LocalTypingsToolPath),
                     string.Empty,
                     false);
             }

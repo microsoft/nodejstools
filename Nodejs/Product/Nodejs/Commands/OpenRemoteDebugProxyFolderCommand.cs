@@ -16,6 +16,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
@@ -46,7 +47,7 @@ namespace Microsoft.NodejsTools.Commands {
             if (!File.Exists(filePath)) {
                 MessageBox.Show(SR.GetString(SR.RemoteDebugProxyFileDoesNotExist, filePath), SR.ProductName);
             } else {
-                Process.Start("explorer", string.Format("/e,/select,{0}", filePath));
+                Process.Start("explorer", string.Format(CultureInfo.InvariantCulture, "/e,/select,{0}", filePath));
             }
         }
 

@@ -934,7 +934,7 @@ namespace Microsoft.NodejsTools {
             var ns = new XmlNamespaceManager(doc.NameTable);
             ns.AddNamespace("sd", "http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceDefinition");
 
-            var role = nav.SelectSingleNode(string.Format(
+            var role = nav.SelectSingleNode(string.Format(CultureInfo.InvariantCulture,
                 "/sd:ServiceDefinition/sd:{0}Role[@name='{1}']", roleType, projectName
             ), ns);
 
@@ -953,7 +953,7 @@ namespace Microsoft.NodejsTools {
                 throw new InvalidOperationException("Missing Startup entry");
             }
 
-            startup.ReplaceSelf(string.Format(@"<Startup>
+            startup.ReplaceSelf(string.Format(CultureInfo.InvariantCulture, @"<Startup>
   <Task commandLine=""setup_{0}.cmd &gt; log.txt"" executionContext=""elevated"" taskType=""simple"">
     <Environment>
       <Variable name=""EMULATED"">

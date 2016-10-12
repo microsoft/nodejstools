@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
@@ -169,7 +170,7 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
 
         public void QueueCommand(string command, string arguments) {
-            QueueCommand(string.Format("{0} {1}", command, arguments));
+            QueueCommand(string.Format(CultureInfo.InvariantCulture, "{0} {1}", command, arguments));
         }
 
         public void QueueInstallPackage(

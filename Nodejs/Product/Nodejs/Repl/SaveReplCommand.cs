@@ -21,6 +21,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Text;
+using System.Globalization;
 
 namespace Microsoft.NodejsTools.Repl {
 #if INTERACTIVE_WINDOW
@@ -37,7 +38,7 @@ namespace Microsoft.NodejsTools.Repl {
                 window.WriteError("save requires a filename");
                 return ExecutionResult.Failed;
             }else if(arguments.IndexOfAny(Path.GetInvalidPathChars()) != -1) {
-                window.WriteError(String.Format("Invalid filename: {0}", arguments));
+                window.WriteError(string.Format(CultureInfo.CurrentCulture, "Invalid filename: {0}", arguments));
                 return ExecutionResult.Failed;
             }
 
@@ -66,9 +67,9 @@ namespace Microsoft.NodejsTools.Repl {
 
             try {
                 File.WriteAllText(arguments, text.ToString());
-                window.WriteLine(String.Format("Session saved to: {0}", arguments));
+                window.WriteLine(string.Format(CultureInfo.CurrentCulture, "Session saved to: {0}", arguments));
             } catch {
-                window.WriteError(String.Format("Failed to save: {0}", arguments));
+                window.WriteError(string.Format(CultureInfo.CurrentCulture, "Failed to save: {0}", arguments));
             }
             return ExecutionResult.Succeeded;
         }
