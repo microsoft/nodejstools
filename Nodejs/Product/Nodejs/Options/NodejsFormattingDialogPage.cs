@@ -48,7 +48,7 @@ namespace Microsoft.NodejsTools.Options {
         }
 
         private static string GetKeyName(string name) {
-            if (name.EndsWith("_TEMP")) {
+            if (name.EndsWith("_TEMP", StringComparison.Ordinal)) {
                 name = name.Remove(name.Length - 5);
             }
             return TypeScriptBaseName + name;

@@ -197,7 +197,7 @@ namespace Microsoft.NodejsTools {
             try {
                 foreach (var file in Directory.EnumerateFiles(typingsDirectoryPath, "*.d.ts", SearchOption.AllDirectories)) {
                     var directory = Directory.GetParent(file);
-                    if (directory.FullName != typingsDirectoryPath && Path.GetFullPath(directory.FullName).StartsWith(typingsDirectoryPath)) {
+                    if (directory.FullName != typingsDirectoryPath && Path.GetFullPath(directory.FullName).StartsWith(typingsDirectoryPath, StringComparison.OrdinalIgnoreCase)) {
                         packages.Add(directory.Name);
                     }
                 }

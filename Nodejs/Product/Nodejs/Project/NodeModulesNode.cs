@@ -234,10 +234,10 @@ namespace Microsoft.NodejsTools.Project {
                 return string.Empty;
             }
 
-            if (text.EndsWith("\r\n")) {
+            if (text.EndsWith("\r\n", StringComparison.Ordinal)) {
                 return text.Remove(text.Length - 2);
             }
-            if (text.EndsWith("\r") || text.EndsWith("\n")) {
+            if (text.EndsWith("\r", StringComparison.Ordinal) || text.EndsWith("\n", StringComparison.Ordinal)) {
                 return text.Remove(text.Length - 1);
             }
 

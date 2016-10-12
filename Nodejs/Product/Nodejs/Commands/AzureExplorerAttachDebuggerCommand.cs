@@ -255,7 +255,7 @@ namespace Microsoft.NodejsTools.Commands {
 
             // Get web.config for the site via FTP.
 
-            if (!publishUrl.EndsWith("/")) {
+            if (!publishUrl.EndsWith("/", StringComparison.Ordinal)) {
                 publishUrl += "/";
             }
             publishUrl += "web.config";

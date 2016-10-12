@@ -54,7 +54,7 @@ namespace Microsoft.NodejsTools.Profiling {
         }
 
         internal SessionNode AddTarget(ProfilingTarget target, string filename, bool save) {
-            Debug.Assert(filename.EndsWith(NodejsProfilingPackage.PerfFileType));
+            Debug.Assert(filename.EndsWith(NodejsProfilingPackage.PerfFileType, StringComparison.Ordinal));
 
             // ensure a unique name
             string newBaseName = Path.GetFileNameWithoutExtension(filename);

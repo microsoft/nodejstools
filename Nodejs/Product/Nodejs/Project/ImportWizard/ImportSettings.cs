@@ -454,7 +454,7 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
             }
 
             var res = files
-                .Where(path => path.StartsWith(source))
+                .Where(path => path.StartsWith(source, StringComparison.Ordinal))
                 .Select(path => path.Substring(source.Length).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))
                 .Distinct(StringComparer.OrdinalIgnoreCase);
 

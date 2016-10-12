@@ -55,7 +55,7 @@ namespace Microsoft.NodejsTools.Npm {
             try {
                 // Hack: To deal with patch truncation - e.g., seen with 'classy' package in npm v1.4.3 onwards
                 var patch = match.Groups["patch"].Value;
-                while (!string.IsNullOrEmpty(patch) && patch.EndsWith("…")) {
+                while (!string.IsNullOrEmpty(patch) && patch.EndsWith("…", StringComparison.Ordinal)) {
                     patch = patch.Length == 1 ? "0" : patch.Substring(0, patch.Length - 1);
                 }
                 // /Hack
