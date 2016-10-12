@@ -95,7 +95,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
             using (var app = VisualStudioApp.FromEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable)) {
                 // .njsproj file path -> project settings
 
-                var projectToTests = new Dictionary<string, List<TestCase>>();
+                //var projectToTests = new Dictionary<string, List<TestCase>>();
                 var sourceToSettings = new Dictionary<string, NodejsProjectSettings>();
                 NodejsProjectSettings settings = null;
 
@@ -103,36 +103,36 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 // NOTE: It seems to me that if we were to run all tests over multiple projects in a solution, 
                 // we would have to separate the tests by their project in order to launch the node process
                 // correctly (to make sure we are using the correct working folder).
-                foreach (var test in receiver.Tests) {
-                    if (!sourceToSettings.TryGetValue(test.Source, out settings)) {
-                        sourceToSettings[test.Source] = settings = LoadProjectSettings(test.Source);
-                    }
-                    if (!projectToTests.ContainsKey(settings.WorkingDir)) {
-                        projectToTests[settings.WorkingDir] = new List<TestCase>();
-                    }
-                    projectToTests[settings.WorkingDir].Add(test);
-                }
+
+                //foreach (var test in receiver.Tests) {
+                //    if (!sourceToSettings.TryGetValue(test.Source, out settings)) {
+                //        sourceToSettings[test.Source] = settings = LoadProjectSettings(test.Source);
+                //    }
+                //    if (!projectToTests.ContainsKey(settings.WorkingDir)) {
+                //        projectToTests[settings.WorkingDir] = new List<TestCase>();
+                //    }
+                //    projectToTests[settings.WorkingDir].Add(test);
+                //}
 
                 // where key is the workingDir and value is a list of tests
-                foreach (KeyValuePair<string, List<TestCase>> entry in projectToTests) {
-                    List<string> args = new List<string>();
-                    TestCase firstTest = entry.Value.ElementAt(0);
-                    int port = 0;
-                    if (runContext.IsBeingDebugged && app != null) {
-                        app.GetDTE().Debugger.DetachAll();
-                        args.AddRange(GetDebugArgs(settings, out port));
-                    }
 
-                    args.AddRange(GetInterpreterArgs(firstTest, entry.Key, settings.ProjectRootDir));
+                //foreach (KeyValuePair<string, List<TestCase>> entry in projectToTests) {
+                //    List<string> args = new List<string>();
+                //    TestCase firstTest = entry.Value.ElementAt(0);
+                //    int port = 0;
+                //    if (runContext.IsBeingDebugged && app != null) {
+                //        app.GetDTE().Debugger.DetachAll();
+                //        args.AddRange(GetDebugArgs(settings, out port));
+                //    }
 
-                    // launch node process
-                    LaunchNodeProcess(entry.Key, settings.NodeExePath, args);
+                //    args.AddRange(GetInterpreterArgs(firstTest, entry.Key, settings.ProjectRootDir));
+
+                    // eventually launch node process here
 
                     // Run all test cases in a given project
                     RunTestCases(entry.Value, runContext, frameworkHandle);
 
                     // dispose node process
-                    _nodeProcess.Dispose();
                 }
             }
         }
@@ -161,7 +161,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                     }
 
                     try {
-                        RunTestCase(app, frameworkHandle, runContext, test, sourceToSettings, _nodeProcess.StandardInput, _nodeProcess.StandardOutput);
+                        RunTestCase(app, frameworkHandle, runContext, test, sourceToSettings);
                     }
                     catch (Exception ex) {
                         frameworkHandle.SendMessage(TestMessageLevel.Error, ex.ToString());
@@ -199,7 +199,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
             };
         }
 
-        private void RunTestCase(VisualStudioApp app, IFrameworkHandle frameworkHandle, IRunContext runContext, TestCase test, Dictionary<string, NodejsProjectSettings> sourceToSettings, StreamWriter standardInput, StreamReader standardOutput) {
+        private void RunTestCase(VisualStudioApp app, IFrameworkHandle frameworkHandle, IRunContext runContext, TestCase test, Dictionary<string, NodejsProjectSettings> sourceToSettings) {
             var testResult = new TestResult(test);
             frameworkHandle.RecordStart(test);
             testResult.StartTime = DateTimeOffset.Now;
@@ -221,6 +221,8 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 return;
             }
 
+            
+
             NodejsTestInfo testInfo = new NodejsTestInfo(test.FullyQualifiedName);
             List<string> args = new List<string>();
             int port = 0;
@@ -239,6 +241,8 @@ namespace Microsoft.NodejsTools.TestAdapter {
             }
 
             lock (_syncObject) {
+                // launch node process
+                LaunchNodeProcess(settings.WorkingDir, settings.NodeExePath, args);
 #if DEBUG
                 frameworkHandle.SendMessage(TestMessageLevel.Informational, "cd " + workingDir);
                 //frameworkHandle.SendMessage(TestMessageLevel.Informational, _nodeProcess.Arguments);
@@ -246,7 +250,8 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 // send test to run_tests.js
                 TestCaseObject testObject = new TestCaseObject(args[1], args[2], args[3], args[4], args[5]);
                 if (!_nodeProcess.HasExited) {
-                    standardInput.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(testObject));
+                    _nodeProcess.StandardInput.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(testObject));
+                    _nodeProcess.StandardInput.Close();
                     _nodeProcess.WaitForExit(5000);
                 }
                 //standardInput.Close();                
@@ -275,7 +280,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
 #endif
                 }
             }
-            var result = GetTestResultFromProcess(standardOutput);
+            var result = GetTestResultFromProcess(_nodeProcess.StandardOutput);
 
             bool runCancelled = _cancelRequested.WaitOne(0);
 
@@ -287,6 +292,9 @@ namespace Microsoft.NodejsTools.TestAdapter {
             } else {
                 frameworkHandle.SendMessage(TestMessageLevel.Error, "Failed to obtain result for " + test.DisplayName + " from TestRunner");
             }
+
+            // dispose node process
+            _nodeProcess.Dispose();
         }
 
         private ResultObject ParseTestResult(string line) {
