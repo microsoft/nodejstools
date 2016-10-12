@@ -511,7 +511,7 @@ namespace Microsoft.NodejsTools.LogParsing {
             // To cover them all, we just repeatedly strip the tail of the string after the last ':',
             // so long as it can be parsed as an integer.
             int colon;
-            while ((colon = location.LastIndexOf(':')) != -1) {
+            while ((colon = location.LastIndexOf(":", StringComparison.Ordinal)) != -1) {
                 string tail = location.Substring(colon + 1, location.Length - (colon + 1));
                 int number;
                 if (!Int32.TryParse(tail, out number)) {

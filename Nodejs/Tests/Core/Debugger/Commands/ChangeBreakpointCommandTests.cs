@@ -16,6 +16,7 @@
 
 using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Globalization;
 
 namespace NodejsTests.Debugger.Commands {
     [TestClass]
@@ -55,7 +56,7 @@ namespace NodejsTests.Debugger.Commands {
             Assert.AreEqual(
                 string.Format(
                     "{{\"command\":\"changebreakpoint\",\"seq\":{0},\"type\":\"request\",\"arguments\":{{\"breakpoint\":{1},\"enabled\":{2},\"condition\":\"{3}\",\"ignoreCount\":{4}}}}}",
-                    commandId, breakpointId, enabled.ToString().ToLower(), condition, ignoreCount),
+                    commandId, breakpointId, enabled.ToString().ToLower(CultureInfo.InvariantCulture), condition, ignoreCount),
                 changeBreakpointCommand.ToString());
         }
     }

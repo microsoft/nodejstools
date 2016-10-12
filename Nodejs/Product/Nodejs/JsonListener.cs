@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -81,7 +82,7 @@ namespace Microsoft.NodejsTools {
                         string body = String.Empty;
                         string contentLen;
                         if (headers.TryGetValue("Content-Length", out contentLen)) {
-                            int lengthRemaining = Int32.Parse(contentLen);
+                            int lengthRemaining = int.Parse(contentLen, CultureInfo.InvariantCulture);
                             if (lengthRemaining != 0) {
                                 StringBuilder bodyBuilder = new StringBuilder();
 
