@@ -380,7 +380,7 @@ namespace Microsoft.NodejsTools.LogParsing {
 
         private static ulong ParseAddress(string address) {
             ulong res;
-            if (address.StartsWith("0x", StringComparison.Ordinal) || address.StartsWith("0X", StringComparison.Ordinal)) {
+            if (address.StartsWith("0x", StringComparison.OrdinalIgnoreCase)) {
                 if (UInt64.TryParse(address.Substring(2), NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture.NumberFormat, out res)) {
                     return res;
                 }
