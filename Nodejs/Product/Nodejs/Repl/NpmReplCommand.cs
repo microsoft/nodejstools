@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -51,7 +52,7 @@ namespace Microsoft.NodejsTools.Repl {
 
             // Include spaces on either side of npm arguments so that we can more simply detect arguments
             // at beginning and end of string (e.g. '--global')
-            npmArguments = string.Format(" {0} ", npmArguments);
+            npmArguments = string.Format(CultureInfo.InvariantCulture, " {0} ", npmArguments);
 
             // Prevent running `npm init` without the `-y` flag since it will freeze the repl window,
             // waiting for user input that will never come.
@@ -225,7 +226,7 @@ namespace Microsoft.NodejsTools.Repl {
                     } else {
                         process.Kill();
                         if (redirector != null) {
-                            redirector.WriteErrorLine(string.Format(
+                            redirector.WriteErrorLine(string.Format(CultureInfo.CurrentCulture,
                             "\r\n===={0}====\r\n\r\n",
                             "npm command cancelled"));
                         }

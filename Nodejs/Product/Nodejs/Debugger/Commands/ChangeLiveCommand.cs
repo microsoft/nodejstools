@@ -15,6 +15,7 @@
 //*********************************************************//
 
 using System.Collections.Generic;
+using System.Globalization;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Debugger.Commands {
@@ -23,7 +24,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
 
         public ChangeLiveCommand(int id, NodeModule module) : base(id, "changelive") {
             // Wrap script contents as following https://github.com/joyent/node/blob/v0.10.26-release/src/node.js#L880
-            string source = string.Format("{0}{1}{2}",
+            string source = string.Format(CultureInfo.InvariantCulture, "{0}{1}{2}",
                 NodeConstants.ScriptWrapBegin,
                 module.Source,
                 NodeConstants.ScriptWrapEnd);

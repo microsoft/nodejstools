@@ -16,6 +16,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -78,7 +79,7 @@ namespace ProfilingUITests {
                 destName = originalDestName;
 
                 while (File.Exists(destName)) {
-                    destName = string.Format("{0} {1}{2}",
+                    destName = string.Format(CultureInfo.InvariantCulture, "{0} {1}{2}",
                         Path.GetFileNameWithoutExtension(originalDestName),
                         Guid.NewGuid(),
                         Path.GetExtension(originalDestName)

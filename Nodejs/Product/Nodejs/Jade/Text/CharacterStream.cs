@@ -233,7 +233,7 @@ namespace Microsoft.NodejsTools.Jade {
         [ExcludeFromCodeCoverage]
         [DebuggerStepThrough]
         public override string ToString() {
-            return String.Format(CultureInfo.InvariantCulture, "@{0} ({1})", Position, _text[Position]);
+            return string.Format(CultureInfo.InvariantCulture, "@{0} ({1})", Position, _text[Position]);
         }
     }
 }

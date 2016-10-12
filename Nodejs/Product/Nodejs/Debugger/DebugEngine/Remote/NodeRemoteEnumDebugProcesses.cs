@@ -15,6 +15,7 @@
 //*********************************************************//
 
 using System;
+using System.Globalization;
 using System.IO;
 using System.Net.Sockets;
 using System.Net.WebSockets;
@@ -87,7 +88,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
 
                         // Send "disconnect" request.
                         string request = @"{""command"":""disconnect"",""seq"":1,""type"":""request"",""arguments"":null}";
-                        request = string.Format("Content-Length: {0}\r\n\r\n{1}", request.Length, request);
+                        request = string.Format(CultureInfo.InvariantCulture, "Content-Length: {0}\r\n\r\n{1}", request.Length, request);
                         buffer = Encoding.UTF8.GetBytes(request);
                         stream.WriteAsync(buffer, 0, buffer.Length, new CancellationTokenSource(5000).Token).GetAwaiter().GetResult();
 
@@ -136,7 +137,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
                     }
                 }
 
-                string errText = string.Format(
+                string errText = string.Format(CultureInfo.CurrentCulture,
                     "Could not attach to Node.js process at {0}{1}\r\n\r\n",
                     port.Uri,
                     exception != null ? ":\r\n\r\n" + exception.Message : ".");
@@ -146,7 +147,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
                             "Make sure that the Azure web site is deployed in the Debug configuration, and web sockets " +
                             "are enabled for it in the Azure management portal.";
                     } else {
-                        errText += string.Format(
+                        errText += string.Format(CultureInfo.CurrentCulture,
                             "Make sure that the process is running behind the remote debug proxy (RemoteDebug.js), " +
                             "and the debugger port (default {0}) is open on the target host.",
                             NodejsConstants.DefaultDebuggerPort);

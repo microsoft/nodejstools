@@ -30,6 +30,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 using MSBuild = Microsoft.Build.Evaluation;
+using System.Globalization;
 
 namespace Microsoft.NodejsTools.TestAdapter {
     [ExtensionUri(TestExecutor.ExecutorUriString)]
@@ -193,7 +194,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                     try {
                         //the '#ping=0' is a special flag to tell VS node debugger not to connect to the port,
                         //because a connection carries the consequence of setting off --debug-brk, and breakpoints will be missed.
-                        string qualifierUri = string.Format("tcp://localhost:{0}#ping=0", port);
+                        string qualifierUri = string.Format(CultureInfo.InvariantCulture, "tcp://localhost:{0}#ping=0", port);
                         while (!app.AttachToProcess(_nodeProcess, NodejsRemoteDebugPortSupplierUnsecuredId, qualifierUri)) {
                             if (_nodeProcess.Wait(TimeSpan.FromMilliseconds(500))) {
                                 break;

@@ -16,13 +16,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
 using Microsoft.NodejsTools.Logging;
-using Microsoft.NodejsTools.Options;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 
@@ -187,7 +187,7 @@ namespace Microsoft.NodejsTools.Commands {
                 var matchedExt = _interestingFileExtensions.Where(ext => file.EndsWith(ext, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
                 if (!string.IsNullOrEmpty(matchedExt)) {
-                    var recordKey = string.Format("{0} ({1})", matchedExt, node.Value.ItemNode?.IsExcluded ?? true ? "excluded from project" : "included in project");
+                    var recordKey = string.Format(CultureInfo.InvariantCulture, "{0} ({1})", matchedExt, node.Value.ItemNode?.IsExcluded ?? true ? "excluded from project" : "included in project");
                     FileTypeInfo record;
                     if (!fileTypeInfo.TryGetValue(recordKey, out record)) {
                         record = fileTypeInfo[recordKey] = new FileTypeInfo();
@@ -216,9 +216,9 @@ namespace Microsoft.NodejsTools.Commands {
             }
 
             var res = new StringBuilder();
-            res.AppendLine(string.Format("Top Level Node Packages ({0}):", modules.Count()));
+            res.AppendLine(string.Format(CultureInfo.InvariantCulture, "Top Level Node Packages ({0}):", modules.Count()));
             foreach (var module in modules) {
-                res.AppendLine(Indent(1, string.Format("{0} {1} ", module.Name, module.Version)));
+                res.AppendLine(Indent(1, string.Format(CultureInfo.InvariantCulture, "{0} {1} ", module.Name, module.Version)));
             }
             return res.ToString();
         }
@@ -258,7 +258,7 @@ namespace Microsoft.NodejsTools.Commands {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().OrderBy(assem => assem.FullName)) {
                 var assemFileVersion = assembly.GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false).OfType<AssemblyFileVersionAttribute>().FirstOrDefault();
 
-                res.AppendLine(Indent(1, string.Format("{0}, FileVersion={1}",
+                res.AppendLine(Indent(1, string.Format(CultureInfo.InvariantCulture, "{0}, FileVersion={1}",
                     assembly.FullName,
                     assemFileVersion == null ? "(null)" : assemFileVersion.Version)));
             }

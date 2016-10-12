@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -364,7 +365,7 @@ namespace Microsoft.NodejsTools.Repl {
                             break;
 #if DEBUG
                         default:
-                            Debug.WriteLine(String.Format("Unknown command: {0}", response.Body));
+                            Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Unknown command: {0}", response.Body));
                             break;
 #endif
                     }

@@ -17,6 +17,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 
@@ -71,7 +72,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
                 if (index > Count) {
                     throw new IndexOutOfRangeException(
-                        string.Format(
+                        string.Format(CultureInfo.CurrentCulture,
                             "Cannot retrieve value from index '{0}' in a package.json string array containing only 1 item.",
                             index));
                 }

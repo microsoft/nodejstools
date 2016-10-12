@@ -15,6 +15,7 @@
 //*********************************************************//
 
 using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -79,7 +80,7 @@ namespace Microsoft.NodejsTools.Commands {
             Action<Task<bool>> onAttach = null;
             onAttach = (attachTask) => {
                 if (!attachTask.Result) {
-                    string msg = string.Format(
+                    string msg = string.Format(CultureInfo.CurrentCulture,
                         "Could not attach to node.exe process on Azure Website at {0}.\r\n\r\n" +
                         "Error retrieving websocket debug proxy information from web.config.",
                         webSite.Uri);
@@ -319,7 +320,7 @@ namespace Microsoft.NodejsTools.Commands {
 
             // Prepare a web request to get the publish settings.
             // See http://msdn.microsoft.com/en-us/library/windowsazure/dn166996.aspx
-            string requestPath = string.Format(
+            string requestPath = string.Format(CultureInfo.InvariantCulture,
                 "{0}/services/WebSpaces/{1}/sites/{2}/publishxml",
                 subscription.SubscriptionId,
                 webSite.WebSpace,

@@ -22,6 +22,7 @@ using Microsoft.Win32;
 using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell.Settings;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
+using System.Globalization;
 
 namespace Microsoft.VisualStudioTools {
     static class SettingsManagerCreator {
@@ -58,7 +59,7 @@ namespace Microsoft.VisualStudioTools {
             if (settings == null) {
                 if (!File.Exists(devenvPath)) {
                     using (var root = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
-                    using (var key = root.OpenSubKey(string.Format(@"Software\Microsoft\VisualStudio\{0}\Setup\VS", VSVersion))) {
+                    using (var key = root.OpenSubKey(string.Format(CultureInfo.InvariantCulture, @"Software\Microsoft\VisualStudio\{0}\Setup\VS", VSVersion))) {
                         if (key == null) {
                             throw new InvalidOperationException("Cannot find settings store for Visual Studio " + VSVersion);
                         }

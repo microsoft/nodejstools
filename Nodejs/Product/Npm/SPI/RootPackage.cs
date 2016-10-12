@@ -15,6 +15,7 @@
 //*********************************************************//
 
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using Microsoft.CSharp.RuntimeBinder;
 
@@ -34,7 +35,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 }
             } catch (RuntimeBinderException rbe) {
                 throw new PackageJsonException(
-                    string.Format(@"Error processing package.json at '{0}'. The file was successfully read, and may be valid JSON, but the objects may not match the expected form for a package.json file.
+                    string.Format(CultureInfo.CurrentCulture, @"Error processing package.json at '{0}'. The file was successfully read, and may be valid JSON, but the objects may not match the expected form for a package.json file.
 
 The following error was reported:
 

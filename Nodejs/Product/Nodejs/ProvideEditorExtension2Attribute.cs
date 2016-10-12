@@ -60,7 +60,7 @@ namespace Microsoft.NodejsTools {
             else if (factoryType is Guid)
                 this._factory = (Guid)factoryType;
             else
-                throw new ArgumentException(string.Format("invalid factory type: {0}", factoryType));
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "invalid factory type: {0}", factoryType));
 
             _extension = extension;
             _priority = priority;

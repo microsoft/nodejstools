@@ -19,6 +19,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -191,9 +192,9 @@ namespace Microsoft.NodejsTools.Project {
 
         private void LaunchDebugger(IServiceProvider provider, VsDebugTargetInfo dbgInfo) {
             if (!Directory.Exists(dbgInfo.bstrCurDir)) {
-                MessageBox.Show(String.Format("Working directory \"{0}\" does not exist.", dbgInfo.bstrCurDir), SR.ProductName);
+                MessageBox.Show(string.Format(CultureInfo.CurrentCulture, "Working directory \"{0}\" does not exist.", dbgInfo.bstrCurDir), SR.ProductName);
             } else if (!File.Exists(dbgInfo.bstrExe)) {
-                MessageBox.Show(String.Format("Interpreter \"{0}\" does not exist.", dbgInfo.bstrExe), SR.ProductName);
+                MessageBox.Show(string.Format(CultureInfo.CurrentCulture, "Interpreter \"{0}\" does not exist.", dbgInfo.bstrExe), SR.ProductName);
             } else if (DoesProjectSupportDebugging()) {
                 VsShellUtilities.LaunchDebugger(provider, dbgInfo);
             }

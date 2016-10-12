@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -115,7 +116,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                     proj.GetPropertyValue(NodejsConstants.NodeExePath));
 
             if (!File.Exists(nodeExePath)) {
-                logger.SendMessage(TestMessageLevel.Error, String.Format("Node.exe was not found.  Please install Node.js before running tests."));
+                logger.SendMessage(TestMessageLevel.Error, string.Format(CultureInfo.CurrentCulture, "Node.exe was not found.  Please install Node.js before running tests."));
                 return;
             }
 
@@ -123,19 +124,19 @@ namespace Microsoft.NodejsTools.TestAdapter {
             foreach (string testFx in testItems.Keys) {
                 TestFrameworks.TestFramework testFramework = GetTestFrameworkObject(testFx);
                 if (testFramework == null) {
-                    logger.SendMessage(TestMessageLevel.Warning, String.Format("Ignoring unsupported test framework {0}", testFx));
+                    logger.SendMessage(TestMessageLevel.Warning, string.Format(CultureInfo.CurrentCulture, "Ignoring unsupported test framework {0}", testFx));
                     continue;
                 }
 
                 List<TestFileEntry> fileList = testItems[testFx];
                 string files = string.Join(";", fileList.Select(p=>p.File));
-                logger.SendMessage(TestMessageLevel.Informational, String.Format("Processing: {0}", files));
+                logger.SendMessage(TestMessageLevel.Informational, string.Format(CultureInfo.CurrentCulture, "Processing: {0}", files));
 
                 List<TestFrameworks.NodejsTestInfo> discoveredTestCases = testFramework.FindTests(fileList.Select(p => p.File), nodeExePath, logger, projectHome);
                 testCount += discoveredTestCases.Count;
                 foreach (TestFrameworks.NodejsTestInfo discoveredTest in discoveredTestCases) {
                     string qualifiedName = discoveredTest.FullyQualifiedName;
-                    logger.SendMessage(TestMessageLevel.Informational, String.Format("  " /*indent*/ + "Creating TestCase:{0}", qualifiedName));
+                    logger.SendMessage(TestMessageLevel.Informational, string.Format(CultureInfo.CurrentCulture, "  " /*indent*/ + "Creating TestCase:{0}", qualifiedName));
                     //figure out the test source info such as line number
                     string filePath = discoveredTest.ModulePath;
                     TestFileEntry entry = fileList.Find(p => p.File.Equals(filePath, StringComparison.OrdinalIgnoreCase));
@@ -154,10 +155,10 @@ namespace Microsoft.NodejsTools.TestAdapter {
                         });
 
                 }
-                logger.SendMessage(TestMessageLevel.Informational, string.Format("Processing finished for framework of {0}", testFx));
+                logger.SendMessage(TestMessageLevel.Informational, string.Format(CultureInfo.CurrentCulture, "Processing finished for framework of {0}", testFx));
             }
             if (testCount == 0) {
-                logger.SendMessage(TestMessageLevel.Warning, String.Format("Discovered 0 testcases."));
+                logger.SendMessage(TestMessageLevel.Warning, string.Format(CultureInfo.CurrentCulture, "Discovered 0 testcases."));
             }
         }
 
