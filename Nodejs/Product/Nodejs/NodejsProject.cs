@@ -568,7 +568,6 @@ namespace Microsoft.NodejsTools {
         public int AddItem(uint itemidLoc, VSADDITEMOPERATION dwAddItemOperation, string pszItemName, uint cFilesToOpen, string[] rgpszFilesToOpen, IntPtr hwndDlgOwner, VSADDRESULT[] pResult) {
             // Check if we are adding an item to a folder that consists of browser-side code.
             // In this case, we will want to open the file with the default editor.
-            var isClientCode = false;
             var project = _innerVsHierarchy.GetProject().GetNodejsProject();
 
             var selectedItems = this.GetSelectedItems().GetEnumerator();
@@ -577,15 +576,9 @@ namespace Microsoft.NodejsTools {
                 string name;
                 GetCanonicalName(currentId, out name);
                 var nodeFolderNode = project.FindNodeByFullPath(name) as NodejsFolderNode;
-
-                if (nodeFolderNode != null) {
-                    if (nodeFolderNode.ContentType == FolderContentType.Browser) {
-                        isClientCode = true;
-                    }
-                }
             }
 
-            if (!isClientCode && _innerProject3 != null && IsJavaScriptFile(pszItemName)) {
+            if (_innerProject3 != null && IsJavaScriptFile(pszItemName)) {
                 Guid ourEditor = Guid.Empty;
                 Guid view = Guid.Empty;
                 return _innerProject3.AddItemWithSpecific(
