@@ -1,8 +1,8 @@
 <VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
   <TemplateData>
-    <Name>Blank Azure Node.js Web Application</Name>
-    <Description>An empty Node.js application for Microsoft Azure.</Description>
-    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="410" />
+    <Name Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3083"/>
+    <Description Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3084"/>
+    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="410"/>
     <ProjectType>JavaScript</ProjectType>
     <TemplateID>Microsoft.JavaScript.TypeScriptNodejsWebApp</TemplateID>
     <SortOrder>140</SortOrder>

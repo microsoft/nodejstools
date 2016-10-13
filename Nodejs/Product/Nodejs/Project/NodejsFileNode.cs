@@ -51,23 +51,7 @@ namespace Microsoft.NodejsTools.Project {
                 return 0;
             }
 
-            // Check if parent folder is designated as containing client-side code.
-            var isContent = false;
-            var folderNode = this.Parent as NodejsFolderNode;
-            if (folderNode != null) {
-                var contentType = folderNode.ContentType;
-                switch (contentType) {
-                    case FolderContentType.Browser:
-                        isContent = true;
-                        break;
-                }
-            }
-
             var includeInProject = base.IncludeInProject(includeChildren);
-            if (isContent && Url.EndsWith(".js", StringComparison.OrdinalIgnoreCase)) {
-                this.ItemNode.ItemTypeName = ProjectFileConstants.Content;
-            }
-
             if (ProjectMgr.ShouldAcquireTypingsAutomatically) {
                 ProjectMgr.Site.GetUIThread().Invoke(() => {
                     ProjectMgr.OnItemAdded(this.Parent, this);

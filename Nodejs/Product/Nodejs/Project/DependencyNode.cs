@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Text;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.Npm;
@@ -229,7 +230,7 @@ namespace Microsoft.NodejsTools.Project {
                         } catch (Exception ex) {
                             if (ex is InvalidOperationException || ex is Win32Exception) {
                                 MessageBox.Show(
-                                    String.Format("Path to module does not exist:\n {0}", path),
+                                    string.Format(CultureInfo.CurrentCulture, "Path to module does not exist:\n {0}", path),
                                     SR.ProductName,
                                     MessageBoxButtons.OK,
                                     MessageBoxIcon.Error);

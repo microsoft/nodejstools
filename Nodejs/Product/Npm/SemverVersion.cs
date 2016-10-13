@@ -15,6 +15,7 @@
 //*********************************************************//
 
 using System;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
@@ -43,7 +44,7 @@ namespace Microsoft.NodejsTools.Npm {
             var matches = RegexSemver.Matches(versionString);
             if (matches.Count != 1) {
                 throw new SemverVersionFormatException(
-                    string.Format(
+                    string.Format(CultureInfo.CurrentCulture,
                         "Invalid semantic version: '{0}'. The version number must consist of three non-negative numeric parts of the form MAJOR.MINOR.PATCH, with optional pre-release and/or build metadata. The optional parts may only contain characters in the set [0-9A-Za-z-].",
                         versionString));
             }
@@ -55,7 +56,7 @@ namespace Microsoft.NodejsTools.Npm {
             try {
                 // Hack: To deal with patch truncation - e.g., seen with 'classy' package in npm v1.4.3 onwards
                 var patch = match.Groups["patch"].Value;
-                while (!string.IsNullOrEmpty(patch) && patch.EndsWith("…")) {
+                while (!string.IsNullOrEmpty(patch) && patch.EndsWith("…", StringComparison.Ordinal)) {
                     patch = patch.Length == 1 ? "0" : patch.Substring(0, patch.Length - 1);
                 }
                 // /Hack
@@ -68,7 +69,7 @@ namespace Microsoft.NodejsTools.Npm {
                     buildMetadata.Success ? buildMetadata.Value : null);
             } catch (OverflowException oe) {
                 throw new SemverVersionFormatException(
-                    string.Format(
+                    string.Format(CultureInfo.CurrentCulture,
                         "Invalid semantic version: '{0}'. One or more of the integer parts is large enough to overflow a 64-bit int.",
                         versionString),
                     oe);
@@ -92,7 +93,7 @@ namespace Microsoft.NodejsTools.Npm {
             string buildMetadata = null) : this() {
             if (!IsValidOptionalFragment(preReleaseVersion)) {
                 throw new ArgumentException(
-                    string.Format(
+                    string.Format(CultureInfo.CurrentCulture,
                         "Invalid pre-release version: '{0}'. Must be a dot separated sequence of identifiers containing only characters [0-9A-Za-z-].",
                         preReleaseVersion),
                     "preReleaseVersion");
@@ -100,7 +101,7 @@ namespace Microsoft.NodejsTools.Npm {
 
             if (!IsValidOptionalFragment(buildMetadata)) {
                 throw new ArgumentException(
-                    string.Format(
+                    string.Format(CultureInfo.CurrentCulture,
                         "Invalid build metadata: '{0}'. Must be a dot separated sequence of identifiers containing only characters [0-9A-Za-z-].",
                         preReleaseVersion),
                     "buildMetadata");
@@ -141,7 +142,7 @@ namespace Microsoft.NodejsTools.Npm {
         }
 
         public override string ToString() {
-            var builder = new StringBuilder(string.Format("{0}.{1}.{2}", Major, Minor, Patch));
+            var builder = new StringBuilder(string.Format(CultureInfo.InvariantCulture, "{0}.{1}.{2}", Major, Minor, Patch));
 
             if (HasPreReleaseVersion) {
                 builder.Append('-');

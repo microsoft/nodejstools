@@ -120,13 +120,46 @@
   <data name="FailedToBuild" xml:space="preserve">
     <value>Failed to build project, do you want to launch profiling anyway?</value>
   </data>
+  <data name="FailedToOpenFileErrorMessageText" xml:space="preserve">
+    <value>Failed to open file {0}</value>
+  </data>
+  <data name="NoConfiguredStatupFileErrorMessageText" xml:space="preserve">
+    <value>Project has no configured startup file, cannot start profiling.</value>
+  </data>
   <data name="NodejsToolsForVS" xml:space="preserve">
     <value>Node.js Tools for Visual Studio</value>
+  </data>
+  <data name="NoProfilingConfiguredMessageCaption" xml:space="preserve">
+    <value>No Profiling Target</value>
+  </data>
+  <data name="NoProfilingConfiguredMessageText" xml:space="preserve">
+    <value>Profiling session is not configured - would you like to configure now and then launch?</value>
   </data>
   <data name="ProfilingOk" xml:space="preserve">
     <value>_OK</value>
   </data>
   <data name="ProfilingStart" xml:space="preserve">
     <value>_Start</value>
+  </data>
+  <data name="ProjectNotFoundErrorMessageText" xml:space="preserve">
+    <value>Project could not be found in current solution.</value>
+  </data>
+  <data name="FailedToReadPerformanceSessionMessageText" xml:space="preserve">
+    <value>Failed to read performance session {0}</value>
+  </data>
+  <data name="FailedToSaveV8LogMessageText" xml:space="preserve">
+    <value>v8 log file was not successfully saved to:
+{0}
+
+No profiling data is available.</value>
+  </data>
+  <data name="PerformanceReportNoLongerExistsMessageText" xml:space="preserve">
+    <value>Performance report no longer exists: {0}</value>
+  </data>
+  <data name="UnableToDeleteV8Log" xml:space="preserve">
+    <value>Unable to delete '{0}'.
+
+There is probably a second copy of node.exe running
+and the results may be unavailable or incorrect.</value>
   </data>
 </root>

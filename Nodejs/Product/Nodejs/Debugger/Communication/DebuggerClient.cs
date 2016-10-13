@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -135,7 +136,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                     break;
 
                 default:
-                    Debug.Fail(string.Format("Unrecognized type '{0}' in message: {1}", messageType, message));
+                    Debug.Fail(string.Format(CultureInfo.CurrentCulture, "Unrecognized type '{0}' in message: {1}", messageType, message));
                     break;
             }
         }
@@ -179,7 +180,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                     break;
 
                 default:
-                    Debug.Fail(string.Format("Unrecognized type '{0}' in event message: {1}", eventType, message));
+                    Debug.Fail(string.Format(CultureInfo.CurrentCulture, "Unrecognized type '{0}' in event message: {1}", eventType, message));
                     break;
             }
         }
@@ -195,7 +196,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             if (_messages.TryGetValue(messageId, out promise)) {
                 promise.SetResult(message);
             } else {
-                Debug.Fail(string.Format("Invalid response identifier '{0}'", messageId));
+                Debug.Fail(string.Format(CultureInfo.CurrentCulture, "Invalid response identifier '{0}'", messageId));
             }
         }
     }

@@ -279,6 +279,144 @@
   <data name="3058" xml:space="preserve">
     <value>A TypeScript Tape UnitTest file</value>
   </data>
+  <data name="3059" xml:space="preserve">
+    <value>Basic Azure Node.js Express 4 Application</value>
+  </data>
+  <data name="3060" xml:space="preserve">
+    <value>A basic Node.js Express 4 application for Microsoft Azure.</value>
+  </data>
+  <data name="3061" xml:space="preserve">
+    <value>Blank Azure Node.js Web Application</value>
+  </data>
+  <data name="3062" xml:space="preserve">
+    <value>An empty Node.js application for Microsoft Azure.</value>
+  </data>
+  <data name="3063" xml:space="preserve">
+    <value>Blank Azure Node.js Worker Role</value>
+  </data>
+  <data name="3064" xml:space="preserve">
+    <value>An empty Node.js worker role for Microsoft Azure.</value>
+  </data>
+  <data name="3065" xml:space="preserve">
+    <value>Azure Cloud Service</value>
+  </data>
+  <data name="3066" xml:space="preserve">
+    <value>Basic Node.js Express 4 Application.</value>
+  </data>
+  <data name="3067" xml:space="preserve">
+    <value>Azure Cloud Service</value>
+  </data>
+  <data name="3068" xml:space="preserve">
+    <value>A basic Node.js Express 4 application.</value>
+  </data>
+  <data name="3069" xml:space="preserve">
+    <value>From Existing Node.js code</value>
+  </data>
+  <data name="3070" xml:space="preserve">
+    <value>Creates a new Node.js project from existing code.</value>
+  </data>
+  <data name="3071" xml:space="preserve">
+    <value>Blank Node.js Console Application</value>
+  </data>
+  <data name="3072" xml:space="preserve">
+    <value>An empty Node.js application.</value>
+  </data>
+  <data name="3073" xml:space="preserve">
+    <value>Blank Node.js Web Application</value>
+  </data>
+  <data name="3074" xml:space="preserve">
+    <value>An empty Node.js Web application.</value>
+  </data>
+  <data name="3075" xml:space="preserve">
+    <value>Basic Azure Node.js Express 4 Application</value>
+  </data>
+  <data name="3076" xml:space="preserve">
+    <value>A basic Node.js Express 4 application for Microsoft Azure.</value>
+  </data>
+  <data name="3077" xml:space="preserve">
+    <value>Blank Azure Node.js Worker Role</value>
+  </data>
+  <data name="3078" xml:space="preserve">
+    <value>An empty Node.js worker role for Microsoft Azure.</value>
+  </data>
+  <data name="3079" xml:space="preserve">
+    <value>Blank Azure Node.js Worker Role</value>
+  </data>
+  <data name="3080" xml:space="preserve">
+    <value>An empty Node.js worker role for Microsoft Azure.</value>
+  </data>
+  <data name="3081" xml:space="preserve">
+    <value>Blank Azure Node.js Web Application</value>
+  </data>
+  <data name="3082" xml:space="preserve">
+    <value>An empty Node.js application for Microsoft Azure.</value>
+  </data>
+  <data name="3083" xml:space="preserve">
+    <value>Blank Azure Node.js Web Application</value>
+  </data>
+  <data name="3084" xml:space="preserve">
+    <value>An empty Node.js application for Microsoft Azure.</value>
+  </data>
+  <data name="3085" xml:space="preserve">
+    <value>Blank Node.js Console Application</value>
+  </data>
+  <data name="3086" xml:space="preserve">
+    <value>An empty Node.js application.</value>
+  </data>
+  <data name="3087" xml:space="preserve">
+    <value>Basic Node.js Express 4 Application</value>
+  </data>
+  <data name="3088" xml:space="preserve">
+    <value>A basic Node.js Express 4 application.</value>
+  </data>
+  <data name="3089" xml:space="preserve">
+    <value>From Existing Node.js code</value>
+  </data>
+  <data name="3090" xml:space="preserve">
+    <value>Creates a new Node.js project from existing code.</value>
+  </data>
+  <data name="3091" xml:space="preserve">
+    <value>Blank Node.js Web Application</value>
+  </data>
+  <data name="3092" xml:space="preserve">
+    <value>An empty Node.js application.</value>
+  </data>
+  <data name="3093" xml:space="preserve">
+    <value>Express Web Role</value>
+  </data>
+  <data name="3094" xml:space="preserve">
+    <value>Service with a web interface using the Express web framework.</value>
+  </data>
+  <data name="3095" xml:space="preserve">
+    <value>TypeScript Express Web Role</value>
+  </data>
+  <data name="3096" xml:space="preserve">
+    <value>Service with a web interface using the Express web framework with TypeScript.</value>
+  </data>
+  <data name="3097" xml:space="preserve">
+    <value>TypeScript Web Role</value>
+  </data>
+  <data name="3098" xml:space="preserve">
+    <value>Service with a web interface using TypeScript.</value>
+  </data>
+  <data name="3099" xml:space="preserve">
+    <value>TypeScript Worker Role</value>
+  </data>
+  <data name="4000" xml:space="preserve">
+    <value>Node.js background processing service using TypeScript.</value>
+  </data>
+  <data name="4001" xml:space="preserve">
+    <value>Web Role</value>
+  </data>
+  <data name="4002" xml:space="preserve">
+    <value>Node.js service with a web interface.</value>
+  </data>
+  <data name="4003" xml:space="preserve">
+    <value>Worker Role</value>
+  </data>
+  <data name="4004" xml:space="preserve">
+    <value>Node.js background processing service.</value>
+  </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="400" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>_BUILDROOT_\Nodejs\Product\Icons\SystemRegisteredICO\NodeJS.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

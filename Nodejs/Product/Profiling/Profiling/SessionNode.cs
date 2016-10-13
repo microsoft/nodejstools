@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -293,7 +294,7 @@ namespace Microsoft.NodejsTools.Profiling {
             var item = GetReport(itemid);
 
             if (!File.Exists(item.Filename)) {
-                MessageBox.Show(String.Format("Performance report no longer exists: {0}", item.Filename), Resources.NodejsToolsForVS);
+                MessageBox.Show(string.Format(CultureInfo.CurrentCulture, Resources.PerformanceReportNoLongerExistsMessageText, item.Filename), Resources.NodejsToolsForVS);
             } else {
                 var dte = (EnvDTE.DTE)NodejsProfilingPackage.GetGlobalService(typeof(EnvDTE.DTE));
                 dte.ItemOperations.OpenFile(item.Filename);

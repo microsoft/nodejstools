@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Globalization;
 using System.IO;
 using System.Security;
 using System.Text;
@@ -174,7 +175,7 @@ namespace Microsoft.NodejsTools {
             using (var commander = _npmController.CreateNpmCommander()) {
                 return await commander.InstallPackageToFolderByVersionAsync(
                     NodejsConstants.ExternalToolsPath,
-                    string.Format(@"""{0}""", LocalTypingsToolPath),
+                    string.Format(CultureInfo.InvariantCulture, @"""{0}""", LocalTypingsToolPath),
                     string.Empty,
                     false);
             }
@@ -197,7 +198,7 @@ namespace Microsoft.NodejsTools {
             try {
                 foreach (var file in Directory.EnumerateFiles(typingsDirectoryPath, "*.d.ts", SearchOption.AllDirectories)) {
                     var directory = Directory.GetParent(file);
-                    if (directory.FullName != typingsDirectoryPath && Path.GetFullPath(directory.FullName).StartsWith(typingsDirectoryPath)) {
+                    if (directory.FullName != typingsDirectoryPath && Path.GetFullPath(directory.FullName).StartsWith(typingsDirectoryPath, StringComparison.OrdinalIgnoreCase)) {
                         packages.Add(directory.Name);
                     }
                 }

@@ -380,7 +380,7 @@ namespace Microsoft.NodejsTools.LogParsing {
 
         private static ulong ParseAddress(string address) {
             ulong res;
-            if (address.StartsWith("0x") || address.StartsWith("0X")) {
+            if (address.StartsWith("0x", StringComparison.OrdinalIgnoreCase)) {
                 if (UInt64.TryParse(address.Substring(2), NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture.NumberFormat, out res)) {
                     return res;
                 }
@@ -440,7 +440,7 @@ namespace Microsoft.NodejsTools.LogParsing {
             string methodName = location;
             List<int> pos = null;
 
-            if (location.Length >= 2 && location.StartsWith("\"") && location.EndsWith("\"")) {
+            if (location.Length >= 2 && location.StartsWith("\"", StringComparison.Ordinal) && location.EndsWith("\"", StringComparison.Ordinal)) {
                 // v8 usually includes quotes, strip them
                 location = location.Substring(1, location.Length - 2);
             }
@@ -604,14 +604,14 @@ namespace Microsoft.NodejsTools.LogParsing {
                             int shift = (_nodeVersion >= v012 ? 1 : 0);
                             var funcInfo = ExtractNamespaceAndMethodName(records[shift + 4]);
                             if (funcInfo.LineNumber != null && !String.IsNullOrWhiteSpace(funcInfo.Filename)) {
-                                pdbCode.Append(String.Format(@"
+                                pdbCode.Append(string.Format(CultureInfo.InvariantCulture, @"
 #line {0} ""{1}""
 public static void X{2:X}() {{
 }}
 ", funcInfo.LineNumber, funcInfo.Filename, methodToken));
                             } else {
                                 // we need to keep outputting methods just to keep tokens lined up.
-                                pdbCode.Append(String.Format(@"
+                                pdbCode.Append(String.Format(CultureInfo.InvariantCulture, @"
 public static void X{0:X}() {{
 }}
 ", methodToken));

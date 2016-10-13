@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -174,7 +175,7 @@ namespace Microsoft.NodejsTools.Repl {
             try {
                 process.Start();
             } catch (Exception e) {
-                _window.WriteError(String.Format("Failed to start interactive process: {0}{1}{2}", Environment.NewLine, e.ToString(), Environment.NewLine));
+                _window.WriteError(SR.GetString(SR.InteractiveWindowFailedToStartProcessErrorMessage, Environment.NewLine, e.ToString(), Environment.NewLine));
                 return;
             }
 
@@ -216,7 +217,7 @@ namespace Microsoft.NodejsTools.Repl {
 #if DEBUG
             private Thread _socketLockedThread;
 #endif
-            static string _noReplProcess = "Current interactive window is disconnected - please reset the process." + Environment.NewLine;
+            private static string _noReplProcess = SR.GetString(SR.InteractiveWindowNoProcessErrorMessage) + Environment.NewLine;
 
             public ListenerThread(NodejsReplEvaluator eval, Process process, Socket socket) {
                 _eval = eval;
@@ -251,7 +252,7 @@ namespace Microsoft.NodejsTools.Repl {
             }
 
             private void ProcessExitedWorker() {
-                _eval._window.WriteError("The process has exited" + Environment.NewLine);
+                _eval._window.WriteError(SR.GetString(SR.InteractiveWindowProcessExitedMessage) + Environment.NewLine);
                 using (new SocketLock(this)) {
                     if (_completion != null) {
                         _completion.SetResult(ExecutionResult.Failure);
@@ -364,7 +365,7 @@ namespace Microsoft.NodejsTools.Repl {
                             break;
 #if DEBUG
                         default:
-                            Debug.WriteLine(String.Format("Unknown command: {0}", response.Body));
+                            Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Unknown command: {0}", response.Body));
                             break;
 #endif
                     }

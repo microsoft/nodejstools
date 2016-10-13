@@ -16,6 +16,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -78,7 +79,7 @@ namespace ProfilingUITests {
                 destName = originalDestName;
 
                 while (File.Exists(destName)) {
-                    destName = string.Format("{0} {1}{2}",
+                    destName = string.Format(CultureInfo.InvariantCulture, "{0} {1}{2}",
                         Path.GetFileNameWithoutExtension(originalDestName),
                         Guid.NewGuid(),
                         Path.GetExtension(originalDestName)
@@ -994,7 +995,7 @@ namespace ProfilingUITests {
                     perfTarget = new NodejsPerfTarget(app.WaitForDialog());
                     Assert.AreEqual(NodeExePath, perfTarget.InterpreterPath);
                     Assert.AreEqual("", perfTarget.Arguments);
-                    Assert.IsTrue(perfTarget.ScriptName.EndsWith("program.js"));
+                    Assert.IsTrue(perfTarget.ScriptName.EndsWith("program.js", StringComparison.Ordinal));
                     Assert.IsTrue(perfTarget.ScriptName.StartsWith(perfTarget.WorkingDir));
                 } finally {
                     if (perfTarget != null) {

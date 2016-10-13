@@ -20,6 +20,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudioTools.Project;
+using System.Globalization;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal abstract class NpmCommand : AbstractNpmLogSource {
@@ -82,8 +83,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 return false;
             }
             redirector.WriteLine(
-                string.Format("===={0}====\r\n\r\n",
-                string.Format(Resources.ExecutingCommand, Arguments)));
+                string.Format(CultureInfo.InvariantCulture, "===={0}====\r\n\r\n",
+                string.Format(CultureInfo.InvariantCulture, Resources.ExecutingCommand, Arguments)));
 
             var cancelled = false;
             try {

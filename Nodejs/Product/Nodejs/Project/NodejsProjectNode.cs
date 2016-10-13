@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -764,7 +765,7 @@ namespace Microsoft.NodejsTools.Project {
                 var longPaths = await Task.Factory.StartNew(() =>
                     GetLongSubPaths(ProjectHome)
                     .Concat(GetLongSubPaths(_intermediateOutputPath))
-                    .Select(lpi => string.Format("• {1}\u00A0<a href=\"{0}\">{2}</a>", lpi.FullPath, lpi.RelativePath, SR.GetString(SR.LongPathClickToCopy)))
+                    .Select(lpi => string.Format(CultureInfo.InvariantCulture, "• {1}\u00A0<a href=\"{0}\">{2}</a>", lpi.FullPath, lpi.RelativePath, SR.GetString(SR.LongPathClickToCopy)))
                     .ToArray());
                 if (longPaths.Length == 0) {
                     return;
@@ -914,11 +915,11 @@ namespace Microsoft.NodejsTools.Project {
                             }
                         }
                         break;
-						case PkgCmdId.cmdidAddNewJavaScriptFileCommand: 
-					case PkgCmdId.cmdidAddNewTypeScriptFileCommand: 
-					case PkgCmdId.cmdidAddNewHTMLFileCommand: 
-					case PkgCmdId.cmdidAddNewCSSFileCommand: 
-						return QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED; 
+                    case PkgCmdId.cmdidAddNewJavaScriptFileCommand: 
+                    case PkgCmdId.cmdidAddNewTypeScriptFileCommand: 
+                    case PkgCmdId.cmdidAddNewHTMLFileCommand: 
+                    case PkgCmdId.cmdidAddNewCSSFileCommand: 
+                        return QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED; 
                 }
             }
 
@@ -1060,7 +1061,7 @@ namespace Microsoft.NodejsTools.Project {
         internal OutputWindowRedirector NpmOutputPane {
             get {
                 try {
-                    return OutputWindowRedirector.Get(Site, VSPackageManagerPaneGuid, "Bower/npm");
+                    return OutputWindowRedirector.Get(Site, VSPackageManagerPaneGuid, SR.GetString(SR.NpmOutputPaneTitle));
                 } catch (InvalidOperationException) {
                     return null;
                 }

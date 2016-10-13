@@ -237,7 +237,7 @@ namespace Microsoft.NodejsTools.Profiling {
             } else if (target.StandaloneTarget != null) {
                 ProfileStandaloneTarget(session, target.StandaloneTarget, openReport);
             } else {
-                if (MessageBox.Show("Profiling session is not configured - would you like to configure now and then launch?", "No Profiling Target", MessageBoxButton.YesNo) == MessageBoxResult.Yes) {
+                if (MessageBox.Show(Resources.NoProfilingConfiguredMessageText, Resources.NoProfilingConfiguredMessageCaption, MessageBoxButton.YesNo) == MessageBoxResult.Yes) {
                     var newTarget = session.OpenTargetProperties();
                     if (newTarget != null && (newTarget.ProjectTarget != null || newTarget.StandaloneTarget != null)) {
                         StartProfiling(newTarget, session, openReport);
@@ -268,7 +268,7 @@ namespace Microsoft.NodejsTools.Profiling {
             if (projectToProfile != null) {
                 var t = ProfileProject(session, projectToProfile, openReport);
             } else {
-                MessageBox.Show("Project could not be found in current solution.", Resources.NodejsToolsForVS);
+                MessageBox.Show(Resources.ProjectNotFoundErrorMessageText, Resources.NodejsToolsForVS);
             }
         }
 
@@ -290,7 +290,7 @@ namespace Microsoft.NodejsTools.Profiling {
 
             string startupFile = (string)projectToProfile.Properties.Item("StartupFile").Value;
             if (String.IsNullOrEmpty(startupFile)) {
-                MessageBox.Show("Project has no configured startup file, cannot start profiling.", Resources.NodejsToolsForVS);
+                MessageBox.Show(Resources.NoConfiguredStatupFileErrorMessageText, Resources.NodejsToolsForVS);
                 return;
             }
 

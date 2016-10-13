@@ -14,6 +14,9 @@
 //
 //*********************************************************//
 
+using System;
+using System.Globalization;
+
 namespace Microsoft.NodejsTools.Npm {
     public static class NpmArgumentBuilder {
         public static string GetNpmInstallArguments(string packageName,
@@ -41,13 +44,13 @@ namespace Microsoft.NodejsTools.Npm {
             }
 
             otherArguments = otherArguments.TrimStart(' ', '\t');
-            if (otherArguments.StartsWith("@")) {
-                return string.Format("install {0}{1} {2}", packageName, otherArguments, dependencyArguments);
+            if (otherArguments.StartsWith("@", StringComparison.Ordinal)) {
+                return string.Format(CultureInfo.InvariantCulture, "install {0}{1} {2}", packageName, otherArguments, dependencyArguments);
             } else if (!string.IsNullOrEmpty(versionRange)) {
-                return string.Format("install {0}@\"{1}\" {2} {3}", packageName, versionRange, dependencyArguments, otherArguments);
+                return string.Format(CultureInfo.InvariantCulture, "install {0}@\"{1}\" {2} {3}", packageName, versionRange, dependencyArguments, otherArguments);
             }
 
-            return string.Format("install {0} {1} {2}", packageName, dependencyArguments, otherArguments);
+            return string.Format(CultureInfo.InvariantCulture, "install {0} {1} {2}", packageName, dependencyArguments, otherArguments);
         }
     }
 }

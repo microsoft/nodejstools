@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -34,11 +35,6 @@ using SR = Microsoft.NodejsTools.Project.SR;
 using Task = System.Threading.Tasks.Task;
 
 namespace Microsoft.NodejsTools.Repl {
-#if INTERACTIVE_WINDOW
-    using IReplCommand = IInteractiveWindowCommand;
-    using IReplWindow = IInteractiveWindow;    
-#endif
-
     [Export(typeof(IReplCommand))]
     class NpmReplCommand : IReplCommand {
         #region IReplCommand Members
@@ -48,7 +44,7 @@ namespace Microsoft.NodejsTools.Repl {
             string npmArguments = arguments.Trim(' ', '\t');
 
             // Parse project name/directory in square brackets
-            if (npmArguments.StartsWith("[")) {
+            if (npmArguments.StartsWith("[", StringComparison.Ordinal)) {
                 var match = Regex.Match(npmArguments, @"(?:[[]\s*\""?\s*)(.*?)(?:\s*\""?\s*[]]\s*)");
                 projectPath = match.Groups[1].Value;
                 npmArguments = npmArguments.Substring(match.Length);
@@ -56,7 +52,7 @@ namespace Microsoft.NodejsTools.Repl {
 
             // Include spaces on either side of npm arguments so that we can more simply detect arguments
             // at beginning and end of string (e.g. '--global')
-            npmArguments = string.Format(" {0} ", npmArguments);
+            npmArguments = string.Format(CultureInfo.InvariantCulture, " {0} ", npmArguments);
 
             // Prevent running `npm init` without the `-y` flag since it will freeze the repl window,
             // waiting for user input that will never come.
@@ -230,7 +226,7 @@ namespace Microsoft.NodejsTools.Repl {
                     } else {
                         process.Kill();
                         if (redirector != null) {
-                            redirector.WriteErrorLine(string.Format(
+                            redirector.WriteErrorLine(string.Format(CultureInfo.CurrentCulture,
                             "\r\n===={0}====\r\n\r\n",
                             "npm command cancelled"));
                         }
@@ -269,11 +265,11 @@ namespace Microsoft.NodejsTools.Repl {
                 var substring = string.Empty;
                 string outputString = string.Empty;
 
-                if (decodedString.StartsWith(ErrorText)) {
+                if (decodedString.StartsWith(ErrorText, StringComparison.Ordinal)) {
                     outputString += ErrorAnsiColor + decodedString.Substring(0, ErrorText.Length);
                     substring = decodedString.Length > ErrorText.Length ? decodedString.Substring(ErrorText.Length) : string.Empty;
                     this.HasErrors = true;
-                } else if (decodedString.StartsWith(WarningText)) {
+                } else if (decodedString.StartsWith(WarningText, StringComparison.Ordinal)) {
                     outputString += WarnAnsiColor + decodedString.Substring(0, WarningText.Length);
                     substring = decodedString.Length > WarningText.Length ? decodedString.Substring(WarningText.Length) : string.Empty;
                 } else {

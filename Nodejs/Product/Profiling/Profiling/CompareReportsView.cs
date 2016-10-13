@@ -16,6 +16,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 
 namespace Microsoft.NodejsTools.Profiling {
@@ -50,7 +51,7 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <returns></returns>
         public string GetComparisonUri() {
             if (IsValid) {
-                return String.Format(
+                return string.Format(CultureInfo.InvariantCulture,
                     "vsp://diff/?baseline={0}&comparison={1}",
                     Uri.EscapeDataString(BaselineFile),
                     Uri.EscapeDataString(ComparisonFile)

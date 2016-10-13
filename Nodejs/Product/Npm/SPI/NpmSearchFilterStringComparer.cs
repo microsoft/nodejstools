@@ -105,8 +105,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             }
 
             // Matches at the beginning are better than matches in the string
-            if (x.Name.StartsWith(_filterString)) {
-                if (y.Name.StartsWith(_filterString)) {
+            if (x.Name.StartsWith(_filterString, StringComparison.CurrentCulture)) {
+                if (y.Name.StartsWith(_filterString, StringComparison.CurrentCulture)) {
                     var result = string.Compare(x.Name, y.Name, StringComparison.CurrentCulture);
                     return 0 == result ? CompareBasedOnDescriptions(x, y) : result;
                 }
@@ -114,7 +114,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 return -1;
             }
                 
-            if (y.Name.StartsWith(_filterString)) {
+            if (y.Name.StartsWith(_filterString, StringComparison.CurrentCulture)) {
                 return 1;
             }
                 

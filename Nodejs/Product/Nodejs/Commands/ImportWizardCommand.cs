@@ -29,10 +29,9 @@ namespace Microsoft.NodejsTools.Commands {
     /// Provides the command to import a project from existing code.
     /// </summary>
     class ImportWizardCommand : Command {
-
         public override void DoCommand(object sender, EventArgs args) {
             var statusBar = (IVsStatusbar)CommonPackage.GetGlobalService(typeof(SVsStatusbar));
-            statusBar.SetText("Importing project...");
+            statusBar.SetText(SR.GetString(SR.ImportingProjectStatusText));
 
             var dlg = new Microsoft.NodejsTools.Project.ImportWizard.ImportWizard();
             int commandIdToRaise = (int)VSConstants.VSStd97CmdID.OpenProject;
@@ -65,22 +64,17 @@ namespace Microsoft.NodejsTools.Commands {
                         } catch (AggregateException ex) {
                             if (ex.InnerException is UnauthorizedAccessException) {
                                 MessageBox.Show(
-                                    "Some file paths could not be accessed." + Environment.NewLine +
-                                    "Try moving your source code to a location where you " +
-                                    "can read and write files.",
-                                    SR.ProductName
-                                );
+                                    SR.GetString(SR.ImportingProjectAccessErrorStatusText, Environment.NewLine),
+                                    SR.ProductName);
                             } else {
                                 string exName = String.Empty;
                                 if (ex.InnerException != null) {
-                                    exName = "(" + ex.InnerException.GetType().Name + ") ";
+                                    exName = "(" + ex.InnerException.GetType().Name + ")";
                                 }
 
                                 MessageBox.Show(
-                                    "An unexpected error " + exName +
-                                    "occurred while creating your project.",
-                                    SR.ProductName
-                                );
+                                    SR.GetString(SR.ImportingProjectUnexpectedErrorMessage, exName),
+                                    SR.ProductName);
                             }
                             return;
                         }
@@ -89,7 +83,7 @@ namespace Microsoft.NodejsTools.Commands {
                             NodejsPackage.Instance.DTE.Commands.Raise(VSConstants.GUID_VSStandardCommandSet97.ToString("B"), commandIdToRaise, ref pathRef, ref outRef);
                             statusBar.SetText(String.Empty);
                         } else {
-                            statusBar.SetText("An error occurred and your project was not created.");
+                            statusBar.SetText(SR.GetString(SR.ImportingProjectErrorStatusText));
                         }
                     },
                     CancellationToken.None,

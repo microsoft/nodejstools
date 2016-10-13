@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
@@ -101,7 +102,7 @@ namespace Microsoft.NodejsTools.Debugger {
             _debuggerEndpointUri = new UriBuilder { Scheme = "tcp", Host = "localhost", Port = debuggerPortOrDefault }.Uri;
 
             // Node usage: node [options] [ -e script | script.js ] [arguments]
-            string allArgs = String.Format(
+            string allArgs = string.Format(CultureInfo.InvariantCulture,
                 "--debug-brk={0} --nolazy {1} {2}",
                 debuggerPortOrDefault,
                 interpreterOptions,
@@ -725,7 +726,7 @@ namespace Microsoft.NodejsTools.Debugger {
             DebuggerClient.RunWithRequestExceptionsHandled(async () => {
                 string exceptionName = exceptionEvent.ExceptionName;
                 if (!string.IsNullOrEmpty(errorCode)) {
-                    exceptionName = string.Format("{0}({1})", exceptionName, errorCode);
+                    exceptionName = string.Format(CultureInfo.InvariantCulture, "{0}({1})", exceptionName, errorCode);
                 }
 
                 // UNDONE Handle break on unhandled, once just my code is supported
@@ -751,7 +752,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 }
 
                 string description = exceptionEvent.Description;
-                if (description.StartsWith("#<") && description.EndsWith(">")) {
+                if (description.StartsWith("#<", StringComparison.Ordinal) && description.EndsWith(">", StringComparison.Ordinal)) {
                     // Serialize exception object to get a proper description
                     var tokenSource = new CancellationTokenSource(_timeout);
                     var evaluateCommand = new EvaluateCommand(CommandId, _resultFactory, exceptionEvent.ExceptionId);
@@ -1138,7 +1139,7 @@ namespace Microsoft.NodejsTools.Debugger {
         internal async Task<bool> TestPredicateAsync(string expression, CancellationToken cancellationToken = new CancellationToken()) {
             DebugWriteCommand("TestPredicate: " + expression);
 
-            string predicateExpression = string.Format("Boolean({0})", expression);
+            string predicateExpression = string.Format(CultureInfo.InvariantCulture, "Boolean({0})", expression);
             var evaluateCommand = new EvaluateCommand(CommandId, _resultFactory, predicateExpression);
 
             return await TrySendRequestAsync(evaluateCommand, cancellationToken).ConfigureAwait(false) &&
@@ -1202,7 +1203,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
             if (string.IsNullOrEmpty(javaScriptFileName) ||
                 javaScriptFileName == NodeVariableType.UnknownModule ||
-                javaScriptFileName.StartsWith("binding:")) {
+                javaScriptFileName.StartsWith("binding:", StringComparison.Ordinal)) {
                 return false;
             }
 

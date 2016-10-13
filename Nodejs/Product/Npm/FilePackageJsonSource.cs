@@ -15,6 +15,7 @@
 //*********************************************************//
 
 using System;
+using System.Globalization;
 using System.IO;
 using System.Threading;
 
@@ -54,8 +55,8 @@ namespace Microsoft.NodejsTools.Npm {
             string fullPathToFile,
             Exception ex) {
             throw new PackageJsonException(
-                        string.Format(@"Error reading package.json at '{0}': {1}", fullPathToFile, ex.Message),
-                        ex);
+                string.Format(CultureInfo.CurrentCulture, @"Error reading package.json at '{0}': {1}", fullPathToFile, ex.Message),
+                ex);
         }
 
         public dynamic Package { get { return null == _source ? null : _source.Package; } }
