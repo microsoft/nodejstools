@@ -15,6 +15,7 @@
 //*********************************************************//
 
 using System;
+using System.Globalization;
 using System.Linq;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
@@ -26,15 +27,15 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         private int GetExactKeywordMatchCount(IPackage source) {
-            return source.Keywords == null ? 0 : source.Keywords.Count(keyword => keyword.ToLower() == _filterString);
+            return source.Keywords == null ? 0 : source.Keywords.Count(keyword => keyword.ToLower(CultureInfo.InvariantCulture) == _filterString);
         }
 
         private int GetStartsWithMatchCount(IPackage source) {
-            return source.Keywords == null ? 0 : source.Keywords.Count(keyword => keyword.ToLower().StartsWith(_filterString));
+            return source.Keywords == null ? 0 : source.Keywords.Count(keyword => keyword.ToLower(CultureInfo.InvariantCulture).StartsWith(_filterString, StringComparison.Ordinal));
         }
 
         private int GetPartialKeywordMatchCount(IPackage source) {
-            return source.Keywords == null ? 0 : source.Keywords.Count(keyword => keyword.ToLower().Contains(_filterString));
+            return source.Keywords == null ? 0 : source.Keywords.Count(keyword => keyword.ToLower(CultureInfo.InvariantCulture).Contains(_filterString));
         }
 
         private new int CompareBasedOnKeywords(IPackage x, IPackage y) {

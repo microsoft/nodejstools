@@ -15,6 +15,7 @@
 //*********************************************************//
 
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -113,7 +114,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 return stringValue.Length;
             }
 
-            return int.Parse(match.Groups[1].Value);
+            return int.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
         }
     }
 }

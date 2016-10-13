@@ -62,9 +62,9 @@ namespace Microsoft.NodejsTools.Npm {
                 // /Hack
 
                 return new SemverVersion(
-                    ulong.Parse(match.Groups["major"].Value),
-                    ulong.Parse(match.Groups["minor"].Value),
-                    ulong.Parse(patch),
+                    ulong.Parse(match.Groups["major"].Value, CultureInfo.InvariantCulture),
+                    ulong.Parse(match.Groups["minor"].Value, CultureInfo.InvariantCulture),
+                    ulong.Parse(patch, CultureInfo.InvariantCulture),
                     preRelease.Success ? preRelease.Value : null,
                     buildMetadata.Success ? buildMetadata.Value : null);
             } catch (OverflowException oe) {

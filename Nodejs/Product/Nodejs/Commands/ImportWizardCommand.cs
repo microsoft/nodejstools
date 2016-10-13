@@ -15,6 +15,7 @@
 //*********************************************************//
 
 using System;
+using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 using System.Threading;
@@ -48,7 +49,7 @@ namespace Microsoft.NodejsTools.Commands {
                             ".njsproj"
                         );
                         dlg.ImportSettings.SourcePath = argItems[1];
-                        commandIdToRaise = int.Parse(argItems[2]);
+                        commandIdToRaise = int.Parse(argItems[2], CultureInfo.InvariantCulture);
                     }
                 }
             }

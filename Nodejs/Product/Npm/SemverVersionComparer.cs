@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Microsoft.NodejsTools.Npm {
 
@@ -63,7 +64,7 @@ namespace Microsoft.NodejsTools.Npm {
                 if (xn) {
                     if (yn) {
                         // Compare numeric identifiers in the expected way
-                        var result = int.Parse(xs[index]).CompareTo(int.Parse(ys[index]));
+                        var result = int.Parse(xs[index], CultureInfo.InvariantCulture).CompareTo(int.Parse(ys[index], CultureInfo.InvariantCulture));
                         if (0 != result) {
                             return result;
                         }
