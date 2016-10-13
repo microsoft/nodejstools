@@ -217,9 +217,14 @@ namespace Microsoft.NodejsTools {
             Environment.SetEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable, Process.GetCurrentProcess().Id.ToString());
 
 #if DEV15
-            var root = Environment.GetEnvironmentVariable("VsInstallRoot");
-            if (!string.IsNullOrEmpty(root)) {
-                Environment.SetEnvironmentVariable(NodejsConstants.NodeToolsVsInstallRootEnvironmentVariable, root);
+            var devenvPath = Environment.GetEnvironmentVariable("VSAPPIDPATH");
+            if (!string.IsNullOrEmpty(devenvPath)) {
+                try {
+                    var root = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(devenvPath), @"..\.."));
+                    Environment.SetEnvironmentVariable(NodejsConstants.NodeToolsVsInstallRootEnvironmentVariable, root);
+                } catch (Exception) {
+                    // noop
+                }
             }
 #endif
         }
