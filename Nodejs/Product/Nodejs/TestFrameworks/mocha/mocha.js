@@ -2,11 +2,24 @@
 var EOL = require('os').EOL;
 var fs = require('fs');
 var path = require('path');
-
+var result = {
+    "title": "",
+    "passed": false,
+    "stdOut": "",
+    "stdErr": ""
+};
 // Choose 'tap' rather than 'min' or 'xunit'. The reason is that
 // 'min' produces undisplayable text to stdout and stderr under piped/redirect, 
 // and 'xunit' does not print the stack trace from the test.
 var defaultMochaOptions = { ui: 'tdd', reporter: 'tap', timeout: 2000 };
+
+process.stdout.write = function (string, encoding, fd) {
+    result.stdOut += string;
+}
+
+process.stderr.write = function (string, encoding, fd) {
+    result.stdErr += string;
+}
 
 var find_tests = function (testFileList, discoverResultFile, projectFolder) {
     var Mocha = detectMocha(projectFolder);
@@ -56,7 +69,8 @@ var find_tests = function (testFileList, discoverResultFile, projectFolder) {
 };
 module.exports.find_tests = find_tests;
 
-var run_tests = function (testName, testFile, workingFolder, projectFolder) {
+var run_tests = function (testName, testFile, workingFolder, projectFolder, callback) {
+    //var testResults = [];
     var Mocha = detectMocha(projectFolder);
     if (!Mocha) {
         return;
@@ -70,10 +84,27 @@ var run_tests = function (testName, testFile, workingFolder, projectFolder) {
         else
             mocha.grep(testName); // prior Mocha 3.0.0
     }
+
     mocha.addFile(testFile);
 
-    mocha.run(function (code) {
-        process.exit(code);
+    // run tests
+    var runner = mocha.run(function (code) { });
+
+    runner.on('start', function () {
+    });
+    runner.on('test', function (test) {
+        result.title = test.title;
+    });
+    runner.on('end', function () {
+        callback(result);
+    });
+    runner.on('pass', function (test) {
+        result.passed = true;
+        //testResults.push(result);
+    });
+    runner.on('fail', function (test, err) {
+        result.passed = false;
+        //testResults.push(result);
     });
 };
 
