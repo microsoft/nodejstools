@@ -304,7 +304,7 @@ namespace Microsoft.VisualStudioTools.Project {
             return result;
         }
 
-        private static string GetArguments(IEnumerable<string> arguments, bool quoteArgs) {
+        public static string GetArguments(IEnumerable<string> arguments, bool quoteArgs) {
             if (quoteArgs) {
                 return string.Join(" ", arguments.Where(a => a != null).Select(QuoteSingleArgument));
             } else {
@@ -335,7 +335,7 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
-        internal static string QuoteSingleArgument(string arg) {
+        public static string QuoteSingleArgument(string arg) {
             if (string.IsNullOrEmpty(arg)) {
                 return "\"\"";
             }

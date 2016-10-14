@@ -162,8 +162,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
                     try {
                         RunTestCase(app, frameworkHandle, runContext, test, sourceToSettings);
-                    }
-                    catch (Exception ex) {
+                    } catch (Exception ex) {
                         frameworkHandle.SendMessage(TestMessageLevel.Error, ex.ToString());
                     }
                 }
@@ -221,8 +220,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 return;
             }
 
-
-
             NodejsTestInfo testInfo = new NodejsTestInfo(test.FullyQualifiedName);
             List<string> args = new List<string>();
             int port = 0;
@@ -266,17 +263,16 @@ namespace Microsoft.NodejsTools.TestAdapter {
                         //    }
                         //}
 #if DEBUG
-                    }
-                    catch (COMException ex) {
+                    } catch (COMException ex) {
                         frameworkHandle.SendMessage(TestMessageLevel.Error, "Error occurred connecting to debuggee.");
                         frameworkHandle.SendMessage(TestMessageLevel.Error, ex.ToString());
                         KillNodeProcess();
                     }
 #else
-                                    } catch (COMException) {
-                                        frameworkHandle.SendMessage(TestMessageLevel.Error, "Error occurred connecting to debuggee.");
-                                        KillNodeProcess();
-                                    }
+                    } catch (COMException) {
+                        frameworkHandle.SendMessage(TestMessageLevel.Error, "Error occurred connecting to debuggee.");
+                        KillNodeProcess();
+                    }
 #endif
                 }
             }
@@ -301,9 +297,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
             ResultObject jsonResult = null;
             try {
                 jsonResult = JsonConvert.DeserializeObject<ResultObject>(line);
-            }
-            catch (Exception) {
-            }
+            } catch (Exception) { }
             return jsonResult;
         }
 
@@ -323,9 +317,9 @@ namespace Microsoft.NodejsTools.TestAdapter {
         private void LaunchNodeProcess(string workingDir, string nodeExePath, List<string> args) {
             _psi = new ProcessStartInfo("cmd.exe") {
                 Arguments = string.Format(@"/S /C pushd {0} & {1} {2}",
-                QuoteSingleArgument(workingDir),
-                QuoteSingleArgument(nodeExePath),
-                GetArguments(args, true)),
+                ProcessOutput.QuoteSingleArgument(workingDir),
+                ProcessOutput.QuoteSingleArgument(nodeExePath),
+                ProcessOutput.GetArguments(args, true)),
                 CreateNoWindow = true,
                 UseShellExecute = false
             };
@@ -352,52 +346,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
                     proj.GetPropertyValue(NodejsConstants.NodeExePath));
 
             return projSettings;
-        }
-
-        private static string GetArguments(IEnumerable<string> arguments, bool quoteArgs) {
-            if (quoteArgs) {
-                return string.Join(" ", arguments.Where(a => a != null).Select(QuoteSingleArgument));
-            }
-            else {
-                return string.Join(" ", arguments.Where(a => a != null));
-            }
-        }
-
-        internal static string QuoteSingleArgument(string arg) {
-            if (string.IsNullOrEmpty(arg)) {
-                return "\"\"";
-            }
-            if (arg.IndexOfAny(_needToBeQuoted) < 0) {
-                return arg;
-            }
-
-            if (arg.StartsWith("\"") && arg.EndsWith("\"")) {
-                bool inQuote = false;
-                int consecutiveBackslashes = 0;
-                foreach (var c in arg) {
-                    if (c == '"') {
-                        if (consecutiveBackslashes % 2 == 0) {
-                            inQuote = !inQuote;
-                        }
-                    }
-
-                    if (c == '\\') {
-                        consecutiveBackslashes += 1;
-                    }
-                    else {
-                        consecutiveBackslashes = 0;
-                    }
-                }
-                if (!inQuote) {
-                    return arg;
-                }
-            }
-
-            var newArg = arg.Replace("\"", "\\\"");
-            if (newArg.EndsWith("\\")) {
-                newArg += "\\";
-            }
-            return "\"" + newArg + "\"";
         }
 
         private static void RecordEnd(IFrameworkHandle frameworkHandle, TestCase test, TestResult result, string stdout, string stderr, TestOutcome outcome) {

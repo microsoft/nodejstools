@@ -13,19 +13,12 @@ var result = {
 // and 'xunit' does not print the stack trace from the test.
 var defaultMochaOptions = { ui: 'tdd', reporter: 'tap', timeout: 2000 };
 
-function hook_stdout(callback) {
-    var old_write = process.stdout.write;
+process.stdout.write = function (string, encoding, fd) {
+    result.stdOut += string;
+}
 
-    process.stdout.write = (function (write) {
-        return function (string, encoding, fd) {
-            callback(string, encoding, fd)
-            //write.apply(process.stdout, arguments)
-        }
-    })(process.stdout.write)
-
-    return function () {
-        process.stdout.write = old_write
-    }
+process.stderr.write = function (string, encoding, fd) {
+    result.stdErr += string;
 }
 
 var find_tests = function (testFileList, discoverResultFile, projectFolder) {
@@ -76,16 +69,12 @@ var find_tests = function (testFileList, discoverResultFile, projectFolder) {
 };
 module.exports.find_tests = find_tests;
 
-var run_tests = function (testName, testFile, workingFolder, projectFolder) {
+var run_tests = function (testName, testFile, workingFolder, projectFolder, callback) {
     //var testResults = [];
     var Mocha = detectMocha(projectFolder);
     if (!Mocha) {
         return;
     }
-
-    var unhook = hook_stdout(function (string, encoding, fd) {
-        result.stdOut += string;
-    });
 
     var mocha = initializeMocha(Mocha, projectFolder);
 
@@ -107,9 +96,7 @@ var run_tests = function (testName, testFile, workingFolder, projectFolder) {
         result.title = test.title;
     });
     runner.on('end', function () {
-        unhook();
-        console.log(JSON.stringify(result));
-        process.exit(0);
+        callback(result);
     });
     runner.on('pass', function (test) {
         result.passed = true;
