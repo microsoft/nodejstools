@@ -146,7 +146,7 @@ namespace Microsoft.NodejsTools.Repl {
                     nodejsProject != null ?
                         Nodejs.GetAbsoluteNodeExePath(
                             nodejsProject.ProjectHome,
-                            nodejsProject.GetProjectProperty(NodejsConstants.NodeExePath))
+                            nodejsProject.GetProjectProperty(NodeProjectProperty.NodeExePath))
                         : null);
             } catch (NpmNotFoundException) {
                 Nodejs.ShowNodejsNotInstalled();

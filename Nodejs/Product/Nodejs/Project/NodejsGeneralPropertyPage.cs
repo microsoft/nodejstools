@@ -47,35 +47,35 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
         public override void Apply() {
-            Project.SetProjectProperty(NodejsConstants.NodeExePath, _control.NodeExePath);
-            Project.SetProjectProperty(NodejsConstants.NodeExeArguments, _control.NodeExeArguments);
+            Project.SetProjectProperty(NodeProjectProperty.NodeExePath, _control.NodeExePath);
+            Project.SetProjectProperty(NodeProjectProperty.NodeExeArguments, _control.NodeExeArguments);
             Project.SetProjectProperty(CommonConstants.StartupFile, _control.ScriptFile);
-            Project.SetProjectProperty(NodejsConstants.ScriptArguments, _control.ScriptArguments);
-            Project.SetProjectProperty(NodejsConstants.NodejsPort, _control.NodejsPort);
-            Project.SetProjectProperty(NodejsConstants.StartWebBrowser, _control.StartWebBrowser.ToString());
+            Project.SetProjectProperty(NodeProjectProperty.ScriptArguments, _control.ScriptArguments);
+            Project.SetProjectProperty(NodeProjectProperty.NodejsPort, _control.NodejsPort);
+            Project.SetProjectProperty(NodeProjectProperty.StartWebBrowser, _control.StartWebBrowser.ToString());
             Project.SetProjectProperty(CommonConstants.WorkingDirectory, _control.WorkingDirectory);
-            Project.SetProjectProperty(NodejsConstants.LaunchUrl, _control.LaunchUrl);
-            Project.SetProjectProperty(NodejsConstants.DebuggerPort, _control.DebuggerPort);
-            Project.SetProjectProperty(NodejsConstants.Environment, _control.Environment);
+            Project.SetProjectProperty(NodeProjectProperty.LaunchUrl, _control.LaunchUrl);
+            Project.SetProjectProperty(NodeProjectProperty.DebuggerPort, _control.DebuggerPort);
+            Project.SetProjectProperty(NodeProjectProperty.Environment, _control.Environment);
             IsDirty = false;
         }
 
         public override void LoadSettings() {
             Loading = true;
             try {
-                _control.NodeExeArguments = Project.GetUnevaluatedProperty(NodejsConstants.NodeExeArguments);
-                _control.NodeExePath = Project.GetUnevaluatedProperty(NodejsConstants.NodeExePath);
+                _control.NodeExeArguments = Project.GetUnevaluatedProperty(NodeProjectProperty.NodeExeArguments);
+                _control.NodeExePath = Project.GetUnevaluatedProperty(NodeProjectProperty.NodeExePath);
                 _control.ScriptFile = Project.GetUnevaluatedProperty(CommonConstants.StartupFile);
-                _control.ScriptArguments = Project.GetUnevaluatedProperty(NodejsConstants.ScriptArguments);
+                _control.ScriptArguments = Project.GetUnevaluatedProperty(NodeProjectProperty.ScriptArguments);
                 _control.WorkingDirectory = Project.GetUnevaluatedProperty(CommonConstants.WorkingDirectory);
-                _control.LaunchUrl = Project.GetUnevaluatedProperty(NodejsConstants.LaunchUrl);
-                _control.NodejsPort = Project.GetUnevaluatedProperty(NodejsConstants.NodejsPort);
-                _control.DebuggerPort = Project.GetUnevaluatedProperty(NodejsConstants.DebuggerPort);
-                _control.Environment = Project.GetUnevaluatedProperty(NodejsConstants.Environment);
+                _control.LaunchUrl = Project.GetUnevaluatedProperty(NodeProjectProperty.LaunchUrl);
+                _control.NodejsPort = Project.GetUnevaluatedProperty(NodeProjectProperty.NodejsPort);
+                _control.DebuggerPort = Project.GetUnevaluatedProperty(NodeProjectProperty.DebuggerPort);
+                _control.Environment = Project.GetUnevaluatedProperty(NodeProjectProperty.Environment);
                 
                 // Attempt to parse the boolean.  If we fail, assume it is true.
                 bool startWebBrowser;
-                if (!Boolean.TryParse(Project.GetUnevaluatedProperty(NodejsConstants.StartWebBrowser), out startWebBrowser)) {
+                if (!Boolean.TryParse(Project.GetUnevaluatedProperty(NodeProjectProperty.StartWebBrowser), out startWebBrowser)) {
                     startWebBrowser = true;
                 }
                 _control.StartWebBrowser = startWebBrowser;

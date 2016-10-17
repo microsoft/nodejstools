@@ -188,7 +188,7 @@ namespace Microsoft.NodejsTools.Repl {
             if (startupProject != null) {
                 nodeExePath = Nodejs.GetAbsoluteNodeExePath(
                     startupProject.ProjectHome,
-                    startupProject.GetProjectProperty(NodejsConstants.NodeExePath)
+                    startupProject.GetProjectProperty(NodeProjectProperty.NodeExePath)
                 );
             } else {
                 nodeExePath = Nodejs.NodeExePath;
