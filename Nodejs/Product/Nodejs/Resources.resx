@@ -632,4 +632,7 @@ Error retrieving websocket debug proxy information from web.config.</value>
   <data name="DebugWorkingDirectoryDoesNotExistErrorMessage" xml:space="preserve">
     <value>Working directory "{0}" does not exist.</value>
   </data>
+  <data name="ImportWizzardCouldNotStartNotAutomationObjectErrorMessage" xml:space="preserve">
+    <value>Unable to start wizard: no automation object available.</value>
+  </data>
 </root>

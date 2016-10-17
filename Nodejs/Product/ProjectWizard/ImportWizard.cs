@@ -23,6 +23,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TemplateWizard;
+using Microsoft.NodejsTools.Project;
 
 namespace Microsoft.NodejsTools.ProjectWizard {
     public sealed class NewProjectFromExistingWizard : IWizard {
@@ -44,7 +45,7 @@ namespace Microsoft.NodejsTools.ProjectWizard {
 
             bool addingNewProject = false;
             if (dte == null) {
-                MessageBox.Show("Unable to start wizard: no automation object available.", "Node.js Tools for Visual Studio");
+                MessageBox.Show(SR.GetString(SR.ImportWizzardCouldNotStartNotAutomationObjectErrorMessage), SR.ProductName);
             } else {
                 // https://nodejstools.codeplex.com/workitem/462
                 // we need to make sure our package is loaded before invoking our command

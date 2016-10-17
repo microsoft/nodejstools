@@ -52,6 +52,7 @@ namespace Microsoft.NodejsTools.Project {
         internal const string ImportingProjectErrorStatusText = "ImportingProjectErrorStatusText";
         internal const string ImportingProjectStatusText = "ImportingProjectStatusText";
         internal const string ImportingProjectUnexpectedErrorMessage = "ImportingProjectUnexpectedErrorMessage";
+        internal const string ImportWizzardCouldNotStartNotAutomationObjectErrorMessage = "ImportWizzardCouldNotStartNotAutomationObjectErrorMessage";
         internal const string IncludeNodeModulesCancelTitle = "IncludeNodeModulesCancelTitle";
         internal const string IncludeNodeModulesContent = "IncludeNodeModulesContent";
         internal const string IncludeNodeModulesIncludeDescription = "IncludeNodeModulesIncludeDescription";
