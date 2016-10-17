@@ -111,7 +111,7 @@ while(true) {{
 
             var project = Project("DebuggerPort",
                 Compile("server", code),
-                Property(NodejsConstants.DebuggerPort, "1234"),
+                Property(NodeProjectProperty.DebuggerPort, "1234"),
                 Property(CommonConstants.StartupFile, "server.js")
             );
 
@@ -144,7 +144,7 @@ while(true) {{
 
             var project = Project("EnvironmentVariables",
                 Compile("server", code),
-                Property(NodejsConstants.Environment, "fob=1\nbar=2;3\r\nbaz=4"),
+                Property(NodeProjectProperty.Environment, "fob=1\nbar=2;3\r\nbaz=4"),
                 Property(CommonConstants.StartupFile, "server.js")
             );
 
@@ -176,7 +176,7 @@ require('fs').writeFileSync('{0}', process.env.fob + process.env.bar + process.e
 
             var project = Project("EnvironmentVariables",
                 Compile("server", code),
-                Property(NodejsConstants.Environment, "fob=1\nbar=2;3\r\nbaz=4"),
+                Property(NodeProjectProperty.Environment, "fob=1\nbar=2;3\r\nbaz=4"),
                 Property(CommonConstants.StartupFile, "server.js")
             );
 
@@ -202,8 +202,8 @@ require('fs').writeFileSync('{0}', process.env.fob + process.env.bar + process.e
 
             var project = Project("ProjectProperties",
                 Compile("server"),
-                Property(NodejsConstants.Environment, "fob=1\r\nbar=2;3\nbaz=4"),
-                Property(NodejsConstants.DebuggerPort, "1234"),
+                Property(NodeProjectProperty.Environment, "fob=1\r\nbar=2;3\nbaz=4"),
+                Property(NodeProjectProperty.DebuggerPort, "1234"),
                 Property(CommonConstants.StartupFile, "server.js")
             );
 

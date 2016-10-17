@@ -113,7 +113,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
             var nodeExePath =
                 Nodejs.GetAbsoluteNodeExePath(
                     projectHome,
-                    proj.GetPropertyValue(NodejsConstants.NodeExePath));
+                    proj.GetPropertyValue(NodeProjectProperty.NodeExePath));
 
             if (!File.Exists(nodeExePath)) {
                 logger.SendMessage(TestMessageLevel.Error, string.Format(CultureInfo.CurrentCulture, "Node.exe was not found.  Please install Node.js before running tests."));

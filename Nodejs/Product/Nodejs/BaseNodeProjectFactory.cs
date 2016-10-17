@@ -36,7 +36,7 @@ namespace Microsoft.NodejsTools {
         }
 
         protected override ProjectUpgradeState UpgradeProjectCheck(ProjectRootElement projectXml, ProjectRootElement userProjectXml, Action<__VSUL_ERRORLEVEL, string> log, ref Guid projectFactory, ref __VSPPROJECTUPGRADEVIAFACTORYFLAGS backupSupport) {
-            var envVarsProp = projectXml.Properties.FirstOrDefault(p => p.Name == NodejsConstants.EnvironmentVariables);
+            var envVarsProp = projectXml.Properties.FirstOrDefault(p => p.Name == NodeProjectProperty.EnvironmentVariables);
             if (envVarsProp != null && !string.IsNullOrEmpty(envVarsProp.Value)) {
                 return ProjectUpgradeState.OneWayUpgrade;
             }
@@ -45,10 +45,10 @@ namespace Microsoft.NodejsTools {
         }
 
         protected override void UpgradeProject(ref ProjectRootElement projectXml, ref ProjectRootElement userProjectXml, Action<__VSUL_ERRORLEVEL, string> log) {
-            var envVarsProp = projectXml.Properties.FirstOrDefault(p => p.Name == NodejsConstants.EnvironmentVariables);
+            var envVarsProp = projectXml.Properties.FirstOrDefault(p => p.Name == NodeProjectProperty.EnvironmentVariables);
             if (envVarsProp != null) {
                 var globals = projectXml.PropertyGroups.FirstOrDefault() ?? projectXml.AddPropertyGroup();
-                AddOrSetProperty(globals, NodejsConstants.Environment, envVarsProp.Value.Replace(";", "\r\n"));
+                AddOrSetProperty(globals, NodeProjectProperty.Environment, envVarsProp.Value.Replace(";", "\r\n"));
                 envVarsProp.Parent.RemoveChild(envVarsProp);
                 log(__VSUL_ERRORLEVEL.VSUL_INFORMATIONAL, SR.GetString(SR.UpgradedEnvironmentVariables));
             }

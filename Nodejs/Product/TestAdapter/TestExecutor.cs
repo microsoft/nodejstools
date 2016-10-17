@@ -240,7 +240,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
             projSettings.NodeExePath =
                 Nodejs.GetAbsoluteNodeExePath(
                     projectRootDir,
-                    proj.GetPropertyValue(NodejsConstants.NodeExePath));
+                    proj.GetPropertyValue(NodeProjectProperty.NodeExePath));
 
             return projSettings;
         }

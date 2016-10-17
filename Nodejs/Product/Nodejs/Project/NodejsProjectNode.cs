@@ -513,31 +513,31 @@ namespace Microsoft.NodejsTools.Project {
             var propPage = GeneralPropertyPageControl;
             if (propPage != null) {
                 switch (propertyName) {
-                    case NodejsConstants.Environment:
+                    case NodeProjectProperty.Environment:
                         propPage.Environment = newValue;
                         break;
-                    case NodejsConstants.DebuggerPort:
+                    case NodeProjectProperty.DebuggerPort:
                         propPage.DebuggerPort = newValue;
                         break;
-                    case NodejsConstants.NodejsPort:
+                    case NodeProjectProperty.NodejsPort:
                         propPage.NodejsPort = newValue;
                         break;
-                    case NodejsConstants.NodeExePath:
+                    case NodeProjectProperty.NodeExePath:
                         propPage.NodeExePath = newValue;
                         break;
-                    case NodejsConstants.NodeExeArguments:
+                    case NodeProjectProperty.NodeExeArguments:
                         propPage.NodeExeArguments = newValue;
                         break;
                     case CommonConstants.StartupFile:
                         propPage.ScriptFile = newValue;
                         break;
-                    case NodejsConstants.ScriptArguments:
+                    case NodeProjectProperty.ScriptArguments:
                         propPage.ScriptArguments = newValue;
                         break;
-                    case NodejsConstants.LaunchUrl:
+                    case NodeProjectProperty.LaunchUrl:
                         propPage.LaunchUrl = newValue;
                         break;
-                    case NodejsConstants.StartWebBrowser:
+                    case NodeProjectProperty.StartWebBrowser:
                         bool value;
                         if (Boolean.TryParse(newValue, out value)) {
                             propPage.StartWebBrowser = value;
@@ -950,7 +950,7 @@ namespace Microsoft.NodejsTools.Project {
                     NpmHelpers.GetPathToNpm(
                         Nodejs.GetAbsoluteNodeExePath(
                             ProjectHome,
-                            Project.GetNodejsProject().GetProjectProperty(NodejsConstants.NodeExePath)
+                            Project.GetNodejsProject().GetProjectProperty(NodeProjectProperty.NodeExePath)
                     ));
                 } catch (NpmNotFoundException) {
                     Nodejs.ShowNodejsNotInstalled();
@@ -966,7 +966,7 @@ namespace Microsoft.NodejsTools.Project {
                     NpmHelpers.GetPathToNpm(
                         Nodejs.GetAbsoluteNodeExePath(
                             ProjectHome,
-                            Project.GetNodejsProject().GetProjectProperty(NodejsConstants.NodeExePath)
+                            Project.GetNodejsProject().GetProjectProperty(NodeProjectProperty.NodeExePath)
                     ));
                 } catch (NpmNotFoundException) {
                     Nodejs.ShowNodejsNotInstalled();

@@ -46,7 +46,7 @@ namespace Microsoft.NodejsTools.Project {
         public NodejsProjectLauncher(NodejsProjectNode project) {
             _project = project;
 
-            var portNumber = _project.GetProjectProperty(NodejsConstants.NodejsPort);
+            var portNumber = _project.GetProjectProperty(NodeProjectProperty.NodejsPort);
             int portNum;
             if (Int32.TryParse(portNumber, out portNum)) {
                 _testServerPort = portNum;
@@ -118,13 +118,13 @@ namespace Microsoft.NodejsTools.Project {
         private string GetFullArguments(string file, bool includeNodeArgs = true) {
             string res = String.Empty;
             if (includeNodeArgs) {
-                var nodeArgs = _project.GetProjectProperty(NodejsConstants.NodeExeArguments);
+                var nodeArgs = _project.GetProjectProperty(NodeProjectProperty.NodeExeArguments);
                 if (!String.IsNullOrWhiteSpace(nodeArgs)) {
                     res = nodeArgs + " ";
                 }
             }
             res += "\"" + file + "\"";
-            var scriptArgs = _project.GetProjectProperty(NodejsConstants.ScriptArguments);
+            var scriptArgs = _project.GetProjectProperty(NodeProjectProperty.ScriptArguments);
             if (!String.IsNullOrWhiteSpace(scriptArgs)) {
                 res += " " + scriptArgs;
             }
@@ -132,14 +132,14 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private string GetNodePath() {
-            var overridePath = _project.GetProjectProperty(NodejsConstants.NodeExePath);
+            var overridePath = _project.GetProjectProperty(NodeProjectProperty.NodeExePath);
             return Nodejs.GetAbsoluteNodeExePath(_project.ProjectHome, overridePath);
         }
 
         #endregion
 
         private string GetFullUrl() {
-            var host = _project.GetProjectProperty(NodejsConstants.LaunchUrl);
+            var host = _project.GetProjectProperty(NodeProjectProperty.LaunchUrl);
 
             try {
                 return GetFullUrl(host, TestServerPort);
@@ -233,7 +233,7 @@ namespace Microsoft.NodejsTools.Project {
             dbgInfo.bstrCurDir = _project.GetWorkingDirectory();
             dbgInfo.bstrArg = GetFullArguments(startupFile, includeNodeArgs: false);    // we need to supply node args via options
             dbgInfo.bstrRemoteMachine = null;
-            var nodeArgs = _project.GetProjectProperty(NodejsConstants.NodeExeArguments);
+            var nodeArgs = _project.GetProjectProperty(NodeProjectProperty.NodeExeArguments);
             if (!String.IsNullOrWhiteSpace(nodeArgs)) {
                 AppendOption(ref dbgInfo, AD7Engine.InterpreterOptions, nodeArgs);
             }
@@ -243,7 +243,7 @@ namespace Microsoft.NodejsTools.Project {
                 AppendOption(ref dbgInfo, AD7Engine.WebBrowserUrl, url);
             }
 
-            var debuggerPort = _project.GetProjectProperty(NodejsConstants.DebuggerPort);
+            var debuggerPort = _project.GetProjectProperty(NodeProjectProperty.DebuggerPort);
             if (!String.IsNullOrWhiteSpace(debuggerPort)) {
                 AppendOption(ref dbgInfo, AD7Engine.DebuggerPort, debuggerPort);
             }
@@ -296,7 +296,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private bool ShouldStartBrowser() {
-            var startBrowser = _project.GetProjectProperty(NodejsConstants.StartWebBrowser);
+            var startBrowser = _project.GetProjectProperty(NodeProjectProperty.StartWebBrowser);
             bool fStartBrowser;
             if (!String.IsNullOrEmpty(startBrowser) &&
                 Boolean.TryParse(startBrowser, out fStartBrowser)) {
@@ -307,7 +307,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private IEnumerable<KeyValuePair<string, string>> GetEnvironmentVariables() {
-            var envVars = _project.GetProjectProperty(NodejsConstants.Environment);
+            var envVars = _project.GetProjectProperty(NodeProjectProperty.Environment);
             if (envVars != null) {
                 foreach (var envVar in envVars.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)) {
                     var nameValue = envVar.Split(new[] { '=' }, 2);

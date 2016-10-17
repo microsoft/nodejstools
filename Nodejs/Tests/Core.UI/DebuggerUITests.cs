@@ -112,7 +112,7 @@ process.exit(" + exitCode + ");"),
             var project = Project("NoDebugging",
                 Compile("server"),
                 Property(CommonConstants.StartupFile, "server.js"),
-                Property(NodejsConstants.NodeExeArguments, "-v")
+                Property(NodeProjectProperty.NodeExeArguments, "-v")
             );
 
             using (var solution = project.Generate().ToVs()) {
