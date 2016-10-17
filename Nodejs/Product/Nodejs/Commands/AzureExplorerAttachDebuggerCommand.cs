@@ -80,10 +80,7 @@ namespace Microsoft.NodejsTools.Commands {
             Action<Task<bool>> onAttach = null;
             onAttach = (attachTask) => {
                 if (!attachTask.Result) {
-                    string msg = string.Format(CultureInfo.CurrentCulture,
-                        "Could not attach to node.exe process on Azure Website at {0}.\r\n\r\n" +
-                        "Error retrieving websocket debug proxy information from web.config.",
-                        webSite.Uri);
+                    string msg = Project.SR.GetString(Project.SR.AzureRemoteDebugCouldNotAttachToWebsiteErrorMessage, webSite.Uri);
                     if (MessageBox.Show(msg, null, MessageBoxButtons.RetryCancel, MessageBoxIcon.Error) == DialogResult.Retry) {
                         AttachWorker(webSite).ContinueWith(onAttach);
                     }
@@ -188,7 +185,11 @@ namespace Microsoft.NodejsTools.Commands {
         }
 
         private async Task<bool> AttachWorker(AzureWebSiteInfo webSite) {
-            using (new WaitDialog("Azure remote debugging", "Attaching to Azure Website at " + webSite.Uri, NodejsPackage.Instance, showProgress: true)) {
+            using (new WaitDialog(
+                Project.SR.GetString(Project.SR.AzureRemoteDebugWaitCaption),
+                Project.SR.GetString(Project.SR.AzureRemoteDebugWaitMessage, webSite.Uri),
+                NodejsPackage.Instance,
+                showProgress: true)) {
                 // Get path (relative to site URL) for the debugger endpoint.
                 XDocument webConfig;
                 try {
@@ -223,7 +224,7 @@ namespace Microsoft.NodejsTools.Commands {
                     // ask the user to retry, so the only case where we actually get here is if user canceled on error. If this is the case,
                     // we don't want to pop any additional error messages, so always return true, but log the error in the Output window.
                     var output = OutputWindowRedirector.GetGeneral(NodejsPackage.Instance);
-                    output.WriteErrorLine("Failed to attach to Azure Website: " + ex.Message);
+                    output.WriteErrorLine(Project.SR.GetString(Project.SR.AzureRemoveDebugCouldNotAttachToWebsiteExceptionErrorMessage, ex.Message));
                     output.ShowAndActivate();
                 }
                 return true;
