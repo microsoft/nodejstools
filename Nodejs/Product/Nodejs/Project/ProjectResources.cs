@@ -37,6 +37,10 @@ namespace Microsoft.NodejsTools.Project {
         internal const string CategoryStatus = "CategoryStatus";
         internal const string CategoryVersion = "CategoryVersion";
         internal const string ContinueWithoutAzureToolsUpgrade = "ContinueWithoutAzureToolsUpgrade";
+        internal const string DebugCouldNotResolveStartupFileErrorMessage = "DebugCouldNotResolveStartupFileErrorMessage";
+        internal const string DebugWorkingDirectoryDoesNotExistErrorMessage = "DebugWorkingDirectoryDoesNotExistErrorMessage";
+        internal const string DebugInterpreterDoesNotExistErrorMessage = "DebugInterpreterDoesNotExistErrorMessage";
+        internal const string DebugTypeScriptCombineNotSupportedWarningMessage = "DebugTypeScriptCombineNotSupportedWarningMessage";
         internal const string DebuggerConnectionClosed = "DebuggerConnectionClosed";
         internal const string DebuggerModuleUpdateFailed = "DebuggerModuleUpdateFailed";
         internal const string DebuggerPort = "DebuggerPort";

@@ -620,4 +620,16 @@ Error retrieving websocket debug proxy information from web.config.</value>
   <data name="RemoteDebugUnsupportedPlatformErrorMessage" xml:space="preserve">
     <value>Remote debugging of node.js Microsoft Azure applications is only supported on Windows 8 and above.</value>
   </data>
+  <data name="DebugCouldNotResolveStartupFileErrorMessage" xml:space="preserve">
+    <value>Please select a startup file to launch by right-clicking the file in Solution Explorer and selecting 'Set as Node.js Startup File' or by modifying your configuration in project properties</value>
+  </data>
+  <data name="DebugInterpreterDoesNotExistErrorMessage" xml:space="preserve">
+    <value>Interpreter "{0}" does not exist.</value>
+  </data>
+  <data name="DebugTypeScriptCombineNotSupportedWarningMessage" xml:space="preserve">
+    <value>This TypeScript project has 'Combine Javascript output into file' option enabled. This option is not supported by NTVS debugger, and may result in erratic behavior of breakpoints, stepping, and debug tool windows. Are you sure you want to start debugging?</value>
+  </data>
+  <data name="DebugWorkingDirectoryDoesNotExistErrorMessage" xml:space="preserve">
+    <value>Working directory "{0}" does not exist.</value>
+  </data>
 </root>
