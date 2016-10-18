@@ -242,7 +242,7 @@ namespace Microsoft.NodejsTools.Project {
 
         public bool IsTypeScriptProject {
             get {
-                return string.Equals(GetProjectProperty(NodejsConstants.EnableTypeScript), "true", StringComparison.OrdinalIgnoreCase);
+                return string.Equals(GetProjectProperty(NodeProjectProperty.EnableTypeScript), "true", StringComparison.OrdinalIgnoreCase);
             }
         }
 
@@ -314,14 +314,14 @@ namespace Microsoft.NodejsTools.Project {
 
             if (IsProjectTypeScriptSourceFile(fileName) && !IsTypeScriptProject) {
                 // enable TypeScript on the project automatically...
-                SetProjectProperty(NodejsConstants.EnableTypeScript, "true");
-                SetProjectProperty(NodejsConstants.TypeScriptSourceMap, "true");
+                SetProjectProperty(NodeProjectProperty.EnableTypeScript, "true");
+                SetProjectProperty(NodeProjectProperty.TypeScriptSourceMap, "true");
 #if DEV14
                 // Reset cached value, so it will be recalculated later.
                 this.shouldAcquireTypingsAutomatically = false;
 #endif
-                if (String.IsNullOrWhiteSpace(GetProjectProperty(NodejsConstants.TypeScriptModuleKind))) {
-                    SetProjectProperty(NodejsConstants.TypeScriptModuleKind, NodejsConstants.CommonJSModuleKind);
+                if (String.IsNullOrWhiteSpace(GetProjectProperty(NodeProjectProperty.TypeScriptModuleKind))) {
+                    SetProjectProperty(NodeProjectProperty.TypeScriptModuleKind, NodejsConstants.CommonJSModuleKind);
                 }
             }
         }
@@ -425,10 +425,10 @@ namespace Microsoft.NodejsTools.Project {
         protected override Guid[] GetConfigurationDependentPropertyPages() {
             var res = base.GetConfigurationDependentPropertyPages();
 
-            var enableTs = GetProjectProperty(NodejsConstants.EnableTypeScript, resetCache: false);
+            var enableTs = GetProjectProperty(NodeProjectProperty.EnableTypeScript, resetCache: false);
             bool fEnableTs;
             if (enableTs != null && Boolean.TryParse(enableTs, out fEnableTs) && fEnableTs) {
-                var typeScriptPages = GetProjectProperty(NodejsConstants.TypeScriptCfgProperty);
+                var typeScriptPages = GetProjectProperty(NodeProjectProperty.TypeScriptCfgProperty);
                 if (typeScriptPages != null) {
                     foreach (var strGuid in typeScriptPages.Split(';')) {
                         Guid guid;

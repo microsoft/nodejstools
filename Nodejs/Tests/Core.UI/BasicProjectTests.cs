@@ -552,25 +552,25 @@ namespace Microsoft.Nodejs.Tests.UI {
 
                 Assert.AreEqual(project.Properties.DTE, app.Dte);
 
-                Assert.AreEqual(project.Properties.Item("StartWebBrowser").Value.GetType(), typeof(bool));
-                Assert.IsTrue(project.Properties.Item("NodejsPort").Value == null || project.Properties.Item("NodejsPort").Value.GetType() == typeof(int));
+                Assert.AreEqual(project.Properties.Item(NodeProjectProperty.StartWebBrowser).Value.GetType(), typeof(bool));
+                Assert.IsTrue(project.Properties.Item(NodeProjectProperty.NodejsPort).Value == null || project.Properties.Item(NodeProjectProperty.NodejsPort).Value.GetType() == typeof(int));
 
-                Assert.AreEqual(project.Properties.Item("LaunchUrl").Value, null);
-                Assert.AreEqual(project.Properties.Item("ScriptArguments").Value, null);
-                Assert.AreEqual(project.Properties.Item("NodeExeArguments").Value, null);
-                Assert.AreEqual(project.Properties.Item("NodeExePath").Value.GetType(), typeof(string));
+                Assert.AreEqual(project.Properties.Item(NodeProjectProperty.LaunchUrl).Value, null);
+                Assert.AreEqual(project.Properties.Item(NodeProjectProperty.ScriptArguments).Value, null);
+                Assert.AreEqual(project.Properties.Item(NodeProjectProperty.NodeExeArguments).Value, null);
+                Assert.AreEqual(project.Properties.Item(NodeProjectProperty.NodeExePath).Value.GetType(), typeof(string));
 
-                project.Properties.Item("StartWebBrowser").Value = true;
-                Assert.AreEqual(project.Properties.Item("StartWebBrowser").Value, true);
-                project.Properties.Item("StartWebBrowser").Value = false;
-                Assert.AreEqual(project.Properties.Item("StartWebBrowser").Value, false);
+                project.Properties.Item(NodeProjectProperty.StartWebBrowser).Value = true;
+                Assert.AreEqual(project.Properties.Item(NodeProjectProperty.StartWebBrowser).Value, true);
+                project.Properties.Item(NodeProjectProperty.StartWebBrowser).Value = false;
+                Assert.AreEqual(project.Properties.Item(NodeProjectProperty.StartWebBrowser).Value, false);
 
-                project.Properties.Item("NodejsPort").Value = 10000;
-                Assert.AreEqual(project.Properties.Item("NodejsPort").Value, 10000);
-                project.Properties.Item("NodejsPort").Value = 5000;
-                Assert.AreEqual(project.Properties.Item("NodejsPort").Value, 5000);
+                project.Properties.Item(NodeProjectProperty.NodejsPort).Value = 10000;
+                Assert.AreEqual(project.Properties.Item(NodeProjectProperty.NodejsPort).Value, 10000);
+                project.Properties.Item(NodeProjectProperty.NodejsPort).Value = 5000;
+                Assert.AreEqual(project.Properties.Item(NodeProjectProperty.NodejsPort).Value, 5000);
 
-                foreach (var value in new[] { "LaunchUrl", "ScriptArguments", "NodeExeArguments", "NodeExePath" }) {
+                foreach (var value in new[] { NodeProjectProperty.LaunchUrl, NodeProjectProperty.ScriptArguments, NodeProjectProperty.NodeExeArguments, NodeProjectProperty.NodeExePath }) {
                     string tmpValue = Guid.NewGuid().ToString();
 
                     project.Properties.Item(value).Value = tmpValue;

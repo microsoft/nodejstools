@@ -30,7 +30,7 @@ namespace Microsoft.NodejsTools.TypeScript {
         }
 
         internal static string GetTypeScriptBackedJavaScriptFile(MSBuild.Project project, string pathToFile) {
-            var typeScriptOutDir = project.GetPropertyValue("TypeScriptOutDir");
+            var typeScriptOutDir = project.GetPropertyValue(NodeProjectProperty.TypeScriptOutDir);
             return GetTypeScriptBackedJavaScriptFile(project.DirectoryPath, typeScriptOutDir, pathToFile);
         }
 
@@ -39,7 +39,7 @@ namespace Microsoft.NodejsTools.TypeScript {
             //Need to deal with the format being relative and explicit
             IVsBuildPropertyStorage props = (IVsBuildPropertyStorage)project;
             String outDir;
-            ErrorHandler.ThrowOnFailure(props.GetPropertyValue("TypeScriptOutDir", null, 0, out outDir));
+            ErrorHandler.ThrowOnFailure(props.GetPropertyValue(NodeProjectProperty.TypeScriptOutDir, null, 0, out outDir));
 
             string projHome = GetProjectHome(project);
 
