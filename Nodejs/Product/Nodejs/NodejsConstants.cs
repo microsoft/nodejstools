@@ -47,14 +47,9 @@ namespace Microsoft.NodejsTools {
 
         internal const string BaseRegistryKey = "NodejsTools";
 
-        internal const string TypeScriptCfgProperty = "CfgPropertyPagesGuidsAddTypeScript";
-
         internal const ushort DefaultDebuggerPort = 5858;
 
         internal const string TypeScriptCompileItemType = "TypeScriptCompile";
-        internal const string EnableTypeScript = "EnableTypeScript";
-        internal const string TypeScriptSourceMap = "TypeScriptSourceMap";
-        internal const string TypeScriptModuleKind = "TypeScriptModuleKind";
         internal const string CommonJSModuleKind = "CommonJS";
         internal const string TypeScript = "TypeScript";
 
@@ -98,15 +93,20 @@ namespace Microsoft.NodejsTools {
         }
     }
 
-    internal class NodeProjectProperty {
+    internal static class NodeProjectProperty {
         internal const string DebuggerPort = "DebuggerPort";
+        internal const string EnableTypeScript = "EnableTypeScript";
         internal const string Environment = "Environment";
         internal const string EnvironmentVariables = "EnvironmentVariables";
         internal const string LaunchUrl = "LaunchUrl";
-        internal const string NodeExePath = "NodeExePath";
         internal const string NodeExeArguments = "NodeExeArguments";
+        internal const string NodeExePath = "NodeExePath";
         internal const string NodejsPort = "NodejsPort";
         internal const string ScriptArguments = "ScriptArguments";
         internal const string StartWebBrowser = "StartWebBrowser";
+        internal const string TypeScriptCfgProperty = "CfgPropertyPagesGuidsAddTypeScript";
+        internal const string TypeScriptModuleKind = "TypeScriptModuleKind";
+        internal const string TypeScriptOutDir = "TypeScriptOutDir";
+        internal const string TypeScriptSourceMap = "TypeScriptSourceMap";
     }
 }

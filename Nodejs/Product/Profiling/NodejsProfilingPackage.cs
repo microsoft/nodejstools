@@ -279,14 +279,14 @@ namespace Microsoft.NodejsTools.Profiling {
                 return;
             }
             
-            var interpreterArgs = (string)projectToProfile.Properties.Item("NodeExeArguments").Value;
-            var scriptArgs = (string)projectToProfile.Properties.Item("ScriptArguments").Value;
-            var startBrowser = (bool)projectToProfile.Properties.Item("StartWebBrowser").Value;
-            string launchUrl = (string)projectToProfile.Properties.Item("LaunchUrl").Value;
+            var interpreterArgs = (string)projectToProfile.Properties.Item(NodeProjectProperty.NodeExeArguments).Value;
+            var scriptArgs = (string)projectToProfile.Properties.Item(NodeProjectProperty.ScriptArguments).Value;
+            var startBrowser = (bool)projectToProfile.Properties.Item(NodeProjectProperty.StartWebBrowser).Value;
+            string launchUrl = (string)projectToProfile.Properties.Item(NodeProjectProperty.LaunchUrl).Value;
 
-            int? port = (int?)projectToProfile.Properties.Item("NodejsPort").Value;
+            int? port = (int?)projectToProfile.Properties.Item(NodeProjectProperty.NodejsPort).Value;
 
-            string interpreterPath = (string)projectToProfile.Properties.Item("NodeExePath").Value;
+            string interpreterPath = (string)projectToProfile.Properties.Item(NodeProjectProperty.NodeExePath).Value;
 
             string startupFile = (string)projectToProfile.Properties.Item("StartupFile").Value;
             if (String.IsNullOrEmpty(startupFile)) {
