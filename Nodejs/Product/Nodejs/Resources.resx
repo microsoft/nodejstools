@@ -592,4 +592,47 @@ The following error occurred trying to execute npm.cmd:
 
 {0}</value>
   </data>
+  <data name="AzureRemoteDebugWaitCaption" xml:space="preserve">
+    <value>Azure remote debugging</value>
+  </data>
+  <data name="AzureRemoteDebugWaitMessage" xml:space="preserve">
+    <value>Attaching to Azure Website at {0}</value>
+  </data>
+  <data name="AzureRemoveDebugCouldNotAttachToWebsiteErrorMessage" xml:space="preserve">
+    <value>Could not attach to node.exe process on Azure Website at {0}.
+
+Error retrieving websocket debug proxy information from web.config.</value>
+  </data>
+  <data name="AzureRemoveDebugCouldNotAttachToWebsiteExceptionErrorMessage" xml:space="preserve">
+    <value>Failed to attach to Azure Website: {0}</value>
+  </data>
+  <data name="RemoteDebugCheckProxyAndPortErrorMessage" xml:space="preserve">
+    <value>Make sure that the process is running behind the remote debug proxy (RemoteDebug.js), and the debugger port (default {0}) is open on the target host.</value>
+  </data>
+  <data name="RemoteDebugCouldNotAttachErrorMessage" xml:space="preserve">
+    <value>Could not attach to Node.js process at {0}{1}
+
+</value>
+  </data>
+  <data name="RemoteDebugEnableWebSocketsErrorMessage" xml:space="preserve">
+    <value>Make sure that the Azure web site is deployed in the Debug configuration, and web sockets are enabled for it in the Azure management portal.</value>
+  </data>
+  <data name="RemoteDebugUnsupportedPlatformErrorMessage" xml:space="preserve">
+    <value>Remote debugging of node.js Microsoft Azure applications is only supported on Windows 8 and above.</value>
+  </data>
+  <data name="DebugCouldNotResolveStartupFileErrorMessage" xml:space="preserve">
+    <value>Please select a startup file to launch by right-clicking the file in Solution Explorer and selecting 'Set as Node.js Startup File' or by modifying your configuration in project properties</value>
+  </data>
+  <data name="DebugInterpreterDoesNotExistErrorMessage" xml:space="preserve">
+    <value>Interpreter "{0}" does not exist.</value>
+  </data>
+  <data name="DebugTypeScriptCombineNotSupportedWarningMessage" xml:space="preserve">
+    <value>This TypeScript project has 'Combine Javascript output into file' option enabled. This option is not supported by NTVS debugger, and may result in erratic behavior of breakpoints, stepping, and debug tool windows. Are you sure you want to start debugging?</value>
+  </data>
+  <data name="DebugWorkingDirectoryDoesNotExistErrorMessage" xml:space="preserve">
+    <value>Working directory "{0}" does not exist.</value>
+  </data>
+  <data name="ImportWizzardCouldNotStartNotAutomationObjectErrorMessage" xml:space="preserve">
+    <value>Unable to start wizard: no automation object available.</value>
+  </data>
 </root>

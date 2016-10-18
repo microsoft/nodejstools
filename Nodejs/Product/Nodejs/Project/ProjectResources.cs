@@ -23,21 +23,24 @@ namespace Microsoft.NodejsTools.Project {
     internal class SR : CommonSR {
         internal const string NodejsToolsForVisualStudio = "NodejsToolsForVisualStudio";
 
-        internal const string NodeModulesCouldNotParsePackageJsonErrorMessageText = "NodeModulesCouldNotParsePackageJsonErrorMessageText";
-        internal const string NpmNotInstalledMessageText = "NpmNotInstalledMessageText";
-        internal const string NpmNotInstalledMessageCaption = "NpmNotInstalledMessageCaption";
-        internal const string ImportingProjectAccessErrorStatusText = "ImportingProjectAccessErrorStatusText";
-        internal const string ImportingProjectUnexpectedErrorMessage = "ImportingProjectUnexpectedErrorMessage";
+        internal const string AzureRemoteDebugCouldNotAttachToWebsiteErrorMessage = "AzureRemoveDebugCouldNotAttachToWebsiteErrorMessage";
+        internal const string AzureRemoteDebugWaitCaption = "AzureRemoteDebugWaitCaption";
+        internal const string AzureRemoteDebugWaitMessage = "AzureRemoteDebugWaitMessage";
+        internal const string AzureRemoveDebugCouldNotAttachToWebsiteExceptionErrorMessage = "AzureRemoveDebugCouldNotAttachToWebsiteExceptionErrorMessage";
         internal const string AzureToolsInstallInstructions = "AzureToolsInstallInstructions";
         internal const string AzureToolsRequired = "AzureToolsRequired";
         internal const string AzureToolsUpgradeInstructions = "AzureToolsUpgradeInstructions";
         internal const string AzureToolsUpgradeRecommended = "AzureToolsUpgradeRecommended";
+        internal const string CacheDirectoryClearFailedCaption = "CacheDirectoryClearFailedCaption";
+        internal const string CacheDirectoryClearFailedTitle = "CacheDirectoryClearFailedTitle";
         internal const string CatalogLoadingDefault = "CatalogLoadingDefault";
         internal const string CategoryStatus = "CategoryStatus";
         internal const string CategoryVersion = "CategoryVersion";
-        internal const string CacheDirectoryClearFailedTitle = "CacheDirectoryClearFailedTitle";
-        internal const string CacheDirectoryClearFailedCaption = "CacheDirectoryClearFailedCaption";
         internal const string ContinueWithoutAzureToolsUpgrade = "ContinueWithoutAzureToolsUpgrade";
+        internal const string DebugCouldNotResolveStartupFileErrorMessage = "DebugCouldNotResolveStartupFileErrorMessage";
+        internal const string DebugWorkingDirectoryDoesNotExistErrorMessage = "DebugWorkingDirectoryDoesNotExistErrorMessage";
+        internal const string DebugInterpreterDoesNotExistErrorMessage = "DebugInterpreterDoesNotExistErrorMessage";
+        internal const string DebugTypeScriptCombineNotSupportedWarningMessage = "DebugTypeScriptCombineNotSupportedWarningMessage";
         internal const string DebuggerConnectionClosed = "DebuggerConnectionClosed";
         internal const string DebuggerModuleUpdateFailed = "DebuggerModuleUpdateFailed";
         internal const string DebuggerPort = "DebuggerPort";
@@ -45,16 +48,19 @@ namespace Microsoft.NodejsTools.Project {
         internal const string DownloadAndInstall = "DownloadAndInstall";
         internal const string EnvironmentVariables = "EnvironmentVariables";
         internal const string ErrorNoDte = "ErrorNoDte";
-        internal const string ImportingProjectStatusText = "ImportingProjectStatusText";
+        internal const string ImportingProjectAccessErrorStatusText = "ImportingProjectAccessErrorStatusText";
         internal const string ImportingProjectErrorStatusText = "ImportingProjectErrorStatusText";
+        internal const string ImportingProjectStatusText = "ImportingProjectStatusText";
+        internal const string ImportingProjectUnexpectedErrorMessage = "ImportingProjectUnexpectedErrorMessage";
+        internal const string ImportWizzardCouldNotStartNotAutomationObjectErrorMessage = "ImportWizzardCouldNotStartNotAutomationObjectErrorMessage";
         internal const string IncludeNodeModulesCancelTitle = "IncludeNodeModulesCancelTitle";
         internal const string IncludeNodeModulesContent = "IncludeNodeModulesContent";
         internal const string IncludeNodeModulesIncludeDescription = "IncludeNodeModulesIncludeDescription";
         internal const string IncludeNodeModulesIncludeTitle = "IncludeNodeModulesIncludeTitle";
         internal const string IncludeNodeModulesInformation = "IncludeNodeModulesInformation";
-        internal const string InteractiveWindowProcessExitedMessage = "InteractiveWindowProcessExitedMessage";
         internal const string InteractiveWindowFailedToStartProcessErrorMessage = "InteractiveWindowFailedToStartProcessErrorMessage";
         internal const string InteractiveWindowNoProcessErrorMessage = "InteractiveWindowNoProcessErrorMessage";
+        internal const string InteractiveWindowProcessExitedMessage = "InteractiveWindowProcessExitedMessage";
         internal const string InteractiveWindowTitle = "InteractiveWindowTitle";
         internal const string InvalidPortNumber = "InvalidPortNumber";
         internal const string LaunchUrlToolTip = "LaunchUrlToolTip";
@@ -81,6 +87,7 @@ namespace Microsoft.NodejsTools.Project {
         internal const string NodeExePathDescription = "NodeExePathDescription";
         internal const string NodeExePathNotFound = "NodeExePathNotFound";
         internal const string NodeExePathToolTip = "NodeExePathToolTip";
+        internal const string NodeModulesCouldNotParsePackageJsonErrorMessageText = "NodeModulesCouldNotParsePackageJsonErrorMessageText";
         internal const string NodejsNotInstalled = "NodejsNotInstalled";
         internal const string NodejsNotInstalledShort = "NodejsNotInstalledShort";
         internal const string NodejsNotSupported = "NodejsNotSupported";
@@ -94,6 +101,8 @@ namespace Microsoft.NodejsTools.Project {
         internal const string NpmNodePackageInstallationDescription = "NpmNodePackageInstallationDescription";
         internal const string NpmNodePath = "NpmNodePath";
         internal const string NpmNodePathDescription = "NpmNodePathDescription";
+        internal const string NpmNotInstalledMessageCaption = "NpmNotInstalledMessageCaption";
+        internal const string NpmNotInstalledMessageText = "NpmNotInstalledMessageText";
         internal const string NpmOutputPaneTitle = "NpmOutputPaneTitle";
         internal const string NpmPackageAuthor = "NpmPackageAuthor";
         internal const string NpmPackageAuthorDescription = "NpmPackageAuthorDescription";
@@ -150,8 +159,12 @@ namespace Microsoft.NodejsTools.Project {
         internal const string PropertiesClassLocalPackage = "PropertiesClassLocalPackage";
         internal const string PropertiesClassLocalSubPackage = "PropertiesClassLocalSubPackage";
         internal const string PropertiesClassNpm = "PropertiesClassNpm";
+        internal const string RemoteDebugCheckProxyAndPortErrorMessage = "RemoteDebugCheckProxyAndPortErrorMessage";
+        internal const string RemoteDebugCouldNotAttachErrorMessage = "RemoteDebugCouldNotAttachErrorMessage";
+        internal const string RemoteDebugEnableWebSocketsErrorMessage = "RemoteDebugEnableWebSocketsErrorMessage";
         internal const string RemoteDebugProxyFileDoesNotExist = "RemoteDebugProxyFileDoesNotExist";
         internal const string RemoteDebugProxyFolderDoesNotExist = "RemoteDebugProxyFolderDoesNotExist";
+        internal const string RemoteDebugUnsupportedPlatformErrorMessage = "RemoteDebugUnsupportedPlatformErrorMessage";
         internal const string ReplInitializationMessage = "ReplInitializationMessage";
         internal const string ReplWindowNpmInitNoYesFlagWarning = "ReplWindowNpmInitNoYesFlagWarning";
         internal const string RequestedVersionRangeNone = "RequestedVersionRangeNone";
@@ -162,11 +175,11 @@ namespace Microsoft.NodejsTools.Project {
         internal const string StatusTypingsLoading = "StatusTypingsLoading";
         internal const string TestFramework = "TestFramework";
         internal const string TestFrameworkDescription = "TestFrameworkDescription";
+        internal const string TypeScriptMinVersionNotInstalled = "TypeScriptMinVersionNotInstalled";
         internal const string TypingsInfoBarSpan1 = "TypingsInfoBarSpan1";
         internal const string TypingsInfoBarSpan2 = "TypingsInfoBarSpan2";
         internal const string TypingsInfoBarSpan3 = "TypingsInfoBarSpan3";
         internal const string TypingsOpenOptionsText = "TypingsOpenOptionsText";
-        internal const string TypeScriptMinVersionNotInstalled = "TypeScriptMinVersionNotInstalled";
         internal const string TypingsToolCouldNotStart = "TypingsToolCouldNotStart";
         internal const string TypingsToolInstallFailed = "TypingsToolInstallFailed";
         internal const string TypingsToolNotInstalledError = "TypingsToolNotInstalledError";
@@ -175,6 +188,7 @@ namespace Microsoft.NodejsTools.Project {
         internal const string UpgradedEnvironmentVariables = "UpgradedEnvironmentVariables";
         internal const string WorkingDirInvalidOrMissing = "WorkingDirInvalidOrMissing";
         internal const string WorkingDirToolTip = "WorkingDirToolTip";
+
         private static readonly Lazy<ResourceManager> _manager = new Lazy<ResourceManager>(
             () => new System.Resources.ResourceManager("Microsoft.NodejsTools.Resources", typeof(SR).Assembly),
             LazyThreadSafetyMode.ExecutionAndPublication
