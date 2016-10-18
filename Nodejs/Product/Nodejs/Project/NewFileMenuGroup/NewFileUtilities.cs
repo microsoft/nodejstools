@@ -15,33 +15,19 @@
 //*********************************************************//
 
 using System;
-using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Microsoft.NodejsTools.Project.NewFileMenuGroup {
     internal static class NewFileUtilities {
-        private static string GetInitialName(string fileType) {
-            switch (fileType) {
-                case NodejsConstants.JavaScript:
-                    return "JavaScript.js";
-                case NodejsConstants.TypeScript:
-                    return "TypeScript.ts";
-                case NodejsConstants.HTML:
-                    return "HTML.html";
-                case NodejsConstants.CSS:
-                    return "CSS.css";
-                default:
-                    Debug.Fail(string.Format(CultureInfo.CurrentCulture, "Invalid file type: {0}", fileType));
-                    return null;
-            }
-        }
-
-        private static void CreateNewFile(NodejsProjectNode projectNode, uint containerId, string fileType) {
-            using (var dialog = new NewFileNameForm(GetInitialName(fileType))) {
+        internal static void CreateNewFile(NodejsProjectNode projectNode, uint containerId) {
+            using (var dialog = new NewFileNameForm("")) {
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
                     string itemName = dialog.TextBox.Text;
+                    if (string.IsNullOrWhiteSpace(itemName)) {
+                        return;
+                    }
+                    itemName = itemName.Trim();
 
                     VSADDRESULT[] pResult = new VSADDRESULT[1];
                     projectNode.AddItem(
@@ -54,22 +40,6 @@ namespace Microsoft.NodejsTools.Project.NewFileMenuGroup {
                         pResult);
                 }
             }
-        }
-
-        internal static void CreateNewJavaScriptFile(NodejsProjectNode projectNode, uint containerId) {
-            CreateNewFile(projectNode, containerId, NodejsConstants.JavaScript);
-        }
-
-        internal static void CreateNewTypeScriptFile(NodejsProjectNode projectNode, uint containerId) {
-            CreateNewFile(projectNode, containerId, NodejsConstants.TypeScript);
-        }
-
-        internal static void CreateNewHTMLFile(NodejsProjectNode projectNode, uint containerId) {
-            CreateNewFile(projectNode, containerId, NodejsConstants.HTML);
-        }
-
-        internal static void CreateNewCSSFile(NodejsProjectNode projectNode, uint containerId) {
-            CreateNewFile(projectNode, containerId, NodejsConstants.CSS);
         }
     }
 }
