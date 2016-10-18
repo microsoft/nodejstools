@@ -25,11 +25,11 @@ rl.on('line', (line) => {
         process.stdout.write = old_stdout;
         process.stderr.write = old_stderr;
         console.log(JSON.stringify(result));
-        process.exit(0);
+        //process.exit(0);
     }
     // run the test
     framework.run_tests(testInfo.testName, testInfo.testFile, testInfo.workingFolder, testInfo.projectFolder, sendResult);
     
     // close readline interface
-    rl.close();
+    //rl.close();
 });
