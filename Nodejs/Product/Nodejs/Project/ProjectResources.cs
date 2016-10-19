@@ -44,6 +44,10 @@ namespace Microsoft.NodejsTools.Project {
         internal const string DebuggerConnectionClosed = "DebuggerConnectionClosed";
         internal const string DebuggerModuleUpdateFailed = "DebuggerModuleUpdateFailed";
         internal const string DebuggerPort = "DebuggerPort";
+        internal const string DependencyNodeLabelBundled = "DependencyNodeLabelBundled";
+        internal const string DependencyNodeLabelMissing = "DependencyNodeLabelMissing";
+        internal const string DependencyNodeLabelNotListed = "DependencyNodeLabelNotListed";
+        internal const string DependencyNodeModuleDoesNotExist = "DependencyNodeModuleDoesNotExist";
         internal const string DontShowAgain = "DontShowAgain";
         internal const string DownloadAndInstall = "DownloadAndInstall";
         internal const string EnvironmentVariables = "EnvironmentVariables";
