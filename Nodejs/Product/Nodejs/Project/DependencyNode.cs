@@ -230,7 +230,7 @@ namespace Microsoft.NodejsTools.Project {
                         } catch (Exception ex) {
                             if (ex is InvalidOperationException || ex is Win32Exception) {
                                 MessageBox.Show(
-                                    string.Format(CultureInfo.CurrentCulture, "Path to module does not exist:\n {0}", path),
+                                    SR.GetString(SR.DependencyNodeModuleDoesNotExist, path),
                                     SR.ProductName,
                                     MessageBoxButtons.OK,
                                     MessageBoxIcon.Error);
@@ -250,13 +250,14 @@ namespace Microsoft.NodejsTools.Project {
         private static string GetInitialPackageDisplayString(IPackage package) {
             var buff = new StringBuilder(package.Name);
             if (package.IsMissing) {
-                buff.Append(" (missing)");
+                buff.Append(string.Format(CultureInfo.CurrentCulture, " ({0})", SR.GetString(SR.DependencyNodeLabelMissing)));
             } else {
                 buff.Append('@');
                 buff.Append(package.Version);
 
                 if (!package.IsListedInParentPackageJson) {
-                    buff.AppendFormat(" (not listed in {0})", NodejsConstants.PackageJsonFile);
+                    buff.AppendFormat(string.Format(CultureInfo.CurrentCulture, " ({0})",
+                        SR.GetString(SR.DependencyNodeLabelNotListed, NodejsConstants.PackageJsonFile)));
                 } else {
                     var dependencyTypes = GetDependencyTypeNames(package);
                     if (package.IsDevDependency || package.IsOptionalDependency) {
@@ -268,7 +269,8 @@ namespace Microsoft.NodejsTools.Project {
             }
 
             if (package.IsBundledDependency) {
-                buff.Append("[bundled]");
+                buff.Append(string.Format(CultureInfo.CurrentCulture, "[{0}]",
+                    SR.GetString(SR.DependencyNodeLabelBundled)));
             }
             return buff.ToString();
         }

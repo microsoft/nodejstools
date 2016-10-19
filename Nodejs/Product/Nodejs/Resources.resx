@@ -635,4 +635,17 @@ Error retrieving websocket debug proxy information from web.config.</value>
   <data name="ImportWizzardCouldNotStartNotAutomationObjectErrorMessage" xml:space="preserve">
     <value>Unable to start wizard: no automation object available.</value>
   </data>
+  <data name="DependencyNodeLabelBundled" xml:space="preserve">
+    <value>bundled</value>
+  </data>
+  <data name="DependencyNodeLabelMissing" xml:space="preserve">
+    <value>missing</value>
+  </data>
+  <data name="DependencyNodeLabelNotListed" xml:space="preserve">
+    <value>not listed in {0}</value>
+  </data>
+  <data name="DependencyNodeModuleDoesNotExist" xml:space="preserve">
+    <value>Path to module does not exist:
+{0}</value>
+  </data>
 </root>
