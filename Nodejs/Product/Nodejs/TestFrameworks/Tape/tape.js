@@ -2,6 +2,20 @@
 var EOL = require('os').EOL;
 var fs = require('fs');
 var path = require('path');
+var result = {
+    "title": "",
+    "passed": false,
+    "stdOut": "",
+    "stdErr": ""
+};
+
+process.stdout.write = function (string, encoding, fd) {
+    result.stdOut += string;
+}
+
+process.stderr.write = function (string, encoding, fd) {
+    result.stdErr += string;
+}
 
 function find_tests(testFileList, discoverResultFile, projectFolder) {
     var test = findTape(projectFolder);
@@ -37,8 +51,9 @@ function find_tests(testFileList, discoverResultFile, projectFolder) {
 };
 module.exports.find_tests = find_tests;
 
-function run_tests(testName, testFile, workingFolder, projectFolder) {
+function run_tests(testName, testFile, workingFolder, projectFolder, callback) {
     var testCases = loadTestCases(testFile);
+    result.title = testName;
     if (testCases === null) {
         return;
     }
@@ -51,10 +66,13 @@ function run_tests(testName, testFile, workingFolder, projectFolder) {
     try {
         var harness = test.getHarness();
         harness.only(testName);
+        result.passed = true;
     } catch (e) {
         logError("Error running test:", testName, "in", testFile, e);
-        return;
+        result.passed = false;
     }
+
+    callback(result);
 }
 module.exports.run_tests = run_tests;
 
