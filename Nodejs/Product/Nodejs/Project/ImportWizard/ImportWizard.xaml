@@ -4,9 +4,10 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:l="clr-namespace:Microsoft.NodejsTools.Project.ImportWizard"
-      xmlns:wpf="clr-namespace:Microsoft.VisualStudioTools.Wpf"
+    xmlns:wpf="clr-namespace:Microsoft.VisualStudioTools.Wpf"
     xmlns:pt="clr-namespace:Microsoft.NodejsTools"
     xmlns:ui="clr-namespace:Microsoft.VisualStudioTools"
+    xmlns:resx="clr-namespace:Microsoft.NodejsTools"
     Height="525" Width="700"
     MinHeight="500" MinWidth="500"
     ResizeMode="CanResizeWithGrip"
@@ -16,9 +17,9 @@
     WindowStartupLocation="CenterOwner">
 
     <Window.Title>
-        Create New Project from Existing Node.js Code
+        <Binding Source="{x:Static resx:ImportWizardResources.WindowTitle}"/>
     </Window.Title>
-    
+
     <Window.Resources>
         <ResourceDictionary Source="ImportWizardDictionary.xaml" />
     </Window.Resources>
@@ -53,11 +54,9 @@
                    Margin="24px"
                    HorizontalAlignment="Center" VerticalAlignment="Top" />
         </Grid>
-        
-        <TextBlock Grid.Row="0" Grid.Column="1" Style="{StaticResource Title}" Margin="8">
-            Welcome to the Create New Project from Existing Node.js Code Wizard
-        </TextBlock>
-        
+
+        <TextBlock Grid.Row="0" Grid.Column="1" Style="{StaticResource Title}" Margin="8" Text="{x:Static resx:ImportWizardResources.Welcome}" />
+
         <Frame Grid.Row="1" Grid.Column="1"
                Content="{Binding PageSequence.CurrentItem}"
                NavigationUIVisibility="Hidden"
@@ -77,10 +76,10 @@
                         <Setter Property="HorizontalAlignment" Value="Stretch" />
                     </Style>
                 </Grid.Resources>
-                <Button Grid.Column="0" Command="NavigationCommands.BrowseBack">_Back</Button>
-                <Button Grid.Column="1" Command="NavigationCommands.BrowseForward" IsDefault="{Binding IsNextDefault}">_Next</Button>
-                <Button Grid.Column="2" Command="ApplicationCommands.Save" IsDefault="{Binding IsFinishDefault}">_Finish</Button>
-                <Button Grid.Column="3" Command="ApplicationCommands.Close">_Cancel</Button>
+                <Button Grid.Column="0" Command="NavigationCommands.BrowseBack" Content="{x:Static resx:ImportWizardResources.BackButtonLabel}" />
+                <Button Grid.Column="1" Command="NavigationCommands.BrowseForward" IsDefault="{Binding IsNextDefault}" Content="{x:Static resx:ImportWizardResources.NextButtonLabel}" />
+                <Button Grid.Column="2" Command="ApplicationCommands.Save" IsDefault="{Binding IsFinishDefault}" Content="{x:Static resx:ImportWizardResources.FinishButtonLabel}" />
+                <Button Grid.Column="3" Command="ApplicationCommands.Close" Content="{x:Static resx:ImportWizardResources.CancelButtonLabel}" />
             </Grid>
         </StackPanel>
     </Grid>
