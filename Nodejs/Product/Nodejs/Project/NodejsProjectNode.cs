@@ -470,11 +470,6 @@ namespace Microsoft.NodejsTools.Project {
                    ext.Equals(NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase);
         }
 
-        public override int InitializeForOuter(string filename, string location, string name, uint flags, ref Guid iid, out IntPtr projectPointer, out int canceled) {
-            NodejsPackage.Instance.GeneralOptionsPage.ShowBrowserAndNodeLabelsChanged += ShowBrowserAndNodeLabelsChanged;
-
-            return base.InitializeForOuter(filename, location, name, flags, ref iid, out projectPointer, out canceled);
-        }
 
         protected override void Reload() {
             using (new DebugTimer("Project Load")) {
@@ -498,13 +493,6 @@ namespace Microsoft.NodejsTools.Project {
 
         private void UpdateProjectNodeFromProjectProperties() {
             _intermediateOutputPath = Path.Combine(ProjectHome, GetProjectProperty("BaseIntermediateOutputPath"));
-        }
-
-        private void ShowBrowserAndNodeLabelsChanged(object sender, EventArgs e) {
-            var nodejsFolderNodes = this.AllDescendants.Where(item => (item as NodejsFolderNode) != null).Select(item => (NodejsFolderNode)item);
-            foreach (var node in nodejsFolderNodes) {
-                ProjectMgr.ReDrawNode(node, UIHierarchyElement.Caption);
-            }
         }
 
         protected override void RaiseProjectPropertyChanged(string propertyName, string oldValue, string newValue) {
@@ -861,8 +849,6 @@ namespace Microsoft.NodejsTools.Project {
                     }
                     _idleNodeModulesTimer = null;
                 }
-
-                NodejsPackage.Instance.GeneralOptionsPage.ShowBrowserAndNodeLabelsChanged -= ShowBrowserAndNodeLabelsChanged;
 
                 OnDispose?.Invoke(this, EventArgs.Empty);
 
