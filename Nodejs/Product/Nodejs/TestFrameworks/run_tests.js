@@ -8,27 +8,31 @@ var rl = readline.createInterface({
 });
 
 rl.on('line', (line) => {
-    var testInfo = JSON.parse(line);
+    var testCases = JSON.parse(line);
     // get rid of leftover quotations from C# (necessary?)
-    for(var s in testInfo) {
-        testInfo[s] = testInfo[s].replace(/["]+/g, '');
+    for (var test in testCases) {
+        for (var value in testCases[test]) {
+            testCases[test][value] = testCases[test][value].replace(/["]+/g, '');
+        }
     }
 
     try {
-        framework = require('./' + testInfo.framework + '/' + testInfo.framework + '.js');
+        framework = require('./' + testCases[0].framework + '/' + testCases[0].framework + '.js');
     } catch (exception) {
-        console.log("NTVS_ERROR:Failed to load TestFramework (" + process.argv[2] + "), " + exception);
+        console.log("NTVS_ERROR:Failed to load TestFramework (" + testCases[0].framework + "), " + exception);
         process.exit(1);
     }
     
-    function sendResult(result) {
+    function returnResult(result) {
+        // unhook stdout and stderr
         process.stdout.write = old_stdout;
         process.stderr.write = old_stderr;
         console.log(JSON.stringify(result));
-        //process.exit(0);
+        // end process, tests are done running.
+        process.exit(0);
     }
     // run the test
-    framework.run_tests(testInfo.testName, testInfo.testFile, testInfo.workingFolder, testInfo.projectFolder, sendResult);
+    framework.run_tests(testCases, returnResult);
     
     // close readline interface
     //rl.close();
