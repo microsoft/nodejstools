@@ -31,8 +31,6 @@ namespace Microsoft.NodejsTools.Options {
         private const string WaitOnNormalExitSetting = "WaitOnNormalExit";
         private const string EditAndContinueSetting = "EditAndContinue";
         private const string CheckForLongPathsSetting = "CheckForLongPaths";
-        private const string ShowBrowserAndNodeLabelsSetting = "ShowBrowserAndNodeLabels";
-        private bool _showBrowserAndNodeLabels;
         private SurveyNewsPolicy _surveyNewsCheck;
         private string _surveyNewsFeedUrl;
         private string _surveyNewsIndexUrl;
@@ -55,12 +53,6 @@ namespace Microsoft.NodejsTools.Options {
         }
 
         /// <summary>
-        /// Indicates whether or not the Output window should be shown when
-        /// npm commands are being executed.
-        /// </summary>
-        public bool ShowOutputWindowWhenExecutingNpm { get; set; }
-
-        /// <summary>
         /// True if Node processes should pause for input before exiting
         /// if they exit abnormally.
         /// </summary>
@@ -81,25 +73,6 @@ namespace Microsoft.NodejsTools.Options {
         /// Indicates whether checks for long paths (exceeding MAX_PATH) are performed after installing packages.
         /// </summary>
         public bool CheckForLongPaths { get; set; }
-
-        /// <summary>
-        /// Indicates whether labels should be appended to folders in Solution Explorer denoting browser and Node.js code.
-        /// </summary>
-        public bool ShowBrowserAndNodeLabels {
-            get { return _showBrowserAndNodeLabels; }
-            set {
-                var oldSetting = _showBrowserAndNodeLabels;
-                _showBrowserAndNodeLabels = value;
-                if (oldSetting != _showBrowserAndNodeLabels) {
-                    var changed = ShowBrowserAndNodeLabelsChanged;
-                    if (changed != null) {
-                        changed(this, EventArgs.Empty);
-                    }
-                }
-            }
-        }
-
-        public event EventHandler<EventArgs> ShowBrowserAndNodeLabelsChanged;
 
         /// <summary>
         /// The frequency at which to check for updated news. Default is once
@@ -148,7 +121,6 @@ namespace Microsoft.NodejsTools.Options {
             WaitOnNormalExit = false;
             EditAndContinue = true;
             CheckForLongPaths = true;
-            _showBrowserAndNodeLabels = true;
         }
 
         public override void LoadSettingsFromStorage() {
@@ -161,7 +133,6 @@ namespace Microsoft.NodejsTools.Options {
             WaitOnNormalExit = LoadBool(WaitOnNormalExitSetting) ?? false;
             EditAndContinue = LoadBool(EditAndContinueSetting) ?? true;
             CheckForLongPaths = LoadBool(CheckForLongPathsSetting) ?? true;
-            _showBrowserAndNodeLabels = LoadBool(ShowBrowserAndNodeLabelsSetting) ?? true;
 
             // Synchronize UI with backing properties.
             if (_window != null) {
@@ -182,7 +153,6 @@ namespace Microsoft.NodejsTools.Options {
             SaveBool(WaitOnAbnormalExitSetting, WaitOnAbnormalExit);
             SaveBool(EditAndContinueSetting, EditAndContinue);
             SaveBool(CheckForLongPathsSetting, CheckForLongPaths);
-            SaveBool(ShowBrowserAndNodeLabelsSetting, ShowBrowserAndNodeLabels);
         }
     }
 }
