@@ -637,7 +637,9 @@
     <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.resx">
       <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Project\NewFileNameForm.resx" />
+    <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.resx">
+      <DependentUpon>NewFileNameForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Options\SalsaLsIntellisenseOptionsControl.resx">
       <DependentUpon>SalsaLsIntellisenseOptionsControl.cs</DependentUpon>
     </EmbeddedResource>
