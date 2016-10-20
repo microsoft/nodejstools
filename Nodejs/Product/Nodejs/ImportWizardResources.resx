@@ -123,11 +123,35 @@
   <data name="CancelButtonLabel" xml:space="preserve">
     <value>_Cancel</value>
   </data>
+  <data name="F5FileSelectHelpText" xml:space="preserve">
+    <value>If it is not in this list, you can right-click any file in your project and choose "Set as startup file"</value>
+  </data>
+  <data name="F5FileSelectTitle" xml:space="preserve">
+    <value>Choose which file to run when F5 is pressed.</value>
+  </data>
+  <data name="FileFilterHelpText" xml:space="preserve">
+    <value>Files with the .js extension are always included.</value>
+  </data>
+  <data name="FileFilterTitle" xml:space="preserve">
+    <value>Enter the filter for files to include</value>
+  </data>
   <data name="FinishButtonLabel" xml:space="preserve">
     <value>_Finish</value>
   </data>
   <data name="NextButtonLabel" xml:space="preserve">
     <value>_Next</value>
+  </data>
+  <data name="SaveFileLocationHelpText" xml:space="preserve">
+    <value>We won't move any files, and you can use Save As to move the project file later.</value>
+  </data>
+  <data name="SaveFileLocationTitle" xml:space="preserve">
+    <value>Select where to save your project file</value>
+  </data>
+  <data name="SelectNodeCodeHelpText" xml:space="preserve">
+    <value>We won't move any files from where they are now.</value>
+  </data>
+  <data name="SelectNodeCodeTitle" xml:space="preserve">
+    <value>Enter or browse to the folder containing your Node.js code</value>
   </data>
   <data name="Welcome" xml:space="preserve">
     <value>Welcome to the Create New Project from Existing Node.js Code Wizard</value>
