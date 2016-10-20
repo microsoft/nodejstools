@@ -24,6 +24,7 @@
         /// </summary>
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NodejsGeneralPropertyPageControl));
             this._nodeExePathLabel = new System.Windows.Forms.Label();
             this._nodeArguments = new System.Windows.Forms.Label();
             this._startBrowser = new System.Windows.Forms.CheckBox();
@@ -52,160 +53,96 @@
             // 
             // _nodeExePathLabel
             // 
-            this._nodeExePathLabel.AutoSize = true;
-            this._nodeExePathLabel.Location = new System.Drawing.Point(14, 22);
+            resources.ApplyResources(this._nodeExePathLabel, "_nodeExePathLabel");
             this._nodeExePathLabel.Name = "_nodeExePathLabel";
-            this._nodeExePathLabel.Size = new System.Drawing.Size(80, 13);
-            this._nodeExePathLabel.TabIndex = 0;
-            this._nodeExePathLabel.Text = "Node.exe &path:";
             // 
             // _nodeArguments
             // 
-            this._nodeArguments.AutoSize = true;
-            this._nodeArguments.Location = new System.Drawing.Point(14, 48);
+            resources.ApplyResources(this._nodeArguments, "_nodeArguments");
             this._nodeArguments.Name = "_nodeArguments";
-            this._nodeArguments.Size = new System.Drawing.Size(93, 13);
-            this._nodeArguments.TabIndex = 3;
-            this._nodeArguments.Text = "N&ode.exe options:";
             // 
             // _startBrowser
             // 
-            this._startBrowser.AutoSize = true;
-            this._startBrowser.Location = new System.Drawing.Point(17, 284);
+            resources.ApplyResources(this._startBrowser, "_startBrowser");
             this._startBrowser.Name = "_startBrowser";
-            this._startBrowser.Size = new System.Drawing.Size(161, 17);
-            this._startBrowser.TabIndex = 20;
-            this._startBrowser.Text = "St&art web browser on launch";
             this._startBrowser.UseVisualStyleBackColor = true;
             this._startBrowser.CheckedChanged += new System.EventHandler(this.Changed);
             // 
             // _nodeExePath
             // 
-            this._nodeExePath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            resources.ApplyResources(this._nodeExePath, "_nodeExePath");
             this._nodeExePath.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
             this._nodeExePath.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.FileSystem;
-            this._nodeExePath.Location = new System.Drawing.Point(135, 19);
             this._nodeExePath.Name = "_nodeExePath";
-            this._nodeExePath.Size = new System.Drawing.Size(308, 20);
-            this._nodeExePath.TabIndex = 1;
             this._nodeExePath.TextChanged += new System.EventHandler(this.NodeExePathChanged);
             // 
             // _nodeExeArguments
             // 
-            this._nodeExeArguments.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._nodeExeArguments.Location = new System.Drawing.Point(135, 45);
+            resources.ApplyResources(this._nodeExeArguments, "_nodeExeArguments");
             this._nodeExeArguments.Name = "_nodeExeArguments";
-            this._nodeExeArguments.Size = new System.Drawing.Size(340, 20);
-            this._nodeExeArguments.TabIndex = 4;
             this._nodeExeArguments.TextChanged += new System.EventHandler(this.Changed);
             // 
             // _nodejsPort
             // 
-            this._nodejsPort.Location = new System.Drawing.Point(135, 176);
+            resources.ApplyResources(this._nodejsPort, "_nodejsPort");
             this._nodejsPort.Name = "_nodejsPort";
-            this._nodejsPort.Size = new System.Drawing.Size(105, 20);
-            this._nodejsPort.TabIndex = 15;
             this._nodejsPort.TextChanged += new System.EventHandler(this.PortChanged);
             // 
             // _nodePortLabel
             // 
-            this._nodePortLabel.AutoSize = true;
-            this._nodePortLabel.Location = new System.Drawing.Point(14, 179);
+            resources.ApplyResources(this._nodePortLabel, "_nodePortLabel");
             this._nodePortLabel.Name = "_nodePortLabel";
-            this._nodePortLabel.Size = new System.Drawing.Size(67, 13);
-            this._nodePortLabel.TabIndex = 14;
-            this._nodePortLabel.Text = "Node.&js port:";
             // 
             // _scriptArgsLabel
             // 
-            this._scriptArgsLabel.AutoSize = true;
-            this._scriptArgsLabel.Location = new System.Drawing.Point(14, 100);
+            resources.ApplyResources(this._scriptArgsLabel, "_scriptArgsLabel");
             this._scriptArgsLabel.Name = "_scriptArgsLabel";
-            this._scriptArgsLabel.Size = new System.Drawing.Size(89, 13);
-            this._scriptArgsLabel.TabIndex = 7;
-            this._scriptArgsLabel.Text = "Script ar&guments:";
             // 
             // _scriptArguments
             // 
-            this._scriptArguments.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._scriptArguments.Location = new System.Drawing.Point(135, 97);
+            resources.ApplyResources(this._scriptArguments, "_scriptArguments");
             this._scriptArguments.Name = "_scriptArguments";
-            this._scriptArguments.Size = new System.Drawing.Size(340, 20);
-            this._scriptArguments.TabIndex = 8;
             this._scriptArguments.TextChanged += new System.EventHandler(this.Changed);
             // 
             // _workingDirLabel
             // 
-            this._workingDirLabel.AutoSize = true;
-            this._workingDirLabel.Location = new System.Drawing.Point(14, 126);
+            resources.ApplyResources(this._workingDirLabel, "_workingDirLabel");
             this._workingDirLabel.Name = "_workingDirLabel";
-            this._workingDirLabel.Size = new System.Drawing.Size(93, 13);
-            this._workingDirLabel.TabIndex = 9;
-            this._workingDirLabel.Text = "Working director&y:";
             // 
             // _workingDir
             // 
-            this._workingDir.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._workingDir.Location = new System.Drawing.Point(135, 123);
+            resources.ApplyResources(this._workingDir, "_workingDir");
             this._workingDir.Name = "_workingDir";
-            this._workingDir.Size = new System.Drawing.Size(308, 20);
-            this._workingDir.TabIndex = 10;
             this._workingDir.TextChanged += new System.EventHandler(this.WorkingDirTextChanged);
             // 
             // _launchUrl
             // 
-            this._launchUrl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._launchUrl.Location = new System.Drawing.Point(135, 150);
+            resources.ApplyResources(this._launchUrl, "_launchUrl");
             this._launchUrl.Name = "_launchUrl";
-            this._launchUrl.Size = new System.Drawing.Size(340, 20);
-            this._launchUrl.TabIndex = 13;
             this._launchUrl.TextChanged += new System.EventHandler(this.Changed);
             // 
             // _launchUrlLabel
             // 
-            this._launchUrlLabel.AutoSize = true;
-            this._launchUrlLabel.Location = new System.Drawing.Point(14, 153);
+            resources.ApplyResources(this._launchUrlLabel, "_launchUrlLabel");
             this._launchUrlLabel.Name = "_launchUrlLabel";
-            this._launchUrlLabel.Size = new System.Drawing.Size(71, 13);
-            this._launchUrlLabel.TabIndex = 12;
-            this._launchUrlLabel.Text = "Launch &URL:";
             // 
             // _envVars
             // 
-            this._envVars.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._envVars.Location = new System.Drawing.Point(135, 228);
-            this._envVars.Multiline = true;
+            resources.ApplyResources(this._envVars, "_envVars");
             this._envVars.Name = "_envVars";
-            this._envVars.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this._envVars.Size = new System.Drawing.Size(340, 50);
-            this._envVars.TabIndex = 19;
             this._envVars.TextChanged += new System.EventHandler(this.Changed);
             // 
             // _browsePath
             // 
-            this._browsePath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._browsePath.Location = new System.Drawing.Point(449, 17);
+            resources.ApplyResources(this._browsePath, "_browsePath");
             this._browsePath.Name = "_browsePath";
-            this._browsePath.Size = new System.Drawing.Size(26, 23);
-            this._browsePath.TabIndex = 2;
-            this._browsePath.Text = "...";
             this._browsePath.UseVisualStyleBackColor = true;
             this._browsePath.Click += new System.EventHandler(this.BrowsePathClick);
             // 
             // _browseDirectory
             // 
-            this._browseDirectory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._browseDirectory.Location = new System.Drawing.Point(449, 121);
+            resources.ApplyResources(this._browseDirectory, "_browseDirectory");
             this._browseDirectory.Name = "_browseDirectory";
-            this._browseDirectory.Size = new System.Drawing.Size(26, 23);
-            this._browseDirectory.TabIndex = 11;
-            this._browseDirectory.Text = "...";
             this._browseDirectory.UseVisualStyleBackColor = true;
             this._browseDirectory.Click += new System.EventHandler(this.BrowseDirectoryClick);
             // 
@@ -215,52 +152,34 @@
             // 
             // _debuggerPortLabel
             // 
-            this._debuggerPortLabel.AutoSize = true;
-            this._debuggerPortLabel.Location = new System.Drawing.Point(14, 205);
+            resources.ApplyResources(this._debuggerPortLabel, "_debuggerPortLabel");
             this._debuggerPortLabel.Name = "_debuggerPortLabel";
-            this._debuggerPortLabel.Size = new System.Drawing.Size(78, 13);
-            this._debuggerPortLabel.TabIndex = 16;
-            this._debuggerPortLabel.Text = "&Debugger port:";
             // 
             // _debuggerPort
             // 
-            this._debuggerPort.Location = new System.Drawing.Point(135, 202);
+            resources.ApplyResources(this._debuggerPort, "_debuggerPort");
             this._debuggerPort.Name = "_debuggerPort";
-            this._debuggerPort.Size = new System.Drawing.Size(105, 20);
-            this._debuggerPort.TabIndex = 17;
             this._debuggerPort.TextChanged += new System.EventHandler(this.PortChanged);
             // 
             // _envVarsLabel
             // 
-            this._envVarsLabel.AutoSize = true;
-            this._envVarsLabel.Location = new System.Drawing.Point(14, 231);
+            resources.ApplyResources(this._envVarsLabel, "_envVarsLabel");
             this._envVarsLabel.Name = "_envVarsLabel";
-            this._envVarsLabel.Size = new System.Drawing.Size(115, 13);
-            this._envVarsLabel.TabIndex = 18;
-            this._envVarsLabel.Text = "Environment &Variables:";
             // 
             // _scriptLabel
             // 
-            this._scriptLabel.AutoSize = true;
-            this._scriptLabel.Location = new System.Drawing.Point(14, 74);
+            resources.ApplyResources(this._scriptLabel, "_scriptLabel");
             this._scriptLabel.Name = "_scriptLabel";
-            this._scriptLabel.Size = new System.Drawing.Size(94, 13);
-            this._scriptLabel.TabIndex = 5;
-            this._scriptLabel.Text = "&Script (startup file):";
             // 
             // _scriptFile
             // 
-            this._scriptFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._scriptFile.Location = new System.Drawing.Point(135, 71);
+            resources.ApplyResources(this._scriptFile, "_scriptFile");
             this._scriptFile.Name = "_scriptFile";
-            this._scriptFile.Size = new System.Drawing.Size(340, 20);
-            this._scriptFile.TabIndex = 6;
             this._scriptFile.TextChanged += new System.EventHandler(this.Changed);
             // 
             // NodejsGeneralPropertyPageControl
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this._scriptLabel);
             this.Controls.Add(this._scriptFile);
@@ -283,9 +202,7 @@
             this.Controls.Add(this._scriptArguments);
             this.Controls.Add(this._nodeExeArguments);
             this.Controls.Add(this._nodeExePath);
-            this.MinimumSize = new System.Drawing.Size(303, 303);
             this.Name = "NodejsGeneralPropertyPageControl";
-            this.Size = new System.Drawing.Size(488, 318);
             ((System.ComponentModel.ISupportInitialize)(this._nodeExeErrorProvider)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
