@@ -7,7 +7,7 @@ var result = {
     'passed': false,
     'stdOut': '',
     'stdErr': '',
-    'time': ''
+    'time': 0
 };
 // Choose 'tap' rather than 'min' or 'xunit'. The reason is that
 // 'min' produces undisplayable text to stdout and stderr under piped/redirect, 
@@ -94,12 +94,12 @@ var run_tests = function (testCases, callback) {
     mocha.addFile(testCases[0].testFile);
 
     // run tests
-    var runner = mocha.run(function (code) { process.exit(code); });
+    var runner = mocha.run(function (code) { });
 
     runner.on('start', function () {
     });
     runner.on('test', function (test) {
-        result.title = test.title;
+        result.title = test.fullTitle();
         result.time = Date.now();
         process.stdout.write = append_stdout;
         process.stderr.write = append_stderr;
