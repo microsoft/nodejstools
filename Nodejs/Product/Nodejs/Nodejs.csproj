@@ -228,6 +228,11 @@
     <Compile Include="Commands\SurveyNewsCommand.cs" />
     <Compile Include="Debugger\DebugEngine\AD7EvalErrorProperty.cs" />
     <Compile Include="Debugger\NodeDebugProvider.cs" />
+    <Compile Include="ImportWizardResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ImportWizardResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Logging\LiveLogger.cs" />
     <Compile Include="Debugger\FilePosition.cs" />
     <Compile Include="Debugger\FuzzyLogicFileNameMapper.cs" />
@@ -305,6 +310,11 @@
     <Compile Include="Debugger\Communication\TcpNetworkClient.cs" />
     <Compile Include="Debugger\ExceptionHitTreatment.cs" />
     <Compile Include="Debugger\ExceptionHandler.cs" />
+    <Compile Include="Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="SourceMapping\FunctionInfo.cs" />
     <Compile Include="SourceMapping\JavaScriptSourceMapInfo.cs" />
     <Compile Include="Debugger\NodeConstants.cs" />
@@ -601,6 +611,11 @@
   <ItemGroup>
     <EmbeddedResource Include="Commands\DiagnosticsForm.resx">
       <DependentUpon>DiagnosticsForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImportWizardResources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>ImportWizardResources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Options\NodejsNpmOptionsControl.resx">
@@ -1078,6 +1093,8 @@
       <ManifestResourceName>Microsoft.NodejsTools.Resources</ManifestResourceName>
       <Visible>true</Visible>
       <SubType>Designer</SubType>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
