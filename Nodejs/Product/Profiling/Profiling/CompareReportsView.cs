@@ -80,7 +80,7 @@ namespace Microsoft.NodejsTools.Profiling {
             set {
                 if (_baselineFile != value) {
                     _baselineFile = value;
-                    OnPropertyChanged("BaselineFile");
+                    OnPropertyChanged(nameof(BaselineFile));
                 }
             }
         }
@@ -95,7 +95,7 @@ namespace Microsoft.NodejsTools.Profiling {
             set {
                 if (_comparisonFile != value) {
                     _comparisonFile = value;
-                    OnPropertyChanged("ComparisonFile");
+                    OnPropertyChanged(nameof(ComparisonFile));
                 }
             }
         }
@@ -119,7 +119,7 @@ namespace Microsoft.NodejsTools.Profiling {
             private set {
                 if (_isValid != value) {
                     _isValid = value;
-                    OnPropertyChanged("IsValid");
+                    OnPropertyChanged(nameof(IsValid));
                 }
             }
         }
