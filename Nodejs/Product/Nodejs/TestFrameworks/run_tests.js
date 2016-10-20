@@ -27,7 +27,9 @@ rl.on('line', (line) => {
         // unhook stdout and stderr
         process.stdout.write = old_stdout;
         process.stderr.write = old_stderr;
-        console.log(JSON.stringify(result));
+        if (result) {
+            console.log(JSON.stringify(result));
+        }
         // end process, tests are done running.
         process.exit(0);
     }
@@ -35,5 +37,5 @@ rl.on('line', (line) => {
     framework.run_tests(testCases, returnResult);
     
     // close readline interface
-    //rl.close();
+    rl.close();
 });
