@@ -79,6 +79,24 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to If it is not in this list, you can right-click any file in your project and choose &quot;Set as startup file&quot;.
+        /// </summary>
+        public static string F5FileSelectHelpText {
+            get {
+                return ResourceManager.GetString("F5FileSelectHelpText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose which file to run when F5 is pressed..
+        /// </summary>
+        public static string F5FileSelectTitle {
+            get {
+                return ResourceManager.GetString("F5FileSelectTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Files with the .js extension are always included..
         /// </summary>
         public static string FileFilterHelpText {
@@ -111,6 +129,24 @@ namespace Microsoft.NodejsTools {
         public static string NextButtonLabel {
             get {
                 return ResourceManager.GetString("NextButtonLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to We won&apos;t move any files, and you can use Save As to move the project file later..
+        /// </summary>
+        public static string SaveFileLocationHelpText {
+            get {
+                return ResourceManager.GetString("SaveFileLocationHelpText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select where to save your project file.
+        /// </summary>
+        public static string SaveFileLocationTitle {
+            get {
+                return ResourceManager.GetString("SaveFileLocationTitle", resourceCulture);
             }
         }
         
