@@ -609,7 +609,7 @@ Run Visual Studio with the /Log option and check ActivityLog.xml for more detail
 {0}</value>
   </data>
   <data name="AddReferenceExtensions" xml:space="preserve">
-    <value>Dynamic Link Libraries (*.dll)|*.dll|All Files (*.*)|*.*</value>
+    <value>Component Files|*.winmd</value>
   </data>
   <data name="WebPiFeedError" xml:space="preserve">
     <value>Unable to get feed "{0}".

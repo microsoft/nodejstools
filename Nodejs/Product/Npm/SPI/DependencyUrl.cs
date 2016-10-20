@@ -14,6 +14,8 @@
 //
 //*********************************************************//
 
+using System;
+
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal class DependencyUrl : IDependencyUrl {
         public DependencyUrl(string address) {
@@ -24,7 +26,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         public DependencyUrlType Type {
             get {
-                var index = Address.IndexOf("://");
+                var index = Address.IndexOf("://", StringComparison.Ordinal);
                 if (index < 0) {
                     return DependencyUrlType.GitHub;
                 } else {

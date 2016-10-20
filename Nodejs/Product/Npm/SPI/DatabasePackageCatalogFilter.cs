@@ -73,8 +73,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             }
 
             private int? CompareEntryStrings(string x, string y) {
-                var xIndex = string.IsNullOrEmpty(x) ? -1 : x.ToLower().IndexOf(_filterText, StringComparison.OrdinalIgnoreCase);
-                var yIndex = string.IsNullOrEmpty(y) ? -1 : y.ToLower().IndexOf(_filterText, StringComparison.OrdinalIgnoreCase);
+                var xIndex = string.IsNullOrEmpty(x) ? -1 : x.ToLower(CultureInfo.InvariantCulture).IndexOf(_filterText, StringComparison.OrdinalIgnoreCase);
+                var yIndex = string.IsNullOrEmpty(y) ? -1 : y.ToLower(CultureInfo.InvariantCulture).IndexOf(_filterText, StringComparison.OrdinalIgnoreCase);
 
                 int? xEqualsY = null;
                 const int xBeforeY = -1;

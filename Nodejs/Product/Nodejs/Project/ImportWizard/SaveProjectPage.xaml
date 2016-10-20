@@ -6,6 +6,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:l="clr-namespace:Microsoft.NodejsTools.Project.ImportWizard"
       xmlns:wpf="clr-namespace:Microsoft.VisualStudioTools.Wpf"
+      xmlns:resx="clr-namespace:Microsoft.NodejsTools"
       mc:Ignorable="d" 
       d:DesignHeight="300" d:DesignWidth="500"
       Title="Save Project"
@@ -20,9 +21,9 @@
             <RowDefinition Height="auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
-        
-        <wpf:LabelledControl Title="Select where to save your project file."
-                           HelpText="We won't move any files, and you can use Save As to move the project file later."
+
+        <wpf:LabelledControl Title="{x:Static resx:ImportWizardResources.SaveFileLocationTitle}"
+                           HelpText="{x:Static resx:ImportWizardResources.SaveFileLocationHelpText}"
                            Grid.Row="0">
             <Grid>
                 <Grid.ColumnDefinitions>

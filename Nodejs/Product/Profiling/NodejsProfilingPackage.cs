@@ -279,14 +279,14 @@ namespace Microsoft.NodejsTools.Profiling {
                 return;
             }
             
-            var interpreterArgs = (string)projectToProfile.Properties.Item("NodeExeArguments").Value;
-            var scriptArgs = (string)projectToProfile.Properties.Item("ScriptArguments").Value;
-            var startBrowser = (bool)projectToProfile.Properties.Item("StartWebBrowser").Value;
-            string launchUrl = (string)projectToProfile.Properties.Item("LaunchUrl").Value;
+            var interpreterArgs = (string)projectToProfile.Properties.Item(NodeProjectProperty.NodeExeArguments).Value;
+            var scriptArgs = (string)projectToProfile.Properties.Item(NodeProjectProperty.ScriptArguments).Value;
+            var startBrowser = (bool)projectToProfile.Properties.Item(NodeProjectProperty.StartWebBrowser).Value;
+            string launchUrl = (string)projectToProfile.Properties.Item(NodeProjectProperty.LaunchUrl).Value;
 
-            int? port = (int?)projectToProfile.Properties.Item("NodejsPort").Value;
+            int? port = (int?)projectToProfile.Properties.Item(NodeProjectProperty.NodejsPort).Value;
 
-            string interpreterPath = (string)projectToProfile.Properties.Item("NodeExePath").Value;
+            string interpreterPath = (string)projectToProfile.Properties.Item(NodeProjectProperty.NodeExePath).Value;
 
             string startupFile = (string)projectToProfile.Properties.Item("StartupFile").Value;
             if (String.IsNullOrEmpty(startupFile)) {
@@ -435,7 +435,7 @@ namespace Microsoft.NodejsTools.Profiling {
             var process = new ProfiledProcess(interpreter, interpreterArgs, script, scriptArgs, workingDir, env, arch, launchUrl, port, startBrowser, jmc);
 
             string baseName = Path.GetFileNameWithoutExtension(session.Filename);
-            string date = DateTime.Now.ToString("yyyyMMdd");
+            string date = DateTime.Now.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
             string outPath = Path.Combine(Path.GetDirectoryName(session.Filename), baseName + "_" + date + ".vspx");
 
             int count = 1;

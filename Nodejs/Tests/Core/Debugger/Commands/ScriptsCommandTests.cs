@@ -14,6 +14,7 @@
 //
 //*********************************************************//
 
+using System.Globalization;
 using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -54,7 +55,7 @@ namespace NodejsTests.Debugger.Commands {
             Assert.AreEqual(
                 string.Format(
                     "{{\"command\":\"scripts\",\"seq\":{0},\"type\":\"request\",\"arguments\":{{\"includeSource\":{1},\"ids\":[{2}]}}}}",
-                    commandId, includeSource.ToString().ToLower(), moduleId),
+                    commandId, includeSource.ToString().ToLower(CultureInfo.InvariantCulture), moduleId),
                 scriptsCommand.ToString());
         }
 

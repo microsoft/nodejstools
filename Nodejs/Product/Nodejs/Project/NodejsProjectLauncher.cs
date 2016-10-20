@@ -46,7 +46,7 @@ namespace Microsoft.NodejsTools.Project {
         public NodejsProjectLauncher(NodejsProjectNode project) {
             _project = project;
 
-            var portNumber = _project.GetProjectProperty(NodejsConstants.NodejsPort);
+            var portNumber = _project.GetProjectProperty(NodeProjectProperty.NodejsPort);
             int portNum;
             if (Int32.TryParse(portNumber, out portNum)) {
                 _testServerPort = portNum;
@@ -118,13 +118,13 @@ namespace Microsoft.NodejsTools.Project {
         private string GetFullArguments(string file, bool includeNodeArgs = true) {
             string res = String.Empty;
             if (includeNodeArgs) {
-                var nodeArgs = _project.GetProjectProperty(NodejsConstants.NodeExeArguments);
+                var nodeArgs = _project.GetProjectProperty(NodeProjectProperty.NodeExeArguments);
                 if (!String.IsNullOrWhiteSpace(nodeArgs)) {
                     res = nodeArgs + " ";
                 }
             }
             res += "\"" + file + "\"";
-            var scriptArgs = _project.GetProjectProperty(NodejsConstants.ScriptArguments);
+            var scriptArgs = _project.GetProjectProperty(NodeProjectProperty.ScriptArguments);
             if (!String.IsNullOrWhiteSpace(scriptArgs)) {
                 res += " " + scriptArgs;
             }
@@ -132,14 +132,14 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private string GetNodePath() {
-            var overridePath = _project.GetProjectProperty(NodejsConstants.NodeExePath);
+            var overridePath = _project.GetProjectProperty(NodeProjectProperty.NodeExePath);
             return Nodejs.GetAbsoluteNodeExePath(_project.ProjectHome, overridePath);
         }
 
         #endregion
 
         private string GetFullUrl() {
-            var host = _project.GetProjectProperty(NodejsConstants.LaunchUrl);
+            var host = _project.GetProjectProperty(NodeProjectProperty.LaunchUrl);
 
             try {
                 return GetFullUrl(host, TestServerPort);
@@ -192,9 +192,9 @@ namespace Microsoft.NodejsTools.Project {
 
         private void LaunchDebugger(IServiceProvider provider, VsDebugTargetInfo dbgInfo) {
             if (!Directory.Exists(dbgInfo.bstrCurDir)) {
-                MessageBox.Show(string.Format(CultureInfo.CurrentCulture, "Working directory \"{0}\" does not exist.", dbgInfo.bstrCurDir), SR.ProductName);
+                MessageBox.Show(SR.GetString(SR.DebugWorkingDirectoryDoesNotExistErrorMessage, dbgInfo.bstrCurDir), SR.ProductName);
             } else if (!File.Exists(dbgInfo.bstrExe)) {
-                MessageBox.Show(string.Format(CultureInfo.CurrentCulture, "Interpreter \"{0}\" does not exist.", dbgInfo.bstrExe), SR.ProductName);
+                MessageBox.Show(SR.GetString(SR.DebugInterpreterDoesNotExistErrorMessage, dbgInfo.bstrExe), SR.ProductName);
             } else if (DoesProjectSupportDebugging()) {
                 VsShellUtilities.LaunchDebugger(provider, dbgInfo);
             }
@@ -204,8 +204,7 @@ namespace Microsoft.NodejsTools.Project {
             var typeScriptOutFile = _project.GetProjectProperty("TypeScriptOutFile");
             if (!string.IsNullOrEmpty(typeScriptOutFile)) {
                 return MessageBox.Show(
-                    "This TypeScript project has 'Combine Javascript output into file' option enabled. This option is not supported by NTVS debugger, " +
-                    "and may result in erratic behavior of breakpoints, stepping, and debug tool windows. Are you sure you want to start debugging?",
+                    SR.GetString(SR.DebugTypeScriptCombineNotSupportedWarningMessage),
                     SR.ProductName,
                     MessageBoxButtons.YesNo,
                     MessageBoxIcon.Warning
@@ -233,7 +232,7 @@ namespace Microsoft.NodejsTools.Project {
             dbgInfo.bstrCurDir = _project.GetWorkingDirectory();
             dbgInfo.bstrArg = GetFullArguments(startupFile, includeNodeArgs: false);    // we need to supply node args via options
             dbgInfo.bstrRemoteMachine = null;
-            var nodeArgs = _project.GetProjectProperty(NodejsConstants.NodeExeArguments);
+            var nodeArgs = _project.GetProjectProperty(NodeProjectProperty.NodeExeArguments);
             if (!String.IsNullOrWhiteSpace(nodeArgs)) {
                 AppendOption(ref dbgInfo, AD7Engine.InterpreterOptions, nodeArgs);
             }
@@ -243,7 +242,7 @@ namespace Microsoft.NodejsTools.Project {
                 AppendOption(ref dbgInfo, AD7Engine.WebBrowserUrl, url);
             }
 
-            var debuggerPort = _project.GetProjectProperty(NodejsConstants.DebuggerPort);
+            var debuggerPort = _project.GetProjectProperty(NodeProjectProperty.DebuggerPort);
             if (!String.IsNullOrWhiteSpace(debuggerPort)) {
                 AppendOption(ref dbgInfo, AD7Engine.DebuggerPort, debuggerPort);
             }
@@ -296,7 +295,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private bool ShouldStartBrowser() {
-            var startBrowser = _project.GetProjectProperty(NodejsConstants.StartWebBrowser);
+            var startBrowser = _project.GetProjectProperty(NodeProjectProperty.StartWebBrowser);
             bool fStartBrowser;
             if (!String.IsNullOrEmpty(startBrowser) &&
                 Boolean.TryParse(startBrowser, out fStartBrowser)) {
@@ -307,7 +306,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private IEnumerable<KeyValuePair<string, string>> GetEnvironmentVariables() {
-            var envVars = _project.GetProjectProperty(NodejsConstants.Environment);
+            var envVars = _project.GetProjectProperty(NodeProjectProperty.Environment);
             if (envVars != null) {
                 foreach (var envVar in envVars.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)) {
                     var nameValue = envVar.Split(new[] { '=' }, 2);
@@ -328,7 +327,7 @@ namespace Microsoft.NodejsTools.Project {
         private string ResolveStartupFile() {
             string startupFile = _project.GetStartupFile();
             if (string.IsNullOrEmpty(startupFile)) {
-                throw new ApplicationException("Please select a startup file to launch by right-clicking the file in Solution Explorer and selecting 'Set as Node.js Startup File' or by modifying your configuration in project properties.");
+                throw new ApplicationException(SR.GetString(SR.DebugCouldNotResolveStartupFileErrorMessage));
             }
 
             if (TypeScriptHelpers.IsTypeScriptFile(startupFile)) {

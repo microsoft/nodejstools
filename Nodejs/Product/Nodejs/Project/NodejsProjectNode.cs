@@ -242,7 +242,7 @@ namespace Microsoft.NodejsTools.Project {
 
         public bool IsTypeScriptProject {
             get {
-                return string.Equals(GetProjectProperty(NodejsConstants.EnableTypeScript), "true", StringComparison.OrdinalIgnoreCase);
+                return string.Equals(GetProjectProperty(NodeProjectProperty.EnableTypeScript), "true", StringComparison.OrdinalIgnoreCase);
             }
         }
 
@@ -314,14 +314,14 @@ namespace Microsoft.NodejsTools.Project {
 
             if (IsProjectTypeScriptSourceFile(fileName) && !IsTypeScriptProject) {
                 // enable TypeScript on the project automatically...
-                SetProjectProperty(NodejsConstants.EnableTypeScript, "true");
-                SetProjectProperty(NodejsConstants.TypeScriptSourceMap, "true");
+                SetProjectProperty(NodeProjectProperty.EnableTypeScript, "true");
+                SetProjectProperty(NodeProjectProperty.TypeScriptSourceMap, "true");
 #if DEV14
                 // Reset cached value, so it will be recalculated later.
                 this.shouldAcquireTypingsAutomatically = false;
 #endif
-                if (String.IsNullOrWhiteSpace(GetProjectProperty(NodejsConstants.TypeScriptModuleKind))) {
-                    SetProjectProperty(NodejsConstants.TypeScriptModuleKind, NodejsConstants.CommonJSModuleKind);
+                if (String.IsNullOrWhiteSpace(GetProjectProperty(NodeProjectProperty.TypeScriptModuleKind))) {
+                    SetProjectProperty(NodeProjectProperty.TypeScriptModuleKind, NodejsConstants.CommonJSModuleKind);
                 }
             }
         }
@@ -425,10 +425,10 @@ namespace Microsoft.NodejsTools.Project {
         protected override Guid[] GetConfigurationDependentPropertyPages() {
             var res = base.GetConfigurationDependentPropertyPages();
 
-            var enableTs = GetProjectProperty(NodejsConstants.EnableTypeScript, resetCache: false);
+            var enableTs = GetProjectProperty(NodeProjectProperty.EnableTypeScript, resetCache: false);
             bool fEnableTs;
             if (enableTs != null && Boolean.TryParse(enableTs, out fEnableTs) && fEnableTs) {
-                var typeScriptPages = GetProjectProperty(NodejsConstants.TypeScriptCfgProperty);
+                var typeScriptPages = GetProjectProperty(NodeProjectProperty.TypeScriptCfgProperty);
                 if (typeScriptPages != null) {
                     foreach (var strGuid in typeScriptPages.Split(';')) {
                         Guid guid;
@@ -470,11 +470,6 @@ namespace Microsoft.NodejsTools.Project {
                    ext.Equals(NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase);
         }
 
-        public override int InitializeForOuter(string filename, string location, string name, uint flags, ref Guid iid, out IntPtr projectPointer, out int canceled) {
-            NodejsPackage.Instance.GeneralOptionsPage.ShowBrowserAndNodeLabelsChanged += ShowBrowserAndNodeLabelsChanged;
-
-            return base.InitializeForOuter(filename, location, name, flags, ref iid, out projectPointer, out canceled);
-        }
 
         protected override void Reload() {
             using (new DebugTimer("Project Load")) {
@@ -500,44 +495,37 @@ namespace Microsoft.NodejsTools.Project {
             _intermediateOutputPath = Path.Combine(ProjectHome, GetProjectProperty("BaseIntermediateOutputPath"));
         }
 
-        private void ShowBrowserAndNodeLabelsChanged(object sender, EventArgs e) {
-            var nodejsFolderNodes = this.AllDescendants.Where(item => (item as NodejsFolderNode) != null).Select(item => (NodejsFolderNode)item);
-            foreach (var node in nodejsFolderNodes) {
-                ProjectMgr.ReDrawNode(node, UIHierarchyElement.Caption);
-            }
-        }
-
         protected override void RaiseProjectPropertyChanged(string propertyName, string oldValue, string newValue) {
             base.RaiseProjectPropertyChanged(propertyName, oldValue, newValue);
 
             var propPage = GeneralPropertyPageControl;
             if (propPage != null) {
                 switch (propertyName) {
-                    case NodejsConstants.Environment:
+                    case NodeProjectProperty.Environment:
                         propPage.Environment = newValue;
                         break;
-                    case NodejsConstants.DebuggerPort:
+                    case NodeProjectProperty.DebuggerPort:
                         propPage.DebuggerPort = newValue;
                         break;
-                    case NodejsConstants.NodejsPort:
+                    case NodeProjectProperty.NodejsPort:
                         propPage.NodejsPort = newValue;
                         break;
-                    case NodejsConstants.NodeExePath:
+                    case NodeProjectProperty.NodeExePath:
                         propPage.NodeExePath = newValue;
                         break;
-                    case NodejsConstants.NodeExeArguments:
+                    case NodeProjectProperty.NodeExeArguments:
                         propPage.NodeExeArguments = newValue;
                         break;
                     case CommonConstants.StartupFile:
                         propPage.ScriptFile = newValue;
                         break;
-                    case NodejsConstants.ScriptArguments:
+                    case NodeProjectProperty.ScriptArguments:
                         propPage.ScriptArguments = newValue;
                         break;
-                    case NodejsConstants.LaunchUrl:
+                    case NodeProjectProperty.LaunchUrl:
                         propPage.LaunchUrl = newValue;
                         break;
-                    case NodejsConstants.StartWebBrowser:
+                    case NodeProjectProperty.StartWebBrowser:
                         bool value;
                         if (Boolean.TryParse(newValue, out value)) {
                             propPage.StartWebBrowser = value;
@@ -614,7 +602,19 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         protected override ReferenceContainerNode CreateReferenceContainerNode() {
-            return null;
+            // Only create a reference node if the project is targeting UWP
+            if(GetProjectTypeGuids().Contains(Guids.NodejsUwpProjectFlavor)) {
+                return base.CreateReferenceContainerNode();
+            } else {
+                return null;
+            }
+        }
+
+        private string GetProjectTypeGuids()
+        {
+            string projectTypeGuids = "";
+            ErrorHandler.ThrowOnFailure(((IVsAggregatableProject)this).GetAggregateProjectTypeGuids(out projectTypeGuids));
+            return projectTypeGuids;
         }
 
         public NodeModulesNode ModulesNode { get; private set; }
@@ -850,8 +850,6 @@ namespace Microsoft.NodejsTools.Project {
                     _idleNodeModulesTimer = null;
                 }
 
-                NodejsPackage.Instance.GeneralOptionsPage.ShowBrowserAndNodeLabelsChanged -= ShowBrowserAndNodeLabelsChanged;
-
                 OnDispose?.Invoke(this, EventArgs.Empty);
 
                 RemoveChild(ModulesNode);
@@ -915,10 +913,7 @@ namespace Microsoft.NodejsTools.Project {
                             }
                         }
                         break;
-                    case PkgCmdId.cmdidAddNewJavaScriptFileCommand: 
-                    case PkgCmdId.cmdidAddNewTypeScriptFileCommand: 
-                    case PkgCmdId.cmdidAddNewHTMLFileCommand: 
-                    case PkgCmdId.cmdidAddNewCSSFileCommand: 
+                    case PkgCmdId.cmdidAddFileCommand:
                         return QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED; 
                 }
             }
@@ -938,7 +933,7 @@ namespace Microsoft.NodejsTools.Project {
                     NpmHelpers.GetPathToNpm(
                         Nodejs.GetAbsoluteNodeExePath(
                             ProjectHome,
-                            Project.GetNodejsProject().GetProjectProperty(NodejsConstants.NodeExePath)
+                            Project.GetNodejsProject().GetProjectProperty(NodeProjectProperty.NodeExePath)
                     ));
                 } catch (NpmNotFoundException) {
                     Nodejs.ShowNodejsNotInstalled();
@@ -954,7 +949,7 @@ namespace Microsoft.NodejsTools.Project {
                     NpmHelpers.GetPathToNpm(
                         Nodejs.GetAbsoluteNodeExePath(
                             ProjectHome,
-                            Project.GetNodejsProject().GetProjectProperty(NodejsConstants.NodeExePath)
+                            Project.GetNodejsProject().GetProjectProperty(NodeProjectProperty.NodeExePath)
                     ));
                 } catch (NpmNotFoundException) {
                     Nodejs.ShowNodejsNotInstalled();
@@ -990,26 +985,10 @@ namespace Microsoft.NodejsTools.Project {
                         handled = true;
                         return VSConstants.S_OK;
 
-                    case PkgCmdId.cmdidAddNewJavaScriptFileCommand:
-                        NewFileMenuGroup.NewFileUtilities.CreateNewJavaScriptFile(projectNode: this, containerId: selectedNodes[0].ID);
+                    case PkgCmdId.cmdidAddFileCommand:
+                        NewFileMenuGroup.NewFileUtilities.CreateNewFile(projectNode: this, containerId: selectedNodes[0].ID);
                         handled = true;
                         return VSConstants.S_OK;
-
-                    case PkgCmdId.cmdidAddNewTypeScriptFileCommand:
-                        NewFileMenuGroup.NewFileUtilities.CreateNewTypeScriptFile(projectNode: this, containerId: selectedNodes[0].ID);
-                        handled = true;
-                        return VSConstants.S_OK;
-
-                    case PkgCmdId.cmdidAddNewHTMLFileCommand:
-                        NewFileMenuGroup.NewFileUtilities.CreateNewHTMLFile(projectNode: this, containerId: selectedNodes[0].ID);
-                        handled = true;
-                        return VSConstants.S_OK;
-
-                    case PkgCmdId.cmdidAddNewCSSFileCommand:
-                        NewFileMenuGroup.NewFileUtilities.CreateNewCSSFile(projectNode: this, containerId: selectedNodes[0].ID);
-                        handled = true;
-                        return VSConstants.S_OK;
-
                 }
             }
 
