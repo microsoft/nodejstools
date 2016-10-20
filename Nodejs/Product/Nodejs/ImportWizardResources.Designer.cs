@@ -79,6 +79,24 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Files with the .js extension are always included..
+        /// </summary>
+        public static string FileFilterHelpText {
+            get {
+                return ResourceManager.GetString("FileFilterHelpText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter the filter for files to include.
+        /// </summary>
+        public static string FileFilterTitle {
+            get {
+                return ResourceManager.GetString("FileFilterTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to _Finish.
         /// </summary>
         public static string FinishButtonLabel {
@@ -93,6 +111,24 @@ namespace Microsoft.NodejsTools {
         public static string NextButtonLabel {
             get {
                 return ResourceManager.GetString("NextButtonLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to We won&apos;t move any files from where they are now..
+        /// </summary>
+        public static string SelectNodeCodeHelpText {
+            get {
+                return ResourceManager.GetString("SelectNodeCodeHelpText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter or browse to the folder containing your Node.js code.
+        /// </summary>
+        public static string SelectNodeCodeTitle {
+            get {
+                return ResourceManager.GetString("SelectNodeCodeTitle", resourceCulture);
             }
         }
         
