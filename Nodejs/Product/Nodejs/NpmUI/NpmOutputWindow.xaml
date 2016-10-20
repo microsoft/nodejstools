@@ -4,11 +4,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:wpf="clr-namespace:Microsoft.VisualStudioTools.Wpf"
+        xmlns:resx="clr-namespace:Microsoft.NodejsTools.NpmUI"
         mc:Ignorable="d"
         Background="{DynamicResource {x:Static wpf:Controls.BackgroundKey}}"
         TextElement.Foreground="{DynamicResource {x:Static wpf:Controls.ForegroundKey}}"
-        Height="300" Width="500" Title="npm install Output"
+        Height="300" Width="500"
+        Title="{x:Static resx:NpmInstallResources.OutputWindowTitle}"
         MinHeight="100" MinWidth="200">
+    
     <!-- Theming -->
     <Window.Resources>
         <ResourceDictionary Source="pack://application:,,,/Microsoft.NodejsTools;component/SharedProject/Wpf/Controls.xaml" />
