@@ -9,7 +9,7 @@
         Background="{DynamicResource {x:Static wpf:Controls.BackgroundKey}}"
         TextElement.Foreground="{DynamicResource {x:Static wpf:Controls.ForegroundKey}}"
         Height="300" Width="500"
-        Title="{x:Static resx:NpmInstallResources.OutputWindowTitle}"
+        Title="{x:Static resx:NpmInstallOutputWindowResources.WindowTitle}"
         MinHeight="100" MinWidth="200">
     
     <!-- Theming -->
@@ -24,7 +24,7 @@
                 <DockPanel HorizontalAlignment="Stretch"
                            Visibility="{Binding Path=CommandCancelVisibility}">
                     <Button DockPanel.Dock="Right"
-                            Content="Cancel"
+                            Content="{x:Static resx:NpmInstallOutputWindowResources.CancelButtonContent}"
                             HorizontalAlignment="Right"
                             Margin="4, 0, 4, 0"
                             IsEnabled="{Binding Path=IsCancellable}"
@@ -49,6 +49,6 @@
                          IsTabStop="False"
                          VerticalScrollBarVisibility="Auto">
             </RichTextBox>
-        </DockPanel>            
+        </DockPanel>
     </Grid>
 </Window>

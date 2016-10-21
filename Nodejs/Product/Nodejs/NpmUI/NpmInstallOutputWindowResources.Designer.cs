@@ -22,14 +22,14 @@ namespace Microsoft.NodejsTools.NpmUI {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class NpmInstallResources {
+    public class NpmInstallOutputWindowResources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal NpmInstallResources() {
+        internal NpmInstallOutputWindowResources() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Microsoft.NodejsTools.NpmUI {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.NodejsTools.NpmUI.NpmInstallResources", typeof(NpmInstallResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.NodejsTools.NpmUI.NpmInstallOutputWindowResources", typeof(NpmInstallOutputWindowResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,11 +61,20 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cancel.
+        /// </summary>
+        public static string CancelButtonContent {
+            get {
+                return ResourceManager.GetString("CancelButtonContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to npm install Output.
         /// </summary>
-        public static string OutputWindowTitle {
+        public static string WindowTitle {
             get {
-                return ResourceManager.GetString("OutputWindowTitle", resourceCulture);
+                return ResourceManager.GetString("WindowTitle", resourceCulture);
             }
         }
     }
