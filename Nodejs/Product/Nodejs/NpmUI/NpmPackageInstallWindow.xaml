@@ -343,19 +343,17 @@
                         BorderThickness="{Binding ElementName=_packageList,Path=BorderThickness}">
                     <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TextBlock HorizontalAlignment="Center"
-                                   Visibility="{Binding PackageFilterState, Converter={wpf:Lambda '(NpmPackageInstallViewModel.FilterState b) => NpmPackageInstallViewModel.FilterState.NoFilterText == b ? Visibility.Visible : Visibility.Hidden'}}">
-                            Type to search for packages.
-                        </TextBlock>
+                                   Visibility="{Binding PackageFilterState, Converter={wpf:Lambda '(NpmPackageInstallViewModel.FilterState b) => NpmPackageInstallViewModel.FilterState.NoFilterText == b ? Visibility.Visible : Visibility.Hidden'}}"
+                                   Text="{x:Static resx:NpmInstallWindowResources.SearchPromptMessage}" />
                         <ProgressBar 
                     HorizontalAlignment="Stretch"
                     IsEnabled="True" 
                     IsIndeterminate="True"
                     Visibility="{Binding PackageFilterState, Converter={wpf:Lambda '(NpmPackageInstallViewModel.FilterState b) => NpmPackageInstallViewModel.FilterState.Filtering == b ? Visibility.Visible : Visibility.Hidden'}}"/>
-                        <TextBlock 
-                    HorizontalAlignment="Center"
-                    Visibility="{Binding PackageFilterState, Converter={wpf:Lambda '(NpmPackageInstallViewModel.FilterState b) => NpmPackageInstallViewModel.FilterState.NoResults == b ? Visibility.Visible : Visibility.Hidden'}}">
-                    No results found.
-                        </TextBlock>
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            Visibility="{Binding PackageFilterState, Converter={wpf:Lambda '(NpmPackageInstallViewModel.FilterState b) => NpmPackageInstallViewModel.FilterState.NoResults == b ? Visibility.Visible : Visibility.Hidden'}}"
+                            Text="{x:Static resx:NpmInstallWindowResources.NoResultsFoundMessage}" />
                     </Grid>
                 </Border>
             </Grid>
@@ -445,7 +443,7 @@
                             <ComboBoxItem Tag="Opt" Content="{x:Static resx:NpmInstallWindowResources.DevTypeOptionalChoice}" />
                         </ComboBox>
 
-                        <Label Grid.Row="4" HorizontalAlignment="Right" VerticalAlignment="Center">Selected version</Label>
+                        <Label Grid.Row="4" HorizontalAlignment="Right" VerticalAlignment="Center" Content="{x:Static resx:NpmInstallWindowResources.SelectedVersionLabel}" />
                         <ComboBox Name="SelectedVersionComboBox"
                                   Grid.Row="4"
                                   Grid.Column="1"

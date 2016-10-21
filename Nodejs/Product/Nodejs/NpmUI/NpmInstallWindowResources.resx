@@ -156,6 +156,9 @@
   <data name="InstallPackageButtonLabel" xml:space="preserve">
     <value>_Install Package</value>
   </data>
+  <data name="NoResultsFoundMessage" xml:space="preserve">
+    <value>No results found.</value>
+  </data>
   <data name="OldVersionMessage" xml:space="preserve">
     <value>Old version</value>
   </data>
@@ -173,6 +176,12 @@
   </data>
   <data name="SearchForPackagesLabel" xml:space="preserve">
     <value>Search for packages</value>
+  </data>
+  <data name="SearchPromptMessage" xml:space="preserve">
+    <value>Type to search for packages.</value>
+  </data>
+  <data name="SelectedVersionLabel" xml:space="preserve">
+    <value>Selected version</value>
   </data>
   <data name="WindowTitle" xml:space="preserve">
     <value>Install New npm Packages</value>

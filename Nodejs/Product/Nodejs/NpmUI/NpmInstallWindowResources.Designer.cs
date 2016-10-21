@@ -178,6 +178,15 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No results found..
+        /// </summary>
+        public static string NoResultsFoundMessage {
+            get {
+                return ResourceManager.GetString("NoResultsFoundMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Old version.
         /// </summary>
         public static string OldVersionMessage {
@@ -228,6 +237,24 @@ namespace Microsoft.NodejsTools.NpmUI {
         public static string SearchForPackagesLabel {
             get {
                 return ResourceManager.GetString("SearchForPackagesLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type to search for packages..
+        /// </summary>
+        public static string SearchPromptMessage {
+            get {
+                return ResourceManager.GetString("SearchPromptMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Selected version.
+        /// </summary>
+        public static string SelectedVersionLabel {
+            get {
+                return ResourceManager.GetString("SelectedVersionLabel", resourceCulture);
             }
         }
         
