@@ -65,8 +65,5 @@ namespace Microsoft.NodejsTools.NpmUI {
         public int Days { get; private set; }
 
         public string Description { get; private set; }
-
-        public bool IsOld { get { return Days > 7; } }
-        public bool IsAncient { get { return Days > 14; } }
     }
 }

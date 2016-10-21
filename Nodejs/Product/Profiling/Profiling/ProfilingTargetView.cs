@@ -127,7 +127,7 @@ namespace Microsoft.NodejsTools.Profiling {
             set {
                 if (_project != value) {
                     _project = value;
-                    OnPropertyChanged("Project");
+                    OnPropertyChanged(nameof(Project));
                 }
             }
         }
@@ -142,7 +142,7 @@ namespace Microsoft.NodejsTools.Profiling {
             set {
                 if (_isProjectSelected != value) {
                     _isProjectSelected = value;
-                    OnPropertyChanged("IsProjectSelected");
+                    OnPropertyChanged(nameof(IsProjectSelected));
                 }
             }
         }
@@ -164,7 +164,7 @@ namespace Microsoft.NodejsTools.Profiling {
                         _standalone.PropertyChanged += Standalone_PropertyChanged;
                     }
 
-                    OnPropertyChanged("Standalone");
+                    OnPropertyChanged(nameof(Standalone));
                 }
             }
         }
@@ -179,7 +179,7 @@ namespace Microsoft.NodejsTools.Profiling {
             set {
                 if (_isStandaloneSelected != value) {
                     _isStandaloneSelected = value;
-                    OnPropertyChanged("IsStandaloneSelected");
+                    OnPropertyChanged(nameof(IsStandaloneSelected));
                 }
             }
         }
@@ -204,7 +204,7 @@ namespace Microsoft.NodejsTools.Profiling {
         /// </summary>
         private void Standalone_PropertyChanged(object sender, PropertyChangedEventArgs e) {
             Debug.Assert(Standalone == sender);
-            OnPropertyChanged("Standalone");
+            OnPropertyChanged(nameof(Standalone));
         }
 
 
@@ -218,7 +218,7 @@ namespace Microsoft.NodejsTools.Profiling {
             private set {
                 if (_isValid != value) {
                     _isValid = value;
-                    OnPropertyChanged("IsValid");
+                    OnPropertyChanged(nameof(IsValid));
                 }
             }
         }

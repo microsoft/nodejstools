@@ -99,9 +99,9 @@ namespace Microsoft.NodejsTools.NpmUI {
                     Pulse();
                 }
                 OnPropertyChanged();
-                OnPropertyChanged("ExecutionProgressVisibility");
-                OnPropertyChanged("ExecutionIdleVisibility");
-                OnPropertyChanged("IsCancellable");
+                OnPropertyChanged(nameof(ExecutionProgressVisibility));
+                OnPropertyChanged(nameof(ExecutionIdleVisibility));
+                OnPropertyChanged(nameof(IsCancellable));
             }
         }
 
@@ -148,7 +148,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
 
             UpdateStatusMessage();
-            OnPropertyChanged("IsCancellable");
+            OnPropertyChanged(nameof(IsCancellable));
         }
 
         private void QueueCommand(QueuedNpmCommandInfo info) {
@@ -162,7 +162,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
 
             UpdateStatusMessageSafe();
-            OnPropertyChanged("IsCancellable");
+            OnPropertyChanged(nameof(IsCancellable));
         }
 
         public void QueueCommand(string arguments) {
@@ -217,7 +217,7 @@ namespace Microsoft.NodejsTools.NpmUI {
 
         private void HandleCompletionSafe() {
             UpdateStatusMessage();
-            OnPropertyChanged("IsCancellable");
+            OnPropertyChanged(nameof(IsCancellable));
         }
 
         private void commander_CommandCompleted(object sender, NpmCommandCompletedEventArgs e) {

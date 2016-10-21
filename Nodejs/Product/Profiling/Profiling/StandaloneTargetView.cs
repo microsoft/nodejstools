@@ -85,7 +85,7 @@ namespace Microsoft.NodejsTools.Profiling {
             set {
                 if (_interpreterPath != value) {
                     _interpreterPath = value;
-                    OnPropertyChanged("InterpreterPath");
+                    OnPropertyChanged(nameof(InterpreterPath));
                 }
             }
         }
@@ -100,7 +100,7 @@ namespace Microsoft.NodejsTools.Profiling {
             set {
                 if (_scriptPath != value) {
                     _scriptPath = value;
-                    OnPropertyChanged("ScriptPath");
+                    OnPropertyChanged(nameof(ScriptPath));
                     //if (string.IsNullOrEmpty(WorkingDirectory)) {
                     //    WorkingDirectory = Path.GetDirectoryName(_scriptPath);
                     //}
@@ -118,7 +118,7 @@ namespace Microsoft.NodejsTools.Profiling {
             set {
                 if (_workingDirectory != value) {
                     _workingDirectory = value;
-                    OnPropertyChanged("WorkingDirectory");
+                    OnPropertyChanged(nameof(WorkingDirectory));
                 }
             }
         }
@@ -133,7 +133,7 @@ namespace Microsoft.NodejsTools.Profiling {
             set {
                 if (_arguments != value) {
                     _arguments = value;
-                    OnPropertyChanged("Arguments");
+                    OnPropertyChanged(nameof(Arguments));
                 }
             }
         }
@@ -164,7 +164,7 @@ namespace Microsoft.NodejsTools.Profiling {
             private set {
                 if (_isValid != value) {
                     _isValid = value;
-                    OnPropertyChanged("IsValid");
+                    OnPropertyChanged(nameof(IsValid));
                 }
             }
         }
