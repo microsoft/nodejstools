@@ -245,6 +245,16 @@
     <Compile Include="Logging\NodejsToolsLogEvent.cs" />
     <Compile Include="Logging\NodejsToolsLogger.cs" />
     <Compile Include="NodejsPackage.Debugger.cs" />
+    <Compile Include="NpmUI\NpmInstallOutputWindowResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>NpmInstallOutputWindowResources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="NpmUI\NpmInstallWindowResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>NpmInstallWindowResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="NpmUI\NpmOutputWindow.xaml.cs">
       <DependentUpon>NpmOutputWindow.xaml</DependentUpon>
     </Compile>
@@ -617,6 +627,14 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>ImportWizardResources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>NpmInstallOutputWindowResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NpmUI\NpmInstallWindowResources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>NpmInstallWindowResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Options\NodejsNpmOptionsControl.resx">
       <DependentUpon>NodejsNpmOptionsControl.cs</DependentUpon>
