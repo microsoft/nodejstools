@@ -39,6 +39,7 @@ namespace Microsoft.NodejsTools.Project {
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NewFileNameForm));
             this.label = new System.Windows.Forms.Label();
             this.textBox = new System.Windows.Forms.TextBox();
             this.cancelButton = new System.Windows.Forms.Button();
@@ -47,48 +48,34 @@ namespace Microsoft.NodejsTools.Project {
             // 
             // label
             // 
-            this.label.AutoSize = true;
-            this.label.Location = new System.Drawing.Point(12, 14);
+            resources.ApplyResources(this.label, "label");
             this.label.Name = "label";
-            this.label.Size = new System.Drawing.Size(59, 13);
-            this.label.TabIndex = 0;
-            this.label.Text = "Item name:";
             // 
             // textBox
             // 
-            this.textBox.Location = new System.Drawing.Point(88, 11);
+            resources.ApplyResources(this.textBox, "textBox");
             this.textBox.Name = "textBox";
-            this.textBox.Size = new System.Drawing.Size(306, 20);
-            this.textBox.TabIndex = 1;
-            this.textBox.TextChanged += this.TextBox_TextChanged;
             // 
             // cancelButton
             // 
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cancelButton.Location = new System.Drawing.Point(319, 46);
+            resources.ApplyResources(this.cancelButton, "cancelButton");
             this.cancelButton.Name = "cancelButton";
-            this.cancelButton.Size = new System.Drawing.Size(75, 23);
-            this.cancelButton.TabIndex = 3;
-            this.cancelButton.Text = "Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
             // 
             // okButton
             // 
             this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.okButton.Location = new System.Drawing.Point(273, 46);
+            resources.ApplyResources(this.okButton, "okButton");
             this.okButton.Name = "okButton";
-            this.okButton.Size = new System.Drawing.Size(40, 23);
-            this.okButton.TabIndex = 4;
-            this.okButton.Text = "OK";
             this.okButton.UseVisualStyleBackColor = true;
             // 
             // NewFileNameForm
             // 
             this.AcceptButton = this.okButton;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.cancelButton;
-            this.ClientSize = new System.Drawing.Size(408, 79);
             this.Controls.Add(this.okButton);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.textBox);
@@ -98,8 +85,6 @@ namespace Microsoft.NodejsTools.Project {
             this.MinimizeBox = false;
             this.Name = "NewFileNameForm";
             this.ShowIcon = false;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Specify Name for Item";
             this.ResumeLayout(false);
             this.PerformLayout();
 
