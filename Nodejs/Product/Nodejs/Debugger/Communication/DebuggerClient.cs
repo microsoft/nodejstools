@@ -25,7 +25,6 @@ using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.NodejsTools.Debugger.Events;
 using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json.Linq;
-using RRRRR = Microsoft.NodejsTools.Project.SR;
 
 namespace Microsoft.NodejsTools.Debugger.Communication {
     sealed class DebuggerClient : IDebuggerClient {

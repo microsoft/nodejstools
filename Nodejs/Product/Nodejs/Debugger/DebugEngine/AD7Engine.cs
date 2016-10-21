@@ -32,7 +32,6 @@ using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Project;
-using RRRRR = Microsoft.NodejsTools.Project.SR;
 
 namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // AD7Engine is the primary entrypoint object for the debugging engine. 

@@ -31,7 +31,6 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Project;
-using RRRRR = Microsoft.NodejsTools.Project.SR;
 using Task = System.Threading.Tasks.Task;
 
 namespace Microsoft.NodejsTools.Repl {
