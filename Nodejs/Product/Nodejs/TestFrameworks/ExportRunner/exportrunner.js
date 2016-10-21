@@ -72,9 +72,12 @@ var run_tests = function (testCases, callback) {
         try {
             var testCase = require(testCases[test].testFile);
             result.title = testCases[test].testName;
+            result.time = Date.now();
             testCase[testCases[test].testName]();
+            result.time = Date.now() - result.time;
             result.passed = true;
         } catch (err) {
+            result.time = Date.now() - result.time;
             result.passed = false;
             console.error(err.name);
             console.error(err.message);
