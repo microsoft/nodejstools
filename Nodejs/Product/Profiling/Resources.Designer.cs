@@ -22,7 +22,7 @@ namespace Microsoft.NodejsTools.Profiling {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace Microsoft.NodejsTools.Profiling {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.NodejsTools.Profiling.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace Microsoft.NodejsTools.Profiling {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         ///   Looks up a localized string similar to _Baseline File:.
         /// </summary>
-        internal static string BaselineFileLabel {
+        public static string BaselineFileLabel {
             get {
                 return ResourceManager.GetString("BaselineFileLabel", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         ///   Looks up a localized string similar to _Cancel.
         /// </summary>
-        internal static string CancelButtonContent {
+        public static string CancelButtonContent {
             get {
                 return ResourceManager.GetString("CancelButtonContent", resourceCulture);
             }
@@ -81,7 +81,7 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         ///   Looks up a localized string similar to Command Line _Arguments:.
         /// </summary>
-        internal static string CommandLineArgumentsLabel {
+        public static string CommandLineArgumentsLabel {
             get {
                 return ResourceManager.GetString("CommandLineArgumentsLabel", resourceCulture);
             }
@@ -90,7 +90,7 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         ///   Looks up a localized string similar to Select analysis files for comparison.
         /// </summary>
-        internal static string CompareWindowTitle {
+        public static string CompareWindowTitle {
             get {
                 return ResourceManager.GetString("CompareWindowTitle", resourceCulture);
             }
@@ -99,16 +99,16 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         ///   Looks up a localized string similar to Co_mparison File:.
         /// </summary>
-        internal static string ComparisonFileLabel {
+        public static string ComparisionFileLabel {
             get {
-                return ResourceManager.GetString("ComparisonFileLabel", resourceCulture);
+                return ResourceManager.GetString("ComparisionFileLabel", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Failed to build project, do you want to launch profiling anyway?.
         /// </summary>
-        internal static string FailedToBuild {
+        public static string FailedToBuild {
             get {
                 return ResourceManager.GetString("FailedToBuild", resourceCulture);
             }
@@ -117,7 +117,7 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         ///   Looks up a localized string similar to Failed to open file {0}.
         /// </summary>
-        internal static string FailedToOpenFileErrorMessageText {
+        public static string FailedToOpenFileErrorMessageText {
             get {
                 return ResourceManager.GetString("FailedToOpenFileErrorMessageText", resourceCulture);
             }
@@ -126,7 +126,7 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         ///   Looks up a localized string similar to Failed to read performance session {0}.
         /// </summary>
-        internal static string FailedToReadPerformanceSessionMessageText {
+        public static string FailedToReadPerformanceSessionMessageText {
             get {
                 return ResourceManager.GetString("FailedToReadPerformanceSessionMessageText", resourceCulture);
             }
@@ -138,7 +138,7 @@ namespace Microsoft.NodejsTools.Profiling {
         ///
         ///No profiling data is available..
         /// </summary>
-        internal static string FailedToSaveV8LogMessageText {
+        public static string FailedToSaveV8LogMessageText {
             get {
                 return ResourceManager.GetString("FailedToSaveV8LogMessageText", resourceCulture);
             }
@@ -147,7 +147,7 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         ///   Looks up a localized string similar to Project has no configured startup file, cannot start profiling..
         /// </summary>
-        internal static string NoConfiguredStatupFileErrorMessageText {
+        public static string NoConfiguredStatupFileErrorMessageText {
             get {
                 return ResourceManager.GetString("NoConfiguredStatupFileErrorMessageText", resourceCulture);
             }
@@ -156,7 +156,7 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         ///   Looks up a localized string similar to Node.js Tools for Visual Studio.
         /// </summary>
-        internal static string NodejsToolsForVS {
+        public static string NodejsToolsForVS {
             get {
                 return ResourceManager.GetString("NodejsToolsForVS", resourceCulture);
             }
@@ -165,7 +165,7 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         ///   Looks up a localized string similar to _Node Path:.
         /// </summary>
-        internal static string NodePathLabel {
+        public static string NodePathLabel {
             get {
                 return ResourceManager.GetString("NodePathLabel", resourceCulture);
             }
@@ -174,7 +174,7 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         ///   Looks up a localized string similar to No Profiling Target.
         /// </summary>
-        internal static string NoProfilingConfiguredMessageCaption {
+        public static string NoProfilingConfiguredMessageCaption {
             get {
                 return ResourceManager.GetString("NoProfilingConfiguredMessageCaption", resourceCulture);
             }
@@ -183,7 +183,7 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         ///   Looks up a localized string similar to Profiling session is not configured - would you like to configure now and then launch?.
         /// </summary>
-        internal static string NoProfilingConfiguredMessageText {
+        public static string NoProfilingConfiguredMessageText {
             get {
                 return ResourceManager.GetString("NoProfilingConfiguredMessageText", resourceCulture);
             }
@@ -192,7 +192,7 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         ///   Looks up a localized string similar to _OK.
         /// </summary>
-        internal static string OkButtonContent {
+        public static string OkButtonContent {
             get {
                 return ResourceManager.GetString("OkButtonContent", resourceCulture);
             }
@@ -201,7 +201,7 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         ///   Looks up a localized string similar to _Open project.
         /// </summary>
-        internal static string OpenProjectButton {
+        public static string OpenProjectButton {
             get {
                 return ResourceManager.GetString("OpenProjectButton", resourceCulture);
             }
@@ -210,7 +210,7 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         ///   Looks up a localized string similar to Performance report no longer exists: {0}.
         /// </summary>
-        internal static string PerformanceReportNoLongerExistsMessageText {
+        public static string PerformanceReportNoLongerExistsMessageText {
             get {
                 return ResourceManager.GetString("PerformanceReportNoLongerExistsMessageText", resourceCulture);
             }
@@ -219,7 +219,7 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         ///   Looks up a localized string similar to _OK.
         /// </summary>
-        internal static string ProfilingOk {
+        public static string ProfilingOk {
             get {
                 return ResourceManager.GetString("ProfilingOk", resourceCulture);
             }
@@ -228,7 +228,7 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         ///   Looks up a localized string similar to What would you like to profile?.
         /// </summary>
-        internal static string ProfilingSettingsHeader {
+        public static string ProfilingSettingsHeader {
             get {
                 return ResourceManager.GetString("ProfilingSettingsHeader", resourceCulture);
             }
@@ -237,7 +237,7 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         ///   Looks up a localized string similar to Profiling Settings.
         /// </summary>
-        internal static string ProfilingSettingsTitle {
+        public static string ProfilingSettingsTitle {
             get {
                 return ResourceManager.GetString("ProfilingSettingsTitle", resourceCulture);
             }
@@ -246,7 +246,7 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         ///   Looks up a localized string similar to _Start.
         /// </summary>
-        internal static string ProfilingStart {
+        public static string ProfilingStart {
             get {
                 return ResourceManager.GetString("ProfilingStart", resourceCulture);
             }
@@ -255,7 +255,7 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         ///   Looks up a localized string similar to Project could not be found in current solution..
         /// </summary>
-        internal static string ProjectNotFoundErrorMessageText {
+        public static string ProjectNotFoundErrorMessageText {
             get {
                 return ResourceManager.GetString("ProjectNotFoundErrorMessageText", resourceCulture);
             }
@@ -264,7 +264,7 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         ///   Looks up a localized string similar to Sc_ript:.
         /// </summary>
-        internal static string ScriptLabel {
+        public static string ScriptLabel {
             get {
                 return ResourceManager.GetString("ScriptLabel", resourceCulture);
             }
@@ -273,7 +273,7 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         ///   Looks up a localized string similar to S_tandalone script.
         /// </summary>
-        internal static string StandaloneScriptLabel {
+        public static string StandaloneScriptLabel {
             get {
                 return ResourceManager.GetString("StandaloneScriptLabel", resourceCulture);
             }
@@ -285,7 +285,7 @@ namespace Microsoft.NodejsTools.Profiling {
         ///There is probably a second copy of node.exe running
         ///and the results may be unavailable or incorrect..
         /// </summary>
-        internal static string UnableToDeleteV8Log {
+        public static string UnableToDeleteV8Log {
             get {
                 return ResourceManager.GetString("UnableToDeleteV8Log", resourceCulture);
             }
@@ -294,7 +294,7 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         ///   Looks up a localized string similar to _Working Directory:.
         /// </summary>
-        internal static string WorkingDirectoryLabel {
+        public static string WorkingDirectoryLabel {
             get {
                 return ResourceManager.GetString("WorkingDirectoryLabel", resourceCulture);
             }

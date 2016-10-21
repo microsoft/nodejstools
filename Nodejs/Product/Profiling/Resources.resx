@@ -174,7 +174,7 @@ and the results may be unavailable or incorrect.</value>
   <data name="CompareWindowTitle" xml:space="preserve">
     <value>Select analysis files for comparison</value>
   </data>
-  <data name="ComparisonFileLabel" xml:space="preserve">
+  <data name="ComparisionFileLabel" xml:space="preserve">
     <value>Co_mparison File:</value>
   </data>
   <data name="NodePathLabel" xml:space="preserve">
