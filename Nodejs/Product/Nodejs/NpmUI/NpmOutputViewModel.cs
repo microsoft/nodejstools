@@ -50,7 +50,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             style.Setters.Add(new Setter(Block.MarginProperty, new Thickness(0)));
             _output.Resources.Add(typeof(Paragraph), style);
 
-            _statusText = SR.GetString(SR.NpmStatusReady);
+            _statusText = Resources.NpmStatusReady;
 
             _worker = new Thread(Run);
             _worker.Name = "npm UI Execution";
@@ -307,21 +307,21 @@ namespace Microsoft.NodejsTools.NpmUI {
             if (executingCommand && null != command) {
                 var commandText = command.ToString();
                 if (count > 0) {
-                    status = SR.GetString(
-                        WithErrors ? SR.NpmStatusExecutingQueuedErrors : SR.NpmStatusExecutingQueued,
+                    status = string.Format(CultureInfo.CurrentCulture,
+                        WithErrors ? Resources.NpmStatusExecutingQueuedErrors : Resources.NpmStatusExecutingQueued,
                         commandText,
                         count,
-                        errorsInfo
-                    );
+                        errorsInfo);
                 } else {
-                    status = SR.GetString(
-                        WithErrors ? SR.NpmStatusExecutingErrors : SR.NpmStatusExecuting,
+                    status = string.Format(CultureInfo.CurrentCulture,
+                        WithErrors ? Resources.NpmStatusExecutingErrors : Resources.NpmStatusExecuting,
                         commandText,
-                        errorsInfo
-                    );
+                        errorsInfo);
                 }
             } else {
-                status = SR.GetString(WithErrors ? SR.NpmStatusReadyWithErrors : SR.NpmStatusReady, errorsInfo);
+                status = string.Format(CultureInfo.CurrentCulture,
+                    WithErrors ? Resources.NpmStatusReadyWithErrors : Resources.NpmStatusReady,
+                    errorsInfo);
             }
 
             StatusText = status;

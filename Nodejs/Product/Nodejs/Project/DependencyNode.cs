@@ -230,7 +230,7 @@ namespace Microsoft.NodejsTools.Project {
                         } catch (Exception ex) {
                             if (ex is InvalidOperationException || ex is Win32Exception) {
                                 MessageBox.Show(
-                                    SR.GetString(SR.DependencyNodeModuleDoesNotExist, path),
+                                    string.Format(CultureInfo.CurrentCulture, Resources.DependencyNodeModuleDoesNotExist, path),
                                     SR.ProductName,
                                     MessageBoxButtons.OK,
                                     MessageBoxIcon.Error);
@@ -250,14 +250,14 @@ namespace Microsoft.NodejsTools.Project {
         private static string GetInitialPackageDisplayString(IPackage package) {
             var buff = new StringBuilder(package.Name);
             if (package.IsMissing) {
-                buff.Append(string.Format(CultureInfo.CurrentCulture, " ({0})", SR.GetString(SR.DependencyNodeLabelMissing)));
+                buff.Append(string.Format(CultureInfo.CurrentCulture, " ({0})", Resources.DependencyNodeLabelMissing));
             } else {
                 buff.Append('@');
                 buff.Append(package.Version);
 
                 if (!package.IsListedInParentPackageJson) {
                     buff.AppendFormat(string.Format(CultureInfo.CurrentCulture, " ({0})",
-                        SR.GetString(SR.DependencyNodeLabelNotListed, NodejsConstants.PackageJsonFile)));
+                        string.Format(CultureInfo.CurrentCulture, Resources.DependencyNodeLabelNotListed, NodejsConstants.PackageJsonFile)));
                 } else {
                     var dependencyTypes = GetDependencyTypeNames(package);
                     if (package.IsDevDependency || package.IsOptionalDependency) {
@@ -270,7 +270,7 @@ namespace Microsoft.NodejsTools.Project {
 
             if (package.IsBundledDependency) {
                 buff.Append(string.Format(CultureInfo.CurrentCulture, "[{0}]",
-                    SR.GetString(SR.DependencyNodeLabelBundled)));
+                    Resources.DependencyNodeLabelBundled));
             }
             return buff.ToString();
         }

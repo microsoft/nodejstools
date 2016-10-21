@@ -32,9 +32,9 @@ namespace Microsoft.NodejsTools.Project {
         private IPackage Package { get { return DependencyNode.Package; } }
 
         public override string GetClassName() {
-            return SR.GetString(IsSubPackage
-                ? SR.PropertiesClassLocalSubPackage
-                : SR.PropertiesClassLocalPackage);
+            return IsSubPackage
+                ? Resources.PropertiesClassLocalSubPackage
+                : Resources.PropertiesClassLocalPackage;
         }
 
         [SRCategoryAttribute(SR.General)]
@@ -61,7 +61,7 @@ namespace Microsoft.NodejsTools.Project {
         public string RequestedVersionRange {
             get {
                 var range = null == Package ? null : Package.RequestedVersionRange;
-                return range ?? SR.GetString(SR.RequestedVersionRangeNone);
+                return range ?? Resources.RequestedVersionRangeNone;
             }
         }
 
@@ -156,8 +156,8 @@ namespace Microsoft.NodejsTools.Project {
         public string PackageType {
             get {
                 return IsSubPackage
-                    ? SR.GetString(SR.PackageTypeLocalSubpackage)
-                    : SR.GetString(SR.PackageTypeLocal);
+                    ? Resources.PackageTypeLocalSubpackage
+                    : Resources.PackageTypeLocal;
             }
         }
 
@@ -168,9 +168,9 @@ namespace Microsoft.NodejsTools.Project {
         public string LinkStatus {
             get {
                 if (IsSubPackage) {
-                    return SR.GetString(SR.LinkStatusNotApplicableSubPackages);
+                    return Resources.LinkStatusNotApplicableSubPackages;
                 }
-                return SR.GetString(SR.LinkStatusUnknown);
+                return Resources.LinkStatusUnknown;
             }
         }
 

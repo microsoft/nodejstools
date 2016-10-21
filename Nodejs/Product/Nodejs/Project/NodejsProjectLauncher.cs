@@ -145,7 +145,7 @@ namespace Microsoft.NodejsTools.Project {
                 return GetFullUrl(host, TestServerPort);
             } catch (UriFormatException) {
                 var output = OutputWindowRedirector.GetGeneral(NodejsPackage.Instance);
-                output.WriteErrorLine(SR.GetString(SR.ErrorInvalidLaunchUrl, host));
+                output.WriteErrorLine(string.Format(CultureInfo.CurrentCulture, Resources.ErrorInvalidLaunchUrl, host));
                 output.ShowAndActivate();
                 return string.Empty;
             }
@@ -192,9 +192,9 @@ namespace Microsoft.NodejsTools.Project {
 
         private void LaunchDebugger(IServiceProvider provider, VsDebugTargetInfo dbgInfo) {
             if (!Directory.Exists(dbgInfo.bstrCurDir)) {
-                MessageBox.Show(SR.GetString(SR.DebugWorkingDirectoryDoesNotExistErrorMessage, dbgInfo.bstrCurDir), SR.ProductName);
+                MessageBox.Show(string.Format(CultureInfo.CurrentCulture, Resources.DebugWorkingDirectoryDoesNotExistErrorMessage, dbgInfo.bstrCurDir), SR.ProductName);
             } else if (!File.Exists(dbgInfo.bstrExe)) {
-                MessageBox.Show(SR.GetString(SR.DebugInterpreterDoesNotExistErrorMessage, dbgInfo.bstrExe), SR.ProductName);
+                MessageBox.Show(string.Format(CultureInfo.CurrentCulture, Resources.DebugInterpreterDoesNotExistErrorMessage, dbgInfo.bstrExe), SR.ProductName);
             } else if (DoesProjectSupportDebugging()) {
                 VsShellUtilities.LaunchDebugger(provider, dbgInfo);
             }
@@ -204,7 +204,7 @@ namespace Microsoft.NodejsTools.Project {
             var typeScriptOutFile = _project.GetProjectProperty("TypeScriptOutFile");
             if (!string.IsNullOrEmpty(typeScriptOutFile)) {
                 return MessageBox.Show(
-                    SR.GetString(SR.DebugTypeScriptCombineNotSupportedWarningMessage),
+                    Resources.DebugTypeScriptCombineNotSupportedWarningMessage,
                     SR.ProductName,
                     MessageBoxButtons.YesNo,
                     MessageBoxIcon.Warning
@@ -327,7 +327,7 @@ namespace Microsoft.NodejsTools.Project {
         private string ResolveStartupFile() {
             string startupFile = _project.GetStartupFile();
             if (string.IsNullOrEmpty(startupFile)) {
-                throw new ApplicationException(SR.GetString(SR.DebugCouldNotResolveStartupFileErrorMessage));
+                throw new ApplicationException(Resources.DebugCouldNotResolveStartupFileErrorMessage);
             }
 
             if (TypeScriptHelpers.IsTypeScriptFile(startupFile)) {

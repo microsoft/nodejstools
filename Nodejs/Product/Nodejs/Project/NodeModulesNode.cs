@@ -291,13 +291,13 @@ namespace Microsoft.NodejsTools.Project {
 
         private static string GetStatusBarMessage(NpmCommandCompletedEventArgs e) {
             if (e.WithErrors) {
-                return SR.GetString(
-                    e.Cancelled ? SR.NpmCancelledWithErrors : SR.NpmCompletedWithErrors,
+                return string.Format(CultureInfo.CurrentCulture,
+                    e.Cancelled ? Resources.NpmCancelledWithErrors : Resources.NpmCompletedWithErrors,
                     e.CommandText);
             } else if (e.Cancelled) {
-                return SR.GetString(SR.NpmCancelled, e.CommandText);
+                return string.Format(CultureInfo.CurrentCulture, Resources.NpmCancelled, e.CommandText);
             }
-            return SR.GetString(SR.NpmSuccessfullyCompleted, e.CommandText);
+            return string.Format(CultureInfo.CurrentCulture, Resources.NpmSuccessfullyCompleted, e.CommandText);
         }
 
         private void StopNpmIdleTimer() {
@@ -450,7 +450,7 @@ namespace Microsoft.NodejsTools.Project {
             if (NpmController.RootPackage == null) {
                 NpmController.Refresh();
                 if (NpmController.RootPackage == null) {
-                    MessageBox.Show(SR.GetString(SR.NodeModulesCouldNotParsePackageJsonErrorMessageText, NodejsConstants.PackageJsonFile));
+                    MessageBox.Show(string.Format(CultureInfo.CurrentCulture, Resources.NodeModulesCouldNotParsePackageJsonErrorMessageText, NodejsConstants.PackageJsonFile));
                     return;
                 }
             }
