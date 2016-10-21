@@ -327,9 +327,10 @@ namespace Microsoft.NodejsTools.TestAdapter {
             if (tests.Count() == results.Count()) {
                 TestResult result;
                 foreach(var res in results) {
+                    // If tests were run using "Run Selected Tests", the `tests` and `results` lists 
+                    // may not have the tests in the same order --so we query the test title from the `tests` list.
                     var test = tests.Where(n => n.DisplayName == res.title);
                     if(test.Count() == 1) {
-                        //frameworkHandle.RecordStart(test.First());
                         result = new TestResult(test.First());
                         result.Outcome = res.passed ? TestOutcome.Passed : TestOutcome.Failed;
                         result.Duration = new TimeSpan(0, 0, 0, 0, res.time);
