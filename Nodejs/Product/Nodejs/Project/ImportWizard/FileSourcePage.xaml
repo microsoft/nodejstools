@@ -9,7 +9,7 @@
       xmlns:resx="clr-namespace:Microsoft.NodejsTools"
       mc:Ignorable="d" 
       d:DesignHeight="300" d:DesignWidth="500"
-      Title="Source Files"
+      Title="{x:Static resx:ImportWizardResources.SourceFilesPageTitle}"
       FocusManager.FocusedElement="{Binding ElementName=SourcePathTextBox}">
     <Page.Resources>
         <ResourceDictionary Source="ImportWizardDictionary.xaml" />
