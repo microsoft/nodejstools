@@ -31,9 +31,9 @@ namespace Microsoft.NodejsTools.Project {
             : base(node) {
         }
 
-        [SRCategoryAttribute(SR.Advanced)]
+        [SRCategory(SR.Advanced)]
         [LocDisplayName(SR.TestFramework)]
-        [SRDescriptionAttribute(SR.TestFrameworkDescription)]
+        [ResourcesDescription(nameof(Resources.TestFrameworkDescription))]
         [TypeConverter(typeof(TestFrameworkStringConverter))]
         public string TestFramework {
             get {
@@ -51,9 +51,9 @@ namespace Microsoft.NodejsTools.Project {
             : base(node) {
         }
 
-        [SRCategoryAttribute(SR.Advanced)]
+        [SRCategory(SR.Advanced)]
         [LocDisplayName(SR.TestFramework)]
-        [SRDescriptionAttribute(SR.TestFrameworkDescription)]
+        [ResourcesDescription(nameof(Resources.TestFrameworkDescription))]
         [TypeConverter(typeof(TestFrameworkStringConverter))]
         public string TestFramework {
             get {
