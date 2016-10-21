@@ -9,7 +9,7 @@
       xmlns:resx="clr-namespace:Microsoft.NodejsTools"
       mc:Ignorable="d" 
       d:DesignHeight="300" d:DesignWidth="500"
-      Title="Save Project"
+      Title="{x:Static resx:ImportWizardResources.SaveProjectPageTitle}"
       FocusManager.FocusedElement="{Binding ElementName=ProjectPathTextBox}">
 
     <Page.Resources>

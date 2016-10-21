@@ -147,11 +147,17 @@
   <data name="SaveFileLocationTitle" xml:space="preserve">
     <value>Select where to save your project file</value>
   </data>
+  <data name="SaveProjectPageTitle" xml:space="preserve">
+    <value>Save Project</value>
+  </data>
   <data name="SelectNodeCodeHelpText" xml:space="preserve">
     <value>We won't move any files from where they are now.</value>
   </data>
   <data name="SelectNodeCodeTitle" xml:space="preserve">
     <value>Enter or browse to the folder containing your Node.js code</value>
+  </data>
+  <data name="SourceFilesPageTitle" xml:space="preserve">
+    <value>Source Files</value>
   </data>
   <data name="Welcome" xml:space="preserve">
     <value>Welcome to the Create New Project from Existing Node.js Code Wizard</value>

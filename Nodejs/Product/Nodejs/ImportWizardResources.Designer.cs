@@ -151,6 +151,15 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Save Project.
+        /// </summary>
+        public static string SaveProjectPageTitle {
+            get {
+                return ResourceManager.GetString("SaveProjectPageTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to We won&apos;t move any files from where they are now..
         /// </summary>
         public static string SelectNodeCodeHelpText {
@@ -165,6 +174,15 @@ namespace Microsoft.NodejsTools {
         public static string SelectNodeCodeTitle {
             get {
                 return ResourceManager.GetString("SelectNodeCodeTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Source Files.
+        /// </summary>
+        public static string SourceFilesPageTitle {
+            get {
+                return ResourceManager.GetString("SourceFilesPageTitle", resourceCulture);
             }
         }
         
