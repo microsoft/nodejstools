@@ -4,7 +4,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ui="clr-namespace:Microsoft.NodejsTools.Profiling"
     xmlns:wpf="clr-namespace:Microsoft.VisualStudioTools.Wpf;assembly=Microsoft.NodejsTools"
-    Title="Select analysis files for comparison"
+    xmlns:resx="clr-namespace:Microsoft.NodejsTools.Profiling"
+    Title="{x:Static resx:Resources.CompareWindowTitle}"
     MinWidth="300" MinHeight="220"
     Width="500" Height="auto" SizeToContent="Height"
     WindowStartupLocation="CenterOwner"
@@ -37,7 +38,7 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
-        <Label Grid.Row="0" Content="_Baseline File:" />
+        <Label Grid.Row="0" Content="{x:Static resx:Resources.BaselineFileLabel}" />
         <Grid Grid.Row="1" Margin="0 0 0 6">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -50,7 +51,7 @@
             <Button Grid.Column="1" Click="BaselineBrowseClick" Style="{StaticResource BrowseButtonStyle}" />
         </Grid>
 
-        <Label Grid.Row="2" Content="Co_mparison File:" />
+        <Label Grid.Row="2" Content="{x:Static resx:Resources.ComparisionFileLabel}" />
         <Grid Grid.Row="3" Margin="0 0 0 6">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -68,13 +69,11 @@
                     Margin="0 12 0 0">
             <Button IsDefault="True" Click="OkClick" IsEnabled="{Binding IsValid}"
                     MinWidth="86" MinHeight="24"
-                    AutomationProperties.AutomationId="Ok">
-                _OK
-            </Button>
+                    AutomationProperties.AutomationId="Ok"
+                    Content="{x:Static resx:Resources.OkButtonContent}" />
             <Button IsCancel="True" Click="CancelClick" MinWidth="86" MinHeight="24"
-                    AutomationProperties.AutomationId="Cancel">
-                _Cancel
-            </Button>
+                    AutomationProperties.AutomationId="Cancel"
+                    Content="{x:Static resx:Resources.CancelButtonContent}" />
         </StackPanel>
     </Grid>
 </ui:DialogWindowVersioningWorkaround>

@@ -162,4 +162,43 @@ No profiling data is available.</value>
 There is probably a second copy of node.exe running
 and the results may be unavailable or incorrect.</value>
   </data>
+  <data name="BaselineFileLabel" xml:space="preserve">
+    <value>_Baseline File:</value>
+  </data>
+  <data name="CancelButtonContent" xml:space="preserve">
+    <value>_Cancel</value>
+  </data>
+  <data name="CommandLineArgumentsLabel" xml:space="preserve">
+    <value>Command Line _Arguments:</value>
+  </data>
+  <data name="CompareWindowTitle" xml:space="preserve">
+    <value>Select analysis files for comparison</value>
+  </data>
+  <data name="ComparisionFileLabel" xml:space="preserve">
+    <value>Co_mparison File:</value>
+  </data>
+  <data name="NodePathLabel" xml:space="preserve">
+    <value>_Node Path:</value>
+  </data>
+  <data name="OkButtonContent" xml:space="preserve">
+    <value>_OK</value>
+  </data>
+  <data name="OpenProjectButton" xml:space="preserve">
+    <value>_Open project</value>
+  </data>
+  <data name="ProfilingSettingsHeader" xml:space="preserve">
+    <value>What would you like to profile?</value>
+  </data>
+  <data name="ProfilingSettingsTitle" xml:space="preserve">
+    <value>Profiling Settings</value>
+  </data>
+  <data name="ScriptLabel" xml:space="preserve">
+    <value>Sc_ript:</value>
+  </data>
+  <data name="StandaloneScriptLabel" xml:space="preserve">
+    <value>S_tandalone script</value>
+  </data>
+  <data name="WorkingDirectoryLabel" xml:space="preserve">
+    <value>_Working Directory:</value>
+  </data>
 </root>

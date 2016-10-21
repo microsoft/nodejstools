@@ -4,7 +4,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ui="clr-namespace:Microsoft.NodejsTools.Profiling"
     xmlns:wpf="clr-namespace:Microsoft.VisualStudioTools.Wpf;assembly=Microsoft.NodejsTools"
-    Title="Profiling Settings" 
+    xmlns:resx="clr-namespace:Microsoft.NodejsTools.Profiling"
+    Title="{x:Static resx:Resources.ProfilingSettingsTitle}" 
     MinHeight="440" Width="700" 
     MinWidth="400"
     SizeToContent="Height"
@@ -32,10 +33,13 @@
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
 
-            <Label Grid.Row="0" Content="What would you like to profile?" Margin="6 12 6 0" FontWeight="Bold" />
+            <Label Grid.Row="0"
+                   Content="{x:Static resx:Resources.ProfilingSettingsHeader}"
+                   Margin="6 12 6 0"
+                   FontWeight="Bold" />
 
             <RadioButton Grid.Row="1" Margin="12 12 12 4"
-                                 Content="_Open project"
+                                 Content="{x:Static resx:Resources.OpenProjectButton}"
                                  AutomationProperties.AutomationId="ProfileProject"
                                  GroupName="ProjectOrStandalone"
                                  IsEnabled="{Binding IsAnyAvailableProjects}"
@@ -49,7 +53,7 @@
                               AutomationProperties.AutomationId="Project" />
 
             <RadioButton Grid.Row="3" Margin="12 12 12 4"
-                                 Content="S_tandalone script" 
+                                 Content="{x:Static resx:Resources.StandaloneScriptLabel}" 
                                  AutomationProperties.AutomationId="ProfileScript"
                                  GroupName="ProjectOrStandalone"
                                  IsChecked="{Binding IsStandaloneSelected}" />
@@ -68,7 +72,7 @@
                         <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
 
-                    <Label Grid.Row="1" Grid.Column="0" Content="_Node Path:"
+                    <Label Grid.Row="1" Grid.Column="0" Content="{x:Static resx:Resources.NodePathLabel}"
                                    Padding="0" VerticalAlignment="Center" />
                     <Grid Grid.Row="1" Grid.Column="1" Margin="4">
                         <Grid.ColumnDefinitions>
@@ -83,7 +87,7 @@
                                         Width="{Binding RelativeSource={RelativeSource Self},Path=ActualHeight}" />
                     </Grid>
 
-                    <Label Grid.Row="2" Grid.Column="0" Content="Sc_ript:"
+                    <Label Grid.Row="2" Grid.Column="0" Content="{x:Static resx:Resources.ScriptLabel}"
                                    Padding="0" VerticalAlignment="Center" />
                     <Grid Grid.Row="2" Grid.Column="1" Margin="4">
                         <Grid.ColumnDefinitions>
@@ -98,7 +102,7 @@
                                         Width="{Binding RelativeSource={RelativeSource Self},Path=ActualHeight}" />
                     </Grid>
 
-                    <Label Grid.Row="3" Grid.Column="0" Content="_Working Directory:"
+                    <Label Grid.Row="3" Grid.Column="0" Content="{x:Static resx:Resources.WorkingDirectoryLabel}"
                                    Padding="0" VerticalAlignment="Center" />
                     <Grid Grid.Row="3" Grid.Column="1" Margin="4">
                         <Grid.ColumnDefinitions>
@@ -113,7 +117,7 @@
                                         Width="{Binding RelativeSource={RelativeSource Self},Path=ActualHeight}" />
                     </Grid>
 
-                    <Label Grid.Row="4" Grid.Column="0" Content="Command Line _Arguments:"
+                    <Label Grid.Row="4" Grid.Column="0" Content="{x:Static resx:Resources.CommandLineArgumentsLabel}"
                                    Padding="0" VerticalAlignment="Center" />
                     <TextBox Grid.Row="4" Grid.Column="1" Margin="4"
                                      Text="{Binding Standalone.Arguments,UpdateSourceTrigger=PropertyChanged}"
@@ -127,9 +131,8 @@
                     AutomationProperties.AutomationId="Ok"
                     Content="{Binding StartText}"/>
             <Button IsCancel="True" Click="CancelClick" MinWidth="86" MinHeight="24"
-                    AutomationProperties.AutomationId="Cancel">
-                _Cancel
-            </Button>
+                    AutomationProperties.AutomationId="Cancel"
+                    Content="{x:Static resx:Resources.CancelButtonContent}" />
         </StackPanel>
     </Grid>
 </ui:DialogWindowVersioningWorkaround>
