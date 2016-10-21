@@ -32,12 +32,12 @@ namespace Microsoft.NodejsTools.Options {
         private readonly static InfoBarModel _infoBarModel =
             new InfoBarModel(
                 new[] {
-                    new InfoBarTextSpan(SR.GetString(SR.TypingsInfoBarSpan1)),
-                    _typingsFolderHyperlink = new InfoBarHyperlink(SR.GetString(SR.TypingsInfoBarSpan2)),
-                    new InfoBarTextSpan(SR.GetString(SR.TypingsInfoBarSpan3))
+                    new InfoBarTextSpan(Resources.TypingsInfoBarSpan1),
+                    _typingsFolderHyperlink = new InfoBarHyperlink(Resources.TypingsInfoBarSpan2),
+                    new InfoBarTextSpan(Resources.TypingsInfoBarSpan3)
                 },
                 new[] {
-                    _customizeInfoBarButton = new InfoBarButton(SR.GetString(SR.TypingsOpenOptionsText))
+                    _customizeInfoBarButton = new InfoBarButton(Resources.TypingsOpenOptionsText)
                 },
                 KnownMonikers.NewFolder,
                 true);

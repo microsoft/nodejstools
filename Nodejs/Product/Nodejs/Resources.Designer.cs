@@ -324,6 +324,15 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Launch url &apos;{0}&apos; is not valid .
+        /// </summary>
+        public static string ErrorInvalidLaunchUrl {
+            get {
+                return ResourceManager.GetString("ErrorInvalidLaunchUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unable to start wizard: no automation object available..
         /// </summary>
         public static string ErrorNoDte {

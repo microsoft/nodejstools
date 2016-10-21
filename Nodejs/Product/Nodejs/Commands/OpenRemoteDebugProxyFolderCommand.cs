@@ -39,13 +39,13 @@ namespace Microsoft.NodejsTools.Commands {
             // Open explorer to folder
             var remoteDebugProxyFolder = RemoteDebugProxyFolder;
             if (string.IsNullOrWhiteSpace(remoteDebugProxyFolder)) {
-                MessageBox.Show(SR.GetString(SR.RemoteDebugProxyFolderDoesNotExist), SR.ProductName);
+                MessageBox.Show(Resources.RemoteDebugProxyFolderDoesNotExist, SR.ProductName);
                 return;
             }
 
             var filePath = Path.Combine(remoteDebugProxyFolder, remoteDebugJsFileName);
             if (!File.Exists(filePath)) {
-                MessageBox.Show(SR.GetString(SR.RemoteDebugProxyFileDoesNotExist, filePath), SR.ProductName);
+                MessageBox.Show(string.Format(CultureInfo.CurrentCulture, Resources.RemoteDebugProxyFileDoesNotExist, filePath), SR.ProductName);
             } else {
                 Process.Start("explorer", string.Format(CultureInfo.InvariantCulture, "/e,/select,{0}", filePath));
             }

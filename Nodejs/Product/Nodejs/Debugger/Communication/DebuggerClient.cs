@@ -25,7 +25,6 @@ using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.NodejsTools.Debugger.Events;
 using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json.Linq;
-using SR = Microsoft.NodejsTools.Project.SR;
 
 namespace Microsoft.NodejsTools.Debugger.Communication {
     sealed class DebuggerClient : IDebuggerClient {
@@ -110,7 +109,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         private void OnConnectionClosed(object sender, EventArgs e) {
             ConcurrentDictionary<int, TaskCompletionSource<JObject>> messages = Interlocked.Exchange(ref _messages, new ConcurrentDictionary<int, TaskCompletionSource<JObject>>());
             foreach (var kv in messages) {
-                var exception = new IOException(SR.GetString(SR.DebuggerConnectionClosed));
+                var exception = new IOException(Resources.DebuggerConnectionClosed);
                 kv.Value.SetException(exception);
             }
 

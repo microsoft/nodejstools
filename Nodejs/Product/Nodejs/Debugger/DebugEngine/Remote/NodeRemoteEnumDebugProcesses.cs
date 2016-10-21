@@ -126,7 +126,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
                 } catch (PlatformNotSupportedException) {
                     LiveLogger.WriteLine("PlatformNotSupportedException connecting to remote debugger");
                     MessageBox.Show(
-                        Project.SR.GetString(Project.SR.RemoteDebugUnsupportedPlatformErrorMessage),
+                        Resources.RemoteDebugUnsupportedPlatformErrorMessage,
                         null, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return null;
                 }
@@ -137,14 +137,15 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
                     }
                 }
 
-                string errText = Project.SR.GetString(Project.SR.RemoteDebugCouldNotAttachErrorMessage,
+                string errText = string.Format(CultureInfo.CurrentCulture,
+                    Resources.RemoteDebugCouldNotAttachErrorMessage,
                     port.Uri,
                     exception != null ? ":\r\n\r\n" + exception.Message : ".");
                 if (!(exception is DebuggerAlreadyAttachedException)) {
                     if (port.Uri.Scheme == "ws" || port.Uri.Scheme == "wss") {
-                        errText += Project.SR.GetString(Project.SR.RemoteDebugEnableWebSocketsErrorMessage);
+                        errText += Resources.RemoteDebugEnableWebSocketsErrorMessage;
                     } else {
-                        errText += Project.SR.GetString(Project.SR.RemoteDebugCheckProxyAndPortErrorMessage, NodejsConstants.DefaultDebuggerPort);
+                        errText += string.Format(CultureInfo.CurrentCulture, Resources.RemoteDebugCheckProxyAndPortErrorMessage, NodejsConstants.DefaultDebuggerPort);
                     }
                 }
 

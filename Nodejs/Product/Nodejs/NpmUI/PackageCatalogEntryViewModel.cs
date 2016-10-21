@@ -115,7 +115,7 @@ namespace Microsoft.NodejsTools.NpmUI {
                 package.Homepages,
                 (package.Keywords != null && package.Keywords.Any())
                     ? string.Join(", ", package.Keywords)
-                    : SR.GetString(SR.NoKeywordsInPackage),
+                    : Resources.NoKeywordsInPackage,
                 localInstall != null ? (SemverVersion?)localInstall.Version : null
             ) {
             if (string.IsNullOrEmpty(Name)) {

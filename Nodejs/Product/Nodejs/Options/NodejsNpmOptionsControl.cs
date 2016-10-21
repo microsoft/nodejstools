@@ -43,8 +43,8 @@ namespace Microsoft.NodejsTools.Options {
 
             if (!didClearNpmCache || !didClearTools) {
                 MessageBox.Show(
-                   SR.GetString(SR.CacheDirectoryClearFailedCaption, NodejsConstants.NtvsLocalAppData),
-                   SR.GetString(SR.CacheDirectoryClearFailedTitle),
+                   string.Format(CultureInfo.CurrentCulture, Resources.CacheDirectoryClearFailedCaption, NodejsConstants.NtvsLocalAppData),
+                   Resources.CacheDirectoryClearFailedTitle,
                    MessageBoxButtons.OK,
                    MessageBoxIcon.Information);
             }

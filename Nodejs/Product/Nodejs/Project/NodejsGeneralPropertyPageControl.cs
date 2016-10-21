@@ -42,16 +42,16 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private void AddToolTips() {
-            _tooltip.SetToolTip(_nodeExePath, SR.GetString(SR.NodeExePathToolTip));
-            _tooltip.SetToolTip(_nodeExeArguments, SR.GetString(SR.NodeExeArgumentsToolTip));
-            _tooltip.SetToolTip(_scriptFile, SR.GetString(SR.ScriptFileToolTip));
-            _tooltip.SetToolTip(_scriptArguments, SR.GetString(SR.ScriptArgumentsToolTip));
-            _tooltip.SetToolTip(_nodejsPort, SR.GetString(SR.NodejsPortToolTip));
-            _tooltip.SetToolTip(_startBrowser, SR.GetString(SR.StartBrowserToolTip));
-            _tooltip.SetToolTip(_workingDir, SR.GetString(SR.WorkingDirToolTip));
-            _tooltip.SetToolTip(_launchUrl, SR.GetString(SR.LaunchUrlToolTip));
-            _tooltip.SetToolTip(_debuggerPort, SR.GetString(SR.DebuggerPort));
-            _tooltip.SetToolTip(_envVars, SR.GetString(SR.EnvironmentVariables));
+            _tooltip.SetToolTip(_nodeExePath, Resources.NodeExePathToolTip);
+            _tooltip.SetToolTip(_nodeExeArguments, Resources.NodeExeArgumentsToolTip);
+            _tooltip.SetToolTip(_scriptFile, Resources.ScriptFileTooltip);
+            _tooltip.SetToolTip(_scriptArguments, Resources.ScriptArgumentsToolTip);
+            _tooltip.SetToolTip(_nodejsPort, Resources.NodejsPortToolTip);
+            _tooltip.SetToolTip(_startBrowser, Resources.StartBrowserToolTip);
+            _tooltip.SetToolTip(_workingDir, Resources.WorkingDirToolTip);
+            _tooltip.SetToolTip(_launchUrl, Resources.LaunchUrlToolTip);
+            _tooltip.SetToolTip(_debuggerPort, Resources.DebuggerPort);
+            _tooltip.SetToolTip(_envVars, Resources.EnvironmentVariables);
         }
 
         public string NodeExePath {
@@ -156,7 +156,7 @@ namespace Microsoft.NodejsTools.Project {
         private void SetCueBanner() {
             string cueBanner = Nodejs.NodeExePath;
             if (String.IsNullOrEmpty(cueBanner)) {
-                cueBanner = SR.GetString(SR.NodejsNotInstalledShort);
+                cueBanner = Resources.NodejsNotInstalledShort;
             }
 
             NativeMethods.SendMessageW(
@@ -172,7 +172,7 @@ namespace Microsoft.NodejsTools.Project {
                 File.Exists(Nodejs.GetAbsoluteNodeExePath(_propPage.Project.ProjectHome, _nodeExePath.Text))) {
                 _nodeExeErrorProvider.SetError(_nodeExePath, String.Empty);
             } else {
-                _nodeExeErrorProvider.SetError(_nodeExePath, SR.GetString(SR.NodeExePathNotFound));
+                _nodeExeErrorProvider.SetError(_nodeExePath, Resources.NodeExePathNotFound);
             }
             Changed(sender, e);
         }
@@ -202,7 +202,7 @@ namespace Microsoft.NodejsTools.Project {
             var textSender = (TextBox)sender;
             if (!textSender.Text.Contains("$(") && 
                 textSender.Text.Any(ch => !Char.IsDigit(ch))) {
-                _nodeExeErrorProvider.SetError(textSender, SR.GetString(SR.InvalidPortNumber));
+                _nodeExeErrorProvider.SetError(textSender, Resources.InvalidPortNumber);
             } else {
                 _nodeExeErrorProvider.SetError(textSender, String.Empty);
             }
@@ -211,7 +211,7 @@ namespace Microsoft.NodejsTools.Project {
 
         private void WorkingDirTextChanged(object sender, EventArgs e) {
             if (!_workingDir.Text.Contains("$(") && !Directory.Exists(_workingDir.Text)) {
-                _nodeExeErrorProvider.SetError(_workingDir, SR.GetString(SR.WorkingDirInvalidOrMissing));
+                _nodeExeErrorProvider.SetError(_workingDir, Resources.WorkingDirInvalidOrMissing);
             } else {
                 _nodeExeErrorProvider.SetError(_workingDir, String.Empty);
             }

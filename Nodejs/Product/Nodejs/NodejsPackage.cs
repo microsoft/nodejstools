@@ -169,7 +169,7 @@ namespace Microsoft.NodejsTools {
 
             if (!_hasRequiredTypescriptVersion.Value) {
                 MessageBox.Show(
-                   Project.SR.GetString(Project.SR.TypeScriptMinVersionNotInstalled, _minRequiredTypescriptVersion.ToString()),
+                   string.Format(CultureInfo.CurrentCulture, Resources.TypeScriptMinVersionNotInstalled, _minRequiredTypescriptVersion.ToString()),
                    Project.SR.ProductName,
                    MessageBoxButtons.OK,
                    MessageBoxIcon.Error);
@@ -299,7 +299,7 @@ namespace Microsoft.NodejsTools {
             if (window == null) {
                 window = (IReplWindow2)provider.CreateReplWindow(
                     ReplContentType,
-                    Project.SR.GetString(Project.SR.InteractiveWindowTitle),
+                    Resources.InteractiveWindowTitle,
                     Guids.TypeScriptLanguageInfo,
                     NodejsReplEvaluatorProvider.NodeReplId
                 );

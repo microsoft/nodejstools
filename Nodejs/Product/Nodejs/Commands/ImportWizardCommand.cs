@@ -32,7 +32,7 @@ namespace Microsoft.NodejsTools.Commands {
     class ImportWizardCommand : Command {
         public override void DoCommand(object sender, EventArgs args) {
             var statusBar = (IVsStatusbar)CommonPackage.GetGlobalService(typeof(SVsStatusbar));
-            statusBar.SetText(SR.GetString(SR.ImportingProjectStatusText));
+            statusBar.SetText(Resources.ImportingProjectStatusText);
 
             var dlg = new Microsoft.NodejsTools.Project.ImportWizard.ImportWizard();
             int commandIdToRaise = (int)VSConstants.VSStd97CmdID.OpenProject;
@@ -65,7 +65,7 @@ namespace Microsoft.NodejsTools.Commands {
                         } catch (AggregateException ex) {
                             if (ex.InnerException is UnauthorizedAccessException) {
                                 MessageBox.Show(
-                                    SR.GetString(SR.ImportingProjectAccessErrorStatusText, Environment.NewLine),
+                                    string.Format(CultureInfo.CurrentCulture, Resources.ImportingProjectAccessErrorStatusText, Environment.NewLine),
                                     SR.ProductName);
                             } else {
                                 string exName = String.Empty;
@@ -74,7 +74,7 @@ namespace Microsoft.NodejsTools.Commands {
                                 }
 
                                 MessageBox.Show(
-                                    SR.GetString(SR.ImportingProjectUnexpectedErrorMessage, exName),
+                                    string.Format(CultureInfo.CurrentCulture, Resources.ImportingProjectUnexpectedErrorMessage, exName),
                                     SR.ProductName);
                             }
                             return;
@@ -84,7 +84,7 @@ namespace Microsoft.NodejsTools.Commands {
                             NodejsPackage.Instance.DTE.Commands.Raise(VSConstants.GUID_VSStandardCommandSet97.ToString("B"), commandIdToRaise, ref pathRef, ref outRef);
                             statusBar.SetText(String.Empty);
                         } else {
-                            statusBar.SetText(SR.GetString(SR.ImportingProjectErrorStatusText));
+                            statusBar.SetText(Resources.ImportingProjectErrorStatusText);
                         }
                     },
                     CancellationToken.None,

@@ -30,7 +30,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override string GetClassName() {
-            return SR.GetString(SR.PropertiesClassNpm);
+            return Resources.PropertiesClassNpm;
         }
 
         [SRCategoryAttribute(SR.General)]
@@ -38,7 +38,7 @@ namespace Microsoft.NodejsTools.Project {
         [SRDescriptionAttribute(SR.NpmNodePackageInstallationDescription)]
         public string PackageInstallation {
             get {
-                return SR.GetString(SR.PackageInstallationLocal);
+                return Resources.PackageInstallationLocal;
             }
         }
 

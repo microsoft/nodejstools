@@ -31,7 +31,6 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Project;
-using SR = Microsoft.NodejsTools.Project.SR;
 using Task = System.Threading.Tasks.Task;
 
 namespace Microsoft.NodejsTools.Repl {
@@ -57,7 +56,7 @@ namespace Microsoft.NodejsTools.Repl {
             // Prevent running `npm init` without the `-y` flag since it will freeze the repl window,
             // waiting for user input that will never come.
             if (npmArguments.Contains(" init ") && !(npmArguments.Contains(" -y ") || npmArguments.Contains(" --yes "))) {
-                window.WriteError(SR.GetString(SR.ReplWindowNpmInitNoYesFlagWarning));
+                window.WriteError(Resources.ReplWindowNpmInitNoYesFlagWarning);
                 return ExecutionResult.Failure;
             }
 
@@ -162,9 +161,9 @@ namespace Microsoft.NodejsTools.Repl {
                 null);
 
             if (npmReplRedirector.HasErrors) {
-                window.WriteError(SR.GetString(SR.NpmReplCommandCompletedWithErrors, arguments));
+                window.WriteError(string.Format(CultureInfo.CurrentCulture, Resources.NpmReplCommandCompletedWithErrors, arguments));
             } else {
-                window.WriteLine(SR.GetString(SR.NpmSuccessfullyCompleted, arguments));
+                window.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.NpmSuccessfullyCompleted, arguments));
             }
 
             if (nodejsProject != null) {

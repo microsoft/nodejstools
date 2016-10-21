@@ -19,6 +19,7 @@ using System.Text;
 using System.Windows;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.Project;
+using System.Globalization;
 
 namespace Microsoft.NodejsTools.NpmUI
 {
@@ -72,18 +73,18 @@ namespace Microsoft.NodejsTools.NpmUI
                 }
             }
 
-            var message = SR.GetString(SR.NpmNotInstalledMessageText, nnfe.Message);
+            var message = string.Format(CultureInfo.CurrentCulture, Resources.NpmNotInstalledMessageText, nnfe.Message);
             if (null == owner) {
                 MessageBox.Show(
                     message,
-                    SR.GetString(SR.NpmNotInstalledMessageCaption),
+                    Resources.NpmNotInstalledMessageCaption,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             } else {
                 MessageBox.Show(
                     owner,
                     message,
-                    SR.GetString(SR.NpmNotInstalledMessageCaption),
+                    Resources.NpmNotInstalledMessageCaption,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }

@@ -80,7 +80,7 @@ namespace Microsoft.NodejsTools.Commands {
             Action<Task<bool>> onAttach = null;
             onAttach = (attachTask) => {
                 if (!attachTask.Result) {
-                    string msg = Project.SR.GetString(Project.SR.AzureRemoteDebugCouldNotAttachToWebsiteErrorMessage, webSite.Uri);
+                    string msg = string.Format(CultureInfo.CurrentCulture, Resources.AzureRemoveDebugCouldNotAttachToWebsiteErrorMessage, webSite.Uri);
                     if (MessageBox.Show(msg, null, MessageBoxButtons.RetryCancel, MessageBoxIcon.Error) == DialogResult.Retry) {
                         AttachWorker(webSite).ContinueWith(onAttach);
                     }
@@ -186,8 +186,8 @@ namespace Microsoft.NodejsTools.Commands {
 
         private async Task<bool> AttachWorker(AzureWebSiteInfo webSite) {
             using (new WaitDialog(
-                Project.SR.GetString(Project.SR.AzureRemoteDebugWaitCaption),
-                Project.SR.GetString(Project.SR.AzureRemoteDebugWaitMessage, webSite.Uri),
+                Resources.AzureRemoteDebugWaitCaption,
+                string.Format(CultureInfo.CurrentCulture, Resources.AzureRemoteDebugWaitMessage, webSite.Uri),
                 NodejsPackage.Instance,
                 showProgress: true)) {
                 // Get path (relative to site URL) for the debugger endpoint.
@@ -224,7 +224,7 @@ namespace Microsoft.NodejsTools.Commands {
                     // ask the user to retry, so the only case where we actually get here is if user canceled on error. If this is the case,
                     // we don't want to pop any additional error messages, so always return true, but log the error in the Output window.
                     var output = OutputWindowRedirector.GetGeneral(NodejsPackage.Instance);
-                    output.WriteErrorLine(Project.SR.GetString(Project.SR.AzureRemoveDebugCouldNotAttachToWebsiteExceptionErrorMessage, ex.Message));
+                    output.WriteErrorLine(string.Format(CultureInfo.CurrentCulture, Resources.AzureRemoveDebugCouldNotAttachToWebsiteExceptionErrorMessage, ex.Message));
                     output.ShowAndActivate();
                 }
                 return true;

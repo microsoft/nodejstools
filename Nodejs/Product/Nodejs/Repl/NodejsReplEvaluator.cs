@@ -58,7 +58,7 @@ namespace Microsoft.NodejsTools.Repl {
             _window.SetOptionValue(ReplOptions.SupportAnsiColors, true);
             _window.SetOptionValue(ReplOptions.UseSmartUpDown, true);
 
-            _window.WriteLine(SR.GetString(SR.ReplInitializationMessage));
+            _window.WriteLine(Resources.ReplInitializationMessage);
 
             return ExecutionResult.Succeeded;
         }
@@ -137,11 +137,11 @@ namespace Microsoft.NodejsTools.Repl {
 
             string nodeExePath = GetNodeExePath();
             if (String.IsNullOrWhiteSpace(nodeExePath)) {
-                _window.WriteError(SR.GetString(SR.NodejsNotInstalled));
+                _window.WriteError(Resources.NodejsNotInstalled);
                 _window.WriteError(Environment.NewLine);
                 return;
             } else if (!File.Exists(nodeExePath)) {
-                _window.WriteError(SR.GetString(SR.NodeExeDoesntExist, nodeExePath));
+                _window.WriteError(string.Format(CultureInfo.CurrentCulture, Resources.NodeExeDoesntExist, nodeExePath));
                 _window.WriteError(Environment.NewLine);
                 return;
             }
@@ -175,7 +175,7 @@ namespace Microsoft.NodejsTools.Repl {
             try {
                 process.Start();
             } catch (Exception e) {
-                _window.WriteError(SR.GetString(SR.InteractiveWindowFailedToStartProcessErrorMessage, Environment.NewLine, e.ToString(), Environment.NewLine));
+                _window.WriteError(string.Format(CultureInfo.CurrentCulture, Resources.InteractiveWindowFailedToStartProcessErrorMessage, Environment.NewLine, e.ToString(), Environment.NewLine));
                 return;
             }
 
@@ -217,7 +217,7 @@ namespace Microsoft.NodejsTools.Repl {
 #if DEBUG
             private Thread _socketLockedThread;
 #endif
-            private static string _noReplProcess = SR.GetString(SR.InteractiveWindowNoProcessErrorMessage) + Environment.NewLine;
+            private static string _noReplProcess = Resources.InteractiveWindowNoProcessErrorMessage + Environment.NewLine;
 
             public ListenerThread(NodejsReplEvaluator eval, Process process, Socket socket) {
                 _eval = eval;
@@ -252,7 +252,7 @@ namespace Microsoft.NodejsTools.Repl {
             }
 
             private void ProcessExitedWorker() {
-                _eval._window.WriteError(SR.GetString(SR.InteractiveWindowProcessExitedMessage) + Environment.NewLine);
+                _eval._window.WriteError(Resources.InteractiveWindowProcessExitedMessage + Environment.NewLine);
                 using (new SocketLock(this)) {
                     if (_completion != null) {
                         _completion.SetResult(ExecutionResult.Failure);
