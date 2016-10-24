@@ -16,7 +16,6 @@
 
 using System;
 using System.Windows.Forms;
-using EnvDTE;
 using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio.Shell;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
@@ -28,22 +27,8 @@ namespace Microsoft.NodejsTools.ProjectWizard {
             if (oleProvider != null) {
                 return new ServiceProvider(oleProvider);
             }
-            MessageBox.Show(SR.GetString(SR.ErrorNoDte), SR.ProductName);
+            MessageBox.Show(ProjectWizardResources.ErrorNoDte, SR.ProductName);
             return null;
-        }
-
-        public static DTE GetDTE(object automationObject) {
-            var dte = automationObject as DTE;
-            if (dte == null) {
-                var provider = GetProvider(automationObject);
-                if (provider != null) {
-                    dte = provider.GetService(typeof(DTE)) as DTE;
-                }
-            }
-            if (dte == null) {
-                MessageBox.Show(SR.GetString(SR.ErrorNoDte), SR.ProductName);
-            }
-            return dte;
         }
     }
 }

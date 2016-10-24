@@ -90,6 +90,11 @@
     <Compile Include="INodePackageModulesCommands.cs" />
     <Compile Include="ImportWizard.cs" />
     <Compile Include="NpmWizardExtension.cs" />
+    <Compile Include="ProjectWizardResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ProjectWizardResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SettingsManagerCreator.cs" />
     <Compile Include="UnitTestFileWizard.cs" />
@@ -97,6 +102,12 @@
     <Compile Include="$(BuildRoot)\Common\Product\SharedProject\CommonUtils.cs">
       <Link>CommonUtils.cs</Link>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ProjectWizardResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ProjectWizardResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="..\Nodejs\SharedResources.proj" />
   <Import Project="..\ProjectAfter.settings" />

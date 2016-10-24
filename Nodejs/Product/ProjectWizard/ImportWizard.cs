@@ -45,7 +45,7 @@ namespace Microsoft.NodejsTools.ProjectWizard {
 
             bool addingNewProject = false;
             if (dte == null) {
-                MessageBox.Show(SR.GetString(SR.ImportWizzardCouldNotStartNotAutomationObjectErrorMessage), SR.ProductName);
+                MessageBox.Show(ProjectWizardResources.ImportWizzardCouldNotStartNotAutomationObjectErrorMessage, SR.ProductName);
             } else {
                 // https://nodejstools.codeplex.com/workitem/462
                 // we need to make sure our package is loaded before invoking our command
