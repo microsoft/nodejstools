@@ -1,6 +1,22 @@
 var fs = require('fs');
 var path = require('path');
 var vm = require('vm');
+var result = {
+    'title': '',
+    'passed': false,
+    'stdOut': '',
+    'stdErr': '',
+    'time': 0
+};
+
+function append_stdout(string, encoding, fd) {
+    result.stdOut += string;
+}
+function append_stderr(string, encoding, fd) {
+    result.stdErr += string;
+}
+process.stdout.write = append_stdout;
+process.stderr.write = append_stderr;
 
 var find_tests = function (testFileList, discoverResultFile) {
     var debug;
@@ -50,8 +66,31 @@ var find_tests = function (testFileList, discoverResultFile) {
 };
 module.exports.find_tests = find_tests;
 
-var run_tests = function (testName, testFile) {
-    var testCase = require(testFile);
-    testCase[testName]();
+var run_tests = function (testCases, callback) {
+    var test_results = [];
+    for (var test in testCases) {
+        try {
+            var testCase = require(testCases[test].testFile);
+            result.title = testCases[test].testName;
+            result.time = Date.now();
+            testCase[testCases[test].testName]();
+            result.time = Date.now() - result.time;
+            result.passed = true;
+        } catch (err) {
+            result.time = Date.now() - result.time;
+            result.passed = false;
+            console.error(err.name);
+            console.error(err.message);
+        }
+        test_results.push(result)
+        result = {
+            'title': '',
+            'passed': false,
+            'stdOut': '',
+            'stdErr': '',
+            'time': 0
+        };
+    }
+    callback(test_results);
 };
 module.exports.run_tests = run_tests;

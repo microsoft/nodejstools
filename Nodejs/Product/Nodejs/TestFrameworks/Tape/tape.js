@@ -3,17 +3,17 @@ var EOL = require('os').EOL;
 var fs = require('fs');
 var path = require('path');
 var result = {
-    "title": "",
-    "passed": false,
-    "stdOut": "",
-    "stdErr": ""
+    'title': '',
+    'passed': false,
+    'stdOut': '',
+    'stdErr': '',
+    'time': 0
 };
 
-process.stdout.write = function (string, encoding, fd) {
+function append_stdout(string, encoding, fd) {
     result.stdOut += string;
 }
-
-process.stderr.write = function (string, encoding, fd) {
+function append_stderr(string, encoding, fd) {
     result.stdErr += string;
 }
 
@@ -24,7 +24,7 @@ function find_tests(testFileList, discoverResultFile, projectFolder) {
     }
 
     var harness = test.getHarness({ exit: false });
-    var tests = harness["_tests"];
+    var tests = harness['_tests'];
 
     var count = 0;
     var testList = [];
@@ -51,28 +51,43 @@ function find_tests(testFileList, discoverResultFile, projectFolder) {
 };
 module.exports.find_tests = find_tests;
 
-function run_tests(testName, testFile, workingFolder, projectFolder, callback) {
-    var testCases = loadTestCases(testFile);
-    result.title = testName;
+function run_tests(testInfo, callback) {
+    var testResults = [];
+    var testCases = loadTestCases(testInfo[0].testFile);
+    process.stdout.write = append_stdout;
+    process.stderr.write = append_stderr;
     if (testCases === null) {
         return;
     }
 
-    var test = findTape(projectFolder);
-    if (test === null) {
+    var tape = findTape(testInfo[0].projectFolder);
+    if (tape === null) {
         return;
     }
 
-    try {
-        var harness = test.getHarness();
-        harness.only(testName);
-        result.passed = true;
-    } catch (e) {
-        logError("Error running test:", testName, "in", testFile, e);
-        result.passed = false;
+    for (var test in testInfo) {
+        result.title = testInfo[test].testName;
+        try {
+            result.time = Date.now();
+            var harness = tape.getHarness();
+            harness(testInfo[test].testName);
+            result.passed = true;
+        } catch (e) {
+            result.passed = false;
+            logError('Error running test:', testInfo[test].testName, 'in', testInfo[test].testFile, e);
+        }
+        result.time = Date.now() - result.time;
+        testResults.push(result);
+        result = {
+            'title': '',
+            'passed': false,
+            'stdOut': '',
+            'stdErr': '',
+            'time': 0
+        };
     }
 
-    callback(result);
+    callback(testResults);
 }
 module.exports.run_tests = run_tests;
 

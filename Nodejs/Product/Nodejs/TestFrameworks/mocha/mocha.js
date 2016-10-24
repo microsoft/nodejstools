@@ -3,10 +3,11 @@ var EOL = require('os').EOL;
 var fs = require('fs');
 var path = require('path');
 var result = {
-    "title": "",
-    "passed": false,
-    "stdOut": "",
-    "stdErr": ""
+    'title': '',
+    'passed': false,
+    'stdOut': '',
+    'stdErr': '',
+    'time': 0
 };
 // Choose 'tap' rather than 'min' or 'xunit'. The reason is that
 // 'min' produces undisplayable text to stdout and stderr under piped/redirect, 
@@ -69,54 +70,65 @@ var find_tests = function (testFileList, discoverResultFile, projectFolder) {
 };
 module.exports.find_tests = find_tests;
 
-var run_tests = function (testName, testFile, workingFolder, projectFolder, callback) {
-    //var testResults = [];
-    var Mocha = detectMocha(projectFolder);
+var run_tests = function (testCases, callback) {
+    function escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+    }
+
+    var testResults = [];
+    var Mocha = detectMocha(testCases[0].projectFolder);
     if (!Mocha) {
         return;
     }
 
-    var mocha = initializeMocha(Mocha, projectFolder);
+    var mocha = initializeMocha(Mocha, testCases[0].projectFolder);
 
-    //if (testName) {
-    //    if (typeof mocha.fgrep === 'function')
-    //        mocha.fgrep(testName); // since Mocha 3.0.0
-    //    else
-    //        mocha.grep(testName); // prior Mocha 3.0.0
-    //}
+    var testGrepString = '^(' + testCases.map(function (testCase) {
+        return testCase.testName
+    }).join('|') + ')$';
 
-    mocha.addFile(testFile);
+    if (testGrepString) {
+        mocha.grep(new RegExp(testGrepString));
+    }
+
+    mocha.addFile(testCases[0].testFile);
 
     // run tests
-    var runner = mocha.run(function (code) { process.exit(code); });
+    var runner = mocha.run(function (code) { });
 
     runner.on('start', function () {
     });
     runner.on('test', function (test) {
-        result.title = test.title;
+        result.title = test.fullTitle();
+        result.time = Date.now();
         process.stdout.write = append_stdout;
         process.stderr.write = append_stderr;
     });
     runner.on('end', function () {
+        callback(testResults);
     });
     runner.on('pass', function (test) {
         result.passed = true;
-        callback(result);
+        result.time = Date.now() - result.time;
+        testResults.push(result);
         result = {
             'title': '',
             'passed': false,
             'stdOut': '',
-            'stdErr': ''
+            'stdErr': '',
+            'time': ''
         }
     });
     runner.on('fail', function (test, err) {
         result.passed = false;
-        callback(result);
+        result.time = Date.now() - result.time;
+        testResults.push(result);
         result = {
             'title': '',
             'passed': false,
             'stdOut': '',
-            'stdErr': ''
+            'stdErr': '',
+            'time': ''
         }
     });
 };
