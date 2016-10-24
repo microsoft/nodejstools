@@ -37,27 +37,27 @@ namespace Microsoft.NodejsTools.Project {
                 : Resources.PropertiesClassLocalPackage;
         }
 
-        [SRCategoryAttribute(SR.General)]
-        [SRDisplayName(SR.NpmPackageName)]
-        [SRDescriptionAttribute(SR.NpmPackageNameDescription)]
+        [SRCategory(SR.General)]
+        [ResourcesDisplayName(nameof(Resources.NpmPackageName))]
+        [ResourcesDescription(nameof(Resources.NpmPackageNameDescription))]
         public string PackageName {
             get {
                 return null == Package ? null : Package.Name;
             }
         }
 
-        [SRCategoryAttribute(SR.CategoryVersion)]
-        [SRDisplayName(SR.NpmPackageVersion)]
-        [SRDescriptionAttribute(SR.NpmPackageVersionDescription)]
+        [ResourcesCategory(nameof(Resources.CategoryVersion))]
+        [ResourcesDisplayName(nameof(Resources.NpmPackageVersion))]
+        [ResourcesDescription(nameof(Resources.NpmPackageVersionDescription))]
         public string PackageVersion {
             get {
                 return null == Package ? null : Package.Version.ToString();
             }
         }
 
-        [SRCategoryAttribute(SR.CategoryVersion)]
-        [SRDisplayName(SR.NpmPackageRequestedVersionRange)]
-        [SRDescriptionAttribute(SR.NpmPackageRequestedVersionRangeDescription)]
+        [ResourcesCategory(nameof(Resources.CategoryVersion))]
+        [ResourcesDisplayName(nameof(Resources.NpmPackageRequestedVersionRange))]
+        [ResourcesDescription(nameof(Resources.NpmPackageRequestedVersionRangeDescription))]
         public string RequestedVersionRange {
             get {
                 var range = null == Package ? null : Package.RequestedVersionRange;
@@ -66,9 +66,9 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         // TODO Retrieving the package information is currently too slow to include in properties pane.
-        //[SRCategoryAttribute(SR.CategoryVersion)]
-        //[SRDisplayName(SR.NpmPackageNewVersionAvailable)]
-        //[SRDescriptionAttribute(SR.NpmPackageNewVersionAvailableDescription)]
+        //[ResourcesCategory(nameof(Resources.CategoryVersion))]
+        //[ResourcesDisplayName(nameof(Resources.NpmPackageNewVersionAvailable))]
+        //[ResourcesDescription(nameof(Resources.NpmPackageNewVersionAvailableDescription))]
         //public string NewVersionAvailable {
         //    get {
         //        if (IsSubPackage) {
@@ -92,18 +92,18 @@ namespace Microsoft.NodejsTools.Project {
         //    }
         //}
 
-        [SRCategoryAttribute(SR.General)]
-        [SRDisplayName(SR.NpmPackageDescription)]
-        [SRDescriptionAttribute(SR.NpmPackageDescriptionDescription)]
+        [SRCategory(SR.General)]
+        [ResourcesDisplayName(nameof(Resources.NpmPackageDescription))]
+        [ResourcesDescription(nameof(Resources.NpmPackageDescriptionDescription))]
         public string Description {
             get {
                 return null == Package ? null : Package.Description;
             }
         }
 
-        [SRCategoryAttribute(SR.General)]
-        [SRDisplayName(SR.NpmPackageKeywords)]
-        [SRDescriptionAttribute(SR.NpmPackageKeywordsDescription)]
+        [SRCategory(SR.General)]
+        [ResourcesDisplayName(nameof(Resources.NpmPackageKeywords))]
+        [ResourcesDescription(nameof(Resources.NpmPackageKeywordsDescription))]
         public string Keywords {
             get {
                 if (null == Package) {
@@ -121,9 +121,9 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        [SRCategoryAttribute(SR.General)]
-        [SRDisplayName(SR.NpmPackageAuthor)]
-        [SRDescriptionAttribute(SR.NpmPackageAuthorDescription)]
+        [SRCategory(SR.General)]
+        [ResourcesDisplayName(nameof(Resources.NpmPackageAuthor))]
+        [ResourcesDescription(nameof(Resources.NpmPackageAuthorDescription))]
         public string Author {
             get {
                 var author = null == Package ? null : Package.Author;
@@ -131,9 +131,9 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        [SRCategoryAttribute(SR.General)]
-        [SRDisplayName(SR.NpmPackagePath)]
-        [SRDescriptionAttribute(SR.NpmPackagePathDescription)]
+        [SRCategory(SR.General)]
+        [ResourcesDisplayName(nameof(Resources.NpmPackagePath))]
+        [ResourcesDescription(nameof(Resources.NpmPackagePathDescription))]
         public string Path {
             get {
                 return null == Package ? null : Package.Path;
@@ -150,9 +150,9 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        [SRCategoryAttribute(SR.General)]
-        [SRDisplayName(SR.NpmPackageType)]
-        [SRDescriptionAttribute(SR.NpmPackageTypeDescription)]
+        [SRCategory(SR.General)]
+        [ResourcesDisplayName(nameof(Resources.NpmPackageType))]
+        [ResourcesDescription(nameof(Resources.NpmPackageTypeDescription))]
         public string PackageType {
             get {
                 return IsSubPackage
@@ -162,9 +162,9 @@ namespace Microsoft.NodejsTools.Project {
         }
 
 
-        [SRCategoryAttribute(SR.General)]
-        [SRDisplayName(SR.NpmPackageLinkStatus)]
-        [SRDescriptionAttribute(SR.NpmPackageLinkStatusDescription)]
+        [SRCategory(SR.General)]
+        [ResourcesDisplayName(nameof(Resources.NpmPackageLinkStatus))]
+        [ResourcesDescription(nameof(Resources.NpmPackageLinkStatusDescription))]
         public string LinkStatus {
             get {
                 if (IsSubPackage) {
@@ -174,45 +174,45 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        [SRCategoryAttribute(SR.CategoryStatus)]
-        [SRDisplayName(SR.NpmPackageIsListedInParentPackageJson)]
-        [SRDescriptionAttribute(SR.NpmPackageIsListedInParentPackageJsonDescription)]
+        [ResourcesCategory(nameof(Resources.CategoryStatus))]
+        [ResourcesDisplayName(nameof(Resources.NpmPackageIsListedInParentPackageJson))]
+        [ResourcesDescription(nameof(Resources.NpmPackageIsListedInParentPackageJsonDescription))]
         public bool IsListedInParentPackageJson {
             get {
                 return null != Package && Package.IsListedInParentPackageJson;
             }
         }
 
-        [SRCategoryAttribute(SR.CategoryStatus)]
-        [SRDisplayName(SR.NpmPackageIsMissing)]
-        [SRDescriptionAttribute(SR.NpmPackageIsMissingDescription)]
+        [ResourcesCategory(nameof(Resources.CategoryStatus))]
+        [ResourcesDisplayName(nameof(Resources.NpmPackageIsMissing))]
+        [ResourcesDescription(nameof(Resources.NpmPackageIsMissingDescription))]
         public bool IsMissing {
             get {
                 return null != Package && Package.IsMissing;
             }
         }
 
-        [SRCategoryAttribute(SR.CategoryStatus)]
-        [SRDisplayName(SR.NpmPackageIsDevDependency)]
-        [SRDescriptionAttribute(SR.NpmPackageIsDevDependencyDescription)]
+        [ResourcesCategory(nameof(Resources.CategoryStatus))]
+        [ResourcesDisplayName(nameof(Resources.NpmPackageIsDevDependency))]
+        [ResourcesDescription(nameof(Resources.NpmPackageIsDevDependencyDescription))]
         public bool IsDevDependency {
             get {
                 return null != Package && Package.IsDevDependency;
             }
         }
 
-        [SRCategoryAttribute(SR.CategoryStatus)]
-        [SRDisplayName(SR.NpmPackageIsOptionalDependency)]
-        [SRDescriptionAttribute(SR.NpmPackageIsOptionalDependencyDescription)]
+        [ResourcesCategory(nameof(Resources.CategoryStatus))]
+        [ResourcesDisplayName(nameof(Resources.NpmPackageIsOptionalDependency))]
+        [ResourcesDescription(nameof(Resources.NpmPackageIsOptionalDependencyDescription))]
         public bool IsOptionalDependency {
             get {
                 return null != Package && Package.IsOptionalDependency;
             }
         }
 
-        [SRCategoryAttribute(SR.CategoryStatus)]
-        [SRDisplayName(SR.NpmPackageIsBundledDependency)]
-        [SRDescriptionAttribute(SR.NpmPackageIsBundledDependencyDescription)]
+        [ResourcesCategory(nameof(Resources.CategoryStatus))]
+        [ResourcesDisplayName(nameof(Resources.NpmPackageIsBundledDependency))]
+        [ResourcesDescription(nameof(Resources.NpmPackageIsBundledDependencyDescription))]
         public bool IsBundledDependency {
             get {
                 return null != Package && Package.IsBundledDependency;
