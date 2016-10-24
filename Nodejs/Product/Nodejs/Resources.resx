@@ -458,39 +458,11 @@ NAME2=value2
   <data name="LongPathNpmDedupeDidNotHelp" xml:space="preserve">
     <value>Unfortunately, running 'npm dedupe' did not resolve the issue. Please consult the &lt;a href="#help"&gt;documentation&lt;/a&gt; for other potential workarounds.</value>
   </data>
-  <data name="AzureToolsInstallInstructions" xml:space="preserve">
-    <value>These tools are a free download for your version of Visual Studio that allow you to write, deploy and debug applications for Microsoft Azure in a range of programming languages.</value>
-  </data>
-  <data name="AzureToolsRequired" xml:space="preserve">
-    <value>This project requires Microsoft Azure Tools for Visual Studio.</value>
-  </data>
-  <data name="AzureToolsUpgradeInstructions" xml:space="preserve">
-    <value>Your project can still be created, but some manual configuration of your project will be required and features may be missing or limited.
-
-We recommend installing the latest version of Microsoft Azure Tools for Visual Studio.</value>
-  </data>
-  <data name="AzureToolsUpgradeRecommended" xml:space="preserve">
-    <value>Your version of Microsoft Azure Tools is not supported by Node.js Tools for Visual Studio.</value>
-  </data>
   <data name="CacheDirectoryClearFailedTitle" xml:space="preserve">
     <value>Could Not Clear Node.js Cache Directory</value>
   </data>
   <data name="CacheDirectoryClearFailedCaption" xml:space="preserve">
     <value>Could not clear Node.js cache directory. Try manually deleting the directory: {0}</value>
-  </data>
-  <data name="ContinueWithoutAzureToolsUpgrade" xml:space="preserve">
-    <value>&amp;Continue
-Some manual steps will be required to configure your project.</value>
-  </data>
-  <data name="DontShowAgain" xml:space="preserve">
-    <value>Do not show this warning again.</value>
-  </data>
-  <data name="DownloadAndInstall" xml:space="preserve">
-    <value>&amp;Download and install now
-You will need to restart Visual Studio after installation.</value>
-  </data>
-  <data name="ErrorNoDte" xml:space="preserve">
-    <value>Unable to start wizard: no automation object available.</value>
   </data>
   <data name="UpgradedEnvironmentVariables" xml:space="preserve">
     <value>Replaced &lt;EnvironmentVariables&gt; property with &lt;Environment&gt;. This project will no longer work with NTVS 1.0 beta 2 or below.</value>
@@ -631,9 +603,6 @@ Error retrieving websocket debug proxy information from web.config.</value>
   </data>
   <data name="DebugWorkingDirectoryDoesNotExistErrorMessage" xml:space="preserve">
     <value>Working directory "{0}" does not exist.</value>
-  </data>
-  <data name="ImportWizzardCouldNotStartNotAutomationObjectErrorMessage" xml:space="preserve">
-    <value>Unable to start wizard: no automation object available.</value>
   </data>
   <data name="DependencyNodeLabelBundled" xml:space="preserve">
     <value>bundled</value>

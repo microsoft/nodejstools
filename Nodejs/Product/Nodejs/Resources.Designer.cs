@@ -99,44 +99,6 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to These tools are a free download for your version of Visual Studio that allow you to write, deploy and debug applications for Microsoft Azure in a range of programming languages..
-        /// </summary>
-        public static string AzureToolsInstallInstructions {
-            get {
-                return ResourceManager.GetString("AzureToolsInstallInstructions", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to This project requires Microsoft Azure Tools for Visual Studio..
-        /// </summary>
-        public static string AzureToolsRequired {
-            get {
-                return ResourceManager.GetString("AzureToolsRequired", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Your project can still be created, but some manual configuration of your project will be required and features may be missing or limited.
-        ///
-        ///We recommend installing the latest version of Microsoft Azure Tools for Visual Studio..
-        /// </summary>
-        public static string AzureToolsUpgradeInstructions {
-            get {
-                return ResourceManager.GetString("AzureToolsUpgradeInstructions", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Your version of Microsoft Azure Tools is not supported by Node.js Tools for Visual Studio..
-        /// </summary>
-        public static string AzureToolsUpgradeRecommended {
-            get {
-                return ResourceManager.GetString("AzureToolsUpgradeRecommended", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Could not clear Node.js cache directory. Try manually deleting the directory: {0}.
         /// </summary>
         public static string CacheDirectoryClearFailedCaption {
@@ -178,16 +140,6 @@ namespace Microsoft.NodejsTools {
         public static string CategoryVersion {
             get {
                 return ResourceManager.GetString("CategoryVersion", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &amp;Continue
-        ///Some manual steps will be required to configure your project..
-        /// </summary>
-        public static string ContinueWithoutAzureToolsUpgrade {
-            get {
-                return ResourceManager.GetString("ContinueWithoutAzureToolsUpgrade", resourceCulture);
             }
         }
         
@@ -292,25 +244,6 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Do not show this warning again..
-        /// </summary>
-        public static string DontShowAgain {
-            get {
-                return ResourceManager.GetString("DontShowAgain", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &amp;Download and install now
-        ///You will need to restart Visual Studio after installation..
-        /// </summary>
-        public static string DownloadAndInstall {
-            get {
-                return ResourceManager.GetString("DownloadAndInstall", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Specifies environment variables to be set in the spawned process in the form:
         ///
         ///NAME1=value1
@@ -329,15 +262,6 @@ namespace Microsoft.NodejsTools {
         public static string ErrorInvalidLaunchUrl {
             get {
                 return ResourceManager.GetString("ErrorInvalidLaunchUrl", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unable to start wizard: no automation object available..
-        /// </summary>
-        public static string ErrorNoDte {
-            get {
-                return ResourceManager.GetString("ErrorNoDte", resourceCulture);
             }
         }
         
@@ -374,15 +298,6 @@ namespace Microsoft.NodejsTools {
         public static string ImportingProjectUnexpectedErrorMessage {
             get {
                 return ResourceManager.GetString("ImportingProjectUnexpectedErrorMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unable to start wizard: no automation object available..
-        /// </summary>
-        public static string ImportWizzardCouldNotStartNotAutomationObjectErrorMessage {
-            get {
-                return ResourceManager.GetString("ImportWizzardCouldNotStartNotAutomationObjectErrorMessage", resourceCulture);
             }
         }
         

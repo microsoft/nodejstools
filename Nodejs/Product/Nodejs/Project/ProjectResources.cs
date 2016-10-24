@@ -23,15 +23,6 @@ namespace Microsoft.NodejsTools.Project {
     internal class SR : CommonSR {
         internal const string NodejsToolsForVisualStudio = "NodejsToolsForVisualStudio";
 
-        internal const string AzureToolsInstallInstructions = "AzureToolsInstallInstructions";
-        internal const string AzureToolsRequired = "AzureToolsRequired";
-        internal const string AzureToolsUpgradeInstructions = "AzureToolsUpgradeInstructions";
-        internal const string AzureToolsUpgradeRecommended = "AzureToolsUpgradeRecommended";
-        internal const string ContinueWithoutAzureToolsUpgrade = "ContinueWithoutAzureToolsUpgrade";
-        internal const string DontShowAgain = "DontShowAgain";
-        internal const string DownloadAndInstall = "DownloadAndInstall";
-        internal const string ErrorNoDte = "ErrorNoDte";
-        internal const string ImportWizzardCouldNotStartNotAutomationObjectErrorMessage = "ImportWizzardCouldNotStartNotAutomationObjectErrorMessage";
         internal const string NodeExeDoesntExist = "NodeExeDoesntExist";
         internal const string NodejsNotInstalled = "NodejsNotInstalled";
         internal const string TestFramework = "TestFramework";
