@@ -19,6 +19,9 @@
     <InstallationTarget Version="[14.0.0,16.0)" Id="Microsoft.VisualStudio.VWDExpress" />
     <InstallationTarget Version="[14.0.0,16.0)" Id="Microsoft.VisualStudio.VSWinDesktopExpress" />
   </Installation>
+  <Prerequisites>
+    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,16.0)" DisplayName="Visual Studio core editor" />
+  </Prerequisites>
   <Assets>
     <Asset Type="Microsoft.VisualStudio.Package" Path="|%CurrentProject%|" d:Source="Project" d:ProjectName="%CurrentProject%" />
   </Assets>
