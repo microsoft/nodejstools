@@ -97,6 +97,8 @@
         
       <Button guid="guidNodeToolsCmdSet" id="cmdidAddNewJavaScriptFileCommand" priority="0x0550" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="AddNewFileGroup"/>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
         <Strings>
           <ButtonText>JavaScript File...</ButtonText>
         </Strings>
@@ -104,6 +106,8 @@
 
       <Button guid="guidNodeToolsCmdSet" id="cmdidAddNewTypeScriptFileCommand" priority="0x0551" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="AddNewFileGroup"/>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
         <Strings>
           <ButtonText>TypeScript File...</ButtonText>
         </Strings>
@@ -111,6 +115,8 @@
 
       <Button guid="guidNodeToolsCmdSet" id="cmdidAddNewHTMLFileCommand" priority="0x0552" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="AddNewFileGroup"/>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
         <Strings>
           <ButtonText>HTML File...</ButtonText>
         </Strings>
@@ -118,6 +124,8 @@
 
       <Button guid="guidNodeToolsCmdSet" id="cmdidAddNewCSSFileCommand" priority="0x0553" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="AddNewFileGroup"/>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
         <Strings>
           <ButtonText>CSS File...</ButtonText>
         </Strings>

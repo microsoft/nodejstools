@@ -914,11 +914,11 @@ namespace Microsoft.NodejsTools.Project {
                             }
                         }
                         break;
-						case PkgCmdId.cmdidAddNewJavaScriptFileCommand: 
-					case PkgCmdId.cmdidAddNewTypeScriptFileCommand: 
-					case PkgCmdId.cmdidAddNewHTMLFileCommand: 
-					case PkgCmdId.cmdidAddNewCSSFileCommand: 
-						return QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED; 
+                    case PkgCmdId.cmdidAddNewJavaScriptFileCommand: 
+                    case PkgCmdId.cmdidAddNewTypeScriptFileCommand: 
+                    case PkgCmdId.cmdidAddNewHTMLFileCommand: 
+                    case PkgCmdId.cmdidAddNewCSSFileCommand: 
+                        return QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED; 
                 }
             }
 
