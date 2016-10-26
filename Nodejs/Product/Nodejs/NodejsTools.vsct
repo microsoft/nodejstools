@@ -97,6 +97,8 @@
         
       <Button guid="guidNodeToolsCmdSet" id="cmdidAddNewFileCommand" priority="0x0550" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="AddNewFileGroup"/>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
         <Strings>
           <ButtonText>New File...</ButtonText>
         </Strings>
