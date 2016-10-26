@@ -31,7 +31,7 @@
     <BuildingInsideVisualStudio Condition="'$(BuildingInsideVisualStudio)' == ''">false</BuildingInsideVisualStudio>
     
     <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)' == ''">v4.6</TargetFrameworkVersion>
-    <TargetFrameworkMoniker Condition="'$(VisualStudioVersion)'=='15.0'">.NETFramework,Version=$(TargetFrameworkVersion)</TargetFrameworkMoniker> 
+    <!--<TargetFrameworkMoniker Condition="'$(VisualStudioVersion)'=='15.0'">.NETFramework,Version=$(TargetFrameworkVersion)</TargetFrameworkMoniker>-->
 
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
 
