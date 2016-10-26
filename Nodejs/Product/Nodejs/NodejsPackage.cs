@@ -217,7 +217,7 @@ namespace Microsoft.NodejsTools {
             Environment.SetEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable, Process.GetCurrentProcess().Id.ToString());
 
 #if DEV15
-            var devenvPath = Environment.GetEnvironmentVariable("VSAPPIDPATH");
+            var devenvPath = Environment.GetEnvironmentVariable("VSAPPIDDIR");
             if (!string.IsNullOrEmpty(devenvPath)) {
                 try {
                     var root = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(devenvPath), @"..\.."));
