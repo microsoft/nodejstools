@@ -31,7 +31,8 @@
     <BuildingInsideVisualStudio Condition="'$(BuildingInsideVisualStudio)' == ''">false</BuildingInsideVisualStudio>
     
     <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)' == ''">v4.6</TargetFrameworkVersion>
-    
+    <!--<TargetFrameworkMoniker Condition="'$(VisualStudioVersion)'=='15.0'">.NETFramework,Version=$(TargetFrameworkVersion)</TargetFrameworkMoniker> -->
+
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
 
     <BuildRoot Condition="'$(BuildRoot)' == ''">$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), build.root))</BuildRoot>
@@ -97,7 +98,8 @@
 
     <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
 
-    <DevEnvDir>$([MSBuild]::GetRegistryValueFromView('HKEY_LOCAL_MACHINE\Software\Microsoft\VisualStudio\$(VSTarget)', 'InstallDir', null, RegistryView.Registry32))\</DevEnvDir>
+    <DevEnvDir Condition="$(VsInstallRoot) != ''">$(VsInstallRoot)Common7\IDE\</DevEnvDir> 
+    <DevEnvDir Condition="!Exists($(DevEnvDir))">$([MSBuild]::GetRegistryValueFromView('HKEY_LOCAL_MACHINE\Software\Microsoft\VisualStudio\$(VSTarget)', 'InstallDir', null, RegistryView.Registry32))\</DevEnvDir> 
     <VSSDKDir>$([MSBuild]::GetRegistryValueFromView('HKEY_LOCAL_MACHINE\Software\Microsoft\VisualStudio\VSIP\$(VSTarget)', 'InstallDir', null, RegistryView.Registry32))\</VSSDKDir>
   </PropertyGroup>
 
