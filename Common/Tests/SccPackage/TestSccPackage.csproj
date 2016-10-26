@@ -71,7 +71,6 @@
     <Reference Include="Microsoft.VisualStudio.Shell.$(VSTarget)">
       <Private>false</Private>
     </Reference>
-    <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -80,6 +79,18 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
+  <Choose>
+    <When Condition="$(VSTarget) == '15.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.VisualStudio.Shell.Framework, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
   <ItemGroup>
     <COMReference Include="EnvDTE">
       <Guid>{80CC9F66-E7D8-4DDD-85B6-D9E6CD0E93E2}</Guid>
