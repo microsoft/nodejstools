@@ -1,6 +1,8 @@
-function get_target_vs_versions {
-    param($vstarget)
- 
+function get_target_vs_versions($vstarget, $vsroot) {
+    if ($vstarget -eq "15.0") {
+        return get_target_vs15_version $vsroot
+    }
+
     $supported_vs_versions = (
         @{number="15.0"; name="VS 15"; build_by_default=$true},    
         @{number="14.0"; name="VS 2015"; build_by_default=$true}
@@ -22,7 +24,7 @@ function get_target_vs_versions {
                 $target_versions += @{
                     number=$target_vs.number;
                     name=$target_vs.name;
-                    vsoot=$vspath.InstallDir;
+                    vsroot=$vspath.InstallDir;
                     msbuildroot=$msbuildroot
                 }
             }
@@ -40,13 +42,12 @@ function get_target_vs_versions {
     return $target_versions
 }
 
-function get_target_vs15_version {
-    param($vsroot)
+function get_target_vs15_version($vsroot) {
     $msbuildroot="${vsroot}\MSBuild\Microsoft\VisualStudio\v15.0\Node.js Tools\Microsoft.NodejsTools.targets"
     return @{
         number="15.0";
         name="VS 15";
-        vsoot=$root;
+        vsroot=$vsroot;
         msbuildroot=$msbuildroot
     }; 
 }

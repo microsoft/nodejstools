@@ -44,12 +44,7 @@ Write-Output "Repository root: $($rootDir)"
 
 
 Import-Module -Force $rootDir\Build\VisualStudioHelpers.psm1
-$target_versions = (, '')
-if ([string]::IsNullOrEmpty($vsroot)) {
-    $target_versions = get_target_vs_versions (, $vstarget)
-} else {
-    $target_versions = get_target_vs15_version $vsroot
-}
+$target_versions = get_target_vs_versions $vstarget $vsroot
 
 Write-Output "Setting up NTVS development environment for $([String]::Join(", ", ($target_versions | % { $_.name })))"
 Write-Output "============================================================"

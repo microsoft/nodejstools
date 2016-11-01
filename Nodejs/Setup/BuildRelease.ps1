@@ -23,6 +23,13 @@
     
     Valid values: "14.0", "15.0"
 
+.Parameter vsroot
+    [Optional] For VS15 only. Specifies the installation root directory of visual studio
+    
+    Example: "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise"
+    
+    Must be specified when building for VS15.
+
 .Parameter name
     [Optional] A suffix to append to the name of the build.
     
@@ -109,7 +116,8 @@
 [CmdletBinding()]
 param(
     [string] $outdir,
-    [string[]] $vsTarget,
+    [string] $vsTarget,
+    [string] $vsroot,
     [string] $name,
     [switch] $release,
     [switch] $internal,
@@ -172,16 +180,20 @@ if ($release -or $mockrelease) {
 
 # Get the path to msbuild for a configuration
 function msbuild-exe($target) {
-    $msbuild_reg = Get-ItemProperty -Path "HKLM:\Software\Wow6432Node\Microsoft\MSBuild\ToolsVersions\$($target.VSTarget)" -EA 0
-    if (-not $msbuild_reg) {
-        Throw "Visual Studio build tools $($target.VSTarget) not found."
+    if ($target.VSTarget -eq "15.0") {
+        return "$($target.vsroot)\MSBuild\$($target.VSTarget)\Bin\msbuild.exe"
+    } else {
+        $msbuild_reg = Get-ItemProperty -Path "HKLM:\Software\Wow6432Node\Microsoft\MSBuild\ToolsVersions\$($target.VSTarget)" -EA 0
+        if (-not $msbuild_reg) {
+            Throw "Visual Studio build tools $($target.VSTarget) not found."
+        }
+        
+        $target_exe = $msbuild_reg.MSBuildToolsPath + "msbuild.exe"
+        if (-not (Test-Path -Path $target_exe)) {
+            Throw "Visual Studio build tools $($target.VSTarget) not found."
+        }
+        return $target_exe
     }
-    
-    $target_exe = $msbuild_reg.MSBuildToolsPath + "msbuild.exe"
-    if (-not (Test-Path -Path $target_exe)) {
-        Throw "Visual Studio build tools $($target.VSTarget) not found."
-    }
-    $target_exe
 }
 
 # This function is used to get options for each configuration
@@ -408,7 +420,7 @@ if ($internal -or $release -or $mockrelease) {
 }
 
 Import-Module -Force $buildroot\Build\VisualStudioHelpers.psm1
-$target_versions = get_target_vs_versions $vstarget
+$target_versions = get_target_vs_versions $vstarget $vsroot
 
 if ($skipdebug) {
     $target_configs = ("Release")
@@ -479,6 +491,7 @@ try {
                 config=$config;
                 msi_version=$msi_version;
                 release_version=$release_version;
+                vsroot=$($_.vsroot)
             }
             $i.unsigned_bindir = mkdir "$($i.destdir)\UnsignedBinaries" -Force
             $i.unsigned_msidir = mkdir "$($i.destdir)\UnsignedMsi" -Force
@@ -494,7 +507,7 @@ try {
             }
             $i
         })
-        
+
         foreach ($i in $target_info) {
             if (-not $skipbuild) {
                 $target_msbuild_exe = msbuild-exe $i
