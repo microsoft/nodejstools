@@ -24,7 +24,7 @@ function get_target_vs_versions($vstarget, $vsroot) {
                 $target_versions += @{
                     number=$target_vs.number;
                     name=$target_vs.name;
-                    vsroot=$vspath.InstallDir;
+                    vsroot="$($vspath.InstallDir)..\..\";
                     msbuildroot=$msbuildroot
                 }
             }
