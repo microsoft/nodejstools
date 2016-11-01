@@ -224,7 +224,8 @@ function msbuild-options($target) {
         "/p:CopyOutputsToPath=$($target.destdir)",
         "/p:Configuration=$($target.config)",
         "/p:MsiVersion=$($target.msi_version)",
-        "/p:ReleaseVersion=$($target.release_version)"
+        "/p:ReleaseVersion=$($target.release_version)",
+        "/p:DevEnvDir=$($target.vsroot)\Common7\IDE\\"
     )
 }
 
