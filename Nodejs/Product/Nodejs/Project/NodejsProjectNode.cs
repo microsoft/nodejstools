@@ -913,6 +913,7 @@ namespace Microsoft.NodejsTools.Project {
                             }
                         }
                         break;
+
                     case PkgCmdId.cmdidAddFileCommand:
                         return QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED; 
                 }
