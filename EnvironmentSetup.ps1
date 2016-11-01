@@ -8,6 +8,13 @@
     
     Valid values: "14.0", "15.0"
     
+.Parameter vsroot
+    [Optional] For VS15 only. Specifies the installation root directory of visual studio
+    
+    Example: "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise"
+    
+    Must be specified when building for VS15.
+    
 .Example
     .\EnvironmentSetup.ps1
     
