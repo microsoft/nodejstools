@@ -8,6 +8,13 @@
     
     Valid values: "14.0", "15.0"
     
+.Parameter vsroot
+    [Optional] For VS15 only. Specifies the installation root directory of visual studio
+    
+    Example: "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise"
+    
+    Must be specified when building for VS15.
+    
 .Example
     .\EnvironmentSetup.ps1
     
@@ -21,7 +28,8 @@
 
 [CmdletBinding()]
 param(
-    [string[]] $vstarget,
+    [string] $vstarget,
+    [string] $vsroot,
     [switch] $microbuild,
     [switch] $skipTestHost
 )
@@ -33,11 +41,15 @@ If ((-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIden
 
 $rootDir = $PSScriptRoot
 Write-Output "Repository root: $($rootDir)"
-Write-Output ""
 
 
 Import-Module -Force $rootDir\Build\VisualStudioHelpers.psm1
-$target_versions = get_target_vs_versions $vstarget
+$target_versions = (, '')
+if ([string]::IsNullOrEmpty($vsroot)) {
+    $target_versions = get_target_vs_versions (, $vstarget)
+} else {
+    $target_versions = get_target_vs15_version $vsroot
+}
 
 Write-Output "Setting up NTVS development environment for $([String]::Join(", ", ($target_versions | % { $_.name })))"
 Write-Output "============================================================"
@@ -64,8 +76,8 @@ Write-Output "Copying required files"
 foreach ($version in $target_versions) {    
     # Copy Microsoft.NodejsTools.targets file to relevant location
     $from = "$rootDir\Nodejs\Product\Nodejs\Microsoft.NodejsTools.targets"
-    $to = "${env:ProgramFiles(x86)}\MSBuild\Microsoft\VisualStudio\v$($version.number)\Node.js Tools\Microsoft.NodejsTools.targets"
-    
+    $to = "$($version.msbuildroot)\Node.js Tools\Microsoft.NodejsTools.targets"
+    Write-Output $version
     Write-Output "    $($from) -> $($to)"
     New-Item -Force $to > $null
     Copy-Item -Force $from $to
