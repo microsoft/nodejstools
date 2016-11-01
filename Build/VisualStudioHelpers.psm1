@@ -18,13 +18,13 @@ function get_target_vs_versions {
                 $vspath = Get-ItemProperty -Path "HKLM:\Software\Microsoft\VisualStudio\$($target_vs.number)" -EA 0
             }
             if ($vspath -and $vspath.InstallDir -and (Test-Path -Path $vspath.InstallDir)) {
-				$msbuildroot = "${env:ProgramFiles(x86)}\MSBuild\Microsoft\VisualStudio\v$($vstarget)"
+                $msbuildroot = "${env:ProgramFiles(x86)}\MSBuild\Microsoft\VisualStudio\v$($vstarget)"
                 $target_versions += @{
-					number=$target_vs.number;
-					name=$target_vs.name;
-					vsoot=$vspath.InstallDir;
-					msbuildroot=$msbuildroot
-				}
+                    number=$target_vs.number;
+                    name=$target_vs.name;
+                    vsoot=$vspath.InstallDir;
+                    msbuildroot=$msbuildroot
+                }
             }
         }
     }
@@ -41,12 +41,12 @@ function get_target_vs_versions {
 }
 
 function get_target_vs15_version {
-	param($vsroot)
-	$msbuildroot="${vsroot}\MSBuild\Microsoft\VisualStudio\v15.0\Node.js Tools\Microsoft.NodejsTools.targets"
-	return @{
-		number="15.0";
-		name="VS 15";
-		vsoot=$root;
-		msbuildroot=$msbuildroot
-	}; 
+    param($vsroot)
+    $msbuildroot="${vsroot}\MSBuild\Microsoft\VisualStudio\v15.0\Node.js Tools\Microsoft.NodejsTools.targets"
+    return @{
+        number="15.0";
+        name="VS 15";
+        vsoot=$root;
+        msbuildroot=$msbuildroot
+    }; 
 }
