@@ -246,8 +246,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                         //    }
                         //}
 #if DEBUG
-                    }
-                    catch (COMException ex) {
+                    } catch (COMException ex) {
                         frameworkHandle.SendMessage(TestMessageLevel.Error, "Error occurred connecting to debuggee.");
                         frameworkHandle.SendMessage(TestMessageLevel.Error, ex.ToString());
                         KillNodeProcess();
@@ -295,8 +294,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
             List<ResultObject> jsonResults = null;
             try {
                 jsonResults = JsonConvert.DeserializeObject<List<ResultObject>>(line);
-            }
-            catch (Exception) { }
+            } catch (Exception) { }
             return jsonResults;
         }
 
