@@ -226,23 +226,28 @@ namespace Microsoft.NodejsTools.TestAdapter {
         }
 
         private NodejsProjectSettings LoadProjectSettings(string projectFile) {
-            var buildEngine = new MSBuild.ProjectCollection();
+            var env = new Dictionary<string, string>();
+#if DEV15
+            var root = Environment.GetEnvironmentVariable(NodejsConstants.NodeToolsVsInstallRootEnvironmentVariable);
+            if (!string.IsNullOrEmpty(root)) {
+                env["VsInstallRoot"] = root;
+                env["MSBuildExtensionsPath32"] = Path.Combine(root, "MSBuild");
+            }
+#endif
+            var buildEngine = new MSBuild.ProjectCollection(env);
             var proj = buildEngine.LoadProject(projectFile);
 
             var projectRootDir = Path.GetFullPath(Path.Combine(proj.DirectoryPath, proj.GetPropertyValue(CommonConstants.ProjectHome) ?? "."));
 
-            NodejsProjectSettings projSettings = new NodejsProjectSettings();
+            return new NodejsProjectSettings() {
+                ProjectRootDir = projectRootDir,
 
-            projSettings.ProjectRootDir = projectRootDir;
+                WorkingDir = Path.GetFullPath(Path.Combine(projectRootDir, proj.GetPropertyValue(CommonConstants.WorkingDirectory) ?? ".")),
 
-            projSettings.WorkingDir = Path.GetFullPath(Path.Combine(projectRootDir, proj.GetPropertyValue(CommonConstants.WorkingDirectory) ?? "."));
-
-            projSettings.NodeExePath =
-                Nodejs.GetAbsoluteNodeExePath(
+                NodeExePath = Nodejs.GetAbsoluteNodeExePath(
                     projectRootDir,
-                    proj.GetPropertyValue(NodeProjectProperty.NodeExePath));
-
-            return projSettings;
+                    proj.GetPropertyValue(NodeProjectProperty.NodeExePath))
+            };
         }
 
         private static void RecordEnd(IFrameworkHandle frameworkHandle, TestCase test, TestResult result, string stdout, string stderr, TestOutcome outcome) {
