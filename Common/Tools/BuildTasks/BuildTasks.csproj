@@ -2,8 +2,6 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <BuildRoot Condition="'$(BuildRoot)' == ''">$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), build.root))</BuildRoot>
-    <OutputPathSuffix Condition="'$(OutputPathSuffix)' == ''">ToolBinaries\$(MSBuildProjectName)\</OutputPathSuffix>
-    <IntermediateOutputPathSuffix>obj\ToolBinaries\$(MSBuildProjectName)\</IntermediateOutputPathSuffix>
   </PropertyGroup>
   <Import Project="$(BuildRoot)\Build\Common.Build.settings" />
   
@@ -16,8 +14,6 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Microsoft.VisualStudioTools.BuildTasks</RootNamespace>
     <AssemblyName>Microsoft.VisualStudioTools.BuildTasks</AssemblyName>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
