@@ -70,7 +70,7 @@ var find_tests = function (testFileList, discoverResultFile, projectFolder) {
 };
 module.exports.find_tests = find_tests;
 
-var run_tests = function (testCases, callback) {
+var run_tests = function (testCases, postResult) {
     function escapeRegExp(string) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
     }
@@ -91,26 +91,64 @@ var run_tests = function (testCases, callback) {
         mocha.grep(new RegExp(testGrepString));
     }
 
-    mocha.addFile(testCases[0].testFile);
+    var files = new Set();
+
+    for (var test in testCases) {
+        files.add(testCases[test].testFile);
+    }
+
+    for (var file of files) {
+        mocha.addFile(file);
+    }
 
     // run tests
-    var runner = mocha.run(function (code) { });
+    var runner = mocha.run(function (code) { process.exit(code); });
 
+    runner.on('hook', function (hook) {
+        var event = {
+            type: 'hook start'
+        }
+        postResult(event);
+        process.stdout.write = append_stdout;
+        process.stderr.write = append_stderr;
+    });
+    runner.on('hook end', function (hook) {
+        var event = {
+            type: 'hook end',
+            title: hook.title
+        }
+        postResult(event);
+        process.stdout.write = append_stdout;
+        process.stderr.write = append_stderr;
+    });
     runner.on('start', function () {
+        process.stdout.write = append_stdout;
+        process.stderr.write = append_stderr;
+    });
+    runner.on('pending', function (test) {
     });
     runner.on('test', function (test) {
+        var event = {
+            type: 'testStart',
+            title: test.fullTitle()
+        }
+        postResult(event);
         result.title = test.fullTitle();
         result.time = Date.now();
         process.stdout.write = append_stdout;
         process.stderr.write = append_stderr;
     });
     runner.on('end', function () {
-        callback(testResults);
     });
     runner.on('pass', function (test) {
         result.passed = true;
         result.time = Date.now() - result.time;
-        testResults.push(result);
+        var event = {
+            type: 'result',
+            title: test.fullTitle(),
+            result: result
+        }
+        postResult(event);
         result = {
             'title': '',
             'passed': false,
@@ -118,11 +156,18 @@ var run_tests = function (testCases, callback) {
             'stdErr': '',
             'time': ''
         }
+        process.stdout.write = append_stdout;
+        process.stderr.write = append_stderr;
     });
     runner.on('fail', function (test, err) {
         result.passed = false;
         result.time = Date.now() - result.time;
-        testResults.push(result);
+        var event = {
+            type: 'result',
+            title: test.fullTitle(),
+            result: result
+        }
+        postResult(event);
         result = {
             'title': '',
             'passed': false,
@@ -130,6 +175,8 @@ var run_tests = function (testCases, callback) {
             'stdErr': '',
             'time': ''
         }
+        process.stdout.write = append_stdout;
+        process.stderr.write = append_stderr;
     });
 };
 
