@@ -235,6 +235,15 @@ namespace Microsoft.NodejsTools.TestAdapter {
                     _nodeProcess.WaitForExit();
                 }
 
+                // Automatically fail tests that haven't been run by this point (failures in before() hooks)
+                foreach(TestCase notRunTest in _currentTests) {
+                    TestResult res = new TestResult(notRunTest);
+                    res.Outcome = TestOutcome.Failed;
+                    res.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, "Failure prior to test being run"));
+                    frameworkHandle.RecordResult(res);
+                    frameworkHandle.RecordEnd(notRunTest, TestOutcome.Failed);
+                }
+
                 if (runContext.IsBeingDebugged && app != null) {
                     try {
                         //the '#ping=0' is a special flag to tell VS node debugger not to connect to the port,
@@ -290,26 +299,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
             };
         }
 
-        private List<ResultObject> ParseTestResult(string line) {
-            List<ResultObject> jsonResults = null;
-            try {
-                jsonResults = JsonConvert.DeserializeObject<List<ResultObject>>(line);
-            } catch (Exception) { }
-            return jsonResults;
-        }
-
-        private List<ResultObject> GetTestResultFromProcess(StreamReader sr) {
-            List<ResultObject> results = null;
-            while (sr.Peek() >= 0) {
-                results = ParseTestResult(sr.ReadLine());
-                if (results == null) {
-                    continue;
-                }
-                break;
-            }
-            return results;
-        }
-
         private void LaunchNodeProcess(string workingDir, string nodeExePath, List<string> args) {
             _psi = new ProcessStartInfo("cmd.exe") {
                 Arguments = string.Format(@"/S /C pushd {0} & {1} {2}",
@@ -346,7 +335,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
             return projSettings;
         }
 
-        private static void RecordEnd(IFrameworkHandle frameworkHandle, TestCase test, TestResult result, ResultObject resultObject) {
+        private void RecordEnd(IFrameworkHandle frameworkHandle, TestCase test, TestResult result, ResultObject resultObject) {
             result.EndTime = DateTimeOffset.Now;
             result.Duration = result.EndTime - result.StartTime;
             result.Outcome = resultObject.passed ? TestOutcome.Passed : TestOutcome.Failed;
@@ -355,6 +344,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
             result.Messages.Add(new TestResultMessage(TestResultMessage.AdditionalInfoCategory, resultObject.stderr));
             frameworkHandle.RecordResult(result);
             frameworkHandle.RecordEnd(test, result.Outcome);
+            _currentTests.Remove(test);
         }
     }
 }
