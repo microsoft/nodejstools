@@ -36,6 +36,9 @@
           SkipUnchangedFiles="true" />
   </Target> 
 
+  <Target Name="GetNativeManifest" />
+  <Target Name="GetTargetFrameworkProperties" />
+  
   <ItemGroup> 
     <Package Include="Targets_files.swr" /> 
   </ItemGroup>

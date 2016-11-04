@@ -15,6 +15,9 @@
   <ItemGroup> 
     <Package Include="Nodejs_files.swr" /> 
   </ItemGroup>
-
+  
+  <Target Name="GetNativeManifest" />
+  <Target Name="GetTargetFrameworkProperties" />
+  
   <Import Project="$(PackagesPath)\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets"/>
 </Project>
