@@ -45,13 +45,11 @@ namespace Microsoft.NodejsTools.TestAdapter {
             passed = false;
             stdout = String.Empty;
             stderr = String.Empty;
-            time = 0;
         }
         public string title { get; set; }
         public bool passed { get; set; }
         public string stdout { get; set; }
         public string stderr { get; set; }
-        public long time { get; set; }
     }
 
     [ExtensionUri(TestExecutor.ExecutorUriString)]
@@ -70,6 +68,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
         private List<TestCase> _currentTests;
         private IFrameworkHandle _frameworkHandle;
         private TestResult _currentResult = null;
+        private ResultObject _currentResultObject = null;
 
         public void Cancel() {
             //let us just kill the node process there, rather do it late, because VS engine process 
@@ -90,10 +89,10 @@ namespace Microsoft.NodejsTools.TestAdapter {
                         _frameworkHandle.RecordStart(test.First());
                     }
                     else if (testEvent.type == "result") {
-                        if (_currentResult != null) {
-                            RecordEnd(_frameworkHandle, test.First(), _currentResult, testEvent.result);
-                        }
+                        RecordEnd(_frameworkHandle, test.First(), _currentResult, testEvent.result);
                     }
+                } else if (testEvent.type == "suite end") {
+                    _currentResultObject = testEvent.result;
                 }
             } catch (Exception) { }
         }
@@ -122,26 +121,26 @@ namespace Microsoft.NodejsTools.TestAdapter {
             // No VS instance just means no debugging, but everything else is
             // okay.
             using (var app = VisualStudioApp.FromEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable)) {
-                // .njsproj file path -> project settings
-                var projectToTests = new Dictionary<string, List<TestCase>>();
+                // .ts file path -> project settings
+                var fileToTests = new Dictionary<string, List<TestCase>>();
                 var sourceToSettings = new Dictionary<string, NodejsProjectSettings>();
                 NodejsProjectSettings settings = null;
 
-                // put tests into dictionary where key is their project working directory
+                // put tests into dictionary where key is their source file
                 foreach (var test in receiver.Tests) {
-                    if (!sourceToSettings.TryGetValue(test.Source, out settings)) {
-                        sourceToSettings[test.Source] = settings = LoadProjectSettings(test.Source);
+                    if (!fileToTests.ContainsKey(test.CodeFilePath)) {
+                        fileToTests[test.CodeFilePath] = new List<TestCase>();
                     }
-                    if (!projectToTests.ContainsKey(settings.WorkingDir)) {
-                        projectToTests[settings.WorkingDir] = new List<TestCase>();
-                    }
-                    projectToTests[settings.WorkingDir].Add(test);
+                    fileToTests[test.CodeFilePath].Add(test);
                 }
 
-                // where key is the workingDir and value is a list of tests
-                foreach (KeyValuePair<string, List<TestCase>> entry in projectToTests) {
+                // where key is the file and value is a list of tests
+                foreach (KeyValuePair<string, List<TestCase>> entry in fileToTests) {
                     List<string> args = new List<string>();
                     TestCase firstTest = entry.Value.ElementAt(0);
+                    if (!sourceToSettings.TryGetValue(firstTest.Source, out settings)) {
+                        sourceToSettings[firstTest.Source] = settings = LoadProjectSettings(firstTest.Source);
+                    }
                     int port = 0;
                     if (runContext.IsBeingDebugged && app != null) {
                         app.GetDTE().Debugger.DetachAll();
@@ -150,11 +149,12 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
                     _currentTests = entry.Value;
                     _frameworkHandle = frameworkHandle;
-                    args.AddRange(GetInterpreterArgs(firstTest, entry.Key, settings.ProjectRootDir));
+
+                    args.AddRange(GetInterpreterArgs(firstTest, settings.WorkingDir, settings.ProjectRootDir));
 
                     // launch node process
                     LaunchNodeProcess(settings.WorkingDir, settings.NodeExePath, args);
-                    // Run all test cases in a given project
+                    // Run all test cases in a given file
                     RunTestCases(entry.Value, runContext, frameworkHandle, settings);
                     // dispose node process
                     _nodeProcess.Dispose();
@@ -174,17 +174,46 @@ namespace Microsoft.NodejsTools.TestAdapter {
             ValidateArg.NotNull(frameworkHandle, "frameworkHandle");
             _cancelRequested.Reset();
 
-            TestCase firstTest = tests.First();
-            NodejsProjectSettings settings = LoadProjectSettings(firstTest.Source);
-            List<string> args = new List<string>();
-            args.AddRange(GetInterpreterArgs(firstTest, settings.WorkingDir, settings.ProjectRootDir));
+            using (var app = VisualStudioApp.FromEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable)) {
+                // .ts file path -> project settings
+                var fileToTests = new Dictionary<string, List<TestCase>>();
+                var sourceToSettings = new Dictionary<string, NodejsProjectSettings>();
+                NodejsProjectSettings settings = null;
 
-            _currentTests = (List<TestCase>)tests;
-            _frameworkHandle = frameworkHandle;
-            LaunchNodeProcess(settings.WorkingDir, settings.NodeExePath, args);
-            // Run all test cases selected
-            RunTestCases(tests, runContext, frameworkHandle, settings);
-            _nodeProcess.Dispose();
+                // put tests into dictionary where key is their source file
+                foreach (var test in tests) {
+                    if (!fileToTests.ContainsKey(test.CodeFilePath)) {
+                        fileToTests[test.CodeFilePath] = new List<TestCase>();
+                    }
+                    fileToTests[test.CodeFilePath].Add(test);
+                }
+
+                // where key is the file and value is a list of tests
+                foreach (KeyValuePair<string, List<TestCase>> entry in fileToTests) {
+                    List<string> args = new List<string>();
+                    TestCase firstTest = entry.Value.ElementAt(0);
+                    if (!sourceToSettings.TryGetValue(firstTest.Source, out settings)) {
+                        sourceToSettings[firstTest.Source] = settings = LoadProjectSettings(firstTest.Source);
+                    }
+                    int port = 0;
+                    if (runContext.IsBeingDebugged && app != null) {
+                        app.GetDTE().Debugger.DetachAll();
+                        args.AddRange(GetDebugArgs(settings, out port));
+                    }
+
+                    _currentTests = entry.Value;
+                    _frameworkHandle = frameworkHandle;
+
+                    args.AddRange(GetInterpreterArgs(firstTest, settings.WorkingDir, settings.ProjectRootDir));
+
+                    // launch node process
+                    LaunchNodeProcess(settings.WorkingDir, settings.NodeExePath, args);
+                    // Run all test cases in a given file
+                    RunTestCases(entry.Value, runContext, frameworkHandle, settings);
+                    // dispose node process
+                    _nodeProcess.Dispose();
+                }
+            }
         }
 
         private void RunTestCases(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle, NodejsProjectSettings settings) {
@@ -239,7 +268,8 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 foreach(TestCase notRunTest in _currentTests) {
                     TestResult res = new TestResult(notRunTest);
                     res.Outcome = TestOutcome.Failed;
-                    res.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, "Failure prior to test being run"));
+                    res.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, _currentResultObject.stdout));
+                    res.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, _currentResultObject.stderr));
                     frameworkHandle.RecordResult(res);
                     frameworkHandle.RecordEnd(notRunTest, TestOutcome.Failed);
                 }
