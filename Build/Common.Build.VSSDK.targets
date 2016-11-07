@@ -219,9 +219,11 @@
       <_Container>%(VSIX.Container)</_Container>
     </PropertyGroup>
 
-    <CreateZipPackage Files="@(_VSIXSourceItems)"
+    <CreateZipPackage SourceManifest="%(VSIX.SourceDir)extension.vsixmanifest"
+                      Files="@(_VSIXSourceItems)"
                       ZipPackage="$(_Container)"
-                      CompressionLevel="$(ZipPackageCompressionLevel)">
+                      CompressionLevel="$(ZipPackageCompressionLevel)"
+                      ItemsToConsider="@(None)">
         <Output TaskParameter="ZipPackage" ItemName="FileWrites" />
     </CreateZipPackage>
 
