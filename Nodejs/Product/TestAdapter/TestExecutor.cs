@@ -366,12 +366,14 @@ namespace Microsoft.NodejsTools.TestAdapter {
         }
 
         private void RecordEnd(IFrameworkHandle frameworkHandle, TestCase test, TestResult result, ResultObject resultObject) {
+            String[] standardOutputLines = resultObject.stdout.Split('\n');
+            String[] standardErrorLines = resultObject.stderr.Split('\n');
             result.EndTime = DateTimeOffset.Now;
             result.Duration = result.EndTime - result.StartTime;
             result.Outcome = resultObject.passed ? TestOutcome.Passed : TestOutcome.Failed;
-            result.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, resultObject.stdout));
-            result.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, resultObject.stderr));
-            result.Messages.Add(new TestResultMessage(TestResultMessage.AdditionalInfoCategory, resultObject.stderr));
+            result.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, String.Join(Environment.NewLine, standardOutputLines)));
+            result.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, String.Join(Environment.NewLine, standardErrorLines)));
+            result.Messages.Add(new TestResultMessage(TestResultMessage.AdditionalInfoCategory, String.Join(Environment.NewLine, standardErrorLines)));
             frameworkHandle.RecordResult(result);
             frameworkHandle.RecordEnd(test, result.Outcome);
             _currentTests.Remove(test);
