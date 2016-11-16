@@ -92,8 +92,13 @@ if (-not $skipTestHost) {
         $currentVSTestHost = ls $gacDir -Recurse | ?{$_.Name -eq "Microsoft.VisualStudioTools.VSTestHost.$($version.number).dll"}
         
         $targetVSTestHostVersion = "$($version.number).1.0"
-        if ((-not $currentVSTestHost) -or ($currentVSTestHost.VersionInfo.FileVersion -ne $targetVSTestHostVersion)) {
-            Write-Warning "VSTestHost already installed. Overriding VSTestHost version $($currentVSTestHost.VersionInfo.FileVersion) with target VSTestHostVersion $targetVSTestHostVersion"
+        if (-not $currentVSTestHost) {
+            Write-Output "VSTestHost not installed. Installing version $targetVSTestHostVersion"
+            $shouldInstallVSTestHost = $true
+            break
+        }
+        if ($currentVSTestHost.VersionInfo.FileVersion -ne $targetVSTestHostVersion) {
+            Write-Warning "Incorrect VSTestHost version already installed. Overriding VSTestHost version $($currentVSTestHost.VersionInfo.FileVersion) with target VSTestHostVersion $targetVSTestHostVersion"
             $shouldInstallVSTestHost = $true
             break
         }
@@ -101,8 +106,8 @@ if (-not $skipTestHost) {
 }
 
 if ($shouldInstallVSTestHost) {
-    Start-Process msiexec -ArgumentList "/i $vsTestHostLocation"
-    Wait-Process msiexec
+    # TODO: This doesn't appear to install correctly on some machines.
+    Start-Process msiexec -ArgumentList /i, $vsTestHostLocation, /lv, ${env:temp}\vstesthost.log, /quiet -Wait
     Write-Output "    Install completed"
 } else {
     Write-Output "    Skipping VSTestHost installation (compatible version of VSTestHost already installed.)"
