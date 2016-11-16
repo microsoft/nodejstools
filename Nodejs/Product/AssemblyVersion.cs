@@ -39,7 +39,7 @@ class AssemblyVersionInfo {
 
     // This version should never change from "4100.00"; BuildRelease.ps1
     // will replace it with a generated value.
-    public const string BuildNumber = "4100.00";
+    public const string BuildNumber = "41115.00";
 #if DEV14
     public const string VSMajorVersion = "14";
     const string VSVersionSuffix = "2015";

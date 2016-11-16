@@ -10,8 +10,6 @@
     <ProjectFile Include="$(BuildRoot)\Nodejs\Tests\Core\NodejsTests.csproj" />
     <ProjectFile Include="$(BuildRoot)\Nodejs\Tests\Core.UI\Nodejs.Tests.UI.csproj" />
     <ProjectFile Include="$(BuildRoot)\Nodejs\Tests\NpmTests\NpmTests.csproj" />
-    <ProjectFile Include="$(BuildRoot)\Nodejs\Tests\Profiling\ProfilerTests.csproj" />
-    <ProjectFile Include="$(BuildRoot)\Nodejs\Tests\Profiling.UI\ProfilerUITests.csproj" />
     <ProjectFile Include="$(BuildRoot)\Nodejs\Tests\Utilities.UI\TestUtilities.UI.Nodejs.csproj" />
   </ItemGroup>
 
