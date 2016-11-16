@@ -276,22 +276,18 @@ function clean-outdir($outdir) {
 $installer_names = @{
     'NodejsToolsInstaller.msi'="NTVS{1}{2}{3}.msi";
     'Microsoft.NodejsTools.vsix' = 'Microsoft.NodejsTools.vsix';
-    'Microsoft.NodejsTools.Profiling.vsix' = 'Microsoft.NodejsTools.Profiling.vsix';
     'Microsoft.NodejsTools.InteractiveWindow.vsix' = 'Microsoft.NodejsTools.InteractiveWindow.vsix';
     'Microsoft.VisualStudio.NodejsTools.Targets.vsix' = 'Microsoft.VisualStudio.NodejsTools.Targets.vsix';
     'NodejsTools.vsman' = 'NodejsTools.vsman';
     'Microsoft.VisualStudio.NodejsTools.NodejsTools.json' = 'Microsoft.VisualStudio.NodejsTools.NodejsTools.json';
-    'Microsoft.VisualStudio.NodejsTools.Profiling.json' = 'Microsoft.VisualStudio.NodejsTools.Profiling.json';
     'Microsoft.VisualStudio.NodejsTools.InteractiveWindow.json' = 'Microsoft.VisualStudio.NodejsTools.InteractiveWindow.json';
     'Microsoft.VisualStudio.NodejsTools.Targets.json' = 'Microsoft.VisualStudio.NodejsTools.Targets.json';
 }
 
 # Add list of files requiring signing here
 $managed_files = (
-    "Microsoft.NodejsTools.NodeLogConverter.exe", 
     "Microsoft.NodejsTools.dll", 
     "Microsoft.NodejsTools.InteractiveWindow.dll",
-    "Microsoft.NodejsTools.Profiling.dll",
     "Microsoft.NodejsTools.ProjectWizard.dll",
     "Microsoft.NodejsTools.WebRole.dll",
     "Microsoft.NodejsTools.Npm.dll",

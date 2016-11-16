@@ -36,7 +36,7 @@ Write-Output "============================================================"
 
 # Set of tests to run
 # AzurePublishing.Tests.UI are currently skipped.
-$tests = @("JSAnalysisTests", "Nodejs.Tests.UI", "NodeTests", "NpmTests", "ProfilerTests", "SharedProjectTests")
+$tests = @("JSAnalysisTests", "Nodejs.Tests.UI", "NodeTests", "NpmTests", "SharedProjectTests")
 
 # Try to get the path to the vstest.console test runner
 if (-not $target_versions) {
