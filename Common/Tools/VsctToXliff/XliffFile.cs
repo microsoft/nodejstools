@@ -41,7 +41,7 @@ namespace VsctToXliff
                 throw new ArgumentException("Expected a rooted path");
             }
 
-            if(string.IsNullOrEmpty(fileNameWithoutExtension))
+            if (string.IsNullOrEmpty(fileNameWithoutExtension))
             {
                 throw new ArgumentException($"{nameof(fileNameWithoutExtension)} should be set");
 
@@ -53,20 +53,26 @@ namespace VsctToXliff
 
         public void WriteTranslationFile(string originalName, IEnumerable<ITranslationUnit> transUnits, string targetLanguage)
         {
+            var fileElement = new XElement(XLIFF + "file",
+                        new XAttribute("original", originalName),
+                        new XAttribute("source-language", "en"),
+                        new XElement(XLIFF + "body",
+                            transUnits.Select(unit => GenerateTransElements(unit, targetLanguage))
+                       )
+                    );
+
+            if (!StringComparer.OrdinalIgnoreCase.Equals(targetLanguage, "en"))
+            {
+                fileElement.Add(new XAttribute("target-language", targetLanguage));
+            }
+
             var document = new XDocument(
                 new XElement(XLIFF + "xliff",
                     new XAttribute("xmlns", "urn:oasis:names:tc:xliff:document:1.2"),
                     new XAttribute(XNamespace.Xmlns + "xsi", XSI),
                     new XAttribute(XSI + "schemaLocation", "urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd"),
                     new XAttribute("version", "1.2"),
-                    new XElement(XLIFF + "file",
-                        new XAttribute("original", originalName),
-                        new XAttribute("source-language", "en"),
-                        new XAttribute("target-language", targetLanguage),
-                        new XElement(XLIFF + "body",
-                            transUnits.Select(unit => GenerateTransElements(unit, targetLanguage))
-                       )
-                    )
+                    fileElement
                 )
             );
 
@@ -76,16 +82,22 @@ namespace VsctToXliff
 
         private XElement GenerateTransElements(ITranslationUnit transUnits, string targetLanguage)
         {
-            return new XElement(XLIFF + "trans-unit",
+            var element = new XElement(XLIFF + "trans-unit",
                                  new XAttribute("id", transUnits.Key),
                                  new XElement(XLIFF + "source",
                                      new XAttribute(XNamespace.Xml + "lang", "en"),
-                                        transUnits.EnglishValue),
-                                 new XElement(XLIFF + "target",
+                                        transUnits.EnglishValue));
+
+            if (!StringComparer.OrdinalIgnoreCase.Equals(targetLanguage, "en"))
+            {
+                element.Add(new XElement(XLIFF + "target",
                                      new XAttribute(XNamespace.Xml + "lang", targetLanguage),
                                      new XAttribute("state", "needs-translation"),
                                         transUnits.EnglishValue)
                               );
+            }
+
+            return element;
         }
 
         public IDictionary<string, string> LoadTranslatedElements(string targetLanguage)
@@ -93,11 +105,11 @@ namespace VsctToXliff
             var translations = new Dictionary<string, string>();
 
             var fileName = Path.Combine(this.XliffFolder, targetLanguage, $"{this.FileNameWithoutExtension}{XliffExt}");
-            if(File.Exists(fileName))
+            if (File.Exists(fileName))
             {
                 var document = XDocument.Load(fileName);
                 var elements = document.Descendants(XLIFF + "trans-unit");
-                foreach( var element in elements)
+                foreach (var element in elements)
                 {
                     var id = element.Attribute("id").Value;
                     var translated = element.Element(XLIFF + "target").Value;

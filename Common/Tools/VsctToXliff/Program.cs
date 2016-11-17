@@ -12,14 +12,13 @@
  * ***************************************************************************/
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 
 namespace VsctToXliff
 {
     class Program
     {
-        private static readonly string[] Locales = new[] { "cs", "de", "en", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "ru", "tr", "zh-CN", "zh-TW" };
+        private static readonly string[] Locales = new[] { "cs", "de", "en", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "ru", "tr", "zh-Hans", "zh-Hant" };
 
         private static int Main(string[] args)
         {
@@ -77,8 +76,17 @@ namespace VsctToXliff
 
             foreach (var locale in Locales)
             {
-                var translations = xlfFiles.LoadTranslatedElements(locale);
-                vsctFile.WriteTranslatedFile(translations, locale);
+                if (StringComparer.OrdinalIgnoreCase.Equals(locale, "en"))
+                {
+                    // for english just copy the file to a new file name
+                    var destFileName = Path.Combine(targetDir, $"{rootName}.en{VsctFile.VsctExt}");
+                    File.Copy(sourceFile, destFileName, overwrite: true);
+                }
+                else
+                {
+                    var translations = xlfFiles.LoadTranslatedElements(locale);
+                    vsctFile.WriteTranslatedFile(translations, locale);
+                }
             }
         }
 

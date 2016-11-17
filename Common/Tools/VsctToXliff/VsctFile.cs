@@ -23,7 +23,7 @@ namespace VsctToXliff
         private static readonly XNamespace NS = @"http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable";
         private static readonly string[] ChildNames = { "ButtonText", "ToolTipText", "MenuText", "CommandName" };
 
-        private const string VsctExt = ".vsct";
+        public const string VsctExt = ".vsct";
 
         public string FileName { get; }
 
