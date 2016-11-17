@@ -5,8 +5,7 @@ var result = {
     'title': '',
     'passed': false,
     'stdOut': '',
-    'stdErr': '',
-    'time': 0
+    'stdErr': ''
 };
 
 function append_stdout(string, encoding, fd) {
@@ -67,30 +66,32 @@ var find_tests = function (testFileList, discoverResultFile) {
 module.exports.find_tests = find_tests;
 
 var run_tests = function (testCases, callback) {
-    var test_results = [];
-    for (var test in testCases) {
+    var event = {};
+    for (var test of testCases) {
+        event.type = 'testStart';
+        event.title = test.testName;
+        callback(event);
         try {
-            var testCase = require(testCases[test].testFile);
-            result.title = testCases[test].testName;
-            result.time = Date.now();
-            testCase[testCases[test].testName]();
-            result.time = Date.now() - result.time;
+            var testCase = require(test.testFile);
+            result.title = test.testName;
+            testCase[test.testName]();
             result.passed = true;
         } catch (err) {
-            result.time = Date.now() - result.time;
             result.passed = false;
             console.error(err.name);
             console.error(err.message);
         }
-        test_results.push(result)
+        event.type = 'result';
+        event.result = result;
+        callback(event);
+        process.stdout.write = append_stdout;
+        process.stderr.write = append_stderr;
         result = {
             'title': '',
             'passed': false,
             'stdOut': '',
-            'stdErr': '',
-            'time': 0
+            'stdErr': ''
         };
     }
-    callback(test_results);
 };
 module.exports.run_tests = run_tests;
