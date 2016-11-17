@@ -56,6 +56,7 @@ namespace VsctToXliff
             var fileElement = new XElement(XLIFF + "file",
                         new XAttribute("original", originalName),
                         new XAttribute("source-language", "en"),
+                        new XAttribute("datatype", "xml"),
                         new XElement(XLIFF + "body",
                             transUnits.Select(unit => GenerateTransElements(unit, targetLanguage))
                        )

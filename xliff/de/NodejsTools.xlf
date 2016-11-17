@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd" version="1.2">
-  <file original="D:\dd\nodejstools\Nodejs\Product\Nodejs\NodejsTools.vsct" source-language="en" target-language="de">
+  <file original="D:\dd\nodejstools\Nodejs\Product\Nodejs\NodejsTools.vsct" source-language="en" datatype="xml" target-language="de">
     <body>
       <trans-unit id="ToolsMenu|ButtonText">
         <source xml:lang="en">Node.&amp;js Tools</source>
