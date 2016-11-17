@@ -6,8 +6,7 @@ var result = {
     'title': '',
     'passed': false,
     'stdOut': '',
-    'stdErr': '',
-    'time': 0
+    'stdErr': ''
 };
 // Choose 'tap' rather than 'min' or 'xunit'. The reason is that
 // 'min' produces undisplayable text to stdout and stderr under piped/redirect, 
@@ -91,22 +90,33 @@ var run_tests = function (testCases, postResult) {
         mocha.grep(new RegExp(testGrepString));
     }
 
-    var files = new Set();
-
-    for (var test in testCases) {
-        files.add(testCases[test].testFile);
-    }
-
-    for (var file of files) {
-        mocha.addFile(file);
-    }
-
+    mocha.addFile(testCases[0].testFile);
+    
     // run tests
     var runner = mocha.run(function (code) { process.exit(code); });
-
+    runner.on('suite', function (suite) {
+        var event = {
+            type: 'suite start',
+            result: result
+        }
+        postResult(event);
+        process.stdout.write = append_stdout;
+        process.stderr.write = append_stderr;
+    });
+    runner.on('suite end', function (suite) {
+        var event = {
+            type: 'suite end',
+            result: result
+        }
+        postResult(event);
+        process.stdout.write = append_stdout;
+        process.stderr.write = append_stderr;
+    });
     runner.on('hook', function (hook) {
         var event = {
-            type: 'hook start'
+            type: 'hook start',
+            title: hook.title,
+            result: result
         }
         postResult(event);
         process.stdout.write = append_stdout;
@@ -115,37 +125,48 @@ var run_tests = function (testCases, postResult) {
     runner.on('hook end', function (hook) {
         var event = {
             type: 'hook end',
-            title: hook.title
+            title: hook.title,
+            result: result
         }
         postResult(event);
         process.stdout.write = append_stdout;
         process.stderr.write = append_stderr;
     });
     runner.on('start', function () {
+        var event = {
+            type: 'start',
+            result: result
+        }
+        postResult(event);
         process.stdout.write = append_stdout;
         process.stderr.write = append_stderr;
     });
     runner.on('pending', function (test) {
     });
     runner.on('test', function (test) {
+        result.title = test.fullTitle();
         var event = {
             type: 'testStart',
-            title: test.fullTitle()
+            title: result.title
         }
         postResult(event);
-        result.title = test.fullTitle();
-        result.time = Date.now();
         process.stdout.write = append_stdout;
         process.stderr.write = append_stderr;
     });
     runner.on('end', function () {
+        var event = {
+            type: 'end',
+            result: result
+        }
+        postResult(event);
+        process.stdout.write = append_stdout;
+        process.stderr.write = append_stderr;
     });
     runner.on('pass', function (test) {
         result.passed = true;
-        result.time = Date.now() - result.time;
         var event = {
             type: 'result',
-            title: test.fullTitle(),
+            title: result.title,
             result: result
         }
         postResult(event);
@@ -153,18 +174,16 @@ var run_tests = function (testCases, postResult) {
             'title': '',
             'passed': false,
             'stdOut': '',
-            'stdErr': '',
-            'time': ''
+            'stdErr': ''
         }
         process.stdout.write = append_stdout;
         process.stderr.write = append_stderr;
     });
     runner.on('fail', function (test, err) {
         result.passed = false;
-        result.time = Date.now() - result.time;
         var event = {
             type: 'result',
-            title: test.fullTitle(),
+            title: result.title,
             result: result
         }
         postResult(event);
@@ -172,8 +191,7 @@ var run_tests = function (testCases, postResult) {
             'title': '',
             'passed': false,
             'stdOut': '',
-            'stdErr': '',
-            'time': ''
+            'stdErr': ''
         }
         process.stdout.write = append_stdout;
         process.stderr.write = append_stderr;
