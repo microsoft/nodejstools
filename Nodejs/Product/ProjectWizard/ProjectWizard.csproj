@@ -103,11 +103,30 @@
       <Link>CommonUtils.cs</Link>
     </Compile>
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition="$(VSTarget) == '14.0'">
     <EmbeddedResource Include="ProjectWizardResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ProjectWizardResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup Condition="$(VSTarget) == '15.0'">
+    <EmbeddedResource Include="ProjectWizardResources.cs.resx" />
+    <EmbeddedResource Include="ProjectWizardResources.de.resx" />
+    <EmbeddedResource Include="ProjectWizardResources.en.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ProjectWizardResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ProjectWizardResources.es.resx" />
+    <EmbeddedResource Include="ProjectWizardResources.fr.resx" />
+    <EmbeddedResource Include="ProjectWizardResources.it.resx" />
+    <EmbeddedResource Include="ProjectWizardResources.ja.resx" />
+    <EmbeddedResource Include="ProjectWizardResources.ko.resx" />
+    <EmbeddedResource Include="ProjectWizardResources.pl.resx" />
+    <EmbeddedResource Include="ProjectWizardResources.pt-BR.resx" />
+    <EmbeddedResource Include="ProjectWizardResources.ru.resx" />
+    <EmbeddedResource Include="ProjectWizardResources.tr.resx" />
+    <EmbeddedResource Include="ProjectWizardResources.zh-Hans.resx" />
+    <EmbeddedResource Include="ProjectWizardResources.zh-Hant.resx" />
   </ItemGroup>
   <Import Project="..\Nodejs\SharedResources.proj" />
   <Import Project="..\ProjectAfter.settings" />

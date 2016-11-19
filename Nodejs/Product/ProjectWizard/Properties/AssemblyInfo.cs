@@ -15,6 +15,7 @@
 //*********************************************************//
 
 using System.Reflection;
+using System.Resources;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
@@ -31,7 +32,9 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("dfdf8c10-b0c5-43d5-8ab6-833523131644")]
-
+#if DEV15
+[assembly: NeutralResourcesLanguage("en", UltimateResourceFallbackLocation.Satellite)]
+#endif
 // Version information for an assembly consists of the following four values:
 //
 //      Major Version

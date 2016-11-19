@@ -286,6 +286,4 @@
              Query="/vsx11:PackageManifest/vsx11:Installation/@InstalledByMsi"
              Value="false" />
   </Target>
-
-
 </Project>
