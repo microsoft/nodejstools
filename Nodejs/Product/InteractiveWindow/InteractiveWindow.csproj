@@ -191,10 +191,10 @@
     <VSCTCompile Include="InteractiveWindow.tr.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
     </VSCTCompile>
-    <VSCTCompile Include="InteractiveWindow.zh-CN.vsct">
+    <VSCTCompile Include="InteractiveWindow.zh-Hans.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
     </VSCTCompile>
-    <VSCTCompile Include="InteractiveWindow.zh-TW.vsct">
+    <VSCTCompile Include="InteractiveWindow.zh-Hant.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
     </VSCTCompile>
     <VSCTCompile Include="InteractiveWindow.de.vsct">
