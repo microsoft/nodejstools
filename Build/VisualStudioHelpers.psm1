@@ -1,10 +1,14 @@
 function get_target_vs_versions($vstarget, $vsroot) {
     if ($vstarget -eq "15.0") {
-        return get_target_vs15_version $vsroot
+        if (-not $vsroot) {
+            Throw "The -vsroot argument must be specified for VS 2017"
+        } else {
+            return get_target_vs15_version $vsroot
+        }
     }
 
     $supported_vs_versions = (
-        @{number="15.0"; name="VS 15"; build_by_default=$true},    
+        @{number="15.0"; name="VS 2017"; build_by_default=$true},
         @{number="14.0"; name="VS 2015"; build_by_default=$true}
     )
 
@@ -15,6 +19,7 @@ function get_target_vs_versions($vstarget, $vsroot) {
     }
     foreach ($target_vs in $supported_vs_versions) {
         if ((-not $vstarget -and $target_vs.build_by_default) -or ($target_vs.number -in $vstarget)) {
+            # Note: These registry entries are not present for "15.0", thus it won't be built.
             $vspath = Get-ItemProperty -Path "HKLM:\Software\Wow6432Node\Microsoft\VisualStudio\$($target_vs.number)" -EA 0
             if (-not $vspath) {
                 $vspath = Get-ItemProperty -Path "HKLM:\Software\Microsoft\VisualStudio\$($target_vs.number)" -EA 0
@@ -43,10 +48,10 @@ function get_target_vs_versions($vstarget, $vsroot) {
 }
 
 function get_target_vs15_version($vsroot) {
-    $msbuildroot="${vsroot}\MSBuild\Microsoft\VisualStudio\v15.0\Node.js Tools\Microsoft.NodejsTools.targets"
+    $msbuildroot="${vsroot}\MSBuild\Microsoft\VisualStudio\v15.0"
     return @{
         number="15.0";
-        name="VS 15";
+        name="VS 2017";
         vsroot=$vsroot;
         msbuildroot=$msbuildroot
     }; 
