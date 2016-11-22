@@ -42,11 +42,6 @@ namespace Microsoft.NodejsTools
 
         public const string ScriptDebugLanguageString = "{F7FA31DA-C32A-11D0-B442-00A0244A1DD2}";
 
-        // Profiling guids
-        public const string NodejsProfilingPkgString = "B515653F-FB69-4B64-9D3F-F1FCF8421DD0";
-        public const string NodejsProfilingCmdSetString = "3F2BC93C-CA2D-450B-9BFC-0C96288F1ED6";
-        public const string ProfilingEditorFactoryString = "3585dc22-81a0-409e-85ae-cae5d02d99cd";
-
         // Debug guids
         public const string DebugEngine = "FC5B45BA-5B9C-46EA-887A-82073AE065FE";
         public const string DebugProgramProvider = "472CD331-218C-451E-929E-98C9408F11DD";
@@ -67,9 +62,7 @@ namespace Microsoft.NodejsTools
         public static readonly Guid WebPackage = new Guid("d9a342d1-a429-4059-808a-e55ee6351f7f");
         public static readonly Guid WebAppCmdId = new Guid("CB26E292-901A-419c-B79D-49BD45C43929");
                         
-        public static readonly Guid NodejsProfilingCmdSet = new Guid(NodejsProfilingCmdSetString);
         public static readonly Guid VsUIHierarchyWindow = new Guid("{7D960B07-7AF8-11D0-8E5E-00A0C911005A}");
-        public static readonly Guid ProfilingEditorFactory = new Guid(ProfilingEditorFactoryString);
         public static readonly Guid PerfPkg = new Guid("{F4A63B2A-49AB-4b2d-AA59-A10F01026C89}");
 
         public const string OfficeToolsBootstrapperCmdSetString = "{D26C976C-8EE8-4EC4-8746-F5F7702A17C5}";

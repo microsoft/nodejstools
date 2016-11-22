@@ -54,13 +54,6 @@ namespace TestUtilities.UI.Nodejs {
         }
 
         /// <summary>
-        /// Opens and activates the Node.js Performance explorer window.
-        /// </summary>
-        public void LaunchNodejsProfiling() {
-            base.OpenDialogWithDteExecuteCommand("Analyze.LaunchNode.jsProfiling");
-        }
-
-        /// <summary>
         /// Provides access to the Python profiling tree view.
         /// </summary>
         public NodejsPerfExplorer NodejsPerformanceExplorerTreeView {
