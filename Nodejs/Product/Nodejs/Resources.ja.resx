@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -59,46 +59,46 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -118,506 +118,506 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="LaunchUrlToolTip" xml:space="preserve">
-    <value>Specifies the URL to open in the browser.  If unspecified http://localhost:port is used.\r\nIf a port is specified, it needs to be specified here as well.</value>
+    <value>ブラウザーで開く URL を指定します。何も指定しないと、http://localhost:port が使われます。\r\nポートが指定されている場合は、それもここで指定する必要があります。</value>
   </data>
   <data name="NodeExeArguments" xml:space="preserve">
-    <value>Arguments to Node.exe</value>
+    <value>Node.exe に対する引数</value>
   </data>
   <data name="NodeExeArgumentsDescription" xml:space="preserve">
-    <value>Specifies the options provided to node.exe, such as -e or -i.</value>
+    <value>node.exe に提供するオプション (-e や -i など) を指定します。</value>
   </data>
   <data name="NodeExeArgumentsToolTip" xml:space="preserve">
-    <value>Specifies the options provided to node.exe, such as -e or -i.</value>
+    <value>node.exe に提供するオプション (-e や -i など) を指定します。</value>
   </data>
   <data name="NodeExePath" xml:space="preserve">
-    <value>Node.exe path</value>
+    <value>Node.exe のパス</value>
   </data>
   <data name="NodeExePathToolTip" xml:space="preserve">
-    <value>Specifies the path to the node.exe executable.</value>
+    <value>node.exe 実行可能ファイルへのパスを指定します。</value>
   </data>
   <data name="NodejsPort" xml:space="preserve">
-    <value>Node.js Port</value>
+    <value>Node.js ポート</value>
   </data>
   <data name="NodejsNotInstalled" xml:space="preserve">
-    <value>Could not find a Node.js runtime on your computer.  Please download and install the current Node.js release from https://nodejs.org, or specify the location of your Node.exe in the Visual Studio Node Project's properties page.</value>
+    <value>お使いのコンピューターに Node.js のランタイムが見つかりませんでした。現在の Node.js リリースを https://nodejs.org からダウンロードしてインストールするか、Node.exe の場所を Visual Studio Node プロジェクトのプロパティ ページで指定してください。</value>
   </data>
   <data name="NodejsPortToolTip" xml:space="preserve">
-    <value>Specifies the port number used for process.env.port, if unspecified a random port is generated.</value>
+    <value>process.env.port に使うポート番号を指定します。指定しないと、ランダムにポートが生成されます。</value>
   </data>
   <data name="NpmPackageName" xml:space="preserve">
-    <value>Package Name</value>
+    <value>パッケージ名</value>
   </data>
   <data name="NpmPackageNameDescription" xml:space="preserve">
-    <value>Name of package, as specified in its package.json.</value>
+    <value>package.json で指定されているとおりのパッケージの名前。</value>
   </data>
   <data name="NpmPackageVersion" xml:space="preserve">
-    <value>Version</value>
+    <value>バージョン</value>
   </data>
   <data name="NpmPackageVersionDescription" xml:space="preserve">
-    <value>Installed version of package.</value>
+    <value>パッケージのインストール済みのバージョン。</value>
   </data>
   <data name="NpmPackageRequestedVersionRange" xml:space="preserve">
-    <value>Requested Version</value>
+    <value>要求されたバージョン</value>
   </data>
   <data name="NpmPackageRequestedVersionRangeDescription" xml:space="preserve">
-    <value>Version of package requested in package.json belonging to parent package or project.</value>
+    <value>package.json で要求されているパッケージのバージョンは、親パッケージまたは親プロジェクトに属しています。</value>
   </data>
   <data name="NpmPackageNewVersionAvailable" xml:space="preserve">
-    <value>Newer Version Available</value>
+    <value>新しいバージョンを入手できます</value>
   </data>
   <data name="NpmPackageNewVersionAvailableDescription" xml:space="preserve">
-    <value>Indicates whether or not a newer version of the package is available.</value>
+    <value>より新しいバージョンのパッケージが入手可能かどうかを示します。</value>
   </data>
   <data name="NpmPackageDescription" xml:space="preserve">
-    <value>Description</value>
+    <value>説明</value>
   </data>
   <data name="NpmPackageDescriptionDescription" xml:space="preserve">
-    <value>Package description.</value>
+    <value>パッケージの説明。</value>
   </data>
   <data name="NpmPackageKeywords" xml:space="preserve">
-    <value>Keywords</value>
+    <value>キーワード</value>
   </data>
   <data name="NpmPackageKeywordsDescription" xml:space="preserve">
-    <value>Package keywords.</value>
+    <value>パッケージ キーワード。</value>
   </data>
   <data name="NpmPackageAuthor" xml:space="preserve">
-    <value>Author</value>
+    <value>作成者</value>
   </data>
   <data name="NpmPackageAuthorDescription" xml:space="preserve">
-    <value>Primary or original author of package; there may also be additional contributors.</value>
+    <value>パッケージの主要な、または元の作成者です。他の共同作成者がいる場合もあります。</value>
   </data>
   <data name="NpmPackagePath" xml:space="preserve">
-    <value>Path</value>
+    <value>パス</value>
   </data>
   <data name="NpmPackagePathDescription" xml:space="preserve">
-    <value>Location of package on disk.</value>
+    <value>ディスク上のパッケージの場所。</value>
   </data>
   <data name="NpmPackageType" xml:space="preserve">
-    <value>Package Type</value>
+    <value>パッケージの種類</value>
   </data>
   <data name="NpmPackageTypeDescription" xml:space="preserve">
-    <value>Indicates whether package is global, or locally installed in your project, and whether or not it is a sub-package.</value>
+    <value>パッケージがグローバルであるか、またはプロジェクト内にローカルにインストールされたものかを示します。また、サブパッケージであるかどうかも示します。</value>
   </data>
   <data name="NpmPackageLinkStatus" xml:space="preserve">
-    <value>Link Status</value>
+    <value>リンクの状態</value>
   </data>
   <data name="NpmPackageLinkStatusDescription" xml:space="preserve">
-    <value>Indicates whether a package has been linked from globally installed packages.</value>
+    <value>パッケージが、グローバルにインストールしたパッケージからリンクされたものかどうかを示します。</value>
   </data>
   <data name="NpmPackageIsListedInParentPackageJson" xml:space="preserve">
-    <value>Listed As Dependency</value>
+    <value>依存関係としてリストに表示</value>
   </data>
   <data name="NpmPackageIsListedInParentPackageJsonDescription" xml:space="preserve">
-    <value>Indicates whether or not the package is listed as a package.json dependency.</value>
+    <value>パッケージが package.json と依存関係にあるものとしてリストに表示されているかどうかを示します。</value>
   </data>
   <data name="NpmPackageIsMissing" xml:space="preserve">
-    <value>Missing</value>
+    <value>欠落</value>
   </data>
   <data name="NpmPackageIsMissingDescription" xml:space="preserve">
-    <value>Indicates whether or not the package is a missing dependency.</value>
+    <value>このパッケージが、欠落している依存関係パッケージであるかどうかを示します。</value>
   </data>
   <data name="NpmPackageIsDevDependency" xml:space="preserve">
-    <value>Dev Dependency</value>
+    <value>開発依存関係</value>
   </data>
   <data name="NpmPackageIsDevDependencyDescription" xml:space="preserve">
-    <value>Indicates whether or not the package is a development dependency.</value>
+    <value>このパッケージが、開発依存関係にあるパッケージであるかどうかを示します。</value>
   </data>
   <data name="NpmPackageIsOptionalDependency" xml:space="preserve">
-    <value>Optional Dependency</value>
+    <value>オプション依存関係</value>
   </data>
   <data name="NpmPackageIsOptionalDependencyDescription" xml:space="preserve">
-    <value>Indicates whether or not the package is an optional dependency.</value>
+    <value>このパッケージがオプション依存関係パッケージであるかどうかを示します。</value>
   </data>
   <data name="NpmPackageIsBundledDependency" xml:space="preserve">
-    <value>Bundled Dependency</value>
+    <value>バンドル依存関係</value>
   </data>
   <data name="NpmPackageIsBundledDependencyDescription" xml:space="preserve">
-    <value>Indicates whether or not the package is a bundled dependency.</value>
+    <value>このパッケージが、バンドル依存関係にあるパッケージかどうかを示します。</value>
   </data>
   <data name="CategoryVersion" xml:space="preserve">
-    <value>Version</value>
+    <value>バージョン</value>
   </data>
   <data name="CategoryStatus" xml:space="preserve">
-    <value>Status</value>
+    <value>状態</value>
   </data>
   <data name="PackageTypeLocal" xml:space="preserve">
-    <value>Local</value>
+    <value>ローカル</value>
   </data>
   <data name="PackageTypeLocalSubpackage" xml:space="preserve">
-    <value>Local sub-package</value>
+    <value>ローカルのサブパッケージ</value>
   </data>
   <data name="LinkStatusNotApplicableSubPackages" xml:space="preserve">
-    <value>Not applicable for sub-packages.</value>
+    <value>サブパッケージには該当しません。</value>
   </data>
   <data name="LinkStatusUnknown" xml:space="preserve">
-    <value>Unknown</value>
+    <value>不明</value>
   </data>
   <data name="RequestedVersionRangeNone" xml:space="preserve">
-    <value>None</value>
+    <value>なし</value>
   </data>
   <data name="NpmNodePackageInstallation" xml:space="preserve">
-    <value>Package Installations</value>
+    <value>パッケージのインストール</value>
   </data>
   <data name="NpmNodePackageInstallationDescription" xml:space="preserve">
-    <value>Indicates whether the node manages local or global npm package installations.</value>
+    <value>ノードが、ローカルまたはグローバルのどちらの npm パッケージ インストールを管理するかを示します。</value>
   </data>
   <data name="NpmNodePath" xml:space="preserve">
-    <value>Path</value>
+    <value>パス</value>
   </data>
   <data name="NpmNodePathDescription" xml:space="preserve">
-    <value>Base path in which npm packages are installed.</value>
+    <value>npm パッケージがインストールされるベース パス。</value>
   </data>
   <data name="PackageInstallationLocal" xml:space="preserve">
-    <value>Local</value>
+    <value>ローカル</value>
   </data>
   <data name="PropertiesClassLocalPackage" xml:space="preserve">
-    <value>Local Package Properties</value>
+    <value>ローカル パッケージのプロパティ</value>
   </data>
   <data name="PropertiesClassLocalSubPackage" xml:space="preserve">
-    <value>Local Sub-Package Properties</value>
+    <value>ローカル サブパッケージのプロパティ</value>
   </data>
   <data name="PropertiesClassNpm" xml:space="preserve">
-    <value>npm Packages Properties</value>
+    <value>npm パッケージのプロパティ</value>
   </data>
   <data name="ScriptArgumentsToolTip" xml:space="preserve">
-    <value>Specifies the arguments passed to the script on launch.</value>
+    <value>起動時にスクリプトに渡す引数を指定します。</value>
   </data>
   <data name="ScriptFileTooltip" xml:space="preserve">
-    <value>Specifies the script run on launch.</value>
+    <value>起動時に実行するスクリプトを指定します。</value>
   </data>
   <data name="StartBrowserToolTip" xml:space="preserve">
-    <value>When checked a web browser is opened on launch</value>
+    <value>これにチェックを入れると、起動時に Web ブラウザーが開きます</value>
   </data>
   <data name="WorkingDirToolTip" xml:space="preserve">
-    <value>Specifies the working directory where the node.exe process is launched.</value>
+    <value>node.exe プロセスを起動する作業ディレクトリを指定します。</value>
   </data>
   <data name="NodeExeDoesntExist" xml:space="preserve">
-    <value>Your project is currently configured to look for Node.exe at "{0}" but the file does not exist.</value>
+    <value>このプロジェクトは現在 Node.exe を &quot;{0}&quot; から見つけるように構成されていますが、そのファイルが存在しません。  </value>
   </data>
   <data name="NodejsToolsForVisualStudio" xml:space="preserve">
     <value>Node.js Tools for Visual Studio</value>
   </data>
   <data name="NodeExePathNotFound" xml:space="preserve">
-    <value>The specified Node.js interpreter does not exist.</value>
+    <value>指定した Node.js インタープリターは存在しません。</value>
   </data>
   <data name="NodejsNotInstalledShort" xml:space="preserve">
-    <value>Node.js has not been detected on your computer</value>
+    <value>お使いのコンピューターでは Node.js が見つかりませんでした</value>
     <comment>Used in general property page when Node.exe isn't found</comment>
   </data>
   <data name="InvalidPortNumber" xml:space="preserve">
-    <value>Invalid port number - the port should contain only digits.</value>
+    <value>ポート番号が無効です。ポートは数字だけで入力してください。</value>
   </data>
   <data name="WorkingDirInvalidOrMissing" xml:space="preserve">
-    <value>The specified working directory is invalid or missing.</value>
+    <value>指定した作業ディレクトリが無効、または存在しません。</value>
   </data>
   <data name="CatalogLoadingDefault" xml:space="preserve">
-    <value>Loading published package list...</value>
+    <value>発行済みのパッケージ リストを読み込んでいます...</value>
   </data>
   <data name="NoKeywordsInPackage" xml:space="preserve">
-    <value>(This package has no keywords.)</value>
+    <value>(このパッケージにキーワードはありません。)</value>
   </data>
   <data name="PackageCatalogRefreshing" xml:space="preserve">
-    <value>Currently refreshing</value>
+    <value>現在、最新の情報に更新しています</value>
   </data>
   <data name="PackageCatalogRefresh0Days" xml:space="preserve">
-    <value>Today at {0:t}</value>
+    <value>今日の {0:t}</value>
   </data>
   <data name="PackageCatalogRefresh1Day" xml:space="preserve">
-    <value>Yesterday at {0:t}</value>
+    <value>昨日の {0:t}</value>
   </data>
   <data name="PackageCatalogRefresh2To7Days" xml:space="preserve">
-    <value>{0} days ago</value>
+    <value>{0} 日前</value>
   </data>
   <data name="PackageCatalogRefresh1Week" xml:space="preserve">
-    <value>More than 1 week ago</value>
+    <value>1 週間以上前</value>
   </data>
   <data name="PackageCatalogRefresh2Weeks" xml:space="preserve">
-    <value>More than 2 weeks ago</value>
+    <value>2 週間以上前</value>
   </data>
   <data name="PackageCatalogRefresh3Weeks" xml:space="preserve">
-    <value>More than 3 weeks ago</value>
+    <value>3 週間以上前</value>
   </data>
   <data name="PackageCatalogRefresh1Month" xml:space="preserve">
-    <value>More than 1 month ago</value>
+    <value>1 か月以上前</value>
   </data>
   <data name="PackageCatalogRefresh3Months" xml:space="preserve">
-    <value>More than 3 months ago</value>
+    <value>3 か月以上前</value>
   </data>
   <data name="NpmCancelledWithErrors" xml:space="preserve">
-    <value>{0} cancelled with errors - see Output window for details</value>
+    <value>エラーが発生したため、{0} がキャンセルされました。詳しくは、出力ウィンドウをご覧ください</value>
   </data>
   <data name="NpmCompletedWithErrors" xml:space="preserve">
-    <value>{0} completed with errors - see Output window for details</value>
+    <value>{0} は完了しましたが、エラーが発生しました。詳しくは、出力ウィンドウをご覧ください</value>
   </data>
   <data name="NpmCancelled" xml:space="preserve">
-    <value>{0} cancelled</value>
+    <value>{0} がキャンセルされました。</value>
   </data>
   <data name="NpmSuccessfullyCompleted" xml:space="preserve">
-    <value>{0} successfully completed</value>
+    <value>{0} が正常に完了しました</value>
   </data>
   <data name="NpmStatusReady" xml:space="preserve">
-    <value>Ready</value>
+    <value>準備完了</value>
   </data>
   <data name="NpmStatusReadyWithErrors" xml:space="preserve">
-    <value>Ready - Command(s) completed with errors ({0})</value>
+    <value>準備完了。コマンドは完了しましたが、{0} 件のエラーが発生しました</value>
   </data>
   <data name="NpmStatusExecuting" xml:space="preserve">
-    <value>Executing: {0}</value>
+    <value>実行しています: {0}</value>
   </data>
   <data name="NpmStatusExecutingQueued" xml:space="preserve">
-    <value>Executing: {0} ({1} command(s) queued)</value>
+    <value>実行しています: {0} ({1} 件のコマンドがキューに入っています)</value>
   </data>
   <data name="NpmStatusExecutingErrors" xml:space="preserve">
-    <value>Errors Encountered ({1}) - Executing: {0}</value>
+    <value>エラーが発生しました ({1}) - 実行しています: {0}</value>
   </data>
   <data name="NpmStatusExecutingQueuedErrors" xml:space="preserve">
-    <value>Errors Encountered ({2}) - Executing: {0} ({1} command(s) queued)</value>
+    <value>エラーが発生しました ({2}) - 実行しています: {0} ({1} 件のコマンドがキューに入っています)</value>
   </data>
   <data name="TestFramework" xml:space="preserve">
-    <value>Test Framework</value>
+    <value>テスト フレームワーク</value>
   </data>
   <data name="TestFrameworkDescription" xml:space="preserve">
-    <value>Specifies the test framework this file applies to.</value>
+    <value>このファイルが適用されるテスト フレームワークを指定します。</value>
   </data>
   <data name="DebuggerPort" xml:space="preserve">
-    <value>Specifies the port used to communicate with the debugger</value>
+    <value>デバッガーとの通信に使用するポートを指定します</value>
   </data>
   <data name="EnvironmentVariables" xml:space="preserve">
-    <value>Specifies environment variables to be set in the spawned process in the form:
+    <value>フォームの起動したプロセスで設定する環境変数を、次の形式で指定します:
 
 NAME1=value1
 NAME2=value2
 ...</value>
   </data>
   <data name="DebuggerConnectionClosed" xml:space="preserve">
-    <value>Debugger connection was closed.</value>
+    <value>デバッガーとの接続が閉じられました。</value>
   </data>
   <data name="DebuggerModuleUpdateFailed" xml:space="preserve">
-    <value>Failed to update file contents.</value>
+    <value>ファイルの内容を更新できませんでした。</value>
   </data>
   <data name="NodejsNotSupported" xml:space="preserve">
-    <value>This version of Node.js ({0}) is not supported. Please upgrade to Node.js v0.10.20 or later.</value>
+    <value>このバージョンの Node.js ({0}) はサポートされていません。Node.js v0.10.20 以降にアップグレードしてください。</value>
   </data>
   <data name="PackageCatalogRefreshFailed" xml:space="preserve">
-    <value>Refresh failed - see output below for details</value>
+    <value>最新の情報に更新できませんでした。詳しくは、以下の出力をご覧ください</value>
   </data>
   <data name="ReplInitializationMessage" xml:space="preserve">
-    <value>Node.js interactive window. Type .help for a list of commands.</value>
+    <value>Node.js の対話型ウィンドウ。コマンドのリストを表示するには、「.help」と入力します。</value>
   </data>
   <data name="ReplWindowNpmInitNoYesFlagWarning" xml:space="preserve">
-    <value>Please run '.npm init -y' to create a new package.json file.</value>
+    <value>新しい package.json ファイルを作成するには、&apos;.npm init -y&apos; を実行してください。</value>
   </data>
   <data name="NodeExePathDescription" xml:space="preserve">
-    <value>Specifies the path to the node.exe executable.</value>
+    <value>node.exe 実行可能ファイルへのパスを指定します。</value>
   </data>
   <data name="NodejsPortDescription" xml:space="preserve">
-    <value>Specifies the port number used for process.env.port, if unspecified a random port is generated.</value>
+    <value>process.env.port に使うポート番号を指定します。指定しないと、ランダムにポートが生成されます。</value>
   </data>
   <data name="NpmOutputPaneTitle" xml:space="preserve">
     <value>Npm</value>
   </data>
   <data name="NpmPackageInstallHelpMessage" xml:space="preserve">
-    <value>(enter arguments above)</value>
+    <value>(上に引数を入力します)</value>
   </data>
   <data name="NpmReplCommandCompletedWithErrors" xml:space="preserve">
-    <value>{0} completed with errors</value>
+    <value>{0} が完了しましたが、エラーが発生しました。</value>
   </data>
   <data name="LongPathWarningTitle" xml:space="preserve">
-    <value>Path Too Long Warning</value>
+    <value>警告: パスが長すぎます</value>
   </data>
   <data name="LongPathWarningText" xml:space="preserve">
-    <value>Your project folder contains one or more paths that exceed the &lt;a href="#msdn"&gt;260 character limit&lt;/a&gt;. Visual Studio &lt;a href="#uservoice"&gt;does not fully support&lt;/a&gt; such projects. You may run into issues building and publishing your project, or interference with other Visual Studio and Node.js Tools features.</value>
+    <value>プロジェクト フォルダーに、&lt;a href=&quot;#msdn&quot;&gt;260 文字の制限&lt;/a&gt;を超えるパスが 1 つ以上含まれています。Visual Studio は、そのようなプロジェクトを&lt;a href=&quot;#uservoice&quot;&gt;完全にはサポートしていません&lt;/a&gt;。プロジェクトのビルドや発行の際に問題が起きたり、他の Visual Studio および Node.js Tools の機能に支障が出たりします。</value>
   </data>
   <data name="LongPathShowPathsExceedingTheLimit" xml:space="preserve">
-    <value>Show &amp;paths exceeding the limit</value>
+    <value>制限を超えているパスを表示(&amp;P)</value>
   </data>
   <data name="LongPathHidePathsExceedingTheLimit" xml:space="preserve">
-    <value>Hide &amp;paths exceeding the limit</value>
+    <value>制限を超えているパスを非表示(&amp;P)</value>
   </data>
   <data name="LongPathNpmDedupe" xml:space="preserve">
-    <value>Run 'npm &amp;dedupe' on the project</value>
+    <value>プロジェクトに対して &apos;npm dedupe&apos; を実行(&amp;D)</value>
   </data>
   <data name="LongPathNpmDedupeDetail" xml:space="preserve">
-    <value>In some cases, deduplicating packages can reduce the amount of nesting in node_modules sufficiently to resolve the issue.</value>
+    <value>場合によっては、パッケージの重複除去を実行すると node_modules の入れ子が十分に解消され、問題が解決することがあります。</value>
   </data>
   <data name="LongPathDoNothingButWarnNextTime" xml:space="preserve">
-    <value>Do nothing, but &amp;warn me next time it happens</value>
+    <value>今回は何も行わず、次回発生したときに警告する(&amp;W)</value>
   </data>
   <data name="LongPathDoNothingAndDoNotWarnAgain" xml:space="preserve">
-    <value>Do nothing and &amp;never warn me again</value>
+    <value>何も行わず、今後は警告しない(&amp;N)</value>
   </data>
   <data name="LongPathDoNothingAndDoNotWarnAgainDetail" xml:space="preserve">
-    <value>You can re-enable the check in Tools → Options → Node.js Tools → General.</value>
+    <value>[ツール] → [オプション] → [Node.js Tools] → [全般] で、チェックを再び有効にできます。</value>
   </data>
   <data name="LongPathFooter" xml:space="preserve">
-    <value>&lt;a href="#help"&gt;Get more information&lt;/a&gt;</value>
+    <value>&lt;a href=&quot;#help&quot;&gt;詳細を表示&lt;/a&gt;</value>
   </data>
   <data name="LongPathClickToCopy" xml:space="preserve">
-    <value>Copy Full Path</value>
+    <value>完全なパスをコピー</value>
   </data>
   <data name="LongPathNpmDedupeDidNotHelp" xml:space="preserve">
-    <value>Unfortunately, running 'npm dedupe' did not resolve the issue. Please consult the &lt;a href="#help"&gt;documentation&lt;/a&gt; for other potential workarounds.</value>
+    <value>申し訳ございません。&apos;npm dedupe&apos; を実行しても問題が解決しませんでした。実行可能なその他の回避策については、&lt;a href=&quot;#help&quot;&gt;ドキュメント&lt;/a&gt;を参照してください。</value>
   </data>
   <data name="CacheDirectoryClearFailedTitle" xml:space="preserve">
-    <value>Could Not Clear Node.js Cache Directory</value>
+    <value>Node.js のキャッシュ ディレクトリをクリアできませんでした</value>
   </data>
   <data name="CacheDirectoryClearFailedCaption" xml:space="preserve">
-    <value>Could not clear Node.js cache directory. Try manually deleting the directory: {0}</value>
+    <value>Node.js のキャッシュ ディレクトリをクリアできませんでした。ディレクトリ {0} を手動で削除してください。</value>
   </data>
   <data name="UpgradedEnvironmentVariables" xml:space="preserve">
-    <value>Replaced &lt;EnvironmentVariables&gt; property with &lt;Environment&gt;. This project will no longer work with NTVS 1.0 beta 2 or below.</value>
+    <value>&lt;EnvironmentVariables&gt; プロパティを &lt;Environment&gt; で置き換えました。このプロジェクトは、NTVS 1.0 ベータ 2 またはそれより前のバージョンでは機能しません。</value>
   </data>
   <data name="StatusAnalysisUpToDate" xml:space="preserve">
-    <value>Node.js code analysis is up to date, analyzed {0:N0} function(s) in {1}</value>
+    <value>Node.js コード分析は最新です。{1} 個中 {0:N0} 個の関数を分析しました。</value>
   </data>
   <data name="IncludeNodeModulesCancelTitle" xml:space="preserve">
-    <value>Do nothing (recommended)</value>
+    <value>何もしません (推奨)</value>
   </data>
   <data name="IncludeNodeModulesContent" xml:space="preserve">
-    <value>Including 'node_modules' in your project is generally unnecessary, and may reduce Visual Studio's performance. You can continue to use and deploy packages from 'node_modules' without including it in your project.</value>
+    <value>一般に、プロジェクトに &apos;node_modules&apos; を含める必要はなく、含めると Visual Studio のパフォーマンスが低下する可能性があります。&apos;node_modules&apos; をプロジェクトに含めずに、&apos;node_modules&apos; からのパッケージを引き続き利用し、配置することができます。</value>
   </data>
   <data name="IncludeNodeModulesIncludeDescription" xml:space="preserve">
-    <value>This may be a long-running operation, during which Visual Studio will be unusable.</value>
+    <value>この操作には長時間かかることがあります。実行中は、Visual Studio を使用できなくなります。</value>
   </data>
   <data name="IncludeNodeModulesIncludeTitle" xml:space="preserve">
-    <value>Include 'node_modules' folder in project</value>
+    <value>プロジェクトに &apos;node_modules&apos; フォルダーを含める</value>
   </data>
   <data name="IncludeNodeModulesInformation" xml:space="preserve">
-    <value>&lt;a href="http://go.microsoft.com/fwlink/?LinkID=518083"&gt;More Information&lt;/a&gt;</value>
+    <value>&lt;a href=&quot;http://go.microsoft.com/fwlink/?LinkID=518083&quot;&gt;詳細情報&lt;/a&gt;</value>
   </data>
   <data name="RemoteDebugProxyFileDoesNotExist" xml:space="preserve">
-    <value>Remote Debug Proxy "{0}" does not exist.</value>
+    <value>リモート デバッグ プロキシ &quot;{0}&quot; が存在しません。</value>
   </data>
   <data name="RemoteDebugProxyFolderDoesNotExist" xml:space="preserve">
-    <value>Could not find RemoteDebugProxyFolder</value>
+    <value>RemoteDebugProxyFolder が見つかりませんでした</value>
   </data>
   <data name="TypingsToolTypingsInstallCompleted" xml:space="preserve">
-    <value>Successfully installed typing files for IntelliSense.</value>
+    <value>IntelliSense 用の型指定ファイルが正常にインストールされました。</value>
   </data>
   <data name="TypingsToolNotInstalledError" xml:space="preserve">
-    <value>Could not find Typings package manager tool used for IntelliSense</value>
+    <value>IntelliSense に使用する型指定パッケージ マネージャー ツールが見つかりませんでした。</value>
   </data>
   <data name="TypingsToolTypingsInstallErrorOccurred" xml:space="preserve">
-    <value>An error occurred installing typings used for IntelliSense.</value>
+    <value>IntelliSense に使用する型指定のインストール中にエラーが発生しました。</value>
   </data>
   <data name="TypingsInfoBarSpan1" xml:space="preserve">
-    <value>Node.js IntelliSense added a </value>
+    <value>Node.js IntelliSense が次を追加しました:</value>
   </data>
   <data name="TypingsInfoBarSpan2" xml:space="preserve">
-    <value>typings folder</value>
+    <value>型指定フォルダー</value>
   </data>
   <data name="TypingsInfoBarSpan3" xml:space="preserve">
-    <value> to your project</value>
+    <value>このプロジェクトに</value>
   </data>
   <data name="TypingsOpenOptionsText" xml:space="preserve">
-    <value>Customize...</value>
+    <value>カスタマイズ...</value>
   </data>
   <data name="StatusTypingsLoaded" xml:space="preserve">
-    <value>Node.js IntelliSense typings folder is up to date</value>
+    <value>Node.js IntelliSense 型指定フォルダーは最新です</value>
   </data>
   <data name="StatusTypingsLoading" xml:space="preserve">
-    <value>Loading Node.js IntelliSense typings for npm packages...</value>
+    <value>npm パッケージ用の Node.js IntelliSense 型指定を読み込んでいます...</value>
   </data>
   <data name="TypingsToolInstallFailed" xml:space="preserve">
-    <value>Failed to install Typings tool used for IntelliSense. Please make sure Node.js is properly installed</value>
+    <value>IntelliSense のために利用する型指定ツールをインストールできませんでした。Node.js が適切にインストールされていることを確認してください。</value>
   </data>
   <data name="TypingsToolCouldNotStart" xml:space="preserve">
-    <value>Could not start Typings tool used for IntelliSense</value>
+    <value>IntelliSense のために使用する型指定ツールを開始できませんでした</value>
   </data>
   <data name="TypeScriptMinVersionNotInstalled" xml:space="preserve">
-    <value>Node.js Tools requires TypeScript for Visual Studio {0} or higher. Please ensure TypeScript is installed</value>
+    <value>Node.js Tools には、TypeScript for Visual Studio {0} 以降が必要です。TypeScript がインストールされていることを確認してください</value>
   </data>
   <data name="ImportingProjectStatusText" xml:space="preserve">
-    <value>Importing project...</value>
+    <value>プロジェクトをインポートしています...</value>
   </data>
   <data name="ImportingProjectErrorStatusText" xml:space="preserve">
-    <value>An error occurred and your project was not created.</value>
+    <value>エラーが発生し、プロジェクトは作成されませんでした。</value>
   </data>
   <data name="InteractiveWindowFailedToStartProcessErrorMessage" xml:space="preserve">
-    <value>Failed to start interactive process: {0}{1}{2}</value>
+    <value>対話型プロセスを開始できませんでした: {0}{1}{2}</value>
   </data>
   <data name="InteractiveWindowNoProcessErrorMessage" xml:space="preserve">
-    <value>Current interactive window is disconnected - please reset the process.</value>
+    <value>現在の対話型ウィンドウは切断されました。プロセスをリセットしてください。</value>
   </data>
   <data name="InteractiveWindowProcessExitedMessage" xml:space="preserve">
-    <value>The process has exited</value>
+    <value>プロセスは終了しました</value>
   </data>
   <data name="InteractiveWindowTitle" xml:space="preserve">
-    <value>Node.js Interactive Window</value>
+    <value>Node.js 対話型ウィンドウ</value>
   </data>
   <data name="ImportingProjectAccessErrorStatusText" xml:space="preserve">
-    <value>Some file paths could not be accessed.{0}Try moving your source code to a location where you can read and write files.</value>
+    <value>いくつかのファイル パスにアクセスできませんでした。{0}ソース コードを、ファイルの読み書きが可能な場所に移動してください。</value>
   </data>
   <data name="ImportingProjectUnexpectedErrorMessage" xml:space="preserve">
-    <value>An unexpected error {0} occurred while creating your project.</value>
+    <value>プロジェクトの作成中に、予期されないエラー {0} が発生しました。</value>
   </data>
   <data name="NodeModulesCouldNotParsePackageJsonErrorMessageText" xml:space="preserve">
-    <value>Unable to parse {0} from your project.  Please fix any errors and try again.</value>
+    <value>プロジェクトからの {0} を解析できません。エラーを修正してから、もう一度お試しください。</value>
   </data>
   <data name="NpmNotInstalledMessageCaption" xml:space="preserve">
-    <value>npm Not Installed</value>
+    <value>npm がインストールされていません</value>
   </data>
   <data name="NpmNotInstalledMessageText" xml:space="preserve">
-    <value>Could not find npm.cmd. Ensure you have a recent version of node.js installed and have specified the location of node.exe in the project properties, or that it is available on your system PATH.
+    <value>npm.cmd が見つかりませんでした。最新バージョンの Node.js がインストールされていることと、プロジェクトのプロパティで node.exe の場所が指定されていること、システム PATH で使用可能になっていることを確認してください。
 
-The following error occurred trying to execute npm.cmd:
+npm.cmd を実行しているときに、次のエラーが発生しました:
 
 {0}</value>
   </data>
   <data name="AzureRemoteDebugWaitCaption" xml:space="preserve">
-    <value>Azure remote debugging</value>
+    <value>Azure リモート デバッグ</value>
   </data>
   <data name="AzureRemoteDebugWaitMessage" xml:space="preserve">
-    <value>Attaching to Azure Website at {0}</value>
+    <value>Azure Web サイト ({0}) にアタッチしています</value>
   </data>
   <data name="AzureRemoveDebugCouldNotAttachToWebsiteErrorMessage" xml:space="preserve">
-    <value>Could not attach to node.exe process on Azure Website at {0}.
+    <value>Azure Web サイト ({0}) 上の node.exe プロセスにアタッチできませんでした。
 
-Error retrieving websocket debug proxy information from web.config.</value>
+web.config から websocket デバッグ プロキシ情報を取得しようとしてエラーが発生しました。</value>
   </data>
   <data name="AzureRemoveDebugCouldNotAttachToWebsiteExceptionErrorMessage" xml:space="preserve">
-    <value>Failed to attach to Azure Website: {0}</value>
+    <value>Azure Web サイトにアタッチできませんでした: {0}</value>
   </data>
   <data name="RemoteDebugCheckProxyAndPortErrorMessage" xml:space="preserve">
-    <value>Make sure that the process is running behind the remote debug proxy (RemoteDebug.js), and the debugger port (default {0}) is open on the target host.</value>
+    <value>プロセスがリモート デバッグ プロキシ (RemoteDebug.js) の背後で実行されていることと、ターゲット ホストでデバッガー ポート (既定値は {0}) が開かれていることを確認します。</value>
   </data>
   <data name="RemoteDebugCouldNotAttachErrorMessage" xml:space="preserve">
-    <value>Could not attach to Node.js process at {0}{1}
+    <value>位置 {0}{1} で Node.js プロセスにアタッチできませんでした。
 
 </value>
   </data>
   <data name="RemoteDebugEnableWebSocketsErrorMessage" xml:space="preserve">
-    <value>Make sure that the Azure web site is deployed in the Debug configuration, and web sockets are enabled for it in the Azure management portal.</value>
+    <value>Azure Web サイトが Debug 構成で配置されていることと、Azure 管理ポータルでそのサイトに対して Web ソケットが有効にされていることを確認してください。</value>
   </data>
   <data name="RemoteDebugUnsupportedPlatformErrorMessage" xml:space="preserve">
-    <value>Remote debugging of node.js Microsoft Azure applications is only supported on Windows 8 and above.</value>
+    <value>Microsoft Azure の Node.js アプリケーションのリモート デバッグは、Windows 8 以降でのみサポートされています。</value>
   </data>
   <data name="DebugCouldNotResolveStartupFileErrorMessage" xml:space="preserve">
-    <value>Please select a startup file to launch by right-clicking the file in Solution Explorer and selecting 'Set as Node.js Startup File' or by modifying your configuration in project properties</value>
+    <value>起動するスタートアップ ファイルを選択するには、ソリューション エクスプローラーでそのファイルを右クリックして [Node.js のスタートアップ ファイルとして設定] を選ぶか、プロジェクトのプロパティで構成を変更してください。</value>
   </data>
   <data name="DebugInterpreterDoesNotExistErrorMessage" xml:space="preserve">
-    <value>Interpreter "{0}" does not exist.</value>
+    <value>インタープリター &quot;{0}&quot; が存在しません。</value>
   </data>
   <data name="DebugTypeScriptCombineNotSupportedWarningMessage" xml:space="preserve">
-    <value>This TypeScript project has 'Combine Javascript output into file' option enabled. This option is not supported by NTVS debugger, and may result in erratic behavior of breakpoints, stepping, and debug tool windows. Are you sure you want to start debugging?</value>
+    <value>この TypeScript プロジェクトでは、[JavaScript 出力をファイルにまとめる] オプションが有効になっています。このオプションは NTVS デバッガーではサポートされておらず、ブレークポイント、ステップ実行、デバッグ ツール ウィンドウの動作に問題が起きることがあります。デバッグを開始しますか?</value>
   </data>
   <data name="DebugWorkingDirectoryDoesNotExistErrorMessage" xml:space="preserve">
-    <value>Working directory "{0}" does not exist.</value>
+    <value>作業ディレクトリ &quot;{0}&quot; が存在しません。</value>
   </data>
   <data name="DependencyNodeLabelBundled" xml:space="preserve">
-    <value>bundled</value>
+    <value>バンドル</value>
   </data>
   <data name="DependencyNodeLabelMissing" xml:space="preserve">
-    <value>missing</value>
+    <value>欠落</value>
   </data>
   <data name="DependencyNodeLabelNotListed" xml:space="preserve">
-    <value>not listed in {0}</value>
+    <value>{0} の一覧にない</value>
   </data>
   <data name="DependencyNodeModuleDoesNotExist" xml:space="preserve">
-    <value>Path to module does not exist:
+    <value>モジュールへのパスが存在しません
 {0}</value>
   </data>
   <data name="ErrorInvalidLaunchUrl" xml:space="preserve">
-    <value>Launch url '{0}' is not valid </value>
+    <value>起動 URL &apos;{0}&apos; が正しくありません</value>
   </data>
 </root>

@@ -1,0 +1,204 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="FailedToBuild" xml:space="preserve">
+    <value>프로젝트를 빌드하지 못했습니다. 그래도 프로파일링을 시작하시겠습니까?</value>
+  </data>
+  <data name="FailedToOpenFileErrorMessageText" xml:space="preserve">
+    <value>{0} 파일을 열지 못했습니다.</value>
+  </data>
+  <data name="NoConfiguredStatupFileErrorMessageText" xml:space="preserve">
+    <value>프로젝트에 구성된 시작 파일이 없어서 프로파일링을 시작할 수 없습니다.</value>
+  </data>
+  <data name="NodejsToolsForVS" xml:space="preserve">
+    <value>Visual Studio용 Node.js 도구</value>
+  </data>
+  <data name="NoProfilingConfiguredMessageCaption" xml:space="preserve">
+    <value>프로파일링 대상 없음</value>
+  </data>
+  <data name="NoProfilingConfiguredMessageText" xml:space="preserve">
+    <value>프로파일링 세션이 구성되지 않았습니다. 지금 구성한 다음 시작하시겠습니까?</value>
+  </data>
+  <data name="ProfilingOk" xml:space="preserve">
+    <value>확인(_O)</value>
+  </data>
+  <data name="ProfilingStart" xml:space="preserve">
+    <value>시작(_S)</value>
+  </data>
+  <data name="ProjectNotFoundErrorMessageText" xml:space="preserve">
+    <value>현재 솔루션에서 프로젝트를 찾을 수 없습니다.</value>
+  </data>
+  <data name="FailedToReadPerformanceSessionMessageText" xml:space="preserve">
+    <value>성능 세션 {0}을(를) 읽지 못했습니다.</value>
+  </data>
+  <data name="FailedToSaveV8LogMessageText" xml:space="preserve">
+    <value>v8 로그 파일을 다음에 저장하지 못했습니다.
+{0}
+
+프로파일링 데이터를 사용할 수 없습니다.</value>
+  </data>
+  <data name="PerformanceReportNoLongerExistsMessageText" xml:space="preserve">
+    <value>다음 성능 보고서가 더 이상 없습니다. {0}</value>
+  </data>
+  <data name="UnableToDeleteV8Log" xml:space="preserve">
+    <value>&apos;{0}&apos;을(를) 삭제할 수 없습니다.
+
+실행 중인 node.exe의 두 번째 복사본이 있을 수 있고
+결과가 사용할 수 없거나 잘못될 수 있습니다.</value>
+  </data>
+  <data name="BaselineFileLabel" xml:space="preserve">
+    <value>기본 파일(_B):</value>
+  </data>
+  <data name="CancelButtonContent" xml:space="preserve">
+    <value>취소(_C)</value>
+  </data>
+  <data name="CommandLineArgumentsLabel" xml:space="preserve">
+    <value>명령줄 인수(_A):</value>
+  </data>
+  <data name="CompareWindowTitle" xml:space="preserve">
+    <value>비교할 분석 파일 선택</value>
+  </data>
+  <data name="ComparisionFileLabel" xml:space="preserve">
+    <value>비교 파일(_M):</value>
+  </data>
+  <data name="NodePathLabel" xml:space="preserve">
+    <value>노드 경로(_N):</value>
+  </data>
+  <data name="OkButtonContent" xml:space="preserve">
+    <value>확인(_O)</value>
+  </data>
+  <data name="OpenProjectButton" xml:space="preserve">
+    <value>프로젝트 열기(_O)</value>
+  </data>
+  <data name="ProfilingSettingsHeader" xml:space="preserve">
+    <value>프로파일링할 항목을 선택하세요.</value>
+  </data>
+  <data name="ProfilingSettingsTitle" xml:space="preserve">
+    <value>프로파일링 설정</value>
+  </data>
+  <data name="ScriptLabel" xml:space="preserve">
+    <value>스크립트(_R):</value>
+  </data>
+  <data name="StandaloneScriptLabel" xml:space="preserve">
+    <value>독립 실행형 스크립트(_T)</value>
+  </data>
+  <data name="WorkingDirectoryLabel" xml:space="preserve">
+    <value>작업 디렉터리(_W):</value>
+  </data>
+</root>

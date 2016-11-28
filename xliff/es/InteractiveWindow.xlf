@@ -1,102 +1,97 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd" version="1.2">
-  <file original="D:\dd\nodejstools\Nodejs\Product\InteractiveWindow\InteractiveWindow.vsct" source-language="en" datatype="xml" target-language="es">
+<?xml version="1.0" ?><xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
+  <file datatype="xml" original="D:\dd\nodejstools\Nodejs\Product\InteractiveWindow\InteractiveWindow.vsct" source-language="en" target-language="es">
     <body>
       <trans-unit id="menuIdConsoleContextMenu|ButtonText">
         <source xml:lang="en">Interactive Console</source>
-        <target xml:lang="es" state="needs-translation">Interactive Console</target>
+        <target>Consola interactiva</target>
       </trans-unit>
       <trans-unit id="menuIdConsoleContextMenu|CommandName">
         <source xml:lang="en">Interactive Console</source>
-        <target xml:lang="es" state="needs-translation">Interactive Console</target>
+        <target>Consola interactiva</target>
       </trans-unit>
       <trans-unit id="menuIdReplToolbar|ButtonText">
         <source xml:lang="en">Interactive Window</source>
-        <target xml:lang="es" state="needs-translation">Interactive Window</target>
+        <target>Ventana interactiva</target>
       </trans-unit>
       <trans-unit id="menuIdReplToolbar|CommandName">
         <source xml:lang="en">Interactive Window</source>
-        <target xml:lang="es" state="needs-translation">Interactive Window</target>
+        <target>Ventana interactiva</target>
       </trans-unit>
       <trans-unit id="cmdidResetRepl|ButtonText">
         <source xml:lang="en">Reset</source>
-        <target xml:lang="es" state="needs-translation">Reset</target>
+        <target>Restablecer</target>
       </trans-unit>
       <trans-unit id="cmdidResetRepl|CommandName">
         <source xml:lang="en">cmdIdResetRepl</source>
-        <target xml:lang="es" state="needs-translation">cmdIdResetRepl</target>
+        <target>cmdIdResetRepl</target>
       </trans-unit>
       <trans-unit id="cmdidSmartExecute|ButtonText">
         <source xml:lang="en">Execute or Paste Input</source>
-        <target xml:lang="es" state="needs-translation">Execute or Paste Input</target>
+        <target>Ejecutar o pegar entrada</target>
       </trans-unit>
       <trans-unit id="cmdidSmartExecute|CommandName">
         <source xml:lang="en">cmdidSmartExecute</source>
-        <target xml:lang="es" state="needs-translation">cmdidSmartExecute</target>
+        <target>cmdidSmartExecute</target>
       </trans-unit>
       <trans-unit id="cmdidReplHistoryPrevious|ButtonText">
         <source xml:lang="en">History Previous</source>
-        <target xml:lang="es" state="needs-translation">History Previous</target>
+        <target>Historial anterior</target>
       </trans-unit>
       <trans-unit id="cmdidReplHistoryPrevious|CommandName">
         <source xml:lang="en">cmdidReplHistoryPrevious</source>
-        <target xml:lang="es" state="needs-translation">cmdidReplHistoryPrevious</target>
+        <target>cmdidReplHistoryPrevious</target>
       </trans-unit>
       <trans-unit id="cmdidReplHistoryNext|ButtonText">
         <source xml:lang="en">History Next</source>
-        <target xml:lang="es" state="needs-translation">History Next</target>
+        <target>Historial siguiente</target>
       </trans-unit>
       <trans-unit id="cmdidReplHistoryNext|CommandName">
         <source xml:lang="en">cmdidReplHistoryNext</source>
-        <target xml:lang="es" state="needs-translation">cmdidReplHistoryNext</target>
+        <target>cmdidReplHistoryNext</target>
       </trans-unit>
       <trans-unit id="cmdidReplSearchHistoryNext|ButtonText">
         <source xml:lang="en">Search History Next</source>
-        <target xml:lang="es" state="needs-translation">Search History Next</target>
+        <target>Buscar historial siguiente</target>
       </trans-unit>
       <trans-unit id="cmdidReplSearchHistoryNext|CommandName">
         <source xml:lang="en">cmdidReplHistoryNext</source>
-        <target xml:lang="es" state="needs-translation">cmdidReplHistoryNext</target>
+        <target>cmdidReplHistoryNext</target>
       </trans-unit>
       <trans-unit id="cmdidReplSearchHistoryPrevious|ButtonText">
         <source xml:lang="en">Search History Previous</source>
-        <target xml:lang="es" state="needs-translation">Search History Previous</target>
+        <target>Buscar historial anterior</target>
       </trans-unit>
       <trans-unit id="cmdidReplSearchHistoryPrevious|CommandName">
         <source xml:lang="en">cmdidReplHistoryNext</source>
-        <target xml:lang="es" state="needs-translation">cmdidReplHistoryNext</target>
+        <target>cmdidReplHistoryNext</target>
       </trans-unit>
       <trans-unit id="cmdidReplClearScreen|ButtonText">
         <source xml:lang="en">Clear Screen</source>
-        <target xml:lang="es" state="needs-translation">Clear Screen</target>
+        <target>Borrar pantalla</target>
       </trans-unit>
       <trans-unit id="cmdidReplClearScreen|CommandName">
         <source xml:lang="en">cmdidReplClearScreen</source>
-        <target xml:lang="es" state="needs-translation">cmdidReplClearScreen</target>
+        <target>cmdidReplClearScreen</target>
       </trans-unit>
       <trans-unit id="cmdidBreakLine|ButtonText">
         <source xml:lang="en">Break Line</source>
-        <target xml:lang="es" state="needs-translation">Break Line</target>
+        <target>Salto de línea</target>
       </trans-unit>
       <trans-unit id="cmdidBreakLine|CommandName">
         <source xml:lang="en">cmdidBreakLine</source>
-        <target xml:lang="es" state="needs-translation">cmdidBreakLine</target>
+        <target>cmdidBreakLine</target>
       </trans-unit>
       <trans-unit id="cmdidReplClearScreen|ButtonText">
         <source xml:lang="en">Clear Screen</source>
-        <target xml:lang="es" state="needs-translation">Clear Screen</target>
       </trans-unit>
       <trans-unit id="cmdidReplClearScreen|CommandName">
         <source xml:lang="en">Clear Screen</source>
-        <target xml:lang="es" state="needs-translation">Clear Screen</target>
       </trans-unit>
       <trans-unit id="cmdidResetRepl|ButtonText">
         <source xml:lang="en">Reset</source>
-        <target xml:lang="es" state="needs-translation">Reset</target>
       </trans-unit>
       <trans-unit id="cmdidResetRepl|CommandName">
         <source xml:lang="en">cmdIdResetRepl</source>
-        <target xml:lang="es" state="needs-translation">cmdIdResetRepl</target>
       </trans-unit>
     </body>
   </file>

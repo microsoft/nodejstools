@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -59,46 +59,46 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -118,34 +118,34 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ErrorNoDte" xml:space="preserve">
-    <value>Unable to start wizard: no automation object available.</value>
+    <value>Не удалось запустить мастер: объект автоматизации недоступен.</value>
   </data>
   <data name="AzureToolsInstallInstructions" xml:space="preserve">
-    <value>These tools are a free download for your version of Visual Studio that allow you to write, deploy and debug applications for Microsoft Azure in a range of programming languages.</value>
+    <value>Эти инструменты можно скачать бесплатно для вашей версии Visual Studio. Они позволяют вам писать, развертывать и отлаживать приложения для Microsoft Azure на различных языках программирования.</value>
   </data>
   <data name="AzureToolsRequired" xml:space="preserve">
-    <value>This project requires Microsoft Azure Tools for Visual Studio.</value>
+    <value>Для этого проекта необходимы инструменты Microsoft Azure для Visual Studio.</value>
   </data>
   <data name="AzureToolsUpgradeInstructions" xml:space="preserve">
-    <value>Your project can still be created, but some manual configuration of your project will be required and features may be missing or limited.
+    <value>Ваш проект будет создан, но может потребовать ручной настройки, а некоторые функции могут быть ограничены или отключены.
 
-We recommend installing the latest version of Microsoft Azure Tools for Visual Studio.</value>
+Рекомендуем установить последнюю версию инструментов Microsoft Azure для Visual Studio.</value>
   </data>
   <data name="AzureToolsUpgradeRecommended" xml:space="preserve">
-    <value>Your version of Microsoft Azure Tools is not supported by Node.js Tools for Visual Studio.</value>
+    <value>Ваша версия инструментов Microsoft Azure не поддерживается инструментами Node.js для Visual Studio.</value>
   </data>
   <data name="ContinueWithoutAzureToolsUpgrade" xml:space="preserve">
-    <value>&amp;Continue
-Some manual steps will be required to configure your project.</value>
+    <value>&amp;Продолжить
+Для настройки вашего проекта могут потребоваться ручные действия.</value>
   </data>
   <data name="DontShowAgain" xml:space="preserve">
-    <value>Do not show this warning again.</value>
+    <value>Больше не показывать это предупреждение.</value>
   </data>
   <data name="DownloadAndInstall" xml:space="preserve">
-    <value>&amp;Download and install now
-You will need to restart Visual Studio after installation.</value>
+    <value>&amp;Скачать и установить сейчас
+Может потребоваться перезапустить Visual Studio после установки.</value>
   </data>
   <data name="ImportWizzardCouldNotStartNotAutomationObjectErrorMessage" xml:space="preserve">
-    <value>Unable to start wizard: no automation object available.</value>
+    <value>Не удалось запустить мастер: объект автоматизации недоступен.</value>
   </data>
 </root>

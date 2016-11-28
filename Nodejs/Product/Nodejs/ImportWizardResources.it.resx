@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -59,46 +59,46 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -118,51 +118,51 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="BackButtonLabel" xml:space="preserve">
-    <value>_Back</value>
+    <value>_Indietro</value>
   </data>
   <data name="CancelButtonLabel" xml:space="preserve">
-    <value>_Cancel</value>
+    <value>A_nnulla</value>
   </data>
   <data name="F5FileSelectHelpText" xml:space="preserve">
-    <value>If it is not in this list, you can right-click any file in your project and choose "Set as startup file"</value>
+    <value>Se non è presente in questo elenco, è possibile fare clic con il pulsante destro del mouse su un file qualsiasi del progetto e scegliere &quot;Imposta come file di avvio&quot;</value>
   </data>
   <data name="F5FileSelectTitle" xml:space="preserve">
-    <value>Choose which file to run when F5 is pressed.</value>
+    <value>Scegli il file da eseguire quando viene premuto F5</value>
   </data>
   <data name="FileFilterHelpText" xml:space="preserve">
-    <value>Files with the .js extension are always included.</value>
+    <value>I file con l&apos;estensione js sono sempre inclusi.</value>
   </data>
   <data name="FileFilterTitle" xml:space="preserve">
-    <value>Enter the filter for files to include</value>
+    <value>Immetti il filtro per i file da includere</value>
   </data>
   <data name="FinishButtonLabel" xml:space="preserve">
-    <value>_Finish</value>
+    <value>_Fine</value>
   </data>
   <data name="NextButtonLabel" xml:space="preserve">
-    <value>_Next</value>
+    <value>_Avanti</value>
   </data>
   <data name="SaveFileLocationHelpText" xml:space="preserve">
-    <value>We won't move any files, and you can use Save As to move the project file later.</value>
+    <value>I file non verranno spostati ed è possibile usare Salva con nome per spostare il file di progetto in un secondo momento.</value>
   </data>
   <data name="SaveFileLocationTitle" xml:space="preserve">
-    <value>Select where to save your project file</value>
+    <value>Scegli dove salvare il file di progetto</value>
   </data>
   <data name="SaveProjectPageTitle" xml:space="preserve">
-    <value>Save Project</value>
+    <value>Salva progetto</value>
   </data>
   <data name="SelectNodeCodeHelpText" xml:space="preserve">
-    <value>We won't move any files from where they are now.</value>
+    <value>I file non verranno spostati dalla posizione corrente.</value>
   </data>
   <data name="SelectNodeCodeTitle" xml:space="preserve">
-    <value>Enter or browse to the folder containing your Node.js code</value>
+    <value>Immetti o seleziona la cartella che contiene il codice Node.js</value>
   </data>
   <data name="SourceFilesPageTitle" xml:space="preserve">
-    <value>Source Files</value>
+    <value>File di origine</value>
   </data>
   <data name="Welcome" xml:space="preserve">
-    <value>Welcome to the Create New Project from Existing Node.js Code Wizard</value>
+    <value>Creazione guidata nuovo progetto da codice Node.js esistente</value>
   </data>
   <data name="WindowTitle" xml:space="preserve">
-    <value>Create New Project from Existing Node.js Code</value>
+    <value>Crea nuovo progetto da codice Node.js esistente</value>
   </data>
 </root>

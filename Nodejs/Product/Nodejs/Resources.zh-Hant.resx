@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -59,46 +59,46 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -118,506 +118,506 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="LaunchUrlToolTip" xml:space="preserve">
-    <value>Specifies the URL to open in the browser.  If unspecified http://localhost:port is used.\r\nIf a port is specified, it needs to be specified here as well.</value>
+    <value>指定要在瀏覽器中開啟的 URL。若未指定則會使用 http://localhost:port。\r\n若有指定連接埠，則也必須在此指定。</value>
   </data>
   <data name="NodeExeArguments" xml:space="preserve">
-    <value>Arguments to Node.exe</value>
+    <value>Node.exe 的引數</value>
   </data>
   <data name="NodeExeArgumentsDescription" xml:space="preserve">
-    <value>Specifies the options provided to node.exe, such as -e or -i.</value>
+    <value>指定提供給 node.exe 的選項，例如 -e 或 -i。</value>
   </data>
   <data name="NodeExeArgumentsToolTip" xml:space="preserve">
-    <value>Specifies the options provided to node.exe, such as -e or -i.</value>
+    <value>指定提供給 node.exe 的選項，例如 -e 或 -i。</value>
   </data>
   <data name="NodeExePath" xml:space="preserve">
-    <value>Node.exe path</value>
+    <value>Node.exe 路徑</value>
   </data>
   <data name="NodeExePathToolTip" xml:space="preserve">
-    <value>Specifies the path to the node.exe executable.</value>
+    <value>指定 node.exe 可執行檔的路徑。</value>
   </data>
   <data name="NodejsPort" xml:space="preserve">
-    <value>Node.js Port</value>
+    <value>Node.js 連接埠</value>
   </data>
   <data name="NodejsNotInstalled" xml:space="preserve">
-    <value>Could not find a Node.js runtime on your computer.  Please download and install the current Node.js release from https://nodejs.org, or specify the location of your Node.exe in the Visual Studio Node Project's properties page.</value>
+    <value>在您的電腦上找不到 Node.js 執行階段。請從 https://nodejs.org 下載並安裝最新的 Node.js 版本，或在 Visual Studio Node Project 的屬性頁面中指定您 Node.exe 的位置。</value>
   </data>
   <data name="NodejsPortToolTip" xml:space="preserve">
-    <value>Specifies the port number used for process.env.port, if unspecified a random port is generated.</value>
+    <value>指定用於 process.env.port 的連接埠號碼，若未指定則會產生隨機的連接埠。</value>
   </data>
   <data name="NpmPackageName" xml:space="preserve">
-    <value>Package Name</value>
+    <value>套件名稱</value>
   </data>
   <data name="NpmPackageNameDescription" xml:space="preserve">
-    <value>Name of package, as specified in its package.json.</value>
+    <value>套件名稱，如其 package.json 中所指定。</value>
   </data>
   <data name="NpmPackageVersion" xml:space="preserve">
-    <value>Version</value>
+    <value>版本</value>
   </data>
   <data name="NpmPackageVersionDescription" xml:space="preserve">
-    <value>Installed version of package.</value>
+    <value>安裝的套件版本。</value>
   </data>
   <data name="NpmPackageRequestedVersionRange" xml:space="preserve">
-    <value>Requested Version</value>
+    <value>要求的版本</value>
   </data>
   <data name="NpmPackageRequestedVersionRangeDescription" xml:space="preserve">
-    <value>Version of package requested in package.json belonging to parent package or project.</value>
+    <value>package.json 中所要求的套件版本屬於父系套件或專案。</value>
   </data>
   <data name="NpmPackageNewVersionAvailable" xml:space="preserve">
-    <value>Newer Version Available</value>
+    <value>有較新版本可用</value>
   </data>
   <data name="NpmPackageNewVersionAvailableDescription" xml:space="preserve">
-    <value>Indicates whether or not a newer version of the package is available.</value>
+    <value>表示是否有較新版本的套件可用。</value>
   </data>
   <data name="NpmPackageDescription" xml:space="preserve">
-    <value>Description</value>
+    <value>描述</value>
   </data>
   <data name="NpmPackageDescriptionDescription" xml:space="preserve">
-    <value>Package description.</value>
+    <value>套件描述。</value>
   </data>
   <data name="NpmPackageKeywords" xml:space="preserve">
-    <value>Keywords</value>
+    <value>關鍵字</value>
   </data>
   <data name="NpmPackageKeywordsDescription" xml:space="preserve">
-    <value>Package keywords.</value>
+    <value>套件關鍵字。</value>
   </data>
   <data name="NpmPackageAuthor" xml:space="preserve">
-    <value>Author</value>
+    <value>作者</value>
   </data>
   <data name="NpmPackageAuthorDescription" xml:space="preserve">
-    <value>Primary or original author of package; there may also be additional contributors.</value>
+    <value>套件的主要或原始作者; 可能也有其他參與者。</value>
   </data>
   <data name="NpmPackagePath" xml:space="preserve">
-    <value>Path</value>
+    <value>路徑</value>
   </data>
   <data name="NpmPackagePathDescription" xml:space="preserve">
-    <value>Location of package on disk.</value>
+    <value>套件在磁碟上的位置。</value>
   </data>
   <data name="NpmPackageType" xml:space="preserve">
-    <value>Package Type</value>
+    <value>套件類型</value>
   </data>
   <data name="NpmPackageTypeDescription" xml:space="preserve">
-    <value>Indicates whether package is global, or locally installed in your project, and whether or not it is a sub-package.</value>
+    <value>表示套件為全域或在您的專案中以本機安裝，且其是否為子套件。</value>
   </data>
   <data name="NpmPackageLinkStatus" xml:space="preserve">
-    <value>Link Status</value>
+    <value>連結狀態</value>
   </data>
   <data name="NpmPackageLinkStatusDescription" xml:space="preserve">
-    <value>Indicates whether a package has been linked from globally installed packages.</value>
+    <value>表示套件是否已從全域安裝的套件連結。</value>
   </data>
   <data name="NpmPackageIsListedInParentPackageJson" xml:space="preserve">
-    <value>Listed As Dependency</value>
+    <value>列為相依性</value>
   </data>
   <data name="NpmPackageIsListedInParentPackageJsonDescription" xml:space="preserve">
-    <value>Indicates whether or not the package is listed as a package.json dependency.</value>
+    <value>表示套件是否列為 package.json 相依性。</value>
   </data>
   <data name="NpmPackageIsMissing" xml:space="preserve">
-    <value>Missing</value>
+    <value>遺漏</value>
   </data>
   <data name="NpmPackageIsMissingDescription" xml:space="preserve">
-    <value>Indicates whether or not the package is a missing dependency.</value>
+    <value>表示套件是否為遺漏的相依性。</value>
   </data>
   <data name="NpmPackageIsDevDependency" xml:space="preserve">
-    <value>Dev Dependency</value>
+    <value>開發相依性</value>
   </data>
   <data name="NpmPackageIsDevDependencyDescription" xml:space="preserve">
-    <value>Indicates whether or not the package is a development dependency.</value>
+    <value>表示套件是否為開發相依性。</value>
   </data>
   <data name="NpmPackageIsOptionalDependency" xml:space="preserve">
-    <value>Optional Dependency</value>
+    <value>選用相依性</value>
   </data>
   <data name="NpmPackageIsOptionalDependencyDescription" xml:space="preserve">
-    <value>Indicates whether or not the package is an optional dependency.</value>
+    <value>表示套件是否為選用相依性。</value>
   </data>
   <data name="NpmPackageIsBundledDependency" xml:space="preserve">
-    <value>Bundled Dependency</value>
+    <value>配套相依性</value>
   </data>
   <data name="NpmPackageIsBundledDependencyDescription" xml:space="preserve">
-    <value>Indicates whether or not the package is a bundled dependency.</value>
+    <value>表示套件是否為配套相依性。</value>
   </data>
   <data name="CategoryVersion" xml:space="preserve">
-    <value>Version</value>
+    <value>版本</value>
   </data>
   <data name="CategoryStatus" xml:space="preserve">
-    <value>Status</value>
+    <value>狀態</value>
   </data>
   <data name="PackageTypeLocal" xml:space="preserve">
-    <value>Local</value>
+    <value>本機</value>
   </data>
   <data name="PackageTypeLocalSubpackage" xml:space="preserve">
-    <value>Local sub-package</value>
+    <value>本機子套件</value>
   </data>
   <data name="LinkStatusNotApplicableSubPackages" xml:space="preserve">
-    <value>Not applicable for sub-packages.</value>
+    <value>不適用於子套件。</value>
   </data>
   <data name="LinkStatusUnknown" xml:space="preserve">
-    <value>Unknown</value>
+    <value>未知</value>
   </data>
   <data name="RequestedVersionRangeNone" xml:space="preserve">
-    <value>None</value>
+    <value>無</value>
   </data>
   <data name="NpmNodePackageInstallation" xml:space="preserve">
-    <value>Package Installations</value>
+    <value>套件安裝</value>
   </data>
   <data name="NpmNodePackageInstallationDescription" xml:space="preserve">
-    <value>Indicates whether the node manages local or global npm package installations.</value>
+    <value>表示節點管理的是本機或全域 npm 套件安裝。</value>
   </data>
   <data name="NpmNodePath" xml:space="preserve">
-    <value>Path</value>
+    <value>路徑</value>
   </data>
   <data name="NpmNodePathDescription" xml:space="preserve">
-    <value>Base path in which npm packages are installed.</value>
+    <value>npm 套件安裝所在的基本路徑。</value>
   </data>
   <data name="PackageInstallationLocal" xml:space="preserve">
-    <value>Local</value>
+    <value>本機</value>
   </data>
   <data name="PropertiesClassLocalPackage" xml:space="preserve">
-    <value>Local Package Properties</value>
+    <value>本機套件屬性</value>
   </data>
   <data name="PropertiesClassLocalSubPackage" xml:space="preserve">
-    <value>Local Sub-Package Properties</value>
+    <value>本機子套件屬性</value>
   </data>
   <data name="PropertiesClassNpm" xml:space="preserve">
-    <value>npm Packages Properties</value>
+    <value>npm 套件屬性</value>
   </data>
   <data name="ScriptArgumentsToolTip" xml:space="preserve">
-    <value>Specifies the arguments passed to the script on launch.</value>
+    <value>指定在啟動時傳遞至指令碼的引數。</value>
   </data>
   <data name="ScriptFileTooltip" xml:space="preserve">
-    <value>Specifies the script run on launch.</value>
+    <value>指定在啟動時執行的指令碼。</value>
   </data>
   <data name="StartBrowserToolTip" xml:space="preserve">
-    <value>When checked a web browser is opened on launch</value>
+    <value>若核取，則啟動時會開啟網頁瀏覽器</value>
   </data>
   <data name="WorkingDirToolTip" xml:space="preserve">
-    <value>Specifies the working directory where the node.exe process is launched.</value>
+    <value>指定啟動 node.exe 處理序所在的工作目錄。</value>
   </data>
   <data name="NodeExeDoesntExist" xml:space="preserve">
-    <value>Your project is currently configured to look for Node.exe at "{0}" but the file does not exist.</value>
+    <value>您的專案目前設為在 &quot;{0}&quot; 尋找 Node.exe，但檔案不存在。</value>
   </data>
   <data name="NodejsToolsForVisualStudio" xml:space="preserve">
     <value>Node.js Tools for Visual Studio</value>
   </data>
   <data name="NodeExePathNotFound" xml:space="preserve">
-    <value>The specified Node.js interpreter does not exist.</value>
+    <value>指定的 Node.js 解譯器不存在。</value>
   </data>
   <data name="NodejsNotInstalledShort" xml:space="preserve">
-    <value>Node.js has not been detected on your computer</value>
+    <value>在您的電腦上尚未偵測到 Node.js</value>
     <comment>Used in general property page when Node.exe isn't found</comment>
   </data>
   <data name="InvalidPortNumber" xml:space="preserve">
-    <value>Invalid port number - the port should contain only digits.</value>
+    <value>連接埠號碼無效 - 連接埠應僅包含數字。</value>
   </data>
   <data name="WorkingDirInvalidOrMissing" xml:space="preserve">
-    <value>The specified working directory is invalid or missing.</value>
+    <value>遺漏指定的工作目錄或其為無效。</value>
   </data>
   <data name="CatalogLoadingDefault" xml:space="preserve">
-    <value>Loading published package list...</value>
+    <value>正在載入發行的套件清單...</value>
   </data>
   <data name="NoKeywordsInPackage" xml:space="preserve">
-    <value>(This package has no keywords.)</value>
+    <value>(此套件沒有關鍵字。)</value>
   </data>
   <data name="PackageCatalogRefreshing" xml:space="preserve">
-    <value>Currently refreshing</value>
+    <value>目前正在重新整理</value>
   </data>
   <data name="PackageCatalogRefresh0Days" xml:space="preserve">
-    <value>Today at {0:t}</value>
+    <value>今日於 {0:t}</value>
   </data>
   <data name="PackageCatalogRefresh1Day" xml:space="preserve">
-    <value>Yesterday at {0:t}</value>
+    <value>昨日於 {0:t}</value>
   </data>
   <data name="PackageCatalogRefresh2To7Days" xml:space="preserve">
-    <value>{0} days ago</value>
+    <value>{0} 天前</value>
   </data>
   <data name="PackageCatalogRefresh1Week" xml:space="preserve">
-    <value>More than 1 week ago</value>
+    <value>超過 1 週前</value>
   </data>
   <data name="PackageCatalogRefresh2Weeks" xml:space="preserve">
-    <value>More than 2 weeks ago</value>
+    <value>超過 2 週前</value>
   </data>
   <data name="PackageCatalogRefresh3Weeks" xml:space="preserve">
-    <value>More than 3 weeks ago</value>
+    <value>超過 3 週前</value>
   </data>
   <data name="PackageCatalogRefresh1Month" xml:space="preserve">
-    <value>More than 1 month ago</value>
+    <value>超過 1 個月前</value>
   </data>
   <data name="PackageCatalogRefresh3Months" xml:space="preserve">
-    <value>More than 3 months ago</value>
+    <value>超過 3 個月前</value>
   </data>
   <data name="NpmCancelledWithErrors" xml:space="preserve">
-    <value>{0} cancelled with errors - see Output window for details</value>
+    <value>{0} 已取消且發生錯誤 - 請參閱 [輸出] 視窗了解詳細資料</value>
   </data>
   <data name="NpmCompletedWithErrors" xml:space="preserve">
-    <value>{0} completed with errors - see Output window for details</value>
+    <value>{0} 完成但發生錯誤 - 請參閱 [輸出] 視窗了解詳細資料</value>
   </data>
   <data name="NpmCancelled" xml:space="preserve">
-    <value>{0} cancelled</value>
+    <value>{0} 已取消</value>
   </data>
   <data name="NpmSuccessfullyCompleted" xml:space="preserve">
-    <value>{0} successfully completed</value>
+    <value>{0} 已成功完成</value>
   </data>
   <data name="NpmStatusReady" xml:space="preserve">
-    <value>Ready</value>
+    <value>就緒</value>
   </data>
   <data name="NpmStatusReadyWithErrors" xml:space="preserve">
-    <value>Ready - Command(s) completed with errors ({0})</value>
+    <value>就緒 - 命令完成但發生錯誤 ({0})</value>
   </data>
   <data name="NpmStatusExecuting" xml:space="preserve">
-    <value>Executing: {0}</value>
+    <value>正在執行: {0}</value>
   </data>
   <data name="NpmStatusExecutingQueued" xml:space="preserve">
-    <value>Executing: {0} ({1} command(s) queued)</value>
+    <value>正在執行: {0} (已將 {1} 個命令排入佇列)</value>
   </data>
   <data name="NpmStatusExecutingErrors" xml:space="preserve">
-    <value>Errors Encountered ({1}) - Executing: {0}</value>
+    <value>遇到的錯誤 ({1}) - 正在執行: {0}</value>
   </data>
   <data name="NpmStatusExecutingQueuedErrors" xml:space="preserve">
-    <value>Errors Encountered ({2}) - Executing: {0} ({1} command(s) queued)</value>
+    <value>遇到的錯誤 ({2}}) - 正在執行: {0} (已將 {1} 個命令排入佇列)</value>
   </data>
   <data name="TestFramework" xml:space="preserve">
-    <value>Test Framework</value>
+    <value>測試架構</value>
   </data>
   <data name="TestFrameworkDescription" xml:space="preserve">
-    <value>Specifies the test framework this file applies to.</value>
+    <value>指定此檔案適用的測試架構。</value>
   </data>
   <data name="DebuggerPort" xml:space="preserve">
-    <value>Specifies the port used to communicate with the debugger</value>
+    <value>指定用來與偵錯工具通訊的連接埠</value>
   </data>
   <data name="EnvironmentVariables" xml:space="preserve">
-    <value>Specifies environment variables to be set in the spawned process in the form:
+    <value>以下列格式指定繁衍的處理序中要設定的環境變數:
 
 NAME1=value1
 NAME2=value2
 ...</value>
   </data>
   <data name="DebuggerConnectionClosed" xml:space="preserve">
-    <value>Debugger connection was closed.</value>
+    <value>已關閉偵錯工具連線。</value>
   </data>
   <data name="DebuggerModuleUpdateFailed" xml:space="preserve">
-    <value>Failed to update file contents.</value>
+    <value>無法更新檔案內容。</value>
   </data>
   <data name="NodejsNotSupported" xml:space="preserve">
-    <value>This version of Node.js ({0}) is not supported. Please upgrade to Node.js v0.10.20 or later.</value>
+    <value>不支援此版本的 Node.js ({0})。請升級至 Node.js v0.10.20 或更新版本。</value>
   </data>
   <data name="PackageCatalogRefreshFailed" xml:space="preserve">
-    <value>Refresh failed - see output below for details</value>
+    <value>重新整理失敗 - 請參閱下方輸出了解詳細資料</value>
   </data>
   <data name="ReplInitializationMessage" xml:space="preserve">
-    <value>Node.js interactive window. Type .help for a list of commands.</value>
+    <value>Node.js Interactive 視窗。輸入 .help 即可取得命令清單。</value>
   </data>
   <data name="ReplWindowNpmInitNoYesFlagWarning" xml:space="preserve">
-    <value>Please run '.npm init -y' to create a new package.json file.</value>
+    <value>請執行 &apos;.npm init -y&apos; 建立新的 package.json 檔案。</value>
   </data>
   <data name="NodeExePathDescription" xml:space="preserve">
-    <value>Specifies the path to the node.exe executable.</value>
+    <value>指定 node.exe 可執行檔的路徑。</value>
   </data>
   <data name="NodejsPortDescription" xml:space="preserve">
-    <value>Specifies the port number used for process.env.port, if unspecified a random port is generated.</value>
+    <value>指定用於 process.env.port 的連接埠號碼，若未指定則會產生隨機的連接埠。</value>
   </data>
   <data name="NpmOutputPaneTitle" xml:space="preserve">
     <value>Npm</value>
   </data>
   <data name="NpmPackageInstallHelpMessage" xml:space="preserve">
-    <value>(enter arguments above)</value>
+    <value>(輸入上方引數)</value>
   </data>
   <data name="NpmReplCommandCompletedWithErrors" xml:space="preserve">
-    <value>{0} completed with errors</value>
+    <value>{0} 已完成但發生錯誤</value>
   </data>
   <data name="LongPathWarningTitle" xml:space="preserve">
-    <value>Path Too Long Warning</value>
+    <value>路徑過長的警告</value>
   </data>
   <data name="LongPathWarningText" xml:space="preserve">
-    <value>Your project folder contains one or more paths that exceed the &lt;a href="#msdn"&gt;260 character limit&lt;/a&gt;. Visual Studio &lt;a href="#uservoice"&gt;does not fully support&lt;/a&gt; such projects. You may run into issues building and publishing your project, or interference with other Visual Studio and Node.js Tools features.</value>
+    <value>您的專案資料夾內含一或多個超過 &lt;a href=&quot;#msdn&quot;&gt;260 個字元限制&lt;/a&gt;的路徑。Visual Studio &lt;a href=&quot;#uservoice&quot;&gt;不會完整支援&lt;/a&gt;此類專案。您可能會在建置或發佈專案時遇到問題，或與其他 Visual Studio 及 Node.js Tools 功能互相干擾。</value>
   </data>
   <data name="LongPathShowPathsExceedingTheLimit" xml:space="preserve">
-    <value>Show &amp;paths exceeding the limit</value>
+    <value>顯示超過限制的路徑(&amp;P)</value>
   </data>
   <data name="LongPathHidePathsExceedingTheLimit" xml:space="preserve">
-    <value>Hide &amp;paths exceeding the limit</value>
+    <value>隱藏超過限制的路徑(&amp;P)</value>
   </data>
   <data name="LongPathNpmDedupe" xml:space="preserve">
-    <value>Run 'npm &amp;dedupe' on the project</value>
+    <value>在專案上執行 &apos;npm dedupe&apos;(&amp;D)</value>
   </data>
   <data name="LongPathNpmDedupeDetail" xml:space="preserve">
-    <value>In some cases, deduplicating packages can reduce the amount of nesting in node_modules sufficiently to resolve the issue.</value>
+    <value>在某些案例中，刪除套件的重複資料可減少在 node_modules 中解決問題所需的巢狀量。</value>
   </data>
   <data name="LongPathDoNothingButWarnNextTime" xml:space="preserve">
-    <value>Do nothing, but &amp;warn me next time it happens</value>
+    <value>不執行任何動作，但在下次發生時警告我(&amp;W)</value>
   </data>
   <data name="LongPathDoNothingAndDoNotWarnAgain" xml:space="preserve">
-    <value>Do nothing and &amp;never warn me again</value>
+    <value>不執行任何動作，且一律不要再警告我(&amp;N)</value>
   </data>
   <data name="LongPathDoNothingAndDoNotWarnAgainDetail" xml:space="preserve">
-    <value>You can re-enable the check in Tools → Options → Node.js Tools → General.</value>
+    <value>您可以在 [工具] → [選項] → [Node.js Tools] → [一般] 中重新啟用檢查。</value>
   </data>
   <data name="LongPathFooter" xml:space="preserve">
-    <value>&lt;a href="#help"&gt;Get more information&lt;/a&gt;</value>
+    <value>&lt;a href=&quot;#help&quot;&gt;取得詳細資訊&lt;/a&gt;</value>
   </data>
   <data name="LongPathClickToCopy" xml:space="preserve">
-    <value>Copy Full Path</value>
+    <value>複製完整路徑</value>
   </data>
   <data name="LongPathNpmDedupeDidNotHelp" xml:space="preserve">
-    <value>Unfortunately, running 'npm dedupe' did not resolve the issue. Please consult the &lt;a href="#help"&gt;documentation&lt;/a&gt; for other potential workarounds.</value>
+    <value>很不幸地，執行 &apos;npm dedupe&apos; 並未解決問題。請參閱&lt;a href=&quot;#help&quot;&gt;文件&lt;/a&gt;取得其他可能的因應措施。</value>
   </data>
   <data name="CacheDirectoryClearFailedTitle" xml:space="preserve">
-    <value>Could Not Clear Node.js Cache Directory</value>
+    <value>無法清除 Node.js 快取目錄</value>
   </data>
   <data name="CacheDirectoryClearFailedCaption" xml:space="preserve">
-    <value>Could not clear Node.js cache directory. Try manually deleting the directory: {0}</value>
+    <value>無法清除 Node.js 快取目錄。嘗試手動刪除目錄: {0}</value>
   </data>
   <data name="UpgradedEnvironmentVariables" xml:space="preserve">
-    <value>Replaced &lt;EnvironmentVariables&gt; property with &lt;Environment&gt;. This project will no longer work with NTVS 1.0 beta 2 or below.</value>
+    <value>已使用 &lt;Environment&gt; 取代 &lt;EnvironmentVariables&gt; 屬性。此專案不再適用於 NTVS 1.0  	Beta 2 或更低版本。</value>
   </data>
   <data name="StatusAnalysisUpToDate" xml:space="preserve">
-    <value>Node.js code analysis is up to date, analyzed {0:N0} function(s) in {1}</value>
+    <value>Node.js 程式碼分析為最新狀態，已分析 {1} 中的 {0:N0} 個函式</value>
   </data>
   <data name="IncludeNodeModulesCancelTitle" xml:space="preserve">
-    <value>Do nothing (recommended)</value>
+    <value>不執行任何動作 (建議)</value>
   </data>
   <data name="IncludeNodeModulesContent" xml:space="preserve">
-    <value>Including 'node_modules' in your project is generally unnecessary, and may reduce Visual Studio's performance. You can continue to use and deploy packages from 'node_modules' without including it in your project.</value>
+    <value>您通常不需要將 &apos;node_modules&apos; 包含在專案內，因為這麼做可能降低 Visual Studio 的效能。您可以持續使用及部署 &apos;node_modules&apos; 的套件而無須將其包含在您的專案中。</value>
   </data>
   <data name="IncludeNodeModulesIncludeDescription" xml:space="preserve">
-    <value>This may be a long-running operation, during which Visual Studio will be unusable.</value>
+    <value>這可能是項長時間執行的作業，在此期間將無法使用 Visual Studio。</value>
   </data>
   <data name="IncludeNodeModulesIncludeTitle" xml:space="preserve">
-    <value>Include 'node_modules' folder in project</value>
+    <value>在專案中包含 &apos;node_modules&apos; 資料夾</value>
   </data>
   <data name="IncludeNodeModulesInformation" xml:space="preserve">
-    <value>&lt;a href="http://go.microsoft.com/fwlink/?LinkID=518083"&gt;More Information&lt;/a&gt;</value>
+    <value>&lt;a href=&quot;http://go.microsoft.com/fwlink/?LinkID=518083&quot;&gt;詳細資訊&lt;/a&gt;</value>
   </data>
   <data name="RemoteDebugProxyFileDoesNotExist" xml:space="preserve">
-    <value>Remote Debug Proxy "{0}" does not exist.</value>
+    <value>遠端偵錯 Proxy &quot;{0}&quot; 不存在。</value>
   </data>
   <data name="RemoteDebugProxyFolderDoesNotExist" xml:space="preserve">
-    <value>Could not find RemoteDebugProxyFolder</value>
+    <value>找不到 RemoteDebugProxyFolder</value>
   </data>
   <data name="TypingsToolTypingsInstallCompleted" xml:space="preserve">
-    <value>Successfully installed typing files for IntelliSense.</value>
+    <value>已成功為 IntelliSense 安裝類型檔。</value>
   </data>
   <data name="TypingsToolNotInstalledError" xml:space="preserve">
-    <value>Could not find Typings package manager tool used for IntelliSense</value>
+    <value>找不到用於 IntelliSense 的類型套件管理員工具</value>
   </data>
   <data name="TypingsToolTypingsInstallErrorOccurred" xml:space="preserve">
-    <value>An error occurred installing typings used for IntelliSense.</value>
+    <value>安裝用於 IntelliSense 的類型時發生錯誤。</value>
   </data>
   <data name="TypingsInfoBarSpan1" xml:space="preserve">
-    <value>Node.js IntelliSense added a </value>
+    <value>Node.js IntelliSense 新增了</value>
   </data>
   <data name="TypingsInfoBarSpan2" xml:space="preserve">
-    <value>typings folder</value>
+    <value>類型資料夾</value>
   </data>
   <data name="TypingsInfoBarSpan3" xml:space="preserve">
-    <value> to your project</value>
+    <value>至您的專案</value>
   </data>
   <data name="TypingsOpenOptionsText" xml:space="preserve">
-    <value>Customize...</value>
+    <value>自訂...</value>
   </data>
   <data name="StatusTypingsLoaded" xml:space="preserve">
-    <value>Node.js IntelliSense typings folder is up to date</value>
+    <value>Node.js IntelliSense 類型資料夾為最新狀態</value>
   </data>
   <data name="StatusTypingsLoading" xml:space="preserve">
-    <value>Loading Node.js IntelliSense typings for npm packages...</value>
+    <value>正在載入 npm 套件的 Node.js IntelliSense 類型...</value>
   </data>
   <data name="TypingsToolInstallFailed" xml:space="preserve">
-    <value>Failed to install Typings tool used for IntelliSense. Please make sure Node.js is properly installed</value>
+    <value>無法安裝用於 IntelliSense 的類型工具。請確認已正確安裝 Node.js</value>
   </data>
   <data name="TypingsToolCouldNotStart" xml:space="preserve">
-    <value>Could not start Typings tool used for IntelliSense</value>
+    <value>無法啟動用於 IntelliSense 的類型工具</value>
   </data>
   <data name="TypeScriptMinVersionNotInstalled" xml:space="preserve">
-    <value>Node.js Tools requires TypeScript for Visual Studio {0} or higher. Please ensure TypeScript is installed</value>
+    <value>對於 Visual Studio {0} 或更新版本，Node.js Tools 需要 TypeScript 。請確認已安裝 TypeScript</value>
   </data>
   <data name="ImportingProjectStatusText" xml:space="preserve">
-    <value>Importing project...</value>
+    <value>正在匯入專案...</value>
   </data>
   <data name="ImportingProjectErrorStatusText" xml:space="preserve">
-    <value>An error occurred and your project was not created.</value>
+    <value>發生錯誤，未建立您的專案。</value>
   </data>
   <data name="InteractiveWindowFailedToStartProcessErrorMessage" xml:space="preserve">
-    <value>Failed to start interactive process: {0}{1}{2}</value>
+    <value>無法啟動 Interactive 處理序: {0}{1}{2}</value>
   </data>
   <data name="InteractiveWindowNoProcessErrorMessage" xml:space="preserve">
-    <value>Current interactive window is disconnected - please reset the process.</value>
+    <value>已中斷目前 Interactive 視窗的連線 - 請重設處理序。</value>
   </data>
   <data name="InteractiveWindowProcessExitedMessage" xml:space="preserve">
-    <value>The process has exited</value>
+    <value>處理序已結束</value>
   </data>
   <data name="InteractiveWindowTitle" xml:space="preserve">
-    <value>Node.js Interactive Window</value>
+    <value>Node.js Interactive 視窗</value>
   </data>
   <data name="ImportingProjectAccessErrorStatusText" xml:space="preserve">
-    <value>Some file paths could not be accessed.{0}Try moving your source code to a location where you can read and write files.</value>
+    <value>無法存取部分檔案路徑。{0}嘗試將您的原始程式碼移至您可讀取及寫入檔案的位置。</value>
   </data>
   <data name="ImportingProjectUnexpectedErrorMessage" xml:space="preserve">
-    <value>An unexpected error {0} occurred while creating your project.</value>
+    <value>建立您的專案時發生未預期的錯誤 {0}。</value>
   </data>
   <data name="NodeModulesCouldNotParsePackageJsonErrorMessageText" xml:space="preserve">
-    <value>Unable to parse {0} from your project.  Please fix any errors and try again.</value>
+    <value>無法剖析您專案的 {0}。請修正任何錯誤並再試一次。</value>
   </data>
   <data name="NpmNotInstalledMessageCaption" xml:space="preserve">
-    <value>npm Not Installed</value>
+    <value>npm 未安裝</value>
   </data>
   <data name="NpmNotInstalledMessageText" xml:space="preserve">
-    <value>Could not find npm.cmd. Ensure you have a recent version of node.js installed and have specified the location of node.exe in the project properties, or that it is available on your system PATH.
+    <value>找不到 npm.cmd。請確認您已安裝最新版本的 node.js 且已在專案屬性中指定 node.exe 的位置，或其在您的系統路徑上可用。
 
-The following error occurred trying to execute npm.cmd:
+嘗試執行 npm.cmd 時發生下列錯誤:
 
 {0}</value>
   </data>
   <data name="AzureRemoteDebugWaitCaption" xml:space="preserve">
-    <value>Azure remote debugging</value>
+    <value>Azure 遠端偵錯</value>
   </data>
   <data name="AzureRemoteDebugWaitMessage" xml:space="preserve">
-    <value>Attaching to Azure Website at {0}</value>
+    <value>正在於 {0} 連結至 Azure 網站</value>
   </data>
   <data name="AzureRemoveDebugCouldNotAttachToWebsiteErrorMessage" xml:space="preserve">
-    <value>Could not attach to node.exe process on Azure Website at {0}.
+    <value>無法於 {0} 在 Azure 網站上連結至 node.exe 處理序。
 
-Error retrieving websocket debug proxy information from web.config.</value>
+從 web.config 擷取 WebSocket 偵錯 Proxy 資訊時發生錯誤。</value>
   </data>
   <data name="AzureRemoveDebugCouldNotAttachToWebsiteExceptionErrorMessage" xml:space="preserve">
-    <value>Failed to attach to Azure Website: {0}</value>
+    <value>無法連結至 Azure 網站: {0}</value>
   </data>
   <data name="RemoteDebugCheckProxyAndPortErrorMessage" xml:space="preserve">
-    <value>Make sure that the process is running behind the remote debug proxy (RemoteDebug.js), and the debugger port (default {0}) is open on the target host.</value>
+    <value>確認處理序執行於遠端偵錯 Proxy (RemoteDebug.js) 後，且偵錯連接埠 (預設 {0}) 在目標主機上為開啟。</value>
   </data>
   <data name="RemoteDebugCouldNotAttachErrorMessage" xml:space="preserve">
-    <value>Could not attach to Node.js process at {0}{1}
+    <value>無法於 {0}{1} 連結至 Node.js 處理序
 
 </value>
   </data>
   <data name="RemoteDebugEnableWebSocketsErrorMessage" xml:space="preserve">
-    <value>Make sure that the Azure web site is deployed in the Debug configuration, and web sockets are enabled for it in the Azure management portal.</value>
+    <value>確認 Azure 網站已在 [偵錯] 設定中部署，且已在 Azure 管理入口網站中為其啟用 Web 通訊端。</value>
   </data>
   <data name="RemoteDebugUnsupportedPlatformErrorMessage" xml:space="preserve">
-    <value>Remote debugging of node.js Microsoft Azure applications is only supported on Windows 8 and above.</value>
+    <value>僅 Windows 8 及更新版本支援 node.js Microsoft Azure 應用程式的遠端偵錯。</value>
   </data>
   <data name="DebugCouldNotResolveStartupFileErrorMessage" xml:space="preserve">
-    <value>Please select a startup file to launch by right-clicking the file in Solution Explorer and selecting 'Set as Node.js Startup File' or by modifying your configuration in project properties</value>
+    <value>請選取要啟動的啟動檔案，方法是以滑鼠右鍵按一下方案總管中的檔案，並選取 [設為 Node.js 啟動檔案]，或是修改專案屬性中的設定。</value>
   </data>
   <data name="DebugInterpreterDoesNotExistErrorMessage" xml:space="preserve">
-    <value>Interpreter "{0}" does not exist.</value>
+    <value>解譯器 &quot;{0}&quot; 不存在。</value>
   </data>
   <data name="DebugTypeScriptCombineNotSupportedWarningMessage" xml:space="preserve">
-    <value>This TypeScript project has 'Combine Javascript output into file' option enabled. This option is not supported by NTVS debugger, and may result in erratic behavior of breakpoints, stepping, and debug tool windows. Are you sure you want to start debugging?</value>
+    <value>此 TypeScript 專案已啟用 [將 JavaScript 輸出合併至檔案] 選項。此選項不受 NTVS 偵錯工具支援，且可能導致中斷點、步驟及偵錯工具視窗的不穩定行為。確定要開始偵錯嗎?</value>
   </data>
   <data name="DebugWorkingDirectoryDoesNotExistErrorMessage" xml:space="preserve">
-    <value>Working directory "{0}" does not exist.</value>
+    <value>工作目錄 &quot;{0}&quot; 不存在。</value>
   </data>
   <data name="DependencyNodeLabelBundled" xml:space="preserve">
-    <value>bundled</value>
+    <value>配套</value>
   </data>
   <data name="DependencyNodeLabelMissing" xml:space="preserve">
-    <value>missing</value>
+    <value>遺漏</value>
   </data>
   <data name="DependencyNodeLabelNotListed" xml:space="preserve">
-    <value>not listed in {0}</value>
+    <value>未列於 {0}</value>
   </data>
   <data name="DependencyNodeModuleDoesNotExist" xml:space="preserve">
-    <value>Path to module does not exist:
+    <value>模組路徑不存在:
 {0}</value>
   </data>
   <data name="ErrorInvalidLaunchUrl" xml:space="preserve">
-    <value>Launch url '{0}' is not valid </value>
+    <value>啟動 URL &apos;{0}&apos; 無效</value>
   </data>
 </root>

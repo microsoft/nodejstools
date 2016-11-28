@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -59,46 +59,46 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -118,87 +118,87 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ErrNpmCatalogEmpty" xml:space="preserve">
-    <value>Unable to retrieve npm catalog: the web service may be unavailable.</value>
+    <value>无法检索 npm 目录: Web 服务可能不可用。</value>
   </data>
   <data name="PackagesDownloadComplete" xml:space="preserve">
-    <value>Download complete - updating database</value>
+    <value>下载完成 - 正在更新数据库</value>
   </data>
   <data name="PackagesDownloadedXMB" xml:space="preserve">
-    <value>Downloaded {0}MB of the package list</value>
+    <value>包列表已下载 {0}MB</value>
   </data>
   <data name="PackagesDownloadStarting" xml:space="preserve">
-    <value>Downloading list of packages from {0}</value>
+    <value>正在从 {0} 下载包列表</value>
   </data>
   <data name="PackagesDownloadedXOfYMB" xml:space="preserve">
-    <value>Downloaded {0}MB of the package list ({1}MB total)</value>
+    <value>包列表已下载 {0}MB (总共 {1}MB)</value>
   </data>
   <data name="ErrCannotStartNpm" xml:space="preserve">
-    <value>Error executing npm - unable to start the npm process</value>
+    <value>执行 npm 时出错 - 无法启动 npm 进程</value>
   </data>
   <data name="ExecutingCommand" xml:space="preserve">
-    <value>Executing command 'npm {0}'</value>
+    <value>正在执行命令“npm {0}”</value>
   </data>
   <data name="InfoCurrentTime" xml:space="preserve">
-    <value>Current Time: {0}</value>
+    <value>当前时间: {0}</value>
     <comment>args: Date/time</comment>
   </data>
   <data name="InfoDeletingFile" xml:space="preserve">
-    <value>Deleting {0}</value>
+    <value>正在删除 {0}</value>
     <comment>args: filename</comment>
   </data>
   <data name="InfoLastRefreshed" xml:space="preserve">
-    <value>Last Refreshed: {0}</value>
+    <value>上次刷新时间: {0}</value>
     <comment>args: Date/time</comment>
   </data>
   <data name="InfoNpmPathLocation" xml:space="preserve">
-    <value>Path to npm: {0}</value>
+    <value>npm 路径: {0}</value>
   </data>
   <data name="InfoNumberOfResults" xml:space="preserve">
-    <value>Number of Results: {0}</value>
+    <value>结果数: {0}</value>
   </data>
   <data name="InfoPackageCacheWriteLocation" xml:space="preserve">
-    <value>Downloading package cache to {0}</value>
+    <value>正在将包缓存下载到  {0}</value>
     <comment>args: filename</comment>
   </data>
   <data name="InfoReadingBytesFromPackageCache" xml:space="preserve">
-    <value>Reading {0} bytes from {1} ({2})</value>
+    <value>正在从 {1} ({2}) 读取 {0} 个字节</value>
     <comment>args: number, filepath, date/time</comment>
   </data>
   <data name="NpmCommandCancelled" xml:space="preserve">
-    <value>npm command cancelled</value>
+    <value>npm 命令已取消</value>
   </data>
   <data name="NpmCommandCompletedWithExitCode" xml:space="preserve">
-    <value>npm command completed with exit code {0}</value>
+    <value>npm 命令已完成，退出代码为 {0}</value>
   </data>
   <data name="ParsingError" xml:space="preserve">
-    <value>Parsing error (package {0})</value>
+    <value>正在分析错误(包 {0})</value>
     <comment>args: package name</comment>
   </data>
   <data name="FailedToDeleteFile" xml:space="preserve">
-    <value>Could not delete file {0} - try deleting it manually.</value>
+    <value>无法删除文件 {0} - 尝试手动删除。</value>
   </data>
   <data name="DatabaseCorrupt" xml:space="preserve">
-    <value>Database is corrupt - deleting {0}. Try refreshing the catalog again. Otherwise restart Visual Studio, and try again.</value>
+    <value>数据库损坏 - 正在删除 {0}。尝试再次刷新目录。或重新启动 Visual Studio，然后再试。</value>
     <comment>args: filename</comment>
   </data>
   <data name="DownloadOrParsingFailed" xml:space="preserve">
-    <value>Download or parsing failed - deleting {0}. Try refreshing the catalog again. Otherwise restart Visual Studio, and try again.</value>
+    <value>下载或分析失败 - 正在删除 {0}。尝试再次刷新目录。或重新启动 Visual Studio，然后再试。</value>
     <comment>args: filename</comment>
   </data>
   <data name="ErrorCatalogInUse" xml:space="preserve">
-    <value>Package catalog cache file is in use. Verify you are not refreshing the catalog in multiple instances.</value>
+    <value>包目录缓存文件正在使用。请确认未在多个实例中刷新此目录。</value>
   </data>
   <data name="InfoCatalogUpgrade" xml:space="preserve">
-    <value>Your package catalog database needs to be upgraded. Please wait while we execute a full refresh.</value>
+    <value>包目录数据库需要升级。执行完全刷新期间请稍候。</value>
   </data>
   <data name="InfoRegistryUrl" xml:space="preserve">
-    <value>Registry url: {0}</value>
+    <value>注册表 URL: {0}</value>
   </data>
   <data name="InvalidPackageSemVersion" xml:space="preserve">
-    <value>Semversion {0} for package {1} is invalid</value>
+    <value>包 {1} 的 Semversion {0} 无效</value>
     <comment>args: semantic version, package name</comment>
   </data>
   <data name="CouldNotFindNpm" xml:space="preserve">
-    <value>Could not find npm. Please make sure Node.js is installed</value>
+    <value>无法找到 npm。请确保安装了 Node.js</value>
   </data>
 </root>
