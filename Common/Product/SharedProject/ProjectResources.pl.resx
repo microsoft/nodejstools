@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -59,46 +59,46 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -118,553 +118,552 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AddToNullProjectError" xml:space="preserve">
-    <value>Failed to add file '{0}' to project as project is null.</value>
+    <value>Nie można dodać pliku „{0}” do projektu, ponieważ projekt ma wartość null.</value>
   </data>
   <data name="Advanced" xml:space="preserve">
-    <value>Advanced</value>
+    <value>Zaawansowane</value>
     <comment>Project Property Page Caption</comment>
   </data>
   <data name="ReferenceAlreadyExists" xml:space="preserve">
-    <value>A reference to component '{0}' cannot be added. A reference to the component already exists in the project.</value>
+    <value>Nie można dodać odwołania do składnika „{0}”. Odwołanie do tego składnika już istnieje w projekcie.</value>
     <comment>ReferenceAlreadyExists error message</comment>
   </data>
   <data name="AttributeLoad" xml:space="preserve">
-    <value>Could not load attribute '{0}' from project file '{1}'.</value>
+    <value>Nie można załadować atrybutu „{0}” z pliku projektu „{1}”.</value>
   </data>
   <data name="BuildAction" xml:space="preserve">
-    <value>Build Action</value>
+    <value>Akcja kompilacji</value>
     <comment>Project Build Property Name</comment>
   </data>
   <data name="BuildActionDescription" xml:space="preserve">
-    <value>How the file relates to the build and deployment process</value>
+    <value>W jaki sposób plik odnosi się do procesu kompilacji i wdrażania</value>
     <comment>Project Build Property Description</comment>
   </data>
   <data name="BuildVerbosity" xml:space="preserve">
-    <value>Verbosity</value>
+    <value>Poziom szczegółowości</value>
   </data>
   <data name="BuildVerbosityDescription" xml:space="preserve">
-    <value>Specify how much information is included in the build output</value>
+    <value>Określ, ile informacji jest uwzględnianych w danych wyjściowych kompilacji</value>
   </data>
   <data name="cli1" xml:space="preserve">
-    <value>ECMA-335 CLI compatible framework (location must be provided)</value>
+    <value>Platforma zgodna z interfejsem wiersza polecenia ECMA-335 (musi być podana lokalizacja)</value>
     <comment>Target platform drop down option</comment>
   </data>
   <data name="Compile" xml:space="preserve">
-    <value>Compile</value>
+    <value>Kompiluj</value>
     <comment>Build Action - drop down option</comment>
   </data>
   <data name="ConfirmExtensionChange" xml:space="preserve">
-    <value>If you change a file name extension, the file may become unusable. Are you sure you want to change it?</value>
+    <value>Jeśli zmienisz rozszerzenie nazwy pliku, plik może przestać nadawać się do użycia. Czy na pewno chcesz je zmienić?</value>
   </data>
   <data name="CannotAddFileThatIsOpenInEditor" xml:space="preserve">
-    <value>A file with name '{0}' already exists and is open in an editor. Please give a unique name to the item you are adding, or delete the existing item first.</value>
+    <value>Plik o nazwie „{0}” już istnieje i jest otwarty w edytorze. Najpierw nadaj unikatową nazwę edytowanemu elementowi lub usuń istniejący element.</value>
   </data>
   <data name="CanNotSaveFileNotOpeneInEditor" xml:space="preserve">
-    <value>Cannot save '{0}' as it is not open in the editor.</value>
+    <value>Nie można zapisać pliku „{0}”, ponieważ nie jest on otwarty w edytorze.</value>
   </data>
   <data name="Content" xml:space="preserve">
-    <value>Content</value>
+    <value>Zawartość</value>
     <comment>Build Action - drop down option</comment>
   </data>
   <data name="CopyToLocal" xml:space="preserve">
-    <value>Copy Local</value>
+    <value>Kopiuj lokalnie</value>
     <comment>File property</comment>
   </data>
   <data name="CopyToLocalDescription" xml:space="preserve">
-    <value>Indicates whether the reference will be copied to the output directory.</value>
+    <value>Wskazuje, czy odwołanie zostanie skopiowane do katalogu wyjściowego.</value>
   </data>
   <data name="Detailed" xml:space="preserve">
-    <value>Detailed</value>
+    <value>Szczegółowo</value>
   </data>
   <data name="Diagnostic" xml:space="preserve">
-    <value>Diagnostic</value>
+    <value>Diagnostyka</value>
   </data>
   <data name="DirectoryExistsShortMessage" xml:space="preserve">
-    <value>Directory already exists</value>
+    <value>Katalog już istnieje</value>
   </data>
   <data name="EditorViewError" xml:space="preserve">
-    <value>Error opening specified view '{0}' using editor '{1}'</value>
+    <value>Błąd otwierania określonego widoku „{0}” przy użyciu edytora „{1}</value>
   </data>
   <data name="EmbeddedResource" xml:space="preserve">
-    <value>Embedded Resource</value>
+    <value>Zasób osadzony</value>
     <comment>Build Action - drop down option</comment>
   </data>
   <data name="Error" xml:space="preserve">
-    <value>error</value>
+    <value>błąd</value>
   </data>
   <data name="ErrorInvalidFileName" xml:space="preserve">
-    <value>Invalid filename: {0}
+    <value>Nieprawidłowa nazwa pliku: {0}
       
-Files and folders cannot be:
-- Empty strings 
-- System reserved names, including 'CON', 'AUX', PRN', 'COM1' or 'LPT2' 
-- contain only '.'
-- have any of the following characters: / ? : &amp;  \ * " &lt; &gt; | # %</value>
+Pliki i foldery nie mogą być:
+- pustymi ciągami 
+- nazwami zastrzeżonymi w systemie, w tym „CON”, „AUX”, „PRN”, „COM1” lub „LPT2” 
+- zawierać jedynie znaku „.”
+- zawierać dowolnego z tych znaków: / ? : &amp;  \ * &quot; &lt; &gt; | # %</value>
   </data>
   <data name="ErrorInvalidProjectName" xml:space="preserve">
-    <value>The name you provided is not a valid project name.</value>
+    <value>Podana nazwa nie jest prawidłową nazwą projektu.</value>
   </data>
   <data name="ErrorMsBuildRegistration" xml:space="preserve">
-    <value>MSBuild path not found in registry. Please reinstall to fix the problem.</value>
+    <value>Nie znaleziono ścieżki MSBuild w rejestrze. Aby usunąć problem, przeprowadź ponownie instalację.</value>
   </data>
   <data name="ErrorSaving" xml:space="preserve">
-    <value>Error Saving File</value>
+    <value>Błąd podczas zapisywania pliku</value>
   </data>
   <data name="Exe" xml:space="preserve">
-    <value>Console Application</value>
+    <value>Aplikacja konsoli</value>
   </data>
   <data name="ExpectedObjectOfType" xml:space="preserve">
-    <value>Expecting object of type {0}.</value>
+    <value>Oczekiwano obiektu o typie {0}.</value>
   </data>
   <data name="FailedToRetrieveProperties" xml:space="preserve">
-    <value>Failed to retrieve MSBuild property {0} from the project file.</value>
+    <value>Nie można pobrać właściwości MSBuild {0} z pliku projektu.</value>
     <comment>The exception message thrown when getting a property from msbuild fails.</comment>
   </data>
   <data name="FileAlreadyExists" xml:space="preserve">
-    <value>A file with the same name '{0}' already exists. Do you want to overwrite it?</value>
+    <value>Plik o takiej samej nazwie „{0}” już istnieje. Czy chcesz go zastąpić?</value>
   </data>
   <data name="FileAlreadyExistsAndCannotBeRenamed" xml:space="preserve">
-    <value>A file with the same name '{0}' already exists.</value>
+    <value>Plik o takiej samej nazwie „{0}” już istnieje.</value>
   </data>
   <data name="FileAlreadyExistsCaption" xml:space="preserve">
-    <value>Destination File Exists</value>
+    <value>Plik docelowy istnieje</value>
   </data>
   <data name="FileAlreadyInProject" xml:space="preserve">
-    <value>A file named '{0}' is already part of the project. Do you want to overwrite it?</value>
+    <value>Plik o nazwie „{0}” jest już częścią projektu. Czy chcesz go zastąpić?</value>
   </data>
   <data name="FileAlreadyInProjectCaption" xml:space="preserve">
-    <value>Destination File Exists</value>
+    <value>Plik docelowy istnieje</value>
   </data>
   <data name="FileCannotBeRenamedToAnExistingFile" xml:space="preserve">
-    <value>A file or folder with the name '{0}' already exists on disk at this location. Please choose another name.</value>
+    <value>Plik lub folder o nazwie „{0}” już istnieje na dysku w tej lokalizacji. Wybierz inną nazwę.</value>
   </data>
   <data name="FileCopyError" xml:space="preserve">
-    <value>Error Copying File</value>
+    <value>Błąd podczas kopiowania pliku</value>
   </data>
   <data name="FileName" xml:space="preserve">
-    <value>File Name</value>
+    <value>Nazwa pliku</value>
   </data>
   <data name="FileNameCannotContainALeadingPeriod" xml:space="preserve">
-    <value>File and folder names cannot contain a leading period.</value>
+    <value>Nazwy plików i folderów nie mogą zaczynać się od kropki.</value>
   </data>
   <data name="FileNameDescription" xml:space="preserve">
-    <value>The name of the file or folder</value>
+    <value>Nazwa pliku lub folderu</value>
   </data>
   <data name="FolderName" xml:space="preserve">
-    <value>Folder Name</value>
+    <value>Nazwa folderu</value>
   </data>
   <data name="FolderNameDescription" xml:space="preserve">
-    <value>Name of this folder</value>
+    <value>Nazwa tego folderu.</value>
   </data>
   <data name="FullPath" xml:space="preserve">
-    <value>Full Path</value>
+    <value>Pełna ścieżka</value>
   </data>
   <data name="FullPathDescription" xml:space="preserve">
-    <value>Location of the file</value>
+    <value>Lokalizacja pliku</value>
   </data>
   <data name="General" xml:space="preserve">
-    <value>General</value>
+    <value>Ogólne</value>
   </data>
   <data name="ItemDoesNotExistInProjectDirectory" xml:space="preserve">
-    <value>The item '{0}' does not exist in the project directory. It may have been moved, renamed or deleted.</value>
+    <value>Element „{0}” nie istnieje w katalogu projektu. Mógł zostać przeniesiony lub usunięty albo jego nazwa mogła zostać zmieniona.</value>
   </data>
   <data name="LaunchUrl" xml:space="preserve">
-    <value>Launch URL</value>
+    <value>Adres URL uruchamiania</value>
   </data>
   <data name="LaunchUrlDescription" xml:space="preserve">
-    <value>The URL which should be opened in the browser when launching the project</value>
+    <value>Adres URL, który powinien zostać otwarty w przeglądarce podczas uruchamiania projektu</value>
   </data>
   <data name="LinkedItemsAreNotSupported" xml:space="preserve">
-    <value>Cannot save '{0}' outside the project directory. Linked items are not supported.</value>
+    <value>Nie można zapisać elementu „{0}” poza katalogiem projektu. Połączone elementy nie są obsługiwane.</value>
   </data>
   <data name="Library" xml:space="preserve">
-    <value>Class Library</value>
+    <value>Biblioteka klas</value>
   </data>
   <data name="Minimal" xml:space="preserve">
-    <value>Minimal</value>
+    <value>Minimalne</value>
   </data>
   <data name="Misc" xml:space="preserve">
-    <value>Misc</value>
+    <value>Różne</value>
   </data>
   <data name="None" xml:space="preserve">
-    <value>None</value>
+    <value>Brak</value>
   </data>
   <data name="Normal" xml:space="preserve">
-    <value>Normal</value>
+    <value>Normalne</value>
   </data>
   <data name="PasteFailed" xml:space="preserve">
-    <value>Item is not available or corrupted and thus cannot be pasted.</value>
+    <value>Element jest niedostępny lub uszkodzony i nie można go wkleić.</value>
   </data>
   <data name="Program" xml:space="preserve">
     <value>Program</value>
   </data>
   <data name="Project" xml:space="preserve">
-    <value>Project</value>
+    <value>Projekt</value>
   </data>
   <data name="ProjectContainsCircularReferences" xml:space="preserve">
-    <value>A reference to library '{0}' cannot be added. Adding this project as a reference would cause a circular dependency. </value>
+    <value>Nie można dodać odwołania do aplikacji „{0}”. Dodanie tego projektu jako odwołania spowodowałoby powstanie zależności cyklicznej. </value>
   </data>
   <data name="ProjectFile" xml:space="preserve">
-    <value>Project File</value>
+    <value>Plik projektu</value>
   </data>
   <data name="ProjectFileDescription" xml:space="preserve">
-    <value>The name of the file containing build, configuration, and other information about the project.</value>
+    <value>Nazwa pliku zawierającego dane kompilacji, konfiguracji i inne informacje o projekcie.</value>
   </data>
   <data name="ProjectFolder" xml:space="preserve">
-    <value>Project Folder</value>
+    <value>Folder projektu</value>
   </data>
   <data name="ProjectFolderDescription" xml:space="preserve">
-    <value>The absolute location of the project.</value>
+    <value>Bezwzględna lokalizacja projektu.</value>
   </data>
   <data name="Quiet" xml:space="preserve">
-    <value>Quiet</value>
+    <value>Cicha</value>
   </data>
   <data name="RefName" xml:space="preserve">
-    <value>(Name)</value>
+    <value>(Nazwa)</value>
   </data>
   <data name="ReferencesNodeName" xml:space="preserve">
-    <value>References</value>
+    <value>Odwołania</value>
   </data>
   <data name="RefNameDescription" xml:space="preserve">
-    <value>Display name of the reference</value>
+    <value>Nazwa wyświetlana odwołania</value>
   </data>
   <data name="RenameFolder" xml:space="preserve">
-    <value>Rename directory failed. {0}</value>
+    <value>Zmiana nazwy katalogu nie powiodła się. {0}</value>
   </data>
   <data name="RTL" xml:space="preserve">
     <value>RTL_False</value>
   </data>
   <data name="SaveCaption" xml:space="preserve">
-    <value>Save?</value>
+    <value>Zapisać?</value>
   </data>
   <data name="SaveModifiedDocuments" xml:space="preserve">
-    <value>Do you want to save modified documents?</value>
+    <value>Czy chcesz zapisać zmodyfikowane dokumenty?</value>
   </data>
   <data name="SaveOfProjectFileOutsideCurrentDirectory" xml:space="preserve">
-    <value>The project file can only be saved into the project location '{0}'.</value>
+    <value>Plik projektu można zapisać wyłącznie w lokalizacji projektu „{0}”.</value>
   </data>
   <data name="ScriptArguments" xml:space="preserve">
-    <value>Script arguments</value>
+    <value>Argumenty skryptu</value>
   </data>
   <data name="ScriptArgumentsDescription" xml:space="preserve">
-    <value>Arguments passed to the script on launch</value>
+    <value>Argumenty przekazywane do skryptu przy uruchamianiu</value>
   </data>
   <data name="StandardEditorViewError" xml:space="preserve">
-    <value>Error opening specified view '{0}' using standard editor.</value>
+    <value>Błąd otwierania określonego widoku „{0}” przy użyciu edytora standardowego.</value>
   </data>
   <data name="StartupFile" xml:space="preserve">
-    <value>Startup file</value>
+    <value>Plik startowy</value>
   </data>
   <data name="StartupFileDescription" xml:space="preserve">
-    <value>The startup file which is launched when running or debugging</value>
+    <value>Plik startowy, który jest uruchamiany przy uruchamianiu lub debugowaniu</value>
   </data>
   <data name="StartWebBrowser" xml:space="preserve">
-    <value>Start web browser</value>
+    <value>Uruchom przeglądarkę sieci Web</value>
   </data>
   <data name="StartWebBrowserDescription" xml:space="preserve">
-    <value>True to start the web browser when launching</value>
+    <value>Ustaw wartość Prawda, aby otwierać przeglądarkę sieci Web przy uruchamianiu</value>
   </data>
   <data name="URL" xml:space="preserve">
-    <value>URL</value>
+    <value>Adres URL</value>
   </data>
   <data name="UseOfDeletedItemError" xml:space="preserve">
-    <value>You are trying to use an item that has already been deleted or that does not exist.</value>
+    <value>Probujesz użyć elementu, który który został już usunięty bądź nie istnieje.</value>
   </data>
   <data name="v1" xml:space="preserve">
-    <value>Microsoft .NET Framework v1.0</value>
+    <value>Microsoft .NET Framework 1.0</value>
   </data>
   <data name="v11" xml:space="preserve">
-    <value>Microsoft .NET Framework v1.1</value>
+    <value>Microsoft .NET Framework 1.1</value>
   </data>
   <data name="v2" xml:space="preserve">
-    <value>Microsoft .NET Framework v2.0</value>
+    <value>Microsoft .NET Framework 2.0</value>
   </data>
   <data name="Warning" xml:space="preserve">
-    <value>warning</value>
+    <value>ostrzeżenie</value>
   </data>
   <data name="WinExe" xml:space="preserve">
-    <value>Windows Application</value>
+    <value>Aplikacja systemu Windows</value>
   </data>
   <data name="WorkingDirectory" xml:space="preserve">
-    <value>Working directory</value>
+    <value>Katalog roboczy</value>
   </data>
   <data name="WorkingDirectoryDescription" xml:space="preserve">
-    <value>The working directory when launching</value>
+    <value>Katalog roboczy podczas uruchamiania</value>
   </data>
   <data name="AddReferenceDialogTitle" xml:space="preserve">
-    <value>Add Reference</value>
+    <value>Dodaj odwołanie</value>
   </data>
   <data name="InvalidAutomationObject" xml:space="preserve">
-    <value>Automation object invalid.</value>
+    <value>Nieprawidłowy obiekt automatyzacji.</value>
   </data>
   <data name="CancelQueryEdit" xml:space="preserve">
-    <value>The command you are attempting cannot be completed because the file '{0}' that must be modified cannot be changed. If the file is under source control, you may want to check it out; if the file is read-only on disk, you may want to change its attributes.</value>
+    <value>Nie można ukończyć polecenia, którego próbujesz użyć, ponieważ nie można zmienić pliku „{0}”, który musi zostać zmodyfikowany. Jeśli plik jest objęty kontrolą źródła, możesz zechcieć go wyewidencjonować; jeśli plik jest zapisany na dysku jako tylko do odczytu, możesz zechcieć zmienić jego atrybuty.</value>
     <comment>MsgBox</comment>
   </data>
   <data name="ParameterMustBeAValidGuid" xml:space="preserve">
-    <value>Parameter must be a valid guid.</value>
+    <value>Parametr musi być prawidłowym identyfikatorem GUID.</value>
     <comment>Error message in the ArgumentException for a  parameter that is not a valid guid.</comment>
   </data>
   <data name="InvalidLoggerType" xml:space="preserve">
-    <value>Invalid logger type\nExpected: {0}\nReceived: {1}</value>
+    <value>Nieprawidłowy typ rejestratora\nOczekiwany: {0}\nOdebrany: {1}</value>
     <comment>Error message thrown for when an  invalid logger type is set.</comment>
   </data>
   <data name="InvalidParameter" xml:space="preserve">
-    <value>InvalidParameter</value>
+    <value>Nieprawidłowy parametr</value>
     <comment>Generic error message for invalid parameters.</comment>
   </data>
   <data name="ParameterCannotBeNullOrEmpty" xml:space="preserve">
-    <value>ParameterCannotBeNullOEmpty</value>
+    <value>Parametr nie może być równy null ani pusty</value>
     <comment>Error message for string parameters that cannot be null or empty.</comment>
   </data>
   <data name="ParameterMustBeAValidItemId" xml:space="preserve">
-    <value>Parameter must be a valid item identifier.</value>
+    <value>Parametr musi być prawidłowym identyfikatorem elementu.</value>
     <comment>Error message thrown when an invalid item id is retrieved.</comment>
   </data>
   <data name="FileProperties" xml:space="preserve">
-    <value>File Properties</value>
+    <value>Właściwości pliku</value>
   </data>
   <data name="FolderProperties" xml:space="preserve">
-    <value>Folder Properties</value>
+    <value>Właściwości folderu</value>
   </data>
   <data name="ProjectProperties" xml:space="preserve">
-    <value>Project Properties</value>
+    <value>Właściwości projektu</value>
   </data>
   <data name="ReferenceProperties" xml:space="preserve">
-    <value>Reference Properties</value>
+    <value>Właściwości odwołania</value>
   </data>
   <data name="FileOrFolderAlreadyExists" xml:space="preserve">
-    <value>A file or folder with the name '{0}' already exists on disk at this location. Please choose another name.</value>
+    <value>Plik lub folder o nazwie „{0}” już istnieje na dysku w tej lokalizacji. Wybierz inną nazwę.</value>
   </data>
   <data name="BuildCaption" xml:space="preserve">
-    <value>Build</value>
+    <value>Kompiluj</value>
   </data>
   <data name="OutputPath" xml:space="preserve">
-    <value>Output Path</value>
+    <value>Ścieżka wyjściowa</value>
   </data>
   <data name="OutputPathDescription" xml:space="preserve">
-    <value>The path to the primary output</value>
+    <value>Ścieżka do głównego wyjścia</value>
   </data>
   <data name="PathTooLong" xml:space="preserve">
-    <value>The complete path to '{0}' exceeds the maximum number of characters permitted by the file system.</value>
+    <value>Pełna ścieżka do elementu „{0}” zawiera więcej znaków niż maksymalna liczba znaków dozwolona przez system plików.</value>
   </data>
   <data name="CustomTool" xml:space="preserve">
-    <value>Custom Tool</value>
+    <value>Narzędzie niestandardowe</value>
   </data>
   <data name="CustomToolDescription" xml:space="preserve">
-    <value>Specifies the tool that transforms a file at design time and places the output of that transformation into another file. For example, a dataset (.xsd) file comes with a default custom tool.</value>
+    <value>Określa narzędzie przekształcające plik w czasie projektowania i umieszczające dane wyjściowe takiej transformacji w innym pliku. Przykładowo plik zbioru danych (.xsd) jest dostarczany z domyślnym narzędziem niestandardowym.</value>
   </data>
   <data name="CustomToolNamespace" xml:space="preserve">
-    <value>Custom Tool Namespace</value>
+    <value>Przestrzeń nazw narzędzia niestandardowego</value>
   </data>
   <data name="CustomToolNamespaceDescription" xml:space="preserve">
-    <value>The namespace into which the output of the custom tool is placed.</value>
+    <value>Przestrzeń nazw, w której umieszczane są dane wyjściowe narzędzia niestandardowego.</value>
   </data>
   <data name="OutputBuilt" xml:space="preserve">
-    <value>Primary Output</value>
+    <value>Główne wyjście</value>
   </data>
   <data name="OutputContentFiles" xml:space="preserve">
-    <value>Content Files</value>
+    <value>Pliki zawartości</value>
   </data>
   <data name="OutputDocumentation" xml:space="preserve">
-    <value>Documentation Files</value>
+    <value>Pliki dokumentacji</value>
   </data>
   <data name="OutputLocalizedResourceDlls" xml:space="preserve">
-    <value>Localized Resources</value>
+    <value>Zlokalizowane zasoby</value>
   </data>
   <data name="OutputSourceFiles" xml:space="preserve">
-    <value>Source Files</value>
+    <value>Pliki źródłowe</value>
   </data>
   <data name="OutputSymbols" xml:space="preserve">
-    <value>Debug Symbols</value>
+    <value>Symbole debugowania</value>
   </data>
   <data name="OutputXmlSerializer" xml:space="preserve">
-    <value>XML Serialization Assemblies</value>
+    <value>Zestawy serializacji XML</value>
   </data>
   <data name="OutputBuiltDescription" xml:space="preserve">
-    <value>Contains the DLL or EXE built by the project.</value>
+    <value>Zawiera pliki DLL i EXE skompilowane przez projekt.</value>
   </data>
   <data name="OutputContentFilesDescription" xml:space="preserve">
-    <value>Contains all content files in the project.</value>
+    <value>Zawiera wszystkie pliki zawartości w projekcie.</value>
   </data>
   <data name="OutputDocumentationDescription" xml:space="preserve">
-    <value>Contains the XML Documentation files for the project.</value>
+    <value>Zawiera pliki dokumentacji XML dla projektu.</value>
   </data>
   <data name="OutputLocalizedResourceDllsDescription" xml:space="preserve">
-    <value>Contains the satellite assemblies for each culture's resources.</value>
+    <value>Zawiera zestawy satelickie dla zasobów każdej kultury.</value>
   </data>
   <data name="OutputSourceFilesDescription" xml:space="preserve">
-    <value>Contains all source files in the project.</value>
+    <value>Zawiera wszystkie pliki źródłowe w projekcie.</value>
   </data>
   <data name="OutputSymbolsDescription" xml:space="preserve">
-    <value>Contains the debugging files for the project.</value>
+    <value>Zawiera pliki debugowania dla projektu.</value>
   </data>
   <data name="OutputXmlSerializerDescription" xml:space="preserve">
-    <value>Contains the XML serialization assemblies for the project.</value>
+    <value>Zawiera zestawy serializacji XML dla projektu.</value>
   </data>
   <data name="QueryReloadNestedProject" xml:space="preserve">
-    <value>The project file '{0}' has been modified outside of Visual Studio.  Do you want to reload the project?</value>
+    <value>Plik projektu „{0}” został zmodyfikowany poza programem Visual Studio. Czy chcesz ponownie załadować projekt?</value>
   </data>
   <data name="NestedProjectFailedToReload" xml:space="preserve">
-    <value>The nested project has failed to reload.</value>
+    <value>Nie udało się załadować ponownie zagnieżdżonego projektu.</value>
   </data>
   <data name="FileOrFolderCannotBeFound" xml:space="preserve">
-    <value>The item '{0}' cannot be found on disk, either because it has been renamed, deleted, or moved to a new location.</value>
+    <value>Nie można znaleźć elementu „{0}” na dysku, ponieważ jego nazwa została zmieniona albo został on usunięty lub przeniesiony do nowej lokalizacji.</value>
   </data>
   <data name="ErrorReferenceCouldNotBeAdded" xml:space="preserve">
-    <value>A reference to {0} could not be added. Please make sure that the file is accessible, and that it is a valid assembly or COM component.</value>
+    <value>Nie można dodać odwołania do elementu {0}. Upewnij się, że plik jest dostępny i że jest prawidłowym zestawem lub składnikiem COM.</value>
   </data>
   <data name="DetailsImport" xml:space="preserve">
-    <value>An 'Import' of the file '{1}' was found in the project file '{0}'. This file is not registered as a safe file to import, and could contain targets and tasks that are harmful.  If this imported file is indeed considered safe, then it can be registered by writing to the registry key {2}.</value>
+    <value>Element „Import” dla pliku „{1}” został znaleziony w pliku projektu „{0}”. Ten plik nie jest zarejestrowany jako bezpieczny do zaimportowania i może zawierać szkodliwe cele lub zadania. Jeżeli ten importowany plik jest faktycznie uważany za bezpieczny, można go zarejestrować, wpisując do rejestru klucz {2}.</value>
   </data>
   <data name="DetailsUserImport" xml:space="preserve">
-    <value>An 'Import' of the file '{1}' was found in the user project file '{0}'.  All imports in user project files are considered unsafe.</value>
+    <value>Element „Import” dla pliku „{1}” został znaleziony w pliku projektu użytkownika „{0}”. Wszystkie importy w plikach projektu użytkownika są uznawane za niebezpieczne.</value>
   </data>
   <data name="DetailsItem" xml:space="preserve">
-    <value>One or more items named '{1}' were found in the project file '{0}'. These items normally should not be specified in the project file. They can change the way targets and tasks are executed during project load, and this could have harmful effects.</value>
+    <value>Znaleziono co najmniej jeden element o nazwie „{1}” w pliku projektu „{0}”. Te elementy normalnie nie powinny być określane w pliku projektu. Mogą one zmieniać sposób, w jaki cele i zadania i są wykonywane podczas ładowania projektu, a to może mieć negatywne skutki.</value>
   </data>
   <data name="DetailsProperty" xml:space="preserve">
-    <value>A property named '{1}' was found in the project file '{0}'.  This property normally should not be specified in the project file.  Its value can change the way targets and tasks are executed during project load, and this could have harmful effects.</value>
+    <value>Znaleziono właściwość o nazwie „{1}” w pliku projektu „{0}”. Ta właściwość normalnie nie powinna być określana w pliku projektu. Jej wartość może zmienić sposób, w jaki cele i zadania są wykonywane podczas ładowania projektu, a to może mieć negatywne skutki.</value>
   </data>
   <data name="DetailsUsingTask" xml:space="preserve">
-    <value>A 'UsingTask' tag which registers the '{1}' task was found in the project file '{0}'.  'UsingTask' tags in the project file take precedence over those in the imported .TARGETS files, and therefore could be used to execute arbitrary code during an otherwise unmodified build process.</value>
+    <value>Tag „UsingTask”, który rejestruje zadanie „{1}”, znaleziono w pliku projektu „{0}”. Tagi „UsingTask” w pliku projektu mają pierwszeństwo nad znajdującymi się w zaimportowanych plikach .TARGETS, dlatego mogą być używane do wykonywania dowolnego kodu podczas niezmodyfikowanego w żaden inny sposób procesu kompilacji.</value>
   </data>
   <data name="DetailsTarget" xml:space="preserve">
-    <value>A 'Target' named '{1}' was found in the project file '{0}'.  The tasks within this target could contain arbitrary code and may get executed as soon as the project is loaded in the IDE.</value>
+    <value>Element „Target” o nazwie „{1}” został znaleziony w pliku projektu „{0}”. Zadania w ramach tego celu mogą zawierać dowolny kod i mogą zostać wykonane po załadowaniu projektu do środowiska IDE.</value>
   </data>
   <data name="DetailsItemLocation" xml:space="preserve">
-    <value>An item referring to the file '{1}' was found in the project file '{0}'.  Since this file is located within a system directory, root directory, or network share, it could be harmful to write to this file.</value>
+    <value>Element odwołujący się do pliku „{1}” został znaleziony w pliku projektu „{0}”. Ponieważ ten plik znajduje się w katalogu systemowym, katalogu głównym lub udziale sieciowym, zapisywanie do tego pliku może mieć negatywne skutki.</value>
   </data>
   <data name="ProjectLocationNotTrusted" xml:space="preserve">
-    <value>The project location is not trusted:{0}{0}{1}{0}{0}Running the application may result in security exceptions when it {0}attempts to perform actions which require full trust.{0}{0}Click OK to ignore and continue.</value>
+    <value>Lokalizacja projektu nie jest zaufana:{0}{0}{1}{0}{0}Uruchomienie aplikacji może skutkować wyjątkami zabezpieczeń,  gdy będzie ona {0}próbować wykonywać akcje wymagające pełnego zaufania.{0}{0}Kliknij przycisk OK, aby to zignorować i kontynuować.</value>
   </data>
   <data name="BuildEventError" xml:space="preserve">
-    <value>Exception was thrown during BuildBegin event\n{0}</value>
+    <value>Zgłoszono wyjątek podczas zdarzenia BuildBegin\n{0}</value>
   </data>
   <data name="Settings" xml:space="preserve">
-    <value>Settings</value>
+    <value>Ustawienia</value>
   </data>
   <data name="v3" xml:space="preserve">
-    <value>Microsoft .NET Framework v3.0</value>
+    <value>Microsoft .NET Framework 3.0</value>
   </data>
   <data name="v35" xml:space="preserve">
-    <value>Microsoft .NET Framework v3.5</value>
+    <value>Microsoft .NET Framework 3.5</value>
   </data>
   <data name="v4" xml:space="preserve">
-    <value>Microsoft .NET Framework v4.0</value>
+    <value>Microsoft .NET Framework 4.0</value>
   </data>
   <data name="Publish" xml:space="preserve">
-    <value>Publish</value>
+    <value>Opublikuj</value>
   </data>
   <data name="PublishDescription" xml:space="preserve">
-    <value>If the file should be included in the files which are published.</value>
+    <value>Czy plik powinien zostać uwzględniony w publikowanych plikach.</value>
   </data>
   <data name="WebPiFeed" xml:space="preserve">
-    <value>Feed</value>
+    <value>Źródło danych</value>
   </data>
   <data name="WebPiFeedDescription" xml:space="preserve">
-    <value>The WebPI Feed that contains this reference</value>
+    <value>Źródło danych WebPI zawierające to odwołanie</value>
   </data>
   <data name="WebPiProduct" xml:space="preserve">
-    <value>Product ID</value>
+    <value>Identyfikator produktu</value>
   </data>
   <data name="WebPiProductDescription" xml:space="preserve">
-    <value>The product ID that for this web reference</value>
+    <value>Identyfikator produktu dla tego odwołania sieci Web</value>
   </data>
   <data name="WebPiReferenceProperties" xml:space="preserve">
-    <value>WebPI Reference Properties</value>
+    <value>Właściwości odwołania WebPI</value>
   </data>
   <data name="PathTooLongShortMessage" xml:space="preserve">
-    <value>The filename or extension is too long.</value>
+    <value>Nazwa pliku lub rozszerzenie jest za długie.</value>
   </data>
   <data name="ProjectHome" xml:space="preserve">
-    <value>Project Home</value>
+    <value>Katalog główny projektu</value>
   </data>
   <data name="ProjectHomeDescription" xml:space="preserve">
-    <value>The base location for all files in the project</value>
+    <value>Podstawowa lokalizacja dla wszystkich plików w projekcie</value>
   </data>
   <data name="UnknownInParentheses" xml:space="preserve">
-    <value>(Unknown)</value>
+    <value>(Brak informacji)</value>
   </data>
   <data name="ErrorInvalidLaunchUrl" xml:space="preserve">
-    <value>Project is configured to launch to invalid URL: "{0}"
+    <value>Projekt jest skonfigurowany do uruchamiania pod nieprawidłowym adresem URL: „{0}”
 
-Your web browser will not be opened.</value>
+Przeglądarka sieci Web nie zostanie otwarta.</value>
   </data>
   <data name="UnexpectedUpgradeError" xml:space="preserve">
-    <value>An unexpected error occurred while attempting to upgrade a project: {0}
-Run Visual Studio with the /Log option and check ActivityLog.xml for more detail.</value>
+    <value>Wystąpił nieoczekiwany błąd podczas próby uaktualnienia projektu: {0}
+Uruchom program Visual Studio z opcją /Log. Więcej szczegółów znajdziesz w pliku ActivityLog.xml.</value>
   </data>
   <data name="UpgradeCannotCheckOutProject" xml:space="preserve">
-    <value>The project could not be upgraded because it could not be checked out from source control.</value>
+    <value>Nie można uaktualnić projektu, ponieważ nie można go wyewidencjonować z kontroli źródła.</value>
   </data>
   <data name="UpgradeCannotLoadProject" xml:space="preserve">
-    <value>The project could not be loaded.</value>
+    <value>Nie można było załadować projektu.</value>
   </data>
   <data name="UpgradeNotRequired" xml:space="preserve">
-    <value>No upgrade required for project.</value>
+    <value>Dla projektu nie jest wymagane uaktualnienie.</value>
   </data>
   <data name="UnhandledException" xml:space="preserve">
-    <value>Unhandled exception in {3} ({1}:{2})
+    <value>Nieobsługiwany wyjątek w elemencie {3} ({1}:{2})
 {0}</value>
   </data>
   <data name="AddReferenceExtensions" xml:space="preserve">
-    <value>Component Files|*.winmd</value>
+    <value>Pliki składników|*.winmd</value>
   </data>
   <data name="WebPiFeedError" xml:space="preserve">
-    <value>Unable to get feed "{0}".
+    <value>Nie można uzyskać źródła danych „{0}.
 
 {1}</value>
   </data>
   <data name="Cancel" xml:space="preserve">
-    <value>&amp;Cancel</value>
+    <value>&amp;Anuluj</value>
   </data>
   <data name="CancelQueryEditMultiple" xml:space="preserve">
-    <value>The command you are attempting cannot be completed because the files that must be modified cannot be changed. If these files are under source control, you may want to check them out; if the files are read-only on disk, you may want to change their attributes.</value>
+    <value>Nie można ukończyć polecenia, którego próbujesz użyć, ponieważ nie można zmienić plików, które muszą zostać zmodyfikowane. Jeśli te pliki są objęte kontrolą źródła, możesz zechcieć je wyewidencjonować; jeśli są zapisane na dysku jako tylko do odczytu, możesz zechcieć zmienić ich atrybuty.</value>
     <comment>MsgBox</comment>
   </data>
   <data name="ErrorDetail" xml:space="preserve">
-    <value>Error &amp;details</value>
+    <value>Szczegóły błę&amp;du</value>
   </data>
   <data name="Retry" xml:space="preserve">
-    <value>T&amp;ry again</value>
+    <value>Sp&amp;róbuj ponownie</value>
   </data>
   <data name="CannotAddFileExists" xml:space="preserve">
-    <value>Unable to add '{0}'. A file with that name already exists.</value>
+    <value>Nie można dodać elementu „{0}”. Plik o tej nazwie już istnieje.</value>
   </data>
   <data name="CannotAddFolderAsDescendantOfSelf" xml:space="preserve">
-    <value>Cannot add folder '{0}' as a child or decedent of self.</value>
+    <value>Nie można dodać folderu „{0}” jako elementu podrzędnego jego samego.</value>
   </data>
   <data name="CannotMoveFolderExists" xml:space="preserve">
-    <value>Cannot move the folder '{0}'. A folder with that name already exists in the destination directory.</value>
+    <value>Nie można przenieść folderu „{0}”. Folder o tej nazwie już istnieje w katalogu docelowym.</value>
   </data>
   <data name="CannotMoveIntoSameDirectory" xml:space="preserve">
-    <value>Cannot move '{0}'. The destination folder is the same as the source folder.</value>
+    <value>Nie można przenieść elementu „{0}”. Folder docelowy jest taki sam jak folder źródłowy.</value>
   </data>
   <data name="CannotMoveIntoSubfolder" xml:space="preserve">
-    <value>Cannot move '{0}'. The destination folder is a subfolder of the source folder.</value>
+    <value>Nie można przenieść elementu „{0}”. Folder docelowy jest podfolderem folderu źródłowego.</value>
   </data>
   <data name="DirectoryExists" xml:space="preserve">
-    <value>A directory with the name '{0}' already exists.</value>
+    <value>Katalog o nazwie „{0}” już istnieje.</value>
   </data>
   <data name="FolderCannotBeCreatedOnDisk" xml:space="preserve">
-    <value>The folder '{0}' does not exist on disk and could not be created.</value>
+    <value>Folder „{0}” nie istnieje na dysku i nie można go utworzyć.</value>
   </data>
   <data name="FolderPathTooLongShortMessage" xml:space="preserve">
-    <value>The folder name is too long.</value>
+    <value>Nazwa folderu jest za długa.</value>
   </data>
   <data name="OverwriteFilesInExistingFolder" xml:space="preserve">
-    <value>This folder already contains a folder called '{0}'
+    <value>Ten folder zawiera już folder o nazwie „{0}”
 
-If the files in the existing folder have the same names as files in the 
-folder you are copying, do you want to replace the existing files?</value>
+Czy jeśli pliki w istniejącym folderze będą miały takie same nazwy jak pliki w kopiowanym folderze, to istniejące pliki mają zostać zastąpione?</value>
   </data>
   <data name="SourceUrlNotFound" xml:space="preserve">
-    <value>The source URL '{0}' could not be found.</value>
+    <value>Nie można znaleźć źródłowego adresu URL „{0}”.</value>
   </data>
   <data name="SeeActivityLog" xml:space="preserve">
-    <value>An unexpected error occurred.
+    <value>Wystąpił nieoczekiwany błąd.
 
-You can get more information by running Visual Studio with the /log parameter on the command line, and then examining the file '{0}'.</value>
+Więcej informacji możesz uzyskać, uruchamiając program Visual Studio z parametrem /log w wierszu polecenia, a następnie zapoznając się z zawartością pliku „{0}.</value>
   </data>
 </root>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -59,46 +59,46 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="102" xml:space="preserve">
-    <value>Node.js editor</value>
+    <value>Edytor Node.js</value>
   </data>
   <data name="106" xml:space="preserve">
     <value>Node.js</value>
@@ -127,297 +127,297 @@
     <value>Node.js Tools</value>
   </data>
   <data name="112" xml:space="preserve">
-    <value>Adds support for developing and debugging Node.js apps in Visual Studio</value>
+    <value>Dodaje obsługę programowania i debugowania aplikacji Node.js w programie Visual Studio</value>
   </data>
   <data name="113" xml:space="preserve">
-    <value>Node.js editor with encoding</value>
+    <value>Edytor Node.js z kodowaniem</value>
   </data>
   <data name="114" xml:space="preserve">
     <value>Node.js Tools</value>
   </data>
   <data name="115" xml:space="preserve">
-    <value>General</value>
+    <value>Ogólne</value>
   </data>
   <data name="116" xml:space="preserve">
     <value>Npm</value>
   </data>
   <data name="3007" xml:space="preserve">
-    <value>JavaScript file</value>
+    <value>Plik JavaScript</value>
   </data>
   <data name="3008" xml:space="preserve">
-    <value>Text file</value>
+    <value>Plik tekstowy</value>
   </data>
   <data name="3009" xml:space="preserve">
-    <value>JavaScript UnitTest file</value>
+    <value>Plik testu jednostkowego JavaScript</value>
   </data>
   <data name="3011" xml:space="preserve">
-    <value>An empty JavaScript file</value>
+    <value>Pusty plik JavaScript</value>
   </data>
   <data name="3012" xml:space="preserve">
-    <value>An empty text file</value>
+    <value>Pusty plik tekstowy</value>
   </data>
   <data name="3013" xml:space="preserve">
     <value>JavaScript</value>
   </data>
   <data name="3014" xml:space="preserve">
-    <value>Text</value>
+    <value>Tekst</value>
   </data>
   <data name="3015" xml:space="preserve">
-    <value>A basic JavaScript UnitTest file</value>
+    <value>Podstawowy plik testu jednostkowego JavaScript</value>
   </data>
   <data name="3016" xml:space="preserve">
-    <value>UnitTest</value>
+    <value>Test jednostkowy</value>
   </data>
   <data name="3017" xml:space="preserve">
-    <value>TypeScript file</value>
+    <value>Plik TypeScript</value>
   </data>
   <data name="3018" xml:space="preserve">
-    <value>An empty TypeScript file</value>
+    <value>Pusty plik TypeScript</value>
   </data>
   <data name="3019" xml:space="preserve">
     <value>TypeScript</value>
   </data>
   <data name="3020" xml:space="preserve">
-    <value>Pug file</value>
+    <value>Plik Pug</value>
   </data>
   <data name="3021" xml:space="preserve">
-    <value>An empty Pug file</value>
+    <value>Pusty plik Pug</value>
   </data>
   <data name="3022" xml:space="preserve">
     <value>Pug</value>
   </data>
   <data name="3023" xml:space="preserve">
-    <value>JSON file</value>
+    <value>Plik JSON</value>
   </data>
   <data name="3024" xml:space="preserve">
-    <value>An empty JSON file</value>
+    <value>Pusty plik JSON</value>
   </data>
   <data name="3025" xml:space="preserve">
     <value>JSON</value>
   </data>
   <data name="3029" xml:space="preserve">
-    <value>CSS file</value>
+    <value>Plik CSS</value>
   </data>
   <data name="3030" xml:space="preserve">
-    <value>An empty CSS file</value>
+    <value>Pusty plik CSS</value>
   </data>
   <data name="3031" xml:space="preserve">
-    <value>Stylesheet</value>
+    <value>Arkusz stylów</value>
   </data>
   <data name="3032" xml:space="preserve">
-    <value>HTML file</value>
+    <value>Plik HTML</value>
   </data>
   <data name="3033" xml:space="preserve">
-    <value>An empty HTML file</value>
+    <value>Pusty plik HTML</value>
   </data>
   <data name="3034" xml:space="preserve">
     <value>HTML</value>
   </data>
   <data name="3035" xml:space="preserve">
-    <value>XML file</value>
+    <value>Plik XML</value>
   </data>
   <data name="3036" xml:space="preserve">
-    <value>An empty XML file</value>
+    <value>Pusty plik XML</value>
   </data>
   <data name="3037" xml:space="preserve">
     <value>XML</value>
   </data>
   <data name="3038" xml:space="preserve">
-    <value>LESS file</value>
+    <value>Plik LESS</value>
   </data>
   <data name="3039" xml:space="preserve">
-    <value>An empty LESS file</value>
+    <value>Pusty plik LESS</value>
   </data>
   <data name="3040" xml:space="preserve">
-    <value>Stylesheet</value>
+    <value>Arkusz stylów</value>
   </data>
   <data name="3041" xml:space="preserve">
     <value>Pug</value>
   </data>
   <data name="3042" xml:space="preserve">
-    <value>Spacing</value>
+    <value>Odstępy</value>
   </data>
   <data name="3043" xml:space="preserve">
-    <value>Braces</value>
+    <value>Nawiasy klamrowe</value>
   </data>
   <data name="3044" xml:space="preserve">
-    <value>General</value>
+    <value>Ogólne</value>
   </data>
   <data name="3045" xml:space="preserve">
-    <value>Pug Editor</value>
+    <value>Edytor Pug</value>
   </data>
   <data name="3046" xml:space="preserve">
-    <value>A basic TypeScript UnitTest file</value>
+    <value>Podstawowy plik testu jednostkowego TypeScript</value>
   </data>
   <data name="3047" xml:space="preserve">
-    <value>TypeScript UnitTest file</value>
+    <value>Plik testu jednostkowego TypeScript</value>
   </data>
   <data name="3048" xml:space="preserve">
-    <value>Advanced</value>
+    <value>Zaawansowane</value>
   </data>
   <data name="3049" xml:space="preserve">
-    <value>JavaScript Mocha UnitTest file</value>
+    <value>Plik testu jednostkowego JavaScript Mocha</value>
   </data>
   <data name="3050" xml:space="preserve">
-    <value>A JavaScript Mocha UnitTest file</value>
+    <value>Plik testu jednostkowego JavaScript Mocha</value>
   </data>
   <data name="3051" xml:space="preserve">
-    <value>A TypeScript Mocha UnitTest file</value>
+    <value>Plik testu jednostkowego TypeScript Mocha</value>
   </data>
   <data name="3052" xml:space="preserve">
-    <value>TypeScript Mocha UnitTest file</value>
+    <value>Plik testu jednostkowego TypeScript Mocha</value>
   </data>
   <data name="3055" xml:space="preserve">
-    <value>JavaScript Tape UnitTest file</value>
+    <value>Plik testu jednostkowego JavaScript Tape</value>
   </data>
   <data name="3056" xml:space="preserve">
-    <value>A JavaScript Tape UnitTest file</value>
+    <value>Plik testu jednostkowego JavaScript Tape</value>
   </data>
   <data name="3057" xml:space="preserve">
-    <value>TypeScript Tape UnitTest file</value>
+    <value>Plik testu jednostkowego TypeScript Tape</value>
   </data>
   <data name="3058" xml:space="preserve">
-    <value>A TypeScript Tape UnitTest file</value>
+    <value>Plik testu jednostkowego TypeScript Tape</value>
   </data>
   <data name="3059" xml:space="preserve">
-    <value>Basic Azure Node.js Express 4 Application</value>
+    <value>Podstawowa aplikacja Node.js Express 4 platformy Azure</value>
   </data>
   <data name="3060" xml:space="preserve">
-    <value>A basic Node.js Express 4 application for Microsoft Azure.</value>
+    <value>Podstawowa aplikacja Node.js Express 4 dla platformy Microsoft Azure.</value>
   </data>
   <data name="3061" xml:space="preserve">
-    <value>Blank Azure Node.js Web Application</value>
+    <value>Pusta aplikacja sieci Web Node.js platformy Azure</value>
   </data>
   <data name="3062" xml:space="preserve">
-    <value>An empty Node.js application for Microsoft Azure.</value>
+    <value>Pusta aplikacja Node.js dla platformy Microsoft Azure.</value>
   </data>
   <data name="3063" xml:space="preserve">
-    <value>Blank Azure Node.js Worker Role</value>
+    <value>Pusta rola procesu roboczego Node.js platformy Azure</value>
   </data>
   <data name="3064" xml:space="preserve">
-    <value>An empty Node.js worker role for Microsoft Azure.</value>
+    <value>Pusta rola procesu roboczego Node.js dla platformy Microsoft Azure.</value>
   </data>
   <data name="3065" xml:space="preserve">
-    <value>Azure Cloud Service</value>
+    <value>Usługa w chmurze platformy Azure</value>
   </data>
   <data name="3066" xml:space="preserve">
-    <value>Basic Node.js Express 4 Application.</value>
+    <value>Podstawowa aplikacja Node.js Express 4.</value>
   </data>
   <data name="3067" xml:space="preserve">
-    <value>Azure Cloud Service</value>
+    <value>Usługa w chmurze platformy Azure</value>
   </data>
   <data name="3068" xml:space="preserve">
-    <value>A basic Node.js Express 4 application.</value>
+    <value>Podstawowa aplikacja Node.js Express 4.</value>
   </data>
   <data name="3069" xml:space="preserve">
-    <value>From Existing Node.js code</value>
+    <value>Na podstawie istniejącego kodu Node.js</value>
   </data>
   <data name="3070" xml:space="preserve">
-    <value>Creates a new Node.js project from existing code.</value>
+    <value>Tworzy nowy projekt Node.js na podstawie istniejącego kodu.</value>
   </data>
   <data name="3071" xml:space="preserve">
-    <value>Blank Node.js Console Application</value>
+    <value>Pusta aplikacja Node.js Console</value>
   </data>
   <data name="3072" xml:space="preserve">
-    <value>An empty Node.js application.</value>
+    <value>Pusta aplikacja Node.js.</value>
   </data>
   <data name="3073" xml:space="preserve">
-    <value>Blank Node.js Web Application</value>
+    <value>Pusta aplikacja sieci Web Node.js</value>
   </data>
   <data name="3074" xml:space="preserve">
-    <value>An empty Node.js Web application.</value>
+    <value>Pusta aplikacja sieci Web Node.js.</value>
   </data>
   <data name="3075" xml:space="preserve">
-    <value>Basic Azure Node.js Express 4 Application</value>
+    <value>Podstawowa aplikacja Node.js Express 4 platformy Azure</value>
   </data>
   <data name="3076" xml:space="preserve">
-    <value>A basic Node.js Express 4 application for Microsoft Azure.</value>
+    <value>Podstawowa aplikacja Node.js Express 4 dla platformy Microsoft Azure.</value>
   </data>
   <data name="3077" xml:space="preserve">
-    <value>Blank Azure Node.js Worker Role</value>
+    <value>Pusta rola procesu roboczego Node.js platformy Azure</value>
   </data>
   <data name="3078" xml:space="preserve">
-    <value>An empty Node.js worker role for Microsoft Azure.</value>
+    <value>Pusta rola procesu roboczego Node.js dla platformy Microsoft Azure.</value>
   </data>
   <data name="3079" xml:space="preserve">
-    <value>Blank Azure Node.js Worker Role</value>
+    <value>Pusta rola procesu roboczego Node.js platformy Azure</value>
   </data>
   <data name="3080" xml:space="preserve">
-    <value>An empty Node.js worker role for Microsoft Azure.</value>
+    <value>Pusta rola procesu roboczego Node.js dla platformy Microsoft Azure.</value>
   </data>
   <data name="3081" xml:space="preserve">
-    <value>Blank Azure Node.js Web Application</value>
+    <value>Pusta aplikacja sieci Web Node.js platformy Azure</value>
   </data>
   <data name="3082" xml:space="preserve">
-    <value>An empty Node.js application for Microsoft Azure.</value>
+    <value>Pusta aplikacja Node.js dla platformy Microsoft Azure.</value>
   </data>
   <data name="3083" xml:space="preserve">
-    <value>Blank Azure Node.js Web Application</value>
+    <value>Pusta aplikacja sieci Web Node.js platformy Azure</value>
   </data>
   <data name="3084" xml:space="preserve">
-    <value>An empty Node.js application for Microsoft Azure.</value>
+    <value>Pusta aplikacja Node.js dla platformy Microsoft Azure.</value>
   </data>
   <data name="3085" xml:space="preserve">
-    <value>Blank Node.js Console Application</value>
+    <value>Pusta aplikacja Node.js Console</value>
   </data>
   <data name="3086" xml:space="preserve">
-    <value>An empty Node.js application.</value>
+    <value>Pusta aplikacja Node.js.</value>
   </data>
   <data name="3087" xml:space="preserve">
-    <value>Basic Node.js Express 4 Application</value>
+    <value>Podstawowa aplikacja Node.js Express 4</value>
   </data>
   <data name="3088" xml:space="preserve">
-    <value>A basic Node.js Express 4 application.</value>
+    <value>Podstawowa aplikacja Node.js Express 4.</value>
   </data>
   <data name="3089" xml:space="preserve">
-    <value>From Existing Node.js code</value>
+    <value>Na podstawie istniejącego kodu Node.js</value>
   </data>
   <data name="3090" xml:space="preserve">
-    <value>Creates a new Node.js project from existing code.</value>
+    <value>Tworzy nowy projekt Node.js na podstawie istniejącego kodu.</value>
   </data>
   <data name="3091" xml:space="preserve">
-    <value>Blank Node.js Web Application</value>
+    <value>Pusta aplikacja sieci Web Node.js</value>
   </data>
   <data name="3092" xml:space="preserve">
-    <value>An empty Node.js application.</value>
+    <value>Pusta aplikacja Node.js.</value>
   </data>
   <data name="3093" xml:space="preserve">
-    <value>Express Web Role</value>
+    <value>Rola sieci Web wersji Express</value>
   </data>
   <data name="3094" xml:space="preserve">
-    <value>Service with a web interface using the Express web framework.</value>
+    <value>Usługa z interfejsem sieci Web korzystająca z platformy sieci Web w wersji Express.</value>
   </data>
   <data name="3095" xml:space="preserve">
-    <value>TypeScript Express Web Role</value>
+    <value>Rola sieci Web TypeScript Express</value>
   </data>
   <data name="3096" xml:space="preserve">
-    <value>Service with a web interface using the Express web framework with TypeScript.</value>
+    <value>Usługa z interfejsem sieci Web używającym platformy sieci Web w wersji Express z językiem TypeScript.</value>
   </data>
   <data name="3097" xml:space="preserve">
-    <value>TypeScript Web Role</value>
+    <value>Rola sieci Web TypeScript</value>
   </data>
   <data name="3098" xml:space="preserve">
-    <value>Service with a web interface using TypeScript.</value>
+    <value>Usługa z interfejsem sieci Web używającym języka TypeScript.</value>
   </data>
   <data name="3099" xml:space="preserve">
-    <value>TypeScript Worker Role</value>
+    <value>Rola procesu roboczego TypeScript</value>
   </data>
   <data name="4000" xml:space="preserve">
-    <value>Node.js background processing service using TypeScript.</value>
+    <value>Usługa przetwarzania w tle Node.js używająca języka TypeScript.</value>
   </data>
   <data name="4001" xml:space="preserve">
-    <value>Web Role</value>
+    <value>Rola sieci Web</value>
   </data>
   <data name="4002" xml:space="preserve">
-    <value>Node.js service with a web interface.</value>
+    <value>Usługa Node.js z interfejsem sieci Web.</value>
   </data>
   <data name="4003" xml:space="preserve">
-    <value>Worker Role</value>
+    <value>Rola procesu roboczego</value>
   </data>
   <data name="4004" xml:space="preserve">
-    <value>Node.js background processing service.</value>
+    <value>Usługa przetwarzania w tle Node.js.</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"/>
   <data name="400" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>_BUILDROOT_\Nodejs\Product\Icons\SystemRegisteredICO\NodeJS.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
     <comment>{Locked}</comment>

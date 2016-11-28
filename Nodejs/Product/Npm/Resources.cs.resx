@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -59,46 +59,46 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -118,87 +118,87 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ErrNpmCatalogEmpty" xml:space="preserve">
-    <value>Unable to retrieve npm catalog: the web service may be unavailable.</value>
+    <value>Nejde načíst katalog npm: Je asi nedostupná webová služba.</value>
   </data>
   <data name="PackagesDownloadComplete" xml:space="preserve">
-    <value>Download complete - updating database</value>
+    <value>Stahování je hotové – aktualizuje se databáze.</value>
   </data>
   <data name="PackagesDownloadedXMB" xml:space="preserve">
-    <value>Downloaded {0}MB of the package list</value>
+    <value>Stáhlo se {0} MB seznamu balíčku.</value>
   </data>
   <data name="PackagesDownloadStarting" xml:space="preserve">
-    <value>Downloading list of packages from {0}</value>
+    <value>Stahuje se seznam balíčků z {0}.</value>
   </data>
   <data name="PackagesDownloadedXOfYMB" xml:space="preserve">
-    <value>Downloaded {0}MB of the package list ({1}MB total)</value>
+    <value>Stáhlo se {0} MB seznamu balíčku (celkem {1} MB).</value>
   </data>
   <data name="ErrCannotStartNpm" xml:space="preserve">
-    <value>Error executing npm - unable to start the npm process</value>
+    <value>Při provádění npm došlo k chybě – nejde spustit proces npm.</value>
   </data>
   <data name="ExecutingCommand" xml:space="preserve">
-    <value>Executing command 'npm {0}'</value>
+    <value>Provádí se příkaz npm {0}.</value>
   </data>
   <data name="InfoCurrentTime" xml:space="preserve">
-    <value>Current Time: {0}</value>
+    <value>Aktuální čas: {0}</value>
     <comment>args: Date/time</comment>
   </data>
   <data name="InfoDeletingFile" xml:space="preserve">
-    <value>Deleting {0}</value>
+    <value>Odstraňuje se {0}.</value>
     <comment>args: filename</comment>
   </data>
   <data name="InfoLastRefreshed" xml:space="preserve">
-    <value>Last Refreshed: {0}</value>
+    <value>Poslední aktualizace: {0}</value>
     <comment>args: Date/time</comment>
   </data>
   <data name="InfoNpmPathLocation" xml:space="preserve">
-    <value>Path to npm: {0}</value>
+    <value>Cesta k npm: {0}</value>
   </data>
   <data name="InfoNumberOfResults" xml:space="preserve">
-    <value>Number of Results: {0}</value>
+    <value>Počet výsledků: {0}</value>
   </data>
   <data name="InfoPackageCacheWriteLocation" xml:space="preserve">
-    <value>Downloading package cache to {0}</value>
+    <value>Stahuje se mezipaměť balíčků do {0}.</value>
     <comment>args: filename</comment>
   </data>
   <data name="InfoReadingBytesFromPackageCache" xml:space="preserve">
-    <value>Reading {0} bytes from {1} ({2})</value>
+    <value>Čte se {0} bajtů z {1} ({2}).</value>
     <comment>args: number, filepath, date/time</comment>
   </data>
   <data name="NpmCommandCancelled" xml:space="preserve">
-    <value>npm command cancelled</value>
+    <value>Příkaz npm je zrušený.</value>
   </data>
   <data name="NpmCommandCompletedWithExitCode" xml:space="preserve">
-    <value>npm command completed with exit code {0}</value>
+    <value>Příkaz npm se provedl s ukončovacím kódem {0}.</value>
   </data>
   <data name="ParsingError" xml:space="preserve">
-    <value>Parsing error (package {0})</value>
+    <value>Chyba analýzy (balíček {0})</value>
     <comment>args: package name</comment>
   </data>
   <data name="FailedToDeleteFile" xml:space="preserve">
-    <value>Could not delete file {0} - try deleting it manually.</value>
+    <value>Soubor {0} nešel odstranit, zkuste ho odstranit ručně.</value>
   </data>
   <data name="DatabaseCorrupt" xml:space="preserve">
-    <value>Database is corrupt - deleting {0}. Try refreshing the catalog again. Otherwise restart Visual Studio, and try again.</value>
+    <value>Databáze je poškozená, odstraňuje se {0}. Zkuste katalog znovu aktualizovat. Jinak restartujte Visual Studio a zkuste to znovu.</value>
     <comment>args: filename</comment>
   </data>
   <data name="DownloadOrParsingFailed" xml:space="preserve">
-    <value>Download or parsing failed - deleting {0}. Try refreshing the catalog again. Otherwise restart Visual Studio, and try again.</value>
+    <value>Stahování nebo analýza se nepovedla, odstraňuje se {0}. Zkuste katalog znovu aktualizovat. Jinak restartujte Visual Studio a zkuste to znovu.</value>
     <comment>args: filename</comment>
   </data>
   <data name="ErrorCatalogInUse" xml:space="preserve">
-    <value>Package catalog cache file is in use. Verify you are not refreshing the catalog in multiple instances.</value>
+    <value>Soubor mezipaměti katalogu balíčku se používá. Ověřte, že neaktualizujete katalog ve více instancích.</value>
   </data>
   <data name="InfoCatalogUpgrade" xml:space="preserve">
-    <value>Your package catalog database needs to be upgraded. Please wait while we execute a full refresh.</value>
+    <value>Je třeba upgradovat databázi katalogu balíčku. Počkejte prosím, než provedeme úplnou aktualizaci.</value>
   </data>
   <data name="InfoRegistryUrl" xml:space="preserve">
-    <value>Registry url: {0}</value>
+    <value>Adresa URL registru: {0}</value>
   </data>
   <data name="InvalidPackageSemVersion" xml:space="preserve">
-    <value>Semversion {0} for package {1} is invalid</value>
+    <value>Verze Semversion {0} pro balíček {1} je neplatná.</value>
     <comment>args: semantic version, package name</comment>
   </data>
   <data name="CouldNotFindNpm" xml:space="preserve">
-    <value>Could not find npm. Please make sure Node.js is installed</value>
+    <value>Npm se nenašel. Je nutné, aby byl nainstalovaný Node.js.</value>
   </data>
 </root>

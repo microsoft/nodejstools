@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -59,46 +59,46 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -118,506 +118,506 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="LaunchUrlToolTip" xml:space="preserve">
-    <value>Specifies the URL to open in the browser.  If unspecified http://localhost:port is used.\r\nIf a port is specified, it needs to be specified here as well.</value>
+    <value>Consente di specificare l&apos;URL da aprire nel browser. Se non viene specificato, verrà usato http://localhost:porta.\r\nSe si specifica una porta, sarà necessario indicarla anche qui.</value>
   </data>
   <data name="NodeExeArguments" xml:space="preserve">
-    <value>Arguments to Node.exe</value>
+    <value>Argomenti di Node.exe</value>
   </data>
   <data name="NodeExeArgumentsDescription" xml:space="preserve">
-    <value>Specifies the options provided to node.exe, such as -e or -i.</value>
+    <value>Consente di specificare le opzioni indicate per node.exe, ad esempio -e o -i.</value>
   </data>
   <data name="NodeExeArgumentsToolTip" xml:space="preserve">
-    <value>Specifies the options provided to node.exe, such as -e or -i.</value>
+    <value>Consente di specificare le opzioni indicate per node.exe, ad esempio -e o -i.</value>
   </data>
   <data name="NodeExePath" xml:space="preserve">
-    <value>Node.exe path</value>
+    <value>Percorso di Node.exe</value>
   </data>
   <data name="NodeExePathToolTip" xml:space="preserve">
-    <value>Specifies the path to the node.exe executable.</value>
+    <value>Consente di specificare il percorso del file eseguibile di node.exe.</value>
   </data>
   <data name="NodejsPort" xml:space="preserve">
-    <value>Node.js Port</value>
+    <value>Porta di Node.js</value>
   </data>
   <data name="NodejsNotInstalled" xml:space="preserve">
-    <value>Could not find a Node.js runtime on your computer.  Please download and install the current Node.js release from https://nodejs.org, or specify the location of your Node.exe in the Visual Studio Node Project's properties page.</value>
+    <value>Nel computer non è stato trovato alcun runtime di Node.js. Scaricare e installare la versione corrente di Node.js da https://nodejs.org oppure specificare il percorso del file Node.exe nella pagina delle proprietà del progetto Node di Visual Studio.</value>
   </data>
   <data name="NodejsPortToolTip" xml:space="preserve">
-    <value>Specifies the port number used for process.env.port, if unspecified a random port is generated.</value>
+    <value>Consente di specificare il numero di porta usato per process.env.port. Se non viene specificato, ne verrà generato uno casuale.</value>
   </data>
   <data name="NpmPackageName" xml:space="preserve">
-    <value>Package Name</value>
+    <value>Nome pacchetto</value>
   </data>
   <data name="NpmPackageNameDescription" xml:space="preserve">
-    <value>Name of package, as specified in its package.json.</value>
+    <value>Nome del pacchetto specificato nel relativo file package.json.</value>
   </data>
   <data name="NpmPackageVersion" xml:space="preserve">
-    <value>Version</value>
+    <value>Versione</value>
   </data>
   <data name="NpmPackageVersionDescription" xml:space="preserve">
-    <value>Installed version of package.</value>
+    <value>Versione installata del pacchetto.</value>
   </data>
   <data name="NpmPackageRequestedVersionRange" xml:space="preserve">
-    <value>Requested Version</value>
+    <value>Versione richiesta</value>
   </data>
   <data name="NpmPackageRequestedVersionRangeDescription" xml:space="preserve">
-    <value>Version of package requested in package.json belonging to parent package or project.</value>
+    <value>Versione del pacchetto richiesta nel file package.json appartenente al progetto o al pacchetto padre.</value>
   </data>
   <data name="NpmPackageNewVersionAvailable" xml:space="preserve">
-    <value>Newer Version Available</value>
+    <value>Disponibilità versione più recente</value>
   </data>
   <data name="NpmPackageNewVersionAvailableDescription" xml:space="preserve">
-    <value>Indicates whether or not a newer version of the package is available.</value>
+    <value>Indica se è disponibile o meno una versione più recente del pacchetto.</value>
   </data>
   <data name="NpmPackageDescription" xml:space="preserve">
-    <value>Description</value>
+    <value>Descrizione</value>
   </data>
   <data name="NpmPackageDescriptionDescription" xml:space="preserve">
-    <value>Package description.</value>
+    <value>Descrizione del pacchetto.</value>
   </data>
   <data name="NpmPackageKeywords" xml:space="preserve">
-    <value>Keywords</value>
+    <value>Parole chiave</value>
   </data>
   <data name="NpmPackageKeywordsDescription" xml:space="preserve">
-    <value>Package keywords.</value>
+    <value>Parole chiave del pacchetto.</value>
   </data>
   <data name="NpmPackageAuthor" xml:space="preserve">
-    <value>Author</value>
+    <value>Autore</value>
   </data>
   <data name="NpmPackageAuthorDescription" xml:space="preserve">
-    <value>Primary or original author of package; there may also be additional contributors.</value>
+    <value>Autore principale o originale del pacchetto. Potrebbero esistere anche altri collaboratori.</value>
   </data>
   <data name="NpmPackagePath" xml:space="preserve">
-    <value>Path</value>
+    <value>Percorso</value>
   </data>
   <data name="NpmPackagePathDescription" xml:space="preserve">
-    <value>Location of package on disk.</value>
+    <value>Percorso del pacchetto sul disco.</value>
   </data>
   <data name="NpmPackageType" xml:space="preserve">
-    <value>Package Type</value>
+    <value>Tipo di pacchetto</value>
   </data>
   <data name="NpmPackageTypeDescription" xml:space="preserve">
-    <value>Indicates whether package is global, or locally installed in your project, and whether or not it is a sub-package.</value>
+    <value>Indica se il pacchetto è globale oppure installato localmente nel progetto e se è o meno un pacchetto secondario.</value>
   </data>
   <data name="NpmPackageLinkStatus" xml:space="preserve">
-    <value>Link Status</value>
+    <value>Stato collegamento</value>
   </data>
   <data name="NpmPackageLinkStatusDescription" xml:space="preserve">
-    <value>Indicates whether a package has been linked from globally installed packages.</value>
+    <value>Indica se un pacchetto è stato collegato da pacchetti installati globalmente.</value>
   </data>
   <data name="NpmPackageIsListedInParentPackageJson" xml:space="preserve">
-    <value>Listed As Dependency</value>
+    <value>Elencato come dipendenza</value>
   </data>
   <data name="NpmPackageIsListedInParentPackageJsonDescription" xml:space="preserve">
-    <value>Indicates whether or not the package is listed as a package.json dependency.</value>
+    <value>Indica se il pacchetto è elencato o meno come dipendenza del file package.json.</value>
   </data>
   <data name="NpmPackageIsMissing" xml:space="preserve">
-    <value>Missing</value>
+    <value>Mancante</value>
   </data>
   <data name="NpmPackageIsMissingDescription" xml:space="preserve">
-    <value>Indicates whether or not the package is a missing dependency.</value>
+    <value>Indica se il pacchetto è o meno una dipendenza mancante.</value>
   </data>
   <data name="NpmPackageIsDevDependency" xml:space="preserve">
-    <value>Dev Dependency</value>
+    <value>Dipendenza di sviluppo</value>
   </data>
   <data name="NpmPackageIsDevDependencyDescription" xml:space="preserve">
-    <value>Indicates whether or not the package is a development dependency.</value>
+    <value>Indica se il pacchetto è o meno una dipendenza di sviluppo.</value>
   </data>
   <data name="NpmPackageIsOptionalDependency" xml:space="preserve">
-    <value>Optional Dependency</value>
+    <value>Dipendenza facoltativa</value>
   </data>
   <data name="NpmPackageIsOptionalDependencyDescription" xml:space="preserve">
-    <value>Indicates whether or not the package is an optional dependency.</value>
+    <value>Indica se il pacchetto è o meno una dipendenza facoltativa.</value>
   </data>
   <data name="NpmPackageIsBundledDependency" xml:space="preserve">
-    <value>Bundled Dependency</value>
+    <value>Dipendenza nel bundle</value>
   </data>
   <data name="NpmPackageIsBundledDependencyDescription" xml:space="preserve">
-    <value>Indicates whether or not the package is a bundled dependency.</value>
+    <value>Indica se il pacchetto è o meno una dipendenza nel bundle.</value>
   </data>
   <data name="CategoryVersion" xml:space="preserve">
-    <value>Version</value>
+    <value>Versione</value>
   </data>
   <data name="CategoryStatus" xml:space="preserve">
-    <value>Status</value>
+    <value>Stato</value>
   </data>
   <data name="PackageTypeLocal" xml:space="preserve">
-    <value>Local</value>
+    <value>Locale</value>
   </data>
   <data name="PackageTypeLocalSubpackage" xml:space="preserve">
-    <value>Local sub-package</value>
+    <value>Pacchetto secondario locale</value>
   </data>
   <data name="LinkStatusNotApplicableSubPackages" xml:space="preserve">
-    <value>Not applicable for sub-packages.</value>
+    <value>Non applicabile per i pacchetti secondari.</value>
   </data>
   <data name="LinkStatusUnknown" xml:space="preserve">
-    <value>Unknown</value>
+    <value>Sconosciuto</value>
   </data>
   <data name="RequestedVersionRangeNone" xml:space="preserve">
-    <value>None</value>
+    <value>Nessuno</value>
   </data>
   <data name="NpmNodePackageInstallation" xml:space="preserve">
-    <value>Package Installations</value>
+    <value>Installazioni pacchetti</value>
   </data>
   <data name="NpmNodePackageInstallationDescription" xml:space="preserve">
-    <value>Indicates whether the node manages local or global npm package installations.</value>
+    <value>Indica se il nodo gestisce le installazioni locali o globali dei pacchetti npm.</value>
   </data>
   <data name="NpmNodePath" xml:space="preserve">
-    <value>Path</value>
+    <value>Percorso</value>
   </data>
   <data name="NpmNodePathDescription" xml:space="preserve">
-    <value>Base path in which npm packages are installed.</value>
+    <value>Percorso di base in cui vengono installati i pacchetti npm.</value>
   </data>
   <data name="PackageInstallationLocal" xml:space="preserve">
-    <value>Local</value>
+    <value>Locale</value>
   </data>
   <data name="PropertiesClassLocalPackage" xml:space="preserve">
-    <value>Local Package Properties</value>
+    <value>Proprietà pacchetto locale</value>
   </data>
   <data name="PropertiesClassLocalSubPackage" xml:space="preserve">
-    <value>Local Sub-Package Properties</value>
+    <value>Proprietà pacchetto secondario locale</value>
   </data>
   <data name="PropertiesClassNpm" xml:space="preserve">
-    <value>npm Packages Properties</value>
+    <value>Proprietà pacchetti npm</value>
   </data>
   <data name="ScriptArgumentsToolTip" xml:space="preserve">
-    <value>Specifies the arguments passed to the script on launch.</value>
+    <value>Consente di specificare gli argomenti passati allo script all&apos;avvio.</value>
   </data>
   <data name="ScriptFileTooltip" xml:space="preserve">
-    <value>Specifies the script run on launch.</value>
+    <value>Consente di specifica lo script da eseguire all&apos;avvio.</value>
   </data>
   <data name="StartBrowserToolTip" xml:space="preserve">
-    <value>When checked a web browser is opened on launch</value>
+    <value>Se è selezionato, all&apos;avvio viene aperto un Web browser</value>
   </data>
   <data name="WorkingDirToolTip" xml:space="preserve">
-    <value>Specifies the working directory where the node.exe process is launched.</value>
+    <value>Consente di specificare la directory di lavoro in cui viene avviato il processo node.exe.</value>
   </data>
   <data name="NodeExeDoesntExist" xml:space="preserve">
-    <value>Your project is currently configured to look for Node.exe at "{0}" but the file does not exist.</value>
+    <value>Il progetto è attualmente configurato in modo da cercare Node.exe in &quot;{0}&quot;, ma il file non esiste.</value>
   </data>
   <data name="NodejsToolsForVisualStudio" xml:space="preserve">
-    <value>Node.js Tools for Visual Studio</value>
+    <value>Strumenti Node.js per Visual Studio</value>
   </data>
   <data name="NodeExePathNotFound" xml:space="preserve">
-    <value>The specified Node.js interpreter does not exist.</value>
+    <value>L&apos;interprete Node.js specificato non esiste.</value>
   </data>
   <data name="NodejsNotInstalledShort" xml:space="preserve">
-    <value>Node.js has not been detected on your computer</value>
+    <value>Node.js non è stato rilevato nel computer</value>
     <comment>Used in general property page when Node.exe isn't found</comment>
   </data>
   <data name="InvalidPortNumber" xml:space="preserve">
-    <value>Invalid port number - the port should contain only digits.</value>
+    <value>Numero di porta non valido. Deve essere composto solo da cifre.</value>
   </data>
   <data name="WorkingDirInvalidOrMissing" xml:space="preserve">
-    <value>The specified working directory is invalid or missing.</value>
+    <value>La directory di lavoro specificata manca o non è valida.</value>
   </data>
   <data name="CatalogLoadingDefault" xml:space="preserve">
-    <value>Loading published package list...</value>
+    <value>Caricamento dell&apos;elenco dei pacchetti pubblicati...</value>
   </data>
   <data name="NoKeywordsInPackage" xml:space="preserve">
-    <value>(This package has no keywords.)</value>
+    <value>Per questo pacchetto non esistono parole chiave.</value>
   </data>
   <data name="PackageCatalogRefreshing" xml:space="preserve">
-    <value>Currently refreshing</value>
+    <value>Aggiornamento in corso</value>
   </data>
   <data name="PackageCatalogRefresh0Days" xml:space="preserve">
-    <value>Today at {0:t}</value>
+    <value>Oggi alle ore {0:t}</value>
   </data>
   <data name="PackageCatalogRefresh1Day" xml:space="preserve">
-    <value>Yesterday at {0:t}</value>
+    <value>Ieri alle ore {0:t}</value>
   </data>
   <data name="PackageCatalogRefresh2To7Days" xml:space="preserve">
-    <value>{0} days ago</value>
+    <value>{0} giorni fa</value>
   </data>
   <data name="PackageCatalogRefresh1Week" xml:space="preserve">
-    <value>More than 1 week ago</value>
+    <value>Più di una settimana fa</value>
   </data>
   <data name="PackageCatalogRefresh2Weeks" xml:space="preserve">
-    <value>More than 2 weeks ago</value>
+    <value>Più di due settimane fa</value>
   </data>
   <data name="PackageCatalogRefresh3Weeks" xml:space="preserve">
-    <value>More than 3 weeks ago</value>
+    <value>Più di tre settimane fa</value>
   </data>
   <data name="PackageCatalogRefresh1Month" xml:space="preserve">
-    <value>More than 1 month ago</value>
+    <value>Più di un mese fa</value>
   </data>
   <data name="PackageCatalogRefresh3Months" xml:space="preserve">
-    <value>More than 3 months ago</value>
+    <value>Più di tre mesi fa</value>
   </data>
   <data name="NpmCancelledWithErrors" xml:space="preserve">
-    <value>{0} cancelled with errors - see Output window for details</value>
+    <value>{0} annullato con errori. Per dettagli, vedere la finestra di output</value>
   </data>
   <data name="NpmCompletedWithErrors" xml:space="preserve">
-    <value>{0} completed with errors - see Output window for details</value>
+    <value>{0} completato con errori. Per dettagli, vedere la finestra di output</value>
   </data>
   <data name="NpmCancelled" xml:space="preserve">
-    <value>{0} cancelled</value>
+    <value>{0} annullato</value>
   </data>
   <data name="NpmSuccessfullyCompleted" xml:space="preserve">
-    <value>{0} successfully completed</value>
+    <value>{0} completato</value>
   </data>
   <data name="NpmStatusReady" xml:space="preserve">
-    <value>Ready</value>
+    <value>Pronto</value>
   </data>
   <data name="NpmStatusReadyWithErrors" xml:space="preserve">
-    <value>Ready - Command(s) completed with errors ({0})</value>
+    <value>Pronto. Comando/i completato/i con errori ({0})</value>
   </data>
   <data name="NpmStatusExecuting" xml:space="preserve">
-    <value>Executing: {0}</value>
+    <value>Esecuzione in corso: {0}</value>
   </data>
   <data name="NpmStatusExecutingQueued" xml:space="preserve">
-    <value>Executing: {0} ({1} command(s) queued)</value>
+    <value>Esecuzione in corso: {0} ({1} comando/i accodato/i)</value>
   </data>
   <data name="NpmStatusExecutingErrors" xml:space="preserve">
-    <value>Errors Encountered ({1}) - Executing: {0}</value>
+    <value>Errori rilevati ({1}) - Esecuzione in corso: {0}</value>
   </data>
   <data name="NpmStatusExecutingQueuedErrors" xml:space="preserve">
-    <value>Errors Encountered ({2}) - Executing: {0} ({1} command(s) queued)</value>
+    <value>Errori rilevati ({2}) - Esecuzione in corso: {0} ({1} comando/i accodato/i)</value>
   </data>
   <data name="TestFramework" xml:space="preserve">
-    <value>Test Framework</value>
+    <value>Framework di test</value>
   </data>
   <data name="TestFrameworkDescription" xml:space="preserve">
-    <value>Specifies the test framework this file applies to.</value>
+    <value>Consente di specificare il framework di test a cui si applica questo file.</value>
   </data>
   <data name="DebuggerPort" xml:space="preserve">
-    <value>Specifies the port used to communicate with the debugger</value>
+    <value>Consente di specificare la porta usata per comunicare con il debugger</value>
   </data>
   <data name="EnvironmentVariables" xml:space="preserve">
-    <value>Specifies environment variables to be set in the spawned process in the form:
+    <value>Consente di specificare le variabili di ambiente da impostare nel processo generato in formato:
 
-NAME1=value1
-NAME2=value2
+NOME1=valore1
+NOME2=valore2
 ...</value>
   </data>
   <data name="DebuggerConnectionClosed" xml:space="preserve">
-    <value>Debugger connection was closed.</value>
+    <value>La connessione con il debugger è stata chiusa.</value>
   </data>
   <data name="DebuggerModuleUpdateFailed" xml:space="preserve">
-    <value>Failed to update file contents.</value>
+    <value>Non è stato possibile aggiornare il contenuto del file.</value>
   </data>
   <data name="NodejsNotSupported" xml:space="preserve">
-    <value>This version of Node.js ({0}) is not supported. Please upgrade to Node.js v0.10.20 or later.</value>
+    <value>Questa versione di Node.js ({0}) non è supportata. Eseguire l&apos;aggiornamento a Node.js 0.10.20 o versione successiva.</value>
   </data>
   <data name="PackageCatalogRefreshFailed" xml:space="preserve">
-    <value>Refresh failed - see output below for details</value>
+    <value>L&apos;aggiornamento non è riuscito. Per dettagli, vedere l&apos;output sotto</value>
   </data>
   <data name="ReplInitializationMessage" xml:space="preserve">
-    <value>Node.js interactive window. Type .help for a list of commands.</value>
+    <value>Finestra interattiva Node.js. Per un elenco di comandi, digitare .help.</value>
   </data>
   <data name="ReplWindowNpmInitNoYesFlagWarning" xml:space="preserve">
-    <value>Please run '.npm init -y' to create a new package.json file.</value>
+    <value>Per creare un nuovo file package.json, eseguire &apos;.npm init -y&apos;.</value>
   </data>
   <data name="NodeExePathDescription" xml:space="preserve">
-    <value>Specifies the path to the node.exe executable.</value>
+    <value>Consente di specificare il percorso del file eseguibile di node.exe.</value>
   </data>
   <data name="NodejsPortDescription" xml:space="preserve">
-    <value>Specifies the port number used for process.env.port, if unspecified a random port is generated.</value>
+    <value>Consente di specificare il numero di porta usato per process.env.port. Se non viene specificato, ne verrà generato uno casuale.</value>
   </data>
   <data name="NpmOutputPaneTitle" xml:space="preserve">
     <value>Npm</value>
   </data>
   <data name="NpmPackageInstallHelpMessage" xml:space="preserve">
-    <value>(enter arguments above)</value>
+    <value>(immettere gli argomenti sopra indicati)</value>
   </data>
   <data name="NpmReplCommandCompletedWithErrors" xml:space="preserve">
-    <value>{0} completed with errors</value>
+    <value>{0} completato con errori</value>
   </data>
   <data name="LongPathWarningTitle" xml:space="preserve">
-    <value>Path Too Long Warning</value>
+    <value>Avviso di percorso troppo lungo</value>
   </data>
   <data name="LongPathWarningText" xml:space="preserve">
-    <value>Your project folder contains one or more paths that exceed the &lt;a href="#msdn"&gt;260 character limit&lt;/a&gt;. Visual Studio &lt;a href="#uservoice"&gt;does not fully support&lt;/a&gt; such projects. You may run into issues building and publishing your project, or interference with other Visual Studio and Node.js Tools features.</value>
+    <value>La cartella di progetto contiene uno o più percorsi che superano il &lt;a href=&quot;#msdn&quot;&gt;limite di 260 caratteri&lt;/a&gt;. Visual Studio &lt;a href=&quot;#uservoice&quot;&gt;non supporta completamente&lt;/a&gt; tali progetti. Potrebbero verificarsi problemi quando si compila e si pubblica il progetto oppure si potrebbero riscontrare interferenze con altre funzionalità di Visual Studio e di Strumenti Node.js.</value>
   </data>
   <data name="LongPathShowPathsExceedingTheLimit" xml:space="preserve">
-    <value>Show &amp;paths exceeding the limit</value>
+    <value>Mostra &amp;percorsi che superano il limite</value>
   </data>
   <data name="LongPathHidePathsExceedingTheLimit" xml:space="preserve">
-    <value>Hide &amp;paths exceeding the limit</value>
+    <value>Nascondi &amp;percorsi che superano il limite</value>
   </data>
   <data name="LongPathNpmDedupe" xml:space="preserve">
-    <value>Run 'npm &amp;dedupe' on the project</value>
+    <value>Esegui &apos;npm &amp;dedupe&apos; sul progetto</value>
   </data>
   <data name="LongPathNpmDedupeDetail" xml:space="preserve">
-    <value>In some cases, deduplicating packages can reduce the amount of nesting in node_modules sufficiently to resolve the issue.</value>
+    <value>In alcuni casi la deduplicazione dei pacchetto consente di ridurre i livelli di annidamento in node_modules a un numero tale da permettere di risolvere il problema.</value>
   </data>
   <data name="LongPathDoNothingButWarnNextTime" xml:space="preserve">
-    <value>Do nothing, but &amp;warn me next time it happens</value>
+    <value>Non eseguire alcuna operazione, ma a&amp;vvisa quando si verifica di nuovo</value>
   </data>
   <data name="LongPathDoNothingAndDoNotWarnAgain" xml:space="preserve">
-    <value>Do nothing and &amp;never warn me again</value>
+    <value>Non eseguire alcuna operazione e &amp;non visualizzare altri avvisi</value>
   </data>
   <data name="LongPathDoNothingAndDoNotWarnAgainDetail" xml:space="preserve">
-    <value>You can re-enable the check in Tools → Options → Node.js Tools → General.</value>
+    <value>È possibile abilitare di nuovo la verifica in Strumenti → Opzioni → Strumenti Node.js → Generale.</value>
   </data>
   <data name="LongPathFooter" xml:space="preserve">
-    <value>&lt;a href="#help"&gt;Get more information&lt;/a&gt;</value>
+    <value>&lt;a href=&quot;#help&quot;&gt;Altre informazioni&lt;/a&gt;</value>
   </data>
   <data name="LongPathClickToCopy" xml:space="preserve">
-    <value>Copy Full Path</value>
+    <value>Copia percorso completo</value>
   </data>
   <data name="LongPathNpmDedupeDidNotHelp" xml:space="preserve">
-    <value>Unfortunately, running 'npm dedupe' did not resolve the issue. Please consult the &lt;a href="#help"&gt;documentation&lt;/a&gt; for other potential workarounds.</value>
+    <value>L&apos;esecuzione di &apos;npm dedupe&apos; non ha purtroppo consentito di risolvere il problema. Per altri possibili soluzioni, consultare la &lt;a href=&quot;#help&quot;&gt;documentazione&lt;/a&gt;.</value>
   </data>
   <data name="CacheDirectoryClearFailedTitle" xml:space="preserve">
-    <value>Could Not Clear Node.js Cache Directory</value>
+    <value>Non è stato possibile cancellare la directory cache di Node.js</value>
   </data>
   <data name="CacheDirectoryClearFailedCaption" xml:space="preserve">
-    <value>Could not clear Node.js cache directory. Try manually deleting the directory: {0}</value>
+    <value>Non è stato possibile cancellare la directory cache di Node.js. Provare a eliminare manualmente la directory: {0}</value>
   </data>
   <data name="UpgradedEnvironmentVariables" xml:space="preserve">
-    <value>Replaced &lt;EnvironmentVariables&gt; property with &lt;Environment&gt;. This project will no longer work with NTVS 1.0 beta 2 or below.</value>
+    <value>La proprietà &lt;EnvironmentVariables&gt; è stata sostituita con &lt;Environment&gt;. Questo progetto non funzionerà più con NTVS 1.0 beta 2 o versioni precedenti.</value>
   </data>
   <data name="StatusAnalysisUpToDate" xml:space="preserve">
-    <value>Node.js code analysis is up to date, analyzed {0:N0} function(s) in {1}</value>
+    <value>L&apos;analisi codice di Node.js è aggiornata. È stata completata l&apos;analisi di {0:N0} funzione/i in {1}</value>
   </data>
   <data name="IncludeNodeModulesCancelTitle" xml:space="preserve">
-    <value>Do nothing (recommended)</value>
+    <value>Non eseguire alcuna operazione (scelta consigliata)</value>
   </data>
   <data name="IncludeNodeModulesContent" xml:space="preserve">
-    <value>Including 'node_modules' in your project is generally unnecessary, and may reduce Visual Studio's performance. You can continue to use and deploy packages from 'node_modules' without including it in your project.</value>
+    <value>Non è in genere necessario includere &apos;node_modules&apos; nel progetto. Tale operazione potrebbe inoltre ridurre le prestazioni di Visual Studio. È possibile continuare a usare &apos;node_modules&apos; e distribuire i pacchetti da tale cartella senza includerla nel progetto.</value>
   </data>
   <data name="IncludeNodeModulesIncludeDescription" xml:space="preserve">
-    <value>This may be a long-running operation, during which Visual Studio will be unusable.</value>
+    <value>Questa può essere un&apos;operazione a esecuzione prolungata durante la quale Visual Studio non sarà utilizzabile.</value>
   </data>
   <data name="IncludeNodeModulesIncludeTitle" xml:space="preserve">
-    <value>Include 'node_modules' folder in project</value>
+    <value>Includi la cartella &apos;node_modules&apos; nel progetto</value>
   </data>
   <data name="IncludeNodeModulesInformation" xml:space="preserve">
-    <value>&lt;a href="http://go.microsoft.com/fwlink/?LinkID=518083"&gt;More Information&lt;/a&gt;</value>
+    <value>&lt;a href=&quot;http://go.microsoft.com/fwlink/?LinkID=518083&quot;&gt;Altre informazioni&lt;/a&gt;</value>
   </data>
   <data name="RemoteDebugProxyFileDoesNotExist" xml:space="preserve">
-    <value>Remote Debug Proxy "{0}" does not exist.</value>
+    <value>Il proxy di debug remoto &quot;{0}&quot; non esiste.</value>
   </data>
   <data name="RemoteDebugProxyFolderDoesNotExist" xml:space="preserve">
-    <value>Could not find RemoteDebugProxyFolder</value>
+    <value>RemoteDebugProxyFolder non trovato</value>
   </data>
   <data name="TypingsToolTypingsInstallCompleted" xml:space="preserve">
-    <value>Successfully installed typing files for IntelliSense.</value>
+    <value>I file di definizione di tipi per IntelliSense sono stati installati.</value>
   </data>
   <data name="TypingsToolNotInstalledError" xml:space="preserve">
-    <value>Could not find Typings package manager tool used for IntelliSense</value>
+    <value>Lo strumento di gestione pacchetti per le definizioni di tipi usato per IntelliSense non è stato trovato</value>
   </data>
   <data name="TypingsToolTypingsInstallErrorOccurred" xml:space="preserve">
-    <value>An error occurred installing typings used for IntelliSense.</value>
+    <value>Si è verificato un errore durante l&apos;installazione delle definizioni di tipi usate per IntelliSense.</value>
   </data>
   <data name="TypingsInfoBarSpan1" xml:space="preserve">
-    <value>Node.js IntelliSense added a </value>
+    <value>IntelliSense di Node.js ha aggiunto una </value>
   </data>
   <data name="TypingsInfoBarSpan2" xml:space="preserve">
-    <value>typings folder</value>
+    <value>cartella di definizioni di tipi</value>
   </data>
   <data name="TypingsInfoBarSpan3" xml:space="preserve">
-    <value> to your project</value>
+    <value> al progetto</value>
   </data>
   <data name="TypingsOpenOptionsText" xml:space="preserve">
-    <value>Customize...</value>
+    <value>Personalizza...</value>
   </data>
   <data name="StatusTypingsLoaded" xml:space="preserve">
-    <value>Node.js IntelliSense typings folder is up to date</value>
+    <value>La cartella delle definizioni di tipi IntelliSense di Node.js è aggiornata</value>
   </data>
   <data name="StatusTypingsLoading" xml:space="preserve">
-    <value>Loading Node.js IntelliSense typings for npm packages...</value>
+    <value>Caricamento delle definizioni di tipi IntelliSense di Node.js dai pacchetti npm...</value>
   </data>
   <data name="TypingsToolInstallFailed" xml:space="preserve">
-    <value>Failed to install Typings tool used for IntelliSense. Please make sure Node.js is properly installed</value>
+    <value>Non è stato possibile installare lo strumento di definizioni di tipi usato per IntelliSense. Assicurarsi che Node.js sia installato correttamente</value>
   </data>
   <data name="TypingsToolCouldNotStart" xml:space="preserve">
-    <value>Could not start Typings tool used for IntelliSense</value>
+    <value>Non è stato possibile avviare lo strumento di definizioni di tipi usato per IntelliSense</value>
   </data>
   <data name="TypeScriptMinVersionNotInstalled" xml:space="preserve">
-    <value>Node.js Tools requires TypeScript for Visual Studio {0} or higher. Please ensure TypeScript is installed</value>
+    <value>Con Strumenti Node.js è richiesto TypeScript per Visual Studio {0} o versione successiva. Assicurarsi che TypeScript sia installato</value>
   </data>
   <data name="ImportingProjectStatusText" xml:space="preserve">
-    <value>Importing project...</value>
+    <value>Importazione del progetto...</value>
   </data>
   <data name="ImportingProjectErrorStatusText" xml:space="preserve">
-    <value>An error occurred and your project was not created.</value>
+    <value>Si è verificato un errore e il progetto non è stato creato.</value>
   </data>
   <data name="InteractiveWindowFailedToStartProcessErrorMessage" xml:space="preserve">
-    <value>Failed to start interactive process: {0}{1}{2}</value>
+    <value>Non è stato possibile avviare il processo interattivo: {0}{1}{2}</value>
   </data>
   <data name="InteractiveWindowNoProcessErrorMessage" xml:space="preserve">
-    <value>Current interactive window is disconnected - please reset the process.</value>
+    <value>La finestra interattiva corrente è disconnessa. Reimpostare il processo.</value>
   </data>
   <data name="InteractiveWindowProcessExitedMessage" xml:space="preserve">
-    <value>The process has exited</value>
+    <value>Il processo è stato terminato</value>
   </data>
   <data name="InteractiveWindowTitle" xml:space="preserve">
-    <value>Node.js Interactive Window</value>
+    <value>Finestra interattiva Node.js</value>
   </data>
   <data name="ImportingProjectAccessErrorStatusText" xml:space="preserve">
-    <value>Some file paths could not be accessed.{0}Try moving your source code to a location where you can read and write files.</value>
+    <value>Non è stato possibile accedere ad alcuni percorsi di file.{0}Provare a spostare il codice sorgente in un percorso in cui sia possibile leggere e scrivere file.</value>
   </data>
   <data name="ImportingProjectUnexpectedErrorMessage" xml:space="preserve">
-    <value>An unexpected error {0} occurred while creating your project.</value>
+    <value>Si è verificato un errore imprevisto {0} durante la creazione del progetto.</value>
   </data>
   <data name="NodeModulesCouldNotParsePackageJsonErrorMessageText" xml:space="preserve">
-    <value>Unable to parse {0} from your project.  Please fix any errors and try again.</value>
+    <value>Non è possibile analizzare {0} dal progetto. Correggere tutti gli errori e riprovare.</value>
   </data>
   <data name="NpmNotInstalledMessageCaption" xml:space="preserve">
-    <value>npm Not Installed</value>
+    <value>npm non installato</value>
   </data>
   <data name="NpmNotInstalledMessageText" xml:space="preserve">
-    <value>Could not find npm.cmd. Ensure you have a recent version of node.js installed and have specified the location of node.exe in the project properties, or that it is available on your system PATH.
+    <value>npm.cmd non è stato trovato. Assicurarsi che sia installata una versione recente di node.js e che sia stato specificato il percorso di node.exe nelle proprietà del progetto o che il percorso sia disponibile nella variabile PATH di sistema.
 
-The following error occurred trying to execute npm.cmd:
+Durante il tentativo di esecuzione di npm.cmd si è verificato l&apos;errore seguente:
 
 {0}</value>
   </data>
   <data name="AzureRemoteDebugWaitCaption" xml:space="preserve">
-    <value>Azure remote debugging</value>
+    <value>Debug remoto di Azure</value>
   </data>
   <data name="AzureRemoteDebugWaitMessage" xml:space="preserve">
-    <value>Attaching to Azure Website at {0}</value>
+    <value>Collegamento al sito Web di Azure all&apos;indirizzo {0}</value>
   </data>
   <data name="AzureRemoveDebugCouldNotAttachToWebsiteErrorMessage" xml:space="preserve">
-    <value>Could not attach to node.exe process on Azure Website at {0}.
+    <value>Non è stato possibile collegarsi al processo node.exe nel sito Web di Azure all&apos;indirizzo {0}.
 
-Error retrieving websocket debug proxy information from web.config.</value>
+Si è verificato un errore durante il recupero delle informazioni sul proxy di debug di WebSocket da web.config.</value>
   </data>
   <data name="AzureRemoveDebugCouldNotAttachToWebsiteExceptionErrorMessage" xml:space="preserve">
-    <value>Failed to attach to Azure Website: {0}</value>
+    <value>Non è stato possibile collegarsi al sito Web di Azure: {0}</value>
   </data>
   <data name="RemoteDebugCheckProxyAndPortErrorMessage" xml:space="preserve">
-    <value>Make sure that the process is running behind the remote debug proxy (RemoteDebug.js), and the debugger port (default {0}) is open on the target host.</value>
+    <value>Assicurarsi che per l&apos;esecuzione del processo venga usato il proxy di debug remoto (RemoteDebug.js) e che la porta del debugger (impostazione predefinita: {0}) sia aperta nell&apos;host di destinazione.</value>
   </data>
   <data name="RemoteDebugCouldNotAttachErrorMessage" xml:space="preserve">
-    <value>Could not attach to Node.js process at {0}{1}
+    <value>Non è possibile collegarsi al processo Node.js all&apos;indirizzo {0}{1}
 
 </value>
   </data>
   <data name="RemoteDebugEnableWebSocketsErrorMessage" xml:space="preserve">
-    <value>Make sure that the Azure web site is deployed in the Debug configuration, and web sockets are enabled for it in the Azure management portal.</value>
+    <value>Assicurarsi che il sito Web di Azure sia distribuito nella configurazione di debug e che i WebSocket siano abilitati per il sito nel portale di gestione di Azure.</value>
   </data>
   <data name="RemoteDebugUnsupportedPlatformErrorMessage" xml:space="preserve">
-    <value>Remote debugging of node.js Microsoft Azure applications is only supported on Windows 8 and above.</value>
+    <value>Il debug remoto di applicazioni Microsoft Azure node.js è supportato solo in Windows 8 e versioni successive.</value>
   </data>
   <data name="DebugCouldNotResolveStartupFileErrorMessage" xml:space="preserve">
-    <value>Please select a startup file to launch by right-clicking the file in Solution Explorer and selecting 'Set as Node.js Startup File' or by modifying your configuration in project properties</value>
+    <value>Selezionare un file di avvio da usare facendo clic con il pulsante destro del mouse sul file in Esplora soluzioni e selezionando &apos;Imposta come file di avvio Node.js&apos; oppure modificando la configurazione nelle proprietà del progetto</value>
   </data>
   <data name="DebugInterpreterDoesNotExistErrorMessage" xml:space="preserve">
-    <value>Interpreter "{0}" does not exist.</value>
+    <value>L&apos;interprete &quot;{0}&quot; non esiste.</value>
   </data>
   <data name="DebugTypeScriptCombineNotSupportedWarningMessage" xml:space="preserve">
-    <value>This TypeScript project has 'Combine Javascript output into file' option enabled. This option is not supported by NTVS debugger, and may result in erratic behavior of breakpoints, stepping, and debug tool windows. Are you sure you want to start debugging?</value>
+    <value>Per questo progetto TypeScript è abilitata l&apos;opzione &apos;Combina output JavaScript nel file&apos;. Questa opzione non è supportata dal debugger NTVS e potrebbe causare un comportamento instabile di punti di interruzione, debug passo a passo e finestre dello strumento di debug. Avviare comunque il debug?</value>
   </data>
   <data name="DebugWorkingDirectoryDoesNotExistErrorMessage" xml:space="preserve">
-    <value>Working directory "{0}" does not exist.</value>
+    <value>La directory di lavoro &quot;{0}&quot; non esiste.</value>
   </data>
   <data name="DependencyNodeLabelBundled" xml:space="preserve">
-    <value>bundled</value>
+    <value>in bundle</value>
   </data>
   <data name="DependencyNodeLabelMissing" xml:space="preserve">
-    <value>missing</value>
+    <value>mancante</value>
   </data>
   <data name="DependencyNodeLabelNotListed" xml:space="preserve">
-    <value>not listed in {0}</value>
+    <value>non elencato in {0}</value>
   </data>
   <data name="DependencyNodeModuleDoesNotExist" xml:space="preserve">
-    <value>Path to module does not exist:
+    <value>Il percorso del modulo non esiste:
 {0}</value>
   </data>
   <data name="ErrorInvalidLaunchUrl" xml:space="preserve">
-    <value>Launch url '{0}' is not valid </value>
+    <value>L&apos;URL di avvio &apos;{0}&apos; non è valido </value>
   </data>
 </root>

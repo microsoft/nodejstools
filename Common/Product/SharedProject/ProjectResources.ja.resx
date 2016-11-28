@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -59,46 +59,46 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -118,257 +118,257 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AddToNullProjectError" xml:space="preserve">
-    <value>Failed to add file '{0}' to project as project is null.</value>
+    <value>プロジェクトが null のため、ファイル &apos;{0}&apos; をプロジェクトに追加できませんでした。</value>
   </data>
   <data name="Advanced" xml:space="preserve">
-    <value>Advanced</value>
+    <value>詳細設定</value>
     <comment>Project Property Page Caption</comment>
   </data>
   <data name="ReferenceAlreadyExists" xml:space="preserve">
-    <value>A reference to component '{0}' cannot be added. A reference to the component already exists in the project.</value>
+    <value>コンポーネント &apos;{0}&apos; に対する参照を追加できません。このコンポーネントに対する参照はプロジェクトに既に存在します。</value>
     <comment>ReferenceAlreadyExists error message</comment>
   </data>
   <data name="AttributeLoad" xml:space="preserve">
-    <value>Could not load attribute '{0}' from project file '{1}'.</value>
+    <value>プロジェクト ファイル&apos;{1}&apos; から属性 &apos;{0}&apos; を読み込めませんでした。</value>
   </data>
   <data name="BuildAction" xml:space="preserve">
-    <value>Build Action</value>
+    <value>ビルド アクション</value>
     <comment>Project Build Property Name</comment>
   </data>
   <data name="BuildActionDescription" xml:space="preserve">
-    <value>How the file relates to the build and deployment process</value>
+    <value>ビルドおよび配置のプロセスにファイルがどのように関連しているかを示します</value>
     <comment>Project Build Property Description</comment>
   </data>
   <data name="BuildVerbosity" xml:space="preserve">
-    <value>Verbosity</value>
+    <value>詳細</value>
   </data>
   <data name="BuildVerbosityDescription" xml:space="preserve">
-    <value>Specify how much information is included in the build output</value>
+    <value>ビルド出力に含める情報の量を指定します</value>
   </data>
   <data name="cli1" xml:space="preserve">
-    <value>ECMA-335 CLI compatible framework (location must be provided)</value>
+    <value>ECMA-335 CLI 互換のフレームワーク (場所を指定する必要があります)</value>
     <comment>Target platform drop down option</comment>
   </data>
   <data name="Compile" xml:space="preserve">
-    <value>Compile</value>
+    <value>コンパイル</value>
     <comment>Build Action - drop down option</comment>
   </data>
   <data name="ConfirmExtensionChange" xml:space="preserve">
-    <value>If you change a file name extension, the file may become unusable. Are you sure you want to change it?</value>
+    <value>ファイル名の拡張子を変更すると、ファイルが使えなくなることがあります。拡張子を変更しますか?</value>
   </data>
   <data name="CannotAddFileThatIsOpenInEditor" xml:space="preserve">
-    <value>A file with name '{0}' already exists and is open in an editor. Please give a unique name to the item you are adding, or delete the existing item first.</value>
+    <value>名前が &apos;{0}&apos; のファイルは既に存在し、エディターで開かれています。追加しようとしている項目に一意の名前を付けるか、まず既存の項目を削除してください。</value>
   </data>
   <data name="CanNotSaveFileNotOpeneInEditor" xml:space="preserve">
-    <value>Cannot save '{0}' as it is not open in the editor.</value>
+    <value>&apos;{0}&apos; は保存できません。エディターで開かれていません。</value>
   </data>
   <data name="Content" xml:space="preserve">
-    <value>Content</value>
+    <value>コンテンツ</value>
     <comment>Build Action - drop down option</comment>
   </data>
   <data name="CopyToLocal" xml:space="preserve">
-    <value>Copy Local</value>
+    <value>ローカルにコピー</value>
     <comment>File property</comment>
   </data>
   <data name="CopyToLocalDescription" xml:space="preserve">
-    <value>Indicates whether the reference will be copied to the output directory.</value>
+    <value>参照が出力ディレクトリにコピーされるかどうかを示します。</value>
   </data>
   <data name="Detailed" xml:space="preserve">
-    <value>Detailed</value>
+    <value>詳細</value>
   </data>
   <data name="Diagnostic" xml:space="preserve">
-    <value>Diagnostic</value>
+    <value>診断</value>
   </data>
   <data name="DirectoryExistsShortMessage" xml:space="preserve">
-    <value>Directory already exists</value>
+    <value>既に存在するディレクトリです</value>
   </data>
   <data name="EditorViewError" xml:space="preserve">
-    <value>Error opening specified view '{0}' using editor '{1}'</value>
+    <value>指定されたビュー &apos;{0}&apos; をエディター &apos;{1}&apos; を使って開いているときにエラーが発生しました</value>
   </data>
   <data name="EmbeddedResource" xml:space="preserve">
-    <value>Embedded Resource</value>
+    <value>埋め込みリソース</value>
     <comment>Build Action - drop down option</comment>
   </data>
   <data name="Error" xml:space="preserve">
-    <value>error</value>
+    <value>エラー</value>
   </data>
   <data name="ErrorInvalidFileName" xml:space="preserve">
-    <value>Invalid filename: {0}
+    <value>ファイル名が無効です: {0}
       
-Files and folders cannot be:
-- Empty strings 
-- System reserved names, including 'CON', 'AUX', PRN', 'COM1' or 'LPT2' 
-- contain only '.'
-- have any of the following characters: / ? : &amp;  \ * " &lt; &gt; | # %</value>
+ファイルおよびフォルダーの名前には:
+- 空の文字列は使用できません 
+- システム予約名は使用できません。例: &apos;CON&apos;、&apos;AUX&apos;、PRN&apos;、&apos;COM1&apos;、&apos;LPT2&apos; 
+- &apos;.&apos; だけを含めることはできません。
+- 次の文字を含めることはできません: / ? : &amp;  \ * &quot; &lt; &gt; | # %</value>
   </data>
   <data name="ErrorInvalidProjectName" xml:space="preserve">
-    <value>The name you provided is not a valid project name.</value>
+    <value>指定した名前は有効なプロジェクト名ではありません。</value>
   </data>
   <data name="ErrorMsBuildRegistration" xml:space="preserve">
-    <value>MSBuild path not found in registry. Please reinstall to fix the problem.</value>
+    <value>MSBuild パスがレジストリ内に見つかりません。問題を修正するため、再インストールしてください。</value>
   </data>
   <data name="ErrorSaving" xml:space="preserve">
-    <value>Error Saving File</value>
+    <value>ファイルの保存中にエラーが発生しました</value>
   </data>
   <data name="Exe" xml:space="preserve">
-    <value>Console Application</value>
+    <value>コンソール アプリケーション</value>
   </data>
   <data name="ExpectedObjectOfType" xml:space="preserve">
-    <value>Expecting object of type {0}.</value>
+    <value>型 {0} のオブジェクトを指定してください。</value>
   </data>
   <data name="FailedToRetrieveProperties" xml:space="preserve">
-    <value>Failed to retrieve MSBuild property {0} from the project file.</value>
+    <value>MSBuild プロパティ {0} をプロジェクト ファイルから取得できませんでした</value>
     <comment>The exception message thrown when getting a property from msbuild fails.</comment>
   </data>
   <data name="FileAlreadyExists" xml:space="preserve">
-    <value>A file with the same name '{0}' already exists. Do you want to overwrite it?</value>
+    <value>同じ名前 &apos;{0}&apos; のファイルは既に存在します。ファイルを上書きしますか?</value>
   </data>
   <data name="FileAlreadyExistsAndCannotBeRenamed" xml:space="preserve">
-    <value>A file with the same name '{0}' already exists.</value>
+    <value>同じ名前 &apos;{0}&apos; のファイルが既に存在します。</value>
   </data>
   <data name="FileAlreadyExistsCaption" xml:space="preserve">
-    <value>Destination File Exists</value>
+    <value>対象のファイルが存在します</value>
   </data>
   <data name="FileAlreadyInProject" xml:space="preserve">
-    <value>A file named '{0}' is already part of the project. Do you want to overwrite it?</value>
+    <value>名前 &apos;{0}&apos; のファイルは既にプロジェクトに含まれています。ファイルを上書きしますか?</value>
   </data>
   <data name="FileAlreadyInProjectCaption" xml:space="preserve">
-    <value>Destination File Exists</value>
+    <value>対象のファイルが存在します</value>
   </data>
   <data name="FileCannotBeRenamedToAnExistingFile" xml:space="preserve">
-    <value>A file or folder with the name '{0}' already exists on disk at this location. Please choose another name.</value>
+    <value>名前 &apos;{0}&apos; のファイルまたはフォルダーは、この場所のディスクに既に存在します。別の名前を選択してください。</value>
   </data>
   <data name="FileCopyError" xml:space="preserve">
-    <value>Error Copying File</value>
+    <value>ファイルのコピー中にエラーが発生しました</value>
   </data>
   <data name="FileName" xml:space="preserve">
-    <value>File Name</value>
+    <value>ファイル名</value>
   </data>
   <data name="FileNameCannotContainALeadingPeriod" xml:space="preserve">
-    <value>File and folder names cannot contain a leading period.</value>
+    <value>ファイル名とフォルダー名の先頭にピリオドを使用することはできません。</value>
   </data>
   <data name="FileNameDescription" xml:space="preserve">
-    <value>The name of the file or folder</value>
+    <value>ファイルまたはフォルダーの名前</value>
   </data>
   <data name="FolderName" xml:space="preserve">
-    <value>Folder Name</value>
+    <value>フォルダー名</value>
   </data>
   <data name="FolderNameDescription" xml:space="preserve">
-    <value>Name of this folder</value>
+    <value>このフォルダーの名前</value>
   </data>
   <data name="FullPath" xml:space="preserve">
-    <value>Full Path</value>
+    <value>完全なパス</value>
   </data>
   <data name="FullPathDescription" xml:space="preserve">
-    <value>Location of the file</value>
+    <value>ファイルの場所</value>
   </data>
   <data name="General" xml:space="preserve">
-    <value>General</value>
+    <value>全般</value>
   </data>
   <data name="ItemDoesNotExistInProjectDirectory" xml:space="preserve">
-    <value>The item '{0}' does not exist in the project directory. It may have been moved, renamed or deleted.</value>
+    <value>項目 &apos;{0}&apos; はプロジェクト ディレクトリに存在しません。移動、名前変更、または削除された可能性があります。</value>
   </data>
   <data name="LaunchUrl" xml:space="preserve">
-    <value>Launch URL</value>
+    <value>起動 URL</value>
   </data>
   <data name="LaunchUrlDescription" xml:space="preserve">
-    <value>The URL which should be opened in the browser when launching the project</value>
+    <value>プロジェクトの起動時にブラウザーで開く URL</value>
   </data>
   <data name="LinkedItemsAreNotSupported" xml:space="preserve">
-    <value>Cannot save '{0}' outside the project directory. Linked items are not supported.</value>
+    <value>プロジェクト ディレクトリの外部で &apos;{0}&apos; を保存できません。リンクされた項目はサポートされていません。</value>
   </data>
   <data name="Library" xml:space="preserve">
-    <value>Class Library</value>
+    <value>クラス ライブラリ</value>
   </data>
   <data name="Minimal" xml:space="preserve">
-    <value>Minimal</value>
+    <value>最小</value>
   </data>
   <data name="Misc" xml:space="preserve">
-    <value>Misc</value>
+    <value>その他</value>
   </data>
   <data name="None" xml:space="preserve">
-    <value>None</value>
+    <value>なし</value>
   </data>
   <data name="Normal" xml:space="preserve">
-    <value>Normal</value>
+    <value>標準</value>
   </data>
   <data name="PasteFailed" xml:space="preserve">
-    <value>Item is not available or corrupted and thus cannot be pasted.</value>
+    <value>項目は使用できないか破損しているため、貼り付けることができません。</value>
   </data>
   <data name="Program" xml:space="preserve">
-    <value>Program</value>
+    <value>プログラム</value>
   </data>
   <data name="Project" xml:space="preserve">
-    <value>Project</value>
+    <value>プロジェクト</value>
   </data>
   <data name="ProjectContainsCircularReferences" xml:space="preserve">
-    <value>A reference to library '{0}' cannot be added. Adding this project as a reference would cause a circular dependency. </value>
+    <value>ライブラリ &apos;{0}&apos; への参照を追加できません。このプロジェクトを参照として追加すると、循環する依存関係が生じます。</value>
   </data>
   <data name="ProjectFile" xml:space="preserve">
-    <value>Project File</value>
+    <value>プロジェクト ファイル</value>
   </data>
   <data name="ProjectFileDescription" xml:space="preserve">
-    <value>The name of the file containing build, configuration, and other information about the project.</value>
+    <value>ビルド、構成、プロジェクトに関するその他の情報を含んだファイルの名前。</value>
   </data>
   <data name="ProjectFolder" xml:space="preserve">
-    <value>Project Folder</value>
+    <value>プロジェクト フォルダー</value>
   </data>
   <data name="ProjectFolderDescription" xml:space="preserve">
-    <value>The absolute location of the project.</value>
+    <value>プロジェクトの絶対的な場所。</value>
   </data>
   <data name="Quiet" xml:space="preserve">
-    <value>Quiet</value>
+    <value>非表示</value>
   </data>
   <data name="RefName" xml:space="preserve">
-    <value>(Name)</value>
+    <value>(名前)</value>
   </data>
   <data name="ReferencesNodeName" xml:space="preserve">
-    <value>References</value>
+    <value>参照</value>
   </data>
   <data name="RefNameDescription" xml:space="preserve">
-    <value>Display name of the reference</value>
+    <value>参照の表示名</value>
   </data>
   <data name="RenameFolder" xml:space="preserve">
-    <value>Rename directory failed. {0}</value>
+    <value>ディレクトリ名を変更できませんでした。{0}</value>
   </data>
   <data name="RTL" xml:space="preserve">
     <value>RTL_False</value>
   </data>
   <data name="SaveCaption" xml:space="preserve">
-    <value>Save?</value>
+    <value>保存しますか?</value>
   </data>
   <data name="SaveModifiedDocuments" xml:space="preserve">
-    <value>Do you want to save modified documents?</value>
+    <value>変更したドキュメントを保存しますか?</value>
   </data>
   <data name="SaveOfProjectFileOutsideCurrentDirectory" xml:space="preserve">
-    <value>The project file can only be saved into the project location '{0}'.</value>
+    <value>プロジェクト ファイルの保存先は、プロジェクトの場所 &apos;{0}&apos; 内のみです。</value>
   </data>
   <data name="ScriptArguments" xml:space="preserve">
-    <value>Script arguments</value>
+    <value>スクリプトの引数</value>
   </data>
   <data name="ScriptArgumentsDescription" xml:space="preserve">
-    <value>Arguments passed to the script on launch</value>
+    <value>起動時にスクリプトに渡した引数</value>
   </data>
   <data name="StandardEditorViewError" xml:space="preserve">
-    <value>Error opening specified view '{0}' using standard editor.</value>
+    <value>指定されたビュー &apos;{0}&apos; を標準エディターを使って開いているときにエラーが発生しました。</value>
   </data>
   <data name="StartupFile" xml:space="preserve">
-    <value>Startup file</value>
+    <value>スタートアップ ファイル</value>
   </data>
   <data name="StartupFileDescription" xml:space="preserve">
-    <value>The startup file which is launched when running or debugging</value>
+    <value>実行中またはデバッグ中に起動されるスタートアップ ファイル</value>
   </data>
   <data name="StartWebBrowser" xml:space="preserve">
-    <value>Start web browser</value>
+    <value>Web ブラウザーを開始</value>
   </data>
   <data name="StartWebBrowserDescription" xml:space="preserve">
-    <value>True to start the web browser when launching</value>
+    <value>True に設定すると、起動時に Web ブラウザーが開始します</value>
   </data>
   <data name="URL" xml:space="preserve">
     <value>URL</value>
   </data>
   <data name="UseOfDeletedItemError" xml:space="preserve">
-    <value>You are trying to use an item that has already been deleted or that does not exist.</value>
+    <value>既に削除されたか、存在しない項目を使おうとしています。</value>
   </data>
   <data name="v1" xml:space="preserve">
     <value>Microsoft .NET Framework v1.0</value>
@@ -380,33 +380,33 @@ Files and folders cannot be:
     <value>Microsoft .NET Framework v2.0</value>
   </data>
   <data name="Warning" xml:space="preserve">
-    <value>warning</value>
+    <value>警告</value>
   </data>
   <data name="WinExe" xml:space="preserve">
-    <value>Windows Application</value>
+    <value>Windows アプリケーション</value>
   </data>
   <data name="WorkingDirectory" xml:space="preserve">
-    <value>Working directory</value>
+    <value>作業ディレクトリ</value>
   </data>
   <data name="WorkingDirectoryDescription" xml:space="preserve">
-    <value>The working directory when launching</value>
+    <value>起動時の作業ディレクトリ</value>
   </data>
   <data name="AddReferenceDialogTitle" xml:space="preserve">
-    <value>Add Reference</value>
+    <value>参照を追加</value>
   </data>
   <data name="InvalidAutomationObject" xml:space="preserve">
-    <value>Automation object invalid.</value>
+    <value>オートメーション オブジェクトが無効です。</value>
   </data>
   <data name="CancelQueryEdit" xml:space="preserve">
-    <value>The command you are attempting cannot be completed because the file '{0}' that must be modified cannot be changed. If the file is under source control, you may want to check it out; if the file is read-only on disk, you may want to change its attributes.</value>
+    <value>修正する必要のあるファイル &apos;{0}&apos; を変更できないため、実行しようとしているコマンドを完了できません。ソース管理下にあるファイルの場合は、ファイルをチェックアウトしてください。ディスク上のファイルが読み取り専用である場合は、ファイルの属性を変更してください。</value>
     <comment>MsgBox</comment>
   </data>
   <data name="ParameterMustBeAValidGuid" xml:space="preserve">
-    <value>Parameter must be a valid guid.</value>
+    <value>パラメーターは有効な GUID でなければなりません。</value>
     <comment>Error message in the ArgumentException for a  parameter that is not a valid guid.</comment>
   </data>
   <data name="InvalidLoggerType" xml:space="preserve">
-    <value>Invalid logger type\nExpected: {0}\nReceived: {1}</value>
+    <value>ロガーの種類が無効です\n想定される種類: {0}\n受け取った種類: {1}</value>
     <comment>Error message thrown for when an  invalid logger type is set.</comment>
   </data>
   <data name="InvalidParameter" xml:space="preserve">
@@ -418,131 +418,131 @@ Files and folders cannot be:
     <comment>Error message for string parameters that cannot be null or empty.</comment>
   </data>
   <data name="ParameterMustBeAValidItemId" xml:space="preserve">
-    <value>Parameter must be a valid item identifier.</value>
+    <value>パラメーターは有効な項目の識別子でなければなりません。</value>
     <comment>Error message thrown when an invalid item id is retrieved.</comment>
   </data>
   <data name="FileProperties" xml:space="preserve">
-    <value>File Properties</value>
+    <value>ファイル プロパティ</value>
   </data>
   <data name="FolderProperties" xml:space="preserve">
-    <value>Folder Properties</value>
+    <value>フォルダー プロパティ</value>
   </data>
   <data name="ProjectProperties" xml:space="preserve">
-    <value>Project Properties</value>
+    <value>プロジェクト プロパティ</value>
   </data>
   <data name="ReferenceProperties" xml:space="preserve">
-    <value>Reference Properties</value>
+    <value>参照プロパティ</value>
   </data>
   <data name="FileOrFolderAlreadyExists" xml:space="preserve">
-    <value>A file or folder with the name '{0}' already exists on disk at this location. Please choose another name.</value>
+    <value>名前 &apos;{0}&apos; のファイルまたはフォルダーは、この場所のディスクに既に存在します。別の名前を付けてください。</value>
   </data>
   <data name="BuildCaption" xml:space="preserve">
-    <value>Build</value>
+    <value>ビルド</value>
   </data>
   <data name="OutputPath" xml:space="preserve">
-    <value>Output Path</value>
+    <value>出力パス</value>
   </data>
   <data name="OutputPathDescription" xml:space="preserve">
-    <value>The path to the primary output</value>
+    <value>プライマリ出力へのパス</value>
   </data>
   <data name="PathTooLong" xml:space="preserve">
-    <value>The complete path to '{0}' exceeds the maximum number of characters permitted by the file system.</value>
+    <value>&apos;{0}&apos; への完全なパスが、ファイル システムで許容される最大文字数を超えています。</value>
   </data>
   <data name="CustomTool" xml:space="preserve">
-    <value>Custom Tool</value>
+    <value>カスタム ツール</value>
   </data>
   <data name="CustomToolDescription" xml:space="preserve">
-    <value>Specifies the tool that transforms a file at design time and places the output of that transformation into another file. For example, a dataset (.xsd) file comes with a default custom tool.</value>
+    <value>設計時にファイルを変換するツールを指定し、その変換の出力を別のファイルに入れます。たとえば、既定のカスタム ツールからはデータセット (.xsd) ファイルが出力されます。</value>
   </data>
   <data name="CustomToolNamespace" xml:space="preserve">
-    <value>Custom Tool Namespace</value>
+    <value>カスタム ツール名前空間</value>
   </data>
   <data name="CustomToolNamespaceDescription" xml:space="preserve">
-    <value>The namespace into which the output of the custom tool is placed.</value>
+    <value>カスタム ツールの出力が配置される名前空間。</value>
   </data>
   <data name="OutputBuilt" xml:space="preserve">
-    <value>Primary Output</value>
+    <value>プライマリ出力</value>
   </data>
   <data name="OutputContentFiles" xml:space="preserve">
-    <value>Content Files</value>
+    <value>コンテンツ ファイル</value>
   </data>
   <data name="OutputDocumentation" xml:space="preserve">
-    <value>Documentation Files</value>
+    <value>ドキュメント ファイル</value>
   </data>
   <data name="OutputLocalizedResourceDlls" xml:space="preserve">
-    <value>Localized Resources</value>
+    <value>ローカライズされたリソース</value>
   </data>
   <data name="OutputSourceFiles" xml:space="preserve">
-    <value>Source Files</value>
+    <value>ソース ファイル</value>
   </data>
   <data name="OutputSymbols" xml:space="preserve">
-    <value>Debug Symbols</value>
+    <value>デバッグ シンボル</value>
   </data>
   <data name="OutputXmlSerializer" xml:space="preserve">
-    <value>XML Serialization Assemblies</value>
+    <value>XML シリアル化アセンブリ</value>
   </data>
   <data name="OutputBuiltDescription" xml:space="preserve">
-    <value>Contains the DLL or EXE built by the project.</value>
+    <value>プロジェクトによってビルドされた DLL または EXE が含まれています。</value>
   </data>
   <data name="OutputContentFilesDescription" xml:space="preserve">
-    <value>Contains all content files in the project.</value>
+    <value>プロジェクト内のすべてのコンテンツ ファイルが含まれています。</value>
   </data>
   <data name="OutputDocumentationDescription" xml:space="preserve">
-    <value>Contains the XML Documentation files for the project.</value>
+    <value>プロジェクトの XML ドキュメント ファイルが含まれています。</value>
   </data>
   <data name="OutputLocalizedResourceDllsDescription" xml:space="preserve">
-    <value>Contains the satellite assemblies for each culture's resources.</value>
+    <value>各カルチャのリソースに対するサテライト アセンブリが含まれています。</value>
   </data>
   <data name="OutputSourceFilesDescription" xml:space="preserve">
-    <value>Contains all source files in the project.</value>
+    <value>プロジェクト内のすべてのソース ファイルが含まれています。</value>
   </data>
   <data name="OutputSymbolsDescription" xml:space="preserve">
-    <value>Contains the debugging files for the project.</value>
+    <value>プロジェクトのデバッグ ファイルが含まれています。</value>
   </data>
   <data name="OutputXmlSerializerDescription" xml:space="preserve">
-    <value>Contains the XML serialization assemblies for the project.</value>
+    <value>プロジェクトの XML シリアル化アセンブリが含まれています。</value>
   </data>
   <data name="QueryReloadNestedProject" xml:space="preserve">
-    <value>The project file '{0}' has been modified outside of Visual Studio.  Do you want to reload the project?</value>
+    <value>プロジェクト ファイル &apos;{0}&apos; が Visual Studio の外部で変更されました。プロジェクトを再度読み込みますか?</value>
   </data>
   <data name="NestedProjectFailedToReload" xml:space="preserve">
-    <value>The nested project has failed to reload.</value>
+    <value>入れ子にされたプロジェクトの再読み込みに失敗しました。</value>
   </data>
   <data name="FileOrFolderCannotBeFound" xml:space="preserve">
-    <value>The item '{0}' cannot be found on disk, either because it has been renamed, deleted, or moved to a new location.</value>
+    <value>名前の変更、削除、または別の場所への移動が行われたため、項目 &apos;{0}&apos; がディスクに見つかりません。</value>
   </data>
   <data name="ErrorReferenceCouldNotBeAdded" xml:space="preserve">
-    <value>A reference to {0} could not be added. Please make sure that the file is accessible, and that it is a valid assembly or COM component.</value>
+    <value>{0} に対する参照を追加できませんでした。ファイルがアクセス可能であることと、有効なアセンブリまたは COM コンポーネントであることを確認してください。</value>
   </data>
   <data name="DetailsImport" xml:space="preserve">
-    <value>An 'Import' of the file '{1}' was found in the project file '{0}'. This file is not registered as a safe file to import, and could contain targets and tasks that are harmful.  If this imported file is indeed considered safe, then it can be registered by writing to the registry key {2}.</value>
+    <value>プロジェクト ファイル &apos;{0}&apos; にファイル &apos;{1}&apos; の &apos;Import&apos; が見つかりました。このファイルはインポートできる安全なファイルとして登録されていません。危害を及ぼすターゲットおよびタスクが含まれている可能性があります。このインポートされるファイルが確実に安全と見なされる場合は、レジストリ キー {2} に書き込むことでファイルを登録できます。</value>
   </data>
   <data name="DetailsUserImport" xml:space="preserve">
-    <value>An 'Import' of the file '{1}' was found in the user project file '{0}'.  All imports in user project files are considered unsafe.</value>
+    <value>ファイル &apos;{1}&apos; の &apos;Import&apos; がユーザー プロジェクト ファイル &apos;{0}&apos; に見つかりました。ユーザー プロジェクト ファイル内のインポートはすべて安全でないと見なされます。</value>
   </data>
   <data name="DetailsItem" xml:space="preserve">
-    <value>One or more items named '{1}' were found in the project file '{0}'. These items normally should not be specified in the project file. They can change the way targets and tasks are executed during project load, and this could have harmful effects.</value>
+    <value>プロジェクト ファイル &apos;{0}&apos; に &apos;{1}&apos; という項目が 1 つ以上見つかりました。通常、これらの項目は、プロジェクト ファイル内で指定しないでください。プロジェクトの読み込み中、これらの項目によってターゲットやタスクの実行方法が変更される可能性があり、危害が及ぶおそれがあります。</value>
   </data>
   <data name="DetailsProperty" xml:space="preserve">
-    <value>A property named '{1}' was found in the project file '{0}'.  This property normally should not be specified in the project file.  Its value can change the way targets and tasks are executed during project load, and this could have harmful effects.</value>
+    <value>プロジェクト ファイル &apos;{0}&apos; に &apos;{1}&apos; というプロパティが見つかりました。通常、これらの項目は、プロジェクト ファイル内で指定しないでください。プロジェクトの読み込み中、これらの項目によってターゲットやタスクの実行方法が変更される可能性があり、危害が及ぶおそれがあります。</value>
   </data>
   <data name="DetailsUsingTask" xml:space="preserve">
-    <value>A 'UsingTask' tag which registers the '{1}' task was found in the project file '{0}'.  'UsingTask' tags in the project file take precedence over those in the imported .TARGETS files, and therefore could be used to execute arbitrary code during an otherwise unmodified build process.</value>
+    <value>&apos;{1}&apos; タスクを登録する &apos;UsingTask&apos; タグが、プロジェクト ファイル &apos;{0}&apos; に見つかりました。プロジェクト ファイル内の &apos;UsingTask&apos; タグは、インポートされた .TARGETS ファイル内のタグより優先されます。このため、他の未変更のビルド処理中に任意のコードを実行するのに使用される可能性があります。</value>
   </data>
   <data name="DetailsTarget" xml:space="preserve">
-    <value>A 'Target' named '{1}' was found in the project file '{0}'.  The tasks within this target could contain arbitrary code and may get executed as soon as the project is loaded in the IDE.</value>
+    <value>&apos;{1}&apos; という &apos;Target&apos; がプロジェクト ファイル &apos;{0}&apos; に見つかりました。このターゲット内のタスクには任意のコードが含まれ、IDE でプロジェクトが読み込まれるとすぐに実行される可能性があります。</value>
   </data>
   <data name="DetailsItemLocation" xml:space="preserve">
-    <value>An item referring to the file '{1}' was found in the project file '{0}'.  Since this file is located within a system directory, root directory, or network share, it could be harmful to write to this file.</value>
+    <value>ファイル &apos;{1}&apos; を参照する項目が、プロジェクト ファイル &apos;{0}&apos; に見つかりました。このファイルはシステム ディレクトリ、ルート ディレクトリ、またはネットワーク共有内に配置されているため、このファイルへの書き込みは危害を及ぼすおそれがあります。</value>
   </data>
   <data name="ProjectLocationNotTrusted" xml:space="preserve">
-    <value>The project location is not trusted:{0}{0}{1}{0}{0}Running the application may result in security exceptions when it {0}attempts to perform actions which require full trust.{0}{0}Click OK to ignore and continue.</value>
+    <value>プロジェクトの場所は信頼されていません:{0}{0}{1}{0}{0}アプリケーションが、完全な信頼を必要とするアクションを{0}実行しようとすると、セキュリティ例外が発生する可能性があります。{0}{0}無視して続行するには、[OK] をクリックしてください。</value>
   </data>
   <data name="BuildEventError" xml:space="preserve">
-    <value>Exception was thrown during BuildBegin event\n{0}</value>
+    <value>BuildBegin イベント中に例外が発生しました\n{0}</value>
   </data>
   <data name="Settings" xml:space="preserve">
-    <value>Settings</value>
+    <value>設定</value>
   </data>
   <data name="v3" xml:space="preserve">
     <value>Microsoft .NET Framework v3.0</value>
@@ -554,117 +554,117 @@ Files and folders cannot be:
     <value>Microsoft .NET Framework v4.0</value>
   </data>
   <data name="Publish" xml:space="preserve">
-    <value>Publish</value>
+    <value>発行</value>
   </data>
   <data name="PublishDescription" xml:space="preserve">
-    <value>If the file should be included in the files which are published.</value>
+    <value>このファイルを、発行したファイルに含める必要がある場合。</value>
   </data>
   <data name="WebPiFeed" xml:space="preserve">
-    <value>Feed</value>
+    <value>フィード</value>
   </data>
   <data name="WebPiFeedDescription" xml:space="preserve">
-    <value>The WebPI Feed that contains this reference</value>
+    <value>この参照を含む WebPI フィード</value>
   </data>
   <data name="WebPiProduct" xml:space="preserve">
-    <value>Product ID</value>
+    <value>製品 ID</value>
   </data>
   <data name="WebPiProductDescription" xml:space="preserve">
-    <value>The product ID that for this web reference</value>
+    <value>この Web 参照に対する製品 ID</value>
   </data>
   <data name="WebPiReferenceProperties" xml:space="preserve">
-    <value>WebPI Reference Properties</value>
+    <value>WebPI 参照プロパティ</value>
   </data>
   <data name="PathTooLongShortMessage" xml:space="preserve">
-    <value>The filename or extension is too long.</value>
+    <value>ファイル名または拡張子が長すぎます。</value>
   </data>
   <data name="ProjectHome" xml:space="preserve">
-    <value>Project Home</value>
+    <value>プロジェクト ホーム</value>
   </data>
   <data name="ProjectHomeDescription" xml:space="preserve">
-    <value>The base location for all files in the project</value>
+    <value>プロジェクト内のすべてのファイルのベース ロケーション</value>
   </data>
   <data name="UnknownInParentheses" xml:space="preserve">
-    <value>(Unknown)</value>
+    <value>(不明)</value>
   </data>
   <data name="ErrorInvalidLaunchUrl" xml:space="preserve">
-    <value>Project is configured to launch to invalid URL: "{0}"
+    <value>無効な URL を起動するようにプロジェクトが構成されています: &quot;{0}&quot;
 
-Your web browser will not be opened.</value>
+Web ブラウザーは開かれません。</value>
   </data>
   <data name="UnexpectedUpgradeError" xml:space="preserve">
-    <value>An unexpected error occurred while attempting to upgrade a project: {0}
-Run Visual Studio with the /Log option and check ActivityLog.xml for more detail.</value>
+    <value>プロジェクトをアップグレードしようとして、予期しないエラーが発生しました: {0}
+詳細を調べるには、/Log オプションを指定して Visual Studio を実行し、ActivityLog.xml を確認してください。</value>
   </data>
   <data name="UpgradeCannotCheckOutProject" xml:space="preserve">
-    <value>The project could not be upgraded because it could not be checked out from source control.</value>
+    <value>ソース管理からプロジェクトをチェックアウトできないため、プロジェクトをアップグレードできませんでした。</value>
   </data>
   <data name="UpgradeCannotLoadProject" xml:space="preserve">
-    <value>The project could not be loaded.</value>
+    <value>プロジェクトを読み込めませんでした。</value>
   </data>
   <data name="UpgradeNotRequired" xml:space="preserve">
-    <value>No upgrade required for project.</value>
+    <value>プロジェクトのアップグレードは必要ありません。</value>
   </data>
   <data name="UnhandledException" xml:space="preserve">
-    <value>Unhandled exception in {3} ({1}:{2})
+    <value>ハンドルされない例外が発生しました:  {3} ({1}:{2})
 {0}</value>
   </data>
   <data name="AddReferenceExtensions" xml:space="preserve">
-    <value>Component Files|*.winmd</value>
+    <value>コンポーネント ファイル|*.winmd</value>
   </data>
   <data name="WebPiFeedError" xml:space="preserve">
-    <value>Unable to get feed "{0}".
+    <value>フィード &quot;{0}&quot; を取得できません。
 
 {1}</value>
   </data>
   <data name="Cancel" xml:space="preserve">
-    <value>&amp;Cancel</value>
+    <value>キャンセル (&amp;C)</value>
   </data>
   <data name="CancelQueryEditMultiple" xml:space="preserve">
-    <value>The command you are attempting cannot be completed because the files that must be modified cannot be changed. If these files are under source control, you may want to check them out; if the files are read-only on disk, you may want to change their attributes.</value>
+    <value>修正する必要のあるファイルを変更できないため、実行しようとしているコマンドを完了できません。ソース管理下にあるファイルの場合は、ファイルをチェックアウトしてください。ディスク上のファイルが読み取り専用である場合は、ファイルの属性を変更してください。</value>
     <comment>MsgBox</comment>
   </data>
   <data name="ErrorDetail" xml:space="preserve">
-    <value>Error &amp;details</value>
+    <value>エラーの詳細(&amp;D)</value>
   </data>
   <data name="Retry" xml:space="preserve">
-    <value>T&amp;ry again</value>
+    <value>再試行する(&amp;R)</value>
   </data>
   <data name="CannotAddFileExists" xml:space="preserve">
-    <value>Unable to add '{0}'. A file with that name already exists.</value>
+    <value>&apos;{0}&apos; を追加できません。同じ名前のファイルが既に存在します。</value>
   </data>
   <data name="CannotAddFolderAsDescendantOfSelf" xml:space="preserve">
-    <value>Cannot add folder '{0}' as a child or decedent of self.</value>
+    <value>フォルダー &apos;{0}&apos; を、それ自身の子または子孫として追加することはできません。</value>
   </data>
   <data name="CannotMoveFolderExists" xml:space="preserve">
-    <value>Cannot move the folder '{0}'. A folder with that name already exists in the destination directory.</value>
+    <value>フォルダー &apos;{0}&apos; を移動できません。同じ名前のフォルダーが移動先ディレクトリに既に存在します。</value>
   </data>
   <data name="CannotMoveIntoSameDirectory" xml:space="preserve">
-    <value>Cannot move '{0}'. The destination folder is the same as the source folder.</value>
+    <value>&apos;{0}&apos; を移動できません。移動先のフォルダーが移動元のフォルダーと同じです。</value>
   </data>
   <data name="CannotMoveIntoSubfolder" xml:space="preserve">
-    <value>Cannot move '{0}'. The destination folder is a subfolder of the source folder.</value>
+    <value>&apos;{0}&apos; を移動できません。移動先のフォルダーが移動元のフォルダーのサブフォルダーです。</value>
   </data>
   <data name="DirectoryExists" xml:space="preserve">
-    <value>A directory with the name '{0}' already exists.</value>
+    <value>名前 &apos;{0}&apos; のディレクトリは既に存在します。</value>
   </data>
   <data name="FolderCannotBeCreatedOnDisk" xml:space="preserve">
-    <value>The folder '{0}' does not exist on disk and could not be created.</value>
+    <value>フォルダー &apos;{0}&apos; はディスク上に存在せず、作成できませんでした。</value>
   </data>
   <data name="FolderPathTooLongShortMessage" xml:space="preserve">
-    <value>The folder name is too long.</value>
+    <value>フォルダー名が長すぎます。</value>
   </data>
   <data name="OverwriteFilesInExistingFolder" xml:space="preserve">
-    <value>This folder already contains a folder called '{0}'
+    <value>このフォルダーには &apos;{0}&apos; という名前のフォルダーが既に存在します。
 
-If the files in the existing folder have the same names as files in the 
-folder you are copying, do you want to replace the existing files?</value>
+既存のフォルダーにあるファイルが、コピー元のフォルダーにあるファイルと
+同じ名前である場合、既存のファイルを置き換えますか?</value>
   </data>
   <data name="SourceUrlNotFound" xml:space="preserve">
-    <value>The source URL '{0}' could not be found.</value>
+    <value>ソース URL &apos;{0}&apos; が見つかりませんでした。</value>
   </data>
   <data name="SeeActivityLog" xml:space="preserve">
-    <value>An unexpected error occurred.
+    <value>予期しないエラーが発生しました。
 
-You can get more information by running Visual Studio with the /log parameter on the command line, and then examining the file '{0}'.</value>
+コマンド ラインで /log パラメーターを指定して Visual Studio を実行し、ファイル &apos;{0}&apos; を調べると、詳細情報を取得できます。</value>
   </data>
 </root>
