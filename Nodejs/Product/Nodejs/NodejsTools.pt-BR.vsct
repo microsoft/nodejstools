@@ -61,8 +61,8 @@
       <Menu guid="guidNodeToolsCmdSet" id="RemoteDebugProxyMenu" priority="0x0500" type="Menu">
         <Parent guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup" />
         <Strings>
-          <ButtonText>&amp;Remote Debugging Proxy</ButtonText>
-          <CommandName>&amp;Remote Debugging Proxy</CommandName>
+          <ButtonText>&amp;Proxy de Depuração Remota</ButtonText>
+          <CommandName>&amp;Proxy de Depuração Remota</CommandName>
         </Strings>
       </Menu>
       <Menu guid="guidNodeToolsNpmCmdSet" id="NpmMenu" priority="0x0600" type="Context">
@@ -86,7 +86,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>DefaultInvisible</CommandFlag>
         <Strings>
-          <ButtonText>New File...</ButtonText>
+          <ButtonText>Novo Arquivo...</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsCmdSet" id="cmdidSetAsNodejsStartupFile" priority="0x0300" type="Button">
@@ -94,8 +94,8 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>DefaultInvisible</CommandFlag>
         <Strings>
-          <CommandName>Set as Node.js Startup File</CommandName>
-          <ButtonText>S&amp;et as Node.js Startup File</ButtonText>
+          <CommandName>Definir como Arquivo de inicialização do Node.js</CommandName>
+          <ButtonText>D&amp;efinir como Arquivo de inicialização do Node.js</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsCmdSet" id="cmdidAddExistingFolder" priority="0x0500" type="Button">
@@ -104,7 +104,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <!-- <Icon guid="guidImages" id="bmpPic2"/> -->
         <Strings>
-          <ButtonText>Existing &amp;Folder...</ButtonText>
+          <ButtonText>Pasta &amp;Existente...</ButtonText>
           <LocCanonicalName>.Project.AddExistingFolder</LocCanonicalName>
         </Strings>
       </Button>
@@ -114,7 +114,7 @@
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
-          <ButtonText>Open Command &amp;Prompt Here...</ButtonText>
+          <ButtonText>Abra o &amp;Prompt de Comando Aqui...</ButtonText>
           <CommandName>OpenCommandPromptHere</CommandName>
           <LocCanonicalName>.File.OpenCommandPromptHere</LocCanonicalName>
         </Strings>
@@ -124,16 +124,16 @@
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
-          <ButtonText>Copy F&amp;ull Path</ButtonText>
-          <ToolTipText>Copy Full Path</ToolTipText>
+          <ButtonText>Copiar Caminho C&amp;ompleto</ButtonText>
+          <ToolTipText>Copiar Caminho Completo</ToolTipText>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsCmdSet" id="cmdidReplWindow" priority="0x7f00" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1" />
         <Icon guid="guidReplImage" id="1" />
         <Strings>
-          <CommandName>Node.js Interactive Window</CommandName>
-          <ButtonText>Node.js Interactive Window</ButtonText>
+          <CommandName>Janela Interativa do Node.js</CommandName>
+          <ButtonText>Janela Interativa do Node.js</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsCmdSet" id="cmdidOpenReplWindow" priority="0x0600" type="Button">
@@ -142,43 +142,43 @@
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
-          <CommandName>Open Node.js Interactive Window</CommandName>
-          <ButtonText>Open Node.js Interactive Window</ButtonText>
+          <CommandName>Abrir Janela Interativa do Node.js</CommandName>
+          <ButtonText>Abrir Janela Interativa do Node.js</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsCmdSet" id="cmdidOpenRemoteDebugProxyFolder" priority="0x0500" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="RemoteDebugProxyGroup" />
         <Strings>
-          <CommandName>Open Containing Folder</CommandName>
-          <ButtonText>&amp;Open Containing Folder</ButtonText>
+          <CommandName>Abrir Pasta Recipiente</CommandName>
+          <ButtonText>&amp;Abrir Pasta Recipiente</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsCmdSet" id="cmdidOpenRemoteDebugDocumentation" priority="0x0510" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="RemoteDebugProxyGroup" />
         <Strings>
-          <CommandName>Open Documentation</CommandName>
-          <ButtonText>Open &amp;Documentation</ButtonText>
+          <CommandName>Abrir Documentação</CommandName>
+          <ButtonText>Abrir &amp;Documentação</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsCmdSet" id="cmdidDocumentation" priority="0x004" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="NtvsHelpGroup" />
         <Strings>
-          <ButtonText>&amp;Documentation...</ButtonText>
-          <CommandName>Documentation...</CommandName>
+          <ButtonText>&amp;Documentação...</ButtonText>
+          <CommandName>Documentação...</CommandName>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsCmdSet" id="cmdidSurveyNews" priority="0x005" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="NtvsHelpGroup" />
         <Strings>
-          <ButtonText>Survey/&amp;News...</ButtonText>
-          <CommandName>Survey/News...</CommandName>
+          <ButtonText>Pesquisa/&amp;Notícias...</ButtonText>
+          <CommandName>Pesquisa/Notícias...</CommandName>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsCmdSet" id="cmdidSendFeedback" priority="0x006" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="NtvsHelpGroup" />
         <Strings>
-          <ButtonText>&amp;Report Issue or Send Feedback...</ButtonText>
-          <CommandName>Report Issue or Send Feedback...</CommandName>
+          <ButtonText>&amp;Reportar Problema ou Enviar Comentários...</ButtonText>
+          <CommandName>Reportar Problema ou Enviar Comentários...</CommandName>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsNpmCmdSet" id="cmdidNpmManageModules" priority="0x8000" type="Button">
@@ -187,7 +187,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidNpmManageModules</CommandName>
-          <ButtonText>Install &amp;New npm Packages...</ButtonText>
+          <ButtonText>Instalar &amp;Novos Pacotes npm...</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsNpmCmdSet" id="cmdidNpmInstallModules" priority="0x8100" type="Button">
@@ -196,7 +196,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidNpmInstallModules</CommandName>
-          <ButtonText>&amp;Install Missing npm Packages</ButtonText>
+          <ButtonText>&amp;Instalar Pacotes npm Ausentes</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsNpmCmdSet" id="cmdidNpmUpdateModules" priority="0x8200" type="Button">
@@ -205,7 +205,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidNpmUpdateModules</CommandName>
-          <ButtonText>Up&amp;date npm Packages</ButtonText>
+          <ButtonText>Atu&amp;alizar Pacotes npm</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsNpmCmdSet" id="cmdidNpmUninstallModule" priority="0x8300" type="Button">
@@ -214,7 +214,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidNpmUninstallModules</CommandName>
-          <ButtonText>Unins&amp;tall npm Package(s)</ButtonText>
+          <ButtonText>Desinstalar Pacotes npm</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsNpmCmdSet" id="cmdidNpmInstallSingleMissingModule" priority="0x8170" type="Button">
@@ -223,7 +223,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidNpmInstallSingleMissingModule</CommandName>
-          <ButtonText>&amp;Install Missing npm Package(s)</ButtonText>
+          <ButtonText>&amp;Instalar Pacotes npm Ausentes</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsNpmCmdSet" id="cmdidNpmUpdateSingleModule" priority="0x8270" type="Button">
@@ -232,7 +232,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidNpmUpdateSingleModule</CommandName>
-          <ButtonText>&amp;Update npm Package(s)</ButtonText>
+          <ButtonText>At&amp;ualizar Pacotes npm</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsNpmCmdSet" id="cmdidNpmOpenModuleHomepage" priority="0x8370" type="Button">
@@ -241,17 +241,17 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidNpmOpenModuleHomepage</CommandName>
-          <ButtonText>Open &amp;Documentation</ButtonText>
+          <ButtonText>Abrir &amp;Documentação</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsCmdSet" id="cmdidImportWizard" priority="0x010" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup" />
         <CommandFlag>DefaultInvisible</CommandFlag>
         <Strings>
-          <ButtonText>Import Existing &amp;Project...</ButtonText>
-          <MenuText>Import Existing &amp;Project...</MenuText>
-          <ToolTipText>Import Existing Project...</ToolTipText>
-          <CommandName>Import Existing Project...</CommandName>
+          <ButtonText>Importar &amp;Projeto Existente...</ButtonText>
+          <MenuText>Importar &amp;Projeto Existente...</MenuText>
+          <ToolTipText>Importar Projeto Existente...</ToolTipText>
+          <CommandName>Importar Projeto Existente...</CommandName>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsCmdSet" id="cmdidAzureExplorerAttachNodejsDebugger" priority="0x0110" type="Button">
@@ -259,19 +259,19 @@
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
-          <ButtonText>Attach Debugger (&amp;Node.js)</ButtonText>
-          <MenuText>Attach Debugger (&amp;Node.js)</MenuText>
-          <ToolTipText>Attach the Node.js debugger to the remote Microsoft Azure site</ToolTipText>
-          <CommandName>Attach Node.js Debugger</CommandName>
+          <ButtonText>Anexar Depurador (&amp;Node.js)</ButtonText>
+          <MenuText>Anexar Depurador (&amp;Node.js)</MenuText>
+          <ToolTipText>Anexar o depurador do Node.js ao site remoto do Microsoft Azure</ToolTipText>
+          <CommandName>Anexar Depurador do Node.js</CommandName>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsCmdSet" id="cmdidDiagnostics" priority="0x001" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup" />
         <Strings>
-          <ButtonText>&amp;Diagnostic Info...</ButtonText>
-          <MenuText>&amp;Diagnostic Info...</MenuText>
-          <ToolTipText>Diagnostic Info...</ToolTipText>
-          <CommandName>Diagnostic Info...</CommandName>
+          <ButtonText>&amp;Informações de Diagnóstico...</ButtonText>
+          <MenuText>&amp;Informações de Diagnóstico...</MenuText>
+          <ToolTipText>Informações de Diagnóstico...</ToolTipText>
+          <CommandName>Informações de Diagnóstico...</CommandName>
         </Strings>
       </Button>
     </Buttons>

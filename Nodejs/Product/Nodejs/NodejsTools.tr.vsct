@@ -54,15 +54,15 @@
       <Menu guid="guidNodeToolsCmdSet" id="ToolsMenu" priority="0x8009" type="Menu">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_TOOLS_OTHER2" />
         <Strings>
-          <ButtonText>Node.&amp;js Tools</ButtonText>
-          <CommandName>Node.&amp;js Tools</CommandName>
+          <ButtonText>Node.&amp;js Araçları</ButtonText>
+          <CommandName>Node.&amp;js Araçları</CommandName>
         </Strings>
       </Menu>
       <Menu guid="guidNodeToolsCmdSet" id="RemoteDebugProxyMenu" priority="0x0500" type="Menu">
         <Parent guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup" />
         <Strings>
-          <ButtonText>&amp;Remote Debugging Proxy</ButtonText>
-          <CommandName>&amp;Remote Debugging Proxy</CommandName>
+          <ButtonText>&amp;Uzaktan Hata Ayıklama Proxy'si</ButtonText>
+          <CommandName>&amp;Uzaktan Hata Ayıklama Proxy'si</CommandName>
         </Strings>
       </Menu>
       <Menu guid="guidNodeToolsNpmCmdSet" id="NpmMenu" priority="0x0600" type="Context">
@@ -86,7 +86,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>DefaultInvisible</CommandFlag>
         <Strings>
-          <ButtonText>New File...</ButtonText>
+          <ButtonText>Yeni Dosya...</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsCmdSet" id="cmdidSetAsNodejsStartupFile" priority="0x0300" type="Button">
@@ -94,8 +94,8 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>DefaultInvisible</CommandFlag>
         <Strings>
-          <CommandName>Set as Node.js Startup File</CommandName>
-          <ButtonText>S&amp;et as Node.js Startup File</ButtonText>
+          <CommandName>Node.js Başlangıç Dosyası Olarak Ayarla</CommandName>
+          <ButtonText>Node.js Başlangıç Dosyası Olarak A&amp;yarla</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsCmdSet" id="cmdidAddExistingFolder" priority="0x0500" type="Button">
@@ -104,7 +104,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <!-- <Icon guid="guidImages" id="bmpPic2"/> -->
         <Strings>
-          <ButtonText>Existing &amp;Folder...</ButtonText>
+          <ButtonText>Mevcut &amp;Klasör...</ButtonText>
           <LocCanonicalName>.Project.AddExistingFolder</LocCanonicalName>
         </Strings>
       </Button>
@@ -114,7 +114,7 @@
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
-          <ButtonText>Open Command &amp;Prompt Here...</ButtonText>
+          <ButtonText>Komut &amp;İstemini Burada Aç...</ButtonText>
           <CommandName>OpenCommandPromptHere</CommandName>
           <LocCanonicalName>.File.OpenCommandPromptHere</LocCanonicalName>
         </Strings>
@@ -124,16 +124,16 @@
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
-          <ButtonText>Copy F&amp;ull Path</ButtonText>
-          <ToolTipText>Copy Full Path</ToolTipText>
+          <ButtonText>T&amp;am Yolu Kopyala</ButtonText>
+          <ToolTipText>Tam Yolu Kopyala</ToolTipText>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsCmdSet" id="cmdidReplWindow" priority="0x7f00" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1" />
         <Icon guid="guidReplImage" id="1" />
         <Strings>
-          <CommandName>Node.js Interactive Window</CommandName>
-          <ButtonText>Node.js Interactive Window</ButtonText>
+          <CommandName>Node.js Etkileşimli Penceresi</CommandName>
+          <ButtonText>Node.js Etkileşimli Penceresi</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsCmdSet" id="cmdidOpenReplWindow" priority="0x0600" type="Button">
@@ -142,43 +142,43 @@
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
-          <CommandName>Open Node.js Interactive Window</CommandName>
-          <ButtonText>Open Node.js Interactive Window</ButtonText>
+          <CommandName>Node.js Etkileşimli Penceresini Aç</CommandName>
+          <ButtonText>Node.js Etkileşimli Penceresini Aç</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsCmdSet" id="cmdidOpenRemoteDebugProxyFolder" priority="0x0500" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="RemoteDebugProxyGroup" />
         <Strings>
-          <CommandName>Open Containing Folder</CommandName>
-          <ButtonText>&amp;Open Containing Folder</ButtonText>
+          <CommandName>İçeren Klasörü Aç</CommandName>
+          <ButtonText>İ&amp;çeren Klasörü Aç</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsCmdSet" id="cmdidOpenRemoteDebugDocumentation" priority="0x0510" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="RemoteDebugProxyGroup" />
         <Strings>
-          <CommandName>Open Documentation</CommandName>
-          <ButtonText>Open &amp;Documentation</ButtonText>
+          <CommandName>Belgeleri Aç</CommandName>
+          <ButtonText>Belgeleri &amp;Aç</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsCmdSet" id="cmdidDocumentation" priority="0x004" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="NtvsHelpGroup" />
         <Strings>
-          <ButtonText>&amp;Documentation...</ButtonText>
-          <CommandName>Documentation...</CommandName>
+          <ButtonText>&amp;Belgeler...</ButtonText>
+          <CommandName>Belgeler...</CommandName>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsCmdSet" id="cmdidSurveyNews" priority="0x005" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="NtvsHelpGroup" />
         <Strings>
-          <ButtonText>Survey/&amp;News...</ButtonText>
-          <CommandName>Survey/News...</CommandName>
+          <ButtonText>Anket/&amp;Haberler...</ButtonText>
+          <CommandName>Anket/Haberler...</CommandName>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsCmdSet" id="cmdidSendFeedback" priority="0x006" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="NtvsHelpGroup" />
         <Strings>
-          <ButtonText>&amp;Report Issue or Send Feedback...</ButtonText>
-          <CommandName>Report Issue or Send Feedback...</CommandName>
+          <ButtonText>&amp;Sorun Bildir veya Geri Bildirim Gönder...</ButtonText>
+          <CommandName>Sorun Bildir veya Geri Bildirim Gönder...</CommandName>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsNpmCmdSet" id="cmdidNpmManageModules" priority="0x8000" type="Button">
@@ -187,7 +187,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidNpmManageModules</CommandName>
-          <ButtonText>Install &amp;New npm Packages...</ButtonText>
+          <ButtonText>&amp;Yeni npm Paketlerini Yükle...</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsNpmCmdSet" id="cmdidNpmInstallModules" priority="0x8100" type="Button">
@@ -196,7 +196,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidNpmInstallModules</CommandName>
-          <ButtonText>&amp;Install Missing npm Packages</ButtonText>
+          <ButtonText>&amp;Eksik npm Paketlerini Yükle</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsNpmCmdSet" id="cmdidNpmUpdateModules" priority="0x8200" type="Button">
@@ -205,7 +205,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidNpmUpdateModules</CommandName>
-          <ButtonText>Up&amp;date npm Packages</ButtonText>
+          <ButtonText>&amp;npm Paketlerini Güncelleştir</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsNpmCmdSet" id="cmdidNpmUninstallModule" priority="0x8300" type="Button">
@@ -214,7 +214,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidNpmUninstallModules</CommandName>
-          <ButtonText>Unins&amp;tall npm Package(s)</ButtonText>
+          <ButtonText>&amp;npm Paketlerini Kaldır</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsNpmCmdSet" id="cmdidNpmInstallSingleMissingModule" priority="0x8170" type="Button">
@@ -223,7 +223,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidNpmInstallSingleMissingModule</CommandName>
-          <ButtonText>&amp;Install Missing npm Package(s)</ButtonText>
+          <ButtonText>&amp;Eksik npm Paketlerini Yükle</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsNpmCmdSet" id="cmdidNpmUpdateSingleModule" priority="0x8270" type="Button">
@@ -232,7 +232,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidNpmUpdateSingleModule</CommandName>
-          <ButtonText>&amp;Update npm Package(s)</ButtonText>
+          <ButtonText>&amp;npm Paketlerini Güncelleştir</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsNpmCmdSet" id="cmdidNpmOpenModuleHomepage" priority="0x8370" type="Button">
@@ -241,17 +241,17 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidNpmOpenModuleHomepage</CommandName>
-          <ButtonText>Open &amp;Documentation</ButtonText>
+          <ButtonText>Belgeleri &amp;Aç</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsCmdSet" id="cmdidImportWizard" priority="0x010" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup" />
         <CommandFlag>DefaultInvisible</CommandFlag>
         <Strings>
-          <ButtonText>Import Existing &amp;Project...</ButtonText>
-          <MenuText>Import Existing &amp;Project...</MenuText>
-          <ToolTipText>Import Existing Project...</ToolTipText>
-          <CommandName>Import Existing Project...</CommandName>
+          <ButtonText>Mevcut &amp;Projeyi İçeri Aktar...</ButtonText>
+          <MenuText>Mevcut &amp;Projeyi İçeri Aktar...</MenuText>
+          <ToolTipText>Mevcut Projeyi İçeri Aktar...</ToolTipText>
+          <CommandName>Mevcut Projeyi İçeri Aktar...</CommandName>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsCmdSet" id="cmdidAzureExplorerAttachNodejsDebugger" priority="0x0110" type="Button">
@@ -259,19 +259,19 @@
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
-          <ButtonText>Attach Debugger (&amp;Node.js)</ButtonText>
-          <MenuText>Attach Debugger (&amp;Node.js)</MenuText>
-          <ToolTipText>Attach the Node.js debugger to the remote Microsoft Azure site</ToolTipText>
-          <CommandName>Attach Node.js Debugger</CommandName>
+          <ButtonText>Hata Ayıklayıcı Ekle (&amp;Node.js)</ButtonText>
+          <MenuText>Hata Ayıklayıcı Ekle (&amp;Node.js)</MenuText>
+          <ToolTipText>Node.js hata ayıklayıcıyı uzak Microsoft Azure sitesine ekleyin</ToolTipText>
+          <CommandName>Node.js Hata Ayıklayıcı Ekle</CommandName>
         </Strings>
       </Button>
       <Button guid="guidNodeToolsCmdSet" id="cmdidDiagnostics" priority="0x001" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup" />
         <Strings>
-          <ButtonText>&amp;Diagnostic Info...</ButtonText>
-          <MenuText>&amp;Diagnostic Info...</MenuText>
-          <ToolTipText>Diagnostic Info...</ToolTipText>
-          <CommandName>Diagnostic Info...</CommandName>
+          <ButtonText>&amp;Tanılama Bilgisi...</ButtonText>
+          <MenuText>&amp;Tanılama Bilgisi...</MenuText>
+          <ToolTipText>Tanılama Bilgisi...</ToolTipText>
+          <CommandName>Tanılama Bilgisi...</CommandName>
         </Strings>
       </Button>
     </Buttons>

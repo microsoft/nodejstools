@@ -59,8 +59,8 @@
       <Menu guid="guidReplWindowCmdSet" id="menuIdConsoleContextMenu" priority="0x0000" type="Context">
         <Parent guid="guidReplWindowCmdSet" id="0" />
         <Strings>
-          <ButtonText>Interactive Console</ButtonText>
-          <CommandName>Interactive Console</CommandName>
+          <ButtonText>대화형 콘솔</ButtonText>
+          <CommandName>대화형 콘솔</CommandName>
         </Strings>
       </Menu>
       <Menu guid="guidReplWindowCmdSet" id="menuIdReplToolbar" priority="0x0000" type="ToolWindowToolbar">
@@ -70,8 +70,8 @@
         <CommandFlag>AlwaysCreate</CommandFlag>
         <CommandFlag>TextChanges</CommandFlag>
         <Strings>
-          <ButtonText>Interactive Window</ButtonText>
-          <CommandName>Interactive Window</CommandName>
+          <ButtonText>대화형 창</ButtonText>
+          <CommandName>대화형 창</CommandName>
         </Strings>
       </Menu>
     </Menus>
@@ -102,7 +102,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdIdResetRepl</CommandName>
-          <ButtonText>Reset</ButtonText>
+          <ButtonText>다시 설정</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidReplWindowCmdSet" id="cmdidSmartExecute" priority="0x0300" type="Button">
@@ -111,7 +111,7 @@
         <CommandFlag>DefaultInvisible</CommandFlag>
         <Strings>
           <CommandName>cmdidSmartExecute</CommandName>
-          <ButtonText>Execute or Paste Input</ButtonText>
+          <ButtonText>입력 실행 또는 붙여넣기</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidReplWindowCmdSet" id="cmdidReplHistoryPrevious" priority="0x0300" type="Button">
@@ -120,7 +120,7 @@
         <CommandFlag>DefaultInvisible</CommandFlag>
         <Strings>
           <CommandName>cmdidReplHistoryPrevious</CommandName>
-          <ButtonText>History Previous</ButtonText>
+          <ButtonText>이전 기록</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidReplWindowCmdSet" id="cmdidReplHistoryNext" priority="0x0300" type="Button">
@@ -129,7 +129,7 @@
         <CommandFlag>DefaultInvisible</CommandFlag>
         <Strings>
           <CommandName>cmdidReplHistoryNext</CommandName>
-          <ButtonText>History Next</ButtonText>
+          <ButtonText>다음 기록</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidReplWindowCmdSet" id="cmdidReplSearchHistoryNext" priority="0x0300" type="Button">
@@ -138,7 +138,7 @@
         <CommandFlag>DefaultInvisible</CommandFlag>
         <Strings>
           <CommandName>cmdidReplHistoryNext</CommandName>
-          <ButtonText>Search History Next</ButtonText>
+          <ButtonText>다음 검색 기록</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidReplWindowCmdSet" id="cmdidReplSearchHistoryPrevious" priority="0x0300" type="Button">
@@ -147,7 +147,7 @@
         <CommandFlag>DefaultInvisible</CommandFlag>
         <Strings>
           <CommandName>cmdidReplHistoryNext</CommandName>
-          <ButtonText>Search History Previous</ButtonText>
+          <ButtonText>이전 검색 기록</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidReplWindowCmdSet" id="cmdidReplClearScreen" priority="0x0300" type="Button">
@@ -155,7 +155,7 @@
         <Icon guid="guidReplToolbarImages" id="bmpClearScreen" />
         <Strings>
           <CommandName>cmdidReplClearScreen</CommandName>
-          <ButtonText>Clear Screen</ButtonText>
+          <ButtonText>화면 지우기</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidReplWindowCmdSet" id="cmdidBreakLine" priority="0x0300" type="Button">
@@ -164,7 +164,7 @@
         <CommandFlag>DefaultInvisible</CommandFlag>
         <Strings>
           <CommandName>cmdidBreakLine</CommandName>
-          <ButtonText>Break Line</ButtonText>
+          <ButtonText>구분선</ButtonText>
         </Strings>
       </Button>
       <!-- Toolbar Buttons -->
@@ -173,7 +173,7 @@
         <Icon guid="guidReplToolbarImages" id="bmpClearScreen" />
         <Strings>
           <CommandName>cmdidReplClearScreen</CommandName>
-          <ButtonText>Clear Screen</ButtonText>
+          <ButtonText>화면 지우기</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidReplWindowCmdSet" id="cmdidResetRepl" priority="0x0200" type="Button">
@@ -181,7 +181,7 @@
         <Icon guid="guidReplToolbarImages" id="bmpResetSession" />
         <Strings>
           <CommandName>cmdIdResetRepl</CommandName>
-          <ButtonText>Reset</ButtonText>
+          <ButtonText>다시 설정</ButtonText>
         </Strings>
       </Button>
       <!--<Button guid="guidReplWindowCmdSet" id="cmdidBreakRepl" priority="0x0300" type="Button">
