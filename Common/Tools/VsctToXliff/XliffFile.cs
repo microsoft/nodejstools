@@ -113,10 +113,10 @@ namespace VsctToXliff
                 foreach (var element in elements)
                 {
                     var id = element.Attribute("id").Value;
-                    var translated = element.Element(XLIFF + "target").Value;
-                    if (!translations.ContainsKey(id))
+                    var translated = element.Element(XLIFF + "target");
+                    if (translated != null  && !translations.ContainsKey(id))
                     {
-                        translations.Add(id, translated);
+                        translations.Add(id, translated.Value);
                     }
                 }
             }
