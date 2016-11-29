@@ -872,9 +872,6 @@
       <DependentUpon>DiagnosticsForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.resx">
-      <DependentUpon>NodejsNpmOptionsControl.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Options\NodejsIntellisenseOptionsControl.resx">
       <DependentUpon>NodejsIntellisenseOptionsControl.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -888,9 +885,6 @@
     <EmbeddedResource Include="Options\NodejsFormattingSpacingOptionsControl.resx">
       <DependentUpon>NodejsFormattingSpacingOptionsControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.resx">
-      <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.resx">
       <DependentUpon>NewFileNameForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -901,6 +895,57 @@
       <DependentUpon>NodejsGeneralPropertyPageControl.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
+  
+  <ItemGroup Condition="$(VSTarget) == '14.0'">
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.resx">
+      <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup Condition="$(VSTarget) == '15.0'">
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.en.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.cs.resx" />
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.de.resx" />
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.es.resx" />
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.fr.resx" />
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.it.resx" />
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.ja.resx" />
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.ko.resx" />
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.pl.resx" />
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.pt-BR.resx" />
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.ru.resx" />
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.tr.resx" />
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.zh-Hans.resx" />
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.zh-Hant.resx" />
+  </ItemGroup>
+  
+  <ItemGroup Condition="$(VSTarget) == '14.0'">
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.resx">
+      <DependentUpon>NodejsNpmOptionsControl.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup Condition="$(VSTarget) == '15.0'">
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.en.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <DependentUpon>NodejsNpmOptionsControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.cs.resx" />
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.de.resx" />
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.es.resx" />
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.fr.resx" />
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.it.resx" />
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.ja.resx" />
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.ko.resx" />
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.pl.resx" />
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.pt-BR.resx" />
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.ru.resx" />
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.tr.resx" />
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.zh-Hans.resx" />
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.zh-Hant.resx" />
+  </ItemGroup>
+  
   <ItemGroup>
     <ZipItem Include="Templates\Files\EmptyCss\EmptyCss.css" />
     <ZipItem Include="Templates\Files\EmptyCss\EmptyCss.vstemplate" />
