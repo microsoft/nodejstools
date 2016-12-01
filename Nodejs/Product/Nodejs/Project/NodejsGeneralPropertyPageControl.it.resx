@@ -658,7 +658,7 @@
     <value>16</value>
   </data>
   <data name="_debuggerPortLabel.Text" xml:space="preserve">
-    <value>&amp;Debugger port:</value>
+    <value>&amp;Porta del debugger:</value>
   </data>
   <data name="&gt;&gt;_debuggerPortLabel.Name" xml:space="preserve">
     <value>_debuggerPortLabel</value>

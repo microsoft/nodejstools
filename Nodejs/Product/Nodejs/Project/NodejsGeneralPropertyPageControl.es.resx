@@ -119,7 +119,7 @@
   </resheader>
   <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"/>
   <data name="_nodeExePathLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>Verdadero</value>
+    <value>True</value>
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"/>
   <data name="_nodeExePathLabel.Location" type="System.Drawing.Point, System.Drawing">
@@ -147,7 +147,7 @@
     <value>13</value>
   </data>
   <data name="_nodeArguments.AutoSize" type="System.Boolean, mscorlib">
-    <value>Verdadero</value>
+    <value>True</value>
   </data>
   <data name="_nodeArguments.Location" type="System.Drawing.Point, System.Drawing">
     <value>14, 48</value>
@@ -174,7 +174,7 @@
     <value>12</value>
   </data>
   <data name="_startBrowser.AutoSize" type="System.Boolean, mscorlib">
-    <value>Verdadero</value>
+    <value>True</value>
   </data>
   <data name="_startBrowser.Location" type="System.Drawing.Point, System.Drawing">
     <value>17, 284</value>
@@ -271,7 +271,7 @@
     <value>15</value>
   </data>
   <data name="_nodePortLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>Verdadero</value>
+    <value>True</value>
   </data>
   <data name="_nodePortLabel.Location" type="System.Drawing.Point, System.Drawing">
     <value>14, 179</value>
@@ -298,7 +298,7 @@
     <value>8</value>
   </data>
   <data name="_scriptArgsLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>Verdadero</value>
+    <value>True</value>
   </data>
   <data name="_scriptArgsLabel.Location" type="System.Drawing.Point, System.Drawing">
     <value>14, 100</value>
@@ -349,7 +349,7 @@
     <value>18</value>
   </data>
   <data name="_workingDirLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>Verdadero</value>
+    <value>True</value>
   </data>
   <data name="_workingDirLabel.Location" type="System.Drawing.Point, System.Drawing">
     <value>14, 126</value>
@@ -424,7 +424,7 @@
     <value>16</value>
   </data>
   <data name="_launchUrlLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>Verdadero</value>
+    <value>True</value>
   </data>
   <data name="_launchUrlLabel.Location" type="System.Drawing.Point, System.Drawing">
     <value>14, 153</value>
@@ -460,7 +460,7 @@
     <value>135, 228</value>
   </data>
   <data name="_envVars.Multiline" type="System.Boolean, mscorlib">
-    <value>Verdadero</value>
+    <value>True</value>
   </data>
   <data name="_envVars.ScrollBars" type="System.Windows.Forms.ScrollBars, System.Windows.Forms">
     <value>Both</value>
@@ -547,7 +547,7 @@
     <value>6, 13</value>
   </data>
   <data name="_scriptLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>Verdadero</value>
+    <value>True</value>
   </data>
   <data name="_scriptLabel.Location" type="System.Drawing.Point, System.Drawing">
     <value>14, 74</value>
@@ -598,7 +598,7 @@
     <value>1</value>
   </data>
   <data name="_envVarsLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>Verdadero</value>
+    <value>True</value>
   </data>
   <data name="_envVarsLabel.Location" type="System.Drawing.Point, System.Drawing">
     <value>14, 231</value>
@@ -646,7 +646,7 @@
     <value>4</value>
   </data>
   <data name="_debuggerPortLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>Verdadero</value>
+    <value>True</value>
   </data>
   <data name="_debuggerPortLabel.Location" type="System.Drawing.Point, System.Drawing">
     <value>14, 205</value>
