@@ -14,8 +14,13 @@ function append_stdout(string, encoding, fd) {
 function append_stderr(string, encoding, fd) {
     result.stdErr += string;
 }
-process.stdout.write = append_stdout;
-process.stderr.write = append_stderr;
+function hook_outputs() {
+    process.stdout.write = append_stdout;
+    process.stderr.write = append_stderr;
+}
+
+
+hook_outputs();
 
 var find_tests = function (testFileList, discoverResultFile) {
     var debug;
@@ -66,15 +71,21 @@ var find_tests = function (testFileList, discoverResultFile) {
 module.exports.find_tests = find_tests;
 
 var run_tests = function (testCases, callback) {
-    var event = {};
-    for (var test of testCases) {
-        event.type = 'testStart';
-        event.title = test.testName;
+    function post(event) {
         callback(event);
+        hook_outputs();
+    }
+
+    for (var test of testCases) {
+        event = {
+            type: 'test start',
+            title: test.testName
+        }
+        post(event);
         try {
             var testCase = require(test.testFile);
-            result.title = test.testName;
             testCase[test.testName]();
+            result.title = test.testName;
             result.passed = true;
         } catch (err) {
             result.passed = false;
@@ -83,9 +94,7 @@ var run_tests = function (testCases, callback) {
         }
         event.type = 'result';
         event.result = result;
-        callback(event);
-        process.stdout.write = append_stdout;
-        process.stderr.write = append_stderr;
+        post(event);
         result = {
             'title': '',
             'passed': false,
@@ -93,5 +102,9 @@ var run_tests = function (testCases, callback) {
             'stdErr': ''
         };
     }
+    callback({
+        type: 'suite end',
+        result: result
+    });
 };
 module.exports.run_tests = run_tests;
