@@ -18,8 +18,12 @@ function append_stdout(string, encoding, fd) {
 function append_stderr(string, encoding, fd) {
     result.stdErr += string;
 }
-process.stdout.write = append_stdout;
-process.stderr.write = append_stderr;
+function hook_outputs() {
+    process.stdout.write = append_stdout;
+    process.stderr.write = append_stderr;
+}
+
+hook_outputs();
 
 var find_tests = function (testFileList, discoverResultFile, projectFolder) {
     var Mocha = detectMocha(projectFolder);
@@ -69,7 +73,11 @@ var find_tests = function (testFileList, discoverResultFile, projectFolder) {
 };
 module.exports.find_tests = find_tests;
 
-var run_tests = function (testCases, postResult) {
+var run_tests = function (testCases, callback) {
+    function post(event) {
+        callback(event);
+        hook_outputs();
+    }
     function escapeRegExp(string) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
     }
@@ -91,110 +99,82 @@ var run_tests = function (testCases, postResult) {
     }
 
     mocha.addFile(testCases[0].testFile);
-    
+
     // run tests
     var runner = mocha.run(function (code) { process.exit(code); });
     runner.on('suite', function (suite) {
-        var event = {
+        post({
             type: 'suite start',
             result: result
-        }
-        postResult(event);
-        process.stdout.write = append_stdout;
-        process.stderr.write = append_stderr;
+        });
     });
     runner.on('suite end', function (suite) {
-        var event = {
+        post({
             type: 'suite end',
             result: result
-        }
-        postResult(event);
-        process.stdout.write = append_stdout;
-        process.stderr.write = append_stderr;
+        });
     });
     runner.on('hook', function (hook) {
-        var event = {
+        post({
             type: 'hook start',
             title: hook.title,
             result: result
-        }
-        postResult(event);
-        process.stdout.write = append_stdout;
-        process.stderr.write = append_stderr;
+        });
     });
     runner.on('hook end', function (hook) {
-        var event = {
+        post({
             type: 'hook end',
             title: hook.title,
             result: result
-        }
-        postResult(event);
-        process.stdout.write = append_stdout;
-        process.stderr.write = append_stderr;
+        });
     });
     runner.on('start', function () {
-        var event = {
+        post({
             type: 'start',
             result: result
-        }
-        postResult(event);
-        process.stdout.write = append_stdout;
-        process.stderr.write = append_stderr;
+        });
     });
-    runner.on('pending', function (test) {
-    });
+
     runner.on('test', function (test) {
         result.title = test.fullTitle();
-        var event = {
-            type: 'testStart',
+        post({
+            type: 'test start',
             title: result.title
-        }
-        postResult(event);
-        process.stdout.write = append_stdout;
-        process.stderr.write = append_stderr;
+        });
     });
     runner.on('end', function () {
-        var event = {
+        post({
             type: 'end',
             result: result
-        }
-        postResult(event);
-        process.stdout.write = append_stdout;
-        process.stderr.write = append_stderr;
+        });
     });
     runner.on('pass', function (test) {
         result.passed = true;
-        var event = {
+        post({
             type: 'result',
             title: result.title,
             result: result
-        }
-        postResult(event);
+        });
         result = {
             'title': '',
             'passed': false,
             'stdOut': '',
             'stdErr': ''
         }
-        process.stdout.write = append_stdout;
-        process.stderr.write = append_stderr;
     });
     runner.on('fail', function (test, err) {
         result.passed = false;
-        var event = {
+        post({
             type: 'result',
             title: result.title,
             result: result
-        }
-        postResult(event);
+        });
         result = {
             'title': '',
             'passed': false,
             'stdOut': '',
             'stdErr': ''
         }
-        process.stdout.write = append_stdout;
-        process.stderr.write = append_stderr;
     });
 };
 
