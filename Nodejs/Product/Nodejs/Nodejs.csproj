@@ -925,7 +925,7 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <DependentUpon>NodejsGeneralPropertyPageControl.cs</DependentUpon>
     </EmbeddedResource>
-    <!--<EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.cs.resx" />
+    <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.cs.resx" />
     <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.de.resx" />
     <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.es.resx" />
     <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.fr.resx" />
@@ -937,7 +937,7 @@
     <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.ru.resx" />
     <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.tr.resx" />
     <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.zh-Hans.resx" />
-    <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.zh-Hant.resx" />-->
+    <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.zh-Hant.resx" />
   </ItemGroup>
 
   <ItemGroup Condition="$(VSTarget) == '14.0'">
