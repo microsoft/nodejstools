@@ -286,6 +286,15 @@ $installer_names = @{
     'Microsoft.VisualStudio.NodejsTools.Targets.json' = 'Microsoft.VisualStudio.NodejsTools.Targets.json';
 }
 
+$locales = ("cs", "de", "en", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "ru", "tr", "zh-Hans", "zh-Hant")
+
+$localized_files = (
+    "Microsoft.NodejsTools.InteractiveWindow.resources.dll",
+    "Microsoft.NodejsTools.Npm.resources.dll",
+    "Microsoft.NodejsTools.ProjectWizard.resources.dll",
+    "Microsoft.NodejsTools.resources.dll"
+)
+
 # Add list of files requiring signing here
 $managed_files = (
     "Microsoft.NodejsTools.NodeLogConverter.exe", 
@@ -300,6 +309,17 @@ $managed_files = (
     "Microsoft.NodejsTools.Telemetry.14.0.dll",
     "Microsoft.NodejsTools.Telemetry.15.0.dll"
 )
+
+function signed-files($target){
+    if ($target.number -eq "14"){
+        $managed_files
+    } else {
+        $locales | % {
+            $locale = $_
+            $localized_files | % { join-path $locale $_ }
+        }
+    }
+}
 
 $native_files = @()
 
@@ -516,7 +536,7 @@ try {
                 if (-not $skipclean) {
                     & $target_msbuild_exe /t:Clean $global_msbuild_options $target_msbuild_options $build_project
                 }
-                & $target_msbuild_exe $global_msbuild_options $target_msbuild_options /fl /flp:logfile=$($i.logfile) $build_project
+                & $target_msbuild_exe $global_msbuild_options $target_msbuild_options /fl /flp:logfile=$($i.logfile) /flp:verbosity=diagnostic $build_project
 
                 if (-not $?) {
                     Write-Error "Build failed: $($i.VSName) $config"
@@ -541,8 +561,10 @@ try {
                 }
                 Write-Output "Submitting signing jobs for $($i.VSName)"
 
+                $signing_files = signed-files $i
+
                 $jobs += begin_sign_files `
-                    @($managed_files | %{@{path="$($i.unsigned_bindir)\$_"; name=$project_name}} | ?{Test-Path $_.path}) `
+                    @($signing_files | %{@{path="$($i.unsigned_bindir)\$_"; name=$project_name}} | ?{Test-Path $_.path}) `
                     $i.signed_bindir $approvers `
                     $project_name $project_url "$project_name $($i.VSName) - managed code" $project_keywords `
                     "authenticode;strongname" `

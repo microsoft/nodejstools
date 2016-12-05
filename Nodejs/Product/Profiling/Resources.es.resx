@@ -1,0 +1,204 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="FailedToBuild" xml:space="preserve">
+    <value>No se pudo compilar el proyecto, ¿quiere iniciar de todos modos la generación de perfiles?</value>
+  </data>
+  <data name="FailedToOpenFileErrorMessageText" xml:space="preserve">
+    <value>No se pudo abrir el archivo {0}</value>
+  </data>
+  <data name="NoConfiguredStatupFileErrorMessageText" xml:space="preserve">
+    <value>El proyecto no tiene ningún archivo de inicio configurado, no se puede iniciar la generación de perfiles.</value>
+  </data>
+  <data name="NodejsToolsForVS" xml:space="preserve">
+    <value>Node.js Tools para Visual Studio</value>
+  </data>
+  <data name="NoProfilingConfiguredMessageCaption" xml:space="preserve">
+    <value>No hay destino de generación de perfiles</value>
+  </data>
+  <data name="NoProfilingConfiguredMessageText" xml:space="preserve">
+    <value>La sesión de generación de perfiles no está configurada, ¿quiere configurarla ahora y luego iniciarla?</value>
+  </data>
+  <data name="ProfilingOk" xml:space="preserve">
+    <value>_Aceptar</value>
+  </data>
+  <data name="ProfilingStart" xml:space="preserve">
+    <value>_Iniciar</value>
+  </data>
+  <data name="ProjectNotFoundErrorMessageText" xml:space="preserve">
+    <value>No se encuentra el proyecto en la solución actual.</value>
+  </data>
+  <data name="FailedToReadPerformanceSessionMessageText" xml:space="preserve">
+    <value>No se pudo leer la sesión de rendimiento {0}</value>
+  </data>
+  <data name="FailedToSaveV8LogMessageText" xml:space="preserve">
+    <value>El archivo de registro v8 no se ha guardado correctamente en:
+{0}
+
+No hay ningún dato de generación de perfiles disponible.</value>
+  </data>
+  <data name="PerformanceReportNoLongerExistsMessageText" xml:space="preserve">
+    <value>Ya no existe el informe de rendimiento: {0}</value>
+  </data>
+  <data name="UnableToDeleteV8Log" xml:space="preserve">
+    <value>No se puede eliminar &apos;{0}&apos;.
+
+Es probable que haya una segunda copia de node.exe en funcionamiento
+y puede que los resultados no estén disponibles o sean incorrectos.</value>
+  </data>
+  <data name="BaselineFileLabel" xml:space="preserve">
+    <value>_Archivo de línea base:</value>
+  </data>
+  <data name="CancelButtonContent" xml:space="preserve">
+    <value>_Cancelar</value>
+  </data>
+  <data name="CommandLineArgumentsLabel" xml:space="preserve">
+    <value>_Argumentos de línea de comandos:</value>
+  </data>
+  <data name="CompareWindowTitle" xml:space="preserve">
+    <value>Seleccionar archivos de análisis para comparación</value>
+  </data>
+  <data name="ComparisionFileLabel" xml:space="preserve">
+    <value>Archivo de co_mparación:</value>
+  </data>
+  <data name="NodePathLabel" xml:space="preserve">
+    <value>Ruta de acceso al _nodo:</value>
+  </data>
+  <data name="OkButtonContent" xml:space="preserve">
+    <value>_Aceptar</value>
+  </data>
+  <data name="OpenProjectButton" xml:space="preserve">
+    <value>_Abrir proyecto</value>
+  </data>
+  <data name="ProfilingSettingsHeader" xml:space="preserve">
+    <value>¿Quiere generar un perfil?</value>
+  </data>
+  <data name="ProfilingSettingsTitle" xml:space="preserve">
+    <value>Configuración de la generación de perfiles</value>
+  </data>
+  <data name="ScriptLabel" xml:space="preserve">
+    <value>Sc_ript:</value>
+  </data>
+  <data name="StandaloneScriptLabel" xml:space="preserve">
+    <value>Script i_ndependiente</value>
+  </data>
+  <data name="WorkingDirectoryLabel" xml:space="preserve">
+    <value>_Directorio de trabajo:</value>
+  </data>
+</root>

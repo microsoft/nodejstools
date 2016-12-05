@@ -121,7 +121,7 @@
       <_DebugSymbolsFinalOutputProjectOutputGroupOutput Include="@(DebugSymbolsProjectOutputGroupOutput->'%(FinalOutputPath)'" />
     </ItemGroup>
   </Target>
-
+  
   <!--
   Copies certain outputs from the project to the specified path.
   
@@ -129,7 +129,7 @@
   -->
   <Target Name="_CopyOutputsToPath"
           AfterTargets="AfterBuild"
-          DependsOnTargets="BuiltProjectOutputGroup;DebugSymbolsFinalOutputProjectOutputGroup"
+          DependsOnTargets="BuiltProjectOutputGroup;SatelliteDllsProjectOutputGroup;DebugSymbolsFinalOutputProjectOutputGroup"
           Condition="'$(CopyOutputsToPath)' != '' and $(MSBuildProjectExtension) != '.wixproj' and Exists($(TargetPath))">
     <PropertyGroup>
       <CopyOutputsToPath Condition="!HasTrailingSlash($(CopyOutputsToPath))">$(CopyOutputsToPath)\</CopyOutputsToPath>
@@ -144,6 +144,10 @@
 
     <Copy SourceFiles="@(DebugSymbolsProjectOutputGroupOutput->'%(FinalOutputPath)')"
           DestinationFolder="$(CopyOutputsToPath)Symbols" />
+
+    <Copy SourceFiles="@(SatelliteDllsProjectOutputGroupOutput)"
+          DestinationFiles="@(SatelliteDllsProjectOutputGroupOutput->'$(CopyOutputsToPath)UnsignedBinaries\%(TargetPath)')"
+          SkipUnchangedFiles="true" />
 
     <Copy SourceFiles="@(OutputBinariesToSign -> '$(OutputPath)%(filename)%(extension)')"
           DestinationFolder="$(CopyOutputsToPath)UnsignedBinaries"

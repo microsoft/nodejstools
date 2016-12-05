@@ -163,6 +163,26 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources.cs.resx" />
+    <EmbeddedResource Include="Resources.de.resx" />
+    <EmbeddedResource Include="Resources.en.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources.es.resx" />
+    <EmbeddedResource Include="Resources.fr.resx" />
+    <EmbeddedResource Include="Resources.it.resx" />
+    <EmbeddedResource Include="Resources.ja.resx" />
+    <EmbeddedResource Include="Resources.ko.resx" />
+    <EmbeddedResource Include="Resources.pl.resx" />
+    <EmbeddedResource Include="Resources.pt-BR.resx" />
+    <EmbeddedResource Include="Resources.ru.resx" />
+    <EmbeddedResource Include="Resources.tr.resx" />
+    <EmbeddedResource Include="Resources.zh-Hans.resx" />
+    <EmbeddedResource Include="Resources.zh-Hant.resx" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="..\..\Common\SQLite\sqlite3.dll">
       <Link>sqlite3.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
