@@ -33,25 +33,6 @@ using MSBuild = Microsoft.Build.Evaluation;
 using Newtonsoft.Json;
 
 namespace Microsoft.NodejsTools.TestAdapter {
-
-    class TestEvent {
-        public string type { get; set; }
-        public string title { get; set; }
-        public ResultObject result { get; set; }
-    }
-    class ResultObject {
-        public ResultObject() {
-            title = String.Empty;
-            passed = false;
-            stdout = String.Empty;
-            stderr = String.Empty;
-        }
-        public string title { get; set; }
-        public bool passed { get; set; }
-        public string stdout { get; set; }
-        public string stderr { get; set; }
-    }
-
     [ExtensionUri(TestExecutor.ExecutorUriString)]
     class TestExecutor : ITestExecutor {
         public const string ExecutorUriString = "executor://NodejsTestExecutor/v1";
@@ -79,20 +60,21 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
         private void ProcessTestEvent(object sender, DataReceivedEventArgs e) {
             try {
-                TestEvent testEvent = JsonConvert.DeserializeObject<TestEvent>(e.Data);
-                // Extract test from list of tests
-                var test = _currentTests.Where(n => n.DisplayName == testEvent.title);
-                if (test.Count() > 0) {
-                    if (testEvent.type == "testStart") {
-                        _currentResult = new TestResult(test.First());
-                        _currentResult.StartTime = DateTimeOffset.Now;
-                        _frameworkHandle.RecordStart(test.First());
+                if (e.Data != null) {
+                    TestEvent testEvent = JsonConvert.DeserializeObject<TestEvent>(e.Data);
+                    // Extract test from list of tests
+                    var test = _currentTests.Where(n => n.DisplayName == testEvent.title);
+                    if (test.Count() > 0) {
+                        if (testEvent.type == "test start") {
+                            _currentResult = new TestResult(test.First());
+                            _currentResult.StartTime = DateTimeOffset.Now;
+                            _frameworkHandle.RecordStart(test.First());
+                        } else if (testEvent.type == "result") {
+                            RecordEnd(_frameworkHandle, test.First(), _currentResult, testEvent.result);
+                        }
+                    } else if (testEvent.type == "suite end") {
+                        _currentResultObject = testEvent.result;
                     }
-                    else if (testEvent.type == "result") {
-                        RecordEnd(_frameworkHandle, test.First(), _currentResult, testEvent.result);
-                    }
-                } else if (testEvent.type == "suite end") {
-                    _currentResultObject = testEvent.result;
                 }
             } catch (Exception) { }
         }
@@ -266,11 +248,13 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
                 // Automatically fail tests that haven't been run by this point (failures in before() hooks)
                 foreach(TestCase notRunTest in _currentTests) {
-                    TestResult res = new TestResult(notRunTest);
-                    res.Outcome = TestOutcome.Failed;
-                    res.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, _currentResultObject.stdout));
-                    res.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, _currentResultObject.stderr));
-                    frameworkHandle.RecordResult(res);
+                    TestResult result = new TestResult(notRunTest);
+                    result.Outcome = TestOutcome.Failed;
+                    if(_currentResultObject != null) {
+                        result.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, _currentResultObject.stdout));
+                        result.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, _currentResultObject.stderr));
+                    }
+                    frameworkHandle.RecordResult(result);
                     frameworkHandle.RecordEnd(notRunTest, TestOutcome.Failed);
                 }
 
@@ -416,6 +400,25 @@ class NodejsProjectSettings {
     public string ProjectRootDir { get; set; }
 }
 
+class ResultObject {
+    public ResultObject() {
+        title = String.Empty;
+        passed = false;
+        stdout = String.Empty;
+        stderr = String.Empty;
+    }
+    public string title { get; set; }
+    public bool passed { get; set; }
+    public string stdout { get; set; }
+    public string stderr { get; set; }
+}
+
+class TestEvent {
+    public string type { get; set; }
+    public string title { get; set; }
+    public ResultObject result { get; set; }
+}
+
 class TestCaseObject {
     public TestCaseObject() {
         framework = String.Empty;
@@ -437,5 +440,4 @@ class TestCaseObject {
     public string testFile { get; set; }
     public string workingFolder { get; set; }
     public string projectFolder { get; set; }
-
 }
