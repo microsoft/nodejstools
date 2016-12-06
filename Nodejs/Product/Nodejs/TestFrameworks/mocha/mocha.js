@@ -78,6 +78,7 @@ var run_tests = function (testCases, callback) {
         callback(event);
         hook_outputs();
     }
+
     function escapeRegExp(string) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
     }
@@ -93,27 +94,30 @@ var run_tests = function (testCases, callback) {
     var testGrepString = '^(' + testCases.map(function (testCase) {
         return testCase.testName
     }).join('|') + ')$';
-
+    
     if (testGrepString) {
         mocha.grep(new RegExp(testGrepString));
     }
-
     mocha.addFile(testCases[0].testFile);
 
-    // run tests
-    var runner = mocha.run(function (code) { process.exit(code); });
+    var runner = mocha.run(function (code) {
+        process.exit(code);
+    });
+
     runner.on('suite', function (suite) {
         post({
             type: 'suite start',
             result: result
         });
     });
+
     runner.on('suite end', function (suite) {
         post({
             type: 'suite end',
             result: result
         });
     });
+
     runner.on('hook', function (hook) {
         post({
             type: 'hook start',
@@ -121,6 +125,7 @@ var run_tests = function (testCases, callback) {
             result: result
         });
     });
+
     runner.on('hook end', function (hook) {
         post({
             type: 'hook end',
@@ -128,6 +133,7 @@ var run_tests = function (testCases, callback) {
             result: result
         });
     });
+
     runner.on('start', function () {
         post({
             type: 'start',
@@ -142,12 +148,14 @@ var run_tests = function (testCases, callback) {
             title: result.title
         });
     });
+
     runner.on('end', function () {
         post({
             type: 'end',
             result: result
         });
     });
+
     runner.on('pass', function (test) {
         result.passed = true;
         post({
@@ -162,6 +170,7 @@ var run_tests = function (testCases, callback) {
             'stdErr': ''
         }
     });
+
     runner.on('fail', function (test, err) {
         result.passed = false;
         post({
