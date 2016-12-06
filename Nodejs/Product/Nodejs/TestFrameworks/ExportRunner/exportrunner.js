@@ -77,11 +77,10 @@ var run_tests = function (testCases, callback) {
     }
 
     for (var test of testCases) {
-        event = {
+        post({
             type: 'test start',
             title: test.testName
-        }
-        post(event);
+        });
         try {
             var testCase = require(test.testFile);
             testCase[test.testName]();
@@ -92,9 +91,11 @@ var run_tests = function (testCases, callback) {
             console.error(err.name);
             console.error(err.message);
         }
-        event.type = 'result';
-        event.result = result;
-        post(event);
+        post({
+            type: 'result',
+            title: test.testName,
+            result: result
+        });
         result = {
             'title': '',
             'passed': false,
