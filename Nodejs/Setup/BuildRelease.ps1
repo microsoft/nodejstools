@@ -603,7 +603,7 @@ try {
                     $setup_project
 
                 & $target_msbuild_exe $global_msbuild_options $target_msbuild_options `
-                    /fl /flp:logfile=$($i.signed_logfile) /flp:verbosity=diag `
+                    /fl /flp:logfile=$($i.signed_logfile) `
                     /p:SignedBinariesPath=$($i.signed_bindir) `
                     /p:RezipVSIXFiles=true `
                     $setup_swix_project
