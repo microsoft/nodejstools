@@ -155,14 +155,14 @@
     <Compile Include="SQLite\SQLite.cs" />
     <Compile Include="SQLite\SQLiteAsync.cs" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition="$(VSTarget) == '14.0'">
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition="$(VSTarget) == '15.0'">
     <EmbeddedResource Include="Resources.cs.resx" />
     <EmbeddedResource Include="Resources.de.resx" />
     <EmbeddedResource Include="Resources.en.resx">

@@ -591,9 +591,8 @@ try {
                 submit_symbols "$project_name$spacename" "$buildnumber $($i.VSName) $config" "symbols" $i.symboldir $symbol_contacts
 
                 Write-Output "End symbol submission for $($i.VSName)"                
-            }
 
-            foreach ($i in $target_info) {
+                Write-Output "Begin Setup build for $($i.VSName)"
                 $target_msbuild_exe = msbuild-exe $i
                 $target_msbuild_options = msbuild-options $i
                 & $target_msbuild_exe $global_msbuild_options $target_msbuild_options `
@@ -607,6 +606,8 @@ try {
                     /p:SignedBinariesPath=$($i.signed_bindir) `
                     /p:RezipVSIXFiles=true `
                     $setup_swix_project
+
+                Write-Output "End Setup build for $($i.VSName)"
             }
 
             $jobs = @()
