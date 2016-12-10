@@ -232,10 +232,12 @@ function msbuild-options($target) {
 # This function is invoked after each target is built.
 function after-build($buildroot, $target) {
     Copy-Item -Force "$buildroot\Nodejs\Prerequisites\*.reg" $($target.destdir)
-    
-    $setup15 = mkdir "$($target.destdir)\Setup15" -Force
-    Copy-Item -Recurse -Force "$buildroot\BuildOutput\$($target.config)$($target.VSTarget)\Setup\*.json" $setup15
-    Copy-Item -Recurse -Force "$buildroot\BuildOutput\$($target.config)$($target.VSTarget)\Setup\*.vsman" $setup15
+
+    $setup15 = mkdir "$($target.destdir)\Setup15" -Force 
+    Copy-Item -Recurse -Force "$buildroot\BuildOutput\$($target.config)$($target.VSTarget)\Setup\*.json" $setup15 
+    Copy-Item -Recurse -Force "$buildroot\BuildOutput\$($target.config)$($target.VSTarget)\Setup\*.vsman" $setup15 
+
+
 
     if ($copytests) {
         Copy-Item -Recurse -Force "$buildroot\BuildOutput\$($target.config)$($target.VSTarget)\Tests" "$($target.destdir)\Tests"
@@ -248,6 +250,9 @@ function after-build-all($buildroot, $outdir) {
     if (-not $release) {
         Copy-Item -Force "$buildroot\Nodejs\Prerequisites\*.reg" $outdir
     }
+ 
+    $logDrop = mkdir "$($outdir)\Logs" -Force 
+    Copy-Item -Recurse -Force "$buildroot\Logs\*.*" $logDrop   
     
     $vsdrop = mkdir "$env:BUILD_STAGINGDIRECTORY\vsdrop" -Force
     Copy-Item -Force "$outdir\**.vsman" $vsdrop
@@ -286,6 +291,15 @@ $installer_names = @{
     'Microsoft.VisualStudio.NodejsTools.Targets.json' = 'Microsoft.VisualStudio.NodejsTools.Targets.json';
 }
 
+$locales = ("cs", "de", "en", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "ru", "tr", "zh-Hans", "zh-Hant")
+
+$localized_files = (
+    "Microsoft.NodejsTools.InteractiveWindow.resources.dll",
+    "Microsoft.NodejsTools.Npm.resources.dll",
+    "Microsoft.NodejsTools.ProjectWizard.resources.dll",
+    "Microsoft.NodejsTools.resources.dll"
+)
+
 # Add list of files requiring signing here
 $managed_files = (
     "Microsoft.NodejsTools.NodeLogConverter.exe", 
@@ -304,7 +318,7 @@ $managed_files = (
 $native_files = @()
 
 $supported_vs_versions = (
-    @{number="15.0"; name="VS 15"; build_by_default=$true},    
+    @{number="15.0"; name="VS 2017"; build_by_default=$true},    
     @{number="14.0"; name="VS 2015"; build_by_default=$true}
 )
 
@@ -361,7 +375,6 @@ if ($signedbuild) {
     Pop-Location
 }
 
-
 $spacename = ""
 if ($name) {
     $spacename = " $name"
@@ -369,7 +382,6 @@ if ($name) {
 } elseif ($internal) {
     Throw "'-name [build name]' must be specified when using '-internal'"
 }
-
 
 $version_file_backed_up = 0
 # Force use of a backup if there are pending changes to $version_file
@@ -459,7 +471,7 @@ if (-not $skipclean) {
     }
 }
 
-$logdir = mkdir "$outdir\Logs" -Force
+$logdir = mkdir "$buildroot\Logs" -Force
 
 if ($scorch -and $has_tf_workspace) {
     tfpt scorch $buildroot /noprompt
@@ -542,7 +554,7 @@ try {
                 Write-Output "Submitting signing jobs for $($i.VSName)"
 
                 $jobs += begin_sign_files `
-                    @($managed_files | %{@{path="$($i.unsigned_bindir)\$_"; name=$project_name}} | ?{Test-Path $_.path}) `
+                    @($managed_files | %{@{path="$($i.unsigned_bindir)\$_"; name=$_}} | ?{Test-Path $_.path}) `
                     $i.signed_bindir $approvers `
                     $project_name $project_url "$project_name $($i.VSName) - managed code" $project_keywords `
                     "authenticode;strongname" `
@@ -553,11 +565,24 @@ try {
                     $i.signed_bindir $approvers `
                     $project_name $project_url "$project_name $($i.VSName) - native code" $project_keywords `
                     "authenticode" 
+
+                # we only loc Dev 15
+                if ($i.VSTarget -eq "15.0") {
+                    foreach ($loc in $locales) {
+                        $jobs += begin_sign_files `
+                            @($localized_files | %{@{path="$($i.unsigned_bindir)\$loc\$_"; name=$_}} | ?{Test-Path $_.path}) `
+                            "$($i.signed_bindir)\$loc" $approvers `
+                            $project_name $project_url "$project_name $($i.VSName) - managed code - $loc" $project_keywords `
+                            "authenticode;strongname" `
+                            -delaysigned
+                    }
+                }
             }
             
             end_sign_files $jobs
             
             foreach ($i in $target_info) {
+                Write-Output "Begin symbol submission for $($i.VSName)"
                 if ($i.logfile -in $failed_logs) {
                     Write-Output "Skipping symbol submission for $($i.VSName) because the build failed"
                     continue
@@ -565,6 +590,9 @@ try {
                 submit_symbols "$project_name$spacename" "$buildnumber $($i.VSName) $config" "binaries" $i.signed_bindir $symbol_contacts
                 submit_symbols "$project_name$spacename" "$buildnumber $($i.VSName) $config" "symbols" $i.symboldir $symbol_contacts
 
+                Write-Output "End symbol submission for $($i.VSName)"                
+
+                Write-Output "Begin Setup build for $($i.VSName)"
                 $target_msbuild_exe = msbuild-exe $i
                 $target_msbuild_options = msbuild-options $i
                 & $target_msbuild_exe $global_msbuild_options $target_msbuild_options `
@@ -578,6 +606,8 @@ try {
                     /p:SignedBinariesPath=$($i.signed_bindir) `
                     /p:RezipVSIXFiles=true `
                     $setup_swix_project
+
+                Write-Output "End Setup build for $($i.VSName)"
             }
 
             $jobs = @()
@@ -599,7 +629,6 @@ try {
                         $project_name $project_url "$project_name $($i.VSName) - installer" $project_keywords `
                         "msi"
                 }
-
 
                 $vsix_files = @((Get-ChildItem "$($i.signed_unsigned_msidir)\*.vsix") | %{ @{
                     path="$_";

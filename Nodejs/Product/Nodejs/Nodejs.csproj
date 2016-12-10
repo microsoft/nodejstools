@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <Choose>
     <When Condition=" '$(VisualStudioVersion)'=='15.0'  Or '$(TargetVisualStudioVersion)'=='VS150' ">
@@ -71,9 +71,9 @@
     <Reference Include="Microsoft.VisualStudio.ImageCatalog, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Imaging, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <!-- 
-    Temporarily freeze versions of some interop assemblies
-    TODO: https://github.com/Microsoft/nodejstools/issues/759
-     -->
+    Temporarily freeze versions of some interop assemblies 
+    TODO: https://github.com/Microsoft/nodejstools/issues/759 
+    -->
     <Reference Include="Microsoft.VisualStudio.Imaging.Interop.14.0.DesignTime, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
@@ -331,11 +331,6 @@
     <Compile Include="Debugger\ExceptionHitTreatment.cs" />
     <Compile Include="Debugger\ExceptionHandler.cs" />
     <Compile Include="ProvideLanguageTemplates.cs" />
-    <Compile Include="Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="SourceMapping\FunctionInfo.cs" />
     <Compile Include="SourceMapping\JavaScriptSourceMapInfo.cs" />
     <Compile Include="Debugger\NodeConstants.cs" />
@@ -629,16 +624,204 @@
       <Visible>true</Visible>
     </Compile>
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Commands\DiagnosticsForm.resx">
-      <DependentUpon>DiagnosticsForm.cs</DependentUpon>
+  <!-- only include the loc files for VS 15 -->
+  <ItemGroup Condition="$(VSTarget) == '14.0'">
+    <Compile Include="Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Resources.resx">
+      <ManifestResourceName>Microsoft.NodejsTools.Resources</ManifestResourceName>
+      <Visible>true</Visible>
       <SubType>Designer</SubType>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="ImportWizardResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>ImportWizardResources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <ConditionalEmbeddedResource Include="VSPackage.resx">
+      <MergeWithCTO>true</MergeWithCTO>
+      <ManifestResourceName>VSPackage</ManifestResourceName>
+      <SubType>Designer</SubType>
+    </ConditionalEmbeddedResource>
+    <VSCTCompile Include="NodejsTools.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+      <SubType>Designer</SubType>
+    </VSCTCompile>
+  </ItemGroup>
+  <ItemGroup Condition="$(VSTarget) == '15.0'">
+    <EmbeddedResource Include="ImportWizardResources.cs.resx" />
+    <EmbeddedResource Include="ImportWizardResources.de.resx" />
+    <EmbeddedResource Include="ImportWizardResources.en.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>ImportWizardResources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImportWizardResources.es.resx" />
+    <EmbeddedResource Include="ImportWizardResources.fr.resx" />
+    <EmbeddedResource Include="ImportWizardResources.it.resx" />
+    <EmbeddedResource Include="ImportWizardResources.ja.resx" />
+    <EmbeddedResource Include="ImportWizardResources.ko.resx" />
+    <EmbeddedResource Include="ImportWizardResources.pl.resx" />
+    <EmbeddedResource Include="ImportWizardResources.pt-BR.resx" />
+    <EmbeddedResource Include="ImportWizardResources.ru.resx" />
+    <EmbeddedResource Include="ImportWizardResources.tr.resx" />
+    <EmbeddedResource Include="ImportWizardResources.zh-Hans.resx" />
+    <EmbeddedResource Include="ImportWizardResources.zh-Hant.resx" />
+    <VSCTCompile Include="NodejsTools.cs.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+    </VSCTCompile>
+    <VSCTCompile Include="NodejsTools.es.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+    </VSCTCompile>
+    <VSCTCompile Include="NodejsTools.fr.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+    </VSCTCompile>
+    <VSCTCompile Include="NodejsTools.it.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+    </VSCTCompile>
+    <VSCTCompile Include="NodejsTools.ja.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+    </VSCTCompile>
+    <VSCTCompile Include="NodejsTools.ko.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+    </VSCTCompile>
+    <VSCTCompile Include="NodejsTools.pl.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+    </VSCTCompile>
+    <VSCTCompile Include="NodejsTools.pt-BR.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+    </VSCTCompile>
+    <VSCTCompile Include="NodejsTools.ru.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+    </VSCTCompile>
+    <VSCTCompile Include="NodejsTools.tr.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+    </VSCTCompile>
+    <VSCTCompile Include="NodejsTools.zh-Hans.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+    </VSCTCompile>
+    <VSCTCompile Include="NodejsTools.zh-Hant.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+    </VSCTCompile>
+    <VSCTCompile Include="NodejsTools.de.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+    </VSCTCompile>
+    <VSCTCompile Include="NodejsTools.en.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+    </VSCTCompile>
+    <Compile Include="Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.en.resx</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Resources.en.resx">
+      <ManifestResourceName>Microsoft.NodejsTools.Resources.en</ManifestResourceName>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources.de.resx">
+      <ManifestResourceName>Microsoft.NodejsTools.Resources.de</ManifestResourceName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources.cs.resx">
+      <ManifestResourceName>Microsoft.NodejsTools.Resources.cs</ManifestResourceName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources.es.resx">
+      <ManifestResourceName>Microsoft.NodejsTools.Resources.es</ManifestResourceName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources.fr.resx">
+      <ManifestResourceName>Microsoft.NodejsTools.Resources.fr</ManifestResourceName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources.it.resx">
+      <ManifestResourceName>Microsoft.NodejsTools.Resources.it</ManifestResourceName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources.ja.resx">
+      <ManifestResourceName>Microsoft.NodejsTools.Resources.ja</ManifestResourceName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources.ko.resx">
+      <ManifestResourceName>Microsoft.NodejsTools.Resources.ko</ManifestResourceName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources.pl.resx">
+      <ManifestResourceName>Microsoft.NodejsTools.Resources.pl</ManifestResourceName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources.pt-BR.resx">
+      <ManifestResourceName>Microsoft.NodejsTools.Resources.pt-BR</ManifestResourceName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources.ru.resx">
+      <ManifestResourceName>Microsoft.NodejsTools.Resources.ru</ManifestResourceName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources.tr.resx">
+      <ManifestResourceName>Microsoft.NodejsTools.Resources.tr</ManifestResourceName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources.zh-Hans.resx">
+      <ManifestResourceName>Microsoft.NodejsTools.Resources.zh-Hans</ManifestResourceName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources.zh-Hant.resx">
+      <ManifestResourceName>Microsoft.NodejsTools.Resources.zh-Hant</ManifestResourceName>
+    </EmbeddedResource>
+    <ConditionalEmbeddedResource Include="VSPackage.de.resx">
+      <MergeWithCTO>true</MergeWithCTO>
+      <LogicalName>VSPackage.de.Resources</LogicalName>
+    </ConditionalEmbeddedResource>
+    <ConditionalEmbeddedResource Include="VSPackage.en.resx">
+      <MergeWithCTO>true</MergeWithCTO>
+      <LogicalName>VSPackage.en.Resources</LogicalName>
+    </ConditionalEmbeddedResource>
+    <ConditionalEmbeddedResource Include="VSPackage.cs.resx">
+      <MergeWithCTO>true</MergeWithCTO>
+      <LogicalName>VSPackage.cs.Resources</LogicalName>
+    </ConditionalEmbeddedResource>
+    <ConditionalEmbeddedResource Include="VSPackage.es.resx">
+      <MergeWithCTO>true</MergeWithCTO>
+      <LogicalName>VSPackage.es.Resources</LogicalName>
+    </ConditionalEmbeddedResource>
+    <ConditionalEmbeddedResource Include="VSPackage.fr.resx">
+      <MergeWithCTO>true</MergeWithCTO>
+      <LogicalName>VSPackage.fr.Resources</LogicalName>
+    </ConditionalEmbeddedResource>
+    <ConditionalEmbeddedResource Include="VSPackage.it.resx">
+      <MergeWithCTO>true</MergeWithCTO>
+      <LogicalName>VSPackage.it.Resources</LogicalName>
+    </ConditionalEmbeddedResource>
+    <ConditionalEmbeddedResource Include="VSPackage.ja.resx">
+      <MergeWithCTO>true</MergeWithCTO>
+      <LogicalName>VSPackage.ja.Resources</LogicalName>
+    </ConditionalEmbeddedResource>
+    <ConditionalEmbeddedResource Include="VSPackage.ko.resx">
+      <MergeWithCTO>true</MergeWithCTO>
+      <LogicalName>VSPackage.ko.Resources</LogicalName>
+    </ConditionalEmbeddedResource>
+    <ConditionalEmbeddedResource Include="VSPackage.pl.resx">
+      <MergeWithCTO>true</MergeWithCTO>
+      <LogicalName>VSPackage.pl.Resources</LogicalName>
+    </ConditionalEmbeddedResource>
+    <ConditionalEmbeddedResource Include="VSPackage.pt-BR.resx">
+      <MergeWithCTO>true</MergeWithCTO>
+      <LogicalName>VSPackage.pt-BR.Resources</LogicalName>
+    </ConditionalEmbeddedResource>
+    <ConditionalEmbeddedResource Include="VSPackage.ru.resx">
+      <MergeWithCTO>true</MergeWithCTO>
+      <LogicalName>VSPackage.ru.Resources</LogicalName>
+    </ConditionalEmbeddedResource>
+    <ConditionalEmbeddedResource Include="VSPackage.tr.resx">
+      <MergeWithCTO>true</MergeWithCTO>
+      <LogicalName>VSPackage.tr.Resources</LogicalName>
+    </ConditionalEmbeddedResource>
+    <ConditionalEmbeddedResource Include="VSPackage.zh-Hans.resx">
+      <MergeWithCTO>true</MergeWithCTO>
+      <LogicalName>VSPackage.zh-Hans.Resources</LogicalName>
+    </ConditionalEmbeddedResource>
+    <ConditionalEmbeddedResource Include="VSPackage.zh-Hant.resx">
+      <MergeWithCTO>true</MergeWithCTO>
+      <LogicalName>VSPackage.zh-Hant.Resources</LogicalName>
+    </ConditionalEmbeddedResource>
+  </ItemGroup>
+  <ItemGroup Condition="$(VSTarget) == '14.0'">
     <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>NpmInstallOutputWindowResources.Designer.cs</LastGenOutput>
@@ -647,8 +830,47 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>NpmInstallWindowResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.resx">
-      <DependentUpon>NodejsNpmOptionsControl.cs</DependentUpon>
+  </ItemGroup>
+  <ItemGroup Condition="$(VSTarget) == '15.0'">
+    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.en.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>NpmInstallOutputWindowResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.cs.resx" />
+    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.de.resx" />
+    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.es.resx" />
+    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.fr.resx" />
+    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.it.resx" />
+    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.ja.resx" />
+    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.ko.resx" />
+    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.pl.resx" />
+    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.pt-BR.resx" />
+    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.ru.resx" />
+    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.tr.resx" />
+    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.zh-Hans.resx" />
+    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.zh-Hant.resx" />
+    <EmbeddedResource Include="NpmUI\NpmInstallWindowResources.en.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>NpmInstallWindowResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NpmUI\NpmInstallWindowResources.cs.resx" />
+    <EmbeddedResource Include="NpmUI\NpmInstallWindowResources.de.resx" />
+    <EmbeddedResource Include="NpmUI\NpmInstallWindowResources.es.resx" />
+    <EmbeddedResource Include="NpmUI\NpmInstallWindowResources.fr.resx" />
+    <EmbeddedResource Include="NpmUI\NpmInstallWindowResources.it.resx" />
+    <EmbeddedResource Include="NpmUI\NpmInstallWindowResources.ja.resx" />
+    <EmbeddedResource Include="NpmUI\NpmInstallWindowResources.ko.resx" />
+    <EmbeddedResource Include="NpmUI\NpmInstallWindowResources.pl.resx" />
+    <EmbeddedResource Include="NpmUI\NpmInstallWindowResources.pt-BR.resx" />
+    <EmbeddedResource Include="NpmUI\NpmInstallWindowResources.ru.resx" />
+    <EmbeddedResource Include="NpmUI\NpmInstallWindowResources.tr.resx" />
+    <EmbeddedResource Include="NpmUI\NpmInstallWindowResources.zh-Hans.resx" />
+    <EmbeddedResource Include="NpmUI\NpmInstallWindowResources.zh-Hant.resx" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Commands\DiagnosticsForm.resx">
+      <DependentUpon>DiagnosticsForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Options\NodejsIntellisenseOptionsControl.resx">
       <DependentUpon>NodejsIntellisenseOptionsControl.cs</DependentUpon>
@@ -663,24 +885,111 @@
     <EmbeddedResource Include="Options\NodejsFormattingSpacingOptionsControl.resx">
       <DependentUpon>NodejsFormattingSpacingOptionsControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.resx">
-      <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.resx">
-      <DependentUpon>NewFileNameForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Options\SalsaLsIntellisenseOptionsControl.resx">
       <DependentUpon>SalsaLsIntellisenseOptionsControl.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup Condition="$(VSTarget) == '14.0'">
+    <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.resx">
+      <DependentUpon>NewFileNameForm.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup Condition="$(VSTarget) == '15.0'">
+    <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.en.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <DependentUpon>NewFileNameForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.cs.resx" />
+    <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.de.resx" />
+    <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.es.resx" />
+    <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.fr.resx" />
+    <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.it.resx" />
+    <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.ja.resx" />
+    <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.ko.resx" />
+    <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.pl.resx" />
+    <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.pt-BR.resx" />
+    <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.ru.resx" />
+    <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.tr.resx" />
+    <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.zh-Hans.resx" />
+    <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.zh-Hant.resx" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(VSTarget) == '14.0'">
     <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.resx">
       <DependentUpon>NodejsGeneralPropertyPageControl.cs</DependentUpon>
     </EmbeddedResource>
-    <ConditionalEmbeddedResource Include="VSPackage.resx">
-      <MergeWithCTO>true</MergeWithCTO>
-      <ManifestResourceName>VSPackage</ManifestResourceName>
-      <SubType>Designer</SubType>
-    </ConditionalEmbeddedResource>
   </ItemGroup>
+  <ItemGroup Condition="$(VSTarget) == '15.0'">
+    <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.en.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <DependentUpon>NodejsGeneralPropertyPageControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.cs.resx" />
+    <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.de.resx" />
+    <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.es.resx" />
+    <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.fr.resx" />
+    <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.it.resx" />
+    <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.ja.resx" />
+    <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.ko.resx" />
+    <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.pl.resx" />
+    <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.pt-BR.resx" />
+    <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.ru.resx" />
+    <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.tr.resx" />
+    <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.zh-Hans.resx" />
+    <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.zh-Hant.resx" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(VSTarget) == '14.0'">
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.resx">
+      <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup Condition="$(VSTarget) == '15.0'">
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.en.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.cs.resx" />
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.de.resx" />
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.es.resx" />
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.fr.resx" />
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.it.resx" />
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.ja.resx" />
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.ko.resx" />
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.pl.resx" />
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.pt-BR.resx" />
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.ru.resx" />
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.tr.resx" />
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.zh-Hans.resx" />
+    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.zh-Hant.resx" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(VSTarget) == '14.0'">
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.resx">
+      <DependentUpon>NodejsNpmOptionsControl.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup Condition="$(VSTarget) == '15.0'">
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.en.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <DependentUpon>NodejsNpmOptionsControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.cs.resx" />
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.de.resx" />
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.es.resx" />
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.fr.resx" />
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.it.resx" />
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.ja.resx" />
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.ko.resx" />
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.pl.resx" />
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.pt-BR.resx" />
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.ru.resx" />
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.tr.resx" />
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.zh-Hans.resx" />
+    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.zh-Hant.resx" />
+  </ItemGroup>
+
   <ItemGroup>
     <ZipItem Include="Templates\Files\EmptyCss\EmptyCss.css" />
     <ZipItem Include="Templates\Files\EmptyCss\EmptyCss.vstemplate" />
@@ -800,7 +1109,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubPath>.</VSIXSubPath>
-	</Content>
+    </Content>
     <Content Include="Credits.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -964,10 +1273,6 @@
       <IncludeInVSIX>false</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <VSCTCompile Include="NodejsTools.vsct">
-      <ResourceName>1000</ResourceName>
-      <SubType>Designer</SubType>
-    </VSCTCompile>
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\AzureNodejsApp.vstemplate">
       <SubType>Designer</SubType>
     </ZipProject>
@@ -1130,13 +1435,6 @@
     <ZipProject Include="ProjectTemplates\NodejsWebApp\NodejsWebApp.vstemplate">
       <SubType>Designer</SubType>
     </ZipProject>
-    <EmbeddedResource Include="Resources.resx">
-      <ManifestResourceName>Microsoft.NodejsTools.Resources</ManifestResourceName>
-      <Visible>true</Visible>
-      <SubType>Designer</SubType>
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\InteractiveWindow\InteractiveWindow.csproj">
@@ -1221,7 +1519,7 @@
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
   </Target>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
@@ -1242,9 +1540,11 @@
       copy /y $(OutDir)..\WebRole\Microsoft.NodejsTools.WebRole.dll $(OutDir)RemoteDebug\
     </PostBuildEvent>
   </PropertyGroup>
-  <!-- We build these assemblies into separate folders to avoid incremental cleaning issues,
-       but then CreatePkgDef can't find them for the ProvideCodeBase attributes. So we copy
-       into the NodejsTools output folder temporarily to generate the pkgdef file. -->
+  <!-- 
+      We build these assemblies into separate folders to avoid incremental cleaning issues,
+      but then CreatePkgDef can't find them for the ProvideCodeBase attributes. So we copy
+      into the NodejsTools output folder temporarily to generate the pkgdef file.
+  -->
   <Target Name="_CopyForCreatePkgDef" BeforeTargets="GeneratePkgDef">
     <Copy SourceFiles="$(OutputPath)..\ProjectWizard\Microsoft.NodejsTools.ProjectWizard.dll;$(OutputPath)..\Npm\Microsoft.NodejsTools.Npm.dll;$(OutputPath)..\PressAnyKey\Microsoft.NodejsTools.PressAnyKey.exe;$(OutputPath)..\TestAdapter\Microsoft.NodejsTools.TestAdapter.dll;" DestinationFolder="$(OutputPath)">
       <Output TaskParameter="CopiedFiles" ItemName="_CopiedForCreatePkgdef" />

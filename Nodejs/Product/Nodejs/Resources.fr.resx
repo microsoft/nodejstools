@@ -1,0 +1,623 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="LaunchUrlToolTip" xml:space="preserve">
+    <value>Spécifie l&apos;URL à ouvrir dans le navigateur. Sinon, http://localhost:port est utilisé.\r\nSi un port est spécifié, il doit être indiqué ici également.</value>
+  </data>
+  <data name="NodeExeArguments" xml:space="preserve">
+    <value>Arguments pour Node.exe</value>
+  </data>
+  <data name="NodeExeArgumentsDescription" xml:space="preserve">
+    <value>Spécifie les options fournies à node.exe, comme -e ou -i.</value>
+  </data>
+  <data name="NodeExeArgumentsToolTip" xml:space="preserve">
+    <value>Spécifie les options fournies à node.exe, comme -e ou -i.</value>
+  </data>
+  <data name="NodeExePath" xml:space="preserve">
+    <value>Chemin de Node.exe</value>
+  </data>
+  <data name="NodeExePathToolTip" xml:space="preserve">
+    <value>Spécifie le chemin de l&apos;exécutable node.exe.</value>
+  </data>
+  <data name="NodejsPort" xml:space="preserve">
+    <value>Port Node.js</value>
+  </data>
+  <data name="NodejsNotInstalled" xml:space="preserve">
+    <value>Runtime Node.js introuvable sur votre ordinateur. Téléchargez et installez la version Node.js actuelle à partir de https://nodejs.org, ou spécifiez l&apos;emplacement du fichier Node.exe dans la page de propriétés du projet Visual Studio Node.</value>
+  </data>
+  <data name="NodejsPortToolTip" xml:space="preserve">
+    <value>Spécifie le numéro de port utilisé pour process.env.port, sinon, un port aléatoire est généré.</value>
+  </data>
+  <data name="NpmPackageName" xml:space="preserve">
+    <value>Nom du package</value>
+  </data>
+  <data name="NpmPackageNameDescription" xml:space="preserve">
+    <value>Nom du package, comme spécifié dans son package.json.</value>
+  </data>
+  <data name="NpmPackageVersion" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  <data name="NpmPackageVersionDescription" xml:space="preserve">
+    <value>Version installée du package.</value>
+  </data>
+  <data name="NpmPackageRequestedVersionRange" xml:space="preserve">
+    <value>Version demandée</value>
+  </data>
+  <data name="NpmPackageRequestedVersionRangeDescription" xml:space="preserve">
+    <value>Version de package demandée dans le package.json appartenant au package ou projet parent.</value>
+  </data>
+  <data name="NpmPackageNewVersionAvailable" xml:space="preserve">
+    <value>Version plus récente disponible</value>
+  </data>
+  <data name="NpmPackageNewVersionAvailableDescription" xml:space="preserve">
+    <value>Indique si une version plus récente du package est disponible ou non.</value>
+  </data>
+  <data name="NpmPackageDescription" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="NpmPackageDescriptionDescription" xml:space="preserve">
+    <value>Description du package.</value>
+  </data>
+  <data name="NpmPackageKeywords" xml:space="preserve">
+    <value>Mots clés</value>
+  </data>
+  <data name="NpmPackageKeywordsDescription" xml:space="preserve">
+    <value>Mots clés du package.</value>
+  </data>
+  <data name="NpmPackageAuthor" xml:space="preserve">
+    <value>Auteur</value>
+  </data>
+  <data name="NpmPackageAuthorDescription" xml:space="preserve">
+    <value>Auteur principal ou d&apos;origine du package. Il peut également y avoir des collaborateurs supplémentaires.</value>
+  </data>
+  <data name="NpmPackagePath" xml:space="preserve">
+    <value>Chemin</value>
+  </data>
+  <data name="NpmPackagePathDescription" xml:space="preserve">
+    <value>Emplacement du package sur le disque.</value>
+  </data>
+  <data name="NpmPackageType" xml:space="preserve">
+    <value>Type de package</value>
+  </data>
+  <data name="NpmPackageTypeDescription" xml:space="preserve">
+    <value>Indique si le package est global ou installé localement dans votre projet, et s&apos;il est ou non un sous-package.</value>
+  </data>
+  <data name="NpmPackageLinkStatus" xml:space="preserve">
+    <value>État du lien</value>
+  </data>
+  <data name="NpmPackageLinkStatusDescription" xml:space="preserve">
+    <value>Indique si un package a été lié à partir de packages installés globalement.</value>
+  </data>
+  <data name="NpmPackageIsListedInParentPackageJson" xml:space="preserve">
+    <value>Répertorié comme dépendance</value>
+  </data>
+  <data name="NpmPackageIsListedInParentPackageJsonDescription" xml:space="preserve">
+    <value>Indique si le package est répertorié comme dépendance de package.json.</value>
+  </data>
+  <data name="NpmPackageIsMissing" xml:space="preserve">
+    <value>Manquant</value>
+  </data>
+  <data name="NpmPackageIsMissingDescription" xml:space="preserve">
+    <value>Indique si le package est ou non une dépendance manquante.</value>
+  </data>
+  <data name="NpmPackageIsDevDependency" xml:space="preserve">
+    <value>Dépendance de développement</value>
+  </data>
+  <data name="NpmPackageIsDevDependencyDescription" xml:space="preserve">
+    <value>Indique si le package est ou non une dépendance de développement.</value>
+  </data>
+  <data name="NpmPackageIsOptionalDependency" xml:space="preserve">
+    <value>Dépendance facultative</value>
+  </data>
+  <data name="NpmPackageIsOptionalDependencyDescription" xml:space="preserve">
+    <value>Indique si le package est ou non une dépendance facultative.</value>
+  </data>
+  <data name="NpmPackageIsBundledDependency" xml:space="preserve">
+    <value>Dépendance groupée</value>
+  </data>
+  <data name="NpmPackageIsBundledDependencyDescription" xml:space="preserve">
+    <value>Indique si le package est ou non une dépendance groupée.</value>
+  </data>
+  <data name="CategoryVersion" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  <data name="CategoryStatus" xml:space="preserve">
+    <value>État</value>
+  </data>
+  <data name="PackageTypeLocal" xml:space="preserve">
+    <value>Local</value>
+  </data>
+  <data name="PackageTypeLocalSubpackage" xml:space="preserve">
+    <value>Sous-package local</value>
+  </data>
+  <data name="LinkStatusNotApplicableSubPackages" xml:space="preserve">
+    <value>Non applicable aux sous-packages.</value>
+  </data>
+  <data name="LinkStatusUnknown" xml:space="preserve">
+    <value>Inconnu</value>
+  </data>
+  <data name="RequestedVersionRangeNone" xml:space="preserve">
+    <value>Aucune</value>
+  </data>
+  <data name="NpmNodePackageInstallation" xml:space="preserve">
+    <value>Installations de package</value>
+  </data>
+  <data name="NpmNodePackageInstallationDescription" xml:space="preserve">
+    <value>Indique si le nœud gère les installations de package npm locales ou globales.</value>
+  </data>
+  <data name="NpmNodePath" xml:space="preserve">
+    <value>Chemin</value>
+  </data>
+  <data name="NpmNodePathDescription" xml:space="preserve">
+    <value>Chemin de base dans lequel les packages npm sont installés.</value>
+  </data>
+  <data name="PackageInstallationLocal" xml:space="preserve">
+    <value>Local</value>
+  </data>
+  <data name="PropertiesClassLocalPackage" xml:space="preserve">
+    <value>Propriétés du package local</value>
+  </data>
+  <data name="PropertiesClassLocalSubPackage" xml:space="preserve">
+    <value>Propriétés du sous-package local</value>
+  </data>
+  <data name="PropertiesClassNpm" xml:space="preserve">
+    <value>Propriétés des packages npm</value>
+  </data>
+  <data name="ScriptArgumentsToolTip" xml:space="preserve">
+    <value>Spécifie les arguments passés au script au lancement.</value>
+  </data>
+  <data name="ScriptFileTooltip" xml:space="preserve">
+    <value>Spécifie l&apos;exécution du script au lancement.</value>
+  </data>
+  <data name="StartBrowserToolTip" xml:space="preserve">
+    <value>Si la case est cochée, un navigateur web est ouvert au lancement</value>
+  </data>
+  <data name="WorkingDirToolTip" xml:space="preserve">
+    <value>Spécifie le répertoire de travail dans lequel le processus node.exe est lancé.</value>
+  </data>
+  <data name="NodeExeDoesntExist" xml:space="preserve">
+    <value>Votre projet est actuellement configuré pour rechercher Node.exe dans &quot;{0}&quot;, mais le fichier n&apos;existe pas.</value>
+  </data>
+  <data name="NodejsToolsForVisualStudio" xml:space="preserve">
+    <value>Node.js Tools pour Visual Studio</value>
+  </data>
+  <data name="NodeExePathNotFound" xml:space="preserve">
+    <value>L&apos;interpréteur Node.js spécifié n&apos;existe pas.</value>
+  </data>
+  <data name="NodejsNotInstalledShort" xml:space="preserve">
+    <value>Node.js n&apos;a pas été détecté sur votre ordinateur</value>
+    <comment>Used in general property page when Node.exe isn't found</comment>
+  </data>
+  <data name="InvalidPortNumber" xml:space="preserve">
+    <value>Numéro de port non valide - le port ne peut contenir que des chiffres.</value>
+  </data>
+  <data name="WorkingDirInvalidOrMissing" xml:space="preserve">
+    <value>Le répertoire de travail spécifié est non valide ou manquant.</value>
+  </data>
+  <data name="CatalogLoadingDefault" xml:space="preserve">
+    <value>Chargement de la liste de packages publiée...</value>
+  </data>
+  <data name="NoKeywordsInPackage" xml:space="preserve">
+    <value>(Ce package n&apos;a pas de mot clé.)</value>
+  </data>
+  <data name="PackageCatalogRefreshing" xml:space="preserve">
+    <value>Actualisation en cours</value>
+  </data>
+  <data name="PackageCatalogRefresh0Days" xml:space="preserve">
+    <value>Aujourd&apos;hui à {0:t}</value>
+  </data>
+  <data name="PackageCatalogRefresh1Day" xml:space="preserve">
+    <value>Hier à {0:t}</value>
+  </data>
+  <data name="PackageCatalogRefresh2To7Days" xml:space="preserve">
+    <value>Il y a {0} jours</value>
+  </data>
+  <data name="PackageCatalogRefresh1Week" xml:space="preserve">
+    <value>Il y a plus d&apos;une semaine</value>
+  </data>
+  <data name="PackageCatalogRefresh2Weeks" xml:space="preserve">
+    <value>Il y a plus de 2 semaines</value>
+  </data>
+  <data name="PackageCatalogRefresh3Weeks" xml:space="preserve">
+    <value>Il y a plus de 3 semaines</value>
+  </data>
+  <data name="PackageCatalogRefresh1Month" xml:space="preserve">
+    <value>Il y a plus d&apos;un mois</value>
+  </data>
+  <data name="PackageCatalogRefresh3Months" xml:space="preserve">
+    <value>Il y a plus de 3 mois</value>
+  </data>
+  <data name="NpmCancelledWithErrors" xml:space="preserve">
+    <value>{0} annulé avec des erreurs - voir la fenêtre Sortie pour plus de détails</value>
+  </data>
+  <data name="NpmCompletedWithErrors" xml:space="preserve">
+    <value>{0} effectué avec des erreurs - voir la fenêtre Sortie pour plus de détails</value>
+  </data>
+  <data name="NpmCancelled" xml:space="preserve">
+    <value>{0} annulé</value>
+  </data>
+  <data name="NpmSuccessfullyCompleted" xml:space="preserve">
+    <value>{0} terminé</value>
+  </data>
+  <data name="NpmStatusReady" xml:space="preserve">
+    <value>Prêt</value>
+  </data>
+  <data name="NpmStatusReadyWithErrors" xml:space="preserve">
+    <value>Prêt - Commande(s) exécutées avec des erreurs ({0})</value>
+  </data>
+  <data name="NpmStatusExecuting" xml:space="preserve">
+    <value>Exécution: {0}</value>
+  </data>
+  <data name="NpmStatusExecutingQueued" xml:space="preserve">
+    <value>Exécution : {0} ({1} commande(s) en file d&apos;attente)</value>
+  </data>
+  <data name="NpmStatusExecutingErrors" xml:space="preserve">
+    <value>Erreurs rencontrées ({1}) - Exécution : {0}</value>
+  </data>
+  <data name="NpmStatusExecutingQueuedErrors" xml:space="preserve">
+    <value>Erreurs rencontrées ({2}) - Exécution : {0} ({1} commande(s) en file d&apos;attente)</value>
+  </data>
+  <data name="TestFramework" xml:space="preserve">
+    <value>Framework de test</value>
+  </data>
+  <data name="TestFrameworkDescription" xml:space="preserve">
+    <value>Spécifie le framework de test auquel s&apos;applique ce fichier.</value>
+  </data>
+  <data name="DebuggerPort" xml:space="preserve">
+    <value>Spécifie le port utilisé pour communiquer avec le débogueur</value>
+  </data>
+  <data name="EnvironmentVariables" xml:space="preserve">
+    <value>Spécifie les variables d&apos;environnement à définir dans le processus généré sous la forme :
+
+NAME1=value1
+NAME2=value2
+...</value>
+  </data>
+  <data name="DebuggerConnectionClosed" xml:space="preserve">
+    <value>La connexion du débogueur était fermée.</value>
+  </data>
+  <data name="DebuggerModuleUpdateFailed" xml:space="preserve">
+    <value>Échec de la mise à jour du contenu de fichier.</value>
+  </data>
+  <data name="NodejsNotSupported" xml:space="preserve">
+    <value>Cette version de Node.js ({0}) n&apos;est pas prise en charge. Effectuez la mise à niveau vers Node.js v0.10.20 ou version ultérieure.</value>
+  </data>
+  <data name="PackageCatalogRefreshFailed" xml:space="preserve">
+    <value>Échec de l&apos;actualisation - voir la sortie ci-dessous pour plus de détails</value>
+  </data>
+  <data name="ReplInitializationMessage" xml:space="preserve">
+    <value>Fenêtre interactive Node.js. Tapez .help pour obtenir la liste des commandes.</value>
+  </data>
+  <data name="ReplWindowNpmInitNoYesFlagWarning" xml:space="preserve">
+    <value>Exécutez &apos;.npm init -y&apos; pour créer un fichier package.json.</value>
+  </data>
+  <data name="NodeExePathDescription" xml:space="preserve">
+    <value>Spécifie le chemin de l&apos;exécutable node.exe.</value>
+  </data>
+  <data name="NodejsPortDescription" xml:space="preserve">
+    <value>Spécifie le numéro de port utilisé pour process.env.port, sinon, un port aléatoire est généré.</value>
+  </data>
+  <data name="NpmOutputPaneTitle" xml:space="preserve">
+    <value>Npm</value>
+  </data>
+  <data name="NpmPackageInstallHelpMessage" xml:space="preserve">
+    <value>(entrer les arguments ci-dessus)</value>
+  </data>
+  <data name="NpmReplCommandCompletedWithErrors" xml:space="preserve">
+    <value>{0} effectué avec des erreurs</value>
+  </data>
+  <data name="LongPathWarningTitle" xml:space="preserve">
+    <value>Avertissement Chemin trop long</value>
+  </data>
+  <data name="LongPathWarningText" xml:space="preserve">
+    <value>Votre dossier de projet contient un ou plusieurs chemins qui dépassent la &lt;a href=&quot;#msdn&quot;&gt;limite de 260 caractères&lt;/a&gt;. Visual Studio &lt;a href=&quot;#uservoice&quot;&gt;ne prend pas complètement en charge&lt;/a&gt; ce type de projets. Vous risquez de rencontrer des problèmes de génération et de publication de votre projet, ou d&apos;interférer avec d&apos;autres fonctionnalités de Visual Studio et Node.js Tools.</value>
+  </data>
+  <data name="LongPathShowPathsExceedingTheLimit" xml:space="preserve">
+    <value>&amp;Afficher les chemins qui dépassent la limite</value>
+  </data>
+  <data name="LongPathHidePathsExceedingTheLimit" xml:space="preserve">
+    <value>&amp;Masquer les chemins qui dépassent la limite</value>
+  </data>
+  <data name="LongPathNpmDedupe" xml:space="preserve">
+    <value>Exécuter &apos;npm &amp;dedupe&apos; sur le projet</value>
+  </data>
+  <data name="LongPathNpmDedupeDetail" xml:space="preserve">
+    <value>Dans certains cas, la déduplication de packages peut réduire la quantité d&apos;imbrications de node_modules suffisamment pour résoudre le problème.</value>
+  </data>
+  <data name="LongPathDoNothingButWarnNextTime" xml:space="preserve">
+    <value>Ne rien faire, &amp;mais m&apos;avertir la prochaine fois que cela se produit</value>
+  </data>
+  <data name="LongPathDoNothingAndDoNotWarnAgain" xml:space="preserve">
+    <value>Ne rien faire et &amp;ne plus m&apos;avertir</value>
+  </data>
+  <data name="LongPathDoNothingAndDoNotWarnAgainDetail" xml:space="preserve">
+    <value>Vous pouvez réactiver l&apos;archivage dans Outils → Options → Node.js Tools → Général.</value>
+  </data>
+  <data name="LongPathFooter" xml:space="preserve">
+    <value>&lt;a href=&quot;#help&quot;&gt;Obtenir plus d&apos;informations&lt;/a&gt;</value>
+  </data>
+  <data name="LongPathClickToCopy" xml:space="preserve">
+    <value>Copier le chemin complet</value>
+  </data>
+  <data name="LongPathNpmDedupeDidNotHelp" xml:space="preserve">
+    <value>Malheureusement, l&apos;exécution de &apos;npm dedupe&apos; n&apos;a pas résolu le problème. Consultez la &lt;a href=&quot;#help&quot;&gt;documentation&lt;/a&gt; pour obtenir d&apos;autres solutions de contournement possibles.</value>
+  </data>
+  <data name="CacheDirectoryClearFailedTitle" xml:space="preserve">
+    <value>Impossible d&apos;effacer le répertoire du cache Node.js</value>
+  </data>
+  <data name="CacheDirectoryClearFailedCaption" xml:space="preserve">
+    <value>Impossible d&apos;effacer le répertoire du cache Node.js. Essayez de supprimer manuellement le répertoire : {0}</value>
+  </data>
+  <data name="UpgradedEnvironmentVariables" xml:space="preserve">
+    <value>Propriété &lt;EnvironmentVariables&gt; remplacée par &lt;Environment&gt;. Ce projet ne fonctionnera plus avec NTVS 1.0 bêta 2 ou version antérieure.</value>
+  </data>
+  <data name="StatusAnalysisUpToDate" xml:space="preserve">
+    <value>L&apos;analyse du code Node.js est à jour, {0:N0} fonction(s) analysée(s) dans {1}</value>
+  </data>
+  <data name="IncludeNodeModulesCancelTitle" xml:space="preserve">
+    <value>Ne rien faire (recommandé)</value>
+  </data>
+  <data name="IncludeNodeModulesContent" xml:space="preserve">
+    <value>L&apos;ajout de &apos;node_modules&apos; dans votre projet est généralement inutile et peut diminuer les performances de Visual Studio. Vous pouvez continuer d&apos;utiliser et de déployer des packages à partir de &apos;node_modules&apos; sans l&apos;inclure dans votre projet.</value>
+  </data>
+  <data name="IncludeNodeModulesIncludeDescription" xml:space="preserve">
+    <value>Cette opération peut prendre un certain temps pendant lequel Visual Studio ne sera pas utilisable.</value>
+  </data>
+  <data name="IncludeNodeModulesIncludeTitle" xml:space="preserve">
+    <value>Inclure le dossier &apos;node_modules&apos; dans le projet</value>
+  </data>
+  <data name="IncludeNodeModulesInformation" xml:space="preserve">
+    <value>&lt;a href=&quot;http://go.microsoft.com/fwlink/?LinkID=518083&quot;&gt;Plus d&apos;informations&lt;/a&gt;</value>
+  </data>
+  <data name="RemoteDebugProxyFileDoesNotExist" xml:space="preserve">
+    <value>Le proxy de débogage à distance &quot;{0}&quot; n&apos;existe pas.</value>
+  </data>
+  <data name="RemoteDebugProxyFolderDoesNotExist" xml:space="preserve">
+    <value>RemoteDebugProxyFolder introuvable</value>
+  </data>
+  <data name="TypingsToolTypingsInstallCompleted" xml:space="preserve">
+    <value>Fichiers de typage installés pour IntelliSense.</value>
+  </data>
+  <data name="TypingsToolNotInstalledError" xml:space="preserve">
+    <value>L&apos;outil de gestionnaire de package Typages utilisé pour IntelliSense est introuvable</value>
+  </data>
+  <data name="TypingsToolTypingsInstallErrorOccurred" xml:space="preserve">
+    <value>Une erreur s&apos;est produite pendant l&apos;installation des typages utilisés pour IntelliSense.</value>
+  </data>
+  <data name="TypingsInfoBarSpan1" xml:space="preserve">
+    <value>IntelliSense Node.js a ajouté un</value>
+  </data>
+  <data name="TypingsInfoBarSpan2" xml:space="preserve">
+    <value>dossier de typages</value>
+  </data>
+  <data name="TypingsInfoBarSpan3" xml:space="preserve">
+    <value>dans votre projet</value>
+  </data>
+  <data name="TypingsOpenOptionsText" xml:space="preserve">
+    <value>Personnaliser...</value>
+  </data>
+  <data name="StatusTypingsLoaded" xml:space="preserve">
+    <value>Le dossier de typages IntelliSense Node.js est à jour</value>
+  </data>
+  <data name="StatusTypingsLoading" xml:space="preserve">
+    <value>Chargement de typages IntelliSense Node.js pour des packages npm...</value>
+  </data>
+  <data name="TypingsToolInstallFailed" xml:space="preserve">
+    <value>Échec de l&apos;installation de l&apos;outil Typages utilisé pour IntelliSense. Vérifiez que Node.js est correctement installé</value>
+  </data>
+  <data name="TypingsToolCouldNotStart" xml:space="preserve">
+    <value>Impossible de démarrer l&apos;outil Typages utilisé pour IntelliSense</value>
+  </data>
+  <data name="TypeScriptMinVersionNotInstalled" xml:space="preserve">
+    <value>Node.js Tools nécessite TypeScript pour Visual Studio {0} ou version supérieure. Vérifiez que TypeScript est installé</value>
+  </data>
+  <data name="ImportingProjectStatusText" xml:space="preserve">
+    <value>Importation du projet...</value>
+  </data>
+  <data name="ImportingProjectErrorStatusText" xml:space="preserve">
+    <value>Une erreur s&apos;est produite et votre projet n&apos;a pas été créé.</value>
+  </data>
+  <data name="InteractiveWindowFailedToStartProcessErrorMessage" xml:space="preserve">
+    <value>Échec du démarrage du processus interactif : {0}{1}{2}</value>
+  </data>
+  <data name="InteractiveWindowNoProcessErrorMessage" xml:space="preserve">
+    <value>La fenêtre interactive actuelle est déconnectée - réinitialisez le processus.</value>
+  </data>
+  <data name="InteractiveWindowProcessExitedMessage" xml:space="preserve">
+    <value>Le processus a quitté</value>
+  </data>
+  <data name="InteractiveWindowTitle" xml:space="preserve">
+    <value>Fenêtre interactive Node.js</value>
+  </data>
+  <data name="ImportingProjectAccessErrorStatusText" xml:space="preserve">
+    <value>Certains chemins de fichier ne sont pas accessibles.{0}Essayez de déplacer votre code source dans un emplacement où vous pouvez lire et écrire des fichiers.</value>
+  </data>
+  <data name="ImportingProjectUnexpectedErrorMessage" xml:space="preserve">
+    <value>Une erreur inattendue {0} s&apos;est produite pendant la création de votre projet.</value>
+  </data>
+  <data name="NodeModulesCouldNotParsePackageJsonErrorMessageText" xml:space="preserve">
+    <value>Impossible d&apos;analyser {0} à partir de votre projet. Corrigez les erreurs et réessayez.</value>
+  </data>
+  <data name="NpmNotInstalledMessageCaption" xml:space="preserve">
+    <value>npm non installé</value>
+  </data>
+  <data name="NpmNotInstalledMessageText" xml:space="preserve">
+    <value>npm.cmd introuvable. Vérifiez que vous avez installé une version récente de node.js et spécifié l&apos;emplacement de node.exe dans les propriétés de projet, ou qu&apos;il est disponible dans votre chemin système.
+
+L&apos;erreur suivante s&apos;est produite pendant la tentative d&apos;exécution de npm.cmd :
+
+{0}</value>
+  </data>
+  <data name="AzureRemoteDebugWaitCaption" xml:space="preserve">
+    <value>Débogage à distance d&apos;Azure</value>
+  </data>
+  <data name="AzureRemoteDebugWaitMessage" xml:space="preserve">
+    <value>Attachement au site web Azure dans {0}</value>
+  </data>
+  <data name="AzureRemoveDebugCouldNotAttachToWebsiteErrorMessage" xml:space="preserve">
+    <value>Attachement impossible au processus node.exe sur le site web Azure dans {0}.
+
+Erreur pendant la récupération des informations de proxy de débogage websocket à partir de web.config.</value>
+  </data>
+  <data name="AzureRemoveDebugCouldNotAttachToWebsiteExceptionErrorMessage" xml:space="preserve">
+    <value>Échec de l&apos;attachement au site web Azure : {0}</value>
+  </data>
+  <data name="RemoteDebugCheckProxyAndPortErrorMessage" xml:space="preserve">
+    <value>Vérifiez que le processus s&apos;exécute derrière le proxy de débogage à distance (RemoteDebug.js) et que le port de débogage (par défaut {0}) est ouvert sur l&apos;hôte cible.</value>
+  </data>
+  <data name="RemoteDebugCouldNotAttachErrorMessage" xml:space="preserve">
+    <value>Attachement impossible au processus Node.js dans {0}{1}
+
+</value>
+  </data>
+  <data name="RemoteDebugEnableWebSocketsErrorMessage" xml:space="preserve">
+    <value>Vérifiez que le site web Azure est déployé dans la configuration Debug et que les websockets sont activés dans le portail de gestion Azure.</value>
+  </data>
+  <data name="RemoteDebugUnsupportedPlatformErrorMessage" xml:space="preserve">
+    <value>Le débogage à distance des applications Microsoft Azure node.js est uniquement pris en charge sur Windows 8 et version supérieure.</value>
+  </data>
+  <data name="DebugCouldNotResolveStartupFileErrorMessage" xml:space="preserve">
+    <value>Pour sélectionner un fichier de démarrage à lancer, cliquez avec le bouton droit sur le fichier dans l&apos;Explorateur de solutions et sélectionnez &apos;Définir comme fichier de démarrage Node.js&apos; ou modifiez votre configuration dans les propriétés du projet</value>
+  </data>
+  <data name="DebugInterpreterDoesNotExistErrorMessage" xml:space="preserve">
+    <value>L&apos;interpréteur &quot;{0}&quot; n&apos;existe pas.</value>
+  </data>
+  <data name="DebugTypeScriptCombineNotSupportedWarningMessage" xml:space="preserve">
+    <value>L&apos;option &apos;Combiner la sortie JavaScript dans un ficher&apos; est activée dans ce projet TypeScript. Cette option n&apos;est pas prise en charge par le débogueur NTVS et peut entraîner un comportement imprévisible des points d&apos;arrêt, du pas à pas et des fenêtres de l&apos;outil de débogage. Voulez-vous vraiment démarrer le débogage ?</value>
+  </data>
+  <data name="DebugWorkingDirectoryDoesNotExistErrorMessage" xml:space="preserve">
+    <value>Le répertoire de travail &quot;{0}&quot; n&apos;existe pas.</value>
+  </data>
+  <data name="DependencyNodeLabelBundled" xml:space="preserve">
+    <value>groupée</value>
+  </data>
+  <data name="DependencyNodeLabelMissing" xml:space="preserve">
+    <value>manquante</value>
+  </data>
+  <data name="DependencyNodeLabelNotListed" xml:space="preserve">
+    <value>non répertoriée dans {0}</value>
+  </data>
+  <data name="DependencyNodeModuleDoesNotExist" xml:space="preserve">
+    <value>Le chemin du module n&apos;existe pas :
+{0}</value>
+  </data>
+  <data name="ErrorInvalidLaunchUrl" xml:space="preserve">
+    <value>L&apos;URL de lancement &apos;{0}&apos; n&apos;est pas valide </value>
+  </data>
+</root>

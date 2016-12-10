@@ -21,7 +21,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell;
 
-
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
@@ -31,8 +30,11 @@ using Microsoft.VisualStudio.Shell;
 
 [assembly: ComVisible(false)]
 [assembly: CLSCompliant(false)]
+#if DEV14
 [assembly: NeutralResourcesLanguage("en-US")]
-
+#elif DEV15
+[assembly: NeutralResourcesLanguage("en", UltimateResourceFallbackLocation.Satellite)]
+#endif
 [assembly: ProvideCodeBase(AssemblyName = "Microsoft.NodejsTools", CodeBase = "Microsoft.NodejsTools.dll", Version = AssemblyVersionInfo.StableVersion)]
 [assembly: ProvideCodeBase(AssemblyName = "Microsoft.NodejsTools.Npm", CodeBase = "Microsoft.NodejsTools.Npm.dll", Version = AssemblyVersionInfo.StableVersion)]
 [assembly: ProvideCodeBase(AssemblyName = "Microsoft.NodejsTools.PressAnyKey", CodeBase = "Microsoft.NodejsTools.PressAnyKey.exe", Version = AssemblyVersionInfo.StableVersion)]
