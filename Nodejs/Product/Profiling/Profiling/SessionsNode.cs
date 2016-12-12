@@ -158,7 +158,7 @@ namespace Microsoft.NodejsTools.Profiling {
             var prop = (__VSHPROPID)propid;
             switch (prop) {
                 case __VSHPROPID.VSHPROPID_CmdUIGuid:
-                    pvar = new Guid(Guids.NodejsProfilingPkgString);
+                    pvar = ProfilingGuids.NodejsProfilingPkg;
                     break;
 
                 case __VSHPROPID.VSHPROPID_Parent:

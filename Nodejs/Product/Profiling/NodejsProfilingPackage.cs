@@ -51,12 +51,12 @@ namespace Microsoft.NodejsTools.Profiling {
     [InstalledProductRegistration("#110", "#112", AssemblyVersionInfo.Version, IconResourceID = 400)]
     // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [Guid(Guids.NodejsProfilingPkgString)]
+    [Guid(ProfilingGuids.NodejsProfilingPkgString)]
     // set the window to dock where Toolbox/Performance Explorer dock by default
     [ProvideToolWindow(typeof(PerfToolWindow), Orientation = ToolWindowOrientation.Left, Style = VsDockStyle.Tabbed, Window = EnvDTE.Constants.vsWindowKindToolbox)]
-    [ProvideFileFilterAttribute("{" + Guids.NodejsProfilingPkgString + "}", "/1", "Node.js Performance Session (*" + PerfFileType + ");*" + PerfFileType, 100)]
+    [ProvideFileFilterAttribute("{" + ProfilingGuids.NodejsProfilingPkgString + "}", "/1", "Node.js Performance Session (*" + PerfFileType + ");*" + PerfFileType, 100)]
     [ProvideEditorExtension(typeof(ProfilingSessionEditorFactory), ".njsperf", 50,
-          ProjectGuid = Guids.NodejsProfilingPkgString,
+          ProjectGuid = ProfilingGuids.NodejsProfilingPkgString,
           NameResourceID = 105,
           DefaultName = "NodejsPerfSession")]
     [ProvideAutomationObject("NodejsProfiling")]
@@ -68,7 +68,7 @@ namespace Microsoft.NodejsTools.Profiling {
         private AutomationProfiling _profilingAutomation;
         private static OleMenuCommand _stopCommand, _startCommand, _startWizard, _startProfiling, _startCommandCtx;
         internal const string PerfFileType = ".njsperf";
-        
+
         /// <summary>
         /// Default constructor of the package.
         /// Inside this method you can place any initialization code that does not require 
@@ -102,41 +102,41 @@ namespace Microsoft.NodejsTools.Profiling {
             OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (null != mcs) {
                 // Create the command for the menu item.
-                CommandID menuCommandID = new CommandID(Guids.NodejsProfilingCmdSet, (int)PkgCmdIDList.cmdidStartNodeProfiling);
+                CommandID menuCommandID = new CommandID(ProfilingGuids.NodejsProfilingCmdSet, (int)PkgCmdIDList.cmdidStartNodeProfiling);
                 var oleMenuItem = new OleMenuCommand(StartProfilingWizard, menuCommandID);
                 oleMenuItem.BeforeQueryStatus += IsProfilingActive;
                 _startWizard = oleMenuItem;
                 mcs.AddCommand(oleMenuItem);
 
                 // Create the command for the menu item.
-                menuCommandID = new CommandID(Guids.NodejsProfilingCmdSet, (int)PkgCmdIDList.cmdidPerfExplorer);
+                menuCommandID = new CommandID(ProfilingGuids.NodejsProfilingCmdSet, (int)PkgCmdIDList.cmdidPerfExplorer);
                 oleMenuItem = new OleMenuCommand(ShowPeformanceExplorer, menuCommandID);
                 mcs.AddCommand(oleMenuItem);
 
-                menuCommandID = new CommandID(Guids.NodejsProfilingCmdSet, (int)PkgCmdIDList.cmdidAddPerfSession);
+                menuCommandID = new CommandID(ProfilingGuids.NodejsProfilingCmdSet, (int)PkgCmdIDList.cmdidAddPerfSession);
                 oleMenuItem = new OleMenuCommand(AddPerformanceSession, menuCommandID);
                 oleMenuItem.BeforeQueryStatus += IsProfilingActive;
                 mcs.AddCommand(oleMenuItem);
 
-                menuCommandID = new CommandID(Guids.NodejsProfilingCmdSet, (int)PkgCmdIDList.cmdidStartProfiling);
+                menuCommandID = new CommandID(ProfilingGuids.NodejsProfilingCmdSet, (int)PkgCmdIDList.cmdidStartProfiling);
                 oleMenuItem = _startCommand = new OleMenuCommand(StartProfiling, menuCommandID);
                 oleMenuItem.BeforeQueryStatus += IsProfilingActiveAndSessionsExist;
                 mcs.AddCommand(oleMenuItem);
-                
+
                 // Exec is handled by the Performance Explorer node, but we want to handle QueryStatus here to disable
                 // the command when another profiling session is running.
-                menuCommandID = new CommandID(Guids.NodejsProfilingCmdSet, (int)PkgCmdIDList.cmdidPerfCtxStartProfiling);
+                menuCommandID = new CommandID(ProfilingGuids.NodejsProfilingCmdSet, (int)PkgCmdIDList.cmdidPerfCtxStartProfiling);
                 oleMenuItem = _startCommandCtx = new OleMenuCommand(null, menuCommandID);
                 oleMenuItem.BeforeQueryStatus += IsProfilingActiveAndSessionsExist;
                 mcs.AddCommand(oleMenuItem);
 
-                menuCommandID = new CommandID(Guids.NodejsProfilingCmdSet, (int)PkgCmdIDList.cmdidStopProfiling);
+                menuCommandID = new CommandID(ProfilingGuids.NodejsProfilingCmdSet, (int)PkgCmdIDList.cmdidStopProfiling);
                 _stopCommand = oleMenuItem = new OleMenuCommand(StopProfiling, menuCommandID);
                 oleMenuItem.BeforeQueryStatus += IsProfilingInactive;
 
                 mcs.AddCommand(oleMenuItem);
 
-                menuCommandID = new CommandID(Guids.NodejsProfilingCmdSet, (int)PkgCmdIDList.cmdidStartPerformanceAnalysis);
+                menuCommandID = new CommandID(ProfilingGuids.NodejsProfilingCmdSet, (int)PkgCmdIDList.cmdidStartPerformanceAnalysis);
                 _startProfiling = oleMenuItem = new OleMenuCommand(StartPerfAnalysis, menuCommandID);
                 oleMenuItem.BeforeQueryStatus += IsNodejsProjectStartup;
                 mcs.AddCommand(oleMenuItem);
@@ -148,19 +148,19 @@ namespace Microsoft.NodejsTools.Profiling {
 
         private void StartPerfAnalysis(object sender, EventArgs e) {
             var view = new ProfilingTargetView();
-            
+
             var sessions = ShowPerformanceExplorer().Sessions;
             SessionNode activeSession = sessions.ActiveSession;
             if (activeSession == null ||
                 activeSession.Target.ProjectTarget == null ||
                 !ProjectTarget.IsSame(activeSession.Target.ProjectTarget, view.Project.GetTarget())) {
                 // need to create a new session
-                    var target = new ProfilingTarget() { ProjectTarget = view.Project.GetTarget() };
-                    
-                    activeSession = AddPerformanceSession(
-                        view.Project.Name, 
-                        target
-                    );
+                var target = new ProfilingTarget() { ProjectTarget = view.Project.GetTarget() };
+
+                activeSession = AddPerformanceSession(
+                    view.Project.Name,
+                    target
+                );
             }
 
             ProfileProjectTarget(activeSession, activeSession.Target.ProjectTarget, true);
@@ -248,7 +248,7 @@ namespace Microsoft.NodejsTools.Profiling {
 
         private void ProfileProjectTarget(SessionNode session, ProjectTarget projectTarget, bool openReport) {
             var targetGuid = projectTarget.TargetProject;
-            
+
             var dte = (EnvDTE.DTE)GetGlobalService(typeof(EnvDTE.DTE));
             EnvDTE.Project projectToProfile = null;
             foreach (EnvDTE.Project project in dte.Solution.Projects) {
@@ -278,7 +278,7 @@ namespace Microsoft.NodejsTools.Profiling {
                 await uiThread.InvokeAsync(() => MessageBox.Show(Resources.FailedToBuild, Resources.NodejsToolsForVS, MessageBoxButton.YesNo)) == MessageBoxResult.No) {
                 return;
             }
-            
+
             var interpreterArgs = (string)projectToProfile.Properties.Item(NodeProjectProperty.NodeExeArguments).Value;
             var scriptArgs = (string)projectToProfile.Properties.Item(NodeProjectProperty.ScriptArguments).Value;
             var startBrowser = (bool)projectToProfile.Properties.Item(NodeProjectProperty.StartWebBrowser).Value;
@@ -303,14 +303,14 @@ namespace Microsoft.NodejsTools.Profiling {
             }
 
             RunProfiler(
-                session, 
-                interpreterPath, 
-                interpreterArgs, 
-                startupFile, 
-                scriptArgs, 
-                workingDir, 
-                null, 
-                openReport, 
+                session,
+                interpreterPath,
+                interpreterArgs,
+                startupFile,
+                scriptArgs,
+                workingDir,
+                null,
+                openReport,
                 launchUrl,
                 port,
                 startBrowser
@@ -319,9 +319,9 @@ namespace Microsoft.NodejsTools.Profiling {
 
         class UpdateSolutionEvents : IVsUpdateSolutionEvents {
             private readonly TaskCompletionSource<bool> SuccessSource = new TaskCompletionSource<bool>();
-            
+
             public Task<bool> Task {
-                get{
+                get {
                     return SuccessSource.Task;
                 }
             }
@@ -340,7 +340,7 @@ namespace Microsoft.NodejsTools.Profiling {
             }
 
             public int UpdateSolution_Done(int fSucceeded, int fModified, int fCancelCommand) {
-                SuccessSource.SetResult(fSucceeded != 0);                
+                SuccessSource.SetResult(fSucceeded != 0);
                 return VSConstants.S_OK;
             }
 
@@ -396,14 +396,14 @@ namespace Microsoft.NodejsTools.Profiling {
 
         private static void ProfileStandaloneTarget(SessionNode session, StandaloneTarget runTarget, bool openReport) {
             RunProfiler(
-                session, 
-                runTarget.InterpreterPath, 
+                session,
+                runTarget.InterpreterPath,
                 String.Empty,             // interpreter args
-                runTarget.Script, 
-                runTarget.Arguments, 
-                runTarget.WorkingDirectory, 
+                runTarget.Script,
+                runTarget.Arguments,
+                runTarget.WorkingDirectory,
                 null,           // env vars
-                openReport, 
+                openReport,
                 null,            // launch url,
                 null,            // port
                 false            // start browser
@@ -553,7 +553,7 @@ namespace Microsoft.NodejsTools.Profiling {
                 oleMenu.Enabled = true;
             }
         }
-        
+
         public bool IsProfiling {
             get {
                 return _profilingProcess != null;

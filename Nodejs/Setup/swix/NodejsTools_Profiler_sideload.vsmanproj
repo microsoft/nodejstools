@@ -10,7 +10,7 @@
         <BuildNumber>$(VSTarget).$(BuildNumber)</BuildNumber>
         <TargetName>$(MSBuildProjectName)</TargetName>
     </PropertyGroup>
-
+    
     <PropertyGroup>
         <!-- NTVS uses BuildVersion as 'major.minor.build.revision' and BuildNumber is 'build.revision'.
              But VS Manifest task wants BuildNumber to be 'major.minor.build.revision' -->
@@ -19,10 +19,8 @@
     </PropertyGroup>
     
     <ItemGroup>
-        <MergeManifest Include="$(BuildOutputRoot)\Binaries\InteractiveWindow\Microsoft.VisualStudio.NodeJsTools.InteractiveWindow.json" />
-        <MergeManifest Include="$(BuildOutputRoot)\Binaries\NodeJs\Microsoft.VisualStudio.NodejsTools.NodejsTools.json" />
-
-        <MergeManifest Include="$(BuildOutputRoot)\Setup\Microsoft.VisualStudio.NodejsTools.Targets.json" />
+        <MergeManifest Include="$(BuildOutputRoot)\Setup\Microsoft.VisualStudio.NodejsTools.Profiling.json"/>
+        <MergeManifest Include="$(BuildRoot)\Nodejs\Setup\swix\profiling_sideload.json"/>
     </ItemGroup>
 
     <Import Project="$(PackagesPath)\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets"/>

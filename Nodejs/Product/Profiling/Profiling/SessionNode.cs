@@ -256,7 +256,7 @@ namespace Microsoft.NodejsTools.Profiling {
                             if (uishell != null) {
                                 var pt = System.Windows.Forms.Cursor.Position;
                                 var pnts = new[] { new POINTS { x = (short)pt.X, y = (short)pt.Y } };
-                                var guid = Guids.NodejsProfilingCmdSet;
+                                var guid = ProfilingGuids.NodejsProfilingCmdSet;
                                 int hr = uishell.ShowContextMenu(
                                     0,
                                     ref guid,
@@ -313,7 +313,7 @@ namespace Microsoft.NodejsTools.Profiling {
             #region IOleCommandTarget Members
 
             public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
-                if (pguidCmdGroup == Guids.NodejsProfilingCmdSet) {
+                if (pguidCmdGroup == ProfilingGuids.NodejsProfilingCmdSet) {
                     switch (nCmdID) {
                         case PkgCmdIDList.cmdidOpenReport:
                             _node.OpenProfile(_itemid);
@@ -328,56 +328,56 @@ namespace Microsoft.NodejsTools.Profiling {
                             return VSConstants.S_OK;
 
                         case PkgCmdIDList.cmdidReportsCompareReports: {
-                            CompareReportsView compareView;
-                            if (_node.IsReportItem(_itemid)) {
-                                var report = _node.GetReport(_itemid);
-                                compareView = new CompareReportsView(report.Filename);
-                            } else {
-                                compareView = new CompareReportsView();
-                            }
-
-                            var dialog = new CompareReportsWindow(compareView);
-                            var res = dialog.ShowModal() ?? false;
-                            if (res && compareView.IsValid) {
-                                IVsUIShellOpenDocument sod = NodejsProfilingPackage.GetGlobalService(typeof(SVsUIShellOpenDocument)) as IVsUIShellOpenDocument;
-                                Debug.Assert(sod != null);
-                                Microsoft.VisualStudio.Shell.Interop.IVsWindowFrame frame = null;
-                                Guid guid = new Guid("{9C710F59-984F-4B83-B781-B6356C363B96}"); // performance diff guid
-                                Guid guidNull = Guid.Empty;
-
-                                sod.OpenSpecificEditor(
-                                    (uint)(_VSRDTFLAGS.RDT_CantSave | _VSRDTFLAGS.RDT_DontAddToMRU | _VSRDTFLAGS.RDT_NonCreatable | _VSRDTFLAGS.RDT_NoLock),
-                                    compareView.GetComparisonUri(),
-                                    ref guid,
-                                    null,
-                                    ref guidNull,
-                                    "Performance Comparison",
-                                    _node,
-                                    _itemid,
-                                    IntPtr.Zero,
-                                    null,
-                                    out frame
-                                );
-
-                                if (frame != null) {
-                                    Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(frame.Show());
+                                CompareReportsView compareView;
+                                if (_node.IsReportItem(_itemid)) {
+                                    var report = _node.GetReport(_itemid);
+                                    compareView = new CompareReportsView(report.Filename);
+                                } else {
+                                    compareView = new CompareReportsView();
                                 }
+
+                                var dialog = new CompareReportsWindow(compareView);
+                                var res = dialog.ShowModal() ?? false;
+                                if (res && compareView.IsValid) {
+                                    IVsUIShellOpenDocument sod = NodejsProfilingPackage.GetGlobalService(typeof(SVsUIShellOpenDocument)) as IVsUIShellOpenDocument;
+                                    Debug.Assert(sod != null);
+                                    Microsoft.VisualStudio.Shell.Interop.IVsWindowFrame frame = null;
+                                    Guid guid = new Guid("{9C710F59-984F-4B83-B781-B6356C363B96}"); // performance diff guid
+                                    Guid guidNull = Guid.Empty;
+
+                                    sod.OpenSpecificEditor(
+                                        (uint)(_VSRDTFLAGS.RDT_CantSave | _VSRDTFLAGS.RDT_DontAddToMRU | _VSRDTFLAGS.RDT_NonCreatable | _VSRDTFLAGS.RDT_NoLock),
+                                        compareView.GetComparisonUri(),
+                                        ref guid,
+                                        null,
+                                        ref guidNull,
+                                        "Performance Comparison",
+                                        _node,
+                                        _itemid,
+                                        IntPtr.Zero,
+                                        null,
+                                        out frame
+                                    );
+
+                                    if (frame != null) {
+                                        Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(frame.Show());
+                                    }
+                                }
+                                return VSConstants.S_OK;
                             }
-                            return VSConstants.S_OK;
-                        }
                         case PkgCmdIDList.cmdidReportsAddReport: {
-                            var dialog = new OpenFileDialog();
-                            dialog.Filter = NodejsProfilingPackage.PerformanceFileFilter;
-                            dialog.CheckFileExists = true;
-                            var res = dialog.ShowDialog() ?? false;
-                            if (res) {
-                                _node.AddProfile(dialog.FileName);
+                                var dialog = new OpenFileDialog();
+                                dialog.Filter = NodejsProfilingPackage.PerformanceFileFilter;
+                                dialog.CheckFileExists = true;
+                                var res = dialog.ShowDialog() ?? false;
+                                if (res) {
+                                    _node.AddProfile(dialog.FileName);
+                                }
+                                return VSConstants.S_OK;
                             }
-                            return VSConstants.S_OK;
-                        }
                     }
                 } else if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97) {
-                    switch((VSConstants.VSStd97CmdID)nCmdID) {
+                    switch ((VSConstants.VSStd97CmdID)nCmdID) {
                         case VSConstants.VSStd97CmdID.PropSheetOrProperties:
                             _node.OpenTargetProperties();
                             return VSConstants.S_OK;
@@ -402,7 +402,7 @@ namespace Microsoft.NodejsTools.Profiling {
         public override int QueryStatusCommand(uint itemid, ref Guid pguidCmdGroup, uint cCmds, VisualStudio.OLE.Interop.OLECMD[] prgCmds, IntPtr pCmdText) {
             return base.QueryStatusCommand(itemid, ref pguidCmdGroup, cCmds, prgCmds, pCmdText);
         }
-        
+
         private bool IsReportItem(uint itemid) {
             return itemid >= StartingReportId && Reports.ContainsKey((int)itemid);
         }
@@ -455,7 +455,7 @@ namespace Microsoft.NodejsTools.Profiling {
                 case VSSAVEFLAGS.VSSAVE_SaveAs:
                 case VSSAVEFLAGS.VSSAVE_SaveCopyAs:
                     SaveFileDialog saveDialog = new SaveFileDialog();
-                    saveDialog.FileName = _filename;                    
+                    saveDialog.FileName = _filename;
                     if (saveDialog.ShowDialog() == true) {
                         Save(saveDialog.FileName);
                         _neverSaved = false;
@@ -478,7 +478,7 @@ namespace Microsoft.NodejsTools.Profiling {
 
             var report = GetReport(itemid);
             Reports.Remove((int)itemid);
-            
+
             OnItemDeleted(itemid);
             OnInvalidateItems(ReportsItemId);
 

@@ -120,6 +120,7 @@
     <Compile Include="..\Nodejs\NodejsConstants.cs">
       <Link>NodejsConstants.cs</Link>
     </Compile>
+    <Compile Include="ProfilingGuids.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DialogWindowVersioningWorkaround.cs" />
     <Compile Include="NativeMethods.cs" />
