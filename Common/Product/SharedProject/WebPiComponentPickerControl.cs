@@ -118,7 +118,6 @@ namespace Microsoft.VisualStudioTools.Project {
                     updatedVal = updatedNode.Value;
                 }
 
-
                 string productIdVal = null;
                 foreach (XPathNavigator productIdNode in productId) {
                     productIdVal = productIdNode.Value;

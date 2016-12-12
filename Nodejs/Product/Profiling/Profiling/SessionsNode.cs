@@ -281,7 +281,6 @@ namespace Microsoft.NodejsTools.Profiling {
             return (SessionNode)_sessionsCollection[itemid];
         }
 
-
         internal void StartProfiling() {
             if (_activeSession != VSConstants.VSITEMID_NIL) {
                 GetItem(_activeSession).StartProfiling();

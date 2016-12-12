@@ -153,7 +153,6 @@ namespace Microsoft.Nodejs.Tests.UI {
 
             WaitForUIInputIdle();
 
-
             WaitForPackageListItemsToAppear(npmWindow);
             return npmWindow;
         }

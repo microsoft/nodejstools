@@ -69,9 +69,6 @@ namespace Microsoft.VisualStudioTools.Project
             }
         }
 
-
-
-
         /// <summary>
         /// Raises the before  project file closed event.
         /// </summary>

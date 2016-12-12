@@ -470,7 +470,6 @@ namespace Microsoft.NodejsTools.Project {
                    ext.Equals(NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase);
         }
 
-
         protected override void Reload() {
             using (new DebugTimer("Project Load")) {
                 // Populate values from project properties before we do anything else.
@@ -1033,7 +1032,6 @@ namespace Microsoft.NodejsTools.Project {
             }
             return base.Build(config, target);
         }
-
 
         // This is the package manager pane that ships with VS2015, and we should print there if available.
         private static readonly Guid VSPackageManagerPaneGuid = new Guid("C7E31C31-1451-4E05-B6BE-D11B6829E8BB");

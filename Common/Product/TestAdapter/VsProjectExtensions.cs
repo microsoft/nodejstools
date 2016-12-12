@@ -202,7 +202,6 @@ namespace Microsoft.VisualStudioTools.TestAdapter {
             return o;
         }
 
-
         /// <summary>
         /// Get the canonical name
         /// </summary>

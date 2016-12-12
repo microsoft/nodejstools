@@ -283,7 +283,6 @@ namespace TestUtilities {
         [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
         static extern int SHFileOperation([In, Out] ref SHFILEOPSTRUCT lpFileOp);
 
-
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode, Pack = 2)]
         struct SHFILEOPSTRUCT {
             public IntPtr hwnd;

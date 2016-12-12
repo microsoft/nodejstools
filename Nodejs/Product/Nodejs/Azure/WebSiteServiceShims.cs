@@ -14,7 +14,6 @@
 //
 //*********************************************************//
 
-
 // This file contains Reflectio-based shims for interfaces from the Microsoft.VisualStudio.Web.WindowsAzure.Contracts.
 // They are used for the time being because the interfaces in question are only going to be stabilized in Visual Studio 2013 Update 2,
 // and until then using them directly requires private builds of Azure Tools to build against. Using Reflection avoids that dependency.

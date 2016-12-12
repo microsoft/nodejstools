@@ -50,7 +50,6 @@ namespace Microsoft.VisualStudioTools.Project {
             this.HasParentNodeNameRelation = false;
         }
 
-
         #endregion
 
         #region overridden methods

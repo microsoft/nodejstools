@@ -126,7 +126,6 @@ namespace Microsoft.NodejsTools.Jade {
                 return;
             }
 
-
             // There may be ws between tag name and = sign. However, = must be on the same line.
             bool allWsToEol = IsAllWhiteSpaceBeforeEndOfLine(_cs.Position);
             if (!allWsToEol) {

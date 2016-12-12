@@ -318,7 +318,6 @@ namespace ProfilingUITests {
                 app.OpenNodejsPerformance();
                 app.NodejsPerformanceExplorerToolBar.NewPerfSession();
 
-
                 var perf = app.NodejsPerformanceExplorerTreeView.WaitForItem("Performance *");
                 Debug.Assert(perf != null);
                 var session = profiling.GetSession(1);
@@ -719,7 +718,6 @@ namespace ProfilingUITests {
                 }
             }
         }
-
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
@@ -1221,7 +1219,6 @@ namespace ProfilingUITests {
                 }
             }
         }
-
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]

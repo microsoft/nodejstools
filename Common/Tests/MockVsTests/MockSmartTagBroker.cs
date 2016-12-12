@@ -69,6 +69,5 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
             }
         }
 
-
     }
 }

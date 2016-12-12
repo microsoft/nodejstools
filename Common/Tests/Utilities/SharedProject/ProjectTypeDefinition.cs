@@ -12,7 +12,6 @@
  *
  * ***************************************************************************/
 
-
 namespace TestUtilities.SharedProject {
     /// <summary>
     /// Defines a project type definition, an instance of this gets exported:

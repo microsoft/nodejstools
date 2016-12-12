@@ -172,7 +172,6 @@ namespace TestUtilities.UI
             Mouse.Down(MouseButton.Left);
         }
 
-
         public void DragOntoThis(params ITreeNode[] source) {
             DragOntoThis(Key.None, source);
         }

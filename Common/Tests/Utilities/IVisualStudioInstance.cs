@@ -42,7 +42,6 @@ namespace TestUtilities {
 
         void WaitForOutputWindowText(string name, string containsText, int timeout = 5000);
 
-
         void Sleep(int ms);
 
         void ExecuteCommand(string command);

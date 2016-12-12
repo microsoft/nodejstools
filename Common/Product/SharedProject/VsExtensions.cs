@@ -116,7 +116,6 @@ namespace Microsoft.VisualStudioTools {
             Debug.Assert(self is MockUIThreadBase || self.InvokeRequired, message);
         }
 
-
         #region NoOpUIThread class
 
         /// <summary>

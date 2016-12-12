@@ -196,7 +196,6 @@ namespace Microsoft.NodejsTools.Repl {
             return nodeExePath;
         }
 
-
         private static void CreateConnection(out Socket conn, out int portNum) {
             conn = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
             conn.Bind(new IPEndPoint(IPAddress.Loopback, 0));
@@ -395,7 +394,6 @@ namespace Microsoft.NodejsTools.Repl {
                 return res;
             }
 
-
             internal void Disconnect() {
                 if (_completion != null) {
                     _completion.SetResult(ExecutionResult.Failure);
@@ -429,7 +427,6 @@ namespace Microsoft.NodejsTools.Repl {
                     _disposed = true;
                 }
             }
-
 
             /// <summary>
             /// Helper struct for locking and tracking the current holding thread.  This allows

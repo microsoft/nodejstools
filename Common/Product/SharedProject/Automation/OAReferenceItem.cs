@@ -44,7 +44,6 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
             throw new InvalidOperationException();
         }
 
-
         /// <summary>
         /// Not implemented. If called throws invalid operation exception.
         /// </summary>

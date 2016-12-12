@@ -1091,7 +1091,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             return browserList;
         }
 
-
         private void OnEntryPointHit(object sender, ThreadEventArgs e) {
             Send(new AD7EntryPointEvent(), AD7EntryPointEvent.IID, _threads[e.Thread]);
         }

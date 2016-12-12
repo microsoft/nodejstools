@@ -278,7 +278,6 @@ namespace Microsoft.VisualStudioTools.Project {
 
             int indexOfSeparator = projectReference.IndexOf('|');
 
-
             string fileName = String.Empty;
 
             // Unfortunately we cannot use the path part of the projectReference string since it is not resolving correctly relative pathes.

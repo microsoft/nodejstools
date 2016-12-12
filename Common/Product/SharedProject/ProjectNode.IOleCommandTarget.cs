@@ -193,7 +193,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 return returnValue;
             }
 
-
             // Now handle commands that need the selected nodes as input parameter.
             returnValue = this.ExecCommandThatDependsOnSelectedNodes(cmdGroup, cmdId, cmdExecOpt, vaIn, vaOut, commandOrigin, selectedNodes, out handled);
             if (handled) {
@@ -379,7 +378,6 @@ namespace Microsoft.VisualStudioTools.Project {
 
             return false;
         }
-
 
         /// <summary>
         /// Queries the object for the command status on a list of selected nodes.

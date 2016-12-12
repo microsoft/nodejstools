@@ -12,7 +12,6 @@
  *
  * ***************************************************************************/
 
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -323,7 +322,6 @@ namespace Microsoft.VisualStudioTools.Project {
 
         }
 
-
         /// <summary>
         /// Verifies that two objects represent the same instance of a COM object.
         /// This essentially compares the IUnkown pointers of the 2 objects.
@@ -440,7 +438,6 @@ namespace Microsoft.VisualStudioTools.Project {
                     return true;
                 }
 
-
                 return IsFilePartInValid(name);
             }
 
@@ -460,7 +457,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 return true;
             }
 
-
             return IsFilePartInValid(fileName);
 
         }
@@ -476,7 +472,6 @@ namespace Microsoft.VisualStudioTools.Project {
 
             // Call GetFullPath to expand any relative path passed into this method.
             fullProjectPath = CommonUtils.NormalizePath(fullProjectPath);
-
 
             // Check if the project already has been loaded with the fullProjectPath. If yes return the build project associated to it.
             List<MSBuild.Project> loadedProject = new List<MSBuild.Project>(buildEngine.GetLoadedProjects(fullProjectPath));

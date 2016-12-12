@@ -261,7 +261,6 @@ namespace TestUtilities
             return sb.ToString();
         }
 
-
         public static void AreEqual(Regex expected, string actual, string message = null) {
             if (!expected.IsMatch(actual)) {
                 Assert.Fail(string.Format("Expected <{0}>. Actual <{1}>. {2}", expected, actual, message ?? ""));

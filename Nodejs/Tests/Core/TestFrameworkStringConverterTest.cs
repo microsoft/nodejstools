@@ -14,7 +14,6 @@
 //
 //*********************************************************//
 
-
 using System.ComponentModel;
 
 using Microsoft.NodejsTools.Project;

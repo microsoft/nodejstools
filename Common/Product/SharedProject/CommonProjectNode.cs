@@ -1195,7 +1195,6 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
-
         public override int GetGuidProperty(int propid, out Guid guid) {
             if ((__VSHPROPID)propid == __VSHPROPID.VSHPROPID_PreferredLanguageSID) {
                 guid = new Guid("{EFB9A1D6-EA71-4F38-9BA7-368C33FCE8DC}");// GetLanguageServiceType().GUID;
@@ -1482,7 +1481,6 @@ namespace Microsoft.VisualStudioTools.Project {
 
             return newNode;
         }
-
 
         /// <summary>
         /// Create a file node based on absolute file name.

@@ -159,7 +159,6 @@ namespace Microsoft.VisualStudioTools.Project {
                     ProjectMgr.EventTriggeringFlag = oldTriggerFlag;
                 }
 
-
                 //Refresh the properties in the properties window
                 IVsUIShell shell = this.ProjectMgr.GetService(typeof(SVsUIShell)) as IVsUIShell;
                 Utilities.CheckNotNull(shell, "Could not get the UI shell from the project");

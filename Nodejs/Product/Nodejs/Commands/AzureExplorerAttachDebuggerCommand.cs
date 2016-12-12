@@ -382,7 +382,6 @@ namespace Microsoft.NodejsTools.Commands {
             Marshal.ThrowExceptionForHR(debugger.LaunchDebugTargets2(1, (IntPtr)pDebugInfo));
         }
 
-
         /// <summary>
         /// Information about an Azure Website node in Server Explorer.
         /// </summary>

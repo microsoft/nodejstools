@@ -161,7 +161,6 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-
         [SRCategory(SR.General)]
         [ResourcesDisplayName(nameof(Resources.NpmPackageLinkStatus))]
         [ResourcesDescription(nameof(Resources.NpmPackageLinkStatusDescription))]

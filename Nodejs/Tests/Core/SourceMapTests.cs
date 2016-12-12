@@ -79,7 +79,6 @@ namespace NodejsTests {
             );
         }
 
-
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void MappingLine() {
             var map = new SourceMap(new StringReader(_sample));
@@ -168,7 +167,6 @@ namespace NodejsTests {
             var map = new SourceMap(new StringReader("{version:3, names:['foo']}"));
             Assert.AreEqual(map.Names[0], "foo");
         }
-
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
         public void Sources() {

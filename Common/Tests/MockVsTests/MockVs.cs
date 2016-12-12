@@ -297,7 +297,6 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
             return res;
         }
 
-
         public IServiceContainer ServiceProvider {
             get {
                 return _serviceProvider;
@@ -627,7 +626,6 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
             AssertListener.ThrowUnhandled();
         }
 
-
         public void Type(Key key) {
             Invoke(() => TypeWorker(key));
         }
@@ -655,7 +653,6 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
                     throw new InvalidOperationException("Unmapped key " + key);
             }
         }
-
 
         private IEnumerable<IOleCommandTarget> Targets {
             get {
@@ -797,7 +794,6 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
         public void Sleep(int ms) {
         }
 
-
         public void ExecuteCommand(string command) {
             throw new NotImplementedException();
         }
@@ -903,7 +899,6 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
         public List<IVsTaskItem> WaitForErrorListItems(int expectedCount) {
             throw new NotImplementedException();
         }
-
 
         public DTE Dte {
             get { return _dte; }

@@ -12,7 +12,6 @@
  *
  * ***************************************************************************/
 
-
 namespace Microsoft.VisualStudioTools.Project {
     /// <summary>
     /// Represents a project element which lives on disk and is visible when Show All Files

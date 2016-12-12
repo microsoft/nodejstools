@@ -367,7 +367,6 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
                     Utilities.CheckNotNull(prjHierarchy);
                     Utilities.CheckNotNull(solution);
 
-
                     ErrorHandler.ThrowOnFailure(solution.SaveSolutionElement((uint)__VSSLNSAVEOPTIONS.SLNSAVEOPT_SaveIfDirty, prjHierarchy, cookie));
                 } else {
 

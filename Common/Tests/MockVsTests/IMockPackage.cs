@@ -12,7 +12,6 @@
  *
  * ***************************************************************************/
 
-
 using System;
 namespace Microsoft.VisualStudioTools.MockVsTests {
     /// <summary>

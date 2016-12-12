@@ -636,7 +636,6 @@ namespace Microsoft.Nodejs.Tests.UI {
                 AssertError<ArgumentOutOfRangeException>(() => item.get_FileNames(-1));
                 AssertNotImplemented(() => item.Saved = false);
 
-
                 AssertError<ArgumentException>(() => item.get_IsOpen("ThisIsNotTheGuidYoureLookingFor"));
                 AssertError<ArgumentException>(() => item.Open("ThisIsNotTheGuidYoureLookingFor"));
             }
@@ -701,7 +700,6 @@ namespace Microsoft.Nodejs.Tests.UI {
                     var solutionExplorer = app.OpenSolutionExplorer();
 
                     var solutionNode = solutionExplorer.FindItem("Solution 'AddFolderExists' (1 project)");
-
 
                     var projectNode = solutionExplorer.FindItem("Solution 'AddFolderExists' (1 project)", "AddFolderExists");
 
