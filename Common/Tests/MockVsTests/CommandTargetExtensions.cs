@@ -38,7 +38,6 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
                             );
                             break;
                     }
-
                 }
             } finally {
                 Marshal.FreeCoTaskMem(variantMem);
@@ -84,6 +83,5 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
             [FieldOffset(8)]
             public double r8;
         }
-
     }
 }

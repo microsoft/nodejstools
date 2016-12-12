@@ -88,5 +88,4 @@ namespace NodeLogConverter {
         public bool SourceIndexed;
         public bool Publics;
     }
-
 }

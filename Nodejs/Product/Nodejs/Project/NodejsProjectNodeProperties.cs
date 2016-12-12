@@ -171,10 +171,8 @@ namespace Microsoft.NodejsTools.Project {
                 }
                 return res;
             }
-
             return null;
         }
-
     }
 
     [ComVisible(true)]

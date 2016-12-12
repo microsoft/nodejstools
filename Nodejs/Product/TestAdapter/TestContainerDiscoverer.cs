@@ -497,7 +497,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
                         OnTestContainersChanged(GetTestProjectFromFile(e.File));
                         break;
                 }
-
             }
         }
 

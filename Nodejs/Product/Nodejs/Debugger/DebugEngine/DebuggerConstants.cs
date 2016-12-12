@@ -139,7 +139,5 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         public static readonly ulong DBG_ATTRIB_INNERCLASS = 0x0000400000000000;
         public static readonly ulong DBG_ATTRIB_MOSTDERIVED = 0x0000800000000000;
         public static readonly ulong DBG_ATTRIB_CHILD_ALL = 0x0000ff0000000000;
-
     }
-
 }

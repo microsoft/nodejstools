@@ -573,6 +573,5 @@ namespace Microsoft.VisualStudioTools.Project {
 
             return (configurations == null) ? new string[] { } : configurations.ToArray();
         }
-
     }
 }

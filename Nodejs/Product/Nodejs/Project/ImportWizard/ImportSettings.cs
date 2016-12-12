@@ -459,6 +459,5 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
 
             return res;
         }
-
     }
 }

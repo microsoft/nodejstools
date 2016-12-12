@@ -216,7 +216,6 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
                         ""
                     );
                 }
-
             } else if (canDeleteItem != 0) {
                 object name;
                 ErrorHandler.ThrowOnFailure(item.Hierarchy.GetProperty(item.ItemId, (int)__VSHPROPID.VSHPROPID_Name, out name));

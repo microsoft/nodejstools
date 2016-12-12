@@ -156,7 +156,6 @@ namespace Microsoft.VisualStudioTools.Project {
                         }
                     }
                 }
-
             }
 
             return null;

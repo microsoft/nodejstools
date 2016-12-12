@@ -385,7 +385,6 @@ namespace Microsoft.VisualStudioTools.Project {
             // NULL terminate it
             Marshal.WriteInt16(new IntPtr((long)data + (s.Length * dwSize)), nullTerminator);
         }
-
     } // end of dragdrophelper
 
     internal class EnumSTATDATA : IEnumSTATDATA {

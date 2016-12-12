@@ -210,7 +210,6 @@ namespace Microsoft.VisualStudioTools.Project {
                     // Unknown docData type then, so we have to force VS to close the other editor.
                     ErrorHandler.ThrowOnFailure((int)VSConstants.VS_E_INCOMPATIBLEDOCDATA);
                 }
-
             }
             return textLines;
         }

@@ -234,7 +234,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                     props[0].priorityId = 0;
                     props[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_PRIORITY_ID;
                 }
-
             }
 
             return hRes;

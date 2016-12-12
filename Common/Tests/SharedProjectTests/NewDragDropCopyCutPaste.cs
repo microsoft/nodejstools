@@ -430,7 +430,6 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     solution.AssertFileExistsWithContent("MoveDuplicateFileName1", "MoveDuplicateFileName1", "textfile.txt");
                     solution.AssertFileExistsWithContent("MoveDuplicateFileName2", "MoveDuplicateFileName2", "textfile.txt");
                 }
-
             }
         }
 
@@ -483,7 +482,6 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     solution.AssertFileExistsWithContent("MoveDuplicateFileName1", "MoveDuplicateFileName1", "textfile.txt");
                     solution.AssertFileExistsWithContent("MoveDuplicateFileNameCS", "MoveDuplicateFileNameCS", "textfile.txt");
                 }
-
             }
         }
 

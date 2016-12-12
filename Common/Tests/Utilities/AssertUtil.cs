@@ -33,7 +33,6 @@ namespace TestUtilities
             {
                 Assert.Inconclusive("Test requires MTA appartment to call COM reliably. Add solution item <root>\\Build\\Default.testsettings.");
             }
-
         }
 
         public static void Throws<TExpected>(Action throwingAction)
@@ -184,7 +183,6 @@ namespace TestUtilities
                     Assert.Fail(String.Format("{0} contains {1}", MakeText(source), value));
                 }
             }
-
         }
 
         [System.Diagnostics.DebuggerStepThrough]

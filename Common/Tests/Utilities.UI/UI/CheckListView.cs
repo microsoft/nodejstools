@@ -55,6 +55,5 @@ namespace TestUtilities.UI {
             Assert.Fail("No item found with Name == {0}", name);
             return null;
         }
-
     }
 }

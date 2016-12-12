@@ -108,7 +108,6 @@ namespace Microsoft.VisualStudioTools.Project {
             get {
                 return (IVsSolutionBuildManager3)this.solutionBuildManager;
             }
-
         }
         #endregion
 

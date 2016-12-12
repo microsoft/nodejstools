@@ -400,7 +400,6 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
                             contentDef.Metadata.BaseDefinition
                         );
                     }
-
                 }
                 return _contentTypeRegistry;
             }
@@ -747,7 +746,6 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
                             );
                             break;
                     }
-
                 }
             } finally {
                 Marshal.FreeCoTaskMem(variantMem);

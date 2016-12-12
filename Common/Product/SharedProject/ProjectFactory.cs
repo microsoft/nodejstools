@@ -626,7 +626,6 @@ namespace Microsoft.VisualStudioTools.Project {
                         pUpgradeRequired = (uint)__VSPPROJECTUPGRADEVIAFACTORYREPAIRFLAGS.VSPUVF_PROJECT_NOREPAIR;
                         break;
                 }
-
             } catch (Exception ex) {
                 if (ex.IsCriticalException()) {
                     throw;

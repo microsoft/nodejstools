@@ -269,6 +269,5 @@ var";
                 Classification.Verify(spans, expected);
             }
         }
-
     }
 }

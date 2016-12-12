@@ -1897,6 +1897,5 @@ namespace Microsoft.VisualStudioTools.Project {
         private void ClearCopyCutState() {
             _copyCutState = CopyCutState.None;
         }
-
     }
 }

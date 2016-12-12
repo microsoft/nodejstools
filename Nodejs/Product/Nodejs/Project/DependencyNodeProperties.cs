@@ -217,6 +217,5 @@ namespace Microsoft.NodejsTools.Project {
                 return null != Package && Package.IsBundledDependency;
             }
         }
-
     }
 }

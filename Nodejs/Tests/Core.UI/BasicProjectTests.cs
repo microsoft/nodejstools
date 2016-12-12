@@ -140,7 +140,6 @@ namespace Microsoft.Nodejs.Tests.UI {
                     File.Delete(movePath);
                 }
             }
-
         }
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]

@@ -430,7 +430,6 @@ namespace Microsoft.VisualStudioTools.Project {
                     if (!handled) {
                         queryResult = this.QueryStatusSelectionOnNodes(selectedNodes, cmdGroup, cmd, pCmdText);
                     }
-
                 }
             }
 

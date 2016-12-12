@@ -214,7 +214,6 @@ namespace Microsoft.VisualStudioTools.Project {
                     throw new InvalidOperationException(errorMessage);
                 }
             }
-
         }
 
         /// <summary>
@@ -350,7 +349,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 if (unknown2 != IntPtr.Zero) {
                     Marshal.Release(unknown2);
                 }
-
             }
 
             return isSame;
@@ -382,7 +380,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 if (releaseIt && unknown != IntPtr.Zero) {
                     Marshal.Release(unknown);
                 }
-
             }
 
             return result;

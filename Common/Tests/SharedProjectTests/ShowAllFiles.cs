@@ -544,7 +544,6 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     Assert.IsNull(solution.WaitForItemRemoved("ShowAllFilesHiddenFiles", "Folder"));
                 }
             }
-
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
@@ -614,7 +613,6 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     Assert.IsTrue(projectText.Contains("<ProjectView>ProjectFiles</ProjectView>"));
                 }
             }
-
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]

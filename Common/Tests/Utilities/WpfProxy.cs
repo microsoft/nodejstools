@@ -330,5 +330,4 @@ namespace TestUtilities {
             get { return (T)_object; }
         }
     }
-
 }

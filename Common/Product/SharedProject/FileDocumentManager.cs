@@ -259,6 +259,5 @@ namespace Microsoft.VisualStudioTools.Project {
                 return (FileNode)base.Node;
             }
         }
-
     }
 }

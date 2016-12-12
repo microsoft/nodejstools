@@ -38,6 +38,5 @@ namespace Microsoft.VisualStudioTools.Project {
             IVsWindowFrame frame;
             manager.Open(false, false, viewGuid, out frame, WindowFrameShowAction.Show);
         }
-
     }
 }

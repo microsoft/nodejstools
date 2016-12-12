@@ -23,6 +23,5 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
             vs.Invoke(() => ErrorHandler.ThrowOnFailure(vs.Solution.OpenSolutionFile(0, self.Filename)));
             return vs;
         }
-
     }
 }

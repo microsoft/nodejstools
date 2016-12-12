@@ -547,7 +547,6 @@ namespace Microsoft.VisualStudioTools.Project {
             set {
                 this.supportsProjectDesigner = value;
             }
-
         }
 
         protected virtual Guid ProjectDesignerEditor {
@@ -3058,7 +3057,6 @@ namespace Microsoft.VisualStudioTools.Project {
             if (this.CanFileNodesHaveChilds) {
                 ProcessDependentFileNodes(subitemsKeys, subitems);
             }
-
         }
 
         private static bool IsVisibleItem(MSBuild.ProjectItem item) {
@@ -3864,7 +3862,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 if (result != VSConstants.OLE_E_PROMPTSAVECANCELLED) {
                     ErrorHandler.ThrowOnFailure(result);
                 }
-
             }
 
             if (setProjectFileDirtyAfterSave != 0) {

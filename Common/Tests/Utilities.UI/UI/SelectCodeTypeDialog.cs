@@ -56,6 +56,5 @@ namespace TestUtilities.UI {
         public void ClickCancel() {
             ClickButtonByName("Cancel");
         }
-
     }
 }

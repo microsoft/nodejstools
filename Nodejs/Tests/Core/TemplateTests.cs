@@ -67,6 +67,5 @@ namespace NodejsTests {
                 Assert.IsTrue(anyChecked, "Failed to find package.json in " + file);
             }
         }
-
     }
 }

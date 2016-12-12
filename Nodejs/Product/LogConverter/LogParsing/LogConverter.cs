@@ -731,7 +731,6 @@ public static void X{0:X}() {{
             } else {
                 Console.WriteLine("Failed to create relogger, timestamps will be incorrect");
             }
-
         }
 
         class TraceReloggerCallback : ITraceEventCallback {

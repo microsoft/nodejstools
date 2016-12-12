@@ -90,6 +90,5 @@ namespace Microsoft.NodejsTools.Profiling {
         bool INodeProfiling.IsProfiling {
             get { return NodejsProfilingPackage.Instance.IsProfiling; }
         }
-
     }
 }

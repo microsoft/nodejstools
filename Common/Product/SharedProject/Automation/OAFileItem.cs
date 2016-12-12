@@ -73,7 +73,6 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
                 }
                 return isDirty;
             }
-
         }
 
         /// <summary>
@@ -306,7 +305,6 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
                     }
                 });
             }
-
         }
         #endregion
 

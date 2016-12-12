@@ -733,7 +733,6 @@ namespace Microsoft.VisualStudioTools.Project {
                         }
                         break;
                     }
-
             }
 
 #if DEV11_OR_LATER
@@ -1438,7 +1437,6 @@ namespace Microsoft.VisualStudioTools.Project {
                     case VsCommands.Paste:
                         return this.ProjectMgr.PasteFromClipboard(this);
                 }
-
             } else if (cmdGroup == VsMenus.guidStandardCommandSet2K) {
                 switch ((VsCommands2K)cmd) {
                     case VsCommands2K.EXCLUDEFROMPROJECT:

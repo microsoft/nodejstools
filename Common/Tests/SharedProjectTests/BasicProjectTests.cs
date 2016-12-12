@@ -141,7 +141,6 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
             }
-
         }
 #endif
 

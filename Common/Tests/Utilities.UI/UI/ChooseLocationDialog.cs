@@ -34,6 +34,5 @@ namespace TestUtilities.UI {
             Assert.IsNotNull(item, "Did not find item " + name);
             item.GetSelectionItemPattern().Select();
         }
-
     }
 }

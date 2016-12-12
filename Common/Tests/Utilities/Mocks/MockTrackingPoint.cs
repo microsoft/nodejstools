@@ -113,6 +113,5 @@ namespace TestUtilities.Mocks {
         public PointTrackingMode TrackingMode {
             get { return _mode; }
         }
-
     }
 }

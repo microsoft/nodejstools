@@ -19,5 +19,4 @@ namespace Microsoft.VisualStudioTools.Project {
     internal enum BuildPropertyPageTag {
         OutputPath
     }
-
 }

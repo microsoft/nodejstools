@@ -1176,7 +1176,6 @@ namespace ProfilingUITests {
 
                         VerifyReport(report, "program.f");
                     }
-
                 } finally {
                     profiling.RemoveSession(session, true);
                     if (session2 != null) {
@@ -1499,7 +1498,6 @@ namespace ProfilingUITests {
                     }
                     vsperfKey.SetValue("tools.options.justmycode", enabled ? "1" : "0");
                 }
-
             }
 
             public void Dispose() {

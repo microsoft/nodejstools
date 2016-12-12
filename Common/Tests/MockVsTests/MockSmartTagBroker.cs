@@ -68,6 +68,5 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
                 return _sessions.Any(kv => kv.Key == textView);
             }
         }
-
     }
 }

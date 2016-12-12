@@ -281,9 +281,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     }
                     break;
                 }
-
             }
-
         }
 
         /// <summary>

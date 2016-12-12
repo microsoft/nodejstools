@@ -84,5 +84,4 @@ namespace TestUtilities {
             return node.Descendants(node.Document.Root.Name.Namespace.GetName(localName)).Single();
         }
     }
-
 }
