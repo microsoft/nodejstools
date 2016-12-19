@@ -297,6 +297,9 @@
   <PropertyGroup>
     <CreateVsixContainer>True</CreateVsixContainer>
     <CopyVsixExtensionFiles>True</CopyVsixExtensionFiles>
+    <IsProductComponent>true</IsProductComponent>
+    <ExtensionInstallationRoot>Extensions</ExtensionInstallationRoot>
+    <ExtensionInstallationFolder>Microsoft\NodeJsTools\Repl</ExtensionInstallationFolder>
   </PropertyGroup>
   <Import Project="$(BuildRoot)\Common\Product\ReplWindow\ReplWindow.proj" />
   <Import Project="..\ProjectAfter.settings" />

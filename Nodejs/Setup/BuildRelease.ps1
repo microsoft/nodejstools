@@ -166,7 +166,7 @@ $symbol_contacts = "$env:username;dinov;smortaz;gilbertw;jinglou"
 $vcs_contact = "ntvscore"
 
 # These options are passed to all MSBuild processes
-$global_msbuild_options = @("/v:m", "/m", "/nologo")
+$global_msbuild_options = @("/v:m", "/m", "/nologo", "/flp:verbosity=detailed")
 
 if ($skiptests) {
     $global_msbuild_options += "/p:IncludeTests=false"
@@ -234,10 +234,8 @@ function after-build($buildroot, $target) {
     Copy-Item -Force "$buildroot\Nodejs\Prerequisites\*.reg" $($target.destdir)
 
     $setup15 = mkdir "$($target.destdir)\Setup15" -Force 
-    Copy-Item -Recurse -Force "$buildroot\BuildOutput\$($target.config)$($target.VSTarget)\Setup\*.json" $setup15 
+    Copy-Item -Recurse -Force "$buildroot\BuildOutput\$($target.config)$($target.VSTarget)\Binaries\**\*.json" $setup15 
     Copy-Item -Recurse -Force "$buildroot\BuildOutput\$($target.config)$($target.VSTarget)\Setup\*.vsman" $setup15 
-
-
 
     if ($copytests) {
         Copy-Item -Recurse -Force "$buildroot\BuildOutput\$($target.config)$($target.VSTarget)\Tests" "$($target.destdir)\Tests"

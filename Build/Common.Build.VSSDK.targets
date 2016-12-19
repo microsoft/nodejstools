@@ -170,7 +170,6 @@
     </ItemGroup>
   </Target>
 
-
   <!--
   Zip folders containing VSIX files. These folders must have been created
   by previously having built the project.
@@ -186,6 +185,12 @@
         <SourcePath>$(SignedBinariesPath)\%(VSIXBinaries.Filename)%(VSIXBinaries.Extension)</SourcePath>
       </VSIXBinaries>
       <VSIXSignedBinaries Include="@(VSIXBinaries)" Condition="Exists(%(VSIXBinaries.SourcePath))" />
+      
+      <VSIXBinariesLoc Include="$(CopyVsixExtensionRoot)**\*.resources.dll" />
+      <VSIXBinariesLoc>
+        <SourcePath>$(SignedBinariesPath)\$([System.IO.Path]::GetFileName($([System.IO.Path]::GetDirectoryName(%(VSIXBinariesLoc.FullPath)))))\%(VSIXBinariesLoc.Filename)%(VSIXBinariesLoc.Extension)</SourcePath>
+      </VSIXBinariesLoc>
+      <VSIXSignedBinaries Include="@(VSIXBinariesLoc)" Condition="Exists(%(VSIXBinariesLoc.SourcePath))" />
     </ItemGroup>
 
     <Copy SourceFiles="@(VSIXSignedBinaries->'%(SourcePath)')"

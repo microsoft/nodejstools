@@ -1507,6 +1507,9 @@
     <RegisterWithCodebase>true</RegisterWithCodebase>
   </PropertyGroup>
   <PropertyGroup>
+    <IsProductComponent>true</IsProductComponent>
+    <ExtensionInstallationRoot>Extensions</ExtensionInstallationRoot>
+    <ExtensionInstallationFolder>Microsoft\NodeJsTools\NodeJsTools</ExtensionInstallationFolder>
     <CreateVsixContainer>True</CreateVsixContainer>
     <CopyVsixExtensionFiles>True</CopyVsixExtensionFiles>
   </PropertyGroup>

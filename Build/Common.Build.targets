@@ -146,10 +146,10 @@
           DestinationFolder="$(CopyOutputsToPath)Symbols" />
 
     <Copy SourceFiles="@(SatelliteDllsProjectOutputGroupOutput)"
-          DestinationFolder="$(CopyOutputsToPath)UnsignedBinaries\%(SatelliteDllsProjectOutputGroupOutput.TargetDir)" 
+          DestinationFiles="@(SatelliteDllsProjectOutputGroupOutput->'$(CopyOutputsToPath)UnsignedBinaries\%(TargetPath)')"
           SkipUnchangedFiles="true" />
 
-    <Copy SourceFiles="@(OutputBinariesToSign -> '$(OutputPath)%(filename)%(extension)')"
+    <Copy SourceFiles="@(OutputBinariesToSign->'$(OutputPath)%(filename)%(extension)')"
           DestinationFolder="$(CopyOutputsToPath)UnsignedBinaries"
           Condition="'@(OutputBinariesToSign)' != ''"/>
   </Target>
