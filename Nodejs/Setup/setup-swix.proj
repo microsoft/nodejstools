@@ -5,7 +5,6 @@
     <ProjectFile Include="swix\Microsoft.VisualStudio.NodejsTools.Targets.swixproj"/>
     <ProjectFile Include="swix\NodejsTools.vsmanproj"/>
     <ProjectFile Include="swix\NodejsTools.Profiling.vsmanproj" />
-
   </ItemGroup>
 
   <Import Project="$(TargetsPath)\Common.Build.Traversal.targets" />
