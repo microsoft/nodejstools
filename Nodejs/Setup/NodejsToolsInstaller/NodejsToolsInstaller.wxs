@@ -68,7 +68,7 @@
                 </Directory>
             </Directory>
         </DirectoryRef>
-        
+
         <DirectoryRef Id="Dir_NTVSInstallLocation">
             <!-- Double click to open Node.js projects with Visual Studio -->
             <Component Id="Comp_NjsProgRegistration" DiskId="1" Guid="$(var.Comp_NjsProjRegistrationGuid)">
@@ -107,6 +107,13 @@
                 <?endforeach?>
                 <ConfigurationData Name="Config_MSBuildLocation" Value="Dir_MSBuildTargets"/>
             </Merge>
+            <Merge Id="Merge_TestAdapter" Language="1033" SourceFile="TestAdapter.msm" DiskId="1">
+                <?foreach key in VS;VWD?>
+                <ConfigurationData Name="Config_$(var.key)ExtensionsParent" Value="Dir_$(var.key)Extensions" />
+                <ConfigurationData Name="Config_$(var.key)TemplatesParent" Value="Dir_$(var.key)Templates"/>
+                <?endforeach?>
+                <ConfigurationData Name="Config_MSBuildLocation" Value="Dir_MSBuildTargets"/>
+            </Merge>
             <Merge Id="Merge_NodejsTools" Language="1033" SourceFile="NodejsTools.msm" DiskId="1">
                 <?foreach key in VS;VWD?>
                 <ConfigurationData Name="Config_$(var.key)ExtensionsParent" Value="Dir_$(var.key)Extensions" />
@@ -125,6 +132,7 @@
             <MergeRef Id="Merge_NodejsTools"/>
             <MergeRef Id="Merge_InteractiveWindow"/>
             <MergeRef Id="Merge_Profiling" />
+            <MergeRef Id="Merge_TestAdapter" />
 
             <Feature Id="Feature_VsNjsFile" AllowAdvertise="no" Level="1" Title="Register file associations" Description="Associates Node.js projects and source files with Visual Studio (existing source file associations are not modified).">
                 <ComponentRef Id="Comp_NjsProgRegistration"/>
@@ -157,6 +165,5 @@
 
         <!-- Include the UI from UI.wxs -->
         <UIRef Id="UI_Default"/>
-        
     </Product>
 </Wix>

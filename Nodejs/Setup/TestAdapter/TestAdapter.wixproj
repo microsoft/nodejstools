@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\SetupProjectBefore.settings" />
+  <PropertyGroup>
+    <ProductVersion>3.5</ProductVersion>
+    <ProjectGuid>{3d659e43-8a4b-4dd1-8b08-111d92e86710}</ProjectGuid>
+    <SchemaVersion>2.0</SchemaVersion>
+    <OutputName>TestAdapter</OutputName>
+    <OutputType>Module</OutputType>
+    <DefineSolutionProperties>false</DefineSolutionProperties>
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+    <DefineConstants>
+      $(DefineConstants);
+      ProductSuffix=TestAdapter
+    </DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <BindInputPaths Include="$(OutDir)" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="TestAdapter.wxs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(BuildRoot)\Nodejs\Product\TestAdapter\TestAdapter.csproj">
+      <Name>Microsoft.NodejsTools.TestAdapter</Name>
+      <Project>{5085DF35-3A32-4894-835E-E5A3956D4F57}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>true</DoNotHarvest>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\MergeModule.wxi">
+      <Link>MergeModule.wxi</Link>
+    </Content>
+    <FilesProj Include="TestAdapterFiles.proj" />
+  </ItemGroup>
+  <Import Project="..\SetupProjectAfter.settings" />
+</Project>

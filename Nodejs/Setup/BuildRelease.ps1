@@ -282,6 +282,7 @@ $installer_names = @{
     'Microsoft.NodejsTools.Profiling.vsix' = 'Microsoft.NodejsTools.Profiling.vsix';
     'Microsoft.NodejsTools.InteractiveWindow.vsix' = 'Microsoft.NodejsTools.InteractiveWindow.vsix';
     'Microsoft.VisualStudio.NodejsTools.Targets.vsix' = 'Microsoft.VisualStudio.NodejsTools.Targets.vsix';
+    'Microsoft.VisualStudio.NodejsTools.TestAdapter.vsix' = 'Microsoft.VisualStudio.NodejsTools.TestAdapter.vsix';
     'NodejsTools.vsman' = 'NodejsTools.vsman';
     'Microsoft.VisualStudio.NodejsTools.NodejsTools.json' = 'Microsoft.VisualStudio.NodejsTools.NodejsTools.json';
     'Microsoft.VisualStudio.NodejsTools.Profiling.json' = 'Microsoft.VisualStudio.NodejsTools.Profiling.json';
