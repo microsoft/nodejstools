@@ -583,6 +583,16 @@
       <Link>SharedProject\WaitDialog.cs</Link>
       <Visible>true</Visible>
     </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\WebPiComponentPickerControl.cs">
+      <Link>SharedProject\WebPiComponentPickerControl.cs</Link>
+      <SubType>UserControl</SubType>
+      <Visible>true</Visible>
+    </Compile>
+    <Compile Include="$(_ProjectSystemFilesLocation)\WebPiComponentPickerControl.Designer.cs">
+      <DependentUpon>WebPiComponentPickerControl.cs</DependentUpon>
+      <Link>SharedProject\WebPiComponentPickerControl.Designer.cs</Link>
+      <Visible>true</Visible>
+    </Compile>
     <Compile Include="$(_ProjectSystemFilesLocation)\ProvideDebugEngineAttribute.cs">
       <Link>SharedProject\Debugger\ProvideDebugEngineAttribute.cs</Link>
       <Visible>true</Visible>
@@ -696,22 +706,6 @@
       <ManifestResourceName>Microsoft.VisualStudio.Project</ManifestResourceName>
       <Visible>true</Visible>
     </EmbeddedResource>
-    <Compile Include="$(_ProjectSystemFilesLocation)\WebPiComponentPickerControl.cs">
-      <Link>SharedProject\WebPiComponentPickerControl.cs</Link>
-      <SubType>UserControl</SubType>
-      <Visible>true</Visible>
-    </Compile>
-    <Compile Include="$(_ProjectSystemFilesLocation)\WebPiComponentPickerControl.Designer.cs">
-      <DependentUpon>WebPiComponentPickerControl.cs</DependentUpon>
-      <Link>SharedProject\WebPiComponentPickerControl.Designer.cs</Link>
-      <Visible>true</Visible>
-    </Compile>
-    <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\WebPiComponentPickerControl.resx">
-      <DependentUpon>WebPiComponentPickerControl.cs</DependentUpon>
-      <Link>SharedProject\WebPiComponentPickerControl.resx</Link>
-      <SubType>Designer</SubType>
-      <Visible>true</Visible>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup Condition="$(VSTarget) == '15.0'">
     <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\ProjectResources.cs.resx">
@@ -782,6 +776,14 @@
     <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\ProjectResources.zh-Hant.resx">
       <Link>SharedProject\ProjectResources.zh-Hant.resx</Link>
       <ManifestResourceName>Microsoft.VisualStudio.Project.zh-Hant</ManifestResourceName>
+      <Visible>true</Visible>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\WebPiComponentPickerControl.resx">
+      <DependentUpon>WebPiComponentPickerControl.cs</DependentUpon>
+      <Link>SharedProject\WebPiComponentPickerControl.resx</Link>
+      <SubType>Designer</SubType>
       <Visible>true</Visible>
     </EmbeddedResource>
   </ItemGroup>
