@@ -126,7 +126,7 @@
     <value>Microsoft Sans Serif, 8.25pt</value>
   </data>
   <data name="_nodeExePathLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>14, 52</value>
+    <value>17, 84</value>
   </data>
   <data name="_nodeExePathLabel.Size" type="System.Drawing.Size, System.Drawing">
     <value>159, 26</value>
@@ -156,7 +156,7 @@
     <value>Microsoft Sans Serif, 8.25pt</value>
   </data>
   <data name="_nodeArguments.Location" type="System.Drawing.Point, System.Drawing">
-    <value>14, 94</value>
+    <value>17, 128</value>
   </data>
   <data name="_nodeArguments.Size" type="System.Drawing.Size, System.Drawing">
     <value>187, 26</value>
@@ -186,7 +186,7 @@
     <value>Microsoft Sans Serif, 8.25pt</value>
   </data>
   <data name="_startBrowser.Location" type="System.Drawing.Point, System.Drawing">
-    <value>19, 524</value>
+    <value>19, 542</value>
   </data>
   <data name="_startBrowser.Size" type="System.Drawing.Size, System.Drawing">
     <value>319, 30</value>
@@ -217,10 +217,10 @@
     <value>Microsoft Sans Serif, 8.25pt</value>
   </data>
   <data name="_nodeExePath.Location" type="System.Drawing.Point, System.Drawing">
-    <value>274, 46</value>
+    <value>274, 84</value>
   </data>
   <data name="_nodeExePath.Size" type="System.Drawing.Size, System.Drawing">
-    <value>1116, 32</value>
+    <value>1125, 32</value>
   </data>
   <data name="_nodeExePath.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -244,7 +244,7 @@
     <value>Microsoft Sans Serif, 8.25pt</value>
   </data>
   <data name="_nodeExeArguments.Location" type="System.Drawing.Point, System.Drawing">
-    <value>274, 88</value>
+    <value>274, 128</value>
   </data>
   <data name="_nodeExeArguments.Size" type="System.Drawing.Size, System.Drawing">
     <value>1171, 32</value>
@@ -268,7 +268,7 @@
     <value>Microsoft Sans Serif, 8.25pt</value>
   </data>
   <data name="_nodejsPort.Location" type="System.Drawing.Point, System.Drawing">
-    <value>274, 315</value>
+    <value>274, 345</value>
   </data>
   <data name="_nodejsPort.Size" type="System.Drawing.Size, System.Drawing">
     <value>105, 32</value>
@@ -295,7 +295,7 @@
     <value>Microsoft Sans Serif, 8.25pt</value>
   </data>
   <data name="_nodePortLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>14, 321</value>
+    <value>17, 345</value>
   </data>
   <data name="_nodePortLabel.Size" type="System.Drawing.Size, System.Drawing">
     <value>135, 26</value>
@@ -325,7 +325,7 @@
     <value>Microsoft Sans Serif, 8.25pt</value>
   </data>
   <data name="_scriptArgsLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>14, 184</value>
+    <value>17, 215</value>
   </data>
   <data name="_scriptArgsLabel.Size" type="System.Drawing.Size, System.Drawing">
     <value>183, 26</value>
@@ -355,7 +355,7 @@
     <value>Microsoft Sans Serif, 8.25pt</value>
   </data>
   <data name="_scriptArguments.Location" type="System.Drawing.Point, System.Drawing">
-    <value>274, 178</value>
+    <value>274, 215</value>
   </data>
   <data name="_scriptArguments.Size" type="System.Drawing.Size, System.Drawing">
     <value>1171, 32</value>
@@ -382,7 +382,7 @@
     <value>Microsoft Sans Serif, 8.25pt</value>
   </data>
   <data name="_workingDirLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>14, 230</value>
+    <value>17, 258</value>
   </data>
   <data name="_workingDirLabel.Size" type="System.Drawing.Size, System.Drawing">
     <value>187, 26</value>
@@ -412,10 +412,10 @@
     <value>Microsoft Sans Serif, 8.25pt</value>
   </data>
   <data name="_workingDir.Location" type="System.Drawing.Point, System.Drawing">
-    <value>274, 224</value>
+    <value>274, 258</value>
   </data>
   <data name="_workingDir.Size" type="System.Drawing.Size, System.Drawing">
-    <value>1116, 32</value>
+    <value>1125, 32</value>
   </data>
   <data name="_workingDir.TabIndex" type="System.Int32, mscorlib">
     <value>10</value>
@@ -439,7 +439,7 @@
     <value>Microsoft Sans Serif, 8.25pt</value>
   </data>
   <data name="_launchUrl.Location" type="System.Drawing.Point, System.Drawing">
-    <value>274, 269</value>
+    <value>274, 302</value>
   </data>
   <data name="_launchUrl.Size" type="System.Drawing.Size, System.Drawing">
     <value>1171, 32</value>
@@ -466,7 +466,7 @@
     <value>Microsoft Sans Serif, 8.25pt</value>
   </data>
   <data name="_launchUrlLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>14, 275</value>
+    <value>17, 302</value>
   </data>
   <data name="_launchUrlLabel.Size" type="System.Drawing.Size, System.Drawing">
     <value>139, 26</value>
@@ -499,7 +499,7 @@
     <value>Microsoft Sans Serif, 8.25pt</value>
   </data>
   <data name="_envVars.Location" type="System.Drawing.Point, System.Drawing">
-    <value>274, 416</value>
+    <value>274, 432</value>
   </data>
   <data name="_envVars.Multiline" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -528,14 +528,20 @@
   <data name="_browsePath.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Right</value>
   </data>
+  <data name="_browsePath.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="_browsePath.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
+    <value>GrowAndShrink</value>
+  </data>
   <data name="_browsePath.Font" type="System.Drawing.Font, System.Drawing">
     <value>Microsoft Sans Serif, 8.25pt</value>
   </data>
   <data name="_browsePath.Location" type="System.Drawing.Point, System.Drawing">
-    <value>1409, 46</value>
+    <value>1405, 84</value>
   </data>
   <data name="_browsePath.Size" type="System.Drawing.Size, System.Drawing">
-    <value>36, 32</value>
+    <value>40, 36</value>
   </data>
   <data name="_browsePath.TabIndex" type="System.Int32, mscorlib">
     <value>2</value>
@@ -558,14 +564,20 @@
   <data name="_browseDirectory.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Right</value>
   </data>
+  <data name="_browseDirectory.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="_browseDirectory.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
+    <value>GrowAndShrink</value>
+  </data>
   <data name="_browseDirectory.Font" type="System.Drawing.Font, System.Drawing">
     <value>Microsoft Sans Serif, 8.25pt</value>
   </data>
   <data name="_browseDirectory.Location" type="System.Drawing.Point, System.Drawing">
-    <value>1409, 224</value>
+    <value>1405, 256</value>
   </data>
   <data name="_browseDirectory.Size" type="System.Drawing.Size, System.Drawing">
-    <value>36, 32</value>
+    <value>40, 36</value>
   </data>
   <data name="_browseDirectory.TabIndex" type="System.Int32, mscorlib">
     <value>11</value>
@@ -594,6 +606,12 @@
   <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
     <value>6, 13</value>
   </data>
+  <data name="$this.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="$this.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
+    <value>GrowAndShrink</value>
+  </data>
   <data name="_scriptLabel.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
@@ -601,7 +619,7 @@
     <value>Microsoft Sans Serif, 8.25pt</value>
   </data>
   <data name="_scriptLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>14, 136</value>
+    <value>17, 172</value>
   </data>
   <data name="_scriptLabel.Size" type="System.Drawing.Size, System.Drawing">
     <value>194, 26</value>
@@ -631,7 +649,7 @@
     <value>Microsoft Sans Serif, 8.25pt</value>
   </data>
   <data name="_scriptFile.Location" type="System.Drawing.Point, System.Drawing">
-    <value>274, 130</value>
+    <value>274, 172</value>
   </data>
   <data name="_scriptFile.Size" type="System.Drawing.Size, System.Drawing">
     <value>1171, 32</value>
@@ -658,7 +676,7 @@
     <value>Microsoft Sans Serif, 8.25pt</value>
   </data>
   <data name="_envVarsLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>14, 416</value>
+    <value>17, 432</value>
   </data>
   <data name="_envVarsLabel.Size" type="System.Drawing.Size, System.Drawing">
     <value>238, 26</value>
@@ -685,7 +703,7 @@
     <value>Microsoft Sans Serif, 8.25pt</value>
   </data>
   <data name="_debuggerPort.Location" type="System.Drawing.Point, System.Drawing">
-    <value>274, 363</value>
+    <value>274, 388</value>
   </data>
   <data name="_debuggerPort.Size" type="System.Drawing.Size, System.Drawing">
     <value>105, 32</value>
@@ -712,7 +730,7 @@
     <value>Microsoft Sans Serif, 8.25pt</value>
   </data>
   <data name="_debuggerPortLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>14, 369</value>
+    <value>17, 388</value>
   </data>
   <data name="_debuggerPortLabel.Size" type="System.Drawing.Size, System.Drawing">
     <value>156, 26</value>
@@ -739,7 +757,7 @@
     <value>303, 303</value>
   </data>
   <data name="$this.Size" type="System.Drawing.Size, System.Drawing">
-    <value>1490, 592</value>
+    <value>1490, 575</value>
   </data>
   <data name="&gt;&gt;_tooltip.Name" xml:space="preserve">
     <value>_tooltip</value>
