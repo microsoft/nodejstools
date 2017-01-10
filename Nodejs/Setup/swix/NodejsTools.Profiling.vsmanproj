@@ -19,7 +19,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Product\Profiling.csproj" />
+        <ProjectReference Include="..\..\Product\Profiling\Profiling.csproj" />
     </ItemGroup>
     
     <ItemGroup>
