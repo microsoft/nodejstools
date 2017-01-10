@@ -33,7 +33,7 @@ namespace Microsoft.NodejsTools.Profiling {
             Caption = Title;
             Instance = this;
         }
-        
+
         public override void OnToolWindowCreated() {
             base.OnToolWindowCreated();
 
@@ -57,7 +57,7 @@ namespace Microsoft.NodejsTools.Profiling {
             object otbh;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(frame.GetProperty((int)__VSFPROPID.VSFPROPID_ToolbarHost, out otbh));
             IVsToolWindowToolbarHost tbh = otbh as IVsToolWindowToolbarHost;
-            Guid guidPerfMenuGroup = Guids.NodejsProfilingCmdSet;
+            Guid guidPerfMenuGroup = ProfilingGuids.NodejsProfilingCmdSet;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(tbh.AddToolbar(VSTWT_LOCATION.VSTWT_TOP, ref guidPerfMenuGroup, PkgCmdIDList.menuIdPerfToolbar));
         }
 
