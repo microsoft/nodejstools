@@ -19,10 +19,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="Microsoft.VisualStudio.NodejsTools.Profiling.swixproj" />
-    </ItemGroup>
-    
-    <ItemGroup>
         <MergeManifest Include="$(BuildOutputRoot)\Setup\Microsoft.VisualStudio.NodejsTools.Profiling.json"/>
     </ItemGroup>
 
