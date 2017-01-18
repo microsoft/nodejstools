@@ -5,6 +5,5 @@
     <IntermediateOutputPathSuffix>obj\$(MSBuildProjectName)\</IntermediateOutputPathSuffix>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">$(BuildRoot)\Nodejs\</SolutionDir>
   </PropertyGroup>
-  <Target Name="GetBuildVersion" Outputs="$(BuildVersion)" />
   <Import Project="$(BuildRoot)\Build\Common.Build.settings" />
 </Project>
