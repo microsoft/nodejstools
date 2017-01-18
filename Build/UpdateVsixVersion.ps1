@@ -1,3 +1,7 @@
+param (
+    [string]$bump = "build" # or 'revision' or 'minor' or 'major'
+ )
+
 $me = $MyInvocation.MyCommand.Definition;
 
 function Update-Version
@@ -8,7 +12,29 @@ function Update-Version
   $versionAttr = $xml.DocumentElement['Metadata']['Identity'].Attributes['Version']
   $oldVersion = $versionAttr.Value
   $parts = $oldVersion.Split('.');
-  $parts[3] = ([convert]::ToInt32($parts[3]) + 1).ToString()
+  $incrementIndex = -1;
+  switch($bump) {
+    "build" {
+      $incrementIndex = 3 
+    }
+    "revision" {
+      $incrementIndex = 2
+      $parts[3] = "0"
+    }
+    "minor" {
+      $incrementIndex = 1
+      $parts[3] = $parts[2] = "0"
+    }
+    "major" {
+      $incrementIndex = 0
+      $parts[3] = $parts[2] = $parts[1] = "0"
+    }
+    default {
+      Write-Host 'Must specify "build", "revision", "minor", or "major"'
+      exit 1
+    }
+  }
+  $parts[$incrementIndex] = ([convert]::ToInt32($parts[$incrementIndex]) + 1).ToString()
   $newVersion = [string]::Join('.', $parts)
   Write-Host "Updated" ([IO.Path]::GetFileName([IO.Path]::GetDirectoryName($path))) "from" $oldVersion "to" $newVersion
   $versionAttr.Value = $newVersion
