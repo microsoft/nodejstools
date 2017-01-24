@@ -1,0 +1,15 @@
+<VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+  <TemplateData>
+    <Name Package="{2ffe45c4-5c73-493c-b187-f2e955ff875e}" ID="1024"/>
+    <Description Package="{2ffe45c4-5c73-493c-b187-f2e955ff875e}" ID="1025"/>
+    <!-- pulled from the asp.net v5 package -->
+    <Icon Package="{AAB75614-2F8F-4DA6-B0A6-763C6DBB2969}" ID="2200"/>
+    <DefaultName>tsconfig.json</DefaultName>
+    <TemplateID>Node.tsconfig</TemplateID>
+    <ProjectType>Node.js</ProjectType>
+    <SortOrder>370</SortOrder>
+  </TemplateData>
+  <TemplateContent>
+    <ProjectItem SubType="Code" ReplaceParameters="true">tsconfig.json</ProjectItem>
+  </TemplateContent>
+</VSTemplate>

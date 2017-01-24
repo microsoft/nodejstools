@@ -40,14 +40,17 @@
                                 ItemTemplates\JavaScript\EmptyHtml.zip;
                                 ItemTemplates\JavaScript\EmptyJs.zip;
                                 ItemTemplates\JavaScript\EmptyJson.zip;
+                                ItemTemplates\JavaScript\EmptyJsx.zip;
                                 ItemTemplates\JavaScript\EmptyLess.zip;
                                 ItemTemplates\JavaScript\EmptyPug.zip;
                                 ItemTemplates\JavaScript\EmptyTs.zip;
                                 ItemTemplates\JavaScript\EmptyXml.zip;
                                 ItemTemplates\JavaScript\MochaUnitTest.zip;
                                 ItemTemplates\JavaScript\TapeUnitTest.zip;
+                                ItemTemplates\JavaScript\TypeScriptJSX.zip;
                                 ItemTemplates\JavaScript\TypeScriptMochaUnitTest.zip;
                                 ItemTemplates\JavaScript\TypeScriptTapeUnitTest.zip;
+                                ItemTemplates\JavaScript\TypeScriptTsConfig.zip;
                                 ItemTemplates\JavaScript\TypeScriptUnitTest.zip;
                                 ItemTemplates\JavaScript\UnitTest.zip;"/>
 

@@ -998,6 +998,8 @@
     <ZipItem Include="Templates\Files\EmptyJson\EmptyJson.vstemplate" />
     <ZipItem Include="Templates\Files\EmptyJs\EmptyJs.js" />
     <ZipItem Include="Templates\Files\EmptyJs\EmptyJs.vstemplate" />
+    <ZipItem Include="Templates\Files\EmptyJsx\EmptyJsx.jsx" />
+    <ZipItem Include="Templates\Files\EmptyJsx\EmptyJsx.vstemplate" />
     <ZipItem Include="Templates\Files\EmptyLess\EmptyLess.vstemplate" />
     <ZipItem Include="Templates\Files\EmptyPug\EmptyPug.vstemplate" />
     <ZipItem Include="Templates\Files\EmptyTs\EmptyTs.vstemplate" />
@@ -1055,10 +1057,14 @@
     <ZipProject Include="ProjectTemplates\AzureExpress4App\setup_web.cmd" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\Web.config" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\Web.Debug.config" />
+    <ZipItem Include="Templates\Files\TypeScriptJSX\EmptyTsx.tsx" />
+    <ZipItem Include="Templates\Files\TypeScriptJSX\EmptyTsx.vstemplate" />
     <ZipItem Include="Templates\Files\TapeUnitTest\UnitTest.js" />
     <ZipItem Include="Templates\Files\TapeUnitTest\UnitTest.vstemplate" />
     <ZipItem Include="Templates\Files\TypeScriptTapeUnitTest\UnitTest.vstemplate" />
     <ZipItem Include="Templates\Files\TypeScriptTapeUnitTest\UnitTest.ts" />
+    <ZipItem Include="Templates\Files\TypeScriptTsConfig\tsconfig.json" />
+    <ZipItem Include="Templates\Files\TypeScriptTsConfig\tsconfig.vstemplate" />
     <None Include="app.config" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\express-serve-static-core.typings.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\express.typings.json" />
