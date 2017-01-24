@@ -8,6 +8,6 @@
     <SortOrder>230</SortOrder>
   </TemplateData>
   <TemplateContent>
-    <ProjectItem SubType="Code" ItemType="TypeScriptCompile" TargetFileName="$fileinputname$.tsx" ReplaceParameters="true">EmptyTsx.tsx</ProjectItem>
+    <ProjectItem SubType="Code" TargetFileName="$fileinputname$.tsx" ReplaceParameters="true">EmptyTsx.tsx</ProjectItem>
   </TemplateContent>
 </VSTemplate>
