@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -59,46 +59,46 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -118,72 +118,72 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AddToPackageJsonCheckboxLabel" xml:space="preserve">
-    <value>(recommended)</value>
+    <value>(scelta consigliata)</value>
   </data>
   <data name="AddToPackageJsonLabel" xml:space="preserve">
-    <value>Add to package.json</value>
+    <value>Aggiungi a package.json</value>
   </data>
   <data name="AuthorLabel" xml:space="preserve">
-    <value>Author: </value>
+    <value>Autore:</value>
   </data>
   <data name="CatalogUpdatedMessage" xml:space="preserve">
-    <value>Catalog Updated</value>
+    <value>Catalogo aggiornato</value>
   </data>
   <data name="CloseButtonContent" xml:space="preserve">
-    <value>_Close</value>
+    <value>_Chiudi</value>
   </data>
   <data name="DependencyTypeLabel" xml:space="preserve">
-    <value>Dependency type</value>
+    <value>Tipo di dipendenza</value>
   </data>
   <data name="DescriptionLabel" xml:space="preserve">
-    <value>Description: </value>
+    <value>Descrizione:</value>
   </data>
   <data name="DevTypeDevelopmentChoice" xml:space="preserve">
-    <value>Development</value>
+    <value>Sviluppo</value>
   </data>
   <data name="DevTypeOptionalChoice" xml:space="preserve">
-    <value>Optional</value>
+    <value>Facoltativo</value>
   </data>
   <data name="DevTypeStandardChoice" xml:space="preserve">
     <value>Standard</value>
   </data>
   <data name="HomepageLabel" xml:space="preserve">
-    <value>Homepage: </value>
+    <value>Home page: </value>
   </data>
   <data name="InstalledLocallyMessage" xml:space="preserve">
-    <value>Installed locally</value>
+    <value>Installazione in locale</value>
   </data>
   <data name="InstallPackageButtonLabel" xml:space="preserve">
-    <value>_Install Package</value>
+    <value>_Installa pacchetto</value>
   </data>
   <data name="NoResultsFoundMessage" xml:space="preserve">
-    <value>No results found.</value>
+    <value>Non sono stati trovati risultati.</value>
   </data>
   <data name="OldVersionMessage" xml:space="preserve">
-    <value>Old version</value>
+    <value>Versione precedente</value>
   </data>
   <data name="OptionsLabel" xml:space="preserve">
-    <value>Options</value>
+    <value>Opzioni</value>
   </data>
   <data name="OtherNpmArgumentsLabel" xml:space="preserve">
-    <value>Other npm arguments</value>
+    <value>Altri argomenti di npm</value>
   </data>
   <data name="RefreshButtonContent" xml:space="preserve">
-    <value>Refresh</value>
+    <value>Aggiorna</value>
   </data>
   <data name="ResetOptionsButtonLabel" xml:space="preserve">
-    <value>Reset Options</value>
+    <value>Reimposta opzioni</value>
   </data>
   <data name="SearchForPackagesLabel" xml:space="preserve">
-    <value>Search for packages</value>
+    <value>Cerca pacchetti</value>
   </data>
   <data name="SearchPromptMessage" xml:space="preserve">
-    <value>Type to search for packages.</value>
+    <value>Digitare per cercare i pacchetti.</value>
   </data>
   <data name="SelectedVersionLabel" xml:space="preserve">
-    <value>Selected version</value>
+    <value>Versione selezionata</value>
   </data>
   <data name="WindowTitle" xml:space="preserve">
-    <value>Install New npm Packages</value>
+    <value>Installa nuovi pacchetti npm</value>
   </data>
 </root>
