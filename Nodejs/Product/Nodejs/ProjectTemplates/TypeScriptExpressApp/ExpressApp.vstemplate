@@ -55,6 +55,7 @@
       </Folder>
       <ProjectItem OpenInEditor="true">app.ts</ProjectItem>
       <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
+      <ProjectItem ReplaceParameters="true">tsconfig.json</ProjectItem>
       <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
       <ProjectItem>typings.json</ProjectItem>
     </Project>

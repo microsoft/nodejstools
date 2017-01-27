@@ -38,6 +38,7 @@
     <TypeScriptCompile Include="typings\globals\mime\index.d.ts" />
     <TypeScriptCompile Include="typings\globals\serve-static\index.d.ts" />
     <Content Include="package.json" />
+    <Content Include="tsconfig.json" />
     <Content Include="public\stylesheets\main.css" />
     <Content Include="README.md" />
 $if$ ($dev14$ == true)

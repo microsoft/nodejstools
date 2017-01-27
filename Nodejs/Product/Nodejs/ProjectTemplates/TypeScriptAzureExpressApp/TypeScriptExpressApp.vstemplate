@@ -52,6 +52,7 @@
       </Folder>
       <ProjectItem OpenInEditor="true">app.ts</ProjectItem>
       <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
+      <ProjectItem ReplaceParameters="true">tsconfig.json</ProjectItem>
       <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
       <ProjectItem ReplaceParameters="true">Web.config</ProjectItem>
       <ProjectItem ReplaceParameters="true">Web.Debug.config</ProjectItem>
