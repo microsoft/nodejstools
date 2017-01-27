@@ -25,11 +25,6 @@
         <File Include="Credits.txt"/>
         <File Include="NoSurveyNewsFeed.html"/>
 
-        <!-- Definitely Typed files -->
-        <File Include="Scripts\Typings\node\node.d.ts">
-            <InstallDirectory>ScriptsTypingsNode</InstallDirectory>
-        </File>
-
         <!-- Resources -->
         <File Include="NodeJS.ico" />
         <File Include="NodejsProject.ico" />

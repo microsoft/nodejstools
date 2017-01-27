@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <Choose>
     <When Condition=" '$(VisualStudioVersion)'=='15.0'  Or '$(TargetVisualStudioVersion)'=='VS150' ">
@@ -890,7 +890,6 @@
       <DependentUpon>SalsaLsIntellisenseOptionsControl.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
-
   <ItemGroup Condition="$(VSTarget) == '14.0'">
     <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.resx">
       <DependentUpon>NewFileNameForm.cs</DependentUpon>
@@ -915,7 +914,6 @@
     <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.zh-Hans.resx" />
     <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.zh-Hant.resx" />
   </ItemGroup>
-
   <ItemGroup Condition="$(VSTarget) == '14.0'">
     <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.resx">
       <DependentUpon>NodejsGeneralPropertyPageControl.cs</DependentUpon>
@@ -940,7 +938,6 @@
     <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.zh-Hans.resx" />
     <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.zh-Hant.resx" />
   </ItemGroup>
-
   <ItemGroup Condition="$(VSTarget) == '14.0'">
     <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.resx">
       <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
@@ -965,7 +962,6 @@
     <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.zh-Hans.resx" />
     <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.zh-Hant.resx" />
   </ItemGroup>
-
   <ItemGroup Condition="$(VSTarget) == '14.0'">
     <EmbeddedResource Include="Options\NodejsNpmOptionsControl.resx">
       <DependentUpon>NodejsNpmOptionsControl.cs</DependentUpon>
@@ -990,7 +986,6 @@
     <EmbeddedResource Include="Options\NodejsNpmOptionsControl.zh-Hans.resx" />
     <EmbeddedResource Include="Options\NodejsNpmOptionsControl.zh-Hant.resx" />
   </ItemGroup>
-
   <ItemGroup>
     <ZipItem Include="Templates\Files\EmptyCss\EmptyCss.css" />
     <ZipItem Include="Templates\Files\EmptyCss\EmptyCss.vstemplate" />
@@ -1199,10 +1194,6 @@
     <ZipProject Include="ProjectTemplates\AzureExpress4App\index.js" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\Preview.png" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\users.js" />
-    <Content Include="Scripts\Typings\node\node.d.ts">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\express.d.ts" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\user.ts" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\app.ts" />

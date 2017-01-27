@@ -273,42 +273,6 @@ namespace Microsoft.NodejsTools.Project {
             get { return NodejsConstants.IssueTrackerUrl; }
         }
 
-        protected override void FinishProjectCreation(string sourceFolder, string destFolder) {
-            foreach (MSBuild.ProjectItem item in this.BuildProject.Items) {
-                if (IsProjectTypeScriptSourceFile(item.EvaluatedInclude)) {
-                    // Create the 'typings' folder
-                    var typingsFolder = Path.Combine(ProjectHome, "Scripts", "typings");
-                    if (!Directory.Exists(typingsFolder)) {
-                        Directory.CreateDirectory(typingsFolder);
-                    }
-
-                    // Deploy node.d.ts
-                    var nodeTypingsFolder = Path.Combine(typingsFolder, "node");
-                    if (!Directory.Exists(Path.Combine(nodeTypingsFolder))) {
-                        Directory.CreateDirectory(nodeTypingsFolder);
-                    }
-
-                    var nodeFolder = ((OAProject)this.GetAutomationObject()).ProjectItems
-                        .AddFolder("Scripts").ProjectItems
-                        .AddFolder("typings").ProjectItems
-                        .AddFolder("node");
-
-                    nodeFolder.ProjectItems.AddFromFileCopy(
-                        Path.Combine(
-                            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                            "Scripts",
-                            "typings",
-                            "node",
-                            "node.d.ts"
-                        )
-                    );
-                    break;
-                }
-            }
-
-            base.FinishProjectCreation(sourceFolder, destFolder);
-        }
-
         protected override void AddNewFileNodeToHierarchy(HierarchyNode parentNode, string fileName) {
             base.AddNewFileNodeToHierarchy(parentNode, fileName);
 
