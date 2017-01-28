@@ -90,42 +90,52 @@ namespace Microsoft.VisualStudioTools.Project {
         #region virtual methods
 
         protected virtual void Refresh() {
-            // Let MSBuild know which configuration we are working with
-            _project.SetConfiguration(_projectCfg.ConfigName);
+            VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.Run(async delegate
+            {
+                await VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            // Generate dependencies if such a task exist
-            if (_project.BuildProject.Targets.ContainsKey(_targetName)) {
-                bool succeeded = false;
-                _project.BuildTarget(_targetName, out succeeded);
-                if (!succeeded) {
-                    Debug.WriteLine("Failed to build target {0}", _targetName);
-                    this._outputs.Clear();
-                    return;
-                }
-            }
+                // Let MSBuild know which configuration we are working with
+                _project.SetConfiguration(_projectCfg.ConfigName);
 
-            // Rebuild the content of our list of output
-            string outputType = _targetName + "Output";
-            this._outputs.Clear();
-
-            if (_project.CurrentConfig != null) {
-                foreach (MSBuildExecution.ProjectItemInstance assembly in _project.CurrentConfig.GetItems(outputType)) {
-                    Output output = new Output(_project, assembly);
-                    _outputs.Add(output);
-
-                    // See if it is our key output
-                    if (_keyOutput == null ||
-                        String.Compare(assembly.GetMetadataValue("IsKeyOutput"), true.ToString(), StringComparison.OrdinalIgnoreCase) == 0) {
-                        _keyOutput = output;
+                // Generate dependencies if such a task exist
+                if (_project.BuildProject.Targets.ContainsKey(_targetName))
+                {
+                    bool succeeded = false;
+                    _project.BuildTarget(_targetName, out succeeded);
+                    if (!succeeded)
+                    {
+                        Debug.WriteLine("Failed to build target {0}", _targetName);
+                        this._outputs.Clear();
+                        return;
                     }
                 }
-            }
 
-            _project.SetCurrentConfiguration();
+                // Rebuild the content of our list of output
+                string outputType = _targetName + "Output";
+                this._outputs.Clear();
 
-            // Now that the group is built we have to check if it is invalidated by a property
-            // change on the project.
-            _project.OnProjectPropertyChanged += new EventHandler<ProjectPropertyChangedArgs>(OnProjectPropertyChanged);
+                if (_project.CurrentConfig != null)
+                {
+                    foreach (MSBuildExecution.ProjectItemInstance assembly in _project.CurrentConfig.GetItems(outputType))
+                    {
+                        Output output = new Output(_project, assembly);
+                        _outputs.Add(output);
+
+                        // See if it is our key output
+                        if (_keyOutput == null ||
+                            String.Compare(assembly.GetMetadataValue("IsKeyOutput"), true.ToString(), StringComparison.OrdinalIgnoreCase) == 0)
+                        {
+                            _keyOutput = output;
+                        }
+                    }
+                }
+
+                _project.SetCurrentConfiguration();
+
+                // Now that the group is built we have to check if it is invalidated by a property
+                // change on the project.
+                _project.OnProjectPropertyChanged += new EventHandler<ProjectPropertyChangedArgs>(OnProjectPropertyChanged);
+            });
         }
 
         public virtual IList<Output> EnumerateOutputs() {
