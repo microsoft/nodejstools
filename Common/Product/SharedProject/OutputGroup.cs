@@ -90,52 +90,47 @@ namespace Microsoft.VisualStudioTools.Project {
         #region virtual methods
 
         protected virtual void Refresh() {
-            VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.Run(async delegate
+            // Let MSBuild know which configuration we are working with
+            _project.SetConfiguration(_projectCfg.ConfigName);
+
+            // Generate dependencies if such a task exist
+            if (_project.BuildProject.Targets.ContainsKey(_targetName))
             {
-                await VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-                // Let MSBuild know which configuration we are working with
-                _project.SetConfiguration(_projectCfg.ConfigName);
-
-                // Generate dependencies if such a task exist
-                if (_project.BuildProject.Targets.ContainsKey(_targetName))
+                bool succeeded = false;
+                _project.BuildTarget(_targetName, out succeeded);
+                if (!succeeded)
                 {
-                    bool succeeded = false;
-                    _project.BuildTarget(_targetName, out succeeded);
-                    if (!succeeded)
+                    Debug.WriteLine("Failed to build target {0}", _targetName);
+                    this._outputs.Clear();
+                    return;
+                }
+            }
+
+            // Rebuild the content of our list of output
+            string outputType = _targetName + "Output";
+            this._outputs.Clear();
+
+            if (_project.CurrentConfig != null)
+            {
+                foreach (MSBuildExecution.ProjectItemInstance assembly in _project.CurrentConfig.GetItems(outputType))
+                {
+                    Output output = new Output(_project, assembly);
+                    _outputs.Add(output);
+
+                    // See if it is our key output
+                    if (_keyOutput == null ||
+                        String.Compare(assembly.GetMetadataValue("IsKeyOutput"), true.ToString(), StringComparison.OrdinalIgnoreCase) == 0)
                     {
-                        Debug.WriteLine("Failed to build target {0}", _targetName);
-                        this._outputs.Clear();
-                        return;
+                        _keyOutput = output;
                     }
                 }
+            }
 
-                // Rebuild the content of our list of output
-                string outputType = _targetName + "Output";
-                this._outputs.Clear();
+            _project.SetCurrentConfiguration();
 
-                if (_project.CurrentConfig != null)
-                {
-                    foreach (MSBuildExecution.ProjectItemInstance assembly in _project.CurrentConfig.GetItems(outputType))
-                    {
-                        Output output = new Output(_project, assembly);
-                        _outputs.Add(output);
-
-                        // See if it is our key output
-                        if (_keyOutput == null ||
-                            String.Compare(assembly.GetMetadataValue("IsKeyOutput"), true.ToString(), StringComparison.OrdinalIgnoreCase) == 0)
-                        {
-                            _keyOutput = output;
-                        }
-                    }
-                }
-
-                _project.SetCurrentConfiguration();
-
-                // Now that the group is built we have to check if it is invalidated by a property
-                // change on the project.
-                _project.OnProjectPropertyChanged += new EventHandler<ProjectPropertyChangedArgs>(OnProjectPropertyChanged);
-            });
+            // Now that the group is built we have to check if it is invalidated by a property
+            // change on the project.
+            _project.OnProjectPropertyChanged += new EventHandler<ProjectPropertyChangedArgs>(OnProjectPropertyChanged);
         }
 
         public virtual IList<Output> EnumerateOutputs() {
@@ -196,7 +191,7 @@ namespace Microsoft.VisualStudioTools.Project {
         public virtual int get_KeyOutput(out string pbstrCanonicalName) {
             pbstrCanonicalName = null;
             if (_keyOutput == null)
-                Refresh();
+                _project.Site.GetUIThread().Invoke(Refresh);
             if (_keyOutput == null) {
                 pbstrCanonicalName = String.Empty;
                 return VSConstants.S_FALSE;
@@ -206,7 +201,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
         public virtual int get_KeyOutputObject(out IVsOutput2 ppKeyOutput) {
             if (_keyOutput == null) {
-                Refresh();
+                _project.Site.GetUIThread().Invoke(Refresh);
                 if (_keyOutput == null) {
                     // horrible hack: we don't really have outputs but the Cider designer insists 
                     // that we have an output so it can figure out our output assembly name.  So we
@@ -232,7 +227,7 @@ namespace Microsoft.VisualStudioTools.Project {
             //
             // In the end, this is probably the right thing to do, though -- as it keeps the output
             // groups always up to date.
-            Refresh();
+            _project.Site.GetUIThread().Invoke(Refresh);
 
             // See if only the caller only wants to know the count
             if (celt == 0 || rgpcfg == null) {
