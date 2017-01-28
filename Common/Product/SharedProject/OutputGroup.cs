@@ -94,12 +94,10 @@ namespace Microsoft.VisualStudioTools.Project {
             _project.SetConfiguration(_projectCfg.ConfigName);
 
             // Generate dependencies if such a task exist
-            if (_project.BuildProject.Targets.ContainsKey(_targetName))
-            {
+            if (_project.BuildProject.Targets.ContainsKey(_targetName)) {
                 bool succeeded = false;
                 _project.BuildTarget(_targetName, out succeeded);
-                if (!succeeded)
-                {
+                if (!succeeded) {
                     Debug.WriteLine("Failed to build target {0}", _targetName);
                     this._outputs.Clear();
                     return;
@@ -110,17 +108,14 @@ namespace Microsoft.VisualStudioTools.Project {
             string outputType = _targetName + "Output";
             this._outputs.Clear();
 
-            if (_project.CurrentConfig != null)
-            {
-                foreach (MSBuildExecution.ProjectItemInstance assembly in _project.CurrentConfig.GetItems(outputType))
-                {
+            if (_project.CurrentConfig != null) {
+                foreach (MSBuildExecution.ProjectItemInstance assembly in _project.CurrentConfig.GetItems(outputType)) {
                     Output output = new Output(_project, assembly);
                     _outputs.Add(output);
 
                     // See if it is our key output
                     if (_keyOutput == null ||
-                        String.Compare(assembly.GetMetadataValue("IsKeyOutput"), true.ToString(), StringComparison.OrdinalIgnoreCase) == 0)
-                    {
+                        String.Compare(assembly.GetMetadataValue("IsKeyOutput"), true.ToString(), StringComparison.OrdinalIgnoreCase) == 0) {
                         _keyOutput = output;
                     }
                 }
