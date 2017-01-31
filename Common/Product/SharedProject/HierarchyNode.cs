@@ -931,7 +931,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
             // When we don't call this it behaves properly also in Solution Explorer search result set
             // Notify hierarchy event listeners that items have been invalidated
-            //ProjectMgr.OnInvalidateItems(this);
+            ProjectMgr.OnInvalidateItems(this);
 
             // Dispose the node now that is deleted.
             this.Dispose(true);
@@ -996,8 +996,12 @@ namespace Microsoft.VisualStudioTools.Project {
             ProjectMgr.OnItemDeleted(this);
 
             // Remove child if any before removing from the hierarchy
-            for (HierarchyNode child = this.FirstChild; child != null; child = child.NextSibling) {
+            HierarchyNode child = this.FirstChild;
+            while (child != null) {
+                // Need to read NextSibling before calling Remove
+                var next = child.NextSibling;
                 child.Remove(removeFromStorage);
+                child = next;
             }
 
             // the project node has no parentNode
