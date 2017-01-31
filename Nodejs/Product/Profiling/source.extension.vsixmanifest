@@ -1,6 +1,6 @@
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="B515653F-FB69-4B64-9D3F-F1FCF8421DD0" Version="1.3.0.3" Language="en-US" Publisher="Microsoft" />
+    <Identity Id="B515653F-FB69-4B64-9D3F-F1FCF8421DD0" Version="1.3.0.4" Language="en-US" Publisher="Microsoft" />
     <DisplayName>Node.js Tools - Profiling</DisplayName>
     <Description xml:space="preserve">Provides support for profiling Node.js projects</Description>
     <MoreInfo>http://go.microsoft.com/fwlink/?LinkId=785971</MoreInfo>
