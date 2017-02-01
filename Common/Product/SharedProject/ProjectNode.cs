@@ -2572,7 +2572,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
                 submission.ExecuteAsync(sub => {
                     Site.GetUIThread().Invoke(() => {
-                        IDEBuildLogger ideLogger = this.buildLogger as IDEBuildLogger;
+                        IDEBuildLogger ideLogger = this.buildLogger;
                         if (ideLogger != null) {
                             ideLogger.FlushBuildOutput();
                         }
