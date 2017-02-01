@@ -706,12 +706,11 @@ try {
                 } } | `
                 %{ Copy-Item $_.src $_.dest -Force -EA 0; $_ } | `
                 %{ "Copied $($_.src) -> $($_.dest)" }
+
+            $vsmanFile = "$($outdir)\NodejsTools.vsman"
+            fix-vs-manifest $vsmanFile $i.final_msidir
         }
     }
-    
-    $binDir = "$buildroot\BuildOutput\$($target.config)$($target.VSTarget)\Setup\"
-    $vsmanFile = "$binDir\NodejsTools.vsman"
-    fix-vs-manifest $vsmanFile $binDir
 
     after-build-all $buildroot $outdir
     
