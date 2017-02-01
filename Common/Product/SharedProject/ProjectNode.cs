@@ -179,7 +179,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         private MSBuild.ProjectCollection buildEngine;
 
-        private Microsoft.Build.Utilities.Logger buildLogger;
+        private IDEBuildLogger buildLogger;
 
         private bool useProvidedLogger;
 
@@ -750,7 +750,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <summary>
         /// Gets or sets the build logger.
         /// </summary>
-        protected Microsoft.Build.Utilities.Logger BuildLogger {
+        protected IDEBuildLogger BuildLogger {
             get {
                 return this.buildLogger;
             }
@@ -2456,8 +2456,10 @@ namespace Microsoft.VisualStudioTools.Project {
                     oldLogger.Dispose();
                 }
             } else {
-                ((IDEBuildLogger)this.BuildLogger).OutputWindowPane = output;
+                this.BuildLogger.OutputWindowPane = output;
             }
+
+            this.buildLogger.RefreshVerbosity();
         }
 
         /// <summary>
@@ -2570,7 +2572,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
                 submission.ExecuteAsync(sub => {
                     Site.GetUIThread().Invoke(() => {
-                        IDEBuildLogger ideLogger = this.buildLogger as IDEBuildLogger;
+                        IDEBuildLogger ideLogger = this.buildLogger;
                         if (ideLogger != null) {
                             ideLogger.FlushBuildOutput();
                         }
