@@ -21,6 +21,7 @@
       <ProjectItem>download.ps1</ProjectItem>
       <ProjectItem>setup_worker.cmd</ProjectItem>
       <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
+      <ProjectItem ReplaceParameters="true">tsconfig.json</ProjectItem>
       <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
       <ProjectItem>node.cmd</ProjectItem>
     </Project>

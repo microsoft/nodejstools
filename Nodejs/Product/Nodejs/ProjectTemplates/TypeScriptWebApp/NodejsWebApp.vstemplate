@@ -18,6 +18,7 @@
     <Project File="NodejsWebApp.njsproj" ReplaceParameters="true">
       <ProjectItem OpenInEditor="true">server.ts</ProjectItem>
       <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
+      <ProjectItem ReplaceParameters="true">tsconfig.json</ProjectItem>
       <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
     </Project>
   </TemplateContent>

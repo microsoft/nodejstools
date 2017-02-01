@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <Choose>
     <When Condition=" '$(VisualStudioVersion)'=='15.0'  Or '$(TargetVisualStudioVersion)'=='VS150' ">
@@ -890,7 +890,6 @@
       <DependentUpon>SalsaLsIntellisenseOptionsControl.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
-
   <ItemGroup Condition="$(VSTarget) == '14.0'">
     <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.resx">
       <DependentUpon>NewFileNameForm.cs</DependentUpon>
@@ -915,7 +914,6 @@
     <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.zh-Hans.resx" />
     <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.zh-Hant.resx" />
   </ItemGroup>
-
   <ItemGroup Condition="$(VSTarget) == '14.0'">
     <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.resx">
       <DependentUpon>NodejsGeneralPropertyPageControl.cs</DependentUpon>
@@ -940,7 +938,6 @@
     <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.zh-Hans.resx" />
     <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.zh-Hant.resx" />
   </ItemGroup>
-
   <ItemGroup Condition="$(VSTarget) == '14.0'">
     <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.resx">
       <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
@@ -965,7 +962,6 @@
     <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.zh-Hans.resx" />
     <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.zh-Hant.resx" />
   </ItemGroup>
-
   <ItemGroup Condition="$(VSTarget) == '14.0'">
     <EmbeddedResource Include="Options\NodejsNpmOptionsControl.resx">
       <DependentUpon>NodejsNpmOptionsControl.cs</DependentUpon>
@@ -990,7 +986,6 @@
     <EmbeddedResource Include="Options\NodejsNpmOptionsControl.zh-Hans.resx" />
     <EmbeddedResource Include="Options\NodejsNpmOptionsControl.zh-Hant.resx" />
   </ItemGroup>
-
   <ItemGroup>
     <ZipItem Include="Templates\Files\EmptyCss\EmptyCss.css" />
     <ZipItem Include="Templates\Files\EmptyCss\EmptyCss.vstemplate" />
@@ -1025,6 +1020,7 @@
     <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\download.ps1" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\node.cmd" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\package.json" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\tsconfig.json" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\README.md" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\setup_worker.cmd" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\Worker.njsproj" />
@@ -1033,6 +1029,7 @@
     <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\iisnode.yml" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\node.cmd" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\package.json" />
+    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\tsconfig.json" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\README.md" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\setup_web.cmd" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\TypeScriptWebApp.njsproj" />
@@ -1067,18 +1064,8 @@
     <ZipItem Include="Templates\Files\TypeScriptTsConfig\tsconfig.json" />
     <ZipItem Include="Templates\Files\TypeScriptTsConfig\tsconfig.vstemplate" />
     <None Include="app.config" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\express-serve-static-core.typings.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\express.typings.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\serve-static.typings.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\typings.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\mine.typings.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\www" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\express-serve-static-core.typings.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\express.typings.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\serve-static.typings.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\mine.typings.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\www" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\typings.json" />
     <ZipItem Include="Templates\Files\EmptyJson\EmptyJson.json" />
     <ZipItem Include="Templates\Files\EmptyLess\EmptyLess.less" />
     <ZipItem Include="Templates\Files\EmptyPug\EmptyPug.pug" />
@@ -1133,8 +1120,8 @@
     <ZipProject Include="ProjectTemplates\FromExistingCode\FromExistingCode.vstemplate">
       <SubType>Designer</SubType>
     </ZipProject>
-    <ZipProject Include="ProjectTemplates\AzureExpress4App\typings.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\package.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\tsconfig.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\README.md" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\app.ts" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\NodejsConsoleApp.njsproj">
@@ -1149,6 +1136,7 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\NodejsWebApp.vstemplate" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\Preview.png" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\package.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\tsconfig.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\README.md" />
     <Content Include="License.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -1184,7 +1172,6 @@
     <ZipProject Include="ProjectTemplates\Express4App\ExpressApp.vstemplate">
       <SubType>Designer</SubType>
     </ZipProject>
-    <ZipProject Include="ProjectTemplates\Express4App\typings.json" />
     <ZipProject Include="ProjectTemplates\Express4App\index.js" />
     <ZipProject Include="ProjectTemplates\Express4App\Preview.png" />
     <ZipProject Include="ProjectTemplates\Express4App\users.js" />
@@ -1199,11 +1186,6 @@
     <ZipProject Include="ProjectTemplates\AzureExpress4App\index.js" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\Preview.png" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\users.js" />
-    <Content Include="Scripts\Typings\node\node.d.ts">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\express.d.ts" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\user.ts" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\app.ts" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\ExpressApp.vstemplate">
@@ -1321,12 +1303,14 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\index.pug" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\layout.pug" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\package.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\tsconfig.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\README.md" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\main.css" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\TypeScriptWebApp.njsproj">
       <SubType>Designer</SubType>
     </TypeScriptProject>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\package.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\tsconfig.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\README.md" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\ChangeConfig.ps1" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\download.ps1" />
@@ -1341,6 +1325,7 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\index.pug" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\layout.pug" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\package.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\tsconfig.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\README.md" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\main.css" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\ChangeConfig.ps1" />
@@ -1362,6 +1347,7 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\download.ps1" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\node.cmd" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\package.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\tsconfig.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\README.md" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\setup_worker.cmd" />
     <None Include="source.extension.vsixmanifest">
@@ -1480,25 +1466,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="RemoteDebug\" />
-  </ItemGroup>
-  <ItemGroup>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\express-serve-static-core.d.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\serve-static.d.ts" />
-  </ItemGroup>
-  <ItemGroup>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\mime.d.ts" />
-  </ItemGroup>
-  <ItemGroup>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\express-serve-static-core.d.ts" />
-  </ItemGroup>
-  <ItemGroup>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\express.d.ts" />
-  </ItemGroup>
-  <ItemGroup>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\serve-static.d.ts" />
-  </ItemGroup>
-  <ItemGroup>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\mime.d.ts" />
   </ItemGroup>
   <ItemGroup>
     <ZipItem Include="Templates\Files\EmptyTs\EmptyTs.ts" />
