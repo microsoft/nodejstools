@@ -179,7 +179,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         private MSBuild.ProjectCollection buildEngine;
 
-        private Microsoft.Build.Utilities.Logger buildLogger;
+        private IDEBuildLogger buildLogger;
 
         private bool useProvidedLogger;
 
@@ -750,7 +750,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <summary>
         /// Gets or sets the build logger.
         /// </summary>
-        protected Microsoft.Build.Utilities.Logger BuildLogger {
+        protected IDEBuildLogger BuildLogger {
             get {
                 return this.buildLogger;
             }
@@ -2458,6 +2458,8 @@ namespace Microsoft.VisualStudioTools.Project {
             } else {
                 ((IDEBuildLogger)this.BuildLogger).OutputWindowPane = output;
             }
+
+            this.buildLogger.SetVerbosity();
         }
 
         /// <summary>

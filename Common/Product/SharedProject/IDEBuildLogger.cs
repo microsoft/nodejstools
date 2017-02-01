@@ -457,8 +457,6 @@ namespace Microsoft.VisualStudioTools.Project {
             // If importance is too low for current settings, ignore the event
             bool logIt = false;
 
-            this.SetVerbosity();
-
             switch (this.Verbosity) {
                 case LoggerVerbosity.Quiet:
                     logIt = false;
@@ -507,11 +505,13 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <summary>
         /// Sets the verbosity level.
         /// </summary>
-        private void SetVerbosity() {
+        public void SetVerbosity() {
             if (!this.haveCachedVerbosity) {
                 this.Verbosity = LoggerVerbosity.Normal;
 
                 try {
+                    serviceProvider.GetUIThread().MustBeCalledFromUIThread();
+
                     var settings = new ShellSettingsManager(serviceProvider);
                     var store = settings.GetReadOnlySettingsStore(SettingsScope.UserSettings);
                     if (store.CollectionExists(GeneralCollection) && store.PropertyExists(GeneralCollection, BuildVerbosityProperty)) {
