@@ -49,7 +49,6 @@ namespace Microsoft.VisualStudioTools.Project {
         private IVsHierarchy hierarchy;
         private IServiceProvider serviceProvider;
         private Dispatcher dispatcher;
-        private bool haveCachedVerbosity = false;
 
         // Queues to manage Tasks and Error output plus message logging
         private ConcurrentQueue<Func<ErrorTask>> taskQueue;
@@ -170,7 +169,6 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         protected virtual void BuildStartedHandler(object sender, BuildStartedEventArgs buildEvent) {
             // NOTE: This may run on a background thread!
-            ClearCachedVerbosity();
             ClearQueuedOutput();
             ClearQueuedTasks();
 
@@ -505,36 +503,30 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <summary>
         /// Sets the verbosity level.
         /// </summary>
-        public void SetVerbosity() {
-            if (!this.haveCachedVerbosity) {
-                this.Verbosity = LoggerVerbosity.Normal;
+        public void RefreshVerbosity()
+        {
+            this.Verbosity = LoggerVerbosity.Normal;
 
-                try {
-                    serviceProvider.GetUIThread().MustBeCalledFromUIThread();
+            try
+            {
+                serviceProvider.GetUIThread().MustBeCalledFromUIThread();
 
-                    var settings = new ShellSettingsManager(serviceProvider);
-                    var store = settings.GetReadOnlySettingsStore(SettingsScope.UserSettings);
-                    if (store.CollectionExists(GeneralCollection) && store.PropertyExists(GeneralCollection, BuildVerbosityProperty)) {
-                        this.Verbosity = (LoggerVerbosity)store.GetInt32(GeneralCollection, BuildVerbosityProperty, (int)LoggerVerbosity.Normal);
-                    }
-                } catch (Exception ex) {
-                    var message = string.Format(
-                        "Unable to read verbosity option from the registry.{0}{1}",
-                        Environment.NewLine,
-                        ex.ToString()
-                    );
-                    this.QueueOutputText(MessageImportance.High, message);
+                var settings = new ShellSettingsManager(serviceProvider);
+                var store = settings.GetReadOnlySettingsStore(SettingsScope.UserSettings);
+                if (store.CollectionExists(GeneralCollection) && store.PropertyExists(GeneralCollection, BuildVerbosityProperty))
+                {
+                    this.Verbosity = (LoggerVerbosity)store.GetInt32(GeneralCollection, BuildVerbosityProperty, (int)LoggerVerbosity.Normal);
                 }
-
-                this.haveCachedVerbosity = true;
             }
-        }
-
-        /// <summary>
-        /// Clear the cached verbosity, so that it will be re-evaluated from the build verbosity registry key.
-        /// </summary>
-        private void ClearCachedVerbosity() {
-            this.haveCachedVerbosity = false;
+            catch (Exception ex)
+            {
+                var message = string.Format(
+                    "Unable to read verbosity option from the registry.{0}{1}",
+                    Environment.NewLine,
+                    ex.ToString()
+                );
+                this.QueueOutputText(MessageImportance.High, message);
+            }
         }
 
         #endregion helpers
