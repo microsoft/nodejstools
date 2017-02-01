@@ -708,7 +708,12 @@ try {
                 %{ "Copied $($_.src) -> $($_.dest)" }
 
             $vsmanFile = "$($outdir)\NodejsTools.vsman"
-            fix-vs-manifest $vsmanFile $i.final_msidir
+            if (Test-Path $vsmanFile) {
+                Write-Output "Patching VS Manifest $vsmanFile"
+                fix-vs-manifest $vsmanFile $i.final_msidir
+            } else {
+                Write-Output "Skipping VS Manifest patching because $vsmanFile does not exist"
+            }
         }
     }
 
