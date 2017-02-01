@@ -39,7 +39,6 @@
     <Content Include="setup_worker.cmd" />
     <Content Include="node.cmd" />
     <Content Include="package.json" />
-    <Content Include="tsconfig.json" />
     <Content Include="README.md" />
   </ItemGroup>
   

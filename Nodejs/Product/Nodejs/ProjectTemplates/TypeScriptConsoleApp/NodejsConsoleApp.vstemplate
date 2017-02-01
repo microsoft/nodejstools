@@ -17,7 +17,6 @@
     <Project File="NodejsConsoleApp.njsproj" ReplaceParameters="true">
       <ProjectItem OpenInEditor="true">app.ts</ProjectItem>
       <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
-      <ProjectItem ReplaceParameters="true">tsconfig.json</ProjectItem>
       <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
     </Project>
   </TemplateContent>

@@ -1,12 +1,9 @@
 {
-    "name": "$npmsafeprojectname$",
-    "version": "0.0.0",
-    "description": "$projectname$",
-    "main": "server.js",
-    "author": {
-        "name": "$username$"
-    },
-    "devDependencies": {
-        "@types/node": "^4.2.1"
-    }
+  "name": "$npmsafeprojectname$",
+  "version": "0.0.0",
+  "description": "$projectname$",
+  "main": "server.js",
+  "author": {
+    "name": "$username$"
+  }
 }
