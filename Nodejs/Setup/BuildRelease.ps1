@@ -243,6 +243,39 @@ function after-build($buildroot, $target) {
     }
 }
 
+# Fixes hashing information in the .vsman file
+function fix-vs-manifest($vsmanFile, $bindir) {
+    Write-Output "Patching Manifest $vsmanFile"
+    $json = Get-Content $vsmanFile -raw | ConvertFrom-Json
+    foreach ($pkg in $json.packages) {
+        Write-Output "Patching package $($pkg.id)"
+
+        # Assume only one payload
+        $payload = $pkg.payloads[0]
+
+        # Remove the _buildInfo block
+        $payload = $payload | Select-Object * -ExcludeProperty _buildInfo
+        $pkg.payloads[0] = $payload
+
+        # Check that the file exists
+        $vsixFilename = "$bindir\$($pkg.payloads[0].fileName)"
+        if (!(Test-Path $vsixFilename)) {
+            Write-Output "File $vsixFilename does not exist; continuing"
+            continue
+        }
+
+        # Get its length and hash
+        $length = (Get-Item $vsixFilename).Length
+        $sha256 = (Get-Filehash $vsixFilename -Algorithm SHA256).Hash.ToLower()
+        Write-Output "Hashed $vsixFilename (size $length) to $($sha256.Substring(0, 34))..."
+
+        # Set properties
+        $payload.sha256 = $sha256
+        $payload.size = $length
+    }
+    $json | ConvertTo-Json -depth 100 | Out-File $vsmanFile
+}
+
 # This function is invoked after the entire build process but before scorching
 function after-build-all($buildroot, $outdir) {
     if (-not $release) {
@@ -676,6 +709,10 @@ try {
         }
     }
     
+    $binDir = "$buildroot\BuildOutput\$($target.config)$($target.VSTarget)\Setup\"
+    $vsmanFile = "$binDir\NodejsTools.vsman"
+    fix-vs-manifest $vsmanFile $binDir
+
     after-build-all $buildroot $outdir
     
     if ($scorch) {
