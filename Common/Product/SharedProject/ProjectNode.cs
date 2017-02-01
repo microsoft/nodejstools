@@ -2456,7 +2456,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     oldLogger.Dispose();
                 }
             } else {
-                ((IDEBuildLogger)this.BuildLogger).OutputWindowPane = output;
+                this.BuildLogger.OutputWindowPane = output;
             }
 
             this.buildLogger.RefreshVerbosity();
