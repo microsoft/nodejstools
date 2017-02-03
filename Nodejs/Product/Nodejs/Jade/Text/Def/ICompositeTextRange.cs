@@ -14,7 +14,6 @@
 //
 //*********************************************************//
 
-
 namespace Microsoft.NodejsTools.Jade {
     /// <summary>
     /// Represents a set of text ranges. It may or may not be actual collection

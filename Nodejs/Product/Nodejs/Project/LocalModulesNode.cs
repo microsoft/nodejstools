@@ -32,7 +32,6 @@ namespace Microsoft.NodejsTools.Project {
         private NodeModulesNode _parent;
         IEnumerable<IPackage> _packages = new List<IPackage>();
 
-
         public LocalModulesNode(NodejsProjectNode root, NodeModulesNode parent, string caption, string virtualName, DependencyType dependencyType)
             : base(root) {
             _parent = parent;

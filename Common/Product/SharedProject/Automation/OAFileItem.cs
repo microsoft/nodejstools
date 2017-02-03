@@ -110,7 +110,6 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
             }
         }
 
-
         /// <summary>
         /// Opens the file item in the specified view.
         /// </summary>
@@ -241,7 +240,6 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
                 });
             }
         }
-
 
         #endregion
 

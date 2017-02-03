@@ -73,7 +73,6 @@ declare var SlowBuffer: {
     concat(list: Buffer[], totalLength?: number): Buffer;
 };
 
-
 // Buffer class
 type BufferEncoding = "ascii" | "utf8" | "utf16le" | "ucs2" | "binary" | "hex";
 interface Buffer extends NodeBuffer { }

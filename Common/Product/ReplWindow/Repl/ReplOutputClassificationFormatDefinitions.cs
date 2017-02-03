@@ -35,7 +35,6 @@ namespace Microsoft.VisualStudio.Repl {
 #endif
         
 
-
         [Export]
         [Name(Name)]
         [BaseDefinition(PredefinedClassificationTypeNames.NaturalLanguage)]
@@ -282,11 +281,7 @@ namespace Microsoft.VisualStudio.Repl {
 
         public InteractiveYellowFormatDefinition() {
             DisplayName = Name;
-#if DEV10
-            ForegroundColor = Color.FromRgb(0xc0, 0xc0, 0x20);
-#else
             ForegroundColor = Color.FromRgb(0xff, 0xff, 0);
-#endif
         }
     }
 
@@ -350,11 +345,7 @@ namespace Microsoft.VisualStudio.Repl {
 
         public InteractiveCyanFormatDefinition() {
             DisplayName = Name;
-#if DEV10
-            ForegroundColor = Color.FromRgb(0x00, 0xc0, 0xc0);
-#else
             ForegroundColor = Color.FromRgb(0x00, 0xff, 0xff);
-#endif
         }
     }
 
@@ -375,11 +366,7 @@ namespace Microsoft.VisualStudio.Repl {
         
         public InteractiveWhiteFormatDefinition() {
             DisplayName = Name;
-#if DEV10
-            ForegroundColor = Color.FromRgb(0x7f, 0x7f, 0x7f);
-#else
             ForegroundColor = Color.FromRgb(0xff, 0xff, 0xff);
-#endif
         }
     }
 }

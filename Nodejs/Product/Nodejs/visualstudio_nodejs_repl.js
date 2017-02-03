@@ -37,7 +37,6 @@ for (; ;) {
     curDir = nextDir;
 }
 
-
 function send_response(socket, data) {
     var str = JSON.stringify(data);
     var buf = Buffer(str);
@@ -56,7 +55,6 @@ function findEndOfHeaders(buf) {
     }
     return -1;
 }
-
 
 var net = require("net");
 

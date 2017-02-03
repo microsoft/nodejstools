@@ -46,5 +46,4 @@ app.use((err: any, req, res, next) => {
     });
 });
 
-
 module.exports = app;

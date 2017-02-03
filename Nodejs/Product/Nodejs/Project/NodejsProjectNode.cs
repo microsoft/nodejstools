@@ -28,29 +28,23 @@ using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.ProjectWizard;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Imaging;
+using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudioTools.Project.Automation;
 using MSBuild = Microsoft.Build.Evaluation;
 using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
-using Microsoft.NodejsTools.Options;
-using Microsoft.VisualStudio.Imaging.Interop;
-using Microsoft.VisualStudio.Imaging;
 
 namespace Microsoft.NodejsTools.Project {
     class NodejsProjectNode : CommonProjectNode, VsWebSite.VSWebSite, INodePackageModulesCommands, IVsBuildPropertyStorage {
         private readonly HashSet<string> _warningFiles = new HashSet<string>();
         private readonly HashSet<string> _errorFiles = new HashSet<string>();
-        private string[] _analysisIgnoredDirs = new string[1] { NodejsConstants.NodeModulesStagingFolder };
-        private int _maxFileSize = 1024 * 512;
+        private readonly string[] _analysisIgnoredDirs = new [] { NodejsConstants.NodeModulesStagingFolder };
+        private const int _maxFileSize = 1024 * 512;
         private string _intermediateOutputPath;
         private readonly Dictionary<NodejsProjectImageName, int> _imageIndexFromNameDictionary = new Dictionary<NodejsProjectImageName, int>();
-
-#if DEV14
-        private bool? shouldAcquireTypingsAutomatically;
-        private TypingsAcquisition _typingsAcquirer;
-#endif
 
         // We delay analysis until things calm down in the node_modules folder.
 #pragma warning disable 0414
@@ -72,125 +66,7 @@ namespace Microsoft.NodejsTools.Project {
             lock (_idleNodeModulesLock) {
                 _isIdleNodeModules = true;
             }
-#if DEV14
-            TryToAcquireCurrentTypings();
-#endif
         }
-
-        internal bool ShouldAcquireTypingsAutomatically {
-            get {
-#if DEV14
-                if (!NodejsPackage.Instance.IntellisenseOptionsPage.EnableAutomaticTypingsAcquisition) {
-                    return false;
-                }
-
-                if (shouldAcquireTypingsAutomatically.HasValue) {
-                    return shouldAcquireTypingsAutomatically.Value;
-                }
-
-                var task = ProjectMgr.Site.GetUIThread().InvokeAsync(() => {
-                    return IsTypeScriptProject;
-                });
-                task.Wait();
-                shouldAcquireTypingsAutomatically = !task.Result;
-                return shouldAcquireTypingsAutomatically.Value;
-#else
-                return false;
-#endif
-            }
-        }
-
-#if DEV14
-        private TypingsAcquisition TypingsAcquirer {
-            get {
-                if (_typingsAcquirer != null) {
-                    return _typingsAcquirer;
-                }
-
-                var controller = ModulesNode != null ? ModulesNode.NpmController : null;
-                if (controller != null) {
-                    _typingsAcquirer = new TypingsAcquisition(controller);
-                }
-                return _typingsAcquirer;
-            }
-        }
-
-        private void TryToAcquireTypings(IEnumerable<string> packages) {
-            if (!ShouldAcquireTypingsAutomatically || TypingsAcquirer == null) {
-                return;
-            }
-
-            IVsStatusbar statusBar = (IVsStatusbar)NodejsPackage.Instance.GetService(typeof(SVsStatusbar));
-            object statusIcon = (short)Constants.SBAI_General;
-
-            bool statusSetSuccess = TrySetTypingsLoadingStatusBar(statusBar, statusIcon);
-
-            var typingsPath = Path.Combine(this.ProjectHome, "typings");
-            bool hadExistingTypingsFolder = Directory.Exists(typingsPath);
-            TypingsAcquirer
-                .AcquireTypings(packages, NpmOutputPane)
-                .ContinueWith(x => {
-                    if (NodejsPackage.Instance.IntellisenseOptionsPage.ShowTypingsInfoBar &&
-                        x.Result &&
-                        (!hadExistingTypingsFolder && Directory.Exists(typingsPath))) {
-                        NodejsPackage.Instance.GetUIThread().Invoke(() => {
-                            TypingsInfoBar.Instance.ShowInfoBar();
-                        });
-                    }
-                    TrySetTypingsLoadedStatusBar(statusBar, statusIcon, statusSetSuccess);
-                });
-        }
-
-        private static bool TrySetTypingsLoadingStatusBar(IVsStatusbar statusBar, object icon) {
-            if (statusBar != null && !IsStatusBarFrozen(statusBar)) {
-                statusBar.SetText(Resources.StatusTypingsLoading);
-                statusBar.Animation(1, ref icon);
-                if (ErrorHandler.Succeeded(statusBar.FreezeOutput(1))) {
-                    return true;
-                }
-                Debug.Fail("Failed to freeze typings status bar");
-            }
-            return false;
-        }
-
-        private static void TrySetTypingsLoadedStatusBar(IVsStatusbar statusBar, object icon, bool statusSetSuccess) {
-            if (statusBar != null && (statusSetSuccess || !IsStatusBarFrozen(statusBar))) {
-                if (!ErrorHandler.Succeeded(statusBar.FreezeOutput(0))) {
-                    Debug.Fail("Failed to unfreeze typings status bar");
-                    return;
-                }
-
-                statusBar.Animation(0, ref icon);
-                statusBar.SetText(Resources.StatusTypingsLoaded);
-            }
-        }
-
-        private static bool IsStatusBarFrozen(IVsStatusbar statusBar) {
-            int frozen;
-            statusBar.IsFrozen(out frozen);
-            return frozen == 1;
-        }
-
-        private void TryToAcquireCurrentTypings() {
-            if (!ShouldAcquireTypingsAutomatically || TypingsAcquirer == null) {
-                return;
-            }
-
-            var controller = ModulesNode?.NpmController;
-            if (controller == null) {
-                return;
-            }
-
-            var currentPackages = controller.RootPackage.Modules
-                .Where(package =>
-                    package.IsDependency
-                    || package.IsOptionalDependency
-                    || package.IsDevDependency
-                    || !package.IsListedInParentPackageJson);
-
-            TryToAcquireTypings(currentPackages.Select(package => package.Name).Concat(new[] { "node" }));
-        }
-#endif
 
         private void NodeModules_FinishedRefresh(object sender, EventArgs e) {
             lock (_idleNodeModulesLock) {
@@ -242,11 +118,10 @@ namespace Microsoft.NodejsTools.Project {
 
         public bool IsTypeScriptProject {
             get {
-                return string.Equals(GetProjectProperty(NodeProjectProperty.EnableTypeScript), "true", StringComparison.OrdinalIgnoreCase);
+                return StringComparer.OrdinalIgnoreCase.Equals(GetProjectProperty(NodeProjectProperty.EnableTypeScript), "true");
             }
         }
 
-#if DEV14_OR_LATER
         protected override bool SupportsIconMonikers {
             get { return true; }
         }
@@ -256,7 +131,6 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         [Obsolete]
-#endif
         private void AddProjectImage(NodejsProjectImageName name, string resourceId) {
             var images = ImageHandler.ImageList.Images;
             ImageIndexFromNameDictionary.Add(name, images.Count);
@@ -316,10 +190,7 @@ namespace Microsoft.NodejsTools.Project {
                 // enable TypeScript on the project automatically...
                 SetProjectProperty(NodeProjectProperty.EnableTypeScript, "true");
                 SetProjectProperty(NodeProjectProperty.TypeScriptSourceMap, "true");
-#if DEV14
-                // Reset cached value, so it will be recalculated later.
-                this.shouldAcquireTypingsAutomatically = false;
-#endif
+
                 if (String.IsNullOrWhiteSpace(GetProjectProperty(NodeProjectProperty.TypeScriptModuleKind))) {
                     SetProjectProperty(NodeProjectProperty.TypeScriptModuleKind, NodejsConstants.CommonJSModuleKind);
                 }
@@ -470,7 +341,6 @@ namespace Microsoft.NodejsTools.Project {
                    ext.Equals(NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase);
         }
 
-
         protected override void Reload() {
             using (new DebugTimer("Project Load")) {
                 // Populate values from project properties before we do anything else.
@@ -484,10 +354,6 @@ namespace Microsoft.NodejsTools.Project {
 
                 NodejsPackage.Instance.CheckSurveyNews(false);
                 ModulesNode.ReloadHierarchySafe();
-
-#if DEV14
-                TryToAcquireTypings(new[] { "node" });
-#endif
             }
         }
 
@@ -855,9 +721,6 @@ namespace Microsoft.NodejsTools.Project {
                 RemoveChild(ModulesNode);
                 ModulesNode?.Dispose();
                 ModulesNode = null;
-#if DEV14
-                _typingsAcquirer = null;
-#endif
             }
             base.Dispose(disposing);
         }
@@ -1033,7 +896,6 @@ namespace Microsoft.NodejsTools.Project {
             }
             return base.Build(config, target);
         }
-
 
         // This is the package manager pane that ships with VS2015, and we should print there if available.
         private static readonly Guid VSPackageManagerPaneGuid = new Guid("C7E31C31-1451-4E05-B6BE-D11B6829E8BB");

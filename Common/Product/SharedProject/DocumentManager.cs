@@ -145,20 +145,12 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         public bool IsDirty {
             get {
-#if DEV12_OR_LATER
                 var docTable = (IVsRunningDocumentTable4)node.ProjectMgr.GetService(typeof(SVsRunningDocumentTable));
                 if (!docTable.IsMonikerValid(node.GetMkDocument())) {
                     return false;
                 }
 
                 return docTable.IsDocumentDirty(docTable.GetDocumentCookie(node.GetMkDocument()));
-#else
-                bool isOpen, isDirty, isOpenedByUs;
-                uint docCookie;
-                IVsPersistDocData persistDocData;
-                GetDocInfo(out isOpen, out isDirty, out isOpenedByUs, out docCookie, out persistDocData);
-                return isDirty;
-#endif
             }
         }
 
@@ -167,7 +159,6 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         public bool IsOpenedByUs {
             get {
-#if DEV12_OR_LATER
                 var docTable = (IVsRunningDocumentTable4)node.ProjectMgr.GetService(typeof(SVsRunningDocumentTable));
                 if (!docTable.IsMonikerValid(node.GetMkDocument())) {
                     return false;
@@ -181,14 +172,6 @@ namespace Microsoft.VisualStudioTools.Project {
                     out itemId
                 );
                 return Utilities.IsSameComObject(node.ProjectMgr, hierarchy);
-#else
-                bool isOpen, isDirty, isOpenedByUs;
-                uint docCookie;
-                IVsPersistDocData persistDocData;
-                GetDocInfo(out isOpen, out isDirty, out isOpenedByUs, out docCookie, out persistDocData);
-                return isOpenedByUs;
-#endif
-
             }
         }
 
@@ -197,20 +180,12 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         public uint DocCookie {
             get {
-#if DEV12_OR_LATER
                 var docTable = (IVsRunningDocumentTable4)node.ProjectMgr.GetService(typeof(SVsRunningDocumentTable));
                 if (!docTable.IsMonikerValid(node.GetMkDocument())) {
                     return (uint)ShellConstants.VSDOCCOOKIE_NIL;
                 }
 
                 return docTable.GetDocumentCookie(node.GetMkDocument());
-#else
-                bool isOpen, isDirty, isOpenedByUs;
-                uint docCookie;
-                IVsPersistDocData persistDocData;
-                GetDocInfo(out isOpen, out isDirty, out isOpenedByUs, out docCookie, out persistDocData);
-                return docCookie;
-#endif
             }
         }
 
@@ -219,20 +194,12 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         public IVsPersistDocData DocData {
             get {
-#if DEV12_OR_LATER
                 var docTable = (IVsRunningDocumentTable4)node.ProjectMgr.GetService(typeof(SVsRunningDocumentTable));
                 if (!docTable.IsMonikerValid(node.GetMkDocument())) {
                     return null;
                 }
 
                 return docTable.GetDocumentData(docTable.GetDocumentCookie(node.GetMkDocument())) as IVsPersistDocData;
-#else
-                bool isOpen, isDirty, isOpenedByUs;
-                uint docCookie;
-                IVsPersistDocData persistDocData;
-                GetDocInfo(out isOpen, out isDirty, out isOpenedByUs, out docCookie, out persistDocData);
-                return persistDocData;
-#endif
             }
         }
 

@@ -26,12 +26,7 @@ namespace Microsoft.VisualStudioTools.Project {
     /// Creates projects within the solution
     /// </summary>
 
-    public abstract class ProjectFactory : FlavoredProjectFactoryBase,
-#if DEV11_OR_LATER
- IVsAsynchronousProjectCreate,
-        IVsProjectUpgradeViaFactory4,
-#endif
- IVsProjectUpgradeViaFactory {
+    public abstract class ProjectFactory : FlavoredProjectFactoryBase, IVsAsynchronousProjectCreate, IVsProjectUpgradeViaFactory4, IVsProjectUpgradeViaFactory {
         #region fields
         private System.IServiceProvider site;
 
@@ -44,9 +39,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// The msbuild project for the project file.
         /// </summary>
         private MSBuild.Project buildProject;
-#if DEV11_OR_LATER
         private readonly Lazy<IVsTaskSchedulerService> taskSchedulerService;
-#endif
 
         // (See GetSccInfo below.)
         // When we upgrade a project, we need to cache the SCC info in case
@@ -78,18 +71,12 @@ namespace Microsoft.VisualStudioTools.Project {
         #endregion
 
         #region ctor
-        [Obsolete("Provide an IServiceProvider instead of a package")]
-        protected ProjectFactory(Microsoft.VisualStudio.Shell.Package package)
-            : this((IServiceProvider)package) {
-        }
 
         protected ProjectFactory(IServiceProvider serviceProvider)
             : base(serviceProvider) {
             this.site = serviceProvider;
             this.buildEngine = MSBuild.ProjectCollection.GlobalProjectCollection;
-#if DEV11_OR_LATER
             this.taskSchedulerService = new Lazy<IVsTaskSchedulerService>(() => Site.GetService(typeof(SVsTaskSchedulerService)) as IVsTaskSchedulerService);
-#endif
         }
 
         #endregion
@@ -172,8 +159,6 @@ namespace Microsoft.VisualStudioTools.Project {
         }
         #endregion
 
-#if DEV11_OR_LATER
-
         public virtual bool CanCreateProjectAsynchronously(ref Guid rguidProjectID, string filename, uint flags) {
             return true;
         }
@@ -194,8 +179,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 return Marshal.GetObjectForIUnknown(project);
             }));
         }
-
-#endif
 
         #region Project Upgrades
 
@@ -259,8 +242,6 @@ namespace Microsoft.VisualStudioTools.Project {
         ) {
             return ProjectUpgradeState.NotNeeded;
         }
-
-
 
         class UpgradeLogger {
             private readonly string _projectFile;
@@ -400,7 +381,6 @@ namespace Microsoft.VisualStudioTools.Project {
                     //}
                 }
 
-
                 var queryEdit = site.GetService(typeof(SVsQueryEditQuerySave)) as IVsQueryEditQuerySave2;
                 if (queryEdit != null) {
                     uint editVerdict;
@@ -528,7 +508,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 pUpgradeProjectCapabilityFlags = 0;
                 return VSConstants.E_INVALIDARG;
             }
-
 
             var backupSupport = __VSPPROJECTUPGRADEVIAFACTORYFLAGS.PUVFF_BACKUPSUPPORTED |
                 __VSPPROJECTUPGRADEVIAFACTORYFLAGS.PUVFF_COPYBACKUP |

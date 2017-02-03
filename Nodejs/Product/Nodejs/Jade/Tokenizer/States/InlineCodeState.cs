@@ -14,7 +14,6 @@
 //
 //*********************************************************//
 
-
 namespace Microsoft.NodejsTools.Jade {
     internal partial class JadeTokenizer : Tokenizer<JadeToken> {
         private void OnInlineCode() {

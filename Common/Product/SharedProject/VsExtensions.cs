@@ -28,19 +28,7 @@ namespace Microsoft.VisualStudioTools {
         public static string GetFilePath(this ITextView textView) {
             return textView.TextBuffer.GetFilePath();
         }
-#if FALSE
-        internal static ITrackingSpan CreateTrackingSpan(this IIntellisenseSession session, ITextBuffer buffer) {
-            var triggerPoint = session.GetTriggerPoint(buffer);
-            var position = session.GetTriggerPoint(buffer).GetPosition(session.TextView.TextSnapshot);
 
-            var snapshot = buffer.CurrentSnapshot;
-            if (position == snapshot.Length) {
-                return snapshot.CreateTrackingSpan(position, 0, SpanTrackingMode.EdgeInclusive);
-            } else {
-                return snapshot.CreateTrackingSpan(position, 1, SpanTrackingMode.EdgeInclusive);
-            }
-        }
-#endif
         internal static EnvDTE.Project GetProject(this IVsHierarchy hierarchy) {
             object project;
 
@@ -115,7 +103,6 @@ namespace Microsoft.VisualStudioTools {
         public static void MustNotBeCalledFromUIThread(this UIThreadBase self, string message = "Invalid cross-thread call") {
             Debug.Assert(self is MockUIThreadBase || self.InvokeRequired, message);
         }
-
 
         #region NoOpUIThread class
 

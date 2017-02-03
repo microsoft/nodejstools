@@ -14,7 +14,6 @@
 //
 //*********************************************************//
 
-
 namespace Microsoft.NodejsTools.Jade {
     /// <summary>
     /// Implements <seealso cref="IToken"/>. Derives from <seealso cref="TextRange"/>

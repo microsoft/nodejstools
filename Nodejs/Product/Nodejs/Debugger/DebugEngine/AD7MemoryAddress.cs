@@ -40,7 +40,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             _column = column;
         }
 
-
         public AD7MemoryAddress(AD7Engine engine, string fileName, int line, int column)
             : this(engine, null, fileName, line, column) {
         }

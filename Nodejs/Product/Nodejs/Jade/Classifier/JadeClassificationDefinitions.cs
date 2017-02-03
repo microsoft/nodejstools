@@ -45,7 +45,6 @@ namespace Microsoft.NodejsTools.Jade {
         }
         #endregion
 
-
         #region JadeFilter
         [Export(typeof(ClassificationTypeDefinition))]
         [Name(JadeClassificationTypes.Filter), Export]

@@ -41,9 +41,6 @@
     <Content Include="package.json" />
     <Content Include="public\stylesheets\main.css" />
     <Content Include="README.md" />
-$if$ ($dev14$ == true)
-    <Content Include="typings.json" />
-$endif$
     <Content Include="views\index.pug" />
     <Content Include="views\layout.pug" />
   </ItemGroup>

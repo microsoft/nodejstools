@@ -30,20 +30,13 @@ namespace Microsoft.NodejsTools.ProjectWizard {
     public sealed class CloudServiceWizard : IWizard {
         private IWizard _wizard;
         private readonly bool _recommendUpgrade;
-
-#if DEV14
-        const string AzureToolsDownload = "https://go.microsoft.com/fwlink/?LinkID=517353";
-#elif DEV15
-        const string AzureToolsDownload = "https://go.microsoft.com/fwlink/?LinkId=746956";
-#else
-#error Unsupported VS version
-#endif
+        private const string AzureToolsDownload = "https://go.microsoft.com/fwlink/?LinkId=746956";
 
         /// <summary>
         /// The settings collection where "Suppress{dialog}" settings are stored
         /// </summary>
-        const string DontShowUpgradeDialogAgainCollection = "NodejsTools\\Dialogs";
-        const string DontShowUpgradeDialogAgainProperty = "SuppressUpgradeAzureTools";
+        private const string DontShowUpgradeDialogAgainCollection = "NodejsTools\\Dialogs";
+        private const string DontShowUpgradeDialogAgainProperty = "SuppressUpgradeAzureTools";
 
         private static bool ShouldRecommendUpgrade(Assembly asm) {
             var attr = asm.GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false)

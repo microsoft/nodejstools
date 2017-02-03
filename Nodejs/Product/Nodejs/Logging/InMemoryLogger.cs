@@ -19,7 +19,6 @@ using System.ComponentModel.Composition;
 using System.Text;
 using Microsoft.NodejsTools.Options;
 
-
 namespace Microsoft.NodejsTools.Logging {
     /// <summary>
     /// Keeps track of logged events and makes them available for display in the diagnostics window.

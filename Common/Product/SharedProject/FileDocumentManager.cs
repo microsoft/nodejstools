@@ -181,12 +181,8 @@ namespace Microsoft.VisualStudioTools.Project {
             IVsUIShellOpenDocument uiShellOpenDocument = this.Node.ProjectMgr.Site.GetService(typeof(SVsUIShellOpenDocument)) as IVsUIShellOpenDocument;
             IOleServiceProvider serviceProvider = this.Node.ProjectMgr.Site.GetService(typeof(IOleServiceProvider)) as IOleServiceProvider;
 
-#if DEV11_OR_LATER
             var openState = uiShellOpenDocument as IVsUIShellOpenDocument3;
             bool showDialog = !reopen && (openState == null || !((__VSNEWDOCUMENTSTATE)openState.NewDocumentState).HasFlag(__VSNEWDOCUMENTSTATE.NDS_Provisional));
-#else
-            bool showDialog = !reopen;
-#endif
 
             // Make sure that the file is on disk before we open the editor and display message if not found
             if (!((FileNode)this.Node).IsFileOnDisk(showDialog)) {
@@ -251,7 +247,6 @@ namespace Microsoft.VisualStudioTools.Project {
 
             return returnValue;
         }
-
 
         #endregion
 

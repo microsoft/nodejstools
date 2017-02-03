@@ -35,12 +35,6 @@ namespace Microsoft.VisualStudioTools.Project {
         private static readonly string[] _supportsDesignViewSubTypes = new[] { ProjectFileAttributeValue.Code, ProjectFileAttributeValue.Form, ProjectFileAttributeValue.UserControl, ProjectFileAttributeValue.Component, ProjectFileAttributeValue.Designer };
         private string _caption;
 
-        #region static fields
-#if !DEV14_OR_LATER
-        private static Dictionary<string, int> extensionIcons;
-#endif
-        #endregion
-
         #region overriden Properties
 
         public override bool DefaultOpensWithDesignView {
@@ -111,28 +105,6 @@ namespace Microsoft.VisualStudioTools.Project {
             return base.GetEditLabel();
         }
 
-#if !DEV14_OR_LATER
-        public override int ImageIndex {
-            get {
-                // Check if the file is there.
-                if (!this.CanShowDefaultIcon()) {
-                    return (int)ProjectNode.ImageName.MissingFile;
-                }
-
-                //Check for known extensions
-                int imageIndex;
-                string extension = Path.GetExtension(this.FileName);
-                if ((string.IsNullOrEmpty(extension)) || (!extensionIcons.TryGetValue(extension, out imageIndex))) {
-                    // Missing or unknown extension; let the base class handle this case.
-                    return base.ImageIndex;
-                }
-
-                // The file type is known and there is an image for it in the image list.
-                return imageIndex;
-            }
-        }
-#endif
-
         public uint DocCookie {
             get {
                 return this._docCookie;
@@ -178,50 +150,6 @@ namespace Microsoft.VisualStudioTools.Project {
 #endregion
 
 #region ctor
-#if !DEV14_OR_LATER
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
-        static FileNode() {
-            // Build the dictionary with the mapping between some well known extensions
-            // and the index of the icons inside the standard image list.
-            extensionIcons = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-            extensionIcons.Add(".aspx", (int)ProjectNode.ImageName.WebForm);
-            extensionIcons.Add(".asax", (int)ProjectNode.ImageName.GlobalApplicationClass);
-            extensionIcons.Add(".asmx", (int)ProjectNode.ImageName.WebService);
-            extensionIcons.Add(".ascx", (int)ProjectNode.ImageName.WebUserControl);
-            extensionIcons.Add(".asp", (int)ProjectNode.ImageName.ASPPage);
-            extensionIcons.Add(".config", (int)ProjectNode.ImageName.WebConfig);
-            extensionIcons.Add(".htm", (int)ProjectNode.ImageName.HTMLPage);
-            extensionIcons.Add(".html", (int)ProjectNode.ImageName.HTMLPage);
-            extensionIcons.Add(".css", (int)ProjectNode.ImageName.StyleSheet);
-            extensionIcons.Add(".xsl", (int)ProjectNode.ImageName.StyleSheet);
-            extensionIcons.Add(".vbs", (int)ProjectNode.ImageName.ScriptFile);
-            extensionIcons.Add(".js", (int)ProjectNode.ImageName.ScriptFile);
-            extensionIcons.Add(".wsf", (int)ProjectNode.ImageName.ScriptFile);
-            extensionIcons.Add(".txt", (int)ProjectNode.ImageName.TextFile);
-            extensionIcons.Add(".resx", (int)ProjectNode.ImageName.Resources);
-            extensionIcons.Add(".rc", (int)ProjectNode.ImageName.Resources);
-            extensionIcons.Add(".bmp", (int)ProjectNode.ImageName.Bitmap);
-            extensionIcons.Add(".ico", (int)ProjectNode.ImageName.Icon);
-            extensionIcons.Add(".gif", (int)ProjectNode.ImageName.Image);
-            extensionIcons.Add(".jpg", (int)ProjectNode.ImageName.Image);
-            extensionIcons.Add(".png", (int)ProjectNode.ImageName.Image);
-            extensionIcons.Add(".map", (int)ProjectNode.ImageName.ImageMap);
-            extensionIcons.Add(".wav", (int)ProjectNode.ImageName.Audio);
-            extensionIcons.Add(".mid", (int)ProjectNode.ImageName.Audio);
-            extensionIcons.Add(".midi", (int)ProjectNode.ImageName.Audio);
-            extensionIcons.Add(".avi", (int)ProjectNode.ImageName.Video);
-            extensionIcons.Add(".mov", (int)ProjectNode.ImageName.Video);
-            extensionIcons.Add(".mpg", (int)ProjectNode.ImageName.Video);
-            extensionIcons.Add(".mpeg", (int)ProjectNode.ImageName.Video);
-            extensionIcons.Add(".cab", (int)ProjectNode.ImageName.CAB);
-            extensionIcons.Add(".jar", (int)ProjectNode.ImageName.JAR);
-            extensionIcons.Add(".xslt", (int)ProjectNode.ImageName.XSLTFile);
-            extensionIcons.Add(".xsd", (int)ProjectNode.ImageName.XMLSchema);
-            extensionIcons.Add(".xml", (int)ProjectNode.ImageName.XMLFile);
-            extensionIcons.Add(".pfx", (int)ProjectNode.ImageName.PFX);
-            extensionIcons.Add(".snk", (int)ProjectNode.ImageName.SNK);
-        }
-#endif
         /// <summary>
         /// Constructor for the FileNode
         /// </summary>
@@ -312,7 +240,6 @@ namespace Microsoft.VisualStudioTools.Project {
                     return VSConstants.S_OK;
                 }
             }
-
 
             // Build the relative path by looking at folder names above us as one scenarios
             // where we get called is when a folder above us gets renamed (in which case our path is invalid)
@@ -465,7 +392,6 @@ namespace Microsoft.VisualStudioTools.Project {
             return base.ExecCommandOnNode(cmdGroup, cmd, nCmdexecopt, pvaIn, pvaOut);
         }
 
-
         internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result) {
             if (cmdGroup == VsMenus.guidStandardCommandSet97) {
                 switch ((VsCommands)cmd) {
@@ -491,7 +417,6 @@ namespace Microsoft.VisualStudioTools.Project {
             }
             return base.QueryStatusOnNode(cmdGroup, cmd, pCmdText, ref result);
         }
-
 
         protected override void DoDefaultAction() {
             FileDocumentManager manager = this.GetDocumentManager() as FileDocumentManager;
@@ -740,7 +665,6 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
-
         /// <summary>
         /// Tries recovering from a rename failure.
         /// </summary>
@@ -927,7 +851,6 @@ namespace Microsoft.VisualStudioTools.Project {
 #endregion
 
 #region helpers
-
 
         /// <summary>
         /// Update the ChildNodes after the parent node has been renamed

@@ -14,8 +14,6 @@
 //
 //*********************************************************//
 
-#if DEV15
-
 using System;
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -27,7 +25,7 @@ namespace Microsoft.NodejsTools.Debugger {
     /// <summary>
     /// Extension to Vs Launch Debugger to handle js files from a Node Js project
     /// </summary>
-    [ExportVsDebugLaunchTarget(ProviderType, new string[] { ".js" }, ProviderPriority.Highest)]
+    [ExportVsDebugLaunchTarget(ProviderType, new [] { ".js" }, ProviderPriority.Highest)]
     internal class NodeJsDebugLaunchProvider : IVsDebugLaunchTargetProvider {
         private const string ProviderType = "6C01D598-DE83-4D5B-B7E5-757FBA8443DD";
         private const string NodeExeKey = "nodeExe";
@@ -71,11 +69,7 @@ namespace Microsoft.NodejsTools.Debugger {
             vsDebugTargetInfo.grfLaunch = (uint)__VSDBGLAUNCHFLAGS.DBGLAUNCH_StopDebuggingOnEnd;
         }
 
-        [ExportLaunchConfigurationProvider(
-            LaunchConfigurationProviderType,
-            new string[] { ".js" },
-            "nodejs",
-            NodeJsSchema)]
+        [ExportLaunchConfigurationProvider(LaunchConfigurationProviderType, new [] { ".js" }, "nodejs", NodeJsSchema)]
         public class LaunchConfigurationProvider : ILaunchConfigurationProvider {
             private const string LaunchConfigurationProviderType = "1DB21619-2C53-4BEF-84E4-B1C4D6771A51";
 
@@ -90,5 +84,3 @@ namespace Microsoft.NodejsTools.Debugger {
         }
     }
 }
-
-#endif

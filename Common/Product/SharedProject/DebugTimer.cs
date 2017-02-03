@@ -43,7 +43,6 @@ namespace Microsoft.VisualStudioTools {
 #endif
         }
 
-
         #region IDisposable Members
 
         public void Dispose() {

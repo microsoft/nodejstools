@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <Choose>
     <When Condition=" '$(VisualStudioVersion)'=='15.0'  Or '$(TargetVisualStudioVersion)'=='VS150' ">
@@ -276,7 +276,6 @@
     </Compile>
     <Compile Include="NpmUI\PackageCatalogEntryViewModel.cs" />
     <Compile Include="Options\TypeScriptRegistrySwitches.cs" />
-    <Compile Include="Options\TypingsInfoBar.cs" />
     <Compile Include="Options\NodejsDiagnosticsOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -288,21 +287,6 @@
     </Compile>
     <Compile Include="Options\NodejsNpmOptionsControl.Designer.cs">
       <DependentUpon>NodejsNpmOptionsControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Options\NodejsIntellisenseOptionsControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Options\NodejsIntellisenseOptionsControl.Designer.cs">
-      <DependentUpon>NodejsIntellisenseOptionsControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Options\NodejsIntellisenseOptionsPage.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Options\SalsaLsIntellisenseOptionsControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Options\SalsaLsIntellisenseOptionsControl.Designer.cs">
-      <DependentUpon>SalsaLsIntellisenseOptionsControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Project\AzureToolsContracts.cs" />
     <Compile Include="Project\NewFileMenuGroup\NewFileUtilities.cs" />
@@ -342,36 +326,6 @@
     <Compile Include="Jade\JadeEditorFactory.cs" />
   </ItemGroup>
   <ItemGroup Condition=" '$(VisualStudioVersion)'=='14.0'  Or '$(TargetVisualStudioVersion)'=='VS140' ">
-    <Compile Include="Options\NodejsFormattingDialogPage.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Options\NodejsFormattingBracesOptionsPage.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Options\NodejsFormattingSpacingOptionsPage.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Options\NodejsFormattingGeneralOptionsPage.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Options\NodejsFormattingBracesOptionsControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Options\NodejsFormattingBracesOptionsControl.Designer.cs">
-      <DependentUpon>NodejsFormattingBracesOptionsControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Options\NodejsFormattingGeneralOptionsControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Options\NodejsFormattingGeneralOptionsControl.Designer.cs">
-      <DependentUpon>NodejsFormattingGeneralOptionsControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Options\NodejsFormattingSpacingOptionsControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Options\NodejsFormattingSpacingOptionsControl.Designer.cs">
-      <DependentUpon>NodejsFormattingSpacingOptionsControl.cs</DependentUpon>
-    </Compile>
     <Compile Include="NodejsLanguageInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -550,7 +504,6 @@
     <Compile Include="Repl\VsNodejsReplSite.cs" />
     <Compile Include="SourceMapping\SourceMap.cs" />
     <Compile Include="TestFrameworks\TestFrameworkDirectories.cs" />
-    <Compile Include="TypingsAcquisition.cs" />
     <Compile Include="VsMenus.cs" />
     <Compile Include="BaseNodeProjectFactory.cs" />
     <Compile Include="Debugger\BreakpointBindingEventArgs.cs" />
@@ -873,24 +826,7 @@
       <DependentUpon>DiagnosticsForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Options\NodejsIntellisenseOptionsControl.resx">
-      <DependentUpon>NodejsIntellisenseOptionsControl.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Options\NodejsFormattingBracesOptionsControl.resx">
-      <DependentUpon>NodejsFormattingBracesOptionsControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Options\NodejsFormattingGeneralOptionsControl.resx">
-      <DependentUpon>NodejsFormattingGeneralOptionsControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Options\NodejsFormattingSpacingOptionsControl.resx">
-      <DependentUpon>NodejsFormattingSpacingOptionsControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Options\SalsaLsIntellisenseOptionsControl.resx">
-      <DependentUpon>SalsaLsIntellisenseOptionsControl.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
-
   <ItemGroup Condition="$(VSTarget) == '14.0'">
     <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.resx">
       <DependentUpon>NewFileNameForm.cs</DependentUpon>
@@ -915,7 +851,6 @@
     <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.zh-Hans.resx" />
     <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.zh-Hant.resx" />
   </ItemGroup>
-
   <ItemGroup Condition="$(VSTarget) == '14.0'">
     <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.resx">
       <DependentUpon>NodejsGeneralPropertyPageControl.cs</DependentUpon>
@@ -940,7 +875,6 @@
     <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.zh-Hans.resx" />
     <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.zh-Hant.resx" />
   </ItemGroup>
-
   <ItemGroup Condition="$(VSTarget) == '14.0'">
     <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.resx">
       <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
@@ -965,7 +899,6 @@
     <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.zh-Hans.resx" />
     <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.zh-Hant.resx" />
   </ItemGroup>
-
   <ItemGroup Condition="$(VSTarget) == '14.0'">
     <EmbeddedResource Include="Options\NodejsNpmOptionsControl.resx">
       <DependentUpon>NodejsNpmOptionsControl.cs</DependentUpon>
@@ -990,7 +923,6 @@
     <EmbeddedResource Include="Options\NodejsNpmOptionsControl.zh-Hans.resx" />
     <EmbeddedResource Include="Options\NodejsNpmOptionsControl.zh-Hant.resx" />
   </ItemGroup>
-
   <ItemGroup>
     <ZipItem Include="Templates\Files\EmptyCss\EmptyCss.css" />
     <ZipItem Include="Templates\Files\EmptyCss\EmptyCss.vstemplate" />

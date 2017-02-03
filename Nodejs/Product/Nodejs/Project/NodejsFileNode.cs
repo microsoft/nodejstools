@@ -28,7 +28,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         protected override void OnParentSet(HierarchyNode parent) {
-            if (ProjectMgr == null || !ProjectMgr.ShouldAcquireTypingsAutomatically) {
+            if (ProjectMgr == null) {
                 return;
             }
 
@@ -51,14 +51,7 @@ namespace Microsoft.NodejsTools.Project {
                 return 0;
             }
 
-            var includeInProject = base.IncludeInProject(includeChildren);
-            if (ProjectMgr.ShouldAcquireTypingsAutomatically) {
-                ProjectMgr.Site.GetUIThread().Invoke(() => {
-                    ProjectMgr.OnItemAdded(this.Parent, this);
-                });
-            }
-
-            return includeInProject;
+            return base.IncludeInProject(includeChildren);
         }
 
         protected override NodeProperties CreatePropertiesObject() {

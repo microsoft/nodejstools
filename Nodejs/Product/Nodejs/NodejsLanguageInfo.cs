@@ -50,7 +50,6 @@ namespace Microsoft.NodejsTools {
             return VSConstants.S_OK;
         }
 
-
         public int GetLanguageName(out string bstrName) {
             // This is the same name the language service was registered with.
             bstrName = NodejsConstants.JavaScript;

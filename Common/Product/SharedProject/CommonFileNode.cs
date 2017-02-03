@@ -20,6 +20,8 @@ using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Editor;
+using Microsoft.VisualStudio.Imaging;
+using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -29,10 +31,6 @@ using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudioTools.Project.Automation;
 using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
 using VSConstants = Microsoft.VisualStudio.VSConstants;
-#if DEV14_OR_LATER
-using Microsoft.VisualStudio.Imaging;
-using Microsoft.VisualStudio.Imaging.Interop;
-#endif
 
 namespace Microsoft.VisualStudioTools.Project {
     internal class CommonFileNode : FileNode {
@@ -78,13 +76,11 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
-#if DEV11_OR_LATER
         public override __VSPROVISIONALVIEWINGSTATUS ProvisionalViewingStatus {
             get {
                 return __VSPROVISIONALVIEWINGSTATUS.PVS_Enabled;
             }
         }
-#endif
 
         #endregion
 
@@ -100,7 +96,6 @@ namespace Microsoft.VisualStudioTools.Project {
 
         #region overridden methods
 
-#if DEV14_OR_LATER
         protected override bool SupportsIconMonikers {
             get { return true; }
         }
@@ -133,27 +128,6 @@ namespace Microsoft.VisualStudioTools.Project {
             }
             return default(ImageMoniker);
         }
-#else
-        public override int ImageIndex {
-            get {
-                if (ItemNode.IsExcluded) {
-                    return (int)ProjectNode.ImageName.ExcludedFile;
-                } else if (!File.Exists(Url)) {
-                    return (int)ProjectNode.ImageName.MissingFile;
-                } else if (IsFormSubType) {
-                    return (int)ProjectNode.ImageName.WindowsForm;
-                } else if (this._project.IsCodeFile(FileName)) {
-                    if (CommonUtils.IsSamePath(this.Url, _project.GetStartupFile())) {
-                        return _project.ImageOffset + (int)CommonImageName.StartupFile;
-                    } else {
-                        return _project.ImageOffset + (int)CommonImageName.File;
-                    }
-                }
-                return base.ImageIndex;
-            }
-        }
-#endif
-
 
         /// <summary>
         /// Open a file depending on the SubType property associated with the file item in the project file

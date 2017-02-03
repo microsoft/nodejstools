@@ -15,21 +15,17 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Imaging;
+using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Shell.Interop;
 using MSBuild = Microsoft.Build.Evaluation;
 using OleConstants = Microsoft.VisualStudio.OLE.Interop.Constants;
 using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
 using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
-#if DEV14_OR_LATER
-using Microsoft.VisualStudio.Imaging;
-using Microsoft.VisualStudio.Imaging.Interop;
-#endif
 
 namespace Microsoft.VisualStudioTools.Project {
     [ComVisible(true)]
@@ -69,11 +65,9 @@ namespace Microsoft.VisualStudioTools.Project {
             get { return VsMenus.IDM_VS_CTXT_REFERENCEROOT; }
         }
 
-
         public override Guid ItemTypeGuid {
             get { return VSConstants.GUID_ItemType_VirtualFolder; }
         }
-
 
         public override string Url {
             get { return ReferencesNodeVirtualName; }
@@ -84,7 +78,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 return SR.GetString(SR.ReferencesNodeName);
             }
         }
-
 
         private Automation.OAReferences references;
         internal override object Object {
@@ -119,8 +112,6 @@ namespace Microsoft.VisualStudioTools.Project {
             return null;
         }
 
-
-#if DEV14_OR_LATER
         protected override bool SupportsIconMonikers {
             get { return true; }
         }
@@ -128,13 +119,6 @@ namespace Microsoft.VisualStudioTools.Project {
         protected override ImageMoniker GetIconMoniker(bool open) {
             return KnownMonikers.Reference;
         }
-#else
-        public override int ImageIndex {
-            get {
-                return ProjectMgr.GetIconIndex(ProjectNode.ImageName.ReferenceFolder);
-            }
-        }
-#endif
 
         /// <summary>
         /// References node cannot be dragged.
@@ -175,10 +159,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 switch ((VsCommands2K)cmd) {
                     case VsCommands2K.ADDREFERENCE:
                         return this.ProjectMgr.AddProjectReference();
-#if FALSE
-                    case VsCommands2K.ADDWEBREFERENCE:
-                        return this.ProjectMgr.AddWebReference();
-#endif
                 }
             }
 
@@ -295,13 +275,6 @@ namespace Microsoft.VisualStudioTools.Project {
         #region virtual methods
         protected virtual ReferenceNode CreateReferenceNode(string referenceType, ProjectElement element) {
             ReferenceNode node = null;
-#if FALSE
-            if(referenceType == ProjectFileConstants.COMReference)
-            {
-                node = this.CreateComReferenceNode(element);
-            }
-            else 
-#endif
             if (referenceType == ProjectFileConstants.Reference) {
                 node = this.CreateAssemblyReferenceNode(element);
             } else if (referenceType == ProjectFileConstants.ProjectReference) {
@@ -322,11 +295,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 case VSCOMPONENTTYPE.VSCOMPONENTTYPE_ComPlus:
                     node = this.CreateFileComponent(selectorData);
                     break;
-#if FALSE
-                case VSCOMPONENTTYPE.VSCOMPONENTTYPE_Com2:
-                    node = this.CreateComReferenceNode(selectorData);
-                    break;
-#endif
             }
 
             return node;

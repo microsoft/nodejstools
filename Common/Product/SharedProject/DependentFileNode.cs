@@ -13,18 +13,12 @@
  * ***************************************************************************/
 
 using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
-using System.Text;
 using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Imaging;
+using Microsoft.VisualStudio.Imaging.Interop;
 using OleConstants = Microsoft.VisualStudio.OLE.Interop.Constants;
 using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
 using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
-#if DEV14_OR_LATER
-using Microsoft.VisualStudio.Imaging;
-using Microsoft.VisualStudio.Imaging.Interop;
-#endif
 
 namespace Microsoft.VisualStudioTools.Project {
     /// <summary>
@@ -50,7 +44,6 @@ namespace Microsoft.VisualStudioTools.Project {
             this.HasParentNodeNameRelation = false;
         }
 
-
         #endregion
 
         #region overridden methods
@@ -63,7 +56,6 @@ namespace Microsoft.VisualStudioTools.Project {
             throw new NotImplementedException();
         }
 
-#if DEV14_OR_LATER
         protected override bool SupportsIconMonikers {
             get { return true; }
         }
@@ -74,12 +66,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 KnownMonikers.ReferencedElement :
                 KnownMonikers.DocumentWarning;
         }
-#else
-        public override int ImageIndex {
-            get { return (this.CanShowDefaultIcon() ? (int)ProjectNode.ImageName.DependentFile : (int)ProjectNode.ImageName.MissingFile); }
-        }
-
-#endif
 
         /// <summary>
         /// Disable certain commands for dependent file nodes 
@@ -146,6 +132,5 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
         #endregion
-
     }
 }

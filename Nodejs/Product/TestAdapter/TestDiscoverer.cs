@@ -48,13 +48,11 @@ namespace Microsoft.NodejsTools.TestAdapter {
             ValidateArg.NotNull(logger, "logger");
 
             var env = new Dictionary<string, string>();
-#if DEV15
             var root = Environment.GetEnvironmentVariable(NodejsConstants.NodeToolsVsInstallRootEnvironmentVariable);
             if (!string.IsNullOrEmpty(root)) {
                 env["VsInstallRoot"] = root;
                 env["MSBuildExtensionsPath32"] = Path.Combine(root, "MSBuild");
             }
-#endif
 
             using (var buildEngine = new MSBuild.ProjectCollection(env)) {
                 try {

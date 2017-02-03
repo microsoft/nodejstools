@@ -1255,8 +1255,6 @@ namespace Microsoft.NodejsTools.Debugger {
         internal void Close() {
         }
 
-
-
         #region IDisposable
 
         public void Dispose() {

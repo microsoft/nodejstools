@@ -19,18 +19,17 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Permissions;
-using System.Text;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Imaging;
+using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Shell.Interop;
 using OleConstants = Microsoft.VisualStudio.OLE.Interop.Constants;
 using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
-#if DEV14_OR_LATER
-using Microsoft.VisualStudio.Imaging;
-using Microsoft.VisualStudio.Imaging.Interop;
-#endif
 
 namespace Microsoft.VisualStudioTools.Project {
+
     internal abstract class ReferenceNode : HierarchyNode {
+
         internal delegate void CannotAddReferenceErrorMessage();
 
         #region ctors
@@ -99,8 +98,6 @@ namespace Microsoft.VisualStudioTools.Project {
             return null;
         }
 
-
-#if DEV14_OR_LATER
         protected override bool SupportsIconMonikers {
             get { return true; }
         }
@@ -108,16 +105,6 @@ namespace Microsoft.VisualStudioTools.Project {
         protected override ImageMoniker GetIconMoniker(bool open) {
             return CanShowDefaultIcon() ? KnownMonikers.Reference : KnownMonikers.ReferenceWarning;
         }
-#else
-        public override int ImageIndex {
-            get {
-                return ProjectMgr.GetIconIndex(CanShowDefaultIcon() ?
-                    ProjectNode.ImageName.Reference :
-                    ProjectNode.ImageName.DanglingReference
-                );
-            }
-        }
-#endif
 
         /// <summary>
         /// Not supported.
@@ -173,7 +160,6 @@ namespace Microsoft.VisualStudioTools.Project {
         #endregion
 
         #region  methods
-
 
         /// <summary>
         /// Links a reference node to the project and hierarchy.
@@ -234,7 +220,6 @@ namespace Microsoft.VisualStudioTools.Project {
             return true;
         }
 
-
         /// <summary>
         /// Checks if a reference is already added. The method parses all references and compares the Url.
         /// </summary>
@@ -255,7 +240,6 @@ namespace Microsoft.VisualStudioTools.Project {
 
             return false;
         }
-
 
         /// <summary>
         /// Shows the Object Browser

@@ -14,9 +14,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Diagnostics;
-using System.Diagnostics.Contracts;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -65,19 +63,12 @@ namespace Microsoft.VisualStudioTools.Project {
         private readonly Dictionary<string, FileSystemWatcher> _symlinkWatchers = new Dictionary<string, FileSystemWatcher>();
         private DiskMerger _currentMerger;
         private IdleManager _idleManager;
-#if DEV11_OR_LATER
         private IVsHierarchyItemManager _hierarchyManager;
         private Dictionary<uint, bool> _needBolding;
-#else
-        private readonly HashSet<HierarchyNode> _needBolding = new HashSet<HierarchyNode>();
-#endif
         private int _idleTriggered;
 
         public CommonProjectNode(IServiceProvider serviceProvider, ImageList imageList)
             : base(serviceProvider) {
-#if !DEV14_OR_LATER
-            Contract.Assert(imageList != null);
-#endif
 
             CanFileNodesHaveChilds = true;
             SupportsProjectDesigner = true;
@@ -97,9 +88,7 @@ namespace Microsoft.VisualStudioTools.Project {
             _projectDocListenerForStartupFileUpdates = new ProjectDocumentsListenerForStartupFileUpdates(Site, this);
             _projectDocListenerForStartupFileUpdates.Init();
 
-#if DEV11_OR_LATER
             UpdateHierarchyManager(alwaysCreate: false);
-#endif
 
             _idleManager = new IdleManager(Site);
             _idleManager.OnIdle += OnIdle;
@@ -222,9 +211,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// Since we appended the language images to the base image list in the constructor,
         /// this should be the offset in the ImageList of the langauge project icon.
         /// </summary>
-#if DEV14_OR_LATER
         [Obsolete("Use GetIconMoniker() to specify the icon and GetIconHandle() for back-compat")]
-#endif
         public override int ImageIndex {
             get {
                 return _imageOffset + (int)CommonImageName.Project;
@@ -470,9 +457,7 @@ namespace Microsoft.VisualStudioTools.Project {
             watcher.Deleted += new FileSystemEventHandler(FileExistanceChanged);
             watcher.Renamed += new RenamedEventHandler(FileNameChanged);
             watcher.Changed += FileContentsChanged;
-#if DEV12_OR_LATER
             watcher.Renamed += FileContentsChanged;
-#endif
             watcher.Error += WatcherError;
 
             // Delay setting EnableRaisingEvents until everything else is initialized.
@@ -529,9 +514,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
         protected override void Dispose(bool disposing) {
             if (disposing) {
-#if DEV11_OR_LATER
                 HierarchyManager = null;
-#endif
 
                 var pdl = _projectDocListenerForStartupFileUpdates;
                 _projectDocListenerForStartupFileUpdates = null;
@@ -985,10 +968,6 @@ namespace Microsoft.VisualStudioTools.Project {
         private void OnIdle(object sender, ComponentManagerEventArgs e) {
             Interlocked.Exchange(ref _idleTriggered, 0);
             do {
-#if DEV10
-                BoldDeferredItems();
-#endif
-
                 using (new DebugTimer("ProcessFileChanges while Idle", 100)) {
                     if (IsClosed) {
                         return;
@@ -1195,7 +1174,6 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
-
         public override int GetGuidProperty(int propid, out Guid guid) {
             if ((__VSHPROPID)propid == __VSHPROPID.VSHPROPID_PreferredLanguageSID) {
                 guid = new Guid("{EFB9A1D6-EA71-4F38-9BA7-368C33FCE8DC}");// GetLanguageServiceType().GUID;
@@ -1232,15 +1210,11 @@ namespace Microsoft.VisualStudioTools.Project {
 
             _fileChangedHandlers.Clear();
 
-            foreach (var pair in _symlinkWatchers)
+            foreach (var pair in _symlinkWatchers) {
                 pair.Value.Dispose();
+            }
             _symlinkWatchers.Clear();
-
-#if DEV11_OR_LATER
             _needBolding = null;
-#else
-            _needBolding.Clear();
-#endif
 
             base.Close();
         }
@@ -1253,7 +1227,6 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
-#if DEV11_OR_LATER
         internal IVsHierarchyItemManager HierarchyManager {
             get {
                 if (_hierarchyManager == null) {
@@ -1366,87 +1339,6 @@ namespace Microsoft.VisualStudioTools.Project {
             BoldItem(node.ID, isBold);
         }
 
-#else // DEV11_OR_LATER
-
-        public void BoldItem(HierarchyNode node, bool isBold) {
-            IVsUIHierarchyWindow2 windows = UIHierarchyUtilities.GetUIHierarchyWindow(
-                Site as IServiceProvider,
-                new Guid(ToolWindowGuids80.SolutionExplorer)) as IVsUIHierarchyWindow2;
-
-            // GetItemState will fail if the item has not yet been added to the
-            // hierarchy. If it succeeds, we can make the item bold.
-            uint state;
-            if (windows == null ||
-                ErrorHandler.Failed(windows.GetItemState(
-                this.GetOuterInterface<IVsUIHierarchy>(),
-                node.ID,
-                (uint)__VSHIERARCHYITEMSTATE.HIS_Bold,
-                out state))) {
-
-                if (isBold) {
-                    _needBolding.Add(node);
-                }
-                return;
-            }
-
-            if (windows == null ||
-                ErrorHandler.Failed(windows.SetItemAttribute(
-                this.GetOuterInterface<IVsUIHierarchy>(),
-                node.ID,
-                (uint)__VSHIERITEMATTRIBUTE.VSHIERITEMATTRIBUTE_Bold,
-                isBold
-            ))) {
-                if (isBold) {
-                    _needBolding.Add(node);
-                }
-                return;
-            }
-                }
-
-        private void BoldDeferredItems() {
-            if (_needBolding.Count == 0 || ParentHierarchy == null) {
-                return;
-            }
-            if (IsClosed) {
-                _needBolding.Clear();
-                return;
-            }
-            var items = _needBolding.ToArray();
-
-            AssertHasParentHierarchy();
-            IVsUIHierarchyWindow2 windows = UIHierarchyUtilities.GetUIHierarchyWindow(
-                Site as IServiceProvider,
-                new Guid(ToolWindowGuids80.SolutionExplorer)) as IVsUIHierarchyWindow2;
-
-            if (windows == null) {
-                return;
-            }
-
-            _needBolding.Clear();
-            foreach (var node in items) {
-                // GetItemState will fail if the item has not yet been added to the
-                // hierarchy. If it succeeds, we can make the item bold.
-                uint state;
-                if (ErrorHandler.Failed(windows.GetItemState(
-                    this.GetOuterInterface<IVsUIHierarchy>(),
-                    node.ID,
-                    (uint)__VSHIERARCHYITEMSTATE.HIS_Bold,
-                    out state))) {
-                    _needBolding.Add(node);
-                    continue;
-                }
-
-                windows.SetItemAttribute(
-                    this.GetOuterInterface<IVsUIHierarchy>(),
-                    node.ID,
-                    (uint)__VSHIERITEMATTRIBUTE.VSHIERITEMATTRIBUTE_Bold,
-                    true
-                );
-            }
-        }
-
-#endif // DEV11_OR_LATER
-
         /// <summary>
         /// Overriding to provide project general property page
         /// </summary>
@@ -1482,7 +1374,6 @@ namespace Microsoft.VisualStudioTools.Project {
 
             return newNode;
         }
-
 
         /// <summary>
         /// Create a file node based on absolute file name.

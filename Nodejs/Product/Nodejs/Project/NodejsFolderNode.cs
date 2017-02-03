@@ -49,7 +49,6 @@ namespace Microsoft.NodejsTools.Project {
             return base.IncludeInProject(includeChildren);
         }
 
-
         private bool ShouldIncludeNodeModulesFolderInProject() {
             var includeNodeModulesButton = new TaskDialogButton(Resources.IncludeNodeModulesIncludeTitle, Resources.IncludeNodeModulesIncludeDescription);
             var cancelOperationButton = new TaskDialogButton(Resources.IncludeNodeModulesCancelTitle);

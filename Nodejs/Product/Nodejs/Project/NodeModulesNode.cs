@@ -555,7 +555,6 @@ namespace Microsoft.NodejsTools.Project {
             });
         }
 
-
         public System.Threading.Tasks.Task UninstallModules() {
             var selected = _projectNode.GetSelectedNodes();
             return RunNpmCommand(async commander => {

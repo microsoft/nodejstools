@@ -101,7 +101,6 @@ namespace Microsoft.NodejsTools.Profiling {
             }
         }
 
-
         public ReadOnlyCollection<ProjectTargetView> AvailableProjects {
             get {
                 return _availableProjects;
@@ -184,7 +183,6 @@ namespace Microsoft.NodejsTools.Profiling {
             }
         }
 
-
         /// <summary>
         /// Receives our own property change events to update IsValid.
         /// </summary>
@@ -206,7 +204,6 @@ namespace Microsoft.NodejsTools.Profiling {
             Debug.Assert(Standalone == sender);
             OnPropertyChanged(nameof(Standalone));
         }
-
 
         /// <summary>
         /// True if all settings are valid; otherwise, false.

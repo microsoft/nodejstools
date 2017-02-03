@@ -15,24 +15,19 @@
 //*********************************************************//
 
 using System;
+using System.Globalization;
 using System.IO;
 using EnvDTE;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.Win32;
 using Microsoft.VisualStudio.Settings;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Settings;
+using Microsoft.Win32;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
-using System.Globalization;
 
 namespace Microsoft.VisualStudioTools {
-    static class SettingsManagerCreator {
-#if DEV14
-        const string VSVersion = "14.0";
-#elif DEV15
-        const string VSVersion = "15.0";
-#else
-#error Unrecognized VS Version.
-#endif
+
+    internal static class SettingsManagerCreator {
+        private const string VSVersion = "15.0";
 
         public static SettingsManager GetSettingsManager(DTE dte) {
             return GetSettingsManager(new ServiceProvider(((IOleServiceProvider)dte)));

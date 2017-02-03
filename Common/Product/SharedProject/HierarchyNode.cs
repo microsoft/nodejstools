@@ -13,24 +13,17 @@
  * ***************************************************************************/
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.OLE.Interop;
-//#define CCI_TRACING
+using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Shell.Interop;
+using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 using OleConstants = Microsoft.VisualStudio.OLE.Interop.Constants;
 using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
 using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
-using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
-#if DEV14_OR_LATER
-using Microsoft.VisualStudio.Imaging.Interop;
-#endif
 
 namespace Microsoft.VisualStudioTools.Project {
     /// <summary>
@@ -140,7 +133,6 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
-
         public virtual int MenuCommandId {
             get { return VsMenus.IDM_VS_CTXT_NOCOMMANDS; }
         }
@@ -149,14 +141,11 @@ namespace Microsoft.VisualStudioTools.Project {
             get { return VsMenus.guidSHLMainMenu; }
         }
 
-
         /// <summary>
         /// Return an imageindex
         /// </summary>
         /// <returns></returns>
-#if DEV14_OR_LATER
-        [Obsolete("Use GetIconMoniker() to specify the icon")]
-#endif
+       [Obsolete("Use GetIconMoniker() to specify the icon")]
         public virtual int ImageIndex {
             get { return NoImage; }
         }
@@ -252,7 +241,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 this.projectMgr = value;
             }
         }
-
 
         [System.ComponentModel.BrowsableAttribute(false)]
         public HierarchyNode NextSibling {
@@ -513,7 +501,6 @@ namespace Microsoft.VisualStudioTools.Project {
             return null;
         }
 
-#if DEV14_OR_LATER
         protected virtual bool SupportsIconMonikers {
             get { return false; }
         }
@@ -526,7 +513,6 @@ namespace Microsoft.VisualStudioTools.Project {
         }
 
         [Obsolete("Use GetIconMoniker() to specify the icon")]
-#endif
         /// <summary>
         /// Return an icon handle
         /// </summary>
@@ -739,16 +725,12 @@ namespace Microsoft.VisualStudioTools.Project {
 
             }
 
-#if DEV11_OR_LATER
             __VSHPROPID5 id5 = (__VSHPROPID5)propId;
             switch (id5) {
                 case __VSHPROPID5.VSHPROPID_ProvisionalViewingStatus:
                     result = ProvisionalViewingStatus;
                     break;
             }
-#endif
-
-#if DEV14_OR_LATER
             __VSHPROPID8 id8 = (__VSHPROPID8)propId;
             switch (id8) {
                 case __VSHPROPID8.VSHPROPID_SupportsIconMonikers:
@@ -771,7 +753,6 @@ namespace Microsoft.VisualStudioTools.Project {
                     result = GetIconMoniker(true).Id;
                     break;
             }
-#endif
 
 #if DEBUG
             if (propId != LastTracedProperty) {
@@ -782,13 +763,11 @@ namespace Microsoft.VisualStudioTools.Project {
             return result;
         }
 
-#if DEV11_OR_LATER
         public virtual __VSPROVISIONALVIEWINGSTATUS ProvisionalViewingStatus {
             get {
                 return __VSPROVISIONALVIEWINGSTATUS.PVS_Disabled;
             }
         }
-#endif
 
         /// <summary>
         /// Sets the value of a property for a given property id
@@ -824,7 +803,6 @@ namespace Microsoft.VisualStudioTools.Project {
             if (propid == (int)__VSHPROPID.VSHPROPID_TypeGuid) {
                 guid = this.ItemTypeGuid;
             }
-#if DEV14_OR_LATER
             __VSHPROPID8 id8 = (__VSHPROPID8)propid;
             switch (id8) {
                 case __VSHPROPID8.VSHPROPID_IconMonikerGuid:
@@ -835,7 +813,6 @@ namespace Microsoft.VisualStudioTools.Project {
                     guid = GetIconMoniker(true).Guid;
                     break;
             }
-#endif
 
             if (guid.Equals(Guid.Empty)) {
                 return VSConstants.DISP_E_MEMBERNOTFOUND;
@@ -1477,7 +1454,6 @@ namespace Microsoft.VisualStudioTools.Project {
 
 #region query command handling
 
-
         /// <summary>
         /// Handles command status on a node. Should be overridden by descendant nodes. If a command cannot be handled then the base should be called.
         /// </summary>
@@ -1795,22 +1771,6 @@ namespace Microsoft.VisualStudioTools.Project {
             node.Parent = this;
 
             ProjectMgr.OnItemAdded(this, node, previousVisible);
-#if DEV10
-            // Dev10 won't check the IsHiddenItem flag when we add an item, and it'll just
-            // make it visible no matter what.  So we turn around and invalidate our parent
-            // so it'll rescan the children items and see that we're not visible.
-            if (!node.IsVisible) 
-            {
-                if (previous != null) 
-                {
-                    ProjectMgr.OnPropertyChanged(previous, (int)__VSHPROPID.VSHPROPID_NextVisibleSibling, 0);
-                } 
-                else 
-                {
-                    ProjectMgr.OnPropertyChanged(this, (int)__VSHPROPID.VSHPROPID_FirstVisibleChild, 0);
-                }
-            }
-#endif
         }
 
         public object GetService(Type type) {
@@ -1820,7 +1780,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 return null;
             return this.projectMgr.Site.GetService(type);
         }
-
 
 #endregion
 

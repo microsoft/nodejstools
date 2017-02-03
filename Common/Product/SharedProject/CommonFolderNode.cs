@@ -16,13 +16,11 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Imaging;
+using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Shell.Interop;
 using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
 using VSConstants = Microsoft.VisualStudio.VSConstants;
-#if DEV14_OR_LATER
-using Microsoft.VisualStudio.Imaging;
-using Microsoft.VisualStudio.Imaging.Interop;
-#endif
 
 namespace Microsoft.VisualStudioTools.Project {
 
@@ -40,24 +38,12 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
-#if DEV14_OR_LATER
         protected override ImageMoniker GetIconMoniker(bool open) {
             if (ItemNode.IsExcluded) {
                 return open ? KnownMonikers.HiddenFolderOpened : KnownMonikers.HiddenFolderClosed;
             }
             return base.GetIconMoniker(open);
         }
-#else
-        public override object GetIconHandle(bool open) {
-            if (ItemNode.IsExcluded) {
-                return ProjectMgr.GetIconHandleByName(open ?
-                    ProjectNode.ImageName.OpenExcludedFolder :
-                    ProjectNode.ImageName.ExcludedFolder
-                );
-            }
-            return base.GetIconHandle(open);
-        }
-#endif
 
         internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result) {
             //Hide Exclude from Project command, show everything else normal Folder node supports

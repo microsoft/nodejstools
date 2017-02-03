@@ -1189,7 +1189,6 @@ namespace Microsoft.VisualStudioTools.Project {
                         created = true;
                     }
 
-
                     var newParent = TargetFolder == Project.ProjectHome ? Project : Project.FindNodeByFullPath(TargetFolder);
                     newParent.AddChild(existing);
                     if (Project.ItemsDraggedOrCutOrCopied != null) {
@@ -1824,7 +1823,6 @@ namespace Microsoft.VisualStudioTools.Project {
             return new ProjectReferenceFileAdder(this, targetNode, projectReferences, mouseDropping, dropEffect).AddFiles();
         }
 
-
         #endregion
 
         #region private helper methods
@@ -1837,7 +1835,6 @@ namespace Microsoft.VisualStudioTools.Project {
             if (oleDataObject == null) {
                 return;
             }
-
 
             string sourceProjectPath = DragDropHelper.GetSourceProjectPath(oleDataObject);
 
@@ -1900,7 +1897,6 @@ namespace Microsoft.VisualStudioTools.Project {
         private void ClearCopyCutState() {
             _copyCutState = CopyCutState.None;
         }
-
 
     }
 }

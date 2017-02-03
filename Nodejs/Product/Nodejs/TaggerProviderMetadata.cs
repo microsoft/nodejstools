@@ -22,7 +22,7 @@ namespace Microsoft.NodejsTools {
     /// Just used for our MEF import to get the metadata in a strongly
     /// typed way.
     /// </summary>
-    sealed class TaggerProviderMetadata {
+    internal sealed class TaggerProviderMetadata {
         public readonly IEnumerable<string> ContentTypes;
         public readonly IEnumerable<Type> TagTypes;
 

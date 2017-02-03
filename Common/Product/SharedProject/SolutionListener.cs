@@ -21,7 +21,6 @@ using ShellConstants = Microsoft.VisualStudio.Shell.Interop.Constants;
 
 namespace Microsoft.VisualStudioTools.Project {
 
-
     internal abstract class SolutionListener : IVsSolutionEvents3, IVsSolutionEvents4, IDisposable {
 
         #region fields

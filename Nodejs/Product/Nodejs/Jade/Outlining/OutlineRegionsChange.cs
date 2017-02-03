@@ -14,7 +14,6 @@
 //
 //*********************************************************//
 
-
 namespace Microsoft.NodejsTools.Jade {
     class OutlineRegionsChange {
         public ITextRange ChangedRange { get; private set; }

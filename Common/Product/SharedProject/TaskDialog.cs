@@ -384,7 +384,6 @@ namespace Microsoft.VisualStudioTools {
         public TaskDialogButton SelectedRadioButton { get; set; }
         public bool SelectedVerified { get; set; }
 
-
         private static NativeMethods.TASKDIALOG_COMMON_BUTTON_FLAGS GetButtonFlag(TaskDialogButton button) {
             if (button == TaskDialogButton.OK) {
                 return NativeMethods.TASKDIALOG_COMMON_BUTTON_FLAGS.TDCBF_OK_BUTTON;

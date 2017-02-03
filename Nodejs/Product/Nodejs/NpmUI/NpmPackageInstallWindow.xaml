@@ -367,7 +367,6 @@
 
                 <!-- Package cache control -->
 
-
                 <ContentControl Grid.Column="0"
                                     Content="{Binding LastRefreshedMessage}"
                                     Foreground="{DynamicResource {x:Static wpf:Controls.ForegroundKey}}"

@@ -311,7 +311,6 @@
       </Button>
     </Buttons>
 
-
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
     <Bitmaps>
       <!--  The bitmap id is defined in a way that is a little bit different from the others: 
@@ -402,7 +401,6 @@
 
       <IDSymbol name="NpmGroup" value="0x2010"/>
       <IDSymbol name="NpmExploreGroup" value="0x2011"/>
-
 
       <IDSymbol name="NpmMenu" value="0x3000"/>
     </GuidSymbol>

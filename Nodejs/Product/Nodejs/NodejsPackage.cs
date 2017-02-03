@@ -66,18 +66,9 @@ namespace Microsoft.NodejsTools {
     [ProvideOptionPage(typeof(NodejsGeneralOptionsPage), "Node.js Tools", "General", 114, 115, true)]
     [ProvideOptionPage(typeof(NodejsNpmOptionsPage), "Node.js Tools", "Npm", 114, 116, true)]
     [ProvideDebugEngine("Node.js Debugging", typeof(AD7ProgramProvider), typeof(AD7Engine), AD7Engine.DebugEngineId, setNextStatement: false, hitCountBp: true, justMyCodeStepping: false)]
-#if DEV14
-    [ProvideLanguageService(typeof(NodejsLanguageInfo), NodejsConstants.Nodejs, 106, RequestStockColors = true, ShowSmartIndent = true, ShowCompletion = true, DefaultToInsertSpaces = true, HideAdvancedMembersByDefault = true, EnableAdvancedMembersOption = true, ShowDropDownOptions = true)]
-#endif
     [ProvideDebugLanguage(NodejsConstants.Nodejs, Guids.NodejsDebugLanguageString, NodeExpressionEvaluatorGuid, AD7Engine.DebugEngineId)]
     [WebSiteProject("JavaScript", "JavaScript")]
-    [ProvideProjectFactory(typeof(NodejsProjectFactory), null, null, null, null, ".\\NullPath",
-#if DEV14
-        LanguageVsTemplate = NodejsConstants.JavaScript,
-#else
-        LanguageVsTemplate = NodejsConstants.Nodejs,
-#endif
-        SortPriority = 0x17)]   // outer flavor, no file extension
+    [ProvideProjectFactory(typeof(NodejsProjectFactory), null, null, null, null, ".\\NullPath", LanguageVsTemplate = NodejsConstants.Nodejs, SortPriority = 0x17)]   // outer flavor, no file extension
     [ProvideDebugPortSupplier("Node remote debugging", typeof(NodeRemoteDebugPortSupplier), NodeRemoteDebugPortSupplier.PortSupplierId)]
     [ProvideMenuResource("Menus.ctmenu", 1)]                              // This attribute is needed to let the shell know that this package exposes some menus.
     [WebSiteProject("JavaScript", "JavaScript")]
@@ -91,12 +82,6 @@ namespace Microsoft.NodejsTools {
     [ProvideLanguageExtension(typeof(JadeEditorFactory), JadeContentTypeDefinition.JadeFileExtension)]
     [ProvideLanguageExtension(typeof(JadeEditorFactory), JadeContentTypeDefinition.PugFileExtension)]
     [ProvideTextEditorAutomation(JadeContentTypeDefinition.JadeLanguageName, 3041, 3045, ProfileMigrationType.PassThrough)]
-#if DEV14
-    [ProvideLanguageEditorOptionPage(typeof(NodejsFormattingSpacingOptionsPage), NodejsConstants.Nodejs, "Formatting", "Spacing", "3042")]
-    [ProvideLanguageEditorOptionPage(typeof(NodejsFormattingBracesOptionsPage), NodejsConstants.Nodejs, "Formatting", "Braces", "3043")]
-    [ProvideLanguageEditorOptionPage(typeof(NodejsFormattingGeneralOptionsPage), NodejsConstants.Nodejs, "Formatting", "General", "3044")]
-    [ProvideLanguageEditorOptionPage(typeof(NodejsIntellisenseOptionsPage), NodejsConstants.Nodejs, "IntelliSense", "", "3048")]
-#endif
     internal sealed partial class NodejsPackage : CommonPackage {
         internal const string NodeExpressionEvaluatorGuid = "{F16F2A71-1C45-4BAB-BECE-09D28CFDE3E6}";
         private IContentType _contentType;
@@ -145,12 +130,6 @@ namespace Microsoft.NodejsTools {
             }
         }
 
-        public NodejsIntellisenseOptionsPage IntellisenseOptionsPage {
-            get {
-                return (NodejsIntellisenseOptionsPage)GetDialogPage(typeof(NodejsIntellisenseOptionsPage));
-            }
-        }
-
         public NodejsDiagnosticsOptionsPage DiagnosticsOptionsPage {
             get {
                 return (NodejsDiagnosticsOptionsPage)GetDialogPage(typeof(NodejsDiagnosticsOptionsPage));
@@ -188,10 +167,7 @@ namespace Microsoft.NodejsTools {
                 delegate { NewProjectFromExistingWizard.IsAddNewProjectCmd = true; },
                 delegate { NewProjectFromExistingWizard.IsAddNewProjectCmd = false; }
             );
-#if DEV14
-            var langService = new NodejsLanguageInfo(this);
-            ((IServiceContainer)this).AddService(langService.GetType(), langService, true);
-#endif
+
             ((IServiceContainer)this).AddService(typeof(ClipboardServiceBase), new ClipboardService(), true);
 
             RegisterProjectFactory(new NodejsProjectFactory(this));
@@ -224,7 +200,6 @@ namespace Microsoft.NodejsTools {
             // the NTVS test discoverer and test executor to connect back to VS.
             Environment.SetEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable, Process.GetCurrentProcess().Id.ToString());
 
-#if DEV15
             var devenvPath = Environment.GetEnvironmentVariable("VSAPPIDDIR");
             if (!string.IsNullOrEmpty(devenvPath)) {
                 try {
@@ -234,7 +209,6 @@ namespace Microsoft.NodejsTools {
                     // noop
                 }
             }
-#endif
         }
 
         private void SubscribeToVsCommandEvents(
