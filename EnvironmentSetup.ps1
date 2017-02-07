@@ -119,21 +119,12 @@ switch($vstarget) {
 Write-Output "Setting up NTVS development environment for ${name}"
 Write-Output "============================================================"
 
-# Disable strong name verification for the Node.js Tools binaries
-$skipVerificationKey = If ( $ENV:PROCESSOR_ARCHITECTURE -eq "AMD64") {"EnableSkipVerification.reg" } Else {"EnableSkipVerification86.reg" }
-$skipVerificationKey = Join-Path $rootDir $("Nodejs\Prerequisites\" + $skipVerificationKey)
-Write-Output "Disabling strong name verification for Node.js Tools binaries"
-Write-Output "    $($skipVerificationKey)"
-regedit /s $($skipVerificationKey)
-Write-Output ""
-
 $from = "$rootDir\Nodejs\Product\Nodejs\Microsoft.NodejsTools.targets"
 $to = "$msbuildroot\Node.js Tools\Microsoft.NodejsTools.targets"
 Write-Output "Copying targets file: $($from) -> $($to)"
 New-Item -Force $to > $null
 Copy-Item -Force $from $to
 Write-Output ""
-
 
 # Need to use distinct install processes until the VSTestHost MSI is updated for 15.0.
 function InstallDev14TestHost {

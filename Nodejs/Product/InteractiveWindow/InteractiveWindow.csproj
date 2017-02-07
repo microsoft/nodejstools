@@ -247,9 +247,6 @@
     <RegisterWithCodebase>true</RegisterWithCodebase>
   </PropertyGroup>
   <PropertyGroup>
-    <DelaySign>true</DelaySign>
-  </PropertyGroup>
-  <PropertyGroup>
     <CreateVsixContainer>True</CreateVsixContainer>
     <CopyVsixExtensionFiles>True</CopyVsixExtensionFiles>
     <IsProductComponent>true</IsProductComponent>

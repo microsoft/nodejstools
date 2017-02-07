@@ -8,7 +8,6 @@
     </MSBuildAllProjects>
   </PropertyGroup>
 
-
   <PropertyGroup>
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <!-- The version number to compare with existing install. -->
