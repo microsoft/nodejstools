@@ -2021,7 +2021,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
         public virtual string[] CodeFileExtensions {
             get {
-                return new string[0];
+                return Array.Empty<string>();
             }
         }
 
@@ -2031,7 +2031,7 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <param name="fileName">Name of the file to be evaluated.</param>
         /// <returns>true if the file is a resx file, otherwise false.</returns>
         public virtual bool IsEmbeddedResource(string fileName) {
-            return String.Equals(Path.GetExtension(fileName), ".ResX", StringComparison.OrdinalIgnoreCase);
+            return StringComparer.OrdinalIgnoreCase.Equals(Path.GetExtension(fileName), ".ResX");
         }
 
         /// <summary>

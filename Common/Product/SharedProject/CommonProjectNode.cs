@@ -1348,7 +1348,7 @@ namespace Microsoft.VisualStudioTools.Project {
             if (pageType != null) {
                 return new[] { pageType.GUID };
             }
-            return new Guid[0];
+            return Array.Empty<Guid>();
         }
 
         /// <summary>

@@ -30,7 +30,7 @@ namespace Microsoft.NodejsTools.Jade {
     /// <typeparam name="T">A class or an interface that derives from <seealso cref="ITextRange"/></typeparam>
     [DebuggerDisplay("Count={Count}")]
     class TextRangeCollection<T> : IEnumerable<T>, ITextRangeCollection<T> where T : ITextRange {
-        private static readonly IList<T> _emptyList = new T[0];
+        private static readonly IList<T> _emptyList = Array.Empty<T>();
 
         private List<T> _items = new List<T>();
 

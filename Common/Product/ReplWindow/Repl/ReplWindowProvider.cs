@@ -81,7 +81,7 @@ namespace Microsoft.VisualStudio.Repl {
         }
 
         private static IReplEvaluator GetReplEvaluator(IComponentModel model, string replId, out string[] roles) {
-            roles = new string[0];
+            roles = Array.Empty<string>();
             foreach (var provider in model.GetExtensions<IReplEvaluatorProvider>()) {
                 var evaluator = provider.GetEvaluator(replId);
 

@@ -39,7 +39,7 @@ namespace Microsoft.NodejsTools {
 
         private void ListenerThread() {
             int pos = 0;
-            byte[] text = new byte[0];
+            byte[] text = Array.Empty<byte>();
 
             // Use a local for Socket to keep nulling of _socket field (on non listener thread)
             // from causing spurious null dereferences

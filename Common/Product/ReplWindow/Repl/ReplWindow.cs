@@ -268,7 +268,7 @@ namespace Microsoft.VisualStudio.Repl {
 
             var projBuffer = projectionFactory.CreateProjectionBuffer(
                 new EditResolver(this),
-                new object[0],
+                Array.Empty<object>(),
                 ProjectionBufferOptions.None,
                 replContentType);
 

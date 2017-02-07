@@ -74,14 +74,14 @@ namespace Microsoft.NodejsTools.SourceMapping {
                     .Select(x => sourceRoot + x)
                     .ToArray();
             } else {
-                _sources = new string[0];
+                _sources = Array.Empty<string>();
             }
 
             if (_mapInfo.TryGetValue("names", out value)) {
                 var names = value as ArrayList;
                 _names = names.Cast<string>().ToArray();
             } else {
-                _names = new string[0];
+                _names = Array.Empty<string>();
             }
 
             List<LineInfo> lineInfos = new List<LineInfo>();
