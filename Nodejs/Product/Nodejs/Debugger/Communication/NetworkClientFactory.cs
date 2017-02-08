@@ -17,7 +17,7 @@
 using System;
 
 namespace Microsoft.NodejsTools.Debugger.Communication {
-    sealed class NetworkClientFactory : INetworkClientFactory {
+    internal sealed class NetworkClientFactory : INetworkClientFactory {
         public INetworkClient CreateNetworkClient(Uri uri) {
             if (uri == null) {
                 throw new ArgumentNullException("uri");

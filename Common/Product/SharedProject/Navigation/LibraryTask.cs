@@ -44,5 +44,4 @@ namespace Microsoft.VisualStudioTools.Navigation {
             get { return _textBuffer; }
         }
     }
-
 }

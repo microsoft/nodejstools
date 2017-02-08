@@ -71,7 +71,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private string _webBrowserUrl;
 
         public const string DebugEngineId = "{0A638DAC-429B-4973-ADA0-E8DCDFB29B61}";
-        public static Guid DebugEngineGuid = new Guid(DebugEngineId);
+        public readonly static Guid DebugEngineGuid = new Guid(DebugEngineId);
         private bool _trackFileChanges;
         private DocumentEvents _documentEvents;
 

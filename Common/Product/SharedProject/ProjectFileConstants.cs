@@ -120,5 +120,4 @@ namespace Microsoft.VisualStudioTools.Project {
         public const int NestedProjectNode = 200;
         public const int ReferenceContainerNode = 300;
     }
-
 }

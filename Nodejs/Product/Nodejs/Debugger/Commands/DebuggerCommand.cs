@@ -19,7 +19,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Debugger.Commands {
-    abstract class DebuggerCommand {
+    internal abstract class DebuggerCommand {
         private readonly string _commandName;
 
         protected DebuggerCommand(int id, string commandName) {

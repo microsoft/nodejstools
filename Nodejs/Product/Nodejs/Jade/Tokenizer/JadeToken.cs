@@ -36,5 +36,4 @@ namespace Microsoft.NodejsTools.Jade {
             get { return TokenType == JadeTokenType.String; }
         }
     }
-
 }

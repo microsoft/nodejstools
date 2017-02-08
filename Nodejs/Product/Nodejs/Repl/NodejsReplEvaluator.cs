@@ -203,7 +203,7 @@ namespace Microsoft.NodejsTools.Repl {
             portNum = ((IPEndPoint)conn.LocalEndPoint).Port;
         }
 
-        class ListenerThread : JsonListener, IDisposable {
+        internal class ListenerThread : JsonListener, IDisposable {
             private readonly NodejsReplEvaluator _eval;
             private readonly Process _process;
             private readonly object _socketLock = new object();

@@ -52,7 +52,6 @@ namespace Microsoft.NodejsTools.Jade {
                         new OutliningRegionTag(false, false, region.DisplayText, region.HoverText));
                 }
             }
-
         }
 
         public event EventHandler<SnapshotSpanEventArgs> TagsChanged;

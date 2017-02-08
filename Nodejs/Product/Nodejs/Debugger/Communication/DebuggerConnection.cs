@@ -27,7 +27,7 @@ using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json;
 
 namespace Microsoft.NodejsTools.Debugger.Communication {
-    sealed class DebuggerConnection : IDebuggerConnection {
+    internal sealed class DebuggerConnection : IDebuggerConnection {
         private static readonly Encoding _encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true);
         private static readonly Regex _contentLengthFieldRegex = new Regex(@"Content-Length: (\d+)", RegexOptions.Compiled);
         private static readonly Regex _nodeVersionFieldRegex = new Regex(@"Embedding-Host: node v([0-9.]+)", RegexOptions.Compiled);

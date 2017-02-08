@@ -27,7 +27,7 @@ namespace Microsoft.NodejsTools {
     /// Base class for listening to a socket where we're communicating by sending JSON over
     /// the wire.  Usage is to subclass, set the socket, and then override ProcessPacket.
     /// </summary>
-    abstract class JsonListener {
+    internal abstract class JsonListener {
         private readonly byte[] _socketBuffer = new byte[4096];
         private Socket _socket;
 
@@ -181,5 +181,4 @@ namespace Microsoft.NodejsTools {
             Body = body;
         }
     }
-
 }

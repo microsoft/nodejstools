@@ -329,5 +329,4 @@ namespace Microsoft.NodejsTools.LogGeneration {
         [FieldOffset(268)]
         public uint BuffersLost;
     }
-
 }

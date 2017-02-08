@@ -18,7 +18,7 @@ using System.IO;
 using System.Net.Sockets;
 
 namespace Microsoft.NodejsTools.Debugger.Communication {
-    sealed class TcpNetworkClient : INetworkClient {
+    internal sealed class TcpNetworkClient : INetworkClient {
         private readonly TcpClient _tcpClient;
 
         public TcpNetworkClient(string hostName, int portNumber) {

@@ -18,7 +18,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Debugger.Commands {
-    sealed class ListBreakpointsCommand : DebuggerCommand {
+    internal sealed class ListBreakpointsCommand : DebuggerCommand {
         public ListBreakpointsCommand(int id) : base(id, "listbreakpoints") {
         }
 
