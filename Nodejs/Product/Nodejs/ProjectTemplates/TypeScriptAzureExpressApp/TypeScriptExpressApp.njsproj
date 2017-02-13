@@ -45,6 +45,7 @@ $if$ ($dev14$ == true)
 $endif$
     <Content Include="views\index.pug" />
     <Content Include="views\layout.pug" />
+    <Content Include="views\error.pug" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config" />
     <Content Include="bin\ChangeConfig.ps1" />

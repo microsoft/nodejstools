@@ -32,6 +32,7 @@
       <Folder Name="views">
         <ProjectItem>index.pug</ProjectItem>
         <ProjectItem>layout.pug</ProjectItem>
+        <ProjectItem>error.pug</ProjectItem>
       </Folder>
       <Folder Name="typings">
         <Folder Name="globals">
