@@ -36,8 +36,8 @@ namespace Microsoft.NodejsTools.Debugger {
     /// <summary>
     /// Handles all interactions with a Node process which is being debugged.
     /// </summary>
-    sealed class NodeDebugger : IDisposable {
-        public readonly int MainThreadId = 1;
+    internal sealed class NodeDebugger : IDisposable {
+        public const int MainThreadId = 1;
         private readonly Dictionary<int, NodeBreakpointBinding> _breakpointBindings = new Dictionary<int, NodeBreakpointBinding>();
         private readonly IDebuggerClient _client;
         private readonly IDebuggerConnection _connection;
@@ -76,62 +76,6 @@ namespace Microsoft.NodejsTools.Debugger {
             _fileNameMapper = new LocalFileNameMapper();
         }
 
-        public NodeDebugger(
-            string exe,
-            string script,
-            string dir,
-            string env,
-            string interpreterOptions,
-            NodeDebugOptions debugOptions,
-            ushort? debuggerPort = null,
-            bool createNodeWindow = true)
-            : this() {
-            // Select debugger port for a local connection
-            ushort debuggerPortOrDefault = NodejsConstants.DefaultDebuggerPort;
-            if (debuggerPort != null) {
-                debuggerPortOrDefault = debuggerPort.Value;
-            } else {
-                List<int> activeConnections =
-                    (from listener in IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners()
-                     select listener.Port).ToList();
-                if (activeConnections.Contains(debuggerPortOrDefault)) {
-                    debuggerPortOrDefault = (ushort)Enumerable.Range(new Random().Next(5859, 6000), 60000).Except(activeConnections).First();
-                }
-            }
-
-            _debuggerEndpointUri = new UriBuilder { Scheme = "tcp", Host = "localhost", Port = debuggerPortOrDefault }.Uri;
-
-            // Node usage: node [options] [ -e script | script.js ] [arguments]
-            string allArgs = string.Format(CultureInfo.InvariantCulture,
-                "--debug-brk={0} --nolazy {1} {2}",
-                debuggerPortOrDefault,
-                interpreterOptions,
-                script
-            );
-
-            var psi = new ProcessStartInfo(exe, allArgs) {
-                CreateNoWindow = !createNodeWindow,
-                WorkingDirectory = dir,
-                UseShellExecute = false
-            };
-
-            if (env != null) {
-                string[] envValues = env.Split('\0');
-                foreach (string curValue in envValues) {
-                    string[] nameValue = curValue.Split(new[] { '=' }, 2);
-                    if (nameValue.Length == 2 && !String.IsNullOrWhiteSpace(nameValue[0])) {
-                        psi.EnvironmentVariables[nameValue[0]] = nameValue[1];
-                    }
-                }
-            }
-
-            _process = new NodeProcess(
-                psi,
-                debugOptions.HasFlag(NodeDebugOptions.WaitOnAbnormalExit),
-                debugOptions.HasFlag(NodeDebugOptions.WaitOnNormalExit),
-                true);
-        }
-
         public NodeDebugger(Uri debuggerEndpointUri, int id)
             : this() {
             _debuggerEndpointUri = debuggerEndpointUri;
@@ -139,19 +83,83 @@ namespace Microsoft.NodejsTools.Debugger {
             _attached = true;
         }
 
+        public NodeDebugger(string exe, string script, string dir, string env, string interpreterOptions, NodeDebugOptions debugOptions, ushort? debuggerPort = null, bool createNodeWindow = true)
+            : this() {
+            // Select debugger port for a local connection
+            var debuggerPortOrDefault = debuggerPort ?? GetDebuggerPort();
+            _debuggerEndpointUri = new UriBuilder { Scheme = "tcp", Host = "localhost", Port = debuggerPortOrDefault }.Uri;
+
+            _process = StartNodeProcessWithDebug(exe, script, dir, env, interpreterOptions, debugOptions, debuggerPortOrDefault, createNodeWindow);
+        }
+
+        private static ushort GetDebuggerPort() {
+            var debuggerPortOrDefault = NodejsConstants.DefaultDebuggerPort;
+
+            var activeConnections = (from listener in IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners()
+                                     select listener.Port).ToList();
+
+            if (activeConnections.Contains(debuggerPortOrDefault)) {
+                debuggerPortOrDefault = (ushort)Enumerable.Range(new Random().Next(5859, 6000), 60000).Except(activeConnections).First();
+            }
+
+            return debuggerPortOrDefault;
+        }
+
+        public static NodeProcess StartNodeProcessWithDebug(string exe, string script, string dir, string env, string interpreterOptions, NodeDebugOptions debugOptions, ushort? debuggerPort = null, bool createNodeWindow = true) {
+            // Select debugger port for a local connection
+            var debuggerPortOrDefault = debuggerPort ?? GetDebuggerPort();
+
+            // Node usage: node [options] [ -e script | script.js ] [arguments]
+            var allArgs = $"--debug-brk={debuggerPortOrDefault} --nolazy {interpreterOptions} \"{script}\"";
+
+            return StartNodeProcess(exe, dir, env, debugOptions, debuggerPortOrDefault, allArgs, createNodeWindow);
+        }
+
+        public static NodeProcess StartNodeProcessWithInspect(string exe, string script, string dir, string env, string interpreterOptions, NodeDebugOptions debugOptions, ushort? debuggerPort = null, bool createNodeWindow = true) {
+            // Select debugger port for a local connection
+            var debuggerPortOrDefault = debuggerPort ?? GetDebuggerPort();
+
+            // Node usage: node [options] [ -e script | script.js ] [arguments]
+            string allArgs = $"--debug-brk={debuggerPortOrDefault} --nolazy {interpreterOptions} {script}";
+
+            return StartNodeProcess(exe, dir, env, debugOptions, debuggerPortOrDefault, allArgs, createNodeWindow);
+        }
+
+        // starts the nodeprocess in debug mode without hooking up our debugger, this way we can attach the WebKit debugger as a next step.
+        private static NodeProcess StartNodeProcess(string exe, string dir, string env, NodeDebugOptions debugOptions, ushort debuggerPortOrDefault, string allArgs, bool createNodeWindow) {
+            var psi = new ProcessStartInfo(exe, allArgs) {
+                CreateNoWindow = !createNodeWindow,
+                WorkingDirectory = dir,
+                UseShellExecute = false
+            };
+
+            if (env != null) {
+                var envValues = env.Split('\0');
+                foreach (var curValue in envValues) {
+                    var nameValue = curValue.Split(new[] { '=' }, 2);
+                    if (nameValue.Length == 2 && !String.IsNullOrWhiteSpace(nameValue[0])) {
+                        psi.EnvironmentVariables[nameValue[0]] = nameValue[1];
+                    }
+                }
+            }
+
+            return new NodeProcess(
+                psi,
+                waitOnAbnormal: debugOptions.HasFlag(NodeDebugOptions.WaitOnAbnormalExit),
+                waitOnNormal: debugOptions.HasFlag(NodeDebugOptions.WaitOnNormalExit),
+                enableRaisingEvents: true,
+                debuggerPort: debuggerPortOrDefault);
+        }
+
+
+
         #region Public Process API
 
-        public int Id {
-            get { return _id != null ? _id.Value : _process.Id; }
-        }
+        public int Id => _id != null ? _id.Value : _process.Id;
 
-        private NodeThread MainThread {
-            get { return _threads[MainThreadId]; }
-        }
+        private NodeThread MainThread => _threads[MainThreadId];
 
-        public bool HasExited {
-            get { return !_connection.Connected; }
-        }
+        public bool HasExited => !_connection.Connected;
 
         /// <summary>
         /// Gets or sets a value indicating whether executed remote debugging process.
@@ -424,16 +432,12 @@ namespace Microsoft.NodejsTools.Debugger {
         /// <summary>
         /// Gets a next command identifier.
         /// </summary>
-        private int CommandId {
-            get { return Interlocked.Increment(ref _commandId); }
-        }
+        private int CommandId => Interlocked.Increment(ref _commandId);
 
         /// <summary>
         /// Gets a source mapper.
         /// </summary>
-        public SourceMapper SourceMapper {
-            get { return _sourceMapper; }
-        }
+        public SourceMapper SourceMapper => _sourceMapper;
 
         /// <summary>
         /// Gets or sets a file name mapper.
@@ -650,7 +654,7 @@ namespace Microsoft.NodejsTools.Debugger {
                     }
 
                     SetBreakpointCommand result = await SetBreakpointAsync(breakpoint, cancellationToken: cancellationToken).ConfigureAwait(false);
-                    
+
                     // Treat rebound breakpoint binding as fully bound
                     NodeBreakpointBinding reboundbreakpointBinding = CreateBreakpointBinding(breakpoint, result.BreakpointId, result.ScriptId, breakpoint.GetPosition(SourceMapper).FileName, result.Line, result.Column, true);
                     HandleBindBreakpointSuccess(reboundbreakpointBinding, breakpoint);
@@ -712,7 +716,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
                 var lookupCommand = new LookupCommand(CommandId, _resultFactory, new[] { exception.ErrorNumber.Value });
                 string errorCodeFromLookup = null;
-                
+
                 if (await TrySendRequestAsync(lookupCommand).ConfigureAwait(false)) {
                     errorCodeFromLookup = lookupCommand.Results[errorNumber][0].StringValue;
                     _errorCodes[errorNumber] = errorCodeFromLookup;
@@ -846,10 +850,6 @@ namespace Microsoft.NodejsTools.Debugger {
             MainThread.Frames = stackFrames;
 
             return backtraceCommand.Running;
-        }
-
-        internal IList<NodeThread> GetThreads() {
-            return _threads.Values.ToList();
         }
 
         internal void SendStepOver(int identity) {
@@ -1049,7 +1049,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
         internal async Task<int?> GetBreakpointHitCountAsync(int breakpointId, CancellationToken cancellationToken = new CancellationToken()) {
             var listBreakpointsCommand = new ListBreakpointsCommand(CommandId);
-            
+
             int hitCount;
             if (await TrySendRequestAsync(listBreakpointsCommand, cancellationToken).ConfigureAwait(false) &&
                 listBreakpointsCommand.Breakpoints.TryGetValue(breakpointId, out hitCount)) {
@@ -1160,7 +1160,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 return false;
             }
         }
-        
+
         #endregion
 
         #region Debugging Events
@@ -1211,7 +1211,7 @@ namespace Microsoft.NodejsTools.Debugger {
             javaScriptFileName = FileNameMapper.GetLocalFileName(javaScriptFileName);
 
             // Try to get mapping for JS file
-            if(stackFrame != null) {
+            if (stackFrame != null) {
                 line = stackFrame.Line;
                 column = stackFrame.Column;
             }
@@ -1254,8 +1254,6 @@ namespace Microsoft.NodejsTools.Debugger {
 
         internal void Close() {
         }
-
-
 
         #region IDisposable
 

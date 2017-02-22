@@ -4496,7 +4496,6 @@ If the files in the existing folder have the same names as files in the folder y
             }
 
             return VSConstants.S_OK;
-
         }
 
         protected virtual bool IncludeNonMemberItemInProject(HierarchyNode node) {
@@ -5596,6 +5595,10 @@ If the files in the existing folder have the same names as files in the folder y
         /// </summary>
         internal HierarchyNode FindNodeByFullPath(string name) {
             Site.GetUIThread().MustBeCalledFromUIThread();
+
+            if (name.StartsWith("mdha:", StringComparison.OrdinalIgnoreCase)) {
+                return default(HierarchyNode);
+            }
 
             Debug.Assert(Path.IsPathRooted(name));
 

@@ -24,7 +24,7 @@ namespace Microsoft.NodejsTools.Debugger {
     /// <summary>
     /// Represents the result of an evaluation of an expression against a given stack frame.
     /// </summary>
-    class NodeEvaluationResult {
+    internal class NodeEvaluationResult {
         private readonly Regex _stringLengthExpression = new Regex(@"\.\.\. \(length: ([0-9]+)\)$", RegexOptions.Compiled);
 
         /// <summary>

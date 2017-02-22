@@ -565,9 +565,10 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
             AttachEvents(_process);
 
-            var adProcessId = new AD_PROCESS_ID();
-            adProcessId.ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM;
-            adProcessId.dwProcessId = (uint)_process.Id;
+            var adProcessId = new AD_PROCESS_ID() {
+                ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM,
+                dwProcessId = (uint)_process.Id
+            };
 
             EngineUtils.RequireOk(port.GetProcess(adProcessId, out process));
             LiveLogger.WriteLine("AD7Engine LaunchSuspended returning S_OK");
