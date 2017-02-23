@@ -120,7 +120,7 @@ namespace Microsoft.NodejsTools.Debugger {
             var debuggerPortOrDefault = debuggerPort ?? GetDebuggerPort();
 
             // Node usage: node [options] [ -e script | script.js ] [arguments]
-            string allArgs = $"--debug-brk={debuggerPortOrDefault} --nolazy {interpreterOptions} {script}";
+            string allArgs = $"--inspect={debuggerPortOrDefault} --debug-brk --nolazy {interpreterOptions} \"{script}\"";
 
             return StartNodeProcess(exe, dir, env, debugOptions, debuggerPortOrDefault, allArgs, createNodeWindow);
         }

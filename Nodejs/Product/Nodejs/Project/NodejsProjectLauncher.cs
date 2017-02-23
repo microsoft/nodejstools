@@ -41,6 +41,9 @@ namespace Microsoft.NodejsTools.Project {
         private readonly NodejsProjectNode _project;
         private int? _testServerPort;
 
+        private static readonly Guid WebkitDebuggerGuid = Guid.Parse("4cc6df14-0ab5-4a91-8bb4-eb0bf233d0fe");
+        private static readonly Guid WebkitPortSupplierGuid = Guid.Parse("4103f338-2255-40c0-acf5-7380e2bea13d");
+
         public NodejsProjectLauncher(NodejsProjectNode project) {
             _project = project;
 
@@ -90,6 +93,7 @@ namespace Microsoft.NodejsTools.Project {
 
         private void StartAndAttachDebugger(string file, string nodePath) {
 
+            // start the node process
             string workingDir = _project.GetWorkingDirectory();
             string env = "";
             var interpreterOptions = _project.GetProjectProperty(NodeProjectProperty.NodeExeArguments);
@@ -98,20 +102,18 @@ namespace Microsoft.NodejsTools.Project {
             process.Start();
 
             // setup debug info and attach
-            var webkitDebuggerGuid = Guid.Parse("4cc6df14-0ab5-4a91-8bb4-eb0bf233d0fe");
-            var webkitPortSupplierGuid = Guid.Parse("4103f338-2255-40c0-acf5-7380e2bea13d");
             var debugUri = $"http://127.0.0.1:{process.DebuggerPort}";
 
             var dbgInfo = new VsDebugTargetInfo4();
             dbgInfo.dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_AlreadyRunning;
             dbgInfo.LaunchFlags = (uint)__VSDBGLAUNCHFLAGS.DBGLAUNCH_DetachOnStop;
 
-            dbgInfo.guidLaunchDebugEngine = webkitDebuggerGuid;
+            dbgInfo.guidLaunchDebugEngine = WebkitDebuggerGuid;
             dbgInfo.dwDebugEngineCount = 1;
 
-            var enginesPtr = MarshalDebugEngines(new[] { webkitDebuggerGuid });
+            var enginesPtr = MarshalDebugEngines(new[] { WebkitDebuggerGuid });
             dbgInfo.pDebugEngines = enginesPtr;
-            dbgInfo.guidPortSupplier = webkitPortSupplierGuid;
+            dbgInfo.guidPortSupplier = WebkitPortSupplierGuid;
             dbgInfo.bstrPortName = debugUri;
 
             // we connect through a URI, so no need to set the process,
@@ -124,13 +126,13 @@ namespace Microsoft.NodejsTools.Project {
         private void AttachDebugger(VsDebugTargetInfo4 dbgInfo) {
             var serviceProvider = _project.Site;
 
-            var launchResults = new VsDebugTargetProcessInfo[1];
             var debugger = serviceProvider.GetService(typeof(SVsShellDebugger)) as IVsDebugger4;
 
             if (debugger == null) {
-                throw new InvalidOperationException();
+                throw new InvalidOperationException("Failed to get the debugger service.");
             }
 
+            var launchResults = new VsDebugTargetProcessInfo[1];
             debugger.LaunchDebugTargets4(1, new[] { dbgInfo }, launchResults);
         }
 
@@ -351,7 +353,7 @@ namespace Microsoft.NodejsTools.Project {
                     }
                 }
 
-                //Environemnt variables should be passed as a
+                //Environment variables should be passed as a
                 //null-terminated block of null-terminated strings. 
                 //Each string is in the following form:name=value\0
                 StringBuilder buf = new StringBuilder();
