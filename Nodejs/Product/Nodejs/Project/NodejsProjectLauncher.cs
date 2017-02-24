@@ -94,11 +94,12 @@ namespace Microsoft.NodejsTools.Project {
         private void StartAndAttachDebugger(string file, string nodePath) {
 
             // start the node process
-            string workingDir = _project.GetWorkingDirectory();
-            string env = "";
+            var workingDir = _project.GetWorkingDirectory();
+            var env = "";
             var interpreterOptions = _project.GetProjectProperty(NodeProjectProperty.NodeExeArguments);
+            var debugOptions = this.GetDebugOptions();
 
-            var process = NodeDebugger.StartNodeProcessWithInspect(exe: nodePath, script: file, dir: workingDir, env: env, interpreterOptions: interpreterOptions, debugOptions: NodeDebugOptions.None);
+            var process = NodeDebugger.StartNodeProcessWithInspect(exe: nodePath, script: file, dir: workingDir, env: env, interpreterOptions: interpreterOptions, debugOptions: debugOptions);
             process.Start();
 
             // setup debug info and attach
@@ -106,7 +107,7 @@ namespace Microsoft.NodejsTools.Project {
 
             var dbgInfo = new VsDebugTargetInfo4();
             dbgInfo.dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_AlreadyRunning;
-            dbgInfo.LaunchFlags = (uint)__VSDBGLAUNCHFLAGS.DBGLAUNCH_DetachOnStop;
+            dbgInfo.LaunchFlags = (uint)__VSDBGLAUNCHFLAGS.DBGLAUNCH_StopDebuggingOnEnd;
 
             dbgInfo.guidLaunchDebugEngine = WebkitDebuggerGuid;
             dbgInfo.dwDebugEngineCount = 1;
@@ -115,12 +116,29 @@ namespace Microsoft.NodejsTools.Project {
             dbgInfo.pDebugEngines = enginesPtr;
             dbgInfo.guidPortSupplier = WebkitPortSupplierGuid;
             dbgInfo.bstrPortName = debugUri;
+            dbgInfo.fSendToOutputWindow = 0;
 
             // we connect through a URI, so no need to set the process,
             // we need to set the process id to '1' so the debugger is able to attach
             dbgInfo.bstrExe = $"\01";
 
             AttachDebugger(dbgInfo);
+        }
+
+        private NodeDebugOptions GetDebugOptions() {
+
+            var debugOptions = NodeDebugOptions.None;
+
+            if (NodejsPackage.Instance.GeneralOptionsPage.WaitOnAbnormalExit) {
+                debugOptions |= NodeDebugOptions.WaitOnAbnormalExit;
+            }
+
+            if (NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit) {
+                debugOptions |= NodeDebugOptions.WaitOnNormalExit;
+            }
+
+
+            return debugOptions;
         }
 
         private void AttachDebugger(VsDebugTargetInfo4 dbgInfo) {
@@ -155,7 +173,7 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         private void StartNodeProcess(string file, string nodePath, bool startBrowser) {
-            //TODO: looks like this duplicates a ton of code in NodeDebugger
+            //TODO: looks like this duplicates a bunch of code in NodeDebugger
             var psi = new ProcessStartInfo() {
                 UseShellExecute = false,
 
@@ -228,7 +246,7 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        internal static string GetFullUrl(string host, int port) {
+        private static string GetFullUrl(string host, int port) {
             UriBuilder builder;
             Uri uri;
             if (Uri.TryCreate(host, UriKind.Absolute, out uri)) {
@@ -332,10 +350,19 @@ namespace Microsoft.NodejsTools.Project {
             }
 
             dbgInfo.fSendStdoutToOutputWindow = 0;
+            dbgInfo.bstrEnv = GetEnvironmentVariablesString(url);
 
+
+            // Set the Node  debugger
+            dbgInfo.clsidCustom = AD7Engine.DebugEngineGuid;
+            dbgInfo.grfLaunch = (uint)__VSDBGLAUNCHFLAGS.DBGLAUNCH_StopDebuggingOnEnd;
+            return true;
+        }
+
+        private string GetEnvironmentVariablesString(string url) {
             var env = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             if (!String.IsNullOrWhiteSpace(url)) {
-                Uri webUrl = new Uri(url);
+                var webUrl = new Uri(url);
                 env["PORT"] = webUrl.Port.ToString();
             }
 
@@ -347,7 +374,7 @@ namespace Microsoft.NodejsTools.Project {
                 // add any inherited env vars
                 var variables = Environment.GetEnvironmentVariables();
                 foreach (var key in variables.Keys) {
-                    string strKey = (string)key;
+                    var strKey = (string)key;
                     if (!env.ContainsKey(strKey)) {
                         env.Add(strKey, (string)variables[key]);
                     }
@@ -356,18 +383,15 @@ namespace Microsoft.NodejsTools.Project {
                 //Environment variables should be passed as a
                 //null-terminated block of null-terminated strings. 
                 //Each string is in the following form:name=value\0
-                StringBuilder buf = new StringBuilder();
+                var buf = new StringBuilder();
                 foreach (var entry in env) {
                     buf.AppendFormat("{0}={1}\0", entry.Key, entry.Value);
                 }
                 buf.Append("\0");
-                dbgInfo.bstrEnv = buf.ToString();
+                return buf.ToString();
             }
 
-            // Set the Node  debugger
-            dbgInfo.clsidCustom = AD7Engine.DebugEngineGuid;
-            dbgInfo.grfLaunch = (uint)__VSDBGLAUNCHFLAGS.DBGLAUNCH_StopDebuggingOnEnd;
-            return true;
+            return null;
         }
 
         private bool ShouldStartBrowser() {

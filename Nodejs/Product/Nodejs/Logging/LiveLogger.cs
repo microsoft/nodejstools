@@ -14,11 +14,11 @@
 //
 //*********************************************************//
 
-using Microsoft.NodejsTools.Options;
-using Microsoft.VisualStudioTools.Project;
 using System;
 using System.Diagnostics;
 using System.Globalization;
+using Microsoft.NodejsTools.Options;
+using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Logging {
 

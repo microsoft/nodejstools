@@ -151,8 +151,6 @@ namespace Microsoft.NodejsTools.Debugger {
                 debuggerPort: debuggerPortOrDefault);
         }
 
-
-
         #region Public Process API
 
         public int Id => _id != null ? _id.Value : _process.Id;
@@ -244,7 +242,7 @@ namespace Microsoft.NodejsTools.Debugger {
             // We need to get the backtrace before we break, so we request the backtrace
             // and follow up with firing the appropriate event for the break
             tokenSource = new CancellationTokenSource(_timeout);
-            bool running = await PerformBacktraceAsync(tokenSource.Token).ConfigureAwait(false);
+            var running = await PerformBacktraceAsync(tokenSource.Token).ConfigureAwait(false);
             Debug.Assert(!running);
 
             // Fallback to firing step complete event
