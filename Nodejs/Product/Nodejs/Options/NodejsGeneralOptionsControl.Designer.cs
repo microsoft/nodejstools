@@ -29,10 +29,10 @@
             this._editAndContinue = new System.Windows.Forms.CheckBox();
             this._waitOnNormalExit = new System.Windows.Forms.CheckBox();
             this._waitOnAbnormalExit = new System.Windows.Forms.CheckBox();
-            this._webkitDebugger = new System.Windows.Forms.CheckBox();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
-            this._surveyNewsCheckCombo = new System.Windows.Forms.ComboBox();
             this._surveyNewsCheckLabel = new System.Windows.Forms.Label();
+            this._surveyNewsCheckCombo = new System.Windows.Forms.ComboBox();
+            this._webkitDebugger = new System.Windows.Forms.CheckBox();
             this._topOptionsPanel.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
             this.SuspendLayout();
@@ -71,18 +71,17 @@
             this._waitOnAbnormalExit.Name = "_waitOnAbnormalExit";
             this._waitOnAbnormalExit.UseVisualStyleBackColor = true;
             // 
-            // _webkitDebugger
-            // 
-            resources.ApplyResources(this._webkitDebugger, "_webkitDebugger");
-            this._webkitDebugger.Name = "_webkitDebugger";
-            this._webkitDebugger.UseVisualStyleBackColor = true;
-            // 
             // tableLayoutPanel3
             // 
             resources.ApplyResources(this.tableLayoutPanel3, "tableLayoutPanel3");
             this.tableLayoutPanel3.Controls.Add(this._surveyNewsCheckLabel, 0, 7);
             this.tableLayoutPanel3.Controls.Add(this._surveyNewsCheckCombo, 1, 7);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
+            // 
+            // _surveyNewsCheckLabel
+            // 
+            resources.ApplyResources(this._surveyNewsCheckLabel, "_surveyNewsCheckLabel");
+            this._surveyNewsCheckLabel.Name = "_surveyNewsCheckLabel";
             // 
             // _surveyNewsCheckCombo
             // 
@@ -97,10 +96,11 @@
             resources.GetString("_surveyNewsCheckCombo.Items3")});
             this._surveyNewsCheckCombo.Name = "_surveyNewsCheckCombo";
             // 
-            // _surveyNewsCheckLabel
+            // _webkitDebugger
             // 
-            resources.ApplyResources(this._surveyNewsCheckLabel, "_surveyNewsCheckLabel");
-            this._surveyNewsCheckLabel.Name = "_surveyNewsCheckLabel";
+            resources.ApplyResources(this._webkitDebugger, "_webkitDebugger");
+            this._webkitDebugger.Name = "_webkitDebugger";
+            this._webkitDebugger.UseVisualStyleBackColor = true;
             // 
             // NodejsGeneralOptionsControl
             // 
@@ -124,9 +124,9 @@
         private System.Windows.Forms.CheckBox _waitOnAbnormalExit;
         private System.Windows.Forms.CheckBox _editAndContinue;
         private System.Windows.Forms.CheckBox _checkForLongPaths;
-        private System.Windows.Forms.CheckBox _webkitDebugger;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
         private System.Windows.Forms.Label _surveyNewsCheckLabel;
         private System.Windows.Forms.ComboBox _surveyNewsCheckCombo;
+        private System.Windows.Forms.CheckBox _webkitDebugger;
     }
 }
