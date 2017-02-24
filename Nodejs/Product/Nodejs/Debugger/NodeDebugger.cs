@@ -882,6 +882,10 @@ namespace Microsoft.NodejsTools.Debugger {
             return backtraceCommand.Running;
         }
 
+        internal IList<NodeThread> GetThreads() {
+            return _threads.Values.ToList();
+        }
+
         internal void SendStepOver(int identity) {
             DebugWriteCommand("StepOver");
             DebuggerClient.RunWithRequestExceptionsHandled(async () => {
