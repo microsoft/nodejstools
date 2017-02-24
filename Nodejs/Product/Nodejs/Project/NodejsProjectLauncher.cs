@@ -247,7 +247,7 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private static string GetFullUrl(string host, int port) {
+        internal static string GetFullUrl(string host, int port) {
             UriBuilder builder;
             Uri uri;
             if (Uri.TryCreate(host, UriKind.Absolute, out uri)) {
