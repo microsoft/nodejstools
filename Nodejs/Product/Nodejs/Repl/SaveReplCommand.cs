@@ -23,21 +23,27 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.Text;
 using System.Globalization;
 
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #if INTERACTIVE_WINDOW
     using IReplCommand = IInteractiveWindowCommand;
     using IReplWindow = IInteractiveWindow;    
 #endif
 
     [Export(typeof(IReplCommand))]
-    class SaveReplCommand : IReplCommand {
+    internal class SaveReplCommand : IReplCommand
+    {
         #region IReplCommand Members
 
-        public Task<ExecutionResult> Execute(IReplWindow window, string arguments) {
-            if(String.IsNullOrWhiteSpace(arguments)) {
+        public Task<ExecutionResult> Execute(IReplWindow window, string arguments)
+        {
+            if (String.IsNullOrWhiteSpace(arguments))
+            {
                 window.WriteError("save requires a filename");
                 return ExecutionResult.Failed;
-            }else if(arguments.IndexOfAny(Path.GetInvalidPathChars()) != -1) {
+            }
+            else if (arguments.IndexOfAny(Path.GetInvalidPathChars()) != -1)
+            {
                 window.WriteError(string.Format(CultureInfo.CurrentCulture, "Invalid filename: {0}", arguments));
                 return ExecutionResult.Failed;
             }
@@ -45,7 +51,8 @@ namespace Microsoft.NodejsTools.Repl {
             StringBuilder text = new StringBuilder();
 
             List<KeyValuePair<int, ITextBuffer>> positions = new List<KeyValuePair<int, ITextBuffer>>();
-            foreach (var buffer in window.TextView.BufferGraph.GetTextBuffers(IsJavaScriptBuffer)) {
+            foreach (var buffer in window.TextView.BufferGraph.GetTextBuffers(IsJavaScriptBuffer))
+            {
                 var target = window.TextView.BufferGraph.MapUpToBuffer(
                     new SnapshotPoint(buffer.CurrentSnapshot, 0),
                     PointTrackingMode.Positive,
@@ -57,37 +64,47 @@ namespace Microsoft.NodejsTools.Repl {
             }
 
             positions.Sort((x, y) => x.Key.CompareTo(y.Key));
-            foreach (var buffer in positions) {
+            foreach (var buffer in positions)
+            {
                 var bufferText = buffer.Value.CurrentSnapshot.GetText();
-                if (!bufferText.StartsWith(".", StringComparison.Ordinal)) {
+                if (!bufferText.StartsWith(".", StringComparison.Ordinal))
+                {
                     text.Append(bufferText);
                     text.Append(Environment.NewLine);
                 }
             }
 
-            try {
+            try
+            {
                 File.WriteAllText(arguments, text.ToString());
                 window.WriteLine(string.Format(CultureInfo.CurrentCulture, "Session saved to: {0}", arguments));
-            } catch {
+            }
+            catch
+            {
                 window.WriteError(string.Format(CultureInfo.CurrentCulture, "Failed to save: {0}", arguments));
             }
             return ExecutionResult.Succeeded;
         }
 
-        public string Description {
+        public string Description
+        {
             get { return "Save the current REPL session to a file"; }
         }
 
-        public string Command {
+        public string Command
+        {
             get { return "save"; }
         }
 
-        private static bool IsJavaScriptBuffer(ITextBuffer buffer) {
+        private static bool IsJavaScriptBuffer(ITextBuffer buffer)
+        {
             return buffer.ContentType.IsOfType(NodejsConstants.JavaScript);
         }
 
-        public object ButtonContent {
-            get {
+        public object ButtonContent
+        {
+            get
+            {
                 return null;
             }
         }

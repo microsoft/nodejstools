@@ -17,10 +17,12 @@
 using Microsoft.VisualStudio.Language.StandardClassification;
 using Microsoft.VisualStudio.Text.Classification;
 
-namespace Microsoft.NodejsTools.Jade {
-    internal class JadeClassificationNameProvider : IClassificationContextNameProvider<JadeToken> {
+namespace Microsoft.NodejsTools.Jade
+{
+    internal class JadeClassificationNameProvider : IClassificationContextNameProvider<JadeToken>
+    {
         private readonly IClassificationTypeRegistryService _classReg;
-        private const string 
+        private const string
             HtmlComment = "HTML Comment",
             HtmlElementName = "HTML Element Name",
             HtmlAttributeName = "HTML Attribute Name",
@@ -31,20 +33,25 @@ namespace Microsoft.NodejsTools.Jade {
             CssPropertyValue = "CSS Property Value",
             CssSelector = "CSS Selector";
 
-        public JadeClassificationNameProvider(IClassificationTypeRegistryService ClassificationRegistryService) {
+        public JadeClassificationNameProvider(IClassificationTypeRegistryService ClassificationRegistryService)
+        {
             _classReg = ClassificationRegistryService;
         }
 
-        public IClassificationType GetClassificationType(JadeToken token) {
-            if (token.Classification != null) {
+        public IClassificationType GetClassificationType(JadeToken token)
+        {
+            if (token.Classification != null)
+            {
                 return token.Classification;
             }
 
             return _classReg.GetClassificationType(GetClassificationName(token));
         }
 
-        private static string GetClassificationName(JadeToken token) {
-            switch (token.TokenType) {
+        private static string GetClassificationName(JadeToken token)
+        {
+            switch (token.TokenType)
+            {
                 case JadeTokenType.TagName:
                     return HtmlElementName;
                 case JadeTokenType.ClassLiteral:

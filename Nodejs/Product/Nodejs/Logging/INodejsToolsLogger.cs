@@ -14,7 +14,8 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Logging {
+namespace Microsoft.NodejsTools.Logging
+{
     /// <summary>
     /// Provides an interface for logging events and statistics inside of PTVS.
     /// 
@@ -23,7 +24,8 @@ namespace Microsoft.NodejsTools.Logging {
     /// By default there is one logger which shows the stats in 
     /// Tools->Node.js Tools->Diagnostic Info.
     /// </summary>
-    public interface INodejsToolsLogger {
+    public interface INodejsToolsLogger
+    {
         /// <summary>
         /// Informs the logger of an event.  Unknown events should be ignored.
         /// </summary>

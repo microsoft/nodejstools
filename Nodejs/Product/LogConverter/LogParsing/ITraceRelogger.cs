@@ -17,11 +17,13 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace NodeLogConverter.LogParsing {
+namespace NodeLogConverter.LogParsing
+{
     [Guid("F754AD43-3BCC-4286-8009-9C5DA214E84E")]
     [ComImport]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    interface ITraceRelogger {
+    internal interface ITraceRelogger
+    {
         void AddLogfileTraceStream(
             [MarshalAs(UnmanagedType.BStr)]
             /* [in] */ string LogfileName,

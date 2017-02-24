@@ -15,28 +15,36 @@
 using System.Collections.Generic;
 using Microsoft.VisualStudioTools.Parsing;
 
-namespace Microsoft.VisualStudioTools.Navigation {
-    interface IScopeNode {
-        LibraryNodeType NodeType {
+namespace Microsoft.VisualStudioTools.Navigation
+{
+    internal interface IScopeNode
+    {
+        LibraryNodeType NodeType
+        {
             get;
         }
 
-        string Name {
+        string Name
+        {
             get;
         }
 
-        string Description {
+        string Description
+        {
             get;
         }
 
-        SourceLocation Start {
+        SourceLocation Start
+        {
             get;
         }
-        SourceLocation End {
+        SourceLocation End
+        {
             get;
         }
 
-        IEnumerable<IScopeNode> NestedScopes {
+        IEnumerable<IScopeNode> NestedScopes
+        {
             get;
         }
     }

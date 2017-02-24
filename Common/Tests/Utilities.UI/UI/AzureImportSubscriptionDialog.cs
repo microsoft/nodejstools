@@ -15,27 +15,35 @@
 using System;
 using System.Windows.Automation;
 
-namespace TestUtilities.UI {
-    public class AzureImportSubscriptionDialog : AutomationDialog {
+namespace TestUtilities.UI
+{
+    public class AzureImportSubscriptionDialog : AutomationDialog
+    {
         public AzureImportSubscriptionDialog(VisualStudioApp app, AutomationElement element)
-            : base(app, element) {
+            : base(app, element)
+        {
         }
 
-        public void ClickImport() {
+        public void ClickImport()
+        {
             WaitForInputIdle();
             WaitForClosed(TimeSpan.FromSeconds(10.0), () => ClickButtonByAutomationId("OKButton"));
         }
 
-        public string FileName {
-            get {
+        public string FileName
+        {
+            get
+            {
                 return GetFileNameBox().GetValuePattern().Current.Value;
             }
-            set {
+            set
+            {
                 GetFileNameBox().GetValuePattern().SetValue(value);
             }
         }
 
-        private AutomationElement GetFileNameBox() {
+        private AutomationElement GetFileNameBox()
+        {
             return Element.FindFirst(TreeScope.Descendants,
                 new AndCondition(
                     new PropertyCondition(AutomationElement.AutomationIdProperty, "PublishSettingsFileTextBox"),

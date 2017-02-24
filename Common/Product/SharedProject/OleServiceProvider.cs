@@ -19,17 +19,18 @@ using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
-namespace Microsoft.VisualStudioTools.Project {
+namespace Microsoft.VisualStudioTools.Project
+{
     // This class is No longer used by project system, retained for backwards for languages
     // which have already shipped this public type.
-#if SHAREDPROJECT_OLESERVICEPROVIDER    
+#if SHAREDPROJECT_OLESERVICEPROVIDER
     public class OleServiceProvider : IOleServiceProvider, IDisposable {
-        #region Public Types
+    #region Public Types
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
         public delegate object ServiceCreatorCallback(Type serviceType);
-        #endregion
+    #endregion
 
-        #region Private Types
+    #region Private Types
         private class ServiceData : IDisposable {
             private Type serviceType;
             private object instance;
@@ -74,9 +75,9 @@ namespace Microsoft.VisualStudioTools.Project {
                 GC.SuppressFinalize(this);
             }
         }
-        #endregion
+    #endregion
 
-        #region fields
+    #region fields
 
         private Dictionary<Guid, ServiceData> services = new Dictionary<Guid, ServiceData>();
         private bool isDisposed;
@@ -84,14 +85,14 @@ namespace Microsoft.VisualStudioTools.Project {
         /// Defines an object that will be a mutex for this object for synchronizing thread calls.
         /// </summary>
         private static volatile object Mutex = new object();
-        #endregion
+    #endregion
 
-        #region ctors
+    #region ctors
         public OleServiceProvider() {
         }
-        #endregion
+    #endregion
 
-        #region IOleServiceProvider Members
+    #region IOleServiceProvider Members
 
         public int QueryService(ref Guid guidService, ref Guid riid, out IntPtr ppvObject) {
             ppvObject = (IntPtr)0;
@@ -131,9 +132,9 @@ namespace Microsoft.VisualStudioTools.Project {
             return hr;
         }
 
-        #endregion
+    #endregion
 
-        #region Dispose
+    #region Dispose
 
         /// <summary>
         /// The IDispose interface Dispose method for disposing the object determinastically.
@@ -143,7 +144,7 @@ namespace Microsoft.VisualStudioTools.Project {
             GC.SuppressFinalize(this);
         }
 
-        #endregion
+    #endregion
 
         /// <summary>
         /// Adds the given service to the service container.
@@ -198,7 +199,7 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
-        #region helper methods
+    #region helper methods
         /// <summary>
         /// The method that does the cleanup.
         /// </summary>
@@ -223,7 +224,7 @@ namespace Microsoft.VisualStudioTools.Project {
                 }
             }
         }
-        #endregion
+    #endregion
 
     }
 #endif

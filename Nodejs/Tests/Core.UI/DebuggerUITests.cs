@@ -25,16 +25,23 @@ using Microsoft.VisualStudioTools.VSTestHost;
 using TestUtilities;
 using TestUtilities.UI;
 
-namespace Microsoft.Nodejs.Tests.UI {
+namespace Microsoft.Nodejs.Tests.UI
+{
     [TestClass]
-    public class DebuggerUITests : NodejsProjectTest {
+    public class DebuggerUITests : NodejsProjectTest
+    {
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Debugging UI")]
         [HostType("VSTestHost")]
-        public void WaitOnExit() {
-            foreach (var debug in new[] { false, true }) {
-                foreach (var exitCode in new[] { 0, 1 }) {
-                    foreach (var waitOnAbnormal in new[] { true, false }) {
-                        foreach (var waitOnNormal in new[] { true, false }) {
+        public void WaitOnExit()
+        {
+            foreach (var debug in new[] { false, true })
+            {
+                foreach (var exitCode in new[] { 0, 1 })
+                {
+                    foreach (var waitOnAbnormal in new[] { true, false })
+                    {
+                        foreach (var waitOnNormal in new[] { true, false })
+                        {
                             Console.WriteLine("Testing {0} {1} {2} {3}", debug, exitCode, waitOnAbnormal, waitOnNormal);
                             var filename = Path.Combine(TestData.GetTempPath(), Path.GetRandomFileName());
 
@@ -46,7 +53,8 @@ process.exit(" + exitCode + ");"),
                                 Property(CommonConstants.StartupFile, "server.js")
                             );
 
-                            using (var solution = project.Generate().ToVs()) {
+                            using (var solution = project.Generate().ToVs())
+                            {
                                 var waitingOnProcess = (waitOnAbnormal || waitOnNormal) ? "Microsoft.NodejsTools.PressAnyKey" : "node";
                                 var beginningProcesses = System.Diagnostics.Process.GetProcessesByName(
                                     waitingOnProcess
@@ -55,13 +63,17 @@ process.exit(" + exitCode + ");"),
                                 NodejsPackage.Instance.GeneralOptionsPage.WaitOnAbnormalExit = waitOnAbnormal;
                                 NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit = waitOnNormal;
 
-                                if (debug) {
+                                if (debug)
+                                {
                                     solution.ExecuteCommand("Debug.Start");
-                                } else {
+                                }
+                                else
+                                {
                                     solution.ExecuteCommand("Debug.StartWithoutDebugging");
                                 }
 
-                                for (int i = 0; i < 10 && !File.Exists(filename); i++) {
+                                for (int i = 0; i < 10 && !File.Exists(filename); i++)
+                                {
                                     System.Threading.Thread.Sleep(1000);
                                 }
 
@@ -72,13 +84,16 @@ process.exit(" + exitCode + ");"),
                                 ).Select(x => x.Id);
 
                                 var newProcesses = currentProcesses.Except(beginningProcesses).ToArray();
-                                if (exitCode == 0) {
+                                if (exitCode == 0)
+                                {
                                     Assert.AreEqual(
                                         waitOnNormal ? 1 : 0,
                                         newProcesses.Length,
                                         "wrong count on normal " + newProcesses.Length
                                     );
-                                } else {
+                                }
+                                else
+                                {
                                     Assert.AreEqual(
                                         waitOnAbnormal ? 1 : 0,
                                         newProcesses.Length,
@@ -86,11 +101,13 @@ process.exit(" + exitCode + ");"),
                                     );
                                 }
 
-                                if (debug) {
+                                if (debug)
+                                {
                                     solution.WaitForMode(dbgDebugMode.dbgDesignMode);
                                 }
 
-                                foreach (var proc in newProcesses) {
+                                foreach (var proc in newProcesses)
+                                {
                                     System.Diagnostics.Process.GetProcessById(proc).Kill();
                                 }
 
@@ -108,18 +125,21 @@ process.exit(" + exitCode + ");"),
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Debugging UI"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void NoDebugging() {
+        public void NoDebugging()
+        {
             var project = Project("NoDebugging",
                 Compile("server"),
                 Property(CommonConstants.StartupFile, "server.js"),
                 Property(NodeProjectProperty.NodeExeArguments, "-v")
             );
 
-            using (var solution = project.Generate().ToVs()) {
+            using (var solution = project.Generate().ToVs())
+            {
                 bool waitOnAbnormal, waitOnNormal;
                 waitOnAbnormal = NodejsPackage.Instance.GeneralOptionsPage.WaitOnAbnormalExit;
                 waitOnNormal = NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit;
-                try {
+                try
+                {
                     NodejsPackage.Instance.GeneralOptionsPage.WaitOnAbnormalExit = true;
                     NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit = true;
 
@@ -130,12 +150,14 @@ process.exit(" + exitCode + ");"),
                     solution.ExecuteCommand("Debug.Start");
 
                     bool foundNewProcesses = false;
-                    for (int i = 0; i < 10; i++) {
+                    for (int i = 0; i < 10; i++)
+                    {
                         var currentProcesses = System.Diagnostics.Process.GetProcessesByName(
                             "Microsoft.NodejsTools.PressAnyKey"
                         ).Select(x => x.Id);
                         var newProcesses = currentProcesses.Except(beginningProcesses).ToArray();
-                        if (newProcesses.Length > 0) {
+                        if (newProcesses.Length > 0)
+                        {
                             // we shouldn't have gotten into debug mode
                             Assert.AreEqual(
                                 VSTestContext.DTE.Debugger.CurrentMode,
@@ -143,7 +165,8 @@ process.exit(" + exitCode + ");"),
                             );
 
                             Assert.AreEqual(1, newProcesses.Length);
-                            foreach (var proc in newProcesses) {
+                            foreach (var proc in newProcesses)
+                            {
                                 System.Diagnostics.Process.GetProcessById(proc).Kill();
                             }
 
@@ -154,7 +177,9 @@ process.exit(" + exitCode + ");"),
                     }
 
                     Assert.IsTrue(foundNewProcesses, "failed to find new processes");
-                } finally {
+                }
+                finally
+                {
                     NodejsPackage.Instance.GeneralOptionsPage.WaitOnAbnormalExit = waitOnAbnormal;
                     NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit = waitOnNormal;
                 }

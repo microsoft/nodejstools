@@ -23,11 +23,13 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools;
 using SR = Microsoft.NodejsTools.Project.SR;
 
-namespace Microsoft.NodejsTools.Jade {
+namespace Microsoft.NodejsTools.Jade
+{
     /// <summary>
     /// Asynchronous task that start on next idle slot
     /// </summary>
-    sealed class IdleTimeAsyncTask : IDisposable {
+    internal sealed class IdleTimeAsyncTask : IDisposable
+    {
         private Func<object> _taskAction;
         private Action<object> _callbackAction;
         private Action<object> _cancelAction;
@@ -39,7 +41,8 @@ namespace Microsoft.NodejsTools.Jade {
 
         public object Tag { get; private set; }
 
-        public IdleTimeAsyncTask() {
+        public IdleTimeAsyncTask()
+        {
         }
 
         /// <summary>
@@ -49,7 +52,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// <param name="callbackAction">Callback to invoke when task completes</param>
         /// <param name="cancelAction">Callback to invoke if task is canceled</param>
         public IdleTimeAsyncTask(Func<object> taskAction, Action<object> callbackAction, Action<object> cancelAction)
-            : this() {
+            : this()
+        {
             Debug.Assert(taskAction != null);
 
             if (taskAction == null)
@@ -66,7 +70,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// <param name="taskAction">Task to perform in a background thread</param>
         /// <param name="callbackAction">Callback to invoke when task completes</param>
         public IdleTimeAsyncTask(Func<object> taskAction, Action<object> callbackAction)
-            : this(taskAction, callbackAction, null) {
+            : this(taskAction, callbackAction, null)
+        {
         }
 
         /// <summary>
@@ -74,7 +79,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// </summary>
         /// <param name="taskAction">Task to perform in a background thread</param>
         public IdleTimeAsyncTask(Func<object> taskAction)
-            : this(taskAction, null) {
+            : this(taskAction, null)
+        {
         }
 
         /// <summary>
@@ -83,11 +89,13 @@ namespace Microsoft.NodejsTools.Jade {
         /// <param name="taskAction">Task to perform in a background thread</param>
         /// <param name="msDelay">Milliseconds to delay before performing task on idle</param>
         public IdleTimeAsyncTask(Func<object> taskAction, int msDelay)
-            : this(taskAction, null) {
+            : this(taskAction, null)
+        {
             _delay = msDelay;
         }
 
-        public void DoTaskNow() {
+        public void DoTaskNow()
+        {
             if (Interlocked.Read(ref _closed) == 0)
                 DoTaskInternal();
         }
@@ -95,7 +103,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// <summary>
         /// Run task on next idle slot
         /// </summary>
-        public void DoTaskOnIdle() {
+        public void DoTaskOnIdle()
+        {
             if (_taskAction == null)
                 throw new InvalidOperationException("Task action is null");
 
@@ -107,7 +116,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// Run task on next idle slot after certain amount of milliseconds
         /// </summary>
         /// <param name="msDelay"></param>
-        public void DoTaskOnIdle(int msDelay) {
+        public void DoTaskOnIdle(int msDelay)
+        {
             if (_taskAction == null)
                 throw new InvalidOperationException("Task action is null");
 
@@ -123,7 +133,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// <param name="taskAction">Task to perform in a background thread</param>
         /// <param name="callbackAction">Callback to invoke when task completes</param>
         /// <param name="cancelAction">Callback to invoke if task is canceled</param>
-        public void DoTaskOnIdle(Func<object> taskAction, Action<object> callbackAction, Action<object> cancelAction, object tag = null) {
+        public void DoTaskOnIdle(Func<object> taskAction, Action<object> callbackAction, Action<object> cancelAction, object tag = null)
+        {
             if (TaskRunning)
                 throw new InvalidOperationException("Task is running");
 
@@ -139,37 +150,50 @@ namespace Microsoft.NodejsTools.Jade {
             DoTaskOnIdle();
         }
 
-        public bool TaskRunning {
+        public bool TaskRunning
+        {
             get { return _connectedToIdle || _taskRunning; }
         }
 
-        public bool TaskScheduled {
+        public bool TaskScheduled
+        {
             get { return TaskRunning; }
         }
 
-        private void DoTaskInternal() {
-            if (!_taskRunning) {
+        private void DoTaskInternal()
+        {
+            if (!_taskRunning)
+            {
                 _taskRunning = true;
 
-                Task.Factory.StartNew(() => {
-                    if (Interlocked.Read(ref _closed) == 0) {
+                Task.Factory.StartNew(() =>
+                {
+                    if (Interlocked.Read(ref _closed) == 0)
+                    {
                         object result = null;
 
-                        try {
+                        try
+                        {
                             result = _taskAction();
-                        } catch (Exception ex) {
+                        }
+                        catch (Exception ex)
+                        {
                             Debug.Fail(
                                 string.Format(CultureInfo.CurrentCulture, "Background task exception {0}. Inner exception: {1}",
                                                            ex.Message,
                                                            ex.InnerException != null ? ex.InnerException.Message : "(none)")
                             );
                             result = ex;
-                        } finally {
+                        }
+                        finally
+                        {
                             NodejsPackage.Instance.GetUIThread().InvokeAsync(() => UIThreadCompletedCallback(result))
                                 .HandleAllExceptions(SR.ProductName)
                                 .DoNotWait();
                         }
-                    } else if (Interlocked.Read(ref _closed) > 0) {
+                    }
+                    else if (Interlocked.Read(ref _closed) > 0)
+                    {
                         NodejsPackage.Instance.GetUIThread().InvokeAsync((() => UIThreadCanceledCallback(null)))
                             .HandleAllExceptions(SR.ProductName)
                             .DoNotWait();
@@ -178,12 +202,17 @@ namespace Microsoft.NodejsTools.Jade {
             }
         }
 
-        private void UIThreadCompletedCallback(object result) {
-            try {
-                if (_callbackAction != null && Interlocked.Read(ref _closed) == 0) {
+        private void UIThreadCompletedCallback(object result)
+        {
+            try
+            {
+                if (_callbackAction != null && Interlocked.Read(ref _closed) == 0)
+                {
                     _callbackAction(result);
                 }
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Debug.Fail(
                     string.Format(CultureInfo.CurrentCulture, "Background task UI thread callback exception {0}. Inner exception: {1}",
                                   ex.Message, ex.InnerException != null ? ex.InnerException.Message : "(none)"));
@@ -192,23 +221,29 @@ namespace Microsoft.NodejsTools.Jade {
             _taskRunning = false;
         }
 
-        private void UIThreadCanceledCallback(object result) {
-            if (_cancelAction != null && Interlocked.Read(ref _closed) > 0) {
+        private void UIThreadCanceledCallback(object result)
+        {
+            if (_cancelAction != null && Interlocked.Read(ref _closed) > 0)
+            {
                 _cancelAction(result);
             }
 
             _taskRunning = false;
         }
 
-        private void OnIdle(object sender, EventArgs e) {
-            if (_delay == 0 || TimeUtility.MillisecondsSince(_idleConnectTime) > _delay) {
+        private void OnIdle(object sender, EventArgs e)
+        {
+            if (_delay == 0 || TimeUtility.MillisecondsSince(_idleConnectTime) > _delay)
+            {
                 DoTaskInternal();
                 DisconnectFromIdle();
             }
         }
 
-        private void ConnectToIdle() {
-            if (!_connectedToIdle) {
+        private void ConnectToIdle()
+        {
+            if (!_connectedToIdle)
+            {
                 _connectedToIdle = true;
                 _idleConnectTime = DateTime.Now;
 
@@ -223,8 +258,10 @@ namespace Microsoft.NodejsTools.Jade {
             }
         }
 
-        private void DisconnectFromIdle() {
-            if (_connectedToIdle) {
+        private void DisconnectFromIdle()
+        {
+            if (_connectedToIdle)
+            {
                 _connectedToIdle = false;
                 NodejsPackage.Instance.OnIdle -= OnIdle;
             }
@@ -232,7 +269,8 @@ namespace Microsoft.NodejsTools.Jade {
 
         #region IDisposable
 
-        public void Dispose() {
+        public void Dispose()
+        {
             DisconnectFromIdle();
             Interlocked.Exchange(ref _closed, 1);
         }

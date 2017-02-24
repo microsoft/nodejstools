@@ -16,9 +16,12 @@
 
 using System;
 
-namespace Microsoft.NodejsTools.Npm {
-    public class NpmExceptionEventArgs : EventArgs {
-        public NpmExceptionEventArgs(Exception cause) {
+namespace Microsoft.NodejsTools.Npm
+{
+    public class NpmExceptionEventArgs : EventArgs
+    {
+        public NpmExceptionEventArgs(Exception cause)
+        {
             Exception = cause;
         }
 

@@ -31,7 +31,8 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 
-namespace Microsoft.NodejsTools.Profiling {
+namespace Microsoft.NodejsTools.Profiling
+{
     /// <summary>
     /// This is the class that implements the package exposed by this assembly.
     ///
@@ -60,7 +61,8 @@ namespace Microsoft.NodejsTools.Profiling {
           NameResourceID = 105,
           DefaultName = "NodejsPerfSession")]
     [ProvideAutomationObject("NodejsProfiling")]
-    sealed class NodejsProfilingPackage : Package {
+    internal sealed class NodejsProfilingPackage : Package
+    {
         internal static NodejsProfilingPackage Instance;
         private static ProfiledProcess _profilingProcess;   // process currently being profiled
         internal static string NodeProjectGuid = "{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}";
@@ -76,7 +78,8 @@ namespace Microsoft.NodejsTools.Profiling {
         /// not sited yet inside Visual Studio environment. The place to do all the other 
         /// initialization is the Initialize method.
         /// </summary>
-        public NodejsProfilingPackage() {
+        public NodejsProfilingPackage()
+        {
             Instance = this;
         }
 
@@ -84,7 +87,8 @@ namespace Microsoft.NodejsTools.Profiling {
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
         /// where you can put all the initilaization code that rely on services provided by VisualStudio.
         /// </summary>
-        protected override void Initialize() {
+        protected override void Initialize()
+        {
             Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
             UIThread.EnsureService(this);
@@ -100,7 +104,8 @@ namespace Microsoft.NodejsTools.Profiling {
 
             // Add our command handlers for menu (commands must exist in the .vsct file)
             OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
-            if (null != mcs) {
+            if (null != mcs)
+            {
                 // Create the command for the menu item.
                 CommandID menuCommandID = new CommandID(ProfilingGuids.NodejsProfilingCmdSet, (int)PkgCmdIDList.cmdidStartNodeProfiling);
                 var oleMenuItem = new OleMenuCommand(StartProfilingWizard, menuCommandID);
@@ -146,14 +151,16 @@ namespace Microsoft.NodejsTools.Profiling {
             base.RegisterEditorFactory(new ProfilingSessionEditorFactory(this));
         }
 
-        private void StartPerfAnalysis(object sender, EventArgs e) {
+        private void StartPerfAnalysis(object sender, EventArgs e)
+        {
             var view = new ProfilingTargetView();
 
             var sessions = ShowPerformanceExplorer().Sessions;
             SessionNode activeSession = sessions.ActiveSession;
             if (activeSession == null ||
                 activeSession.Target.ProjectTarget == null ||
-                !ProjectTarget.IsSame(activeSession.Target.ProjectTarget, view.Project.GetTarget())) {
+                !ProjectTarget.IsSame(activeSession.Target.ProjectTarget, view.Project.GetTarget()))
+            {
                 // need to create a new session
                 var target = new ProfilingTarget() { ProjectTarget = view.Project.GetTarget() };
 
@@ -166,16 +173,21 @@ namespace Microsoft.NodejsTools.Profiling {
             ProfileProjectTarget(activeSession, activeSession.Target.ProjectTarget, true);
         }
 
-        private void IsNodejsProjectStartup(object sender, EventArgs e) {
+        private void IsNodejsProjectStartup(object sender, EventArgs e)
+        {
             bool foundStartupProject = false;
             var dteService = (EnvDTE.DTE)(GetService(typeof(EnvDTE.DTE)));
 
-            if (dteService.Solution.SolutionBuild.StartupProjects != null) {
+            if (dteService.Solution.SolutionBuild.StartupProjects != null)
+            {
                 var startupProjects = ((object[])dteService.Solution.SolutionBuild.StartupProjects).Select(x => x.ToString());
-                foreach (EnvDTE.Project project in dteService.Solution.Projects) {
+                foreach (EnvDTE.Project project in dteService.Solution.Projects)
+                {
                     var kind = project.Kind;
-                    if (String.Equals(kind, NodejsProfilingPackage.NodeProjectGuid, StringComparison.OrdinalIgnoreCase)) {
-                        if (startupProjects.Contains(project.UniqueName, StringComparer.OrdinalIgnoreCase)) {
+                    if (String.Equals(kind, NodejsProfilingPackage.NodeProjectGuid, StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (startupProjects.Contains(project.UniqueName, StringComparer.OrdinalIgnoreCase))
+                        {
                             foundStartupProject = true;
                             break;
                         }
@@ -188,9 +200,12 @@ namespace Microsoft.NodejsTools.Profiling {
             oleMenu.Enabled = foundStartupProject;
         }
 
-        protected override object GetAutomationObject(string name) {
-            if (name == "NodejsProfiling") {
-                if (_profilingAutomation == null) {
+        protected override object GetAutomationObject(string name)
+        {
+            if (name == "NodejsProfiling")
+            {
+                if (_profilingAutomation == null)
+                {
                     var pane = (PerfToolWindow)this.FindToolWindow(typeof(PerfToolWindow), 0, true);
                     _profilingAutomation = new AutomationProfiling(pane.Sessions);
                 }
@@ -205,19 +220,23 @@ namespace Microsoft.NodejsTools.Profiling {
         /// See the Initialize method to see how the menu item is associated to this function using
         /// the OleMenuCommandService service and the MenuCommand class.
         /// </summary>
-        private void StartProfilingWizard(object sender, EventArgs e) {
+        private void StartProfilingWizard(object sender, EventArgs e)
+        {
             var targetView = new ProfilingTargetView();
             var dialog = new LaunchProfiling(targetView);
             var res = dialog.ShowModal() ?? false;
-            if (res && targetView.IsValid) {
+            if (res && targetView.IsValid)
+            {
                 var target = targetView.GetTarget();
-                if (target != null) {
+                if (target != null)
+                {
                     ProfileTarget(target);
                 }
             }
         }
 
-        internal SessionNode ProfileTarget(ProfilingTarget target, bool openReport = true) {
+        internal SessionNode ProfileTarget(ProfilingTarget target, bool openReport = true)
+        {
             bool save;
             string name = target.GetProfilingName(out save);
             var session = ShowPerformanceExplorer().Sessions.AddTarget(target, name, save);
@@ -226,56 +245,74 @@ namespace Microsoft.NodejsTools.Profiling {
             return session;
         }
 
-        internal void StartProfiling(ProfilingTarget target, SessionNode session, bool openReport = true) {
-            if (!Utilities.SaveDirtyFiles()) {
+        internal void StartProfiling(ProfilingTarget target, SessionNode session, bool openReport = true)
+        {
+            if (!Utilities.SaveDirtyFiles())
+            {
                 // Abort
                 return;
             }
 
-            if (target.ProjectTarget != null) {
+            if (target.ProjectTarget != null)
+            {
                 ProfileProjectTarget(session, target.ProjectTarget, openReport);
-            } else if (target.StandaloneTarget != null) {
+            }
+            else if (target.StandaloneTarget != null)
+            {
                 ProfileStandaloneTarget(session, target.StandaloneTarget, openReport);
-            } else {
-                if (MessageBox.Show(Resources.NoProfilingConfiguredMessageText, Resources.NoProfilingConfiguredMessageCaption, MessageBoxButton.YesNo) == MessageBoxResult.Yes) {
+            }
+            else
+            {
+                if (MessageBox.Show(Resources.NoProfilingConfiguredMessageText, Resources.NoProfilingConfiguredMessageCaption, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
                     var newTarget = session.OpenTargetProperties();
-                    if (newTarget != null && (newTarget.ProjectTarget != null || newTarget.StandaloneTarget != null)) {
+                    if (newTarget != null && (newTarget.ProjectTarget != null || newTarget.StandaloneTarget != null))
+                    {
                         StartProfiling(newTarget, session, openReport);
                     }
                 }
             }
         }
 
-        private void ProfileProjectTarget(SessionNode session, ProjectTarget projectTarget, bool openReport) {
+        private void ProfileProjectTarget(SessionNode session, ProjectTarget projectTarget, bool openReport)
+        {
             var targetGuid = projectTarget.TargetProject;
 
             var dte = (EnvDTE.DTE)GetGlobalService(typeof(EnvDTE.DTE));
             EnvDTE.Project projectToProfile = null;
-            foreach (EnvDTE.Project project in dte.Solution.Projects) {
+            foreach (EnvDTE.Project project in dte.Solution.Projects)
+            {
                 var kind = project.Kind;
 
-                if (String.Equals(kind, NodejsProfilingPackage.NodeProjectGuid, StringComparison.OrdinalIgnoreCase)) {
+                if (String.Equals(kind, NodejsProfilingPackage.NodeProjectGuid, StringComparison.OrdinalIgnoreCase))
+                {
                     var guid = project.Properties.Item("Guid").Value as string;
 
                     Guid guidVal;
-                    if (Guid.TryParse(guid, out guidVal) && guidVal == projectTarget.TargetProject) {
+                    if (Guid.TryParse(guid, out guidVal) && guidVal == projectTarget.TargetProject)
+                    {
                         projectToProfile = project;
                         break;
                     }
                 }
             }
 
-            if (projectToProfile != null) {
+            if (projectToProfile != null)
+            {
                 var t = ProfileProject(session, projectToProfile, openReport);
-            } else {
+            }
+            else
+            {
                 MessageBox.Show(Resources.ProjectNotFoundErrorMessageText, Resources.NodejsToolsForVS);
             }
         }
 
-        internal async System.Threading.Tasks.Task ProfileProject(SessionNode session, EnvDTE.Project projectToProfile, bool openReport) {
+        internal async System.Threading.Tasks.Task ProfileProject(SessionNode session, EnvDTE.Project projectToProfile, bool openReport)
+        {
             var uiThread = (UIThreadBase)NodejsProfilingPackage.Instance.GetService(typeof(UIThreadBase));
             if (!await uiThread.InvokeTask(() => EnsureProjectUpToDate(projectToProfile)) &&
-                await uiThread.InvokeAsync(() => MessageBox.Show(Resources.FailedToBuild, Resources.NodejsToolsForVS, MessageBoxButton.YesNo)) == MessageBoxResult.No) {
+                await uiThread.InvokeAsync(() => MessageBox.Show(Resources.FailedToBuild, Resources.NodejsToolsForVS, MessageBoxButton.YesNo)) == MessageBoxResult.No)
+            {
                 return;
             }
 
@@ -289,15 +326,18 @@ namespace Microsoft.NodejsTools.Profiling {
             string interpreterPath = (string)projectToProfile.Properties.Item(NodeProjectProperty.NodeExePath).Value;
 
             string startupFile = (string)projectToProfile.Properties.Item("StartupFile").Value;
-            if (String.IsNullOrEmpty(startupFile)) {
+            if (String.IsNullOrEmpty(startupFile))
+            {
                 MessageBox.Show(Resources.NoConfiguredStatupFileErrorMessageText, Resources.NodejsToolsForVS);
                 return;
             }
 
             string workingDir = projectToProfile.Properties.Item("WorkingDirectory").Value as string;
-            if (String.IsNullOrEmpty(workingDir) || workingDir == ".") {
+            if (String.IsNullOrEmpty(workingDir) || workingDir == ".")
+            {
                 workingDir = projectToProfile.Properties.Item("ProjectHome").Value as string;
-                if (String.IsNullOrEmpty(workingDir)) {
+                if (String.IsNullOrEmpty(workingDir))
+                {
                     workingDir = Path.GetDirectoryName(projectToProfile.FullName);
                 }
             }
@@ -317,34 +357,42 @@ namespace Microsoft.NodejsTools.Profiling {
             );
         }
 
-        class UpdateSolutionEvents : IVsUpdateSolutionEvents {
+        private class UpdateSolutionEvents : IVsUpdateSolutionEvents
+        {
             private readonly TaskCompletionSource<bool> SuccessSource = new TaskCompletionSource<bool>();
 
-            public Task<bool> Task {
-                get {
+            public Task<bool> Task
+            {
+                get
+                {
                     return SuccessSource.Task;
                 }
             }
 
-            public int OnActiveProjectCfgChange(IVsHierarchy pIVsHierarchy) {
+            public int OnActiveProjectCfgChange(IVsHierarchy pIVsHierarchy)
+            {
                 return VSConstants.S_OK;
             }
 
-            public int UpdateSolution_Begin(ref int pfCancelUpdate) {
+            public int UpdateSolution_Begin(ref int pfCancelUpdate)
+            {
                 pfCancelUpdate = 0;
                 return VSConstants.S_OK;
             }
 
-            public int UpdateSolution_Cancel() {
+            public int UpdateSolution_Cancel()
+            {
                 return VSConstants.S_OK;
             }
 
-            public int UpdateSolution_Done(int fSucceeded, int fModified, int fCancelCommand) {
+            public int UpdateSolution_Done(int fSucceeded, int fModified, int fCancelCommand)
+            {
                 SuccessSource.SetResult(fSucceeded != 0);
                 return VSConstants.S_OK;
             }
 
-            public int UpdateSolution_StartUpdate(ref int pfCancelUpdate) {
+            public int UpdateSolution_StartUpdate(ref int pfCancelUpdate)
+            {
                 pfCancelUpdate = 0;
                 return VSConstants.S_OK;
             }
@@ -354,22 +402,28 @@ namespace Microsoft.NodejsTools.Profiling {
         /// Ensures the project is up to date.  Returns true if the project is up to date
         /// or is successfully built, false if it's not up to date.
         /// </summary>
-        private async Task<bool> EnsureProjectUpToDate(EnvDTE.Project projectToProfile) {
+        private async Task<bool> EnsureProjectUpToDate(EnvDTE.Project projectToProfile)
+        {
             var guid = Guid.Parse((string)projectToProfile.Properties.Item("Guid").Value);
             var solution = (IVsSolution)GetService(typeof(SVsSolution));
             IVsHierarchy hierarchy;
-            if (ErrorHandler.Succeeded(solution.GetProjectOfGuid(ref guid, out hierarchy))) {
+            if (ErrorHandler.Succeeded(solution.GetProjectOfGuid(ref guid, out hierarchy)))
+            {
                 var buildMan = (IVsSolutionBuildManager)GetService(typeof(SVsSolutionBuildManager));
-                if (buildMan != null) {
-                    if (((IVsSolutionBuildManager3)buildMan).AreProjectsUpToDate(0) == VSConstants.S_OK) {
+                if (buildMan != null)
+                {
+                    if (((IVsSolutionBuildManager3)buildMan).AreProjectsUpToDate(0) == VSConstants.S_OK)
+                    {
                         // projects are up to date, no need to build.
                         return true;
                     }
 
                     uint updateCookie = VSConstants.VSCOOKIE_NIL;
                     var updateEvents = new UpdateSolutionEvents();
-                    try {
-                        if (ErrorHandler.Succeeded(buildMan.AdviseUpdateSolutionEvents(updateEvents, out updateCookie))) {
+                    try
+                    {
+                        if (ErrorHandler.Succeeded(buildMan.AdviseUpdateSolutionEvents(updateEvents, out updateCookie)))
+                        {
                             int hr;
                             if (ErrorHandler.Succeeded(
                                 hr = buildMan.StartSimpleUpdateProjectConfiguration(
@@ -379,12 +433,16 @@ namespace Microsoft.NodejsTools.Profiling {
                                 (uint)(VSSOLNBUILDUPDATEFLAGS.SBF_OPERATION_BUILD),
                                 0,
                                 0
-                            ))) {
+                            )))
+                            {
                                 return await updateEvents.Task;
                             }
                         }
-                    } finally {
-                        if (updateCookie != VSConstants.VSCOOKIE_NIL) {
+                    }
+                    finally
+                    {
+                        if (updateCookie != VSConstants.VSCOOKIE_NIL)
+                        {
                             buildMan.UnadviseUpdateSolutionEvents(updateCookie);
                         }
                     }
@@ -394,7 +452,8 @@ namespace Microsoft.NodejsTools.Profiling {
             return true;
         }
 
-        private static void ProfileStandaloneTarget(SessionNode session, StandaloneTarget runTarget, bool openReport) {
+        private static void ProfileStandaloneTarget(SessionNode session, StandaloneTarget runTarget, bool openReport)
+        {
             RunProfiler(
                 session,
                 runTarget.InterpreterPath,
@@ -410,11 +469,15 @@ namespace Microsoft.NodejsTools.Profiling {
             );
         }
 
-        private static void RunProfiler(SessionNode session, string interpreter, string interpreterArgs, string script, string scriptArgs, string workingDir, Dictionary<string, string> env, bool openReport, string launchUrl, int? port, bool startBrowser) {
-            if (String.IsNullOrWhiteSpace(interpreter)) {
+        private static void RunProfiler(SessionNode session, string interpreter, string interpreterArgs, string script, string scriptArgs, string workingDir, Dictionary<string, string> env, bool openReport, string launchUrl, int? port, bool startBrowser)
+        {
+            if (String.IsNullOrWhiteSpace(interpreter))
+            {
                 Nodejs.ShowNodejsNotInstalled();
                 return;
-            } else if (!File.Exists(interpreter)) {
+            }
+            else if (!File.Exists(interpreter))
+            {
                 Nodejs.ShowNodejsPathNotFound(interpreter);
                 return;
             }
@@ -422,11 +485,14 @@ namespace Microsoft.NodejsTools.Profiling {
             var arch = NativeMethods.GetBinaryType(interpreter);
 
             bool jmc = true;
-            using (var vsperfKey = VSRegistry.RegistryRoot(__VsLocalRegistryType.RegType_UserSettings).OpenSubKey("VSPerf")) {
-                if (vsperfKey != null) {
+            using (var vsperfKey = VSRegistry.RegistryRoot(__VsLocalRegistryType.RegType_UserSettings).OpenSubKey("VSPerf"))
+            {
+                if (vsperfKey != null)
+                {
                     var value = vsperfKey.GetValue("tools.options.justmycode");
                     int jmcSetting;
-                    if (value != null && value is string && Int32.TryParse((string)value, out jmcSetting)) {
+                    if (value != null && value is string && Int32.TryParse((string)value, out jmcSetting))
+                    {
                         jmc = jmcSetting != 0;
                     }
                 }
@@ -439,18 +505,21 @@ namespace Microsoft.NodejsTools.Profiling {
             string outPath = Path.Combine(Path.GetDirectoryName(session.Filename), baseName + "_" + date + ".vspx");
 
             int count = 1;
-            while (File.Exists(outPath)) {
+            while (File.Exists(outPath))
+            {
                 outPath = Path.Combine(Path.GetTempPath(), baseName + "_" + date + "(" + count + ").vspx");
                 count++;
             }
 
-            process.ProcessExited += (sender, args) => {
+            process.ProcessExited += (sender, args) =>
+            {
                 var dte = (EnvDTE.DTE)NodejsProfilingPackage.GetGlobalService(typeof(EnvDTE.DTE));
                 _profilingProcess = null;
                 _stopCommand.Enabled = false;
                 _startCommand.Enabled = true;
                 _startCommandCtx.Enabled = true;
-                if (openReport && File.Exists(outPath)) {
+                if (openReport && File.Exists(outPath))
+                {
                     dte.ItemOperations.OpenFile(outPath);
                 }
             };
@@ -469,17 +538,21 @@ namespace Microsoft.NodejsTools.Profiling {
         /// See the Initialize method to see how the menu item is associated to this function using
         /// the OleMenuCommandService service and the MenuCommand class.
         /// </summary>
-        private void ShowPeformanceExplorer(object sender, EventArgs e) {
+        private void ShowPeformanceExplorer(object sender, EventArgs e)
+        {
             ShowPerformanceExplorer();
         }
 
-        internal PerfToolWindow ShowPerformanceExplorer() {
+        internal PerfToolWindow ShowPerformanceExplorer()
+        {
             var pane = this.FindToolWindow(typeof(PerfToolWindow), 0, true);
-            if (pane == null) {
+            if (pane == null)
+            {
                 throw new InvalidOperationException();
             }
             IVsWindowFrame frame = pane.Frame as IVsWindowFrame;
-            if (frame == null) {
+            if (frame == null)
+            {
                 throw new InvalidOperationException();
             }
 
@@ -487,21 +560,25 @@ namespace Microsoft.NodejsTools.Profiling {
             return pane as PerfToolWindow;
         }
 
-        private void AddPerformanceSession(object sender, EventArgs e) {
+        private void AddPerformanceSession(object sender, EventArgs e)
+        {
             string baseName = "Performance";
             var target = new ProfilingTarget();
             AddPerformanceSession(baseName, target);
         }
 
-        private SessionNode AddPerformanceSession(string baseName, ProfilingTarget target) {
+        private SessionNode AddPerformanceSession(string baseName, ProfilingTarget target)
+        {
             var dte = (EnvDTE.DTE)NodejsProfilingPackage.GetGlobalService(typeof(EnvDTE.DTE));
 
             string filename;
             int? id = null;
             bool save = false;
-            do {
+            do
+            {
                 filename = baseName + id + PerfFileType;
-                if (dte.Solution.IsOpen && !String.IsNullOrEmpty(dte.Solution.FullName)) {
+                if (dte.Solution.IsOpen && !String.IsNullOrEmpty(dte.Solution.FullName))
+                {
                     filename = Path.Combine(Path.GetDirectoryName(dte.Solution.FullName), filename);
                     save = true;
                 }
@@ -510,74 +587,99 @@ namespace Microsoft.NodejsTools.Profiling {
             return ShowPerformanceExplorer().Sessions.AddTarget(target, filename, save);
         }
 
-        private void StartProfiling(object sender, EventArgs e) {
+        private void StartProfiling(object sender, EventArgs e)
+        {
             ShowPerformanceExplorer().Sessions.StartProfiling();
         }
 
-        private void StopProfiling(object sender, EventArgs e) {
+        private void StopProfiling(object sender, EventArgs e)
+        {
             var process = _profilingProcess;
-            if (process != null) {
+            if (process != null)
+            {
                 process.StopProfiling();
             }
         }
 
-        private void IsProfilingActiveAndSessionsExist(object sender, EventArgs args) {
+        private void IsProfilingActiveAndSessionsExist(object sender, EventArgs args)
+        {
             var oleMenu = sender as OleMenuCommand;
-            if (_profilingProcess != null) {
+            if (_profilingProcess != null)
+            {
                 oleMenu.Enabled = false;
-            } else {
-                if (PerfToolWindow.Instance != null && PerfToolWindow.Instance.Sessions.Sessions.Count > 0) {
+            }
+            else
+            {
+                if (PerfToolWindow.Instance != null && PerfToolWindow.Instance.Sessions.Sessions.Count > 0)
+                {
                     oleMenu.Enabled = true;
-                } else {
+                }
+                else
+                {
                     oleMenu.Enabled = false;
                 }
             }
         }
 
-        private void IsProfilingInactive(object sender, EventArgs args) {
+        private void IsProfilingInactive(object sender, EventArgs args)
+        {
             var oleMenu = sender as OleMenuCommand;
 
-            if (_profilingProcess != null) {
+            if (_profilingProcess != null)
+            {
                 oleMenu.Enabled = true;
-            } else {
+            }
+            else
+            {
                 oleMenu.Enabled = false;
             }
         }
 
-        private void IsProfilingActive(object sender, EventArgs args) {
+        private void IsProfilingActive(object sender, EventArgs args)
+        {
             var oleMenu = sender as OleMenuCommand;
 
-            if (_profilingProcess != null) {
+            if (_profilingProcess != null)
+            {
                 oleMenu.Enabled = false;
-            } else {
+            }
+            else
+            {
                 oleMenu.Enabled = true;
             }
         }
 
-        public bool IsProfiling {
-            get {
+        public bool IsProfiling
+        {
+            get
+            {
                 return _profilingProcess != null;
             }
         }
 
-        internal Guid GetStartupProjectGuid() {
+        internal Guid GetStartupProjectGuid()
+        {
             var buildMgr = (IVsSolutionBuildManager)GetService(typeof(IVsSolutionBuildManager));
             IVsHierarchy hierarchy;
-            if (buildMgr != null && ErrorHandler.Succeeded(buildMgr.get_StartupProject(out hierarchy)) && hierarchy != null) {
+            if (buildMgr != null && ErrorHandler.Succeeded(buildMgr.get_StartupProject(out hierarchy)) && hierarchy != null)
+            {
                 Guid guid;
                 if (ErrorHandler.Succeeded(hierarchy.GetGuidProperty(
                     (uint)VSConstants.VSITEMID.Root,
                     (int)__VSHPROPID.VSHPROPID_ProjectIDGuid,
                     out guid
-                ))) {
+                )))
+                {
                     return guid;
                 }
             }
             return Guid.Empty;
         }
 
-        internal IVsSolution Solution {
-            get {
+        internal IVsSolution Solution
+        {
+            get
+            {
                 return GetService(typeof(SVsSolution)) as IVsSolution;
             }
         }

@@ -19,37 +19,47 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
-namespace TestAdapterTests {
-    class MockRunContext : IRunContext {
-        public ITestCaseFilterExpression GetTestCaseFilter(IEnumerable<string> supportedProperties, Func<string, TestProperty> propertyProvider) {
+namespace TestAdapterTests
+{
+    internal class MockRunContext : IRunContext
+    {
+        public ITestCaseFilterExpression GetTestCaseFilter(IEnumerable<string> supportedProperties, Func<string, TestProperty> propertyProvider)
+        {
             throw new NotImplementedException();
         }
 
-        public bool InIsolation {
+        public bool InIsolation
+        {
             get { throw new NotImplementedException(); }
         }
 
-        public bool IsBeingDebugged {
+        public bool IsBeingDebugged
+        {
             get { return false; }
         }
 
-        public bool IsDataCollectionEnabled {
+        public bool IsDataCollectionEnabled
+        {
             get { throw new NotImplementedException(); }
         }
 
-        public bool KeepAlive {
+        public bool KeepAlive
+        {
             get { throw new NotImplementedException(); }
         }
 
-        public string SolutionDirectory {
+        public string SolutionDirectory
+        {
             get { throw new NotImplementedException(); }
         }
 
-        public string TestRunDirectory {
+        public string TestRunDirectory
+        {
             get { throw new NotImplementedException(); }
         }
 
-        public IRunSettings RunSettings {
+        public IRunSettings RunSettings
+        {
             get { throw new NotImplementedException(); }
         }
     }

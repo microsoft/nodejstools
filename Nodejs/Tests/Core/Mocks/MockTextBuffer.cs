@@ -17,15 +17,20 @@
 using System.IO;
 using Microsoft.NodejsTools;
 
-namespace NodejsTests.Mocks {
-    class MockTextBuffer : TestUtilities.Mocks.MockTextBuffer {
+namespace NodejsTests.Mocks
+{
+    internal class MockTextBuffer : TestUtilities.Mocks.MockTextBuffer
+    {
         public MockTextBuffer(string content) :
-            base(content: content, contentType: NodejsConstants.Nodejs) { }
+            base(content: content, contentType: NodejsConstants.Nodejs)
+        { }
 
         public MockTextBuffer(string content, string contentType, string filename = null) :
-            base(content: content,contentType: contentType, filename: GetRandomFileNameIfNull(filename)) { }
+            base(content: content, contentType: contentType, filename: GetRandomFileNameIfNull(filename))
+        { }
 
-        private static string GetRandomFileNameIfNull(string filename) {
+        private static string GetRandomFileNameIfNull(string filename)
+        {
             return filename ?? Path.Combine(TestUtilities.TestData.GetTempPath(), Path.GetRandomFileName(), "file.js");
         }
     }

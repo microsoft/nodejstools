@@ -19,13 +19,16 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Utilities;
 
-namespace Microsoft.NodejsTools.Jade {
+namespace Microsoft.NodejsTools.Jade
+{
     [Export(typeof(ITaggerProvider))]
     [TagType(typeof(IOutliningRegionTag))]
     [ContentType(JadeContentTypeDefinition.JadeContentType)]
-    internal sealed class JadeOutliningTaggerProvider : ITaggerProvider {
+    internal sealed class JadeOutliningTaggerProvider : ITaggerProvider
+    {
         #region ITaggerProvider
-        public ITagger<T> CreateTagger<T>(ITextBuffer buffer) where T : ITag {
+        public ITagger<T> CreateTagger<T>(ITextBuffer buffer) where T : ITag
+        {
             var tagger = ServiceManager.GetService<JadeOutliningTagger>(buffer);
             if (tagger == null)
                 tagger = new JadeOutliningTagger(buffer);

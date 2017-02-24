@@ -18,8 +18,10 @@ using System;
 using System.Windows.Automation;
 using EnvDTE;
 
-namespace TestUtilities.UI.Nodejs {
-    public class NodejsVisualStudioApp : VisualStudioApp {
+namespace TestUtilities.UI.Nodejs
+{
+    public class NodejsVisualStudioApp : VisualStudioApp
+    {
         private NodejsPerfExplorer _perfTreeView;
         private NodejsPerfToolBar _perfToolBar;
 
@@ -31,14 +33,20 @@ namespace TestUtilities.UI.Nodejs {
         public const string JavascriptWebAppTemplate = "Blank Node.js Web Application";
 
         public NodejsVisualStudioApp(DTE dte = null)
-            : base(dte) {
+            : base(dte)
+        {
         }
 
-        protected override void Dispose(bool disposing) {
-            if (!IsDisposed) {
-                try {
+        protected override void Dispose(bool disposing)
+        {
+            if (!IsDisposed)
+            {
+                try
+                {
                     InteractiveWindow.CloseAll(this);
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     Console.WriteLine("Error while closing all interactive windows");
                     Console.WriteLine(ex);
                 }
@@ -49,23 +57,28 @@ namespace TestUtilities.UI.Nodejs {
         /// <summary>
         /// Opens and activates the solution explorer window.
         /// </summary>
-        public void OpenNodejsPerformance() {
+        public void OpenNodejsPerformance()
+        {
             Dte.ExecuteCommand("View.Node.jsPerformanceExplorer");
         }
 
         /// <summary>
         /// Opens and activates the Node.js Performance explorer window.
         /// </summary>
-        public void LaunchNodejsProfiling() {
+        public void LaunchNodejsProfiling()
+        {
             base.OpenDialogWithDteExecuteCommand("Analyze.LaunchNode.jsProfiling");
         }
 
         /// <summary>
         /// Provides access to the Python profiling tree view.
         /// </summary>
-        public NodejsPerfExplorer NodejsPerformanceExplorerTreeView {
-            get {
-                if (_perfTreeView == null) {
+        public NodejsPerfExplorer NodejsPerformanceExplorerTreeView
+        {
+            get
+            {
+                if (_perfTreeView == null)
+                {
                     var element = Element.FindFirst(TreeScope.Descendants,
                         new AndCondition(
                             new PropertyCondition(
@@ -87,9 +100,12 @@ namespace TestUtilities.UI.Nodejs {
         /// <summary>
         /// Provides access to the Python profiling tool bar
         /// </summary>
-        public NodejsPerfToolBar NodejsPerformanceExplorerToolBar {
-            get {
-                if (_perfToolBar == null) {
+        public NodejsPerfToolBar NodejsPerformanceExplorerToolBar
+        {
+            get
+            {
+                if (_perfToolBar == null)
+                {
                     var element = Element.FindFirst(TreeScope.Descendants,
                         new AndCondition(
                             new PropertyCondition(
@@ -108,21 +124,28 @@ namespace TestUtilities.UI.Nodejs {
             }
         }
 
-        public Document WaitForDocument(string docName) {
-            for (int i = 0; i < 20; i++) {
-                try {
+        public Document WaitForDocument(string docName)
+        {
+            for (int i = 0; i < 20; i++)
+            {
+                try
+                {
                     return Dte.Documents.Item(docName);
-                } catch {
+                }
+                catch
+                {
                     System.Threading.Thread.Sleep(500);
                 }
             }
             throw new InvalidOperationException("Document not opened: " + docName);
         }
 
-        public InteractiveWindow GetInteractiveWindow(string title) {
+        public InteractiveWindow GetInteractiveWindow(string title)
+        {
             string autoId = GetName(title);
             AutomationElement element = null;
-            for (int i = 0; i < 5 && element == null; i++) {
+            for (int i = 0; i < 5 && element == null; i++)
+            {
                 element = Element.FindFirst(TreeScope.Descendants,
                         new AndCondition(
                             new PropertyCondition(
@@ -135,7 +158,8 @@ namespace TestUtilities.UI.Nodejs {
                             )
                         )
                     );
-                if (element == null) {
+                if (element == null)
+                {
                     System.Threading.Thread.Sleep(500);
                 }
             }
@@ -151,7 +175,6 @@ namespace TestUtilities.UI.Nodejs {
                 ),
                 this
             );
-
         }
     }
 }

@@ -40,7 +40,7 @@ namespace Microsoft.TestSccPackage
     // a package.
     [PackageRegistration(UseManagedResourcesOnly = true)]
     [Guid(Guids.guidSccPackagePkgString)]
-    [ProvideService(typeof(TestSccProvider), ServiceName="Test Source Provider")]
+    [ProvideService(typeof(TestSccProvider), ServiceName = "Test Source Provider")]
     [@ProvideSourceControlProvider("Test Source Provider", Guids.guidSccPackageCmdSetString, typeof(SccPackage), typeof(TestSccProvider))]
     [ProvideMenuResource(1000, 1)]                              // This attribute is needed to let the shell know that this package exposes some menus.
     public sealed class SccPackage : Package
@@ -53,7 +53,7 @@ namespace Microsoft.TestSccPackage
         /// initialization is the Initialize method.
         /// </summary>
         public SccPackage()
-        {            
+        {
             Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
         }
 
@@ -67,7 +67,7 @@ namespace Microsoft.TestSccPackage
         /// </summary>
         protected override void Initialize()
         {
-            Trace.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
+            Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
 
             OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
@@ -83,12 +83,14 @@ namespace Microsoft.TestSccPackage
             ((IServiceContainer)this).AddService(typeof(TestSccProvider), new TestSccProvider(trackDocs), true);
         }
 
-        private void ClearDocEvents(object sender, EventArgs e) {
+        private void ClearDocEvents(object sender, EventArgs e)
+        {
             TestSccProvider.DocumentEvents.Clear();
             TestSccProvider.CodeDocumentEvents.Clear();
         }
 
-        private void ShowDocEvents(object sender, EventArgs e) {
+        private void ShowDocEvents(object sender, EventArgs e)
+        {
             MessageBox.Show(
                 String.Join(
                     Environment.NewLine,
@@ -101,12 +103,12 @@ namespace Microsoft.TestSccPackage
             );
         }
 
-        const string CodeHeader = @"
+        private const string CodeHeader = @"
 -----------------------------------------------------------
 Code version:
 ";
 
-        const string CodeLineSeperator = ", ";
+        private const string CodeLineSeperator = ", ";
 
         #endregion
     }

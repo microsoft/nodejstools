@@ -19,11 +19,13 @@ using System.Text;
 using System.Threading.Tasks;
 using MSBuild = Microsoft.Build.Evaluation;
 
-namespace TestUtilities.SharedProject {
+namespace TestUtilities.SharedProject
+{
     /// <summary>
     /// Represents a solution element such as a project or solution folder.
     /// </summary>
-    public interface ISolutionElement {
+    public interface ISolutionElement
+    {
         /// <summary>
         /// Gets the name of the solution element
         /// </summary>
@@ -32,7 +34,8 @@ namespace TestUtilities.SharedProject {
         /// <summary>
         /// The type guid for the project type or other solution element type such as a folder.
         /// </summary>
-        Guid TypeGuid {
+        Guid TypeGuid
+        {
             get;
         }
 
@@ -40,7 +43,8 @@ namespace TestUtilities.SharedProject {
         /// Gets the flags which control how the solution element is written to the
         /// solution file.
         /// </summary>
-        SolutionElementFlags Flags {
+        SolutionElementFlags Flags
+        {
             get;
         }
 

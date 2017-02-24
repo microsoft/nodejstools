@@ -20,11 +20,15 @@ using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio.Shell;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
-namespace Microsoft.NodejsTools.ProjectWizard {
-    static class WizardHelpers {
-        public static IServiceProvider GetProvider(object automationObject) {
+namespace Microsoft.NodejsTools.ProjectWizard
+{
+    internal static class WizardHelpers
+    {
+        public static IServiceProvider GetProvider(object automationObject)
+        {
             var oleProvider = automationObject as IOleServiceProvider;
-            if (oleProvider != null) {
+            if (oleProvider != null)
+            {
                 return new ServiceProvider(oleProvider);
             }
             MessageBox.Show(ProjectWizardResources.ErrorNoDte, SR.ProductName);

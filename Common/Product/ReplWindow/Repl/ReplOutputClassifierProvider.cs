@@ -20,7 +20,8 @@ using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Utilities;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
@@ -28,12 +29,14 @@ namespace Microsoft.VisualStudio.Repl {
     /// Provides the classifier for our repl error output buffer.
     /// </summary>
     [Export(typeof(IClassifierProvider)), ContentType(ReplConstants.ReplOutputContentTypeName)]
-    class ReplOutputClassifierProvider : IClassifierProvider {
+    internal class ReplOutputClassifierProvider : IClassifierProvider
+    {
         internal readonly Dictionary<ConsoleColor, IClassificationType> _classTypes = new Dictionary<ConsoleColor, IClassificationType>();
 
         [ImportingConstructor]
-        public ReplOutputClassifierProvider(IClassificationTypeRegistryService classificationService) {
-            _classTypes[ConsoleColor.Black] = classificationService.GetClassificationType(InteractiveBlackFormatDefinition.Name);            
+        public ReplOutputClassifierProvider(IClassificationTypeRegistryService classificationService)
+        {
+            _classTypes[ConsoleColor.Black] = classificationService.GetClassificationType(InteractiveBlackFormatDefinition.Name);
             _classTypes[ConsoleColor.DarkBlue] = classificationService.GetClassificationType(InteractiveDarkBlueFormatDefinition.Name);
             _classTypes[ConsoleColor.DarkGreen] = classificationService.GetClassificationType(InteractiveDarkGreenFormatDefinition.Name);
             _classTypes[ConsoleColor.DarkCyan] = classificationService.GetClassificationType(InteractiveDarkCyanFormatDefinition.Name);
@@ -53,7 +56,8 @@ namespace Microsoft.VisualStudio.Repl {
 
         #region IClassifierProvider Members
 
-        public IClassifier GetClassifier(ITextBuffer textBuffer) {
+        public IClassifier GetClassifier(ITextBuffer textBuffer)
+        {
             return new ReplOutputClassifier(this, textBuffer);
         }
 

@@ -16,11 +16,13 @@
 
 using Microsoft.VisualStudioTools.Project;
 
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
     /// <summary>
     /// Internal interface to mock out project system inputs for test cases.
     /// </summary>
-    interface INodejsReplSite {
+    internal interface INodejsReplSite
+    {
         CommonProjectNode GetStartupProject();
         bool TryGetStartupFileAndDirectory(out string fileName, out string directory);
     }

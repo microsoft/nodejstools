@@ -17,10 +17,11 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Microsoft.NodejsTools.Npm {
-
+namespace Microsoft.NodejsTools.Npm
+{
     [Serializable]
-    public class NpmNotFoundException : NpmExecutionException, ISerializable {
+    public class NpmNotFoundException : NpmExecutionException, ISerializable
+    {
         public NpmNotFoundException() { }
         public NpmNotFoundException(string message) : base(message) { }
         public NpmNotFoundException(string message, Exception innerException) : base(message, innerException) { }

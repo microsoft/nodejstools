@@ -22,11 +22,14 @@ using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 
-namespace NodejsTests.Debugger.Commands {
+namespace NodejsTests.Debugger.Commands
+{
     [TestClass]
-    public class SetBreakpointCommandTests {
+    public class SetBreakpointCommandTests
+    {
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateLocalScriptRegExpShouldCreateCaseInSensitiveRegularExpression() {
+        public void CreateLocalScriptRegExpShouldCreateCaseInSensitiveRegularExpression()
+        {
             const string drive = "c:";
             var pathParts = new[] { "nOdE", "IS", "awesome.js" };
             string fileName = Path.Combine(drive, Path.Combine(pathParts));
@@ -42,22 +45,24 @@ namespace NodejsTests.Debugger.Commands {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateLocalScriptRegExpShouldOnlyMatchExactPath() {
+        public void CreateLocalScriptRegExpShouldOnlyMatchExactPath()
+        {
             const string drive = "c:";
             var pathParts = new[] { "nOdE", "IS", "awsome.js" };
             string fileName = Path.Combine(drive, Path.Combine(pathParts));
 
             var scriptRegExp = new Regex(SetBreakpointCommand.CreateLocalScriptRegExp(fileName));
-       
+
             Assert.IsFalse(scriptRegExp.IsMatch(Path.Combine("d:", Path.Combine(pathParts))));
 
-             Assert.IsFalse(scriptRegExp.IsMatch(fileName + 'x'));
-             Assert.IsFalse(scriptRegExp.IsMatch(Path.Combine(fileName, "x")));
-             Assert.IsFalse(scriptRegExp.IsMatch("x" + fileName));
+            Assert.IsFalse(scriptRegExp.IsMatch(fileName + 'x'));
+            Assert.IsFalse(scriptRegExp.IsMatch(Path.Combine(fileName, "x")));
+            Assert.IsFalse(scriptRegExp.IsMatch("x" + fileName));
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateSetBreakpointCommand() {
+        public void CreateSetBreakpointCommand()
+        {
             // Arrange
             const int commandId = 3;
             const int moduleId = 5;
@@ -82,7 +87,8 @@ namespace NodejsTests.Debugger.Commands {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateSetBreakpointCommandOnFirstLine() {
+        public void CreateSetBreakpointCommandOnFirstLine()
+        {
             // Arrange
             const int commandId = 3;
             const int moduleId = 5;
@@ -107,7 +113,8 @@ namespace NodejsTests.Debugger.Commands {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateSetBreakpointCommandOnRemoteFile() {
+        public void CreateSetBreakpointCommandOnRemoteFile()
+        {
             // Arrange
             const int commandId = 3;
             const int line = 2;
@@ -130,7 +137,8 @@ namespace NodejsTests.Debugger.Commands {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateSetBreakpointCommandOnLocalFile() {
+        public void CreateSetBreakpointCommandOnLocalFile()
+        {
             // Arrange
             const int commandId = 3;
             const int line = 2;
@@ -153,7 +161,8 @@ namespace NodejsTests.Debugger.Commands {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateSetBreakpointCommandWithoutPredicate() {
+        public void CreateSetBreakpointCommandWithoutPredicate()
+        {
             // Arrange
             const int commandId = 3;
             const int moduleId = 5;
@@ -178,7 +187,8 @@ namespace NodejsTests.Debugger.Commands {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void ProcessSetBreakpointResponse() {
+        public void ProcessSetBreakpointResponse()
+        {
             // Arrange
             const int commandId = 3;
             const int moduleId = 33;
@@ -204,7 +214,8 @@ namespace NodejsTests.Debugger.Commands {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateSetBreakpointCommandWithNullBreakpoint() {
+        public void CreateSetBreakpointCommandWithNullBreakpoint()
+        {
             // Arrange
             const int commandId = 3;
             const int moduleId = 5;
@@ -214,16 +225,19 @@ namespace NodejsTests.Debugger.Commands {
             Exception exception = null;
 
             // Act
-            try {
+            try
+            {
                 setBreakpointCommand = new SetBreakpointCommand(commandId, module, null, false, false);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 exception = e;
             }
 
             // Assert
             Assert.IsNull(setBreakpointCommand);
             Assert.IsNotNull(exception);
-            Assert.IsInstanceOfType(exception, typeof (ArgumentNullException));
+            Assert.IsInstanceOfType(exception, typeof(ArgumentNullException));
         }
     }
 }

@@ -19,13 +19,16 @@ using System.Linq;
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace TestUtilities {
-    public sealed class ProcessScope : IDisposable {
+namespace TestUtilities
+{
+    public sealed class ProcessScope : IDisposable
+    {
         private readonly string[] _names;
         private readonly HashSet<int> _alreadyRunning;
         private readonly HashSet<int> _alreadyWaited;
 
-        public ProcessScope(params string[] names) {
+        public ProcessScope(params string[] names)
+        {
             _names = names;
 
             _alreadyRunning = new HashSet<int>(
@@ -34,14 +37,17 @@ namespace TestUtilities {
             _alreadyWaited = new HashSet<int>(_alreadyRunning);
         }
 
-        public IEnumerable<Process> WaitForNewProcess(TimeSpan timeout) {
+        public IEnumerable<Process> WaitForNewProcess(TimeSpan timeout)
+        {
             var end = DateTime.Now + timeout;
-            while (DateTime.Now < end) {
+            while (DateTime.Now < end)
+            {
                 var nowRunning = _names
                     .SelectMany(n => Process.GetProcessesByName(n))
                     .Where(p => !_alreadyWaited.Contains(p.Id))
                     .ToList();
-                if (nowRunning.Any()) {
+                if (nowRunning.Any())
+                {
                     _alreadyWaited.UnionWith(nowRunning.Select(p => p.Id));
                     return nowRunning;
                 }
@@ -51,20 +57,27 @@ namespace TestUtilities {
 
             return Enumerable.Empty<Process>();
         }
-        
-        public void Dispose() {
+
+        public void Dispose()
+        {
             var end = DateTime.Now + TimeSpan.FromSeconds(30.0);
-            while (DateTime.Now < end) {
+            while (DateTime.Now < end)
+            {
                 var newProcesses = _names
                     .SelectMany(n => Process.GetProcessesByName(n))
                     .Where(p => !_alreadyRunning.Contains(p.Id));
                 bool anyLeft = false;
-                foreach (var p in newProcesses) {
-                    if (!p.HasExited) {
+                foreach (var p in newProcesses)
+                {
+                    if (!p.HasExited)
+                    {
                         anyLeft = true;
-                        try {
+                        try
+                        {
                             p.Kill();
-                        } catch (Exception ex) {
+                        }
+                        catch (Exception ex)
+                        {
                             Trace.TraceWarning("Failed to kill {0} ({1}).{2}{3}",
                                 p.ProcessName,
                                 p.Id,
@@ -74,7 +87,8 @@ namespace TestUtilities {
                         }
                     }
                 }
-                if (!anyLeft) {
+                if (!anyLeft)
+                {
                     return;
                 }
                 Thread.Sleep(100);

@@ -18,9 +18,12 @@ using System;
 using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.NodejsTools.Debugger.Serialization {
-    sealed class NodeBacktraceVariable : INodeVariable {
-        public NodeBacktraceVariable(NodeStackFrame stackFrame, JToken parameter) {
+namespace Microsoft.NodejsTools.Debugger.Serialization
+{
+    internal sealed class NodeBacktraceVariable : INodeVariable
+    {
+        public NodeBacktraceVariable(NodeStackFrame stackFrame, JToken parameter)
+        {
             Utilities.ArgumentNotNull("stackFrame", stackFrame);
             Utilities.ArgumentNotNull("parameter", parameter);
 
@@ -32,9 +35,12 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
             TypeName = (string)value["type"];
             Value = (string)value["value"];
             Class = (string)value["className"];
-            try {
+            try
+            {
                 Text = (string)value["text"];
-            } catch (ArgumentException) {
+            }
+            catch (ArgumentException)
+            {
                 Text = String.Empty;
             }
             Attributes = NodePropertyAttributes.None;

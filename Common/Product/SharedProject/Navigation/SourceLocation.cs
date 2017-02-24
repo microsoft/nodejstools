@@ -15,12 +15,14 @@
 using System;
 using System.Globalization;
 
-namespace Microsoft.VisualStudioTools.Parsing {
+namespace Microsoft.VisualStudioTools.Parsing
+{
     /// <summary>
     /// Represents a location in source code.
     /// </summary>
     [Serializable]
-    public struct SourceLocation {
+    public struct SourceLocation
+    {
         // TODO: remove index
         private readonly int _index;
 
@@ -33,7 +35,8 @@ namespace Microsoft.VisualStudioTools.Parsing {
         /// <param name="index">The index in the source stream the location represents (0-based).</param>
         /// <param name="line">The line in the source stream the location represents (1-based).</param>
         /// <param name="column">The column in the source stream the location represents (1-based).</param>
-        public SourceLocation(int index, int line, int column) {
+        public SourceLocation(int index, int line, int column)
+        {
             ValidateLocation(index, line, column);
 
             _index = index;
@@ -41,24 +44,30 @@ namespace Microsoft.VisualStudioTools.Parsing {
             _column = column;
         }
 
-        private static void ValidateLocation(int index, int line, int column) {
-            if (index < 0) {
+        private static void ValidateLocation(int index, int line, int column)
+        {
+            if (index < 0)
+            {
                 throw ErrorOutOfRange("index", 0);
             }
-            if (line < 1) {
+            if (line < 1)
+            {
                 throw ErrorOutOfRange("line", 1);
             }
-            if (column < 1) {
+            if (column < 1)
+            {
                 throw ErrorOutOfRange("column", 1);
             }
         }
 
-        private static Exception ErrorOutOfRange(object p0, object p1) {
+        private static Exception ErrorOutOfRange(object p0, object p1)
+        {
             return new ArgumentOutOfRangeException(string.Format("{0} must be greater than or equal to {1}", p0, p1));
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters")]
-        private SourceLocation(int index, int line, int column, bool noChecks) {
+        private SourceLocation(int index, int line, int column, bool noChecks)
+        {
             _index = index;
             _line = line;
             _column = column;
@@ -67,21 +76,24 @@ namespace Microsoft.VisualStudioTools.Parsing {
         /// <summary>
         /// The index in the source stream the location represents (0-based).
         /// </summary>
-        public int Index {
+        public int Index
+        {
             get { return _index; }
         }
 
         /// <summary>
         /// The line in the source stream the location represents (1-based).
         /// </summary>
-        public int Line {
+        public int Line
+        {
             get { return _line; }
         }
 
         /// <summary>
         /// The column in the source stream the location represents (1-based).
         /// </summary>
-        public int Column {
+        public int Column
+        {
             get { return _column; }
         }
 
@@ -91,7 +103,8 @@ namespace Microsoft.VisualStudioTools.Parsing {
         /// <param name="left">One location to compare.</param>
         /// <param name="right">The other location to compare.</param>
         /// <returns>True if the locations are the same, False otherwise.</returns>
-        public static bool operator ==(SourceLocation left, SourceLocation right) {
+        public static bool operator ==(SourceLocation left, SourceLocation right)
+        {
             return left._index == right._index && left._line == right._line && left._column == right._column;
         }
 
@@ -101,7 +114,8 @@ namespace Microsoft.VisualStudioTools.Parsing {
         /// <param name="left">One location to compare.</param>
         /// <param name="right">The other location to compare.</param>
         /// <returns>True if the locations are not the same, False otherwise.</returns>
-        public static bool operator !=(SourceLocation left, SourceLocation right) {
+        public static bool operator !=(SourceLocation left, SourceLocation right)
+        {
             return left._index != right._index || left._line != right._line || left._column != right._column;
         }
 
@@ -111,7 +125,8 @@ namespace Microsoft.VisualStudioTools.Parsing {
         /// <param name="left">One location to compare.</param>
         /// <param name="right">The other location to compare.</param>
         /// <returns>True if the first location is before the other location, False otherwise.</returns>
-        public static bool operator <(SourceLocation left, SourceLocation right) {
+        public static bool operator <(SourceLocation left, SourceLocation right)
+        {
             return left._index < right._index;
         }
 
@@ -121,7 +136,8 @@ namespace Microsoft.VisualStudioTools.Parsing {
         /// <param name="left">One location to compare.</param>
         /// <param name="right">The other location to compare.</param>
         /// <returns>True if the first location is after the other location, False otherwise.</returns>
-        public static bool operator >(SourceLocation left, SourceLocation right) {
+        public static bool operator >(SourceLocation left, SourceLocation right)
+        {
             return left._index > right._index;
         }
 
@@ -131,7 +147,8 @@ namespace Microsoft.VisualStudioTools.Parsing {
         /// <param name="left">One location to compare.</param>
         /// <param name="right">The other location to compare.</param>
         /// <returns>True if the first location is before or the same as the other location, False otherwise.</returns>
-        public static bool operator <=(SourceLocation left, SourceLocation right) {
+        public static bool operator <=(SourceLocation left, SourceLocation right)
+        {
             return left._index <= right._index;
         }
 
@@ -141,7 +158,8 @@ namespace Microsoft.VisualStudioTools.Parsing {
         /// <param name="left">One location to compare.</param>
         /// <param name="right">The other location to compare.</param>
         /// <returns>True if the first location is after or the same as the other location, False otherwise.</returns>
-        public static bool operator >=(SourceLocation left, SourceLocation right) {
+        public static bool operator >=(SourceLocation left, SourceLocation right)
+        {
             return left._index >= right._index;
         }
 
@@ -151,7 +169,8 @@ namespace Microsoft.VisualStudioTools.Parsing {
         /// <param name="left">One location to compare.</param>
         /// <param name="right">The other location to compare.</param>
         /// <returns>0 if the locations are equal, -1 if the left one is less than the right one, 1 otherwise.</returns>
-        public static int Compare(SourceLocation left, SourceLocation right) {
+        public static int Compare(SourceLocation left, SourceLocation right)
+        {
             if (left < right)
                 return -1;
             if (left > right)
@@ -179,13 +198,16 @@ namespace Microsoft.VisualStudioTools.Parsing {
         /// Whether the location is a valid location.
         /// </summary>
         /// <returns>True if the location is valid, False otherwise.</returns>
-        public bool IsValid {
-            get {
+        public bool IsValid
+        {
+            get
+            {
                 return this._line != 0 && this._column != 0;
             }
         }
 
-        public override bool Equals(object obj) {
+        public override bool Equals(object obj)
+        {
             if (!(obj is SourceLocation))
                 return false;
 
@@ -193,15 +215,18 @@ namespace Microsoft.VisualStudioTools.Parsing {
             return other._index == _index && other._line == _line && other._column == _column;
         }
 
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             return (_line << 16) ^ _column;
         }
 
-        public override string ToString() {
+        public override string ToString()
+        {
             return "(" + _line + "," + _column + ")";
         }
 
-        internal string ToDebugString() {
+        internal string ToDebugString()
+        {
             return String.Format(CultureInfo.CurrentCulture, "({0},{1},{2})", _index, _line, _column);
         }
     }

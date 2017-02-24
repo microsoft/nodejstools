@@ -20,12 +20,14 @@ using System.ComponentModel;
 using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace NodejsTests {
-
+namespace NodejsTests
+{
     [TestClass]
-    public class TestFrameworkStringConverterTest {
+    public class TestFrameworkStringConverterTest
+    {
         [TestMethod, Priority(0), TestCategory("Ignore")]
-        public void GetStandardValues_CheckValueSequence() {
+        public void GetStandardValues_CheckValueSequence()
+        {
             //Arrange
             TestFrameworkStringConverter convert = new TestFrameworkStringConverter();
             //Act

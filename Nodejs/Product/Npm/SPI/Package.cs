@@ -20,8 +20,10 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 
-namespace Microsoft.NodejsTools.Npm.SPI {
-    internal class Package : RootPackage, IPackage {
+namespace Microsoft.NodejsTools.Npm.SPI
+{
+    internal class Package : RootPackage, IPackage
+    {
         private IRootPackage _parent;
 
         public Package(
@@ -31,7 +33,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             Dictionary<string, ModuleInfo> allModules = null,
             int depth = 0,
             int maxDepth = 1)
-            : base(fullPathToRootDirectory, showMissingDevOptionalSubPackages, allModules, depth, maxDepth) {
+            : base(fullPathToRootDirectory, showMissingDevOptionalSubPackages, allModules, depth, maxDepth)
+        {
             _parent = parent;
         }
 
@@ -41,54 +44,69 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         public string RequestedVersionRange { get; internal set; }
 
-        public IEnumerable<string> Keywords {
-            get {
+        public IEnumerable<string> Keywords
+        {
+            get
+            {
                 var keywords = null == PackageJson ? null : PackageJson.Keywords;
-                return keywords ?? (IEnumerable<string>) new List<string>();
+                return keywords ?? (IEnumerable<string>)new List<string>();
             }
         }
 
-        public bool IsListedInParentPackageJson {
-            get {
+        public bool IsListedInParentPackageJson
+        {
+            get
+            {
                 IPackageJson parentPackageJson = _parent.PackageJson;
                 return (null != parentPackageJson && parentPackageJson.AllDependencies.Contains(Name));
             }
         }
 
-        public bool IsMissing {
+        public bool IsMissing
+        {
             get { return IsListedInParentPackageJson && !Directory.Exists(Path); }
         }
 
-        public bool IsDevDependency {
-            get {
+        public bool IsDevDependency
+        {
+            get
+            {
                 IPackageJson parentPackageJson = _parent.PackageJson;
                 return null != parentPackageJson && parentPackageJson.DevDependencies.Contains(Name);
             }
         }
 
-        public bool IsDependency {
-            get {
+        public bool IsDependency
+        {
+            get
+            {
                 IPackageJson parentPackageJson = _parent.PackageJson;
                 return null != parentPackageJson && parentPackageJson.Dependencies.Contains(Name);
             }
         }
 
-        public bool IsOptionalDependency {
-            get {
+        public bool IsOptionalDependency
+        {
+            get
+            {
                 IPackageJson parentPackageJson = _parent.PackageJson;
                 return null != parentPackageJson && parentPackageJson.OptionalDependencies.Contains(Name);
             }
         }
 
-        public bool IsBundledDependency {
-            get {
+        public bool IsBundledDependency
+        {
+            get
+            {
                 IPackageJson parentPackageJson = _parent.PackageJson;
                 return null != parentPackageJson && parentPackageJson.BundledDependencies.Contains(Name);
             }
         }
 
-        public PackageFlags Flags {
-            get {
+        public PackageFlags Flags
+        {
+            get
+            {
                 return (!IsListedInParentPackageJson ? PackageFlags.NotListedAsDependency : 0)
                        | (IsMissing ? PackageFlags.Missing : 0)
                        | (IsDevDependency ? PackageFlags.Dev : 0)
@@ -97,7 +115,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             }
         }
 
-        public override string ToString() {
+        public override string ToString()
+        {
             return string.Format(CultureInfo.InvariantCulture, "{0} {1}", Name, Version);
         }
     }

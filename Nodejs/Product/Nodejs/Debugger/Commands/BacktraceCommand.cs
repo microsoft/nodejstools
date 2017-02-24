@@ -19,15 +19,18 @@ using System.Linq;
 using Microsoft.NodejsTools.Debugger.Serialization;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.NodejsTools.Debugger.Commands {
-    sealed class BacktraceCommand : DebuggerCommand {
+namespace Microsoft.NodejsTools.Debugger.Commands
+{
+    internal sealed class BacktraceCommand : DebuggerCommand
+    {
         private readonly Dictionary<string, object> _arguments;
         private readonly IEvaluationResultFactory _resultFactory;
         private readonly bool _depthOnly;
         private readonly NodeModule _unknownModule = new NodeModule(-1, NodeVariableType.UnknownModule);
 
         public BacktraceCommand(int id, IEvaluationResultFactory resultFactory, int fromFrame, int toFrame, bool depthOnly = false)
-            : base(id, "backtrace") {
+            : base(id, "backtrace")
+        {
             _resultFactory = resultFactory;
             _depthOnly = depthOnly;
 
@@ -38,7 +41,8 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             };
         }
 
-        protected override IDictionary<string, object> Arguments {
+        protected override IDictionary<string, object> Arguments
+        {
             get { return _arguments; }
         }
 
@@ -46,14 +50,16 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
         public List<NodeStackFrame> StackFrames { get; private set; }
         public Dictionary<int, NodeModule> Modules { get; private set; }
 
-        public override void ProcessResponse(JObject response) {
+        public override void ProcessResponse(JObject response)
+        {
             base.ProcessResponse(response);
 
             JToken body = response["body"];
             CallstackDepth = (int)body["totalFrames"];
 
             // Collect frames only if required
-            if (_depthOnly) {
+            if (_depthOnly)
+            {
                 Modules = new Dictionary<int, NodeModule>();
                 StackFrames = new List<NodeStackFrame>();
                 return;
@@ -66,13 +72,15 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             JArray frames = (JArray)body["frames"] ?? new JArray();
             StackFrames = new List<NodeStackFrame>(frames.Count);
 
-            foreach (JToken frame in frames) {
+            foreach (JToken frame in frames)
+            {
                 // Create stack frame
                 string functionName = GetFunctionName(frame);
                 var moduleId = (int?)frame["func"]["scriptId"];
 
                 NodeModule module;
-                if (!moduleId.HasValue || !Modules.TryGetValue(moduleId.Value, out module)) {
+                if (!moduleId.HasValue || !Modules.TryGetValue(moduleId.Value, out module))
+                {
                     module = _unknownModule;
                 }
 
@@ -80,7 +88,8 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                 int column = (int?)frame["column"] ?? 0;
                 int frameId = (int?)frame["index"] ?? 0;
 
-                var stackFrame = new NodeStackFrame(frameId) {
+                var stackFrame = new NodeStackFrame(frameId)
+                {
                     Column = column,
                     FunctionName = functionName,
                     Line = line,
@@ -99,26 +108,32 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             }
         }
 
-        private List<NodeEvaluationResult> GetVariables(NodeStackFrame stackFrame, IEnumerable<JToken> variables) {
+        private List<NodeEvaluationResult> GetVariables(NodeStackFrame stackFrame, IEnumerable<JToken> variables)
+        {
             return variables.Select(t => new NodeBacktraceVariable(stackFrame, t))
                 .Select(variableProvider => _resultFactory.Create(variableProvider)).ToList();
         }
 
-        private static string GetFunctionName(JToken frame) {
+        private static string GetFunctionName(JToken frame)
+        {
             JToken func = frame["func"];
             var framename = (string)func["name"];
-            if (string.IsNullOrEmpty(framename)) {
+            if (string.IsNullOrEmpty(framename))
+            {
                 framename = (string)func["inferredName"];
             }
-            if (string.IsNullOrEmpty(framename)) {
+            if (string.IsNullOrEmpty(framename))
+            {
                 framename = NodeVariableType.AnonymousFunction;
             }
             return framename;
         }
 
-        private static Dictionary<int, NodeModule> GetModules(JArray references) {
+        private static Dictionary<int, NodeModule> GetModules(JArray references)
+        {
             var scripts = new Dictionary<int, NodeModule>(references.Count);
-            foreach (JToken reference in references) {
+            foreach (JToken reference in references)
+            {
                 var scriptId = (int)reference["id"];
                 var fileName = (string)reference["name"];
 

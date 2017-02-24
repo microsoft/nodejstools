@@ -17,8 +17,10 @@
 using System;
 using System.IO;
 
-namespace Microsoft.NodejsTools.Debugger.Communication {
-    interface INetworkClient : IDisposable {
+namespace Microsoft.NodejsTools.Debugger.Communication
+{
+    internal interface INetworkClient : IDisposable
+    {
         /// <summary>
         /// Gets a value indicating whether client is connected to a remote host.
         /// </summary>

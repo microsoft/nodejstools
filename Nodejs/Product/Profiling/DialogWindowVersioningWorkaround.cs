@@ -16,7 +16,8 @@
 
 using Microsoft.VisualStudio.PlatformUI;
 
-namespace Microsoft.NodejsTools.Profiling {
+namespace Microsoft.NodejsTools.Profiling
+{
     /// <summary>
     /// Works around an issue w/ DialogWindow and targetting multiple versions of VS.
     /// 
@@ -24,6 +25,7 @@ namespace Microsoft.NodejsTools.Profiling {
     /// we cannot refer to both v10 and v11 versions from within the same XAML file.
     /// Instead we use this subclass defined in our assembly.
     /// </summary>
-    public class DialogWindowVersioningWorkaround : DialogWindow {
+    public class DialogWindowVersioningWorkaround : DialogWindow
+    {
     }
 }

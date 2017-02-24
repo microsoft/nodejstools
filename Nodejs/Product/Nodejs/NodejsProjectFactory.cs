@@ -18,16 +18,20 @@ using System;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell.Flavor;
 
-namespace Microsoft.NodejsTools {
+namespace Microsoft.NodejsTools
+{
     [Guid(Guids.NodejsProjectFactoryString)]
-    class NodejsProjectFactory : FlavoredProjectFactoryBase {
+    internal class NodejsProjectFactory : FlavoredProjectFactoryBase
+    {
         private NodejsPackage _package;
 
-        public NodejsProjectFactory(NodejsPackage package) {
+        public NodejsProjectFactory(NodejsPackage package)
+        {
             _package = package;
         }
 
-        protected override object PreCreateForOuter(IntPtr outerProjectIUnknown) {
+        protected override object PreCreateForOuter(IntPtr outerProjectIUnknown)
+        {
             var res = new NodejsProject();
             res._package = _package;
             return res;

@@ -14,8 +14,10 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Debugger.Commands {
-    sealed class SuspendCommand : DebuggerCommand {
+namespace Microsoft.NodejsTools.Debugger.Commands
+{
+    internal sealed class SuspendCommand : DebuggerCommand
+    {
         public SuspendCommand(int id) : base(id, "suspend") { }
     }
 }

@@ -21,11 +21,13 @@ using System.Linq;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
 
-namespace Microsoft.NodejsTools.Jade {
+namespace Microsoft.NodejsTools.Jade
+{
     /// <summary>
     /// Implements <see cref="IClassifier"/> and provides classification using generic tokens
     /// </summary>
-    class TokenBasedClassifier<TTokenType, TTokenClass> : IClassifier where TTokenClass : IToken<TTokenType> {
+    internal class TokenBasedClassifier<TTokenType, TTokenClass> : IClassifier where TTokenClass : IToken<TTokenType>
+    {
 #pragma warning disable 67
         public event EventHandler<ClassificationChangedEventArgs> ClassificationChanged;
 #pragma warning restore 67
@@ -37,14 +39,15 @@ namespace Microsoft.NodejsTools.Jade {
         protected ITextBuffer TextBuffer { get; set; }
         protected bool LineBasedClassification { get; set; }
 
-        IClassificationContextNameProvider<TTokenClass> _classificationNameProvider;
+        private IClassificationContextNameProvider<TTokenClass> _classificationNameProvider;
 
         private int _lastValidPosition = 0;
 
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "tokenizer", Justification = "Standard name of code that produces tokens")]
         public TokenBasedClassifier(ITextBuffer textBuffer,
                                     ITokenizer<TTokenClass> tokenizer,
-                                    IClassificationContextNameProvider<TTokenClass> classificationNameProvider) {
+                                    IClassificationContextNameProvider<TTokenClass> classificationNameProvider)
+        {
             _classificationNameProvider = classificationNameProvider;
 
             Tokenizer = tokenizer;
@@ -60,10 +63,12 @@ namespace Microsoft.NodejsTools.Jade {
         /// </summary>
         /// <param name="position"></param>
         /// <param name="tokens"></param>
-        protected virtual void RemoveSensitiveTokens(int position, TextRangeCollection<TTokenClass> tokens) {
+        protected virtual void RemoveSensitiveTokens(int position, TextRangeCollection<TTokenClass> tokens)
+        {
         }
 
-        protected virtual void OnTextChanged(object sender, TextContentChangedEventArgs e) {
+        protected virtual void OnTextChanged(object sender, TextContentChangedEventArgs e)
+        {
             int start, oldLength, newLength;
             TextUtility.CombineChanges(e, out start, out oldLength, out newLength);
 
@@ -73,7 +78,8 @@ namespace Microsoft.NodejsTools.Jade {
             // shortening buffer to nothing.
 
             var snapshot = TextBuffer.CurrentSnapshot;
-            if (start > snapshot.Length || start + newLength > snapshot.Length) {
+            if (start > snapshot.Length || start + newLength > snapshot.Length)
+            {
                 start = 0;
                 newLength = snapshot.Length;
             }
@@ -83,7 +89,8 @@ namespace Microsoft.NodejsTools.Jade {
 
         [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "oldLength", Justification = "It may be used in derived class and/or unit tests")]
         [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "newLength", Justification = "It may be used in derived class and/or unit tests")]
-        protected virtual void OnTextChanged(int start, int oldLength, int newLength) {
+        protected virtual void OnTextChanged(int start, int oldLength, int newLength)
+        {
             // Invalidate items starting from start of the change and onward
 
             // Expand range to take into accound token that might be just touching
@@ -97,24 +104,33 @@ namespace Microsoft.NodejsTools.Jade {
 
             var touchingTokens = Tokens.GetItemsContainingInclusiveEnd(start);
 
-            if (touchingTokens != null && touchingTokens.Count > 0) {
+            if (touchingTokens != null && touchingTokens.Count > 0)
+            {
                 initialIndex = touchingTokens.Min();
                 start = Tokens[initialIndex].Start;
             }
 
             // nothing is touching but we still might have tokens right after us
-            if (initialIndex < 0) {
+            if (initialIndex < 0)
+            {
                 initialIndex = Tokens.GetFirstItemAfterPosition(start);
             }
 
-            if (initialIndex == 0) {
+            if (initialIndex == 0)
+            {
                 start = Tokens[0].Start;
-            } else {
-                while (initialIndex > 0) {
-                    if (Tokens[initialIndex - 1].End == start) {
+            }
+            else
+            {
+                while (initialIndex > 0)
+                {
+                    if (Tokens[initialIndex - 1].End == start)
+                    {
                         start = Tokens[initialIndex - 1].Start;
                         initialIndex--;
-                    } else {
+                    }
+                    else
+                    {
                         break;
                     }
                 }
@@ -135,7 +151,8 @@ namespace Microsoft.NodejsTools.Jade {
 
             _lastValidPosition = Tokens.Count > 0 ? Math.Min(_lastValidPosition, Tokens[Tokens.Count - 1].End) : 0;
 
-            if (ClassificationChanged != null) {
+            if (ClassificationChanged != null)
+            {
                 var snapshot = TextBuffer.CurrentSnapshot;
 
                 ClassificationChanged(this, new ClassificationChangedEventArgs(
@@ -145,11 +162,13 @@ namespace Microsoft.NodejsTools.Jade {
             }
         }
 
-        public virtual IList<ClassificationSpan> GetClassificationSpans(SnapshotSpan span) {
+        public virtual IList<ClassificationSpan> GetClassificationSpans(SnapshotSpan span)
+        {
             List<ClassificationSpan> classifications = new List<ClassificationSpan>();
             ITextSnapshot textSnapshot = TextBuffer.CurrentSnapshot;
 
-            if (span.Length <= 2) {
+            if (span.Length <= 2)
+            {
                 string ws = textSnapshot.GetText(span);
                 if (String.IsNullOrWhiteSpace(ws))
                     return classifications;
@@ -158,7 +177,8 @@ namespace Microsoft.NodejsTools.Jade {
             // Token collection at this point contains valid tokens at least to a point
             // of the most recent change. We can reuse existing tokens but may also need
             // to tokenize to get tokens for the recently changed range.
-            if (span.End > _lastValidPosition) {
+            if (span.End > _lastValidPosition)
+            {
                 // Span is beyond the last position we know about. We need to tokenize new area.
                 // tokenize from end of the last good token. If last token intersected last change
                 // it would have been removed from the collection by now.
@@ -166,7 +186,8 @@ namespace Microsoft.NodejsTools.Jade {
                 int tokenizeFrom = Tokens.Count > 0 ? Tokens[Tokens.Count - 1].End : new SnapshotPoint(textSnapshot, 0);
                 var tokenizeAnchor = GetAnchorPosition(tokenizeFrom);
 
-                if (tokenizeAnchor < tokenizeFrom) {
+                if (tokenizeAnchor < tokenizeFrom)
+                {
                     Tokens.RemoveInRange(TextRange.FromBounds(tokenizeAnchor, span.End));
                     RemoveSensitiveTokens(tokenizeAnchor, Tokens);
 
@@ -175,7 +196,8 @@ namespace Microsoft.NodejsTools.Jade {
                 }
 
                 var newTokens = Tokenizer.Tokenize(new TextProvider(TextBuffer.CurrentSnapshot), tokenizeFrom, span.End - tokenizeFrom);
-                if (newTokens.Count > 0) {
+                if (newTokens.Count > 0)
+                {
                     Tokens.Add(newTokens);
                     _lastValidPosition = newTokens[newTokens.Count - 1].End;
                 }
@@ -183,14 +205,19 @@ namespace Microsoft.NodejsTools.Jade {
 
             var tokensInSpan = Tokens.ItemsInRange(TextRange.FromBounds(span.Start, span.End));
 
-            foreach (var token in tokensInSpan) {
+            foreach (var token in tokensInSpan)
+            {
                 var compositeToken = token as ICompositeToken<TTokenClass>;
 
-                if (compositeToken != null) {
-                    foreach (var internalToken in compositeToken.TokenList) {
+                if (compositeToken != null)
+                {
+                    foreach (var internalToken in compositeToken.TokenList)
+                    {
                         AddClassificationFromToken(classifications, textSnapshot, internalToken);
                     }
-                } else {
+                }
+                else
+                {
                     AddClassificationFromToken(classifications, textSnapshot, token);
                 }
             }
@@ -198,8 +225,10 @@ namespace Microsoft.NodejsTools.Jade {
             return classifications;
         }
 
-        protected virtual int GetAnchorPosition(int position) {
-            if (LineBasedClassification) {
+        protected virtual int GetAnchorPosition(int position)
+        {
+            if (LineBasedClassification)
+            {
                 var line = TextBuffer.CurrentSnapshot.GetLineFromPosition(position);
                 position = Math.Min(position, line.Start);
             }
@@ -207,17 +236,20 @@ namespace Microsoft.NodejsTools.Jade {
             return position;
         }
 
-        private void AddClassificationFromToken(List<ClassificationSpan> classifications, ITextSnapshot textSnapshot, TTokenClass token) {
+        private void AddClassificationFromToken(List<ClassificationSpan> classifications, ITextSnapshot textSnapshot, TTokenClass token)
+        {
             // We don't necessarily map each token to a classification
             var ct = _classificationNameProvider.GetClassificationType(token);
-            if (ct != null) {
+            if (ct != null)
+            {
                 Span tokenSpan = new Span(token.Start, token.Length);
                 ClassificationSpan cs = new ClassificationSpan(new SnapshotSpan(textSnapshot, tokenSpan), ct);
                 classifications.Add(cs);
             }
         }
 
-        private void VerifyTokensSorted() {
+        private void VerifyTokensSorted()
+        {
 #if _DEBUG
             // Verify that tokens are sorted
             for (int i = 0; i < Tokens.Count - 1; i++)

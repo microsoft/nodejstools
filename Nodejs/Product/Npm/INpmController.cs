@@ -17,16 +17,18 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Microsoft.NodejsTools.Npm {
-    public interface INpmController : INpmLogSource, IDisposable {
+namespace Microsoft.NodejsTools.Npm
+{
+    public interface INpmController : INpmLogSource, IDisposable
+    {
         event EventHandler StartingRefresh;
-        
+
         void Refresh();
-        
+
         event EventHandler FinishedRefresh;
-        
+
         IRootPackage RootPackage { get; }
-        
+
         INpmCommander CreateNpmCommander();
 
         Task<IPackageCatalog> GetRepositoryCatalogAsync(bool forceDownload, IProgress<string> progress);

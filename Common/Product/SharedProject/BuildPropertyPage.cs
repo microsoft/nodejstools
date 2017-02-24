@@ -12,11 +12,13 @@
  *
  * ***************************************************************************/
 
-namespace Microsoft.VisualStudioTools.Project {
+namespace Microsoft.VisualStudioTools.Project
+{
     /// <summary>
     /// Enumerated list of the properties shown on the build property page
     /// </summary>
-    internal enum BuildPropertyPageTag {
+    internal enum BuildPropertyPageTag
+    {
         OutputPath
     }
 }

@@ -13,7 +13,8 @@
  * ***************************************************************************/
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
@@ -23,7 +24,8 @@ namespace Microsoft.VisualStudio.Repl {
     /// not been created during the current Visual Studio session if the user exited Visual Studio with the REPL window opened and docked.  Therefore
     /// the replId should contain enough information to re-create the appropriate REPL window.
     /// </summary>
-    public interface IReplEvaluatorProvider {
+    public interface IReplEvaluatorProvider
+    {
         IReplEvaluator GetEvaluator(string replId);
     }
 }

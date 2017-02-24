@@ -14,7 +14,8 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Jade {
+namespace Microsoft.NodejsTools.Jade
+{
     /// <summary>
     /// Represents a set of text ranges. It may or may not be actual collection
     /// internally, but it supports shifting its content according to the supplied start
@@ -22,7 +23,8 @@ namespace Microsoft.NodejsTools.Jade {
     /// it typically consists of left separator, inner range and right separator. However,
     /// artifact may not expose its inner parts as a collection of ranges.
     /// </summary>
-    interface ICompositeTextRange : ITextRange {
+    internal interface ICompositeTextRange : ITextRange
+    {
         /// <summary>
         /// Shifts items in collection starting from given position by the specified offset.
         /// </summary>

@@ -19,11 +19,14 @@ using System.Collections.Generic;
 using Microsoft.NodejsTools.Debugger;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace NodejsTests.Debugger.FileNameMapping {
+namespace NodejsTests.Debugger.FileNameMapping
+{
     [TestClass]
-    public class FuzzyLogicFileNameMapperTests {
+    public class FuzzyLogicFileNameMapperTests
+    {
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void GetLocalFileNameForBuiltInModuleTests() {
+        public void GetLocalFileNameForBuiltInModuleTests()
+        {
             // Arrange
             const string remoteFileName = "node.js";
             var localFiles = new List<string> { @"c:\path\to\project\app.js" };
@@ -37,7 +40,8 @@ namespace NodejsTests.Debugger.FileNameMapping {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void GetLocalFileNameForRemoteModuleTests() {
+        public void GetLocalFileNameForRemoteModuleTests()
+        {
             // Arrange
             const string remoteFileName = "/root/other/project/path/app.js";
             const string localFileName = @"c:\path\to\project\app.js";
@@ -52,7 +56,8 @@ namespace NodejsTests.Debugger.FileNameMapping {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void GetLocalFileNameIfProjectContainsDuplicatesTests() {
+        public void GetLocalFileNameIfProjectContainsDuplicatesTests()
+        {
             // Arrange
             const string remoteFileName1 = "/root/other/project/path/app.js";
             const string remoteFileName2 = "/root/other/project/path/sub/app.js";

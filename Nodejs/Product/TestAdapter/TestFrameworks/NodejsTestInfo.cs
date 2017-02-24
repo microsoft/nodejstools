@@ -16,11 +16,15 @@
 
 using System;
 
-namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
-    class NodejsTestInfo {
-        public NodejsTestInfo(string fullyQualifiedName) {
+namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
+{
+    internal class NodejsTestInfo
+    {
+        public NodejsTestInfo(string fullyQualifiedName)
+        {
             string[] parts = fullyQualifiedName.Split(new string[] { "::" }, StringSplitOptions.None);
-            if (parts.Length != 3) {
+            if (parts.Length != 3)
+            {
                 throw new ArgumentException("Invalid fully qualified test name");
             }
             ModulePath = parts[0];
@@ -37,8 +41,10 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
             SourceColumn = column;
         }
 
-        public string FullyQualifiedName {
-            get {
+        public string FullyQualifiedName
+        {
+            get
+            {
                 return ModulePath + "::" + TestName + "::" + TestFramework;
             }
         }

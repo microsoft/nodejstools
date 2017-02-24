@@ -19,11 +19,14 @@ using Microsoft.NodejsTools.Debugger.DebugEngine;
 using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.VisualStudioTools;
 
-namespace Microsoft.NodejsTools {
-    sealed class ProvideNodeDebugExceptionAttribute : ProvideDebugExceptionAttribute {
+namespace Microsoft.NodejsTools
+{
+    internal sealed class ProvideNodeDebugExceptionAttribute : ProvideDebugExceptionAttribute
+    {
         public readonly string ExceptionName;
 
-        public ProvideNodeDebugExceptionAttribute(params string[] exceptionPath) : base(AD7Engine.DebugEngineId, "Node.js Exceptions", exceptionPath) {
+        public ProvideNodeDebugExceptionAttribute(params string[] exceptionPath) : base(AD7Engine.DebugEngineId, "Node.js Exceptions", exceptionPath)
+        {
             State = enum_EXCEPTION_STATE.EXCEPTION_NONE;
             ExceptionName = exceptionPath.LastOrDefault();
         }
@@ -125,6 +128,7 @@ namespace Microsoft.NodejsTools {
     [ProvideNodeDebugException("SyntaxError")]
     [ProvideNodeDebugException("TypeError")]
     [ProvideNodeDebugException("URIError")]
-    partial class NodejsPackage : CommonPackage {
+    internal partial class NodejsPackage : CommonPackage
+    {
     }
 }

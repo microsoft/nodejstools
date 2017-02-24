@@ -19,23 +19,29 @@ using System.IO;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudioTools;
 
-namespace Microsoft.VisualStudioTools.TestAdapter {
-    class TestFilesUpdateWatcher : IDisposable {
+namespace Microsoft.VisualStudioTools.TestAdapter
+{
+    internal class TestFilesUpdateWatcher : IDisposable
+    {
         private readonly IDictionary<string, FileSystemWatcher> _fileWatchers;
         public event EventHandler<TestFileChangedEventArgs> FileChangedEvent;
 
-        public TestFilesUpdateWatcher() {
+        public TestFilesUpdateWatcher()
+        {
             _fileWatchers = new Dictionary<string, FileSystemWatcher>(StringComparer.OrdinalIgnoreCase);
         }
 
-        public bool AddWatch(string path) {
-            ValidateArg.NotNull(path,"path");
+        public bool AddWatch(string path)
+        {
+            ValidateArg.NotNull(path, "path");
 
-            if (!String.IsNullOrEmpty(path)) {
+            if (!String.IsNullOrEmpty(path))
+            {
                 var directoryName = Path.GetDirectoryName(path);
                 var filter = Path.GetFileName(path);
 
-                if (!_fileWatchers.ContainsKey(path) && Directory.Exists(directoryName)) {
+                if (!_fileWatchers.ContainsKey(path) && Directory.Exists(directoryName))
+                {
                     var watcher = new FileSystemWatcher(directoryName, filter);
                     _fileWatchers[path] = watcher;
 
@@ -47,11 +53,14 @@ namespace Microsoft.VisualStudioTools.TestAdapter {
             return false;
         }
 
-        public bool AddDirectoryWatch(string path) {
+        public bool AddDirectoryWatch(string path)
+        {
             ValidateArg.NotNull(path, "path");
 
-            if (!String.IsNullOrEmpty(path)) {
-                if (!_fileWatchers.ContainsKey(path) && Directory.Exists(path)) {
+            if (!String.IsNullOrEmpty(path))
+            {
+                if (!_fileWatchers.ContainsKey(path) && Directory.Exists(path))
+                {
                     var watcher = new FileSystemWatcher(path);
                     _fileWatchers[path] = watcher;
 
@@ -65,13 +74,16 @@ namespace Microsoft.VisualStudioTools.TestAdapter {
             return false;
         }
 
-        public void RemoveWatch(string path) {
+        public void RemoveWatch(string path)
+        {
             ValidateArg.NotNull(path, "path");
 
-            if (!String.IsNullOrEmpty(path)) {
+            if (!String.IsNullOrEmpty(path))
+            {
                 FileSystemWatcher watcher;
 
-                if (_fileWatchers.TryGetValue(path, out watcher)) {
+                if (_fileWatchers.TryGetValue(path, out watcher))
+                {
                     watcher.EnableRaisingEvents = false;
 
                     _fileWatchers.Remove(path);
@@ -82,31 +94,40 @@ namespace Microsoft.VisualStudioTools.TestAdapter {
             }
         }
 
-        private void OnChanged(object sender, FileSystemEventArgs e) {
+        private void OnChanged(object sender, FileSystemEventArgs e)
+        {
             var evt = FileChangedEvent;
-            if (evt != null) {
+            if (evt != null)
+            {
                 evt(sender, new TestFileChangedEventArgs(null, e.FullPath, TestFileChangedReason.Changed));
             }
         }
 
-        private void OnRenamed(object sender, RenamedEventArgs e) {
+        private void OnRenamed(object sender, RenamedEventArgs e)
+        {
             var evt = FileChangedEvent;
-            if (evt != null) {
+            if (evt != null)
+            {
                 evt(sender, new TestFileChangedEventArgs(null, e.FullPath, TestFileChangedReason.Renamed));
             }
         }
 
-        public void Dispose() {
+        public void Dispose()
+        {
             Dispose(true);
             // Use SupressFinalize in case a subclass
             // of this type implements a finalizer.
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool disposing) {
-            if (disposing && _fileWatchers != null) {
-                foreach (var watcher in _fileWatchers.Values) {
-                    if (watcher != null) {
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing && _fileWatchers != null)
+            {
+                foreach (var watcher in _fileWatchers.Values)
+                {
+                    if (watcher != null)
+                    {
                         watcher.Changed -= OnChanged;
                         watcher.Dispose();
                     }

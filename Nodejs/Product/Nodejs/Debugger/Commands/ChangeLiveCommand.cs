@@ -18,11 +18,14 @@ using System.Collections.Generic;
 using System.Globalization;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.NodejsTools.Debugger.Commands {
-    sealed class ChangeLiveCommand : DebuggerCommand {
+namespace Microsoft.NodejsTools.Debugger.Commands
+{
+    internal sealed class ChangeLiveCommand : DebuggerCommand
+    {
         private readonly Dictionary<string, object> _arguments;
 
-        public ChangeLiveCommand(int id, NodeModule module) : base(id, "changelive") {
+        public ChangeLiveCommand(int id, NodeModule module) : base(id, "changelive")
+        {
             // Wrap script contents as following https://github.com/joyent/node/blob/v0.10.26-release/src/node.js#L880
             string source = string.Format(CultureInfo.InvariantCulture, "{0}{1}{2}",
                 NodeConstants.ScriptWrapBegin,
@@ -36,14 +39,16 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             };
         }
 
-        protected override IDictionary<string, object> Arguments {
+        protected override IDictionary<string, object> Arguments
+        {
             get { return _arguments; }
         }
 
         public bool Updated { get; private set; }
         public bool StackModified { get; private set; }
 
-        public override void ProcessResponse(JObject response) {
+        public override void ProcessResponse(JObject response)
+        {
             base.ProcessResponse(response);
 
             JToken result = response["body"]["result"];

@@ -17,9 +17,12 @@
 using System;
 using Microsoft.NodejsTools.Debugger.Events;
 
-namespace Microsoft.NodejsTools.Debugger.Communication {
-    sealed class BreakpointEventArgs : EventArgs {
-        public BreakpointEventArgs(BreakpointEvent breakpointEvent) {
+namespace Microsoft.NodejsTools.Debugger.Communication
+{
+    internal sealed class BreakpointEventArgs : EventArgs
+    {
+        public BreakpointEventArgs(BreakpointEvent breakpointEvent)
+        {
             BreakpointEvent = breakpointEvent;
         }
 

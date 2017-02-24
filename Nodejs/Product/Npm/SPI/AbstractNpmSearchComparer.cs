@@ -17,11 +17,14 @@
 using System;
 using System.Collections.Generic;
 
-namespace Microsoft.NodejsTools.Npm.SPI {
-    internal abstract class AbstractNpmSearchComparer : IComparer<IPackage> {
-
-        protected int CompareBasedOnKeywords(IPackage x, IPackage y) {
-            if (x.Keywords != null && y.Keywords != null) {
+namespace Microsoft.NodejsTools.Npm.SPI
+{
+    internal abstract class AbstractNpmSearchComparer : IComparer<IPackage>
+    {
+        protected int CompareBasedOnKeywords(IPackage x, IPackage y)
+        {
+            if (x.Keywords != null && y.Keywords != null)
+            {
                 return string.Compare(
                     string.Join(", ", x.Keywords),
                     string.Join(", ", y.Keywords),

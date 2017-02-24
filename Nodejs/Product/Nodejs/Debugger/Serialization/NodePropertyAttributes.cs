@@ -16,12 +16,14 @@
 
 using System;
 
-namespace Microsoft.NodejsTools.Debugger.Serialization {
+namespace Microsoft.NodejsTools.Debugger.Serialization
+{
     /// <summary>
     /// Defines a node property attributes.
     /// </summary>
     [Flags]
-    enum NodePropertyAttributes {
+    internal enum NodePropertyAttributes
+    {
         None = 0,
         ReadOnly = 1,
         DontEnum = 2,

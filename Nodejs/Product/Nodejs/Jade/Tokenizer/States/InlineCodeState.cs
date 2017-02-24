@@ -14,34 +14,48 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Jade {
-    internal partial class JadeTokenizer : Tokenizer<JadeToken> {
-        private void OnInlineCode() {
+namespace Microsoft.NodejsTools.Jade
+{
+    internal partial class JadeTokenizer : Tokenizer<JadeToken>
+    {
+        private void OnInlineCode()
+        {
             if (_cs.CurrentChar == '-' || _cs.CurrentChar == '=')
                 _cs.MoveToNextChar();
 
             // Make tokens for code keywords
-            while (!_cs.IsEndOfStream()) {
+            while (!_cs.IsEndOfStream())
+            {
                 if (SkipWhiteSpace())
                     break;
 
-                if (IsAtString()) {
+                if (IsAtString())
+                {
                     HandleString();
-                } else if (_cs.IsAnsiLetter()) {
+                }
+                else if (_cs.IsAnsiLetter())
+                {
                     var range = ParseIdentifier();
                     var ident = _cs.GetSubstringAt(range.Start, range.Length);
 
                     if (JadeCodeKeywords.IsKeyword(ident))
                         AddToken(JadeTokenType.CodeKeyword, range.Start, range.Length);
-                } else if (_cs.CurrentChar == '=' || _cs.CurrentChar == '+' || _cs.CurrentChar == '*' || _cs.CurrentChar == '/' || _cs.CurrentChar == '-') {
+                }
+                else if (_cs.CurrentChar == '=' || _cs.CurrentChar == '+' || _cs.CurrentChar == '*' || _cs.CurrentChar == '/' || _cs.CurrentChar == '-')
+                {
                     AddToken(JadeTokenType.Operator, _cs.Position, 1);
                     _cs.MoveToNextChar();
-                } else if (_cs.CurrentChar == '#' && _cs.NextChar == '{') {
+                }
+                else if (_cs.CurrentChar == '#' && _cs.NextChar == '{')
+                {
                     var range = GetNonWSSequence('}', inclusive: true);
-                    if (range.Length > 0) {
+                    if (range.Length > 0)
+                    {
                         AddToken(JadeTokenType.Variable, range.Start, range.Length);
                     }
-                } else {
+                }
+                else
+                {
                     _cs.MoveToNextChar();
                 }
             }

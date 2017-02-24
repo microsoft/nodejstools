@@ -15,12 +15,15 @@
 using System;
 using System.Threading;
 
-namespace Microsoft.VisualStudioTools {
-    static class ExceptionExtensions {
+namespace Microsoft.VisualStudioTools
+{
+    internal static class ExceptionExtensions
+    {
         /// <summary>
         /// Returns true if an exception should not be handled by logging code.
         /// </summary>
-        public static bool IsCriticalException(this Exception ex) {
+        public static bool IsCriticalException(this Exception ex)
+        {
             return ex is StackOverflowException ||
                 ex is OutOfMemoryException ||
                 ex is ThreadAbortException ||
@@ -33,13 +36,15 @@ namespace Microsoft.VisualStudioTools {
     /// An exception that should not be silently handled and logged.
     /// </summary>
     [Serializable]
-    class CriticalException : Exception {
+    internal class CriticalException : Exception
+    {
         public CriticalException() { }
         public CriticalException(string message) : base(message) { }
         public CriticalException(string message, Exception inner) : base(message, inner) { }
         protected CriticalException(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context)
-            : base(info, context) { }
+            : base(info, context)
+        { }
     }
 }

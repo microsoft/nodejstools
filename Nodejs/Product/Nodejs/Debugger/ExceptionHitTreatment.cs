@@ -14,8 +14,10 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Debugger {
-    enum ExceptionHitTreatment {
+namespace Microsoft.NodejsTools.Debugger
+{
+    internal enum ExceptionHitTreatment
+    {
         BreakNever = 0,
         BreakAlways,
         BreakOnUnhandled

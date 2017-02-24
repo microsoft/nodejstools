@@ -20,41 +20,50 @@ using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
-    class InlineReplAdornmentManager : ITagger<IntraTextAdornmentTag> {
+    internal class InlineReplAdornmentManager : ITagger<IntraTextAdornmentTag>
+    {
         private readonly ITextView _textView;
         private readonly List<Tuple<SnapshotPoint, ZoomableInlineAdornment>> _tags;
         private readonly Dispatcher _dispatcher;
 
-        internal InlineReplAdornmentManager(ITextView textView) {
+        internal InlineReplAdornmentManager(ITextView textView)
+        {
             _textView = textView;
             _tags = new List<Tuple<SnapshotPoint, ZoomableInlineAdornment>>();
             _dispatcher = Dispatcher.CurrentDispatcher;
         }
 
-        public IEnumerable<ITagSpan<IntraTextAdornmentTag>> GetTags(NormalizedSnapshotSpanCollection spans) {
+        public IEnumerable<ITagSpan<IntraTextAdornmentTag>> GetTags(NormalizedSnapshotSpanCollection spans)
+        {
             var result = new List<TagSpan<IntraTextAdornmentTag>>();
-            for (int i = 0; i < _tags.Count; i++) {
-                if (_tags[i].Item1.Snapshot != _textView.TextSnapshot) {
+            for (int i = 0; i < _tags.Count; i++)
+            {
+                if (_tags[i].Item1.Snapshot != _textView.TextSnapshot)
+                {
                     // update to the latest snapshot
                     _tags[i] = new Tuple<SnapshotPoint, ZoomableInlineAdornment>(
                         _tags[i].Item1.TranslateTo(_textView.TextSnapshot, PointTrackingMode.Negative),
                         _tags[i].Item2
                     );
                 }
-                
+
                 var span = new SnapshotSpan(_textView.TextSnapshot, _tags[i].Item1, 0);
                 bool intersects = false;
-                foreach (var applicableSpan in spans) {
-                    if (applicableSpan.TranslateTo(_textView.TextSnapshot, SpanTrackingMode.EdgeInclusive).IntersectsWith(span)) {
+                foreach (var applicableSpan in spans)
+                {
+                    if (applicableSpan.TranslateTo(_textView.TextSnapshot, SpanTrackingMode.EdgeInclusive).IntersectsWith(span))
+                    {
                         intersects = true;
                         break;
                     }
                 }
-                if (!intersects) {
+                if (!intersects)
+                {
                     continue;
                 }
                 var tag = new IntraTextAdornmentTag(_tags[i].Item2, null);
@@ -63,26 +72,31 @@ namespace Microsoft.VisualStudio.Repl {
             return result;
         }
 
-        public void AddAdornment(ZoomableInlineAdornment uiElement, SnapshotPoint targetLoc) {
-            if (Dispatcher.CurrentDispatcher != _dispatcher) {
+        public void AddAdornment(ZoomableInlineAdornment uiElement, SnapshotPoint targetLoc)
+        {
+            if (Dispatcher.CurrentDispatcher != _dispatcher)
+            {
                 _dispatcher.BeginInvoke(new Action(() => AddAdornment(uiElement, targetLoc)));
                 return;
             }
             var targetLine = targetLoc.GetContainingLine();
             _tags.Add(new Tuple<SnapshotPoint, ZoomableInlineAdornment>(targetLoc, uiElement));
             var handler = TagsChanged;
-            if (handler != null) {
+            if (handler != null)
+            {
                 var span = new SnapshotSpan(_textView.TextSnapshot, targetLine.Start, targetLine.LengthIncludingLineBreak);
                 var args = new SnapshotSpanEventArgs(span);
                 handler(this, args);
             }
         }
 
-        public IList<Tuple<SnapshotPoint, ZoomableInlineAdornment>> Adornments {
+        public IList<Tuple<SnapshotPoint, ZoomableInlineAdornment>> Adornments
+        {
             get { return _tags; }
         }
 
-        public void RemoveAll() {
+        public void RemoveAll()
+        {
             _tags.Clear();
         }
 

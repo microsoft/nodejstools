@@ -16,8 +16,10 @@
 
 using System;
 
-namespace Microsoft.NodejsTools.Debugger.Communication {
-    interface INetworkClientFactory {
+namespace Microsoft.NodejsTools.Debugger.Communication
+{
+    internal interface INetworkClientFactory
+    {
         INetworkClient CreateNetworkClient(Uri uri);
     }
 }

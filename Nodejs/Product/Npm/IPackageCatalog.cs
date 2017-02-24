@@ -18,8 +18,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Microsoft.NodejsTools.Npm {
-    public interface IPackageCatalog {
+namespace Microsoft.NodejsTools.Npm
+{
+    public interface IPackageCatalog
+    {
         DateTime LastRefreshed { get; }
 
         Task<IEnumerable<IPackage>> GetCatalogPackagesAsync(string filterText, Uri registryUrl = null);

@@ -26,33 +26,40 @@ using TestUtilities.UI;
 using Keyboard = TestUtilities.UI.Keyboard;
 using Mouse = TestUtilities.UI.Mouse;
 
-namespace Microsoft.VisualStudioTools.SharedProjectTests {
+namespace Microsoft.VisualStudioTools.SharedProjectTests
+{
     [TestClass]
-    public class DragDropCopyCutPaste : SharedProjectTest {
+    public class DragDropCopyCutPaste : SharedProjectTest
+    {
         [ClassInitialize]
-        public static void DoDeployment(TestContext context) {
+        public static void DoDeployment(TestContext context)
+        {
             AssertListener.Initialize();
         }
 
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MultiPasteKeyboard() {
+        public void MultiPasteKeyboard()
+        {
             MultiPaste(CopyByKeyboard);
         }
 
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MultiPasteMouse() {
+        public void MultiPasteMouse()
+        {
             MultiPaste(CopyByMouse);
         }
 
         /// <summary>
         /// Cut item, paste into folder, paste into top-level, 2nd paste should prompt for overwrite
         /// </summary>
-        private void MultiPaste(MoveDelegate mover) {
-            foreach (var projectType in ProjectTypes) {
+        private void MultiPaste(MoveDelegate mover)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition("HelloWorld",
                     projectType,
                     ItemGroup(
@@ -62,7 +69,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = testDef.Generate().ToVs()) {
+                using (var solution = testDef.Generate().ToVs())
+                {
                     var server = solution.WaitForItem("HelloWorld", "server" + projectType.CodeExtension);
                     var server2 = solution.WaitForItem("HelloWorld", "server2" + projectType.CodeExtension);
 
@@ -87,7 +95,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     );
 
                     // paste again, we should get the replace prompts...
-                    using (var dialog = solution.WaitForOverwriteFileDialog()) {
+                    using (var dialog = solution.WaitForOverwriteFileDialog())
+                    {
                         dialog.Cancel();
                     }
 
@@ -104,8 +113,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Mock")]
         [HostType("VSTestHost")]
-        public void CutPastePasteItem() {
-            foreach (var projectType in ProjectTypes) {
+        public void CutPastePasteItem()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition("DragDropCopyCutPaste",
                     projectType,
                     ItemGroup(
@@ -114,7 +125,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = testDef.Generate().ToVs()) {
+                using (var solution = testDef.Generate().ToVs())
+                {
                     var project = solution.WaitForItem("DragDropCopyCutPaste");
                     var folder = solution.WaitForItem("DragDropCopyCutPaste", "PasteFolder");
                     var file = solution.WaitForItem("DragDropCopyCutPaste", "CutPastePasteItem" + projectType.CodeExtension);
@@ -142,8 +154,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Mock")]
         [HostType("VSTestHost")]
-        public void CutRenamePaste() {
-            foreach (var projectType in ProjectTypes) {
+        public void CutRenamePaste()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition("DragDropCopyCutPaste",
                     projectType,
                     ItemGroup(
@@ -152,7 +166,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = testDef.Generate().ToVs()) {
+                using (var solution = testDef.Generate().ToVs())
+                {
                     var project = solution.WaitForItem("DragDropCopyCutPaste");
                     var file = solution.WaitForItem("DragDropCopyCutPaste", "CutRenamePaste", "CutRenamePaste" + projectType.CodeExtension);
 
@@ -179,8 +194,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Mock")]
         [HostType("VSTestHost")]
-        public void CutDeletePaste() {
-            foreach (var projectType in ProjectTypes) {
+        public void CutDeletePaste()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition("DragDropCopyCutPaste",
                     projectType,
                     ItemGroup(
@@ -189,7 +206,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = testDef.Generate().ToVs()) {
+                using (var solution = testDef.Generate().ToVs())
+                {
                     var project = solution.WaitForItem("DragDropCopyCutPaste");
                     var file = solution.WaitForItem("DragDropCopyCutPaste", "CutDeletePaste", "CutDeletePaste" + projectType.CodeExtension);
 
@@ -210,21 +228,25 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void CopyFileToFolderTooLongKeyboard() {
+        public void CopyFileToFolderTooLongKeyboard()
+        {
             CopyFileToFolderTooLong(CopyByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void CopyFileToFolderTooLongMouse() {
+        public void CopyFileToFolderTooLongMouse()
+        {
             CopyFileToFolderTooLong(CopyByMouse);
         }
 
         /// <summary>
         /// Adds a new folder which fits exactly w/ no space left in the path name
         /// </summary>
-        private void CopyFileToFolderTooLong(MoveDelegate copier) {
-            foreach (var projectType in ProjectTypes) {
+        private void CopyFileToFolderTooLong(MoveDelegate copier)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition("LFN",
                     projectType,
                     ItemGroup(
@@ -232,7 +254,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = SolutionFile.Generate("LongFileNames", 29, testDef).ToVs()) {
+                using (var solution = SolutionFile.Generate("LongFileNames", 29, testDef).ToVs())
+                {
                     // find server, send copy & paste, verify copy of file is there
                     var projectNode = solution.WaitForItem("LFN");
                     AutomationWrapper.Select(projectNode);
@@ -267,21 +290,25 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void CutFileToFolderTooLongKeyboard() {
+        public void CutFileToFolderTooLongKeyboard()
+        {
             CutFileToFolderTooLong(MoveByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void CutFileToFolderTooLongMouse() {
+        public void CutFileToFolderTooLongMouse()
+        {
             CutFileToFolderTooLong(MoveByMouse);
         }
 
         /// <summary>
         /// Adds a new folder which fits exactly w/ no space left in the path name
         /// </summary>
-        private void CutFileToFolderTooLong(MoveDelegate mover) {
-            foreach (var projectType in ProjectTypes) {
+        private void CutFileToFolderTooLong(MoveDelegate mover)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition("LFN",
                     projectType,
                     ItemGroup(
@@ -289,7 +316,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = SolutionFile.Generate("LongFileNames", 29, testDef).ToVs()) {
+                using (var solution = SolutionFile.Generate("LongFileNames", 29, testDef).ToVs())
+                {
                     // find server, send copy & paste, verify copy of file is there
                     var projectNode = solution.WaitForItem("LFN");
                     AutomationWrapper.Select(projectNode);
@@ -327,8 +355,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Mock")]
         [HostType("VSTestHost")]
-        public void CutRenamePasteFolder() {
-            foreach (var projectType in ProjectTypes) {
+        public void CutRenamePasteFolder()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition("DragDropCopyCutPaste",
                     projectType,
                     ItemGroup(
@@ -337,7 +367,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = testDef.Generate().ToVs()) {
+                using (var solution = testDef.Generate().ToVs())
+                {
                     var project = solution.WaitForItem("DragDropCopyCutPaste");
                     var file = solution.WaitForItem("DragDropCopyCutPaste", "CutRenamePaste", "CutRenamePasteFolder");
                     AutomationWrapper.Select(file);
@@ -362,8 +393,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void CopiedBeforeDragPastedAfterDrop() {
-            foreach (var projectType in ProjectTypes) {
+        public void CopiedBeforeDragPastedAfterDrop()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition("DragDropCopyCutPaste",
                     projectType,
                     ItemGroup(
@@ -374,7 +407,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = testDef.Generate().ToVs()) {
+                using (var solution = testDef.Generate().ToVs())
+                {
                     var project = solution.WaitForItem("DragDropCopyCutPaste");
                     Assert.AreNotEqual(null, project);
                     var file = solution.WaitForItem("DragDropCopyCutPaste", "CopiedBeforeDragPastedAfterDrop" + projectType.CodeExtension);
@@ -406,22 +440,26 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void DragToAnotherProjectKeyboard() {
+        public void DragToAnotherProjectKeyboard()
+        {
             DragToAnotherProject(CopyByKeyboard);
         }
 
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void DragToAnotherProjectMouse() {
+        public void DragToAnotherProjectMouse()
+        {
             DragToAnotherProject(DragAndDrop);
         }
 
         /// <summary>
         /// Copy from CSharp into our project
         /// </summary>
-        private void DragToAnotherProject(MoveDelegate mover) {
-            foreach (var projectType in ProjectTypes) {
+        private void DragToAnotherProject(MoveDelegate mover)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var projects = new[] {
                     new ProjectDefinition(
                         "DragDropCopyCutPaste",
@@ -440,7 +478,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 };
 
-                using (var solution = SolutionFile.Generate("DragDropCopyCutPaste", projects).ToVs()) {
+                using (var solution = SolutionFile.Generate("DragDropCopyCutPaste", projects).ToVs())
+                {
                     mover(
                         solution,
                         solution.WaitForItem("ConsoleApplication1"),
@@ -459,8 +498,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Mock")]
         [HostType("VSTestHost")]
-        public void CutFolderPasteOnSelf() {
-            foreach (var projectType in ProjectTypes) {
+        public void CutFolderPasteOnSelf()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition("DragDropCopyCutPaste",
                     projectType,
                     ItemGroup(
@@ -468,7 +509,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = testDef.Generate().ToVs()) {
+                using (var solution = testDef.Generate().ToVs())
+                {
                     MoveByKeyboard(
                         solution,
                         solution.WaitForItem("DragDropCopyCutPaste", "CutFolderPasteOnSelf"),
@@ -489,8 +531,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Mock")]
         [HostType("VSTestHost")]
-        public void DragFolderOntoSelf() {
-            foreach (var projectType in ProjectTypes) {
+        public void DragFolderOntoSelf()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition("DragDropCopyCutPaste",
                     projectType,
                     ItemGroup(
@@ -499,7 +543,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = testDef.Generate().ToVs()) {
+                using (var solution = testDef.Generate().ToVs())
+                {
                     var draggedFolder = solution.WaitForItem("DragDropCopyCutPaste", "DragFolderOntoSelf");
                     AutomationWrapper.Select(draggedFolder);
 
@@ -518,8 +563,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Mock")]
         [HostType("VSTestHost")]
-        public void DragFolderOntoChild() {
-            foreach (var projectType in ProjectTypes) {
+        public void DragFolderOntoChild()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition("DragDropCopyCutPaste",
                     projectType,
                     ItemGroup(
@@ -528,7 +575,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = testDef.Generate().ToVs()) {
+                using (var solution = testDef.Generate().ToVs())
+                {
                     MoveByMouse(
                         solution,
                         solution.WaitForItem("DragDropCopyCutPaste", "ParentFolder", "ChildFolder"),
@@ -555,8 +603,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void CutFileReplace() {
-            foreach (var projectType in ProjectTypes) {
+        public void CutFileReplace()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition("DragDropCopyCutPaste",
                     projectType,
                     ItemGroup(
@@ -567,14 +617,16 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = testDef.Generate().ToVs()) {
+                using (var solution = testDef.Generate().ToVs())
+                {
                     MoveByKeyboard(
                         solution,
                         solution.WaitForItem("DragDropCopyCutPaste", "MoveDupFilename"),
                         solution.WaitForItem("DragDropCopyCutPaste", "MoveDupFilename", "Fob", "server" + projectType.CodeExtension)
                     );
 
-                    using (var dialog = solution.WaitForOverwriteFileDialog()) {
+                    using (var dialog = solution.WaitForOverwriteFileDialog())
+                    {
                         dialog.Yes();
                     }
 
@@ -587,8 +639,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Mock")]
         [HostType("VSTestHost")]
-        public void CutFolderAndFile() {
-            foreach (var projectType in ProjectTypes) {
+        public void CutFolderAndFile()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition("DragDropCopyCutPaste",
                     projectType,
                     ItemGroup(
@@ -598,7 +652,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = testDef.Generate().ToVs()) {
+                using (var solution = testDef.Generate().ToVs())
+                {
                     var folder = solution.WaitForItem("DragDropCopyCutPaste", "CutFolderAndFile", "CutFolder");
                     var file = solution.WaitForItem("DragDropCopyCutPaste", "CutFolderAndFile", "CutFolder", "CutFolderAndFile" + projectType.CodeExtension);
                     var dest = solution.WaitForItem("DragDropCopyCutPaste");
@@ -622,8 +677,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Mock")]
         [HostType("VSTestHost")]
-        public void CutFilePasteSameLocation() {
-            foreach (var projectType in ProjectTypes) {
+        public void CutFilePasteSameLocation()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition("DragDropCopyCutPaste",
                     projectType,
                     ItemGroup(
@@ -631,7 +688,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = testDef.Generate().ToVs()) {
+                using (var solution = testDef.Generate().ToVs())
+                {
                     MoveByKeyboard(
                         solution,
                         solution.WaitForItem("DragDropCopyCutPaste"),
@@ -653,8 +711,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void DragFolderAndFileOntoSelf() {
-            foreach (var projectType in ProjectTypes) {
+        public void DragFolderAndFileOntoSelf()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition("DragDropCopyCutPaste",
                     projectType,
                     ItemGroup(
@@ -663,7 +723,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = testDef.Generate().ToVs()) {
+                using (var solution = testDef.Generate().ToVs())
+                {
                     var folder = solution.WaitForItem("DragDropCopyCutPaste", "DragFolderAndFileOntoSelf");
                     DragAndDrop(
                         solution,
@@ -682,8 +743,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void CopyFolderFromAnotherHierarchy() {
-            foreach (var projectType in ProjectTypes) {
+        public void CopyFolderFromAnotherHierarchy()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var projects = new[] {
                     new ProjectDefinition(
                         "DragDropCopyCutPaste",
@@ -704,7 +767,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 };
 
-                using (var solution = SolutionFile.Generate("DragDropCopyCutPaste", projects).ToVs()) {
+                using (var solution = SolutionFile.Generate("DragDropCopyCutPaste", projects).ToVs())
+                {
                     CopyByKeyboard(
                         solution,
                         solution.WaitForItem("DragDropCopyCutPaste"),
@@ -723,8 +787,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void CopyDeletePaste() {
-            foreach (var projectType in ProjectTypes) {
+        public void CopyDeletePaste()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition("DragDropCopyCutPaste",
                     projectType,
                     ItemGroup(
@@ -733,7 +799,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = testDef.Generate().ToVs()) {
+                using (var solution = testDef.Generate().ToVs())
+                {
                     var file = solution.WaitForItem("DragDropCopyCutPaste", "CopyDeletePaste", "CopyDeletePaste" + projectType.CodeExtension);
                     var project = solution.WaitForItem("DragDropCopyCutPaste");
 
@@ -760,21 +827,25 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void CrossHierarchyFileDragAndDropKeyboard() {
+        public void CrossHierarchyFileDragAndDropKeyboard()
+        {
             CrossHierarchyFileDragAndDrop(CopyByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void CrossHierarchyFileDragAndDropMouse() {
+        public void CrossHierarchyFileDragAndDropMouse()
+        {
             CrossHierarchyFileDragAndDrop(DragAndDrop);
         }
 
         /// <summary>
         /// Copy from C# into our project
         /// </summary>
-        private void CrossHierarchyFileDragAndDrop(MoveDelegate mover) {
-            foreach (var projectType in ProjectTypes) {
+        private void CrossHierarchyFileDragAndDrop(MoveDelegate mover)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var projects = new[] {
                     new ProjectDefinition(
                         "DragDropCopyCutPaste",
@@ -792,7 +863,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 };
 
-                using (var solution = SolutionFile.Generate("DragDropCopyCutPaste", projects).ToVs()) {
+                using (var solution = SolutionFile.Generate("DragDropCopyCutPaste", projects).ToVs())
+                {
                     mover(
                         solution,
                         solution.WaitForItem("DragDropCopyCutPaste", "DropFolder"),
@@ -806,13 +878,15 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Mock")]
         [HostType("VSTestHost")]
-        public void MoveDuplicateFolderNameKeyboard() {
+        public void MoveDuplicateFolderNameKeyboard()
+        {
             MoveDuplicateFolderName(MoveByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Mock")]
         [HostType("VSTestHost")]
-        public void MoveDuplicateFolderNameMouse() {
+        public void MoveDuplicateFolderNameMouse()
+        {
             MoveDuplicateFolderName(MoveByMouse);
         }
 
@@ -820,8 +894,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// Drag file from another hierarchy into folder in our hierarchy, item should be added
         ///     Cannot move the folder 'DuplicateFolderName'. A folder with that name already exists in the destination directory.
         /// </summary>
-        private void MoveDuplicateFolderName(MoveDelegate mover) {
-            foreach (var projectType in ProjectTypes) {
+        private void MoveDuplicateFolderName(MoveDelegate mover)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition("DragDropCopyCutPaste",
                     projectType,
                     ItemGroup(
@@ -831,7 +907,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = testDef.Generate().ToVs()) {
+                using (var solution = testDef.Generate().ToVs())
+                {
                     mover(
                         solution,
                         solution.WaitForItem("DragDropCopyCutPaste", "DuplicateFolderNameTarget"),
@@ -846,22 +923,26 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void CopyDuplicateFolderNameKeyboard() {
+        public void CopyDuplicateFolderNameKeyboard()
+        {
             CopyDuplicateFolderName(CopyByKeyboard);
         }
 
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void CopyDuplicateFolderNameMouse() {
+        public void CopyDuplicateFolderNameMouse()
+        {
             CopyDuplicateFolderName(CopyByMouse);
         }
 
         /// <summary>
         /// Copy folder to a destination where the folder already exists.  Say don't copy, nothing should be copied.
         /// </summary>
-        private void CopyDuplicateFolderName(MoveDelegate mover) {
-            foreach (var projectType in ProjectTypes) {
+        private void CopyDuplicateFolderName(MoveDelegate mover)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition("DragDropCopyCutPaste",
                     projectType,
                     ItemGroup(
@@ -872,14 +953,16 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = testDef.Generate().ToVs()) {
+                using (var solution = testDef.Generate().ToVs())
+                {
                     mover(
                         solution,
                         solution.WaitForItem("DragDropCopyCutPaste", "CopyDuplicateFolderNameTarget"),
                         solution.WaitForItem("DragDropCopyCutPaste", "CopyDuplicateFolderName")
                     );
 
-                    using (var dialog = solution.WaitForOverwriteFileDialog()) {
+                    using (var dialog = solution.WaitForOverwriteFileDialog())
+                    {
                         AssertUtil.Contains(dialog.Text, "This folder already contains a folder called 'CopyDuplicateFolderName'");
                         dialog.No();
                     }
@@ -891,21 +974,25 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveCrossHierarchyKeyboard() {
+        public void MoveCrossHierarchyKeyboard()
+        {
             MoveCrossHierarchy(MoveByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveCrossHierarchyMouse() {
+        public void MoveCrossHierarchyMouse()
+        {
             MoveCrossHierarchy(MoveByMouse);
         }
 
         /// <summary>
         /// Cut item from one project, paste into another project, item should be removed from original project
         /// </summary>
-        private void MoveCrossHierarchy(MoveDelegate mover) {
-            foreach (var projectType in ProjectTypes) {
+        private void MoveCrossHierarchy(MoveDelegate mover)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var projects = new[] {
                     new ProjectDefinition(
                         "DragDropCopyCutPaste",
@@ -924,7 +1011,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 };
 
-                using (var solution = SolutionFile.Generate("DragDropCopyCutPaste", projects).ToVs()) {
+                using (var solution = SolutionFile.Generate("DragDropCopyCutPaste", projects).ToVs())
+                {
                     mover(
                         solution,
                         solution.WaitForItem("DragDropCopyCutPaste"),
@@ -940,25 +1028,29 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveReverseCrossHierarchyKeyboard() {
+        public void MoveReverseCrossHierarchyKeyboard()
+        {
             MoveReverseCrossHierarchy(MoveByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveReverseCrossHierarchyMouse() {
+        public void MoveReverseCrossHierarchyMouse()
+        {
             MoveReverseCrossHierarchy(MoveByMouse);
         }
-       
+
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveDuplicateFileNameOverwriteKeyboard() {
+        public void MoveDuplicateFileNameOverwriteKeyboard()
+        {
             MoveDuplicateFileNameOverwrite(MoveByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveDuplicateFileNameOverwriteMouse() {
+        public void MoveDuplicateFileNameOverwriteMouse()
+        {
             MoveDuplicateFileNameOverwrite(MoveByMouse);
         }
 
@@ -967,8 +1059,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// makes sure only one file is left.
         /// </summary>
         /// <param name="mover"></param>
-        private void MoveDuplicateFileNameOverwrite(MoveDelegate mover) {
-            foreach (var projectType in ProjectTypes) {
+        private void MoveDuplicateFileNameOverwrite(MoveDelegate mover)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var project = new ProjectDefinition(
                     "DragDropCopyCutPaste",
                     projectType,
@@ -980,7 +1074,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = project.Generate().ToVs()) {
+                using (var solution = project.Generate().ToVs())
+                {
                     mover(
                         solution,
                         solution.WaitForItem("DragDropCopyCutPaste", "B"),
@@ -988,7 +1083,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         solution.WaitForItem("DragDropCopyCutPaste", "quox.txt")
                     );
 
-                    using (var dialog = solution.WaitForOverwriteFileDialog()) {
+                    using (var dialog = solution.WaitForOverwriteFileDialog())
+                    {
                         AssertUtil.Contains(dialog.Text, "A file with the same name 'quox.txt' already exists.");
                         dialog.Yes();
                     }
@@ -1004,13 +1100,15 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveDuplicateFileNameOverwriteAllItemsKeyboard() {
+        public void MoveDuplicateFileNameOverwriteAllItemsKeyboard()
+        {
             MoveDuplicateFileNameOverwriteAllItems(MoveByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveDuplicateFileNameOverwriteAllItemsMouse() {
+        public void MoveDuplicateFileNameOverwriteAllItemsMouse()
+        {
             MoveDuplicateFileNameOverwriteAllItems(MoveByMouse);
         }
 
@@ -1019,8 +1117,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// checks do this for all items, and makes sure only one file is left.
         /// </summary>
         /// <param name="mover"></param>
-        private void MoveDuplicateFileNameOverwriteAllItems(MoveDelegate mover) {
-            foreach (var projectType in ProjectTypes) {
+        private void MoveDuplicateFileNameOverwriteAllItems(MoveDelegate mover)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var project = new ProjectDefinition(
                     "DragDropCopyCutPaste",
                     projectType,
@@ -1034,7 +1134,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = project.Generate().ToVs()) {
+                using (var solution = project.Generate().ToVs())
+                {
                     mover(
                         solution,
                         solution.WaitForItem("DragDropCopyCutPaste", "B"),
@@ -1043,7 +1144,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         solution.WaitForItem("DragDropCopyCutPaste", "quox.txt")
                     );
 
-                    using (var dialog = solution.WaitForOverwriteFileDialog()) {
+                    using (var dialog = solution.WaitForOverwriteFileDialog())
+                    {
                         AssertUtil.Contains(dialog.Text, "A file with the same name 'quox.txt' already exists.");
                         dialog.AllItems = true;
                         dialog.Yes();
@@ -1061,13 +1163,15 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveDuplicateFileNameDontOverwriteKeyboard() {
+        public void MoveDuplicateFileNameDontOverwriteKeyboard()
+        {
             MoveDuplicateFileNameDontOverwrite(MoveByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveDuplicateFileNameDontOverwriteMouse() {
+        public void MoveDuplicateFileNameDontOverwriteMouse()
+        {
             MoveDuplicateFileNameDontOverwrite(MoveByMouse);
         }
 
@@ -1077,8 +1181,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// files should still be in the project.
         /// </summary>
         /// <param name="mover"></param>
-        private void MoveDuplicateFileNameDontOverwrite(MoveDelegate mover) {
-            foreach (var projectType in ProjectTypes) {
+        private void MoveDuplicateFileNameDontOverwrite(MoveDelegate mover)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var project = new ProjectDefinition(
                     "DragDropCopyCutPaste",
                     projectType,
@@ -1090,7 +1196,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = project.Generate().ToVs()) {
+                using (var solution = project.Generate().ToVs())
+                {
                     mover(
                         solution,
                         solution.WaitForItem("DragDropCopyCutPaste", "B"),
@@ -1098,16 +1205,20 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         solution.WaitForItem("DragDropCopyCutPaste", "quox.txt")
                     );
 
-                    using (var dialog = solution.WaitForOverwriteFileDialog()) {
+                    using (var dialog = solution.WaitForOverwriteFileDialog())
+                    {
                         AssertUtil.Contains(dialog.Text, "A file with the same name 'quox.txt' already exists.");
                         dialog.No();
                     }
 
                     solution.AssertFileExists("DragDropCopyCutPaste", "B", "quox.txt");
                     // one of the fils should still exist...
-                    try {
+                    try
+                    {
                         solution.AssertFileExists("DragDropCopyCutPaste", "quox.txt");
-                    } catch (AssertFailedException) {
+                    }
+                    catch (AssertFailedException)
+                    {
                         solution.AssertFileExists("DragDropCopyCutPaste", "A", "quox.txt");
                     }
 
@@ -1118,13 +1229,15 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveDuplicateFileNameDontOverwrite2Keyboard() {
+        public void MoveDuplicateFileNameDontOverwrite2Keyboard()
+        {
             MoveDuplicateFileNameDontOverwrite2(MoveByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveDuplicateFileNameDontOverwrite2Mouse() {
+        public void MoveDuplicateFileNameDontOverwrite2Mouse()
+        {
             MoveDuplicateFileNameDontOverwrite2(MoveByMouse);
         }
 
@@ -1134,8 +1247,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// all the files should still exist somewhere.
         /// </summary>
         /// <param name="mover"></param>
-        private void MoveDuplicateFileNameDontOverwrite2(MoveDelegate mover) {
-            foreach (var projectType in ProjectTypes) {
+        private void MoveDuplicateFileNameDontOverwrite2(MoveDelegate mover)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var project = new ProjectDefinition(
                     "DragDropCopyCutPaste",
                     projectType,
@@ -1149,7 +1264,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = project.Generate().ToVs()) {
+                using (var solution = project.Generate().ToVs())
+                {
                     mover(
                         solution,
                         solution.WaitForItem("DragDropCopyCutPaste", "B"),
@@ -1158,14 +1274,16 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         solution.WaitForItem("DragDropCopyCutPaste", "quox.txt")
                     );
 
-                    using (var dialog = solution.WaitForOverwriteFileDialog()) {
+                    using (var dialog = solution.WaitForOverwriteFileDialog())
+                    {
                         AssertUtil.Contains(dialog.Text, "A file with the same name 'quox.txt' already exists.");
                         dialog.No();
                     }
 
                     System.Threading.Thread.Sleep(1000);
 
-                    using (var dialog = solution.WaitForOverwriteFileDialog()) {
+                    using (var dialog = solution.WaitForOverwriteFileDialog())
+                    {
                         AssertUtil.Contains(dialog.Text, "A file with the same name 'quox.txt' already exists.");
                         dialog.No();
                     }
@@ -1184,13 +1302,15 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveDuplicateFileNameDontOverwriteAllItemsKeyboard() {
+        public void MoveDuplicateFileNameDontOverwriteAllItemsKeyboard()
+        {
             MoveDuplicateFileNameDontOverwriteAllItems(MoveByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveDuplicateFileNameDontOverwriteAllItemsMouse() {
+        public void MoveDuplicateFileNameDontOverwriteAllItemsMouse()
+        {
             MoveDuplicateFileNameDontOverwriteAllItems(MoveByMouse);
         }
 
@@ -1199,8 +1319,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// do this for all items, and makes sure all the files still exist somewhere.
         /// </summary>
         /// <param name="mover"></param>
-        private void MoveDuplicateFileNameDontOverwriteAllItems(MoveDelegate mover) {
-            foreach (var projectType in ProjectTypes) {
+        private void MoveDuplicateFileNameDontOverwriteAllItems(MoveDelegate mover)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var project = new ProjectDefinition(
                     "DragDropCopyCutPaste",
                     projectType,
@@ -1214,7 +1336,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = project.Generate().ToVs()) {
+                using (var solution = project.Generate().ToVs())
+                {
                     mover(
                         solution,
                         solution.WaitForItem("DragDropCopyCutPaste", "B"),
@@ -1223,7 +1346,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         solution.WaitForItem("DragDropCopyCutPaste", "quox.txt")
                     );
 
-                    using (var dialog = solution.WaitForOverwriteFileDialog()) {
+                    using (var dialog = solution.WaitForOverwriteFileDialog())
+                    {
                         AssertUtil.Contains(dialog.Text, "A file with the same name 'quox.txt' already exists.");
                         dialog.AllItems = true;
                         dialog.No();
@@ -1245,13 +1369,15 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveDuplicateFileNameCancelKeyboard() {
+        public void MoveDuplicateFileNameCancelKeyboard()
+        {
             MoveDuplicateFileNameCancel(MoveByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveDuplicateFileNameCancelMouse() {
+        public void MoveDuplicateFileNameCancelMouse()
+        {
             MoveDuplicateFileNameCancel(MoveByMouse);
         }
 
@@ -1261,8 +1387,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// of the files are still there.
         /// </summary>
         /// <param name="mover"></param>
-        private void MoveDuplicateFileNameCancel(MoveDelegate mover) {
-            foreach (var projectType in ProjectTypes) {
+        private void MoveDuplicateFileNameCancel(MoveDelegate mover)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var project = new ProjectDefinition(
                     "DragDropCopyCutPaste",
                     projectType,
@@ -1276,7 +1404,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = project.Generate().ToVs()) {
+                using (var solution = project.Generate().ToVs())
+                {
                     mover(
                         solution,
                         solution.WaitForItem("DragDropCopyCutPaste", "B"),
@@ -1285,7 +1414,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         solution.WaitForItem("DragDropCopyCutPaste", "quox.txt")
                     );
 
-                    using (var dialog = solution.WaitForOverwriteFileDialog()) {
+                    using (var dialog = solution.WaitForOverwriteFileDialog())
+                    {
                         AssertUtil.Contains(dialog.Text, "A file with the same name 'quox.txt' already exists.");
                         dialog.Cancel();
                     }
@@ -1304,9 +1434,11 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             }
         }
 
-        private static bool IsFile(EnvDTE.ProjectItem projectItem) {
+        private static bool IsFile(EnvDTE.ProjectItem projectItem)
+        {
             Guid guid;
-            if (Guid.TryParse(projectItem.Kind, out guid)) {
+            if (Guid.TryParse(projectItem.Kind, out guid))
+            {
                 return guid == VSConstants.GUID_ItemType_PhysicalFile;
             }
             return false;
@@ -1315,8 +1447,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// <summary>
         /// Cut an item from our project, paste into another project, item should be removed from our project
         /// </summary>
-        private void MoveReverseCrossHierarchy(MoveDelegate mover) {
-            foreach (var projectType in ProjectTypes) {
+        private void MoveReverseCrossHierarchy(MoveDelegate mover)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var projects = new[] {
                     new ProjectDefinition(
                         "DragDropCopyCutPaste",
@@ -1331,7 +1465,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 };
 
-                using (var solution = SolutionFile.Generate("DragDropCopyCutPaste", projects).ToVs()) {
+                using (var solution = SolutionFile.Generate("DragDropCopyCutPaste", projects).ToVs())
+                {
                     mover(
                         solution,
                         solution.WaitForItem("ConsoleApplication1"),
@@ -1351,8 +1486,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveDoubleCrossHierarchy() {
-            foreach (var projectType in ProjectTypes) {
+        public void MoveDoubleCrossHierarchy()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var projects = new[] {
                     new ProjectDefinition(
                         "DragDropCopyCutPaste",
@@ -1371,7 +1508,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 };
 
-                using (var solution = SolutionFile.Generate("DragDropCopyCutPaste", projects).ToVs()) {
+                using (var solution = SolutionFile.Generate("DragDropCopyCutPaste", projects).ToVs())
+                {
                     DragAndDrop(
                         solution,
                         solution.WaitForItem("ConsoleApplication1"),
@@ -1398,8 +1536,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void DragTwiceAndOverwrite() {
-            foreach (var projectType in ProjectTypes) {
+        public void DragTwiceAndOverwrite()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var projects = new[] {
                     new ProjectDefinition(
                         "DragDropCopyCutPaste",
@@ -1415,8 +1555,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 };
 
-                using (var solution = SolutionFile.Generate("DragDropCopyCutPaste", projects).ToVs()) {
-                    for (int i = 0; i < 2; i++) {
+                using (var solution = SolutionFile.Generate("DragDropCopyCutPaste", projects).ToVs())
+                {
+                    for (int i = 0; i < 2; i++)
+                    {
                         DragAndDrop(
                             solution,
                             solution.WaitForItem("DragDropCopyCutPaste"),
@@ -1424,7 +1566,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         );
                     }
 
-                    using (var dialog = solution.WaitForOverwriteFileDialog()) {
+                    using (var dialog = solution.WaitForOverwriteFileDialog())
+                    {
                         AssertUtil.Contains(dialog.Text, "A file with the same name 'DragTwiceAndOverwrite.cs' already exists.");
                         dialog.Yes();
                     }
@@ -1441,8 +1584,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Mock")]
         [HostType("VSTestHost")]
-        public void CopyFolderMissingItem() {
-            foreach (var projectType in ProjectTypes) {
+        public void CopyFolderMissingItem()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition("DragDropCopyCutPaste",
                     projectType,
                     ItemGroup(
@@ -1452,7 +1597,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = testDef.Generate().ToVs()) {
+                using (var solution = testDef.Generate().ToVs())
+                {
                     CopyByKeyboard(
                         solution,
                         solution.WaitForItem("DragDropCopyCutPaste", "PasteFolder"),
@@ -1476,8 +1622,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Mock")]
         [HostType("VSTestHost")]
-        public void CopyPasteMissingFile() {
-            foreach (var projectType in ProjectTypes) {
+        public void CopyPasteMissingFile()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition("DragDropCopyCutPaste",
                     projectType,
                     ItemGroup(
@@ -1486,7 +1634,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = testDef.Generate().ToVs()) {
+                using (var solution = testDef.Generate().ToVs())
+                {
                     CopyByKeyboard(
                         solution,
                         solution.WaitForItem("DragDropCopyCutPaste", "PasteFolder"),
@@ -1505,8 +1654,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Mock")]
         [HostType("VSTestHost")]
-        public void MoveFolderExistingFile() {
-            foreach (var projectType in ProjectTypes) {
+        public void MoveFolderExistingFile()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition("DragDropCopyCutPaste",
                     projectType,
                     ItemGroup(
@@ -1516,7 +1667,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = testDef.Generate().ToVs()) {
+                using (var solution = testDef.Generate().ToVs())
+                {
                     MoveByKeyboard(
                         solution,
                         solution.FindItem("DragDropCopyCutPaste", "PasteFolder"),
@@ -1536,8 +1688,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Mock")]
         [HostType("VSTestHost")]
-        public void MoveFolderWithContents() {
-            foreach (var projectType in ProjectTypes) {
+        public void MoveFolderWithContents()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition("FolderWithContentsProj",
                     projectType,
                     ItemGroup(
@@ -1548,7 +1702,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = testDef.Generate().ToVs()) {
+                using (var solution = testDef.Generate().ToVs())
+                {
                     MoveByKeyboard(
                         solution,
                         solution.FindItem("FolderWithContentsProj", "C"),
@@ -1567,27 +1722,32 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveProjectToSolutionFolderKeyboard() {
+        public void MoveProjectToSolutionFolderKeyboard()
+        {
             MoveProjectToSolutionFolder(MoveByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveProjectToSolutionFolderMouse() {
+        public void MoveProjectToSolutionFolderMouse()
+        {
             MoveProjectToSolutionFolder(MoveByMouse);
         }
 
         /// <summary>
         /// Cut an item from our project, paste into another project, item should be removed from our project
         /// </summary>
-        private void MoveProjectToSolutionFolder(MoveDelegate mover) {
-            foreach (var projectType in ProjectTypes) {
+        private void MoveProjectToSolutionFolder(MoveDelegate mover)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var projects = new ISolutionElement[] {
                     new ProjectDefinition("DragDropCopyCutPaste", projectType),
                     SolutionFolder("SolFolder")
                 };
 
-                using (var solution = SolutionFile.Generate("DragDropCopyCutPaste", projects).ToVs()) {
+                using (var solution = SolutionFile.Generate("DragDropCopyCutPaste", projects).ToVs())
+                {
                     mover(
                         solution,
                         solution.WaitForItem("SolFolder"),
@@ -1604,7 +1764,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void CopyReadOnlyFileByKeyboard() {
+        public void CopyReadOnlyFileByKeyboard()
+        {
             CopyReadOnlyFile(CopyByKeyboard);
         }
 
@@ -1613,12 +1774,15 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void CopyReadOnlyFileByMouse() {
+        public void CopyReadOnlyFileByMouse()
+        {
             CopyReadOnlyFile(CopyByMouse);
         }
 
-        private void CopyReadOnlyFile(MoveDelegate mover) {
-            foreach (var projectType in ProjectTypes) {
+        private void CopyReadOnlyFile(MoveDelegate mover)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var projects = new[] {
                     new ProjectDefinition(
                         "CopyReadOnlyFile",
@@ -1629,7 +1793,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 };
 
-                using (var solution = SolutionFile.Generate("CopyReadOnlyFile", projects).ToVs()) {
+                using (var solution = SolutionFile.Generate("CopyReadOnlyFile", projects).ToVs())
+                {
                     var classFile = Path.Combine(solution.SolutionDirectory, "CopyReadOnlyFile", "Class" + projectType.CodeExtension);
                     Assert.IsTrue(File.Exists(classFile));
                     File.SetAttributes(classFile, FileAttributes.ReadOnly | FileAttributes.Archive);
@@ -1657,14 +1822,16 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [Ignore]
         [TestMethod, Priority(2), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void CopyFileFromFolderToLinkedFolderKeyboard() {
+        public void CopyFileFromFolderToLinkedFolderKeyboard()
+        {
             CopyFileFromFolderToLinkedFolder(CopyByKeyboard);
         }
 
         [Ignore]
         [TestMethod, Priority(2), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void CopyFileFromFolderToLinkedFolderMouse() {
+        public void CopyFileFromFolderToLinkedFolderMouse()
+        {
             CopyFileFromFolderToLinkedFolder(CopyByMouse);
         }
 
@@ -1672,8 +1839,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// Copy item from folder to a symbolic link of that folder.  Expect a copy to be made.
         /// NOTE: Because of symbolic link creation, this test must be run as administrator.
         /// </summary>
-        private void CopyFileFromFolderToLinkedFolder(MoveDelegate copier) {
-            foreach (var projectType in ProjectTypes) {
+        private void CopyFileFromFolderToLinkedFolder(MoveDelegate copier)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var projectDefs = new[] {
                     new ProjectDefinition("MoveLinkedFolder",
                         projectType,
@@ -1685,7 +1854,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 };
 
-                using (var solution = SolutionFile.Generate("MoveLinkedFolder", projectDefs).ToVs()) {
+                using (var solution = SolutionFile.Generate("MoveLinkedFolder", projectDefs).ToVs())
+                {
                     copier(
                         solution,
                         solution.FindItem("MoveLinkedFolder", "FolderLink"),
@@ -1707,7 +1877,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// <summary>
         /// Moves one or more items in solution explorer to the destination using the mouse.
         /// </summary>
-        internal static void MoveByMouse(IVisualStudioInstance vs, ITreeNode destination, params ITreeNode[] source) {
+        internal static void MoveByMouse(IVisualStudioInstance vs, ITreeNode destination, params ITreeNode[] source)
+        {
             destination.DragOntoThis(Key.LeftShift, source);
         }
 
@@ -1715,25 +1886,29 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// Moves or copies (taking the default behavior) one or more items in solution explorer to 
         /// the destination using the mouse.
         /// </summary>
-        private static void DragAndDrop(IVisualStudioInstance vs, ITreeNode destination, params ITreeNode[] source) {
+        private static void DragAndDrop(IVisualStudioInstance vs, ITreeNode destination, params ITreeNode[] source)
+        {
             destination.DragOntoThis(source);
         }
 
         /// <summary>
         /// Moves one or more items in solution explorer to the destination using the mouse.
         /// </summary>
-        internal static void CopyByMouse(IVisualStudioInstance vs, ITreeNode destination, params ITreeNode[] source) {
+        internal static void CopyByMouse(IVisualStudioInstance vs, ITreeNode destination, params ITreeNode[] source)
+        {
             destination.DragOntoThis(Key.LeftCtrl, source);
         }
-        
+
         /// <summary>
         /// Moves one or more items in solution explorer using the keyboard to cut and paste.
         /// </summary>
         /// <param name="destination"></param>
         /// <param name="source"></param>
-        internal static void MoveByKeyboard(IVisualStudioInstance vs, ITreeNode destination, params ITreeNode[] source) {
+        internal static void MoveByKeyboard(IVisualStudioInstance vs, ITreeNode destination, params ITreeNode[] source)
+        {
             AutomationWrapper.Select(source.First());
-            for (int i = 1; i < source.Length; i++) {
+            for (int i = 1; i < source.Length; i++)
+            {
                 AutomationWrapper.AddToSelection(source[i]);
             }
 
@@ -1748,9 +1923,11 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// </summary>
         /// <param name="destination"></param>
         /// <param name="source"></param>
-        internal static void CopyByKeyboard(IVisualStudioInstance vs, ITreeNode destination, params ITreeNode[] source) {
+        internal static void CopyByKeyboard(IVisualStudioInstance vs, ITreeNode destination, params ITreeNode[] source)
+        {
             AutomationWrapper.Select(source.First());
-            for (int i = 1; i < source.Length; i++) {
+            for (int i = 1; i < source.Length; i++)
+            {
                 AutomationWrapper.AddToSelection(source[i]);
             }
 

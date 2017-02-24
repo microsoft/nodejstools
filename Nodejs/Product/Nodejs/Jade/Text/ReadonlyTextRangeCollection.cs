@@ -18,11 +18,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace Microsoft.NodejsTools.Jade {
-    class ReadOnlyTextRangeCollection<T> : IEnumerable<T>, IEnumerable where T : ITextRange {
-        TextRangeCollection<T> _collection;
+namespace Microsoft.NodejsTools.Jade
+{
+    internal class ReadOnlyTextRangeCollection<T> : IEnumerable<T>, IEnumerable where T : ITextRange
+    {
+        private TextRangeCollection<T> _collection;
 
-        public ReadOnlyTextRangeCollection(TextRangeCollection<T> collection) {
+        public ReadOnlyTextRangeCollection(TextRangeCollection<T> collection)
+        {
             _collection = collection;
         }
 
@@ -33,15 +36,18 @@ namespace Microsoft.NodejsTools.Jade {
 
         public bool Contains(int position) { return _collection.Contains(position); }
 
-        public IList<T> ItemsInRange(ITextRange range) {
+        public IList<T> ItemsInRange(ITextRange range)
+        {
             return _collection.ItemsInRange(range);
         }
 
-        public IList<T> ItemsInRange(int start) {
+        public IList<T> ItemsInRange(int start)
+        {
             return _collection.ItemsInRange(TextRange.FromBounds(start, start));
         }
 
-        public IList<int> GetItemsContainingInclusiveEnd(int position) {
+        public IList<int> GetItemsContainingInclusiveEnd(int position)
+        {
             return _collection.GetItemsContainingInclusiveEnd(position);
         }
 
@@ -63,23 +69,28 @@ namespace Microsoft.NodejsTools.Jade {
         /// </summary>
         /// <param name="position">Position in a text buffer</param>
         /// <returns>Item index or -1 if not found</returns>
-        public int GetItemAtPosition(int position) {
+        public int GetItemAtPosition(int position)
+        {
             return _collection.GetItemAtPosition(position);
         }
 
-        public virtual int GetItemContaining(int position) {
+        public virtual int GetItemContaining(int position)
+        {
             return _collection.GetItemContaining(position);
         }
 
-        public virtual int GetFirstItemBeforePosition(int position) {
+        public virtual int GetFirstItemBeforePosition(int position)
+        {
             return _collection.GetFirstItemBeforePosition(position);
         }
 
-        public virtual int GetFirstItemAfterPosition(int position) {
+        public virtual int GetFirstItemAfterPosition(int position)
+        {
             return _collection.GetFirstItemAfterPosition(position);
         }
 
-        public T[] ToArray() {
+        public T[] ToArray()
+        {
             return _collection.ToArray();
         }
 
@@ -94,13 +105,15 @@ namespace Microsoft.NodejsTools.Jade {
         //}
 
         #region IEnumerable<T> Members
-        public IEnumerator<T> GetEnumerator() {
+        public IEnumerator<T> GetEnumerator()
+        {
             return _collection.GetEnumerator();
         }
         #endregion
 
         #region IEnumerable Members
-        IEnumerator IEnumerable.GetEnumerator() {
+        IEnumerator IEnumerable.GetEnumerator()
+        {
             return _collection.GetEnumerator();
         }
         #endregion

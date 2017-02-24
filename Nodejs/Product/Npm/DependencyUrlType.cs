@@ -14,8 +14,10 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Npm {
-    public enum DependencyUrlType {
+namespace Microsoft.NodejsTools.Npm
+{
+    public enum DependencyUrlType
+    {
         UnsupportedProtocol,
         Http,
         Git,

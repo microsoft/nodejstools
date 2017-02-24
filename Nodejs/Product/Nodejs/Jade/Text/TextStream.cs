@@ -18,24 +18,28 @@ using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Microsoft.NodejsTools.Jade {
+namespace Microsoft.NodejsTools.Jade
+{
     /// <summary>
     /// Implements <seealso cref="ITextProvider"/> on a string
     /// </summary>
     [SuppressMessage("Microsoft.Naming", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix")]
-    class TextStream : ITextProvider {
-        string _text;
+    internal class TextStream : ITextProvider
+    {
+        private string _text;
 
         // Array access (i.e. converting string to an array)
         // is faster, but takes more memory.
 
         [DebuggerStepThrough]
-        public TextStream(string text) {
+        public TextStream(string text)
+        {
             _text = text;
         }
 
         [DebuggerStepThrough]
-        public override string ToString() {
+        public override string ToString()
+        {
             return _text;
         }
 
@@ -44,15 +48,18 @@ namespace Microsoft.NodejsTools.Jade {
         /// <summary>
         /// Text length
         /// </summary>
-        public int Length {
+        public int Length
+        {
             get { return _text.Length; }
         }
 
         /// <summary>
         /// Retrieves character at a given position
         /// </summary>
-        public char this[int position] {
-            get {
+        public char this[int position]
+        {
+            get
+            {
                 if (position < 0 || position >= _text.Length)
                     return '\0';
 
@@ -63,7 +70,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// <summary>
         /// Retrieves a substring given start position and length
         /// </summary>
-        public string GetText(int position, int length) {
+        public string GetText(int position, int length)
+        {
             if (length == 0)
                 return String.Empty;
 
@@ -75,7 +83,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// Retrieves substring given text range
         /// </summary>
         [DebuggerStepThrough]
-        public string GetText(ITextRange range) {
+        public string GetText(ITextRange range)
+        {
             return GetText(range.Start, range.Length);
         }
 
@@ -86,7 +95,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// <param name="startPosition">Starting position</param>
         /// <param name="ignoreCase">True if search should be case-insensitive</param>
         /// <returns>Character index of the first string appearance or -1 if string was not found</returns>
-        public int IndexOf(string stringToFind, int startPosition, bool ignoreCase) {
+        public int IndexOf(string stringToFind, int startPosition, bool ignoreCase)
+        {
             return _text.IndexOf(stringToFind, startPosition, ignoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture);
         }
 
@@ -98,7 +108,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// <param name="range">Range to search in</param>
         /// <param name="ignoreCase">True if search should be case-insensitive</param>
         /// <returns>Character index of the first string appearance or -1 if string was not found</returns>
-        public int IndexOf(string stringToFind, ITextRange range, bool ignoreCase) {
+        public int IndexOf(string stringToFind, ITextRange range, bool ignoreCase)
+        {
             if (range.Start + stringToFind.Length > _text.Length)
                 return -1;
 
@@ -110,13 +121,15 @@ namespace Microsoft.NodejsTools.Jade {
             return _text.IndexOf(stringToFind, range.Start, range.Length, comparison);
         }
 
-        public bool CompareTo(int position, int length, string compareTo, bool ignoreCase) {
+        public bool CompareTo(int position, int length, string compareTo, bool ignoreCase)
+        {
             var comparison = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
 
             return String.Compare(_text, position, compareTo, 0, length, comparison) == 0;
         }
 
-        public ITextProvider Clone() {
+        public ITextProvider Clone()
+        {
             return new TextStream(_text);
         }
 
@@ -130,7 +143,8 @@ namespace Microsoft.NodejsTools.Jade {
         #endregion
 
         #region Dispose
-        public void Dispose() {
+        public void Dispose()
+        {
             _text = null;
         }
         #endregion

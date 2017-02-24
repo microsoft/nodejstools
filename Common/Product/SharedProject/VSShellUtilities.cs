@@ -19,12 +19,14 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextManager.Interop;
 
-namespace Microsoft.VisualStudioTools.Project {
+namespace Microsoft.VisualStudioTools.Project
+{
     /// <summary>
     ///This class provides some useful static shell based methods. 
     /// </summary>
 
-    internal static class UIHierarchyUtilities {
+    internal static class UIHierarchyUtilities
+    {
         /// <summary>
         /// Get reference to IVsUIHierarchyWindow interface from guid persistence slot.
         /// </summary>
@@ -33,13 +35,16 @@ namespace Microsoft.VisualStudioTools.Project {
         /// The caller of this method can use predefined identifiers that map to tool windows if those tool windows 
         /// are known to the caller. </param>
         /// <returns>A reference to an IVsUIHierarchyWindow interface.</returns>
-        public static IVsUIHierarchyWindow GetUIHierarchyWindow(IServiceProvider serviceProvider, Guid persistenceSlot) {
-            if (serviceProvider == null) {
+        public static IVsUIHierarchyWindow GetUIHierarchyWindow(IServiceProvider serviceProvider, Guid persistenceSlot)
+        {
+            if (serviceProvider == null)
+            {
                 throw new ArgumentNullException("serviceProvider");
             }
 
             IVsUIShell shell = serviceProvider.GetService(typeof(SVsUIShell)) as IVsUIShell;
-            if (shell == null) {
+            if (shell == null)
+            {
                 throw new InvalidOperationException("Could not get the UI shell from the project");
             }
 
@@ -47,7 +52,8 @@ namespace Microsoft.VisualStudioTools.Project {
             IVsWindowFrame frame;
 
             if (ErrorHandler.Succeeded(shell.FindToolWindow(0, ref persistenceSlot, out frame)) &&
-                ErrorHandler.Succeeded(frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out pvar))) {
+                ErrorHandler.Succeeded(frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out pvar)))
+            {
                 return pvar as IVsUIHierarchyWindow;
             }
 
@@ -55,13 +61,18 @@ namespace Microsoft.VisualStudioTools.Project {
         }
     }
 
-    internal static class VsUtilities {
-        internal static void NavigateTo(IServiceProvider serviceProvider, string filename, Guid docViewGuidType, int line, int col) {
+    internal static class VsUtilities
+    {
+        internal static void NavigateTo(IServiceProvider serviceProvider, string filename, Guid docViewGuidType, int line, int col)
+        {
             IVsTextView viewAdapter;
             IVsWindowFrame pWindowFrame;
-            if (docViewGuidType != Guid.Empty) {
+            if (docViewGuidType != Guid.Empty)
+            {
                 OpenDocument(serviceProvider, filename, docViewGuidType, out viewAdapter, out pWindowFrame);
-            } else {
+            }
+            else
+            {
                 OpenDocument(serviceProvider, filename, out viewAdapter, out pWindowFrame);
             }
 
@@ -73,12 +84,16 @@ namespace Microsoft.VisualStudioTools.Project {
             viewAdapter.CenterLines(line, 1);
         }
 
-        internal static void NavigateTo(IServiceProvider serviceProvider, string filename, Guid docViewGuidType, int pos) {
+        internal static void NavigateTo(IServiceProvider serviceProvider, string filename, Guid docViewGuidType, int pos)
+        {
             IVsTextView viewAdapter;
             IVsWindowFrame pWindowFrame;
-            if (docViewGuidType != Guid.Empty) {
+            if (docViewGuidType != Guid.Empty)
+            {
                 OpenDocument(serviceProvider, filename, docViewGuidType, out viewAdapter, out pWindowFrame);
-            } else {
+            }
+            else
+            {
                 OpenDocument(serviceProvider, filename, out viewAdapter, out pWindowFrame);
             }
 
@@ -90,7 +105,8 @@ namespace Microsoft.VisualStudioTools.Project {
             viewAdapter.CenterLines(line, 1);
         }
 
-        internal static void OpenDocument(IServiceProvider serviceProvider, string filename, out IVsTextView viewAdapter, out IVsWindowFrame pWindowFrame) {
+        internal static void OpenDocument(IServiceProvider serviceProvider, string filename, out IVsTextView viewAdapter, out IVsWindowFrame pWindowFrame)
+        {
             IVsTextManager textMgr = (IVsTextManager)serviceProvider.GetService(typeof(SVsTextManager));
 
             IVsUIHierarchy hierarchy;
@@ -105,7 +121,8 @@ namespace Microsoft.VisualStudioTools.Project {
                 out viewAdapter);
         }
 
-        internal static void OpenDocument(IServiceProvider serviceProvider, string filename, Guid docViewGuid, out IVsTextView viewAdapter, out IVsWindowFrame pWindowFrame) {
+        internal static void OpenDocument(IServiceProvider serviceProvider, string filename, Guid docViewGuid, out IVsTextView viewAdapter, out IVsWindowFrame pWindowFrame)
+        {
             IVsUIHierarchy hierarchy;
             uint itemid;
             VsShellUtilities.OpenDocumentWithSpecificEditor(

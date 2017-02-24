@@ -14,12 +14,15 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Profiling {
-    class Profile {
+namespace Microsoft.NodejsTools.Profiling
+{
+    internal class Profile
+    {
         public readonly string Name;
 
-        public Profile(string name) {
+        public Profile(string name)
+        {
             Name = name;
-        }        
+        }
     }
 }

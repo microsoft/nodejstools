@@ -20,11 +20,14 @@ using System.Collections.Generic;
 using Microsoft.CSharp.RuntimeBinder;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.NodejsTools.Npm.SPI {
-    internal class PackageJson : IPackageJson {
+namespace Microsoft.NodejsTools.Npm.SPI
+{
+    internal class PackageJson : IPackageJson
+    {
         private string _versionString;
 
-        public PackageJson(dynamic package) {
+        public PackageJson(dynamic package)
+        {
             Keywords = LoadKeywords(package);
             Homepages = LoadHomepages(package);
             Files = LoadFiles(package);
@@ -41,9 +44,10 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             Author = package.author == null ? null : Person.CreateFromJsonSource(package.author.ToString());
         }
 
-        private static PackageJsonException WrapRuntimeBinderException(string errorProperty, RuntimeBinderException rbe) {
+        private static PackageJsonException WrapRuntimeBinderException(string errorProperty, RuntimeBinderException rbe)
+        {
             return new PackageJsonException(
-                string.Format(CultureInfo.CurrentCulture,@"Exception occurred retrieving {0} from package.json. The file may be invalid: you should edit it to correct an errors.
+                string.Format(CultureInfo.CurrentCulture, @"Exception occurred retrieving {0} from package.json. The file may be invalid: you should edit it to correct an errors.
 
 The following error occurred:
 
@@ -52,75 +56,110 @@ The following error occurred:
                         rbe));
         }
 
-        private static IKeywords LoadKeywords(dynamic package) {
-            try {
+        private static IKeywords LoadKeywords(dynamic package)
+        {
+            try
+            {
                 return new Keywords(package);
-            } catch (RuntimeBinderException rbe) {
+            }
+            catch (RuntimeBinderException rbe)
+            {
                 throw WrapRuntimeBinderException("keywords", rbe);
             }
         }
 
-        private static IHomepages LoadHomepages(dynamic package) {
-            try {
+        private static IHomepages LoadHomepages(dynamic package)
+        {
+            try
+            {
                 return new Homepages(package);
             }
-            catch (RuntimeBinderException rbe) {
+            catch (RuntimeBinderException rbe)
+            {
                 throw WrapRuntimeBinderException("homepage", rbe);
             }
         }
 
-        private static IFiles LoadFiles(dynamic package) {
-            try {
+        private static IFiles LoadFiles(dynamic package)
+        {
+            try
+            {
                 return new PkgFiles(package);
-            } catch (RuntimeBinderException rbe) {
+            }
+            catch (RuntimeBinderException rbe)
+            {
                 throw WrapRuntimeBinderException("files", rbe);
             }
         }
 
-        private static IDependencies LoadDependencies(dynamic package) {
-            try {
+        private static IDependencies LoadDependencies(dynamic package)
+        {
+            try
+            {
                 return new Dependencies(package, "dependencies");
-            } catch (RuntimeBinderException rbe) {
+            }
+            catch (RuntimeBinderException rbe)
+            {
                 throw WrapRuntimeBinderException("dependencies", rbe);
             }
         }
 
-        private static IDependencies LoadDevDependencies(dynamic package) {
-            try {
+        private static IDependencies LoadDevDependencies(dynamic package)
+        {
+            try
+            {
                 return new Dependencies(package, "devDependencies");
-            } catch (RuntimeBinderException rbe) {
+            }
+            catch (RuntimeBinderException rbe)
+            {
                 throw WrapRuntimeBinderException("dev dependencies", rbe);
             }
         }
 
-        private static IBundledDependencies LoadBundledDependencies(dynamic package) {
-            try {
+        private static IBundledDependencies LoadBundledDependencies(dynamic package)
+        {
+            try
+            {
                 return new BundledDependencies(package);
-            } catch (RuntimeBinderException rbe) {
+            }
+            catch (RuntimeBinderException rbe)
+            {
                 throw WrapRuntimeBinderException("bundled dependencies", rbe);
             }
         }
 
-        private static IDependencies LoadOptionalDependencies(dynamic package) {
-            try {
+        private static IDependencies LoadOptionalDependencies(dynamic package)
+        {
+            try
+            {
                 return new Dependencies(package, "optionalDependencies");
-            } catch (RuntimeBinderException rbe) {
+            }
+            catch (RuntimeBinderException rbe)
+            {
                 throw WrapRuntimeBinderException("optional dependencies", rbe);
             }
         }
 
-        private static IDependencies LoadAllDependencies(dynamic package) {
-            try {
+        private static IDependencies LoadAllDependencies(dynamic package)
+        {
+            try
+            {
                 return new Dependencies(package, "dependencies", "devDependencies", "optionalDependencies");
-            } catch (RuntimeBinderException rbe) {
+            }
+            catch (RuntimeBinderException rbe)
+            {
                 throw WrapRuntimeBinderException("all dependencies", rbe);
             }
         }
 
-        private static IEnumerable<string> LoadRequiredBy(dynamic package) {
-            try {
+        private static IEnumerable<string> LoadRequiredBy(dynamic package)
+        {
+            try
+            {
                 return (package["_requiredBy"] as IEnumerable<JToken> ?? Enumerable.Empty<JToken>()).Values<string>().ToList();
-            } catch (RuntimeBinderException rbe) {
+            }
+            catch (RuntimeBinderException rbe)
+            {
                 System.Diagnostics.Debug.WriteLine(rbe);
                 throw WrapRuntimeBinderException("required by", rbe);
             }
@@ -128,8 +167,10 @@ The following error occurred:
 
         public string Name { get; private set; }
 
-        public SemverVersion Version {
-            get {
+        public SemverVersion Version
+        {
+            get
+            {
                 return _versionString == null ? new SemverVersion() : SemverVersion.Parse(_versionString);
             }
         }

@@ -16,26 +16,32 @@ using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
     [Export(typeof(IReplCommand))]
-    class EchoReplCommand : IReplCommand {
+    internal class EchoReplCommand : IReplCommand
+    {
         #region IReplCommand Members
 
-        public Task<ExecutionResult> Execute(IReplWindow window, string arguments) {
-
-            if (string.IsNullOrWhiteSpace(arguments)) {
+        public Task<ExecutionResult> Execute(IReplWindow window, string arguments)
+        {
+            if (string.IsNullOrWhiteSpace(arguments))
+            {
                 var curValue = (bool)window.GetOptionValue(ReplOptions.ShowOutput);
                 window.WriteLine("ECHO is " + (curValue ? "ON" : "OFF"));
                 return ExecutionResult.Succeeded;
             }
 
-            if (arguments.Equals("on", System.StringComparison.InvariantCultureIgnoreCase)) {
+            if (arguments.Equals("on", System.StringComparison.InvariantCultureIgnoreCase))
+            {
                 window.SetOptionValue(ReplOptions.ShowOutput, true);
                 return ExecutionResult.Succeeded;
-            } else if(arguments.Equals("off",System.StringComparison.InvariantCultureIgnoreCase)) {
+            }
+            else if (arguments.Equals("off", System.StringComparison.InvariantCultureIgnoreCase))
+            {
                 window.SetOptionValue(ReplOptions.ShowOutput, false);
                 return ExecutionResult.Succeeded;
             }
@@ -46,16 +52,20 @@ namespace Microsoft.VisualStudio.Repl {
             return ExecutionResult.Succeeded;
         }
 
-        public string Description {
+        public string Description
+        {
             get { return "Suppress or unsuppress output to the buffer"; }
         }
 
-        public string Command {
+        public string Command
+        {
             get { return "echo"; }
         }
 
-        public object ButtonContent {
-            get {
+        public object ButtonContent
+        {
+            get
+            {
                 return null;
             }
         }

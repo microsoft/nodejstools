@@ -14,8 +14,11 @@
 
 
 using System.Windows.Input;
-namespace TestUtilities {
-    public interface ITreeNode {
+
+namespace TestUtilities
+{
+    public interface ITreeNode
+    {
         void Select();
         void AddToSelection();
 

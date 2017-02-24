@@ -17,28 +17,39 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Microsoft.NodejsTools.Debugger.Communication {
-    public class AsyncProducerConsumerCollection<T> {
+namespace Microsoft.NodejsTools.Debugger.Communication
+{
+    public class AsyncProducerConsumerCollection<T>
+    {
         private readonly Queue<T> _collection = new Queue<T>();
         private readonly Queue<TaskCompletionSource<T>> _waiting = new Queue<TaskCompletionSource<T>>();
 
-        public void Add(T item) {
+        public void Add(T item)
+        {
             TaskCompletionSource<T> tcs = null;
-            lock (_collection) {
-                if (_waiting.Count > 0) {
+            lock (_collection)
+            {
+                if (_waiting.Count > 0)
+                {
                     tcs = _waiting.Dequeue();
-                } else {
+                }
+                else
+                {
                     _collection.Enqueue(item);
                 }
             }
-            if (tcs != null) {
+            if (tcs != null)
+            {
                 tcs.TrySetResult(item);
             }
         }
 
-        public Task<T> TakeAsync() {
-            lock (_collection) {
-                if (_collection.Count > 0) {
+        public Task<T> TakeAsync()
+        {
+            lock (_collection)
+            {
+                if (_collection.Count > 0)
+                {
                     return Task.FromResult(_collection.Dequeue());
                 }
                 var tcs = new TaskCompletionSource<T>();

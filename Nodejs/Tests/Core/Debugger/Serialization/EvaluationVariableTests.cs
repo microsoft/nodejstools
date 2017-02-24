@@ -20,11 +20,14 @@ using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 
-namespace NodejsTests.Debugger.Serialization {
+namespace NodejsTests.Debugger.Serialization
+{
     [TestClass]
-    public class EvaluationVariableTests {
+    public class EvaluationVariableTests
+    {
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateEvaluationVariable() {
+        public void CreateEvaluationVariable()
+        {
             // Arrange
             JObject json = SerializationTestData.GetEvaluationJsonObject();
             var stackFrame = new NodeStackFrame(0);
@@ -48,7 +51,8 @@ namespace NodejsTests.Debugger.Serialization {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateBacktraceVariableWithNullStackFrame() {
+        public void CreateBacktraceVariableWithNullStackFrame()
+        {
             // Arrange
             JObject json = SerializationTestData.GetBacktraceJsonObject();
             Exception exception = null;
@@ -56,20 +60,24 @@ namespace NodejsTests.Debugger.Serialization {
             const string name = "name";
 
             // Act
-            try {
+            try
+            {
                 result = new NodeEvaluationVariable(null, name, json);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 exception = e;
             }
 
             // Assert
             Assert.IsNull(result);
             Assert.IsNotNull(exception);
-            Assert.IsInstanceOfType(exception, typeof (ArgumentNullException));
+            Assert.IsInstanceOfType(exception, typeof(ArgumentNullException));
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateBacktraceVariableWithNullName() {
+        public void CreateBacktraceVariableWithNullName()
+        {
             // Arrange
             JObject json = SerializationTestData.GetBacktraceJsonObject();
             Exception exception = null;
@@ -77,20 +85,24 @@ namespace NodejsTests.Debugger.Serialization {
             const string name = "name";
 
             // Act
-            try {
+            try
+            {
                 result = new NodeEvaluationVariable(null, name, json);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 exception = e;
             }
 
             // Assert
             Assert.IsNull(result);
             Assert.IsNotNull(exception);
-            Assert.IsInstanceOfType(exception, typeof (ArgumentNullException));
+            Assert.IsInstanceOfType(exception, typeof(ArgumentNullException));
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateBacktraceVariableWithNullJson() {
+        public void CreateBacktraceVariableWithNullJson()
+        {
             // Arrange
             var stackFrame = new NodeStackFrame(0);
             Exception exception = null;
@@ -98,16 +110,19 @@ namespace NodejsTests.Debugger.Serialization {
             const string name = "name";
 
             // Act
-            try {
+            try
+            {
                 result = new NodeEvaluationVariable(stackFrame, name, null);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 exception = e;
             }
 
             // Assert
             Assert.IsNull(result);
             Assert.IsNotNull(exception);
-            Assert.IsInstanceOfType(exception, typeof (ArgumentNullException));
+            Assert.IsInstanceOfType(exception, typeof(ArgumentNullException));
         }
     }
 }

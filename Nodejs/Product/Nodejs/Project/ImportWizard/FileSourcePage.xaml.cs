@@ -16,12 +16,15 @@
 
 using System.Windows.Controls;
 
-namespace Microsoft.NodejsTools.Project.ImportWizard {
+namespace Microsoft.NodejsTools.Project.ImportWizard
+{
     /// <summary>
     /// Interaction logic for FileSourcePage.xaml
     /// </summary>
-    internal partial class FileSourcePage : Page {
-        public FileSourcePage() {
+    internal partial class FileSourcePage : Page
+    {
+        public FileSourcePage()
+        {
             InitializeComponent();
         }
     }

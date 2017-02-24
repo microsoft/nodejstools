@@ -23,8 +23,10 @@ using Microsoft.NodejsTools.SourceMapping;
 using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.NodejsTools.Debugger.Commands {
-    sealed class SetBreakpointCommand : DebuggerCommand {
+namespace Microsoft.NodejsTools.Debugger.Commands
+{
+    internal sealed class SetBreakpointCommand : DebuggerCommand
+    {
         private static string _pathSeperatorCharacterGroup = string.Format(CultureInfo.InvariantCulture, "[{0}{1}]", Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 
         private readonly Dictionary<string, object> _arguments;
@@ -34,7 +36,8 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
         private readonly FilePosition _position;
 
         public SetBreakpointCommand(int id, NodeModule module, NodeBreakpoint breakpoint, bool withoutPredicate, bool remote, SourceMapper sourceMapper = null)
-            : base(id, "setbreakpoint") {
+            : base(id, "setbreakpoint")
+        {
             Utilities.ArgumentNotNull("breakpoint", breakpoint);
 
             _module = module;
@@ -51,7 +54,8 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             // Node (V8) treats specially for script loaded via require
             // Script wrapping process: https://github.com/joyent/node/blob/v0.10.26-release/src/node.js#L880
             int column = _position.Column;
-            if (line == 0) {
+            if (line == 0)
+            {
                 column += NodeConstants.ScriptWrapBegin.Length;
             }
 
@@ -60,36 +64,46 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                 { "column", column }
             };
 
-            if (_module != null) {
+            if (_module != null)
+            {
                 _arguments["type"] = "scriptId";
                 _arguments["target"] = _module.Id;
-            } else if (remote) {
+            }
+            else if (remote)
+            {
                 _arguments["type"] = "scriptRegExp";
                 _arguments["target"] = CreateRemoteScriptRegExp(_position.FileName);
-            } else {
+            }
+            else
+            {
                 _arguments["type"] = "scriptRegExp";
                 _arguments["target"] = CreateLocalScriptRegExp(_position.FileName);
             }
 
-            if (!NodeBreakpointBinding.GetEngineEnabled(_breakpoint.Enabled, _breakpoint.BreakOn, 0)) {
+            if (!NodeBreakpointBinding.GetEngineEnabled(_breakpoint.Enabled, _breakpoint.BreakOn, 0))
+            {
                 _arguments["enabled"] = false;
             }
 
-            if (withoutPredicate) {
+            if (withoutPredicate)
+            {
                 return;
             }
 
             int ignoreCount = NodeBreakpointBinding.GetEngineIgnoreCount(_breakpoint.BreakOn, 0);
-            if (ignoreCount > 0) {
+            if (ignoreCount > 0)
+            {
                 _arguments["ignoreCount"] = ignoreCount;
             }
 
-            if (!string.IsNullOrEmpty(_breakpoint.Condition)) {
+            if (!string.IsNullOrEmpty(_breakpoint.Condition))
+            {
                 _arguments["condition"] = _breakpoint.Condition;
             }
         }
 
-        protected override IDictionary<string, object> Arguments {
+        protected override IDictionary<string, object> Arguments
+        {
             get { return _arguments; }
         }
 
@@ -101,7 +115,8 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
 
         public int Column { get; private set; }
 
-        public override void ProcessResponse(JObject response) {
+        public override void ProcessResponse(JObject response)
+        {
             base.ProcessResponse(response);
 
             JToken body = response["body"];
@@ -112,25 +127,30 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
 
             // Handle breakpoint actual location fixup
             JArray actualLocations = (JArray)body["actual_locations"] ?? new JArray();
-            if (actualLocations.Count > 0) {
+            if (actualLocations.Count > 0)
+            {
                 var location = actualLocations[0];
                 ScriptId = ScriptId ?? (int?)location["script_id"];
                 Line = (int)location["line"];
                 var column = (int)location["column"];
                 Column = Line == 0 ? column - NodeConstants.ScriptWrapBegin.Length : column;
-            } else {
+            }
+            else
+            {
                 Line = _position.Line;
                 Column = _position.Column;
             }
         }
 
-        private static string CreateRemoteScriptRegExp(string filePath) {
+        private static string CreateRemoteScriptRegExp(string filePath)
+        {
             string fileName = Path.GetFileName(filePath) ?? string.Empty;
             string start = fileName == filePath ? "^" : _pathSeperatorCharacterGroup;
             return string.Format(CultureInfo.InvariantCulture, "{0}{1}$", start, CreateCaseInsensitiveRegExpFromString(fileName));
         }
 
-        public static string CreateLocalScriptRegExp(string filePath) {
+        public static string CreateLocalScriptRegExp(string filePath)
+        {
             return string.Format(CultureInfo.InvariantCulture, "^{0}$", CreateCaseInsensitiveRegExpFromString(filePath));
         }
 
@@ -139,17 +159,22 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
         /// 
         /// This is a workaround for the fact that we cannot pass a regex case insensitive modifier to the Node (V8) engine.
         /// </summary>
-        private static string CreateCaseInsensitiveRegExpFromString(string str) {
+        private static string CreateCaseInsensitiveRegExpFromString(string str)
+        {
             var builder = new StringBuilder();
-            foreach (var ch in Regex.Escape(str)) {
+            foreach (var ch in Regex.Escape(str))
+            {
                 string upper = ch.ToString(CultureInfo.InvariantCulture).ToUpper();
                 string lower = ch.ToString(CultureInfo.InvariantCulture).ToLower();
-                if (upper != lower) {
+                if (upper != lower)
+                {
                     builder.Append('[');
                     builder.Append(upper);
                     builder.Append(lower);
                     builder.Append(']');
-                } else {
+                }
+                else
+                {
                     builder.Append(upper);
                 }
             }

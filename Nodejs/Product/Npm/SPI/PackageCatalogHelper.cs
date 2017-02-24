@@ -19,22 +19,28 @@ using Microsoft.NodejsTools.Npm.SQLiteTables;
 using Newtonsoft.Json;
 using SQLite;
 
-namespace Microsoft.NodejsTools.Npm.SPI {
-    internal static class PackageCatalogHelper {
-        public static void CreateCatalogTableIfNotExists(this SQLiteConnection db) {
+namespace Microsoft.NodejsTools.Npm.SPI
+{
+    internal static class PackageCatalogHelper
+    {
+        public static void CreateCatalogTableIfNotExists(this SQLiteConnection db)
+        {
             db.CreateTable<DbVersion>();
             db.CreateTable<RegistryFileMapping>();
         }
 
-        public static void CreateRegistryTableIfNotExists(this SQLiteConnection db) {
+        public static void CreateRegistryTableIfNotExists(this SQLiteConnection db)
+        {
             // Create virtual table for FTS
             db.Execute("CREATE VIRTUAL TABLE IF NOT EXISTS CatalogEntry USING FTS4(Name, Description, Keywords, Homepage, Version, AvailableVersions, Author, PublishDateTimeString)");
 
             db.CreateTable<RegistryInfo>();
         }
 
-        public static IPackage ToPackage(this CatalogEntry entry) {
-            return new PackageProxy() {
+        public static IPackage ToPackage(this CatalogEntry entry)
+        {
+            return new PackageProxy()
+            {
                 Name = entry.Name,
                 Description = entry.Description,
                 Author = JsonConvert.DeserializeObject<Person>(entry.Author),

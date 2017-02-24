@@ -17,10 +17,13 @@
 using System;
 using System.Diagnostics;
 
-namespace Microsoft.NodejsTools.Jade {
-    internal partial class JadeTokenizer : Tokenizer<JadeToken> {
+namespace Microsoft.NodejsTools.Jade
+{
+    internal partial class JadeTokenizer : Tokenizer<JadeToken>
+    {
         // plain text with possible #{foo} variable references
-        private void OnHtml() {
+        private void OnHtml()
+        {
             Debug.Assert(_cs.CurrentChar == '<' && (_cs.NextChar == '/' || Char.IsLetter(_cs.NextChar)));
 
             int length = _cs.NextChar == '/' ? 2 : 1;

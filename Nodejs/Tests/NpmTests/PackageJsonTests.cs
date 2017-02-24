@@ -18,9 +18,11 @@ using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 
-namespace NpmTests {
+namespace NpmTests
+{
     [TestClass]
-    public class PackageJsonTests : AbstractPackageJsonTests {
+    public class PackageJsonTests : AbstractPackageJsonTests
+    {
         private const string PkgSimpleBugs = @"{
     ""name"": ""TestPkg"",
     ""version"": ""0.1.0"",
@@ -194,19 +196,22 @@ namespace NpmTests {
 }";
 
         [TestMethod, Priority(0)]
-        public void ReadNoNameNull() {
+        public void ReadNoNameNull()
+        {
             var pkg = LoadFrom(PkgEmpty);
             Assert.IsNull(pkg.Name, "Name should be null.");
         }
 
         [TestMethod, Priority(0)]
-        public void ReadNoVersionIsZeroed() {
+        public void ReadNoVersionIsZeroed()
+        {
             var pkg = LoadFrom(PkgEmpty);
             Assert.AreEqual(new SemverVersion(), pkg.Version, "Empty version mismatch.");
         }
 
         [TestMethod, Priority(0)]
-        public void ReadNameAndVersion() {
+        public void ReadNameAndVersion()
+        {
             var pkgJson = LoadFrom(PkgSimple);
 
             dynamic json = JsonConvert.DeserializeObject(PkgSimple);
@@ -218,13 +223,15 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void ReadNoDescriptionNull() {
+        public void ReadNoDescriptionNull()
+        {
             var pkg = LoadFrom(PkgEmpty);
             Assert.IsNull(pkg.Description, "Description should be null.");
         }
 
         [TestMethod, Priority(0)]
-        public void ReadDescription() {
+        public void ReadDescription()
+        {
             var pkg = LoadFrom(PkgLargeCompliant);
             Assert.AreEqual(
                 "Sample package for CommonJS. This package demonstrates the required elements of a CommonJS package.",
@@ -233,12 +240,14 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void ReadEmptyKeywordsCountZero() {
+        public void ReadEmptyKeywordsCountZero()
+        {
             CheckEmptyArray(LoadFrom(PkgEmpty).Keywords);
         }
 
         [TestMethod, Priority(0)]
-        public void EnumerationOverKeywords() {
+        public void EnumerationOverKeywords()
+        {
             CheckStringArrayContents(
                 LoadFrom(PkgLargeCompliant).Keywords,
                 2,
@@ -246,13 +255,15 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void ReadNoHomepageEmpty() {
+        public void ReadNoHomepageEmpty()
+        {
             var pkg = LoadFrom(PkgSimple);
             Assert.AreEqual(0, pkg.Homepages.Count, "Homepage should be empty.");
         }
 
         [TestMethod, Priority(0)]
-        public void ReadHomepageCompliant() {
+        public void ReadHomepageCompliant()
+        {
             var pkg = LoadFrom(PkgLargeCompliant);
             CheckStringArrayContents(
                 pkg.Homepages,
@@ -261,7 +272,8 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void ReadHomepageNonCompliant() {
+        public void ReadHomepageNonCompliant()
+        {
             var pkg = LoadFrom(PkgLargeNonCompliant);
             CheckStringArrayContents(
                 pkg.Homepages,
@@ -270,12 +282,14 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void ReadEmptyFilesEmpty() {
+        public void ReadEmptyFilesEmpty()
+        {
             CheckEmptyArray(LoadFrom(PkgSimple).Files);
         }
 
         [TestMethod, Priority(0)]
-        public void ReadFiles() {
+        public void ReadFiles()
+        {
             CheckStringArrayContents(
                 LoadFrom(PkgLargeCompliant).Files,
                 3,
@@ -283,12 +297,14 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void ReadEmptyAuthor() {
+        public void ReadEmptyAuthor()
+        {
             Assert.IsNull(LoadFrom(PkgSimple).Author);
         }
 
         [TestMethod, Priority(0)]
-        public void ReadMisspelledAuthor() {
+        public void ReadMisspelledAuthor()
+        {
             Assert.AreEqual(
                 @"{
   ""misspelledname"": ""Firstname Lastname""
@@ -298,7 +314,8 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void ReadSingleAuthorField() {
+        public void ReadSingleAuthorField()
+        {
             Assert.AreEqual(
                 "Firstname Lastname",
                 LoadFrom(PkgSingleAuthorField).Author.Name
@@ -306,7 +323,8 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void ReadAuthorCompliant() {
+        public void ReadAuthorCompliant()
+        {
             var compliantAuthor = LoadFrom(PkgLargeCompliant).Author;
             Assert.AreEqual("Firstname Lastname", compliantAuthor.Name);
             Assert.AreEqual("firstname@lastname.com", compliantAuthor.Email);
@@ -314,7 +332,8 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void ReadAuthorNonCompliant() {
+        public void ReadAuthorNonCompliant()
+        {
             var nonCompliantAuthor = LoadFrom(PkgLargeNonCompliant).Author;
             Assert.AreEqual("Firstname Lastname", nonCompliantAuthor.Name);
             Assert.AreEqual("http://firstnamelastname.com", nonCompliantAuthor.Url);

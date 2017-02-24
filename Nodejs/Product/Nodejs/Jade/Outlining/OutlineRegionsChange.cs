@@ -14,12 +14,15 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Jade {
-    class OutlineRegionsChange {
+namespace Microsoft.NodejsTools.Jade
+{
+    internal class OutlineRegionsChange
+    {
         public ITextRange ChangedRange { get; private set; }
         public OutlineRegionCollection NewRegions { get; private set; }
 
-        public OutlineRegionsChange(ITextRange changedRange, OutlineRegionCollection newRegions) {
+        public OutlineRegionsChange(ITextRange changedRange, OutlineRegionCollection newRegions)
+        {
             ChangedRange = changedRange;
             NewRegions = newRegions;
         }

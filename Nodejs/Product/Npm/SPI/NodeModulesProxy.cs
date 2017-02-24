@@ -16,13 +16,17 @@
 
 using System;
 
-namespace Microsoft.NodejsTools.Npm.SPI {
-    internal class NodeModulesProxy : AbstractNodeModules {
-        public new void AddModule(IPackage package) {
+namespace Microsoft.NodejsTools.Npm.SPI
+{
+    internal class NodeModulesProxy : AbstractNodeModules
+    {
+        public new void AddModule(IPackage package)
+        {
             base.AddModule(package);
         }
 
-        public override int GetDepth(string filepath) {
+        public override int GetDepth(string filepath)
+        {
             throw new NotImplementedException();
         }
     }

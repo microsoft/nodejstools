@@ -19,17 +19,24 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.NodejsTools.Npm.SPI {
-    internal class Dependencies : IDependencies {
+namespace Microsoft.NodejsTools.Npm.SPI
+{
+    internal class Dependencies : IDependencies
+    {
         private IList<Dependency> _dependencyProperties;
 
-        public Dependencies(JObject package, params string[] dependencyPropertyNames) {
+        public Dependencies(JObject package, params string[] dependencyPropertyNames)
+        {
             _dependencyProperties = new List<Dependency>();
-            foreach (var propertyName in dependencyPropertyNames) {
+            foreach (var propertyName in dependencyPropertyNames)
+            {
                 var dependencies = package[propertyName] as JObject;
-                if (dependencies != null) {
-                    foreach (var property in dependencies.Properties()) {
-                        if (property.Value.Type == JTokenType.String) {
+                if (dependencies != null)
+                {
+                    foreach (var property in dependencies.Properties())
+                    {
+                        if (property.Value.Type == JTokenType.String)
+                        {
                             _dependencyProperties.Add(new Dependency(property.Name, property.Value.Value<string>()));
                         }
                     }
@@ -37,22 +44,29 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             }
         }
 
-        public IEnumerator<IDependency> GetEnumerator() {
+        public IEnumerator<IDependency> GetEnumerator()
+        {
             return _dependencyProperties.GetEnumerator();
         }
 
-        IEnumerator IEnumerable.GetEnumerator() {
+        IEnumerator IEnumerable.GetEnumerator()
+        {
             return GetEnumerator();
         }
 
-        public int Count {
+        public int Count
+        {
             get { return this.Count(); }
         }
 
-        public IDependency this[string name] {
-            get {
-                foreach (var dependeny in _dependencyProperties) {
-                    if (dependeny.Name == name) {
+        public IDependency this[string name]
+        {
+            get
+            {
+                foreach (var dependeny in _dependencyProperties)
+                {
+                    if (dependeny.Name == name)
+                    {
                         return dependeny;
                     }
                 }
@@ -60,7 +74,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             }
         }
 
-        public bool Contains(string name) {
+        public bool Contains(string name)
+        {
             return this[name] != null;
         }
     }

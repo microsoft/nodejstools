@@ -19,15 +19,18 @@ using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.NodejsTools.Debugger.Commands {
-    sealed class SetVariableValueCommand : DebuggerCommand {
+namespace Microsoft.NodejsTools.Debugger.Commands
+{
+    internal sealed class SetVariableValueCommand : DebuggerCommand
+    {
         private readonly Dictionary<string, object> _arguments;
         private readonly string _name;
         private readonly IEvaluationResultFactory _resultFactory;
         private readonly NodeStackFrame _stackFrame;
 
         public SetVariableValueCommand(int id, IEvaluationResultFactory resultFactory, NodeStackFrame stackFrame, string name, int handle)
-            : base(id, "setVariableValue") {
+            : base(id, "setVariableValue")
+        {
             Utilities.ArgumentNotNull("resultFactory", resultFactory);
             Utilities.ArgumentNotNull("stackFrame", stackFrame);
             Utilities.ArgumentNotNullOrEmpty("name", name);
@@ -43,13 +46,15 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             };
         }
 
-        protected override IDictionary<string, object> Arguments {
+        protected override IDictionary<string, object> Arguments
+        {
             get { return _arguments; }
         }
 
         public NodeEvaluationResult Result { get; private set; }
 
-        public override void ProcessResponse(JObject response) {
+        public override void ProcessResponse(JObject response)
+        {
             base.ProcessResponse(response);
 
             var variableProvider = new NodeSetValueVariable(_stackFrame, _name, response);

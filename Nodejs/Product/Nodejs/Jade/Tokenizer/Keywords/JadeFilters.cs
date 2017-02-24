@@ -16,15 +16,18 @@
 
 using System;
 
-namespace Microsoft.NodejsTools.Jade {
-    internal static class JadeFilters {
-        public static bool IsFilter(string candidate) {
+namespace Microsoft.NodejsTools.Jade
+{
+    internal static class JadeFilters
+    {
+        public static bool IsFilter(string candidate)
+        {
             string lower = candidate.ToLowerInvariant();
             return Array.BinarySearch<string>(_filters, lower) >= 0;
         }
 
         // must be sorted
-        private static string[] _filters = new string[] { 
+        private static string[] _filters = new string[] {
             "cdata",
             "coffeescript",
             "less",

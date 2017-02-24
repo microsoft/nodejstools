@@ -16,15 +16,18 @@
 
 using System;
 
-namespace Microsoft.NodejsTools.Jade {
-    internal static class JadeTagKeywords {
-        public static bool IsKeyword(string candidate) {
+namespace Microsoft.NodejsTools.Jade
+{
+    internal static class JadeTagKeywords
+    {
+        public static bool IsKeyword(string candidate)
+        {
             string lower = candidate.ToLowerInvariant();
             return Array.BinarySearch<string>(_keywords, lower) >= 0;
         }
 
         // must be sorted
-        private static string[] _keywords = new string[] { 
+        private static string[] _keywords = new string[] {
             "block",
             "extends",
             "include",

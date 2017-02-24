@@ -16,11 +16,13 @@
 
 using System.Windows.Automation;
 
-namespace TestUtilities.UI {
-    public class NodejsPerfExplorer : TreeView {
+namespace TestUtilities.UI
+{
+    public class NodejsPerfExplorer : TreeView
+    {
         public NodejsPerfExplorer(AutomationElement element)
-            : base(element) {
+            : base(element)
+        {
         }
-
     }
 }

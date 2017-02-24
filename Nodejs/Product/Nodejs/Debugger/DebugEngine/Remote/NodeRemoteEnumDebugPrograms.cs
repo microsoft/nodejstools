@@ -17,18 +17,22 @@
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
-namespace Microsoft.NodejsTools.Debugger.Remote {
-    internal class NodeRemoteEnumDebugPrograms : NodeRemoteEnumDebug<IDebugProgram2>, IEnumDebugPrograms2 {
-
+namespace Microsoft.NodejsTools.Debugger.Remote
+{
+    internal class NodeRemoteEnumDebugPrograms : NodeRemoteEnumDebug<IDebugProgram2>, IEnumDebugPrograms2
+    {
         public NodeRemoteEnumDebugPrograms(NodeRemoteDebugProcess process)
-            : base(new NodeRemoteDebugProgram(process)) {
+            : base(new NodeRemoteDebugProgram(process))
+        {
         }
 
         public NodeRemoteEnumDebugPrograms(NodeRemoteEnumDebugPrograms programs)
-            : base(programs.Element) {
+            : base(programs.Element)
+        {
         }
 
-        public int Clone(out IEnumDebugPrograms2 ppEnum) {
+        public int Clone(out IEnumDebugPrograms2 ppEnum)
+        {
             ppEnum = new NodeRemoteEnumDebugPrograms(this);
             return VSConstants.S_OK;
         }

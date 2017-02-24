@@ -18,35 +18,43 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Microsoft.NodejsTools.TestFrameworks {
-    class TestFrameworkDirectories {
+namespace Microsoft.NodejsTools.TestFrameworks
+{
+    internal class TestFrameworkDirectories
+    {
         public const string ExportRunnerFramework = "ExportRunner";
         private const string TestFrameworksDirectory = "TestFrameworks";
 
         private readonly Dictionary<string, string> _frameworkDirectories;
 
-        public TestFrameworkDirectories() {
+        public TestFrameworkDirectories()
+        {
             _frameworkDirectories = new Dictionary<string, string>(System.StringComparer.OrdinalIgnoreCase);
-            foreach (string directory in Directory.GetDirectories(GetBaseTestframeworkFolder())) {
+            foreach (string directory in Directory.GetDirectories(GetBaseTestframeworkFolder()))
+            {
                 string name = Path.GetFileName(directory);
                 _frameworkDirectories.Add(name, directory);
             }
             string defaultFx;
             _frameworkDirectories.TryGetValue(ExportRunnerFramework, out defaultFx);
-            if (defaultFx == null) {
+            if (defaultFx == null)
+            {
                 throw new InvalidOperationException("Missing generic test framework");
             }
         }
 
-        public List<string> GetFrameworkNames() {
+        public List<string> GetFrameworkNames()
+        {
             return new List<string>(_frameworkDirectories.Keys);
         }
 
-        public List<string> GetFrameworkDirectories() {
+        public List<string> GetFrameworkDirectories()
+        {
             return new List<string>(_frameworkDirectories.Values);
         }
 
-        private static string GetBaseTestframeworkFolder() {
+        private static string GetBaseTestframeworkFolder()
+        {
             string installFolder = GetExecutingAssemblyPath();
             string baseDirectory = Path.Combine(installFolder, TestFrameworksDirectory);
 #if DEBUG
@@ -56,7 +64,8 @@ namespace Microsoft.NodejsTools.TestFrameworks {
             return baseDirectory;
         }
 
-        private static string GetExecutingAssemblyPath() {
+        private static string GetExecutingAssemblyPath()
+        {
             string codeBase = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
             UriBuilder uri = new UriBuilder(codeBase);
             string path = Uri.UnescapeDataString(uri.Path);

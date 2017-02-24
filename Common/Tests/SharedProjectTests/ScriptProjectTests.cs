@@ -18,19 +18,24 @@ using TestUtilities;
 using TestUtilities.SharedProject;
 using TestUtilities.UI;
 
-namespace Microsoft.VisualStudioTools.SharedProjectTests {
+namespace Microsoft.VisualStudioTools.SharedProjectTests
+{
     /// <summary>
     /// Test cases which are applicable to projects designed for scripting languages.
     /// </summary>
     [TestClass]
-    public class ScriptProjectTests : SharedProjectTest {
+    public class ScriptProjectTests : SharedProjectTest
+    {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void RunWithoutStartupFile() {
-            foreach (var projectType in ProjectTypes) {
+        public void RunWithoutStartupFile()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition("RunWithoutStartupFile", projectType);
 
-                using (var solution = testDef.Generate().ToVs()) {
+                using (var solution = testDef.Generate().ToVs())
+                {
                     solution.OpenDialogWithDteExecuteCommand("Debug.Start");
                     solution.CheckMessageBox("startup file");
 
@@ -47,17 +52,20 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void RenameStartupFileFolder() {
-            foreach (var projectType in ProjectTypes) {
+        public void RenameStartupFileFolder()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition(
-                    "RenameStartupFileFolder", 
+                    "RenameStartupFileFolder",
                     projectType,
                     Folder("Folder"),
                     Compile("Folder\\server"),
                     Property("StartupFile", "Folder\\server" + projectType.CodeExtension)
                 );
 
-                using (var solution = testDef.Generate().ToVs()) {
+                using (var solution = testDef.Generate().ToVs())
+                {
                     var folder = solution.GetProject("RenameStartupFileFolder").ProjectItems.Item("Folder");
                     folder.Name = "FolderNew";
 
@@ -74,8 +82,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void RenameStartupFile() {
-            foreach (var projectType in ProjectTypes) {
+        public void RenameStartupFile()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition(
                     "RenameStartupFileFolder",
                     projectType,
@@ -84,7 +94,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     Property("StartupFile", "Folder\\server" + projectType.CodeExtension)
                 );
 
-                using (var solution = testDef.Generate().ToVs()) {
+                using (var solution = testDef.Generate().ToVs())
+                {
                     var file = solution.GetProject("RenameStartupFileFolder").ProjectItems.Item("Folder").ProjectItems.Item("server" + projectType.CodeExtension);
                     file.Name = "server2" + projectType.CodeExtension;
 

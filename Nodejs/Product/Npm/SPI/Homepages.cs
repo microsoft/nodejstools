@@ -16,8 +16,10 @@
 
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.NodejsTools.Npm.SPI {
-    internal class Homepages : PkgStringArray, IHomepages {
+namespace Microsoft.NodejsTools.Npm.SPI
+{
+    internal class Homepages : PkgStringArray, IHomepages
+    {
         public Homepages(JObject package) : base(package, "homepage") { }
     }
 }

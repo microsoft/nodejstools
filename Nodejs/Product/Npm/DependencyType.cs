@@ -14,8 +14,10 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Npm {
-    public enum DependencyType {
+namespace Microsoft.NodejsTools.Npm
+{
+    public enum DependencyType
+    {
         Standard = 0,
         Development,
         Optional

@@ -17,29 +17,37 @@
 using System;
 using System.Windows.Forms;
 
-namespace Microsoft.NodejsTools.Commands {
-    public partial class DiagnosticsForm : Form {
-        public DiagnosticsForm(string content) {
+namespace Microsoft.NodejsTools.Commands
+{
+    public partial class DiagnosticsForm : Form
+    {
+        public DiagnosticsForm(string content)
+        {
             InitializeComponent();
             _textBox.Text = content;
         }
 
-        public TextBox TextBox {
-            get {
+        public TextBox TextBox
+        {
+            get
+            {
                 return _textBox;
             }
         }
 
-        private void _ok_Click(object sender, EventArgs e) {
+        private void _ok_Click(object sender, EventArgs e)
+        {
             Close();
         }
 
-        private void _copy_Click(object sender, EventArgs e) {
+        private void _copy_Click(object sender, EventArgs e)
+        {
             _textBox.SelectAll();
             Clipboard.SetText(_textBox.SelectedText);
         }
 
-        private void _diagnosticLoggingCheckbox_CheckedChanged(object sender, EventArgs e) {
+        private void _diagnosticLoggingCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
             NodejsPackage.Instance.DiagnosticsOptionsPage.IsLiveDiagnosticsEnabled = _diagnosticLoggingCheckbox.Checked;
         }
     }

@@ -19,18 +19,23 @@ using Microsoft.VisualStudioTools.VSTestHost;
 using TestUtilities;
 using TestUtilities.UI;
 
-namespace Microsoft.Nodejs.Tests.UI {
+namespace Microsoft.Nodejs.Tests.UI
+{
     [TestClass]
-    public class ProjectPropertiesTests : NodejsProjectTest {
+    public class ProjectPropertiesTests : NodejsProjectTest
+    {
         [ClassInitialize]
-        public static void DoDeployment(TestContext context) {
+        public static void DoDeployment(TestContext context)
+        {
             AssertListener.Initialize();
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void DirtyProperties() {
-            using (var solution = Project("DirtyProperties").Generate().ToVs()) {
+        public void DirtyProperties()
+        {
+            using (var solution = Project("DirtyProperties").Generate().ToVs())
+            {
                 var proj = solution.FindItem("DirtyProperties");
                 AutomationWrapper.Select(proj);
                 solution.ExecuteCommand("ClassViewContextMenus.ClassViewMultiselectProjectreferencesItems.Properties");

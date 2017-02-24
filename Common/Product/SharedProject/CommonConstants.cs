@@ -18,8 +18,10 @@ using Microsoft.VisualStudio.OLE.Interop;
 using OleConstants = Microsoft.VisualStudio.OLE.Interop.Constants;
 using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
 
-namespace Microsoft.VisualStudioTools {
-    internal static class CommonConstants {
+namespace Microsoft.VisualStudioTools
+{
+    internal static class CommonConstants
+    {
         /// <summary>
         /// <see cref="VsConstants.UICONTEXT_NoSolution"/>.
         /// </summary>

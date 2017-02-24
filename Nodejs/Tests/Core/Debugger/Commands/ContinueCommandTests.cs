@@ -19,11 +19,14 @@ using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Globalization;
 
-namespace NodejsTests.Debugger.Commands {
+namespace NodejsTests.Debugger.Commands
+{
     [TestClass]
-    public class ContinueCommandTests {
+    public class ContinueCommandTests
+    {
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateContinueCommand() {
+        public void CreateContinueCommand()
+        {
             // Arrange
             const int commandId = 3;
             const SteppingKind stepping = SteppingKind.Out;
@@ -41,7 +44,8 @@ namespace NodejsTests.Debugger.Commands {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateContinueCommandWithOptionalParameters() {
+        public void CreateContinueCommandWithOptionalParameters()
+        {
             // Arrange
             const int commandId = 3;
             const SteppingKind stepping = SteppingKind.Out;

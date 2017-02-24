@@ -20,20 +20,24 @@ using System.Linq;
 using Microsoft.NodejsTools.Debugger.Serialization;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.NodejsTools.Debugger.Commands {
-    sealed class LookupCommand : DebuggerCommand {
+namespace Microsoft.NodejsTools.Debugger.Commands
+{
+    internal sealed class LookupCommand : DebuggerCommand
+    {
         private readonly Dictionary<string, object> _arguments;
         private readonly int[] _handles;
         private readonly Dictionary<int, NodeEvaluationResult> _parents;
         private readonly IEvaluationResultFactory _resultFactory;
 
         public LookupCommand(int id, IEvaluationResultFactory resultFactory, IEnumerable<NodeEvaluationResult> parents)
-            : this(id, resultFactory, EnsureUniqueHandles(ref parents).Select(p => p.Handle).ToArray()) {
+            : this(id, resultFactory, EnsureUniqueHandles(ref parents).Select(p => p.Handle).ToArray())
+        {
             _parents = parents.ToDictionary(p => p.Handle);
         }
 
         public LookupCommand(int id, IEvaluationResultFactory resultFactory, int[] handles)
-            : base(id, "lookup") {
+            : base(id, "lookup")
+        {
             _resultFactory = resultFactory;
             _handles = handles;
 
@@ -43,36 +47,43 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             };
         }
 
-        private class HandleEqualityComparer : EqualityComparer<NodeEvaluationResult> {
+        private class HandleEqualityComparer : EqualityComparer<NodeEvaluationResult>
+        {
             public static readonly HandleEqualityComparer Instance = new HandleEqualityComparer();
 
-            public override bool Equals(NodeEvaluationResult x, NodeEvaluationResult y) {
+            public override bool Equals(NodeEvaluationResult x, NodeEvaluationResult y)
+            {
                 return x.Handle == y.Handle;
             }
 
-            public override int GetHashCode(NodeEvaluationResult obj) {
+            public override int GetHashCode(NodeEvaluationResult obj)
+            {
                 return obj.Handle.GetHashCode();
             }
         }
 
-        private static IEnumerable<NodeEvaluationResult> EnsureUniqueHandles(ref IEnumerable<NodeEvaluationResult> parents) {
+        private static IEnumerable<NodeEvaluationResult> EnsureUniqueHandles(ref IEnumerable<NodeEvaluationResult> parents)
+        {
             return parents = parents.Distinct(HandleEqualityComparer.Instance);
         }
 
-        protected override IDictionary<string, object> Arguments {
+        protected override IDictionary<string, object> Arguments
+        {
             get { return _arguments; }
         }
 
         public Dictionary<int, List<NodeEvaluationResult>> Results { get; private set; }
 
-        public override void ProcessResponse(JObject response) {
+        public override void ProcessResponse(JObject response)
+        {
             base.ProcessResponse(response);
 
             // Retrieve references
             JArray refs = (JArray)response["refs"] ?? new JArray();
             var references = new Dictionary<int, JToken>(refs.Count);
 
-            foreach (JToken reference in refs) {
+            foreach (JToken reference in refs)
+            {
                 var id = (int)reference["handle"];
                 references.Add(id, reference);
             }
@@ -81,20 +92,24 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             JToken body = response["body"];
             Results = new Dictionary<int, List<NodeEvaluationResult>>(_handles.Length);
 
-            foreach (int handle in _handles) {
+            foreach (int handle in _handles)
+            {
                 string id = handle.ToString(CultureInfo.InvariantCulture);
                 JToken data = body[id];
-                if (data == null) {
+                if (data == null)
+                {
                     continue;
                 }
 
                 NodeEvaluationResult parent = null;
-                if (_parents != null) {
+                if (_parents != null)
+                {
                     _parents.TryGetValue(handle, out parent);
                 }
 
                 List<NodeEvaluationResult> properties = GetProperties(data, parent, references);
-                if (properties.Count == 0) {
+                if (properties.Count == 0)
+                {
                     // Primitive javascript type
                     var variable = new NodeEvaluationVariable(null, id, data);
                     NodeEvaluationResult property = _resultFactory.Create(variable);
@@ -105,18 +120,21 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             }
         }
 
-        private List<NodeEvaluationResult> GetProperties(JToken data, NodeEvaluationResult parent, Dictionary<int, JToken> references) {
+        private List<NodeEvaluationResult> GetProperties(JToken data, NodeEvaluationResult parent, Dictionary<int, JToken> references)
+        {
             var properties = new List<NodeEvaluationResult>();
 
             var props = (JArray)data["properties"];
-            if (props != null) {
+            if (props != null)
+            {
                 properties.AddRange(props.Select(property => new NodeLookupVariable(parent, property, references))
                     .Select(variableProvider => _resultFactory.Create(variableProvider)));
             }
 
             // Try to get prototype
             JToken prototype = data["protoObject"];
-            if (prototype != null) {
+            if (prototype != null)
+            {
                 var variableProvider = new NodePrototypeVariable(parent, prototype, references);
                 NodeEvaluationResult result = _resultFactory.Create(variableProvider);
                 properties.Add(result);

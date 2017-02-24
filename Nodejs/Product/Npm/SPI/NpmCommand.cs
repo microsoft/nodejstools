@@ -22,8 +22,10 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudioTools.Project;
 using System.Globalization;
 
-namespace Microsoft.NodejsTools.Npm.SPI {
-    internal abstract class NpmCommand : AbstractNpmLogSource {
+namespace Microsoft.NodejsTools.Npm.SPI
+{
+    internal abstract class NpmCommand : AbstractNpmLogSource
+    {
         private readonly string _fullPathToRootPackageDirectory;
         private string _pathToNpm;
         private readonly ManualResetEvent _cancellation;
@@ -33,7 +35,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         protected NpmCommand(
             string fullPathToRootPackageDirectory,
-            string pathToNpm = null) {
+            string pathToNpm = null)
+        {
             _fullPathToRootPackageDirectory = fullPathToRootPackageDirectory;
             _pathToNpm = pathToNpm;
             _cancellation = new ManualResetEvent(false);
@@ -41,44 +44,58 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         protected string Arguments { get; set; }
 
-        internal string FullPathToRootPackageDirectory {
+        internal string FullPathToRootPackageDirectory
+        {
             get { return _fullPathToRootPackageDirectory; }
         }
 
-        protected string GetPathToNpm() {
-            if (null == _pathToNpm || !File.Exists(_pathToNpm)) {
+        protected string GetPathToNpm()
+        {
+            if (null == _pathToNpm || !File.Exists(_pathToNpm))
+            {
                 _pathToNpm = NpmHelpers.GetPathToNpm();
             }
             return _pathToNpm;
         }
 
-        public string StandardOutput {
-            get {
-                lock (_bufferLock) {
+        public string StandardOutput
+        {
+            get
+            {
+                lock (_bufferLock)
+                {
                     return _output.ToString();
                 }
             }
         }
 
-        public string StandardError {
-            get {
-                lock (_bufferLock) {
+        public string StandardError
+        {
+            get
+            {
+                lock (_bufferLock)
+                {
                     return _error.ToString();
                 }
             }
         }
 
-        public void CancelCurrentTask() {
+        public void CancelCurrentTask()
+        {
             _cancellation.Set();
         }
 
-        public virtual async Task<bool> ExecuteAsync() {
+        public virtual async Task<bool> ExecuteAsync()
+        {
             OnCommandStarted();
             var redirector = new NpmCommandRedirector(this);
 
-            try {
+            try
+            {
                 GetPathToNpm();
-            } catch (NpmNotFoundException) {
+            }
+            catch (NpmNotFoundException)
+            {
                 redirector.WriteErrorLine(Resources.CouldNotFindNpm);
                 return false;
             }
@@ -87,43 +104,53 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 string.Format(CultureInfo.InvariantCulture, Resources.ExecutingCommand, Arguments)));
 
             var cancelled = false;
-            try {
+            try
+            {
                 await NpmHelpers.ExecuteNpmCommandAsync(
                     redirector,
                     GetPathToNpm(),
                     _fullPathToRootPackageDirectory,
                     new[] { Arguments },
                     _cancellation);
-            } catch (OperationCanceledException) {
+            }
+            catch (OperationCanceledException)
+            {
                 cancelled = true;
             }
             OnCommandCompleted(Arguments, redirector.HasErrors, cancelled);
             return !redirector.HasErrors;
         }
 
-        internal class NpmCommandRedirector : Redirector {
-            NpmCommand _owner;
-            
-            public NpmCommandRedirector(NpmCommand owner) {
+        internal class NpmCommandRedirector : Redirector
+        {
+            private NpmCommand _owner;
+
+            public NpmCommandRedirector(NpmCommand owner)
+            {
                 _owner = owner;
             }
 
             public bool HasErrors { get; private set; }
 
-            private string AppendToBuffer(StringBuilder buffer, string data) {
-                if (data != null) {
-                    lock (_owner._bufferLock) {
+            private string AppendToBuffer(StringBuilder buffer, string data)
+            {
+                if (data != null)
+                {
+                    lock (_owner._bufferLock)
+                    {
                         buffer.Append(data + Environment.NewLine);
                     }
                 }
                 return data;
             }
 
-            public override void WriteLine(string line) {
+            public override void WriteLine(string line)
+            {
                 _owner.OnOutputLogged(AppendToBuffer(_owner._output, line));
             }
 
-            public override void WriteErrorLine(string line) {
+            public override void WriteErrorLine(string line)
+            {
                 HasErrors = true;
                 _owner.OnErrorLogged(AppendToBuffer(_owner._error, line));
             }

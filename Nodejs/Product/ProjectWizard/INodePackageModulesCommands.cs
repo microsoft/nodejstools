@@ -16,11 +16,13 @@
 
 using System.Threading.Tasks;
 
-namespace Microsoft.NodejsTools.ProjectWizard {
+namespace Microsoft.NodejsTools.ProjectWizard
+{
     /// <summary>
     /// Provides access to NPM commands
     /// </summary>
-    public interface INodePackageModulesCommands {
+    public interface INodePackageModulesCommands
+    {
         /// <summary>
         /// Triggers installation of missing node package modules (npm)
         /// </summary>

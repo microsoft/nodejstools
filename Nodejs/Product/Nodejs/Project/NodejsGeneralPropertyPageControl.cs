@@ -22,12 +22,15 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Microsoft.VisualStudioTools.Project;
 
-namespace Microsoft.NodejsTools.Project {
-    partial class NodejsGeneralPropertyPageControl : UserControl {
+namespace Microsoft.NodejsTools.Project
+{
+    internal partial class NodejsGeneralPropertyPageControl : UserControl
+    {
         private readonly NodejsGeneralPropertyPage _propPage;
         private const string _exeFilter = "Executable Files (*.exe)|*.exe|All Files (*.*)|*.*";
 
-        public NodejsGeneralPropertyPageControl() {
+        public NodejsGeneralPropertyPageControl()
+        {
             InitializeComponent();
 
             SetCueBanner();
@@ -37,11 +40,13 @@ namespace Microsoft.NodejsTools.Project {
             _nodeExeErrorProvider.SetIconAlignment(_workingDir, ErrorIconAlignment.MiddleLeft);
         }
 
-        public NodejsGeneralPropertyPageControl(NodejsGeneralPropertyPage page) : this() {
+        public NodejsGeneralPropertyPageControl(NodejsGeneralPropertyPage page) : this()
+        {
             _propPage = page;
         }
 
-        private void AddToolTips() {
+        private void AddToolTips()
+        {
             _tooltip.SetToolTip(_nodeExePath, Resources.NodeExePathToolTip);
             _tooltip.SetToolTip(_nodeExeArguments, Resources.NodeExeArgumentsToolTip);
             _tooltip.SetToolTip(_scriptFile, Resources.ScriptFileTooltip);
@@ -54,107 +59,140 @@ namespace Microsoft.NodejsTools.Project {
             _tooltip.SetToolTip(_envVars, Resources.EnvironmentVariables);
         }
 
-        public string NodeExePath {
-            get {
+        public string NodeExePath
+        {
+            get
+            {
                 return _nodeExePath.Text;
             }
-            set {
+            set
+            {
                 _nodeExePath.Text = value;
             }
         }
 
-        public string NodeExeArguments {
-            get {
+        public string NodeExeArguments
+        {
+            get
+            {
                 return _nodeExeArguments.Text;
             }
-            set {
+            set
+            {
                 _nodeExeArguments.Text = value;
             }
         }
 
-        public string ScriptFile  {
-            get {
+        public string ScriptFile
+        {
+            get
+            {
                 return this._scriptFile.Text;
             }
-            set {
+            set
+            {
                 this._scriptFile.Text = value;
             }
         }
 
-        public string ScriptArguments {
-            get {
+        public string ScriptArguments
+        {
+            get
+            {
                 return _scriptArguments.Text;
             }
-            set {
+            set
+            {
                 _scriptArguments.Text = value;
             }
         }
 
-        public string NodejsPort {
-            get {
+        public string NodejsPort
+        {
+            get
+            {
                 return _nodejsPort.Text;
             }
-            set {
+            set
+            {
                 _nodejsPort.Text = value;
             }
         }
 
-        public bool StartWebBrowser {
-            get {
+        public bool StartWebBrowser
+        {
+            get
+            {
                 return _startBrowser.Checked;
             }
-            set {
+            set
+            {
                 _startBrowser.Checked = value;
             }
         }
 
-        public string WorkingDirectory {
-            get {
+        public string WorkingDirectory
+        {
+            get
+            {
                 return _workingDir.Text;
             }
-            set {
+            set
+            {
                 _workingDir.Text = value;
             }
         }
 
-        public string LaunchUrl {
-            get {
+        public string LaunchUrl
+        {
+            get
+            {
                 return _launchUrl.Text;
             }
-            set {
+            set
+            {
                 _launchUrl.Text = value;
             }
         }
 
         private static Regex lfToCrLfRegex = new Regex(@"(?<!\r)\n");
 
-        public string Environment {
-            get {
+        public string Environment
+        {
+            get
+            {
                 return _envVars.Text;
             }
-            set {
+            set
+            {
                 // TextBox requires \r\n for line separators, but XML can have either \n or \r\n, and we should treat those equally.
                 // (It will always have \r\n when we write it out, but users can edit it by other means.)
                 _envVars.Text = lfToCrLfRegex.Replace(value ?? String.Empty, "\r\n");
             }
         }
 
-        public string DebuggerPort {
-            get {
+        public string DebuggerPort
+        {
+            get
+            {
                 return _debuggerPort.Text;
             }
-            set {
+            set
+            {
                 _debuggerPort.Text = value;
             }
         }
 
-        private void Changed(object sender, EventArgs e) {
+        private void Changed(object sender, EventArgs e)
+        {
             _propPage.IsDirty = true;
         }
 
-        private void SetCueBanner() {
+        private void SetCueBanner()
+        {
             string cueBanner = Nodejs.NodeExePath;
-            if (String.IsNullOrEmpty(cueBanner)) {
+            if (String.IsNullOrEmpty(cueBanner))
+            {
                 cueBanner = Resources.NodejsNotInstalledShort;
             }
 
@@ -166,52 +204,69 @@ namespace Microsoft.NodejsTools.Project {
             );
         }
 
-        private void NodeExePathChanged(object sender, EventArgs e) {
+        private void NodeExePathChanged(object sender, EventArgs e)
+        {
             if (String.IsNullOrEmpty(_nodeExePath.Text) || _nodeExePath.Text.Contains("$(") ||
-                File.Exists(Nodejs.GetAbsoluteNodeExePath(_propPage.Project.ProjectHome, _nodeExePath.Text))) {
+                File.Exists(Nodejs.GetAbsoluteNodeExePath(_propPage.Project.ProjectHome, _nodeExePath.Text)))
+            {
                 _nodeExeErrorProvider.SetError(_nodeExePath, String.Empty);
-            } else {
+            }
+            else
+            {
                 _nodeExeErrorProvider.SetError(_nodeExePath, Resources.NodeExePathNotFound);
             }
             Changed(sender, e);
         }
-        
-        private void BrowsePathClick(object sender, EventArgs e) {
+
+        private void BrowsePathClick(object sender, EventArgs e)
+        {
             var dialog = new OpenFileDialog();
             dialog.CheckFileExists = true;
             dialog.Filter = _exeFilter;
-            if (dialog.ShowDialog() == DialogResult.OK) {
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
                 _nodeExePath.Text = dialog.FileName;
                 _nodeExePath.ForeColor = SystemColors.ControlText;
             }
         }
 
-        private void BrowseDirectoryClick(object sender, EventArgs e) {
+        private void BrowseDirectoryClick(object sender, EventArgs e)
+        {
             string dir = _workingDir.Text;
-            if (string.IsNullOrEmpty(dir)) {
+            if (string.IsNullOrEmpty(dir))
+            {
                 dir = _propPage.Project.ProjectHome;
             }
             var path = NodejsPackage.Instance.BrowseForDirectory(Handle, dir);
-            if (!string.IsNullOrEmpty(path)) {
+            if (!string.IsNullOrEmpty(path))
+            {
                 _workingDir.Text = path;
             }
         }
 
-        private void PortChanged(object sender, EventArgs e) {
+        private void PortChanged(object sender, EventArgs e)
+        {
             var textSender = (TextBox)sender;
-            if (!textSender.Text.Contains("$(") && 
-                textSender.Text.Any(ch => !Char.IsDigit(ch))) {
+            if (!textSender.Text.Contains("$(") &&
+                textSender.Text.Any(ch => !Char.IsDigit(ch)))
+            {
                 _nodeExeErrorProvider.SetError(textSender, Resources.InvalidPortNumber);
-            } else {
+            }
+            else
+            {
                 _nodeExeErrorProvider.SetError(textSender, String.Empty);
             }
             Changed(sender, e);
         }
 
-        private void WorkingDirTextChanged(object sender, EventArgs e) {
-            if (!_workingDir.Text.Contains("$(") && !Directory.Exists(_workingDir.Text)) {
+        private void WorkingDirTextChanged(object sender, EventArgs e)
+        {
+            if (!_workingDir.Text.Contains("$(") && !Directory.Exists(_workingDir.Text))
+            {
                 _nodeExeErrorProvider.SetError(_workingDir, Resources.WorkingDirInvalidOrMissing);
-            } else {
+            }
+            else
+            {
                 _nodeExeErrorProvider.SetError(_workingDir, String.Empty);
             }
             Changed(sender, e);

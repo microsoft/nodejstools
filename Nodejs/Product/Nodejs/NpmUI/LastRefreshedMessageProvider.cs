@@ -18,46 +18,70 @@ using System;
 using Microsoft.NodejsTools.Project;
 using System.Globalization;
 
-namespace Microsoft.NodejsTools.NpmUI {
-    internal class LastRefreshedMessageProvider {
-        public static readonly LastRefreshedMessageProvider RefreshFailed = new LastRefreshedMessageProvider {
+namespace Microsoft.NodejsTools.NpmUI
+{
+    internal class LastRefreshedMessageProvider
+    {
+        public static readonly LastRefreshedMessageProvider RefreshFailed = new LastRefreshedMessageProvider
+        {
             Days = int.MaxValue,
             Description = Resources.PackageCatalogRefreshFailed
         };
 
-        public static readonly LastRefreshedMessageProvider RefreshInProgress = new LastRefreshedMessageProvider {
+        public static readonly LastRefreshedMessageProvider RefreshInProgress = new LastRefreshedMessageProvider
+        {
             Days = 0,
             Description = Resources.PackageCatalogRefreshing
         };
 
-        public static readonly LastRefreshedMessageProvider NpmNotFound = new LastRefreshedMessageProvider {
+        public static readonly LastRefreshedMessageProvider NpmNotFound = new LastRefreshedMessageProvider
+        {
             Days = int.MaxValue,
             Description = "npm not installed"
         };
 
         private LastRefreshedMessageProvider() { }
 
-        public LastRefreshedMessageProvider(DateTime lastRefreshTime) {
-            if (lastRefreshTime == DateTime.MinValue) {
+        public LastRefreshedMessageProvider(DateTime lastRefreshTime)
+        {
+            if (lastRefreshTime == DateTime.MinValue)
+            {
                 Days = int.MaxValue;
                 Description = Resources.PackageCatalogRefreshFailed;
-            } else {
+            }
+            else
+            {
                 Days = (int)(DateTime.Now.Date - lastRefreshTime.Date).TotalDays;
-                if (Days == 0) {
+                if (Days == 0)
+                {
                     Description = string.Format(CultureInfo.CurrentCulture, Resources.PackageCatalogRefresh0Days, lastRefreshTime);
-                } else if (Days == 1) {
+                }
+                else if (Days == 1)
+                {
                     Description = string.Format(CultureInfo.CurrentCulture, Resources.PackageCatalogRefresh1Day, lastRefreshTime);
-                } else if (Days <= 7) {
+                }
+                else if (Days <= 7)
+                {
                     Description = string.Format(CultureInfo.CurrentCulture, Resources.PackageCatalogRefresh2To7Days, Days);
-                } else if (Days <= 14) {
+                }
+                else if (Days <= 14)
+                {
                     Description = Resources.PackageCatalogRefresh1Week;
-                } else if (Days <= 21) {
+                }
+                else if (Days <= 21)
+                {
                     Description = Resources.PackageCatalogRefresh2Weeks;
-                } else if (Days <= 31) {
+                }
+                else if (Days <= 31)
+                {
                     Description = Resources.PackageCatalogRefresh3Weeks;
-                } else if (Days <= 92) {
+                }
+                else if (Days <= 92)
+                {
                     Description = Resources.PackageCatalogRefresh1Month;
-                } else {
+                }
+                else
+                {
                     Description = Resources.PackageCatalogRefresh3Months;
                 }
             }

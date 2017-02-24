@@ -14,8 +14,10 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Debugger.Events {
-    interface IDebuggerEvent {
+namespace Microsoft.NodejsTools.Debugger.Events
+{
+    internal interface IDebuggerEvent
+    {
         /// <summary>
         /// Gets a value indicating whether command execution in progress.
         /// </summary>

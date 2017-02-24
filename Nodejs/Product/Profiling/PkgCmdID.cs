@@ -14,11 +14,12 @@
 //
 //*********************************************************//
 
-// PkgCmdID.cs
 // MUST match PkgCmdID.h
 
-namespace Microsoft.NodejsTools.Profiling {
-    static class PkgCmdIDList {
+namespace Microsoft.NodejsTools.Profiling
+{
+    internal static class PkgCmdIDList
+    {
         public const uint cmdidStartNodeProfiling = 0x100;
         public const uint cmdidPerfExplorer = 0x101;
         public const uint cmdidAddPerfSession = 0x102;
@@ -36,6 +37,5 @@ namespace Microsoft.NodejsTools.Profiling {
         public const uint menuIdPerfContext = 0x2001;
         public const uint menuIdPerfReportsContext = 0x2002;
         public const uint menuIdPerfSingleReportContext = 0x2003;
-
     };
 }

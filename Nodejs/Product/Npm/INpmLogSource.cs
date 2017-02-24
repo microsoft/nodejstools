@@ -16,8 +16,10 @@
 
 using System;
 
-namespace Microsoft.NodejsTools.Npm {
-    public interface INpmLogSource {
+namespace Microsoft.NodejsTools.Npm
+{
+    public interface INpmLogSource
+    {
         event EventHandler CommandStarted;
         event EventHandler<NpmLogEventArgs> OutputLogged;
         event EventHandler<NpmLogEventArgs> ErrorLogged;

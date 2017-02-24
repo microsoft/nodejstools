@@ -18,15 +18,19 @@ using System.Collections.Generic;
 using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.NodejsTools.Debugger.Serialization {
-    sealed class NodeLookupVariable : INodeVariable {
-        public NodeLookupVariable(NodeEvaluationResult parent, JToken property, Dictionary<int, JToken> references) {
+namespace Microsoft.NodejsTools.Debugger.Serialization
+{
+    internal sealed class NodeLookupVariable : INodeVariable
+    {
+        public NodeLookupVariable(NodeEvaluationResult parent, JToken property, Dictionary<int, JToken> references)
+        {
             Utilities.ArgumentNotNull("property", property);
             Utilities.ArgumentNotNull("references", references);
 
             Id = (int)property["ref"];
             JToken reference;
-            if (!references.TryGetValue(Id, out reference)) {
+            if (!references.TryGetValue(Id, out reference))
+            {
                 reference = property;
             }
             Parent = parent;

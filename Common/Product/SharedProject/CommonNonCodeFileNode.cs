@@ -16,17 +16,22 @@ using System;
 using System.Diagnostics;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace Microsoft.VisualStudioTools.Project {
-    internal class CommonNonCodeFileNode : CommonFileNode {
+namespace Microsoft.VisualStudioTools.Project
+{
+    internal class CommonNonCodeFileNode : CommonFileNode
+    {
         public CommonNonCodeFileNode(CommonProjectNode root, ProjectElement e)
-            : base(root, e) {
+            : base(root, e)
+        {
         }
 
         /// <summary>
         /// Open a file depending on the SubType property associated with the file item in the project file
         /// </summary>
-        protected override void DoDefaultAction() {
-            if ("WebBrowser".Equals(SubType, StringComparison.OrdinalIgnoreCase)) {
+        protected override void DoDefaultAction()
+        {
+            if ("WebBrowser".Equals(SubType, StringComparison.OrdinalIgnoreCase))
+            {
                 CommonPackage.OpenVsWebBrowser(ProjectMgr.Site, Url);
                 return;
             }
@@ -38,6 +43,5 @@ namespace Microsoft.VisualStudioTools.Project {
             IVsWindowFrame frame;
             manager.Open(false, false, viewGuid, out frame, WindowFrameShowAction.Show);
         }
-
     }
 }

@@ -23,17 +23,21 @@ using TestUtilities;
 using TestUtilities.Mocks;
 using TestUtilities.Nodejs;
 
-namespace NodejsTests {
+namespace NodejsTests
+{
     [TestClass]
-    public class ProjectUpgradeTests {
+    public class ProjectUpgradeTests
+    {
         [ClassInitialize]
-        public static void DoDeployment(TestContext context) {
+        public static void DoDeployment(TestContext context)
+        {
             AssertListener.Initialize();
             NodejsTestData.Deploy();
         }
 
         [TestMethod, TestCategory("Core"), Priority(0), TestCategory("Ignore")]
-        public void UpgradeEnvironmentVariables() {
+        public void UpgradeEnvironmentVariables()
+        {
             var factory = new BaseNodeProjectFactory(null);
             var sp = new MockServiceProvider();
             sp.Services[typeof(SVsQueryEditQuerySave).GUID] = null;

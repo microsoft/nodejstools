@@ -21,14 +21,20 @@ using System.Text;
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace TestUtilities {
-    public static class FileUtils {
-        public static void CopyDirectory(string sourceDir, string destDir) {
+namespace TestUtilities
+{
+    public static class FileUtils
+    {
+        public static void CopyDirectory(string sourceDir, string destDir)
+        {
             sourceDir = sourceDir.TrimEnd('\\');
             destDir = destDir.TrimEnd('\\');
-            try {
+            try
+            {
                 Directory.CreateDirectory(destDir);
-            } catch (IOException) {
+            }
+            catch (IOException)
+            {
             }
 
             var newDirectories = new HashSet<string>(from d in Directory.EnumerateDirectories(sourceDir, "*", SearchOption.AllDirectories)
@@ -38,12 +44,17 @@ namespace TestUtilities {
                                       where d.StartsWith(destDir)
                                       select d.Substring(destDir.Length + 1));
 
-            foreach (var newDir in newDirectories.OrderBy(i => i.Length).Select(i => Path.Combine(destDir, i))) {
-                try {
-                    if (newDir.Length < NativeMethods.MAX_FOLDER_PATH) {
+            foreach (var newDir in newDirectories.OrderBy(i => i.Length).Select(i => Path.Combine(destDir, i)))
+            {
+                try
+                {
+                    if (newDir.Length < NativeMethods.MAX_FOLDER_PATH)
+                    {
                         Directory.CreateDirectory(newDir);
                     }
-                } catch {
+                }
+                catch
+                {
                     Debug.WriteLine("Failed to create directory " + newDir);
                 }
             }
@@ -55,71 +66,104 @@ namespace TestUtilities {
                                 where f.StartsWith(destDir)
                                 select f.Substring(destDir.Length + 1));
 
-            foreach (var newFile in newFiles) {
+            foreach (var newFile in newFiles)
+            {
                 var copyFrom = Path.Combine(sourceDir, newFile);
                 var copyTo = Path.Combine(destDir, newFile);
-                try {
-                    if (copyTo.Length < NativeMethods.MAX_PATH && copyFrom.Length < NativeMethods.MAX_PATH) {
+                try
+                {
+                    if (copyTo.Length < NativeMethods.MAX_PATH && copyFrom.Length < NativeMethods.MAX_PATH)
+                    {
                         var copyToDir = Path.GetDirectoryName(copyTo);
-                        if (copyToDir.Length < NativeMethods.MAX_FOLDER_PATH) {
+                        if (copyToDir.Length < NativeMethods.MAX_FOLDER_PATH)
+                        {
                             File.Copy(copyFrom, copyTo);
                             File.SetAttributes(copyTo, FileAttributes.Normal);
-                        } else {
+                        }
+                        else
+                        {
                             Debug.WriteLine("Failed to copy " + copyFrom + " to " + copyTo + " due to max path limit");
                         }
-                    } else {
+                    }
+                    else
+                    {
                         Debug.WriteLine("Failed to copy " + copyFrom + " to " + copyTo + " due to max path limit");
                     }
-                } catch {
+                }
+                catch
+                {
                     Debug.WriteLine("Failed to copy " + copyFrom + " to " + copyTo + " for unknown reason");
                 }
             }
         }
 
 
-        public static IDisposable Backup(string path) {
+        public static IDisposable Backup(string path)
+        {
             var backup = Path.GetTempFileName();
             File.Delete(backup);
             File.Copy(path, backup);
             return new FileRestorer(path, backup);
         }
 
-        public static IDisposable TemporaryTextFile(out string path, string content) {
+        public static IDisposable TemporaryTextFile(out string path, string content)
+        {
             var tempPath = TestData.GetTempPath();
-            for (int retries = 100; retries > 0; --retries) {
+            for (int retries = 100; retries > 0; --retries)
+            {
                 path = Path.Combine(tempPath, Path.GetRandomFileName());
-                try {
+                try
+                {
                     using (var stream = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None))
-                    using (var writer = new StreamWriter(stream, Encoding.Default, 128, true)) {
+                    using (var writer = new StreamWriter(stream, Encoding.Default, 128, true))
+                    {
                         writer.Write(content);
                         return new FileDeleter(path);
                     }
-                } catch (IOException) {
-                } catch (UnauthorizedAccessException) {
+                }
+                catch (IOException)
+                {
+                }
+                catch (UnauthorizedAccessException)
+                {
                 }
             }
             Assert.Fail("Failed to create temporary file.");
             throw new InvalidOperationException();
         }
 
-        private sealed class FileDeleter : IDisposable {
+        private sealed class FileDeleter : IDisposable
+        {
             private readonly string _path;
 
-            public FileDeleter(string path) {
+            public FileDeleter(string path)
+            {
                 _path = path;
             }
-            
-            public void Dispose() {
-                for (int retries = 10; retries > 0; --retries) {
-                    try {
+
+            public void Dispose()
+            {
+                for (int retries = 10; retries > 0; --retries)
+                {
+                    try
+                    {
                         File.Delete(_path);
                         return;
-                    } catch (IOException) {
-                    } catch (UnauthorizedAccessException) {
-                        try {
+                    }
+                    catch (IOException)
+                    {
+                    }
+                    catch (UnauthorizedAccessException)
+                    {
+                        try
+                        {
                             File.SetAttributes(_path, FileAttributes.Normal);
-                        } catch (IOException) {
-                        } catch (UnauthorizedAccessException) {
+                        }
+                        catch (IOException)
+                        {
+                        }
+                        catch (UnauthorizedAccessException)
+                        {
                         }
                     }
                     Thread.Sleep(100);
@@ -128,26 +172,40 @@ namespace TestUtilities {
         }
 
 
-        private sealed class FileRestorer : IDisposable {
+        private sealed class FileRestorer : IDisposable
+        {
             private readonly string _original, _backup;
 
-            public FileRestorer(string original, string backup) {
+            public FileRestorer(string original, string backup)
+            {
                 _original = original;
                 _backup = backup;
             }
 
-            public void Dispose() {
-                for (int retries = 10; retries > 0; --retries) {
-                    try {
+            public void Dispose()
+            {
+                for (int retries = 10; retries > 0; --retries)
+                {
+                    try
+                    {
                         File.Delete(_original);
                         File.Move(_backup, _original);
                         return;
-                    } catch (IOException) {
-                    } catch (UnauthorizedAccessException) {
-                        try {
+                    }
+                    catch (IOException)
+                    {
+                    }
+                    catch (UnauthorizedAccessException)
+                    {
+                        try
+                        {
                             File.SetAttributes(_original, FileAttributes.Normal);
-                        } catch (IOException) {
-                        } catch (UnauthorizedAccessException) {
+                        }
+                        catch (IOException)
+                        {
+                        }
+                        catch (UnauthorizedAccessException)
+                        {
                         }
                     }
                     Thread.Sleep(100);

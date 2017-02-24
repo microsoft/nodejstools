@@ -16,12 +16,14 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Microsoft.NodejsTools.Jade {
+namespace Microsoft.NodejsTools.Jade
+{
     /// <summary>
     /// Generic tokenizer
     /// </summary>
     [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Tokenizer")]
-    interface ITokenizer<T> where T : ITextRange {
+    internal interface ITokenizer<T> where T : ITextRange
+    {
         /// <summary>
         /// Tokenize text from a given provider
         /// </summary>

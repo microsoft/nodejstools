@@ -14,11 +14,13 @@
 
 using System;
 
-namespace Microsoft.VisualStudioTools.Project {
+namespace Microsoft.VisualStudioTools.Project
+{
     /// <summary>
     /// Implements a publisher which handles publishing the list of files to a destination.
     /// </summary>
-    public interface IProjectPublisher {
+    public interface IProjectPublisher
+    {
         /// <summary>
         /// Publishes the files listed in the given project to the provided URI.
         /// 
@@ -31,7 +33,8 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <summary>
         /// Gets a localized description of the destination type (web site, file share, etc...)
         /// </summary>
-        string DestinationDescription {
+        string DestinationDescription
+        {
             get;
         }
 
@@ -39,7 +42,8 @@ namespace Microsoft.VisualStudioTools.Project {
         /// Gets the schema supported by this publisher - used to select which publisher will
         /// be used based upon the schema of the Uri provided by the user.
         /// </summary>
-        string Schema {
+        string Schema
+        {
             get;
         }
     }

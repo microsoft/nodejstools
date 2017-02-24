@@ -15,10 +15,15 @@
 //*********************************************************//
 
 using Microsoft.VisualStudio.Text;
-namespace Microsoft.NodejsTools.Jade {
-    internal partial class JadeTokenizer : Tokenizer<JadeToken> {
-        private void OnScript(int blockIndent) {
-            if (_jsTagger != null) {
+
+namespace Microsoft.NodejsTools.Jade
+{
+    internal partial class JadeTokenizer : Tokenizer<JadeToken>
+    {
+        private void OnScript(int blockIndent)
+        {
+            if (_jsTagger != null)
+            {
                 int start = _cs.Position;
 
                 SkipToEndOfBlock(blockIndent, text: false);
@@ -26,7 +31,8 @@ namespace Microsoft.NodejsTools.Jade {
                 int end = _cs.Position;
                 int length = end - start;
 
-                if (length > 0) {
+                if (length > 0)
+                {
                     _jsBuffer.Replace(
                         new Span(0, _jsBuffer.CurrentSnapshot.Length),
                         _cs.Text.GetText(new TextRange(start, length))
@@ -34,7 +40,8 @@ namespace Microsoft.NodejsTools.Jade {
 
                     var tokens = _jsTagger.GetTags(new NormalizedSnapshotSpanCollection(new SnapshotSpan(_jsBuffer.CurrentSnapshot, 0, _jsBuffer.CurrentSnapshot.Length)));
 
-                    foreach (var t in tokens) {
+                    foreach (var t in tokens)
+                    {
                         AddToken(t.Tag.ClassificationType, t.Span.Start.Position + start, t.Span.Length);
                     }
                 }

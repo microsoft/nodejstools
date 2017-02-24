@@ -23,19 +23,23 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools;
 
-namespace Microsoft.NodejsTools.TypeScript {
-    internal static class TypeScriptHelpers {
-        internal static bool IsTypeScriptFile(string filename) {
+namespace Microsoft.NodejsTools.TypeScript
+{
+    internal static class TypeScriptHelpers
+    {
+        internal static bool IsTypeScriptFile(string filename)
+        {
             return String.Equals(Path.GetExtension(filename), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase);
         }
 
-        internal static string GetTypeScriptBackedJavaScriptFile(MSBuild.Project project, string pathToFile) {
+        internal static string GetTypeScriptBackedJavaScriptFile(MSBuild.Project project, string pathToFile)
+        {
             var typeScriptOutDir = project.GetPropertyValue(NodeProjectProperty.TypeScriptOutDir);
             return GetTypeScriptBackedJavaScriptFile(project.DirectoryPath, typeScriptOutDir, pathToFile);
         }
 
-        internal static string GetTypeScriptBackedJavaScriptFile(IVsProject project, string pathToFile) {
-
+        internal static string GetTypeScriptBackedJavaScriptFile(IVsProject project, string pathToFile)
+        {
             //Need to deal with the format being relative and explicit
             IVsBuildPropertyStorage props = (IVsBuildPropertyStorage)project;
             String outDir;
@@ -46,10 +50,12 @@ namespace Microsoft.NodejsTools.TypeScript {
             return GetTypeScriptBackedJavaScriptFile(projHome, outDir, pathToFile);
         }
 
-        private static string GetTypeScriptBackedJavaScriptFile(string projectHome, string typeScriptOutDir, string pathToFile) {
+        private static string GetTypeScriptBackedJavaScriptFile(string projectHome, string typeScriptOutDir, string pathToFile)
+        {
             string jsFilePath = Path.ChangeExtension(pathToFile, NodejsConstants.JavaScriptExtension);
 
-            if (String.IsNullOrEmpty(typeScriptOutDir)) {
+            if (String.IsNullOrEmpty(typeScriptOutDir))
+            {
                 //No setting for OutDir
                 //  .js file is created next to .ts file
                 return jsFilePath;
@@ -66,7 +72,8 @@ namespace Microsoft.NodejsTools.TypeScript {
             return Path.Combine(outDirPath, relativeJSFilePath);
         }
 
-        private static string GetProjectHome(IVsProject project) {
+        private static string GetProjectHome(IVsProject project)
+        {
             Debug.Assert(project != null);
             var hier = (IVsHierarchy)project;
             object extObject;
@@ -76,15 +83,18 @@ namespace Microsoft.NodejsTools.TypeScript {
                 out extObject
             ));
             var proj = extObject as EnvDTE.Project;
-            if (proj == null) {
+            if (proj == null)
+            {
                 return null;
             }
             var props = proj.Properties;
-            if (props == null) {
+            if (props == null)
+            {
                 return null;
             }
             var projHome = props.Item("ProjectHome");
-            if (projHome == null) {
+            if (projHome == null)
+            {
                 return null;
             }
 

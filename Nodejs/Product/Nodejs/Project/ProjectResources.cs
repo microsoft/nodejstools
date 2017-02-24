@@ -19,8 +19,10 @@ using System.Resources;
 using System.Threading;
 using CommonSR = Microsoft.VisualStudioTools.Project.SR;
 
-namespace Microsoft.NodejsTools.Project {
-    internal class SR : CommonSR {
+namespace Microsoft.NodejsTools.Project
+{
+    internal class SR : CommonSR
+    {
         internal const string NodejsToolsForVisualStudio = "NodejsToolsForVisualStudio";
 
         internal const string NodeExeDoesntExist = "NodeExeDoesntExist";
@@ -32,18 +34,23 @@ namespace Microsoft.NodejsTools.Project {
             LazyThreadSafetyMode.ExecutionAndPublication
         );
 
-        private static ResourceManager Manager {
-            get {
+        private static ResourceManager Manager
+        {
+            get
+            {
                 return _manager.Value;
             }
         }
 
-        internal static new string GetString(string value, params object[] args) {
+        internal static new string GetString(string value, params object[] args)
+        {
             return GetStringInternal(Manager, value, args) ?? CommonSR.GetString(value, args);
         }
 
-        internal static string ProductName {
-            get {
+        internal static string ProductName
+        {
+            get
+            {
                 return GetString(NodejsToolsForVisualStudio);
             }
         }

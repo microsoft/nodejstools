@@ -19,8 +19,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.SourceMapping;
 
-namespace Microsoft.NodejsTools.Debugger {
-    sealed class NodeBreakpoint {
+namespace Microsoft.NodejsTools.Debugger
+{
+    internal sealed class NodeBreakpoint
+    {
         private readonly Dictionary<int, NodeBreakpointBinding> _bindings = new Dictionary<int, NodeBreakpointBinding>();
         private readonly BreakOn _breakOn;
         private readonly string _condition;
@@ -29,7 +31,8 @@ namespace Microsoft.NodejsTools.Debugger {
         private readonly FilePosition _target;
         private bool _deleted;
 
-        public NodeBreakpoint(NodeDebugger process, FilePosition target, bool enabled, BreakOn breakOn, string condition) {
+        public NodeBreakpoint(NodeDebugger process, FilePosition target, bool enabled, BreakOn breakOn, string condition)
+        {
             _process = process;
             _target = target;
             _enabled = enabled;
@@ -37,7 +40,8 @@ namespace Microsoft.NodejsTools.Debugger {
             _condition = condition;
         }
 
-        public NodeDebugger Process {
+        public NodeDebugger Process
+        {
             get { return _process; }
         }
 
@@ -45,7 +49,8 @@ namespace Microsoft.NodejsTools.Debugger {
         /// The file name, line and column where the breakpoint was requested to be set.
         /// If source maps are in use this can be different than Position.
         /// </summary>
-        public FilePosition Target {
+        public FilePosition Target
+        {
             get { return _target; }
         }
 
@@ -55,38 +60,45 @@ namespace Microsoft.NodejsTools.Debugger {
         /// This translates the breakpoint from the location where the user set it (possibly
         /// a TypeScript file) into the location where it lives in JavaScript code.
         /// </summary>
-        public FilePosition GetPosition(SourceMapper mapper) {
+        public FilePosition GetPosition(SourceMapper mapper)
+        {
             // Checks whether source map is available
             string javaScriptFileName;
             int javaScriptLine;
             int javaScriptColumn;
 
             if (mapper != null &&
-                mapper.MapToJavaScript(Target.FileName, Target.Line, Target.Column, out javaScriptFileName, out javaScriptLine, out javaScriptColumn)) {
+                mapper.MapToJavaScript(Target.FileName, Target.Line, Target.Column, out javaScriptFileName, out javaScriptLine, out javaScriptColumn))
+            {
                 return new FilePosition(javaScriptFileName, javaScriptLine, javaScriptColumn);
             }
 
             return Target;
         }
 
-        public bool Enabled {
+        public bool Enabled
+        {
             get { return _enabled; }
         }
 
-        public bool Deleted {
+        public bool Deleted
+        {
             get { return _deleted; }
-            set { _deleted = value;  }
+            set { _deleted = value; }
         }
 
-        public BreakOn BreakOn {
+        public BreakOn BreakOn
+        {
             get { return _breakOn; }
         }
 
-        public string Condition {
+        public string Condition
+        {
             get { return _condition; }
         }
 
-        public bool HasPredicate {
+        public bool HasPredicate
+        {
             get { return (!string.IsNullOrEmpty(_condition) || NodeBreakpointBinding.GetEngineIgnoreCount(_breakOn, 0) > 0); }
         }
 
@@ -94,21 +106,25 @@ namespace Microsoft.NodejsTools.Debugger {
         /// Requests the remote process enable the break point.  An event will be raised on the process
         /// when the break point is received.
         /// </summary>
-        public Task<NodeBreakpointBinding> BindAsync() {
+        public Task<NodeBreakpointBinding> BindAsync()
+        {
             return _process.BindBreakpointAsync(this);
         }
 
-        internal NodeBreakpointBinding CreateBinding(FilePosition target, FilePosition position, int breakpointId, int? scriptId, bool fullyBound) {
+        internal NodeBreakpointBinding CreateBinding(FilePosition target, FilePosition position, int breakpointId, int? scriptId, bool fullyBound)
+        {
             var binding = new NodeBreakpointBinding(this, target, position, breakpointId, scriptId, fullyBound);
             _bindings[breakpointId] = binding;
             return binding;
         }
 
-        internal void RemoveBinding(NodeBreakpointBinding binding) {
+        internal void RemoveBinding(NodeBreakpointBinding binding)
+        {
             _bindings.Remove(binding.BreakpointId);
         }
 
-        internal IEnumerable<NodeBreakpointBinding> GetBindings() {
+        internal IEnumerable<NodeBreakpointBinding> GetBindings()
+        {
             return _bindings.Values.ToArray();
         }
     }

@@ -21,10 +21,14 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.VisualStudioTools.Project;
 
-namespace Microsoft.NodejsTools.PressAnyKey {
-    class Program {
-        static int Main(string[] args) {
-            if (args.Length < 3) {
+namespace Microsoft.NodejsTools.PressAnyKey
+{
+    internal class Program
+    {
+        private static int Main(string[] args)
+        {
+            if (args.Length < 3)
+            {
                 Console.WriteLine("Usage: {0} (normal|abnormal|both) (pid file) (path to exe) [args]", Assembly.GetExecutingAssembly().GetName().Name);
             }
 
@@ -38,7 +42,8 @@ namespace Microsoft.NodejsTools.PressAnyKey {
 
             if (args[0] == "both" ||
                 (proc.ExitCode == 0 && args[0] == "normal") ||
-                (proc.ExitCode != 0 && args[0] == "abnormal")) {
+                (proc.ExitCode != 0 && args[0] == "abnormal"))
+            {
                 Console.Write("Press any key to continue...");
                 Console.ReadKey();
             }

@@ -20,17 +20,20 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.NodejsTools.Debugger {
+namespace Microsoft.NodejsTools.Debugger
+{
     /// <summary>
     /// Represents the result of an evaluation of an expression against a given stack frame.
     /// </summary>
-    class NodeEvaluationResult {
+    internal class NodeEvaluationResult
+    {
         private readonly Regex _stringLengthExpression = new Regex(@"\.\.\. \(length: ([0-9]+)\)$", RegexOptions.Compiled);
 
         /// <summary>
         /// Creates an evaluation result for an expression which successfully returned a value.
         /// </summary>
-        public NodeEvaluationResult(int handle, string stringValue, string hexValue, string typeName, string expression, string fullName, NodeExpressionType type, NodeStackFrame frame) {
+        public NodeEvaluationResult(int handle, string stringValue, string hexValue, string typeName, string expression, string fullName, NodeExpressionType type, NodeStackFrame frame)
+        {
             Handle = handle;
             Frame = frame;
             Expression = expression;
@@ -49,7 +52,8 @@ namespace Microsoft.NodejsTools.Debugger {
         /// <summary>
         /// Gets the string representation length.
         /// </summary>
-        public int StringLength {
+        public int StringLength
+        {
             get { return GetStringLength(StringValue); }
         }
 
@@ -96,21 +100,26 @@ namespace Microsoft.NodejsTools.Debugger {
         /// "foo" or "0" so they need additional work to append onto this expression.
         /// Returns null if the object is not expandable.
         /// </summary>
-        public async Task<List<NodeEvaluationResult>> GetChildrenAsync(CancellationToken cancellationToken = new CancellationToken()) {
-            if (!Type.HasFlag(NodeExpressionType.Expandable)) {
+        public async Task<List<NodeEvaluationResult>> GetChildrenAsync(CancellationToken cancellationToken = new CancellationToken())
+        {
+            if (!Type.HasFlag(NodeExpressionType.Expandable))
+            {
                 return null;
             }
 
             return await Frame.Process.EnumChildrenAsync(this, cancellationToken).ConfigureAwait(false);
         }
 
-        private int GetStringLength(string stringValue) {
-            if (string.IsNullOrEmpty(stringValue)) {
+        private int GetStringLength(string stringValue)
+        {
+            if (string.IsNullOrEmpty(stringValue))
+            {
                 return 0;
             }
 
             Match match = _stringLengthExpression.Match(stringValue);
-            if (!match.Success) {
+            if (!match.Success)
+            {
                 return stringValue.Length;
             }
 

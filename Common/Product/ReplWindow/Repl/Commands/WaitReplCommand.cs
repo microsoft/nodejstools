@@ -18,18 +18,22 @@ using System.Threading.Tasks;
 using System.Windows.Threading;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
     [Export(typeof(IReplCommand))]
-    class WaitReplCommand : IReplCommand {
+    internal class WaitReplCommand : IReplCommand
+    {
         #region IReplCommand Members
 
-        public Task<ExecutionResult> Execute(IReplWindow window, string arguments) {
+        public Task<ExecutionResult> Execute(IReplWindow window, string arguments)
+        {
             var delay = new TimeSpan(0, 0, 0, 0, int.Parse(arguments));
             var start = DateTime.UtcNow;
-            while ((start + delay) > DateTime.UtcNow) {
+            while ((start + delay) > DateTime.UtcNow)
+            {
                 var frame = new DispatcherFrame();
                 Dispatcher.CurrentDispatcher.BeginInvoke(
                     DispatcherPriority.Background,
@@ -41,16 +45,20 @@ namespace Microsoft.VisualStudio.Repl {
             return ExecutionResult.Succeeded;
         }
 
-        public string Description {
+        public string Description
+        {
             get { return "Wait for at least the specified number of milliseconds"; }
         }
 
-        public string Command {
+        public string Command
+        {
             get { return "wait"; }
         }
 
-        public object ButtonContent {
-            get {
+        public object ButtonContent
+        {
+            get
+            {
                 return null;
             }
         }

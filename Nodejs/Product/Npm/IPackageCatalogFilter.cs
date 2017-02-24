@@ -16,14 +16,14 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.NodejsTools.Npm {
-
+namespace Microsoft.NodejsTools.Npm
+{
     /// <summary>
     /// Used to filter the entire package catalog down to a more manageable/relevant
     /// list.
     /// </summary>
-    public interface IPackageCatalogFilter {
-
+    public interface IPackageCatalogFilter
+    {
         /// <summary>
         /// Filters the entire package list based on the supplied filter string and returns
         /// any packages that match. If filterString starts with a '/' it will be treated as
@@ -37,6 +37,6 @@ namespace Microsoft.NodejsTools.Npm {
         /// <returns>
         /// List of matching packages. If there are no matches an empty list is returned.
         /// </returns>
-        IEnumerable<IPackage> Filter(string filterString);  
+        IEnumerable<IPackage> Filter(string filterString);
     }
 }

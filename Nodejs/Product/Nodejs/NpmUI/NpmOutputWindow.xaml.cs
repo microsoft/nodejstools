@@ -17,20 +17,26 @@
 using System;
 using System.Windows;
 
-namespace Microsoft.NodejsTools.NpmUI {
+namespace Microsoft.NodejsTools.NpmUI
+{
     /// <summary>
     /// Interaction logic for NpmOutputControl.xaml
     /// </summary>
-    public partial class NpmOutputWindow : Window {
-        public NpmOutputWindow() {
+    public partial class NpmOutputWindow : Window
+    {
+        public NpmOutputWindow()
+        {
             InitializeComponent();
         }
 
-        protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e) {
-            switch (e.Property.Name) {
+        protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+        {
+            switch (e.Property.Name)
+            {
                 case "DataContext":
                     var vm = DataContext as NpmOutputViewModel;
-                    if (null != vm) {
+                    if (null != vm)
+                    {
                         _textBox.Document = vm.Output;
                         vm.OutputWritten += vm_OutputWritten;
                     }
@@ -40,13 +46,16 @@ namespace Microsoft.NodejsTools.NpmUI {
             base.OnPropertyChanged(e);
         }
 
-        void vm_OutputWritten(object sender, EventArgs e) {
+        private void vm_OutputWritten(object sender, EventArgs e)
+        {
             _textBox.ScrollToEnd();
         }
 
-        private void OnClickCancel(object sender, RoutedEventArgs e) {
+        private void OnClickCancel(object sender, RoutedEventArgs e)
+        {
             var vm = DataContext as NpmOutputViewModel;
-            if (null != vm) {
+            if (null != vm)
+            {
                 vm.Cancel();
             }
         }

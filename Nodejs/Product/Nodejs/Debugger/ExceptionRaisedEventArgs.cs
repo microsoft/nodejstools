@@ -16,13 +16,16 @@
 
 using System;
 
-namespace Microsoft.NodejsTools.Debugger {
-    class ExceptionRaisedEventArgs : EventArgs {
+namespace Microsoft.NodejsTools.Debugger
+{
+    internal class ExceptionRaisedEventArgs : EventArgs
+    {
         public readonly NodeThread Thread;
         public readonly NodeException Exception;
         public readonly bool IsUnhandled;
 
-        public ExceptionRaisedEventArgs(NodeThread thread, NodeException exception, bool isUnhandled) {
+        public ExceptionRaisedEventArgs(NodeThread thread, NodeException exception, bool isUnhandled)
+        {
             Thread = thread;
             Exception = exception;
             IsUnhandled = isUnhandled;

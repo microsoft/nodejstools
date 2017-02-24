@@ -16,28 +16,35 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.NodejsTools.Debugger.Commands {
-    sealed class ChangeBreakpointCommand : DebuggerCommand {
+namespace Microsoft.NodejsTools.Debugger.Commands
+{
+    internal sealed class ChangeBreakpointCommand : DebuggerCommand
+    {
         private readonly Dictionary<string, object> _arguments;
 
         public ChangeBreakpointCommand(int id, int breakpointId, bool? enabled = null, string condition = null, int? ignoreCount = null)
-            : base(id, "changebreakpoint") {
+            : base(id, "changebreakpoint")
+        {
             _arguments = new Dictionary<string, object> { { "breakpoint", breakpointId } };
 
-            if (enabled != null) {
+            if (enabled != null)
+            {
                 _arguments["enabled"] = enabled.Value;
             }
 
-            if (condition != null) {
+            if (condition != null)
+            {
                 _arguments["condition"] = condition;
             }
 
-            if (ignoreCount != null) {
+            if (ignoreCount != null)
+            {
                 _arguments["ignoreCount"] = ignoreCount.Value;
             }
         }
 
-        protected override IDictionary<string, object> Arguments {
+        protected override IDictionary<string, object> Arguments
+        {
             get { return _arguments; }
         }
     }

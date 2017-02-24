@@ -23,13 +23,17 @@ using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudioTools.Project.Automation;
 using VsShellUtil = Microsoft.VisualStudio.Shell.VsShellUtilities;
 
-namespace Microsoft.VisualStudioTools {
-    static class VsExtensions {
-        public static string GetFilePath(this ITextView textView) {
+namespace Microsoft.VisualStudioTools
+{
+    internal static class VsExtensions
+    {
+        public static string GetFilePath(this ITextView textView)
+        {
             return textView.TextBuffer.GetFilePath();
         }
 
-        internal static EnvDTE.Project GetProject(this IVsHierarchy hierarchy) {
+        internal static EnvDTE.Project GetProject(this IVsHierarchy hierarchy)
+        {
             object project;
 
             ErrorHandler.ThrowOnFailure(
@@ -43,50 +47,63 @@ namespace Microsoft.VisualStudioTools {
             return (project as EnvDTE.Project);
         }
 
-        public static CommonProjectNode GetCommonProject(this EnvDTE.Project project) {
+        public static CommonProjectNode GetCommonProject(this EnvDTE.Project project)
+        {
             OAProject oaProj = project as OAProject;
-            if (oaProj != null) {
+            if (oaProj != null)
+            {
                 var common = oaProj.Project as CommonProjectNode;
-                if (common != null) {
+                if (common != null)
+                {
                     return common;
                 }
             }
             return null;
         }
 
-        public static string GetRootCanonicalName(this IVsProject project) {
+        public static string GetRootCanonicalName(this IVsProject project)
+        {
             return ((IVsHierarchy)project).GetRootCanonicalName();
         }
 
-        public static string GetRootCanonicalName(this IVsHierarchy heirarchy) {
+        public static string GetRootCanonicalName(this IVsHierarchy heirarchy)
+        {
             string path;
             ErrorHandler.ThrowOnFailure(heirarchy.GetCanonicalName(VSConstants.VSITEMID_ROOT, out path));
             return path;
         }
 
-        internal static T[] Append<T>(this T[] list, T item) {
+        internal static T[] Append<T>(this T[] list, T item)
+        {
             T[] res = new T[list.Length + 1];
             list.CopyTo(res, 0);
             res[res.Length - 1] = item;
             return res;
         }
 
-        internal static string GetFilePath(this ITextBuffer textBuffer) {
+        internal static string GetFilePath(this ITextBuffer textBuffer)
+        {
             ITextDocument textDocument;
-            if (textBuffer.Properties.TryGetProperty<ITextDocument>(typeof(ITextDocument), out textDocument)) {
+            if (textBuffer.Properties.TryGetProperty<ITextDocument>(typeof(ITextDocument), out textDocument))
+            {
                 return textDocument.FilePath;
-            } else {
+            }
+            else
+            {
                 return null;
             }
         }
 
-        internal static ClipboardServiceBase GetClipboardService(this IServiceProvider serviceProvider) {
+        internal static ClipboardServiceBase GetClipboardService(this IServiceProvider serviceProvider)
+        {
             return (ClipboardServiceBase)serviceProvider.GetService(typeof(ClipboardServiceBase));
         }
 
-        internal static UIThreadBase GetUIThread(this IServiceProvider serviceProvider) {
+        internal static UIThreadBase GetUIThread(this IServiceProvider serviceProvider)
+        {
             var uiThread = (UIThreadBase)serviceProvider.GetService(typeof(UIThreadBase));
-            if (uiThread == null) {
+            if (uiThread == null)
+            {
                 Trace.TraceWarning("Returning NoOpUIThread instance from GetUIThread");
                 Debug.Assert(VsShellUtil.ShellIsShuttingDown, "No UIThread service but shell is not shutting down");
                 return new NoOpUIThread();
@@ -95,12 +112,14 @@ namespace Microsoft.VisualStudioTools {
         }
 
         [Conditional("DEBUG")]
-        public static void MustBeCalledFromUIThread(this UIThreadBase self, string message = "Invalid cross-thread call") {
+        public static void MustBeCalledFromUIThread(this UIThreadBase self, string message = "Invalid cross-thread call")
+        {
             Debug.Assert(self is MockUIThreadBase || !self.InvokeRequired, message);
         }
 
         [Conditional("DEBUG")]
-        public static void MustNotBeCalledFromUIThread(this UIThreadBase self, string message = "Invalid cross-thread call") {
+        public static void MustNotBeCalledFromUIThread(this UIThreadBase self, string message = "Invalid cross-thread call")
+        {
             Debug.Assert(self is MockUIThreadBase || self.InvokeRequired, message);
         }
 
@@ -110,32 +129,39 @@ namespace Microsoft.VisualStudioTools {
         /// Provides a no-op implementation of <see cref="UIThreadBase"/> that will
         /// not execute any tasks.
         /// </summary>
-        private sealed class NoOpUIThread : MockUIThreadBase {
+        private sealed class NoOpUIThread : MockUIThreadBase
+        {
             public override void Invoke(Action action) { }
 
-            public override T Invoke<T>(Func<T> func) {
+            public override T Invoke<T>(Func<T> func)
+            {
                 return default(T);
             }
 
-            public override Task InvokeAsync(Action action) {
+            public override Task InvokeAsync(Action action)
+            {
                 return Task.FromResult<object>(null);
             }
 
-            public override Task<T> InvokeAsync<T>(Func<T> func) {
+            public override Task<T> InvokeAsync<T>(Func<T> func)
+            {
                 return Task.FromResult<T>(default(T));
             }
 
-            public override Task InvokeTask(Func<Task> func) {
+            public override Task InvokeTask(Func<Task> func)
+            {
                 return Task.FromResult<object>(null);
             }
 
-            public override Task<T> InvokeTask<T>(Func<Task<T>> func) {
+            public override Task<T> InvokeTask<T>(Func<Task<T>> func)
+            {
                 return Task.FromResult<T>(default(T));
             }
 
             public override void MustBeCalledFromUIThreadOrThrow() { }
 
-            public override bool InvokeRequired {
+            public override bool InvokeRequired
+            {
                 get { return false; }
             }
         }
@@ -146,13 +172,17 @@ namespace Microsoft.VisualStudioTools {
         /// Use the line ending of the first line for the line endings.  
         /// If we have no line endings (single line file) just use Environment.NewLine
         /// </summary>
-        public static string GetNewLineText(ITextSnapshot snapshot) {
+        public static string GetNewLineText(ITextSnapshot snapshot)
+        {
             // https://nodejstools.codeplex.com/workitem/1670 : override the GetNewLineCharacter as VS always returns '\r\n'
             // check on each format as the user could have changed line endings (manually or through advanced save options) since
             // the file was opened.
-            if (snapshot.LineCount > 0 && snapshot.GetLineFromPosition(0).LineBreakLength > 0) {
+            if (snapshot.LineCount > 0 && snapshot.GetLineFromPosition(0).LineBreakLength > 0)
+            {
                 return snapshot.GetLineFromPosition(0).GetLineBreakText();
-            } else {
+            }
+            else
+            {
                 return Environment.NewLine;
             }
         }

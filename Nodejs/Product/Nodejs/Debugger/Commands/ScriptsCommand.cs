@@ -18,35 +18,43 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.NodejsTools.Debugger.Commands {
-    sealed class ScriptsCommand : DebuggerCommand {
+namespace Microsoft.NodejsTools.Debugger.Commands
+{
+    internal sealed class ScriptsCommand : DebuggerCommand
+    {
         private readonly Dictionary<string, object> _arguments;
 
-        public ScriptsCommand(int id, bool includeSource = false, int? moduleId = null) : base(id, "scripts") {
+        public ScriptsCommand(int id, bool includeSource = false, int? moduleId = null) : base(id, "scripts")
+        {
             _arguments = new Dictionary<string, object> {
                 { "includeSource", includeSource }
             };
 
-            if (moduleId != null) {
+            if (moduleId != null)
+            {
                 _arguments["ids"] = new object[] { moduleId };
             }
         }
 
-        protected override IDictionary<string, object> Arguments {
+        protected override IDictionary<string, object> Arguments
+        {
             get { return _arguments; }
         }
 
         public List<NodeModule> Modules { get; private set; }
 
-        public override void ProcessResponse(JObject response) {
+        public override void ProcessResponse(JObject response)
+        {
             base.ProcessResponse(response);
 
             JArray body = (JArray)response["body"] ?? new JArray();
             Modules = new List<NodeModule>(body.Count);
 
-            foreach (JToken module in body) {
+            foreach (JToken module in body)
+            {
                 var fileName = (string)module["name"];
-                if (fileName == null) {
+                if (fileName == null)
+                {
                     continue;
                 }
 
@@ -54,7 +62,8 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
                 var source = (string)module["source"];
                 if (!string.IsNullOrEmpty(source) &&
                     source.StartsWith(NodeConstants.ScriptWrapBegin, StringComparison.Ordinal) &&
-                    source.EndsWith(NodeConstants.ScriptWrapEnd, StringComparison.Ordinal)) {
+                    source.EndsWith(NodeConstants.ScriptWrapEnd, StringComparison.Ordinal))
+                {
                     source = source.Substring(
                         NodeConstants.ScriptWrapBegin.Length,
                         source.Length - NodeConstants.ScriptWrapBegin.Length - NodeConstants.ScriptWrapEnd.Length);

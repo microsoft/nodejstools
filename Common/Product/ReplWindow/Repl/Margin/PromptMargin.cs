@@ -28,7 +28,8 @@ using Microsoft.VisualStudio.Text.Classification;
 using System.Diagnostics;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
@@ -39,11 +40,13 @@ namespace Microsoft.VisualStudio.Repl {
     [MarginContainer(PredefinedMarginNames.Left)]
     [ContentType(ReplConstants.ReplContentTypeName)]
     [TextViewRole(ReplConstants.ReplTextViewRole)]
-    internal sealed class PromptMarginProvider : IWpfTextViewMarginProvider {
+    internal sealed class PromptMarginProvider : IWpfTextViewMarginProvider
+    {
         [Import]
         internal IEditorFormatMapService EditorFormatMapService;
 
-        public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent) {
+        public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent)
+        {
             return new PromptMargin(wpfTextViewHost, EditorFormatMapService.GetEditorFormatMap(wpfTextViewHost.TextView));
         }
     }
@@ -51,7 +54,8 @@ namespace Microsoft.VisualStudio.Repl {
     /// <summary>
     /// Provides glyphs corresponding to GlyphTags in the buffer.
     /// </summary>
-    internal sealed class PromptMargin : IWpfTextViewMargin {
+    internal sealed class PromptMargin : IWpfTextViewMargin
+    {
 #if NTVS_FEATURE_INTERACTIVEWINDOW
         public const string MarginName = "NodejsInteractivePromptMargin";
 #else
@@ -63,7 +67,8 @@ namespace Microsoft.VisualStudio.Repl {
         private readonly ReplWindow _promptProvider;
         private PromptMarginVisualManager _visualManager;
 
-        public PromptMargin(IWpfTextViewHost wpfTextViewHost, IEditorFormatMap editorFormatMap) {
+        public PromptMargin(IWpfTextViewHost wpfTextViewHost, IEditorFormatMap editorFormatMap)
+        {
             _textView = wpfTextViewHost.TextView;
             _editorFormatMap = editorFormatMap;
 
@@ -81,28 +86,36 @@ namespace Microsoft.VisualStudio.Repl {
             get { return _textView; }
         }
 
-        internal ReplWindow PromptProvider {
+        internal ReplWindow PromptProvider
+        {
             get { return _promptProvider; }
         }
 
-        void OnMarginVisibilityChanged() {
+        private void OnMarginVisibilityChanged()
+        {
             _visualManager.MarginVisual.Visibility = this.Enabled ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e) {
-            if ((bool)e.NewValue) {
+        private void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if ((bool)e.NewValue)
+            {
                 _textView.LayoutChanged += OnLayoutChanged;
                 _textView.ZoomLevelChanged += OnZoomLevelChanged;
 
-                foreach (var line in _textView.TextViewLines) {
+                foreach (var line in _textView.TextViewLines)
+                {
                     RefreshGlyphsOver(line);
                 }
 
                 _visualManager.MarginVisual.LayoutTransform = new ScaleTransform(scaleX: _textView.ZoomLevel / 100, scaleY: _textView.ZoomLevel / 100);
-                if (_visualManager.MarginVisual.LayoutTransform.CanFreeze) {
+                if (_visualManager.MarginVisual.LayoutTransform.CanFreeze)
+                {
                     _visualManager.MarginVisual.LayoutTransform.Freeze();
                 }
-            } else {
+            }
+            else
+            {
                 _visualManager.RemoveGlyphsByVisualSpan(new SnapshotSpan(_textView.TextSnapshot, 0, _textView.TextSnapshot.Length));
 
                 _textView.LayoutChanged -= OnLayoutChanged;
@@ -110,45 +123,55 @@ namespace Microsoft.VisualStudio.Repl {
             }
         }
 
-        void OnZoomLevelChanged(object sender, ZoomLevelChangedEventArgs e) {
+        private void OnZoomLevelChanged(object sender, ZoomLevelChangedEventArgs e)
+        {
             _visualManager.MarginVisual.LayoutTransform = e.ZoomTransform;
         }
 
-        void OnLayoutChanged(object sender, TextViewLayoutChangedEventArgs e) {
+        private void OnLayoutChanged(object sender, TextViewLayoutChangedEventArgs e)
+        {
             // If the view did a vertical translation then we can generally assume the screen position of every line changed.
             _visualManager.SetSnapshotAndUpdate(
-                _textView.TextSnapshot, 
-                e.NewOrReformattedLines, 
+                _textView.TextSnapshot,
+                e.NewOrReformattedLines,
                 e.VerticalTranslation ? ((IList<ITextViewLine>)_textView.TextViewLines) : e.TranslatedLines
             );
 
-            foreach (ITextViewLine line in e.NewOrReformattedLines) {
+            foreach (ITextViewLine line in e.NewOrReformattedLines)
+            {
                 _visualManager.RemoveGlyphsByVisualSpan(line.Extent);
                 RefreshGlyphsOver(line);
             }
         }
 
-        private void RefreshGlyphsOver(ITextViewLine textViewLine) {
-            foreach (var prompt in _promptProvider.GetOverlappingPrompts(textViewLine.Extent)) {
+        private void RefreshGlyphsOver(ITextViewLine textViewLine)
+        {
+            foreach (var prompt in _promptProvider.GetOverlappingPrompts(textViewLine.Extent))
+            {
                 SnapshotSpan span = new SnapshotSpan(prompt.Value, 0);
                 ReplSpanKind kind = prompt.Key;
 
-                if (textViewLine.End == prompt.Value || textViewLine.Extent.Contains(prompt.Value)) {
+                if (textViewLine.End == prompt.Value || textViewLine.Extent.Contains(prompt.Value))
+                {
                     _visualManager.AddGlyph(_promptProvider.GetPromptText(kind), span);
                 }
             }
         }
 
-        private void ThrowIfDisposed() {
-            if (_visualManager == null) {
+        private void ThrowIfDisposed()
+        {
+            if (_visualManager == null)
+            {
                 throw new ObjectDisposedException(PredefinedMarginNames.Glyph);
             }
         }
 
         #region IWpfTextViewMargin Members
 
-        public FrameworkElement VisualElement {
-            get {
+        public FrameworkElement VisualElement
+        {
+            get
+            {
                 ThrowIfDisposed();
                 return _visualManager.MarginVisual;
             }
@@ -158,32 +181,41 @@ namespace Microsoft.VisualStudio.Repl {
 
         #region ITextViewMargin Members
 
-        public double MarginSize {
-            get {
+        public double MarginSize
+        {
+            get
+            {
                 ThrowIfDisposed();
                 return _visualManager.MarginVisual.Width;
             }
         }
 
-        public bool Enabled {
-            get {
+        public bool Enabled
+        {
+            get
+            {
                 ThrowIfDisposed();
                 return _promptProvider.DisplayPromptInMargin;
             }
         }
 
-        public ITextViewMargin GetTextViewMargin(string marginName) {
+        public ITextViewMargin GetTextViewMargin(string marginName)
+        {
             return string.Compare(marginName, MarginName, StringComparison.OrdinalIgnoreCase) == 0 ? this : (ITextViewMargin)null;
         }
 
-        public void Dispose() {
-            if (_promptProvider != null) {
+        public void Dispose()
+        {
+            if (_promptProvider != null)
+            {
                 _promptProvider.MarginVisibilityChanged -= this.OnMarginVisibilityChanged;
             }
 
-            if (_visualManager != null) {
+            if (_visualManager != null)
+            {
                 var visual = _visualManager.MarginVisual;
-                if (visual != null) {
+                if (visual != null)
+                {
                     visual.IsVisibleChanged -= this.OnIsVisibleChanged;
                 }
             }

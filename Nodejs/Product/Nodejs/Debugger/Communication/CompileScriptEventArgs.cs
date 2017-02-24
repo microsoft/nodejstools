@@ -17,9 +17,12 @@
 using System;
 using Microsoft.NodejsTools.Debugger.Events;
 
-namespace Microsoft.NodejsTools.Debugger.Communication {
-    sealed class CompileScriptEventArgs : EventArgs {
-        public CompileScriptEventArgs(CompileScriptEvent compileScriptEvent) {
+namespace Microsoft.NodejsTools.Debugger.Communication
+{
+    internal sealed class CompileScriptEventArgs : EventArgs
+    {
+        public CompileScriptEventArgs(CompileScriptEvent compileScriptEvent)
+        {
             CompileScriptEvent = compileScriptEvent;
         }
 

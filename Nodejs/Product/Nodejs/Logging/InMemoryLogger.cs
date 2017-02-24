@@ -19,32 +19,40 @@ using System.ComponentModel.Composition;
 using System.Text;
 using Microsoft.NodejsTools.Options;
 
-namespace Microsoft.NodejsTools.Logging {
+namespace Microsoft.NodejsTools.Logging
+{
     /// <summary>
     /// Keeps track of logged events and makes them available for display in the diagnostics window.
     /// </summary>
     [Export(typeof(INodejsToolsLogger))]
     [Export(typeof(InMemoryLogger))]
-    class InMemoryLogger : INodejsToolsLogger {
+    internal class InMemoryLogger : INodejsToolsLogger
+    {
         private int _debugLaunchCount, _normalLaunchCount;
 
         private SurveyNewsPolicy _surveyNewsPolicy;
 
         #region INodejsToolsLogger Members
 
-        public void LogEvent(NodejsToolsLogEvent logEvent, object argument) {
+        public void LogEvent(NodejsToolsLogEvent logEvent, object argument)
+        {
             int val;
-            switch (logEvent) {
+            switch (logEvent)
+            {
                 case NodejsToolsLogEvent.Launch:
-                    if ((int)argument != 0) {
+                    if ((int)argument != 0)
+                    {
                         _debugLaunchCount++;
-                    } else {
+                    }
+                    else
+                    {
                         _normalLaunchCount++;
                     }
                     break;
                 case NodejsToolsLogEvent.SurveyNewsFrequency:
                     val = (int)argument;
-                    if (Enum.IsDefined(typeof(SurveyNewsPolicy), val)) {
+                    if (Enum.IsDefined(typeof(SurveyNewsPolicy), val))
+                    {
                         _surveyNewsPolicy = (SurveyNewsPolicy)val;
                     }
                     break;
@@ -53,7 +61,8 @@ namespace Microsoft.NodejsTools.Logging {
 
         #endregion
 
-        public override string ToString() {
+        public override string ToString()
+        {
             StringBuilder res = new StringBuilder();
             res.AppendLine("    SurveyNewsFrequency: " + _surveyNewsPolicy);
             res.AppendLine("    Debug Launches: " + _debugLaunchCount);

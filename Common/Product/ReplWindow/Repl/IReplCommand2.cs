@@ -15,7 +15,8 @@
 using System.Collections.Generic;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
@@ -25,11 +26,13 @@ namespace Microsoft.VisualStudio.Repl {
     /// This interface is a MEF contract and can be implemented and exported to add commands to the REPL window.
     /// This is new in v1.5.
     /// </summary>
-    public interface IReplCommand2 : IReplCommand {
+    public interface IReplCommand2 : IReplCommand
+    {
         /// <summary>
         /// Gets a list of aliases for the command.
         /// </summary>
-        IEnumerable<string> Aliases {
+        IEnumerable<string> Aliases
+        {
             get;
         }
     }

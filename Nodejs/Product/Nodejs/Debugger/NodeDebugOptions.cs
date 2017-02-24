@@ -16,9 +16,11 @@
 
 using System;
 
-namespace Microsoft.NodejsTools.Debugger {
+namespace Microsoft.NodejsTools.Debugger
+{
     [Flags]
-    enum NodeDebugOptions {
+    internal enum NodeDebugOptions
+    {
         None,
         /// <summary>
         /// Passing this flag to the debugger will cause it to wait for input on an abnormal (non-zero)

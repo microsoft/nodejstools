@@ -33,7 +33,8 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
         }
 
-        internal new ProjectReferenceNode BaseReferenceNode {
+        internal new ProjectReferenceNode BaseReferenceNode
+        {
             get { return (ProjectReferenceNode)base.BaseReferenceNode; }
         }
 

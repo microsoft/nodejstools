@@ -18,11 +18,14 @@ using System.Linq;
 using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace NodejsTests.Debugger {
+namespace NodejsTests.Debugger
+{
     [TestClass]
-    public class InfrastructureTests {
+    public class InfrastructureTests
+    {
         [TestMethod, Priority(0)]
-        public void NaturalSortComparerTest() {
+        public void NaturalSortComparerTest()
+        {
             // Arrange
             var comparer = new NaturalSortComparer();
             var source = new[] { "2name", "1name", "20name", "3name", "11name" };

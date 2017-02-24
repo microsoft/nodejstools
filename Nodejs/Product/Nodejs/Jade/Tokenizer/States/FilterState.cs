@@ -14,16 +14,21 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Jade {
-    internal partial class JadeTokenizer : Tokenizer<JadeToken> {
-        private void OnFilter() {
+namespace Microsoft.NodejsTools.Jade
+{
+    internal partial class JadeTokenizer : Tokenizer<JadeToken>
+    {
+        private void OnFilter()
+        {
             // :markdown
             _cs.MoveToNextChar();
 
             var range = ParseIdentifier();
-            if (range.Length > 0) {
+            if (range.Length > 0)
+            {
                 var text = _cs.GetSubstringAt(range.Start, range.Length);
-                if (JadeFilters.IsFilter(text)) {
+                if (JadeFilters.IsFilter(text))
+                {
                     AddToken(JadeTokenType.Filter, range.Start - 1, range.Length + 1);
 
                     int blockIndent = CalculateLineIndent();

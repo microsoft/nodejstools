@@ -15,11 +15,13 @@
 using System.Collections.Generic;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
-    public interface IContentTypeMetadata {
+    public interface IContentTypeMetadata
+    {
         IEnumerable<string> ContentTypes { get; }
     }
 }

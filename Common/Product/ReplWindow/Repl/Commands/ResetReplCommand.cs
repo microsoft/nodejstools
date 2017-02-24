@@ -19,29 +19,36 @@ using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
     [Export(typeof(IReplCommand))]
     [ReplRole("Reset")]
-    class ResetReplCommand : IReplCommand {
+    internal class ResetReplCommand : IReplCommand
+    {
         #region IReplCommand Members
 
-        public Task<ExecutionResult> Execute(IReplWindow window, string arguments) {
+        public Task<ExecutionResult> Execute(IReplWindow window, string arguments)
+        {
             return window.Reset();
         }
 
-        public string Description {
+        public string Description
+        {
             get { return "Reset to an empty execution engine, but keep REPL history"; }
         }
 
-        public string Command {
+        public string Command
+        {
             get { return "reset"; }
         }
 
-        public object ButtonContent {
-            get {
+        public object ButtonContent
+        {
+            get
+            {
                 var image = new BitmapImage();
                 image.BeginInit();
                 image.StreamSource = Assembly.GetExecutingAssembly().GetManifestResourceStream("Microsoft.VisualStudio.Resources.ResetSession.gif");

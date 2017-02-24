@@ -14,9 +14,10 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.SourceMapping {
-
-    internal class FunctionInformation {
+namespace Microsoft.NodejsTools.SourceMapping
+{
+    internal class FunctionInformation
+    {
         internal readonly string Namespace;
         internal readonly string Function;
         internal readonly string Filename;
@@ -25,7 +26,8 @@ namespace Microsoft.NodejsTools.SourceMapping {
 
         internal FunctionInformation(string ns, string methodName, int? lineNo, string filename) : this(ns, methodName, lineNo, filename, false) { }
 
-        internal FunctionInformation(string ns, string methodName, int? lineNo, string filename, bool isRecompilation) {
+        internal FunctionInformation(string ns, string methodName, int? lineNo, string filename, bool isRecompilation)
+        {
             Namespace = ns;
             Function = methodName;
             LineNumber = lineNo;

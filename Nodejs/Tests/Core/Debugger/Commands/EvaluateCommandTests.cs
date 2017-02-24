@@ -21,11 +21,14 @@ using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace NodejsTests.Debugger.Commands {
+namespace NodejsTests.Debugger.Commands
+{
     [TestClass]
-    public class EvaluateCommandTests {
+    public class EvaluateCommandTests
+    {
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateEvaluateCommand() {
+        public void CreateEvaluateCommand()
+        {
             // Arrange
             const int commandId = 3;
             var resultFactoryMock = new Mock<IEvaluationResultFactory>();
@@ -44,7 +47,8 @@ namespace NodejsTests.Debugger.Commands {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateEvaluateCommandWithVariableId() {
+        public void CreateEvaluateCommandWithVariableId()
+        {
             // Arrange
             const int commandId = 3;
             var resultFactoryMock = new Mock<IEvaluationResultFactory>();
@@ -63,7 +67,8 @@ namespace NodejsTests.Debugger.Commands {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void ProcessEvaluateResponse() {
+        public void ProcessEvaluateResponse()
+        {
             // Arrange
             const int commandId = 3;
             var resultFactoryMock = new Mock<IEvaluationResultFactory>();
@@ -83,7 +88,8 @@ namespace NodejsTests.Debugger.Commands {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void ProcessEvaluateResponseWithReferenceError() {
+        public void ProcessEvaluateResponseWithReferenceError()
+        {
             // Arrange
             const int commandId = 3;
             var resultFactoryMock = new Mock<IEvaluationResultFactory>();
@@ -94,15 +100,18 @@ namespace NodejsTests.Debugger.Commands {
             Exception exception = null;
 
             // Act
-            try {
+            try
+            {
                 evaluateCommand.ProcessResponse(SerializationTestData.GetEvaluateResponseWithReferenceError());
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 exception = e;
             }
 
             // Assert
             Assert.IsNotNull(exception);
-            Assert.IsInstanceOfType(exception, typeof (DebuggerCommandException));
+            Assert.IsInstanceOfType(exception, typeof(DebuggerCommandException));
             Assert.AreEqual("ReferenceError: hello is not defined", exception.Message);
             Assert.IsNull(evaluateCommand.Result);
             resultFactoryMock.Verify(factory => factory.Create(It.IsAny<INodeVariable>()), Times.Never);

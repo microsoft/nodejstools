@@ -21,11 +21,13 @@ using System.Windows.Automation;
 using Accessibility;
 using Microsoft.VisualStudio.OLE.Interop;
 
-namespace TestUtilities {
+namespace TestUtilities
+{
     /// <summary>
     /// Unmanaged API wrappers.
     /// </summary>
-    public static class NativeMethods {
+    public static class NativeMethods
+    {
         public const int SW_SHOW = 5;
 
         /// <summary>
@@ -160,7 +162,8 @@ namespace TestUtilities {
         [DllImport("oleacc.dll")]
         private static extern int AccessibleObjectFromWindow(IntPtr hWnd, int dwObjectID, ref Guid riid, ref IAccessible pAcc);
 
-        public static IAccessible GetAccessibleObject(IntPtr handle) {
+        public static IAccessible GetAccessibleObject(IntPtr handle)
+        {
             Guid iid = typeof(IAccessible).GUID;
             const int OBJID_WINDOW = 0;
             IAccessible result = null;
@@ -169,7 +172,8 @@ namespace TestUtilities {
             return result;
         }
 
-        public static IAccessible GetAccessibleObject(AutomationElement element) {
+        public static IAccessible GetAccessibleObject(AutomationElement element)
+        {
             return GetAccessibleObject(new IntPtr(element.Current.NativeWindowHandle));
         }
 
@@ -201,13 +205,15 @@ namespace TestUtilities {
 
         // Various Win32 data structures
         [StructLayout(LayoutKind.Sequential)]
-        public struct INPUT {
+        public struct INPUT
+        {
             public int type;
             public INPUTUNION union;
         };
 
         [StructLayout(LayoutKind.Explicit)]
-        public struct INPUTUNION {
+        public struct INPUTUNION
+        {
             [FieldOffset(0)]
             public MOUSEINPUT mouseInput;
             [FieldOffset(0)]
@@ -215,7 +221,8 @@ namespace TestUtilities {
         };
 
         [StructLayout(LayoutKind.Sequential)]
-        public struct MOUSEINPUT {
+        public struct MOUSEINPUT
+        {
             public int dx;
             public int dy;
             public int mouseData;
@@ -225,7 +232,8 @@ namespace TestUtilities {
         };
 
         [StructLayout(LayoutKind.Sequential)]
-        public struct KEYBDINPUT {
+        public struct KEYBDINPUT
+        {
             public short wVk;
             public short wScan;
             public int dwFlags;
@@ -234,7 +242,8 @@ namespace TestUtilities {
         };
 
         [Flags]
-        public enum SendMouseInputFlags {
+        public enum SendMouseInputFlags
+        {
             Move = 0x0001,
             LeftDown = 0x0002,
             LeftUp = 0x0004,
@@ -268,24 +277,27 @@ namespace TestUtilities {
         /// handle long file names
         /// </summary>
         /// <param name="dir"></param>
-        public static void RecursivelyDeleteDirectory(string dir) {
+        public static void RecursivelyDeleteDirectory(string dir)
+        {
             SHFILEOPSTRUCT fileOp = new SHFILEOPSTRUCT();
             fileOp.pFrom = dir + '\0';  // pFrom must be double null terminated
             fileOp.wFunc = FO_Func.FO_DELETE;
             fileOp.fFlags = FILEOP_FLAGS_ENUM.FOF_NOCONFIRMATION |
                 FILEOP_FLAGS_ENUM.FOF_NOERRORUI;
             int res = SHFileOperation(ref fileOp);
-            if (res != 0) {
+            if (res != 0)
+            {
                 throw new System.IO.IOException("Failed to delete dir " + res);
             }
         }
 
         [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
-        static extern int SHFileOperation([In, Out] ref SHFILEOPSTRUCT lpFileOp);
+        private static extern int SHFileOperation([In, Out] ref SHFILEOPSTRUCT lpFileOp);
 
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode, Pack = 2)]
-        struct SHFILEOPSTRUCT {
+        private struct SHFILEOPSTRUCT
+        {
             public IntPtr hwnd;
             public FO_Func wFunc;
             [MarshalAs(UnmanagedType.LPWStr)]
@@ -298,11 +310,11 @@ namespace TestUtilities {
             public IntPtr hNameMappings;
             [MarshalAs(UnmanagedType.LPWStr)]
             public string lpszProgressTitle;
-
         }
 
         [Flags]
-        private enum FILEOP_FLAGS_ENUM : ushort {
+        private enum FILEOP_FLAGS_ENUM : ushort
+        {
             FOF_MULTIDESTFILES = 0x0001,
             FOF_CONFIRMMOUSE = 0x0002,
             FOF_SILENT = 0x0004,  // don't create progress/report
@@ -322,7 +334,8 @@ namespace TestUtilities {
             FOF_NORECURSEREPARSE = 0x8000,  // treat reparse points as objects, not containers
         }
 
-        public enum FO_Func : uint {
+        public enum FO_Func : uint
+        {
             FO_MOVE = 0x0001,
             FO_COPY = 0x0002,
             FO_DELETE = 0x0003,
@@ -358,7 +371,8 @@ namespace TestUtilities {
         [DllImport("kernel32.dll")]
         internal static extern bool CreateSymbolicLink(string lpSymlinkFileName, string lpTargetFileName, SymbolicLink dwFlags);
 
-        internal enum SymbolicLink {
+        internal enum SymbolicLink
+        {
             File = 0,
             Directory = 1
         }
@@ -369,30 +383,43 @@ namespace TestUtilities {
         /// </summary>
         /// <param name="symlinkPath">Path to the symbolic link you wish to create.</param>
         /// <param name="targetPath">Path to the file/directory that the symbolic link should be pointing to.</param>
-        public static void CreateSymbolicLink(string symlinkPath, string targetPath) {
+        public static void CreateSymbolicLink(string symlinkPath, string targetPath)
+        {
             // Pre-checks.
-            if (!(new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator))) {
+            if (!(new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator)))
+            {
                 throw new UnauthorizedAccessException("Process must be run in elevated permissions in order to create symbolic link.");
-            } else if (Directory.Exists(symlinkPath) || File.Exists(symlinkPath)) {
+            }
+            else if (Directory.Exists(symlinkPath) || File.Exists(symlinkPath))
+            {
                 throw new IOException("Path Already Exists.  We cannot create a symbolic link here");
             }
 
             // Create the correct symbolic link.
             bool result;
-            if (File.Exists(targetPath)) {
+            if (File.Exists(targetPath))
+            {
                 result = CreateSymbolicLink(symlinkPath, targetPath, NativeMethods.SymbolicLink.File);
-            } else if (Directory.Exists(targetPath)) {
+            }
+            else if (Directory.Exists(targetPath))
+            {
                 result = CreateSymbolicLink(symlinkPath, targetPath, NativeMethods.SymbolicLink.Directory);
-            } else {
+            }
+            else
+            {
                 throw new FileNotFoundException("Target File/Directory was not found.  Cannot make a symbolic link.");
             }
 
             // Validate that we created a symbolic link.
             // If we failed and the symlink doesn't exist throw an exception here.
-            if (!result) {
-                if (!Directory.Exists(symlinkPath) && !File.Exists(symlinkPath)) {
+            if (!result)
+            {
+                if (!Directory.Exists(symlinkPath) && !File.Exists(symlinkPath))
+                {
                     throw new FileNotFoundException("Unable to find symbolic link after creation.");
-                } else {
+                }
+                else
+                {
                     Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
                 }
             }

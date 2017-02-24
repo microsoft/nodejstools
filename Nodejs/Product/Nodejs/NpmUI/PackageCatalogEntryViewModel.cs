@@ -21,8 +21,10 @@ using System.Windows;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.Project;
 
-namespace Microsoft.NodejsTools.NpmUI {
-    abstract class PackageCatalogEntryViewModel {
+namespace Microsoft.NodejsTools.NpmUI
+{
+    internal abstract class PackageCatalogEntryViewModel
+    {
         private readonly string _name;
         private readonly SemverVersion? _version;
         private readonly List<SemverVersion> _availableVersions;
@@ -36,13 +38,14 @@ namespace Microsoft.NodejsTools.NpmUI {
         protected PackageCatalogEntryViewModel(
             string name,
             SemverVersion? version,
-            IEnumerable<SemverVersion> availableVersions, 
+            IEnumerable<SemverVersion> availableVersions,
             string author,
             string description,
             IEnumerable<string> homepages,
             string keywords,
             SemverVersion? localVersion
-        ) {
+        )
+        {
             _name = name;
             _version = version;
             _availableVersions = availableVersions != null ? availableVersions.ToList() : new List<SemverVersion>();
@@ -53,24 +56,29 @@ namespace Microsoft.NodejsTools.NpmUI {
             _localVersion = localVersion;
         }
 
-        public virtual string Name { 
-            get { return _name; } 
+        public virtual string Name
+        {
+            get { return _name; }
         }
 
-        public string Version { 
-            get { return ToString(_version); } 
+        public string Version
+        {
+            get { return ToString(_version); }
         }
 
-        public IEnumerable<SemverVersion> AvailableVersions {
+        public IEnumerable<SemverVersion> AvailableVersions
+        {
             get { return _availableVersions; }
-        } 
-
-        public string Author { 
-            get { return _author; } 
         }
 
-        public Visibility AuthorVisibility { 
-            get { return string.IsNullOrEmpty(_author) ? Visibility.Collapsed : Visibility.Visible; } 
+        public string Author
+        {
+            get { return _author; }
+        }
+
+        public Visibility AuthorVisibility
+        {
+            get { return string.IsNullOrEmpty(_author) ? Visibility.Collapsed : Visibility.Visible; }
         }
 
         public string Description { get { return _description; } }
@@ -79,32 +87,39 @@ namespace Microsoft.NodejsTools.NpmUI {
 
         public IEnumerable<string> Homepages { get { return _homepages; } }
 
-        public Visibility HomepagesVisibility { 
-            get { return _homepages.Any() ? Visibility.Visible : Visibility.Collapsed; } 
+        public Visibility HomepagesVisibility
+        {
+            get { return _homepages.Any() ? Visibility.Visible : Visibility.Collapsed; }
         }
-        
-        public string Keywords { 
-            get { return _keywords; } 
+
+        public string Keywords
+        {
+            get { return _keywords; }
         }
-        
-        public bool IsInstalledLocally { 
-            get { return _localVersion.HasValue; } 
+
+        public bool IsInstalledLocally
+        {
+            get { return _localVersion.HasValue; }
         }
-        
-        public bool IsLocalInstallOutOfDate { 
-            get { return _localVersion.HasValue && _localVersion < _version; } 
+
+        public bool IsLocalInstallOutOfDate
+        {
+            get { return _localVersion.HasValue && _localVersion < _version; }
         }
-        
-        public string LocalVersion { 
-            get { return ToString(_localVersion); } 
+
+        public string LocalVersion
+        {
+            get { return ToString(_localVersion); }
         }
-       
-        private static string ToString(SemverVersion? version) {
+
+        private static string ToString(SemverVersion? version)
+        {
             return version.HasValue ? version.ToString() : string.Empty;
         }
     }
 
-    internal class ReadOnlyPackageCatalogEntryViewModel : PackageCatalogEntryViewModel {
+    internal class ReadOnlyPackageCatalogEntryViewModel : PackageCatalogEntryViewModel
+    {
         public ReadOnlyPackageCatalogEntryViewModel(IPackage package, IPackage localInstall)
             : base(
                 package.Name ?? string.Empty,
@@ -117,8 +132,10 @@ namespace Microsoft.NodejsTools.NpmUI {
                     ? string.Join(", ", package.Keywords)
                     : Resources.NoKeywordsInPackage,
                 localInstall != null ? (SemverVersion?)localInstall.Version : null
-            ) {
-            if (string.IsNullOrEmpty(Name)) {
+            )
+        {
+            if (string.IsNullOrEmpty(Name))
+            {
                 throw new ArgumentNullException("package.Name");
             }
         }

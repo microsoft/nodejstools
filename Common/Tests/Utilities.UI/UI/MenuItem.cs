@@ -17,10 +17,11 @@ using System.Windows.Automation;
 
 namespace TestUtilities.UI
 {
-    class MenuItem : AutomationWrapper
+    internal class MenuItem : AutomationWrapper
     {
         public MenuItem(AutomationElement element)
-            : base(element) {
+            : base(element)
+        {
         }
 
         public string Value

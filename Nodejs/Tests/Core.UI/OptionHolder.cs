@@ -18,12 +18,15 @@ using System;
 using System.Reflection;
 using Microsoft.VisualStudioTools.VSTestHost;
 
-namespace Microsoft.Nodejs.Tests.UI {
-    class OptionHolder : IDisposable {
+namespace Microsoft.Nodejs.Tests.UI
+{
+    internal class OptionHolder : IDisposable
+    {
         private readonly string _category, _page, _option;
         private readonly object _oldValue;
 
-        public OptionHolder(string category, string page, string option, object newValue) {
+        public OptionHolder(string category, string page, string option, object newValue)
+        {
             _category = category;
             _page = page;
             _option = option;
@@ -32,25 +35,29 @@ namespace Microsoft.Nodejs.Tests.UI {
             props.Item(option).Value = newValue;
         }
 
-        public void Dispose() {
+        public void Dispose()
+        {
             var props = VSTestContext.DTE.get_Properties(_category, _page);
             props.Item(_option).Value = _oldValue;
         }
     }
 
-    class NodejsOptionHolder : IDisposable {
-        object _oldValue;
-        PropertyInfo _property;
-        object _page;
+    internal class NodejsOptionHolder : IDisposable
+    {
+        private object _oldValue;
+        private PropertyInfo _property;
+        private object _page;
 
-        public NodejsOptionHolder(object optionsPage, string propertyName, object newValue) {
+        public NodejsOptionHolder(object optionsPage, string propertyName, object newValue)
+        {
             _page = optionsPage;
             _property = optionsPage.GetType().GetProperty(propertyName);
             _oldValue = _property.GetValue(_page);
             _property.SetValue(_page, newValue);
         }
 
-        public void Dispose() {
+        public void Dispose()
+        {
             _property.SetValue(_page, _oldValue);
         }
     }

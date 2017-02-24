@@ -19,11 +19,14 @@ using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace NodejsTests.Debugger.Commands {
+namespace NodejsTests.Debugger.Commands
+{
     [TestClass]
-    public class ScriptsCommandTests {
+    public class ScriptsCommandTests
+    {
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateScriptsCommand() {
+        public void CreateScriptsCommand()
+        {
             // Arrange
             const int commandId = 3;
             const bool includeSource = true;
@@ -41,7 +44,8 @@ namespace NodejsTests.Debugger.Commands {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateScriptsCommandWithOptionalParameters() {
+        public void CreateScriptsCommandWithOptionalParameters()
+        {
             // Arrange
             const int commandId = 3;
             const int moduleId = 5;
@@ -60,7 +64,8 @@ namespace NodejsTests.Debugger.Commands {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void ProcessScriptsResponse() {
+        public void ProcessScriptsResponse()
+        {
             // Arrange
             const int commandId = 3;
             const bool includeSource = true;

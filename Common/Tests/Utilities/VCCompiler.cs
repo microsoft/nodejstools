@@ -18,8 +18,10 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.Win32;
 
-namespace TestUtilities {
-    public class VCCompiler {
+namespace TestUtilities
+{
+    public class VCCompiler
+    {
         public readonly string BinPath;
 
         public readonly string BinPaths;
@@ -37,61 +39,76 @@ namespace TestUtilities {
         public static VCCompiler VC12_X64 { get { return FindVC("12.0", ProcessorArchitecture.Amd64); } }
         public static VCCompiler VC14_X64 { get { return FindVC("14.0", ProcessorArchitecture.Amd64); } }
 
-        private VCCompiler(string bin, string bins, string include, string lib) {
+        private VCCompiler(string bin, string bins, string include, string lib)
+        {
             BinPath = bin ?? string.Empty;
             BinPaths = bins ?? BinPath;
             LibPaths = lib ?? string.Empty;
             IncludePaths = include ?? string.Empty;
         }
 
-        private static VCCompiler FindVC(string version, ProcessorArchitecture arch) {
+        private static VCCompiler FindVC(string version, ProcessorArchitecture arch)
+        {
             string vcDir = null, vsDir = null;
 
             using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
             using (var key1 = baseKey.OpenSubKey("SOFTWARE\\Microsoft\\VisualStudio\\SxS\\VC7"))
-            using (var key2 = baseKey.OpenSubKey("SOFTWARE\\Microsoft\\VisualStudio\\SxS\\VS7")) {
-                if (key1 != null) {
+            using (var key2 = baseKey.OpenSubKey("SOFTWARE\\Microsoft\\VisualStudio\\SxS\\VS7"))
+            {
+                if (key1 != null)
+                {
                     vcDir = key1.GetValue(version) as string;
                 }
-                if (key2 != null) {
+                if (key2 != null)
+                {
                     vsDir = key2.GetValue(version) as string;
                 }
             }
 
-            if (string.IsNullOrEmpty(vcDir)) {
+            if (string.IsNullOrEmpty(vcDir))
+            {
                 using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry32))
-                using (var key = baseKey.OpenSubKey("SOFTWARE\\Microsoft\\DevDiv\\VCForPython\\" + version)) {
-                    if (key != null) {
+                using (var key = baseKey.OpenSubKey("SOFTWARE\\Microsoft\\DevDiv\\VCForPython\\" + version))
+                {
+                    if (key != null)
+                    {
                         vcDir = key.GetValue("InstallDir") as string;
                     }
                 }
             }
-            if (string.IsNullOrEmpty(vcDir)) {
+            if (string.IsNullOrEmpty(vcDir))
+            {
                 using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
-                using (var key = baseKey.OpenSubKey("SOFTWARE\\Microsoft\\DevDiv\\VCForPython\\" + version)) {
-                    if (key != null) {
+                using (var key = baseKey.OpenSubKey("SOFTWARE\\Microsoft\\DevDiv\\VCForPython\\" + version))
+                {
+                    if (key != null)
+                    {
                         vcDir = key.GetValue("InstallDir") as string;
                     }
                 }
             }
 
-            if (string.IsNullOrEmpty(vcDir)) {
+            if (string.IsNullOrEmpty(vcDir))
+            {
                 return null;
             }
 
             string bin = Path.Combine(vcDir, "bin"), bins = bin;
-            if (arch == ProcessorArchitecture.Amd64) {
+            if (arch == ProcessorArchitecture.Amd64)
+            {
                 bin = Path.Combine(bin, "x86_amd64");
                 bins = bin + ";" + bins;
             }
-            if (!string.IsNullOrEmpty(vsDir)) {
+            if (!string.IsNullOrEmpty(vsDir))
+            {
                 bins += ";" + vsDir;
             }
 
             string include = Path.Combine(vcDir, "include");
 
             string lib = Path.Combine(vcDir, "lib");
-            if (arch == ProcessorArchitecture.Amd64) {
+            if (arch == ProcessorArchitecture.Amd64)
+            {
                 lib = Path.Combine(lib, "amd64");
             }
 
@@ -105,18 +122,22 @@ namespace TestUtilities {
             ProcessorArchitecture arch,
             ref string includePaths,
             ref string libPaths
-        ) {
+        )
+        {
             var isX64 = (arch == ProcessorArchitecture.Amd64);
 
-            if (vcVersion == "14.0") {
+            if (vcVersion == "14.0")
+            {
                 // Windows 10 kit is required for this version
                 AddWindows10KitPaths(isX64, ref includePaths, ref libPaths);
                 return;
             }
 
-            if (vcVersion == "10.0" || vcVersion == "11.0" || vcVersion == "12.0") {
+            if (vcVersion == "10.0" || vcVersion == "11.0" || vcVersion == "12.0")
+            {
                 // If we find a Windows 8 kit, then return
-                if (AddWindows8KitPaths(isX64, ref includePaths, ref libPaths)) {
+                if (AddWindows8KitPaths(isX64, ref includePaths, ref libPaths))
+                {
                     return;
                 }
             }
@@ -124,10 +145,14 @@ namespace TestUtilities {
             AddWindowsSdkPaths(isX64, ref includePaths, ref libPaths);
         }
 
-        private static void AppendPath(ref string paths, string path) {
-            if (string.IsNullOrEmpty(paths)) {
+        private static void AppendPath(ref string paths, string path)
+        {
+            if (string.IsNullOrEmpty(paths))
+            {
                 paths = path;
-            } else {
+            }
+            else
+            {
                 paths += ";" + path;
             }
         }
@@ -136,36 +161,43 @@ namespace TestUtilities {
             bool isX64,
             ref string includePaths,
             ref string libPaths
-        ) {
-            foreach(var version in new[] { "v8.0A", "v7.0A", "v7.0" }) {
-            var regValue = Registry.GetValue(
-                "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\" + version,
-                "InstallationFolder",
-                null
-            );
+        )
+        {
+            foreach (var version in new[] { "v8.0A", "v7.0A", "v7.0" })
+            {
+                var regValue = Registry.GetValue(
+                    "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\" + version,
+                    "InstallationFolder",
+                    null
+                );
 
-            string[] locations = new[] {
+                string[] locations = new[] {
                 regValue != null ? regValue.ToString() : null,
                     Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Microsoft SDKs", "Windows", version),
                     Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Microsoft SDKs", "Windows", version)
                 };
 
-            foreach(var rootPath in locations) {
-                if (!Directory.Exists(rootPath)) {
-                    continue;
-                }
+                foreach (var rootPath in locations)
+                {
+                    if (!Directory.Exists(rootPath))
+                    {
+                        continue;
+                    }
 
-                var include = Path.Combine(rootPath, "Include");
-                var lib = Path.Combine(rootPath, "Lib");
-                if (isX64) {
-                    lib = Path.Combine(lib, "x64");
+                    var include = Path.Combine(rootPath, "Include");
+                    var lib = Path.Combine(rootPath, "Lib");
+                    if (isX64)
+                    {
+                        lib = Path.Combine(lib, "x64");
+                    }
+                    if (Directory.Exists(include) && Directory.Exists(lib))
+                    {
+                        AppendPath(ref includePaths, include);
+                        AppendPath(ref libPaths, lib);
+                        return true;
+                    }
                 }
-                if (Directory.Exists(include) && Directory.Exists(lib)) {
-                    AppendPath(ref includePaths, include);
-                    AppendPath(ref libPaths, lib);
-                    return true;
-                }
-            }}
+            }
             return false;
         }
 
@@ -173,15 +205,18 @@ namespace TestUtilities {
             bool isX64,
             ref string includePaths,
             ref string libPaths
-        ) {
-            foreach (var version in new[] { "KitsRoot81", "KitsRoot" }) {
+        )
+        {
+            foreach (var version in new[] { "KitsRoot81", "KitsRoot" })
+            {
                 var regValue = Registry.GetValue(
                     "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots",
                     version,
                     null
                 );
 
-                if (regValue == null) {
+                if (regValue == null)
+                {
                     continue;
                 }
 
@@ -191,15 +226,21 @@ namespace TestUtilities {
                 var lib8 = Path.Combine(rootPath, "Lib", "win8", "um", isX64 ? "x64" : "x86");
                 var libv63 = Path.Combine(rootPath, "Lib", "winv6.3", "um", isX64 ? "x64" : "x86");
 
-                if (!Directory.Exists(includeShared) || !Directory.Exists(includeum)) {
+                if (!Directory.Exists(includeShared) || !Directory.Exists(includeum))
+                {
                     continue;
                 }
 
-                if (Directory.Exists(lib8)) {
+                if (Directory.Exists(lib8))
+                {
                     AppendPath(ref libPaths, lib8);
-                } else if (Directory.Exists(libv63)) {
+                }
+                else if (Directory.Exists(libv63))
+                {
                     AppendPath(ref libPaths, libv63);
-                } else {
+                }
+                else
+                {
                     continue;
                 }
 
@@ -216,28 +257,33 @@ namespace TestUtilities {
             bool isX64,
             ref string includePaths,
             ref string libPaths
-        ) {
+        )
+        {
             string include8 = null;
             string lib8 = null;
 
-            if (!AddWindows8KitPaths(isX64, ref include8, ref lib8)) {
+            if (!AddWindows8KitPaths(isX64, ref include8, ref lib8))
+            {
                 return false;
             }
 
-            foreach (var version in new[] { "KitsRoot10" }) {
+            foreach (var version in new[] { "KitsRoot10" })
+            {
                 var regValue = Registry.GetValue(
                     "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots",
                     version,
                     null
                 );
 
-                if (regValue == null) {
+                if (regValue == null)
+                {
                     continue;
                 }
 
                 var rootPath = regValue.ToString();
                 var include = Path.Combine(rootPath, "Include");
-                if (!Directory.Exists(include)) {
+                if (!Directory.Exists(include))
+                {
                     continue;
                 }
                 // We want a subfolder that is a version number - get the latest
@@ -245,14 +291,16 @@ namespace TestUtilities {
                     .Select(d => d.Name)
                     .OrderByDescending(s => s)
                     .FirstOrDefault();
-                if (string.IsNullOrEmpty(crtVersion)) {
+                if (string.IsNullOrEmpty(crtVersion))
+                {
                     continue;
                 }
 
                 include = Path.Combine(include, crtVersion, "ucrt");
                 var lib = Path.Combine(rootPath, "Lib", crtVersion, "ucrt", isX64 ? "x64" : "x86");
 
-                if (!Directory.Exists(include) || !Directory.Exists(lib)) {
+                if (!Directory.Exists(include) || !Directory.Exists(lib))
+                {
                     continue;
                 }
 
@@ -266,8 +314,6 @@ namespace TestUtilities {
             }
 
             return false;
-
         }
     }
-
 }

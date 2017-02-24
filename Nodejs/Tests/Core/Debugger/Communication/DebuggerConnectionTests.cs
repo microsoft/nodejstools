@@ -22,30 +22,37 @@ using Microsoft.NodejsTools.Debugger.Communication;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace NodejsTests.Debugger.Communication {
+namespace NodejsTests.Debugger.Communication
+{
     [TestClass]
-    public class DebuggerConnectionTests {
+    public class DebuggerConnectionTests
+    {
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateDebuggerConnectionWithNullNetworkClientFactory() {
+        public void CreateDebuggerConnectionWithNullNetworkClientFactory()
+        {
             // Arrange
             Exception exception = null;
             DebuggerConnection connection = null;
 
             // Act
-            try {
+            try
+            {
                 connection = new DebuggerConnection(null);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 exception = e;
             }
 
             // Assert
             Assert.IsNull(connection);
             Assert.IsNotNull(exception);
-            Assert.IsInstanceOfType(exception, typeof (ArgumentNullException));
+            Assert.IsInstanceOfType(exception, typeof(ArgumentNullException));
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public async Task RaiseConnectionClosedEvent() {
+        public async Task RaiseConnectionClosedEvent()
+        {
             // Arrange
             var memoryStream = new MemoryStream();
 
@@ -61,7 +68,8 @@ namespace NodejsTests.Debugger.Communication {
             EventArgs args = null;
 
             // Act
-            debuggerConnection.ConnectionClosed += (s, a) => {
+            debuggerConnection.ConnectionClosed += (s, a) =>
+            {
                 sender = s;
                 args = a;
             };
@@ -79,7 +87,8 @@ namespace NodejsTests.Debugger.Communication {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public async Task RaiseOutputMessageEvent() {
+        public async Task RaiseOutputMessageEvent()
+        {
             // Arrange
             const string message = "Hello node.js!";
             string formattedMessage = string.Format("Content-Length: {0}{1}{1}{2}", Encoding.UTF8.GetByteCount(message), Environment.NewLine, message);
@@ -103,7 +112,8 @@ namespace NodejsTests.Debugger.Communication {
             bool inital = debuggerConnection.Connected;
 
             // Act
-            debuggerConnection.OutputMessage += (s, a) => {
+            debuggerConnection.OutputMessage += (s, a) =>
+            {
                 sender = s;
                 args = a;
             };
@@ -123,7 +133,8 @@ namespace NodejsTests.Debugger.Communication {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public async Task SendMessageAsync() {
+        public async Task SendMessageAsync()
+        {
             // Arrange
             const string message = "Hello node.js!";
             var sourceStream = new MemoryStream();
@@ -155,7 +166,8 @@ namespace NodejsTests.Debugger.Communication {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public async Task RetrieveNodeVersion() {
+        public async Task RetrieveNodeVersion()
+        {
             // Arrange
             const string version = "0.10.25";
             string message = string.Format("Embedding-Host: node v{0}\r\n\r\n", version);
@@ -177,7 +189,8 @@ namespace NodejsTests.Debugger.Communication {
 
             // Act
             debuggerConnection.Connect(new Uri("tcp://localhost:5858"));
-            for (int i = 0; i < 10 && debuggerConnection.NodeVersion == null; ++i) {
+            for (int i = 0; i < 10 && debuggerConnection.NodeVersion == null; ++i)
+            {
                 await Task.Delay(TimeSpan.FromMilliseconds(100));
             }
             memoryStream.Close();
@@ -185,6 +198,6 @@ namespace NodejsTests.Debugger.Communication {
             // Assert
             Assert.IsNotNull(debuggerConnection.NodeVersion);
             Assert.AreEqual(version, debuggerConnection.NodeVersion.ToString());
-       }
+        }
     }
 }

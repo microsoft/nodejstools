@@ -16,32 +16,44 @@
 
 using System.Text;
 
-namespace Microsoft.NodejsTools.Jade {
+namespace Microsoft.NodejsTools.Jade
+{
     /// <summary>
     /// A helper class exposing various helper functions that 
     /// are used in formatting, smart indent and elsewhere else.
     /// </summary>
-    static class TextHelper {
-        public static string ConvertTabsToSpaces(string text, int tabSize, bool replaceNonWhitespaceChars = false) {
+    internal static class TextHelper
+    {
+        public static string ConvertTabsToSpaces(string text, int tabSize, bool replaceNonWhitespaceChars = false)
+        {
             var sb = new StringBuilder(text.Length);
             int charsSoFar = 0;
 
-            for (int i = 0; i < text.Length; i++) {
+            for (int i = 0; i < text.Length; i++)
+            {
                 char ch = text[i];
 
-                if (ch == '\t') {
+                if (ch == '\t')
+                {
                     var spaces = tabSize - (charsSoFar % tabSize);
                     sb.Append(' ', spaces);
                     charsSoFar = 0;
-                } else if (ch == '\r' || ch == '\n') {
+                }
+                else if (ch == '\r' || ch == '\n')
+                {
                     charsSoFar = 0;
                     sb.Append(ch);
-                } else {
+                }
+                else
+                {
                     charsSoFar++;
                     charsSoFar = charsSoFar % tabSize;
-                    if (replaceNonWhitespaceChars) {
+                    if (replaceNonWhitespaceChars)
+                    {
                         sb.Append(' ');
-                    } else {
+                    }
+                    else
+                    {
                         sb.Append(ch);
                     }
                 }

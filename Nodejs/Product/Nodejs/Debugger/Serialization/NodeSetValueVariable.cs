@@ -16,9 +16,12 @@
 
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.NodejsTools.Debugger.Serialization {
-    sealed class NodeSetValueVariable : INodeVariable {
-        public NodeSetValueVariable(NodeStackFrame stackFrame, string name, JToken message) {
+namespace Microsoft.NodejsTools.Debugger.Serialization
+{
+    internal sealed class NodeSetValueVariable : INodeVariable
+    {
+        public NodeSetValueVariable(NodeStackFrame stackFrame, string name, JToken message)
+        {
             Id = (int)message["body"]["newValue"]["handle"];
             StackFrame = stackFrame;
             Parent = null;

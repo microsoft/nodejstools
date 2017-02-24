@@ -14,12 +14,15 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.SourceMapping {
-    internal class JavaScriptSourceMapInfo {
+namespace Microsoft.NodejsTools.SourceMapping
+{
+    internal class JavaScriptSourceMapInfo
+    {
         internal readonly string[] Lines;
         internal readonly SourceMap Map;
 
-        internal JavaScriptSourceMapInfo(SourceMap map, string[] lines) {
+        internal JavaScriptSourceMapInfo(SourceMap map, string[] lines)
+        {
             Map = map;
             Lines = lines;
         }

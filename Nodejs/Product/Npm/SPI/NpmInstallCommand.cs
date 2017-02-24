@@ -14,13 +14,16 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Npm.SPI {
-    internal class NpmInstallCommand : NpmCommand {
+namespace Microsoft.NodejsTools.Npm.SPI
+{
+    internal class NpmInstallCommand : NpmCommand
+    {
         public NpmInstallCommand(
             string fullPathToRootPackageDirectory,
             string pathToNpm = null,
             bool useFallbackIfNpmNotFound = true)
-            : base(fullPathToRootPackageDirectory, pathToNpm) {
+            : base(fullPathToRootPackageDirectory, pathToNpm)
+        {
             Arguments = "install";
         }
 
@@ -33,7 +36,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             bool saveToPackageJson = true,
             string pathToNpm = null,
             bool useFallbackIfNpmNotFound = true)
-            : base(fullPathToRootPackageDirectory, pathToNpm) {
+            : base(fullPathToRootPackageDirectory, pathToNpm)
+        {
             Arguments = NpmArgumentBuilder.GetNpmInstallArguments(
                 packageName,
                 versionRange,

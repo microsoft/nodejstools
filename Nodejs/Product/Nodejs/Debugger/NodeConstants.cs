@@ -14,8 +14,10 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Debugger {
-    sealed class NodeConstants {
+namespace Microsoft.NodejsTools.Debugger
+{
+    internal sealed class NodeConstants
+    {
         public const string ScriptWrapBegin = "(function (exports, require, module, __filename, __dirname) { ";
         public const string ScriptWrapEnd = "\n});";
     }

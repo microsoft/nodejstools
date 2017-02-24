@@ -16,9 +16,12 @@
 
 using System.Collections.ObjectModel;
 
-namespace Microsoft.NodejsTools.Jade {
-    interface ICompositeToken<TTokenType> {
-        ReadOnlyCollection<TTokenType> TokenList {
+namespace Microsoft.NodejsTools.Jade
+{
+    internal interface ICompositeToken<TTokenType>
+    {
+        ReadOnlyCollection<TTokenType> TokenList
+        {
             get;
         }
     }

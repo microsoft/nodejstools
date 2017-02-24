@@ -25,27 +25,33 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools;
 
-namespace Microsoft.NodejsTools.Commands {
+namespace Microsoft.NodejsTools.Commands
+{
     /// <summary>
     /// Provides the command to import a project from existing code.
     /// </summary>
-    class ImportWizardCommand : Command {
-        public override void DoCommand(object sender, EventArgs args) {
+    internal class ImportWizardCommand : Command
+    {
+        public override void DoCommand(object sender, EventArgs args)
+        {
             var statusBar = (IVsStatusbar)CommonPackage.GetGlobalService(typeof(SVsStatusbar));
             statusBar.SetText(Resources.ImportingProjectStatusText);
 
             var dlg = new Microsoft.NodejsTools.Project.ImportWizard.ImportWizard();
             int commandIdToRaise = (int)VSConstants.VSStd97CmdID.OpenProject;
-            
+
             Microsoft.VisualStudio.Shell.OleMenuCmdEventArgs oleArgs = args as Microsoft.VisualStudio.Shell.OleMenuCmdEventArgs;
-            if (oleArgs != null) {
+            if (oleArgs != null)
+            {
                 string projectArgs = oleArgs.InValue as string;
-                if (projectArgs != null) {
+                if (projectArgs != null)
+                {
                     var argItems = projectArgs.Split('|');
-                    if (argItems.Length == 3) {
+                    if (argItems.Length == 3)
+                    {
                         dlg.ImportSettings.ProjectPath = CommonUtils.GetAvailableFilename(
-                            argItems[1], 
-                            argItems[0], 
+                            argItems[1],
+                            argItems[0],
                             ".njsproj"
                         );
                         dlg.ImportSettings.SourcePath = argItems[1];
@@ -53,23 +59,32 @@ namespace Microsoft.NodejsTools.Commands {
                     }
                 }
             }
-            
-            if (dlg.ShowModal() ?? false) {
+
+            if (dlg.ShowModal() ?? false)
+            {
                 var settings = dlg.ImportSettings;
 
                 settings.CreateRequestedProjectAsync()
-                    .ContinueWith(t => {
+                    .ContinueWith(t =>
+                    {
                         string path;
-                        try {
+                        try
+                        {
                             path = t.Result;
-                        } catch (AggregateException ex) {
-                            if (ex.InnerException is UnauthorizedAccessException) {
+                        }
+                        catch (AggregateException ex)
+                        {
+                            if (ex.InnerException is UnauthorizedAccessException)
+                            {
                                 MessageBox.Show(
                                     string.Format(CultureInfo.CurrentCulture, Resources.ImportingProjectAccessErrorStatusText, Environment.NewLine),
                                     SR.ProductName);
-                            } else {
+                            }
+                            else
+                            {
                                 string exName = String.Empty;
-                                if (ex.InnerException != null) {
+                                if (ex.InnerException != null)
+                                {
                                     exName = "(" + ex.InnerException.GetType().Name + ")";
                                 }
 
@@ -79,23 +94,29 @@ namespace Microsoft.NodejsTools.Commands {
                             }
                             return;
                         }
-                        if (File.Exists(path)) {
+                        if (File.Exists(path))
+                        {
                             object outRef = null, pathRef = "\"" + path + "\"";
                             NodejsPackage.Instance.DTE.Commands.Raise(VSConstants.GUID_VSStandardCommandSet97.ToString("B"), commandIdToRaise, ref pathRef, ref outRef);
                             statusBar.SetText(String.Empty);
-                        } else {
+                        }
+                        else
+                        {
                             statusBar.SetText(Resources.ImportingProjectErrorStatusText);
                         }
                     },
                     CancellationToken.None,
                     TaskContinuationOptions.HideScheduler,
                     System.Threading.Tasks.TaskScheduler.FromCurrentSynchronizationContext());
-            } else {
+            }
+            else
+            {
                 statusBar.SetText("");
             }
         }
 
-        public override int CommandId {
+        public override int CommandId
+        {
             get { return (int)PkgCmdId.cmdidImportWizard; }
         }
     }

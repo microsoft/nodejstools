@@ -18,13 +18,17 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.TestWindow.Extensibility;
 
-namespace Microsoft.NodejsTools.TestAdapter {
+namespace Microsoft.NodejsTools.TestAdapter
+{
     [Export(typeof(IRunFromContextFileExtensions))]
-    class RunFromContextFileExtensions : IRunFromContextFileExtensions {
+    internal class RunFromContextFileExtensions : IRunFromContextFileExtensions
+    {
         #region IRunFromContextFileExtensions Members
 
-        public IEnumerable<string> FileTypes {
-            get { 
+        public IEnumerable<string> FileTypes
+        {
+            get
+            {
                 return new[] { NodejsConstants.JavaScriptExtension };
             }
         }

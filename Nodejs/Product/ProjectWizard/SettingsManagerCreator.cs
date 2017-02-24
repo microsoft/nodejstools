@@ -24,44 +24,58 @@ using Microsoft.VisualStudio.Shell.Settings;
 using Microsoft.Win32;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
-namespace Microsoft.VisualStudioTools {
-
-    internal static class SettingsManagerCreator {
+namespace Microsoft.VisualStudioTools
+{
+    internal static class SettingsManagerCreator
+    {
         private const string VSVersion = "15.0";
 
-        public static SettingsManager GetSettingsManager(DTE dte) {
+        public static SettingsManager GetSettingsManager(DTE dte)
+        {
             return GetSettingsManager(new ServiceProvider(((IOleServiceProvider)dte)));
         }
 
-        public static SettingsManager GetSettingsManager(IServiceProvider provider) {
+        public static SettingsManager GetSettingsManager(IServiceProvider provider)
+        {
             SettingsManager settings = null;
             string devenvPath = null;
-            if (provider == null) {
+            if (provider == null)
+            {
                 provider = ServiceProvider.GlobalProvider;
             }
 
-            if (provider != null) {
-                try {
+            if (provider != null)
+            {
+                try
+                {
                     settings = new ShellSettingsManager(provider);
-                } catch (NotSupportedException) {
+                }
+                catch (NotSupportedException)
+                {
                     var dte = (DTE)provider.GetService(typeof(DTE));
-                    if (dte != null) {
+                    if (dte != null)
+                    {
                         devenvPath = dte.FullName;
                     }
                 }
             }
 
-            if (settings == null) {
-                if (!File.Exists(devenvPath)) {
+            if (settings == null)
+            {
+                if (!File.Exists(devenvPath))
+                {
                     using (var root = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
-                    using (var key = root.OpenSubKey(string.Format(CultureInfo.InvariantCulture, @"Software\Microsoft\VisualStudio\{0}\Setup\VS", VSVersion))) {
-                        if (key == null) {
+                    using (var key = root.OpenSubKey(string.Format(CultureInfo.InvariantCulture, @"Software\Microsoft\VisualStudio\{0}\Setup\VS", VSVersion)))
+                    {
+                        if (key == null)
+                        {
                             throw new InvalidOperationException("Cannot find settings store for Visual Studio " + VSVersion);
                         }
                         devenvPath = key.GetValue("EnvironmentPath") as string;
                     }
                 }
-                if (!File.Exists(devenvPath)) {
+                if (!File.Exists(devenvPath))
+                {
                     throw new InvalidOperationException("Cannot find settings store for Visual Studio " + VSVersion);
                 }
 #if DEBUG

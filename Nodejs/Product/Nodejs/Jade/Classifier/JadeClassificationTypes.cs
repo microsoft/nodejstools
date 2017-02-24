@@ -14,8 +14,10 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Jade {
-    internal class JadeClassificationTypes {
+namespace Microsoft.NodejsTools.Jade
+{
+    internal class JadeClassificationTypes
+    {
         public const string Filter = "JadeFilter";
         public const string Keyword = "JadeKeyword"; // break case do ...
         public const string Variable = "JadeVariable"; // #{foo}

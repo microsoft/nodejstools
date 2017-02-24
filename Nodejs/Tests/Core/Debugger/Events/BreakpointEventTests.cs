@@ -18,11 +18,14 @@ using Microsoft.NodejsTools.Debugger.Events;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 
-namespace NodejsTests.Debugger.Events {
+namespace NodejsTests.Debugger.Events
+{
     [TestClass]
-    public class BreakpointEventTests {
+    public class BreakpointEventTests
+    {
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateBreakpointEvent() {
+        public void CreateBreakpointEvent()
+        {
             // Arrange
             JObject message = JObject.Parse(Resources.NodeBreakpointResponse);
 

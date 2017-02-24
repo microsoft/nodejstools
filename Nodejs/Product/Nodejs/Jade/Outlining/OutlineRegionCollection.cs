@@ -16,19 +16,23 @@
 
 using System;
 
-namespace Microsoft.NodejsTools.Jade {
+namespace Microsoft.NodejsTools.Jade
+{
     /// <summary>
     /// A collection of outline regions than match specific text buffer version
     /// </summary>
-    class OutlineRegionCollection : TextRangeCollection<OutlineRegion>, ICloneable {
+    internal class OutlineRegionCollection : TextRangeCollection<OutlineRegion>, ICloneable
+    {
         public int TextBufferVersion { get; internal set; }
 
-        public OutlineRegionCollection(int textBufferVersion) {
+        public OutlineRegionCollection(int textBufferVersion)
+        {
             TextBufferVersion = textBufferVersion;
         }
 
         #region ICloneable
-        public virtual object Clone() {
+        public virtual object Clone()
+        {
             var clone = new OutlineRegionCollection(TextBufferVersion);
 
             foreach (var item in this)

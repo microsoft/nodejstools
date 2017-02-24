@@ -17,9 +17,12 @@
 using System;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
-namespace TestAdapterTests {
-    class MockDiscoveryContext : IDiscoveryContext {
-        public IRunSettings RunSettings {
+namespace TestAdapterTests
+{
+    internal class MockDiscoveryContext : IDiscoveryContext
+    {
+        public IRunSettings RunSettings
+        {
             get { throw new NotImplementedException(); }
         }
     }

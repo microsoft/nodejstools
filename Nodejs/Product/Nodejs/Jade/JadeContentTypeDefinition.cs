@@ -17,11 +17,13 @@
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Utilities;
 
-namespace Microsoft.NodejsTools.Jade {
+namespace Microsoft.NodejsTools.Jade
+{
     /// <summary>
     /// Exports the Jade content type and file extension
     /// </summary>
-    class JadeContentTypeDefinition {
+    internal class JadeContentTypeDefinition
+    {
         public const string JadeLanguageName = "Jade";
         public const string JadeContentType = "jade";
         public const string JadeFileExtension = ".jade";

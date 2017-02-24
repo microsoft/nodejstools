@@ -16,32 +16,40 @@
 
 using Microsoft.VisualStudio;
 
-namespace Microsoft.NodejsTools.Debugger.Remote {
+namespace Microsoft.NodejsTools.Debugger.Remote
+{
     internal class NodeRemoteEnumDebug<T>
-        where T : class {
-
+        where T : class
+    {
         private readonly T _elem;
         private bool _done;
 
-        public NodeRemoteEnumDebug(T elem = null) {
+        public NodeRemoteEnumDebug(T elem = null)
+        {
             _elem = elem;
             Reset();
         }
 
-        protected T Element {
+        protected T Element
+        {
             get { return _elem; }
         }
 
-        public int GetCount(out uint pcelt) {
+        public int GetCount(out uint pcelt)
+        {
             pcelt = (_elem == null) ? 0u : 1u;
             return VSConstants.S_OK;
         }
 
-        public int Next(uint celt, T[] rgelt, ref uint pceltFetched) {
-            if (_done) {
+        public int Next(uint celt, T[] rgelt, ref uint pceltFetched)
+        {
+            if (_done)
+            {
                 pceltFetched = 0;
                 return VSConstants.S_FALSE;
-            } else {
+            }
+            else
+            {
                 pceltFetched = 1;
                 rgelt[0] = _elem;
                 _done = true;
@@ -49,17 +57,24 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
             }
         }
 
-        public int Reset() {
+        public int Reset()
+        {
             _done = (_elem == null);
             return VSConstants.S_OK;
         }
 
-        public int Skip(uint celt) {
-            if (celt == 0) {
+        public int Skip(uint celt)
+        {
+            if (celt == 0)
+            {
                 return VSConstants.S_OK;
-            } else if (_done) {
+            }
+            else if (_done)
+            {
                 return VSConstants.S_FALSE;
-            } else {
+            }
+            else
+            {
                 _done = true;
                 return celt > 1 ? VSConstants.S_FALSE : VSConstants.S_OK;
             }

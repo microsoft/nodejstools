@@ -17,8 +17,10 @@
 using System.ComponentModel.Composition;
 using TestUtilities.SharedProject;
 
-namespace Microsoft.Nodejs.Tests.UI {
-    public sealed class NodejsTestDefintions {
+namespace Microsoft.Nodejs.Tests.UI
+{
+    public sealed class NodejsTestDefintions
+    {
         [Export]
         [ProjectExtension(".njsproj")]
         [ProjectTypeGuid("9092AA53-FB77-4645-B42D-1CCCA6BD08BD")]

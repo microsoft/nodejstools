@@ -23,21 +23,25 @@ using TestUtilities.Nodejs;
 using TestUtilities.UI;
 using TestUtilities.UI.Nodejs;
 
-namespace AzurePublishingUITests {
+namespace AzurePublishingUITests
+{
     [TestClass]
-    public class AzureWebSiteTests {
+    public class AzureWebSiteTests
+    {
         private string _webSiteToDelete;
         private static string publishSettingsFilePath;
 
         [ClassInitialize]
-        public static void DoDeployment(TestContext context) {
+        public static void DoDeployment(TestContext context)
+        {
             AssertListener.Initialize();
             NodejsTestData.Deploy();
 
             // The tests currently only support Azure Tools v2.2.
             // Support for other versions will be added later.
             var azureToolsVersion = AzureUtility.ToolsVersion.V22;
-            if (!AzureUtility.AzureToolsInstalled(azureToolsVersion)) {
+            if (!AzureUtility.AzureToolsInstalled(azureToolsVersion))
+            {
                 Assert.Inconclusive(string.Format("Azure Tools v{0} required", azureToolsVersion));
             }
 
@@ -47,16 +51,20 @@ namespace AzurePublishingUITests {
         }
 
         [TestCleanup]
-        public void Cleanup() {
-            if (!string.IsNullOrEmpty(_webSiteToDelete)) {
+        public void Cleanup()
+        {
+            if (!string.IsNullOrEmpty(_webSiteToDelete))
+            {
                 Assert.IsTrue(AzureUtility.DeleteWebSiteWithRetry(publishSettingsFilePath, _webSiteToDelete));
             }
         }
 
         public TestContext TestContext { get; set; }
 
-        internal static void CreateProject(VisualStudioApp app, string languageName, string templateName, string location, string projectName, string expectedProjectItem) {
-            using (var newProjDialog = app.FileNewProject()) {
+        internal static void CreateProject(VisualStudioApp app, string languageName, string templateName, string location, string projectName, string expectedProjectItem)
+        {
+            using (var newProjDialog = app.FileNewProject())
+            {
                 newProjDialog.FocusLanguageNode(languageName);
                 newProjDialog.Location = location;
                 newProjDialog.ProjectName = projectName;
@@ -67,7 +75,8 @@ namespace AzurePublishingUITests {
             }
 
             // wait for new solution to load...
-            for (int i = 0; i < 40 && app.Dte.Solution.Projects.Count == 0; i++) {
+            for (int i = 0; i < 40 && app.Dte.Solution.Projects.Count == 0; i++)
+            {
                 System.Threading.Thread.Sleep(250);
             }
 
@@ -85,8 +94,10 @@ namespace AzurePublishingUITests {
             string expectedProjectItem,
             string textInResponse,
             int publishTimeout
-        ) {
-            using (var app = new VisualStudioApp()) {
+        )
+        {
+            using (var app = new VisualStudioApp())
+            {
                 CreateProject(
                     app,
                     languageName,
@@ -107,11 +118,12 @@ namespace AzurePublishingUITests {
             }
         }
 
-        const int JavaScriptWebAppPublishTimeout = 2 * 60 * 1000;
+        private const int JavaScriptWebAppPublishTimeout = 2 * 60 * 1000;
 
         [TestMethod, Priority(0), TestCategory("Core"), Timeout(JavaScriptWebAppPublishTimeout)]
         [HostType("VSTestHost")]
-        public void JavaScriptWebAppPublish() {
+        public void JavaScriptWebAppPublish()
+        {
             TestPublishToWebSite(
                 NodejsVisualStudioApp.JavaScriptTemplateLanguageName,
                 NodejsVisualStudioApp.JavaScriptAzureWebAppTemplate,
@@ -122,11 +134,12 @@ namespace AzurePublishingUITests {
             );
         }
 
-        const int TypeScriptWebAppPublishTimeout = 2 * 60 * 1000;
+        private const int TypeScriptWebAppPublishTimeout = 2 * 60 * 1000;
 
         [TestMethod, Priority(0), TestCategory("Core"), Timeout(TypeScriptWebAppPublishTimeout)]
         [HostType("VSTestHost")]
-        public void TypeScriptWebAppPublish() {
+        public void TypeScriptWebAppPublish()
+        {
             TestPublishToWebSite(
                 NodejsVisualStudioApp.TypeScriptTemplateLanguageName,
                 NodejsVisualStudioApp.TypeScriptAzureWebAppTemplate,

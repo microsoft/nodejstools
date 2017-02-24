@@ -16,11 +16,14 @@
 
 using Microsoft.VisualStudio.Text;
 
-namespace Microsoft.NodejsTools.Jade {
-    internal sealed class JadeOutliningTagger : OutliningTagger {
+namespace Microsoft.NodejsTools.Jade
+{
+    internal sealed class JadeOutliningTagger : OutliningTagger
+    {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public JadeOutliningTagger(ITextBuffer textBuffer)
-            : base(textBuffer, new IndentBasedOutlineRegionBuilder(textBuffer)) {
+            : base(textBuffer, new IndentBasedOutlineRegionBuilder(textBuffer))
+        {
             ServiceManager.AddService<JadeOutliningTagger>(this, textBuffer);
         }
     }

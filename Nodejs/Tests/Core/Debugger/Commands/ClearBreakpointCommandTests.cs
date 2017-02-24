@@ -17,11 +17,14 @@
 using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace NodejsTests.Debugger.Commands {
+namespace NodejsTests.Debugger.Commands
+{
     [TestClass]
-    public class ClearBreakpointCommandTests {
+    public class ClearBreakpointCommandTests
+    {
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateClearBreakpointCommand() {
+        public void CreateClearBreakpointCommand()
+        {
             // Arrange
             const int commandId = 3;
             const int breakpointId = 5;

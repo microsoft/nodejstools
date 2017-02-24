@@ -18,17 +18,21 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Security;
 
-namespace Microsoft.NodejsTools.Debugger.Serialization {
+namespace Microsoft.NodejsTools.Debugger.Serialization
+{
     /// <summary>
     /// Performs natural string compare.
     /// </summary>
-    sealed class NaturalSortComparer : IComparer<string> {
-        public int Compare(string x, string y) {
+    internal sealed class NaturalSortComparer : IComparer<string>
+    {
+        public int Compare(string x, string y)
+        {
             return SafeNativeMethods.StrCmpLogicalW(x, y);
         }
 
         [SuppressUnmanagedCodeSecurity]
-        private static class SafeNativeMethods {
+        private static class SafeNativeMethods
+        {
             [DllImport("shlwapi.dll", CharSet = CharSet.Unicode)]
             public static extern int StrCmpLogicalW(string psz1, string psz2);
         }

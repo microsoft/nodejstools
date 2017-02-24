@@ -18,8 +18,10 @@ using System;
 using System.Globalization;
 using System.Runtime.InteropServices;
 
-namespace Microsoft.NodejsTools.LogGeneration {
-    class EtlNativeMethods {
+namespace Microsoft.NodejsTools.LogGeneration
+{
+    internal class EtlNativeMethods
+    {
         [DllImport("advapi32.dll", CallingConvention = CallingConvention.StdCall)]
         public static extern uint CloseTrace(ulong handle);
 
@@ -39,7 +41,8 @@ namespace Microsoft.NodejsTools.LogGeneration {
         internal static Guid CLSID_TraceRelogger = new Guid("7b40792d-05ff-44c4-9058-f440c71f17d4");
     }
 
-    enum TraceControlCode {
+    internal enum TraceControlCode
+    {
         Query,
         Stop,
         Update,
@@ -48,7 +51,8 @@ namespace Microsoft.NodejsTools.LogGeneration {
 
     // http://msdn.microsoft.com/en-us/library/dd264810.aspx
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
-    struct MethodLoadUnload {
+    internal struct MethodLoadUnload
+    {
         public ulong MethodID;
         public ulong ModuleID;
         public ulong MethodStartAddress;
@@ -61,7 +65,8 @@ namespace Microsoft.NodejsTools.LogGeneration {
 
     // http://msdn.microsoft.com/en-us/library/vstudio/ff356159(v=vs.110).aspx
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
-    struct ManagedModuleLoadUnload {
+    internal struct ManagedModuleLoadUnload
+    {
         public ulong ModuleID;
         public ulong AssemblyID;
         public uint ModuleFlags;
@@ -79,7 +84,8 @@ namespace Microsoft.NodejsTools.LogGeneration {
 
     // http://msdn.microsoft.com/en-us/library/windows/desktop/aa364068(v=vs.85).aspx
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
-    struct ImageLoad {
+    internal struct ImageLoad
+    {
         public uint ImageBase;
         public uint ImageSize;
         public uint ProcessId;
@@ -95,13 +101,15 @@ namespace Microsoft.NodejsTools.LogGeneration {
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    struct StackWalk {
+    internal struct StackWalk
+    {
         public ulong TimeStamp;
         public uint Process;
         public uint Thread;
     }
 
-    struct ThreadInfo {
+    internal struct ThreadInfo
+    {
         public uint ProcessId;
         public uint TThreadId;
         public uint StackBase;
@@ -119,7 +127,8 @@ namespace Microsoft.NodejsTools.LogGeneration {
     };
 
     // http://msdn.microsoft.com/en-us/library/windows/desktop/aa964789(v=vs.85).aspx
-    struct ProcessInfo {
+    internal struct ProcessInfo
+    {
         public uint UniqueProcessKey;
         public uint ProcessId;
         public uint ParentId;
@@ -128,7 +137,8 @@ namespace Microsoft.NodejsTools.LogGeneration {
         public uint UserSID;               // we'll write 0 here indicating no sid
     };
 
-    struct SampledProfile {
+    internal struct SampledProfile
+    {
         public uint InstructionPointer;
         public uint ThreadId;
         public uint Count;
@@ -137,7 +147,8 @@ namespace Microsoft.NodejsTools.LogGeneration {
 #pragma warning disable 649
 #pragma warning disable 169
 
-    struct EVENT_TRACE {
+    internal struct EVENT_TRACE
+    {
         public EVENT_TRACE_HEADER Header;
         public uint InstanceId;
         public uint ParentInstanceId;
@@ -147,7 +158,8 @@ namespace Microsoft.NodejsTools.LogGeneration {
         public uint ClientContext_Or_ETW_BUFFER_CONTEXT;
     }
 
-    struct EVENT_TRACE_HEADER {
+    internal struct EVENT_TRACE_HEADER
+    {
         public ushort Size;
         public byte HeaderType;
         public byte MarkerFlags;
@@ -162,17 +174,19 @@ namespace Microsoft.NodejsTools.LogGeneration {
         public uint UserTime;
     }
 
-    struct SYSTEMTIME {
-        short wYear;
-        short wMonth;
-        short wDayOfWeek;
-        short wDay;
-        short wHour;
-        short wMinute;
-        short wSecond;
-        short wMilliseconds;
+    internal struct SYSTEMTIME
+    {
+        private short wYear;
+        private short wMonth;
+        private short wDayOfWeek;
+        private short wDay;
+        private short wHour;
+        private short wMinute;
+        private short wSecond;
+        private short wMilliseconds;
 
-        public SYSTEMTIME(DateTime time) {
+        public SYSTEMTIME(DateTime time)
+        {
             wYear = (short)time.Year;
             wMonth = (short)time.Month;
             wDayOfWeek = (short)time.DayOfWeek;
@@ -183,17 +197,20 @@ namespace Microsoft.NodejsTools.LogGeneration {
             wMilliseconds = (short)time.Millisecond;
         }
 
-        public DateTime ToDateTime() {
+        public DateTime ToDateTime()
+        {
             return new DateTime(wYear, wMonth, wDay, wHour, wMinute, wSecond, wMilliseconds);
         }
 
-        public override string ToString() {
+        public override string ToString()
+        {
             return string.Format(CultureInfo.InvariantCulture, "{0}/{1}/{2} {3}:{4}:{5}.{6}", wYear, wMonth, wDay, wHour, wMinute, wSecond, wMilliseconds);
             //return ToDateTime().ToString();
         }
     }
 
-    struct EVENT_TRACE_PROPERTIES {
+    internal struct EVENT_TRACE_PROPERTIES
+    {
         public WNODE_HEADER Wnode;
         public uint BufferSize;
         public uint MinimumBuffers;
@@ -214,17 +231,19 @@ namespace Microsoft.NodejsTools.LogGeneration {
         public uint LoggerNameOffset;
     }
 
-    struct WNODE_HEADER {
+    internal struct WNODE_HEADER
+    {
         public uint BufferSize;
-        uint ProviderId;
-        ulong HistoricalContext;
+        private uint ProviderId;
+        private ulong HistoricalContext;
         public ulong TimeStamp;
         public Guid Guid;
         public uint ClientContext;
         public uint Flags;
     }
 
-    struct EVENT_RECORD {
+    internal struct EVENT_RECORD
+    {
         public EVENT_HEADER EventHeader;
         public ETW_BUFFER_CONTEXT BufferContext;
         public ushort ExtendedDataCount;
@@ -234,7 +253,8 @@ namespace Microsoft.NodejsTools.LogGeneration {
         public IntPtr UserContext;
     }
 
-    struct EVENT_HEADER {
+    internal struct EVENT_HEADER
+    {
         public ushort Size;
         public ushort HeaderType;
         public ushort Flags;
@@ -248,7 +268,8 @@ namespace Microsoft.NodejsTools.LogGeneration {
         public Guid ActivityId;
     }
 
-    struct EVENT_DESCRIPTOR {
+    internal struct EVENT_DESCRIPTOR
+    {
         public ushort Id;
         public byte Version;
         public byte Channel;
@@ -258,34 +279,39 @@ namespace Microsoft.NodejsTools.LogGeneration {
         public ulong Keyword;
     }
 
-    struct EVENT_DATA_DESCRIPTOR {
+    internal struct EVENT_DATA_DESCRIPTOR
+    {
         public ulong Ptr;
         public uint Size;
         public uint Reserved;
     }
 
-    struct ETW_BUFFER_CONTEXT {
-        byte ProcessorNumber;
-        byte Alignment;
-        ushort LoggerId;
+    internal struct ETW_BUFFER_CONTEXT
+    {
+        private byte ProcessorNumber;
+        private byte Alignment;
+        private ushort LoggerId;
     }
 
-    struct EVENT_HEADER_EXTENDED_DATA_ITEM {
-        ushort Reserved1;
-        ushort ExtType;
-        ushort Linkage;
-        ushort DataSize;
-        ulong DataPtr;
+    internal struct EVENT_HEADER_EXTENDED_DATA_ITEM
+    {
+        private ushort Reserved1;
+        private ushort ExtType;
+        private ushort Linkage;
+        private ushort DataSize;
+        private ulong DataPtr;
     }
 
-    struct TRACE_GUID_REGISTRATION {
+    internal struct TRACE_GUID_REGISTRATION
+    {
         public IntPtr Guid;
         public IntPtr RegHandle;
     }
 
     // http://msdn.microsoft.com/en-us/library/aa363748(v=vs.85).aspx
     [StructLayout(LayoutKind.Explicit)]
-    struct EventTrace_Header {
+    internal struct EventTrace_Header
+    {
         [FieldOffset(0)]
         public uint BufferSize;
         [FieldOffset(4)]

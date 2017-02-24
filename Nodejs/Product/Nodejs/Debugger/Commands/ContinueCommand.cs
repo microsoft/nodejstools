@@ -16,12 +16,16 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.NodejsTools.Debugger.Commands {
-    sealed class ContinueCommand : DebuggerCommand {
+namespace Microsoft.NodejsTools.Debugger.Commands
+{
+    internal sealed class ContinueCommand : DebuggerCommand
+    {
         private readonly Dictionary<string, object> _arguments;
 
-        public ContinueCommand(int id, SteppingKind stepping, int stepCount = 1) : base(id, "continue") {
-            switch (stepping) {
+        public ContinueCommand(int id, SteppingKind stepping, int stepCount = 1) : base(id, "continue")
+        {
+            switch (stepping)
+            {
                 case SteppingKind.Into:
                     _arguments = new Dictionary<string, object> {
                         { "stepaction", "in" },
@@ -45,7 +49,8 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             }
         }
 
-        protected override IDictionary<string, object> Arguments {
+        protected override IDictionary<string, object> Arguments
+        {
             get { return _arguments; }
         }
     }

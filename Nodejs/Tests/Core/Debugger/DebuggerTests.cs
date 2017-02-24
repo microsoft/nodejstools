@@ -28,40 +28,49 @@ using Microsoft.VisualStudioTools;
 using TestUtilities;
 using TestUtilities.Nodejs;
 
-namespace NodejsTests.Debugger {
+namespace NodejsTests.Debugger
+{
     [TestClass]
-    public class DebuggerTests : BaseDebuggerTests {
+    public class DebuggerTests : BaseDebuggerTests
+    {
         [ClassInitialize]
-        public static void DoDeployment(TestContext context) {
+        public static void DoDeployment(TestContext context)
+        {
             AssertListener.Initialize();
             NodejsTestData.Deploy();
         }
 
         #region Enum Children Tests
 
-        public virtual string EnumChildrenTestName {
-            get {
+        public virtual string EnumChildrenTestName
+        {
+            get
+            {
                 return "EnumChildTest.js";
             }
         }
 
-        private void ChildTest(string filename, int lineNo, string text, params ChildInfo[] children) {
+        private void ChildTest(string filename, int lineNo, string text, params ChildInfo[] children)
+        {
             ChildTest(filename, lineNo, text, 0, children);
         }
 
-        private void ChildTest(string filename, int lineNo, string text, int frame, params ChildInfo[] children) {
+        private void ChildTest(string filename, int lineNo, string text, int frame, params ChildInfo[] children)
+        {
             NodeThread thread = null;
             var process =
                 DebugProcess(
                     filename,
-                    onLoadComplete: (newproc, newthread) => {
+                    onLoadComplete: (newproc, newthread) =>
+                    {
                         AddBreakPoint(newproc, filename, lineNo, 0);
                         thread = newthread;
                     }
                 );
 
             AutoResetEvent brkHit = new AutoResetEvent(false);
-            process.BreakpointHit += (sender, args) => {
+            process.BreakpointHit += (sender, args) =>
+            {
                 brkHit.Set();
             };
 
@@ -74,25 +83,34 @@ namespace NodejsTests.Debugger {
             NodeEvaluationResult evalRes = frames[frame].ExecuteTextAsync(text).WaitAndUnwrapExceptions();
             Assert.IsTrue(evalRes != null, "didn't get evaluation result");
 
-            if (children == null) {
+            if (children == null)
+            {
                 Assert.IsTrue(!evalRes.Type.HasFlag(NodeExpressionType.Expandable));
                 Assert.IsTrue(evalRes.GetChildrenAsync().WaitAndUnwrapExceptions() == null);
-            } else {
+            }
+            else
+            {
                 Assert.IsTrue(evalRes.Type.HasFlag(NodeExpressionType.Expandable));
                 var childrenReceived = new List<NodeEvaluationResult>(evalRes.GetChildrenAsync().WaitAndUnwrapExceptions());
 
                 Assert.AreEqual(children.Length, childrenReceived.Count, String.Format("received incorrect number of children: {0} expected, received {1}", children.Length, childrenReceived.Count));
-                for (int i = 0; i < children.Length; i++) {
+                for (int i = 0; i < children.Length; i++)
+                {
                     var curChild = children[i];
                     bool foundChild = false;
-                    for (int j = 0; j < childrenReceived.Count; j++) {
+                    for (int j = 0; j < childrenReceived.Count; j++)
+                    {
                         var curReceived = childrenReceived[j];
-                        if (ChildrenMatch(curChild, curReceived)) {
+                        if (ChildrenMatch(curChild, curReceived))
+                        {
                             foundChild = true;
 
-                            if (children[i].ChildText.StartsWith("[")) {
+                            if (children[i].ChildText.StartsWith("["))
+                            {
                                 Assert.AreEqual(childrenReceived[j].Expression, text + children[i].ChildText);
-                            } else {
+                            }
+                            else
+                            {
                                 Assert.AreEqual(childrenReceived[j].Expression, text + "." + children[i].ChildText);
                             }
 
@@ -111,17 +129,20 @@ namespace NodejsTests.Debugger {
             process.WaitForExit();
         }
 
-        private bool ChildrenMatch(ChildInfo curChild, NodeEvaluationResult curReceived) {
+        private bool ChildrenMatch(ChildInfo curChild, NodeEvaluationResult curReceived)
+        {
             return curReceived.StringValue == curChild.ChildText &&
                 (curReceived.StringValue == curChild.Repr || curChild.Repr == null);
         }
 
-        class ChildInfo {
+        private class ChildInfo
+        {
             public readonly string ChildText;
             public readonly string Repr;
             public readonly string HexRepr;
 
-            public ChildInfo(string key, string value = null, string hexRepr = null) {
+            public ChildInfo(string key, string value = null, string hexRepr = null)
+            {
                 ChildText = key;
                 Repr = value;
                 HexRepr = hexRepr;
@@ -133,19 +154,23 @@ namespace NodejsTests.Debugger {
         #region BreakAll Tests
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
-        public void BreakAll() {
+        public void BreakAll()
+        {
             // Load process (running)
             NodeThread thread = null;
             using (var process = DebugProcess(
                 "BreakAllTest.js",
-                onLoadComplete: (newproc, newthread) => {
+                onLoadComplete: (newproc, newthread) =>
+                {
                     thread = newthread;
                 }
-            )) {
+            ))
+            {
                 // BreakAll
                 Thread.Sleep(500);
                 AutoResetEvent breakComplete = new AutoResetEvent(false);
-                process.AsyncBreakComplete += (sender, args) => {
+                process.AsyncBreakComplete += (sender, args) =>
+                {
                     Assert.AreEqual(thread, args.Thread);
                     breakComplete.Set();
                 };
@@ -163,7 +188,8 @@ namespace NodejsTests.Debugger {
         #region Eval Tests
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void EvalTests() {
+        public void EvalTests()
+        {
             TestDebuggerSteps(
                 "LocalsTest4.js",
                 new[] {
@@ -196,7 +222,8 @@ namespace NodejsTests.Debugger {
         #region Locals Tests
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void LocalsTest() {
+        public void LocalsTest()
+        {
             LocalsTest(
                 "LocalsTest.js",
                 2,
@@ -221,7 +248,8 @@ namespace NodejsTests.Debugger {
         /// http://nodejstools.codeplex.com/workitem/13
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void SpecialNumberLocalsTest() {
+        public void SpecialNumberLocalsTest()
+        {
             LocalsTest(
                 "SpecialNumberLocalsTest.js",
                 6,
@@ -232,7 +260,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void GlobalsTest() {
+        public void GlobalsTest()
+        {
             LocalsTest(
                 "GlobalsTest.js",
                 3,
@@ -245,7 +274,8 @@ namespace NodejsTests.Debugger {
         #region Stepping Tests
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void StepTest() {
+        public void StepTest()
+        {
             // Bug 509: http://pytools.codeplex.com/workitem/509
             TestDebuggerSteps(
                 "SteppingTestBug509.js",
@@ -426,7 +456,8 @@ namespace NodejsTests.Debugger {
 
         // F5 startup
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
-        public void Startup_NoBreakOnEntryPoint() {
+        public void Startup_NoBreakOnEntryPoint()
+        {
             TestDebuggerSteps(
                 "BreakpointTest.js",
                 new[] {
@@ -438,7 +469,8 @@ namespace NodejsTests.Debugger {
 
         // F10/F11 startup
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore"), TestCategory("Ignore")]
-        public void Startup_BreakOnEntryPoint() {
+        public void Startup_BreakOnEntryPoint()
+        {
             TestDebuggerSteps(
                 "BreakpointTest.js",
                 new[] {
@@ -450,7 +482,8 @@ namespace NodejsTests.Debugger {
 
         // F5/F10/F11 startup
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore"), TestCategory("Ignore")]
-        public void Startup_BreakOnEntryPointBreakPoint() {
+        public void Startup_BreakOnEntryPointBreakPoint()
+        {
             TestDebuggerSteps(
                 "BreakpointTest.js",
                 new[] {
@@ -463,7 +496,8 @@ namespace NodejsTests.Debugger {
 
         // F5 startup
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
-        public void Startup_NoBreakOnEntryPointTracePoint() {
+        public void Startup_NoBreakOnEntryPointTracePoint()
+        {
             TestDebuggerSteps(
                 "BreakpointTest.js",
                 new[] {
@@ -477,7 +511,8 @@ namespace NodejsTests.Debugger {
 
         // F10/F11 startup
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void Startup_BreakOnEntryPointTracePoint() {
+        public void Startup_BreakOnEntryPointTracePoint()
+        {
             TestDebuggerSteps(
                 "BreakpointTest.js",
                 new[] {
@@ -491,7 +526,8 @@ namespace NodejsTests.Debugger {
 
         // F5 startup
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
-        public void Startup_NoBreakOnEntryPointBreakOn() {
+        public void Startup_NoBreakOnEntryPointBreakOn()
+        {
             TestDebuggerSteps(
                 "BreakpointTest.js",
                 new[] {
@@ -504,7 +540,8 @@ namespace NodejsTests.Debugger {
 
         // F5 startup
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void Startup_BreakOnEntryPointBreakOn() {
+        public void Startup_BreakOnEntryPointBreakOn()
+        {
             TestDebuggerSteps(
                 "BreakpointTest.js",
                 new[] {
@@ -524,7 +561,8 @@ namespace NodejsTests.Debugger {
         //public void Running_Simple() { }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void Running_AccrossBreakPoint() {
+        public void Running_AccrossBreakPoint()
+        {
             TestDebuggerSteps(
                 "BreakpointTest3.js",
                 new[] {
@@ -537,7 +575,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
-        public void Running_AccrossTracePoint() {
+        public void Running_AccrossTracePoint()
+        {
             TestDebuggerSteps(
                 "BreakpointTest3.js",
                 new[] {
@@ -554,7 +593,8 @@ namespace NodejsTests.Debugger {
         #region Stepping Tests
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void Stepping_Basic() {
+        public void Stepping_Basic()
+        {
             TestDebuggerSteps(
                 "SteppingBasic.js",
                 new[] {
@@ -586,7 +626,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void Stepping_AccrossBreakPoints() {
+        public void Stepping_AccrossBreakPoints()
+        {
             TestDebuggerSteps(
                 "SteppingAccrossBreakPoints.js",
                 new[] {
@@ -634,7 +675,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void Stepping_AccrossTracePoints() {
+        public void Stepping_AccrossTracePoints()
+        {
             TestDebuggerSteps(
                 "SteppingAccrossTracePoints.js",
                 new[] {
@@ -688,7 +730,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void Stepping_AcrossCaughtExceptions() {
+        public void Stepping_AcrossCaughtExceptions()
+        {
             TestDebuggerSteps(
                 "SteppingAcrossCaughtExceptions.js",
                 new[] {
@@ -710,7 +753,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void DebuggingDownloaded() {
+        public void DebuggingDownloaded()
+        {
             TestDebuggerSteps(
                 "DebuggingDownloaded.js",
                 new[] {
@@ -738,7 +782,7 @@ namespace NodejsTests.Debugger {
                             module = thread.Frames[2].Module;
                             Assert.IsFalse(module.BuiltIn);
                             scriptText = await process.GetScriptTextAsync(module.Id);
-                            string fileText = File.ReadAllText(module.FileName);                            
+                            string fileText = File.ReadAllText(module.FileName);
                             Assert.IsTrue(scriptText.Contains(fileText));
                         }
                     ),
@@ -748,7 +792,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void Breaking_InFunctionPassedFewerThanTakenParms() {
+        public void Breaking_InFunctionPassedFewerThanTakenParms()
+        {
             TestDebuggerSteps(
                 "FunctionPassedFewerThanTakenParms.js",
                 new[] {
@@ -763,7 +808,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void Stepping_IntoFunctionPassedFewerThanTakenParms() {
+        public void Stepping_IntoFunctionPassedFewerThanTakenParms()
+        {
             TestDebuggerSteps(
                 "FunctionPassedFewerThanTakenParms.js",
                 new[] {
@@ -781,7 +827,8 @@ namespace NodejsTests.Debugger {
         #region Breakpoint Tests
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
-        public void CannonicalHelloWorldTest() {
+        public void CannonicalHelloWorldTest()
+        {
             AutoResetEvent textRead = new AutoResetEvent(false);
             TestDebuggerSteps(
                 "HelloWorld.js",
@@ -811,7 +858,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
-        public void BreakOnFixedUpBreakpoint() {
+        public void BreakOnFixedUpBreakpoint()
+        {
             AutoResetEvent textRead = new AutoResetEvent(false);
             TestDebuggerSteps(
                 "HelloWorldWithClosure.js",
@@ -841,7 +889,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
-        public void SetBreakpointWhileRunning() {
+        public void SetBreakpointWhileRunning()
+        {
             TestDebuggerSteps(
                 "RunForever.js",
                 new[] {
@@ -855,7 +904,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void Breakpoints() {
+        public void Breakpoints()
+        {
             TestDebuggerSteps(
                 "BreakpointTest.js",
                 new[] {
@@ -867,7 +917,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void Breakpoints2() {
+        public void Breakpoints2()
+        {
             TestDebuggerSteps(
                 "BreakpointTest2.js",
                 new[] {
@@ -882,7 +933,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void Breakpoints3() {
+        public void Breakpoints3()
+        {
             TestDebuggerSteps(
                 "BreakpointTest3.js",
                 new[] {
@@ -895,7 +947,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void BreakpointsConditionals() {
+        public void BreakpointsConditionals()
+        {
             TestDebuggerSteps(
                 "BreakpointTest2.js",
                 new[] {
@@ -926,7 +979,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void BreakpointEnable() {
+        public void BreakpointEnable()
+        {
             TestDebuggerSteps(
                 "BreakpointTest2.js",
                 new[] {
@@ -942,7 +996,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void BreakpointRemove() {
+        public void BreakpointRemove()
+        {
             TestDebuggerSteps(
                 "BreakpointTest2.js",
                 new[] {
@@ -984,7 +1039,8 @@ namespace NodejsTests.Debugger {
         //}
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void BreakpointsBreakOn() {
+        public void BreakpointsBreakOn()
+        {
             // BreakOnKind.Always
             TestDebuggerSteps(
                 "BreakpointBreakOn.js",
@@ -1137,25 +1193,34 @@ namespace NodejsTests.Debugger {
 
             // Invalid BreakOn
             bool exceptionHit = false;
-            try {
+            try
+            {
                 new BreakOn(BreakOnKind.Equal, 0);
-            } catch (ArgumentException e) {
+            }
+            catch (ArgumentException e)
+            {
                 Assert.AreEqual("Invalid BreakOn count", e.Message);
                 exceptionHit = true;
             }
             Assert.IsTrue(exceptionHit);
             exceptionHit = false;
-            try {
+            try
+            {
                 new BreakOn(BreakOnKind.GreaterThanOrEqual, 0);
-            } catch (ArgumentException e) {
+            }
+            catch (ArgumentException e)
+            {
                 Assert.AreEqual("Invalid BreakOn count", e.Message);
                 exceptionHit = true;
             }
             Assert.IsTrue(exceptionHit);
             exceptionHit = false;
-            try {
+            try
+            {
                 new BreakOn(BreakOnKind.Mod, 0);
-            } catch (ArgumentException e) {
+            }
+            catch (ArgumentException e)
+            {
                 Assert.AreEqual("Invalid BreakOn count", e.Message);
                 exceptionHit = true;
             }
@@ -1163,7 +1228,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void BreakpointsHitCount() {
+        public void BreakpointsHitCount()
+        {
             TestDebuggerSteps(
                 "BreakpointBreakOn.js",
                 new[] {
@@ -1182,7 +1248,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void BreakpointInvalidLineFixup() {
+        public void BreakpointInvalidLineFixup()
+        {
             TestDebuggerSteps(
                 "FixupBreakpointOnComment.js",
                 new[] {
@@ -1262,7 +1329,8 @@ namespace NodejsTests.Debugger {
             );
         }
 
-        private void TestBreakpointPredicatedEntrypoint(string filename, int targetBreakpoint, int expectedHit) {
+        private void TestBreakpointPredicatedEntrypoint(string filename, int targetBreakpoint, int expectedHit)
+        {
             var expectFailure = (expectedHit != targetBreakpoint);
             // No predicates
             TestDebuggerSteps(
@@ -1398,22 +1466,26 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void BreakpointPredicatedEntrypointNoFixup() {
+        public void BreakpointPredicatedEntrypointNoFixup()
+        {
             TestBreakpointPredicatedEntrypoint("BreakpointTest.js", targetBreakpoint: 0, expectedHit: 0);
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void BreakpointPredicatedEntrypointBlankLineFixup() {
+        public void BreakpointPredicatedEntrypointBlankLineFixup()
+        {
             TestBreakpointPredicatedEntrypoint("FixupBreakpointOnBlankLine.js", targetBreakpoint: 0, expectedHit: 2);
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void BreakpointPredicatedEntrypointCommentFixup() {
+        public void BreakpointPredicatedEntrypointCommentFixup()
+        {
             TestBreakpointPredicatedEntrypoint("FixupBreakpointOnComment.js", targetBreakpoint: 0, expectedHit: 1);
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
-        public void DuplicateFileName() {
+        public void DuplicateFileName()
+        {
             TestDebuggerSteps(
                 "DuppedFilename.js",
                 new[] {
@@ -1437,7 +1509,8 @@ namespace NodejsTests.Debugger {
         #region Exception Tests
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void Exceptions() {
+        public void Exceptions()
+        {
             // Well-known, handled
             // Implicit break always
             //TestExceptions(
@@ -1548,7 +1621,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void ExceptionsTypes() {
+        public void ExceptionsTypes()
+        {
             TestExceptions(
                 DebuggerTestPath + @"ExceptionTypes.js",
                 ExceptionHitTreatment.BreakAlways,
@@ -1571,7 +1645,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void ComplexExceptions() {
+        public void ComplexExceptions()
+        {
             TestExceptions(
                 DebuggerTestPath + @"ComplexExceptions.js",
                 ExceptionHitTreatment.BreakAlways,
@@ -1593,7 +1668,8 @@ namespace NodejsTests.Debugger {
         /// by default.
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void RequireExceptions() {
+        public void RequireExceptions()
+        {
             TestExceptions(
                 DebuggerTestPath + @"RequireExceptions.js",
                 null,
@@ -1608,7 +1684,8 @@ namespace NodejsTests.Debugger {
         /// Test handling of exceptions in evaluated code
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void ExceptionInEvaluatedCode() {
+        public void ExceptionInEvaluatedCode()
+        {
             TestDebuggerSteps(
                 "ExceptionInEvaluatedCode.js",
                 new[] {
@@ -1627,7 +1704,8 @@ namespace NodejsTests.Debugger {
         #region Deep Callstack Tests
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void Stepping_AccrossDeepThrow() {
+        public void Stepping_AccrossDeepThrow()
+        {
             TestDebuggerSteps(
                 "ThrowsWithDeepCallstack.js",
                 new[] {
@@ -1641,7 +1719,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void Stepping_AccrossDeepTracePoint() {
+        public void Stepping_AccrossDeepTracePoint()
+        {
             TestDebuggerSteps(
                 "DeepCallstack.js",
                 new[] {
@@ -1656,7 +1735,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void Stepping_AccrossDeepFixedUpTracePoint() {
+        public void Stepping_AccrossDeepFixedUpTracePoint()
+        {
             TestDebuggerSteps(
                 "DeepCallstack.js",
                 new[] {
@@ -1675,7 +1755,8 @@ namespace NodejsTests.Debugger {
         #region Module Load Tests
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void ModuleLoad() {
+        public void ModuleLoad()
+        {
             TestModuleLoad(
                 "NoRequires.js",
                 "NoRequires.js"
@@ -1688,15 +1769,18 @@ namespace NodejsTests.Debugger {
             );
         }
 
-        private void TestModuleLoad(string filename, params string[] expectedModulesLoaded) {
+        private void TestModuleLoad(string filename, params string[] expectedModulesLoaded)
+        {
             List<string> receivedFilenames = new List<string>();
             TestDebuggerSteps(
                 filename,
                 new[] {
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0)
                 },
-                onProcessCreated: newProcess => {
-                    newProcess.ModuleLoaded += (sender, args) => {
+                onProcessCreated: newProcess =>
+                {
+                    newProcess.ModuleLoaded += (sender, args) =>
+                    {
                         receivedFilenames.Add(args.Module.FileName);
                     };
                 }
@@ -1704,16 +1788,19 @@ namespace NodejsTests.Debugger {
 
             Assert.IsTrue(receivedFilenames.Count >= expectedModulesLoaded.Length);
             var set = new HashSet<string>();
-            foreach (var received in receivedFilenames) {
+            foreach (var received in receivedFilenames)
+            {
                 set.Add(Path.GetFileName(received));
             }
 
-            foreach (var file in expectedModulesLoaded) {
+            foreach (var file in expectedModulesLoaded)
+            {
                 Assert.IsTrue(set.Contains(file));
             }
         }
 
-        private object DebugProcess(string filename, object onProcessCreated) {
+        private object DebugProcess(string filename, object onProcessCreated)
+        {
             throw new NotImplementedException();
         }
 
@@ -1722,7 +1809,8 @@ namespace NodejsTests.Debugger {
         #region Exit Code Tests
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void ExitNormal() {
+        public void ExitNormal()
+        {
             TestDebuggerSteps(
                 "ExitNormal.js",
                 new[] {
@@ -1733,7 +1821,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void ExitException() {
+        public void ExitException()
+        {
             TestDebuggerSteps(
                 "ExitException.js",
                 new[] {
@@ -1743,11 +1832,11 @@ namespace NodejsTests.Debugger {
                 },
                 exceptionTreatments: CollectExceptionTreatments(ExceptionHitTreatment.BreakAlways, "Error")
             );
-
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
-        public void ExitExplicit() {
+        public void ExitExplicit()
+        {
             TestDebuggerSteps(
                 "ExitExplicit.js",
                 new[] {
@@ -1762,7 +1851,8 @@ namespace NodejsTests.Debugger {
         #region Argument Tests
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void ScriptArguments() {
+        public void ScriptArguments()
+        {
             TestDebuggerSteps(
                 "PassedArgs.js",
                 new[] {
@@ -1787,12 +1877,14 @@ namespace NodejsTests.Debugger {
         #region Attach Tests
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
-        public void LocalAttach() {
+        public void LocalAttach()
+        {
             var filename = "RunForever.js";
 
-            using (var sysProcess = StartNodeProcess(filename)) {
-
-                for (var i = 0; i < 3; ++i) {
+            using (var sysProcess = StartNodeProcess(filename))
+            {
+                for (var i = 0; i < 3; ++i)
+                {
                     var process = AttachToNodeProcess(id: sysProcess.Id);
                     var thread = process.GetThreads().First();
                     TestDebuggerSteps(
@@ -1817,20 +1909,21 @@ namespace NodejsTests.Debugger {
         #region TypeScript Tests
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void TypeScript_Stepping_Basic() {
+        public void TypeScript_Stepping_Basic()
+        {
             TestDebuggerSteps(
                 "TypeScriptTest.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, 
+                    new TestStep(action: TestAction.AddBreakpoint,
                         targetBreakpoint: 1,
                         targetBreakpointColumn: 43,
                         targetBreakpointFile: "TypeScriptTest.ts"),
                     new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
-                    new TestStep(action: TestAction.ResumeThread, 
-                        expectedHitCount: 1, 
+                    new TestStep(action: TestAction.ResumeThread,
+                        expectedHitCount: 1,
                         targetBreakpoint: 1,
                         targetBreakpointColumn: 43,
-                        targetBreakpointFile: "TypeScriptTest.ts", 
+                        targetBreakpointFile: "TypeScriptTest.ts",
                         expectedBreakFunction: "Greeter.constructor",
                         expectedBreakpointHit: 1),
                     new TestStep(action: TestAction.StepOut, expectedStepComplete: 8),
@@ -1840,14 +1933,14 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "TypeScriptTest.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, 
-                        targetBreakpoint: 7, 
+                    new TestStep(action: TestAction.AddBreakpoint,
+                        targetBreakpoint: 7,
                         targetBreakpointFile: "TypeScriptTest.ts"),
                     new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
-                    new TestStep(action: TestAction.ResumeThread, 
-                        expectedHitCount: 1, 
-                        targetBreakpoint: 7, 
-                        targetBreakpointFile: "TypeScriptTest.ts", 
+                    new TestStep(action: TestAction.ResumeThread,
+                        expectedHitCount: 1,
+                        targetBreakpoint: 7,
+                        targetBreakpointFile: "TypeScriptTest.ts",
                         expectedBreakFunction: "Greeter",
                         expectedBreakpointHit: 7),
                     new TestStep(action: TestAction.StepInto, expectedStepComplete: 1),
@@ -1857,14 +1950,14 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "TypeScriptTest.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, 
-                        targetBreakpoint: 7, 
+                    new TestStep(action: TestAction.AddBreakpoint,
+                        targetBreakpoint: 7,
                         targetBreakpointFile: "TypeScriptTest.ts"),
                     new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
-                    new TestStep(action: TestAction.ResumeThread, 
-                        expectedHitCount: 1, 
-                        targetBreakpoint: 7, 
-                        targetBreakpointFile: "TypeScriptTest.ts", 
+                    new TestStep(action: TestAction.ResumeThread,
+                        expectedHitCount: 1,
+                        targetBreakpoint: 7,
+                        targetBreakpointFile: "TypeScriptTest.ts",
                         expectedBreakFunction: "Greeter",
                         expectedBreakpointHit: 7),
                     new TestStep(action: TestAction.StepOver, expectedStepComplete: 8),
@@ -1884,14 +1977,14 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "TypeScriptTest.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, 
-                        targetBreakpoint: 1, 
+                    new TestStep(action: TestAction.AddBreakpoint,
+                        targetBreakpoint: 1,
                         targetBreakpointFile: "TypeScriptTest.ts"),
                     new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
-                    new TestStep(action: TestAction.ResumeThread, 
-                        expectedHitCount: 1, 
-                        targetBreakpoint: 1, 
-                        targetBreakpointFile: "TypeScriptTest.ts", 
+                    new TestStep(action: TestAction.ResumeThread,
+                        expectedHitCount: 1,
+                        targetBreakpoint: 1,
+                        targetBreakpointFile: "TypeScriptTest.ts",
                         expectedBreakFunction: "Greeter.constructor",
                         expectedBreakpointHit: 1),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
@@ -1901,14 +1994,14 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "TypeScriptTest2.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, 
-                        targetBreakpoint: 2, 
+                    new TestStep(action: TestAction.AddBreakpoint,
+                        targetBreakpoint: 2,
                         targetBreakpointFile: "TypeScriptTest2.ts"),
                     new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
-                    new TestStep(action: TestAction.ResumeThread, 
-                        expectedHitCount: 1, 
-                        targetBreakpoint: 2, 
-                        targetBreakpointFile: "TypeScriptTest2.ts", 
+                    new TestStep(action: TestAction.ResumeThread,
+                        expectedHitCount: 1,
+                        targetBreakpoint: 2,
+                        targetBreakpointFile: "TypeScriptTest2.ts",
                         expectedBreakFunction: "Greeter.constructor",
                         expectedBreakpointHit: 2),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
@@ -1920,20 +2013,21 @@ namespace NodejsTests.Debugger {
         /// https://nodejstools.codeplex.com/workitem/1515
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void TypeScript_Stepping_Basic_RedirectDir() {
+        public void TypeScript_Stepping_Basic_RedirectDir()
+        {
             TestDebuggerSteps(
                 "TypeScriptOut\\TypeScriptTest.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, 
+                    new TestStep(action: TestAction.AddBreakpoint,
                         targetBreakpoint: 1,
                         targetBreakpointColumn: 43,
                         targetBreakpointFile: "TypeScriptTest.ts"),
                     new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
-                    new TestStep(action: TestAction.ResumeThread, 
-                        expectedHitCount: 1, 
+                    new TestStep(action: TestAction.ResumeThread,
+                        expectedHitCount: 1,
                         targetBreakpoint: 1,
                         targetBreakpointColumn: 43,
-                        targetBreakpointFile: "TypeScriptTest.ts", 
+                        targetBreakpointFile: "TypeScriptTest.ts",
                         expectedBreakFunction: "Greeter.constructor",
                         expectedBreakpointHit: 1),
                     new TestStep(action: TestAction.StepOut, expectedStepComplete: 8),
@@ -1943,14 +2037,14 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "TypeScriptOut\\TypeScriptTest.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, 
-                        targetBreakpoint: 7, 
+                    new TestStep(action: TestAction.AddBreakpoint,
+                        targetBreakpoint: 7,
                         targetBreakpointFile: "TypeScriptTest.ts"),
                     new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
-                    new TestStep(action: TestAction.ResumeThread, 
-                        expectedHitCount: 1, 
-                        targetBreakpoint: 7, 
-                        targetBreakpointFile: "TypeScriptTest.ts", 
+                    new TestStep(action: TestAction.ResumeThread,
+                        expectedHitCount: 1,
+                        targetBreakpoint: 7,
+                        targetBreakpointFile: "TypeScriptTest.ts",
                         expectedBreakFunction: "Greeter",
                         expectedBreakpointHit: 7),
                     new TestStep(action: TestAction.StepInto, expectedStepComplete: 1),
@@ -1960,14 +2054,14 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "TypeScriptOut\\TypeScriptTest.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, 
-                        targetBreakpoint: 7, 
+                    new TestStep(action: TestAction.AddBreakpoint,
+                        targetBreakpoint: 7,
                         targetBreakpointFile: "TypeScriptTest.ts"),
                     new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
-                    new TestStep(action: TestAction.ResumeThread, 
-                        expectedHitCount: 1, 
-                        targetBreakpoint: 7, 
-                        targetBreakpointFile: "TypeScriptTest.ts", 
+                    new TestStep(action: TestAction.ResumeThread,
+                        expectedHitCount: 1,
+                        targetBreakpoint: 7,
+                        targetBreakpointFile: "TypeScriptTest.ts",
                         expectedBreakFunction: "Greeter",
                         expectedBreakpointHit: 7),
                     new TestStep(action: TestAction.StepOver, expectedStepComplete: 8),
@@ -1987,14 +2081,14 @@ namespace NodejsTests.Debugger {
             TestDebuggerSteps(
                 "TypeScriptOut\\TypeScriptTest.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, 
-                        targetBreakpoint: 1, 
+                    new TestStep(action: TestAction.AddBreakpoint,
+                        targetBreakpoint: 1,
                         targetBreakpointFile: "TypeScriptTest.ts"),
                     new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
-                    new TestStep(action: TestAction.ResumeThread, 
-                        expectedHitCount: 1, 
-                        targetBreakpoint: 1, 
-                        targetBreakpointFile: "TypeScriptTest.ts", 
+                    new TestStep(action: TestAction.ResumeThread,
+                        expectedHitCount: 1,
+                        targetBreakpoint: 1,
+                        targetBreakpointFile: "TypeScriptTest.ts",
                         expectedBreakFunction: "Greeter.constructor",
                         expectedBreakpointHit: 1),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
@@ -2003,18 +2097,19 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void TypeScript_Break_On_First_Line() {
+        public void TypeScript_Break_On_First_Line()
+        {
             TestDebuggerSteps(
                 "TypeScriptTest3.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, 
+                    new TestStep(action: TestAction.AddBreakpoint,
                         targetBreakpoint: 0,
                         targetBreakpointFile: "TypeScriptTest3.ts"),
-                    new TestStep(action: TestAction.ResumeThread, 
-                        expectedHitCount: 1, 
+                    new TestStep(action: TestAction.ResumeThread,
+                        expectedHitCount: 1,
                         targetBreakpoint: 0,
                         targetBreakpointColumn: 0,
-                        targetBreakpointFile: "TypeScriptTest3.ts", 
+                        targetBreakpointFile: "TypeScriptTest3.ts",
                         expectedBreakFunction: NodeVariableType.AnonymousFunction,
                         expectedBreakpointHit: 0),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
@@ -2023,28 +2118,29 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("Ignore")]
-        public void TypeScript_Inheiritance_BreakInClass() {
+        public void TypeScript_Inheiritance_BreakInClass()
+        {
             TestDebuggerSteps(
                 "TypeScriptInheritTest.js",
                 new[] {
-                    new TestStep(action: TestAction.AddBreakpoint, 
+                    new TestStep(action: TestAction.AddBreakpoint,
                         targetBreakpoint: 7,
                         targetBreakpointFile: "TypeScriptInheritApple.ts",
                         expectFailure: true),
                     new TestStep(action: TestAction.ResumeThread, expectedEntryPointHit: 0),
-                    new TestStep(action: TestAction.ResumeThread, 
-                        expectedHitCount: 1, 
+                    new TestStep(action: TestAction.ResumeThread,
+                        expectedHitCount: 1,
                         targetBreakpoint: 7,
                         targetBreakpointColumn: 0,
-                        targetBreakpointFile: "TypeScriptInheritApple.ts", 
+                        targetBreakpointFile: "TypeScriptInheritApple.ts",
                         expectedBreakFunction: "TypeScriptInheritApple.constructor",
                         expectedBreakpointHit: 7,
                         expectReBind: true),
-                    new TestStep(action: TestAction.ResumeThread, 
-                        expectedHitCount: 2, 
+                    new TestStep(action: TestAction.ResumeThread,
+                        expectedHitCount: 2,
                         targetBreakpoint: 7,
                         targetBreakpointColumn: 0,
-                        targetBreakpointFile: "TypeScriptInheritApple.ts", 
+                        targetBreakpointFile: "TypeScriptInheritApple.ts",
                         expectedBreakFunction: "TypeScriptInheritApple.constructor",
                         expectedBreakpointHit: 7),
                     new TestStep(action: TestAction.ResumeProcess, expectedExitCode: 0),
@@ -2056,49 +2152,65 @@ namespace NodejsTests.Debugger {
         #region Helpers Tests
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
-        public async Task TaskWaitAsync() {
+        public async Task TaskWaitAsync()
+        {
             // Successful task, no timeout.
-            var task = Task.Run(() => {
+            var task = Task.Run(() =>
+            {
                 Thread.Sleep(500);
-                return 42; });
+                return 42;
+            });
             Assert.AreEqual(42, await task.WaitAsync(TimeSpan.FromMilliseconds(1000)));
 
             // Failed task, no timeout.
             var tex = new Exception();
-            try {
-                task = Task.Run(() => {
+            try
+            {
+                task = Task.Run(() =>
+                {
                     Thread.Sleep(500);
-                    if ("".Length == 0) {
+                    if ("".Length == 0)
+                    {
                         throw tex;
                     }
                     return 42;
                 });
                 await task.WaitAsync(TimeSpan.FromMilliseconds(1000));
                 Assert.Fail("Exception expected");
-            } catch (Exception cex) {
+            }
+            catch (Exception cex)
+            {
                 Assert.AreSame(tex, cex);
             }
 
             // Timeout before task completes.
-            task = Task.Run(() => {
+            task = Task.Run(() =>
+            {
                 Thread.Sleep(500);
                 return 42;
             });
-            try {
+            try
+            {
                 await task.WaitAsync(TimeSpan.FromMilliseconds(100));
                 Assert.Fail("TaskCanceledException expected");
-            } catch (TaskCanceledException) {
+            }
+            catch (TaskCanceledException)
+            {
             }
 
             // Forced cancelation before task completes.
-            task = Task.Run(() => {
+            task = Task.Run(() =>
+            {
                 Thread.Sleep(500);
                 return 42;
             });
-            try {
+            try
+            {
                 await task.WaitAsync(TimeSpan.FromMilliseconds(300), new CancellationTokenSource(100).Token);
                 Assert.Fail("TaskCanceledException expected");
-            } catch (TaskCanceledException) {
+            }
+            catch (TaskCanceledException)
+            {
             }
         }
 

@@ -16,12 +16,15 @@
 
 using System.Windows.Controls;
 
-namespace Microsoft.NodejsTools.Project.ImportWizard {
+namespace Microsoft.NodejsTools.Project.ImportWizard
+{
     /// <summary>
     /// Interaction logic for SaveProjectPage.xaml
     /// </summary>
-    internal partial class SaveProjectPage : Page {
-        public SaveProjectPage() {
+    internal partial class SaveProjectPage : Page
+    {
+        public SaveProjectPage()
+        {
             InitializeComponent();
         }
     }

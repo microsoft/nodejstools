@@ -27,8 +27,10 @@ using System.Windows.Media;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.Project;
 
-namespace Microsoft.NodejsTools.NpmUI {
-    class NpmOutputViewModel : INotifyPropertyChanged, IDisposable {
+namespace Microsoft.NodejsTools.NpmUI
+{
+    internal class NpmOutputViewModel : INotifyPropertyChanged, IDisposable
+    {
         private readonly INpmController _npmController;
         private readonly Queue<QueuedNpmCommandInfo> _commandQueue = new Queue<QueuedNpmCommandInfo>();
         private readonly object _lock = new object();
@@ -42,8 +44,9 @@ namespace Microsoft.NodejsTools.NpmUI {
         private QueuedNpmCommandInfo _currentCommand;
         private readonly HashSet<string> _failedCommands = new HashSet<string>();
         private INpmCommander _commander;
-        
-        public NpmOutputViewModel(INpmController controller) {
+
+        public NpmOutputViewModel(INpmController controller)
+        {
             _npmController = controller;
 
             var style = new Style(typeof(Paragraph));
@@ -60,41 +63,53 @@ namespace Microsoft.NodejsTools.NpmUI {
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) {
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
             PropertyChangedEventHandler handler = PropertyChanged;
             if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private void Pulse() {
-            lock (_lock) {
+        private void Pulse()
+        {
+            lock (_lock)
+            {
                 Monitor.PulseAll(_lock);
             }
         }
 
-        public string StatusText {
+        public string StatusText
+        {
             get { return _statusText; }
-            set {
+            set
+            {
                 _statusText = value;
                 OnPropertyChanged();
             }
         }
 
-        public bool WithErrors {
+        public bool WithErrors
+        {
             get { return _withErrors; }
-            set {
+            set
+            {
                 _withErrors = value;
                 OnPropertyChanged();
             }
         }
 
-        public bool IsExecutingCommand {
-            get {
-                lock (_lock) {
+        public bool IsExecutingCommand
+        {
+            get
+            {
+                lock (_lock)
+                {
                     return _isExecutingCommand;
                 }
             }
-            set {
-                lock (_lock) {
+            set
+            {
+                lock (_lock)
+                {
                     _isExecutingCommand = value;
                     Pulse();
                 }
@@ -105,43 +120,55 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
         }
 
-        public Visibility ExecutionIdleVisibility {
+        public Visibility ExecutionIdleVisibility
+        {
             get { return IsExecutingCommand ? Visibility.Collapsed : Visibility.Visible; }
         }
 
-        public Visibility ExecutionProgressVisibility {
+        public Visibility ExecutionProgressVisibility
+        {
             get { return IsExecutingCommand ? Visibility.Visible : Visibility.Collapsed; }
         }
 
-        public Visibility CommandCancelVisibility {
+        public Visibility CommandCancelVisibility
+        {
             get { return _commandCancelVisibility; }
-            set {
+            set
+            {
                 _commandCancelVisibility = value;
                 OnPropertyChanged();
             }
         }
 
-        private void SetCancellable(bool cancellable) {
+        private void SetCancellable(bool cancellable)
+        {
             CommandCancelVisibility = cancellable ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        public void SetCancellableSafe(bool cancellable) {
+        public void SetCancellableSafe(bool cancellable)
+        {
             Application.Current.Dispatcher.BeginInvoke(new Action(
                 () => SetCancellable(cancellable)));
         }
 
-        public bool IsCancellable {
-            get {
-                lock (_lock) {
+        public bool IsCancellable
+        {
+            get
+            {
+                lock (_lock)
+                {
                     return _commandQueue.Count > 0 || IsExecutingCommand;
                 }
             }
         }
 
-        public void Cancel() {
-            lock (_lock) {
+        public void Cancel()
+        {
+            lock (_lock)
+            {
                 _commandQueue.Clear();
-                if (null != _commander) {
+                if (null != _commander)
+                {
                     _commander.CancelCurrentCommand();
                 }
                 IsExecutingCommand = false;
@@ -151,10 +178,13 @@ namespace Microsoft.NodejsTools.NpmUI {
             OnPropertyChanged(nameof(IsCancellable));
         }
 
-        private void QueueCommand(QueuedNpmCommandInfo info) {
-            lock (_lock) {
+        private void QueueCommand(QueuedNpmCommandInfo info)
+        {
+            lock (_lock)
+            {
                 if (_commandQueue.Contains(info)
-                    || info.Equals(_currentCommand)) {
+                    || info.Equals(_currentCommand))
+                {
                     return;
                 }
                 _commandQueue.Enqueue(info);
@@ -165,26 +195,32 @@ namespace Microsoft.NodejsTools.NpmUI {
             OnPropertyChanged(nameof(IsCancellable));
         }
 
-        public void QueueCommand(string arguments) {
+        public void QueueCommand(string arguments)
+        {
             QueueCommand(new QueuedNpmCommandInfo(arguments));
         }
 
-        public void QueueCommand(string command, string arguments) {
+        public void QueueCommand(string command, string arguments)
+        {
             QueueCommand(string.Format(CultureInfo.InvariantCulture, "{0} {1}", command, arguments));
         }
 
         public void QueueInstallPackage(
             string name,
             string version,
-            DependencyType type) {
+            DependencyType type)
+        {
             QueueCommand(new QueuedNpmCommandInfo(name, version, type));
         }
 
-        private async void Execute(QueuedNpmCommandInfo info) {
+        private async void Execute(QueuedNpmCommandInfo info)
+        {
             IsExecutingCommand = true;
             INpmCommander cmdr = null;
-            try {
-                lock (_lock) {
+            try
+            {
+                lock (_lock)
+                {
                     cmdr = _npmController.CreateNpmCommander();
                     cmdr.OutputLogged += commander_OutputLogged;
                     cmdr.ErrorLogged += commander_ErrorLogged;
@@ -193,19 +229,26 @@ namespace Microsoft.NodejsTools.NpmUI {
                     _commander = cmdr;
                 }
 
-                if (info.IsFreeformArgumentCommand) {
+                if (info.IsFreeformArgumentCommand)
+                {
                     await cmdr.ExecuteNpmCommandAsync(info.Arguments);
-                }  else {
+                }
+                else
+                {
                     await cmdr.InstallPackageByVersionAsync(
                                 info.Name,
                                 info.Version,
                                 info.DependencyType,
                                 true);
                 }
-            } finally {
-                lock (_lock) {
+            }
+            finally
+            {
+                lock (_lock)
+                {
                     _commander = null;
-                    if (null != cmdr) {
+                    if (null != cmdr)
+                    {
                         cmdr.OutputLogged -= commander_OutputLogged;
                         cmdr.ErrorLogged -= commander_ErrorLogged;
                         cmdr.ExceptionLogged -= commander_ExceptionLogged;
@@ -215,56 +258,70 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
         }
 
-        private void HandleCompletionSafe() {
+        private void HandleCompletionSafe()
+        {
             UpdateStatusMessage();
             OnPropertyChanged(nameof(IsCancellable));
         }
 
-        private void commander_CommandCompleted(object sender, NpmCommandCompletedEventArgs e) {
+        private void commander_CommandCompleted(object sender, NpmCommandCompletedEventArgs e)
+        {
             IsExecutingCommand = false;
             Application.Current.Dispatcher.BeginInvoke(
                 new Action(HandleCompletionSafe));
         }
 
-        public FlowDocument Output {
+        public FlowDocument Output
+        {
             get { return _output; }
         }
 
         public event EventHandler OutputWritten;
 
-        private void OnOutputWritten() {
+        private void OnOutputWritten()
+        {
             var handlers = OutputWritten;
-            if (null != handlers) {
+            if (null != handlers)
+            {
                 handlers(this, EventArgs.Empty);
             }
         }
 
-        private string Preprocess(string source) {
+        private string Preprocess(string source)
+        {
             return source.EndsWith(Environment.NewLine, StringComparison.Ordinal) ? source.Substring(0, source.Length - Environment.NewLine.Length) : source;
         }
 
-        private void WriteLines(string text, bool forceError) {
+        private void WriteLines(string text, bool forceError)
+        {
             text = Preprocess(text);
-            if (forceError) {
+            if (forceError)
+            {
                 WithErrors = true;
             }
-            foreach (var line in text.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None)) {
+            foreach (var line in text.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None))
+            {
                 var sub = line;
                 var paragraph = new Paragraph();
 
-                if (sub.StartsWith("npm ")) {
-                    paragraph.Inlines.Add(new Run(sub.Substring(0,4)));
+                if (sub.StartsWith("npm "))
+                {
+                    paragraph.Inlines.Add(new Run(sub.Substring(0, 4)));
                     sub = sub.Length > 4 ? sub.Substring(4) : string.Empty;
-                    if (sub.StartsWith("ERR!")) {
+                    if (sub.StartsWith("ERR!"))
+                    {
                         WithErrors = true;
                         var arguments = _currentCommand.Arguments.Split(' ');
-                        if (arguments.Length >= 2) {
+                        if (arguments.Length >= 2)
+                        {
                             _failedCommands.Add(arguments[1]);
                         }
 
                         paragraph.Inlines.Add(new Run(sub.Substring(0, 4)) { Foreground = Brushes.Red });
                         sub = sub.Length > 4 ? sub.Substring(4) : string.Empty;
-                    } else if (sub.StartsWith("WARN")) {
+                    }
+                    else if (sub.StartsWith("WARN"))
+                    {
                         paragraph.Inlines.Add(new Run(sub.Substring(0, 4)) { Foreground = Brushes.Yellow });
                         sub = sub.Length > 4 ? sub.Substring(4) : string.Empty;
                     }
@@ -278,24 +335,29 @@ namespace Microsoft.NodejsTools.NpmUI {
             OnOutputWritten();
         }
 
-        internal void commander_ExceptionLogged(object sender, NpmExceptionEventArgs e) {
+        internal void commander_ExceptionLogged(object sender, NpmExceptionEventArgs e)
+        {
             Application.Current.Dispatcher.BeginInvoke(
                 new Action(() => WriteLines(ErrorHelper.GetExceptionDetailsText(e.Exception), true)));
         }
 
-        internal void commander_ErrorLogged(object sender, NpmLogEventArgs e) {
+        internal void commander_ErrorLogged(object sender, NpmLogEventArgs e)
+        {
             Application.Current.Dispatcher.BeginInvoke(new Action(() => WriteLines(e.LogText, false)));
         }
 
-        internal void commander_OutputLogged(object sender, NpmLogEventArgs e) {
+        internal void commander_OutputLogged(object sender, NpmLogEventArgs e)
+        {
             Application.Current.Dispatcher.BeginInvoke(new Action(() => WriteLines(e.LogText, false)));
         }
 
-        private void UpdateStatusMessage() {
-            bool                    executingCommand;
-            QueuedNpmCommandInfo    command;
+        private void UpdateStatusMessage()
+        {
+            bool executingCommand;
+            QueuedNpmCommandInfo command;
             int count;
-            lock (_lock) {
+            lock (_lock)
+            {
                 executingCommand = IsExecutingCommand;
                 command = _currentCommand;
                 count = _commandQueue.Count;
@@ -304,21 +366,27 @@ namespace Microsoft.NodejsTools.NpmUI {
             string status;
             var errorsInfo = string.Join(", ", _failedCommands);
 
-            if (executingCommand && null != command) {
+            if (executingCommand && null != command)
+            {
                 var commandText = command.ToString();
-                if (count > 0) {
+                if (count > 0)
+                {
                     status = string.Format(CultureInfo.CurrentCulture,
                         WithErrors ? Resources.NpmStatusExecutingQueuedErrors : Resources.NpmStatusExecutingQueued,
                         commandText,
                         count,
                         errorsInfo);
-                } else {
+                }
+                else
+                {
                     status = string.Format(CultureInfo.CurrentCulture,
                         WithErrors ? Resources.NpmStatusExecutingErrors : Resources.NpmStatusExecuting,
                         commandText,
                         errorsInfo);
                 }
-            } else {
+            }
+            else
+            {
                 status = string.Format(CultureInfo.CurrentCulture,
                     WithErrors ? Resources.NpmStatusReadyWithErrors : Resources.NpmStatusReady,
                     errorsInfo);
@@ -327,51 +395,64 @@ namespace Microsoft.NodejsTools.NpmUI {
             StatusText = status;
         }
 
-        private void UpdateStatusMessageSafe() {
+        private void UpdateStatusMessageSafe()
+        {
             Application.Current.Dispatcher.BeginInvoke(new Action(UpdateStatusMessage));
         }
 
-        private void Run() {
+        private void Run()
+        {
             int count = 0;
             // We want the thread to continue running queued commands before
             // exiting so the user can close the install window without having to wait
             // for commands to complete.
-            while (!_isDisposed || count > 0) {
-                lock (_lock) {
+            while (!_isDisposed || count > 0)
+            {
+                lock (_lock)
+                {
                     while ((_commandQueue.Count == 0 && !_isDisposed)
                         || null == _npmController
-                        || IsExecutingCommand) {
+                        || IsExecutingCommand)
+                    {
                         Monitor.Wait(_lock);
                     }
 
-                    if (_commandQueue.Count > 0) {
+                    if (_commandQueue.Count > 0)
+                    {
                         _currentCommand = _commandQueue.Dequeue();
-                    } else {
+                    }
+                    else
+                    {
                         _currentCommand = null;
                     }
                     count = _commandQueue.Count;
                 }
 
-                if (null != _currentCommand) {
+                if (null != _currentCommand)
+                {
                     Execute(_currentCommand);
                     UpdateStatusMessageSafe();
                 }
             }
         }
 
-        public void Dispose() {
+        public void Dispose()
+        {
             _isDisposed = true;
             OutputWritten = null;
             Pulse();
         }
 
-        private class QueuedNpmCommandInfo : EventArgs {
-            public QueuedNpmCommandInfo(string arguments) {
+        private class QueuedNpmCommandInfo : EventArgs
+        {
+            public QueuedNpmCommandInfo(string arguments)
+            {
                 Name = arguments;
                 IsFreeformArgumentCommand = true;
             }
 
-            public QueuedNpmCommandInfo(string name,string version, DependencyType depType) {
+            public QueuedNpmCommandInfo(string name, string version, DependencyType depType)
+            {
                 Name = name;
                 Version = version;
                 IsFreeformArgumentCommand = false;
@@ -379,30 +460,38 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
 
             public bool IsFreeformArgumentCommand { get; private set; }
-            public string Arguments {
+            public string Arguments
+            {
                 get { return Name; }
             }
             public string Name { get; private set; }
             public string Version { get; private set; }
             public DependencyType DependencyType { get; private set; }
 
-            public bool Equals(QueuedNpmCommandInfo other) {
+            public bool Equals(QueuedNpmCommandInfo other)
+            {
                 return null != other && StringComparer.CurrentCulture.Compare(ToString(), other.ToString()) == 0;
             }
 
-            public override bool Equals(object obj) {
+            public override bool Equals(object obj)
+            {
                 return Equals(obj as QueuedNpmCommandInfo);
             }
 
-            public override int GetHashCode() {
+            public override int GetHashCode()
+            {
                 return ToString().GetHashCode();
             }
 
-            public override string ToString() {
+            public override string ToString()
+            {
                 var buff = new StringBuilder("npm ");
-                if (IsFreeformArgumentCommand) {
+                if (IsFreeformArgumentCommand)
+                {
                     buff.Append(Arguments);
-                } else {
+                }
+                else
+                {
                     buff.Append(NpmArgumentBuilder.GetNpmInstallArguments(
                         Name,
                         Version,

@@ -19,29 +19,36 @@ using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
     [Export(typeof(IReplCommand))]
-    class ClearScreenReplCommand : IReplCommand {
+    internal class ClearScreenReplCommand : IReplCommand
+    {
         #region IReplCommand Members
 
-        public Task<ExecutionResult> Execute(IReplWindow window, string arguments) {
+        public Task<ExecutionResult> Execute(IReplWindow window, string arguments)
+        {
             window.ClearScreen();
             return ExecutionResult.Succeeded;
         }
 
-        public string Description {
+        public string Description
+        {
             get { return "Clears the contents of the REPL editor window"; }
         }
 
-        public string Command {
+        public string Command
+        {
             get { return "cls"; }
         }
 
-        public object ButtonContent {
-            get {
+        public object ButtonContent
+        {
+            get
+            {
                 var image = new BitmapImage();
                 image.BeginInit();
                 image.StreamSource = Assembly.GetExecutingAssembly().GetManifestResourceStream("Microsoft.VisualStudio.Resources.clearscr.gif");
@@ -52,7 +59,6 @@ namespace Microsoft.VisualStudio.Repl {
                 res.Opacity = 1.0;
                 res.Width = res.Height = 16;
                 return res;
-
             }
         }
 

@@ -17,14 +17,18 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Microsoft.NodejsTools.Profiling {
+namespace Microsoft.NodejsTools.Profiling
+{
     [Guid("7C711031-50B4-4263-901E-9EF86DD6DC57")]
-    public interface INodeProfileSession {
-        string Name {
+    public interface INodeProfileSession
+    {
+        string Name
+        {
             get;
         }
 
-        string Filename {
+        string Filename
+        {
             get;
         }
 
@@ -34,7 +38,8 @@ namespace Microsoft.NodejsTools.Profiling {
 
         void Launch(bool openReport = false);
 
-        bool IsSaved {
+        bool IsSaved
+        {
             get;
         }
     }

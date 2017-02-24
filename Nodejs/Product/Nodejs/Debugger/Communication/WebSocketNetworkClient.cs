@@ -21,21 +21,27 @@ using System.Net.WebSockets;
 using System.Threading;
 using Microsoft.VisualStudioTools;
 
-namespace Microsoft.NodejsTools.Debugger.Communication {
-    sealed class WebSocketNetworkClient : INetworkClient {
+namespace Microsoft.NodejsTools.Debugger.Communication
+{
+    internal sealed class WebSocketNetworkClient : INetworkClient
+    {
         private readonly ClientWebSocket _webSocket;
         private readonly WebSocketStream _stream;
 
-        public WebSocketNetworkClient(Uri uri) {
+        public WebSocketNetworkClient(Uri uri)
+        {
             // iisnode starts node.exe processes lazily on the first incoming request, and will terminate them after a period
             // of inactivity, making it impossible to attach. So before trying to connect to the debugger, "ping" the website
             // via HTTP to ensure that we have something to connect to.
-            try {
+            try
+            {
                 var httpRequest = WebRequest.Create(new UriBuilder(uri) { Scheme = "http", Port = -1, Path = "/" }.Uri);
                 httpRequest.Method = WebRequestMethods.Http.Head;
                 httpRequest.Timeout = 5000;
                 httpRequest.GetResponse().Dispose();
-            } catch (WebException) {
+            }
+            catch (WebException)
+            {
                 // If it fails or times out, just go ahead and try to connect anyway, and rely on normal error reporting path.
             }
 
@@ -44,21 +50,27 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             _stream = new WebSocketStream(_webSocket);
         }
 
-        public bool Connected {
+        public bool Connected
+        {
             get { return _webSocket.State == WebSocketState.Open; }
         }
 
-        public void Dispose() {
+        public void Dispose()
+        {
             _stream.Dispose();
-            try {
+            try
+            {
                 _webSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None).GetAwaiter().GetResult();
                 _webSocket.Dispose();
-            } catch (WebSocketException) {
+            }
+            catch (WebSocketException)
+            {
                 // We don't care about any errors when cleaning up and closing connection.
             }
         }
 
-        public Stream GetStream() {
+        public Stream GetStream()
+        {
             return _stream;
         }
     }

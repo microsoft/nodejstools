@@ -17,46 +17,61 @@
 using System;
 using System.Windows.Automation;
 
-namespace TestUtilities.UI.Nodejs {
-    public class ComparePerfReports : AutomationWrapper {
+namespace TestUtilities.UI.Nodejs
+{
+    public class ComparePerfReports : AutomationWrapper
+    {
         public ComparePerfReports(IntPtr hwnd)
-            : base(AutomationElement.FromHandle(hwnd)) {
+            : base(AutomationElement.FromHandle(hwnd))
+        {
         }
 
-        public void Ok() {
+        public void Ok()
+        {
             ClickButtonByName("OK");
         }
 
-        public void Cancel() {
+        public void Cancel()
+        {
             ClickButtonByName("Cancel");
         }
 
-        public string ComparisonFile {
-            get {
+        public string ComparisonFile
+        {
+            get
+            {
                 return ComparisonFileTextBox.GetValue();
             }
-            set {
+            set
+            {
                 ComparisonFileTextBox.SetValue(value);
             }
         }
 
-        private AutomationWrapper ComparisonFileTextBox {
-            get {
+        private AutomationWrapper ComparisonFileTextBox
+        {
+            get
+            {
                 return new AutomationWrapper(FindByAutomationId("ComparisonFile"));
             }
         }
 
-        public string BaselineFile {
-            get {
+        public string BaselineFile
+        {
+            get
+            {
                 return BaselineFileTextBox.GetValue();
             }
-            set {
+            set
+            {
                 BaselineFileTextBox.SetValue(value);
             }
         }
 
-        private AutomationWrapper BaselineFileTextBox {
-            get {
+        private AutomationWrapper BaselineFileTextBox
+        {
+            get
+            {
                 return new AutomationWrapper(FindByAutomationId("BaselineFile"));
             }
         }

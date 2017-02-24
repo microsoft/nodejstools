@@ -19,12 +19,15 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestWindow.Extensibility;
 using Microsoft.VisualStudio.TestWindow.Extensibility.Model;
 
-namespace Microsoft.VisualStudioTools.TestAdapter {
-    internal class TestContainer : ITestContainer {
+namespace Microsoft.VisualStudioTools.TestAdapter
+{
+    internal class TestContainer : ITestContainer
+    {
         private readonly DateTime _timeStamp;
         private readonly Architecture _architecture;
 
-        public TestContainer(ITestContainerDiscoverer discoverer, string source, DateTime timeStamp, Architecture architecture) {
+        public TestContainer(ITestContainerDiscoverer discoverer, string source, DateTime timeStamp, Architecture architecture)
+        {
             Discoverer = discoverer;
             Source = source;
             _timeStamp = timeStamp;
@@ -32,24 +35,30 @@ namespace Microsoft.VisualStudioTools.TestAdapter {
         }
 
         private TestContainer(TestContainer copy)
-            : this(copy.Discoverer, copy.Source, copy._timeStamp, copy._architecture) { }
+            : this(copy.Discoverer, copy.Source, copy._timeStamp, copy._architecture)
+        { }
 
-        public int CompareTo(ITestContainer other) {
+        public int CompareTo(ITestContainer other)
+        {
             var container = other as TestContainer;
-            if (container == null) {
+            if (container == null)
+            {
                 return -1;
             }
 
             var result = String.Compare(Source, container.Source, StringComparison.OrdinalIgnoreCase);
-            if (result != 0) {
+            if (result != 0)
+            {
                 return result;
             }
 
             return _timeStamp.CompareTo(container._timeStamp);
         }
 
-        public IEnumerable<Guid> DebugEngines {
-            get {
+        public IEnumerable<Guid> DebugEngines
+        {
+            get
+            {
                 // TODO: Create a debug engine that can be used to attach to the (managed) test executor
                 // Mixed mode debugging is not strictly necessary, provided that
                 // the first engine returned from this method can attach to a
@@ -60,31 +69,37 @@ namespace Microsoft.VisualStudioTools.TestAdapter {
             }
         }
 
-        public IDeploymentData DeployAppContainer() {
+        public IDeploymentData DeployAppContainer()
+        {
             return null;
         }
 
         public ITestContainerDiscoverer Discoverer { get; private set; }
 
-        public bool IsAppContainerTestContainer {
+        public bool IsAppContainerTestContainer
+        {
             get { return false; }
         }
 
-        public ITestContainer Snapshot() {
+        public ITestContainer Snapshot()
+        {
             return new TestContainer(this);
         }
 
         public string Source { get; private set; }
 
-        public FrameworkVersion TargetFramework {
+        public FrameworkVersion TargetFramework
+        {
             get { return FrameworkVersion.None; }
         }
 
-        public Architecture TargetPlatform {
+        public Architecture TargetPlatform
+        {
             get { return _architecture; }
         }
 
-        public override string ToString() {
+        public override string ToString()
+        {
             return Source + ":" + Discoverer.ExecutorUri.ToString();
         }
     }

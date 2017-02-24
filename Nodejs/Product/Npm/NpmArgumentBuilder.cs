@@ -17,20 +17,26 @@
 using System;
 using System.Globalization;
 
-namespace Microsoft.NodejsTools.Npm {
-    public static class NpmArgumentBuilder {
+namespace Microsoft.NodejsTools.Npm
+{
+    public static class NpmArgumentBuilder
+    {
         public static string GetNpmInstallArguments(string packageName,
             string versionRange,
             DependencyType type,
             bool global = false,
             bool saveToPackageJson = true,
-            string otherArguments = "") 
+            string otherArguments = "")
         {
             string dependencyArguments = "";
-            if (global) {
+            if (global)
+            {
                 dependencyArguments = "-g";
-            } else if (saveToPackageJson) {
-                switch(type) {
+            }
+            else if (saveToPackageJson)
+            {
+                switch (type)
+                {
                     case DependencyType.Standard:
                         dependencyArguments = "--save";
                         break;
@@ -44,9 +50,12 @@ namespace Microsoft.NodejsTools.Npm {
             }
 
             otherArguments = otherArguments.TrimStart(' ', '\t');
-            if (otherArguments.StartsWith("@", StringComparison.Ordinal)) {
+            if (otherArguments.StartsWith("@", StringComparison.Ordinal))
+            {
                 return string.Format(CultureInfo.InvariantCulture, "install {0}{1} {2}", packageName, otherArguments, dependencyArguments);
-            } else if (!string.IsNullOrEmpty(versionRange)) {
+            }
+            else if (!string.IsNullOrEmpty(versionRange))
+            {
                 return string.Format(CultureInfo.InvariantCulture, "install {0}@\"{1}\" {2} {3}", packageName, versionRange, dependencyArguments, otherArguments);
             }
 

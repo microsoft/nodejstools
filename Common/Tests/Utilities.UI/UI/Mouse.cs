@@ -21,7 +21,8 @@ using System.Security.Permissions;
 using System.Windows.Input;
 using TestUtilities;
 
-namespace TestUtilities.UI {
+namespace TestUtilities.UI
+{
     /// <summary>
     /// Exposes a simple interface to common mouse operations, allowing the user to simulate mouse input.
     /// </summary>
@@ -33,12 +34,14 @@ namespace TestUtilities.UI {
     */
     /// </code>
     /// </example>
-    public static class Mouse {
+    public static class Mouse
+    {
         /// <summary>
         /// Clicks a mouse button.
         /// </summary>
         /// <param name="mouseButton">The mouse button to click.</param>
-        public static void Click(MouseButton mouseButton = MouseButton.Left) {
+        public static void Click(MouseButton mouseButton = MouseButton.Left)
+        {
             Down(mouseButton);
             Up(mouseButton);
         }
@@ -47,9 +50,10 @@ namespace TestUtilities.UI {
         /// Double-clicks a mouse button.
         /// </summary>
         /// <param name="mouseButton">The mouse button to click.</param>
-        public static void DoubleClick(MouseButton mouseButton) {
-            Down(mouseButton, delay:false);
-            Up(mouseButton, delay:false);
+        public static void DoubleClick(MouseButton mouseButton)
+        {
+            Down(mouseButton, delay: false);
+            Up(mouseButton, delay: false);
             Down(mouseButton, delay: false);
             Up(mouseButton);
         }
@@ -58,8 +62,10 @@ namespace TestUtilities.UI {
         /// Performs a mouse-down operation for a specified mouse button.
         /// </summary>
         /// <param name="mouseButton">The mouse button to use.</param>
-        public static void Down(MouseButton mouseButton, bool delay = true) {
-            switch (mouseButton) {
+        public static void Down(MouseButton mouseButton, bool delay = true)
+        {
+            switch (mouseButton)
+            {
                 case MouseButton.Left:
                     SendMouseInput(0, 0, 0, NativeMethods.SendMouseInputFlags.LeftDown, delay);
                     break;
@@ -80,40 +86,48 @@ namespace TestUtilities.UI {
             }
         }
 
-        public static void MoveTo(System.Windows.Point point) {
-            SendMouseInput((int)point.X, (int)point.Y, 0, NativeMethods.SendMouseInputFlags.Move | NativeMethods.SendMouseInputFlags.Absolute);            
+        public static void MoveTo(System.Windows.Point point)
+        {
+            SendMouseInput((int)point.X, (int)point.Y, 0, NativeMethods.SendMouseInputFlags.Move | NativeMethods.SendMouseInputFlags.Absolute);
         }
         /// <summary>
         /// Moves the mouse pointer to the specified screen coordinates.
         /// </summary>
         /// <param name="point">The screen coordinates to move to.</param>
-        public static void MoveTo(System.Drawing.Point point) {
+        public static void MoveTo(System.Drawing.Point point)
+        {
             SendMouseInput(point.X, point.Y, 0, NativeMethods.SendMouseInputFlags.Move | NativeMethods.SendMouseInputFlags.Absolute);
         }
 
         /// <summary>
         /// Resets the system mouse to a clean state.
         /// </summary>
-        public static void Reset() {
+        public static void Reset()
+        {
             MoveTo(new Point(0, 0));
 
-            if (System.Windows.Input.Mouse.LeftButton == MouseButtonState.Pressed) {
+            if (System.Windows.Input.Mouse.LeftButton == MouseButtonState.Pressed)
+            {
                 SendMouseInput(0, 0, 0, NativeMethods.SendMouseInputFlags.LeftUp);
             }
 
-            if (System.Windows.Input.Mouse.MiddleButton == MouseButtonState.Pressed) {
+            if (System.Windows.Input.Mouse.MiddleButton == MouseButtonState.Pressed)
+            {
                 SendMouseInput(0, 0, 0, NativeMethods.SendMouseInputFlags.MiddleUp);
             }
 
-            if (System.Windows.Input.Mouse.RightButton == MouseButtonState.Pressed) {
+            if (System.Windows.Input.Mouse.RightButton == MouseButtonState.Pressed)
+            {
                 SendMouseInput(0, 0, 0, NativeMethods.SendMouseInputFlags.RightUp);
             }
 
-            if (System.Windows.Input.Mouse.XButton1 == MouseButtonState.Pressed) {
+            if (System.Windows.Input.Mouse.XButton1 == MouseButtonState.Pressed)
+            {
                 SendMouseInput(0, 0, NativeMethods.XButton1, NativeMethods.SendMouseInputFlags.XUp);
             }
 
-            if (System.Windows.Input.Mouse.XButton2 == MouseButtonState.Pressed) {
+            if (System.Windows.Input.Mouse.XButton2 == MouseButtonState.Pressed)
+            {
                 SendMouseInput(0, 0, NativeMethods.XButton2, NativeMethods.SendMouseInputFlags.XUp);
             }
         }
@@ -122,7 +136,8 @@ namespace TestUtilities.UI {
         /// Simulates scrolling of the mouse wheel up or down.
         /// </summary>
         /// <param name="lines">The number of lines to scroll. Use positive numbers to scroll up and negative numbers to scroll down.</param>
-        public static void Scroll(double lines) {
+        public static void Scroll(double lines)
+        {
             int amount = (int)(NativeMethods.WheelDelta * lines);
 
             SendMouseInput(0, 0, amount, NativeMethods.SendMouseInputFlags.Wheel);
@@ -132,8 +147,10 @@ namespace TestUtilities.UI {
         /// Performs a mouse-up operation for a specified mouse button.
         /// </summary>
         /// <param name="mouseButton">The mouse button to use.</param>
-        public static void Up(MouseButton mouseButton, bool delay = true) {
-            switch (mouseButton) {
+        public static void Up(MouseButton mouseButton, bool delay = true)
+        {
+            switch (mouseButton)
+            {
                 case MouseButton.Left:
                     SendMouseInput(0, 0, 0, NativeMethods.SendMouseInputFlags.LeftUp, delay);
                     break;
@@ -162,13 +179,15 @@ namespace TestUtilities.UI {
         /// <param name="data">scroll wheel amount</param>
         /// <param name="flags">SendMouseInputFlags flags</param>
         [PermissionSet(SecurityAction.Assert, Name = "FullTrust")]
-        private static void SendMouseInput(int x, int y, int data, NativeMethods.SendMouseInputFlags flags, bool delay = true) {
+        private static void SendMouseInput(int x, int y, int data, NativeMethods.SendMouseInputFlags flags, bool delay = true)
+        {
             PermissionSet permissions = new PermissionSet(PermissionState.Unrestricted);
             permissions.Demand();
 
             int intflags = (int)flags;
 
-            if ((intflags & (int)NativeMethods.SendMouseInputFlags.Absolute) != 0) {
+            if ((intflags & (int)NativeMethods.SendMouseInputFlags.Absolute) != 0)
+            {
                 // Absolute position requires normalized coordinates.
                 NormalizeCoordinates(ref x, ref y);
                 intflags |= NativeMethods.MouseeventfVirtualdesk;
@@ -183,15 +202,18 @@ namespace TestUtilities.UI {
             mi.union.mouseInput.time = 0;
             mi.union.mouseInput.dwExtraInfo = new IntPtr(0);
 
-            if (NativeMethods.SendInput(1, ref mi, Marshal.SizeOf(mi)) == 0) {
+            if (NativeMethods.SendInput(1, ref mi, Marshal.SizeOf(mi)) == 0)
+            {
                 throw new Win32Exception(Marshal.GetLastWin32Error());
             }
-            if (delay) {
+            if (delay)
+            {
                 System.Threading.Thread.Sleep(250);
             }
         }
 
-        private static void NormalizeCoordinates(ref int x, ref int y) {
+        private static void NormalizeCoordinates(ref int x, ref int y)
+        {
             int vScreenWidth = NativeMethods.GetSystemMetrics(NativeMethods.SMCxvirtualscreen);
             int vScreenHeight = NativeMethods.GetSystemMetrics(NativeMethods.SMCyvirtualscreen);
             int vScreenLeft = NativeMethods.GetSystemMetrics(NativeMethods.SMXvirtualscreen);

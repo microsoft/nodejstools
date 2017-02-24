@@ -22,11 +22,13 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.VisualStudioTools;
 
-namespace Microsoft.NodejsTools.Debugger.DebugEngine {
+namespace Microsoft.NodejsTools.Debugger.DebugEngine
+{
     // This class represents a pending breakpoint which is an abstract representation of a breakpoint before it is bound.
     // When a user creates a new breakpoint, the pending breakpoint is created and is later bound. The bound breakpoints
     // become children of the pending breakpoint.
-    class AD7PendingBreakpoint : IDebugPendingBreakpoint2 {
+    internal class AD7PendingBreakpoint : IDebugPendingBreakpoint2
+    {
         // The breakpoint request that resulted in this pending breakpoint being created.
         private readonly BreakpointManager _bpManager;
         private readonly IDebugBreakpointRequest2 _bpRequest;
@@ -37,7 +39,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         private string _documentName;
         private bool _enabled, _deleted;
 
-        public AD7PendingBreakpoint(IDebugBreakpointRequest2 pBpRequest, AD7Engine engine, BreakpointManager bpManager) {
+        public AD7PendingBreakpoint(IDebugBreakpointRequest2 pBpRequest, AD7Engine engine, BreakpointManager bpManager)
+        {
             _bpRequest = pBpRequest;
             var requestInfo = new BP_REQUEST_INFO[1];
             EngineUtils.CheckOk(_bpRequest.GetRequestInfo(enum_BPREQI_FIELDS.BPREQI_BPLOCATION | enum_BPREQI_FIELDS.BPREQI_CONDITION | enum_BPREQI_FIELDS.BPREQI_ALLFIELDS, requestInfo));
@@ -50,13 +53,17 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             _deleted = false;
         }
 
-        public BP_PASSCOUNT PassCount {
+        public BP_PASSCOUNT PassCount
+        {
             get { return _bpRequestInfo.bpPassCount; }
         }
 
-        public string DocumentName {
-            get {
-                if (_documentName == null) {
+        public string DocumentName
+        {
+            get
+            {
+                if (_documentName == null)
+                {
                     var docPosition = (IDebugDocumentPosition2)(Marshal.GetObjectForIUnknown(_bpRequestInfo.bpLocation.unionmember2));
                     EngineUtils.CheckOk(docPosition.GetFileName(out _documentName));
                 }
@@ -67,8 +74,10 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         #region IDebugPendingBreakpoint2 Members
 
         // Binds this pending breakpoint to one or more code locations.
-        int IDebugPendingBreakpoint2.Bind() {
-            if (CanBind()) {
+        int IDebugPendingBreakpoint2.Bind()
+        {
+            if (CanBind())
+            {
                 // Get the location in the document that the breakpoint is in.
                 var startPosition = new TEXT_POSITION[1];
                 var endPosition = new TEXT_POSITION[1];
@@ -99,10 +108,12 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         // Determines whether this pending breakpoint can bind to a code location.
-        int IDebugPendingBreakpoint2.CanBind(out IEnumDebugErrorBreakpoints2 ppErrorEnum) {
+        int IDebugPendingBreakpoint2.CanBind(out IEnumDebugErrorBreakpoints2 ppErrorEnum)
+        {
             ppErrorEnum = null;
 
-            if (!CanBind()) {
+            if (!CanBind())
+            {
                 // Called to determine if a pending breakpoint can be bound. 
                 // The breakpoint may not be bound for many reasons such as an invalid location, an invalid expression, etc...
                 // The sample engine does not support this, but a real world engine will want to return a valid enumeration of IDebugErrorBreakpoint2.
@@ -114,19 +125,24 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         // Deletes this pending breakpoint and all breakpoints bound from it.
-        int IDebugPendingBreakpoint2.Delete() {
+        int IDebugPendingBreakpoint2.Delete()
+        {
             ClearBreakpointBindingResults();
             _deleted = true;
             return VSConstants.S_OK;
         }
 
         // Toggles the enabled state of this pending breakpoint.
-        int IDebugPendingBreakpoint2.Enable(int fEnable) {
+        int IDebugPendingBreakpoint2.Enable(int fEnable)
+        {
             _enabled = fEnable != 0;
 
-            if (_breakpoint != null) {
-                lock (_breakpoint) {
-                    foreach (NodeBreakpointBinding binding in _breakpoint.GetBindings()) {
+            if (_breakpoint != null)
+            {
+                lock (_breakpoint)
+                {
+                    foreach (NodeBreakpointBinding binding in _breakpoint.GetBindings())
+                    {
                         var boundBreakpoint = (IDebugBoundBreakpoint2)_bpManager.GetBoundBreakpoint(binding);
                         boundBreakpoint.Enable(fEnable);
                     }
@@ -137,11 +153,14 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         // Enumerates all breakpoints bound from this pending breakpoint
-        int IDebugPendingBreakpoint2.EnumBoundBreakpoints(out IEnumDebugBoundBreakpoints2 ppEnum) {
+        int IDebugPendingBreakpoint2.EnumBoundBreakpoints(out IEnumDebugBoundBreakpoints2 ppEnum)
+        {
             ppEnum = null;
 
-            if (_breakpoint != null) {
-                lock (_breakpoint) {
+            if (_breakpoint != null)
+            {
+                lock (_breakpoint)
+                {
                     IDebugBoundBreakpoint2[] boundBreakpoints = _breakpoint.GetBindings()
                         .Select(binding => _bpManager.GetBoundBreakpoint(binding))
                         .Cast<IDebugBoundBreakpoint2>().ToArray();
@@ -154,11 +173,13 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         // Enumerates all error breakpoints that resulted from this pending breakpoint.
-        int IDebugPendingBreakpoint2.EnumErrorBreakpoints(enum_BP_ERROR_TYPE bpErrorType, out IEnumDebugErrorBreakpoints2 ppEnum) {
+        int IDebugPendingBreakpoint2.EnumErrorBreakpoints(enum_BP_ERROR_TYPE bpErrorType, out IEnumDebugErrorBreakpoints2 ppEnum)
+        {
             // Called when a pending breakpoint could not be bound. This may occur for many reasons such as an invalid location, an invalid expression, etc...
             // Return a valid enumeration of IDebugErrorBreakpoint2 from IDebugPendingBreakpoint2::EnumErrorBreakpoints, allowing the debugger to
             // display information about why the breakpoint did not bind to the user.
-            lock (_breakpointErrors) {
+            lock (_breakpointErrors)
+            {
                 IDebugErrorBreakpoint2[] breakpointErrors = _breakpointErrors.Cast<IDebugErrorBreakpoint2>().ToArray();
                 ppEnum = new AD7ErrorBreakpointsEnum(breakpointErrors);
             }
@@ -167,26 +188,35 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         // Gets the breakpoint request that was used to create this pending breakpoint
-        int IDebugPendingBreakpoint2.GetBreakpointRequest(out IDebugBreakpointRequest2 ppBpRequest) {
+        int IDebugPendingBreakpoint2.GetBreakpointRequest(out IDebugBreakpointRequest2 ppBpRequest)
+        {
             ppBpRequest = _bpRequest;
             return VSConstants.S_OK;
         }
 
         // Gets the state of this pending breakpoint.
-        int IDebugPendingBreakpoint2.GetState(PENDING_BP_STATE_INFO[] pState) {
-            if (_deleted) {
+        int IDebugPendingBreakpoint2.GetState(PENDING_BP_STATE_INFO[] pState)
+        {
+            if (_deleted)
+            {
                 pState[0].state = (enum_PENDING_BP_STATE)enum_BP_STATE.BPS_DELETED;
-            } else if (_enabled) {
+            }
+            else if (_enabled)
+            {
                 pState[0].state = (enum_PENDING_BP_STATE)enum_BP_STATE.BPS_ENABLED;
-            } else {
+            }
+            else
+            {
                 pState[0].state = (enum_PENDING_BP_STATE)enum_BP_STATE.BPS_DISABLED;
             }
 
             return VSConstants.S_OK;
         }
 
-        int IDebugPendingBreakpoint2.SetCondition(BP_CONDITION bpCondition) {
-            if (bpCondition.styleCondition == enum_BP_COND_STYLE.BP_COND_WHEN_CHANGED) {
+        int IDebugPendingBreakpoint2.SetCondition(BP_CONDITION bpCondition)
+        {
+            if (bpCondition.styleCondition == enum_BP_COND_STYLE.BP_COND_WHEN_CHANGED)
+            {
                 return VSConstants.E_NOTIMPL;
             }
 
@@ -194,7 +224,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             return VSConstants.S_OK;
         }
 
-        int IDebugPendingBreakpoint2.SetPassCount(BP_PASSCOUNT bpPassCount) {
+        int IDebugPendingBreakpoint2.SetPassCount(BP_PASSCOUNT bpPassCount)
+        {
             _bpRequestInfo.bpPassCount = bpPassCount;
             return VSConstants.S_OK;
         }
@@ -202,34 +233,43 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // Toggles the virtualized state of this pending breakpoint. When a pending breakpoint is virtualized, 
         // the debug engine will attempt to bind it every time new code loads into the program.
         // The sample engine will does not support this.
-        int IDebugPendingBreakpoint2.Virtualize(int fVirtualize) {
+        int IDebugPendingBreakpoint2.Virtualize(int fVirtualize)
+        {
             return VSConstants.S_OK;
         }
 
         #endregion
 
-        private bool CanBind() {
+        private bool CanBind()
+        {
             // Reject binding breakpoints which are deleted, not code file line, and on condition changed
             if (_deleted ||
                 _bpRequestInfo.bpLocation.bpLocationType != (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FILE_LINE ||
-                _bpRequestInfo.bpCondition.styleCondition == enum_BP_COND_STYLE.BP_COND_WHEN_CHANGED) {
+                _bpRequestInfo.bpCondition.styleCondition == enum_BP_COND_STYLE.BP_COND_WHEN_CHANGED)
+            {
                 return false;
             }
 
             return true;
         }
 
-        public void AddBreakpointError(AD7BreakpointErrorEvent breakpointError) {
+        public void AddBreakpointError(AD7BreakpointErrorEvent breakpointError)
+        {
             _breakpointErrors.Add(breakpointError);
         }
 
         // Remove all of the bound breakpoints for this pending breakpoint
-        public void ClearBreakpointBindingResults() {
-            if (_breakpoint != null) {
-                lock (_breakpoint) {
-                    foreach (NodeBreakpointBinding binding in _breakpoint.GetBindings()) {
+        public void ClearBreakpointBindingResults()
+        {
+            if (_breakpoint != null)
+            {
+                lock (_breakpoint)
+                {
+                    foreach (NodeBreakpointBinding binding in _breakpoint.GetBindings())
+                    {
                         var boundBreakpoint = (IDebugBoundBreakpoint2)_bpManager.GetBoundBreakpoint(binding);
-                        if (boundBreakpoint != null) {
+                        if (boundBreakpoint != null)
+                        {
                             boundBreakpoint.Delete();
                             binding.Remove().WaitAndUnwrapExceptions();
                         }

@@ -16,8 +16,10 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.NodejsTools.Npm {
-    public interface IPackage : IRootPackage {
+namespace Microsoft.NodejsTools.Npm
+{
+    public interface IPackage : IRootPackage
+    {
         string PublishDateTimeString { get; }
 
         string RequestedVersionRange { get; }

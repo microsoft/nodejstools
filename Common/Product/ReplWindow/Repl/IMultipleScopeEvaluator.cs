@@ -18,7 +18,8 @@ using System.Linq;
 using System.Text;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
@@ -26,7 +27,8 @@ namespace Microsoft.VisualStudio.Repl {
     /// Supports a REPL evaluator which enables the user to switch between
     /// multiple scopes of execution.
     /// </summary>
-    public interface IMultipleScopeEvaluator : IReplEvaluator {
+    public interface IMultipleScopeEvaluator : IReplEvaluator
+    {
         /// <summary>
         /// Sets the current scope to the given name.
         /// </summary>
@@ -40,7 +42,8 @@ namespace Microsoft.VisualStudio.Repl {
         /// <summary>
         /// Gets the current scope name.
         /// </summary>
-        string CurrentScopeName {
+        string CurrentScopeName
+        {
             get;
         }
 
@@ -57,7 +60,8 @@ namespace Microsoft.VisualStudio.Repl {
         /// <summary>
         /// Returns true if multiple scope support is currently enabled, false if not.
         /// </summary>
-        bool EnableMultipleScopes {
+        bool EnableMultipleScopes
+        {
             get;
         }
     }

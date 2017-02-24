@@ -17,16 +17,19 @@
 using System;
 using System.Collections.Generic;
 
-namespace Microsoft.NodejsTools {
+namespace Microsoft.NodejsTools
+{
     /// <summary>
     /// Just used for our MEF import to get the metadata in a strongly
     /// typed way.
     /// </summary>
-    internal sealed class TaggerProviderMetadata {
+    internal sealed class TaggerProviderMetadata
+    {
         public readonly IEnumerable<string> ContentTypes;
         public readonly IEnumerable<Type> TagTypes;
 
-        public TaggerProviderMetadata(IDictionary<string, object> values) {
+        public TaggerProviderMetadata(IDictionary<string, object> values)
+        {
             ContentTypes = (IEnumerable<string>)values["ContentTypes"];
             TagTypes = (IEnumerable<Type>)values["TagTypes"];
         }

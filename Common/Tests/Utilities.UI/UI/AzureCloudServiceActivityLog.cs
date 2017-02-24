@@ -16,22 +16,29 @@ using System;
 using System.Threading;
 using System.Windows.Automation;
 
-namespace TestUtilities.UI {
-    public class AzureCloudServiceActivityLog : AutomationWrapper {
+namespace TestUtilities.UI
+{
+    public class AzureCloudServiceActivityLog : AutomationWrapper
+    {
         public AzureCloudServiceActivityLog(AutomationElement element)
-            : base(element) {
+            : base(element)
+        {
         }
 
-        public void WaitForPublishComplete(string serviceName, int timeout) {
+        public void WaitForPublishComplete(string serviceName, int timeout)
+        {
             var rowElement = WaitForRow(serviceName, 5000);
             WaitForRowComplete(rowElement, timeout);
         }
 
-        private AutomationElement WaitForRow(string serviceName, int timeout) {
+        private AutomationElement WaitForRow(string serviceName, int timeout)
+        {
             const int interval = 200;
-            for (int i = 0; i < timeout; i += interval) {
+            for (int i = 0; i < timeout; i += interval)
+            {
                 var res = FindRowElement(serviceName);
-                if (res != null) {
+                if (res != null)
+                {
                     return res;
                 }
 
@@ -41,10 +48,13 @@ namespace TestUtilities.UI {
             throw new TimeoutException("Timed out waiting for publish to start.");
         }
 
-        private void WaitForRowComplete(AutomationElement row, int timeout) {
+        private void WaitForRowComplete(AutomationElement row, int timeout)
+        {
             const int interval = 1000;
-            for (int i = 0; i < timeout; i += interval) {
-                if (HasCompleted(row)) {
+            for (int i = 0; i < timeout; i += interval)
+            {
+                if (HasCompleted(row))
+                {
                     return;
                 }
 
@@ -54,7 +64,8 @@ namespace TestUtilities.UI {
             throw new TimeoutException("Timed out waiting for publish to complete.");
         }
 
-        private AutomationElement FindRowElement(string serviceName) {
+        private AutomationElement FindRowElement(string serviceName)
+        {
             var rows = Element.FindAll(TreeScope.Descendants, new AndCondition(
                 new PropertyCondition(
                     AutomationElement.ClassNameProperty,
@@ -67,13 +78,16 @@ namespace TestUtilities.UI {
                 )
             ));
 
-            foreach (AutomationElement row in rows) {
+            foreach (AutomationElement row in rows)
+            {
                 var columns = row.FindAll(TreeScope.Children,
                     new PropertyCondition(AutomationElement.ClassNameProperty, "DataGridCell")
                 );
 
-                foreach (AutomationElement column in columns) {
-                    if (column.Current.Name.Contains(serviceName)) {
+                foreach (AutomationElement column in columns)
+                {
+                    if (column.Current.Name.Contains(serviceName))
+                    {
                         return row;
                     }
                 }
@@ -82,7 +96,8 @@ namespace TestUtilities.UI {
             return null;
         }
 
-        private bool HasCompleted(AutomationElement row) {
+        private bool HasCompleted(AutomationElement row)
+        {
             return row.FindFirst(TreeScope.Descendants, new AndCondition(
                 new PropertyCondition(AutomationElement.NameProperty, "Completed"),
                 new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Text)

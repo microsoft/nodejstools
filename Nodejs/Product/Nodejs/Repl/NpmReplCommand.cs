@@ -33,17 +33,21 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Project;
 using Task = System.Threading.Tasks.Task;
 
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
     [Export(typeof(IReplCommand))]
-    class NpmReplCommand : IReplCommand {
+    internal class NpmReplCommand : IReplCommand
+    {
         #region IReplCommand Members
 
-        public async Task<ExecutionResult> Execute(IReplWindow window, string arguments) {
+        public async Task<ExecutionResult> Execute(IReplWindow window, string arguments)
+        {
             string projectPath = string.Empty;
             string npmArguments = arguments.Trim(' ', '\t');
 
             // Parse project name/directory in square brackets
-            if (npmArguments.StartsWith("[", StringComparison.Ordinal)) {
+            if (npmArguments.StartsWith("[", StringComparison.Ordinal))
+            {
                 var match = Regex.Match(npmArguments, @"(?:[[]\s*\""?\s*)(.*?)(?:\s*\""?\s*[]]\s*)");
                 projectPath = match.Groups[1].Value;
                 npmArguments = npmArguments.Substring(match.Length);
@@ -55,7 +59,8 @@ namespace Microsoft.NodejsTools.Repl {
 
             // Prevent running `npm init` without the `-y` flag since it will freeze the repl window,
             // waiting for user input that will never come.
-            if (npmArguments.Contains(" init ") && !(npmArguments.Contains(" -y ") || npmArguments.Contains(" --yes "))) {
+            if (npmArguments.Contains(" init ") && !(npmArguments.Contains(" -y ") || npmArguments.Contains(" --yes ")))
+            {
                 window.WriteError(Resources.ReplWindowNpmInitNoYesFlagWarning);
                 return ExecutionResult.Failure;
             }
@@ -64,38 +69,48 @@ namespace Microsoft.NodejsTools.Repl {
             IEnumerable<IVsProject> loadedProjects = solution.EnumerateLoadedProjects(onlyNodeProjects: false);
 
             var projectNameToDirectoryDictionary = new Dictionary<string, Tuple<string, IVsHierarchy>>(StringComparer.OrdinalIgnoreCase);
-            foreach (IVsProject project in loadedProjects) {
+            foreach (IVsProject project in loadedProjects)
+            {
                 var hierarchy = (IVsHierarchy)project;
                 object extObject;
 
                 var projectResult = hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ExtObject, out extObject);
-                if (!ErrorHandler.Succeeded(projectResult)) {
+                if (!ErrorHandler.Succeeded(projectResult))
+                {
                     continue;
                 }
 
                 EnvDTE.Project dteProject = extObject as EnvDTE.Project;
-                if (dteProject == null) {
+                if (dteProject == null)
+                {
                     continue;
                 }
 
                 string projectName = dteProject.Name;
-                if (string.IsNullOrEmpty(projectName)) {
+                if (string.IsNullOrEmpty(projectName))
+                {
                     continue;
                 }
 
                 // Try checking the `ProjectHome` property first
                 EnvDTE.Properties properties = dteProject.Properties;
-                if (dteProject.Properties != null) {
+                if (dteProject.Properties != null)
+                {
                     EnvDTE.Property projectHome = null;
-                    try {
+                    try
+                    {
                         projectHome = properties.Item("ProjectHome");
-                    } catch (ArgumentException) {
+                    }
+                    catch (ArgumentException)
+                    {
                         // noop
                     }
 
-                    if (projectHome != null) {
+                    if (projectHome != null)
+                    {
                         var projectHomeDirectory = projectHome.Value as string;
-                        if (!string.IsNullOrEmpty(projectHomeDirectory)) {
+                        if (!string.IsNullOrEmpty(projectHomeDirectory))
+                        {
                             projectNameToDirectoryDictionary.Add(projectName, Tuple.Create(projectHomeDirectory, hierarchy));
                             continue;
                         }
@@ -104,50 +119,61 @@ namespace Microsoft.NodejsTools.Repl {
 
                 // Otherwise, fall back to using fullname
                 string projectDirectory = string.IsNullOrEmpty(dteProject.FullName) ? null : Path.GetDirectoryName(dteProject.FullName);
-                if (!string.IsNullOrEmpty(projectDirectory)) {
+                if (!string.IsNullOrEmpty(projectDirectory))
+                {
                     projectNameToDirectoryDictionary.Add(projectName, Tuple.Create(projectDirectory, hierarchy));
                 }
             }
 
             Tuple<string, IVsHierarchy> projectInfo;
-            if (string.IsNullOrEmpty(projectPath) && projectNameToDirectoryDictionary.Count == 1) {
+            if (string.IsNullOrEmpty(projectPath) && projectNameToDirectoryDictionary.Count == 1)
+            {
                 projectInfo = projectNameToDirectoryDictionary.Values.First();
-            } else {
+            }
+            else
+            {
                 projectNameToDirectoryDictionary.TryGetValue(projectPath, out projectInfo);
             }
 
             NodejsProjectNode nodejsProject = null;
-            if (projectInfo != null) {
+            if (projectInfo != null)
+            {
                 projectPath = projectInfo.Item1;
-                if (projectInfo.Item2 != null) {
+                if (projectInfo.Item2 != null)
+                {
                     nodejsProject = projectInfo.Item2.GetProject().GetNodejsProject();
                 }
             }
 
             bool isGlobalCommand = false;
             if (string.IsNullOrWhiteSpace(npmArguments) ||
-                npmArguments.Contains(" -g ") || npmArguments.Contains(" --global ")) {
+                npmArguments.Contains(" -g ") || npmArguments.Contains(" --global "))
+            {
                 projectPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
                 isGlobalCommand = true;
             }
 
             // In case someone copies filename
             string projectDirectoryPath = File.Exists(projectPath) ? Path.GetDirectoryName(projectPath) : projectPath;
-            
-            if (!isGlobalCommand && !Directory.Exists(projectDirectoryPath)) {
+
+            if (!isGlobalCommand && !Directory.Exists(projectDirectoryPath))
+            {
                 window.WriteError("Please specify a valid Node.js project or project directory. If your solution contains multiple projects, specify a target project using .npm [ProjectName or ProjectDir] <npm arguments> For example: .npm [MyApp] list");
                 return ExecutionResult.Failure;
             }
 
             string npmPath;
-            try {
+            try
+            {
                 npmPath = NpmHelpers.GetPathToNpm(
                     nodejsProject != null ?
                         Nodejs.GetAbsoluteNodeExePath(
                             nodejsProject.ProjectHome,
                             nodejsProject.GetProjectProperty(NodeProjectProperty.NodeExePath))
                         : null);
-            } catch (NpmNotFoundException) {
+            }
+            catch (NpmNotFoundException)
+            {
                 Nodejs.ShowNodejsNotInstalled();
                 return ExecutionResult.Failure;
             }
@@ -160,40 +186,47 @@ namespace Microsoft.NodejsTools.Repl {
                 new[] { npmArguments },
                 null);
 
-            if (npmReplRedirector.HasErrors) {
+            if (npmReplRedirector.HasErrors)
+            {
                 window.WriteError(string.Format(CultureInfo.CurrentCulture, Resources.NpmReplCommandCompletedWithErrors, arguments));
-            } else {
+            }
+            else
+            {
                 window.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.NpmSuccessfullyCompleted, arguments));
             }
 
-            if (nodejsProject != null) {
+            if (nodejsProject != null)
+            {
                 await nodejsProject.CheckForLongPaths(npmArguments);
             }
 
             return ExecutionResult.Success;
         }
 
-        public string Description {
+        public string Description
+        {
             get { return "Executes npm command. If solution contains multiple projects, specify target project using .npm [ProjectName] <npm arguments>"; }
         }
 
-        public string Command {
+        public string Command
+        {
             get { return "npm"; }
         }
 
-        public object ButtonContent {
+        public object ButtonContent
+        {
             get { return null; }
         }
 
         // TODO: This is duplicated from Npm project
         // We should consider using InternalsVisibleTo to avoid code duplication
         internal static async Task<IEnumerable<string>> ExecuteNpmCommandAsync(
-            Redirector redirector, 
+            Redirector redirector,
             string pathToNpm,
             string executionDirectory,
             string[] arguments,
-            ManualResetEvent cancellationResetEvent) {
-
+            ManualResetEvent cancellationResetEvent)
+        {
             IEnumerable<string> standardOutputLines = null;
 
             using (var process = ProcessOutput.Run(
@@ -205,32 +238,43 @@ namespace Microsoft.NodejsTools.Repl {
                 redirector,
                 quoteArgs: false,
                 outputEncoding: Encoding.UTF8 // npm uses UTF-8 regardless of locale if its output is redirected
-                )) {
+                ))
+            {
                 var whnd = process.WaitHandle;
-                if (whnd == null) {
+                if (whnd == null)
+                {
                     // Process failed to start, and any exception message has
                     // already been sent through the redirector
-                    if (redirector != null) {
+                    if (redirector != null)
+                    {
                         redirector.WriteErrorLine("Error - cannot start npm");
                     }
-                } else {
-                    var handles = cancellationResetEvent != null ? new[] { whnd, cancellationResetEvent } : new [] { whnd };
+                }
+                else
+                {
+                    var handles = cancellationResetEvent != null ? new[] { whnd, cancellationResetEvent } : new[] { whnd };
                     var i = await Task.Run(() => WaitHandle.WaitAny(handles));
-                    if (i == 0) {
+                    if (i == 0)
+                    {
                         Debug.Assert(process.ExitCode.HasValue, "npm process has not really exited");
                         process.Wait();
-                        if (process.StandardOutputLines != null) {
-                            standardOutputLines = process.StandardOutputLines.ToList();                            
+                        if (process.StandardOutputLines != null)
+                        {
+                            standardOutputLines = process.StandardOutputLines.ToList();
                         }
-                    } else {
+                    }
+                    else
+                    {
                         process.Kill();
-                        if (redirector != null) {
+                        if (redirector != null)
+                        {
                             redirector.WriteErrorLine(string.Format(CultureInfo.CurrentCulture,
                             "\r\n===={0}====\r\n\r\n",
                             "npm command cancelled"));
                         }
-                        
-                        if (cancellationResetEvent != null) {
+
+                        if (cancellationResetEvent != null)
+                        {
                             cancellationResetEvent.Reset();
                         }
 
@@ -243,8 +287,8 @@ namespace Microsoft.NodejsTools.Repl {
 
         #endregion
 
-        internal class NpmReplRedirector : Redirector {
-            
+        internal class NpmReplRedirector : Redirector
+        {
             internal const string ErrorAnsiColor = "\x1b[31;1m";
             internal const string WarnAnsiColor = "\x1b[33;22m";
             internal const string NormalAnsiColor = "\x1b[39;49m";
@@ -254,24 +298,31 @@ namespace Microsoft.NodejsTools.Repl {
 
             private IReplWindow _window;
 
-            public NpmReplRedirector(IReplWindow window) {
+            public NpmReplRedirector(IReplWindow window)
+            {
                 _window = window;
                 HasErrors = false;
             }
             public bool HasErrors { get; set; }
 
-            public override void WriteLine(string decodedString) {
+            public override void WriteLine(string decodedString)
+            {
                 var substring = string.Empty;
                 string outputString = string.Empty;
 
-                if (decodedString.StartsWith(ErrorText, StringComparison.Ordinal)) {
+                if (decodedString.StartsWith(ErrorText, StringComparison.Ordinal))
+                {
                     outputString += ErrorAnsiColor + decodedString.Substring(0, ErrorText.Length);
                     substring = decodedString.Length > ErrorText.Length ? decodedString.Substring(ErrorText.Length) : string.Empty;
                     this.HasErrors = true;
-                } else if (decodedString.StartsWith(WarningText, StringComparison.Ordinal)) {
+                }
+                else if (decodedString.StartsWith(WarningText, StringComparison.Ordinal))
+                {
                     outputString += WarnAnsiColor + decodedString.Substring(0, WarningText.Length);
                     substring = decodedString.Length > WarningText.Length ? decodedString.Substring(WarningText.Length) : string.Empty;
-                } else {
+                }
+                else
+                {
                     substring = decodedString;
                 }
 
@@ -281,7 +332,8 @@ namespace Microsoft.NodejsTools.Repl {
                 Debug.WriteLine(decodedString, "REPL npm");
             }
 
-            public override void WriteErrorLine(string line) {
+            public override void WriteErrorLine(string line)
+            {
                 _window.WriteError(line);
             }
         }

@@ -22,10 +22,12 @@ using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Utilities;
 
-namespace Microsoft.NodejsTools.Jade {
+namespace Microsoft.NodejsTools.Jade
+{
     [Export(typeof(IClassifierProvider))]
     [ContentType(JadeContentTypeDefinition.JadeContentType)]
-    internal sealed class JadeClassifierProvider : IClassifierProvider {
+    internal sealed class JadeClassifierProvider : IClassifierProvider
+    {
         public readonly IClassificationTypeRegistryService ClassificationRegistryService;
         public readonly ITaggerProvider JsTaggerProvider;
         public readonly IClassifierProvider CssClassifierProvider;
@@ -34,11 +36,12 @@ namespace Microsoft.NodejsTools.Jade {
 
         private const string JavaScriptContentType = "JavaScript";
         [ImportingConstructor]
-        public JadeClassifierProvider(IClassificationTypeRegistryService registryService,   
+        public JadeClassifierProvider(IClassificationTypeRegistryService registryService,
             ITextBufferFactoryService bufferFact,
             IContentTypeRegistryService contentTypeService,
             [ImportMany(typeof(ITaggerProvider))]Lazy<ITaggerProvider, TaggerProviderMetadata>[] taggerProviders,
-            [ImportMany(typeof(IClassifierProvider))]Lazy<IClassifierProvider, IClassifierProviderMetadata>[] classifierProviders) {
+            [ImportMany(typeof(IClassifierProvider))]Lazy<IClassifierProvider, IClassifierProviderMetadata>[] classifierProviders)
+        {
             ClassificationRegistryService = registryService;
             BufferFactoryService = bufferFact;
             JsContentType = contentTypeService.GetContentType(NodejsConstants.JavaScript);
@@ -49,19 +52,22 @@ namespace Microsoft.NodejsTools.Jade {
                     provider.Metadata.ContentTypes.Contains(NodejsConstants.JavaScript) &&
                     provider.Metadata.TagTypes.Any(tagType => tagType.IsSubclassOf(typeof(ClassificationTag)))
             ).FirstOrDefault();
-            if (JsTaggerProvider != null) {
+            if (JsTaggerProvider != null)
+            {
                 JsTaggerProvider = jsTagger.Value;
             }
 
             var cssTagger = classifierProviders.Where(
                 provider => provider.Metadata.ContentTypes.Any(x => x.Equals("css", StringComparison.OrdinalIgnoreCase))
             ).FirstOrDefault();
-            if (cssTagger != null) {
+            if (cssTagger != null)
+            {
                 CssClassifierProvider = cssTagger.Value;
             }
         }
 
-        public IClassifier GetClassifier(ITextBuffer textBuffer) {
+        public IClassifier GetClassifier(ITextBuffer textBuffer)
+        {
             var classifier = ServiceManager.GetService<JadeClassifier>(textBuffer);
 
             if (classifier == null)

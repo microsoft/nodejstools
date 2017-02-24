@@ -33,19 +33,24 @@ using TestUtilities.UI;
 using MessageBoxButton = TestUtilities.MessageBoxButton;
 using ST = System.Threading;
 
-namespace Microsoft.Nodejs.Tests.UI {
+namespace Microsoft.Nodejs.Tests.UI
+{
     [TestClass]
-    public class BasicProjectTests : SharedProjectTest {
+    public class BasicProjectTests : SharedProjectTest
+    {
         [ClassInitialize]
-        public static void DoDeployment(TestContext context) {
+        public static void DoDeployment(TestContext context)
+        {
             AssertListener.Initialize();
             NodejsTestData.Deploy();
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void LoadNodejsProject() {
-            using (var app = new VisualStudioApp()) {
+        public void LoadNodejsProject()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
                 Assert.IsTrue(app.Dte.Solution.IsOpen, "The solution is not open");
@@ -60,8 +65,10 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void SaveProjectAs() {
-            using (var app = new VisualStudioApp()) {
+        public void SaveProjectAs()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
                 AssertError<ArgumentNullException>(() => project.SaveAs(null));
@@ -69,19 +76,25 @@ namespace Microsoft.Nodejs.Tests.UI {
                 project.Save("");   // empty string means just save
 
                 // try too long of a file
-                try {
+                try
+                {
                     project.SaveAs("TempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFileTempFile.njsproj");
                     Assert.Fail("was able to save with long file name");
-                } catch (InvalidOperationException e) {
+                }
+                catch (InvalidOperationException e)
+                {
                     Assert.IsTrue(e.ToString().Contains("exceeds the maximum number of"));
                 }
 
                 // save to a new location
                 bool couldSaveToC = false;
-                try {
+                try
+                {
                     project.SaveAs("C:\\TempFile.njsproj");
                     couldSaveToC = true;
-                } catch (UnauthorizedAccessException e) {
+                }
+                catch (UnauthorizedAccessException e)
+                {
                     // Saving to a new location is now permitted, but this location will not succeed.
                     Assert.IsTrue(e.ToString().Contains("Access to the path 'C:\\TempFile.njsproj' is denied."));
                 } //catch (InvalidOperationException e) {
@@ -91,7 +104,8 @@ namespace Microsoft.Nodejs.Tests.UI {
                 project.SaveAs(TestData.GetPath(@"TestData\NodejsProjectData\TempFile.njsproj"));
                 project.Save("");   // empty string means just save
                 project.Delete();
-                if (couldSaveToC) {
+                if (couldSaveToC)
+                {
                     Assert.Inconclusive("could save to C:\\");
                 }
             }
@@ -99,8 +113,10 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void RenameProjectTest() {
-            using (var app = new VisualStudioApp()) {
+        public void RenameProjectTest()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\RenameProjectTest.sln");
 
                 // try it another way...
@@ -126,27 +142,34 @@ namespace Microsoft.Nodejs.Tests.UI {
 
                 string projPath = TestData.GetPath(@"TestData\NodejsProjectData\RenameProjectTest\HelloWorld3.njsproj");
                 string movePath = TestData.GetPath(@"TestData\NodejsProjectData\RenameProjectTest\HelloWorld_moved.njsproj");
-                try {
+                try
+                {
                     File.Move(projPath, movePath);
                     AssertError<InvalidOperationException>(() => project.Name = "HelloWorld4");
-                } finally {
+                }
+                finally
+                {
                     File.Move(movePath, projPath);
                 }
 
-                try {
+                try
+                {
                     File.Copy(projPath, movePath);
                     AssertError<InvalidOperationException>(() => project.Name = "HelloWorld_moved");
-                } finally {
+                }
+                finally
+                {
                     File.Delete(movePath);
                 }
             }
-
         }
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void ProjectAddFolder() {
-            using (var app = new VisualStudioApp()) {
+        public void ProjectAddFolder()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
                 var folder = project.ProjectItems.AddFolder("Test\\Folder\\Name");
@@ -184,11 +207,14 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ProjectAddFolderThroughUI() {
-            using (var app = new VisualStudioApp()) {
+        public void ProjectAddFolderThroughUI()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\AddFolderExists.sln");
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var solutionExplorer = app.OpenSolutionExplorer();
 
                     var solutionNode = solutionExplorer.FindItem("Solution 'AddFolderExists' (1 project)");
@@ -229,17 +255,21 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void AddExistingFolder() {
-            using (var app = new VisualStudioApp()) {
+        public void AddExistingFolder()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\AddExistingFolder.sln");
-                
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var solutionExplorer = app.OpenSolutionExplorer();
 
                     var projectNode = solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder");
                     AutomationWrapper.Select(projectNode);
 
-                    using (var dialog = SelectFolderDialog.AddExistingFolder(app)) {
+                    using (var dialog = SelectFolderDialog.AddExistingFolder(app))
+                    {
                         Assert.AreEqual(dialog.Address.ToLower(), Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder").ToLower());
 
                         dialog.FolderName = Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder\TestFolder");
@@ -252,7 +282,8 @@ namespace Microsoft.Nodejs.Tests.UI {
                     var subFolderNode = solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder", "SubFolder");
                     AutomationWrapper.Select(subFolderNode);
 
-                    using (var dialog = SelectFolderDialog.AddExistingFolder(app)) {
+                    using (var dialog = SelectFolderDialog.AddExistingFolder(app))
+                    {
                         Assert.AreEqual(dialog.Address.ToLower(), Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder\SubFolder").ToLower());
                         dialog.FolderName = Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder\SubFolder\TestFolder2");
                         dialog.SelectFolder();
@@ -265,17 +296,21 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void AddExistingFolderProject() {
-            using (var app = new VisualStudioApp()) {
+        public void AddExistingFolderProject()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\AddExistingFolder.sln");
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var solutionExplorer = app.OpenSolutionExplorer();
 
                     var projectNode = solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder");
                     AutomationWrapper.Select(projectNode);
 
-                    using (var dialog = SelectFolderDialog.AddExistingFolder(app)) {
+                    using (var dialog = SelectFolderDialog.AddExistingFolder(app))
+                    {
                         Assert.AreEqual(dialog.Address.ToLower(), Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder").ToLower());
 
                         dialog.FolderName = Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder");
@@ -289,11 +324,14 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void AddExistingFolderDebugging() {
-            using (var app = new VisualStudioApp()) {
+        public void AddExistingFolderDebugging()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\AddExistingFolder.sln");
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var window = project.ProjectItems.Item("server.js").Open();
                     window.Activate();
 
@@ -307,17 +345,23 @@ namespace Microsoft.Nodejs.Tests.UI {
                     var projectNode = solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder");
                     AutomationWrapper.Select(projectNode);
 
-                    try {
+                    try
+                    {
                         app.Dte.ExecuteCommand("ProjectandSolutionContextMenus.Project.Add.Existingfolder");
 
                         // try and dismiss the dialog if we successfully executed
-                        try {
+                        try
+                        {
                             var dialog = app.WaitForDialog();
                             Keyboard.Type(System.Windows.Input.Key.Escape);
-                        } finally {
+                        }
+                        finally
+                        {
                             Assert.Fail("Was able to add an existing folder");
                         }
-                    } catch (COMException) {
+                    }
+                    catch (COMException)
+                    {
                     }
                     app.ExecuteCommand("Debug.StopDebugging");
                     app.WaitForMode(dbgDebugMode.dbgDesignMode);
@@ -325,7 +369,8 @@ namespace Microsoft.Nodejs.Tests.UI {
                     projectNode = solutionExplorer.WaitForItem("Solution 'AddExistingFolder' (1 project)", "AddExistingFolder");
                     AutomationWrapper.Select(projectNode);
 
-                    using (var addDialog = SelectFolderDialog.AddExistingFolder(app)) {
+                    using (var addDialog = SelectFolderDialog.AddExistingFolder(app))
+                    {
                         Assert.AreEqual(addDialog.Address.ToLower(), Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder").ToLower());
 
                         addDialog.FolderName = Path.GetFullPath(@"TestData\NodejsProjectData\AddExistingFolder\TestFolder");
@@ -346,11 +391,14 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ProjectAddAndRenameFolder() {
-            using (var app = new VisualStudioApp()) {
+        public void ProjectAddAndRenameFolder()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var solutionExplorer = app.OpenSolutionExplorer();
 
                     var folder = project.ProjectItems.AddFolder("AddAndRenameFolder");
@@ -376,11 +424,14 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ProjectAddAndMoveRenamedFolder() {
-            using (var app = new VisualStudioApp()) {
+        public void ProjectAddAndMoveRenamedFolder()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var solutionExplorer = app.OpenSolutionExplorer();
 
                     var folder = project.ProjectItems.AddFolder("AddAndMoveRenamedFolder\\AddAndMoveRenamedSubFolder");
@@ -413,8 +464,10 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ProjectBuild() {
-            using (var app = new VisualStudioApp()) {
+        public void ProjectBuild()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
                 app.Dte.Solution.SolutionBuild.Build(true);
@@ -426,8 +479,10 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ProjectBuildWithProjFileSeparateFromSources() {
-            using (var app = new VisualStudioApp()) {
+        public void ProjectBuildWithProjFileSeparateFromSources()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld3.sln");
 
                 app.Dte.Solution.SolutionBuild.Build(true);
@@ -437,8 +492,10 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void ProjectRenameAndDeleteItem() {
-            using (var app = new VisualStudioApp()) {
+        public void ProjectRenameAndDeleteItem()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\RenameItemsTest.sln");
 
                 app.Dte.Documents.CloseAll(vsSaveChanges.vsSaveChangesNo);
@@ -457,9 +514,11 @@ namespace Microsoft.Nodejs.Tests.UI {
                 project.ProjectItems.Item("ProgramX.js").Name = "Program2.js";
 
                 bool foundProg2 = false;
-                foreach (ProjectItem item in project.ProjectItems) {
+                foreach (ProjectItem item in project.ProjectItems)
+                {
                     Debug.Assert(item.Name != "ProgramX.js");
-                    if (item.Name == "Program2.js") {
+                    if (item.Name == "Program2.js")
+                    {
                         foundProg2 = true;
                     }
                 }
@@ -468,9 +527,11 @@ namespace Microsoft.Nodejs.Tests.UI {
                 // rename using a different method...
                 project.ProjectItems.Item("ProgramY.js").Properties.Item("FileName").Value = "Program3.js";
                 bool foundProg3 = false;
-                foreach (ProjectItem item in project.ProjectItems) {
+                foreach (ProjectItem item in project.ProjectItems)
+                {
                     Debug.Assert(item.Name != "ProgramY.js");
-                    if (item.Name == "Program3.js") {
+                    if (item.Name == "Program3.js")
+                    {
                         foundProg3 = true;
                     }
                 }
@@ -485,10 +546,12 @@ namespace Microsoft.Nodejs.Tests.UI {
                 project.ProjectItems.Item("ProgramZ.js").SaveAs("Program4.js");
 
                 bool foundProgZ = false;
-                foreach (ProjectItem item in project.ProjectItems) {
+                foreach (ProjectItem item in project.ProjectItems)
+                {
                     Debug.Assert(item.Name
                         != "Program4.js");
-                    if (item.Name == "ProgramZ.js") {
+                    if (item.Name == "ProgramZ.js")
+                    {
                         foundProgZ = true;
                     }
                 }
@@ -512,29 +575,41 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void AutomationProperties() {
-            using (var app = new VisualStudioApp()) {
+        public void AutomationProperties()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
                 int propCount = 0;
-                foreach (Property prop in project.Properties) {
+                foreach (Property prop in project.Properties)
+                {
                     object intIndexValue;
-                    try {
+                    try
+                    {
                         intIndexValue = project.Properties.Item(propCount + 1).Value;
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         intIndexValue = e.Message;
                     }
                     object nameIndexValue;
-                    try {
+                    try
+                    {
                         nameIndexValue = project.Properties.Item(prop.Name).Value;
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         nameIndexValue = e.Message;
                     }
 
                     object indexedValue;
-                    try {
+                    try
+                    {
                         indexedValue = project.Properties.Item(prop.Name).get_IndexedValue(null);
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         indexedValue = e.Message;
                     }
 
@@ -570,7 +645,8 @@ namespace Microsoft.Nodejs.Tests.UI {
                 project.Properties.Item(NodeProjectProperty.NodejsPort).Value = 5000;
                 Assert.AreEqual(project.Properties.Item(NodeProjectProperty.NodejsPort).Value, 5000);
 
-                foreach (var value in new[] { NodeProjectProperty.LaunchUrl, NodeProjectProperty.ScriptArguments, NodeProjectProperty.NodeExeArguments, NodeProjectProperty.NodeExePath }) {
+                foreach (var value in new[] { NodeProjectProperty.LaunchUrl, NodeProjectProperty.ScriptArguments, NodeProjectProperty.NodeExeArguments, NodeProjectProperty.NodeExePath })
+                {
                     string tmpValue = Guid.NewGuid().ToString();
 
                     project.Properties.Item(value).Value = tmpValue;
@@ -581,8 +657,10 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void AutomationProject() {
-            using (var app = new VisualStudioApp()) {
+        public void AutomationProject()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
                 Assert.AreEqual("{9092aa53-fb77-4645-b42d-1ccca6bd08bd}", project.Kind);
@@ -606,7 +684,8 @@ namespace Microsoft.Nodejs.Tests.UI {
                 AssertError<COMException>(() => project.get_Extender("DoesNotExist"));
                 Assert.AreEqual(null, project.Collection);
 
-                foreach (ProjectItem item in project.ProjectItems) {
+                foreach (ProjectItem item in project.ProjectItems)
+                {
                     Assert.AreEqual(item.Name, project.ProjectItems.Item(1).Name);
                     break;
                 }
@@ -622,8 +701,10 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ProjectItemAutomation() {
-            using (var app = new VisualStudioApp()) {
+        public void ProjectItemAutomation()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
                 var item = project.ProjectItems.Item("server.js");
@@ -644,9 +725,11 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void RelativePaths() {
+        public void RelativePaths()
+        {
             // link to outside file should show up as top-level item
-            using (var app = new VisualStudioApp()) {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\RelativePaths.sln");
 
                 var item = project.ProjectItems.Item("server.js");
@@ -656,8 +739,10 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ProjectConfiguration() {
-            using (var app = new VisualStudioApp()) {
+        public void ProjectConfiguration()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
                 project.ConfigurationManager.AddConfigurationRow("NewConfig", "Debug", true);
@@ -690,14 +775,17 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void AddFolderExists() {
+        public void AddFolderExists()
+        {
             Directory.CreateDirectory(TestData.GetPath(@"TestData\NodejsProjectData\\AddFolderExists\\X"));
             Directory.CreateDirectory(TestData.GetPath(@"TestData\NodejsProjectData\\AddFolderExists\\Y"));
 
-            using (var app = new VisualStudioApp()) {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\AddFolderExists.sln");
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var solutionExplorer = app.OpenSolutionExplorer();
 
                     var solutionNode = solutionExplorer.FindItem("Solution 'AddFolderExists' (1 project)");
@@ -749,11 +837,14 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void AddFolderCopyAndPasteFile() {
-            using (var app = new VisualStudioApp()) {
+        public void AddFolderCopyAndPasteFile()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\AddFolderCopyAndPasteFile.sln");
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var solutionExplorer = app.OpenSolutionExplorer();
                     var solutionNode = solutionExplorer.FindItem("Solution 'AddFolderCopyAndPasteFile' (1 project)");
 
@@ -793,11 +884,14 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void CopyAndPasteFolder() {
-            using (var app = new VisualStudioApp()) {
+        public void CopyAndPasteFolder()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\CopyAndPasteFolder.sln");
-                
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var solutionExplorer = app.OpenSolutionExplorer();
                     var solutionNode = solutionExplorer.FindItem("Solution 'CopyAndPasteFolder' (1 project)");
 
@@ -836,11 +930,14 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void CopyAndPasteEmptyFolder() {
-            using (var app = new VisualStudioApp()) {
+        public void CopyAndPasteEmptyFolder()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\CopyAndPasteFolder.sln");
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var solutionExplorer = app.OpenSolutionExplorer();
                     var solutionNode = solutionExplorer.FindItem("Solution 'CopyAndPasteFolder' (1 project)");
 
@@ -877,7 +974,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        private static void ToSTA(ST.ThreadStart code) {
+        private static void ToSTA(ST.ThreadStart code)
+        {
             ST.Thread t = new ST.Thread(code);
             t.SetApartmentState(ST.ApartmentState.STA);
             t.Start();
@@ -889,12 +987,15 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void CopyFolderWithMultipleItems() {
+        public void CopyFolderWithMultipleItems()
+        {
             // http://mpfproj10.codeplex.com/workitem/11618
-            using (var app = new VisualStudioApp()) {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\FolderMultipleItems.sln");
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var solutionExplorer = app.OpenSolutionExplorer();
                     var solutionNode = solutionExplorer.FindItem("Solution 'FolderMultipleItems' (1 project)");
 
@@ -917,8 +1018,10 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void LoadProjectWithDuplicateItems() {
-            using (var app = new VisualStudioApp()) {
+        public void LoadProjectWithDuplicateItems()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var solution = app.OpenProject(@"TestData\NodejsProjectData\DuplicateItems.sln");
 
                 var itemCount = new Dictionary<string, int>();
@@ -937,8 +1040,10 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void CopyFullPath() {
-            foreach (var projectType in ProjectTypes) {
+        public void CopyFullPath()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var def = new ProjectDefinition(
                     "HelloWorld",
                     projectType,
@@ -949,14 +1054,16 @@ namespace Microsoft.Nodejs.Tests.UI {
                     Compile("missing", isMissing: true)
                 );
 
-                using (var solution = def.Generate().ToVs()) {
+                using (var solution = def.Generate().ToVs())
+                {
                     var projectDir = Path.GetDirectoryName(solution.GetProject("HelloWorld").FullName);
 
                     CheckCopyFullPath(solution,
                                       solution.WaitForItem("HelloWorld", "IncFolder"),
                                       projectDir + "\\IncFolder\\");
                     var excFolder = solution.WaitForItem("HelloWorld", "ExcFolder");
-                    if (excFolder == null) {
+                    if (excFolder == null)
+                    {
                         solution.SelectProject(solution.GetProject("HelloWorld"));
                         solution.ExecuteCommand("Project.ShowAllFiles");
                         excFolder = solution.WaitForItem("HelloWorld", "ExcFolder");
@@ -975,7 +1082,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        private void CheckCopyFullPath(IVisualStudioInstance vs, ITreeNode element, string expected) {
+        private void CheckCopyFullPath(IVisualStudioInstance vs, ITreeNode element, string expected)
+        {
             string clipboardText = "";
             Console.WriteLine("Checking CopyFullPath on:{0}", expected);
             AutomationWrapper.Select(element);
@@ -987,23 +1095,30 @@ namespace Microsoft.Nodejs.Tests.UI {
             Assert.AreEqual(expected, clipboardText);
         }
 
-        private static void CountIs(Dictionary<string, int> count, string key, int expected) {
+        private static void CountIs(Dictionary<string, int> count, string key, int expected)
+        {
             int actual;
-            if (!count.TryGetValue(key, out actual)) {
+            if (!count.TryGetValue(key, out actual))
+            {
                 actual = 0;
             }
             Assert.AreEqual(expected, actual, "count[" + key + "]");
         }
 
-        private static void CountNames(Dictionary<string, int> count, ProjectItems items) {
-            if (items == null) {
+        private static void CountNames(Dictionary<string, int> count, ProjectItems items)
+        {
+            if (items == null)
+            {
                 return;
             }
 
-            foreach (var item in items.OfType<ProjectItem>()) {
-                if (!string.IsNullOrEmpty(item.Name)) {
+            foreach (var item in items.OfType<ProjectItem>())
+            {
+                if (!string.IsNullOrEmpty(item.Name))
+                {
                     int value;
-                    if (!count.TryGetValue(item.Name, out value)) {
+                    if (!count.TryGetValue(item.Name, out value))
+                    {
                         value = 0;
                     }
                     count[item.Name] = value + 1;
@@ -1012,15 +1127,20 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        private static void ProjectNewFolder(VisualStudioApp app, System.Windows.Automation.AutomationElement solutionNode, System.Windows.Automation.AutomationElement projectNode) {
+        private static void ProjectNewFolder(VisualStudioApp app, System.Windows.Automation.AutomationElement solutionNode, System.Windows.Automation.AutomationElement projectNode)
+        {
             // Project menu can take a little while to appear...
-            for (int i = 0; i < 20; i++) {
+            for (int i = 0; i < 20; i++)
+            {
                 AutomationWrapper.Select(projectNode);
                 projectNode.SetFocus();
-                try {
+                try
+                {
                     app.Dte.ExecuteCommand("Project.NewFolder");
                     break;
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     Debug.WriteLine("New folder failed: {0}", e);
                 }
 
@@ -1031,7 +1151,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        private static void ProjectNewFolderWithName(VisualStudioApp app, System.Windows.Automation.AutomationElement solutionNode, System.Windows.Automation.AutomationElement projectNode, string name) {
+        private static void ProjectNewFolderWithName(VisualStudioApp app, System.Windows.Automation.AutomationElement solutionNode, System.Windows.Automation.AutomationElement projectNode, string name)
+        {
             Mouse.MoveTo(projectNode.GetClickablePoint());
             Mouse.Click(System.Windows.Input.MouseButton.Right);
 
@@ -1047,17 +1168,23 @@ namespace Microsoft.Nodejs.Tests.UI {
             System.Threading.Thread.Sleep(500);
         }
 
-        private static ProjectItem WaitForItem(Project project, string name) {
+        private static ProjectItem WaitForItem(Project project, string name)
+        {
             bool found = false;
             ProjectItem item = null;
-            for (int i = 0; i < 40; i++) {
-                try {
+            for (int i = 0; i < 40; i++)
+            {
+                try
+                {
                     item = project.ProjectItems.Item(name);
-                    if (item != null) {
+                    if (item != null)
+                    {
                         found = true;
                         break;
                     }
-                } catch (ArgumentException) {
+                }
+                catch (ArgumentException)
+                {
                 }
                 // wait for the edit to complete
                 System.Threading.Thread.Sleep(250);
@@ -1066,15 +1193,20 @@ namespace Microsoft.Nodejs.Tests.UI {
             return item;
         }
 
-        private static void AssertNotImplemented(Action action) {
+        private static void AssertNotImplemented(Action action)
+        {
             AssertError<NotImplementedException>(action);
         }
 
-        private static void AssertError<T>(Action action) where T : Exception {
-            try {
+        private static void AssertError<T>(Action action) where T : Exception
+        {
+            try
+            {
                 action();
                 Assert.Fail();
-            } catch (T) {
+            }
+            catch (T)
+            {
             }
         }
     }

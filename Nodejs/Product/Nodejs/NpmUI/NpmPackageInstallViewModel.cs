@@ -27,15 +27,19 @@ using System.Windows.Threading;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.Project;
 
-namespace Microsoft.NodejsTools.NpmUI {
-    internal class NpmPackageInstallViewModel : INotifyPropertyChanged {
-        internal enum Indices {
+namespace Microsoft.NodejsTools.NpmUI
+{
+    internal class NpmPackageInstallViewModel : INotifyPropertyChanged
+    {
+        internal enum Indices
+        {
             IndexStandard = 0,
             IndexDev = 1,
             IndexOptional = 2
         }
 
-        internal enum FilterState {
+        internal enum FilterState
+        {
             NoFilterText,
             Filtering,
             ResultsAvailable,
@@ -45,7 +49,7 @@ namespace Microsoft.NodejsTools.NpmUI {
         public static readonly ICommand InstallCommand = new RoutedCommand();
         public static readonly ICommand OpenHomepageCommand = new RoutedCommand();
         public static readonly ICommand RefreshCatalogCommand = new RoutedCommand();
-        
+
         private INpmController _npmController;
 
         private bool _isFiltering = false;
@@ -71,11 +75,12 @@ namespace Microsoft.NodejsTools.NpmUI {
         private readonly Dispatcher _dispatcher;
 
         private readonly NpmOutputViewModel _executeViewModel;
-        
+
         public NpmPackageInstallViewModel(
             NpmOutputViewModel executeViewModel,
             Dispatcher dispatcher
-        ) {
+        )
+        {
             _dispatcher = dispatcher;
 
             _executeViewModel = executeViewModel;
@@ -84,82 +89,101 @@ namespace Microsoft.NodejsTools.NpmUI {
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) {
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
             PropertyChangedEventHandler handler = PropertyChanged;
             if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public INpmController NpmController {
+        public INpmController NpmController
+        {
             get { return _npmController; }
-            set {
-                if (null != _npmController) {
+            set
+            {
+                if (null != _npmController)
+                {
                     _npmController.FinishedRefresh -= NpmController_FinishedRefresh;
                 }
                 _npmController = value;
                 OnPropertyChanged();
-                if (null != _npmController) {
+                if (null != _npmController)
+                {
                     LoadCatalog();
                     _npmController.FinishedRefresh += NpmController_FinishedRefresh;
                 }
             }
         }
 
-        void NpmController_FinishedRefresh(object sender, EventArgs e) {
+        private void NpmController_FinishedRefresh(object sender, EventArgs e)
+        {
             StartFilter();
         }
 
-        public NpmOutputViewModel ExecuteViewModel {
+        public NpmOutputViewModel ExecuteViewModel
+        {
             get { return _executeViewModel; }
         }
 
         #region Catalog control and refresh
-        public bool IsLoadingCatalog {
+        public bool IsLoadingCatalog
+        {
             get { return _isLoadingCatalog; }
-            private set {
+            private set
+            {
                 _isLoadingCatalog = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(CanRefreshCatalog));
             }
         }
 
-        public bool CanRefreshCatalog {
+        public bool CanRefreshCatalog
+        {
             get { return !IsLoadingCatalog; }
         }
 
-        public bool IsCatalogEmpty {
+        public bool IsCatalogEmpty
+        {
             get { return _isCatalogEmpty; }
-            private set {
+            private set
+            {
                 _isCatalogEmpty = value;
                 OnPropertyChanged();
             }
         }
 
-        public string LoadingCatalogMessage {
+        public string LoadingCatalogMessage
+        {
             get { return _catalogLoadingMessage; }
-            private set {
+            private set
+            {
                 _catalogLoadingMessage = value;
                 OnPropertyChanged();
             }
         }
 
-        public string LoadingCatalogProgressMessage {
+        public string LoadingCatalogProgressMessage
+        {
             get { return _catalogLoadingProgressMessage; }
-            private set {
+            private set
+            {
                 _catalogLoadingProgressMessage = value;
                 OnPropertyChanged();
             }
         }
 
-        public Visibility LoadingCatalogControlVisibility {
+        public Visibility LoadingCatalogControlVisibility
+        {
             get { return _loadingCatalogControlVisibility; }
-            set {
+            set
+            {
                 _loadingCatalogControlVisibility = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(FilterControlsVisibility));
             }
         }
-        
-        private async void LoadCatalog(bool forceRefresh) {
+
+        private async void LoadCatalog(bool forceRefresh)
+        {
             IsLoadingCatalog = true;
 
             CatalogControlVisibility = Visibility.Collapsed;
@@ -173,25 +197,35 @@ namespace Microsoft.NodejsTools.NpmUI {
             controller.ExceptionLogged += _executeViewModel.commander_ExceptionLogged;
             controller.OutputLogged += _executeViewModel.commander_OutputLogged;
             _executeViewModel.SetCancellableSafe(false);
-            try {
+            try
+            {
                 _allPackages = await controller.GetRepositoryCatalogAsync(
                     forceRefresh,
                     new Progress<string>(msg => LoadingCatalogProgressMessage = msg)
                 );
                 IsCatalogEmpty = false;
-            } catch (NpmNotFoundException) {
+            }
+            catch (NpmNotFoundException)
+            {
                 LastRefreshedMessage = LastRefreshedMessageProvider.NpmNotFound;
-            } catch (NpmCatalogEmptyException) {
+            }
+            catch (NpmCatalogEmptyException)
+            {
                 IsCatalogEmpty = true;
                 LastRefreshedMessage = new LastRefreshedMessageProvider(_allPackages.LastRefreshed);
-            } catch (Exception ex) {
-                if (IsCriticalException(ex)) {
+            }
+            catch (Exception ex)
+            {
+                if (IsCriticalException(ex))
+                {
                     throw;
                 }
 
                 LastRefreshedMessage = LastRefreshedMessageProvider.RefreshFailed;
                 IsCatalogEmpty = true;
-            } finally {
+            }
+            finally
+            {
                 IsLoadingCatalog = false;
                 controller.ErrorLogged -= _executeViewModel.commander_ErrorLogged;
                 controller.ExceptionLogged -= _executeViewModel.commander_ExceptionLogged;
@@ -208,28 +242,33 @@ namespace Microsoft.NodejsTools.NpmUI {
 
             // We want to show the catalog regardless of whether an exception was thrown so that the user has the chance to refresh it.
             LoadingCatalogControlVisibility = Visibility.Collapsed;
-            
+
             StartFilter();
         }
 
-        private static bool IsCriticalException(Exception ex) {
+        private static bool IsCriticalException(Exception ex)
+        {
             return ex is StackOverflowException ||
                    ex is OutOfMemoryException ||
                    ex is ThreadAbortException ||
                    ex is AccessViolationException;
         }
 
-        public void LoadCatalog() {
+        public void LoadCatalog()
+        {
             LoadCatalog(false);
         }
 
-        public void RefreshCatalog() {
+        public void RefreshCatalog()
+        {
             LoadCatalog(true);
         }
 
-        public Visibility CatalogControlVisibility {
+        public Visibility CatalogControlVisibility
+        {
             get { return _catalogControlVisibility; }
-            set {
+            set
+            {
                 _catalogControlVisibility = value;
                 OnPropertyChanged();
             }
@@ -238,38 +277,50 @@ namespace Microsoft.NodejsTools.NpmUI {
         #endregion
 
         #region Filtering
-        public FilterState PackageFilterState {
-            get {
-                if (IsFiltering) {
+        public FilterState PackageFilterState
+        {
+            get
+            {
+                if (IsFiltering)
+                {
                     return FilterState.Filtering;
                 }
-                if (string.IsNullOrEmpty(FilterText)) {
+                if (string.IsNullOrEmpty(FilterText))
+                {
                     return FilterState.NoFilterText;
                 }
-                if (!FilteredPackages.Any()) {
+                if (!FilteredPackages.Any())
+                {
                     return FilterState.NoResults;
                 }
                 return FilterState.ResultsAvailable;
             }
         }
 
-        private bool IsFiltering {
+        private bool IsFiltering
+        {
             get { return _isFiltering; }
-            set {
+            set
+            {
                 _isFiltering = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(PackageFilterState));
             }
         }
 
-        public IList<PackageCatalogEntryViewModel> FilteredPackages {
-            get {
-                lock (_filteredPackagesLock) {
+        public IList<PackageCatalogEntryViewModel> FilteredPackages
+        {
+            get
+            {
+                lock (_filteredPackagesLock)
+                {
                     return _filteredPackages;
                 }
             }
-            set {
-                lock (_filteredPackagesLock) {
+            set
+            {
+                lock (_filteredPackagesLock)
+                {
                     _filteredPackages = value;
                 }
 
@@ -281,9 +332,11 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
         }
 
-        public string FilterText {
+        public string FilterText
+        {
             get { return _filterText; }
-            set {
+            set
+            {
                 _filterText = value;
 
                 StartFilter();
@@ -294,12 +347,15 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
         }
 
-        private void StartFilter() {
+        private void StartFilter()
+        {
             _filterTimer.Change(300, Timeout.Infinite);
         }
 
-        private async void FilterTimer_Elapsed(object state) {
-            if (_allPackages == null) {
+        private async void FilterTimer_Elapsed(object state)
+        {
+            if (_allPackages == null)
+            {
                 LastRefreshedMessage = LastRefreshedMessageProvider.RefreshFailed;
                 IsFiltering = false;
                 return;
@@ -308,14 +364,21 @@ namespace Microsoft.NodejsTools.NpmUI {
             var filterText = GetTrimmedTextSafe(_filterText);
 
             IEnumerable<IPackage> filtered;
-            if (string.IsNullOrWhiteSpace(filterText)) {
+            if (string.IsNullOrWhiteSpace(filterText))
+            {
                 filtered = Enumerable.Empty<IPackage>();
-            } else {
-                try {
+            }
+            else
+            {
+                try
+                {
                     filtered = await _allPackages.GetCatalogPackagesAsync(filterText);
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     LastRefreshedMessage = LastRefreshedMessageProvider.RefreshFailed;
-                    if (IsCriticalException(ex)) {
+                    if (IsCriticalException(ex))
+                    {
                         throw;
                     }
                     StartFilter();
@@ -323,7 +386,8 @@ namespace Microsoft.NodejsTools.NpmUI {
                 }
             }
 
-            if (filtered == null) {
+            if (filtered == null)
+            {
                 // The database file must be in use. Display current results, but try again later.
                 LastRefreshedMessage = LastRefreshedMessageProvider.RefreshInProgress;
                 StartFilter();
@@ -331,14 +395,17 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
 
             var newItems = new List<PackageCatalogEntryViewModel>();
-            if (filterText != GetTrimmedTextSafe(_filterText)) {
+            if (filterText != GetTrimmedTextSafe(_filterText))
+            {
                 return;
             }
 
-            if (filtered.Any()) {
+            if (filtered.Any())
+            {
                 IRootPackage rootPackage = null;
                 var controller = _npmController;
-                if (controller != null) {
+                if (controller != null)
+                {
                     rootPackage = controller.RootPackage;
                 }
 
@@ -347,8 +414,10 @@ namespace Microsoft.NodejsTools.NpmUI {
                     rootPackage != null ? rootPackage.Modules[package.Name] : null)));
             }
 
-            await _dispatcher.BeginInvoke((Action)(() => {
-                if (filterText != GetTrimmedTextSafe(_filterText)) {
+            await _dispatcher.BeginInvoke((Action)(() =>
+            {
+                if (filterText != GetTrimmedTextSafe(_filterText))
+                {
                     return;
                 }
 
@@ -356,7 +425,8 @@ namespace Microsoft.NodejsTools.NpmUI {
                 FilteredPackages = newItems;
 
                 // Reassign originalSelectedPackage to the original selected package in the new list of filtered packages.
-                if (originalSelectedPackage != null) {
+                if (originalSelectedPackage != null)
+                {
                     originalSelectedPackage = FilteredPackages.FirstOrDefault(package => package.Name == originalSelectedPackage.Name);
                 }
 
@@ -376,19 +446,23 @@ namespace Microsoft.NodejsTools.NpmUI {
             GC.Collect();
         }
 
-        private string GetTrimmedTextSafe(string text) {
+        private string GetTrimmedTextSafe(string text)
+        {
             return text != null ? text.Trim() : string.Empty;
         }
 
-        public LastRefreshedMessageProvider LastRefreshedMessage {
+        public LastRefreshedMessageProvider LastRefreshedMessage
+        {
             get { return _lastRefreshedMessage; }
-            set {
+            set
+            {
                 _lastRefreshedMessage = value;
                 OnPropertyChanged();
             }
         }
 
-        public Visibility FilterControlsVisibility {
+        public Visibility FilterControlsVisibility
+        {
             get { return LoadingCatalogControlVisibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible; }
         }
 
@@ -396,29 +470,36 @@ namespace Microsoft.NodejsTools.NpmUI {
 
         #region Installation
 
-        public int SelectedDependencyTypeIndex {
+        public int SelectedDependencyTypeIndex
+        {
             get { return _selectedDependencyTypeIndex; }
-            set {
+            set
+            {
                 _selectedDependencyTypeIndex = value;
                 OnPropertyChanged();
             }
         }
 
-        public object SelectedVersion {
+        public object SelectedVersion
+        {
             get { return _selectedVersion; }
-            set {
+            set
+            {
                 _selectedVersion = value;
                 OnPropertyChanged();
             }
         }
 
-        internal bool CanInstall(PackageCatalogEntryViewModel package) {
+        internal bool CanInstall(PackageCatalogEntryViewModel package)
+        {
             return package != null;
         }
 
-        internal void Install(PackageCatalogEntryViewModel package) {
+        internal void Install(PackageCatalogEntryViewModel package)
+        {
             var type = DependencyType.Standard;
-            switch ((Indices)SelectedDependencyTypeIndex) {
+            switch ((Indices)SelectedDependencyTypeIndex)
+            {
                 case Indices.IndexDev:
                     type = DependencyType.Development;
                     break;
@@ -428,48 +509,58 @@ namespace Microsoft.NodejsTools.NpmUI {
                     break;
             }
 
-            if (!string.IsNullOrEmpty(package.Name)) {
-                var selectedVersion = SelectedVersion is SemverVersion ? ((SemverVersion)SelectedVersion).ToString(): string.Empty;
+            if (!string.IsNullOrEmpty(package.Name))
+            {
+                var selectedVersion = SelectedVersion is SemverVersion ? ((SemverVersion)SelectedVersion).ToString() : string.Empty;
                 _executeViewModel.QueueCommand(
                     NpmArgumentBuilder.GetNpmInstallArguments(
-                        package.Name, 
-                        selectedVersion, 
-                        type, 
-                        false, 
-                        SaveToPackageJson, 
+                        package.Name,
+                        selectedVersion,
+                        type,
+                        false,
+                        SaveToPackageJson,
                         Arguments));
             }
         }
 
-        internal bool CanOpenHomepage(string homepage) {
+        internal bool CanOpenHomepage(string homepage)
+        {
             return !string.IsNullOrEmpty(homepage);
         }
 
-        internal void OpenHomepage(string homepage) {
-            if (!string.IsNullOrEmpty(homepage)) {
+        internal void OpenHomepage(string homepage)
+        {
+            if (!string.IsNullOrEmpty(homepage))
+            {
                 Process.Start(homepage);
             }
         }
 
-        public string Arguments {
+        public string Arguments
+        {
             get { return _arguments; }
-            set {
+            set
+            {
                 _arguments = value;
                 OnPropertyChanged();
             }
         }
 
-        public bool SaveToPackageJson {
+        public bool SaveToPackageJson
+        {
             get { return _saveToPackageJson; }
-            set {
+            set
+            {
                 _saveToPackageJson = value;
                 OnPropertyChanged();
             }
         }
 
-        public PackageCatalogEntryViewModel SelectedPackage {
+        public PackageCatalogEntryViewModel SelectedPackage
+        {
             get { return _selectedPackage; }
-            set {
+            set
+            {
                 _selectedPackage = value;
                 OnPropertyChanged();
             }

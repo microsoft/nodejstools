@@ -14,12 +14,15 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Debugger {
+namespace Microsoft.NodejsTools.Debugger
+{
     /// <summary>
     /// Handles file name mapping while local debigging.
     /// </summary>
-    sealed class LocalFileNameMapper : IFileNameMapper {
-        public string GetLocalFileName(string remoteFileName) {
+    internal sealed class LocalFileNameMapper : IFileNameMapper
+    {
+        public string GetLocalFileName(string remoteFileName)
+        {
             return remoteFileName;
         }
     }

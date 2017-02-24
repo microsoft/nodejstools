@@ -30,19 +30,24 @@ using TestUtilities.Nodejs;
 using TestUtilities.UI;
 using TestUtilities.UI.Nodejs;
 
-namespace Microsoft.Nodejs.Tests.UI {
+namespace Microsoft.Nodejs.Tests.UI
+{
     [TestClass]
-    public class ProjectTests {
+    public class ProjectTests
+    {
         [ClassInitialize]
-        public static void DoDeployment(TestContext context) {
+        public static void DoDeployment(TestContext context)
+        {
             AssertListener.Initialize();
             NodejsTestData.Deploy();
         }
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void NoAutoFormattingEnter() {
-            using (var app = new VisualStudioApp()) {
+        public void NoAutoFormattingEnter()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 Window window;
                 var openFile = OpenProjectItem(app, "server.js", out window);
 
@@ -66,8 +71,10 @@ http.createServer(function (req, res) {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void NoAutoFormattingCloseFunction() {
-            using (var app = new VisualStudioApp()) {
+        public void NoAutoFormattingCloseFunction()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 Window window;
                 var openFile = OpenProjectItem(app, "server.js", out window);
 
@@ -92,8 +99,10 @@ http.createServer(function (req, res) {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void NoAutoFormattingPaste() {
-            using (var app = new VisualStudioApp()) {
+        public void NoAutoFormattingPaste()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 Window window;
                 var openFile = OpenProjectItem(app, "server.js", out window);
 
@@ -118,11 +127,14 @@ http.createServer(function (req, res) {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void NoReferences() {
+        public void NoReferences()
+        {
             Window window;
-            using (var app = new VisualStudioApp()) {
+            using (var app = new VisualStudioApp())
+            {
                 var openFile = OpenProjectItem(app, "server.js", out window);
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var solutionExplorer = app.OpenSolutionExplorer();
                     solutionExplorer.WaitForItemRemoved("Solution 'NodeAppWithModule' (1 project)", "NodeAppWithModule", "References");
                 }
@@ -131,16 +143,18 @@ http.createServer(function (req, res) {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void GlobalIntellisense() {
-            using (var app = new VisualStudioApp()) {
+        public void GlobalIntellisense()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 Window window;
                 var openFile = OpenProjectItem(app, "server.js", out window);
 
                 openFile.MoveCaret(6, 1);
 
                 Keyboard.Type("process.");
-                using (var session = openFile.WaitForSession<ICompletionSession>()) {
-
+                using (var session = openFile.WaitForSession<ICompletionSession>())
+                {
                     var completions = session.Session.CompletionSets.First().Completions.Select(x => x.InsertionText);
                     Assert.IsTrue(completions.Contains("abort"));
                     Assert.IsTrue(completions.Contains("chdir"));
@@ -150,8 +164,8 @@ http.createServer(function (req, res) {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void RequireIntellisenseExpanded() {
-
+        public void RequireIntellisenseExpanded()
+        {
             var testCases = new[] {
                 new { File="server.js", Line = 4, Type = "mymod.", Expected = "mymod_export" },
                 new { File="server.js", Line = 8, Type = "mymod2.", Expected = "mymod_export" },
@@ -194,10 +208,12 @@ http.createServer(function (req, res) {
             string curFile = null;
             Window window;
             EditorWindow openFile = null;
-            using (var app = new VisualStudioApp()) {
-
-                foreach (var testCase in testCases) {
-                    if (testCase.File != curFile) {
+            using (var app = new VisualStudioApp())
+            {
+                foreach (var testCase in testCases)
+                {
+                    if (testCase.File != curFile)
+                    {
                         openFile = OpenProjectItem(app, testCase.File, out window, @"TestData\RequireTestApp\RequireTestApp.sln");
                         app.OpenSolutionExplorer();
                         app.SolutionExplorerTreeView.WaitForItem("Solution 'RequireTestApp' (1 project)", "RequireTestApp", "dup.js");
@@ -211,11 +227,13 @@ http.createServer(function (req, res) {
                     openFile.Invoke(() => openFile.TextView.Caret.EnsureVisible());
                     openFile.SetFocus();
                     Keyboard.Type(testCase.Type);
-                    using (var session = openFile.WaitForSession<ICompletionSession>()) {
+                    using (var session = openFile.WaitForSession<ICompletionSession>())
+                    {
                         var completions = session.Session.CompletionSets.First().Completions.Select(x => x.InsertionText);
                         Assert.IsTrue(completions.Contains(testCase.Expected));
                         Keyboard.Type(System.Windows.Input.Key.Escape);
-                        for (int i = 0; i < testCase.Type.Length; i++) {
+                        for (int i = 0; i < testCase.Type.Length; i++)
+                        {
                             Keyboard.Type(System.Windows.Input.Key.Back);
                         }
 
@@ -227,12 +245,15 @@ http.createServer(function (req, res) {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void GlobalIntellisenseProjectReload() {
+        public void GlobalIntellisenseProjectReload()
+        {
             Window window;
-            using (var app = new VisualStudioApp()) {
+            using (var app = new VisualStudioApp())
+            {
                 app.OpenProject(Path.GetFullPath(@"TestData\NodeAppWithModule2\NodeAppWithModule.sln"));
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     app.OpenSolutionExplorer();
                     var projectName = "NodeAppWithModule";
                     var project = app.SolutionExplorerTreeView.WaitForItem(
@@ -270,8 +291,8 @@ http.createServer(function (req, res) {
 
                     openFile.MoveCaret(6, 1);
                     Keyboard.Type("process.");
-                    using (var session = openFile.WaitForSession<ICompletionSession>()) {
-
+                    using (var session = openFile.WaitForSession<ICompletionSession>())
+                    {
                         var completions = session.Session.CompletionSets.First().Completions.Select(x => x.InsertionText);
                         Assert.IsTrue(completions.Contains("abort"));
                         Assert.IsTrue(completions.Contains("chdir"));
@@ -282,15 +303,17 @@ http.createServer(function (req, res) {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void UserModule() {
-            using (var app = new VisualStudioApp()) {
+        public void UserModule()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 Window window;
                 var openFile = OpenProjectItem(app, "server.js", out window);
 
                 openFile.MoveCaret(6, 1);
                 Keyboard.Type("mymod.");
-                using (var session = openFile.WaitForSession<ICompletionSession>()) {
-
+                using (var session = openFile.WaitForSession<ICompletionSession>())
+                {
                     var completions = session.Session.CompletionSets.First().Completions.Select(x => x.InsertionText);
                     Assert.IsTrue(completions.Contains("area"));
                     Assert.IsTrue(completions.Contains("circumference"));
@@ -300,13 +323,16 @@ http.createServer(function (req, res) {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void AddNewItem() {
+        public void AddNewItem()
+        {
             Window window;
 
-            using (var app = new VisualStudioApp()) {
+            using (var app = new VisualStudioApp())
+            {
                 var openFile = OpenProjectItem(app, "server.js", out window);
 
-                using (var newItem = NewItemDialog.FromDte(app)) {
+                using (var newItem = NewItemDialog.FromDte(app))
+                {
                     newItem.FileName = "NewJSFile.js";
                     newItem.OK();
                 }
@@ -320,9 +346,11 @@ http.createServer(function (req, res) {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void EnterCompletion() {
+        public void EnterCompletion()
+        {
             Window window;
-            using (var app = new VisualStudioApp()) {
+            using (var app = new VisualStudioApp())
+            {
                 var openFile = OpenProjectItem(app, "server.js", out window);
 
                 openFile.MoveCaret(6, 1);
@@ -349,10 +377,12 @@ http.createServer(function (req, res) {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void ModuleCompletions() {
+        public void ModuleCompletions()
+        {
             Window window;
 
-            using (var app = new VisualStudioApp()) {
+            using (var app = new VisualStudioApp())
+            {
                 var openFile = OpenProjectItem(app, "intellisensemod.js", out window);
 
                 openFile.MoveCaret(3, 1);
@@ -385,9 +415,12 @@ sd.StringDecoder
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void NewProject() {
-            using (var app = new VisualStudioApp()) {
-                using (var newProjDialog = app.FileNewProject()) {
+        public void NewProject()
+        {
+            using (var app = new VisualStudioApp())
+            {
+                using (var newProjDialog = app.FileNewProject())
+                {
                     newProjDialog.FocusLanguageNode("JavaScript");
 
                     var nodejsApp = newProjDialog.ProjectTypes.FindItem(NodejsVisualStudioApp.JavascriptWebAppTemplate);
@@ -397,7 +430,8 @@ sd.StringDecoder
                 }
 
                 // wait for new solution to load...            
-                for (int i = 0; i < 40 && app.Dte.Solution.Projects.Count == 0; i++) {
+                for (int i = 0; i < 40 && app.Dte.Solution.Projects.Count == 0; i++)
+                {
                     System.Threading.Thread.Sleep(250);
                 }
 
@@ -417,9 +451,12 @@ sd.StringDecoder
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void NewAzureProject() {
-            using (var app = new VisualStudioApp()) {
-                using (var newProjDialog = app.FileNewProject()) {
+        public void NewAzureProject()
+        {
+            using (var app = new VisualStudioApp())
+            {
+                using (var newProjDialog = app.FileNewProject())
+                {
                     newProjDialog.FocusLanguageNode("JavaScript");
 
                     var azureApp = newProjDialog.ProjectTypes.FindItem(NodejsVisualStudioApp.JavaScriptAzureWebAppTemplate);
@@ -428,7 +465,8 @@ sd.StringDecoder
                 }
 
                 // wait for new solution to load...
-                for (int i = 0; i < 40 && app.Dte.Solution.Projects.Count == 0; i++) {
+                for (int i = 0; i < 40 && app.Dte.Solution.Projects.Count == 0; i++)
+                {
                     System.Threading.Thread.Sleep(250);
                 }
 
@@ -448,21 +486,24 @@ sd.StringDecoder
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void AutomationProject() {
-            using (var app = new VisualStudioApp()) {
+        public void AutomationProject()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodeAppWithModule\NodeAppWithModule.sln");
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     Assert.AreEqual("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}", project.Kind.ToUpper());
                     // we don't yet expose a VSProject interface here, if we did we'd need tests for it, but it doesn't support
                     // any functionality we care about/implement yet.
                     Assert.AreEqual(typeof(NodejsProjectNode), project.Object.GetType());
-    
+
                     Assert.AreEqual(true, project.Saved);
                     project.Saved = false;
                     Assert.AreEqual(false, project.Saved);
                     project.Saved = true;
-    
+
                     Assert.AreEqual(null, project.Globals);
                     Assert.AreEqual("{04726c27-8125-471a-bac0-2301d273db5e}", project.ExtenderCATID);
                     var extNames = project.ExtenderNames;
@@ -473,16 +514,17 @@ sd.StringDecoder
                     AssertError<ArgumentNullException>(() => project.get_Extender(null));
                     AssertError<COMException>(() => project.get_Extender("DoesNotExist"));
                     Assert.AreEqual(null, project.Collection);
-    
-                    foreach (ProjectItem item in project.ProjectItems) {
+
+                    foreach (ProjectItem item in project.ProjectItems)
+                    {
                         Assert.AreEqual(item.Name, project.ProjectItems.Item(1).Name);
                         break;
                     }
-    
+
                     Assert.AreEqual(app.Dte, project.ProjectItems.DTE);
                     Assert.AreEqual(project, project.ProjectItems.Parent);
                     Assert.AreEqual(null, project.ProjectItems.Kind);
-    
+
                     AssertError<ArgumentException>(() => project.ProjectItems.Item(-1));
                     AssertError<ArgumentException>(() => project.ProjectItems.Item(0));
                 }
@@ -491,13 +533,17 @@ sd.StringDecoder
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void SetAsStartupFile() {
-            using (var app = new VisualStudioApp()) {
+        public void SetAsStartupFile()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodeAppWithModule\NodeAppWithModule.sln");
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     // wait for new solution to load...
-                    for (int i = 0; i < 40 && app.Dte.Solution.Projects.Count == 0; i++) {
+                    for (int i = 0; i < 40 && app.Dte.Solution.Projects.Count == 0; i++)
+                    {
                         System.Threading.Thread.Sleep(250);
                     }
 
@@ -512,9 +558,11 @@ sd.StringDecoder
                     app.Dte.ExecuteCommand("Project.SetasNode.jsStartupFile");
 
                     string startupFile = null;
-                    for (int i = 0; i < 40; i++) {
+                    for (int i = 0; i < 40; i++)
+                    {
                         startupFile = (string)project.Properties.Item("StartupFile").Value;
-                        if (startupFile == "mymod.js") {
+                        if (startupFile == "mymod.js")
+                        {
                             break;
                         }
                         System.Threading.Thread.Sleep(250);
@@ -524,30 +572,40 @@ sd.StringDecoder
             }
         }
 
-        private static void AssertError<T>(Action action) where T : Exception {
-            try {
+        private static void AssertError<T>(Action action) where T : Exception
+        {
+            try
+            {
                 action();
                 Assert.Fail();
-            } catch (T) {
+            }
+            catch (T)
+            {
             }
         }
 
-        private static EditorWindow OpenProjectItem(VisualStudioApp app, string startItem, out Window window, string projectName = @"TestData\NodeAppWithModule\NodeAppWithModule.sln") {
+        private static EditorWindow OpenProjectItem(VisualStudioApp app, string startItem, out Window window, string projectName = @"TestData\NodeAppWithModule\NodeAppWithModule.sln")
+        {
             var project = app.OpenProject(projectName, startItem);
 
             return OpenItem(app, startItem, project, out window);
         }
 
-        private static EditorWindow OpenItem(VisualStudioApp app, string startItem, Project project, out Window window) {
+        private static EditorWindow OpenItem(VisualStudioApp app, string startItem, Project project, out Window window)
+        {
             EnvDTE.ProjectItem item = null;
-            if (startItem.IndexOf('\\') != -1) {
+            if (startItem.IndexOf('\\') != -1)
+            {
                 var items = project.ProjectItems;
-                foreach (var itemName in startItem.Split('\\')) {
+                foreach (var itemName in startItem.Split('\\'))
+                {
                     Console.WriteLine(itemName);
                     item = items.Item(itemName);
                     items = item.ProjectItems;
                 }
-            } else {
+            }
+            else
+            {
                 item = project.ProjectItems.Item(startItem);
             }
 
@@ -560,17 +618,22 @@ sd.StringDecoder
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void ProjectProperties() {
-            for (int mode = 0; mode < 2; mode++) {
-                using (var app = new VisualStudioApp()) {
+        public void ProjectProperties()
+        {
+            for (int mode = 0; mode < 2; mode++)
+            {
+                using (var app = new VisualStudioApp())
+                {
                     var testFile = Path.Combine(Path.GetTempPath(), "nodejstest.txt");
-                    if (File.Exists(testFile)) {
+                    if (File.Exists(testFile))
+                    {
                         File.Delete(testFile);
                     }
 
                     var project = OpenProjectAndRun(app, @"TestData\NodejsProjectPropertiesTest\NodejsProjectPropertiesTest.sln", "server.js", true, debug: mode == 0);
 
-                    for (int i = 0; i < 30 && !File.Exists(testFile); i++) {
+                    for (int i = 0; i < 30 && !File.Exists(testFile); i++)
+                    {
                         System.Threading.Thread.Sleep(250);
                     }
 
@@ -589,19 +652,24 @@ sd.StringDecoder
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void BrowserLaunch() {
-            for (int mode = 0; mode < 2; mode++) {
+        public void BrowserLaunch()
+        {
+            for (int mode = 0; mode < 2; mode++)
+            {
                 var startingProcesses = System.Diagnostics.Process.GetProcessesByName("iexplore").Select(x => x.Id).ToSet();
 
-                using (var app = new VisualStudioApp()) {
+                using (var app = new VisualStudioApp())
+                {
                     var testFile = Path.Combine(Path.GetTempPath(), "nodejstest.txt");
-                    if (File.Exists(testFile)) {
+                    if (File.Exists(testFile))
+                    {
                         File.Delete(testFile);
                     }
 
                     var project = OpenProjectAndRun(app, @"TestData\NodejsProjectPropertiesTest\NodejsProjectPropertiesTest.sln", "server2.js", true, debug: mode == 0);
 
-                    for (int i = 0; i < 30 && !File.Exists(testFile); i++) {
+                    for (int i = 0; i < 30 && !File.Exists(testFile); i++)
+                    {
                         System.Threading.Thread.Sleep(250);
                     }
 
@@ -612,13 +680,17 @@ sd.StringDecoder
                 var endingProcesses = System.Diagnostics.Process.GetProcessesByName("iexplore").Select(x => x.Id);
                 var newProcesses = endingProcesses.Except(startingProcesses).ToArray();
 
-                if (mode == 0) {
+                if (mode == 0)
+                {
                     // new processes should have been shutdown when debugging stopped
                     Assert.AreEqual(0, newProcesses.Length);
-                } else {
+                }
+                else
+                {
                     // no debugging, process will hang around
                     Assert.IsTrue(newProcesses.Length > 0);
-                    foreach (var proc in newProcesses) {
+                    foreach (var proc in newProcesses)
+                    {
                         Console.WriteLine("Killing process {0}", proc);
                         System.Diagnostics.Process.GetProcessById(proc).Kill();
                     }
@@ -626,23 +698,29 @@ sd.StringDecoder
             }
         }
 
-        internal static Project OpenProjectAndRun(VisualStudioApp app, string projName, string filename, bool setStartupItem = true, bool debug = true) {
+        internal static Project OpenProjectAndRun(VisualStudioApp app, string projName, string filename, bool setStartupItem = true, bool debug = true)
+        {
             var project = app.OpenProject(projName, filename, setStartupItem: setStartupItem);
 
-            if (debug) {
+            if (debug)
+            {
                 app.Dte.ExecuteCommand("Debug.Start");
-            } else {
+            }
+            else
+            {
                 app.Dte.ExecuteCommand("Debug.StartWithoutDebugging");
             }
 
             return project;
         }
 
-        private string CreateTempPathOfLength(int length) {
+        private string CreateTempPathOfLength(int length)
+        {
             var path = TestData.GetTempPath(randomSubPath: true) + "\\";
 
             int padding = length - path.Length;
-            if (padding <= 0) {
+            if (padding <= 0)
+            {
                 Assert.Inconclusive("Could not obtain a base directory with a sufficiently short path.");
             }
 
@@ -652,51 +730,66 @@ sd.StringDecoder
             return path;
         }
 
-        private void DeleteLongPath(string path) {
-            if (!path.StartsWith(@"\\?\")) {
+        private void DeleteLongPath(string path)
+        {
+            if (!path.StartsWith(@"\\?\"))
+            {
                 path = @"\\?\" + path;
             }
 
             Microsoft.VisualStudioTools.Project.WIN32_FIND_DATA wfd;
             IntPtr hFind = Microsoft.VisualStudioTools.Project.NativeMethods.FindFirstFile(path + "\\*", out wfd);
-            if (hFind == Microsoft.VisualStudioTools.Project.NativeMethods.INVALID_HANDLE_VALUE) {
+            if (hFind == Microsoft.VisualStudioTools.Project.NativeMethods.INVALID_HANDLE_VALUE)
+            {
                 return;
             }
 
-            try {
-                do {
-                    if (wfd.cFileName == "." || wfd.cFileName == "..") {
+            try
+            {
+                do
+                {
+                    if (wfd.cFileName == "." || wfd.cFileName == "..")
+                    {
                         continue;
                     }
 
                     string childPath = path;
-                    if (childPath != "") {
+                    if (childPath != "")
+                    {
                         childPath += "\\";
                     }
                     childPath += wfd.cFileName;
 
                     bool isDirectory = (wfd.dwFileAttributes & Microsoft.VisualStudioTools.Project.NativeMethods.FILE_ATTRIBUTE_DIRECTORY) != 0;
-                    if (isDirectory) {
+                    if (isDirectory)
+                    {
                         DeleteLongPath(childPath);
-                    } else {
+                    }
+                    else
+                    {
                         Console.WriteLine("DeleteFile " + childPath);
-                        if (!Microsoft.VisualStudioTools.Project.NativeMethods.DeleteFile(childPath)) {
+                        if (!Microsoft.VisualStudioTools.Project.NativeMethods.DeleteFile(childPath))
+                        {
                             throw new Win32Exception(Marshal.GetLastWin32Error());
                         }
                     }
                 } while (Microsoft.VisualStudioTools.Project.NativeMethods.FindNextFile(hFind, out wfd));
 
                 Console.WriteLine("RemoveDirectory " + path);
-                if (!Microsoft.VisualStudioTools.Project.NativeMethods.RemoveDirectory(path)) {
+                if (!Microsoft.VisualStudioTools.Project.NativeMethods.RemoveDirectory(path))
+                {
                     throw new Win32Exception(Marshal.GetLastWin32Error());
                 }
-            } finally {
+            }
+            finally
+            {
                 Microsoft.VisualStudioTools.Project.NativeMethods.FindClose(hFind);
             }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
-        public void GetLongSubPaths() {
+        public void GetLongSubPaths()
+        {
             string
                 basePath = CreateTempPathOfLength(248 - 1 - @"\d\d".Length),
                 shortFile = basePath + @"\f",
@@ -709,14 +802,17 @@ sd.StringDecoder
                 longDir = basePath + @"\d.dd",
                 longLongFile = longDir + @"\ff",
                 longLongDir = longDir + @"\dd";
-            try {
-                foreach (var path in new[] { shortDir, shortShortDir, shortLongDir, longDir, longLongDir }) {
+            try
+            {
+                foreach (var path in new[] { shortDir, shortShortDir, shortLongDir, longDir, longLongDir })
+                {
                     Console.WriteLine("CreateDirectory {0}", path);
                     Assert.IsTrue(NativeMethods.CreateDirectory(@"\\?\" + path, IntPtr.Zero), path);
                 }
 
                 File.WriteAllText(shortFile, "");
-                foreach (var path in new[] { shortShortFile, shortLongFile, longFile, longLongFile }) {
+                foreach (var path in new[] { shortShortFile, shortLongFile, longFile, longLongFile })
+                {
                     Console.WriteLine("CopyFile {0}", path);
                     Assert.IsTrue(NativeMethods.CopyFile(shortFile, @"\\?\" + path, true), path);
                 }
@@ -732,50 +828,60 @@ sd.StringDecoder
 
                 // There should be no other elements reported.
                 Assert.AreEqual(0, longPaths.Count);
-            } finally {
+            }
+            finally
+            {
                 DeleteLongPath(basePath);
             }
         }
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void LongPathCheck() {
+        public void LongPathCheck()
+        {
             string[] expectedLongPaths = {
                 @"node_modules\azure\node_modules\azure-common\node_modules\xml2js\node_modules\sax\test\trailing-attribute-no-value.js",
                 @"node_modules\azure\node_modules\azure-common\node_modules\xml2js\node_modules\sax\test\xmlns-xml-default-prefix-attribute.js",
                 @"node_modules\azure\node_modules\azure-common\node_modules\xml2js\node_modules\sax\test\xmlns-xml-default-redefine.js",
                 @"node_modules\azure\node_modules\request\node_modules\form-data\node_modules\combined-stream\node_modules",
                 @"node_modules\azure\node_modules\request\node_modules\http-signature\node_modules\ctype\tst\ctio\uint\tst.roundtrip.js",
-            };                                         
+            };
 
             string projectDir = CreateTempPathOfLength(248 - 1 - expectedLongPaths.Min(s => s.Length));
-            try {
-                foreach (var fileName in new[] { "HelloWorld.njsproj", "HelloWorld.sln", "package.json", "README.md", "server.js" }) {
+            try
+            {
+                foreach (var fileName in new[] { "HelloWorld.njsproj", "HelloWorld.sln", "package.json", "README.md", "server.js" })
+                {
                     File.Copy(TestData.GetPath(@"TestData\HelloWorld\" + fileName), projectDir + "\\" + fileName);
                 }
 
-                using (var app = new NodejsVisualStudioApp()) {
-                    try {
+                using (var app = new NodejsVisualStudioApp())
+                {
+                    try
+                    {
                         NodejsPackage.Instance.GeneralOptionsPage.CheckForLongPaths = true;
 
                         var project = app.OpenProject(projectDir + "\\HelloWorld.sln");
 
                         // Wait for new solution to load.
-                        for (int i = 0; i < 40 && app.Dte.Solution.Projects.Count == 0; i++) {
+                        for (int i = 0; i < 40 && app.Dte.Solution.Projects.Count == 0; i++)
+                        {
                             System.Threading.Thread.Sleep(250);
                         }
 
                         const string interpreterDescription = "Node.js Interactive Window";
                         app.Dte.ExecuteCommand("View.Node.jsInteractiveWindow");
                         var interactive = app.GetInteractiveWindow(interpreterDescription);
-                        if (interactive == null) {
+                        if (interactive == null)
+                        {
                             Assert.Inconclusive("Need " + interpreterDescription);
                         }
 
                         interactive.WaitForIdleState();
                         var npmTask = interactive.ReplWindow.ExecuteCommand(".npm install azure@0.9.12");
 
-                        using (var dialog = new AutomationDialog(app, AutomationElement.FromHandle(app.WaitForDialog(npmTask)))) {
+                        using (var dialog = new AutomationDialog(app, AutomationElement.FromHandle(app.WaitForDialog(npmTask))))
+                        {
                             // The option to offer "npm dedupe" should be there.
                             var firstCommandLink = dialog.FindByAutomationId("CommandLink_1000");
                             Assert.IsNotNull(firstCommandLink);
@@ -787,26 +893,30 @@ sd.StringDecoder
 
                             var reportedLongPaths =
                                 (from line in detailsText.Current.Name.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
-                                 where line.StartsWith("•")
+                                 where line.StartsWith("\u2022")
                                  let nbspIndex = line.IndexOf('\u00A0')
                                  where nbspIndex >= 0
                                  select line.Substring(1, nbspIndex - 1).Trim()
                                 ).ToArray();
                             Console.WriteLine("Reported paths:");
-                            foreach (var path in reportedLongPaths) {
+                            foreach (var path in reportedLongPaths)
+                            {
                                 Console.WriteLine("\t" + path);
                             }
 
                             reportedLongPaths = reportedLongPaths.Except(expectedLongPaths).ToArray();
-                            if (reportedLongPaths.Length != 0) {
+                            if (reportedLongPaths.Length != 0)
+                            {
                                 Console.WriteLine("Unexpected paths:");
-                                foreach (var path in reportedLongPaths) {
+                                foreach (var path in reportedLongPaths)
+                                {
                                     Console.WriteLine("\t" + path);
                                 }
                                 Assert.Fail("Unexpected long paths reported.");
                             }
 
-                            dialog.WaitForClosed(TimeSpan.FromSeconds(1), () => {
+                            dialog.WaitForClosed(TimeSpan.FromSeconds(1), () =>
+                            {
                                 // Click the first command button (dedupe).
                                 firstCommandLink.SetFocus();
                                 Keyboard.Press(System.Windows.Input.Key.Enter);
@@ -820,13 +930,15 @@ sd.StringDecoder
                         interactive.WaitForIdleState();
 
                         // npm dedupe won't be able to fix the problem, so we should get the dialog once again.
-                        using (var dialog = new AutomationDialog(app, AutomationElement.FromHandle(app.WaitForDialog(npmTask)))) {
+                        using (var dialog = new AutomationDialog(app, AutomationElement.FromHandle(app.WaitForDialog(npmTask))))
+                        {
                             // The option to offer "npm dedupe" should not be there anymore.
                             var firstCommandLink = dialog.FindByAutomationId("CommandLink_1000");
                             Assert.IsNotNull(firstCommandLink);
                             Assert.IsFalse(firstCommandLink.Current.Name.Contains("npm dedupe"));
 
-                            dialog.WaitForClosed(TimeSpan.FromSeconds(1), () => {
+                            dialog.WaitForClosed(TimeSpan.FromSeconds(1), () =>
+                            {
                                 Keyboard.Type("\r"); // click the first command button (do nothing, but warn next time)
                             });
                         }
@@ -842,13 +954,15 @@ sd.StringDecoder
                         interactive.WaitForIdleState();
                         npmTask = interactive.ReplWindow.ExecuteCommand(".npm list");
 
-                        using (var dialog = new AutomationDialog(app, AutomationElement.FromHandle(app.WaitForDialog(npmTask)))) {
+                        using (var dialog = new AutomationDialog(app, AutomationElement.FromHandle(app.WaitForDialog(npmTask))))
+                        {
                             // The option to offer "npm dedupe" should be there again, since this is a new check.
                             var firstCommandLink = dialog.FindByAutomationId("CommandLink_1000");
                             Assert.IsNotNull(firstCommandLink);
                             Assert.IsTrue(firstCommandLink.Current.Name.Contains("npm dedupe"));
 
-                            dialog.WaitForClosed(TimeSpan.FromSeconds(1), () => {
+                            dialog.WaitForClosed(TimeSpan.FromSeconds(1), () =>
+                            {
                                 // Click the third command button (do nothing, do not warn anymore)
                                 firstCommandLink.SetFocus();
                                 Keyboard.Press(System.Windows.Input.Key.Tab);
@@ -867,11 +981,15 @@ sd.StringDecoder
                         interactive.WaitForIdleState();
                         npmTask = interactive.ReplWindow.ExecuteCommand(".npm list");
                         app.WaitForNoDialog(TimeSpan.FromSeconds(3));
-                    } finally {
+                    }
+                    finally
+                    {
                         NodejsPackage.Instance.GeneralOptionsPage.CheckForLongPaths = true;
                     }
                 }
-            } finally {
+            }
+            finally
+            {
                 DeleteLongPath(projectDir);
             }
         }

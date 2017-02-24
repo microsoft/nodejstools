@@ -16,12 +16,15 @@
 
 using System;
 
-namespace Microsoft.NodejsTools.Debugger {
-    sealed class BreakpointHitEventArgs : EventArgs {
+namespace Microsoft.NodejsTools.Debugger
+{
+    internal sealed class BreakpointHitEventArgs : EventArgs
+    {
         public readonly NodeBreakpointBinding BreakpointBinding;
         public readonly NodeThread Thread;
 
-        public BreakpointHitEventArgs(NodeBreakpointBinding breakpoint, NodeThread thread) {
+        public BreakpointHitEventArgs(NodeBreakpointBinding breakpoint, NodeThread thread)
+        {
             BreakpointBinding = breakpoint;
             Thread = thread;
         }

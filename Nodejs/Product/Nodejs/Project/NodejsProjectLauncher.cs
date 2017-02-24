@@ -38,45 +38,56 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Project;
 using Microsoft.NodejsTools.TypeScript;
 
-namespace Microsoft.NodejsTools.Project {
-    class NodejsProjectLauncher : IProjectLauncher {
+namespace Microsoft.NodejsTools.Project
+{
+    internal class NodejsProjectLauncher : IProjectLauncher
+    {
         private readonly NodejsProjectNode _project;
         private int? _testServerPort;
 
-        public NodejsProjectLauncher(NodejsProjectNode project) {
+        public NodejsProjectLauncher(NodejsProjectNode project)
+        {
             _project = project;
 
             var portNumber = _project.GetProjectProperty(NodeProjectProperty.NodejsPort);
             int portNum;
-            if (Int32.TryParse(portNumber, out portNum)) {
+            if (Int32.TryParse(portNumber, out portNum))
+            {
                 _testServerPort = portNum;
             }
         }
 
         #region IProjectLauncher Members
 
-        public int LaunchProject(bool debug) {
+        public int LaunchProject(bool debug)
+        {
             NodejsPackage.Instance.Logger.LogEvent(Logging.NodejsToolsLogEvent.Launch, debug ? 1 : 0);
             return Start(ResolveStartupFile(), debug);
         }
 
-        public int LaunchFile(string file, bool debug) {
+        public int LaunchFile(string file, bool debug)
+        {
             NodejsPackage.Instance.Logger.LogEvent(Logging.NodejsToolsLogEvent.Launch, debug ? 1 : 0);
             return Start(file, debug);
         }
 
-        private int Start(string file, bool debug) {
+        private int Start(string file, bool debug)
+        {
             string nodePath = GetNodePath();
-            if (nodePath == null) {
+            if (nodePath == null)
+            {
                 Nodejs.ShowNodejsNotInstalled();
                 return VSConstants.S_OK;
             }
 
             bool startBrowser = ShouldStartBrowser();
 
-            if (debug) {
+            if (debug)
+            {
                 StartWithDebugger(file);
-            } else {
+            }
+            else
+            {
                 var psi = new ProcessStartInfo();
                 psi.UseShellExecute = false;
 
@@ -86,13 +97,15 @@ namespace Microsoft.NodejsTools.Project {
 
                 string webBrowserUrl = GetFullUrl();
                 Uri uri = null;
-                if (!String.IsNullOrWhiteSpace(webBrowserUrl)) {
+                if (!String.IsNullOrWhiteSpace(webBrowserUrl))
+                {
                     uri = new Uri(webBrowserUrl);
 
                     psi.EnvironmentVariables["PORT"] = uri.Port.ToString();
                 }
 
-                foreach (var nameValue in GetEnvironmentVariables()) {
+                foreach (var nameValue in GetEnvironmentVariables())
+                {
                     psi.EnvironmentVariables[nameValue.Key] = nameValue.Value;
                 }
 
@@ -102,11 +115,13 @@ namespace Microsoft.NodejsTools.Project {
                     NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit);
                 _project.OnDispose += process.ResponseToTerminateEvent;
 
-                if (startBrowser && uri != null) {
+                if (startBrowser && uri != null)
+                {
                     OnPortOpenedHandler.CreateHandler(
                         uri.Port,
                         shortCircuitPredicate: () => process.HasExited,
-                        action: () => {
+                        action: () =>
+                        {
                             VsShellUtilities.OpenBrowser(webBrowserUrl, (uint)__VSOSPFLAGS.OSP_LaunchNewBrowser);
                         }
                     );
@@ -115,35 +130,44 @@ namespace Microsoft.NodejsTools.Project {
             return VSConstants.S_OK;
         }
 
-        private string GetFullArguments(string file, bool includeNodeArgs = true) {
+        private string GetFullArguments(string file, bool includeNodeArgs = true)
+        {
             string res = String.Empty;
-            if (includeNodeArgs) {
+            if (includeNodeArgs)
+            {
                 var nodeArgs = _project.GetProjectProperty(NodeProjectProperty.NodeExeArguments);
-                if (!String.IsNullOrWhiteSpace(nodeArgs)) {
+                if (!String.IsNullOrWhiteSpace(nodeArgs))
+                {
                     res = nodeArgs + " ";
                 }
             }
             res += "\"" + file + "\"";
             var scriptArgs = _project.GetProjectProperty(NodeProjectProperty.ScriptArguments);
-            if (!String.IsNullOrWhiteSpace(scriptArgs)) {
+            if (!String.IsNullOrWhiteSpace(scriptArgs))
+            {
                 res += " " + scriptArgs;
             }
             return res;
         }
 
-        private string GetNodePath() {
+        private string GetNodePath()
+        {
             var overridePath = _project.GetProjectProperty(NodeProjectProperty.NodeExePath);
             return Nodejs.GetAbsoluteNodeExePath(_project.ProjectHome, overridePath);
         }
 
         #endregion
 
-        private string GetFullUrl() {
+        private string GetFullUrl()
+        {
             var host = _project.GetProjectProperty(NodeProjectProperty.LaunchUrl);
 
-            try {
+            try
+            {
                 return GetFullUrl(host, TestServerPort);
-            } catch (UriFormatException) {
+            }
+            catch (UriFormatException)
+            {
                 var output = OutputWindowRedirector.GetGeneral(NodejsPackage.Instance);
                 output.WriteErrorLine(string.Format(CultureInfo.CurrentCulture, Resources.ErrorInvalidLaunchUrl, host));
                 output.ShowAndActivate();
@@ -151,12 +175,16 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        internal static string GetFullUrl(string host, int port) {
+        internal static string GetFullUrl(string host, int port)
+        {
             UriBuilder builder;
             Uri uri;
-            if (Uri.TryCreate(host, UriKind.Absolute, out uri)) {
+            if (Uri.TryCreate(host, UriKind.Absolute, out uri))
+            {
                 builder = new UriBuilder(uri);
-            } else {
+            }
+            else
+            {
                 builder = new UriBuilder();
                 builder.Scheme = Uri.UriSchemeHttp;
                 builder.Host = "localhost";
@@ -168,9 +196,12 @@ namespace Microsoft.NodejsTools.Project {
             return builder.ToString();
         }
 
-        private int TestServerPort {
-            get {
-                if (!_testServerPort.HasValue) {
+        private int TestServerPort
+        {
+            get
+            {
+                if (!_testServerPort.HasValue)
+                {
                     _testServerPort = GetFreePort();
                 }
                 return _testServerPort.Value;
@@ -180,28 +211,38 @@ namespace Microsoft.NodejsTools.Project {
         /// <summary>
         /// Default implementation of the "Start Debugging" command.
         /// </summary>
-        private void StartWithDebugger(string startupFile) {
+        private void StartWithDebugger(string startupFile)
+        {
             VsDebugTargetInfo dbgInfo = new VsDebugTargetInfo();
             dbgInfo.cbSize = (uint)Marshal.SizeOf(dbgInfo);
 
-            if (SetupDebugInfo(ref dbgInfo, startupFile)) {
+            if (SetupDebugInfo(ref dbgInfo, startupFile))
+            {
                 LaunchDebugger(_project.Site, dbgInfo);
             }
         }
 
-        private void LaunchDebugger(IServiceProvider provider, VsDebugTargetInfo dbgInfo) {
-            if (!Directory.Exists(dbgInfo.bstrCurDir)) {
+        private void LaunchDebugger(IServiceProvider provider, VsDebugTargetInfo dbgInfo)
+        {
+            if (!Directory.Exists(dbgInfo.bstrCurDir))
+            {
                 MessageBox.Show(string.Format(CultureInfo.CurrentCulture, Resources.DebugWorkingDirectoryDoesNotExistErrorMessage, dbgInfo.bstrCurDir), SR.ProductName);
-            } else if (!File.Exists(dbgInfo.bstrExe)) {
+            }
+            else if (!File.Exists(dbgInfo.bstrExe))
+            {
                 MessageBox.Show(string.Format(CultureInfo.CurrentCulture, Resources.DebugInterpreterDoesNotExistErrorMessage, dbgInfo.bstrExe), SR.ProductName);
-            } else if (DoesProjectSupportDebugging()) {
+            }
+            else if (DoesProjectSupportDebugging())
+            {
                 VsShellUtilities.LaunchDebugger(provider, dbgInfo);
             }
         }
 
-        private bool DoesProjectSupportDebugging() {
+        private bool DoesProjectSupportDebugging()
+        {
             var typeScriptOutFile = _project.GetProjectProperty("TypeScriptOutFile");
-            if (!string.IsNullOrEmpty(typeScriptOutFile)) {
+            if (!string.IsNullOrEmpty(typeScriptOutFile))
+            {
                 return MessageBox.Show(
                     Resources.DebugTypeScriptCombineNotSupportedWarningMessage,
                     SR.ProductName,
@@ -213,8 +254,10 @@ namespace Microsoft.NodejsTools.Project {
             return true;
         }
 
-        private void AppendOption(ref VsDebugTargetInfo dbgInfo, string option, string value) {
-            if (!String.IsNullOrWhiteSpace(dbgInfo.bstrOptions)) {
+        private void AppendOption(ref VsDebugTargetInfo dbgInfo, string option, string value)
+        {
+            if (!String.IsNullOrWhiteSpace(dbgInfo.bstrOptions))
+            {
                 dbgInfo.bstrOptions += ";";
             }
 
@@ -224,7 +267,8 @@ namespace Microsoft.NodejsTools.Project {
         /// <summary>
         /// Sets up debugger information.
         /// </summary>
-        private bool SetupDebugInfo(ref VsDebugTargetInfo dbgInfo, string startupFile) {
+        private bool SetupDebugInfo(ref VsDebugTargetInfo dbgInfo, string startupFile)
+        {
             dbgInfo.dlo = DEBUG_LAUNCH_OPERATION.DLO_CreateProcess;
 
             dbgInfo.bstrExe = GetNodePath();
@@ -232,46 +276,56 @@ namespace Microsoft.NodejsTools.Project {
             dbgInfo.bstrArg = GetFullArguments(startupFile, includeNodeArgs: false);    // we need to supply node args via options
             dbgInfo.bstrRemoteMachine = null;
             var nodeArgs = _project.GetProjectProperty(NodeProjectProperty.NodeExeArguments);
-            if (!String.IsNullOrWhiteSpace(nodeArgs)) {
+            if (!String.IsNullOrWhiteSpace(nodeArgs))
+            {
                 AppendOption(ref dbgInfo, AD7Engine.InterpreterOptions, nodeArgs);
             }
 
             var url = GetFullUrl();
-            if (ShouldStartBrowser() && !String.IsNullOrWhiteSpace(url)) {
+            if (ShouldStartBrowser() && !String.IsNullOrWhiteSpace(url))
+            {
                 AppendOption(ref dbgInfo, AD7Engine.WebBrowserUrl, url);
             }
 
             var debuggerPort = _project.GetProjectProperty(NodeProjectProperty.DebuggerPort);
-            if (!String.IsNullOrWhiteSpace(debuggerPort)) {
+            if (!String.IsNullOrWhiteSpace(debuggerPort))
+            {
                 AppendOption(ref dbgInfo, AD7Engine.DebuggerPort, debuggerPort);
             }
 
-            if (NodejsPackage.Instance.GeneralOptionsPage.WaitOnAbnormalExit) {
+            if (NodejsPackage.Instance.GeneralOptionsPage.WaitOnAbnormalExit)
+            {
                 AppendOption(ref dbgInfo, AD7Engine.WaitOnAbnormalExitSetting, "true");
             }
 
-            if (NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit) {
+            if (NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit)
+            {
                 AppendOption(ref dbgInfo, AD7Engine.WaitOnNormalExitSetting, "true");
             }
 
             dbgInfo.fSendStdoutToOutputWindow = 0;
 
             StringDictionary env = new StringDictionary();
-            if (!String.IsNullOrWhiteSpace(url)) {
+            if (!String.IsNullOrWhiteSpace(url))
+            {
                 Uri webUrl = new Uri(url);
                 env["PORT"] = webUrl.Port.ToString();
             }
 
-            foreach (var nameValue in GetEnvironmentVariables()) {
+            foreach (var nameValue in GetEnvironmentVariables())
+            {
                 env[nameValue.Key] = nameValue.Value;
             }
 
-            if (env.Count > 0) {
+            if (env.Count > 0)
+            {
                 // add any inherited env vars
                 var variables = Environment.GetEnvironmentVariables();
-                foreach (var key in variables.Keys) {
+                foreach (var key in variables.Keys)
+                {
                     string strKey = (string)key;
-                    if (!env.ContainsKey(strKey)) {
+                    if (!env.ContainsKey(strKey))
+                    {
                         env.Add(strKey, (string)variables[key]);
                     }
                 }
@@ -280,7 +334,8 @@ namespace Microsoft.NodejsTools.Project {
                 //null-terminated block of null-terminated strings. 
                 //Each string is in the following form:name=value\0
                 StringBuilder buf = new StringBuilder();
-                foreach (DictionaryEntry entry in env) {
+                foreach (DictionaryEntry entry in env)
+                {
                     buf.AppendFormat("{0}={1}\0", entry.Key, entry.Value);
                 }
                 buf.Append("\0");
@@ -293,52 +348,63 @@ namespace Microsoft.NodejsTools.Project {
             return true;
         }
 
-        private bool ShouldStartBrowser() {
+        private bool ShouldStartBrowser()
+        {
             var startBrowser = _project.GetProjectProperty(NodeProjectProperty.StartWebBrowser);
             bool fStartBrowser;
             if (!String.IsNullOrEmpty(startBrowser) &&
-                Boolean.TryParse(startBrowser, out fStartBrowser)) {
+                Boolean.TryParse(startBrowser, out fStartBrowser))
+            {
                 return fStartBrowser;
             }
 
             return true;
         }
 
-        private IEnumerable<KeyValuePair<string, string>> GetEnvironmentVariables() {
+        private IEnumerable<KeyValuePair<string, string>> GetEnvironmentVariables()
+        {
             var envVars = _project.GetProjectProperty(NodeProjectProperty.Environment);
-            if (envVars != null) {
-                foreach (var envVar in envVars.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)) {
+            if (envVars != null)
+            {
+                foreach (var envVar in envVars.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
+                {
                     var nameValue = envVar.Split(new[] { '=' }, 2);
-                    if (nameValue.Length == 2) {
+                    if (nameValue.Length == 2)
+                    {
                         yield return new KeyValuePair<string, string>(nameValue[0], nameValue[1]);
                     }
                 }
             }
         }
 
-        private static int GetFreePort() {
+        private static int GetFreePort()
+        {
             return Enumerable.Range(new Random().Next(1200, 2000), 60000).Except(
                 from connection in IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpConnections()
                 select connection.LocalEndPoint.Port
             ).First();
         }
 
-        private string ResolveStartupFile() {
+        private string ResolveStartupFile()
+        {
             string startupFile = _project.GetStartupFile();
-            if (string.IsNullOrEmpty(startupFile)) {
+            if (string.IsNullOrEmpty(startupFile))
+            {
                 throw new ApplicationException(Resources.DebugCouldNotResolveStartupFileErrorMessage);
             }
 
-            if (TypeScriptHelpers.IsTypeScriptFile(startupFile)) {
+            if (TypeScriptHelpers.IsTypeScriptFile(startupFile))
+            {
                 startupFile = TypeScriptHelpers.GetTypeScriptBackedJavaScriptFile(_project, startupFile);
             }
             return startupFile;
         }
     }
 
-    internal class OnPortOpenedHandler {
-
-        class OnPortOpenedInfo {
+    internal class OnPortOpenedHandler
+    {
+        private class OnPortOpenedInfo
+        {
             public readonly int Port;
             public readonly TimeSpan? Timeout;
             public readonly int Sleep;
@@ -352,9 +418,11 @@ namespace Microsoft.NodejsTools.Project {
                 int? sleep = null,
                 Func<bool> shortCircuitPredicate = null,
                 Action action = null
-            ) {
+            )
+            {
                 Port = port;
-                if (timeout.HasValue) {
+                if (timeout.HasValue)
+                {
                     Timeout = TimeSpan.FromMilliseconds(Convert.ToDouble(timeout));
                 }
                 Sleep = sleep ?? 500;                                   // 1/2 second sleep
@@ -370,7 +438,8 @@ namespace Microsoft.NodejsTools.Project {
             int? sleep = null,
             Func<bool> shortCircuitPredicate = null,
             Action action = null
-        ) {
+        )
+        {
             ThreadPool.QueueUserWorkItem(
                 OnPortOpened,
                 new OnPortOpenedInfo(
@@ -383,42 +452,54 @@ namespace Microsoft.NodejsTools.Project {
             );
         }
 
-        private static void OnPortOpened(object infoObj) {
+        private static void OnPortOpened(object infoObj)
+        {
             var info = (OnPortOpenedInfo)infoObj;
 
-            using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)) {
+            using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+            {
                 socket.Blocking = true;
-                try {
-                    while (true) {
+                try
+                {
+                    while (true)
+                    {
                         // Short circuit
-                        if (info.ShortCircuitPredicate()) {
+                        if (info.ShortCircuitPredicate())
+                        {
                             return;
                         }
 
                         // Try connect
-                        try {
+                        try
+                        {
                             socket.Connect(IPAddress.Loopback, info.Port);
                             break;
-                        } catch {
+                        }
+                        catch
+                        {
                             // Connect failure
                             // Fall through
                         }
 
                         // Timeout
-                        if (info.Timeout.HasValue && (System.DateTime.Now - info.StartTime) >= info.Timeout) {
+                        if (info.Timeout.HasValue && (System.DateTime.Now - info.StartTime) >= info.Timeout)
+                        {
                             break;
                         }
 
                         // Sleep
                         System.Threading.Thread.Sleep(info.Sleep);
                     }
-                } finally {
+                }
+                finally
+                {
                     socket.Close();
                 }
             }
 
             // Launch browser (if not short-circuited)
-            if (!info.ShortCircuitPredicate()) {
+            if (!info.ShortCircuitPredicate())
+            {
                 info.Action();
             }
         }

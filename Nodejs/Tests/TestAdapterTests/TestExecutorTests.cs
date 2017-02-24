@@ -23,18 +23,21 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
 using TestUtilities.Nodejs;
 
-namespace TestAdapterTests {
+namespace TestAdapterTests
+{
     [TestClass]
-    public class TestExecutorTests {
+    public class TestExecutorTests
+    {
         [ClassInitialize]
-        public static void DoDeployment(TestContext context) {
+        public static void DoDeployment(TestContext context)
+        {
             AssertListener.Initialize();
             NodejsTestData.Deploy();
         }
 
         [TestMethod, Priority(0), TestCategory("Ignore")]
-        public void Run() {
-            
+        public void Run()
+        {
             var executor = new TestExecutor();
             var recorder = new MockTestExecutionRecorder();
             var runContext = new MockRunContext();
@@ -44,7 +47,8 @@ namespace TestAdapterTests {
             executor.RunTests(testCases, runContext, recorder);
             PrintTestResults(recorder.Results);
 
-            foreach (var expectedResult in expectedTests) {
+            foreach (var expectedResult in expectedTests)
+            {
                 var actualResult = recorder.Results.SingleOrDefault(tr => tr.TestCase.FullyQualifiedName == expectedResult.TestCase.FullyQualifiedName);
 
                 Assert.IsNotNull(actualResult);
@@ -53,8 +57,8 @@ namespace TestAdapterTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Ignore")]
-        public void RunAll() {
-            
+        public void RunAll()
+        {
             var executor = new TestExecutor();
             var recorder = new MockTestExecutionRecorder();
             var runContext = new MockRunContext();
@@ -63,7 +67,8 @@ namespace TestAdapterTests {
             executor.RunTests(new[] { TestInfo.TestAdapterLibProjectFilePath, TestInfo.TestAdapterAProjectFilePath, TestInfo.TestAdapterBProjectFilePath }, runContext, recorder);
             PrintTestResults(recorder.Results);
 
-            foreach (var expectedResult in expectedTests) {
+            foreach (var expectedResult in expectedTests)
+            {
                 var actualResult = recorder.Results.SingleOrDefault(tr => tr.TestCase.FullyQualifiedName == expectedResult.TestCase.FullyQualifiedName);
 
                 Assert.IsNotNull(actualResult, expectedResult.TestCase.FullyQualifiedName + " not found in results");
@@ -72,15 +77,16 @@ namespace TestAdapterTests {
         }
 
         [TestMethod, Priority(0)]
-        public void Cancel() {
-            
+        public void Cancel()
+        {
             var executor = new TestExecutor();
             var recorder = new MockTestExecutionRecorder();
             var runContext = new MockRunContext();
             var expectedTests = TestInfo.TestAdapterATests.Union(TestInfo.TestAdapterBTests).ToArray();
             var testCases = expectedTests.Select(tr => tr.TestCase);
 
-            var thread = new System.Threading.Thread(o => {
+            var thread = new System.Threading.Thread(o =>
+            {
                 executor.RunTests(testCases, runContext, recorder);
             });
             thread.Start();
@@ -106,11 +112,14 @@ namespace TestAdapterTests {
             Assert.IsTrue(recorder.Results.Count < expectedTests.Length);
         }
 
-        private static void PrintTestResults(IEnumerable<TestResult> results) {
-            foreach (var result in results) {
+        private static void PrintTestResults(IEnumerable<TestResult> results)
+        {
+            foreach (var result in results)
+            {
                 Console.WriteLine("Test: " + result.TestCase.FullyQualifiedName);
                 Console.WriteLine("Result: " + result.Outcome);
-                foreach(var msg in result.Messages) {
+                foreach (var msg in result.Messages)
+                {
                     Console.WriteLine("Message " + msg.Category + ":");
                     Console.WriteLine(msg.Text);
                 }

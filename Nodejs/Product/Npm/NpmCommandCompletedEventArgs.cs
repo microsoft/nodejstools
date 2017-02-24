@@ -17,14 +17,16 @@
 using System;
 using System.Globalization;
 
-namespace Microsoft.NodejsTools.Npm {
-
+namespace Microsoft.NodejsTools.Npm
+{
     /// <summary>
     /// Fired when an attempt to execute an npm command is completed, whether
     /// successfully or not.
     /// </summary>
-    public class NpmCommandCompletedEventArgs : EventArgs {
-        public NpmCommandCompletedEventArgs(string arguments, bool withErrors, bool cancelled) {
+    public class NpmCommandCompletedEventArgs : EventArgs
+    {
+        public NpmCommandCompletedEventArgs(string arguments, bool withErrors, bool cancelled)
+        {
             Arguments = arguments;
             WithErrors = withErrors;
             Cancelled = cancelled;
@@ -32,7 +34,8 @@ namespace Microsoft.NodejsTools.Npm {
 
         public string Arguments { get; private set; }
 
-        public string CommandText {
+        public string CommandText
+        {
             get { return string.IsNullOrEmpty(Arguments) ? "npm" : string.Format(CultureInfo.InvariantCulture, "npm {0}", Arguments); }
         }
 

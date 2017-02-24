@@ -19,8 +19,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Debugger.Commands;
 
-namespace Microsoft.NodejsTools.Debugger.Communication {
-    interface IDebuggerClient {
+namespace Microsoft.NodejsTools.Debugger.Communication
+{
+    internal interface IDebuggerClient
+    {
         /// <summary>
         /// Send a command to debugger.
         /// </summary>

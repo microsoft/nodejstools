@@ -16,12 +16,15 @@
 
 using System;
 
-namespace Microsoft.NodejsTools.Telemetry {
+namespace Microsoft.NodejsTools.Telemetry
+{
     /// <summary>
     /// Extensions for logging telemetry events.
     /// </summary>
-    internal static class NodejsTelemetryExtensions {
-        public static void LogProjectImported(this ITelemetryLogger logger, Guid projectGuid) {
+    internal static class NodejsTelemetryExtensions
+    {
+        public static void LogProjectImported(this ITelemetryLogger logger, Guid projectGuid)
+        {
             logger.ReportEvent(
                 TelemetryEvents.ProjectImported,
                 TelemetryProperties.ProjectGuid,

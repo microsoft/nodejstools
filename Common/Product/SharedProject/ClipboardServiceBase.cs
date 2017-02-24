@@ -15,8 +15,10 @@
 using System;
 using Microsoft.VisualStudio.OLE.Interop;
 
-namespace Microsoft.VisualStudioTools {
-    public abstract class ClipboardServiceBase {
+namespace Microsoft.VisualStudioTools
+{
+    public abstract class ClipboardServiceBase
+    {
         public abstract void SetClipboard(IDataObject dataObject);
 
         public abstract IDataObject GetClipboard();

@@ -22,8 +22,10 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudioTools.Project;
 using Task = System.Threading.Tasks.Task;
 
-namespace Microsoft.VisualStudioTools {
-    static class VsTaskExtensions {
+namespace Microsoft.VisualStudioTools
+{
+    internal static class VsTaskExtensions
+    {
         private static readonly HashSet<string> _displayedMessages = new HashSet<string>();
 
         /// <summary>
@@ -38,7 +40,8 @@ namespace Microsoft.VisualStudioTools {
             [CallerFilePath] string callerFile = null,
             [CallerLineNumber] int callerLineNumber = 0,
             [CallerMemberName] string callerName = null
-        ) {
+        )
+        {
             return task.HandleAllExceptions(productTitle, callerType, callerFile, callerLineNumber, callerName)
                 .WaitAndUnwrapExceptions();
         }
@@ -55,12 +58,17 @@ namespace Microsoft.VisualStudioTools {
             [CallerFilePath] string callerFile = null,
             [CallerLineNumber] int callerLineNumber = 0,
             [CallerMemberName] string callerName = null
-        ) {
+        )
+        {
             var result = default(T);
-            try {
+            try
+            {
                 result = await task;
-            } catch (Exception ex) {
-                if (ex.IsCriticalException()) {
+            }
+            catch (Exception ex)
+            {
+                if (ex.IsCriticalException())
+                {
                     throw;
                 }
 
@@ -70,23 +78,31 @@ namespace Microsoft.VisualStudioTools {
                 Trace.TraceError(message);
 
                 string logFile;
-                try {
+                try
+                {
                     logFile = ActivityLog.LogFilePath;
-                } catch (InvalidOperationException) {
+                }
+                catch (InvalidOperationException)
+                {
                     logFile = null;
                 }
 
-                lock (_displayedMessages) {
+                lock (_displayedMessages)
+                {
                     if (!string.IsNullOrEmpty(logFile) &&
-                        _displayedMessages.Add(string.Format("{0}:{1}", callerFile, callerLineNumber))) {
+                        _displayedMessages.Add(string.Format("{0}:{1}", callerFile, callerLineNumber)))
+                    {
                         // First time we've seen this error, so let the user know
                         MessageBox.Show(SR.GetString(SR.SeeActivityLog, logFile), productTitle);
                     }
                 }
 
-                try {
+                try
+                {
                     ActivityLog.LogError(productTitle, message);
-                } catch (InvalidOperationException) {
+                }
+                catch (InvalidOperationException)
+                {
                     // Activity Log is unavailable.
                 }
 
@@ -108,7 +124,8 @@ namespace Microsoft.VisualStudioTools {
             [CallerFilePath] string callerFile = null,
             [CallerLineNumber] int callerLineNumber = 0,
             [CallerMemberName] string callerName = null
-        ) {
+        )
+        {
             task.HandleAllExceptions(productTitle, callerType, callerFile, callerLineNumber, callerName)
                 .WaitAndUnwrapExceptions();
         }
@@ -124,11 +141,16 @@ namespace Microsoft.VisualStudioTools {
             [CallerFilePath] string callerFile = null,
             [CallerLineNumber] int callerLineNumber = 0,
             [CallerMemberName] string callerName = null
-        ) {
-            try {
+        )
+        {
+            try
+            {
                 await task;
-            } catch (Exception ex) {
-                if (ex.IsCriticalException()) {
+            }
+            catch (Exception ex)
+            {
+                if (ex.IsCriticalException())
+                {
                     throw;
                 }
 
@@ -138,23 +160,31 @@ namespace Microsoft.VisualStudioTools {
                 Trace.TraceError(message);
 
                 string logFile;
-                try {
+                try
+                {
                     logFile = ActivityLog.LogFilePath;
-                } catch (InvalidOperationException) {
+                }
+                catch (InvalidOperationException)
+                {
                     logFile = null;
                 }
 
-                lock (_displayedMessages) {
+                lock (_displayedMessages)
+                {
                     if (!string.IsNullOrEmpty(logFile) &&
-                        _displayedMessages.Add(string.Format("{0}:{1}", callerFile, callerLineNumber))) {
+                        _displayedMessages.Add(string.Format("{0}:{1}", callerFile, callerLineNumber)))
+                    {
                         // First time we've seen this error, so let the user know
                         MessageBox.Show(SR.GetString(SR.SeeActivityLog, logFile), productTitle);
                     }
                 }
 
-                try {
+                try
+                {
                     ActivityLog.LogError(productTitle, message);
-                } catch (InvalidOperationException) {
+                }
+                catch (InvalidOperationException)
+                {
                     // Activity Log is unavailable.
                 }
 

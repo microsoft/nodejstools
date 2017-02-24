@@ -22,34 +22,43 @@ using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudioTools.Project.Automation;
 
-namespace Microsoft.NodejsTools.Project {
+namespace Microsoft.NodejsTools.Project
+{
     [ComVisible(true)]
     [ClassInterface(ClassInterfaceType.AutoDual)]
     [Guid("04726C27-8125-471A-BAC0-2301D273DB5E")]
-    public class NodejsProjectNodeProperties : CommonProjectNodeProperties, EnvDTE80.IInternalExtenderProvider {
+    public class NodejsProjectNodeProperties : CommonProjectNodeProperties, EnvDTE80.IInternalExtenderProvider
+    {
         internal NodejsProjectNodeProperties(ProjectNode node)
-            : base(node) {
+            : base(node)
+        {
         }
 
         [PropertyNameAttribute("WebApplication.AspNetDebugging")]
         [Browsable(false)]
-        public bool AspNetDebugging {
-            get {
+        public bool AspNetDebugging
+        {
+            get
+            {
                 return true;
             }
         }
 
         [PropertyNameAttribute("WebApplication.NativeDebugging")]
         [Browsable(false)]
-        public bool NativeDebugging {
-            get {
+        public bool NativeDebugging
+        {
+            get
+            {
                 return false;
             }
         }
 
         [Browsable(false)]
-        public uint TargetFramework {
-            get {
+        public uint TargetFramework
+        {
+            get
+            {
                 return 0x40005;
             }
         }
@@ -57,16 +66,21 @@ namespace Microsoft.NodejsTools.Project {
         [SRCategory(SR.General)]
         [ResourcesDisplayName(nameof(Resources.NodeExePath))]
         [ResourcesDescription(nameof(Resources.NodeExePathDescription))]
-        public string NodeExePath {
-            get {
-                return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
+        public string NodeExePath
+        {
+            get
+            {
+                return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                {
                     return Nodejs.GetAbsoluteNodeExePath(
                         ProjectHome,
                         Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.NodeExePath, true));
                 });
             }
-            set {
-                HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
+            set
+            {
+                HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                {
                     Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.NodeExePath, value);
                 });
             }
@@ -75,14 +89,19 @@ namespace Microsoft.NodejsTools.Project {
         [SRCategory(SR.General)]
         [ResourcesDisplayName(nameof(Resources.NodeExeArguments))]
         [ResourcesDescription(nameof(Resources.NodeExeArgumentsDescription))]
-        public string NodeExeArguments {
-            get {
-                return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
+        public string NodeExeArguments
+        {
+            get
+            {
+                return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                {
                     return this.Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.NodeExeArguments, true);
                 });
             }
-            set {
-                HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
+            set
+            {
+                HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                {
                     Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.NodeExeArguments, value);
                 });
             }
@@ -91,14 +110,19 @@ namespace Microsoft.NodejsTools.Project {
         [SRCategory(SR.General)]
         [SRDisplayName(SR.ScriptArguments)]
         [SRDescription(SR.ScriptArgumentsDescription)]
-        public string ScriptArguments {
-            get {
-                return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
+        public string ScriptArguments
+        {
+            get
+            {
+                return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                {
                     return this.Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.ScriptArguments, true);
                 });
             }
-            set {
-                HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
+            set
+            {
+                HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                {
                     Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.ScriptArguments, value);
                 });
             }
@@ -107,18 +131,24 @@ namespace Microsoft.NodejsTools.Project {
         [SRCategory(SR.General)]
         [ResourcesDisplayName(nameof(Resources.NodejsPort))]
         [ResourcesDescription(nameof(Resources.NodejsPortDescription))]
-        public int? NodejsPort {
-            get {
-                return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke((Func<int?>)(() => {
+        public int? NodejsPort
+        {
+            get
+            {
+                return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke((Func<int?>)(() =>
+                {
                     int port;
-                    if (Int32.TryParse(Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.NodejsPort, true), out port)) {
+                    if (Int32.TryParse(Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.NodejsPort, true), out port))
+                    {
                         return port;
                     }
                     return null;
                 }));
             }
-            set {
-                HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
+            set
+            {
+                HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                {
                     Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.NodejsPort, value != null ? value.ToString() : String.Empty);
                 });
             }
@@ -127,14 +157,19 @@ namespace Microsoft.NodejsTools.Project {
         [SRCategory(SR.General)]
         [SRDisplayName(SR.LaunchUrl)]
         [SRDescription(SR.LaunchUrlDescription)]
-        public string LaunchUrl {
-            get {
-                return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
+        public string LaunchUrl
+        {
+            get
+            {
+                return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                {
                     return this.Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.LaunchUrl, true);
                 });
             }
-            set {
-                HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
+            set
+            {
+                HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                {
                     Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.LaunchUrl, value);
                 });
             }
@@ -143,29 +178,38 @@ namespace Microsoft.NodejsTools.Project {
         [SRCategory(SR.General)]
         [SRDisplayName(SR.StartWebBrowser)]
         [SRDescription(SR.StartWebBrowserDescription)]
-        public bool StartWebBrowser {
-            get {
-                return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
+        public bool StartWebBrowser
+        {
+            get
+            {
+                return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                {
                     bool res;
-                    if (Boolean.TryParse(Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.StartWebBrowser, true), out res)) {
+                    if (Boolean.TryParse(Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.StartWebBrowser, true), out res))
+                    {
                         return res;
                     }
                     return true;
                 });
             }
-            set {
-                HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
+            set
+            {
+                HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                {
                     Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.StartWebBrowser, value.ToString());
                 });
             }
         }
 
-        object EnvDTE80.IInternalExtenderProvider.GetExtender(string extenderCATID, string extenderName, object extendeeObject, EnvDTE.IExtenderSite extenderSite, int cookie) {
+        object EnvDTE80.IInternalExtenderProvider.GetExtender(string extenderCATID, string extenderName, object extendeeObject, EnvDTE.IExtenderSite extenderSite, int cookie)
+        {
             EnvDTE80.IInternalExtenderProvider outerHierarchy = Node.GetOuterInterface<EnvDTE80.IInternalExtenderProvider>();
 
-            if (outerHierarchy != null) {
+            if (outerHierarchy != null)
+            {
                 var res = outerHierarchy.GetExtender(extenderCATID, extenderName, extendeeObject, extenderSite, cookie);
-                if (extenderName == "WebApplication" && res is ICustomTypeDescriptor) {
+                if (extenderName == "WebApplication" && res is ICustomTypeDescriptor)
+                {
                     // we want to filter out the launch debug server option
                     return new WebAppExtenderFilter((ICustomTypeDescriptor)res);
                 }
@@ -174,67 +218,82 @@ namespace Microsoft.NodejsTools.Project {
 
             return null;
         }
-
     }
 
     [ComVisible(true)]
     [ClassInterface(ClassInterfaceType.AutoDual)] // This line triggers an FXCop warning, but is ok
-    public class WebAppExtenderFilter : ICustomTypeDescriptor {
+    public class WebAppExtenderFilter : ICustomTypeDescriptor
+    {
         private readonly ICustomTypeDescriptor _innerObject;
 
-        public WebAppExtenderFilter(ICustomTypeDescriptor innerObject) {
+        public WebAppExtenderFilter(ICustomTypeDescriptor innerObject)
+        {
             _innerObject = innerObject;
         }
 
-        internal object InnerObject {
-            get {
+        internal object InnerObject
+        {
+            get
+            {
                 return _innerObject;
             }
         }
 
         #region ICustomTypeDescriptor Members
 
-        public AttributeCollection GetAttributes() {
+        public AttributeCollection GetAttributes()
+        {
             return _innerObject.GetAttributes();
         }
 
-        public string GetClassName() {
+        public string GetClassName()
+        {
             return _innerObject.GetClassName();
         }
 
-        public string GetComponentName() {
+        public string GetComponentName()
+        {
             return _innerObject.GetComponentName();
         }
 
-        public TypeConverter GetConverter() {
+        public TypeConverter GetConverter()
+        {
             return _innerObject.GetConverter();
         }
 
-        public EventDescriptor GetDefaultEvent() {
+        public EventDescriptor GetDefaultEvent()
+        {
             return _innerObject.GetDefaultEvent();
         }
 
-        public PropertyDescriptor GetDefaultProperty() {
+        public PropertyDescriptor GetDefaultProperty()
+        {
             return _innerObject.GetDefaultProperty();
         }
 
-        public object GetEditor(Type editorBaseType) {
+        public object GetEditor(Type editorBaseType)
+        {
             return _innerObject.GetEditor(editorBaseType);
         }
 
-        public EventDescriptorCollection GetEvents(Attribute[] attributes) {
+        public EventDescriptorCollection GetEvents(Attribute[] attributes)
+        {
             return _innerObject.GetEvents(attributes);
         }
 
-        public EventDescriptorCollection GetEvents() {
+        public EventDescriptorCollection GetEvents()
+        {
             return _innerObject.GetEvents();
         }
 
-        public PropertyDescriptorCollection GetProperties(Attribute[] attributes) {
+        public PropertyDescriptorCollection GetProperties(Attribute[] attributes)
+        {
             List<PropertyDescriptor> res = new List<PropertyDescriptor>();
             var original = _innerObject.GetProperties(attributes);
-            foreach (PropertyDescriptor item in original) {
-                if (!IsFiltered(item)) {
+            foreach (PropertyDescriptor item in original)
+            {
+                if (!IsFiltered(item))
+                {
                     res.Add(item);
                 }
             }
@@ -242,15 +301,19 @@ namespace Microsoft.NodejsTools.Project {
             return new PropertyDescriptorCollection(res.ToArray());
         }
 
-        private static bool IsFiltered(PropertyDescriptor item) {
+        private static bool IsFiltered(PropertyDescriptor item)
+        {
             return item.Name == "StartWebServerOnDebug";
         }
 
-        public PropertyDescriptorCollection GetProperties() {
+        public PropertyDescriptorCollection GetProperties()
+        {
             List<PropertyDescriptor> res = new List<PropertyDescriptor>();
             var original = _innerObject.GetProperties();
-            foreach (PropertyDescriptor item in original) {
-                if (!IsFiltered(item)) {
+            foreach (PropertyDescriptor item in original)
+            {
+                if (!IsFiltered(item))
+                {
                     res.Add(item);
                 }
             }
@@ -258,7 +321,8 @@ namespace Microsoft.NodejsTools.Project {
             return new PropertyDescriptorCollection(res.ToArray());
         }
 
-        public object GetPropertyOwner(PropertyDescriptor pd) {
+        public object GetPropertyOwner(PropertyDescriptor pd)
+        {
             return _innerObject.GetPropertyOwner(pd);
         }
 

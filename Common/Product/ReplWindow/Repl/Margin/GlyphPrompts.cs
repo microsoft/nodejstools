@@ -26,14 +26,15 @@ using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Utilities;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
 
-// An alternative implementation of prompt margin using GlyphMargin.
-// Unfortunately bug in GlyphMargin causes disappearance of the last REPL prompt under certain circumstances which deteriorates user experience.
-// We implement our own margin until this bug is fixed in VS.
+    // An alternative implementation of prompt margin using GlyphMargin.
+    // Unfortunately bug in GlyphMargin causes disappearance of the last REPL prompt under certain circumstances which deteriorates user experience.
+    // We implement our own margin until this bug is fixed in VS.
 #if TAGGERS
     /// <summary>
     /// Any <see cref="ITextBuffer"/> with content type <see cref="ReplConstants.ReplContentTypeName"/>, role <see cref="ReplConstants.ReplTextViewRole"/> 

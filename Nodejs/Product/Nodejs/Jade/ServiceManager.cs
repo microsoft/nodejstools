@@ -20,8 +20,10 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.VisualStudio.Utilities;
 
-namespace Microsoft.NodejsTools.Jade {
-    sealed class ServiceManager : IDisposable {
+namespace Microsoft.NodejsTools.Jade
+{
+    internal sealed class ServiceManager : IDisposable
+    {
         private const string ServiceManagerId = "ServiceManager";
         private IPropertyOwner _propertyOwner;
         private object _lock = new object();
@@ -30,7 +32,8 @@ namespace Microsoft.NodejsTools.Jade {
         private Dictionary<Guid, object> _servicesByGuid = new Dictionary<Guid, object>();
         private Dictionary<Tuple<Type, string>, object> _servicesByContentType = new Dictionary<Tuple<Type, string>, object>();
 
-        private ServiceManager(IPropertyOwner propertyOwner) {
+        private ServiceManager(IPropertyOwner propertyOwner)
+        {
             _propertyOwner = propertyOwner;
             _propertyOwner.Properties.AddProperty(ServiceManagerId, this);
         }
@@ -40,10 +43,12 @@ namespace Microsoft.NodejsTools.Jade {
         /// </summary>
         /// <param name="propertyOwner">Property owner</param>
         /// <returns>Service manager instance</returns>
-        public static ServiceManager FromPropertyOwner(IPropertyOwner propertyOwner) {
+        public static ServiceManager FromPropertyOwner(IPropertyOwner propertyOwner)
+        {
             ServiceManager sm = null;
 
-            if (propertyOwner.Properties.ContainsProperty(ServiceManagerId)) {
+            if (propertyOwner.Properties.ContainsProperty(ServiceManagerId))
+            {
                 sm = propertyOwner.Properties.GetProperty(ServiceManagerId) as ServiceManager;
                 return sm;
             }
@@ -58,13 +63,17 @@ namespace Microsoft.NodejsTools.Jade {
         /// <param name="propertyOwner">Property owner</param>
         /// <returns>Service instance</returns>
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        public static T GetService<T>(IPropertyOwner propertyOwner) where T : class {
-            try {
+        public static T GetService<T>(IPropertyOwner propertyOwner) where T : class
+        {
+            try
+            {
                 var sm = ServiceManager.FromPropertyOwner(propertyOwner);
                 Debug.Assert(sm != null);
 
                 return sm.GetService<T>();
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 return null;
             }
         }
@@ -77,13 +86,17 @@ namespace Microsoft.NodejsTools.Jade {
         /// <param name="propertyOwner">Property owner</param>
         /// <returns>Service instance</returns>
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        public static object GetService(IPropertyOwner propertyOwner, ref Guid serviceGuid) {
-            try {
+        public static object GetService(IPropertyOwner propertyOwner, ref Guid serviceGuid)
+        {
+            try
+            {
                 var sm = ServiceManager.FromPropertyOwner(propertyOwner);
                 Debug.Assert(sm != null);
 
                 return sm.GetService(ref serviceGuid);
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 return null;
             }
         }
@@ -95,7 +108,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// <param name="propertyOwner">Property owner</param>
         /// <param name="contentType">Content type</param>
         /// <returns>Service instance</returns>
-        public static T GetService<T>(IPropertyOwner propertyOwner, IContentType contentType) where T : class {
+        public static T GetService<T>(IPropertyOwner propertyOwner, IContentType contentType) where T : class
+        {
             var sm = ServiceManager.FromPropertyOwner(propertyOwner);
             if (sm != null)
                 return sm.GetService<T>(contentType);
@@ -103,7 +117,8 @@ namespace Microsoft.NodejsTools.Jade {
             return null;
         }
 
-        public static ICollection<T> GetAllServices<T>(IPropertyOwner propertyOwner) where T : class {
+        public static ICollection<T> GetAllServices<T>(IPropertyOwner propertyOwner) where T : class
+        {
             var sm = ServiceManager.FromPropertyOwner(propertyOwner);
             if (sm != null)
                 return sm.GetAllServices<T>();
@@ -117,7 +132,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// <typeparam name="T">Service type</typeparam>
         /// <param name="serviceInstance">Service instance</param>
         /// <param name="propertyOwner">Property owner</param>
-        public static void AddService<T>(T serviceInstance, IPropertyOwner propertyOwner) where T : class {
+        public static void AddService<T>(T serviceInstance, IPropertyOwner propertyOwner) where T : class
+        {
             var sm = ServiceManager.FromPropertyOwner(propertyOwner);
             Debug.Assert(sm != null);
 
@@ -131,7 +147,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// <param name="serviceInstance">Service instance</param>
         /// <param name="propertyOwner">Property owner</param>
         /// <param name="contentType">Content type of the service</param>
-        public static void AddService<T>(T serviceInstance, IPropertyOwner propertyOwner, IContentType contentType) where T : class {
+        public static void AddService<T>(T serviceInstance, IPropertyOwner propertyOwner, IContentType contentType) where T : class
+        {
             var sm = ServiceManager.FromPropertyOwner(propertyOwner);
             Debug.Assert(sm != null);
 
@@ -146,42 +163,50 @@ namespace Microsoft.NodejsTools.Jade {
         /// <typeparam name="serviceGuid">Service GUID</typeparam>
         /// <param name="serviceInstance">Service instance</param>
         /// <param name="propertyOwner">Property owner</param>
-        public static void AddService(ref Guid serviceGuid, object serviceInstance, IPropertyOwner propertyOwner) {
+        public static void AddService(ref Guid serviceGuid, object serviceInstance, IPropertyOwner propertyOwner)
+        {
             var sm = ServiceManager.FromPropertyOwner(propertyOwner);
             Debug.Assert(sm != null);
 
             sm.AddService(ref serviceGuid, serviceInstance);
         }
 
-        public static void RemoveService<T>(IPropertyOwner propertyOwner) where T : class {
+        public static void RemoveService<T>(IPropertyOwner propertyOwner) where T : class
+        {
             var sm = ServiceManager.FromPropertyOwner(propertyOwner);
             Debug.Assert(sm != null);
 
             sm.RemoveService<T>();
         }
 
-        public static void RemoveService<T>(IPropertyOwner propertyOwner, IContentType contentType) where T : class {
+        public static void RemoveService<T>(IPropertyOwner propertyOwner, IContentType contentType) where T : class
+        {
             var sm = ServiceManager.FromPropertyOwner(propertyOwner);
             Debug.Assert(sm != null);
 
             sm.RemoveService<T>(contentType);
         }
 
-        public static void RemoveService(IPropertyOwner propertyOwner, ref Guid guidService) {
+        public static void RemoveService(IPropertyOwner propertyOwner, ref Guid guidService)
+        {
             var sm = ServiceManager.FromPropertyOwner(propertyOwner);
             Debug.Assert(sm != null);
 
             sm.RemoveService(ref guidService);
         }
 
-        private T GetService<T>() where T : class {
-            lock (_lock) {
+        private T GetService<T>() where T : class
+        {
+            lock (_lock)
+            {
                 object service = null;
 
-                if (!_servicesByType.TryGetValue(typeof(T), out service)) {
+                if (!_servicesByType.TryGetValue(typeof(T), out service))
+                {
                     // try walk through and cast. Perhaps someone is asking for IFoo
                     // that is implemented on class Bar but Bar was added as Bar, not as IFoo
-                    foreach (var kvp in _servicesByType) {
+                    foreach (var kvp in _servicesByType)
+                    {
                         service = kvp.Value as T;
                         if (service != null)
                             break;
@@ -192,8 +217,10 @@ namespace Microsoft.NodejsTools.Jade {
             }
         }
 
-        private T GetService<T>(IContentType contentType) where T : class {
-            lock (_lock) {
+        private T GetService<T>(IContentType contentType) where T : class
+        {
+            lock (_lock)
+            {
                 object service = null;
 
                 _servicesByContentType.TryGetValue(Tuple.Create(typeof(T), contentType.TypeName), out service);
@@ -202,8 +229,10 @@ namespace Microsoft.NodejsTools.Jade {
 
                 // Try walking through and cast. Perhaps someone is asking for IFoo
                 // that is implemented on class Bar but Bar was added as Bar, not as IFoo
-                foreach (var kvp in _servicesByContentType) {
-                    if (String.Compare(kvp.Key.Item2, contentType.TypeName, StringComparison.OrdinalIgnoreCase) == 0) {
+                foreach (var kvp in _servicesByContentType)
+                {
+                    if (String.Compare(kvp.Key.Item2, contentType.TypeName, StringComparison.OrdinalIgnoreCase) == 0)
+                    {
                         service = kvp.Value as T;
                         if (service != null)
                             return service as T;
@@ -211,7 +240,8 @@ namespace Microsoft.NodejsTools.Jade {
                 }
 
                 // iterate through base types since Razor, PHP and ASP.NET content type derive from HTML
-                foreach (var ct in contentType.BaseTypes) {
+                foreach (var ct in contentType.BaseTypes)
+                {
                     service = GetService<T>(ct);
                     if (service != null)
                         break;
@@ -221,14 +251,18 @@ namespace Microsoft.NodejsTools.Jade {
             }
         }
 
-        private object GetService(ref Guid serviceGuid) {
-            lock (_lock) {
-                foreach (var kvp in _servicesByGuid) {
+        private object GetService(ref Guid serviceGuid)
+        {
+            lock (_lock)
+            {
+                foreach (var kvp in _servicesByGuid)
+                {
                     if (serviceGuid.Equals(kvp.Key))
                         return kvp.Value;
                 }
 
-                foreach (var kvp in _servicesByType) {
+                foreach (var kvp in _servicesByType)
+                {
                     if (serviceGuid.Equals(kvp.Value.GetType().GUID))
                         return kvp.Value;
                 }
@@ -237,11 +271,14 @@ namespace Microsoft.NodejsTools.Jade {
             }
         }
 
-        private ICollection<T> GetAllServices<T>() where T : class {
+        private ICollection<T> GetAllServices<T>() where T : class
+        {
             var list = new List<T>();
 
-            lock (_lock) {
-                foreach (var kvp in _servicesByType) {
+            lock (_lock)
+            {
+                foreach (var kvp in _servicesByType)
+                {
                     var service = kvp.Value as T;
                     if (service != null)
                         list.Add(service);
@@ -251,45 +288,59 @@ namespace Microsoft.NodejsTools.Jade {
             return list;
         }
 
-        private void AddService<T>(T serviceInstance) where T : class {
-            lock (_lock) {
-                if (GetService<T>() == null) {
+        private void AddService<T>(T serviceInstance) where T : class
+        {
+            lock (_lock)
+            {
+                if (GetService<T>() == null)
+                {
                     _servicesByType.Add(typeof(T), serviceInstance);
                 }
             }
         }
 
-        private void AddService<T>(T serviceInstance, IContentType contentType) where T : class {
-            lock (_lock) {
-                if (GetService<T>(contentType) == null) {
+        private void AddService<T>(T serviceInstance, IContentType contentType) where T : class
+        {
+            lock (_lock)
+            {
+                if (GetService<T>(contentType) == null)
+                {
                     _servicesByContentType.Add(Tuple.Create(typeof(T), contentType.TypeName), serviceInstance);
                 }
             }
         }
 
-        private void AddService(ref Guid serviceGuid, object serviceInstance) {
-            lock (_lock) {
+        private void AddService(ref Guid serviceGuid, object serviceInstance)
+        {
+            lock (_lock)
+            {
                 if (GetService(ref serviceGuid) == null)
                     _servicesByGuid.Add(serviceGuid, serviceInstance);
             }
         }
 
-        private void RemoveService<T>() where T : class {
+        private void RemoveService<T>() where T : class
+        {
             _servicesByType.Remove(typeof(T));
         }
 
-        private void RemoveService<T>(IContentType contentType) where T : class {
-            lock (_lock) {
+        private void RemoveService<T>(IContentType contentType) where T : class
+        {
+            lock (_lock)
+            {
                 _servicesByContentType.Remove(Tuple.Create(typeof(T), contentType.TypeName));
             }
         }
 
-        private void RemoveService(ref Guid guidService) {
+        private void RemoveService(ref Guid guidService)
+        {
             _servicesByGuid.Remove(guidService);
         }
 
-        public void Dispose() {
-            if (_propertyOwner != null) {
+        public void Dispose()
+        {
+            if (_propertyOwner != null)
+            {
                 _propertyOwner.Properties.RemoveProperty(ServiceManagerId);
 
                 _servicesByGuid.Clear();

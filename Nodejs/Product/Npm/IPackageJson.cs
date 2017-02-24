@@ -16,8 +16,10 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.NodejsTools.Npm {
-    public interface IPackageJson {
+namespace Microsoft.NodejsTools.Npm
+{
+    public interface IPackageJson
+    {
         string Name { get; }
         SemverVersion Version { get; }
         IPerson Author { get; }

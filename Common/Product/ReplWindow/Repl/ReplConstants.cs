@@ -18,11 +18,13 @@ using System.Linq;
 using System.Text;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
-    public static class ReplConstants {
+    public static class ReplConstants
+    {
 #if NTVS_FEATURE_INTERACTIVEWINDOW
         public const string ReplContentTypeName = "NodejsREPLCode";
         public const string ReplOutputContentTypeName = "NodejsREPLOutput";

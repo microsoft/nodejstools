@@ -14,6 +14,7 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Npm {
+namespace Microsoft.NodejsTools.Npm
+{
     public interface IFiles : IPkgStringArray { }
 }

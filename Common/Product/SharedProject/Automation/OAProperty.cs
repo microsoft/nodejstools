@@ -17,9 +17,11 @@ using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
 
-namespace Microsoft.VisualStudioTools.Project.Automation {
+namespace Microsoft.VisualStudioTools.Project.Automation
+{
     [ComVisible(true)]
-    public class OAProperty : EnvDTE.Property {
+    public class OAProperty : EnvDTE.Property
+    {
         private const string WrappedStacktraceKey =
             "$$Microsoft.VisualStudioTools.Project.Automation.WrappedStacktraceKey$$";
 
@@ -30,7 +32,8 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
 
         #region ctors
 
-        public OAProperty(OAProperties parent, PropertyInfo pi) {
+        public OAProperty(OAProperties parent, PropertyInfo pi)
+        {
             this.parent = parent;
             this.pi = pi;
         }
@@ -40,15 +43,18 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
         /// <summary>
         /// Microsoft Internal Use Only.
         /// </summary>
-        public object Application {
+        public object Application
+        {
             get { return null; }
         }
 
         /// <summary>
         /// Gets the Collection containing the Property object supporting this property.
         /// </summary>
-        public EnvDTE.Properties Collection {
-            get {
+        public EnvDTE.Properties Collection
+        {
+            get
+            {
                 //todo: EnvDTE.Property.Collection
                 return this.parent;
             }
@@ -57,8 +63,10 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
         /// <summary>
         /// Gets the top-level extensibility object.
         /// </summary>
-        public EnvDTE.DTE DTE {
-            get {
+        public EnvDTE.DTE DTE
+        {
+            get
+            {
                 return this.parent.DTE;
             }
         }
@@ -71,7 +79,8 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
         /// <param name="index3">The index of the item to display. Reserved for future use.</param>
         /// <param name="index4">The index of the item to display. Reserved for future use.</param>
         /// <returns>The value of a property</returns>
-        public object get_IndexedValue(object index1, object index2, object index3, object index4) {
+        public object get_IndexedValue(object index1, object index2, object index3, object index4)
+        {
             Debug.Assert(pi.GetIndexParameters().Length == 0);
             return this.Value;
         }
@@ -80,17 +89,21 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
         /// Setter function to set properties values. 
         /// </summary>
         /// <param name="value"></param>
-        public void let_Value(object value) {
+        public void let_Value(object value)
+        {
             this.Value = value;
         }
 
         /// <summary>
         /// Gets the name of the object.
         /// </summary>
-        public string Name {
-            get {
+        public string Name
+        {
+            get
+            {
                 var attrs = pi.GetCustomAttributes(typeof(PropertyNameAttribute), true);
-                if (attrs.Length > 0) {
+                if (attrs.Length > 0)
+                {
                     return ((PropertyNameAttribute)attrs[0]).Name;
                 }
                 return pi.Name;
@@ -100,25 +113,30 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
         /// <summary>
         /// Gets the number of indices required to access the value.
         /// </summary>
-        public short NumIndices {
+        public short NumIndices
+        {
             get { return (short)pi.GetIndexParameters().Length; }
         }
 
         /// <summary>
         /// Sets or gets the object supporting the Property object.
         /// </summary>
-        public object Object {
-            get {
+        public object Object
+        {
+            get
+            {
                 return this.parent.Target;
             }
-            set {
+            set
+            {
             }
         }
 
         /// <summary>
         /// Microsoft Internal Use Only.
         /// </summary>
-        public EnvDTE.Properties Parent {
+        public EnvDTE.Properties Parent
+        {
             get { return this.parent; }
         }
 
@@ -130,9 +148,11 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
         /// <param name="index3">Reserved for future use.</param>
         /// <param name="index4">Reserved for future use.</param>
         /// <param name="value">The value to set.</param>
-        public void set_IndexedValue(object index1, object index2, object index3, object index4, object value) {
+        public void set_IndexedValue(object index1, object index2, object index3, object index4, object value)
+        {
             Debug.Assert(pi.GetIndexParameters().Length == 0);
-            parent.Target.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
+            parent.Target.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+            {
                 this.Value = value;
             });
         }
@@ -140,16 +160,24 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
         /// <summary>
         /// Gets or sets the value of the property returned by the Property object.
         /// </summary>
-        public object Value {
-            get {
-                using (AutomationScope scope = new AutomationScope(this.parent.Target.HierarchyNode.ProjectMgr.Site)) {
-                    return parent.Target.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
-                        try {
+        public object Value
+        {
+            get
+            {
+                using (AutomationScope scope = new AutomationScope(this.parent.Target.HierarchyNode.ProjectMgr.Site))
+                {
+                    return parent.Target.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                    {
+                        try
+                        {
                             return pi.GetValue(this.parent.Target, null);
-                        } catch (TargetInvocationException ex) {
+                        }
+                        catch (TargetInvocationException ex)
+                        {
                             // If the property raised an exception, we want to
                             // rethrow that exception and not the outer one.
-                            if (ex.InnerException != null) {
+                            if (ex.InnerException != null)
+                            {
                                 ex.InnerException.Data[WrappedStacktraceKey] = ex.InnerException.StackTrace;
                                 throw ex.InnerException;
                             }
@@ -158,15 +186,22 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
                     });
                 }
             }
-            set {
-                using (AutomationScope scope = new AutomationScope(this.parent.Target.HierarchyNode.ProjectMgr.Site)) {
-                    parent.Target.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
-                        try {
+            set
+            {
+                using (AutomationScope scope = new AutomationScope(this.parent.Target.HierarchyNode.ProjectMgr.Site))
+                {
+                    parent.Target.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                    {
+                        try
+                        {
                             this.pi.SetValue(this.parent.Target, value, null);
-                        } catch (TargetInvocationException ex) {
+                        }
+                        catch (TargetInvocationException ex)
+                        {
                             // If the property raised an exception, we want to
                             // rethrow that exception and not the outer one.
-                            if (ex.InnerException != null) {
+                            if (ex.InnerException != null)
+                            {
                                 ex.InnerException.Data[WrappedStacktraceKey] = ex.InnerException.StackTrace;
                                 throw ex.InnerException;
                             }

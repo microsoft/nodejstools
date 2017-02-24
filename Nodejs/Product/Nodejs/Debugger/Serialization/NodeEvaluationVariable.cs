@@ -17,9 +17,12 @@
 using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.NodejsTools.Debugger.Serialization {
-    sealed class NodeEvaluationVariable : INodeVariable {
-        public NodeEvaluationVariable(NodeStackFrame stackFrame, string name, JToken message) {
+namespace Microsoft.NodejsTools.Debugger.Serialization
+{
+    internal sealed class NodeEvaluationVariable : INodeVariable
+    {
+        public NodeEvaluationVariable(NodeStackFrame stackFrame, string name, JToken message)
+        {
             Utilities.ArgumentNotNull("name", name);
             Utilities.ArgumentNotNull("message", message);
 

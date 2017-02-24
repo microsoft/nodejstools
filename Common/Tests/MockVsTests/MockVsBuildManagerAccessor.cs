@@ -22,48 +22,60 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using MSBuild = Microsoft.Build.Evaluation;
 
-namespace Microsoft.VisualStudioTools.MockVsTests {
-    class MockVsBuildManagerAccessor : IVsBuildManagerAccessor {
-        public int BeginDesignTimeBuild() {
+namespace Microsoft.VisualStudioTools.MockVsTests
+{
+    internal class MockVsBuildManagerAccessor : IVsBuildManagerAccessor
+    {
+        public int BeginDesignTimeBuild()
+        {
             BuildParameters buildParameters = new BuildParameters(MSBuild.ProjectCollection.GlobalProjectCollection);
             BuildManager.DefaultBuildManager.BeginBuild(buildParameters);
             return VSConstants.S_OK;
         }
 
-        public int ClaimUIThreadForBuild() {
+        public int ClaimUIThreadForBuild()
+        {
             return VSConstants.S_OK;
         }
 
-        public int EndDesignTimeBuild() {
+        public int EndDesignTimeBuild()
+        {
             BuildManager.DefaultBuildManager.EndBuild();
             return VSConstants.S_OK;
         }
 
-        public int Escape(string pwszUnescapedValue, out string pbstrEscapedValue) {
+        public int Escape(string pwszUnescapedValue, out string pbstrEscapedValue)
+        {
             throw new NotImplementedException();
         }
 
-        public int GetCurrentBatchBuildId(out uint pBatchId) {
+        public int GetCurrentBatchBuildId(out uint pBatchId)
+        {
             throw new NotImplementedException();
         }
 
-        public int GetSolutionConfiguration(object punkRootProject, out string pbstrXmlFragment) {
+        public int GetSolutionConfiguration(object punkRootProject, out string pbstrXmlFragment)
+        {
             throw new NotImplementedException();
         }
 
-        public int RegisterLogger(int submissionId, object punkLogger) {
+        public int RegisterLogger(int submissionId, object punkLogger)
+        {
             return VSConstants.S_OK;
         }
 
-        public int ReleaseUIThreadForBuild() {
+        public int ReleaseUIThreadForBuild()
+        {
             return VSConstants.S_OK;
         }
 
-        public int Unescape(string pwszEscapedValue, out string pbstrUnescapedValue) {
+        public int Unescape(string pwszEscapedValue, out string pbstrUnescapedValue)
+        {
             throw new NotImplementedException();
         }
 
-        public int UnregisterLoggers(int submissionId) {
+        public int UnregisterLoggers(int submissionId)
+        {
             return VSConstants.S_OK;
         }
     }

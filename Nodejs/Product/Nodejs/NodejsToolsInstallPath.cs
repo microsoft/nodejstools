@@ -18,21 +18,27 @@ using System;
 using System.IO;
 using System.Reflection;
 
-namespace Microsoft.NodejsTools {
-    public static class NodejsToolsInstallPath {
-        private static string GetFromAssembly(Assembly assembly, string filename) {
+namespace Microsoft.NodejsTools
+{
+    public static class NodejsToolsInstallPath
+    {
+        private static string GetFromAssembly(Assembly assembly, string filename)
+        {
             string path = Path.Combine(
                 Path.GetDirectoryName(assembly.Location),
                 filename);
-            if (File.Exists(path)) {
+            if (File.Exists(path))
+            {
                 return path;
             }
             return string.Empty;
         }
 
-        public static string GetFile(string filename) {
+        public static string GetFile(string filename)
+        {
             string path = GetFromAssembly(typeof(NodejsToolsInstallPath).Assembly, filename);
-            if (!string.IsNullOrEmpty(path)) {
+            if (!string.IsNullOrEmpty(path))
+            {
                 return path;
             }
 

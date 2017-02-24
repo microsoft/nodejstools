@@ -17,31 +17,38 @@
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #if INTERACTIVE_WINDOW
     using IReplCommand = IInteractiveWindowCommand;
     using IReplWindow = IInteractiveWindow;    
 #endif
 
     [Export(typeof(IReplCommand))]
-    class ClearReplCommand : IReplCommand {
+    internal class ClearReplCommand : IReplCommand
+    {
         #region IReplCommand Members
 
-        public Task<ExecutionResult> Execute(IReplWindow window, string arguments) {
+        public Task<ExecutionResult> Execute(IReplWindow window, string arguments)
+        {
             ((NodejsReplEvaluator)window.Evaluator).Clear();
             return ExecutionResult.Succeeded;
         }
 
-        public string Description {
+        public string Description
+        {
             get { return "Resets the context object to an empty object and clears any multi-line expression."; }
         }
 
-        public string Command {
+        public string Command
+        {
             get { return "clear"; }
         }
 
-        public object ButtonContent {
-            get {
+        public object ButtonContent
+        {
+            get
+            {
                 return null;
             }
         }

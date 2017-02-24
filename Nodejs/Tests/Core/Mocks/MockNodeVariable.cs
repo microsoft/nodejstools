@@ -17,8 +17,10 @@
 using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Debugger.Serialization;
 
-namespace NodejsTests.Mocks {
-    class MockNodeVariable : INodeVariable {
+namespace NodejsTests.Mocks
+{
+    internal class MockNodeVariable : INodeVariable
+    {
         public int Id { get; set; }
         public NodeEvaluationResult Parent { get; set; }
         public NodeStackFrame StackFrame { get; set; }

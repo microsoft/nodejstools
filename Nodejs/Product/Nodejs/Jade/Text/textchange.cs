@@ -16,8 +16,10 @@
 
 using System;
 
-namespace Microsoft.NodejsTools.Jade {
-    class TextChange : ICloneable {
+namespace Microsoft.NodejsTools.Jade
+{
+    internal class TextChange : ICloneable
+    {
         /// <summary>
         /// Text snapshot version
         /// </summary>
@@ -43,18 +45,21 @@ namespace Microsoft.NodejsTools.Jade {
         /// </summary>
         public ITextProvider NewText;
 
-        public TextChange() {
+        public TextChange()
+        {
             Clear();
         }
 
         public TextChange(int start, int oldLength, int newLength) :
-            this() {
+            this()
+        {
             OldRange = new TextRange(start, start + oldLength);
             NewRange = new TextRange(start, start + newLength);
         }
 
         public TextChange(int start, int oldLength, int newLength, ITextProvider oldText, ITextProvider newText)
-            : this() {
+            : this()
+        {
             this.Combine(new TextChange(start, oldLength, newLength));
 
             OldText = oldText;
@@ -62,14 +67,16 @@ namespace Microsoft.NodejsTools.Jade {
         }
 
         public TextChange(TextChange change, ITextProvider oldText, ITextProvider newText)
-            : this() {
+            : this()
+        {
             this.Combine(change);
 
             OldText = oldText;
             NewText = newText;
         }
 
-        public virtual void Clear() {
+        public virtual void Clear()
+        {
             OldRange = TextRange.EmptyRange;
             NewRange = TextRange.EmptyRange;
 
@@ -80,18 +87,23 @@ namespace Microsoft.NodejsTools.Jade {
         /// <summary>
         /// True if no changes are pending.
         /// </summary>
-        public virtual bool IsEmpty() {
+        public virtual bool IsEmpty()
+        {
             return (OldRange.Length == 0 && NewRange.Length == 0);
         }
 
-        public void Combine(TextChange other) {
+        public void Combine(TextChange other)
+        {
             if (other.IsEmpty())
                 return;
 
-            if (OldRange == TextRange.EmptyRange || NewRange == TextRange.EmptyRange) {
+            if (OldRange == TextRange.EmptyRange || NewRange == TextRange.EmptyRange)
+            {
                 OldRange = other.OldRange;
                 NewRange = other.NewRange;
-            } else {
+            }
+            else
+            {
                 int oldStart = Math.Min(other.OldRange.Start, this.OldRange.Start);
                 int oldEnd = Math.Max(other.OldRange.End, this.OldRange.End);
 
@@ -106,7 +118,8 @@ namespace Microsoft.NodejsTools.Jade {
         }
 
         #region ICloneable Members
-        public object Clone() {
+        public object Clone()
+        {
             TextChange clone = this.MemberwiseClone() as TextChange;
 
             clone.OldRange = this.OldRange.Clone() as TextRange;

@@ -17,11 +17,14 @@
 using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace NodejsTests.Debugger.Commands {
+namespace NodejsTests.Debugger.Commands
+{
     [TestClass]
-    public class SetExceptionBreakCommandTests {
+    public class SetExceptionBreakCommandTests
+    {
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateSetExceptionBreakCommand() {
+        public void CreateSetExceptionBreakCommand()
+        {
             // Arrange
             const int commandId = 3;
             const bool uncaught = true;
@@ -40,7 +43,8 @@ namespace NodejsTests.Debugger.Commands {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateSetExceptionBreakCommandForAll() {
+        public void CreateSetExceptionBreakCommandForAll()
+        {
             // Arrange
             const int commandId = 3;
             const bool uncaught = false;

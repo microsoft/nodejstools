@@ -14,8 +14,10 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Jade {
-    enum JadeTokenType {
+namespace Microsoft.NodejsTools.Jade
+{
+    internal enum JadeTokenType
+    {
         None,
         Comment,
         String,

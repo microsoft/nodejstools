@@ -14,11 +14,13 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Logging {
+namespace Microsoft.NodejsTools.Logging
+{
     /// <summary>
     /// Defines the list of events which PTVS will log to a INodejsToolsLogger.
     /// </summary>
-    public enum NodejsToolsLogEvent {
+    public enum NodejsToolsLogEvent
+    {
         /// <summary>
         /// Logs a debug launch.  Data supplied should be 1 or 0 indicating whether
         /// the launch was without debugging or with.

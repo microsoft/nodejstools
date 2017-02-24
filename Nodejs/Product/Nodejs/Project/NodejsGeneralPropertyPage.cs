@@ -19,34 +19,44 @@ using System.Runtime.InteropServices;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 
-namespace Microsoft.NodejsTools.Project {
+namespace Microsoft.NodejsTools.Project
+{
     [Guid("62E8E091-6914-498E-A47B-6F198DC1873D")]
-    class NodejsGeneralPropertyPage : CommonPropertyPage {
+    internal class NodejsGeneralPropertyPage : CommonPropertyPage
+    {
         private readonly NodejsGeneralPropertyPageControl _control;
 
-        public NodejsGeneralPropertyPage() {
+        public NodejsGeneralPropertyPage()
+        {
             _control = new NodejsGeneralPropertyPageControl(this);
         }
 
-        public override System.Windows.Forms.Control Control {
+        public override System.Windows.Forms.Control Control
+        {
             get { return _control; }
         }
 
-        internal override CommonProjectNode Project {
-            get {
+        internal override CommonProjectNode Project
+        {
+            get
+            {
                 return base.Project;
             }
-            set {
-                if (value == null && base.Project != null) {
+            set
+            {
+                if (value == null && base.Project != null)
+                {
                     base.Project.PropertyPage = null;
                 }
                 base.Project = value;
-                if (value != null) {
+                if (value != null)
+                {
                     ((NodejsProjectNode)value).PropertyPage = this;
                 }
             }
         }
-        public override void Apply() {
+        public override void Apply()
+        {
             Project.SetProjectProperty(NodeProjectProperty.NodeExePath, _control.NodeExePath);
             Project.SetProjectProperty(NodeProjectProperty.NodeExeArguments, _control.NodeExeArguments);
             Project.SetProjectProperty(CommonConstants.StartupFile, _control.ScriptFile);
@@ -60,9 +70,11 @@ namespace Microsoft.NodejsTools.Project {
             IsDirty = false;
         }
 
-        public override void LoadSettings() {
+        public override void LoadSettings()
+        {
             Loading = true;
-            try {
+            try
+            {
                 _control.NodeExeArguments = Project.GetUnevaluatedProperty(NodeProjectProperty.NodeExeArguments);
                 _control.NodeExePath = Project.GetUnevaluatedProperty(NodeProjectProperty.NodeExePath);
                 _control.ScriptFile = Project.GetUnevaluatedProperty(CommonConstants.StartupFile);
@@ -72,19 +84,23 @@ namespace Microsoft.NodejsTools.Project {
                 _control.NodejsPort = Project.GetUnevaluatedProperty(NodeProjectProperty.NodejsPort);
                 _control.DebuggerPort = Project.GetUnevaluatedProperty(NodeProjectProperty.DebuggerPort);
                 _control.Environment = Project.GetUnevaluatedProperty(NodeProjectProperty.Environment);
-                
+
                 // Attempt to parse the boolean.  If we fail, assume it is true.
                 bool startWebBrowser;
-                if (!Boolean.TryParse(Project.GetUnevaluatedProperty(NodeProjectProperty.StartWebBrowser), out startWebBrowser)) {
+                if (!Boolean.TryParse(Project.GetUnevaluatedProperty(NodeProjectProperty.StartWebBrowser), out startWebBrowser))
+                {
                     startWebBrowser = true;
                 }
                 _control.StartWebBrowser = startWebBrowser;
-            } finally {
+            }
+            finally
+            {
                 Loading = false;
             }
         }
 
-        public override string Name {
+        public override string Name
+        {
             get { return "General"; }
         }
     }

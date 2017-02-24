@@ -19,11 +19,14 @@ using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 
-namespace NodejsTests.Debugger.Serialization {
+namespace NodejsTests.Debugger.Serialization
+{
     [TestClass]
-    public class SetValueVariableTests {
+    public class SetValueVariableTests
+    {
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateSetVariableValue() {
+        public void CreateSetVariableValue()
+        {
             // Arrange
             JObject json = SerializationTestData.GetSetVariableValueResponse();
             const int frameId = 3;

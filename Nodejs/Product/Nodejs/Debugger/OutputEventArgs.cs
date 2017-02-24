@@ -16,12 +16,15 @@
 
 using System;
 
-namespace Microsoft.NodejsTools.Debugger {
-    sealed class OutputEventArgs : EventArgs {
+namespace Microsoft.NodejsTools.Debugger
+{
+    internal sealed class OutputEventArgs : EventArgs
+    {
         public readonly NodeThread Thread;
         public readonly string Output;
 
-        public OutputEventArgs(NodeThread thread, string output) {
+        public OutputEventArgs(NodeThread thread, string output)
+        {
             Thread = thread;
             Output = output;
         }

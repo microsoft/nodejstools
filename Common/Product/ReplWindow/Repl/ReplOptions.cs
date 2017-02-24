@@ -13,14 +13,16 @@
  * ***************************************************************************/
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
     /// <summary>
     /// Enumerates the various options that can be configured for a REPL window.
     /// </summary>
-    public enum ReplOptions {
+    public enum ReplOptions
+    {
         /// <summary>
         /// True/false, true if output should be echoed into the buffer.
         /// </summary>

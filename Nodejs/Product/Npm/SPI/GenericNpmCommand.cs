@@ -14,14 +14,17 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Npm.SPI {
-    internal class GenericNpmCommand : NpmCommand {
+namespace Microsoft.NodejsTools.Npm.SPI
+{
+    internal class GenericNpmCommand : NpmCommand
+    {
         public GenericNpmCommand(
             string fullPathToRootPackageDirectory,
             string arguments,
             string pathToNpm = null) : base(
             fullPathToRootPackageDirectory,
-            pathToNpm) {
+            pathToNpm)
+        {
             Arguments = arguments;
         }
     }

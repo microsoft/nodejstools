@@ -14,11 +14,13 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Debugger.Serialization {
+namespace Microsoft.NodejsTools.Debugger.Serialization
+{
     /// <summary>
     /// Defines an interface for a variable.
     /// </summary>
-    interface INodeVariable {
+    internal interface INodeVariable
+    {
         /// <summary>
         /// Gets a variable identifier.
         /// </summary>

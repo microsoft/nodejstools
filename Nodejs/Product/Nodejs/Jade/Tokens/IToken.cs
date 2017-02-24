@@ -14,14 +14,16 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Jade {
+namespace Microsoft.NodejsTools.Jade
+{
     /// <summary>
     /// Describes a parse token. Parse token is a text range
     /// with a type that describes nature of the range.
     /// Derives from <seealso cref="ITextRange"/>
     /// </summary>
     /// <typeparam name="T">Token type (typically enum)</typeparam>
-    interface IToken<T> : ITextRange {
+    internal interface IToken<T> : ITextRange
+    {
         /// <summary>
         /// Type of the token
         /// </summary>

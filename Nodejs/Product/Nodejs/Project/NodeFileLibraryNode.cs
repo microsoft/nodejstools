@@ -16,10 +16,13 @@
 
 using Microsoft.VisualStudioTools.Project;
 
-namespace Microsoft.VisualStudioTools.Navigation {
-    class NodeFileLibraryNode : LibraryNode {
+namespace Microsoft.VisualStudioTools.Navigation
+{
+    internal class NodeFileLibraryNode : LibraryNode
+    {
         public NodeFileLibraryNode(LibraryNode parent, HierarchyNode hierarchy, string name, string filename, LibraryNodeType libraryNodeType)
-            : base(parent, name, filename, libraryNodeType) {
+            : base(parent, name, filename, libraryNodeType)
+        {
         }
     }
 }

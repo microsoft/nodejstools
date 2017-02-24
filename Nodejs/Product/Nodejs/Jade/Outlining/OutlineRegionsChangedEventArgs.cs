@@ -16,12 +16,15 @@
 
 using System;
 
-namespace Microsoft.NodejsTools.Jade {
-    class OutlineRegionsChangedEventArgs : EventArgs {
+namespace Microsoft.NodejsTools.Jade
+{
+    internal class OutlineRegionsChangedEventArgs : EventArgs
+    {
         public OutlineRegionCollection Regions { get; private set; }
         public ITextRange ChangedRange { get; private set; }
 
-        public OutlineRegionsChangedEventArgs(OutlineRegionCollection regions, ITextRange changedRange) {
+        public OutlineRegionsChangedEventArgs(OutlineRegionCollection regions, ITextRange changedRange)
+        {
             Regions = regions;
             ChangedRange = changedRange;
         }

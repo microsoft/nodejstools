@@ -17,12 +17,16 @@ using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Editor;
 
-namespace TestUtilities {
-    public interface IEditor {
-        IIntellisenseSession TopSession {
+namespace TestUtilities
+{
+    public interface IEditor
+    {
+        IIntellisenseSession TopSession
+        {
             get;
         }
-        string Text {
+        string Text
+        {
             get;
         }
         void Type(string text);
@@ -32,11 +36,13 @@ namespace TestUtilities {
         void MoveCaret(int line, int column);
         void SetFocus();
 
-        IWpfTextView TextView {
+        IWpfTextView TextView
+        {
             get;
         }
 
-        IClassifier Classifier {
+        IClassifier Classifier
+        {
             get;
         }
 

@@ -16,11 +16,13 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Microsoft.NodejsTools.Jade {
+namespace Microsoft.NodejsTools.Jade
+{
     /// <summary>
     /// Represents an item that has a range in a text document
     /// </summary>
-    interface ITextRange {
+    internal interface ITextRange
+    {
         /// <summary>
         /// Range start.
         /// </summary>
@@ -53,7 +55,8 @@ namespace Microsoft.NodejsTools.Jade {
     /// <summary>
     /// Represents an item that has a range in a text document
     /// </summary>
-    interface IExpandableTextRange : ITextRange {
+    internal interface IExpandableTextRange : ITextRange
+    {
         /// <summary>
         /// Changes range boundaries by the given offsets
         /// </summary>

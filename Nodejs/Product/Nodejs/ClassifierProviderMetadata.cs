@@ -16,12 +16,14 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.NodejsTools {
+namespace Microsoft.NodejsTools
+{
     /// <summary>
     /// Just used for our MEF import to get the metadata in a strongly
     /// typed way.
     /// </summary>
-    public interface IClassifierProviderMetadata {
+    public interface IClassifierProviderMetadata
+    {
         IEnumerable<string> ContentTypes { get; }
     }
 }

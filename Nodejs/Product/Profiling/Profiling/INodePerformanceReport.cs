@@ -17,10 +17,13 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Microsoft.NodejsTools.Profiling {
+namespace Microsoft.NodejsTools.Profiling
+{
     [Guid("5949B936-37D6-47E6-BAE5-A2C49A6EE74B")]
-    public interface INodePerformanceReport {
-        string Filename {
+    public interface INodePerformanceReport
+    {
+        string Filename
+        {
             get;
         }
     }

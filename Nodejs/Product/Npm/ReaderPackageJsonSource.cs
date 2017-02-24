@@ -20,26 +20,41 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Globalization;
 
-namespace Microsoft.NodejsTools.Npm {
-    public class ReaderPackageJsonSource : IPackageJsonSource {
-        public ReaderPackageJsonSource(TextReader reader) {
-            try {
+namespace Microsoft.NodejsTools.Npm
+{
+    public class ReaderPackageJsonSource : IPackageJsonSource
+    {
+        public ReaderPackageJsonSource(TextReader reader)
+        {
+            try
+            {
                 var text = reader.ReadToEnd();
-                try {
+                try
+                {
                     // JsonConvert and JObject.Parse exhibit slightly different behavior,
                     // so fall back to JObject.Parse if JsonConvert does not properly deserialize
                     // the object.
                     Package = JsonConvert.DeserializeObject(text);
-                } catch (ArgumentException) {
+                }
+                catch (ArgumentException)
+                {
                     Package = JObject.Parse(text);
                 }
-            } catch (JsonReaderException jre) {
+            }
+            catch (JsonReaderException jre)
+            {
                 WrapExceptionAndRethrow(jre);
-            } catch (JsonSerializationException jse) {
+            }
+            catch (JsonSerializationException jse)
+            {
                 WrapExceptionAndRethrow(jse);
-            } catch (FormatException fe) {
+            }
+            catch (FormatException fe)
+            {
                 WrapExceptionAndRethrow(fe);
-            } catch (ArgumentException ae) {
+            }
+            catch (ArgumentException ae)
+            {
                 throw new PackageJsonException(
                     string.Format(CultureInfo.CurrentCulture, @"Error reading package.json. The file may be parseable JSON but may contain objects with duplicate properties.
 
@@ -51,7 +66,8 @@ The following error occurred:
         }
 
         private void WrapExceptionAndRethrow(
-            Exception ex) {
+            Exception ex)
+        {
             throw new PackageJsonException(
                 string.Format(CultureInfo.CurrentCulture, @"Unable to read package.json. Please ensure the file is valid JSON.
 

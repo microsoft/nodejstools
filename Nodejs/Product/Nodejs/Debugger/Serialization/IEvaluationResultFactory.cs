@@ -14,8 +14,10 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Debugger.Serialization {
-    interface IEvaluationResultFactory {
+namespace Microsoft.NodejsTools.Debugger.Serialization
+{
+    internal interface IEvaluationResultFactory
+    {
         /// <summary>
         /// Creates a new <see cref="NodeEvaluationResult" />.
         /// </summary>

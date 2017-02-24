@@ -14,11 +14,13 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Debugger.Serialization {
+namespace Microsoft.NodejsTools.Debugger.Serialization
+{
     /// <summary>
     /// Defines a node property type.
     /// </summary>
-    enum NodePropertyType {
+    internal enum NodePropertyType
+    {
         Normal = 0,
         Field = 1,
         Constant = 2,

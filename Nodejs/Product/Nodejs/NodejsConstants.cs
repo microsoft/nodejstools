@@ -17,8 +17,10 @@
 using System;
 using System.IO;
 
-namespace Microsoft.NodejsTools {
-    internal class NodejsConstants {
+namespace Microsoft.NodejsTools
+{
+    internal class NodejsConstants
+    {
         internal const string JavaScriptExtension = ".js";
         internal const string TypeScriptExtension = ".ts";
         internal const string TypeScriptDeclarationExtension = ".d.ts";
@@ -56,8 +58,10 @@ namespace Microsoft.NodejsTools {
         internal const string NodeToolsProcessIdEnvironmentVariable = "_NTVS_PID";
         internal const string NodeToolsVsInstallRootEnvironmentVariable = "_NTVS_VSINSTALLROOT";
 
-        public static string NtvsLocalAppData {
-            get {
+        public static string NtvsLocalAppData
+        {
+            get
+            {
                 return Path.Combine(
                     System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData),
                     "Microsoft",
@@ -68,17 +72,20 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         /// Path to the private package where NTVS tools are installed.
         /// </summary>
-        public static string ExternalToolsPath {
-            get {
+        public static string ExternalToolsPath
+        {
+            get
+            {
                 return Path.Combine(NtvsLocalAppData, "ExternalTools");
             }
-
         }
         /// <summary>
         /// Path to where NTVS caches Npm data.
         /// </summary>
-        public static string NpmCachePath {
-            get {
+        public static string NpmCachePath
+        {
+            get
+            {
                 return Path.Combine(NtvsLocalAppData, "NpmCache");
             }
         }
@@ -86,14 +93,16 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         /// Checks whether a relative and double-backslashed seperated path contains a folder name.
         /// </summary>
-        internal static bool ContainsNodeModulesOrBowerComponentsFolder(string path) {
+        internal static bool ContainsNodeModulesOrBowerComponentsFolder(string path)
+        {
             string tmp = "\\" + path + "\\";
             return tmp.IndexOf("\\" + NodeModulesFolder + "\\", StringComparison.OrdinalIgnoreCase) >= 0
                 || tmp.IndexOf("\\" + BowerComponentsFolder + "\\", StringComparison.OrdinalIgnoreCase) >= 0;
         }
     }
 
-    internal static class NodeProjectProperty {
+    internal static class NodeProjectProperty
+    {
         internal const string DebuggerPort = "DebuggerPort";
         internal const string EnableTypeScript = "EnableTypeScript";
         internal const string Environment = "Environment";

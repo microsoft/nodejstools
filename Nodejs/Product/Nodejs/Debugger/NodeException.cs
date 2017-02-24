@@ -14,11 +14,14 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Debugger {
-    sealed class NodeException {
+namespace Microsoft.NodejsTools.Debugger
+{
+    internal sealed class NodeException
+    {
         public readonly string TypeName, Description;
 
-        public NodeException(string typeName, string description) {
+        public NodeException(string typeName, string description)
+        {
             TypeName = typeName;
             Description = description;
         }

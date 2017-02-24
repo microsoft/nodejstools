@@ -18,9 +18,11 @@ using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Microsoft.NodejsTools.Jade {
+namespace Microsoft.NodejsTools.Jade
+{
     [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Tokenizer")]
-    abstract class Tokenizer<T> : ITokenizer<T> where T : ITextRange {
+    internal abstract class Tokenizer<T> : ITokenizer<T> where T : ITextRange
+    {
         protected bool CComments { get; set; }
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Cpp")]
         protected bool CppComments { get; set; }
@@ -33,7 +35,8 @@ namespace Microsoft.NodejsTools.Jade {
         protected CharacterStream _cs { get; set; }
         protected TextRangeCollection<T> Tokens { get; set; }
 
-        protected Tokenizer() {
+        protected Tokenizer()
+        {
             CComments = true;
             CppComments = true;
             MultilineCppComments = false;
@@ -41,11 +44,13 @@ namespace Microsoft.NodejsTools.Jade {
             DoubleQuotedStrings = true;
         }
 
-        public ReadOnlyTextRangeCollection<T> Tokenize(ITextProvider textProvider, int start, int length) {
+        public ReadOnlyTextRangeCollection<T> Tokenize(ITextProvider textProvider, int start, int length)
+        {
             return Tokenize(textProvider, start, length, false);
         }
 
-        public virtual ReadOnlyTextRangeCollection<T> Tokenize(ITextProvider textProvider, int start, int length, bool excludePartialTokens) {
+        public virtual ReadOnlyTextRangeCollection<T> Tokenize(ITextProvider textProvider, int start, int length, bool excludePartialTokens)
+        {
             Debug.Assert(start >= 0 && length >= 0 && start + length <= textProvider.Length);
 
             _cs = new CharacterStream(textProvider);
@@ -53,7 +58,8 @@ namespace Microsoft.NodejsTools.Jade {
 
             Tokens = new TextRangeCollection<T>();
 
-            while (!_cs.IsEndOfStream()) {
+            while (!_cs.IsEndOfStream())
+            {
                 // Keep on adding tokens...
                 AddNextToken();
 
@@ -61,12 +67,14 @@ namespace Microsoft.NodejsTools.Jade {
                     break;
             }
 
-            if (excludePartialTokens) {
+            if (excludePartialTokens)
+            {
                 int end = start + length;
 
                 // Exclude tokens that are beyond the specified range
                 int i;
-                for (i = Tokens.Count - 1; i >= 0; i--) {
+                for (i = Tokens.Count - 1; i >= 0; i--)
+                {
                     if (Tokens[i].End <= end)
                         break;
                 }
@@ -86,32 +94,39 @@ namespace Microsoft.NodejsTools.Jade {
         protected abstract T GetCommentToken(int start, int length);
         protected abstract T GetStringToken(int start, int length);
 
-        protected virtual bool AddNextToken() {
+        protected virtual bool AddNextToken()
+        {
             SkipWhiteSpace();
 
             if (_cs.IsEndOfStream())
                 return true;
 
-            switch (_cs.CurrentChar) {
+            switch (_cs.CurrentChar)
+            {
                 case '\'':
-                    if (SingleQuotedStrings) {
+                    if (SingleQuotedStrings)
+                    {
                         HandleString();
                         return true;
                     }
                     break;
 
                 case '\"':
-                    if (DoubleQuotedStrings) {
+                    if (DoubleQuotedStrings)
+                    {
                         HandleString();
                         return true;
                     }
                     break;
 
                 case '/':
-                    if (_cs.NextChar == '/' && CppComments) {
+                    if (_cs.NextChar == '/' && CppComments)
+                    {
                         HandleCppComment();
                         return true;
-                    } else if (_cs.NextChar == '*' && CComments) {
+                    }
+                    else if (_cs.NextChar == '*' && CComments)
+                    {
                         HandleCComment();
                         return true;
                     }
@@ -125,12 +140,17 @@ namespace Microsoft.NodejsTools.Jade {
         /// Processes comments (// or /*)
         /// </summary>
         /// <returns>True if comment included new line characters</returns>
-        protected virtual bool HandleComment(bool multiline) {
-            if (_cs.CurrentChar == '/') {
-                if (CComments && _cs.NextChar == '*') {
+        protected virtual bool HandleComment(bool multiline)
+        {
+            if (_cs.CurrentChar == '/')
+            {
+                if (CComments && _cs.NextChar == '*')
+                {
                     HandleCComment();
                     return false;
-                } else if (CppComments && _cs.NextChar == '/') {
+                }
+                else if (CppComments && _cs.NextChar == '/')
+                {
                     return HandleCppComment(multiline);
                 }
             }
@@ -142,7 +162,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// Processes C++ style comments (//)
         /// </summary>
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Cpp")]
-        protected bool HandleCppComment() {
+        protected bool HandleCppComment()
+        {
             return HandleCppComment(false);
         }
 
@@ -151,7 +172,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// </summary>
         /// <returns>True if comment included new line characters</returns>
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Cpp")]
-        protected bool HandleCppComment(bool multiline = false) {
+        protected bool HandleCppComment(bool multiline = false)
+        {
             // SaSS version can span more than one line like this (indented):
             //
             // // This comment will not appear in the CSS output.
@@ -161,33 +183,41 @@ namespace Microsoft.NodejsTools.Jade {
             int start = _cs.Position;
             int baseIndent = 0;
 
-            if (MultilineCppComments) {
+            if (MultilineCppComments)
+            {
                 baseIndent = CalculateLineIndent();
                 multiline = true;
 
                 // only standalone // comments can span more than one line
-                for (int i = _cs.Position - 1; i >= 0; i--) {
+                for (int i = _cs.Position - 1; i >= 0; i--)
+                {
                     char ch = _cs[i];
 
                     if (ch == '\r' || ch == '\n')
                         break;
 
-                    if (!Char.IsWhiteSpace(ch)) {
+                    if (!Char.IsWhiteSpace(ch))
+                    {
                         multiline = false;
                         break;
                     }
                 }
-            } else {
+            }
+            else
+            {
                 multiline = false;
             }
 
             _cs.Advance(2); // skip over //
 
-            while (!_cs.IsEndOfStream()) {
+            while (!_cs.IsEndOfStream())
+            {
                 int eolPosition = _cs.Position;
 
-                if (_cs.IsAtNewLine()) {
-                    if (multiline) {
+                if (_cs.IsAtNewLine())
+                {
+                    if (multiline)
+                    {
                         // skip '\r'
                         _cs.MoveToNextChar();
 
@@ -196,22 +226,29 @@ namespace Microsoft.NodejsTools.Jade {
                             _cs.MoveToNextChar();
 
                         SkipToNonWhiteSpaceOrEndOfLine();
-                        if (_cs.IsEndOfStream()) {
+                        if (_cs.IsEndOfStream())
+                        {
                             _cs.Position = eolPosition;
                             break;
                         }
 
                         var lineIndent = CalculateLineIndent();
-                        if (lineIndent <= baseIndent) {
+                        if (lineIndent <= baseIndent)
+                        {
                             // Ignore empty lines, they do not break current block
-                            if (lineIndent == 0 && _cs.IsAtNewLine()) {
+                            if (lineIndent == 0 && _cs.IsAtNewLine())
+                            {
                                 continue;
-                            } else {
+                            }
+                            else
+                            {
                                 _cs.Position = eolPosition;
                                 break;
                             }
                         }
-                    } else {
+                    }
+                    else
+                    {
                         break;
                     }
                 }
@@ -230,13 +267,16 @@ namespace Microsoft.NodejsTools.Jade {
         /// Processes C-style comments (/* */)
         /// </summary>
         /// <returns>True if comment includes new line characters</returns>
-        protected virtual void HandleCComment() {
+        protected virtual void HandleCComment()
+        {
             int start = _cs.Position;
 
             _cs.Advance(2);
 
-            while (!_cs.IsEndOfStream()) {
-                if (_cs.CurrentChar == '*' && _cs.NextChar == '/') {
+            while (!_cs.IsEndOfStream())
+            {
+                if (_cs.CurrentChar == '*' && _cs.NextChar == '/')
+                {
                     _cs.Advance(2);
                     break;
                 }
@@ -253,7 +293,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// <summary>
         /// Handles single or double quoted strings
         /// </summary>
-        protected virtual ITextRange HandleString(bool addToken = true) {
+        protected virtual ITextRange HandleString(bool addToken = true)
+        {
             int start = _cs.Position;
             char quote = _cs.CurrentChar;
 
@@ -261,12 +302,15 @@ namespace Microsoft.NodejsTools.Jade {
             // it will get reset by the first char regardless what it is, but it will keep the '' case honest
             _cs.MoveToNextChar();
 
-            while (!_cs.IsEndOfStream() && !_cs.IsAtNewLine()) {
-                if (_cs.CurrentChar == '\\' && _cs.NextChar == quote) {
+            while (!_cs.IsEndOfStream() && !_cs.IsAtNewLine())
+            {
+                if (_cs.CurrentChar == '\\' && _cs.NextChar == quote)
+                {
                     _cs.Advance(2);
                 }
 
-                if (_cs.CurrentChar == quote) {
+                if (_cs.CurrentChar == quote)
+                {
                     _cs.MoveToNextChar();
                     break;
                 }
@@ -285,7 +329,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// Collects all characters up to the next whitespace
         /// </summary>
         /// <returns>Sequence range</returns>
-        protected ITextRange GetNonWSSequence() {
+        protected ITextRange GetNonWSSequence()
+        {
             return GetNonWSSequence('\0', inclusive: false);
         }
 
@@ -296,11 +341,14 @@ namespace Microsoft.NodejsTools.Jade {
         /// <param name="inclusive">True if sequence includes the terminator, 
         /// false if advance should stop at the terminator character</param>
         /// <returns>Sequence range</returns>
-        protected virtual ITextRange GetNonWSSequence(char terminator, bool inclusive) {
+        protected virtual ITextRange GetNonWSSequence(char terminator, bool inclusive)
+        {
             int start = _cs.Position;
 
-            while (!_cs.IsEndOfStream() && !_cs.IsWhiteSpace()) {
-                if (_cs.CurrentChar == terminator && terminator != '\0') {
+            while (!_cs.IsEndOfStream() && !_cs.IsWhiteSpace())
+            {
+                if (_cs.CurrentChar == terminator && terminator != '\0')
+                {
                     if (inclusive)
                         _cs.MoveToNextChar();
 
@@ -318,12 +366,14 @@ namespace Microsoft.NodejsTools.Jade {
         /// including the current character
         /// </summary>
         /// <returns>Sequence range</returns>
-        protected ITextRange GetNonWSSequence(string terminators) {
+        protected ITextRange GetNonWSSequence(string terminators)
+        {
             int start = _cs.Position;
 
             _cs.MoveToNextChar();
 
-            while (!_cs.IsEndOfStream() && !_cs.IsWhiteSpace()) {
+            while (!_cs.IsEndOfStream() && !_cs.IsWhiteSpace())
+            {
                 if (terminators.IndexOf(_cs.CurrentChar) != -1)
                     return TextRange.FromBounds(start, _cs.Position);
 
@@ -337,11 +387,13 @@ namespace Microsoft.NodejsTools.Jade {
         /// Collects 'identifier' sequence. Identifier consists of ANSI characters and decimal digits.
         /// </summary>
         /// <returns>Identifier range</returns>
-        protected virtual ITextRange ParseIdentifier() {
+        protected virtual ITextRange ParseIdentifier()
+        {
             int start = _cs.Position;
 
             while (!_cs.IsEndOfStream() && !_cs.IsWhiteSpace() &&
-                  (_cs.IsAnsiLetter() || _cs.IsDecimal() || _cs.CurrentChar == '_')) {
+                  (_cs.IsAnsiLetter() || _cs.IsDecimal() || _cs.CurrentChar == '_'))
+            {
                 _cs.MoveToNextChar();
             }
 
@@ -351,15 +403,20 @@ namespace Microsoft.NodejsTools.Jade {
         /// <summary>
         /// Determines amount of leading whitespace in the current line
         /// </summary>
-        protected int CalculateLineIndent() {
+        protected int CalculateLineIndent()
+        {
             int baseIndent = -1;
 
             // Find base tag indent
-            for (int pos = _cs.Position - 1; pos >= 0 && baseIndent < 0; pos--) {
-                if (_cs[pos] == '\n' || _cs[pos] == '\r') {
+            for (int pos = _cs.Position - 1; pos >= 0 && baseIndent < 0; pos--)
+            {
+                if (_cs[pos] == '\n' || _cs[pos] == '\r')
+                {
                     pos++;
-                    for (int j = pos; j < _cs.Position + 1; j++) {
-                        if (j == _cs.Position || !Char.IsWhiteSpace(_cs[j])) {
+                    for (int j = pos; j < _cs.Position + 1; j++)
+                    {
+                        if (j == _cs.Position || !Char.IsWhiteSpace(_cs[j]))
+                        {
                             baseIndent = j - pos;
                             break;
                         }
@@ -376,10 +433,12 @@ namespace Microsoft.NodejsTools.Jade {
         /// Skips over all whitespace. Stops at non-whitespace character or end of file.
         /// </summary>
         /// <returns>True if whitespace included newline characters</returns>
-        protected virtual bool SkipWhiteSpace() {
+        protected virtual bool SkipWhiteSpace()
+        {
             bool newLine = false;
 
-            while (!_cs.IsEndOfStream()) {
+            while (!_cs.IsEndOfStream())
+            {
                 if (!_cs.IsWhiteSpace())
                     break;
 
@@ -395,8 +454,10 @@ namespace Microsoft.NodejsTools.Jade {
         /// <summary>
         /// Advances character stream to the next end of line.
         /// </summary>
-        protected virtual void SkipToEndOfLine() {
-            while (!_cs.IsEndOfStream() && !_cs.IsAtNewLine()) {
+        protected virtual void SkipToEndOfLine()
+        {
+            while (!_cs.IsEndOfStream() && !_cs.IsAtNewLine())
+            {
                 _cs.MoveToNextChar();
             }
         }
@@ -404,8 +465,10 @@ namespace Microsoft.NodejsTools.Jade {
         /// <summary>
         /// Advances character stream to the next end of line, comment or end of file.
         /// </summary>
-        protected virtual void SkipToEndOfLineOrComment() {
-            while (!_cs.IsEndOfStream() && !_cs.IsAtNewLine() && !IsAtComment()) {
+        protected virtual void SkipToEndOfLineOrComment()
+        {
+            while (!_cs.IsEndOfStream() && !_cs.IsAtNewLine() && !IsAtComment())
+            {
                 _cs.MoveToNextChar();
             }
         }
@@ -413,8 +476,10 @@ namespace Microsoft.NodejsTools.Jade {
         /// <summary>
         /// Advances character stream to the next whitespace, comment or end of file.
         /// </summary>
-        protected virtual void SkipToWhiteSpaceOrComment() {
-            while (!_cs.IsEndOfStream()) {
+        protected virtual void SkipToWhiteSpaceOrComment()
+        {
+            while (!_cs.IsEndOfStream())
+            {
                 if (_cs.IsWhiteSpace() || IsAtComment())
                     break;
 
@@ -425,8 +490,10 @@ namespace Microsoft.NodejsTools.Jade {
         /// <summary>
         /// Advances character stream to the next whitespace
         /// </summary>
-        protected virtual void SkipToWhiteSpace() {
-            while (!_cs.IsEndOfStream()) {
+        protected virtual void SkipToWhiteSpace()
+        {
+            while (!_cs.IsEndOfStream())
+            {
                 if (_cs.IsWhiteSpace())
                     break;
 
@@ -437,8 +504,10 @@ namespace Microsoft.NodejsTools.Jade {
         /// <summary>
         /// Advances character stream to the next non-whitespace character
         /// </summary>
-        protected virtual void SkipToNonWhiteSpaceOrEndOfLine() {
-            while (!_cs.IsEndOfStream()) {
+        protected virtual void SkipToNonWhiteSpaceOrEndOfLine()
+        {
+            while (!_cs.IsEndOfStream())
+            {
                 if (!_cs.IsWhiteSpace() || _cs.IsAtNewLine())
                     break;
 
@@ -449,30 +518,35 @@ namespace Microsoft.NodejsTools.Jade {
         /// <summary>
         /// Checks if character stream is at a comment sequence (// or /*)
         /// </summary>
-        protected virtual bool IsAtComment() {
+        protected virtual bool IsAtComment()
+        {
             return (_cs.CurrentChar == '/' && ((_cs.NextChar == '/' && CppComments) || (_cs.NextChar == '*' && CComments)));
         }
 
         /// <summary>
         /// Checks if character stream is at a string (' or ")
         /// </summary>
-        protected virtual bool IsAtString() {
+        protected virtual bool IsAtString()
+        {
             return ((_cs.CurrentChar == '\'' && SingleQuotedStrings) || (_cs.CurrentChar == '\"' && DoubleQuotedStrings));
         }
 
         /// <summary>
         /// Determines if remaning part of the line is all whitespace
         /// </summary>
-        protected virtual bool IsAllWhiteSpaceBeforeEndOfLine(int position) {
+        protected virtual bool IsAllWhiteSpaceBeforeEndOfLine(int position)
+        {
             bool allWS = true;
 
-            for (int i = position; i < _cs.Length; i++) {
+            for (int i = position; i < _cs.Length; i++)
+            {
                 char ch = _cs[i];
 
                 if (ch == '\r' || ch == '\n')
                     break;
 
-                if (!Char.IsWhiteSpace(ch)) {
+                if (!Char.IsWhiteSpace(ch))
+                {
                     allWS = false;
                     break;
                 }

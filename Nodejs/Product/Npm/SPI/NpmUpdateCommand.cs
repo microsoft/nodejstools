@@ -17,10 +17,13 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.NodejsTools.Npm.SPI {
-    internal class NpmUpdateCommand : NpmCommand {
+namespace Microsoft.NodejsTools.Npm.SPI
+{
+    internal class NpmUpdateCommand : NpmCommand
+    {
         public NpmUpdateCommand(string fullPathToRootPackageDirectory, bool global, string pathToNpm = null)
-            : this(fullPathToRootPackageDirectory, new List<IPackage>(), global, pathToNpm) { }
+            : this(fullPathToRootPackageDirectory, new List<IPackage>(), global, pathToNpm)
+        { }
 
         public NpmUpdateCommand(
             string fullPathToRootPackageDirectory,
@@ -28,18 +31,22 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             bool global,
             string pathToNpm = null,
             bool useFallbackIfNpmNotFound = true)
-            : base(fullPathToRootPackageDirectory, pathToNpm) {
+            : base(fullPathToRootPackageDirectory, pathToNpm)
+        {
             var buff = new StringBuilder("update");
-            if (global) {
+            if (global)
+            {
                 buff.Append(" -g");
             }
 
-            foreach (var package in packages) {
+            foreach (var package in packages)
+            {
                 buff.Append(' ');
                 buff.Append(package.Name);
             }
 
-            if (!global) {
+            if (!global)
+            {
                 buff.Append(" --save");
             }
             Arguments = buff.ToString();

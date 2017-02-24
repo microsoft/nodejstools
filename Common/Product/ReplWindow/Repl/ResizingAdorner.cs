@@ -20,21 +20,25 @@ using System.Windows.Input;
 using System.Windows.Media;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
-    internal class ResizingAdorner : Adorner {
+    internal class ResizingAdorner : Adorner
+    {
         private readonly VisualCollection _visualChildren;
         private readonly Thumb _bottomRight;
 
         public ResizingAdorner(UIElement adornedElement)
-            : base(adornedElement) {
+            : base(adornedElement)
+        {
             _visualChildren = new VisualCollection(this);
             _bottomRight = BuildAdornerCorner(Cursors.SizeNWSE, HandleBottomRight);
         }
 
-        private Thumb BuildAdornerCorner(Cursor cursor, DragDeltaEventHandler dragHandler) {
+        private Thumb BuildAdornerCorner(Cursor cursor, DragDeltaEventHandler dragHandler)
+        {
             var thumb = new Thumb();
             // TODO: this thumb should be styled to look like a dotted triangle, 
             // similar to the one you can see on the bottom right corner of 
@@ -44,15 +48,19 @@ namespace Microsoft.VisualStudio.Repl {
             thumb.Opacity = 0.40;
             thumb.Background = new SolidColorBrush(Colors.MediumBlue);
             thumb.DragDelta += dragHandler;
-            thumb.DragStarted += (s, e) => {
+            thumb.DragStarted += (s, e) =>
+            {
                 var handler = ResizeStarted;
-                if (handler != null) {
+                if (handler != null)
+                {
                     handler(this, e);
                 }
             };
-            thumb.DragCompleted += (s, e) => {
+            thumb.DragCompleted += (s, e) =>
+            {
                 var handler = ResizeCompleted;
-                if (handler != null) {
+                if (handler != null)
+                {
                     handler(this, e);
                 }
             };
@@ -60,10 +68,12 @@ namespace Microsoft.VisualStudio.Repl {
             return thumb;
         }
 
-        private void HandleBottomRight(object sender, DragDeltaEventArgs eventArgs) {
+        private void HandleBottomRight(object sender, DragDeltaEventArgs eventArgs)
+        {
             var thumb = sender as Thumb;
             var element = AdornedElement as FrameworkElement;
-            if (element == null || thumb == null) {
+            if (element == null || thumb == null)
+            {
                 return;
             }
 
@@ -73,7 +83,8 @@ namespace Microsoft.VisualStudio.Repl {
             AdornedElement.Measure(size);
         }
 
-        protected override Size ArrangeOverride(Size finalSize) {
+        protected override Size ArrangeOverride(Size finalSize)
+        {
             var desiredWidth = AdornedElement.DesiredSize.Width;
             var desiredHeight = AdornedElement.DesiredSize.Height;
             var adornerWidth = DesiredSize.Width;
@@ -85,11 +96,13 @@ namespace Microsoft.VisualStudio.Repl {
             return finalSize;
         }
 
-        protected override int VisualChildrenCount {
+        protected override int VisualChildrenCount
+        {
             get { return _visualChildren.Count; }
         }
 
-        protected override Visual GetVisualChild(int index) {
+        protected override Visual GetVisualChild(int index)
+        {
             return _visualChildren[index];
         }
 

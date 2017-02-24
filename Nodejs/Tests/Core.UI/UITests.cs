@@ -29,11 +29,14 @@ using Keyboard = TestUtilities.UI.Keyboard;
 using Mouse = TestUtilities.UI.Mouse;
 using Path = System.IO.Path;
 
-namespace Microsoft.Nodejs.Tests.UI {
+namespace Microsoft.Nodejs.Tests.UI
+{
     [TestClass]
-    public class UITests {
+    public class UITests
+    {
         [ClassInitialize]
-        public static void DoDeployment(TestContext context) {
+        public static void DoDeployment(TestContext context)
+        {
             AssertListener.Initialize();
             NodejsTestData.Deploy();
         }
@@ -83,13 +86,15 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void AbsolutePaths() {
+        public void AbsolutePaths()
+        {
             var proj = File.ReadAllText(TestData.GetPath(@"TestData\NodejsProjectData\AbsolutePath\AbsolutePath.njsproj"));
             proj = proj.Replace("[ABSPATH]", TestData.GetPath(@"TestData\NodejsProjectData\AbsolutePath"));
             File.WriteAllText(TestData.GetPath(@"TestData\NodejsProjectData\AbsolutePath\AbsolutePath.njsproj"), proj);
 
 
-            using (var app = new VisualStudioApp()) {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\AbsolutePath.sln");
 
                 var window = app.OpenSolutionExplorer();
@@ -102,11 +107,14 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void MoveStartupFile() {
-            using (var app = new VisualStudioApp()) {
+        public void MoveStartupFile()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\MoveStartupFile.sln");
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var window = app.OpenSolutionExplorer();
 
                     // find server.js, send copy & paste, verify copy of file is there
@@ -128,11 +136,14 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void CopyPasteFile() {
-            using (var app = new VisualStudioApp()) {
+        public void CopyPasteFile()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var window = app.OpenSolutionExplorer();
 
                     // find server.js, send copy & paste, verify copy of file is there
@@ -156,11 +167,14 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void CopyPasteRenameFile() {
-            using (var app = new VisualStudioApp()) {
+        public void CopyPasteRenameFile()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\CopyPasteRenameProject\CopyPasteRenameProject.sln");
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var window = app.OpenSolutionExplorer();
 
                     var jsFile = window.WaitForItem("Solution 'CopyPasteRenameProject' (2 projects)", "CopyPasteRenameJavaScript", "app.js");
@@ -207,11 +221,14 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void DeleteFile() {
-            using (var app = new VisualStudioApp()) {
+        public void DeleteFile()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\DeleteFile.sln");
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var window = app.OpenSolutionExplorer();
 
                     // find server.js, send copy & paste, verify copy of file is there
@@ -233,11 +250,14 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void AddNewFolder() {
-            using (var app = new VisualStudioApp()) {
+        public void AddNewFolder()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var window = app.OpenSolutionExplorer();
 
                     // find server.js, send copy & paste, verify copy of file is there
@@ -267,11 +287,14 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void AddNewFolderLongPathBoundary() {
-            using (var app = new VisualStudioApp()) {
+        public void AddNewFolderLongPathBoundary()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = OpenLongFileNameProject(app, 24);
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var window = app.OpenSolutionExplorer();
 
                     // find server.js, send copy & paste, verify copy of file is there
@@ -300,11 +323,14 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void AddNewFolderLongPathTooLong() {
-            using (var app = new VisualStudioApp()) {
+        public void AddNewFolderLongPathTooLong()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = OpenLongFileNameProject(app, 24);
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var window = app.OpenSolutionExplorer();
 
                     // find server.js, send copy & paste, verify copy of file is there
@@ -328,11 +354,14 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void AddNewFolderLongPathTooLongCancelEdit() {
-            using (var app = new VisualStudioApp()) {
+        public void AddNewFolderLongPathTooLongCancelEdit()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = OpenLongFileNameProject(app, 21);
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var window = app.OpenSolutionExplorer();
 
                     // find server.js, send copy & paste, verify copy of file is there
@@ -355,8 +384,10 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void AddNewItemLongPathBoundary() {
-            using (var app = new VisualStudioApp()) {
+        public void AddNewItemLongPathBoundary()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = OpenLongFileNameProject(app, 12);
 
                 var window = app.OpenSolutionExplorer();
@@ -365,7 +396,8 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var projectNode = window.WaitForItem("Solution 'LongFileNames' (1 project)", "LFN");
                 AutomationWrapper.Select(projectNode);
 
-                using (var newItem = NewItemDialog.FromDte(app)) {
+                using (var newItem = NewItemDialog.FromDte(app))
+                {
                     newItem.FileName = "NewJSFil.js";
                     newItem.OK();
                 }
@@ -380,8 +412,10 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void AddNewItemLongPathTooLong() {
-            using (var app = new VisualStudioApp()) {
+        public void AddNewItemLongPathTooLong()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = OpenLongFileNameProject(app, 12);
 
                 var window = app.OpenSolutionExplorer();
@@ -390,7 +424,8 @@ namespace Microsoft.Nodejs.Tests.UI {
                 var projectNode = window.WaitForItem("Solution 'LongFileNames' (1 project)", "LFN");
                 AutomationWrapper.Select(projectNode);
 
-                using (var newItem = NewItemDialog.FromDte(app)) {
+                using (var newItem = NewItemDialog.FromDte(app))
+                {
                     newItem.FileName = "NewJSFile.js";
                     newItem.OK();
                 }
@@ -404,11 +439,14 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void DeleteLockedFolder() {
-            using (var app = new VisualStudioApp()) {
+        public void DeleteLockedFolder()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\DeleteLockedFolder.sln");
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var window = app.OpenSolutionExplorer();
 
                     var folderNode = window.WaitForItem("Solution 'DeleteLockedFolder' (1 project)", "DeleteLockedFolder", "Folder");
@@ -419,8 +457,10 @@ namespace Microsoft.Nodejs.Tests.UI {
                     psi.WorkingDirectory = Path.Combine(Environment.CurrentDirectory, @"TestData\NodejsProjectData\DeleteLockedFolder\Folder");
                     psi.CreateNoWindow = true;
                     psi.UseShellExecute = false;
-                    using (var process = System.Diagnostics.Process.Start(psi)) {
-                        try {
+                    using (var process = System.Diagnostics.Process.Start(psi))
+                    {
+                        try
+                        {
                             //Ensure the other process started and has time to lock the file
                             System.Threading.Thread.Sleep(1000);
                             Keyboard.Type(Key.Delete);
@@ -429,7 +469,9 @@ namespace Microsoft.Nodejs.Tests.UI {
                             System.Threading.Thread.Sleep(500);
 
                             VisualStudioApp.CheckMessageBox("The process cannot access the file 'Folder' because it is being used by another process.");
-                        } finally {
+                        }
+                        finally
+                        {
                             process.Kill();
                         }
                     }
@@ -439,7 +481,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        internal static Project OpenLongFileNameProject(VisualStudioApp app, int spaceRemaining = 30) {
+        internal static Project OpenLongFileNameProject(VisualStudioApp app, int spaceRemaining = 30)
+        {
             string testDir = Path.Combine(Environment.CurrentDirectory, Guid.NewGuid().ToString());
             int targetPathLength = 260 - spaceRemaining - "\\LongFileNames\\".Length;
             testDir = testDir + new string('X', targetPathLength - testDir.Length);
@@ -456,11 +499,14 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void AddNewFolderNested() {
-            using (var app = new VisualStudioApp()) {
+        public void AddNewFolderNested()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var window = app.OpenSolutionExplorer();
 
                     // find server.js, send copy & paste, verify copy of file is there
@@ -504,11 +550,14 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void RenameProjectToExisting() {
-            using (var app = new VisualStudioApp()) {
+        public void RenameProjectToExisting()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\RenameProjectTestUI.sln");
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var window = app.OpenSolutionExplorer();
 
                     // find server.js, send copy & paste, verify copy of file is there
@@ -545,11 +594,14 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void RenameItemsTest() {
-            using (var app = new VisualStudioApp()) {
+        public void RenameItemsTest()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\RenameItemsTestUI.sln");
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var window = app.OpenSolutionExplorer();
 
                     // find server.js, send copy & paste, verify copy of file is there
@@ -600,12 +652,17 @@ namespace Microsoft.Nodejs.Tests.UI {
                     Keyboard.Type("FolderName");
                     Keyboard.PressAndRelease(Key.Enter);
 
-                    for (int i = 0; i < 20; i++) {
-                        try {
-                            if (project.GetIsFolderExpanded("FolderName")) {
+                    for (int i = 0; i < 20; i++)
+                    {
+                        try
+                        {
+                            if (project.GetIsFolderExpanded("FolderName"))
+                            {
                                 break;
                             }
-                        } catch (ArgumentException) {
+                        }
+                        catch (ArgumentException)
+                        {
                         }
                         System.Threading.Thread.Sleep(100);
                     }
@@ -618,11 +675,14 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void CrossProjectCopy() {
-            using (var app = new VisualStudioApp()) {
+        public void CrossProjectCopy()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 app.OpenProject(@"TestData\NodejsProjectData\HelloWorld2.sln", expectedProjects: 2);
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var window = app.OpenSolutionExplorer();
 
                     var folderNode = window.WaitForItem("Solution 'HelloWorld2' (2 projects)", "HelloWorld2", "TestFolder3");
@@ -642,11 +702,14 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void CrossProjectCutPaste() {
-            using (var app = new VisualStudioApp()) {
+        public void CrossProjectCutPaste()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 app.OpenProject(@"TestData\NodejsProjectData\HelloWorld2.sln", expectedProjects: 2);
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var window = app.OpenSolutionExplorer();
 
                     var folderNode = window.WaitForItem("Solution 'HelloWorld2' (2 projects)", "HelloWorld2", "TestFolder2");
@@ -667,11 +730,13 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void CutPaste() {
-            using (var app = new VisualStudioApp()) {
-
+        public void CutPaste()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 app.OpenProject(@"TestData\NodejsProjectData\HelloWorld2.sln", expectedProjects: 2);
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var window = app.OpenSolutionExplorer();
 
                     var subItem = window.WaitForItem("Solution 'HelloWorld2' (2 projects)", "HelloWorld2", "TestFolder", "SubItem.js");
@@ -692,10 +757,13 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void CopyFolderOnToSelf() {
-            using (var app = new VisualStudioApp()) {
+        public void CopyFolderOnToSelf()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 app.OpenProject(@"TestData\NodejsProjectData\HelloWorld2.sln", expectedProjects: 2);
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var window = app.OpenSolutionExplorer();
 
                     var folder = window.WaitForItem("Solution 'HelloWorld2' (2 projects)", "HelloWorld2", "TestFolder");
@@ -712,11 +780,14 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void DragDropTest() {
-            using (var app = new VisualStudioApp()) {
+        public void DragDropTest()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 app.OpenProject(@"TestData\NodejsProjectData\DragDropTest.sln");
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var window = app.OpenSolutionExplorer();
 
                     var folder = window.WaitForItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder", "SubItem.js");
@@ -739,11 +810,14 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void DragDropFileToFileTest() {
-            using (var app = new VisualStudioApp()) {
+        public void DragDropFileToFileTest()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 app.OpenProject(@"TestData\NodejsProjectData\DragDropTest.sln");
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var window = app.OpenSolutionExplorer();
 
                     var folder = window.WaitForItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder", "SubItem2.js");
@@ -767,11 +841,14 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void DragDropFileToContainingFolderTest() {
-            using (var app = new VisualStudioApp()) {
+        public void DragDropFileToContainingFolderTest()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 app.OpenProject(@"TestData\NodejsProjectData\DragDropTest.sln");
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var window = app.OpenSolutionExplorer();
 
                     var folder = window.WaitForItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder", "SubItem2.js");
@@ -791,11 +868,14 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void DragLeaveTest() {
-            using (var app = new VisualStudioApp()) {
+        public void DragLeaveTest()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 app.OpenProject(@"TestData\NodejsProjectData\DragDropTest.sln");
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var window = app.OpenSolutionExplorer();
 
                     var item = window.WaitForItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder2", "SubItem.js");
@@ -821,11 +901,14 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void DragLeaveFolderTest() {
-            using (var app = new VisualStudioApp()) {
+        public void DragLeaveFolderTest()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 app.OpenProject(@"TestData\NodejsProjectData\DragDropTest.sln");
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var window = app.OpenSolutionExplorer();
 
                     var folder = window.WaitForItem("Solution 'DragDropTest' (1 project)", "DragDropTest", "TestFolder2", "SubFolder");
@@ -851,11 +934,14 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void MultiSelectCopyAndPaste() {
-            using (var app = new VisualStudioApp()) {
+        public void MultiSelectCopyAndPaste()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 app.OpenProject(@"TestData\NodejsProjectData\MultiSelectCopyAndPaste.sln");
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var window = app.OpenSolutionExplorer();
 
                     var folderNode = window.WaitForItem("Solution 'MultiSelectCopyAndPaste' (1 project)", "MultiSelectCopyAndPaste", "server.js");
@@ -882,14 +968,18 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void TransferItem() {
-            using (var app = new VisualStudioApp()) {
+        public void TransferItem()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\HelloWorld.sln");
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     string filename, basename;
                     int i = 0;
-                    do {
+                    do
+                    {
                         i++;
                         basename = "test" + i + " .js";
                         filename = Path.Combine(Path.GetTempPath(), basename);
@@ -899,7 +989,8 @@ namespace Microsoft.Nodejs.Tests.UI {
 
                     var fileWindow = app.Dte.ItemOperations.OpenFile(filename);
 
-                    using (var dlg = ChooseLocationDialog.FromDte(app)) {
+                    using (var dlg = ChooseLocationDialog.FromDte(app))
+                    {
                         dlg.SelectProject("HelloWorld");
                         dlg.OK();
                     }
@@ -916,11 +1007,14 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void SaveAs() {
-            using (var app = new VisualStudioApp()) {
+        public void SaveAs()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\SaveAsUI.sln");
 
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false)) {
+                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", false))
+                {
                     var solutionTree = app.OpenSolutionExplorer();
 
                     // open and edit the file

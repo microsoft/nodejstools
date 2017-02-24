@@ -21,11 +21,14 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Newtonsoft.Json.Linq;
 
-namespace NodejsTests.Debugger.Commands {
+namespace NodejsTests.Debugger.Commands
+{
     [TestClass]
-    public class BacktraceCommandTests {
+    public class BacktraceCommandTests
+    {
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateBacktraceCommand() {
+        public void CreateBacktraceCommand()
+        {
             // Arrange
             const int commandId = 3;
             const int fromFrame = 0;
@@ -45,7 +48,8 @@ namespace NodejsTests.Debugger.Commands {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void ProcessBacktraceForCallstackDepth() {
+        public void ProcessBacktraceForCallstackDepth()
+        {
             // Arrange
             const int commandId = 3;
             const int fromFrame = 0;
@@ -69,7 +73,8 @@ namespace NodejsTests.Debugger.Commands {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void ProcessBacktraceForStackFrames() {
+        public void ProcessBacktraceForStackFrames()
+        {
             // Arrange
             const int commandId = 3;
             const int fromFrame = 0;

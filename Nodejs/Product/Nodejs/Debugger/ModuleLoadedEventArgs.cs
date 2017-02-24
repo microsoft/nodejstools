@@ -16,11 +16,14 @@
 
 using System;
 
-namespace Microsoft.NodejsTools.Debugger {
-    sealed class ModuleLoadedEventArgs : EventArgs {
+namespace Microsoft.NodejsTools.Debugger
+{
+    internal sealed class ModuleLoadedEventArgs : EventArgs
+    {
         public readonly NodeModule Module;
 
-        public ModuleLoadedEventArgs(NodeModule module) {
+        public ModuleLoadedEventArgs(NodeModule module)
+        {
             Module = module;
         }
     }

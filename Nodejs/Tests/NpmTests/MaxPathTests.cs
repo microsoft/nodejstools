@@ -18,25 +18,29 @@ using System.Threading;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace NpmTests {
-
+namespace NpmTests
+{
     [TestClass]
-    public class MaxPathTests : AbstractPackageJsonTests {
-        
+    public class MaxPathTests : AbstractPackageJsonTests
+    {
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void InstallUninstallMaxPathGlobalModule() {
-            using (var manager = new TemporaryFileManager()) {
+        public void InstallUninstallMaxPathGlobalModule()
+        {
+            using (var manager = new TemporaryFileManager())
+            {
                 var rootDir = FilesystemPackageJsonTestHelpers.CreateRootPackage(manager, PkgSimple);
                 var controller = NpmControllerFactory.Create(rootDir, string.Empty);
 
-                using (var commander = controller.CreateNpmCommander()) {
+                using (var commander = controller.CreateNpmCommander())
+                {
                     commander.InstallPackageByVersionAsync("yo", "^1.2.0", DependencyType.Standard, false).Wait();
                 }
 
                 Assert.IsNotNull(controller.RootPackage, "Cannot retrieve packages after install");
                 Assert.IsTrue(controller.RootPackage.Modules.Contains("yo"), "Package failed to install");
 
-                using (var commander = controller.CreateNpmCommander()) {
+                using (var commander = controller.CreateNpmCommander())
+                {
                     commander.UninstallPackageAsync("yo").Wait();
                 }
 

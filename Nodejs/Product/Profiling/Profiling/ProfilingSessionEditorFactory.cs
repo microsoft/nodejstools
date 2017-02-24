@@ -25,16 +25,19 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace Microsoft.NodejsTools.Profiling {
+namespace Microsoft.NodejsTools.Profiling
+{
     /// <summary>
     /// Factory for creating our editor object. Extends from the IVsEditoryFactory interface
     /// </summary>
     [Guid(ProfilingGuids.ProfilingEditorFactoryString)]
-    sealed class ProfilingSessionEditorFactory : IVsEditorFactory, IDisposable {
+    internal sealed class ProfilingSessionEditorFactory : IVsEditorFactory, IDisposable
+    {
         private readonly NodejsProfilingPackage _editorPackage;
         private ServiceProvider _vsServiceProvider;
 
-        public ProfilingSessionEditorFactory(NodejsProfilingPackage package) {
+        public ProfilingSessionEditorFactory(NodejsProfilingPackage package)
+        {
             Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering {0} constructor", this.ToString()));
 
             this._editorPackage = package;
@@ -45,8 +48,10 @@ namespace Microsoft.NodejsTools.Profiling {
         /// also need to implement IDisposable to make sure that the ServiceProvider's
         /// Dispose method gets called.
         /// </summary>
-        public void Dispose() {
-            if (_vsServiceProvider != null) {
+        public void Dispose()
+        {
+            if (_vsServiceProvider != null)
+            {
                 _vsServiceProvider.Dispose();
             }
         }
@@ -59,12 +64,14 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <param name="psp">pointer to the service provider. Can be used to obtain instances of other interfaces
         /// </param>
         /// <returns></returns>
-        public int SetSite(Microsoft.VisualStudio.OLE.Interop.IServiceProvider psp) {
+        public int SetSite(Microsoft.VisualStudio.OLE.Interop.IServiceProvider psp)
+        {
             _vsServiceProvider = new ServiceProvider(psp);
             return VSConstants.S_OK;
         }
 
-        public object GetService(Type serviceType) {
+        public object GetService(Type serviceType)
+        {
             return _vsServiceProvider.GetService(serviceType);
         }
 
@@ -97,7 +104,8 @@ namespace Microsoft.NodejsTools.Profiling {
         //                    {...LOGVIEWID_Debugging...} = s ''
         //                    {...LOGVIEWID_Designer...} = s 'Form'
         //
-        public int MapLogicalView(ref Guid rguidLogicalView, out string pbstrPhysicalView) {
+        public int MapLogicalView(ref Guid rguidLogicalView, out string pbstrPhysicalView)
+        {
             pbstrPhysicalView = null;    // initialize out parameter
 
             // we support only a single physical view
@@ -107,7 +115,8 @@ namespace Microsoft.NodejsTools.Profiling {
                 return VSConstants.E_NOTIMPL;   // you must return E_NOTIMPL for any unrecognized rguidLogicalView values
         }
 
-        public int Close() {
+        public int Close()
+        {
             return VSConstants.S_OK;
         }
 
@@ -153,7 +162,8 @@ namespace Microsoft.NodejsTools.Profiling {
                         out System.IntPtr ppunkDocData,
                         out string pbstrEditorCaption,
                         out Guid pguidCmdUI,
-                        out int pgrfCDW) {
+                        out int pgrfCDW)
+        {
             Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering {0} CreateEditorInstace()", this.ToString()));
 
             // Initialize to null
@@ -164,10 +174,12 @@ namespace Microsoft.NodejsTools.Profiling {
             pbstrEditorCaption = null;
 
             // Validate inputs
-            if ((grfCreateDoc & (VSConstants.CEF_OPENFILE | VSConstants.CEF_SILENT)) == 0) {
+            if ((grfCreateDoc & (VSConstants.CEF_OPENFILE | VSConstants.CEF_SILENT)) == 0)
+            {
                 return VSConstants.E_INVALIDARG;
             }
-            if (punkDocDataExisting != IntPtr.Zero) {
+            if (punkDocDataExisting != IntPtr.Zero)
+            {
                 return VSConstants.VS_E_INCOMPATIBLEDOCDATA;
             }
 
@@ -175,15 +187,21 @@ namespace Microsoft.NodejsTools.Profiling {
             var perfWin = _editorPackage.ShowPerformanceExplorer();
 
             ProfilingTarget target;
-            try {
-                using (var fs = new FileStream(pszMkDocument, FileMode.Open)) {
+            try
+            {
+                using (var fs = new FileStream(pszMkDocument, FileMode.Open))
+                {
                     target = (ProfilingTarget)ProfilingTarget.Serializer.Deserialize(fs);
                     fs.Close();
                 }
-            } catch (IOException e) {
+            }
+            catch (IOException e)
+            {
                 MessageBox.Show(string.Format(CultureInfo.CurrentCulture, Resources.FailedToOpenFileErrorMessageText, e.Message), Resources.NodejsToolsForVS);
                 return VSConstants.E_FAIL;
-            } catch (InvalidOperationException e) {
+            }
+            catch (InvalidOperationException e)
+            {
                 MessageBox.Show(string.Format(CultureInfo.CurrentCulture, Resources.FailedToReadPerformanceSessionMessageText, e.Message), Resources.NodejsToolsForVS);
                 return VSConstants.E_FAIL;
             }

@@ -21,11 +21,14 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Newtonsoft.Json;
 
-namespace NodejsTests.Debugger.Commands {
+namespace NodejsTests.Debugger.Commands
+{
     [TestClass]
-    public class LookupCommandTests {
+    public class LookupCommandTests
+    {
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateLookupCommand() {
+        public void CreateLookupCommand()
+        {
             // Arrange
             const int commandId = 3;
             var resultFactoryMock = new Mock<IEvaluationResultFactory>();
@@ -44,7 +47,8 @@ namespace NodejsTests.Debugger.Commands {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void ProcessLookupResponse() {
+        public void ProcessLookupResponse()
+        {
             // Arrange
             const int commandId = 3;
             var resultFactoryMock = new Mock<IEvaluationResultFactory>();
@@ -66,7 +70,8 @@ namespace NodejsTests.Debugger.Commands {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void ProcessLookupResponseWithPrimitiveObject() {
+        public void ProcessLookupResponseWithPrimitiveObject()
+        {
             // Arrange
             const int commandId = 3;
             var resultFactoryMock = new Mock<IEvaluationResultFactory>();

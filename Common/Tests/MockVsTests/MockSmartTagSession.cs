@@ -22,12 +22,14 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
 
-namespace Microsoft.VisualStudioTools.MockVsTests {
+namespace Microsoft.VisualStudioTools.MockVsTests
+{
 #if DEV14_OR_LATER
 #pragma warning disable 0618
 #endif
 
-    class MockSmartTagSession : ISmartTagSession {
+    internal class MockSmartTagSession : ISmartTagSession
+    {
         private ITrackingSpan _applicableToSpan;
         private ImageSource _iconSource;
         private SmartTagState _state;
@@ -38,28 +40,36 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
             new ObservableCollection<SmartTagActionSet>();
         private readonly PropertyCollection _properties = new PropertyCollection();
 
-        public MockSmartTagSession(MockSmartTagBroker broker) {
+        public MockSmartTagSession(MockSmartTagBroker broker)
+        {
             _broker = broker;
         }
 
-        public ObservableCollection<SmartTagActionSet> ActionSets {
+        public ObservableCollection<SmartTagActionSet> ActionSets
+        {
             get { return _actionSets; }
         }
 
-        ReadOnlyObservableCollection<SmartTagActionSet> ISmartTagSession.ActionSets {
+        ReadOnlyObservableCollection<SmartTagActionSet> ISmartTagSession.ActionSets
+        {
             get { return new ReadOnlyObservableCollection<SmartTagActionSet>(_actionSets); }
         }
 
-        private void Raise(EventHandler evt) {
-            if (evt != null) {
+        private void Raise(EventHandler evt)
+        {
+            if (evt != null)
+            {
                 evt(this, EventArgs.Empty);
             }
         }
 
-        public ITrackingSpan ApplicableToSpan {
+        public ITrackingSpan ApplicableToSpan
+        {
             get { return _applicableToSpan; }
-            set {
-                if (_applicableToSpan != value) {
+            set
+            {
+                if (_applicableToSpan != value)
+                {
                     _applicableToSpan = value;
                     Raise(ApplicableToSpanChanged);
                 }
@@ -68,10 +78,13 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
 
         public event EventHandler ApplicableToSpanChanged;
 
-        public ImageSource IconSource {
+        public ImageSource IconSource
+        {
             get { return _iconSource; }
-            set {
-                if (_iconSource != value) {
+            set
+            {
+                if (_iconSource != value)
+                {
                     _iconSource = value;
                     Raise(IconSourceChanged);
                 }
@@ -80,10 +93,13 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
 
         public event EventHandler IconSourceChanged;
 
-        public SmartTagState State {
+        public SmartTagState State
+        {
             get { return _state; }
-            set {
-                if (_state != value) {
+            set
+            {
+                if (_state != value)
+                {
                     _state = value;
                     Raise(StateChanged);
                 }
@@ -92,10 +108,13 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
 
         public event EventHandler StateChanged;
 
-        public ITrackingSpan TagSpan {
+        public ITrackingSpan TagSpan
+        {
             get { return _tagSpan; }
-            set {
-                if (_tagSpan != value) {
+            set
+            {
+                if (_tagSpan != value)
+                {
                     _tagSpan = value;
                     Raise(TagSpanChanged);
                 }
@@ -106,17 +125,21 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
 
         public string TagText { get; set; }
 
-        public SmartTagType Type {
+        public SmartTagType Type
+        {
             get;
             set;
         }
 
-        public void Collapse() {
+        public void Collapse()
+        {
             throw new NotImplementedException();
         }
 
-        public void Dismiss() {
-            if (IsDismissed == false) {
+        public void Dismiss()
+        {
+            if (IsDismissed == false)
+            {
                 IsDismissed = true;
                 Raise(Dismissed);
             }
@@ -124,11 +147,13 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
 
         public event EventHandler Dismissed;
 
-        public SnapshotPoint? GetTriggerPoint(ITextSnapshot textSnapshot) {
+        public SnapshotPoint? GetTriggerPoint(ITextSnapshot textSnapshot)
+        {
             return TriggerPoint.GetPoint(textSnapshot);
         }
 
-        public ITrackingPoint GetTriggerPoint(ITextBuffer textBuffer) {
+        public ITrackingPoint GetTriggerPoint(ITextBuffer textBuffer)
+        {
             return TriggerPoint;
         }
 
@@ -136,56 +161,70 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
 
         public bool IsDismissed { get; set; }
 
-        public bool Match() {
+        public bool Match()
+        {
             throw new NotImplementedException();
         }
 
-        public IIntellisensePresenter Presenter {
+        public IIntellisensePresenter Presenter
+        {
             get { throw new NotImplementedException(); }
             set { Raise(PresenterChanged); }
         }
 
         public event EventHandler PresenterChanged;
 
-        public void Recalculate() {
-            if (_broker != null) {
+        public void Recalculate()
+        {
+            if (_broker != null)
+            {
                 var sources = new List<ISmartTagSource>();
-                foreach (var p in _broker.SourceProviders) {
+                foreach (var p in _broker.SourceProviders)
+                {
                     var source = p.TryCreateSmartTagSource(TextView.TextBuffer);
-                    if (source != null) {
+                    if (source != null)
+                    {
                         sources.Add(source);
                     }
                 }
 
                 var sets = new List<SmartTagActionSet>();
-                foreach (var source in sources) {
+                foreach (var source in sources)
+                {
                     source.AugmentSmartTagSession(this, sets);
                 }
 
                 _actionSets.Clear();
-                foreach (var set in sets) {
-                    if (set.Actions.Any()) {
+                foreach (var set in sets)
+                {
+                    if (set.Actions.Any())
+                    {
                         _actionSets.Add(set);
                     }
                 }
             }
 
-            if (!_actionSets.Any()) {
+            if (!_actionSets.Any())
+            {
                 Dismiss();
-            } else {
+            }
+            else
+            {
                 Raise(Recalculated);
             }
         }
 
         public event EventHandler Recalculated;
 
-        public void Start() {
+        public void Start()
+        {
             Recalculate();
         }
 
         public ITextView TextView { get; set; }
 
-        public PropertyCollection Properties {
+        public PropertyCollection Properties
+        {
             get { return _properties; }
         }
     }

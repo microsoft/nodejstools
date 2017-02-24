@@ -26,8 +26,10 @@ using Microsoft.VisualStudio.TemplateWizard;
 using Microsoft.VisualStudioTools;
 using ProjectItem = EnvDTE.ProjectItem;
 
-namespace Microsoft.NodejsTools.ProjectWizard {
-    public sealed class CloudServiceWizard : IWizard {
+namespace Microsoft.NodejsTools.ProjectWizard
+{
+    public sealed class CloudServiceWizard : IWizard
+    {
         private IWizard _wizard;
         private readonly bool _recommendUpgrade;
         private const string AzureToolsDownload = "https://go.microsoft.com/fwlink/?LinkId=746956";
@@ -38,13 +40,15 @@ namespace Microsoft.NodejsTools.ProjectWizard {
         private const string DontShowUpgradeDialogAgainCollection = "NodejsTools\\Dialogs";
         private const string DontShowUpgradeDialogAgainProperty = "SuppressUpgradeAzureTools";
 
-        private static bool ShouldRecommendUpgrade(Assembly asm) {
+        private static bool ShouldRecommendUpgrade(Assembly asm)
+        {
             var attr = asm.GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false)
                 .OfType<AssemblyFileVersionAttribute>()
                 .FirstOrDefault();
 
             Version ver;
-            if (attr != null && Version.TryParse(attr.Version, out ver)) {
+            if (attr != null && Version.TryParse(attr.Version, out ver))
+            {
                 Debug.WriteLine(ver);
                 // 2.4 is the minimun requirement.
                 return ver < new Version(2, 4);
@@ -52,8 +56,10 @@ namespace Microsoft.NodejsTools.ProjectWizard {
             return false;
         }
 
-        public CloudServiceWizard() {
-            try {
+        public CloudServiceWizard()
+        {
+            try
+            {
                 // If we fail to find the wizard, we will redirect the user to
                 // the WebPI download.
                 var asm = Assembly.Load("Microsoft.VisualStudio.CloudService.Wizard,Version=1.0.0.0,Culture=neutral,PublicKeyToken=b03f5f7f11d50a3a");
@@ -62,56 +68,80 @@ namespace Microsoft.NodejsTools.ProjectWizard {
 
                 var type = asm.GetType("Microsoft.VisualStudio.CloudService.Wizard.CloudServiceWizard");
                 _wizard = type.InvokeMember(null, BindingFlags.CreateInstance, null, null, new object[0]) as IWizard;
-            } catch (ArgumentException) {
-            } catch (BadImageFormatException) {
-            } catch (IOException) {
-            } catch (MemberAccessException) {
+            }
+            catch (ArgumentException)
+            {
+            }
+            catch (BadImageFormatException)
+            {
+            }
+            catch (IOException)
+            {
+            }
+            catch (MemberAccessException)
+            {
             }
         }
 
-        public void BeforeOpeningFile(ProjectItem projectItem) {
-            if (_wizard != null) {
+        public void BeforeOpeningFile(ProjectItem projectItem)
+        {
+            if (_wizard != null)
+            {
                 _wizard.BeforeOpeningFile(projectItem);
             }
         }
 
-        public void ProjectFinishedGenerating(EnvDTE.Project project) {
-            if (_wizard != null) {
+        public void ProjectFinishedGenerating(EnvDTE.Project project)
+        {
+            if (_wizard != null)
+            {
                 _wizard.ProjectFinishedGenerating(project);
             }
         }
 
-        public void ProjectItemFinishedGenerating(ProjectItem projectItem) {
-            if (_wizard != null) {
+        public void ProjectItemFinishedGenerating(ProjectItem projectItem)
+        {
+            if (_wizard != null)
+            {
                 _wizard.ProjectItemFinishedGenerating(projectItem);
             }
         }
 
-        public void RunFinished() {
-            if (_wizard != null) {
+        public void RunFinished()
+        {
+            if (_wizard != null)
+            {
                 _wizard.RunFinished();
             }
         }
 
-        public bool ShouldAddProjectItem(string filePath) {
-            if (_wizard != null) {
+        public bool ShouldAddProjectItem(string filePath)
+        {
+            if (_wizard != null)
+            {
                 return _wizard.ShouldAddProjectItem(filePath);
             }
             return false;
         }
 
-        public void RunStarted(object automationObject, Dictionary<string, string> replacementsDictionary, WizardRunKind runKind, object[] customParams) {
+        public void RunStarted(object automationObject, Dictionary<string, string> replacementsDictionary, WizardRunKind runKind, object[] customParams)
+        {
             var provider = WizardHelpers.GetProvider(automationObject);
 
-            if (_wizard == null) {
-                try {
+            if (_wizard == null)
+            {
+                try
+                {
                     Directory.Delete(replacementsDictionary["$destinationdirectory$"]);
                     Directory.Delete(replacementsDictionary["$solutiondirectory$"]);
-                } catch {
+                }
+                catch
+                {
                     // If it fails (doesn't exist/contains files/read-only), let the directory stay.
                 }
 
-                var dlg = new TaskDialog(provider) {
+                var dlg = new TaskDialog(provider)
+                {
                     Title = SR.ProductName,
                     MainInstruction = ProjectWizardResources.AzureToolsRequired,
                     Content = ProjectWizardResources.AzureToolsInstallInstructions,
@@ -121,7 +151,8 @@ namespace Microsoft.NodejsTools.ProjectWizard {
                 dlg.Buttons.Add(download);
                 dlg.Buttons.Add(TaskDialogButton.Cancel);
 
-                if (dlg.ShowModal() == download) {
+                if (dlg.ShowModal() == download)
+                {
                     Process.Start(new ProcessStartInfo(AzureToolsDownload));
                     throw new WizardCancelledException();
                 }
@@ -130,13 +161,16 @@ namespace Microsoft.NodejsTools.ProjectWizard {
                 throw new WizardBackoutException();
             }
 
-            if (_recommendUpgrade) {
+            if (_recommendUpgrade)
+            {
                 var sm = SettingsManagerCreator.GetSettingsManager(provider);
                 var store = sm.GetReadOnlySettingsStore(SettingsScope.UserSettings);
 
                 if (!store.CollectionExists(DontShowUpgradeDialogAgainCollection) ||
-                    !store.GetBoolean(DontShowUpgradeDialogAgainCollection, DontShowUpgradeDialogAgainProperty, false)) {
-                    var dlg = new TaskDialog(provider) {
+                    !store.GetBoolean(DontShowUpgradeDialogAgainCollection, DontShowUpgradeDialogAgainProperty, false))
+                {
+                    var dlg = new TaskDialog(provider)
+                    {
                         Title = SR.ProductName,
                         MainInstruction = ProjectWizardResources.AzureToolsUpgradeRecommended,
                         Content = ProjectWizardResources.AzureToolsUpgradeInstructions,
@@ -151,25 +185,33 @@ namespace Microsoft.NodejsTools.ProjectWizard {
 
                     var response = dlg.ShowModal();
 
-                    if (response != cont) {
-                        try {
+                    if (response != cont)
+                    {
+                        try
+                        {
                             Directory.Delete(replacementsDictionary["$destinationdirectory$"]);
                             Directory.Delete(replacementsDictionary["$solutiondirectory$"]);
-                        } catch {
+                        }
+                        catch
+                        {
                             // If it fails (doesn't exist/contains files/read-only), let the directory stay.
                         }
                     }
 
-                    if (dlg.SelectedVerified) {
+                    if (dlg.SelectedVerified)
+                    {
                         var rwStore = sm.GetWritableSettingsStore(SettingsScope.UserSettings);
                         rwStore.CreateCollection(DontShowUpgradeDialogAgainCollection);
                         rwStore.SetBoolean(DontShowUpgradeDialogAgainCollection, DontShowUpgradeDialogAgainProperty, true);
                     }
 
-                    if (response == download) {
+                    if (response == download)
+                    {
                         Process.Start(new ProcessStartInfo(AzureToolsDownload));
                         throw new WizardCancelledException();
-                    } else if (response == TaskDialogButton.Cancel) {
+                    }
+                    else if (response == TaskDialogButton.Cancel)
+                    {
                         // User cancelled, so go back to the New Project dialog
                         throw new WizardBackoutException();
                     }

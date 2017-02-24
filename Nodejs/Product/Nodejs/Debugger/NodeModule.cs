@@ -17,16 +17,20 @@
 using System.Diagnostics;
 using System.IO;
 
-namespace Microsoft.NodejsTools.Debugger {
-    class NodeModule {
+namespace Microsoft.NodejsTools.Debugger
+{
+    internal class NodeModule
+    {
         private readonly string _fileName;
         private readonly int _id;
         private readonly string _javaScriptFileName;
 
-        public NodeModule(int id, string fileName) : this(id, fileName, fileName) {
+        public NodeModule(int id, string fileName) : this(id, fileName, fileName)
+        {
         }
 
-        public NodeModule(int id, string fileName, string javaScriptFileName) {
+        public NodeModule(int id, string fileName, string javaScriptFileName)
+        {
             Debug.Assert(fileName != null);
 
             _id = id;
@@ -34,31 +38,39 @@ namespace Microsoft.NodejsTools.Debugger {
             _javaScriptFileName = javaScriptFileName;
         }
 
-        public int Id {
+        public int Id
+        {
             get { return _id; }
         }
 
-        public string Name {
-            get {
-                if (_fileName.IndexOfAny(Path.GetInvalidPathChars()) == -1) {
+        public string Name
+        {
+            get
+            {
+                if (_fileName.IndexOfAny(Path.GetInvalidPathChars()) == -1)
+                {
                     return Path.GetFileName(_fileName);
                 }
                 return _fileName;
             }
         }
 
-        public string JavaScriptFileName {
+        public string JavaScriptFileName
+        {
             get { return _javaScriptFileName; }
         }
 
-        public string FileName {
+        public string FileName
+        {
             get { return _fileName; }
         }
 
         public string Source { get; set; }
 
-        public bool BuiltIn {
-            get {
+        public bool BuiltIn
+        {
+            get
+            {
                 // No directory separator characters implies builtin
                 return (_fileName.IndexOfAny(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }) == -1);
             }

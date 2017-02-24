@@ -14,8 +14,10 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Debugger {
-    enum BreakOnKind {
+namespace Microsoft.NodejsTools.Debugger
+{
+    internal enum BreakOnKind
+    {
         Always = 0,
         Equal,
         GreaterThanOrEqual,

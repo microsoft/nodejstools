@@ -13,16 +13,19 @@
 //    permissions and limitations under the License.
 //
 //*********************************************************//
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.NodejsTools.TestAdapter.TestFrameworks;
 using Microsoft.NodejsTools.TestFrameworks;
 
-namespace TestAdapterTests {
-
+namespace TestAdapterTests
+{
     [TestClass]
-    public class FrameworkDiscoverTest {
+    public class FrameworkDiscoverTest
+    {
         [TestMethod, Priority(0)]
-        public void InitializeAllFrameworks() {
+        public void InitializeAllFrameworks()
+        {
             //Arrange and Act
             string[] frameworkDirectories = new string[] {
                 "c:\\nodejstools\\" + TestFrameworkDirectories.ExportRunnerFramework,
@@ -40,7 +43,8 @@ namespace TestAdapterTests {
         }
 
         [TestMethod, Priority(0)]
-        public void DefaultFramework_HasCorrectFolderInformation() {
+        public void DefaultFramework_HasCorrectFolderInformation()
+        {
             //Arrange
             string testName = "dummyUT";
             string testFile = "dummyTestFile.js";

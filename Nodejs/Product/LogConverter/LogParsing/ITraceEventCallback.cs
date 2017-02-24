@@ -17,12 +17,13 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace NodeLogConverter.LogParsing {
+namespace NodeLogConverter.LogParsing
+{
     [Guid("3ED25501-593F-43E9-8F38-3AB46F5A4A52")]
     [ComImport]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    interface ITraceEventCallback {
-
+    internal interface ITraceEventCallback
+    {
         void OnBeginProcessTrace(
             /* [in] */ ITraceEvent HeaderEvent,
             /* [in] */ ITraceRelogger Relogger);

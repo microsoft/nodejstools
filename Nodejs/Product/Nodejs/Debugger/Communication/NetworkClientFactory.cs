@@ -16,17 +16,24 @@
 
 using System;
 
-namespace Microsoft.NodejsTools.Debugger.Communication {
-    internal sealed class NetworkClientFactory : INetworkClientFactory {
-        public INetworkClient CreateNetworkClient(Uri uri) {
-            if (uri == null) {
+namespace Microsoft.NodejsTools.Debugger.Communication
+{
+    internal sealed class NetworkClientFactory : INetworkClientFactory
+    {
+        public INetworkClient CreateNetworkClient(Uri uri)
+        {
+            if (uri == null)
+            {
                 throw new ArgumentNullException("uri");
             }
 
-            if (uri.IsAbsoluteUri) {
-                switch (uri.Scheme) {
+            if (uri.IsAbsoluteUri)
+            {
+                switch (uri.Scheme)
+                {
                     case "tcp":
-                        if (uri.Port < 0) {
+                        if (uri.Port < 0)
+                        {
                             throw new ArgumentException("tcp:// URI must include port number", "uri");
                         }
                         return new TcpNetworkClient(uri.Host, uri.Port);

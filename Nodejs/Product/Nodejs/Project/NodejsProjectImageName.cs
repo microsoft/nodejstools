@@ -14,8 +14,10 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Project {
-    enum NodejsProjectImageName {
+namespace Microsoft.NodejsTools.Project
+{
+    internal enum NodejsProjectImageName
+    {
         TypeScriptProjectFile,
         Dependency,
         DependencyNotListed,

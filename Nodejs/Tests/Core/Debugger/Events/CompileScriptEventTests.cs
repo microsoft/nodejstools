@@ -19,11 +19,14 @@ using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 
-namespace NodejsTests.Debugger.Events {
+namespace NodejsTests.Debugger.Events
+{
     [TestClass]
-    public class CompileScriptEventTests {
+    public class CompileScriptEventTests
+    {
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateCompileScriptEvent() {
+        public void CreateCompileScriptEvent()
+        {
             // Arrange
             JObject message = JObject.Parse(Resources.NodeCompileScriptResponse);
 

@@ -20,11 +20,14 @@ using Microsoft.VisualStudio.Language.Intellisense;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace TestUtilities.Mocks {
-    public class MockGlyphService : IGlyphService {
+namespace TestUtilities.Mocks
+{
+    public class MockGlyphService : IGlyphService
+    {
         #region IGlyphService Members
 
-        public ImageSource GetGlyph(StandardGlyphGroup group, StandardGlyphItem item) {
+        public ImageSource GetGlyph(StandardGlyphGroup group, StandardGlyphItem item)
+        {
             return new DrawingImage();
         }
 

@@ -16,8 +16,10 @@
 
 using System.Globalization;
 
-namespace Microsoft.NodejsTools.Npm.SPI {
-    internal class NpmUninstallCommand : NpmCommand {
+namespace Microsoft.NodejsTools.Npm.SPI
+{
+    internal class NpmUninstallCommand : NpmCommand
+    {
         public NpmUninstallCommand(
             string fullPathToRootPackageDirectory,
             string packageName,
@@ -25,7 +27,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             bool global = false,
             string pathToNpm = null,
             bool useFallbackIfNpmNotFound = true)
-            : base(fullPathToRootPackageDirectory, pathToNpm) {
+            : base(fullPathToRootPackageDirectory, pathToNpm)
+        {
             Arguments = global
                             ? string.Format(CultureInfo.InvariantCulture, "uninstall {0} --g", packageName)
                             : string.Format(CultureInfo.InvariantCulture,

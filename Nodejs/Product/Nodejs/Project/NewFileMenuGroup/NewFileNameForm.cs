@@ -17,23 +17,32 @@
 using System;
 using System.Windows.Forms;
 
-namespace Microsoft.NodejsTools.Project {
-    public partial class NewFileNameForm : Form {
-        public NewFileNameForm(string initialFileName) {
+namespace Microsoft.NodejsTools.Project
+{
+    public partial class NewFileNameForm : Form
+    {
+        public NewFileNameForm(string initialFileName)
+        {
             InitializeComponent();
             TextBox.Text = initialFileName;
         }
 
-        public TextBox TextBox {
-            get {
+        public TextBox TextBox
+        {
+            get
+            {
                 return textBox;
             }
         }
 
-        private void TextBox_TextChanged(object sender, EventArgs e) {
-            if (TextBox.Text.Trim().Length == 0) {
+        private void TextBox_TextChanged(object sender, EventArgs e)
+        {
+            if (TextBox.Text.Trim().Length == 0)
+            {
                 okButton.Enabled = false;
-            } else {
+            }
+            else
+            {
                 okButton.Enabled = true;
             }
         }

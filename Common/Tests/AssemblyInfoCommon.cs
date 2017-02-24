@@ -11,13 +11,14 @@ using System.Runtime.InteropServices;
 // Properties\AssemblyInfo.cs file and remove any lines duplicating the ones below.
 [assembly: AssemblyCompany("Microsoft")]
 [assembly: AssemblyProduct("Tools for Visual Studio")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2013")]
+[assembly: AssemblyCopyright("Copyright \u00A9 Microsoft 2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: AssemblyVersion(AssemblyVersionInfo.StableVersion)]
 [assembly: AssemblyFileVersion(AssemblyVersionInfo.Version)]
 
-class AssemblyVersionInfo {
+internal class AssemblyVersionInfo
+{
     // This version string (and the comments for StableVersion and Version)
     // should be updated manually between major releases.
     // Servicing branches should retain the value
@@ -43,7 +44,7 @@ class AssemblyVersionInfo {
     const string VSVersionSuffix = "2014";
 #elif DEV15
     public const string VSMajorVersion = "15";
-    const string VSVersionSuffix = "15";
+    private const string VSVersionSuffix = "15";
 #else
 #error Unrecognized VS Version.
 #endif

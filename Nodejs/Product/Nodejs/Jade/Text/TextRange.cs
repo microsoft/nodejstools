@@ -20,14 +20,16 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
-namespace Microsoft.NodejsTools.Jade {
+namespace Microsoft.NodejsTools.Jade
+{
     /// <summary>
     /// Represents a range in a text buffer or a string. Specified start and end of text. 
     /// End is exclusive, i.e. Length = End - Start. Implements IComparable that compares
     /// range start positions. 
     /// </summary>
     [DebuggerDisplay("[{Start}...{End}], Length = {Length}")]
-    class TextRange : IExpandableTextRange, ICloneable, IComparable {
+    internal class TextRange : IExpandableTextRange, ICloneable, IComparable
+    {
         private static TextRange _emptyRange = new TextRange(0, 0);
 
         private int _start;
@@ -36,7 +38,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// <summary>
         /// Returns an empty, invalid range.
         /// </summary>
-        public static TextRange EmptyRange {
+        public static TextRange EmptyRange
+        {
             get { return _emptyRange; }
         }
 
@@ -45,7 +48,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// and length of 1
         /// </summary>
         public TextRange()
-            : this(0) {
+            : this(0)
+        {
         }
 
         /// <summary>
@@ -53,7 +57,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// and length of 1.
         /// </summary>
         /// <param name="position">Start position</param>
-        public TextRange(int position) {
+        public TextRange(int position)
+        {
             _start = position;
             _end = position < Int32.MaxValue ? position + 1 : position;
         }
@@ -64,7 +69,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// <param name="start">Range start</param>
         /// <param name="length">Range length</param>
         /// </summary>
-        public TextRange(int start, int length) {
+        public TextRange(int start, int length)
+        {
             if (length < 0)
                 throw new ArgumentException("Length must not be negative");
 
@@ -77,13 +83,15 @@ namespace Microsoft.NodejsTools.Jade {
         /// </summary>
         /// <param name="range">Text range to use as position source</param>
         public TextRange(ITextRange range)
-            : this(range.Start, range.Length) {
+            : this(range.Start, range.Length)
+        {
         }
 
         /// <summary>
         /// Resets text range to (0, 0)
         /// </summary>
-        public void Empty() {
+        public void Empty()
+        {
             _start = 0;
             _end = 0;
         }
@@ -94,7 +102,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// </summary>
         /// <param name="start"></param>
         /// <param name="end"></param>
-        public static TextRange FromBounds(int start, int end) {
+        public static TextRange FromBounds(int start, int end)
+        {
             return new TextRange(start, end - start);
         }
 
@@ -104,7 +113,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// <param name="start">Start of another range</param>
         /// <param name="length">Length of another range</param>
         /// <returns>True if ranges intersect</returns>
-        public virtual bool Intersect(int start, int length) {
+        public virtual bool Intersect(int start, int length)
+        {
             return TextRange.Intersect(this, start, length);
         }
 
@@ -113,14 +123,16 @@ namespace Microsoft.NodejsTools.Jade {
         /// </summary>
         /// <param name="start">Text range</param>
         /// <returns>True if ranges intersect</returns>
-        public virtual bool Intersect(ITextRange range) {
+        public virtual bool Intersect(ITextRange range)
+        {
             return TextRange.Intersect(this, range.Start, range.Length);
         }
         /// <summary>
         /// Finds out if range represents valid text range (it's length is greater than zero)
         /// </summary>
         /// <returns>True if range is valid</returns>
-        public virtual bool IsValid() {
+        public virtual bool IsValid()
+        {
             return TextRange.IsValid(this);
         }
 
@@ -138,14 +150,16 @@ namespace Microsoft.NodejsTools.Jade {
         /// <summary>
         /// Text range length
         /// </summary>
-        public int Length {
+        public int Length
+        {
             get { return End - Start; }
         }
 
         /// <summary>
         /// Determines if range contains given position
         /// </summary>
-        public virtual bool Contains(int position) {
+        public virtual bool Contains(int position)
+        {
             return TextRange.Contains(this, position);
         }
 
@@ -153,7 +167,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// Determines if text range fully contains another range
         /// </summary>
         /// <param name="range"></param>
-        public virtual bool Contains(ITextRange range) {
+        public virtual bool Contains(ITextRange range)
+        {
             return Contains(range.Start) && Contains(range.End);
         }
 
@@ -161,14 +176,17 @@ namespace Microsoft.NodejsTools.Jade {
         /// Determines if element contains one or more of the ranges
         /// </summary>
         /// <returns></returns>
-        public virtual bool Contains(IEnumerable<ITextRange> ranges) {
+        public virtual bool Contains(IEnumerable<ITextRange> ranges)
+        {
             if (ranges == null)
                 return false;
 
             bool contains = false;
 
-            foreach (var range in ranges) {
-                if (Contains(range)) {
+            foreach (var range in ranges)
+            {
+                if (Contains(range))
+                {
                     contains = true;
                     break;
                 }
@@ -180,12 +198,14 @@ namespace Microsoft.NodejsTools.Jade {
         /// <summary>
         /// Shifts text range by a given offset
         /// </summary>
-        public void Shift(int offset) {
+        public void Shift(int offset)
+        {
             _start += offset;
             _end += offset;
         }
 
-        public void Expand(int startOffset, int endOffset) {
+        public void Expand(int startOffset, int endOffset)
+        {
             if (_start + startOffset > _end + endOffset)
                 throw new ArgumentException("Combination of start and end offsets should not be making range invalid");
 
@@ -195,7 +215,8 @@ namespace Microsoft.NodejsTools.Jade {
         #endregion
 
         [ExcludeFromCodeCoverage]
-        public override string ToString() {
+        public override string ToString()
+        {
             return string.Format(CultureInfo.InvariantCulture, "[{0}...{1}]", Start, End);
         }
 
@@ -206,7 +227,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// <param name="left">First range</param>
         /// <param name="right">Second range</param>
         /// <returns>True if ranges are equal</returns>
-        public static bool AreEqual(ITextRange left, ITextRange right) {
+        public static bool AreEqual(ITextRange left, ITextRange right)
+        {
             if (Object.ReferenceEquals(left, right))
                 return true;
 
@@ -223,14 +245,16 @@ namespace Microsoft.NodejsTools.Jade {
         /// <param name="range">Text range</param>
         /// <param name="position">Position</param>
         /// <returns>True if position is inside the range</returns>
-        public static bool Contains(ITextRange range, int position) {
+        public static bool Contains(ITextRange range, int position)
+        {
             return Contains(range.Start, range.Length, position);
         }
 
         /// <summary>
         /// Determines if range contains another range
         /// </summary>
-        public static bool Contains(ITextRange range, ITextRange other) {
+        public static bool Contains(ITextRange range, ITextRange other)
+        {
             var textRange = new TextRange(range);
             return textRange.Contains(other);
         }
@@ -238,7 +262,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// <summary>
         /// Determines if range contains all ranges in a collection
         /// </summary>
-        public static bool Contains(ITextRange range, IEnumerable<ITextRange> ranges) {
+        public static bool Contains(ITextRange range, IEnumerable<ITextRange> ranges)
+        {
             var textRange = new TextRange(range);
             return textRange.Contains(ranges);
         }
@@ -250,7 +275,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// <param name="rangeLength">Length of the text range</param>
         /// <param name="position">Position</param>
         /// <returns>Tru if position is inside the range</returns>
-        public static bool Contains(int rangeStart, int rangeLength, int position) {
+        public static bool Contains(int rangeStart, int rangeLength, int position)
+        {
             if (rangeLength == 0 && position == rangeStart)
                 return true;
 
@@ -263,7 +289,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// <param name="range1">First text range</param>
         /// <param name="range2">Second text range</param>
         /// <returns>True if ranges intersect</returns>
-        public static bool Intersect(ITextRange range1, ITextRange range2) {
+        public static bool Intersect(ITextRange range1, ITextRange range2)
+        {
             return Intersect(range1, range2.Start, range2.Length);
         }
 
@@ -274,7 +301,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// <param name="rangeStart2">Start of the second range</param>
         /// <param name="rangeLength2">Length of the second range</param>
         /// <returns>True if ranges intersect</returns>
-        public static bool Intersect(ITextRange range1, int rangeStart2, int rangeLength2) {
+        public static bool Intersect(ITextRange range1, int rangeStart2, int rangeLength2)
+        {
             return Intersect(range1.Start, range1.Length, rangeStart2, rangeLength2);
         }
 
@@ -286,7 +314,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// <param name="rangeStart2">Start of the second range</param>
         /// <param name="rangeLength2">Length of the second range</param>
         /// <returns>True if ranges intersect</returns>
-        public static bool Intersect(int rangeStart1, int rangeLength1, int rangeStart2, int rangeLength2) {
+        public static bool Intersect(int rangeStart1, int rangeLength1, int rangeStart2, int rangeLength2)
+        {
             // !(rangeEnd2 <= rangeStart1 || rangeStart2 >= rangeEnd1)
 
             // Support intersection with empty ranges
@@ -307,14 +336,16 @@ namespace Microsoft.NodejsTools.Jade {
         /// Finds out if range represents valid text range (when range is not null and it's length is greater than zero)
         /// </summary>
         /// <returns>True if range is valid</returns>
-        public static bool IsValid(ITextRange range) {
+        public static bool IsValid(ITextRange range)
+        {
             return range != null && range.Length > 0;
         }
 
         /// <summary>
         /// Calculates range that includes both supplied ranges.
         /// </summary>
-        public static ITextRange Union(ITextRange range1, ITextRange range2) {
+        public static ITextRange Union(ITextRange range1, ITextRange range2)
+        {
             int start = Math.Min(range1.Start, range2.Start);
             int end = Math.Max(range1.End, range2.End);
 
@@ -324,7 +355,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// <summary>
         /// Calculates range that includes both supplied ranges.
         /// </summary>
-        public static ITextRange Union(ITextRange range1, int rangeStart, int rangeLength) {
+        public static ITextRange Union(ITextRange range1, int rangeStart, int rangeLength)
+        {
             int start = Math.Min(range1.Start, rangeStart);
             int end = Math.Max(range1.End, rangeStart + rangeLength);
 
@@ -335,7 +367,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// Calculates range that is an intersection of the supplied ranges.
         /// </summary>
         /// <returns>Intersection or empty range if ranges don't intersect</returns>
-        public static ITextRange Intersection(ITextRange range1, ITextRange range2) {
+        public static ITextRange Intersection(ITextRange range1, ITextRange range2)
+        {
             int start = Math.Max(range1.Start, range2.Start);
             int end = Math.Min(range1.End, range2.End);
 
@@ -346,7 +379,8 @@ namespace Microsoft.NodejsTools.Jade {
         /// Calculates range that is an intersection of the supplied ranges.
         /// </summary>
         /// <returns>Intersection or empty range if ranges don't intersect</returns>
-        public static ITextRange Intersection(ITextRange range1, int rangeStart, int rangeLength) {
+        public static ITextRange Intersection(ITextRange range1, int rangeStart, int rangeLength)
+        {
             int start = Math.Max(range1.Start, rangeStart);
             int end = Math.Min(range1.End, rangeStart + rangeLength);
 
@@ -356,11 +390,13 @@ namespace Microsoft.NodejsTools.Jade {
         /// <summary>
         /// Creates copy of the text range object via memberwise cloning
         /// </summary>
-        public virtual object Clone() {
+        public virtual object Clone()
+        {
             return this.MemberwiseClone();
         }
 
-        public int CompareTo(object obj) {
+        public int CompareTo(object obj)
+        {
             TextRange other = obj as TextRange;
 
             if (other == null)
@@ -369,18 +405,21 @@ namespace Microsoft.NodejsTools.Jade {
             return this.Start.CompareTo(other.Start);
         }
 
-        public override bool Equals(object obj) {
+        public override bool Equals(object obj)
+        {
             if (obj == null)
                 return false;
 
             return CompareTo(obj) == 0;
         }
 
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             return base.GetHashCode();
         }
 
-        public static bool operator ==(TextRange range1, TextRange range2) {
+        public static bool operator ==(TextRange range1, TextRange range2)
+        {
             if ((object)range1 == null && (object)range2 == null)
                 return true;
 
@@ -390,18 +429,21 @@ namespace Microsoft.NodejsTools.Jade {
             return range1.Equals(range2);
         }
 
-        public static bool operator !=(TextRange range1, TextRange range2) {
+        public static bool operator !=(TextRange range1, TextRange range2)
+        {
             return !(range1 == range2);
         }
 
-        public static bool operator <(TextRange range1, TextRange range2) {
+        public static bool operator <(TextRange range1, TextRange range2)
+        {
             if ((object)range1 == null || (object)range2 == null)
                 return false;
 
             return range1.CompareTo(range2) < 0;
         }
 
-        public static bool operator >(TextRange range1, TextRange range2) {
+        public static bool operator >(TextRange range1, TextRange range2)
+        {
             if ((object)range1 == null || (object)range2 == null)
                 return false;
 

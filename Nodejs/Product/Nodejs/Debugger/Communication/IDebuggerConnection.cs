@@ -16,8 +16,10 @@
 
 using System;
 
-namespace Microsoft.NodejsTools.Debugger.Communication {
-    interface IDebuggerConnection : IDisposable {
+namespace Microsoft.NodejsTools.Debugger.Communication
+{
+    internal interface IDebuggerConnection : IDisposable
+    {
         /// <summary>
         /// Gets a value indicating whether connection established.
         /// </summary>

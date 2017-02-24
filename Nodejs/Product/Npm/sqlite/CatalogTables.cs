@@ -17,13 +17,15 @@
 using System;
 using SQLite;
 
-namespace Microsoft.NodejsTools.Npm.SQLiteTables {
-    public class CatalogEntry {
+namespace Microsoft.NodejsTools.Npm.SQLiteTables
+{
+    public class CatalogEntry
+    {
         public string Name { get; set; }
 
-        public  string Description { get; set; }
+        public string Description { get; set; }
 
-        public  string Homepage { get; set; }
+        public string Homepage { get; set; }
 
         public string Version { get; set; }
 
@@ -36,12 +38,14 @@ namespace Microsoft.NodejsTools.Npm.SQLiteTables {
         public string PublishDateTimeString { get; set; }
     }
 
-    public class DbVersion {
+    public class DbVersion
+    {
         [PrimaryKey, NotNull]
         public int Id { get; set; }
     }
 
-    public class RegistryFileMapping {
+    public class RegistryFileMapping
+    {
         [PrimaryKey, NotNull, Indexed]
         public string RegistryUrl { get; set; }
 
@@ -49,7 +53,8 @@ namespace Microsoft.NodejsTools.Npm.SQLiteTables {
         public string DbFileLocation { get; set; }
     }
 
-    public class RegistryInfo {
+    public class RegistryInfo
+    {
         [PrimaryKey, NotNull, Indexed]
         public string RegistryUrl { get; set; }
 
@@ -58,5 +63,5 @@ namespace Microsoft.NodejsTools.Npm.SQLiteTables {
 
         [NotNull]
         public DateTime UpdatedOn { get; set; }
-    } 
+    }
 }

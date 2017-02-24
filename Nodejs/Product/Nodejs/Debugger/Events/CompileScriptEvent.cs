@@ -17,9 +17,12 @@
 using Microsoft.NodejsTools.Debugger.Serialization;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.NodejsTools.Debugger.Events {
-    sealed class CompileScriptEvent : IDebuggerEvent {
-        public CompileScriptEvent(JObject message) {
+namespace Microsoft.NodejsTools.Debugger.Events
+{
+    internal sealed class CompileScriptEvent : IDebuggerEvent
+    {
+        public CompileScriptEvent(JObject message)
+        {
             Running = (bool)message["running"];
 
             var scriptId = (int)message["body"]["script"]["id"];

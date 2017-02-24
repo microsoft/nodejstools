@@ -8,56 +8,67 @@ using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Imaging;
 
-namespace Microsoft.NodejsTools.Project {
-    internal abstract class AbstractNpmNode : HierarchyNode {
+namespace Microsoft.NodejsTools.Project
+{
+    internal abstract class AbstractNpmNode : HierarchyNode
+    {
         protected readonly NodejsProjectNode _projectNode;
 
         protected AbstractNpmNode(NodejsProjectNode root)
-            : base(root) {
+            : base(root)
+        {
             _projectNode = root;
             ExcludeNodeFromScc = true;
         }
 
         #region HierarchyNode implementation
 
-        public override Guid ItemTypeGuid {
+        public override Guid ItemTypeGuid
+        {
             get { return VSConstants.GUID_ItemType_VirtualFolder; }
         }
 
-        public override Guid MenuGroupId {
+        public override Guid MenuGroupId
+        {
             get { return Guids.NodejsNpmCmdSet; }
         }
 
-        public override int MenuCommandId {
+        public override int MenuCommandId
+        {
             get { return PkgCmdId.menuIdNpm; }
         }
 
         /// <summary>
         /// Disable inline editing of Caption.
         /// </summary>
-        public sealed override string GetEditLabel() {
+        public sealed override string GetEditLabel()
+        {
             return null;
         }
 
-        protected override bool SupportsIconMonikers {
+        protected override bool SupportsIconMonikers
+        {
             get { return true; }
         }
 
         /// <summary>
         /// Returns the icon to use.
         /// </summary>
-        protected override ImageMoniker GetIconMoniker(bool open) {
+        protected override ImageMoniker GetIconMoniker(bool open)
+        {
             return KnownMonikers.Reference;
         }
 
-        protected override NodeProperties CreatePropertiesObject() {
+        protected override NodeProperties CreatePropertiesObject()
+        {
             return new NpmNodeProperties(this);
         }
-#endregion
+        #endregion
 
         public abstract void ManageNpmModules();
 
-        protected void ReloadHierarchy(HierarchyNode parent, IEnumerable<IPackage> modules) {
+        protected void ReloadHierarchy(HierarchyNode parent, IEnumerable<IPackage> modules)
+        {
             //  We're going to reuse nodes for which matching modules exist in the new set.
             //  The reason for this is that we want to preserve the expansion state of the
             //  hierarchy. If we just bin everything off and recreate it all from scratch
@@ -69,32 +80,41 @@ namespace Microsoft.NodejsTools.Project {
             BuildModuleHierarchy(parent, modules, recycle);
         }
 
-        private void RemoveUnusedModuleNodesFromHierarchy(HierarchyNode parent, List<HierarchyNode> remove) {
-            foreach (var obsolete in remove) {
+        private void RemoveUnusedModuleNodesFromHierarchy(HierarchyNode parent, List<HierarchyNode> remove)
+        {
+            foreach (var obsolete in remove)
+            {
                 parent.RemoveChild(obsolete);
                 ProjectMgr.OnItemDeleted(obsolete);
             }
         }
 
-        private IEnumerable<IPackage> BuildModuleHierarchy(HierarchyNode parent, IEnumerable<IPackage> modules, IReadOnlyDictionary<string, DependencyNode> recycle) {
-            if (modules == null) {
+        private IEnumerable<IPackage> BuildModuleHierarchy(HierarchyNode parent, IEnumerable<IPackage> modules, IReadOnlyDictionary<string, DependencyNode> recycle)
+        {
+            if (modules == null)
+            {
                 return Enumerable.Empty<IPackage>();
             }
 
             var newModules = new List<IPackage>();
-            foreach (var package in modules) {
+            foreach (var package in modules)
+            {
                 DependencyNode child;
-                if (recycle.ContainsKey(package.Name)) {
+                if (recycle.ContainsKey(package.Name))
+                {
                     child = recycle[package.Name];
                     child.Package = package;
-                } else {
+                }
+                else
+                {
                     child = new DependencyNode(_projectNode, parent as DependencyNode, package);
                     parent.AddChild(child);
                     newModules.Add(package);
                 }
 
                 ReloadHierarchy(child, package.Modules);
-                if (ProjectMgr.ParentHierarchy != null) {
+                if (ProjectMgr.ParentHierarchy != null)
+                {
                     child.ExpandItem(EXPANDFLAGS.EXPF_CollapseFolder);
                 }
             }
@@ -108,20 +128,27 @@ namespace Microsoft.NodejsTools.Project {
         /// <param name="modules">New set of modules</param>
         /// <param name="recycle">Set of existing nodes that should be reused</param>
         /// <returns>List of nodes that should be removed</returns>
-        private static List<HierarchyNode> GetNodesToRemoveOrRecycle(HierarchyNode parent, IEnumerable<IPackage> modules, IDictionary<string, DependencyNode> recycle) {
+        private static List<HierarchyNode> GetNodesToRemoveOrRecycle(HierarchyNode parent, IEnumerable<IPackage> modules, IDictionary<string, DependencyNode> recycle)
+        {
             var remove = new List<HierarchyNode>();
-            for (var current = parent.FirstChild; null != current; current = current.NextSibling) {
+            for (var current = parent.FirstChild; null != current; current = current.NextSibling)
+            {
                 var dep = current as DependencyNode;
-                if (null == dep) {
-                    if (!(current is LocalModulesNode)) {
+                if (null == dep)
+                {
+                    if (!(current is LocalModulesNode))
+                    {
                         remove.Add(current);
                     }
                     continue;
                 }
 
-                if (modules != null && modules.Contains(dep.Package, new PackageEqualityComparer())) {
+                if (modules != null && modules.Contains(dep.Package, new PackageEqualityComparer()))
+                {
                     recycle[dep.Package.Name] = dep;
-                } else {
+                }
+                else
+                {
                     remove.Add(current);
                 }
             }

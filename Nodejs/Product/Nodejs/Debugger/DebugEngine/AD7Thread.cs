@@ -19,26 +19,32 @@ using System.Diagnostics;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
-namespace Microsoft.NodejsTools.Debugger.DebugEngine {
+namespace Microsoft.NodejsTools.Debugger.DebugEngine
+{
     // This class implements IDebugThread2 which represents a thread running in a program.
-    class AD7Thread : IDebugThread2, IDebugThread100 {
+    internal class AD7Thread : IDebugThread2, IDebugThread100
+    {
         private readonly AD7Engine _engine;
         private readonly NodeThread _debuggedThread;
 
-        public AD7Thread(AD7Engine engine, NodeThread debuggedThread) {
+        public AD7Thread(AD7Engine engine, NodeThread debuggedThread)
+        {
             _engine = engine;
             _debuggedThread = debuggedThread;
         }
 
-        private string GetCurrentLocation(bool fIncludeModuleName) {
+        private string GetCurrentLocation(bool fIncludeModuleName)
+        {
             var topStackFrame = _debuggedThread.TopStackFrame;
-            if (topStackFrame != null) {
+            if (topStackFrame != null)
+            {
                 return topStackFrame.FunctionName;
             }
             return "<unknown location, not in Node.js code>";
         }
 
-        internal NodeThread GetDebuggedThread() {
+        internal NodeThread GetDebuggedThread()
+        {
             return _debuggedThread;
         }
 
@@ -46,15 +52,18 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // Determines whether the next statement can be set to the given stack frame and code context.
         // NOTE: VS2013 and earlier do not use the result to disable the "set next statement" command
-        int IDebugThread2.CanSetNextStatement(IDebugStackFrame2 stackFrame, IDebugCodeContext2 codeContext) {
+        int IDebugThread2.CanSetNextStatement(IDebugStackFrame2 stackFrame, IDebugCodeContext2 codeContext)
+        {
             throw new NotSupportedException("Set Next Statement is not supported by Node.js.");
         }
 
         // Retrieves a list of the stack frames for this thread.
         // We currently call into the process and get the frames.  We might want to cache the frame info.
-        int IDebugThread2.EnumFrameInfo(enum_FRAMEINFO_FLAGS dwFieldSpec, uint nRadix, out IEnumDebugFrameInfo2 enumObject) {
+        int IDebugThread2.EnumFrameInfo(enum_FRAMEINFO_FLAGS dwFieldSpec, uint nRadix, out IEnumDebugFrameInfo2 enumObject)
+        {
             var stackFrames = _debuggedThread.Frames;
-            if (stackFrames == null) {
+            if (stackFrames == null)
+            {
                 enumObject = null;
                 return VSConstants.E_FAIL;
             }
@@ -62,7 +71,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             int numStackFrames = stackFrames.Count;
             var frameInfoArray = new FRAMEINFO[numStackFrames];
 
-            for (int i = 0; i < numStackFrames; i++) {
+            for (int i = 0; i < numStackFrames; i++)
+            {
                 var frame = new AD7StackFrame(_engine, this, stackFrames[i]);
                 frame.SetFrameInfo(dwFieldSpec, out frameInfoArray[i]);
             }
@@ -72,48 +82,58 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         // Get the name of the thread. For the sample engine, the name of the thread is always "Sample Engine Thread"
-        int IDebugThread2.GetName(out string threadName) {
+        int IDebugThread2.GetName(out string threadName)
+        {
             threadName = _debuggedThread.Name;
             return VSConstants.S_OK;
         }
 
         // Return the program that this thread belongs to.
-        int IDebugThread2.GetProgram(out IDebugProgram2 program) {
+        int IDebugThread2.GetProgram(out IDebugProgram2 program)
+        {
             program = _engine;
             return VSConstants.S_OK;
         }
 
         // Gets the system thread identifier.
-        int IDebugThread2.GetThreadId(out uint threadId) {
+        int IDebugThread2.GetThreadId(out uint threadId)
+        {
             threadId = (uint)_debuggedThread.Id;
             return VSConstants.S_OK;
         }
 
         // Gets properties that describe a thread.
-        int IDebugThread2.GetThreadProperties(enum_THREADPROPERTY_FIELDS dwFields, THREADPROPERTIES[] propertiesArray) {
+        int IDebugThread2.GetThreadProperties(enum_THREADPROPERTY_FIELDS dwFields, THREADPROPERTIES[] propertiesArray)
+        {
             THREADPROPERTIES props = new THREADPROPERTIES();
 
-            if ((dwFields & enum_THREADPROPERTY_FIELDS.TPF_ID) != 0) {
+            if ((dwFields & enum_THREADPROPERTY_FIELDS.TPF_ID) != 0)
+            {
                 props.dwThreadId = (uint)_debuggedThread.Id;
                 props.dwFields |= enum_THREADPROPERTY_FIELDS.TPF_ID;
             }
-            if ((dwFields & enum_THREADPROPERTY_FIELDS.TPF_SUSPENDCOUNT) != 0) {
+            if ((dwFields & enum_THREADPROPERTY_FIELDS.TPF_SUSPENDCOUNT) != 0)
+            {
                 // sample debug engine doesn't support suspending threads
                 props.dwFields |= enum_THREADPROPERTY_FIELDS.TPF_SUSPENDCOUNT;
             }
-            if ((dwFields & enum_THREADPROPERTY_FIELDS.TPF_STATE) != 0) {
+            if ((dwFields & enum_THREADPROPERTY_FIELDS.TPF_STATE) != 0)
+            {
                 props.dwThreadState = (uint)enum_THREADSTATE.THREADSTATE_RUNNING;
                 props.dwFields |= enum_THREADPROPERTY_FIELDS.TPF_STATE;
             }
-            if ((dwFields & enum_THREADPROPERTY_FIELDS.TPF_PRIORITY) != 0) {
+            if ((dwFields & enum_THREADPROPERTY_FIELDS.TPF_PRIORITY) != 0)
+            {
                 props.bstrPriority = "Normal";
                 props.dwFields |= enum_THREADPROPERTY_FIELDS.TPF_PRIORITY;
             }
-            if ((dwFields & enum_THREADPROPERTY_FIELDS.TPF_NAME) != 0) {
+            if ((dwFields & enum_THREADPROPERTY_FIELDS.TPF_NAME) != 0)
+            {
                 props.bstrName = _debuggedThread.Name;
                 props.dwFields |= enum_THREADPROPERTY_FIELDS.TPF_NAME;
             }
-            if ((dwFields & enum_THREADPROPERTY_FIELDS.TPF_LOCATION) != 0) {
+            if ((dwFields & enum_THREADPROPERTY_FIELDS.TPF_LOCATION) != 0)
+            {
                 props.bstrLocation = GetCurrentLocation(true);
                 props.dwFields |= enum_THREADPROPERTY_FIELDS.TPF_LOCATION;
             }
@@ -124,7 +144,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         // Resume a thread.
         // This is called when the user chooses "Unfreeze" from the threads window when a thread has previously been frozen.
-        int IDebugThread2.Resume(out uint suspendCount) {
+        int IDebugThread2.Resume(out uint suspendCount)
+        {
             // We don't support suspending/resuming threads
             suspendCount = 0;
             return VSConstants.E_NOTIMPL;
@@ -133,13 +154,15 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         internal const int E_CANNOT_SET_NEXT_STATEMENT_ON_EXCEPTION = unchecked((int)0x80040105);
 
         // Sets the next statement to the given stack frame and code context.
-        int IDebugThread2.SetNextStatement(IDebugStackFrame2 stackFrame, IDebugCodeContext2 codeContext) {
+        int IDebugThread2.SetNextStatement(IDebugStackFrame2 stackFrame, IDebugCodeContext2 codeContext)
+        {
             return VSConstants.E_NOTIMPL;
         }
 
         // suspend a thread.
         // This is called when the user chooses "Freeze" from the threads window
-        int IDebugThread2.Suspend(out uint suspendCount) {
+        int IDebugThread2.Suspend(out uint suspendCount)
+        {
             // We don't support suspending/resuming threads
             suspendCount = 0;
             return VSConstants.E_NOTIMPL;
@@ -149,13 +172,15 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
         #region IDebugThread100 Members
 
-        int IDebugThread100.SetThreadDisplayName(string name) {
+        int IDebugThread100.SetThreadDisplayName(string name)
+        {
             // Not necessary to implement in the debug engine. Instead
             // it is implemented in the SDM.
             return VSConstants.E_NOTIMPL;
         }
 
-        int IDebugThread100.GetThreadDisplayName(out string name) {
+        int IDebugThread100.GetThreadDisplayName(out string name)
+        {
             // Not necessary to implement in the debug engine. Instead
             // it is implemented in the SDM, which calls GetThreadProperties100()
             name = String.Empty;
@@ -163,24 +188,28 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         // Returns whether this thread can be used to do function/property evaluation.
-        int IDebugThread100.CanDoFuncEval() {
+        int IDebugThread100.CanDoFuncEval()
+        {
             return VSConstants.S_FALSE;
         }
 
-        int IDebugThread100.SetFlags(uint flags) {
+        int IDebugThread100.SetFlags(uint flags)
+        {
             // Not necessary to implement in the debug engine. Instead
             // it is implemented in the SDM.
             return VSConstants.E_NOTIMPL;
         }
 
-        int IDebugThread100.GetFlags(out uint flags) {
+        int IDebugThread100.GetFlags(out uint flags)
+        {
             // Not necessary to implement in the debug engine. Instead
             // it is implemented in the SDM.
             flags = 0;
             return VSConstants.E_NOTIMPL;
         }
 
-        int IDebugThread100.GetThreadProperties100(uint dwFields, THREADPROPERTIES100[] props) {
+        int IDebugThread100.GetThreadProperties100(uint dwFields, THREADPROPERTIES100[] props)
+        {
             // Invoke GetThreadProperties to get the VS7/8/9 properties
             THREADPROPERTIES[] props90 = new THREADPROPERTIES[1];
             enum_THREADPROPERTY_FIELDS dwFields90 = (enum_THREADPROPERTY_FIELDS)(dwFields & 0x3f);
@@ -194,8 +223,10 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             props[0].dwThreadState = props90[0].dwThreadState;
 
             // Populate the new fields
-            if (hRes == VSConstants.S_OK && dwFields != (uint)dwFields90) {
-                if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_DISPLAY_NAME) != 0) {
+            if (hRes == VSConstants.S_OK && dwFields != (uint)dwFields90)
+            {
+                if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_DISPLAY_NAME) != 0)
+                {
                     // Thread display name is being requested
                     props[0].bstrDisplayName = _debuggedThread.Name;
                     props[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_DISPLAY_NAME;
@@ -206,61 +237,70 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                     props[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_DISPLAY_NAME_PRIORITY;
                 }
 
-                if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_CATEGORY) != 0) {
+                if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_CATEGORY) != 0)
+                {
                     // Thread category is being requested
-                    if (_debuggedThread.IsWorkerThread) {
+                    if (_debuggedThread.IsWorkerThread)
+                    {
                         props[0].dwThreadCategory = (uint)enum_THREADCATEGORY.THREADCATEGORY_Worker;
-                    } else {
+                    }
+                    else
+                    {
                         props[0].dwThreadCategory = (uint)enum_THREADCATEGORY.THREADCATEGORY_Main;
                     }
-                    
+
                     props[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_CATEGORY;
                 }
 
-                if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_ID) != 0) {
+                if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_ID) != 0)
+                {
                     // Thread category is being requested
                     props[0].dwThreadId = (uint)_debuggedThread.Id;
                     props[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_ID;
                 }
 
-                if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_AFFINITY) != 0) {
+                if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_AFFINITY) != 0)
+                {
                     // Thread cpu affinity is being requested
                     props[0].AffinityMask = 0;
                     props[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_AFFINITY;
                 }
 
-                if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_PRIORITY_ID) != 0) {
+                if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_PRIORITY_ID) != 0)
+                {
                     // Thread display name is being requested
                     props[0].priorityId = 0;
                     props[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_PRIORITY_ID;
                 }
-
             }
 
             return hRes;
         }
 
-        enum enum_THREADCATEGORY {
+        private enum enum_THREADCATEGORY
+        {
             THREADCATEGORY_Worker = 0,
             THREADCATEGORY_UI = (THREADCATEGORY_Worker + 1),
             THREADCATEGORY_Main = (THREADCATEGORY_UI + 1),
             THREADCATEGORY_RPC = (THREADCATEGORY_Main + 1),
             THREADCATEGORY_Unknown = (THREADCATEGORY_RPC + 1)
         }
-   
+
         #endregion
 
         #region Uncalled interface methods
         // These methods are not currently called by the Visual Studio debugger, so they don't need to be implemented
 
-        int IDebugThread2.GetLogicalThread(IDebugStackFrame2 stackFrame, out IDebugLogicalThread2 logicalThread) {
+        int IDebugThread2.GetLogicalThread(IDebugStackFrame2 stackFrame, out IDebugLogicalThread2 logicalThread)
+        {
             Debug.Fail("This function is not called by the debugger");
 
             logicalThread = null;
             return VSConstants.E_NOTIMPL;
         }
 
-        int IDebugThread2.SetThreadName(string name) {
+        int IDebugThread2.SetThreadName(string name)
+        {
             Debug.Fail("This function is not called by the debugger");
 
             return VSConstants.E_NOTIMPL;

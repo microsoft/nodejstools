@@ -14,11 +14,13 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Options {
+namespace Microsoft.NodejsTools.Options
+{
     /// <summary>
     /// Copied from  TypeScript\VS\LanguageService\TypeScriptLanguageService\ToolsOptions\Constants.cs
     /// </summary>
-    public static class TypeScriptRegistrySwitches {
+    public static class TypeScriptRegistrySwitches
+    {
         public const string TypeScriptLanguageServiceSubKey = "TypeScriptLanguageService";
 
         public const string TerminateProcessOnException = "TerminateProcessOnException";

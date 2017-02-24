@@ -14,11 +14,13 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.VisualStudioTools.Project {
+namespace Microsoft.VisualStudioTools.Project
+{
     /// <summary>
     /// Defines an interface for launching a project or a file with or without debugging.
     /// </summary>
-    public interface IProjectLauncher {
+    public interface IProjectLauncher
+    {
         /// <summary>
         /// Starts a project with or without debugging.
         /// </summary>
@@ -32,7 +34,8 @@ namespace Microsoft.VisualStudioTools.Project {
         int LaunchFile(string file, bool debug);
     }
 
-    public interface IProjectLauncher2 : IProjectLauncher {
+    public interface IProjectLauncher2 : IProjectLauncher
+    {
         /// <summary>
         /// Starts a file in a project with custom settings.
         /// </summary>

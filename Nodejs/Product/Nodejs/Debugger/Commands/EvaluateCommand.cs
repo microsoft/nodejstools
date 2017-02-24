@@ -18,15 +18,18 @@ using System.Collections.Generic;
 using Microsoft.NodejsTools.Debugger.Serialization;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.NodejsTools.Debugger.Commands {
-    sealed class EvaluateCommand : DebuggerCommand {
+namespace Microsoft.NodejsTools.Debugger.Commands
+{
+    internal sealed class EvaluateCommand : DebuggerCommand
+    {
         private readonly Dictionary<string, object> _arguments;
         private readonly string _expression;
         private readonly IEvaluationResultFactory _resultFactory;
         private readonly NodeStackFrame _stackFrame;
 
         public EvaluateCommand(int id, IEvaluationResultFactory resultFactory, string expression, NodeStackFrame stackFrame = null)
-            : base(id, "evaluate") {
+            : base(id, "evaluate")
+        {
             _resultFactory = resultFactory;
             _expression = expression;
             _stackFrame = stackFrame;
@@ -41,7 +44,8 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
         }
 
         public EvaluateCommand(int id, IEvaluationResultFactory resultFactory, int variableId, NodeStackFrame stackFrame = null)
-            : base(id, "evaluate") {
+            : base(id, "evaluate")
+        {
             _resultFactory = resultFactory;
             _expression = "variable";
             _stackFrame = stackFrame;
@@ -56,13 +60,15 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             };
         }
 
-        protected override IDictionary<string, object> Arguments {
+        protected override IDictionary<string, object> Arguments
+        {
             get { return _arguments; }
         }
 
         public NodeEvaluationResult Result { get; private set; }
 
-        public override void ProcessResponse(JObject response) {
+        public override void ProcessResponse(JObject response)
+        {
             base.ProcessResponse(response);
 
             var variableProvider = new NodeEvaluationVariable(_stackFrame, _expression, response["body"]);

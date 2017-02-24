@@ -16,18 +16,22 @@
 
 using System.Runtime.InteropServices;
 
-namespace Microsoft.NodejsTools.Profiling {
+namespace Microsoft.NodejsTools.Profiling
+{
     [ComVisible(true)]
-    public sealed class ReportWrapper : INodePerformanceReport {
+    public sealed class ReportWrapper : INodePerformanceReport
+    {
         private readonly Report _report;
 
-        internal ReportWrapper(Report report) {
+        internal ReportWrapper(Report report)
+        {
             _report = report;
         }
 
         #region INodePerformanceReport Members
 
-        public string Filename {
+        public string Filename
+        {
             get { return _report.Filename; }
         }
 

@@ -18,9 +18,11 @@ using System;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace Microsoft.NodejsTools.Options {
+namespace Microsoft.NodejsTools.Options
+{
     [ComVisible(true)]
-    public class NodejsGeneralOptionsPage : NodejsDialogPage {
+    public class NodejsGeneralOptionsPage : NodejsDialogPage
+    {
         private const string DefaultSurveyNewsFeedUrl = "https://go.microsoft.com/fwlink/?LinkId=328027";
         private const string DefaultSurveyNewsIndexUrl = "https://go.microsoft.com/fwlink/?LinkId=328029";
         private const string SurveyNewsCheckSetting = "SurveyNewsCheck";
@@ -38,13 +40,17 @@ namespace Microsoft.NodejsTools.Options {
         private NodejsGeneralOptionsControl _window;
 
         public NodejsGeneralOptionsPage()
-            : base("General") {
+            : base("General")
+        {
         }
 
         // replace the default UI of the dialog page w/ our own UI.
-        protected override IWin32Window Window {
-            get {
-                if (_window == null) {
+        protected override IWin32Window Window
+        {
+            get
+            {
+                if (_window == null)
+                {
                     _window = new NodejsGeneralOptionsControl();
                     LoadSettingsFromStorage();
                 }
@@ -78,7 +84,8 @@ namespace Microsoft.NodejsTools.Options {
         /// The frequency at which to check for updated news. Default is once
         /// per week.
         /// </summary>
-        public SurveyNewsPolicy SurveyNewsCheck {
+        public SurveyNewsPolicy SurveyNewsCheck
+        {
             get { return _surveyNewsCheck; }
             set { _surveyNewsCheck = value; }
         }
@@ -86,7 +93,8 @@ namespace Microsoft.NodejsTools.Options {
         /// <summary>
         /// The date/time when the last check for news occurred.
         /// </summary>
-        public DateTime SurveyNewsLastCheck {
+        public DateTime SurveyNewsLastCheck
+        {
             get { return _surveyNewsLastCheck; }
             set { _surveyNewsLastCheck = value; }
         }
@@ -94,7 +102,8 @@ namespace Microsoft.NodejsTools.Options {
         /// <summary>
         /// The url of the news feed.
         /// </summary>
-        public string SurveyNewsFeedUrl {
+        public string SurveyNewsFeedUrl
+        {
             get { return _surveyNewsFeedUrl; }
             set { _surveyNewsFeedUrl = value; }
         }
@@ -102,7 +111,8 @@ namespace Microsoft.NodejsTools.Options {
         /// <summary>
         /// The url of the news index page.
         /// </summary>
-        public string SurveyNewsIndexUrl {
+        public string SurveyNewsIndexUrl
+        {
             get { return _surveyNewsIndexUrl; }
             set { _surveyNewsIndexUrl = value; }
         }
@@ -112,7 +122,8 @@ namespace Microsoft.NodejsTools.Options {
         /// a call to <see cref="SaveSettingsToStorage" /> to commit the new
         /// values.
         /// </summary>
-        public override void ResetSettings() {
+        public override void ResetSettings()
+        {
             _surveyNewsCheck = SurveyNewsPolicy.CheckOnceWeek;
             _surveyNewsLastCheck = DateTime.MinValue;
             _surveyNewsFeedUrl = DefaultSurveyNewsFeedUrl;
@@ -123,7 +134,8 @@ namespace Microsoft.NodejsTools.Options {
             CheckForLongPaths = true;
         }
 
-        public override void LoadSettingsFromStorage() {
+        public override void LoadSettingsFromStorage()
+        {
             // Load settings from storage.
             _surveyNewsCheck = LoadEnum<SurveyNewsPolicy>(SurveyNewsCheckSetting) ?? SurveyNewsPolicy.CheckOnceWeek;
             _surveyNewsLastCheck = LoadDateTime(SurveyNewsLastCheckSetting) ?? DateTime.MinValue;
@@ -135,14 +147,17 @@ namespace Microsoft.NodejsTools.Options {
             CheckForLongPaths = LoadBool(CheckForLongPathsSetting) ?? true;
 
             // Synchronize UI with backing properties.
-            if (_window != null) {
+            if (_window != null)
+            {
                 _window.SyncControlWithPageSettings(this);
             }
         }
 
-        public override void SaveSettingsToStorage() {
+        public override void SaveSettingsToStorage()
+        {
             // Synchronize backing properties with UI.
-            if (_window != null) {
+            if (_window != null)
+            {
                 _window.SyncPageWithControlSettings(this);
             }
 

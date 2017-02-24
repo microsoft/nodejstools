@@ -16,10 +16,13 @@
 
 // Guids.cs
 // MUST match guids.h
+
 using System;
 
-namespace Microsoft.NodejsTools.Profiling {
-    internal static class ProfilingGuids {
+namespace Microsoft.NodejsTools.Profiling
+{
+    internal static class ProfilingGuids
+    {
         // Profiling guids
         public const string NodejsProfilingPkgString = "B515653F-FB69-4B64-9D3F-F1FCF8421DD0";
         public const string NodejsProfilingCmdSetString = "3F2BC93C-CA2D-450B-9BFC-0C96288F1ED6";

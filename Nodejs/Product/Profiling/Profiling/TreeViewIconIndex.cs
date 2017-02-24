@@ -14,8 +14,10 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Profiling {
-    enum TreeViewIconIndex {
+namespace Microsoft.NodejsTools.Profiling
+{
+    internal enum TreeViewIconIndex
+    {
         GreenNotebook,
         GreenPropertyNotebook,
         EmptyApp,

@@ -24,7 +24,8 @@ namespace TestUtilities.UI
     public class TreeNode : AutomationWrapper, ITreeNode
     {
         public TreeNode(AutomationElement element)
-            : base(element) {
+            : base(element)
+        {
         }
 
         public new void Select()
@@ -54,11 +55,13 @@ namespace TestUtilities.UI
             }
         }
 
-        void ITreeNode.Select() {
+        void ITreeNode.Select()
+        {
             base.Select();
         }
 
-        void ITreeNode.AddToSelection() {
+        void ITreeNode.AddToSelection()
+        {
             AutomationWrapper.AddToSelection(Element);
         }
 
@@ -122,7 +125,8 @@ namespace TestUtilities.UI
 
         public void ExpandCollapse()
         {
-            try {
+            try
+            {
                 var pattern = Element.GetExpandCollapsePattern();
                 switch (pattern.Current.ExpandCollapseState)
                 {
@@ -140,7 +144,9 @@ namespace TestUtilities.UI
                     default:
                         break;
                 }
-            } catch (InvalidOperationException) {
+            }
+            catch (InvalidOperationException)
+            {
                 Element.GetInvokePattern().Invoke();
             }
         }
@@ -162,9 +168,11 @@ namespace TestUtilities.UI
         /// Selects the provided items with the mouse preparing for a drag and drop
         /// </summary>
         /// <param name="source"></param>
-        private static void SelectItemsForDragAndDrop(ITreeNode[] source) {
+        private static void SelectItemsForDragAndDrop(ITreeNode[] source)
+        {
             AutomationWrapper.Select(((TreeNode)source.First()).Element);
-            for (int i = 1; i < source.Length; i++) {
+            for (int i = 1; i < source.Length; i++)
+            {
                 AutomationWrapper.AddToSelection(((TreeNode)source[i]).Element);
             }
 
@@ -173,35 +181,47 @@ namespace TestUtilities.UI
         }
 
 
-        public void DragOntoThis(params ITreeNode[] source) {
+        public void DragOntoThis(params ITreeNode[] source)
+        {
             DragOntoThis(Key.None, source);
         }
 
-        public void DragOntoThis(Key modifier, params ITreeNode[] source) {
+        public void DragOntoThis(Key modifier, params ITreeNode[] source)
+        {
             SelectItemsForDragAndDrop(source);
 
-            try {
-                try {
-                    if (modifier != Key.None) {
+            try
+            {
+                try
+                {
+                    if (modifier != Key.None)
+                    {
                         Keyboard.Press(modifier);
                     }
                     var dest = Element;
-                    if (source.Length == 1 && source[0] == this) {
+                    if (source.Length == 1 && source[0] == this)
+                    {
                         // dragging onto ourself, the mouse needs to move
                         var point = dest.GetClickablePoint();
                         Mouse.MoveTo(new Point(point.X + 1, point.Y + 1));
-                    } else {
+                    }
+                    else
+                    {
                         Mouse.MoveTo(dest.GetClickablePoint());
                     }
-                } finally {
+                }
+                finally
+                {
                     Mouse.Up(MouseButton.Left);
                 }
-            } finally {
-                if (modifier != Key.None) {
+            }
+            finally
+            {
+                if (modifier != Key.None)
+                {
                     Keyboard.Release(modifier);
                 }
             }
         }
-
     }
 }

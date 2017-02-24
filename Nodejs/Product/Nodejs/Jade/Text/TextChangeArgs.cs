@@ -18,14 +18,16 @@ using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Microsoft.NodejsTools.Jade {
+namespace Microsoft.NodejsTools.Jade
+{
     /// <summary>
     /// Text change event arguments. This class abstracts text change information 
     /// allowing code that handles text changes to use <seealso cref="ITextProvider"/>
     /// rather than Visual Studio ITextBuffer or some other editor specific types.
     /// </summary>
     [ExcludeFromCodeCoverage]
-    class TextChangeEventArgs : EventArgs {
+    internal class TextChangeEventArgs : EventArgs
+    {
         /// <summary>
         /// Start position of the change
         /// </summary>
@@ -53,11 +55,13 @@ namespace Microsoft.NodejsTools.Jade {
         public ITextProvider NewText { get; private set; }
 
         public TextChangeEventArgs(int start, int oldLength, int newLength)
-            : this(start, oldLength, newLength, null, null) {
+            : this(start, oldLength, newLength, null, null)
+        {
         }
 
         [DebuggerStepThrough]
-        public TextChangeEventArgs(int start, int oldLength, int newLength, ITextProvider oldText, ITextProvider newText) {
+        public TextChangeEventArgs(int start, int oldLength, int newLength, ITextProvider oldText, ITextProvider newText)
+        {
             Start = start;
             OldLength = oldLength;
             NewLength = newLength;

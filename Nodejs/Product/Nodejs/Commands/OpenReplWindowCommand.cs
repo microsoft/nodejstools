@@ -17,13 +17,17 @@
 using System;
 using Microsoft.VisualStudioTools;
 
-namespace Microsoft.NodejsTools.Commands {
-    internal sealed class OpenReplWindowCommand : Command {
-        public override void DoCommand(object sender, EventArgs args) {
+namespace Microsoft.NodejsTools.Commands
+{
+    internal sealed class OpenReplWindowCommand : Command
+    {
+        public override void DoCommand(object sender, EventArgs args)
+        {
             NodejsPackage.Instance.OpenReplWindow();
         }
 
-        public override int CommandId {
+        public override int CommandId
+        {
             get { return (int)PkgCmdId.cmdidReplWindow; }
         }
     }

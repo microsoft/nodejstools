@@ -17,14 +17,18 @@
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.NodejsTools.Debugger.Commands {
-    internal sealed class ListBreakpointsCommand : DebuggerCommand {
-        public ListBreakpointsCommand(int id) : base(id, "listbreakpoints") {
+namespace Microsoft.NodejsTools.Debugger.Commands
+{
+    internal sealed class ListBreakpointsCommand : DebuggerCommand
+    {
+        public ListBreakpointsCommand(int id) : base(id, "listbreakpoints")
+        {
         }
 
         public Dictionary<int, int> Breakpoints { get; private set; }
 
-        public override void ProcessResponse(JObject response) {
+        public override void ProcessResponse(JObject response)
+        {
             base.ProcessResponse(response);
 
             JToken body = response["body"];
@@ -32,7 +36,8 @@ namespace Microsoft.NodejsTools.Debugger.Commands {
             JArray breakpoints = (JArray)body["breakpoints"] ?? new JArray();
             Breakpoints = new Dictionary<int, int>(breakpoints.Count);
 
-            foreach (JToken breakpoint in breakpoints) {
+            foreach (JToken breakpoint in breakpoints)
+            {
                 var breakpointId = (int)breakpoint["number"];
                 var hitCount = (int)breakpoint["hit_count"];
 

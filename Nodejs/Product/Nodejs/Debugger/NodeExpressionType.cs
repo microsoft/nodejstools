@@ -16,9 +16,11 @@
 
 using System;
 
-namespace Microsoft.NodejsTools.Debugger {
+namespace Microsoft.NodejsTools.Debugger
+{
     [Flags]
-    enum NodeExpressionType {
+    internal enum NodeExpressionType
+    {
         None = 0,
 
         /// <summary>

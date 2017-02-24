@@ -20,29 +20,36 @@ using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
     [Export(typeof(IReplCommand))]
-    class CancelExecutionCommand : IReplCommand {
+    internal class CancelExecutionCommand : IReplCommand
+    {
         #region IReplCommand Members
 
-        public Task<ExecutionResult> Execute(IReplWindow window, string arguments) {
+        public Task<ExecutionResult> Execute(IReplWindow window, string arguments)
+        {
             window.AbortCommand();
             return ExecutionResult.Succeeded;
         }
 
-        public string Description {
+        public string Description
+        {
             get { return "Stops execution of the current command."; }
         }
 
-        public string Command {
+        public string Command
+        {
             get { return null; }
         }
 
-        public object ButtonContent {
-            get {
+        public object ButtonContent
+        {
+            get
+            {
                 var image = new BitmapImage();
                 image.BeginInit();
                 image.StreamSource = Assembly.GetExecutingAssembly().GetManifestResourceStream("Microsoft.VisualStudio.Resources.CancelEvaluation.gif");

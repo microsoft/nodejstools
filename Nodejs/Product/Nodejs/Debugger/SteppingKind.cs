@@ -14,8 +14,10 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Debugger {
-    enum SteppingKind {
+namespace Microsoft.NodejsTools.Debugger
+{
+    internal enum SteppingKind
+    {
         None = 0,
         Over,
         Into,

@@ -16,9 +16,12 @@
 
 using System;
 
-namespace Microsoft.NodejsTools.Jade {
-    static class TimeUtility {
-        public static int MillisecondsSince(DateTime since) {
+namespace Microsoft.NodejsTools.Jade
+{
+    internal static class TimeUtility
+    {
+        public static int MillisecondsSince(DateTime since)
+        {
             var diff = DateTime.Now - since;
             return (int)diff.TotalMilliseconds;
         }

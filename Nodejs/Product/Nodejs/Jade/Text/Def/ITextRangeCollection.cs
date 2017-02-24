@@ -16,11 +16,13 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.NodejsTools.Jade {
+namespace Microsoft.NodejsTools.Jade
+{
     /// <summary>
     /// Represents collection of ITextRange items
     /// </summary>
-    interface ITextRangeCollection<T> : ICompositeTextRange, IEnumerable<T> {
+    internal interface ITextRangeCollection<T> : ICompositeTextRange, IEnumerable<T>
+    {
         /// <summary>
         /// Number of items in collection
         /// </summary>

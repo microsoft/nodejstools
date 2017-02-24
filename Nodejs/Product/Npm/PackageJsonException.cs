@@ -17,9 +17,11 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Microsoft.NodejsTools.Npm {
+namespace Microsoft.NodejsTools.Npm
+{
     [Serializable]
-    public class PackageJsonException : Exception, ISerializable {
+    public class PackageJsonException : Exception, ISerializable
+    {
         public PackageJsonException() { }
         public PackageJsonException(string message) : base(message) { }
         public PackageJsonException(string message, Exception innerException) : base(message, innerException) { }

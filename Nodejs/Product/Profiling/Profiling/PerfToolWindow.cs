@@ -20,21 +20,25 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace Microsoft.NodejsTools.Profiling {
+namespace Microsoft.NodejsTools.Profiling
+{
     [Guid(WindowGuid)]
-    class PerfToolWindow : ToolWindowPane {
+    internal class PerfToolWindow : ToolWindowPane
+    {
         internal const string Title = "Node.js Performance";
         internal const string WindowGuid = "FB2AB212-5D1F-4101-A442-2231B4195E97";
         private SessionsNode _sessions;
         internal static PerfToolWindow Instance;
 
-        public PerfToolWindow() {
+        public PerfToolWindow()
+        {
             ToolClsid = Guids.VsUIHierarchyWindow;
             Caption = Title;
             Instance = this;
         }
 
-        public override void OnToolWindowCreated() {
+        public override void OnToolWindowCreated()
+        {
             base.OnToolWindowCreated();
 
             var frame = (IVsWindowFrame)Frame;
@@ -61,8 +65,10 @@ namespace Microsoft.NodejsTools.Profiling {
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(tbh.AddToolbar(VSTWT_LOCATION.VSTWT_TOP, ref guidPerfMenuGroup, PkgCmdIDList.menuIdPerfToolbar));
         }
 
-        public SessionsNode Sessions {
-            get {
+        public SessionsNode Sessions
+        {
+            get
+            {
                 return _sessions;
             }
         }

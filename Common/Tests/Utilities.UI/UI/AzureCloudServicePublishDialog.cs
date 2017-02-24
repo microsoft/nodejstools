@@ -18,18 +18,23 @@ using System.Threading.Tasks;
 using System.Windows.Automation;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace TestUtilities.UI {
-    public class AzureCloudServicePublishDialog : AutomationDialog {
+namespace TestUtilities.UI
+{
+    public class AzureCloudServicePublishDialog : AutomationDialog
+    {
         public AzureCloudServicePublishDialog(VisualStudioApp app, AutomationElement element)
-            : base(app, element) {
+            : base(app, element)
+        {
         }
 
-        public static AzureCloudServicePublishDialog FromDte(VisualStudioApp app) {
+        public static AzureCloudServicePublishDialog FromDte(VisualStudioApp app)
+        {
             var publishDialogHandle = app.OpenDialogWithDteExecuteCommand("Build.PublishSelection");
             return new AzureCloudServicePublishDialog(app, AutomationElement.FromHandle(publishDialogHandle));
         }
 
-        public AzureManageSubscriptionsDialog SelectManageSubscriptions() {
+        public AzureManageSubscriptionsDialog SelectManageSubscriptions()
+        {
             WaitForInputIdle();
 
             // <Manage...> is different from other list item, selecting it 
@@ -41,7 +46,8 @@ namespace TestUtilities.UI {
             return new AzureManageSubscriptionsDialog(App, AutomationElement.FromHandle(App.WaitForDialogToReplace(Element)));
         }
 
-        public AzureCloudServiceCreateDialog SelectCreateNewService() {
+        public AzureCloudServiceCreateDialog SelectCreateNewService()
+        {
             WaitForInputIdle();
 
             // <Create New...> is different from other list item, selecting it 
@@ -53,7 +59,8 @@ namespace TestUtilities.UI {
             return new AzureCloudServiceCreateDialog(App, AutomationElement.FromHandle(App.WaitForDialogToReplace(Element)));
         }
 
-        public void ClickPublish() {
+        public void ClickPublish()
+        {
             // Wait for the publish button to be enabled
             // It will not be enabled until all combo boxes have a valid
             // selection, such as the storage account combo box.
@@ -63,25 +70,32 @@ namespace TestUtilities.UI {
             WaitForClosed(TimeSpan.FromSeconds(10.0), () => PublishButton.Click());
         }
 
-        public void ClickNext() {
+        public void ClickNext()
+        {
             WaitForInputIdle();
             WaitForClosed(TimeSpan.FromSeconds(10.0), () => ClickButtonByAutomationId("PART_NextCommandSource"));
         }
 
-        private Button PublishButton {
-            get {
+        private Button PublishButton
+        {
+            get
+            {
                 return new Button(FindByAutomationId("PART_FinishCommandSource"));
             }
         }
 
-        private ComboBox AccountComboBox {
-            get {
+        private ComboBox AccountComboBox
+        {
+            get
+            {
                 return new ComboBox(FindByAutomationId("accountCombo"));
             }
         }
 
-        private ComboBox ServiceComboBox {
-            get {
+        private ComboBox ServiceComboBox
+        {
+            get
+            {
                 return new ComboBox(FindByAutomationId("ServiceComboBox"));
             }
         }

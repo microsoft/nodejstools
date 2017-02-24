@@ -33,28 +33,34 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.WindowsAzure.Authentication;
 
-namespace Microsoft.VisualStudio.Web.WindowsAzure.Contracts.Shims {
-    internal class ContractShim<T> {
+namespace Microsoft.VisualStudio.Web.WindowsAzure.Contracts.Shims
+{
+    internal class ContractShim<T>
+    {
         private static readonly Assembly contractAssembly = Assembly.Load("Microsoft.VisualStudio.Web.WindowsAzure.Contracts, Version=2.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a");
         private static readonly Type _interface;
         private readonly object _impl;
 
-        static ContractShim() {
+        static ContractShim()
+        {
             string shimName = typeof(T).FullName;
             Debug.Assert(shimName.StartsWith("Microsoft.VisualStudio.Web.WindowsAzure.Contracts.Shims.", StringComparison.Ordinal));
             string realName = shimName.Replace(".Shims.", ".");
             _interface = contractAssembly.GetType(realName, throwOnError: true);
         }
 
-        protected ContractShim(object impl) {
+        protected ContractShim(object impl)
+        {
             _impl = impl;
         }
 
-        public static bool CanShim(object impl) {
+        public static bool CanShim(object impl)
+        {
             return impl != null && impl.GetType().GetInterfaces().Contains(_interface);
         }
 
-        private object InvokeByName(string name, object[] args) {
+        private object InvokeByName(string name, object[] args)
+        {
             Type[] types = args != null ?
                 args.Select(arg => { return arg.GetType(); }).ToArray() :
                 new Type[] { };
@@ -64,42 +70,54 @@ namespace Microsoft.VisualStudio.Web.WindowsAzure.Contracts.Shims {
                 .Select(t => t.GetMethod(name, types))
                 .Where(m => m != null)
                 .FirstOrDefault();
-            if (method == null) {
+            if (method == null)
+            {
                 throw new MissingMethodException(_interface.FullName, name);
             }
-            try {
+            try
+            {
                 return method.Invoke(_impl, args);
-            } catch (TargetInvocationException tex) {
+            }
+            catch (TargetInvocationException tex)
+            {
                 ExceptionDispatchInfo.Capture(tex.InnerException ?? tex).Throw();
                 return null;
             }
         }
 
-        protected object Invoke([CallerMemberName] string name = null) {
+        protected object Invoke([CallerMemberName] string name = null)
+        {
             return InvokeByName(name, null);
         }
 
-        protected object Invoke(object arg1, [CallerMemberName] string name = null) {
+        protected object Invoke(object arg1, [CallerMemberName] string name = null)
+        {
             return InvokeByName(name, new[] { arg1 });
         }
 
-        protected object Invoke(object arg1, object arg2, [CallerMemberName] string name = null) {
+        protected object Invoke(object arg1, object arg2, [CallerMemberName] string name = null)
+        {
             return InvokeByName(name, new[] { arg1, arg2 });
         }
 
-        protected object Get([CallerMemberName] string name = null) {
+        protected object Get([CallerMemberName] string name = null)
+        {
             var prop =
                 new[] { _interface }
                 .Concat(_interface.GetInterfaces())
                 .Select(t => t.GetProperty(name))
                 .Where(p => p != null)
                 .FirstOrDefault();
-            if (prop == null) {
+            if (prop == null)
+            {
                 throw new MissingMemberException(_interface.FullName, name);
             }
-            try {
+            try
+            {
                 return prop.GetValue(_impl);
-            } catch (TargetInvocationException tex) {
+            }
+            catch (TargetInvocationException tex)
+            {
                 ExceptionDispatchInfo.Capture(tex.InnerException ?? tex).Throw();
                 return null;
             }
@@ -107,33 +125,42 @@ namespace Microsoft.VisualStudio.Web.WindowsAzure.Contracts.Shims {
     }
 
     [Guid("D756EDAE-0998-42AA-AA02-6B4FD029E731")]
-    internal interface IVsAzureServices {
+    internal interface IVsAzureServices
+    {
         IAzureWebSitesService GetAzureWebSitesService();
     }
 
-    internal class VsAzureServicesShim : ContractShim<IVsAzureServices>, IVsAzureServices {
+    internal class VsAzureServicesShim : ContractShim<IVsAzureServices>, IVsAzureServices
+    {
         public VsAzureServicesShim(object impl)
-            : base(impl) {
+            : base(impl)
+        {
         }
 
-        public IAzureWebSitesService GetAzureWebSitesService() {
+        public IAzureWebSitesService GetAzureWebSitesService()
+        {
             return new AzureWebSitesServiceShim(Invoke());
         }
     }
 
-    internal interface IAzureService {
+    internal interface IAzureService
+    {
         Task<List<IAzureSubscription>> GetSubscriptionsAsync();
     }
 
-    internal interface IAzureWebSitesService : IAzureService {
+    internal interface IAzureWebSitesService : IAzureService
+    {
     }
 
-    internal class AzureWebSitesServiceShim : ContractShim<IAzureWebSitesService>, IAzureWebSitesService {
+    internal class AzureWebSitesServiceShim : ContractShim<IAzureWebSitesService>, IAzureWebSitesService
+    {
         public AzureWebSitesServiceShim(object impl)
-            : base(impl) {
+            : base(impl)
+        {
         }
-        
-        public Task<List<IAzureSubscription>> GetSubscriptionsAsync() {
+
+        public Task<List<IAzureSubscription>> GetSubscriptionsAsync()
+        {
             return ((Task)Invoke()).ContinueWith(task =>
                 ((IEnumerable<object>)((dynamic)task).Result)
                 .Select(item => (IAzureSubscription)new AzureSubscriptionShim(item))
@@ -142,31 +169,38 @@ namespace Microsoft.VisualStudio.Web.WindowsAzure.Contracts.Shims {
         }
     }
 
-    internal interface IAzureSubscription {
+    internal interface IAzureSubscription
+    {
         string SubscriptionId { get; }
         Uri ServiceManagementEndpointUri { get; }
         IAzureSubscriptionContext AzureCredentials { get; }
         Task<List<IAzureResource>> GetResourcesAsync(bool refresh);
     }
 
-    internal class AzureSubscriptionShim : ContractShim<IAzureSubscription>, IAzureSubscription {
+    internal class AzureSubscriptionShim : ContractShim<IAzureSubscription>, IAzureSubscription
+    {
         public AzureSubscriptionShim(object impl)
-            : base(impl) {
+            : base(impl)
+        {
         }
 
-        public string SubscriptionId {
+        public string SubscriptionId
+        {
             get { return (string)Get(); }
         }
 
-        public Uri ServiceManagementEndpointUri {
+        public Uri ServiceManagementEndpointUri
+        {
             get { return (Uri)Get(); }
         }
 
-        public IAzureSubscriptionContext AzureCredentials {
+        public IAzureSubscriptionContext AzureCredentials
+        {
             get { return (IAzureSubscriptionContext)Get(); }
         }
 
-        public Task<List<IAzureResource>> GetResourcesAsync(bool refresh) {
+        public Task<List<IAzureResource>> GetResourcesAsync(bool refresh)
+        {
             // The caller will only use websites from this list, and we don't
             // want to shim other resource types, so filter them out.
             return ((Task)Invoke(refresh)).ContinueWith(task =>
@@ -178,29 +212,36 @@ namespace Microsoft.VisualStudio.Web.WindowsAzure.Contracts.Shims {
         }
     }
 
-    internal interface IAzureResource {
+    internal interface IAzureResource
+    {
         string Name { get; }
     }
 
-    internal interface IAzureWebSite : IAzureResource {
+    internal interface IAzureWebSite : IAzureResource
+    {
         string WebSpace { get; }
         string BrowseURL { get; }
     }
 
-    internal class AzureWebSiteShim : ContractShim<IAzureWebSite>, IAzureWebSite {
+    internal class AzureWebSiteShim : ContractShim<IAzureWebSite>, IAzureWebSite
+    {
         public AzureWebSiteShim(object impl)
-            : base(impl) {
+            : base(impl)
+        {
         }
 
-        public string WebSpace {
+        public string WebSpace
+        {
             get { return (string)Get(); }
         }
 
-        public string BrowseURL {
+        public string BrowseURL
+        {
             get { return (string)Get(); }
         }
 
-        public string Name {
+        public string Name
+        {
             get { return (string)Get(); }
         }
     }

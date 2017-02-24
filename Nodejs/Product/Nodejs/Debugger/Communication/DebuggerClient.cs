@@ -26,18 +26,22 @@ using Microsoft.NodejsTools.Debugger.Events;
 using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.NodejsTools.Debugger.Communication {
-    sealed class DebuggerClient : IDebuggerClient {
+namespace Microsoft.NodejsTools.Debugger.Communication
+{
+    internal sealed class DebuggerClient : IDebuggerClient
+    {
         private readonly IDebuggerConnection _connection;
 
         private ConcurrentDictionary<int, TaskCompletionSource<JObject>> _messages =
             new ConcurrentDictionary<int, TaskCompletionSource<JObject>>();
 
-        private readonly static Newtonsoft.Json.JsonSerializerSettings jsonSettings = new Newtonsoft.Json.JsonSerializerSettings() {
+        private readonly static Newtonsoft.Json.JsonSerializerSettings jsonSettings = new Newtonsoft.Json.JsonSerializerSettings()
+        {
             DateParseHandling = Newtonsoft.Json.DateParseHandling.None
         };
 
-        public DebuggerClient(IDebuggerConnection connection) {
+        public DebuggerClient(IDebuggerConnection connection)
+        {
             Utilities.ArgumentNotNull("connection", connection);
 
             _connection = connection;
@@ -50,10 +54,12 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         /// </summary>
         /// <param name="command">Command.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        public async Task SendRequestAsync(DebuggerCommand command, CancellationToken cancellationToken = new CancellationToken()) {
+        public async Task SendRequestAsync(DebuggerCommand command, CancellationToken cancellationToken = new CancellationToken())
+        {
             cancellationToken.ThrowIfCancellationRequested();
 
-            try {
+            try
+            {
                 TaskCompletionSource<JObject> promise = _messages.GetOrAdd(command.Id, i => new TaskCompletionSource<JObject>());
                 _connection.SendMessage(command.ToString());
                 cancellationToken.ThrowIfCancellationRequested();
@@ -64,7 +70,9 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                 cancellationToken.ThrowIfCancellationRequested();
 
                 command.ProcessResponse(response);
-            } finally {
+            }
+            finally
+            {
                 TaskCompletionSource<JObject> promise;
                 _messages.TryRemove(command.Id, out promise);
             }
@@ -78,11 +86,17 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         /// This is intended to be used primarily with fire-and-forget async void methods that run on threadpool threads and cannot leak those exceptions
         /// without crashing the process.
         /// </remarks>
-        public static async void RunWithRequestExceptionsHandled(Func<Task> action) {
-            try {
+        public static async void RunWithRequestExceptionsHandled(Func<Task> action)
+        {
+            try
+            {
                 await action().ConfigureAwait(false);
-            } catch (IOException) {
-            } catch (OperationCanceledException) {
+            }
+            catch (IOException)
+            {
+            }
+            catch (OperationCanceledException)
+            {
             }
         }
 
@@ -106,9 +120,11 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         /// </summary>
         /// <param name="sender">Sender.</param>
         /// <param name="e">Event arguments.</param>
-        private void OnConnectionClosed(object sender, EventArgs e) {
+        private void OnConnectionClosed(object sender, EventArgs e)
+        {
             ConcurrentDictionary<int, TaskCompletionSource<JObject>> messages = Interlocked.Exchange(ref _messages, new ConcurrentDictionary<int, TaskCompletionSource<JObject>>());
-            foreach (var kv in messages) {
+            foreach (var kv in messages)
+            {
                 var exception = new IOException(Resources.DebuggerConnectionClosed);
                 kv.Value.SetException(exception);
             }
@@ -121,11 +137,13 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         /// </summary>
         /// <param name="sender">Sender.</param>
         /// <param name="args">Event arguments.</param>
-        private void OnOutputMessage(object sender, MessageEventArgs args) {
+        private void OnOutputMessage(object sender, MessageEventArgs args)
+        {
             var message = Newtonsoft.Json.JsonConvert.DeserializeObject<JObject>(args.Message, jsonSettings);
             var messageType = (string)message["type"];
 
-            switch (messageType) {
+            switch (messageType)
+            {
                 case "event":
                     HandleEventMessage(message);
                     break;
@@ -144,12 +162,15 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         /// Handles event message.
         /// </summary>
         /// <param name="message">Message.</param>
-        private void HandleEventMessage(JObject message) {
+        private void HandleEventMessage(JObject message)
+        {
             var eventType = (string)message["event"];
-            switch (eventType) {
+            switch (eventType)
+            {
                 case "afterCompile":
                     EventHandler<CompileScriptEventArgs> compileScriptHandler = CompileScriptEvent;
-                    if (compileScriptHandler != null) {
+                    if (compileScriptHandler != null)
+                    {
                         var compileScriptEvent = new CompileScriptEvent(message);
                         compileScriptHandler(this, new CompileScriptEventArgs(compileScriptEvent));
                     }
@@ -157,7 +178,8 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
 
                 case "break":
                     EventHandler<BreakpointEventArgs> breakpointHandler = BreakpointEvent;
-                    if (breakpointHandler != null) {
+                    if (breakpointHandler != null)
+                    {
                         var breakpointEvent = new BreakpointEvent(message);
                         breakpointHandler(this, new BreakpointEventArgs(breakpointEvent));
                     }
@@ -165,7 +187,8 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
 
                 case "exception":
                     EventHandler<ExceptionEventArgs> exceptionHandler = ExceptionEvent;
-                    if (exceptionHandler != null) {
+                    if (exceptionHandler != null)
+                    {
                         var exceptionEvent = new ExceptionEvent(message);
                         exceptionHandler(this, new ExceptionEventArgs(exceptionEvent));
                     }
@@ -188,13 +211,17 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         /// Handles response message.
         /// </summary>
         /// <param name="message">Message.</param>
-        private void HandleResponseMessage(JObject message) {
+        private void HandleResponseMessage(JObject message)
+        {
             TaskCompletionSource<JObject> promise;
             var messageId = (int)message["request_seq"];
 
-            if (_messages.TryGetValue(messageId, out promise)) {
+            if (_messages.TryGetValue(messageId, out promise))
+            {
                 promise.SetResult(message);
-            } else {
+            }
+            else
+            {
                 Debug.Fail(string.Format(CultureInfo.CurrentCulture, "Invalid response identifier '{0}'", messageId));
             }
         }

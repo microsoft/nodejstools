@@ -17,20 +17,23 @@
 using System;
 using Microsoft.VisualStudio.Text;
 
-namespace Microsoft.NodejsTools.Jade {
+namespace Microsoft.NodejsTools.Jade
+{
     /// <summary>
     /// Text provider that implements ITextProvider over Visual Studio 
     /// core editor's ITextBuffer or ITextSnapshot 
     /// </summary>
-    class TextProvider : ITextProvider, ITextSnapshotProvider {
+    internal class TextProvider : ITextProvider, ITextSnapshotProvider
+    {
         static public int BlockLength = 16384;
 
-        string _cachedBlock;
-        int _basePosition;
-        ITextSnapshot _snapshot;
-        bool _partial = false;
+        private string _cachedBlock;
+        private int _basePosition;
+        private ITextSnapshot _snapshot;
+        private bool _partial = false;
 
-        public TextProvider(ITextSnapshot snapshot, bool partial = false) {
+        public TextProvider(ITextSnapshot snapshot, bool partial = false)
+        {
             _snapshot = snapshot;
             Length = _snapshot.Length;
             _partial = partial;
@@ -38,11 +41,13 @@ namespace Microsoft.NodejsTools.Jade {
             UpdateCachedBlock(0, partial ? BlockLength : snapshot.Length);
         }
 
-        private void UpdateCachedBlock(int position, int length) {
+        private void UpdateCachedBlock(int position, int length)
+        {
             if (!_partial && _cachedBlock != null)
                 return;
 
-            if (_cachedBlock == null || position < _basePosition || (_basePosition + _cachedBlock.Length < position + length)) {
+            if (_cachedBlock == null || position < _basePosition || (_basePosition + _cachedBlock.Length < position + length))
+            {
                 length = Math.Max(length, BlockLength);
                 length = Math.Min(length, _snapshot.Length - position);
 
@@ -53,8 +58,10 @@ namespace Microsoft.NodejsTools.Jade {
 
         public int Length { get; private set; }
 
-        public char this[int position] {
-            get {
+        public char this[int position]
+        {
+            get
+            {
                 if (position < 0 || position >= Length)
                     return '\0';
 
@@ -63,41 +70,50 @@ namespace Microsoft.NodejsTools.Jade {
             }
         }
 
-        public string GetText(int position, int length) {
+        public string GetText(int position, int length)
+        {
             UpdateCachedBlock(position, length);
             return _cachedBlock.Substring(position - _basePosition, length);
         }
 
-        public string GetText(ITextRange range) {
+        public string GetText(ITextRange range)
+        {
             return GetText(range.Start, range.Length);
         }
 
-        public int IndexOf(string text, int startPosition, bool ignoreCase) {
+        public int IndexOf(string text, int startPosition, bool ignoreCase)
+        {
             return IndexOf(text, TextRange.FromBounds(startPosition, this.Length), ignoreCase);
         }
 
-        public int IndexOf(string text, ITextRange range, bool ignoreCase) {
-            for (int i = range.Start; i < range.End; i++) {
+        public int IndexOf(string text, ITextRange range, bool ignoreCase)
+        {
+            for (int i = range.Start; i < range.End; i++)
+            {
                 bool found = true;
                 int k = i;
                 int j;
 
-                for (j = 0; j < text.Length && k < range.End; j++, k++) {
+                for (j = 0; j < text.Length && k < range.End; j++, k++)
+                {
                     char ch1 = text[j];
                     char ch2 = this[k];
 
-                    if (ignoreCase) {
+                    if (ignoreCase)
+                    {
                         ch1 = Char.ToLowerInvariant(ch1);
                         ch2 = Char.ToLowerInvariant(ch2);
                     }
 
-                    if (ch1 != ch2) {
+                    if (ch1 != ch2)
+                    {
                         found = false;
                         break;
                     }
                 }
 
-                if (found && j == text.Length) {
+                if (found && j == text.Length)
+                {
                     return i;
                 }
             }
@@ -105,7 +121,8 @@ namespace Microsoft.NodejsTools.Jade {
             return -1;
         }
 
-        public bool CompareTo(int position, int length, string text, bool ignoreCase) {
+        public bool CompareTo(int position, int length, string text, bool ignoreCase)
+        {
             if (text.Length != length)
                 return false;
 
@@ -116,11 +133,13 @@ namespace Microsoft.NodejsTools.Jade {
                                   ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal) == 0;
         }
 
-        public ITextProvider Clone() {
+        public ITextProvider Clone()
+        {
             return new TextProvider(_snapshot, _partial);
         }
 
-        public int Version {
+        public int Version
+        {
             get { return _snapshot.Version.VersionNumber; }
         }
 
@@ -129,7 +148,8 @@ namespace Microsoft.NodejsTools.Jade {
 
         #region ITextSnapshotProvider
 
-        public ITextSnapshot Snapshot {
+        public ITextSnapshot Snapshot
+        {
             get { return _snapshot; }
         }
 

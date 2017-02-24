@@ -18,11 +18,14 @@ using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace NodejsTests.Debugger.Commands {
+namespace NodejsTests.Debugger.Commands
+{
     [TestClass]
-    public class ChangeLiveCommandTests {
+    public class ChangeLiveCommandTests
+    {
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateChangeLiveCommand() {
+        public void CreateChangeLiveCommand()
+        {
             // Arrange
             const int commandId = 3;
             const int moduleId = 5;
@@ -44,7 +47,8 @@ namespace NodejsTests.Debugger.Commands {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void ProcessChangeLiveResponse() {
+        public void ProcessChangeLiveResponse()
+        {
             // Arrange
             const int commandId = 3;
             const int moduleId = 5;

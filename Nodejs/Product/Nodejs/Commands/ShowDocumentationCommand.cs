@@ -18,13 +18,17 @@ using System;
 using System.Diagnostics;
 using Microsoft.VisualStudioTools;
 
-namespace Microsoft.NodejsTools.Commands {
-    internal sealed class ShowDocumentationCommand : Command {
-        public override void DoCommand(object sender, EventArgs args) {
+namespace Microsoft.NodejsTools.Commands
+{
+    internal sealed class ShowDocumentationCommand : Command
+    {
+        public override void DoCommand(object sender, EventArgs args)
+        {
             Process.Start(@"https://go.microsoft.com/fwlink/?linkid=785972");
         }
 
-        public override int CommandId {
+        public override int CommandId
+        {
             get { return (int)PkgCmdId.cmdidShowDocumentation; }
         }
     }

@@ -21,51 +21,68 @@ using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Imaging;
 
-namespace Microsoft.NodejsTools.Project {
-    class NodejsFileNode : CommonFileNode {
+namespace Microsoft.NodejsTools.Project
+{
+    internal class NodejsFileNode : CommonFileNode
+    {
         public NodejsFileNode(NodejsProjectNode root, ProjectElement e)
-            : base(root, e) {
+            : base(root, e)
+        {
         }
 
-        protected override void OnParentSet(HierarchyNode parent) {
-            if (ProjectMgr == null) {
+        protected override void OnParentSet(HierarchyNode parent)
+        {
+            if (ProjectMgr == null)
+            {
                 return;
             }
 
             if (Url.EndsWith(NodejsConstants.TypeScriptDeclarationExtension, StringComparison.OrdinalIgnoreCase)
-              && Url.StartsWith(Path.Combine(ProjectMgr.ProjectFolder, @"typings\"), StringComparison.OrdinalIgnoreCase)) {
-                ProjectMgr.Site.GetUIThread().Invoke(() => {
+              && Url.StartsWith(Path.Combine(ProjectMgr.ProjectFolder, @"typings\"), StringComparison.OrdinalIgnoreCase))
+            {
+                ProjectMgr.Site.GetUIThread().Invoke(() =>
+                {
                     this.IncludeInProject(true);
                 });
             }
         }
 
-        protected override ImageMoniker CodeFileIconMoniker {
-            get {
+        protected override ImageMoniker CodeFileIconMoniker
+        {
+            get
+            {
                 return KnownMonikers.JSScript;
             }
         }
 
-        internal override int IncludeInProject(bool includeChildren) {
-            if (!ItemNode.IsExcluded) {
+        internal override int IncludeInProject(bool includeChildren)
+        {
+            if (!ItemNode.IsExcluded)
+            {
                 return 0;
             }
 
             return base.IncludeInProject(includeChildren);
         }
 
-        protected override NodeProperties CreatePropertiesObject() {
-            if (IsLinkFile) {
+        protected override NodeProperties CreatePropertiesObject()
+        {
+            if (IsLinkFile)
+            {
                 return new NodejsLinkFileNodeProperties(this);
-            } else if (IsNonMemberItem) {
+            }
+            else if (IsNonMemberItem)
+            {
                 return new ExcludedFileNodeProperties(this);
             }
 
             return new NodejsIncludedFileNodeProperties(this);
         }
 
-        public new NodejsProjectNode ProjectMgr {
-            get {
+        public new NodejsProjectNode ProjectMgr
+        {
+            get
+            {
                 return (NodejsProjectNode)base.ProjectMgr;
             }
         }

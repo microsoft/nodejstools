@@ -17,14 +17,17 @@
 using System.Windows;
 using Microsoft.Win32;
 
-namespace Microsoft.NodejsTools.Profiling {
+namespace Microsoft.NodejsTools.Profiling
+{
     /// <summary>
     /// Interaction logic for LaunchProfiling.xaml
     /// </summary>
-    public partial class LaunchProfiling : DialogWindowVersioningWorkaround {
-        readonly ProfilingTargetView _viewModel;
+    public partial class LaunchProfiling : DialogWindowVersioningWorkaround
+    {
+        private readonly ProfilingTargetView _viewModel;
 
-        public LaunchProfiling(ProfilingTargetView viewModel) {
+        public LaunchProfiling(ProfilingTargetView viewModel)
+        {
             _viewModel = viewModel;
 
             InitializeComponent();
@@ -32,50 +35,61 @@ namespace Microsoft.NodejsTools.Profiling {
             DataContext = _viewModel;
         }
 
-        private void FindInterpreterClick(object sender, RoutedEventArgs e) {
+        private void FindInterpreterClick(object sender, RoutedEventArgs e)
+        {
             var standalone = _viewModel.Standalone;
-            if (standalone != null) {
+            if (standalone != null)
+            {
                 var dlg = new OpenFileDialog();
                 // TODO: Specify an OpenFileDialog filter for finding an interpreter to profile
                 dlg.CheckFileExists = true;
                 bool res = dlg.ShowDialog() ?? false;
-                if (res) {
+                if (res)
+                {
                     standalone.InterpreterPath = dlg.FileName;
                 }
             }
         }
 
-        private void FindScriptClick(object sender, RoutedEventArgs e) {
+        private void FindScriptClick(object sender, RoutedEventArgs e)
+        {
             var standalone = _viewModel.Standalone;
-            if (standalone != null) {
+            if (standalone != null)
+            {
                 var dlg = new OpenFileDialog();
                 // TODO: Specify an OpenFileDialog filter for finding a script to profile
                 dlg.CheckFileExists = true;
                 bool res = dlg.ShowDialog() ?? false;
-                if (res) {
+                if (res)
+                {
                     standalone.ScriptPath = dlg.FileName;
                 }
             }
         }
 
-        private void FindWorkingDirectoryClick(object sender, RoutedEventArgs e) {
+        private void FindWorkingDirectoryClick(object sender, RoutedEventArgs e)
+        {
             var standalone = _viewModel.Standalone;
-            if (standalone != null) {
+            if (standalone != null)
+            {
                 var dlg = new System.Windows.Forms.FolderBrowserDialog();
                 dlg.SelectedPath = standalone.WorkingDirectory;
                 var res = dlg.ShowDialog();
-                if (res == System.Windows.Forms.DialogResult.OK) {
+                if (res == System.Windows.Forms.DialogResult.OK)
+                {
                     standalone.WorkingDirectory = dlg.SelectedPath;
                 }
             }
         }
 
-        private void OkClick(object sender, RoutedEventArgs e) {
+        private void OkClick(object sender, RoutedEventArgs e)
+        {
             this.DialogResult = true;
             Close();
         }
 
-        private void CancelClick(object sender, RoutedEventArgs e) {
+        private void CancelClick(object sender, RoutedEventArgs e)
+        {
             this.DialogResult = false;
             Close();
         }

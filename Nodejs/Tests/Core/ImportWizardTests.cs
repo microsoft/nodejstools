@@ -25,18 +25,23 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
 using TestUtilities.Nodejs;
 
-namespace NodejsTests {
+namespace NodejsTests
+{
     [TestClass]
-    public class ImportWizardTests {
+    public class ImportWizardTests
+    {
         [ClassInitialize]
-        public static void DoDeployment(TestContext context) {
+        public static void DoDeployment(TestContext context)
+        {
             AssertListener.Initialize();
             NodejsTestData.Deploy();
         }
 
         [TestMethod, Priority(0)]
-        public void ImportWizardSimple() {
-            DispatcherTest(async () => {
+        public void ImportWizardSimple()
+        {
+            DispatcherTest(async () =>
+            {
                 var settings = new ImportSettings();
 
                 settings.SourcePath = TestData.GetPath("TestData\\HelloWorld\\");
@@ -60,8 +65,10 @@ namespace NodejsTests {
 
         [Ignore]
         [TestMethod, Priority(0)]
-        public void ImportWizardSimpleApp() {
-            DispatcherTest(async () => {                
+        public void ImportWizardSimpleApp()
+        {
+            DispatcherTest(async () =>
+            {
                 var settings = new ImportSettings();
 
                 settings.SourcePath = TestData.GetPath("TestData\\HelloWorldApp\\");
@@ -85,8 +92,10 @@ namespace NodejsTests {
 
         [Ignore]
         [TestMethod, Priority(0)]
-        public void ImportWizardSimpleOther() {
-            DispatcherTest(async () => {
+        public void ImportWizardSimpleOther()
+        {
+            DispatcherTest(async () =>
+            {
                 var settings = new ImportSettings();
 
                 settings.SourcePath = TestData.GetPath("TestData\\HelloWorldOther\\");
@@ -110,7 +119,8 @@ namespace NodejsTests {
 
         [Ignore]
         [TestMethod, Priority(0)]
-        public void ImportWizardFiltered() {
+        public void ImportWizardFiltered()
+        {
             var settings = new ImportSettings();
 
             settings.SourcePath = TestData.GetPath("TestData\\HelloWorld\\");
@@ -129,7 +139,8 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0)]
-        public void ImportWizardFolders() {
+        public void ImportWizardFolders()
+        {
             var settings = new ImportSettings();
 
             settings.SourcePath = TestData.GetPath("TestData\\HelloWorld2\\");
@@ -155,7 +166,8 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0)]
-        public void ImportWizardStartupFile() {
+        public void ImportWizardStartupFile()
+        {
             var settings = new ImportSettings();
 
             settings.SourcePath = TestData.GetPath("TestData\\HelloWorld\\");
@@ -172,7 +184,8 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0)]
-        public void ImportWizardExcludeNodeModules() {
+        public void ImportWizardExcludeNodeModules()
+        {
             var settings = new ImportSettings();
 
             settings.SourcePath = TestData.GetPath("TestData\\HelloWorld3\\");
@@ -190,7 +203,8 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0)]
-        public void ImportWizardExcludeDotPrefixedFolders() {
+        public void ImportWizardExcludeDotPrefixedFolders()
+        {
             var settings = new ImportSettings();
 
             settings.SourcePath = TestData.GetPath("TestData\\HelloWorld5\\");
@@ -214,7 +228,8 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0)]
-        public void ImportWizardEmptyFolders() {
+        public void ImportWizardEmptyFolders()
+        {
             var settings = new ImportSettings();
 
             settings.SourcePath = TestData.GetPath("TestData\\HelloWorld4");
@@ -232,7 +247,8 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0)]
-        public void ImportWizardExcludeBowerComponents() {
+        public void ImportWizardExcludeBowerComponents()
+        {
             var settings = new ImportSettings();
 
             settings.SourcePath = TestData.GetPath("TestData\\HelloWorld6");
@@ -250,8 +266,10 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0)]
-        public void ProjectFileAlreadyExists() {
-            DispatcherTest(async () => {
+        public void ProjectFileAlreadyExists()
+        {
+            DispatcherTest(async () =>
+            {
                 var settings = new ImportSettings();
 
                 settings.SourcePath = TestData.GetPath("TestData\\HelloWorld3");
@@ -263,7 +281,8 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0)]
-        public void ImportWizardTypeScript() {
+        public void ImportWizardTypeScript()
+        {
             var settings = new ImportSettings();
 
             settings.SourcePath = TestData.GetPath("TestData\\HelloWorldTypeScript\\");
@@ -291,13 +310,15 @@ namespace NodejsTests {
         /// any actual message processing occur.
         /// </summary>
         /// <param name="testCase"></param>
-        private static void DispatcherTest(Action testCase) {
+        private static void DispatcherTest(Action testCase)
+        {
             var window = new Window();
             window.ShowInTaskbar = false;
             window.MaxHeight = 0;
             window.MaxWidth = 0;
             window.WindowStyle = WindowStyle.None;
-            window.Activated += (sender, args) => {
+            window.Activated += (sender, args) =>
+            {
                 testCase();
                 window.Close();
             };

@@ -19,20 +19,25 @@ using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.Utilities;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
 
     [Export(typeof(IClassifierProvider)), ContentType(ReplConstants.ReplContentTypeName)]
-    class ReplAggregateClassifierProvider : IClassifierProvider {
-        [Import] private IBufferGraphFactoryService _bufferGraphFact = null; // set via MEF
+    internal class ReplAggregateClassifierProvider : IClassifierProvider
+    {
+        [Import]
+        private IBufferGraphFactoryService _bufferGraphFact = null; // set via MEF
 
         #region IClassifierProvider Members
 
-        public IClassifier GetClassifier(ITextBuffer textBuffer) {
+        public IClassifier GetClassifier(ITextBuffer textBuffer)
+        {
             ReplAggregateClassifier res;
-            if (!textBuffer.Properties.TryGetProperty<ReplAggregateClassifier>(typeof(ReplAggregateClassifier), out res)) {
+            if (!textBuffer.Properties.TryGetProperty<ReplAggregateClassifier>(typeof(ReplAggregateClassifier), out res))
+            {
                 res = new ReplAggregateClassifier(_bufferGraphFact, textBuffer);
                 textBuffer.Properties.AddProperty(typeof(ReplAggregateClassifier), res);
             }

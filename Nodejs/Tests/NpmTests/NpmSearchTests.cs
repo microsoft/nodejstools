@@ -24,13 +24,13 @@ using Microsoft.NodejsTools.Npm.SPI;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
 
-namespace NpmTests {
-
+namespace NpmTests
+{
     [TestClass]
     [DeploymentItem(@"TestData\NpmSearchData\", "NpmSearchData")]
     [DeploymentItem(@"sqlite3.dll")]
-    public class NpmSearchTests {
-
+    public class NpmSearchTests
+    {
         private const string PackageCacheAllJsonFilename = "packagecache.min.json";
         private const string PackageCacheSinceJsonFilename = "since_packages.object.json";
         private const string PackageCacheSinceJsonArrayFilename = "since_packages.array.json";
@@ -39,11 +39,13 @@ namespace NpmTests {
         private const string RegistryUrl = "http://registry.npmjs.org";
 
         [ClassInitialize]
-        public static void Init(TestContext context) {
+        public static void Init(TestContext context)
+        {
             AssertListener.Initialize();
         }
 
-        private TextReader GetCatalogueReader(string filename) {
+        private TextReader GetCatalogueReader(string filename)
+        {
             return new StreamReader(string.Format(@"NpmSearchData\{0}", filename));
         }
 
@@ -55,8 +57,8 @@ namespace NpmTests {
             string expectedPublishDateTime,
             SemverVersion expectedVersion,
             IEnumerable<SemverVersion> expectedVersions,
-            IEnumerable<string> expectedKeywords) {
-
+            IEnumerable<string> expectedKeywords)
+        {
             Assert.AreEqual(expectedName, package.Name, "Invalid name.");
             Assert.AreEqual(expectedDescription, package.Description, "Invalid description.");
             string actualAuthorString = null == package.Author ? null : package.Author.Name;
@@ -79,7 +81,8 @@ namespace NpmTests {
             string expectedPublishDateTime,
             SemverVersion expectedVersion,
             IEnumerable<SemverVersion> expectedVersions,
-            IEnumerable<string> expectedKeywords) {
+            IEnumerable<string> expectedKeywords)
+        {
             CheckPackage(
                 packagesByName[expectedName],
                 expectedName,
@@ -90,9 +93,12 @@ namespace NpmTests {
                 expectedVersions,
                 expectedKeywords);
 
-            if (expectedIndex >= 0) {
-                for (int index = 0, size = packages.Count; index < size; ++index ) {
-                    if (packages[index].Name == expectedName) {
+            if (expectedIndex >= 0)
+            {
+                for (int index = 0, size = packages.Count; index < size; ++index)
+                {
+                    if (packages[index].Name == expectedName)
+                    {
                         Assert.AreEqual(
                             expectedIndex,
                             index,
@@ -114,13 +120,15 @@ namespace NpmTests {
 
         private IList<IPackage> GetTestPackageList(
             string cachePath,
-            out IDictionary<string, IPackage> byName) {
+            out IDictionary<string, IPackage> byName)
+        {
             IList<IPackage> target = new NpmGetCatalogCommand(string.Empty, cachePath, false, RegistryUrl).GetCatalogPackagesAsync(string.Empty, new Uri(RegistryUrl)).GetAwaiter().GetResult().ToList();
 
             //  Do this after because package names can be split across multiple
             //  lines and therefore may change after the IPackage is initially created.
             IDictionary<string, IPackage> temp = new Dictionary<string, IPackage>();
-            foreach (var package in target ) {
+            foreach (var package in target)
+            {
                 temp[package.Name] = package;
             }
 
@@ -128,13 +136,15 @@ namespace NpmTests {
             return target;
         }
 
-        private IPackageCatalog GetTestPackageCatalog(string filename) {
+        private IPackageCatalog GetTestPackageCatalog(string filename)
+        {
             IDictionary<string, IPackage> byName;
             return new MockPackageCatalog(GetTestPackageList(filename, out byName));
         }
 
         [TestMethod, Priority(0)]
-        public void CheckDatabaseCreation() {
+        public void CheckDatabaseCreation()
+        {
             string databaseFilename = NpmGetCatalogCommand.DatabaseCacheFilename;
             string registryFilename = NpmGetCatalogCommand.RegistryCacheFilename;
             string cachePath = "CachePath";
@@ -147,7 +157,8 @@ namespace NpmTests {
             string relativeRegistryDatabaseFilename = Path.Combine(registryDirectory, registryFilename);
 
 
-            using (var reader = GetCatalogueReader(PackageCacheAllJsonFilename)) {
+            using (var reader = GetCatalogueReader(PackageCacheAllJsonFilename))
+            {
                 var getCatalogCommand = new NpmGetCatalogCommand(string.Empty, cachePath, false, RegistryUrl);
                 getCatalogCommand.CreateCatalogDatabaseAndInsertEntries(catalogDatabaseFilename, registryUrl, registryDirectory);
                 new NpmGetCatalogCommand(string.Empty, cachePath, false).ParseResultsAndAddToDatabase(reader, registryDatabaseFilename, registryUrl.ToString());
@@ -176,13 +187,15 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void CheckDatabaseUpdate() {
+        public void CheckDatabaseUpdate()
+        {
             string cachePath = "NpmCacheUpdate";
             string registryPath = Path.Combine(cachePath, "registry", NpmGetCatalogCommand.RegistryCacheFilename);
 
             FileUtils.CopyDirectory(PackageCacheDirectory, cachePath);
 
-            using (var reader = GetCatalogueReader(PackageCacheSinceJsonFilename)) {
+            using (var reader = GetCatalogueReader(PackageCacheSinceJsonFilename))
+            {
                 new NpmGetCatalogCommand(string.Empty, cachePath, false).ParseResultsAndAddToDatabase(reader, registryPath, RegistryUrl);
             }
 
@@ -223,17 +236,18 @@ namespace NpmTests {
                 },
                 Enumerable.Empty<string>()
                 );
-
         }
 
         [TestMethod, Priority(0)]
-        public void CheckDatabaseUpdateArray() {
+        public void CheckDatabaseUpdateArray()
+        {
             string cachePath = "NpmCacheUpdate";
             string registryPath = Path.Combine(cachePath, "registry", NpmGetCatalogCommand.RegistryCacheFilename);
 
             FileUtils.CopyDirectory(PackageCacheDirectory, cachePath);
 
-            using (var reader = GetCatalogueReader(PackageCacheSinceJsonArrayFilename)) {
+            using (var reader = GetCatalogueReader(PackageCacheSinceJsonArrayFilename))
+            {
                 new NpmGetCatalogCommand(string.Empty, cachePath, false).ParseResultsAndAddToDatabase(reader, registryPath, RegistryUrl);
             }
 
@@ -274,11 +288,11 @@ namespace NpmTests {
                 },
                 new[] { "sass", "css", "lint", "rules" }
                 );
-
         }
 
         [TestMethod, Priority(0)]
-        public void CheckPackageWithBuildPreReleaseInfo() {
+        public void CheckPackageWithBuildPreReleaseInfo()
+        {
             IDictionary<string, IPackage> byName;
             var target = GetTestPackageList(PackageCacheDirectory, out byName);
             CheckPackage(
@@ -299,11 +313,14 @@ namespace NpmTests {
         }
 
 
-        private void CheckSensibleNumberOfNonZeroVersions(ICollection<IPackage> target) {
+        private void CheckSensibleNumberOfNonZeroVersions(ICollection<IPackage> target)
+        {
             int sensibleVersionCount = 0;
             var zero = SemverVersion.Parse("0.0.0");
-            foreach (var package in target) {
-                if (package.Version != zero) {
+            foreach (var package in target)
+            {
+                if (package.Version != zero)
+                {
                     ++sensibleVersionCount;
                 }
             }
@@ -314,31 +331,41 @@ namespace NpmTests {
                 string.Format("There are only {0} packages with version numbers other than {1}", sensibleVersionCount, zero));
         }
 
-        private void CheckOnlyOneOfEachPackage(IEnumerable<IPackage> target) {
+        private void CheckOnlyOneOfEachPackage(IEnumerable<IPackage> target)
+        {
             var packageCounts = new Dictionary<string, IList<IPackage>>();
-            foreach (IPackage package in target) {
-                if (!packageCounts.ContainsKey(package.Name)) {
+            foreach (IPackage package in target)
+            {
+                if (!packageCounts.ContainsKey(package.Name))
+                {
                     packageCounts[package.Name] = new List<IPackage>();
                 }
                 packageCounts[package.Name].Add(package);
             }
 
             var moreThanOne = new List<IList<IPackage>>();
-            foreach (string name in packageCounts.Keys) {
-                if (packageCounts[name].Count > 1) {
+            foreach (string name in packageCounts.Keys)
+            {
+                if (packageCounts[name].Count > 1)
+                {
                     moreThanOne.Add(packageCounts[name]);
                 }
             }
 
-            if (moreThanOne.Count > 0) {
+            if (moreThanOne.Count > 0)
+            {
                 var buff = new StringBuilder();
-                foreach (var list in moreThanOne) {
-                    if (buff.Length > 0) {
+                foreach (var list in moreThanOne)
+                {
+                    if (buff.Length > 0)
+                    {
                         buff.Append(", ");
                     }
                     buff.Append("[");
-                    foreach (var package in list) {
-                        if (buff[buff.Length - 1] != '[') {
+                    foreach (var package in list)
+                    {
+                        if (buff[buff.Length - 1] != '[')
+                        {
                             buff.Append(", ");
                         }
                         buff.Append("{\"");
@@ -360,35 +387,40 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void CheckNonZeroPackageVersionsExist() {
+        public void CheckNonZeroPackageVersionsExist()
+        {
             IDictionary<string, IPackage> byName;
             var target = GetTestPackageList(PackageCacheDirectory, out byName);
             CheckSensibleNumberOfNonZeroVersions(target);
         }
 
         [TestMethod, Priority(0)]
-        public void CheckCorrectPackageCount() {
+        public void CheckCorrectPackageCount()
+        {
             IDictionary<string, IPackage> byName;
             var target = GetTestPackageList(PackageCacheDirectory, out byName);
             Assert.AreEqual(89924, target.Count, "Unexpected package count in catalogue list.");
         }
 
         [TestMethod, Priority(0)]
-        public void CheckNoDuplicatePackages() {
+        public void CheckNoDuplicatePackages()
+        {
             IDictionary<string, IPackage> byName;
             var target = GetTestPackageList(PackageCacheDirectory, out byName);
             CheckOnlyOneOfEachPackage(target);
         }
 
         [TestMethod, Priority(0)]
-        public void CheckListAndDictByNameSameSize() {
+        public void CheckListAndDictByNameSameSize()
+        {
             IDictionary<string, IPackage> byName;
             var target = GetTestPackageList(PackageCacheDirectory, out byName);
             Assert.AreEqual(target.Count, byName.Count, "Number of packages should be same in list and dictionary.");
         }
-        
+
         [TestMethod, Priority(0)]
-        public void CheckFirstPackageInCatalog() {
+        public void CheckFirstPackageInCatalog()
+        {
             IDictionary<string, IPackage> byName;
             var target = GetTestPackageList(PackageCacheDirectory, out byName);
             CheckPackage(
@@ -407,7 +439,8 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void CheckLastPackageInCatalog_zzz() {
+        public void CheckLastPackageInCatalog_zzz()
+        {
             IDictionary<string, IPackage> byName;
             var target = GetTestPackageList(PackageCacheDirectory, out byName);
             CheckPackage(
@@ -426,7 +459,8 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void CheckPackageEqualsInDescription() {
+        public void CheckPackageEqualsInDescription()
+        {
             IDictionary<string, IPackage> byName;
             var target = GetTestPackageList(PackageCacheDirectory, out byName);
             CheckPackage(
@@ -445,7 +479,8 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void CheckPackageNoDescriptionAuthorVersion() {
+        public void CheckPackageNoDescriptionAuthorVersion()
+        {
             IDictionary<string, IPackage> byName;
             var target = GetTestPackageList(PackageCacheDirectory, out byName);
 
@@ -463,7 +498,8 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void CheckPackageNoDescription() {
+        public void CheckPackageNoDescription()
+        {
             IDictionary<string, IPackage> byName;
             var target = GetTestPackageList(PackageCacheDirectory, out byName);
 
@@ -482,24 +518,33 @@ namespace NpmTests {
                 Enumerable.Empty<string>());
         }
 
-        private IList<IPackage> GetFilteredPackageList(string filterString) {
+        private IList<IPackage> GetFilteredPackageList(string filterString)
+        {
             var filter = new DatabasePackageCatalogFilter(PackageCacheFilename);
             return filter.Filter(filterString).ToList();
         }
 
         [TestMethod, Priority(0)]
-        public void FilterString() {
+        public void FilterString()
+        {
             const string filterString = "express";
             var results = GetFilteredPackageList(filterString);
             Assert.IsTrue(results.Count > 0, string.Format("Should be some filter results for '{0}'.", filterString));
-            foreach (var package in results) {
+            foreach (var package in results)
+            {
                 bool match = false;
-                if (package.Name.ToLower().Contains(filterString)) {
+                if (package.Name.ToLower().Contains(filterString))
+                {
                     match = true;
-                } else if (null != package.Description && package.Description.ToLower().Contains(filterString)) {
+                }
+                else if (null != package.Description && package.Description.ToLower().Contains(filterString))
+                {
                     match = true;
-                } else {
-                    if (package.Keywords.Any(keyword => keyword.ToLower().Contains(filterString))) {
+                }
+                else
+                {
+                    if (package.Keywords.Any(keyword => keyword.ToLower().Contains(filterString)))
+                    {
                         match = true;
                     }
                 }
@@ -510,7 +555,8 @@ namespace NpmTests {
 
         [Ignore]
         [TestMethod, Priority(0)]
-        public void FilterStringWithHyphens() {
+        public void FilterStringWithHyphens()
+        {
             const string
                 filterStringWithHyphenMiddle = "grunt-contrib",
                 filterStringWithHyphenSuffix = "amazing-",
@@ -527,17 +573,25 @@ namespace NpmTests {
             Assert.IsTrue(results.First().Name.Contains(filterStringWithHyphenPrefix), "Filter string match (including prefix) should be first");
         }
 
-        private void CheckRegexFilterResults(string filterString, IList<IPackage> results) {
+        private void CheckRegexFilterResults(string filterString, IList<IPackage> results)
+        {
             const string expectedMatch = "express";
             Assert.IsTrue(results.Count > 0, string.Format("Should be some filter results for '{0}'.", filterString));
-            foreach (var package in results) {
+            foreach (var package in results)
+            {
                 bool match = false;
-                if (package.Name.ToLower() == expectedMatch) {
+                if (package.Name.ToLower() == expectedMatch)
+                {
                     match = true;
-                } else if (null != package.Description && package.Description.ToLower() == expectedMatch) {
+                }
+                else if (null != package.Description && package.Description.ToLower() == expectedMatch)
+                {
                     match = true;
-                } else {
-                    if (package.Keywords.Any(keyword => keyword.ToLower() == expectedMatch)) {
+                }
+                else
+                {
+                    if (package.Keywords.Any(keyword => keyword.ToLower() == expectedMatch))
+                    {
                         match = true;
                     }
                 }
@@ -546,17 +600,20 @@ namespace NpmTests {
             }
         }
 
-        private void TestFilterRegex(string filterString) {
+        private void TestFilterRegex(string filterString)
+        {
             CheckRegexFilterResults(filterString, GetFilteredPackageList(filterString));
         }
 
         [TestMethod, Priority(0)]
-        public void FilterRegex() {
+        public void FilterRegex()
+        {
             TestFilterRegex("/^express$");
         }
 
         [TestMethod, Priority(0)]
-        public void FilterRegexTrailingSlash() {
+        public void FilterRegexTrailingSlash()
+        {
             TestFilterRegex("/^express$/");
         }
     }

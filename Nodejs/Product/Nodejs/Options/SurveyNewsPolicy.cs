@@ -14,8 +14,10 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Options {
-    public enum SurveyNewsPolicy {
+namespace Microsoft.NodejsTools.Options
+{
+    public enum SurveyNewsPolicy
+    {
         Disabled,
         CheckOnceDay,
         CheckOnceWeek,

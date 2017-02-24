@@ -21,7 +21,9 @@ using Microsoft.VisualStudio.Shell.Interop;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
 using Microsoft.VisualStudio;
-namespace Microsoft.NodejsTools.Repl {
+
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
@@ -48,9 +50,12 @@ namespace Microsoft.VisualStudio.Repl {
     [ProvideToolWindow(typeof(ReplWindow), Style = VsDockStyle.Linked, Orientation = ToolWindowOrientation.none, Window = ToolWindowGuids80.Outputwindow, MultiInstances = true)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [Guid(Guids.guidReplWindowPkgString)]
-    internal sealed class ReplWindowPackage : Package, IVsToolWindowFactory {
-        int IVsToolWindowFactory.CreateToolWindow(ref Guid toolWindowType, uint id) {
-            if (toolWindowType == typeof(ReplWindow).GUID) {
+    internal sealed class ReplWindowPackage : Package, IVsToolWindowFactory
+    {
+        int IVsToolWindowFactory.CreateToolWindow(ref Guid toolWindowType, uint id)
+        {
+            if (toolWindowType == typeof(ReplWindow).GUID)
+            {
                 var model = (IComponentModel)GetService(typeof(SComponentModel));
                 var replProvider = (ReplWindowProvider)model.GetService<IReplWindowProvider>();
 

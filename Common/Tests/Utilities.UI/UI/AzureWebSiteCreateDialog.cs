@@ -15,13 +15,17 @@
 using System;
 using System.Windows.Automation;
 
-namespace TestUtilities.UI {
-    public class AzureWebSiteCreateDialog : AutomationDialog {
+namespace TestUtilities.UI
+{
+    public class AzureWebSiteCreateDialog : AutomationDialog
+    {
         public AzureWebSiteCreateDialog(VisualStudioApp app, AutomationElement element)
-            : base(app, element) {
+            : base(app, element)
+        {
         }
 
-        public void ClickCreate() {
+        public void ClickCreate()
+        {
             // Wait for the create button to be enabled
             WaitFor(CreateButton, btn => btn.Element.Current.IsEnabled);
 
@@ -34,35 +38,45 @@ namespace TestUtilities.UI {
             WaitForClosed(TimeSpan.FromSeconds(180.0), () => CreateButton.Click());
         }
 
-        public string SiteName {
-            get {
+        public string SiteName
+        {
+            get
+            {
                 return GetSiteNameBox().GetValuePattern().Current.Value;
             }
-            set {
+            set
+            {
                 WaitForInputIdle();
                 GetSiteNameBox().GetValuePattern().SetValue(value);
             }
         }
 
-        private Button CreateButton {
-            get {
+        private Button CreateButton
+        {
+            get
+            {
                 return new Button(FindByName("Create"));
             }
         }
 
-        private ComboBox LocationComboBox {
-            get {
+        private ComboBox LocationComboBox
+        {
+            get
+            {
                 return new ComboBox(FindByAutomationId("_azureSiteLocation"));
             }
         }
 
-        private ComboBox DatabaseComboBox {
-            get {
+        private ComboBox DatabaseComboBox
+        {
+            get
+            {
                 return new ComboBox(FindByAutomationId("_azureDatabaseServer"));
             }
         }
 
-        private AutomationElement GetSiteNameBox() {
+        private AutomationElement GetSiteNameBox()
+        {
             return Element.FindFirst(TreeScope.Descendants,
                 new AndCondition(
                     new PropertyCondition(AutomationElement.AutomationIdProperty, "_azureSiteName"),

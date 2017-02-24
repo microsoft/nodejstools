@@ -17,28 +17,36 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Microsoft.NodejsTools.Debugger {
-    sealed class ExceptionHandler {
+namespace Microsoft.NodejsTools.Debugger
+{
+    internal sealed class ExceptionHandler
+    {
         private ExceptionHitTreatment _defaultExceptionTreatment = ExceptionHitTreatment.BreakNever;
         private Dictionary<string, ExceptionHitTreatment> _exceptionTreatments;
 
-        public ExceptionHandler() {
+        public ExceptionHandler()
+        {
             _exceptionTreatments = GetDefaultExceptionTreatments();
         }
 
-        public bool BreakOnAllExceptions {
-            get {
+        public bool BreakOnAllExceptions
+        {
+            get
+            {
                 return _defaultExceptionTreatment != ExceptionHitTreatment.BreakNever ||
                        _exceptionTreatments.Values.Any(value => value != ExceptionHitTreatment.BreakNever);
             }
         }
 
-        public bool SetExceptionTreatments(ICollection<KeyValuePair<string, ExceptionHitTreatment>> exceptionTreatments) {
+        public bool SetExceptionTreatments(ICollection<KeyValuePair<string, ExceptionHitTreatment>> exceptionTreatments)
+        {
             bool updated = false;
-            foreach (var exceptionTreatment in exceptionTreatments) {
+            foreach (var exceptionTreatment in exceptionTreatments)
+            {
                 ExceptionHitTreatment treatmentValue;
                 if (!_exceptionTreatments.TryGetValue(exceptionTreatment.Key, out treatmentValue) ||
-                    (exceptionTreatment.Value != treatmentValue)) {
+                    (exceptionTreatment.Value != treatmentValue))
+                {
                     _exceptionTreatments[exceptionTreatment.Key] = exceptionTreatment.Value;
                     updated = true;
                 }
@@ -46,11 +54,14 @@ namespace Microsoft.NodejsTools.Debugger {
             return updated;
         }
 
-        public bool ClearExceptionTreatments(ICollection<KeyValuePair<string, ExceptionHitTreatment>> exceptionTreatments) {
+        public bool ClearExceptionTreatments(ICollection<KeyValuePair<string, ExceptionHitTreatment>> exceptionTreatments)
+        {
             bool updated = false;
-            foreach (var exceptionTreatment in exceptionTreatments) {
+            foreach (var exceptionTreatment in exceptionTreatments)
+            {
                 ExceptionHitTreatment treatmentValue;
-                if (_exceptionTreatments.TryGetValue(exceptionTreatment.Key, out treatmentValue)) {
+                if (_exceptionTreatments.TryGetValue(exceptionTreatment.Key, out treatmentValue))
+                {
                     _exceptionTreatments.Remove(exceptionTreatment.Key);
                     updated = true;
                 }
@@ -58,38 +69,47 @@ namespace Microsoft.NodejsTools.Debugger {
             return updated;
         }
 
-        public bool ResetExceptionTreatments() {
+        public bool ResetExceptionTreatments()
+        {
             bool updated = false;
-            if (_exceptionTreatments.Values.Any(value => value != _defaultExceptionTreatment)) {
+            if (_exceptionTreatments.Values.Any(value => value != _defaultExceptionTreatment))
+            {
                 _exceptionTreatments = GetDefaultExceptionTreatments();
                 updated = true;
             }
             return updated;
         }
 
-        public bool SetDefaultExceptionHitTreatment(ExceptionHitTreatment exceptionTreatment) {
-            if (_defaultExceptionTreatment != exceptionTreatment) {
+        public bool SetDefaultExceptionHitTreatment(ExceptionHitTreatment exceptionTreatment)
+        {
+            if (_defaultExceptionTreatment != exceptionTreatment)
+            {
                 _defaultExceptionTreatment = exceptionTreatment;
                 return true;
             }
             return false;
         }
 
-        public ExceptionHitTreatment GetExceptionHitTreatment(string exceptionName) {
+        public ExceptionHitTreatment GetExceptionHitTreatment(string exceptionName)
+        {
             ExceptionHitTreatment exceptionTreatment;
-            if (!_exceptionTreatments.TryGetValue(exceptionName, out exceptionTreatment)) {
+            if (!_exceptionTreatments.TryGetValue(exceptionName, out exceptionTreatment))
+            {
                 exceptionTreatment = _defaultExceptionTreatment;
             }
             return exceptionTreatment;
         }
 
-        private Dictionary<string, ExceptionHitTreatment> GetDefaultExceptionTreatments() {
+        private Dictionary<string, ExceptionHitTreatment> GetDefaultExceptionTreatments()
+        {
             var defaultExceptionTreatments = new Dictionary<string, ExceptionHitTreatment>();
 
             // Get exception names from in NodePackage.Debugger.cs
-            foreach (var attr in System.Attribute.GetCustomAttributes(typeof(NodejsPackage))) {
+            foreach (var attr in System.Attribute.GetCustomAttributes(typeof(NodejsPackage)))
+            {
                 var debugAttr = attr as ProvideNodeDebugExceptionAttribute;
-                if (debugAttr != null && !string.IsNullOrEmpty(debugAttr.ExceptionName)) {
+                if (debugAttr != null && !string.IsNullOrEmpty(debugAttr.ExceptionName))
+                {
                     defaultExceptionTreatments[debugAttr.ExceptionName] = ExceptionHitTreatment.BreakNever;
                 }
             }

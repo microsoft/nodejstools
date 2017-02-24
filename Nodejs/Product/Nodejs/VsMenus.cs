@@ -17,12 +17,14 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Microsoft.NodejsTools {
+namespace Microsoft.NodejsTools
+{
     /// <summary>
     /// Defines menu commands guids and menu command id's
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1053:StaticHolderTypesShouldNotHaveConstructors"), SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "Vs")]
-    class VsMenus {
+    internal class VsMenus
+    {
         [SuppressMessage("Microsoft.Usage", "CA2211:NonConstantFieldsShouldNotBeVisible")]
         public static Guid guidSHLMainMenu = new Guid(0xd309f791, 0x903f, 0x11d0, 0x9e, 0xfc, 0x00, 0xa0, 0xc9, 0x11, 0x00, 0x4f);
 

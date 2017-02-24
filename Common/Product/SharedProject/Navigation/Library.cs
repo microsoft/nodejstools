@@ -18,29 +18,34 @@ using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell.Interop;
 using VSConstants = Microsoft.VisualStudio.VSConstants;
 
-namespace Microsoft.VisualStudioTools.Navigation {
-
+namespace Microsoft.VisualStudioTools.Navigation
+{
     /// <summary>
     /// Implements a simple library that tracks project symbols, objects etc.
     /// </summary>
-    class Library : IVsSimpleLibrary2 {
+    internal class Library : IVsSimpleLibrary2
+    {
         private Guid _guid;
         private _LIB_FLAGS2 _capabilities;
         private LibraryNode _root;
         private uint _updateCount;
 
-        public Library(Guid libraryGuid) {
+        public Library(Guid libraryGuid)
+        {
             _guid = libraryGuid;
             _root = new LibraryNode(null, String.Empty, String.Empty, LibraryNodeType.Package);
         }
 
-        public _LIB_FLAGS2 LibraryCapabilities {
+        public _LIB_FLAGS2 LibraryCapabilities
+        {
             get { return _capabilities; }
             set { _capabilities = value; }
         }
 
-        internal void AddNode(LibraryNode node) {
-            lock (this) {
+        internal void AddNode(LibraryNode node)
+        {
+            lock (this)
+            {
                 // re-create root node here because we may have handed out the node before and don't want to mutate it's list.
                 _root = _root.Clone();
                 _root.AddNode(node);
@@ -48,8 +53,10 @@ namespace Microsoft.VisualStudioTools.Navigation {
             }
         }
 
-        internal void RemoveNode(LibraryNode node) {
-            lock (this) {
+        internal void RemoveNode(LibraryNode node)
+        {
+            lock (this)
+            {
                 _root = _root.Clone();
                 _root.RemoveNode(node);
                 _updateCount++;
@@ -58,41 +65,51 @@ namespace Microsoft.VisualStudioTools.Navigation {
 
         #region IVsSimpleLibrary2 Members
 
-        public int AddBrowseContainer(VSCOMPONENTSELECTORDATA[] pcdComponent, ref uint pgrfOptions, out string pbstrComponentAdded) {
+        public int AddBrowseContainer(VSCOMPONENTSELECTORDATA[] pcdComponent, ref uint pgrfOptions, out string pbstrComponentAdded)
+        {
             pbstrComponentAdded = null;
             return VSConstants.E_NOTIMPL;
         }
 
-        public int CreateNavInfo(SYMBOL_DESCRIPTION_NODE[] rgSymbolNodes, uint ulcNodes, out IVsNavInfo ppNavInfo) {
+        public int CreateNavInfo(SYMBOL_DESCRIPTION_NODE[] rgSymbolNodes, uint ulcNodes, out IVsNavInfo ppNavInfo)
+        {
             ppNavInfo = null;
             return VSConstants.E_NOTIMPL;
         }
 
-        public int GetBrowseContainersForHierarchy(IVsHierarchy pHierarchy, uint celt, VSBROWSECONTAINER[] rgBrowseContainers, uint[] pcActual) {
+        public int GetBrowseContainersForHierarchy(IVsHierarchy pHierarchy, uint celt, VSBROWSECONTAINER[] rgBrowseContainers, uint[] pcActual)
+        {
             return VSConstants.E_NOTIMPL;
         }
 
-        public int GetGuid(out Guid pguidLib) {
+        public int GetGuid(out Guid pguidLib)
+        {
             pguidLib = _guid;
             return VSConstants.S_OK;
         }
 
-        public int GetLibFlags2(out uint pgrfFlags) {
+        public int GetLibFlags2(out uint pgrfFlags)
+        {
             pgrfFlags = (uint)LibraryCapabilities;
             return VSConstants.S_OK;
         }
 
-        public int GetList2(uint ListType, uint flags, VSOBSEARCHCRITERIA2[] pobSrch, out IVsSimpleObjectList2 ppIVsSimpleObjectList2) {
-            if ((flags & (uint)_LIB_LISTFLAGS.LLF_RESOURCEVIEW) != 0) {
+        public int GetList2(uint ListType, uint flags, VSOBSEARCHCRITERIA2[] pobSrch, out IVsSimpleObjectList2 ppIVsSimpleObjectList2)
+        {
+            if ((flags & (uint)_LIB_LISTFLAGS.LLF_RESOURCEVIEW) != 0)
+            {
                 ppIVsSimpleObjectList2 = null;
                 return VSConstants.E_NOTIMPL;
             }
 
             ICustomSearchListProvider listProvider;
             if (pobSrch != null &&
-                pobSrch.Length > 0) {
-                if ((listProvider = pobSrch[0].pIVsNavInfo as ICustomSearchListProvider) != null) {
-                    switch ((_LIB_LISTTYPE)ListType) {
+                pobSrch.Length > 0)
+            {
+                if ((listProvider = pobSrch[0].pIVsNavInfo as ICustomSearchListProvider) != null)
+                {
+                    switch ((_LIB_LISTTYPE)ListType)
+                    {
                         case _LIB_LISTTYPE.LLT_NAMESPACES:
                             ppIVsSimpleObjectList2 = listProvider.GetSearchList();
                             break;
@@ -100,17 +117,25 @@ namespace Microsoft.VisualStudioTools.Navigation {
                             ppIVsSimpleObjectList2 = null;
                             return VSConstants.E_FAIL;
                     }
-                } else {
-                    if (pobSrch[0].eSrchType == VSOBSEARCHTYPE.SO_ENTIREWORD && ListType == (uint)_LIB_LISTTYPE.LLT_MEMBERS) {
+                }
+                else
+                {
+                    if (pobSrch[0].eSrchType == VSOBSEARCHTYPE.SO_ENTIREWORD && ListType == (uint)_LIB_LISTTYPE.LLT_MEMBERS)
+                    {
                         string srchText = pobSrch[0].szName;
                         int colonIndex;
-                        if ((colonIndex = srchText.LastIndexOf(':')) != -1) {
+                        if ((colonIndex = srchText.LastIndexOf(':')) != -1)
+                        {
                             string filename = srchText.Substring(0, srchText.LastIndexOf(':'));
-                            foreach (ProjectLibraryNode project in _root.Children) {
-                                foreach (var item in project.Children) {
-                                    if (item.FullName == filename) {
+                            foreach (ProjectLibraryNode project in _root.Children)
+                            {
+                                foreach (var item in project.Children)
+                                {
+                                    if (item.FullName == filename)
+                                    {
                                         ppIVsSimpleObjectList2 = item.DoSearch(pobSrch[0]);
-                                        if (ppIVsSimpleObjectList2 != null) {
+                                        if (ppIVsSimpleObjectList2 != null)
+                                        {
                                             return VSConstants.S_OK;
                                         }
                                     }
@@ -120,27 +145,37 @@ namespace Microsoft.VisualStudioTools.Navigation {
 
                         ppIVsSimpleObjectList2 = null;
                         return VSConstants.E_FAIL;
-                    } else if (pobSrch[0].eSrchType == VSOBSEARCHTYPE.SO_SUBSTRING && ListType == (uint)_LIB_LISTTYPE.LLT_NAMESPACES) {
+                    }
+                    else if (pobSrch[0].eSrchType == VSOBSEARCHTYPE.SO_SUBSTRING && ListType == (uint)_LIB_LISTTYPE.LLT_NAMESPACES)
+                    {
                         var lib = new LibraryNode(null, "Search results " + pobSrch[0].szName, "Search results " + pobSrch[0].szName, LibraryNodeType.Package);
-                        foreach (var item in SearchNodes(pobSrch[0], new SimpleObjectList<LibraryNode>(), _root).Children) {
+                        foreach (var item in SearchNodes(pobSrch[0], new SimpleObjectList<LibraryNode>(), _root).Children)
+                        {
                             lib.Children.Add(item);
                         }
                         ppIVsSimpleObjectList2 = lib;
                         return VSConstants.S_OK;
-                    } else {
+                    }
+                    else
+                    {
                         ppIVsSimpleObjectList2 = null;
                         return VSConstants.E_FAIL;
                     }
                 }
-            } else {
+            }
+            else
+            {
                 ppIVsSimpleObjectList2 = _root as IVsSimpleObjectList2;
             }
             return VSConstants.S_OK;
         }
 
-        private static SimpleObjectList<LibraryNode> SearchNodes(VSOBSEARCHCRITERIA2 srch, SimpleObjectList<LibraryNode> list, LibraryNode curNode) {
-            foreach (var child in curNode.Children) {
-                if (child.Name.IndexOf(srch.szName, StringComparison.OrdinalIgnoreCase) != -1) {
+        private static SimpleObjectList<LibraryNode> SearchNodes(VSOBSEARCHCRITERIA2 srch, SimpleObjectList<LibraryNode> list, LibraryNode curNode)
+        {
+            foreach (var child in curNode.Children)
+            {
+                if (child.Name.IndexOf(srch.szName, StringComparison.OrdinalIgnoreCase) != -1)
+                {
                     list.Children.Add(child.Clone(child.Name));
                 }
 
@@ -149,40 +184,49 @@ namespace Microsoft.VisualStudioTools.Navigation {
             return list;
         }
 
-        public void VisitNodes(ILibraryNodeVisitor visitor, CancellationToken ct = default(CancellationToken)) {
-            lock (this) {
+        public void VisitNodes(ILibraryNodeVisitor visitor, CancellationToken ct = default(CancellationToken))
+        {
+            lock (this)
+            {
                 _root.Visit(visitor, ct);
             }
         }
 
-        public int GetSeparatorStringWithOwnership(out string pbstrSeparator) {
+        public int GetSeparatorStringWithOwnership(out string pbstrSeparator)
+        {
             pbstrSeparator = ".";
             return VSConstants.S_OK;
         }
 
-        public int GetSupportedCategoryFields2(int Category, out uint pgrfCatField) {
+        public int GetSupportedCategoryFields2(int Category, out uint pgrfCatField)
+        {
             pgrfCatField = (uint)_LIB_CATEGORY2.LC_HIERARCHYTYPE | (uint)_LIB_CATEGORY2.LC_PHYSICALCONTAINERTYPE;
             return VSConstants.S_OK;
         }
 
-        public int LoadState(IStream pIStream, LIB_PERSISTTYPE lptType) {
+        public int LoadState(IStream pIStream, LIB_PERSISTTYPE lptType)
+        {
             return VSConstants.S_OK;
         }
 
-        public int RemoveBrowseContainer(uint dwReserved, string pszLibName) {
+        public int RemoveBrowseContainer(uint dwReserved, string pszLibName)
+        {
             return VSConstants.E_NOTIMPL;
         }
 
-        public int SaveState(IStream pIStream, LIB_PERSISTTYPE lptType) {
+        public int SaveState(IStream pIStream, LIB_PERSISTTYPE lptType)
+        {
             return VSConstants.S_OK;
         }
 
-        public int UpdateCounter(out uint pCurUpdate) {
+        public int UpdateCounter(out uint pCurUpdate)
+        {
             pCurUpdate = _updateCount;
             return VSConstants.S_OK;
         }
 
-        public void Update() {
+        public void Update()
+        {
             _updateCount++;
             _root.Update();
         }

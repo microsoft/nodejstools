@@ -19,21 +19,24 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Tagging;
 
-namespace Microsoft.NodejsTools.Jade {
-
-    class OutliningTagger : ITagger<IOutliningRegionTag> {
+namespace Microsoft.NodejsTools.Jade
+{
+    internal class OutliningTagger : ITagger<IOutliningRegionTag>
+    {
         private OutlineRegionCollection _currentRegions;
         private OutlineRegionBuilder _regionBuilder;
         private ITextBuffer _textBuffer;
 
-        public OutliningTagger(ITextBuffer textBuffer, OutlineRegionBuilder regionBuilder) {
+        public OutliningTagger(ITextBuffer textBuffer, OutlineRegionBuilder regionBuilder)
+        {
             _textBuffer = textBuffer;
             _regionBuilder = regionBuilder;
             _regionBuilder.RegionsChanged += OnRegionsChanged;
         }
 
         #region ITagger<IOutliningRegionTag>
-        public IEnumerable<ITagSpan<IOutliningRegionTag>> GetTags(NormalizedSnapshotSpanCollection spans) {
+        public IEnumerable<ITagSpan<IOutliningRegionTag>> GetTags(NormalizedSnapshotSpanCollection spans)
+        {
             if (spans.Count == 0 || _currentRegions == null || _currentRegions.Count == 0)
                 yield break;
 
@@ -43,10 +46,12 @@ namespace Microsoft.NodejsTools.Jade {
             int startPosition = entire.Start.GetContainingLine().Start;
             int endPosition = entire.End.GetContainingLine().End;
 
-            foreach (var region in _currentRegions) {
+            foreach (var region in _currentRegions)
+            {
                 int end = Math.Min(region.End, snapshot.Length);
 
-                if (region.Start <= endPosition && end >= startPosition) {
+                if (region.Start <= endPosition && end >= startPosition)
+                {
                     yield return new TagSpan<IOutliningRegionTag>(
                         new SnapshotSpan(snapshot, Span.FromBounds(region.Start, end)),
                         new OutliningRegionTag(false, false, region.DisplayText, region.HoverText));
@@ -57,11 +62,14 @@ namespace Microsoft.NodejsTools.Jade {
         public event EventHandler<SnapshotSpanEventArgs> TagsChanged;
         #endregion
 
-        void OnRegionsChanged(object sender, OutlineRegionsChangedEventArgs e) {
+        private void OnRegionsChanged(object sender, OutlineRegionsChangedEventArgs e)
+        {
             var snapshot = _textBuffer.CurrentSnapshot;
 
-            if (e.Regions.TextBufferVersion == _textBuffer.CurrentSnapshot.Version.VersionNumber) {
-                if (TagsChanged != null) {
+            if (e.Regions.TextBufferVersion == _textBuffer.CurrentSnapshot.Version.VersionNumber)
+            {
+                if (TagsChanged != null)
+                {
                     int start = Math.Min(e.ChangedRange.Start, snapshot.Length);
                     int end = Math.Min(e.ChangedRange.End, snapshot.Length);
 

@@ -16,19 +16,24 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.NodejsTools.Jade {
-    static class EntityTable {
+namespace Microsoft.NodejsTools.Jade
+{
+    internal static class EntityTable
+    {
         public static Dictionary<string, char> Entities { get; private set; }
 
-        public static bool IsEntity(string candidate, out char mappedChar) {
+        public static bool IsEntity(string candidate, out char mappedChar)
+        {
             return Entities.TryGetValue(candidate, out mappedChar);
         }
 
-        public static ICollection<string> EntityNames {
+        public static ICollection<string> EntityNames
+        {
             get { return Entities.Keys; }
         }
 
-        static EntityTable() {
+        static EntityTable()
+        {
             Entities = new Dictionary<string, char>();
 
             Entities.Add("quot", '"');

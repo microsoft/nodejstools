@@ -18,9 +18,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.NodejsTools.Debugger.Events {
-    sealed class BreakpointEvent : IDebuggerEvent {
-        public BreakpointEvent(JObject message) {
+namespace Microsoft.NodejsTools.Debugger.Events
+{
+    internal sealed class BreakpointEvent : IDebuggerEvent
+    {
+        public BreakpointEvent(JObject message)
+        {
             Running = false;
             Line = (int)message["body"]["sourceLine"];
             Column = (int)message["body"]["sourceColumn"];

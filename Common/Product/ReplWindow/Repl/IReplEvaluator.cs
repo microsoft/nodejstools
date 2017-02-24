@@ -17,7 +17,8 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.Text;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
@@ -25,7 +26,8 @@ namespace Microsoft.VisualStudio.Repl {
     /// Implements an evaluator for a specific REPL implementation.  The evaluator is provided to the
     /// REPL implementation by the IReplEvaluatorProvider interface.
     /// </summary>
-    public interface IReplEvaluator : IDisposable {
+    public interface IReplEvaluator : IDisposable
+    {
         /// <summary>
         /// Initializes the interactive session. 
         /// </summary>
@@ -73,7 +75,7 @@ namespace Microsoft.VisualStudio.Repl {
         /// <param name="text">The code snippet to execute.</param>
         /// <returns>Task that completes the execution.</returns>
         Task<ExecutionResult> ExecuteText(string text);
-        
+
         void ExecuteFile(string filename);
 
         /// <summary>

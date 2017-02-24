@@ -18,13 +18,19 @@ using System;
 using System.IO;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace Microsoft.NodejsTools.Project.NewFileMenuGroup {
-    internal static class NewFileUtilities {
-        internal static void CreateNewFile(NodejsProjectNode projectNode, uint containerId) {
-            using (var dialog = new NewFileNameForm("")) {
-                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
+namespace Microsoft.NodejsTools.Project.NewFileMenuGroup
+{
+    internal static class NewFileUtilities
+    {
+        internal static void CreateNewFile(NodejsProjectNode projectNode, uint containerId)
+        {
+            using (var dialog = new NewFileNameForm(""))
+            {
+                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
                     string itemName = dialog.TextBox.Text;
-                    if (string.IsNullOrWhiteSpace(itemName)) {
+                    if (string.IsNullOrWhiteSpace(itemName))
+                    {
                         return;
                     }
                     itemName = itemName.Trim();

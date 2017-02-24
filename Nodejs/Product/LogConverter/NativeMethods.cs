@@ -17,8 +17,10 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace NodeLogConverter {
-    static class NativeMethods {
+namespace NodeLogConverter
+{
+    internal static class NativeMethods
+    {
         [DllImport("kernel32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool DuplicateHandle(IntPtr hSourceProcessHandle,
@@ -53,12 +55,14 @@ namespace NodeLogConverter {
     }
 
     [Flags]
-    public enum DuplicateOptions : uint {
+    public enum DuplicateOptions : uint
+    {
         DUPLICATE_CLOSE_SOURCE = 0x00000001,
         DUPLICATE_SAME_ACCESS = 0x00000002
     }
 
-    struct IMAGEHLP_MODULE64 {
+    internal struct IMAGEHLP_MODULE64
+    {
         public uint SizeOfStruct;
         public ulong BaseOfImage;
         public uint ImageSize;

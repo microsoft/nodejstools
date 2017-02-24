@@ -22,30 +22,38 @@ using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Project;
 
-namespace Microsoft.NodejsTools {
+namespace Microsoft.NodejsTools
+{
     [Guid(Guids.NodejsBaseProjectFactoryString)]
-    class BaseNodeProjectFactory : ProjectFactory {
+    internal class BaseNodeProjectFactory : ProjectFactory
+    {
         public BaseNodeProjectFactory(NodejsProjectPackage package)
-            : base((IServiceProvider)package) {
+            : base((IServiceProvider)package)
+        {
         }
 
-        internal override ProjectNode CreateProject() {
+        internal override ProjectNode CreateProject()
+        {
             NodejsProjectNode project = new NodejsProjectNode((NodejsProjectPackage)Site);
             return project;
         }
 
-        protected override ProjectUpgradeState UpgradeProjectCheck(ProjectRootElement projectXml, ProjectRootElement userProjectXml, Action<__VSUL_ERRORLEVEL, string> log, ref Guid projectFactory, ref __VSPPROJECTUPGRADEVIAFACTORYFLAGS backupSupport) {
+        protected override ProjectUpgradeState UpgradeProjectCheck(ProjectRootElement projectXml, ProjectRootElement userProjectXml, Action<__VSUL_ERRORLEVEL, string> log, ref Guid projectFactory, ref __VSPPROJECTUPGRADEVIAFACTORYFLAGS backupSupport)
+        {
             var envVarsProp = projectXml.Properties.FirstOrDefault(p => p.Name == NodeProjectProperty.EnvironmentVariables);
-            if (envVarsProp != null && !string.IsNullOrEmpty(envVarsProp.Value)) {
+            if (envVarsProp != null && !string.IsNullOrEmpty(envVarsProp.Value))
+            {
                 return ProjectUpgradeState.OneWayUpgrade;
             }
 
             return ProjectUpgradeState.NotNeeded;
         }
 
-        protected override void UpgradeProject(ref ProjectRootElement projectXml, ref ProjectRootElement userProjectXml, Action<__VSUL_ERRORLEVEL, string> log) {
+        protected override void UpgradeProject(ref ProjectRootElement projectXml, ref ProjectRootElement userProjectXml, Action<__VSUL_ERRORLEVEL, string> log)
+        {
             var envVarsProp = projectXml.Properties.FirstOrDefault(p => p.Name == NodeProjectProperty.EnvironmentVariables);
-            if (envVarsProp != null) {
+            if (envVarsProp != null)
+            {
                 var globals = projectXml.PropertyGroups.FirstOrDefault() ?? projectXml.AddPropertyGroup();
                 AddOrSetProperty(globals, NodeProjectProperty.Environment, envVarsProp.Value.Replace(";", "\r\n"));
                 envVarsProp.Parent.RemoveChild(envVarsProp);
@@ -53,14 +61,17 @@ namespace Microsoft.NodejsTools {
             }
         }
 
-        private static void AddOrSetProperty(ProjectPropertyGroupElement group, string name, string value) {
+        private static void AddOrSetProperty(ProjectPropertyGroupElement group, string name, string value)
+        {
             bool anySet = false;
-            foreach (var prop in group.Properties.Where(p => p.Name == name)) {
+            foreach (var prop in group.Properties.Where(p => p.Name == name))
+            {
                 prop.Value = value;
                 anySet = true;
             }
 
-            if (!anySet) {
+            if (!anySet)
+            {
                 group.AddProperty(name, value);
             }
         }

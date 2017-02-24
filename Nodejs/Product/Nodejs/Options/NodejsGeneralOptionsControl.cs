@@ -16,20 +16,26 @@
 
 using System.Windows.Forms;
 
-namespace Microsoft.NodejsTools.Options {
-    public partial class NodejsGeneralOptionsControl : UserControl {
+namespace Microsoft.NodejsTools.Options
+{
+    public partial class NodejsGeneralOptionsControl : UserControl
+    {
         private const int SurveyNewsNeverIndex = 0;
         private const int SurveyNewsOnceDayIndex = 1;
         private const int SurveyNewsOnceWeekIndex = 2;
         private const int SurveyNewsOnceMonthIndex = 3;
 
-        public NodejsGeneralOptionsControl() {
+        public NodejsGeneralOptionsControl()
+        {
             InitializeComponent();
         }
 
-        internal SurveyNewsPolicy SurveyNewsCheckCombo {
-            get {
-                switch (_surveyNewsCheckCombo.SelectedIndex) {
+        internal SurveyNewsPolicy SurveyNewsCheckCombo
+        {
+            get
+            {
+                switch (_surveyNewsCheckCombo.SelectedIndex)
+                {
                     case SurveyNewsNeverIndex:
                         return SurveyNewsPolicy.Disabled;
                     case SurveyNewsOnceDayIndex:
@@ -42,8 +48,10 @@ namespace Microsoft.NodejsTools.Options {
                         return SurveyNewsPolicy.Disabled;
                 }
             }
-            set {
-                switch (value) {
+            set
+            {
+                switch (value)
+                {
                     case SurveyNewsPolicy.Disabled:
                         _surveyNewsCheckCombo.SelectedIndex = SurveyNewsNeverIndex;
                         break;
@@ -60,7 +68,8 @@ namespace Microsoft.NodejsTools.Options {
             }
         }
 
-        internal void SyncControlWithPageSettings(NodejsGeneralOptionsPage page) {
+        internal void SyncControlWithPageSettings(NodejsGeneralOptionsPage page)
+        {
             SurveyNewsCheckCombo = page.SurveyNewsCheck;
             _waitOnAbnormalExit.Checked = page.WaitOnAbnormalExit;
             _waitOnNormalExit.Checked = page.WaitOnNormalExit;
@@ -68,7 +77,8 @@ namespace Microsoft.NodejsTools.Options {
             _checkForLongPaths.Checked = page.CheckForLongPaths;
         }
 
-        internal void SyncPageWithControlSettings(NodejsGeneralOptionsPage page) {
+        internal void SyncPageWithControlSettings(NodejsGeneralOptionsPage page)
+        {
             page.SurveyNewsCheck = SurveyNewsCheckCombo;
             page.WaitOnAbnormalExit = _waitOnAbnormalExit.Checked;
             page.WaitOnNormalExit = _waitOnNormalExit.Checked;

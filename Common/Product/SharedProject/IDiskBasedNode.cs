@@ -12,12 +12,15 @@
  *
  * ***************************************************************************/
 
-namespace Microsoft.VisualStudioTools.Project {
+namespace Microsoft.VisualStudioTools.Project
+{
     /// <summary>
     /// Represents a node which has a filename on disk, implemented by folder and file nodes.
     /// </summary>
-    interface IDiskBasedNode {
-        string Url {
+    internal interface IDiskBasedNode
+    {
+        string Url
+        {
             get;
         }
 

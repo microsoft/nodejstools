@@ -18,11 +18,14 @@ using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Globalization;
 
-namespace NodejsTests.Debugger.Commands {
+namespace NodejsTests.Debugger.Commands
+{
     [TestClass]
-    public class ChangeBreakpointCommandTests {
+    public class ChangeBreakpointCommandTests
+    {
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateChangeBreakpointCommand() {
+        public void CreateChangeBreakpointCommand()
+        {
             // Arrange
             const int commandId = 3;
             const int breakpointId = 5;
@@ -40,7 +43,8 @@ namespace NodejsTests.Debugger.Commands {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateChangeBreakpointCommandWithOptionalParameters() {
+        public void CreateChangeBreakpointCommandWithOptionalParameters()
+        {
             // Arrange
             const int commandId = 3;
             const int breakpointId = 5;

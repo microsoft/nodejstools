@@ -16,13 +16,15 @@
 
 using System;
 
-namespace Microsoft.NodejsTools.Jade {
+namespace Microsoft.NodejsTools.Jade
+{
     /// <summary>
     /// Text provider. HTML parser calls this interface to retrieve text.
     /// Can be implemented on a string <seealso cref="TextStream"/> or
     /// on a Visual Studio ITextBuffer (see Microsoft.Html.Editor implementation)
     /// </summary>
-    interface ITextProvider {
+    internal interface ITextProvider
+    {
         /// <summary>Text length</summary>
         int Length { get; }
 

@@ -2,12 +2,14 @@
 using Microsoft.NodejsTools.TestAdapter.TestFrameworks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace TestAdapterTests {
+namespace TestAdapterTests
+{
     [TestClass]
-    public class NodejsTestInfoTests {
-
+    public class NodejsTestInfoTests
+    {
         [TestMethod, Priority(0)]
-        public void ConstructFullyQualifiedName_ValidInput() {
+        public void ConstructFullyQualifiedName_ValidInput()
+        {
             //Arrange
             string testFile = "c:\\dummyWhatever.js";
             string testName = "myMochaTest";
@@ -26,7 +28,8 @@ namespace TestAdapterTests {
 
         [TestMethod, Priority(0)]
         [ExpectedException(typeof(System.ArgumentException))]
-        public void ConstructFromQualifiedName_ThrowOnInValidInput() {
+        public void ConstructFromQualifiedName_ThrowOnInValidInput()
+        {
             //Arrange
             string badDummy = "c:\\dummy.js::dummy::dumm2::test1";
 

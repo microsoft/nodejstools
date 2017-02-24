@@ -18,11 +18,14 @@ using System.Collections.Generic;
 using Microsoft.NodejsTools.Debugger;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace NodejsTests.Debugger {
+namespace NodejsTests.Debugger
+{
     [TestClass]
-    public class ExceptionHandlerTests {
+    public class ExceptionHandlerTests
+    {
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void SetNewDefaultExceptionHitTreatment() {
+        public void SetNewDefaultExceptionHitTreatment()
+        {
             // Arrange
             var exceptionHandler = new ExceptionHandler();
 
@@ -34,7 +37,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void SetSameDefaultExceptionHitTreatment() {
+        public void SetSameDefaultExceptionHitTreatment()
+        {
             // Arrange
             var exceptionHandler = new ExceptionHandler();
 
@@ -46,7 +50,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging"), TestCategory("AppVeyorIgnore")]
-        public void GetExceptionHitTreatmentForKnownError() {
+        public void GetExceptionHitTreatmentForKnownError()
+        {
             // Arrange
             var exceptionHandler = new ExceptionHandler();
 
@@ -58,7 +63,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void GetExceptionHitTreatmentForUnknownError() {
+        public void GetExceptionHitTreatmentForUnknownError()
+        {
             // Arrange
             var exceptionHandler = new ExceptionHandler();
 
@@ -70,7 +76,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void GetExceptionHitTreatmentForUnknownErrorAfterChangingDefaults() {
+        public void GetExceptionHitTreatmentForUnknownErrorAfterChangingDefaults()
+        {
             // Arrange
             var exceptionHandler = new ExceptionHandler();
             const ExceptionHitTreatment newDefault = ExceptionHitTreatment.BreakAlways;
@@ -84,7 +91,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void SetSameExceptionTreatments() {
+        public void SetSameExceptionTreatments()
+        {
             // Arrange
             var exceptionHandler = new ExceptionHandler();
             const string exceptionName = "Error";
@@ -105,7 +113,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void SetNewExceptionTreatments() {
+        public void SetNewExceptionTreatments()
+        {
             // Arrange
             var exceptionHandler = new ExceptionHandler();
             const string exceptionName = "Error";
@@ -125,7 +134,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void ClearExceptionTreatments() {
+        public void ClearExceptionTreatments()
+        {
             // Arrange
             var exceptionHandler = new ExceptionHandler();
             const string exceptionName = "SyntaxError";
@@ -147,7 +157,8 @@ namespace NodejsTests.Debugger {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void ResetExceptionTreatments() {
+        public void ResetExceptionTreatments()
+        {
             // Arrange
             var exceptionHandler = new ExceptionHandler();
             exceptionHandler.SetExceptionTreatments(new Dictionary<string, ExceptionHitTreatment> {

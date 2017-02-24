@@ -14,8 +14,10 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Debugger {
-    interface IFileNameMapper {
+namespace Microsoft.NodejsTools.Debugger
+{
+    internal interface IFileNameMapper
+    {
         /// <summary>
         /// Returns a local file name for a remote.
         /// </summary>

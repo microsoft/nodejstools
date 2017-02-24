@@ -16,8 +16,10 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.NodejsTools.Npm {
-    public interface IRootPackage {
+namespace Microsoft.NodejsTools.Npm
+{
+    public interface IRootPackage
+    {
         INodeModules Modules { get; }
 
         IPackageJson PackageJson { get; }

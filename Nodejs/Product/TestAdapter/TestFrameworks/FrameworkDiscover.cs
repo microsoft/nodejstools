@@ -18,25 +18,32 @@ using System;
 using System.Collections.Generic;
 using Microsoft.NodejsTools.TestFrameworks;
 
-namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks {
-    class FrameworkDiscover {
+namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
+{
+    internal class FrameworkDiscover
+    {
         private readonly Dictionary<String, TestFramework> _frameworks;
-        public FrameworkDiscover(): this(null) {
+        public FrameworkDiscover() : this(null)
+        {
         }
 
-        public FrameworkDiscover(IEnumerable<string> testFrameworkDirectories) {
-            if (testFrameworkDirectories == null) {
+        public FrameworkDiscover(IEnumerable<string> testFrameworkDirectories)
+        {
+            if (testFrameworkDirectories == null)
+            {
                 TestFrameworkDirectories directoryLoader = new TestFrameworkDirectories();
                 testFrameworkDirectories = directoryLoader.GetFrameworkDirectories();
             }
             _frameworks = new Dictionary<string, TestFramework>(StringComparer.OrdinalIgnoreCase);
-            foreach (string directory in testFrameworkDirectories) {
+            foreach (string directory in testFrameworkDirectories)
+            {
                 TestFramework fx = new TestFramework(directory);
                 _frameworks.Add(fx.Name, fx);
             }
         }
 
-        public TestFramework Get(string frameworkName) {
+        public TestFramework Get(string frameworkName)
+        {
             TestFramework testFX = null;
             _frameworks.TryGetValue(frameworkName, out testFX);
             return testFX;

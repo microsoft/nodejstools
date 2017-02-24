@@ -18,26 +18,32 @@ using System;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudioTools.Project;
 
-namespace Microsoft.NodejsTools.Project {
+namespace Microsoft.NodejsTools.Project
+{
     [ComVisible(true)]
     [ClassInterface(ClassInterfaceType.AutoDual)]
     [Guid("3C3BD073-2AB3-4E66-BBE9-C8B2D8A774D1")]
-    public class NpmNodeProperties : NodeProperties {
-        internal NpmNodeProperties(AbstractNpmNode node) : base(node) {}
+    public class NpmNodeProperties : NodeProperties
+    {
+        internal NpmNodeProperties(AbstractNpmNode node) : base(node) { }
 
-        private AbstractNpmNode NpmNode {
+        private AbstractNpmNode NpmNode
+        {
             get { return Node as AbstractNpmNode; }
         }
 
-        public override string GetClassName() {
+        public override string GetClassName()
+        {
             return Resources.PropertiesClassNpm;
         }
 
         [SRCategory(SR.General)]
         [ResourcesDisplayName(nameof(Resources.NpmNodePackageInstallation))]
         [ResourcesDescription(nameof(Resources.NpmNodePackageInstallationDescription))]
-        public string PackageInstallation {
-            get {
+        public string PackageInstallation
+        {
+            get
+            {
                 return Resources.PackageInstallationLocal;
             }
         }
@@ -45,14 +51,19 @@ namespace Microsoft.NodejsTools.Project {
         [SRCategory(SR.General)]
         [ResourcesDisplayName(nameof(Resources.NpmNodePath))]
         [ResourcesDescription(nameof(Resources.NpmNodePathDescription))]
-        public string Path {
-            get {
+        public string Path
+        {
+            get
+            {
                 var node = NpmNode;
-                if (null != node) {
+                if (null != node)
+                {
                     var local = node as NodeModulesNode;
-                    if (null != local) {
+                    if (null != local)
+                    {
                         var root = local.RootPackage;
-                        if (null != root) {
+                        if (null != root)
+                        {
                             return root.Path;
                         }
                     }

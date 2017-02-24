@@ -16,8 +16,10 @@
 
 using Microsoft.VisualStudio.Text;
 
-namespace Microsoft.NodejsTools.Jade {
-    interface ITextSnapshotProvider {
+namespace Microsoft.NodejsTools.Jade
+{
+    internal interface ITextSnapshotProvider
+    {
         ITextSnapshot Snapshot { get; }
     }
 }

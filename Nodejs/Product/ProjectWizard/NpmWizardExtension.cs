@@ -18,37 +18,45 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.VisualStudio.TemplateWizard;
 
-namespace Microsoft.NodejsTools.ProjectWizard {
+namespace Microsoft.NodejsTools.ProjectWizard
+{
     /// <summary>
     /// Provides a project wizard extension which will optionally do an
     /// npm install after the project is created.
     /// </summary>
-    public sealed class NpmWizardExtension : IWizard {
+    public sealed class NpmWizardExtension : IWizard
+    {
         #region IWizard Members
 
-        public void BeforeOpeningFile(EnvDTE.ProjectItem projectItem) {
+        public void BeforeOpeningFile(EnvDTE.ProjectItem projectItem)
+        {
         }
 
-        public void ProjectFinishedGenerating(EnvDTE.Project project) {
+        public void ProjectFinishedGenerating(EnvDTE.Project project)
+        {
             Debug.Assert(project != null && project.Object != null);
             Debug.Assert(project.Object is INodePackageModulesCommands);
 
             ((INodePackageModulesCommands)project.Object).InstallMissingModulesAsync();
         }
 
-        public void ProjectItemFinishedGenerating(EnvDTE.ProjectItem projectItem) {
+        public void ProjectItemFinishedGenerating(EnvDTE.ProjectItem projectItem)
+        {
         }
 
-        public void RunFinished() {
+        public void RunFinished()
+        {
         }
 
-        public void RunStarted(object automationObject, Dictionary<string, string> replacementsDictionary, WizardRunKind runKind, object[] customParams) {
+        public void RunStarted(object automationObject, Dictionary<string, string> replacementsDictionary, WizardRunKind runKind, object[] customParams)
+        {
         }
 
-        public bool ShouldAddProjectItem(string filePath) {
+        public bool ShouldAddProjectItem(string filePath)
+        {
             return true;
         }
 
-#endregion
+        #endregion
     }
 }

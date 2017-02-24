@@ -22,10 +22,13 @@ using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.IncrementalSearch;
 using TestUtilities.Mocks;
 
-namespace Microsoft.VisualStudioTools.MockVsTests {
+namespace Microsoft.VisualStudioTools.MockVsTests
+{
     [Export(typeof(IIncrementalSearchFactoryService))]
-    class MockIncrementalSearchFactoryService : IIncrementalSearchFactoryService {
-        public IIncrementalSearch GetIncrementalSearch(ITextView textView) {
+    internal class MockIncrementalSearchFactoryService : IIncrementalSearchFactoryService
+    {
+        public IIncrementalSearch GetIncrementalSearch(ITextView textView)
+        {
             return new MockIncrementalSearch((MockTextView)textView);
         }
     }

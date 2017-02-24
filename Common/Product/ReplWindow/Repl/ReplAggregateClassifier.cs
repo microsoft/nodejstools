@@ -19,17 +19,20 @@ using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Projection;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
-    class ReplAggregateClassifier : IClassifier {
+    internal class ReplAggregateClassifier : IClassifier
+    {
         private readonly List<ElisionInfo> _elisionBuffers = new List<ElisionInfo>();                    // the ellison buffers we've created, 1 for each language span
         private readonly ITextBuffer _primaryBuffer;
         private readonly IBufferGraphFactoryService _bufGraphFact;
         private IBufferGraph _bufferGraph;
-        
-        public ReplAggregateClassifier(IBufferGraphFactoryService bufferGraphFactory, ITextBuffer buffer) {            
+
+        public ReplAggregateClassifier(IBufferGraphFactoryService bufferGraphFactory, ITextBuffer buffer)
+        {
             _primaryBuffer = buffer;
             _bufGraphFact = bufferGraphFactory;
             _bufferGraph = bufferGraphFactory.CreateBufferGraph(buffer);
@@ -39,12 +42,17 @@ namespace Microsoft.VisualStudio.Repl {
 
         public event EventHandler<ClassificationChangedEventArgs> ClassificationChanged;
 
-        public IList<ClassificationSpan> GetClassificationSpans(SnapshotSpan span) {
+        public IList<ClassificationSpan> GetClassificationSpans(SnapshotSpan span)
+        {
             List<ClassificationSpan> res = new List<ClassificationSpan>();
-            foreach (var info in _elisionBuffers) {
-                foreach (var targetSpan in info.BufferGraph.MapDownToBuffer(span, SpanTrackingMode.EdgeExclusive, info.Buffer)) {
-                    foreach (var classSpan in info.Classifier.GetClassificationSpans(targetSpan)) {
-                        foreach (var mappedBack in info.BufferGraph.MapUpToBuffer(classSpan.Span, SpanTrackingMode.EdgeExclusive, _primaryBuffer)) {
+            foreach (var info in _elisionBuffers)
+            {
+                foreach (var targetSpan in info.BufferGraph.MapDownToBuffer(span, SpanTrackingMode.EdgeExclusive, info.Buffer))
+                {
+                    foreach (var classSpan in info.Classifier.GetClassificationSpans(targetSpan))
+                    {
+                        foreach (var mappedBack in info.BufferGraph.MapUpToBuffer(classSpan.Span, SpanTrackingMode.EdgeExclusive, _primaryBuffer))
+                        {
                             res.Add(
                                 new ClassificationSpan(
                                     mappedBack,
@@ -61,31 +69,36 @@ namespace Microsoft.VisualStudio.Repl {
 
         #endregion
 
-        public void AddClassifier(IProjectionBuffer projectionBuffer, ITextBuffer textBuffer, IClassifier classifer) {
+        public void AddClassifier(IProjectionBuffer projectionBuffer, ITextBuffer textBuffer, IClassifier classifer)
+        {
             var elisionInfo = new ElisionInfo(textBuffer, classifer, _bufGraphFact.CreateBufferGraph(projectionBuffer));
             _elisionBuffers.Add(elisionInfo);
-            
-            classifer.ClassificationChanged += (sender, args) => {
+
+            classifer.ClassificationChanged += (sender, args) =>
+            {
                 var classChanged = ClassificationChanged;
-                if (classChanged != null) {
-                    foreach (var span in elisionInfo.BufferGraph.MapDownToBuffer(args.ChangeSpan, SpanTrackingMode.EdgeExclusive, projectionBuffer)) {
+                if (classChanged != null)
+                {
+                    foreach (var span in elisionInfo.BufferGraph.MapDownToBuffer(args.ChangeSpan, SpanTrackingMode.EdgeExclusive, projectionBuffer))
+                    {
                         classChanged(this, new ClassificationChangedEventArgs(span));
                     }
                 }
             };
         }
 
-        class ElisionInfo {
+        private class ElisionInfo
+        {
             public readonly ITextBuffer Buffer;
             public readonly IClassifier Classifier;
             public readonly IBufferGraph BufferGraph;
 
-            public ElisionInfo(ITextBuffer buffer, IClassifier classifier, IBufferGraph bufferGraph) {
+            public ElisionInfo(ITextBuffer buffer, IClassifier classifier, IBufferGraph bufferGraph)
+            {
                 Buffer = buffer;
                 Classifier = classifier;
                 BufferGraph = bufferGraph;
             }
         }
     }
-    
 }

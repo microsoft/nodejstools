@@ -18,8 +18,10 @@ using System.Collections.Generic;
 using Microsoft.NodejsTools.Debugger.Serialization;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.NodejsTools.Debugger.Events {
-    sealed class ExceptionEvent : IDebuggerEvent {
+namespace Microsoft.NodejsTools.Debugger.Events
+{
+    internal sealed class ExceptionEvent : IDebuggerEvent
+    {
         /// <summary>
         /// V8 type transformations.
         /// </summary>
@@ -35,7 +37,8 @@ namespace Microsoft.NodejsTools.Debugger.Events {
             { "error", NodeVariableType.Error },
         };
 
-        public ExceptionEvent(JObject message) {
+        public ExceptionEvent(JObject message)
+        {
             Running = false;
 
             JToken body = message["body"];
@@ -49,7 +52,8 @@ namespace Microsoft.NodejsTools.Debugger.Events {
             ErrorNumber = GetExceptionCodeRef(body);
 
             JToken script = body["script"];
-            if (script != null) {
+            if (script != null)
+            {
                 var scriptId = (int)script["id"];
                 var fileName = (string)script["name"];
                 Module = new NodeModule(scriptId, fileName);
@@ -67,12 +71,16 @@ namespace Microsoft.NodejsTools.Debugger.Events {
         public NodeModule Module { get; private set; }
         public bool Running { get; private set; }
 
-        private int? GetExceptionCodeRef(JToken body) {
+        private int? GetExceptionCodeRef(JToken body)
+        {
             JToken exception = body["exception"];
             var properties = (JArray)exception["properties"];
-            if (properties != null) {
-                foreach (JToken property in properties) {
-                    if (((string)property["name"]) == "code") {
+            if (properties != null)
+            {
+                foreach (JToken property in properties)
+                {
+                    if (((string)property["name"]) == "code")
+                    {
                         return (int)property["ref"];
                     }
                 }
@@ -80,34 +88,41 @@ namespace Microsoft.NodejsTools.Debugger.Events {
             return null;
         }
 
-        private string GetExceptionName(JObject json) {
+        private string GetExceptionName(JObject json)
+        {
             JToken body = json["body"];
             JToken exception = body["exception"];
             var name = (string)exception["type"];
-            if (name == "error" || name == "object") {
+            if (name == "error" || name == "object")
+            {
                 JToken constructorFunction = exception["constructorFunction"];
                 var constructorFunctionHandle = (int)constructorFunction["ref"];
                 var refs = (JArray)json["refs"];
                 JToken refRecord = GetRefRecord(refs, constructorFunctionHandle);
-                if (refRecord != null) {
+                if (refRecord != null)
+                {
                     name = (string)refRecord["name"];
                 }
             }
             return _typeNameMappings.ContainsKey(name) ? _typeNameMappings[name] : name;
         }
 
-        private JToken GetRefRecord(JArray refs, int handle) {
-            foreach (JToken refRecordObj in refs) {
+        private JToken GetRefRecord(JArray refs, int handle)
+        {
+            foreach (JToken refRecordObj in refs)
+            {
                 JToken refRecord = refRecordObj;
                 var refRecordHandle = (int)refRecord["handle"];
-                if (refRecordHandle == handle) {
+                if (refRecordHandle == handle)
+                {
                     return refRecord;
                 }
             }
             return null;
         }
 
-        private string GetExceptionType(JToken body) {
+        private string GetExceptionType(JToken body)
+        {
             string name = (string)body["exception"]["className"]
                           ?? (string)body["exception"]["type"];
             return _typeNameMappings.ContainsKey(name) ? _typeNameMappings[name] : name;

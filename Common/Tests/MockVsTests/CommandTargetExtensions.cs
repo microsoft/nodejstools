@@ -17,14 +17,20 @@ using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 
-namespace Microsoft.VisualStudioTools.MockVsTests {
-    public static class CommandTargetExtensions {
-        public static void Type(this IOleCommandTarget target, string text) {
+namespace Microsoft.VisualStudioTools.MockVsTests
+{
+    public static class CommandTargetExtensions
+    {
+        public static void Type(this IOleCommandTarget target, string text)
+        {
             var guid = VSConstants.VSStd2K;
             var variantMem = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(VARIANT)));
-            try {
-                for (int i = 0; i < text.Length; i++) {
-                    switch (text[i]) {
+            try
+            {
+                for (int i = 0; i < text.Length; i++)
+                {
+                    switch (text[i])
+                    {
                         case '\r': target.Enter(); break;
                         case '\t': target.Tab(); break;
                         default:
@@ -38,35 +44,41 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
                             );
                             break;
                     }
-
                 }
-            } finally {
+            }
+            finally
+            {
                 Marshal.FreeCoTaskMem(variantMem);
             }
         }
 
-        public static void Enter(this IOleCommandTarget target) {
+        public static void Enter(this IOleCommandTarget target)
+        {
             var guid = VSConstants.VSStd2K;
             target.Exec(ref guid, (int)VSConstants.VSStd2KCmdID.RETURN, 0, IntPtr.Zero, IntPtr.Zero);
         }
 
-        public static void Tab(this IOleCommandTarget target) {
+        public static void Tab(this IOleCommandTarget target)
+        {
             var guid = VSConstants.VSStd2K;
             target.Exec(ref guid, (int)VSConstants.VSStd2KCmdID.TAB, 0, IntPtr.Zero, IntPtr.Zero);
         }
 
-        public static void Backspace(this IOleCommandTarget target) {
+        public static void Backspace(this IOleCommandTarget target)
+        {
             var guid = VSConstants.VSStd2K;
             target.Exec(ref guid, (int)VSConstants.VSStd2KCmdID.BACKSPACE, 0, IntPtr.Zero, IntPtr.Zero);
         }
 
-        public static void MemberList(this IOleCommandTarget target) {
+        public static void MemberList(this IOleCommandTarget target)
+        {
             var guid = VSConstants.VSStd2K;
             ErrorHandler.ThrowOnFailure(target.Exec(ref guid, (int)VSConstants.VSStd2KCmdID.SHOWMEMBERLIST, 0, IntPtr.Zero, IntPtr.Zero));
         }
 
         [StructLayout(LayoutKind.Explicit, Size = 16)]
-        struct VARIANT {
+        private struct VARIANT
+        {
             [FieldOffset(0)]
             public ushort vt;
             [FieldOffset(8)]
@@ -84,6 +96,5 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
             [FieldOffset(8)]
             public double r8;
         }
-
     }
 }

@@ -16,7 +16,8 @@ using System;
 using System.ComponentModel.Composition;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
@@ -28,17 +29,20 @@ namespace Microsoft.VisualStudio.Repl {
     /// </summary>
     [MetadataAttribute]
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public sealed class ReplRoleAttribute : Attribute {
+    public sealed class ReplRoleAttribute : Attribute
+    {
         private readonly string _name;
 
-        public ReplRoleAttribute(string name) {
+        public ReplRoleAttribute(string name)
+        {
             if (name.Contains(","))
                 throw new ArgumentException("ReplRoleAttribute name cannot contain any commas. Apply multiple attributes if you want to support multiple roles.", "name");
 
             _name = name;
         }
 
-        public string Name {
+        public string Name
+        {
             get { return _name; }
         }
     }

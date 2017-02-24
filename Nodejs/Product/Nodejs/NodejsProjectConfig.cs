@@ -19,12 +19,13 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace Microsoft.NodejsTools.Project {
+namespace Microsoft.NodejsTools.Project
+{
     /// <summary>
     /// Merges the NTVS IVsCfg object with the Venus IVsCfg implementation redirecting
     /// things appropriately to either one.
     /// </summary>
-    class NodejsProjectConfig :
+    internal class NodejsProjectConfig :
         IVsCfg,
         IVsProjectCfg,
         IVsProjectCfg2,
@@ -32,26 +33,31 @@ namespace Microsoft.NodejsTools.Project {
         IVsDebuggableProjectCfg,
         ISpecifyPropertyPages,
         IVsSpecifyProjectDesignerPages,
-        IVsCfgBrowseObject {
+        IVsCfgBrowseObject
+    {
         private readonly IVsCfg _innerNodeCfg;
         private readonly IVsProjectFlavorCfg _webCfg;
 
-        public NodejsProjectConfig(IVsCfg pythonCfg, IVsProjectFlavorCfg webConfig) {
+        public NodejsProjectConfig(IVsCfg pythonCfg, IVsProjectFlavorCfg webConfig)
+        {
             _innerNodeCfg = pythonCfg;
             _webCfg = webConfig;
         }
 
         #region IVsCfg Members
 
-        public int get_DisplayName(out string pbstrDisplayName) {
+        public int get_DisplayName(out string pbstrDisplayName)
+        {
             return _innerNodeCfg.get_DisplayName(out pbstrDisplayName);
         }
 
-        public int get_IsDebugOnly(out int pfIsDebugOnly) {
+        public int get_IsDebugOnly(out int pfIsDebugOnly)
+        {
             return _innerNodeCfg.get_IsDebugOnly(out pfIsDebugOnly);
         }
 
-        public int get_IsReleaseOnly(out int pfIsReleaseOnly) {
+        public int get_IsReleaseOnly(out int pfIsReleaseOnly)
+        {
             return _innerNodeCfg.get_IsReleaseOnly(out pfIsReleaseOnly);
         }
 
@@ -59,99 +65,121 @@ namespace Microsoft.NodejsTools.Project {
 
         #region IVsProjectCfg Members
 
-        public int EnumOutputs(out IVsEnumOutputs ppIVsEnumOutputs) {
+        public int EnumOutputs(out IVsEnumOutputs ppIVsEnumOutputs)
+        {
             IVsProjectCfg projCfg = _webCfg as IVsProjectCfg;
-            if (projCfg != null) {
+            if (projCfg != null)
+            {
                 return projCfg.EnumOutputs(out ppIVsEnumOutputs);
             }
             ppIVsEnumOutputs = null;
             return VSConstants.E_NOTIMPL;
         }
 
-        public int OpenOutput(string szOutputCanonicalName, out IVsOutput ppIVsOutput) {
+        public int OpenOutput(string szOutputCanonicalName, out IVsOutput ppIVsOutput)
+        {
             IVsProjectCfg projCfg = _webCfg as IVsProjectCfg;
-            if (projCfg != null) {
+            if (projCfg != null)
+            {
                 return projCfg.OpenOutput(szOutputCanonicalName, out ppIVsOutput);
             }
             ppIVsOutput = null;
             return VSConstants.E_NOTIMPL;
         }
 
-        public int get_BuildableProjectCfg(out IVsBuildableProjectCfg ppIVsBuildableProjectCfg) {
+        public int get_BuildableProjectCfg(out IVsBuildableProjectCfg ppIVsBuildableProjectCfg)
+        {
             IVsProjectCfg projCfg = _webCfg as IVsProjectCfg;
-            if (projCfg != null) {
+            if (projCfg != null)
+            {
                 return projCfg.get_BuildableProjectCfg(out ppIVsBuildableProjectCfg);
             }
             ppIVsBuildableProjectCfg = null;
             return VSConstants.E_NOTIMPL;
         }
 
-        public int get_CanonicalName(out string pbstrCanonicalName) {
+        public int get_CanonicalName(out string pbstrCanonicalName)
+        {
             IVsProjectCfg projCfg = _webCfg as IVsProjectCfg;
-            if (projCfg != null) {
+            if (projCfg != null)
+            {
                 return projCfg.get_CanonicalName(out pbstrCanonicalName);
             }
             pbstrCanonicalName = null;
             return VSConstants.E_NOTIMPL;
         }
 
-        public int get_IsPackaged(out int pfIsPackaged) {
+        public int get_IsPackaged(out int pfIsPackaged)
+        {
             IVsProjectCfg projCfg = _webCfg as IVsProjectCfg;
-            if (projCfg != null) {
+            if (projCfg != null)
+            {
                 return projCfg.get_IsPackaged(out pfIsPackaged);
             }
             pfIsPackaged = 0;
             return VSConstants.E_NOTIMPL;
         }
 
-        public int get_IsSpecifyingOutputSupported(out int pfIsSpecifyingOutputSupported) {
+        public int get_IsSpecifyingOutputSupported(out int pfIsSpecifyingOutputSupported)
+        {
             IVsProjectCfg projCfg = _webCfg as IVsProjectCfg;
-            if (projCfg != null) {
+            if (projCfg != null)
+            {
                 return projCfg.get_IsSpecifyingOutputSupported(out pfIsSpecifyingOutputSupported);
             }
             pfIsSpecifyingOutputSupported = 0;
             return VSConstants.E_NOTIMPL;
         }
 
-        public int get_Platform(out Guid pguidPlatform) {
+        public int get_Platform(out Guid pguidPlatform)
+        {
             IVsProjectCfg projCfg = _webCfg as IVsProjectCfg;
-            if (projCfg != null) {
+            if (projCfg != null)
+            {
                 return projCfg.get_Platform(out pguidPlatform);
             }
             pguidPlatform = Guid.Empty;
             return VSConstants.E_NOTIMPL;
         }
 
-        public int get_ProjectCfgProvider(out IVsProjectCfgProvider ppIVsProjectCfgProvider) {
+        public int get_ProjectCfgProvider(out IVsProjectCfgProvider ppIVsProjectCfgProvider)
+        {
             IVsProjectCfg projCfg = _webCfg as IVsProjectCfg;
-            if (projCfg != null) {
+            if (projCfg != null)
+            {
                 return projCfg.get_ProjectCfgProvider(out ppIVsProjectCfgProvider);
             }
             ppIVsProjectCfgProvider = null;
             return VSConstants.E_NOTIMPL;
         }
 
-        public int get_RootURL(out string pbstrRootURL) {
+        public int get_RootURL(out string pbstrRootURL)
+        {
             IVsProjectCfg projCfg = _webCfg as IVsProjectCfg;
-            if (projCfg != null) {
+            if (projCfg != null)
+            {
                 return projCfg.get_RootURL(out pbstrRootURL);
             }
             pbstrRootURL = null;
             return VSConstants.E_NOTIMPL;
         }
 
-        public int get_TargetCodePage(out uint puiTargetCodePage) {
+        public int get_TargetCodePage(out uint puiTargetCodePage)
+        {
             IVsProjectCfg projCfg = _webCfg as IVsProjectCfg;
-            if (projCfg != null) {
+            if (projCfg != null)
+            {
                 return projCfg.get_TargetCodePage(out puiTargetCodePage);
             }
             puiTargetCodePage = 0;
             return VSConstants.E_NOTIMPL;
         }
 
-        public int get_UpdateSequenceNumber(ULARGE_INTEGER[] puliUSN) {
+        public int get_UpdateSequenceNumber(ULARGE_INTEGER[] puliUSN)
+        {
             IVsProjectCfg projCfg = _webCfg as IVsProjectCfg;
-            if (projCfg != null) {
+            if (projCfg != null)
+            {
                 return projCfg.get_UpdateSequenceNumber(puliUSN);
             }
             return VSConstants.E_NOTIMPL;
@@ -161,60 +189,74 @@ namespace Microsoft.NodejsTools.Project {
 
         #region IVsProjectCfg2 Members
 
-        public int OpenOutputGroup(string szCanonicalName, out IVsOutputGroup ppIVsOutputGroup) {
+        public int OpenOutputGroup(string szCanonicalName, out IVsOutputGroup ppIVsOutputGroup)
+        {
             IVsProjectCfg2 projCfg = _innerNodeCfg as IVsProjectCfg2;
-            if (projCfg != null) {
+            if (projCfg != null)
+            {
                 return projCfg.OpenOutputGroup(szCanonicalName, out ppIVsOutputGroup);
             }
             ppIVsOutputGroup = null;
             return VSConstants.E_NOTIMPL;
         }
 
-        public int OutputsRequireAppRoot(out int pfRequiresAppRoot) {
+        public int OutputsRequireAppRoot(out int pfRequiresAppRoot)
+        {
             IVsProjectCfg2 projCfg = _innerNodeCfg as IVsProjectCfg2;
-            if (projCfg != null) {
+            if (projCfg != null)
+            {
                 return projCfg.OutputsRequireAppRoot(out pfRequiresAppRoot);
             }
             pfRequiresAppRoot = 1;
             return VSConstants.E_NOTIMPL;
         }
 
-        public int get_CfgType(ref Guid iidCfg, out IntPtr ppCfg) {
-            if (iidCfg == typeof(IVsDebuggableProjectCfg).GUID) {
+        public int get_CfgType(ref Guid iidCfg, out IntPtr ppCfg)
+        {
+            if (iidCfg == typeof(IVsDebuggableProjectCfg).GUID)
+            {
                 var pyCfg = _innerNodeCfg as IVsProjectFlavorCfg;
-                if (pyCfg != null) {
+                if (pyCfg != null)
+                {
                     return pyCfg.get_CfgType(ref iidCfg, out ppCfg);
                 }
             }
 
             var projCfg = _webCfg as IVsProjectFlavorCfg;
-            if (projCfg != null) {
+            if (projCfg != null)
+            {
                 return projCfg.get_CfgType(ref iidCfg, out ppCfg);
             }
             ppCfg = IntPtr.Zero;
             return VSConstants.E_NOTIMPL;
         }
 
-        public int get_IsPrivate(out int pfPrivate) {
+        public int get_IsPrivate(out int pfPrivate)
+        {
             IVsProjectCfg2 projCfg = _innerNodeCfg as IVsProjectCfg2;
-            if (projCfg != null) {
+            if (projCfg != null)
+            {
                 return projCfg.get_IsPrivate(out pfPrivate);
             }
             pfPrivate = 0;
             return VSConstants.E_NOTIMPL;
         }
 
-        public int get_OutputGroups(uint celt, IVsOutputGroup[] rgpcfg, uint[] pcActual = null) {
+        public int get_OutputGroups(uint celt, IVsOutputGroup[] rgpcfg, uint[] pcActual = null)
+        {
             IVsProjectCfg2 projCfg = _innerNodeCfg as IVsProjectCfg2;
-            if (projCfg != null) {
+            if (projCfg != null)
+            {
                 return projCfg.get_OutputGroups(celt, rgpcfg, pcActual);
             }
             return VSConstants.E_NOTIMPL;
         }
 
-        public int get_VirtualRoot(out string pbstrVRoot) {
+        public int get_VirtualRoot(out string pbstrVRoot)
+        {
             IVsProjectCfg2 projCfg = _innerNodeCfg as IVsProjectCfg2;
-            if (projCfg != null) {
+            if (projCfg != null)
+            {
                 return projCfg.get_VirtualRoot(out pbstrVRoot);
             }
             pbstrVRoot = null;
@@ -225,9 +267,11 @@ namespace Microsoft.NodejsTools.Project {
 
         #region IVsProjectFlavorCfg Members
 
-        public int Close() {
+        public int Close()
+        {
             IVsProjectFlavorCfg cfg = _webCfg as IVsProjectFlavorCfg;
-            if (cfg != null) {
+            if (cfg != null)
+            {
                 return cfg.Close();
             }
             return VSConstants.S_OK;
@@ -237,17 +281,21 @@ namespace Microsoft.NodejsTools.Project {
 
         #region IVsDebuggableProjectCfg Members
 
-        public int DebugLaunch(uint grfLaunch) {
+        public int DebugLaunch(uint grfLaunch)
+        {
             IVsDebuggableProjectCfg cfg = _innerNodeCfg as IVsDebuggableProjectCfg;
-            if (cfg != null) {
+            if (cfg != null)
+            {
                 return cfg.DebugLaunch(grfLaunch);
             }
             return VSConstants.E_NOTIMPL;
         }
 
-        public int QueryDebugLaunch(uint grfLaunch, out int pfCanLaunch) {
+        public int QueryDebugLaunch(uint grfLaunch, out int pfCanLaunch)
+        {
             IVsDebuggableProjectCfg cfg = _innerNodeCfg as IVsDebuggableProjectCfg;
-            if (cfg != null) {
+            if (cfg != null)
+            {
                 return cfg.QueryDebugLaunch(grfLaunch, out pfCanLaunch);
             }
             pfCanLaunch = 0;
@@ -258,9 +306,11 @@ namespace Microsoft.NodejsTools.Project {
 
         #region ISpecifyPropertyPages Members
 
-        public void GetPages(CAUUID[] pPages) {
+        public void GetPages(CAUUID[] pPages)
+        {
             var cfg = _innerNodeCfg as ISpecifyPropertyPages;
-            if (cfg != null) {
+            if (cfg != null)
+            {
                 cfg.GetPages(pPages);
             }
         }
@@ -269,9 +319,11 @@ namespace Microsoft.NodejsTools.Project {
 
         #region IVsSpecifyProjectDesignerPages Members
 
-        public int GetProjectDesignerPages(CAUUID[] pPages) {
+        public int GetProjectDesignerPages(CAUUID[] pPages)
+        {
             var cfg = _innerNodeCfg as IVsSpecifyProjectDesignerPages;
-            if (cfg != null) {
+            if (cfg != null)
+            {
                 return cfg.GetProjectDesignerPages(pPages);
             }
             return VSConstants.E_NOTIMPL;
@@ -281,14 +333,17 @@ namespace Microsoft.NodejsTools.Project {
 
         #region IVsCfgBrowseObject Members
 
-        public int GetCfg(out IVsCfg ppCfg) {
+        public int GetCfg(out IVsCfg ppCfg)
+        {
             ppCfg = this;
             return VSConstants.S_OK;
         }
 
-        public int GetProjectItem(out IVsHierarchy pHier, out uint pItemid) {
+        public int GetProjectItem(out IVsHierarchy pHier, out uint pItemid)
+        {
             var cfg = _innerNodeCfg as IVsCfgBrowseObject;
-            if (cfg != null) {
+            if (cfg != null)
+            {
                 return cfg.GetProjectItem(out pHier, out pItemid);
             }
             pHier = null;

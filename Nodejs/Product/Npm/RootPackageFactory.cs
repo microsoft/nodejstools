@@ -16,12 +16,15 @@
 
 using Microsoft.NodejsTools.Npm.SPI;
 
-namespace Microsoft.NodejsTools.Npm {
-    public static class RootPackageFactory {
+namespace Microsoft.NodejsTools.Npm
+{
+    public static class RootPackageFactory
+    {
         public static IRootPackage Create(
             string fullPathToRootDirectory,
             bool showMissingDevOptionalSubPackages = false,
-            int maxDepth = 1) {
+            int maxDepth = 1)
+        {
             return new RootPackage(
                 fullPathToRootDirectory,
                 showMissingDevOptionalSubPackages,

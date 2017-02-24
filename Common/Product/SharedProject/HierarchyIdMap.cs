@@ -16,30 +16,39 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Microsoft.VisualStudioTools.Project {
-    sealed class HierarchyIdMap {
+namespace Microsoft.VisualStudioTools.Project
+{
+    internal sealed class HierarchyIdMap
+    {
         private readonly List<WeakReference<HierarchyNode>> _ids = new List<WeakReference<HierarchyNode>>();
         private readonly Stack<int> _freedIds = new Stack<int>();
 
         /// <summary>
         /// Must be called from the UI thread
         /// </summary>
-        public uint Add(HierarchyNode node) {
+        public uint Add(HierarchyNode node)
+        {
 #if DEBUG
-            foreach (var reference in _ids) {
-                if (reference != null) {
+            foreach (var reference in _ids)
+            {
+                if (reference != null)
+                {
                     HierarchyNode item;
-                    if (reference.TryGetTarget(out item)) {
+                    if (reference.TryGetTarget(out item))
+                    {
                         Debug.Assert(node != item);
                     }
                 }
             }
 #endif
-            if (_freedIds.Count > 0) {
+            if (_freedIds.Count > 0)
+            {
                 var i = _freedIds.Pop();
                 _ids[i] = new WeakReference<HierarchyNode>(node);
                 return (uint)i + 1;
-            } else {
+            }
+            else
+            {
                 _ids.Add(new WeakReference<HierarchyNode>(node));
                 // ids are 1 based
                 return (uint)_ids.Count;
@@ -49,12 +58,14 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <summary>
         /// Must be called from the UI thread
         /// </summary>
-        public void Remove(HierarchyNode node) {
+        public void Remove(HierarchyNode node)
+        {
             int i = (int)node.ID - 1;
             HierarchyNode found;
             if (i < 0 ||
                 i >= _ids.Count ||
-                (_ids[i].TryGetTarget(out found) && !object.ReferenceEquals(node, found))) {
+                (_ids[i].TryGetTarget(out found) && !object.ReferenceEquals(node, found)))
+            {
                 throw new InvalidOperationException("Removing node with invalid ID or map is corrupted");
             }
 
@@ -65,13 +76,17 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <summary>
         /// Must be called from the UI thread
         /// </summary>
-        public HierarchyNode this[uint itemId] {
-            get {
+        public HierarchyNode this[uint itemId]
+        {
+            get
+            {
                 int i = (int)itemId - 1;
-                if (0 <= i && i < _ids.Count) {
+                if (0 <= i && i < _ids.Count)
+                {
                     var reference = _ids[i];
                     HierarchyNode node;
-                    if (reference != null && reference.TryGetTarget(out node)) {
+                    if (reference != null && reference.TryGetTarget(out node))
+                    {
                         return node;
                     }
                 }

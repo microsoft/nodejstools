@@ -18,9 +18,12 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.NodejsTools.Debugger {
-    static class Extensions {
-        internal static async Task<T> WaitAsync<T>(this Task<T> task, TimeSpan timeout, CancellationToken token = default(CancellationToken)) {
+namespace Microsoft.NodejsTools.Debugger
+{
+    internal static class Extensions
+    {
+        internal static async Task<T> WaitAsync<T>(this Task<T> task, TimeSpan timeout, CancellationToken token = default(CancellationToken))
+        {
             var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
             linkedTokenSource.CancelAfter(timeout);
             // If the token will time out, this await will throw TaskCanceledException, which is automatically propagated to our caller.
@@ -30,7 +33,8 @@ namespace Microsoft.NodejsTools.Debugger {
             return await task.ConfigureAwait(false);
         }
 
-        internal static async Task WaitAsync(this Task task, TimeSpan timeout, CancellationToken token = default(CancellationToken)) {
+        internal static async Task WaitAsync(this Task task, TimeSpan timeout, CancellationToken token = default(CancellationToken))
+        {
             // Same logic as above but for a regular Task without a return value.
             var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
             linkedTokenSource.CancelAfter(timeout);

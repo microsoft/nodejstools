@@ -14,8 +14,10 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Npm {
-    public interface INpmPathProvider {
+namespace Microsoft.NodejsTools.Npm
+{
+    public interface INpmPathProvider
+    {
         string PathToNpm { get; }
     }
 }

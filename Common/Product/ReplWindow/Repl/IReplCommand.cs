@@ -15,7 +15,8 @@
 using System.Threading.Tasks;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
@@ -24,7 +25,8 @@ namespace Microsoft.VisualStudio.Repl {
     /// 
     /// This interface is a MEF contract and can be implemented and exported to add commands to the REPL window.
     /// </summary>
-    public interface IReplCommand {
+    public interface IReplCommand
+    {
         /// <summary>
         /// Asynchronously executes the command with specified arguments and calls back the given completion when finished.
         /// </summary>
@@ -35,21 +37,24 @@ namespace Microsoft.VisualStudio.Repl {
         /// <summary>
         /// Gets a description of the REPL command which is displayed when the user asks for help.
         /// </summary>
-        string Description {
+        string Description
+        {
             get;
         }
 
         /// <summary>
         /// Gets the text for the actual command.
         /// </summary>
-        string Command {
+        string Command
+        {
             get;
         }
 
         /// <summary>
         /// Content to be placed in a toolbar button or null if should not be placed on a toolbar.
         /// </summary>
-        object ButtonContent {
+        object ButtonContent
+        {
             get;
         }
     }

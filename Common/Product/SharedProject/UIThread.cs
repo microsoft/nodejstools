@@ -19,14 +19,18 @@ using System.Threading;
 using System.Threading.Tasks;
 using Task = System.Threading.Tasks.Task;
 
-namespace Microsoft.VisualStudioTools {
-    class UIThread : UIThreadBase {
+namespace Microsoft.VisualStudioTools
+{
+    internal class UIThread : UIThreadBase
+    {
         private readonly TaskScheduler _scheduler;
         private readonly TaskFactory _factory;
         private readonly Thread _uiThread;
 
-        private UIThread() {
-            if (SynchronizationContext.Current == null) {
+        private UIThread()
+        {
+            if (SynchronizationContext.Current == null)
+            {
                 SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
             }
             _scheduler = TaskScheduler.FromCurrentSynchronizationContext();
@@ -34,20 +38,26 @@ namespace Microsoft.VisualStudioTools {
             _uiThread = Thread.CurrentThread;
         }
 
-        public static void EnsureService(IServiceContainer container) {
-            if (container.GetService(typeof(UIThreadBase)) == null) {
+        public static void EnsureService(IServiceContainer container)
+        {
+            if (container.GetService(typeof(UIThreadBase)) == null)
+            {
                 container.AddService(typeof(UIThreadBase), new UIThread(), true);
             }
         }
 
-        public override bool InvokeRequired {
-            get {
+        public override bool InvokeRequired
+        {
+            get
+            {
                 return Thread.CurrentThread != _uiThread;
             }
         }
 
-        public override void MustBeCalledFromUIThreadOrThrow() {
-            if (InvokeRequired) {
+        public override void MustBeCalledFromUIThreadOrThrow()
+        {
+            if (InvokeRequired)
+            {
                 const int RPC_E_WRONG_THREAD = unchecked((int)0x8001010E);
                 throw new COMException("Invalid cross-thread call", RPC_E_WRONG_THREAD);
             }
@@ -60,10 +70,14 @@ namespace Microsoft.VisualStudioTools {
         /// <remarks>
         /// If called from the UI thread, the action is executed synchronously.
         /// </remarks>
-        public override void Invoke(Action action) {
-            if (InvokeRequired) {
+        public override void Invoke(Action action)
+        {
+            if (InvokeRequired)
+            {
                 _factory.StartNew(action).GetAwaiter().GetResult();
-            } else {
+            }
+            else
+            {
                 action();
             }
         }
@@ -76,10 +90,14 @@ namespace Microsoft.VisualStudioTools {
         /// If called from the UI thread, the function is evaluated 
         /// synchronously.
         /// </remarks>
-        public override T Invoke<T>(Func<T> func) {
-            if (InvokeRequired) {
+        public override T Invoke<T>(Func<T> func)
+        {
+            if (InvokeRequired)
+            {
                 return _factory.StartNew(func).GetAwaiter().GetResult();
-            } else {
+            }
+            else
+            {
                 return func();
             }
         }
@@ -91,11 +109,15 @@ namespace Microsoft.VisualStudioTools {
         /// <remarks>
         /// If called from the UI thread, the action is executed synchronously.
         /// </remarks>
-        public override Task InvokeAsync(Action action) {
+        public override Task InvokeAsync(Action action)
+        {
             var tcs = new TaskCompletionSource<object>();
-            if (InvokeRequired) {
+            if (InvokeRequired)
+            {
                 return _factory.StartNew(action);
-            } else {
+            }
+            else
+            {
                 // Action is run synchronously, but we still return the task.
                 InvokeAsyncHelper(action, tcs);
             }
@@ -110,11 +132,15 @@ namespace Microsoft.VisualStudioTools {
         /// If called from the UI thread, the function is evaluated 
         /// synchronously.
         /// </remarks>
-        public override Task<T> InvokeAsync<T>(Func<T> func) {
+        public override Task<T> InvokeAsync<T>(Func<T> func)
+        {
             var tcs = new TaskCompletionSource<T>();
-            if (InvokeRequired) {
+            if (InvokeRequired)
+            {
                 return _factory.StartNew(func);
-            } else {
+            }
+            else
+            {
                 // Function is run synchronously, but we still return the task.
                 InvokeAsyncHelper(func, tcs);
             }
@@ -130,11 +156,15 @@ namespace Microsoft.VisualStudioTools {
         /// If called from the UI thread, the function is evaluated 
         /// synchronously.
         /// </remarks>
-        public override Task InvokeTask(Func<Task> func) {
+        public override Task InvokeTask(Func<Task> func)
+        {
             var tcs = new TaskCompletionSource<object>();
-            if (InvokeRequired) {
+            if (InvokeRequired)
+            {
                 InvokeAsync(() => InvokeTaskHelper(func, tcs));
-            } else {
+            }
+            else
+            {
                 // Function is run synchronously, but we still return the task.
                 InvokeTaskHelper(func, tcs);
             }
@@ -150,11 +180,15 @@ namespace Microsoft.VisualStudioTools {
         /// If called from the UI thread, the function is evaluated 
         /// synchronously.
         /// </remarks>
-        public override Task<T> InvokeTask<T>(Func<Task<T>> func) {
+        public override Task<T> InvokeTask<T>(Func<Task<T>> func)
+        {
             var tcs = new TaskCompletionSource<T>();
-            if (InvokeRequired) {
+            if (InvokeRequired)
+            {
                 InvokeAsync(() => InvokeTaskHelper(func, tcs));
-            } else {
+            }
+            else
+            {
                 // Function is run synchronously, but we still return the task.
                 InvokeTaskHelper(func, tcs);
             }
@@ -163,54 +197,82 @@ namespace Microsoft.VisualStudioTools {
 
         #region Helper Functions
 
-        internal static void InvokeAsyncHelper(Action action, TaskCompletionSource<object> tcs) {
-            try {
+        internal static void InvokeAsyncHelper(Action action, TaskCompletionSource<object> tcs)
+        {
+            try
+            {
                 action();
                 tcs.TrySetResult(null);
-            } catch (OperationCanceledException) {
+            }
+            catch (OperationCanceledException)
+            {
                 tcs.TrySetCanceled();
-            } catch (Exception ex) {
-                if (ex.IsCriticalException()) {
+            }
+            catch (Exception ex)
+            {
+                if (ex.IsCriticalException())
+                {
                     throw;
                 }
                 tcs.TrySetException(ex);
             }
         }
 
-        internal static void InvokeAsyncHelper<T>(Func<T> func, TaskCompletionSource<T> tcs) {
-            try {
+        internal static void InvokeAsyncHelper<T>(Func<T> func, TaskCompletionSource<T> tcs)
+        {
+            try
+            {
                 tcs.TrySetResult(func());
-            } catch (OperationCanceledException) {
+            }
+            catch (OperationCanceledException)
+            {
                 tcs.TrySetCanceled();
-            } catch (Exception ex) {
-                if (ex.IsCriticalException()) {
+            }
+            catch (Exception ex)
+            {
+                if (ex.IsCriticalException())
+                {
                     throw;
                 }
                 tcs.TrySetException(ex);
             }
         }
 
-        internal static async void InvokeTaskHelper(Func<Task> func, TaskCompletionSource<object> tcs) {
-            try {
+        internal static async void InvokeTaskHelper(Func<Task> func, TaskCompletionSource<object> tcs)
+        {
+            try
+            {
                 await func();
                 tcs.TrySetResult(null);
-            } catch (OperationCanceledException) {
+            }
+            catch (OperationCanceledException)
+            {
                 tcs.TrySetCanceled();
-            } catch (Exception ex) {
-                if (ex.IsCriticalException()) {
+            }
+            catch (Exception ex)
+            {
+                if (ex.IsCriticalException())
+                {
                     throw;
                 }
                 tcs.TrySetException(ex);
             }
         }
 
-        internal static async void InvokeTaskHelper<T>(Func<Task<T>> func, TaskCompletionSource<T> tcs) {
-            try {
+        internal static async void InvokeTaskHelper<T>(Func<Task<T>> func, TaskCompletionSource<T> tcs)
+        {
+            try
+            {
                 tcs.TrySetResult(await func());
-            } catch (OperationCanceledException) {
+            }
+            catch (OperationCanceledException)
+            {
                 tcs.TrySetCanceled();
-            } catch (Exception ex) {
-                if (ex.IsCriticalException()) {
+            }
+            catch (Exception ex)
+            {
+                if (ex.IsCriticalException())
+                {
                     throw;
                 }
                 tcs.TrySetException(ex);
@@ -218,6 +280,5 @@ namespace Microsoft.VisualStudioTools {
         }
 
         #endregion
-
     }
 }

@@ -20,7 +20,8 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudioTools.Project;
 
-namespace Microsoft.NodejsTools.Jade {
+namespace Microsoft.NodejsTools.Jade
+{
     /// <summary>
     /// Factory for creating code editor.
     /// </summary>
@@ -28,12 +29,14 @@ namespace Microsoft.NodejsTools.Jade {
     /// While currently empty, editor factory has to be unique per language.
     /// </remarks>
     [Guid(Guids.JadeEditorFactoryString)]
-    public class JadeEditorFactory : CommonEditorFactory {
+    public class JadeEditorFactory : CommonEditorFactory
+    {
         public JadeEditorFactory(Package package) : base(package) { }
 
         public JadeEditorFactory(Package package, bool promptForEncoding) : base(package, promptForEncoding) { }
 
-        protected override void InitializeLanguageService(IVsTextLines textLines) {
+        protected override void InitializeLanguageService(IVsTextLines textLines)
+        {
             InitializeLanguageService(textLines, typeof(JadeLanguageInfo).GUID);
         }
     }

@@ -17,11 +17,14 @@
 using System;
 using System.Collections.Generic;
 
-namespace Microsoft.NodejsTools.Debugger {
-    sealed class NodeEventEventArgs : EventArgs {
+namespace Microsoft.NodejsTools.Debugger
+{
+    internal sealed class NodeEventEventArgs : EventArgs
+    {
         public readonly Dictionary<string, object> Data;
 
-        public NodeEventEventArgs(Dictionary<string, object> data) {
+        public NodeEventEventArgs(Dictionary<string, object> data)
+        {
             Data = data;
         }
     }

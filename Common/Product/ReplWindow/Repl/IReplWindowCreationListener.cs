@@ -13,11 +13,13 @@
  * ***************************************************************************/
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
-    public interface IReplWindowCreationListener {
+    public interface IReplWindowCreationListener
+    {
         void ReplWindowCreated(IReplWindow window);
     }
 }

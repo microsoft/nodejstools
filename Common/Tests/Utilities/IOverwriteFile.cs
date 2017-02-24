@@ -14,8 +14,10 @@
 
 using System;
 
-namespace TestUtilities {
-    public interface IOverwriteFile : IDisposable {
+namespace TestUtilities
+{
+    public interface IOverwriteFile : IDisposable
+    {
         string Text { get; }
 
         void No();

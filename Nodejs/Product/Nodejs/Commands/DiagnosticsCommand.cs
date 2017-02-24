@@ -26,8 +26,10 @@ using Microsoft.NodejsTools.Logging;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 
-namespace Microsoft.NodejsTools.Commands {
-    internal sealed class DiagnosticsCommand : Command {
+namespace Microsoft.NodejsTools.Commands
+{
+    internal sealed class DiagnosticsCommand : Command
+    {
         private static readonly string[] _interestingDteProperties = new[] {
             "StartupFile",
             "WorkingDirectory",
@@ -47,28 +49,36 @@ namespace Microsoft.NodejsTools.Commands {
 
         public DiagnosticsCommand(IServiceProvider serviceProvider) { }
 
-        public override int CommandId {
+        public override int CommandId
+        {
             get { return (int)PkgCmdId.cmdidDiagnostics; }
         }
 
-        public override void DoCommand(object sender, EventArgs args) {
+        public override void DoCommand(object sender, EventArgs args)
+        {
             var dlg = new DiagnosticsForm("Gathering data...");
 
-            ThreadPool.QueueUserWorkItem(x => {
+            ThreadPool.QueueUserWorkItem(x =>
+            {
                 var data = GetData();
-                try {
-                    dlg.BeginInvoke((Action)(() => {
+                try
+                {
+                    dlg.BeginInvoke((Action)(() =>
+                    {
                         dlg.TextBox.Text = data;
                         dlg.TextBox.SelectAll();
                     }));
-                } catch (InvalidOperationException) {
+                }
+                catch (InvalidOperationException)
+                {
                     // Window has been closed already
                 }
             });
             dlg.ShowDialog();
         }
 
-        private string GetData() {
+        private string GetData()
+        {
             var res = new StringBuilder();
             res.AppendLine("Use Ctrl-C to copy contents");
             res.AppendLine();
@@ -78,39 +88,51 @@ namespace Microsoft.NodejsTools.Commands {
             return res.ToString();
         }
 
-        private static string GetSolutionInfo() {
+        private static string GetSolutionInfo()
+        {
             var res = new StringBuilder();
 
             var dte = (EnvDTE.DTE)NodejsPackage.GetGlobalService(typeof(EnvDTE.DTE));
             res.AppendLine("Projects:");
 
-            foreach (EnvDTE.Project project in dte.Solution.Projects) {
+            foreach (EnvDTE.Project project in dte.Solution.Projects)
+            {
                 res.AppendLine(Indent(1, GetProjectInfo(project)));
             }
 
             return res.ToString();
         }
 
-        private static string GetProjectInfo(EnvDTE.Project project) {
+        private static string GetProjectInfo(EnvDTE.Project project)
+        {
             var res = new StringBuilder();
             string name;
-            try {
+            try
+            {
                 // Some projects will throw rather than give us a unique
                 // name. They are not ours, so we will ignore them.
                 name = project.UniqueName;
-            } catch (Exception ex) {
-                if (ex.IsCriticalException()) {
+            }
+            catch (Exception ex)
+            {
+                if (ex.IsCriticalException())
+                {
                     throw;
                 }
                 bool isNodejsProject = false;
-                try {
+                try
+                {
                     isNodejsProject = Utilities.GuidEquals(Guids.NodejsProjectFactoryString, project.Kind);
-                } catch (Exception ex2) {
-                    if (ex2.IsCriticalException()) {
+                }
+                catch (Exception ex2)
+                {
+                    if (ex2.IsCriticalException())
+                    {
                         throw;
                     }
                 }
-                if (isNodejsProject) {
+                if (isNodejsProject)
+                {
                     // Actually, it was one of our projects, so we do care
                     // about the exception. We'll add it to the output,
                     // rather than crashing.
@@ -124,24 +146,31 @@ namespace Microsoft.NodejsTools.Commands {
             return res.ToString();
         }
 
-        private static string GetProjectPropertiesInfo(EnvDTE.Project project) {
+        private static string GetProjectPropertiesInfo(EnvDTE.Project project)
+        {
             var res = new StringBuilder();
-            if (Utilities.GuidEquals(Guids.NodejsBaseProjectFactoryString, project.Kind)) {
+            if (Utilities.GuidEquals(Guids.NodejsBaseProjectFactoryString, project.Kind))
+            {
                 res.AppendLine("Kind: Node.js");
-                foreach (var prop in _interestingDteProperties) {
+                foreach (var prop in _interestingDteProperties)
+                {
                     res.AppendLine(prop + ": " + GetProjectProperty(project, prop));
                 }
                 var njsProj = project.GetNodejsProject();
-                if (njsProj != null) {
+                if (njsProj != null)
+                {
                     res.AppendLine(GetNodeJsProjectProperties(njsProj));
                 }
-            } else {
+            }
+            else
+            {
                 res.AppendLine("Kind: " + project.Kind);
             }
             return res.ToString();
         }
 
-        private static string GetNodeJsProjectProperties(Project.NodejsProjectNode project) {
+        private static string GetNodeJsProjectProperties(Project.NodejsProjectNode project)
+        {
             var res = new StringBuilder();
             res.AppendLine(GetProjectNpmInfo(project));
             res.AppendLine(GetProjectFileInfo(project));
@@ -151,45 +180,57 @@ namespace Microsoft.NodejsTools.Commands {
         /// <summary>
         /// Stores information about a collection of files of a given type.
         /// </summary>
-        private class FileTypeInfo {
+        private class FileTypeInfo
+        {
             private int _count = 0;
             private int _maxLineLength = 0;
             private int _totalLineLength = 0;
 
-            public int Count {
+            public int Count
+            {
                 get { return _count; }
             }
 
-            public int MaxLineLength {
+            public int MaxLineLength
+            {
                 get { return _maxLineLength; }
             }
 
-            public int AverageLineLength {
+            public int AverageLineLength
+            {
                 get { return _count > 0 ? _totalLineLength / _count : 0; }
             }
 
-            public void UpdateForFile(string file) {
-                try {
+            public void UpdateForFile(string file)
+            {
+                try
+                {
                     int length = File.ReadLines(file).Count();
                     ++_count;
                     _totalLineLength += length;
                     _maxLineLength = Math.Max(_maxLineLength, length);
-                } catch (IOException) {
+                }
+                catch (IOException)
+                {
                     // noop
                 }
             }
         }
 
-        private static string GetProjectFileInfo(Project.NodejsProjectNode project) {
+        private static string GetProjectFileInfo(Project.NodejsProjectNode project)
+        {
             var fileTypeInfo = new Dictionary<string, FileTypeInfo>();
-            foreach (var node in project.DiskNodes) {
+            foreach (var node in project.DiskNodes)
+            {
                 var file = node.Key;
                 var matchedExt = _interestingFileExtensions.Where(ext => file.EndsWith(ext, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
-                if (!string.IsNullOrEmpty(matchedExt)) {
+                if (!string.IsNullOrEmpty(matchedExt))
+                {
                     var recordKey = string.Format(CultureInfo.InvariantCulture, "{0} ({1})", matchedExt, node.Value.ItemNode?.IsExcluded ?? true ? "excluded from project" : "included in project");
                     FileTypeInfo record;
-                    if (!fileTypeInfo.TryGetValue(recordKey, out record)) {
+                    if (!fileTypeInfo.TryGetValue(recordKey, out record))
+                    {
                         record = fileTypeInfo[recordKey] = new FileTypeInfo();
                     }
                     record.UpdateForFile(file);
@@ -199,7 +240,8 @@ namespace Microsoft.NodejsTools.Commands {
             var res = new StringBuilder();
 
             res.AppendLine("Project Info:");
-            foreach (var entry in fileTypeInfo) {
+            foreach (var entry in fileTypeInfo)
+            {
                 res.AppendLine(Indent(1, entry.Key + ":"));
                 res.AppendLine(Indent(2, "Number of Files: " + entry.Value.Count));
                 res.AppendLine(Indent(2, "Average Line Count: " + entry.Value.AverageLineLength));
@@ -209,41 +251,54 @@ namespace Microsoft.NodejsTools.Commands {
             return res.ToString();
         }
 
-        private static string GetProjectNpmInfo(Project.NodejsProjectNode project) {
+        private static string GetProjectNpmInfo(Project.NodejsProjectNode project)
+        {
             var modules = project?.ModulesNode?.RootPackage?.Modules;
-            if (modules == null) {
+            if (modules == null)
+            {
                 return "";
             }
 
             var res = new StringBuilder();
             res.AppendLine(string.Format(CultureInfo.InvariantCulture, "Top Level Node Packages ({0}):", modules.Count()));
-            foreach (var module in modules) {
+            foreach (var module in modules)
+            {
                 res.AppendLine(Indent(1, string.Format(CultureInfo.InvariantCulture, "{0} {1} ", module.Name, module.Version)));
             }
             return res.ToString();
         }
 
-        private static string GetProjectProperty(EnvDTE.Project project, string name) {
-            try {
+        private static string GetProjectProperty(EnvDTE.Project project, string name)
+        {
+            try
+            {
                 var item = project.Properties.Item(name);
-                if (item != null && item.Value != null) {
+                if (item != null && item.Value != null)
+                {
                     return item.Value.ToString();
                 }
-            } catch {
+            }
+            catch
+            {
                 // noop
             }
             return "<undefined>";
         }
 
-        private static string GetEventsAndStatsInfo() {
+        private static string GetEventsAndStatsInfo()
+        {
             var res = new StringBuilder();
             res.AppendLine("Logged events/stats:");
 
-            try {
+            try
+            {
                 var inMemLogger = NodejsPackage.Instance.GetComponentModel().GetService<InMemoryLogger>();
                 res.AppendLine(inMemLogger.ToString());
-            } catch (Exception ex) {
-                if (ex.IsCriticalException()) {
+            }
+            catch (Exception ex)
+            {
+                if (ex.IsCriticalException())
+                {
                     throw;
                 }
                 res.AppendLine(Indent(1, "Failed to access event log."));
@@ -252,10 +307,12 @@ namespace Microsoft.NodejsTools.Commands {
             return res.ToString();
         }
 
-        private static string GetLoadedAssemblyInfo() {
+        private static string GetLoadedAssemblyInfo()
+        {
             var res = new StringBuilder();
             res.AppendLine("Loaded assemblies:");
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().OrderBy(assem => assem.FullName)) {
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().OrderBy(assem => assem.FullName))
+            {
                 var assemFileVersion = assembly.GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false).OfType<AssemblyFileVersionAttribute>().FirstOrDefault();
 
                 res.AppendLine(Indent(1, string.Format(CultureInfo.InvariantCulture, "{0}, FileVersion={1}",
@@ -265,7 +322,8 @@ namespace Microsoft.NodejsTools.Commands {
             return res.ToString();
         }
 
-        private static string Indent(int count, string text) {
+        private static string Indent(int count, string text)
+        {
             var indent = new string(' ', count * 4);
             var lines = text.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
             var indentedText = lines.Select(line =>

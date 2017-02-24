@@ -16,14 +16,17 @@
 
 using System;
 
-namespace Microsoft.NodejsTools.Debugger {
+namespace Microsoft.NodejsTools.Debugger
+{
     /// <summary>
     /// Event args for start/stop of threads.
     /// </summary>
-    class ThreadEventArgs : EventArgs {
+    internal class ThreadEventArgs : EventArgs
+    {
         public readonly NodeThread Thread;
 
-        public ThreadEventArgs(NodeThread thread) {
+        public ThreadEventArgs(NodeThread thread)
+        {
             Thread = thread;
         }
     }

@@ -17,34 +17,41 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudioTools.Project;
 
-namespace Microsoft.VisualStudioTools {
-
-    class ClipboardService : ClipboardServiceBase {
-        public override void SetClipboard(IDataObject dataObject) {
+namespace Microsoft.VisualStudioTools
+{
+    internal class ClipboardService : ClipboardServiceBase
+    {
+        public override void SetClipboard(IDataObject dataObject)
+        {
             ErrorHandler.ThrowOnFailure(UnsafeNativeMethods.OleSetClipboard(dataObject));
         }
 
-        public override IDataObject GetClipboard() {
+        public override IDataObject GetClipboard()
+        {
             IDataObject res;
             ErrorHandler.ThrowOnFailure(UnsafeNativeMethods.OleGetClipboard(out res));
             return res;
         }
 
-        public override void FlushClipboard() {
+        public override void FlushClipboard()
+        {
             ErrorHandler.ThrowOnFailure(UnsafeNativeMethods.OleFlushClipboard());
         }
 
-        public override bool OpenClipboard() {
+        public override bool OpenClipboard()
+        {
             int res = UnsafeNativeMethods.OpenClipboard(IntPtr.Zero);
             ErrorHandler.ThrowOnFailure(res);
             return res == 1;
         }
 
-        public override void EmptyClipboard() {
+        public override void EmptyClipboard()
+        {
             ErrorHandler.ThrowOnFailure(UnsafeNativeMethods.EmptyClipboard());
         }
 
-        public override void CloseClipboard() {
+        public override void CloseClipboard()
+        {
             ErrorHandler.ThrowOnFailure(UnsafeNativeMethods.CloseClipboard());
         }
     }

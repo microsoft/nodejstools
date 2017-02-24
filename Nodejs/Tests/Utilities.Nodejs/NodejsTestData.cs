@@ -14,11 +14,14 @@
 //
 //*********************************************************//
 
-namespace TestUtilities.Nodejs {
-    public class NodejsTestData {
-        const string DataSourcePath = @"Nodejs\Tests\TestData";
+namespace TestUtilities.Nodejs
+{
+    public class NodejsTestData
+    {
+        private const string DataSourcePath = @"Nodejs\Tests\TestData";
 
-        public static void Deploy(bool includeTestData = true) {
+        public static void Deploy(bool includeTestData = true)
+        {
             TestData.Deploy(DataSourcePath, includeTestData);
         }
     }

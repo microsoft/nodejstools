@@ -17,9 +17,12 @@
 using System;
 using Microsoft.NodejsTools.Debugger.Events;
 
-namespace Microsoft.NodejsTools.Debugger.Communication {
-    sealed class ExceptionEventArgs : EventArgs {
-        public ExceptionEventArgs(ExceptionEvent exceptionEvent) {
+namespace Microsoft.NodejsTools.Debugger.Communication
+{
+    internal sealed class ExceptionEventArgs : EventArgs
+    {
+        public ExceptionEventArgs(ExceptionEvent exceptionEvent)
+        {
             ExceptionEvent = exceptionEvent;
         }
 

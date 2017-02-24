@@ -18,16 +18,20 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.NodejsTools;
 using System.IO;
 
-namespace NodejsTests {
+namespace NodejsTests
+{
     [TestClass]
-    public class NodePathResolutionTests {
+    public class NodePathResolutionTests
+    {
         [TestMethod, Priority(0)]
-        public void CheckNodeExeEnvironmentResolution() {
+        public void CheckNodeExeEnvironmentResolution()
+        {
             Assert.IsTrue(File.Exists(Nodejs.NodeExePath));
         }
 
         [TestMethod, Priority(0)]
-        public void CheckRelativeNodeExePathResolution() {
+        public void CheckRelativeNodeExePathResolution()
+        {
             var path = @"C:\mynodepath\node.exe";
             var dir = Path.GetDirectoryName(path);
             var filename = Path.GetFileName(path);
@@ -47,7 +51,8 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0)]
-        public void CheckAbsoluteNodeExePathResolution() {
+        public void CheckAbsoluteNodeExePathResolution()
+        {
             var path = @"C:\Program Files\node.exe";
             var dir = Path.GetDirectoryName(path);
 

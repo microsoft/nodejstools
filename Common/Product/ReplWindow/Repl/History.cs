@@ -17,11 +17,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
-    internal class History {
+    internal class History
+    {
         private readonly int _maxLength;
         private int _pos;
         private bool _live;
@@ -29,86 +31,113 @@ namespace Microsoft.VisualStudio.Repl {
         private string _uncommitedInput;
 
         internal History()
-            : this(50) {
+            : this(50)
+        {
         }
 
-        internal History(int maxLength) {
+        internal History(int maxLength)
+        {
             _maxLength = maxLength;
             _pos = -1;
             _history = new List<HistoryEntry>();
         }
 
-        internal void Clear() {
+        internal void Clear()
+        {
             _pos = -1;
             _live = false;
             _history.Clear();
         }
 
-        internal int MaxLength {
+        internal int MaxLength
+        {
             get { return _maxLength; }
         }
 
-        internal int Length {
+        internal int Length
+        {
             get { return _history.Count; }
         }
 
-        internal string UncommittedInput {
+        internal string UncommittedInput
+        {
             get { return _uncommitedInput; }
             set { _uncommitedInput = value; }
         }
 
-        internal IEnumerable<HistoryEntry> Items {
+        internal IEnumerable<HistoryEntry> Items
+        {
             get { return _history; }
         }
 
-        internal HistoryEntry Last {
-            get {
-                if (_history.Count > 0) {
+        internal HistoryEntry Last
+        {
+            get
+            {
+                if (_history.Count > 0)
+                {
                     return _history[_history.Count - 1];
-                } else {
+                }
+                else
+                {
                     return null;
                 }
             }
         }
 
-        internal void Add(string text) {
+        internal void Add(string text)
+        {
             var entry = new HistoryEntry { Text = text };
             _live = false;
-            if (Length == 0 || Last.Text != text) {
+            if (Length == 0 || Last.Text != text)
+            {
                 _history.Add(entry);
             }
-            if (_history[InternalPosition].Text != text) {
+            if (_history[InternalPosition].Text != text)
+            {
                 _pos = -1;
             }
-            if (Length > MaxLength) {
+            if (Length > MaxLength)
+            {
                 _history.RemoveAt(0);
-                if (_pos > 0) {
+                if (_pos > 0)
+                {
                     _pos--;
                 }
             }
         }
 
-        private int InternalPosition {
-            get {
-                if (_pos == -1) {
+        private int InternalPosition
+        {
+            get
+            {
+                if (_pos == -1)
+                {
                     return Length - 1;
-                } else {
+                }
+                else
+                {
                     return _pos;
                 }
             }
         }
 
-        private string GetHistoryText(int pos) {
-            if (pos < 0) {
+        private string GetHistoryText(int pos)
+        {
+            if (pos < 0)
+            {
                 pos += Length;
             }
             return _history[pos].Text;
         }
 
-        private string MoveToNext(string search) {
-            do {
+        private string MoveToNext(string search)
+        {
+            do
+            {
                 _live = true;
-                if (_pos < 0 || _pos == Length - 1) {
+                if (_pos < 0 || _pos == Length - 1)
+                {
                     return null;
                 }
                 _pos++;
@@ -116,22 +145,30 @@ namespace Microsoft.VisualStudio.Repl {
 
             return GetHistoryMatch(search);
         }
-        
-        private string MoveToPrevious(string search) {
+
+        private string MoveToPrevious(string search)
+        {
             bool wasLive = _live;
             _live = true;
-            do {
-                if (Length == 0 || (Length > 1 && _pos == 0)) {
+            do
+            {
+                if (Length == 0 || (Length > 1 && _pos == 0))
+                {
                     // we have no history or we have history but have scrolled to the very beginning
                     return null;
                 }
-                if (_pos == -1) {
+                if (_pos == -1)
+                {
                     // no search in progress, start our search at the end
                     _pos = Length - 1;
-                } else if (!wasLive && String.IsNullOrWhiteSpace(search)) {
+                }
+                else if (!wasLive && String.IsNullOrWhiteSpace(search))
+                {
                     // Handles up up up enter up
                     // Do nothing
-                } else {
+                }
+                else
+                {
                     // go to the previous item
                     _pos--;
                 }
@@ -140,37 +177,45 @@ namespace Microsoft.VisualStudio.Repl {
             return GetHistoryMatch(search);
         }
 
-        private bool SearchDoesntMatch(string search) {
+        private bool SearchDoesntMatch(string search)
+        {
             return !String.IsNullOrWhiteSpace(search) && GetHistoryText(_pos).IndexOf(search) == -1;
         }
 
-        private string GetHistoryMatch(string search) {
-            if (SearchDoesntMatch(search)) {
+        private string GetHistoryMatch(string search)
+        {
+            if (SearchDoesntMatch(search))
+            {
                 return null;
             }
 
             return GetHistoryText(_pos);
         }
 
-        private string Get(Func<string, string> moveFn, string search) {
+        private string Get(Func<string, string> moveFn, string search)
+        {
             var startPos = _pos;
             string next = moveFn(search);
-            if (next == null) {
+            if (next == null)
+            {
                 _pos = startPos;
                 return null;
             }
             return next;
         }
 
-        internal string GetNext(string search = null) {
+        internal string GetNext(string search = null)
+        {
             return Get(MoveToNext, search);
         }
 
-        internal string GetPrevious(string search = null) {
+        internal string GetPrevious(string search = null)
+        {
             return Get(MoveToPrevious, search);
         }
 
-        internal class HistoryEntry {
+        internal class HistoryEntry
+        {
             internal string Text;
             internal bool Command;
             internal int Duration;

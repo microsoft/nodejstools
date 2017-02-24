@@ -14,8 +14,10 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Debugger.Commands {
-    sealed class DisconnectCommand : DebuggerCommand {
+namespace Microsoft.NodejsTools.Debugger.Commands
+{
+    internal sealed class DisconnectCommand : DebuggerCommand
+    {
         public DisconnectCommand(int id) : base(id, "disconnect") { }
     }
 }

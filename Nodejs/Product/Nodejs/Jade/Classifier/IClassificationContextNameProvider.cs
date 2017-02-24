@@ -15,8 +15,11 @@
 //*********************************************************//
 
 using Microsoft.VisualStudio.Text.Classification;
-namespace Microsoft.NodejsTools.Jade {
-    interface IClassificationContextNameProvider<T> {
+
+namespace Microsoft.NodejsTools.Jade
+{
+    internal interface IClassificationContextNameProvider<T>
+    {
         IClassificationType GetClassificationType(T t);
     }
 }

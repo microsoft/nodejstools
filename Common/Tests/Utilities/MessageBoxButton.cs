@@ -13,9 +13,11 @@
  * ***************************************************************************/
 
 
-namespace TestUtilities {
+namespace TestUtilities
+{
     // http://msdn.microsoft.com/en-us/library/ms645505(VS.85).aspx
-    public enum MessageBoxButton {
+    public enum MessageBoxButton
+    {
         Abort = 3,
         Cancel = 2,
         Continue = 11,
@@ -25,6 +27,5 @@ namespace TestUtilities {
         Retry = 4,
         TryAgain = 10,
         Yes = 6
-
     }
 }

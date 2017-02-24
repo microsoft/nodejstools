@@ -20,11 +20,14 @@ using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 
-namespace NodejsTests.Debugger.Serialization {
+namespace NodejsTests.Debugger.Serialization
+{
     [TestClass]
-    public class BacktraceVariableTests {
+    public class BacktraceVariableTests
+    {
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateBacktraceVariable() {
+        public void CreateBacktraceVariable()
+        {
             // Arrange
             JObject json = SerializationTestData.GetBacktraceJsonObject();
             var stackFrame = new NodeStackFrame(0);
@@ -47,7 +50,8 @@ namespace NodejsTests.Debugger.Serialization {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateBacktraceVariableWithNullName() {
+        public void CreateBacktraceVariableWithNullName()
+        {
             // Arrange
             JObject json = SerializationTestData.GetBacktraceJsonObjectWithNullName();
             var stackFrame = new NodeStackFrame(0);
@@ -69,43 +73,51 @@ namespace NodejsTests.Debugger.Serialization {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateBacktraceVariableWithNullStackFrame() {
+        public void CreateBacktraceVariableWithNullStackFrame()
+        {
             // Arrange
             JObject json = SerializationTestData.GetBacktraceJsonObject();
             Exception exception = null;
             NodeBacktraceVariable result = null;
 
             // Act
-            try {
+            try
+            {
                 result = new NodeBacktraceVariable(null, json);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 exception = e;
             }
 
             // Assert
             Assert.IsNull(result);
             Assert.IsNotNull(exception);
-            Assert.IsInstanceOfType(exception, typeof (ArgumentNullException));
+            Assert.IsInstanceOfType(exception, typeof(ArgumentNullException));
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateBacktraceVariableWithNullJson() {
+        public void CreateBacktraceVariableWithNullJson()
+        {
             // Arrange
             var stackFrame = new NodeStackFrame(0);
             Exception exception = null;
             NodeBacktraceVariable result = null;
 
             // Act
-            try {
+            try
+            {
                 result = new NodeBacktraceVariable(stackFrame, null);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 exception = e;
             }
 
             // Assert
             Assert.IsNull(result);
             Assert.IsNotNull(exception);
-            Assert.IsInstanceOfType(exception, typeof (ArgumentNullException));
+            Assert.IsInstanceOfType(exception, typeof(ArgumentNullException));
         }
     }
 }

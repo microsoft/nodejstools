@@ -20,35 +20,43 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm;
 
-namespace NpmTests {
-    public class MockPackageCatalog : IPackageCatalog {
+namespace NpmTests
+{
+    public class MockPackageCatalog : IPackageCatalog
+    {
         private IDictionary<string, IPackage> _byName = new Dictionary<string, IPackage>();
-        private IList<IPackage> _results; 
- 
-        public MockPackageCatalog(IList<IPackage> results) {
+        private IList<IPackage> _results;
+
+        public MockPackageCatalog(IList<IPackage> results)
+        {
             _results = results;
             LastRefreshed = DateTime.Now;
 
-            foreach (var package in results) {
+            foreach (var package in results)
+            {
                 _byName[package.Name] = package;
             }
         }
 
         public DateTime LastRefreshed { get; private set; }
 
-        public Task<IEnumerable<IPackage>> GetCatalogPackagesAsync(string filterText, Uri registryUrl = null) {
+        public Task<IEnumerable<IPackage>> GetCatalogPackagesAsync(string filterText, Uri registryUrl = null)
+        {
             return Task.FromResult(_results.AsEnumerable());
         }
 
-        public IPackage this[string name] {
-            get {
+        public IPackage this[string name]
+        {
+            get
+            {
                 IPackage match;
                 _byName.TryGetValue(name, out match);
                 return match;
             }
         }
 
-        public long? ResultsCount {
+        public long? ResultsCount
+        {
             get { return _results.LongCount(); }
         }
     }

@@ -14,20 +14,26 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Options {
-    internal class NodejsDiagnosticsOptionsPage : NodejsDialogPage {
+namespace Microsoft.NodejsTools.Options
+{
+    internal class NodejsDiagnosticsOptionsPage : NodejsDialogPage
+    {
         private bool _isLiveDiagnosticsEnabled;
         private const string IsLiveDiagnosticsEnabledSetting = "IsLiveDiagnosticsEnabled";
 
-        public NodejsDiagnosticsOptionsPage() : base("Diagnostics") {
+        public NodejsDiagnosticsOptionsPage() : base("Diagnostics")
+        {
             _isLiveDiagnosticsEnabled = !NodejsPackage.Instance.Zombied && (LoadBool(IsLiveDiagnosticsEnabledSetting) ?? false);
         }
 
-        public bool IsLiveDiagnosticsEnabled {
-            get {
+        public bool IsLiveDiagnosticsEnabled
+        {
+            get
+            {
                 return !NodejsPackage.Instance.Zombied && _isLiveDiagnosticsEnabled;
             }
-            set {
+            set
+            {
                 _isLiveDiagnosticsEnabled = value;
                 SaveBool(IsLiveDiagnosticsEnabledSetting, value);
             }

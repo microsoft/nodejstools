@@ -20,11 +20,14 @@ using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace NodejsTests.Debugger.Commands {
+namespace NodejsTests.Debugger.Commands
+{
     [TestClass]
-    public class SetVariableValueCommandTests {
+    public class SetVariableValueCommandTests
+    {
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateSetVariableValueCommand() {
+        public void CreateSetVariableValueCommand()
+        {
             // Arrange
             const int commandId = 3;
             const int frameId = 1;
@@ -45,7 +48,8 @@ namespace NodejsTests.Debugger.Commands {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void ProcessSetVariableValueResponse() {
+        public void ProcessSetVariableValueResponse()
+        {
             // Arrange
             const int commandId = 3;
             var resultFactoryMock = new Mock<IEvaluationResultFactory>();

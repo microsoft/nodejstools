@@ -18,30 +18,41 @@ using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Imaging;
 
-namespace Microsoft.NodejsTools.Project {
-    class NodejsTypeScriptFileNode : NodejsFileNode {
+namespace Microsoft.NodejsTools.Project
+{
+    internal class NodejsTypeScriptFileNode : NodejsFileNode
+    {
         public NodejsTypeScriptFileNode(NodejsProjectNode root, ProjectElement e)
-            : base(root, e) {
+            : base(root, e)
+        {
         }
 
-        protected override ImageMoniker CodeFileIconMoniker {
-            get {
+        protected override ImageMoniker CodeFileIconMoniker
+        {
+            get
+            {
                 return KnownMonikers.TSFileNode;
             }
         }
 
-        protected override NodeProperties CreatePropertiesObject() {
-            if (IsLinkFile) {
+        protected override NodeProperties CreatePropertiesObject()
+        {
+            if (IsLinkFile)
+            {
                 return new NodejsTypeScriptLinkFileNodeProperties(this);
-            } else if (IsNonMemberItem) {
+            }
+            else if (IsNonMemberItem)
+            {
                 return new ExcludedFileNodeProperties(this);
             }
 
             return new NodejsTypeScriptFileNodeProperties(this);
         }
 
-        public new NodejsProjectNode ProjectMgr {
-            get {
+        public new NodejsProjectNode ProjectMgr
+        {
+            get
+            {
                 return (NodejsProjectNode)base.ProjectMgr;
             }
         }

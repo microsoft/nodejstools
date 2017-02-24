@@ -15,24 +15,31 @@
 //*********************************************************//
 
 using Microsoft.VisualStudio.Text.Classification;
-namespace Microsoft.NodejsTools.Jade {
-    class JadeToken : Token<JadeTokenType> {
+
+namespace Microsoft.NodejsTools.Jade
+{
+    internal class JadeToken : Token<JadeTokenType>
+    {
         public readonly IClassificationType Classification;
 
         public JadeToken(JadeTokenType type, int start, int length)
-            : base(type, start, length) {
+            : base(type, start, length)
+        {
         }
 
         public JadeToken(JadeTokenType type, IClassificationType classification, int start, int length)
-            : base(type, start, length) {
+            : base(type, start, length)
+        {
             Classification = classification;
         }
 
-        public override bool IsComment {
+        public override bool IsComment
+        {
             get { return TokenType == JadeTokenType.Comment; }
         }
 
-        public override bool IsString {
+        public override bool IsString
+        {
             get { return TokenType == JadeTokenType.String; }
         }
     }

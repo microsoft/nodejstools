@@ -16,24 +16,30 @@
 
 using Microsoft.VisualStudioTools.Project;
 
-namespace Microsoft.NodejsTools.Repl {
-    class VsNodejsReplSite : INodejsReplSite {
+namespace Microsoft.NodejsTools.Repl
+{
+    internal class VsNodejsReplSite : INodejsReplSite
+    {
         internal static VsNodejsReplSite Site = new VsNodejsReplSite();
 
-#region INodejsReplSite Members
+        #region INodejsReplSite Members
 
-        public CommonProjectNode GetStartupProject() {
+        public CommonProjectNode GetStartupProject()
+        {
             var nodeJsInstance = NodejsPackage.Instance;
-            if (nodeJsInstance == null) {
+            if (nodeJsInstance == null)
+            {
                 // Node.js Tools package has not loaded yet. Expected if no NTVS project is open.
                 return null;
             }
             return NodejsPackage.GetStartupProject(nodeJsInstance);
         }
 
-        public bool TryGetStartupFileAndDirectory(out string fileName, out string directory) {
+        public bool TryGetStartupFileAndDirectory(out string fileName, out string directory)
+        {
             var nodeJsInstance = NodejsPackage.Instance;
-            if (nodeJsInstance == null) {
+            if (nodeJsInstance == null)
+            {
                 // Node.js Tools package has not loaded yet. Expected if no NTVS project is open.
                 fileName = null;
                 directory = null;
@@ -42,6 +48,6 @@ namespace Microsoft.NodejsTools.Repl {
             return NodejsPackage.TryGetStartupFileAndDirectory(nodeJsInstance, out fileName, out directory);
         }
 
-#endregion
+        #endregion
     }
 }

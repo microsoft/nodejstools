@@ -16,69 +16,87 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.NodejsTools.Debugger {
-    sealed class NodeThread {
+namespace Microsoft.NodejsTools.Debugger
+{
+    internal sealed class NodeThread
+    {
         private readonly int _identity;
         private readonly NodeDebugger _process;
         private readonly bool _isWorkerThread;
 
-        internal NodeThread(NodeDebugger process, int identity, bool isWorkerThread) {
+        internal NodeThread(NodeDebugger process, int identity, bool isWorkerThread)
+        {
             _process = process;
             _identity = identity;
             _isWorkerThread = isWorkerThread;
             Name = "main thread";
         }
 
-        public void StepInto() {
+        public void StepInto()
+        {
             _process.SendStepInto(_identity);
         }
 
-        public void StepOver() {
+        public void StepOver()
+        {
             _process.SendStepOver(_identity);
         }
 
-        public void StepOut() {
+        public void StepOut()
+        {
             _process.SendStepOut(_identity);
         }
 
-        public void Resume() {
+        public void Resume()
+        {
             _process.SendResumeThread(_identity);
         }
 
-        public bool IsWorkerThread {
-            get {
+        public bool IsWorkerThread
+        {
+            get
+            {
                 return _isWorkerThread;
             }
         }
 
-        internal void ClearSteppingState() {
+        internal void ClearSteppingState()
+        {
             _process.SendClearStepping(_identity);
         }
 
         public IList<NodeStackFrame> Frames { get; set; }
 
-        public int CallstackDepth {
-            get {
+        public int CallstackDepth
+        {
+            get
+            {
                 return Frames != null ? Frames.Count : 0;
             }
         }
 
-        public NodeStackFrame TopStackFrame {
-            get {
+        public NodeStackFrame TopStackFrame
+        {
+            get
+            {
                 return Frames != null && Frames.Count > 0 ? Frames[0] : null;
             }
         }
 
-        public NodeDebugger Process {
-            get {
+        public NodeDebugger Process
+        {
+            get
+            {
                 return _process;
             }
         }
 
         public string Name { get; set; }
 
-        internal int Id {
-            get {
+        internal int Id
+        {
+            get
+            {
                 return _identity;
             }
         }

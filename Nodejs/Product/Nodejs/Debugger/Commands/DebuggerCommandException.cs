@@ -17,9 +17,11 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Microsoft.NodejsTools.Debugger.Commands {
+namespace Microsoft.NodejsTools.Debugger.Commands
+{
     [Serializable]
-    class DebuggerCommandException : Exception {
+    internal class DebuggerCommandException : Exception
+    {
         public DebuggerCommandException() { }
         public DebuggerCommandException(string message) : base(message) { }
         public DebuggerCommandException(string message, Exception innerException) : base(message, innerException) { }

@@ -18,9 +18,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Microsoft.NodejsTools.Npm {
-    public interface INpmCommander : INpmLogSource, IDisposable {
-
+namespace Microsoft.NodejsTools.Npm
+{
+    public interface INpmCommander : INpmLogSource, IDisposable
+    {
         /// <summary>
         /// Cancels the currently running command
         /// </summary>

@@ -14,16 +14,19 @@
 //
 //*********************************************************//
 
-namespace Microsoft.NodejsTools.Debugger {
+namespace Microsoft.NodejsTools.Debugger
+{
     /// <summary>
     /// Stores line and column position in the file.
     /// </summary>
-    sealed class FilePosition {
+    internal sealed class FilePosition
+    {
         public readonly int Column;
         public readonly string FileName;
         public readonly int Line;
 
-        public FilePosition(string fileName, int line, int column) {
+        public FilePosition(string fileName, int line, int column)
+        {
             FileName = fileName;
             Line = line;
             Column = column;

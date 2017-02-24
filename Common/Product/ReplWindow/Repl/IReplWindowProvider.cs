@@ -20,14 +20,16 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Utilities;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
     /// <summary>
     /// Provides access to creating or finding existing REPL windows.   
     /// </summary>
-    public interface IReplWindowProvider {
+    public interface IReplWindowProvider
+    {
         /// <summary>
         /// Creates a REPL window and returns a ToolWindowPane which implements IReplWindow.  An IReplEvaluatorProvider must exist
         /// to respond and create the specified REPL ID.

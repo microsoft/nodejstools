@@ -17,11 +17,13 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace NodeLogConverter.LogParsing {
+namespace NodeLogConverter.LogParsing
+{
     [Guid("8CC97F40-9028-4FF3-9B62-7D1F79CA7BCB")]
     [ComImport]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    interface ITraceEvent {
+    internal interface ITraceEvent
+    {
         void Clone(
             /* [retval][out] */ out ITraceEvent NewEvent);
 
