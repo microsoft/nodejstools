@@ -83,7 +83,15 @@ namespace Microsoft.NodejsTools.Debugger {
             _attached = true;
         }
 
-        public NodeDebugger(string exe, string script, string dir, string env, string interpreterOptions, NodeDebugOptions debugOptions, ushort? debuggerPort = null, bool createNodeWindow = true)
+        public NodeDebugger(
+            string exe,
+            string script,
+            string dir,
+            string env,
+            string interpreterOptions,
+            NodeDebugOptions debugOptions,
+            ushort? debuggerPort = null,
+            bool createNodeWindow = true)
             : this() {
             // Select debugger port for a local connection
             var debuggerPortOrDefault = debuggerPort ?? GetDebuggerPort();
@@ -105,7 +113,15 @@ namespace Microsoft.NodejsTools.Debugger {
             return debuggerPortOrDefault;
         }
 
-        public static NodeProcess StartNodeProcessWithDebug(string exe, string script, string dir, string env, string interpreterOptions, NodeDebugOptions debugOptions, ushort? debuggerPort = null, bool createNodeWindow = true) {
+        public static NodeProcess StartNodeProcessWithDebug(
+            string exe, 
+            string script, 
+            string dir, 
+            string env, 
+            string interpreterOptions, 
+            NodeDebugOptions debugOptions,
+            ushort? debuggerPort = null, 
+            bool createNodeWindow = true) {
             // Select debugger port for a local connection
             var debuggerPortOrDefault = debuggerPort ?? GetDebuggerPort();
 
@@ -115,7 +131,15 @@ namespace Microsoft.NodejsTools.Debugger {
             return StartNodeProcess(exe, dir, env, debugOptions, debuggerPortOrDefault, allArgs, createNodeWindow);
         }
 
-        public static NodeProcess StartNodeProcessWithInspect(string exe, string script, string dir, string env, string interpreterOptions, NodeDebugOptions debugOptions, ushort? debuggerPort = null, bool createNodeWindow = true) {
+        public static NodeProcess StartNodeProcessWithInspect(
+            string exe, 
+            string script, 
+            string dir, 
+            string env, 
+            string interpreterOptions, 
+            NodeDebugOptions debugOptions, 
+            ushort? debuggerPort = null, 
+            bool createNodeWindow = true) {
             // Select debugger port for a local connection
             var debuggerPortOrDefault = debuggerPort ?? GetDebuggerPort();
 
@@ -126,7 +150,15 @@ namespace Microsoft.NodejsTools.Debugger {
         }
 
         // starts the nodeprocess in debug mode without hooking up our debugger, this way we can attach the WebKit debugger as a next step.
-        private static NodeProcess StartNodeProcess(string exe, string dir, string env, NodeDebugOptions debugOptions, ushort debuggerPortOrDefault, string allArgs, bool createNodeWindow) {
+        private static NodeProcess StartNodeProcess(
+            string exe, 
+            string dir, 
+            string env, 
+            NodeDebugOptions 
+            debugOptions, 
+            ushort debuggerPortOrDefault, 
+            string allArgs, 
+            bool createNodeWindow) {
             var psi = new ProcessStartInfo(exe, allArgs) {
                 CreateNoWindow = !createNodeWindow,
                 WorkingDirectory = dir,

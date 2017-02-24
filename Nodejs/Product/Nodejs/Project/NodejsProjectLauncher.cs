@@ -95,7 +95,8 @@ namespace Microsoft.NodejsTools.Project {
 
             // start the node process
             var workingDir = _project.GetWorkingDirectory();
-            var env = "";
+            var url = GetFullUrl();
+            var env = GetEnvironmentVariablesString(url);
             var interpreterOptions = _project.GetProjectProperty(NodeProjectProperty.NodeExeArguments);
             var debugOptions = this.GetDebugOptions();
 
@@ -159,11 +160,11 @@ namespace Microsoft.NodejsTools.Project {
                 return IntPtr.Zero;
             }
 
-            var guiSize = Marshal.SizeOf(typeof(Guid));
-            var size = debugEngines.Length * guiSize;
+            var guidSize = Marshal.SizeOf(typeof(Guid));
+            var size = debugEngines.Length * guidSize;
             var bytes = new byte[size];
             for (var i = 0; i < debugEngines.Length; ++i) {
-                debugEngines[i].ToByteArray().CopyTo(bytes, i * guiSize);
+                debugEngines[i].ToByteArray().CopyTo(bytes, i * guidSize);
             }
 
             var pDebugEngines = Marshal.AllocCoTaskMem(size);
