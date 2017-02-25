@@ -30,27 +30,27 @@ namespace Microsoft.VisualStudioTools.Navigation
 
         public TextLineEventListener(IVsTextLines buffer, string fileName, ModuleId id)
         {
-            _buffer = buffer;
-            _fileId = id;
-            _fileName = fileName;
+            this._buffer = buffer;
+            this._fileId = id;
+            this._fileName = fileName;
             IConnectionPointContainer container = buffer as IConnectionPointContainer;
             if (null != container)
             {
                 Guid eventsGuid = typeof(IVsTextLinesEvents).GUID;
-                container.FindConnectionPoint(ref eventsGuid, out _connectionPoint);
-                _connectionPoint.Advise(this as IVsTextLinesEvents, out _connectionCookie);
+                container.FindConnectionPoint(ref eventsGuid, out this._connectionPoint);
+                this._connectionPoint.Advise(this as IVsTextLinesEvents, out this._connectionCookie);
             }
         }
 
         #region Properties
         public ModuleId FileID
         {
-            get { return _fileId; }
+            get { return this._fileId; }
         }
         public string FileName
         {
-            get { return _fileName; }
-            set { _fileName = value; }
+            get { return this._fileName; }
+            set { this._fileName = value; }
         }
         #endregion
 
@@ -75,41 +75,41 @@ namespace Microsoft.VisualStudioTools.Navigation
                 eh(this, pTextLineChange, fLast);
             }
 
-            _isDirty = true;
+            this._isDirty = true;
         }
         #endregion
 
         #region IDisposable Members
         public void Dispose()
         {
-            if ((null != _connectionPoint) && (0 != _connectionCookie))
+            if ((null != this._connectionPoint) && (0 != this._connectionCookie))
             {
-                _connectionPoint.Unadvise(_connectionCookie);
+                this._connectionPoint.Unadvise(this._connectionCookie);
             }
-            _connectionCookie = 0;
-            _connectionPoint = null;
+            this._connectionCookie = 0;
+            this._connectionPoint = null;
 
-            _buffer = null;
-            _fileId = null;
+            this._buffer = null;
+            this._fileId = null;
         }
         #endregion
 
         #region Idle time processing
         public void OnIdle()
         {
-            if (!_isDirty)
+            if (!this._isDirty)
             {
                 return;
             }
             var onFileChanged = OnFileChanged;
             if (null != onFileChanged)
             {
-                HierarchyEventArgs args = new HierarchyEventArgs(_fileId.ItemID, _fileName);
-                args.TextBuffer = _buffer;
-                onFileChanged(_fileId.Hierarchy, args);
+                HierarchyEventArgs args = new HierarchyEventArgs(this._fileId.ItemID, this._fileName);
+                args.TextBuffer = this._buffer;
+                onFileChanged(this._fileId.Hierarchy, args);
             }
 
-            _isDirty = false;
+            this._isDirty = false;
         }
         #endregion
     }

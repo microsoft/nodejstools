@@ -24,14 +24,14 @@ namespace Microsoft.VisualStudioTools.Project
 
         public DirtyChangedEventArgs(bool isDirty)
         {
-            _isDirty = isDirty;
+            this._isDirty = isDirty;
         }
 
         public bool IsDirty
         {
             get
             {
-                return _isDirty;
+                return this._isDirty;
             }
         }
     }

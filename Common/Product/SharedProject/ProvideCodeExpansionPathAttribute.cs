@@ -37,9 +37,9 @@ namespace Microsoft.VisualStudioTools
         public ProvideCodeExpansionPathAttribute(string languageStringId, string description,
                                           string paths)
         {
-            _languageStringId = languageStringId;
-            _description = description;
-            _paths = paths;
+            this._languageStringId = languageStringId;
+            this._description = description;
+            this._paths = paths;
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudioTools
         /// </summary>
         public string LanguageStringId
         {
-            get { return _languageStringId; }
+            get { return this._languageStringId; }
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudioTools
         /// </summary>
         public string Paths
         {
-            get { return _paths; }
+            get { return this._paths; }
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace Microsoft.VisualStudioTools
         /// </summary>
         private string LanguageName()
         {
-            return string.Format(CultureInfo.InvariantCulture, "Languages\\CodeExpansions\\{0}", LanguageStringId);
+            return string.Format(CultureInfo.InvariantCulture, "Languages\\CodeExpansions\\{0}", this.LanguageStringId);
         }
 
         /// <summary>
@@ -78,12 +78,12 @@ namespace Microsoft.VisualStudioTools
             using (Key childKey = context.CreateKey(LanguageName()))
             {
                 string snippetPaths = context.ComponentPath;
-                snippetPaths = System.IO.Path.Combine(snippetPaths, Paths);
+                snippetPaths = System.IO.Path.Combine(snippetPaths, this.Paths);
                 snippetPaths = context.EscapePath(System.IO.Path.GetFullPath(snippetPaths));
 
                 using (Key pathsSubKey = childKey.CreateSubkey("Paths"))
                 {
-                    pathsSubKey.SetValue(_description, snippetPaths);
+                    pathsSubKey.SetValue(this._description, snippetPaths);
                 }
             }
         }

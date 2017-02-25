@@ -81,7 +81,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <returns>The value of a property</returns>
         public object get_IndexedValue(object index1, object index2, object index3, object index4)
         {
-            Debug.Assert(pi.GetIndexParameters().Length == 0);
+            Debug.Assert(this.pi.GetIndexParameters().Length == 0);
             return this.Value;
         }
 
@@ -101,12 +101,12 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                var attrs = pi.GetCustomAttributes(typeof(PropertyNameAttribute), true);
+                var attrs = this.pi.GetCustomAttributes(typeof(PropertyNameAttribute), true);
                 if (attrs.Length > 0)
                 {
                     return ((PropertyNameAttribute)attrs[0]).Name;
                 }
-                return pi.Name;
+                return this.pi.Name;
             }
         }
 
@@ -115,7 +115,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// </summary>
         public short NumIndices
         {
-            get { return (short)pi.GetIndexParameters().Length; }
+            get { return (short)this.pi.GetIndexParameters().Length; }
         }
 
         /// <summary>
@@ -150,8 +150,8 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <param name="value">The value to set.</param>
         public void set_IndexedValue(object index1, object index2, object index3, object index4, object value)
         {
-            Debug.Assert(pi.GetIndexParameters().Length == 0);
-            parent.Target.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+            Debug.Assert(this.pi.GetIndexParameters().Length == 0);
+            this.parent.Target.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
             {
                 this.Value = value;
             });
@@ -166,11 +166,11 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             {
                 using (AutomationScope scope = new AutomationScope(this.parent.Target.HierarchyNode.ProjectMgr.Site))
                 {
-                    return parent.Target.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                    return this.parent.Target.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
                     {
                         try
                         {
-                            return pi.GetValue(this.parent.Target, null);
+                            return this.pi.GetValue(this.parent.Target, null);
                         }
                         catch (TargetInvocationException ex)
                         {
@@ -190,7 +190,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             {
                 using (AutomationScope scope = new AutomationScope(this.parent.Target.HierarchyNode.ProjectMgr.Site))
                 {
-                    parent.Target.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                    this.parent.Target.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
                     {
                         try
                         {

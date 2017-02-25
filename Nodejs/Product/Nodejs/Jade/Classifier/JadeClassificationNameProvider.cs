@@ -35,7 +35,7 @@ namespace Microsoft.NodejsTools.Jade
 
         public JadeClassificationNameProvider(IClassificationTypeRegistryService ClassificationRegistryService)
         {
-            _classReg = ClassificationRegistryService;
+            this._classReg = ClassificationRegistryService;
         }
 
         public IClassificationType GetClassificationType(JadeToken token)
@@ -45,7 +45,7 @@ namespace Microsoft.NodejsTools.Jade
                 return token.Classification;
             }
 
-            return _classReg.GetClassificationType(GetClassificationName(token));
+            return this._classReg.GetClassificationType(GetClassificationName(token));
         }
 
         private static string GetClassificationName(JadeToken token)

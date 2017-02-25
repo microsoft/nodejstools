@@ -34,24 +34,24 @@ namespace Microsoft.VisualStudioTools
 
             if (!doForAllItems)
             {
-                _allItems.Visibility = Visibility.Hidden;
+                this._allItems.Visibility = Visibility.Hidden;
             }
 
-            _message.Text = message;
+            this._message.Text = message;
         }
 
 
         private void YesClick(object sender, RoutedEventArgs e)
         {
-            ShouldOverwrite = true;
-            DialogResult = true;
+            this.ShouldOverwrite = true;
+            this.DialogResult = true;
             Close();
         }
 
         private void NoClick(object sender, RoutedEventArgs e)
         {
-            ShouldOverwrite = false;
-            DialogResult = true;
+            this.ShouldOverwrite = false;
+            this.DialogResult = true;
             Close();
         }
 
@@ -64,7 +64,7 @@ namespace Microsoft.VisualStudioTools
         {
             get
             {
-                return _allItems.IsChecked.Value;
+                return this._allItems.IsChecked.Value;
             }
         }
     }

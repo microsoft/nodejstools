@@ -42,9 +42,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public AD7Property(AD7StackFrame frame, NodeEvaluationResult evaluationResult, AD7Property parent = null)
         {
-            _evaluationResult = evaluationResult;
-            _parent = parent;
-            _frame = frame;
+            this._evaluationResult = evaluationResult;
+            this._parent = parent;
+            this._frame = frame;
         }
 
         // Construct a DEBUG_PROPERTY_INFO representing this local or parameter.
@@ -54,62 +54,62 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
             if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_FULLNAME))
             {
-                propertyInfo.bstrFullName = _evaluationResult.FullName;
+                propertyInfo.bstrFullName = this._evaluationResult.FullName;
                 propertyInfo.dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_FULLNAME;
             }
 
             if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_NAME))
             {
-                propertyInfo.bstrName = _evaluationResult.Expression;
+                propertyInfo.bstrName = this._evaluationResult.Expression;
                 propertyInfo.dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_NAME;
             }
 
             if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_TYPE))
             {
-                propertyInfo.bstrType = _evaluationResult.TypeName;
+                propertyInfo.bstrType = this._evaluationResult.TypeName;
                 propertyInfo.dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_TYPE;
             }
 
             if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE))
             {
-                string value = radix == 16 ? _evaluationResult.HexValue ?? _evaluationResult.StringValue : _evaluationResult.StringValue;
-                propertyInfo.bstrValue = _evaluationResult.Type.HasFlag(NodeExpressionType.String) ? string.Format(CultureInfo.InvariantCulture, "\"{0}\"", value) : value;
+                string value = radix == 16 ? this._evaluationResult.HexValue ?? this._evaluationResult.StringValue : this._evaluationResult.StringValue;
+                propertyInfo.bstrValue = this._evaluationResult.Type.HasFlag(NodeExpressionType.String) ? string.Format(CultureInfo.InvariantCulture, "\"{0}\"", value) : value;
                 propertyInfo.dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE;
             }
 
             if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_ATTRIB))
             {
-                if (_evaluationResult.Type.HasFlag(NodeExpressionType.ReadOnly))
+                if (this._evaluationResult.Type.HasFlag(NodeExpressionType.ReadOnly))
                 {
                     propertyInfo.dwAttrib |= enum_DBG_ATTRIB_FLAGS.DBG_ATTRIB_VALUE_READONLY;
                 }
 
-                if (_evaluationResult.Type.HasFlag(NodeExpressionType.Private))
+                if (this._evaluationResult.Type.HasFlag(NodeExpressionType.Private))
                 {
                     propertyInfo.dwAttrib |= enum_DBG_ATTRIB_FLAGS.DBG_ATTRIB_ACCESS_PRIVATE;
                 }
 
-                if (_evaluationResult.Type.HasFlag(NodeExpressionType.Expandable))
+                if (this._evaluationResult.Type.HasFlag(NodeExpressionType.Expandable))
                 {
                     propertyInfo.dwAttrib |= enum_DBG_ATTRIB_FLAGS.DBG_ATTRIB_OBJ_IS_EXPANDABLE;
                 }
 
-                if (_evaluationResult.Type.HasFlag(NodeExpressionType.String))
+                if (this._evaluationResult.Type.HasFlag(NodeExpressionType.String))
                 {
                     propertyInfo.dwAttrib |= enum_DBG_ATTRIB_FLAGS.DBG_ATTRIB_VALUE_RAW_STRING;
                 }
 
-                if (_evaluationResult.Type.HasFlag(NodeExpressionType.Boolean))
+                if (this._evaluationResult.Type.HasFlag(NodeExpressionType.Boolean))
                 {
                     propertyInfo.dwAttrib |= enum_DBG_ATTRIB_FLAGS.DBG_ATTRIB_VALUE_BOOLEAN;
                 }
 
-                if (_evaluationResult.Type.HasFlag(NodeExpressionType.Property))
+                if (this._evaluationResult.Type.HasFlag(NodeExpressionType.Property))
                 {
                     propertyInfo.dwAttrib |= enum_DBG_ATTRIB_FLAGS.DBG_ATTRIB_PROPERTY;
                 }
 
-                if (_evaluationResult.Type.HasFlag(NodeExpressionType.Function))
+                if (this._evaluationResult.Type.HasFlag(NodeExpressionType.Function))
                 {
                     propertyInfo.dwAttrib |= enum_DBG_ATTRIB_FLAGS.DBG_ATTRIB_METHOD;
                 }
@@ -131,7 +131,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             TimeSpan timeout = TimeSpan.FromMilliseconds(dwTimeout);
             var tokenSource = new CancellationTokenSource(timeout);
 
-            List<NodeEvaluationResult> children = _evaluationResult.GetChildrenAsync(tokenSource.Token)
+            List<NodeEvaluationResult> children = this._evaluationResult.GetChildrenAsync(tokenSource.Token)
                 .WaitAsync(timeout, tokenSource.Token).Result;
 
             DEBUG_PROPERTY_INFO[] properties;
@@ -144,13 +144,13 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                 properties = new DEBUG_PROPERTY_INFO[children.Count];
                 for (int i = 0; i < children.Count; i++)
                 {
-                    properties[i] = new AD7Property(_frame, children[i], this).ConstructDebugPropertyInfo(dwRadix, dwFields);
+                    properties[i] = new AD7Property(this._frame, children[i], this).ConstructDebugPropertyInfo(dwRadix, dwFields);
                 }
             }
 
             if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_NAME))
             {
-                properties = properties.OrderBy(p => p.bstrName, _comparer).ToArray();
+                properties = properties.OrderBy(p => p.bstrName, this._comparer).ToArray();
             }
 
             ppEnum = new AD7PropertyEnum(properties);
@@ -177,7 +177,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public int GetStringCharLength(out uint pLen)
         {
-            pLen = (uint)_evaluationResult.StringLength;
+            pLen = (uint)this._evaluationResult.StringLength;
             return VSConstants.S_OK;
         }
 
@@ -188,7 +188,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             NodeEvaluationResult result;
             try
             {
-                result = _evaluationResult.Frame.ExecuteTextAsync(_evaluationResult.FullName).WaitAndUnwrapExceptions();
+                result = this._evaluationResult.Frame.ExecuteTextAsync(this._evaluationResult.FullName).WaitAndUnwrapExceptions();
             }
             catch (DebuggerCommandException)
             {
@@ -308,14 +308,14 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         private Task<NodeEvaluationResult> SetValueAsStringAsync(string value, TimeSpan timeout)
         {
             var tokenSource = new CancellationTokenSource(timeout);
-            if (_parent == null)
+            if (this._parent == null)
             {
-                return _evaluationResult.Frame.SetVariableValueAsync(_evaluationResult.FullName, value, tokenSource.Token)
+                return this._evaluationResult.Frame.SetVariableValueAsync(this._evaluationResult.FullName, value, tokenSource.Token)
                     .WaitAsync(timeout, tokenSource.Token);
             }
 
-            string expression = string.Format(CultureInfo.InvariantCulture, "{0} = {1}", _evaluationResult.FullName, value);
-            return _evaluationResult.Frame.ExecuteTextAsync(expression, tokenSource.Token).WaitAsync(timeout, tokenSource.Token);
+            string expression = string.Format(CultureInfo.InvariantCulture, "{0} = {1}", this._evaluationResult.FullName, value);
+            return this._evaluationResult.Frame.ExecuteTextAsync(expression, tokenSource.Token).WaitAsync(timeout, tokenSource.Token);
         }
 
         #endregion

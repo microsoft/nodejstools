@@ -28,12 +28,12 @@ namespace Microsoft.NodejsTools.Debugger.Remote
 
         public NodeRemoteDebugProgram(NodeRemoteDebugProcess process)
         {
-            _process = process;
+            this._process = process;
         }
 
         public NodeRemoteDebugProcess DebugProcess
         {
-            get { return _process; }
+            get { return this._process; }
         }
 
         public int Attach(IDebugEventCallback2 pCallback)
@@ -121,13 +121,13 @@ namespace Microsoft.NodejsTools.Debugger.Remote
 
         public int GetProcess(out IDebugProcess2 ppProcess)
         {
-            ppProcess = _process;
+            ppProcess = this._process;
             return VSConstants.S_OK;
         }
 
         public int GetProgramId(out Guid pguidProgramId)
         {
-            pguidProgramId = _guid;
+            pguidProgramId = this._guid;
             return VSConstants.S_OK;
         }
 

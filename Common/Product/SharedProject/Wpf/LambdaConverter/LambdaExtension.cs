@@ -34,12 +34,12 @@ namespace Microsoft.VisualStudioTools.Wpf
 
         public LambdaExtension(string lambda)
         {
-            Lambda = lambda;
+            this.Lambda = lambda;
         }
 
         public override object ProvideValue(IServiceProvider serviceProvider)
         {
-            if (Lambda == null)
+            if (this.Lambda == null)
             {
                 throw new InvalidOperationException("Lambda not specified");
             }
@@ -57,7 +57,7 @@ namespace Microsoft.VisualStudioTools.Wpf
                 throw new InvalidOperationException("Root object does not implement ILambdaConverterProvider - code generator not run");
             }
 
-            return provider.GetConverterForLambda(Lambda);
+            return provider.GetConverterForLambda(this.Lambda);
         }
     }
 }

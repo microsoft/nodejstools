@@ -27,7 +27,7 @@ namespace Microsoft.NodejsTools.Debugger
 
         public ThreadEventArgs(NodeThread thread)
         {
-            Thread = thread;
+            this.Thread = thread;
         }
     }
 }

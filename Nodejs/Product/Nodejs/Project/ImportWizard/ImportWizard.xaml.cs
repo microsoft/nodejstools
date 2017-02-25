@@ -72,41 +72,41 @@ namespace Microsoft.NodejsTools.Project.ImportWizard
 
         public ImportWizard()
         {
-            ImportSettings = new ImportSettings();
+            this.ImportSettings = new ImportSettings();
 
-            _pageSequence = new CollectionViewSource
+            this._pageSequence = new CollectionViewSource
             {
                 Source = new ObservableCollection<Page>(new Page[] {
-                    new StartupPage { DataContext = ImportSettings },
-                    new FileSourcePage { DataContext = ImportSettings },
-                    new SaveProjectPage { DataContext = ImportSettings }
+                    new StartupPage { DataContext = this.ImportSettings },
+                    new FileSourcePage { DataContext = this.ImportSettings },
+                    new SaveProjectPage { DataContext = this.ImportSettings }
                 })
             };
-            PageCount = _pageSequence.View.OfType<object>().Count();
+            this.PageCount = this._pageSequence.View.OfType<object>().Count();
 
-            PageSequence = _pageSequence.View;
-            PageSequence.CurrentChanged += PageSequence_CurrentChanged;
-            PageSequence.MoveCurrentToFirst();
+            this.PageSequence = this._pageSequence.View;
+            this.PageSequence.CurrentChanged += this.PageSequence_CurrentChanged;
+            this.PageSequence.MoveCurrentToFirst();
 
-            DataContext = this;
+            this.DataContext = this;
 
             InitializeComponent();
         }
 
         private void PageSequence_CurrentChanged(object sender, EventArgs e)
         {
-            SetValue(IsNextDefaultPropertyKey, PageSequence.CurrentPosition < PageCount - 1);
-            SetValue(IsFinishDefaultPropertyKey, PageSequence.CurrentPosition >= PageCount - 1);
+            SetValue(IsNextDefaultPropertyKey, this.PageSequence.CurrentPosition < this.PageCount - 1);
+            SetValue(IsFinishDefaultPropertyKey, this.PageSequence.CurrentPosition >= this.PageCount - 1);
         }
 
         private void Finish_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = ImportSettings != null && ImportSettings.IsValid;
+            e.CanExecute = this.ImportSettings != null && this.ImportSettings.IsValid;
         }
 
         private void Finish_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            DialogResult = true;
+            this.DialogResult = true;
             Close();
         }
 
@@ -117,28 +117,28 @@ namespace Microsoft.NodejsTools.Project.ImportWizard
 
         private void Cancel_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            DialogResult = false;
+            this.DialogResult = false;
             Close();
         }
 
         private void Back_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = PageSequence != null && PageSequence.CurrentPosition > 0;
+            e.CanExecute = this.PageSequence != null && this.PageSequence.CurrentPosition > 0;
         }
 
         private void Back_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            PageSequence.MoveCurrentToPrevious();
+            this.PageSequence.MoveCurrentToPrevious();
         }
 
         private void Next_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = PageSequence != null && PageSequence.CurrentPosition < PageCount - 1;
+            e.CanExecute = this.PageSequence != null && this.PageSequence.CurrentPosition < this.PageCount - 1;
         }
 
         private void Next_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            PageSequence.MoveCurrentToNext();
+            this.PageSequence.MoveCurrentToNext();
         }
 
         private void Browse_CanExecute(object sender, CanExecuteRoutedEventArgs e)

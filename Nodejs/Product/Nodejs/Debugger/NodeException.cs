@@ -22,8 +22,8 @@ namespace Microsoft.NodejsTools.Debugger
 
         public NodeException(string typeName, string description)
         {
-            TypeName = typeName;
-            Description = description;
+            this.TypeName = typeName;
+            this.Description = description;
         }
     }
 }

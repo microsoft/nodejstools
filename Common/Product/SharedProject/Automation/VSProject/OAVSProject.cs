@@ -76,9 +76,9 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                if (events == null)
-                    events = new OAVSProjectEvents(this);
-                return events;
+                if (this.events == null)
+                    this.events = new OAVSProjectEvents(this);
+                return this.events;
             }
         }
 
@@ -117,10 +117,10 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                ReferenceContainerNode references = project.GetReferenceContainer() as ReferenceContainerNode;
+                ReferenceContainerNode references = this.project.GetReferenceContainer() as ReferenceContainerNode;
                 if (null == references)
                 {
-                    return new OAReferences(null, project);
+                    return new OAReferences(null, this.project);
                 }
                 return references.Object as References;
             }
@@ -184,7 +184,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                return vsProject.BuildManager as BuildManagerEvents;
+                return this.vsProject.BuildManager as BuildManagerEvents;
             }
         }
 
@@ -200,7 +200,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                return vsProject.References as ReferencesEvents;
+                return this.vsProject.References as ReferencesEvents;
             }
         }
 

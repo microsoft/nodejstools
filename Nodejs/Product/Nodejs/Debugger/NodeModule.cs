@@ -33,36 +33,36 @@ namespace Microsoft.NodejsTools.Debugger
         {
             Debug.Assert(fileName != null);
 
-            _id = id;
-            _fileName = fileName;
-            _javaScriptFileName = javaScriptFileName;
+            this._id = id;
+            this._fileName = fileName;
+            this._javaScriptFileName = javaScriptFileName;
         }
 
         public int Id
         {
-            get { return _id; }
+            get { return this._id; }
         }
 
         public string Name
         {
             get
             {
-                if (_fileName.IndexOfAny(Path.GetInvalidPathChars()) == -1)
+                if (this._fileName.IndexOfAny(Path.GetInvalidPathChars()) == -1)
                 {
-                    return Path.GetFileName(_fileName);
+                    return Path.GetFileName(this._fileName);
                 }
-                return _fileName;
+                return this._fileName;
             }
         }
 
         public string JavaScriptFileName
         {
-            get { return _javaScriptFileName; }
+            get { return this._javaScriptFileName; }
         }
 
         public string FileName
         {
-            get { return _fileName; }
+            get { return this._fileName; }
         }
 
         public string Source { get; set; }
@@ -72,7 +72,7 @@ namespace Microsoft.NodejsTools.Debugger
             get
             {
                 // No directory separator characters implies builtin
-                return (_fileName.IndexOfAny(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }) == -1);
+                return (this._fileName.IndexOfAny(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }) == -1);
             }
         }
 

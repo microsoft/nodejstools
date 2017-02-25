@@ -36,38 +36,38 @@ namespace Microsoft.NodejsTools.Project
             SetCueBanner();
 
             AddToolTips();
-            _nodeExeErrorProvider.SetIconAlignment(_nodeExePath, ErrorIconAlignment.MiddleLeft);
-            _nodeExeErrorProvider.SetIconAlignment(_workingDir, ErrorIconAlignment.MiddleLeft);
+            this._nodeExeErrorProvider.SetIconAlignment(this._nodeExePath, ErrorIconAlignment.MiddleLeft);
+            this._nodeExeErrorProvider.SetIconAlignment(this._workingDir, ErrorIconAlignment.MiddleLeft);
         }
 
         public NodejsGeneralPropertyPageControl(NodejsGeneralPropertyPage page) : this()
         {
-            _propPage = page;
+            this._propPage = page;
         }
 
         private void AddToolTips()
         {
-            _tooltip.SetToolTip(_nodeExePath, Resources.NodeExePathToolTip);
-            _tooltip.SetToolTip(_nodeExeArguments, Resources.NodeExeArgumentsToolTip);
-            _tooltip.SetToolTip(_scriptFile, Resources.ScriptFileTooltip);
-            _tooltip.SetToolTip(_scriptArguments, Resources.ScriptArgumentsToolTip);
-            _tooltip.SetToolTip(_nodejsPort, Resources.NodejsPortToolTip);
-            _tooltip.SetToolTip(_startBrowser, Resources.StartBrowserToolTip);
-            _tooltip.SetToolTip(_workingDir, Resources.WorkingDirToolTip);
-            _tooltip.SetToolTip(_launchUrl, Resources.LaunchUrlToolTip);
-            _tooltip.SetToolTip(_debuggerPort, Resources.DebuggerPort);
-            _tooltip.SetToolTip(_envVars, Resources.EnvironmentVariables);
+            this._tooltip.SetToolTip(this._nodeExePath, Resources.NodeExePathToolTip);
+            this._tooltip.SetToolTip(this._nodeExeArguments, Resources.NodeExeArgumentsToolTip);
+            this._tooltip.SetToolTip(this._scriptFile, Resources.ScriptFileTooltip);
+            this._tooltip.SetToolTip(this._scriptArguments, Resources.ScriptArgumentsToolTip);
+            this._tooltip.SetToolTip(this._nodejsPort, Resources.NodejsPortToolTip);
+            this._tooltip.SetToolTip(this._startBrowser, Resources.StartBrowserToolTip);
+            this._tooltip.SetToolTip(this._workingDir, Resources.WorkingDirToolTip);
+            this._tooltip.SetToolTip(this._launchUrl, Resources.LaunchUrlToolTip);
+            this._tooltip.SetToolTip(this._debuggerPort, Resources.DebuggerPort);
+            this._tooltip.SetToolTip(this._envVars, Resources.EnvironmentVariables);
         }
 
         public string NodeExePath
         {
             get
             {
-                return _nodeExePath.Text;
+                return this._nodeExePath.Text;
             }
             set
             {
-                _nodeExePath.Text = value;
+                this._nodeExePath.Text = value;
             }
         }
 
@@ -75,11 +75,11 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                return _nodeExeArguments.Text;
+                return this._nodeExeArguments.Text;
             }
             set
             {
-                _nodeExeArguments.Text = value;
+                this._nodeExeArguments.Text = value;
             }
         }
 
@@ -99,11 +99,11 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                return _scriptArguments.Text;
+                return this._scriptArguments.Text;
             }
             set
             {
-                _scriptArguments.Text = value;
+                this._scriptArguments.Text = value;
             }
         }
 
@@ -111,11 +111,11 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                return _nodejsPort.Text;
+                return this._nodejsPort.Text;
             }
             set
             {
-                _nodejsPort.Text = value;
+                this._nodejsPort.Text = value;
             }
         }
 
@@ -123,11 +123,11 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                return _startBrowser.Checked;
+                return this._startBrowser.Checked;
             }
             set
             {
-                _startBrowser.Checked = value;
+                this._startBrowser.Checked = value;
             }
         }
 
@@ -135,11 +135,11 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                return _workingDir.Text;
+                return this._workingDir.Text;
             }
             set
             {
-                _workingDir.Text = value;
+                this._workingDir.Text = value;
             }
         }
 
@@ -147,11 +147,11 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                return _launchUrl.Text;
+                return this._launchUrl.Text;
             }
             set
             {
-                _launchUrl.Text = value;
+                this._launchUrl.Text = value;
             }
         }
 
@@ -161,13 +161,13 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                return _envVars.Text;
+                return this._envVars.Text;
             }
             set
             {
                 // TextBox requires \r\n for line separators, but XML can have either \n or \r\n, and we should treat those equally.
                 // (It will always have \r\n when we write it out, but users can edit it by other means.)
-                _envVars.Text = lfToCrLfRegex.Replace(value ?? String.Empty, "\r\n");
+                this._envVars.Text = lfToCrLfRegex.Replace(value ?? String.Empty, "\r\n");
             }
         }
 
@@ -175,17 +175,17 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                return _debuggerPort.Text;
+                return this._debuggerPort.Text;
             }
             set
             {
-                _debuggerPort.Text = value;
+                this._debuggerPort.Text = value;
             }
         }
 
         private void Changed(object sender, EventArgs e)
         {
-            _propPage.IsDirty = true;
+            this._propPage.IsDirty = true;
         }
 
         private void SetCueBanner()
@@ -197,7 +197,7 @@ namespace Microsoft.NodejsTools.Project
             }
 
             NativeMethods.SendMessageW(
-                _nodeExePath.Handle,
+                this._nodeExePath.Handle,
                 NativeMethods.EM_SETCUEBANNER,
                 new IntPtr(1),  // fDrawFocused == true
                 cueBanner
@@ -206,14 +206,14 @@ namespace Microsoft.NodejsTools.Project
 
         private void NodeExePathChanged(object sender, EventArgs e)
         {
-            if (String.IsNullOrEmpty(_nodeExePath.Text) || _nodeExePath.Text.Contains("$(") ||
-                File.Exists(Nodejs.GetAbsoluteNodeExePath(_propPage.Project.ProjectHome, _nodeExePath.Text)))
+            if (String.IsNullOrEmpty(this._nodeExePath.Text) || this._nodeExePath.Text.Contains("$(") ||
+                File.Exists(Nodejs.GetAbsoluteNodeExePath(this._propPage.Project.ProjectHome, this._nodeExePath.Text)))
             {
-                _nodeExeErrorProvider.SetError(_nodeExePath, String.Empty);
+                this._nodeExeErrorProvider.SetError(this._nodeExePath, String.Empty);
             }
             else
             {
-                _nodeExeErrorProvider.SetError(_nodeExePath, Resources.NodeExePathNotFound);
+                this._nodeExeErrorProvider.SetError(this._nodeExePath, Resources.NodeExePathNotFound);
             }
             Changed(sender, e);
         }
@@ -225,22 +225,22 @@ namespace Microsoft.NodejsTools.Project
             dialog.Filter = _exeFilter;
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                _nodeExePath.Text = dialog.FileName;
-                _nodeExePath.ForeColor = SystemColors.ControlText;
+                this._nodeExePath.Text = dialog.FileName;
+                this._nodeExePath.ForeColor = SystemColors.ControlText;
             }
         }
 
         private void BrowseDirectoryClick(object sender, EventArgs e)
         {
-            string dir = _workingDir.Text;
+            string dir = this._workingDir.Text;
             if (string.IsNullOrEmpty(dir))
             {
-                dir = _propPage.Project.ProjectHome;
+                dir = this._propPage.Project.ProjectHome;
             }
-            var path = NodejsPackage.Instance.BrowseForDirectory(Handle, dir);
+            var path = NodejsPackage.Instance.BrowseForDirectory(this.Handle, dir);
             if (!string.IsNullOrEmpty(path))
             {
-                _workingDir.Text = path;
+                this._workingDir.Text = path;
             }
         }
 
@@ -250,24 +250,24 @@ namespace Microsoft.NodejsTools.Project
             if (!textSender.Text.Contains("$(") &&
                 textSender.Text.Any(ch => !Char.IsDigit(ch)))
             {
-                _nodeExeErrorProvider.SetError(textSender, Resources.InvalidPortNumber);
+                this._nodeExeErrorProvider.SetError(textSender, Resources.InvalidPortNumber);
             }
             else
             {
-                _nodeExeErrorProvider.SetError(textSender, String.Empty);
+                this._nodeExeErrorProvider.SetError(textSender, String.Empty);
             }
             Changed(sender, e);
         }
 
         private void WorkingDirTextChanged(object sender, EventArgs e)
         {
-            if (!_workingDir.Text.Contains("$(") && !Directory.Exists(_workingDir.Text))
+            if (!this._workingDir.Text.Contains("$(") && !Directory.Exists(this._workingDir.Text))
             {
-                _nodeExeErrorProvider.SetError(_workingDir, Resources.WorkingDirInvalidOrMissing);
+                this._nodeExeErrorProvider.SetError(this._workingDir, Resources.WorkingDirInvalidOrMissing);
             }
             else
             {
-                _nodeExeErrorProvider.SetError(_workingDir, String.Empty);
+                this._nodeExeErrorProvider.SetError(this._workingDir, String.Empty);
             }
             Changed(sender, e);
         }

@@ -22,23 +22,23 @@ namespace Microsoft.NodejsTools.Jade
     {
         private void OnScript(int blockIndent)
         {
-            if (_jsTagger != null)
+            if (this._jsTagger != null)
             {
-                int start = _cs.Position;
+                int start = this._cs.Position;
 
                 SkipToEndOfBlock(blockIndent, text: false);
 
-                int end = _cs.Position;
+                int end = this._cs.Position;
                 int length = end - start;
 
                 if (length > 0)
                 {
-                    _jsBuffer.Replace(
-                        new Span(0, _jsBuffer.CurrentSnapshot.Length),
-                        _cs.Text.GetText(new TextRange(start, length))
+                    this._jsBuffer.Replace(
+                        new Span(0, this._jsBuffer.CurrentSnapshot.Length),
+                        this._cs.Text.GetText(new TextRange(start, length))
                     );
 
-                    var tokens = _jsTagger.GetTags(new NormalizedSnapshotSpanCollection(new SnapshotSpan(_jsBuffer.CurrentSnapshot, 0, _jsBuffer.CurrentSnapshot.Length)));
+                    var tokens = this._jsTagger.GetTags(new NormalizedSnapshotSpanCollection(new SnapshotSpan(this._jsBuffer.CurrentSnapshot, 0, this._jsBuffer.CurrentSnapshot.Length)));
 
                     foreach (var t in tokens)
                     {

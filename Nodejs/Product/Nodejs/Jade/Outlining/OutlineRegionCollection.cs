@@ -27,13 +27,13 @@ namespace Microsoft.NodejsTools.Jade
 
         public OutlineRegionCollection(int textBufferVersion)
         {
-            TextBufferVersion = textBufferVersion;
+            this.TextBufferVersion = textBufferVersion;
         }
 
         #region ICloneable
         public virtual object Clone()
         {
-            var clone = new OutlineRegionCollection(TextBufferVersion);
+            var clone = new OutlineRegionCollection(this.TextBufferVersion);
 
             foreach (var item in this)
                 clone.Add(item.Clone() as OutlineRegion);

@@ -71,7 +71,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         private AD7EngineCreateEvent(AD7Engine engine)
         {
-            m_engine = engine;
+            this.m_engine = engine;
         }
 
         public static void Send(AD7Engine engine)
@@ -82,7 +82,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         int IDebugEngineCreateEvent2.GetEngine(out IDebugEngine2 engine)
         {
-            engine = m_engine;
+            engine = this.m_engine;
 
             return VSConstants.S_OK;
         }
@@ -117,13 +117,13 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public int GetExpression(out IDebugExpression2 ppExpr)
         {
-            ppExpr = _expression;
+            ppExpr = this._expression;
             return VSConstants.S_OK;
         }
 
         public int GetResult(out IDebugProperty2 ppResult)
         {
-            ppResult = _property;
+            ppResult = this._property;
             return VSConstants.S_OK;
         }
 
@@ -140,15 +140,15 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public AD7ModuleLoadEvent(AD7Module module, bool fLoad)
         {
-            m_module = module;
-            m_fLoad = fLoad;
+            this.m_module = module;
+            this.m_fLoad = fLoad;
         }
 
         int IDebugModuleLoadEvent2.GetModule(out IDebugModule2 module, ref string debugMessage, ref int fIsLoad)
         {
-            module = m_module;
+            module = this.m_module;
 
-            if (m_fLoad)
+            if (this.m_fLoad)
             {
                 debugMessage = null; //String.Concat("Loaded '", m_module.DebuggedModule.Name, "'");
                 fIsLoad = 1;
@@ -172,14 +172,14 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         private readonly uint m_exitCode;
         public AD7ProgramDestroyEvent(uint exitCode)
         {
-            m_exitCode = exitCode;
+            this.m_exitCode = exitCode;
         }
 
         #region IDebugProgramDestroyEvent2 Members
 
         int IDebugProgramDestroyEvent2.GetExitCode(out uint exitCode)
         {
-            exitCode = m_exitCode;
+            exitCode = this.m_exitCode;
 
             return VSConstants.S_OK;
         }
@@ -201,14 +201,14 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         private readonly uint m_exitCode;
         public AD7ThreadDestroyEvent(uint exitCode)
         {
-            m_exitCode = exitCode;
+            this.m_exitCode = exitCode;
         }
 
         #region IDebugThreadDestroyEvent2 Members
 
         int IDebugThreadDestroyEvent2.GetExitCode(out uint exitCode)
         {
-            exitCode = m_exitCode;
+            exitCode = this.m_exitCode;
 
             return VSConstants.S_OK;
         }
@@ -258,8 +258,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public AD7BreakpointBoundEvent(AD7PendingBreakpoint pendingBreakpoint, AD7BoundBreakpoint boundBreakpoint)
         {
-            m_pendingBreakpoint = pendingBreakpoint;
-            m_boundBreakpoint = boundBreakpoint;
+            this.m_pendingBreakpoint = pendingBreakpoint;
+            this.m_boundBreakpoint = boundBreakpoint;
         }
 
         #region IDebugBreakpointBoundEvent2 Members
@@ -267,14 +267,14 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         int IDebugBreakpointBoundEvent2.EnumBoundBreakpoints(out IEnumDebugBoundBreakpoints2 ppEnum)
         {
             IDebugBoundBreakpoint2[] boundBreakpoints = new IDebugBoundBreakpoint2[1];
-            boundBreakpoints[0] = m_boundBreakpoint;
+            boundBreakpoints[0] = this.m_boundBreakpoint;
             ppEnum = new AD7BoundBreakpointsEnum(boundBreakpoints);
             return VSConstants.S_OK;
         }
 
         int IDebugBreakpointBoundEvent2.GetPendingBreakpoint(out IDebugPendingBreakpoint2 ppPendingBP)
         {
-            ppPendingBP = m_pendingBreakpoint;
+            ppPendingBP = this.m_pendingBreakpoint;
             return VSConstants.S_OK;
         }
 
@@ -290,14 +290,14 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public AD7BreakpointUnboundEvent(AD7BoundBreakpoint boundBreakpoint)
         {
-            m_boundBreakpoint = boundBreakpoint;
+            this.m_boundBreakpoint = boundBreakpoint;
         }
 
         #region IDebugBreakpointUnboundEvent2 Members
 
         int IDebugBreakpointUnboundEvent2.GetBreakpoint(out IDebugBoundBreakpoint2 ppBP)
         {
-            ppBP = m_boundBreakpoint;
+            ppBP = this.m_boundBreakpoint;
             return VSConstants.S_OK;
         }
 
@@ -319,8 +319,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public AD7BreakpointErrorEvent(AD7PendingBreakpoint pendingBreakpoint, AD7Engine engine)
         {
-            m_engine = engine;
-            m_pendingBreakpoint = pendingBreakpoint;
+            this.m_engine = engine;
+            this.m_pendingBreakpoint = pendingBreakpoint;
         }
 
         #region IDebugBreakpointErrorEvent2 Members
@@ -343,7 +343,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         int IDebugErrorBreakpoint2.GetPendingBreakpoint(out IDebugPendingBreakpoint2 ppPendingBreakpoint)
         {
-            ppPendingBreakpoint = m_pendingBreakpoint;
+            ppPendingBreakpoint = this.m_pendingBreakpoint;
             return VSConstants.S_OK;
         }
 
@@ -362,11 +362,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             pErrorResolutionInfo[0].dwFields = dwFields;
             if ((dwFields & enum_BPERESI_FIELDS.BPERESI_PROGRAM) != 0)
             {
-                pErrorResolutionInfo[0].pProgram = (IDebugProgram2)m_engine;
+                pErrorResolutionInfo[0].pProgram = (IDebugProgram2)this.m_engine;
             }
             if ((dwFields & enum_BPERESI_FIELDS.BPERESI_THREAD) != 0)
             {
-                pErrorResolutionInfo[0].pThread = (IDebugThread2)m_engine.MainThread;
+                pErrorResolutionInfo[0].pThread = (IDebugThread2)this.m_engine.MainThread;
             }
             if ((dwFields & enum_BPERESI_FIELDS.BPERESI_TYPE) != 0)
             {
@@ -402,14 +402,14 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public AD7BreakpointEvent(IEnumDebugBoundBreakpoints2 boundBreakpoints)
         {
-            m_boundBreakpoints = boundBreakpoints;
+            this.m_boundBreakpoints = boundBreakpoints;
         }
 
         #region IDebugBreakpointEvent2 Members
 
         int IDebugBreakpointEvent2.EnumBreakpoints(out IEnumDebugBoundBreakpoints2 ppEnum)
         {
-            ppEnum = m_boundBreakpoints;
+            ppEnum = this.m_boundBreakpoints;
             return VSConstants.S_OK;
         }
 
@@ -425,10 +425,10 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public AD7DebugExceptionEvent(string typeName, string description, bool isUnhandled, AD7Engine engine)
         {
-            _exception = typeName;
-            _description = description;
-            _isUnhandled = isUnhandled;
-            _engine = engine;
+            this._exception = typeName;
+            this._description = description;
+            this._isUnhandled = isUnhandled;
+            this._engine = engine;
         }
 
         #region IDebugExceptionEvent2 Members
@@ -440,10 +440,10 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public int GetException(EXCEPTION_INFO[] pExceptionInfo)
         {
-            pExceptionInfo[0].pProgram = _engine;
+            pExceptionInfo[0].pProgram = this._engine;
             pExceptionInfo[0].guidType = AD7Engine.DebugEngineGuid;
-            pExceptionInfo[0].bstrExceptionName = _exception;
-            if (_isUnhandled)
+            pExceptionInfo[0].bstrExceptionName = this._exception;
+            if (this._isUnhandled)
             {
                 pExceptionInfo[0].dwState = enum_EXCEPTION_STATE.EXCEPTION_STOP_USER_UNCAUGHT;
             }
@@ -456,7 +456,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public int GetExceptionDescription(out string pbstrDescription)
         {
-            pbstrDescription = _description;
+            pbstrDescription = this._description;
             return VSConstants.S_OK;
         }
 
@@ -479,13 +479,13 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public AD7DebugOutputStringEvent2(string output)
         {
-            _output = output;
+            this._output = output;
         }
         #region IDebugOutputStringEvent2 Members
 
         public int GetString(out string pbstrString)
         {
-            pbstrString = _output;
+            pbstrString = this._output;
             return VSConstants.S_OK;
         }
 

@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             }
             set
             {
-                Node.ProjectMgr.Site.GetUIThread().Invoke(() => base.Name = value);
+                this.Node.ProjectMgr.Site.GetUIThread().Invoke(() => base.Name = value);
             }
         }
 
@@ -75,7 +75,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
                 using (AutomationScope scope = new AutomationScope(this.Node.ProjectMgr.Site))
                 {
-                    Node.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                    this.Node.ProjectMgr.Site.GetUIThread().Invoke(() =>
                     {
                         DocumentManager manager = this.Node.GetDocumentManager();
                         Utilities.CheckNotNull(manager);
@@ -100,7 +100,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
                 using (AutomationScope scope = new AutomationScope(this.Node.ProjectMgr.Site))
                 {
-                    Node.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                    this.Node.ProjectMgr.Site.GetUIThread().Invoke(() =>
                     {
                         IVsUIHierarchy hier;
                         uint itemid;
@@ -140,7 +140,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
             using (AutomationScope scope = new AutomationScope(this.Node.ProjectMgr.Site))
             {
-                Node.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                this.Node.ProjectMgr.Site.GetUIThread().Invoke(() =>
                 {
                     try
                     {
@@ -172,8 +172,8 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
                         // Open the file using the IVsProject interface
                         // We get the outer hierarchy so that projects can customize opening.
-                        var project = Node.ProjectMgr.GetOuterInterface<IVsProject>();
-                        ErrorHandler.ThrowOnFailure(project.OpenItem(Node.ID, ref logicalViewGuid, docData, out windowFrame));
+                        var project = this.Node.ProjectMgr.GetOuterInterface<IVsProject>();
+                        ErrorHandler.ThrowOnFailure(project.OpenItem(this.Node.ID, ref logicalViewGuid, docData, out windowFrame));
                     }
                     finally
                     {
@@ -197,7 +197,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <exception cref="ArgumentNullException">Is thrown if fileName is null.</exception>
         public override void Save(string fileName)
         {
-            Node.ProjectMgr.Site.GetUIThread().Invoke(() =>
+            this.Node.ProjectMgr.Site.GetUIThread().Invoke(() =>
             {
                 this.DoSave(false, fileName);
             });
@@ -212,7 +212,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             try
             {
-                Node.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                this.Node.ProjectMgr.Site.GetUIThread().Invoke(() =>
                 {
                     this.DoSave(true, fileName);
                 });
@@ -256,7 +256,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
             using (AutomationScope scope = new AutomationScope(this.Node.ProjectMgr.Site))
             {
-                Node.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                this.Node.ProjectMgr.Site.GetUIThread().Invoke(() =>
                 {
                     IVsUIHierarchy hier;
                     uint itemid;
@@ -277,7 +277,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                return Node.ProjectMgr.Site.GetUIThread().Invoke<ProjectItems>(() =>
+                return this.Node.ProjectMgr.Site.GetUIThread().Invoke<ProjectItems>(() =>
                 {
                     if (this.Project.ProjectNode.CanFileNodesHaveChilds)
                         return new OAProjectItems(this.Project, this.Node);
@@ -303,7 +303,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
             using (AutomationScope scope = new AutomationScope(this.Node.ProjectMgr.Site))
             {
-                Node.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                this.Node.ProjectMgr.Site.GetUIThread().Invoke(() =>
                 {
                     IntPtr docData = IntPtr.Zero;
 

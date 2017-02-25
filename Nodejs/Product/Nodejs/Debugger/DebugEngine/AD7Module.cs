@@ -41,13 +41,13 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
             if ((dwFields & enum_MODULE_INFO_FIELDS.MIF_NAME) != 0)
             {
-                info.m_bstrName = DebuggedModule.Name;
+                info.m_bstrName = this.DebuggedModule.Name;
                 Debug.Assert(info.m_bstrName != null);
                 info.dwValidFields |= enum_MODULE_INFO_FIELDS.MIF_NAME;
             }
             if ((dwFields & enum_MODULE_INFO_FIELDS.MIF_URL) != 0)
             {
-                info.m_bstrUrl = DebuggedModule.FileName;
+                info.m_bstrUrl = this.DebuggedModule.FileName;
                 Debug.Assert(info.m_bstrUrl != null);
                 info.dwValidFields |= enum_MODULE_INFO_FIELDS.MIF_URL;
             }

@@ -64,19 +64,19 @@ namespace Microsoft.NodejsTools
             else
                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "invalid factory type: {0}", factoryType));
 
-            _extension = extension;
-            _priority = priority;
-            _project = Guid.Empty;
-            _templateDir = "./NullPath";
-            _resId = 0;
-            _editorFactoryNotify = false;
-            _extensions = extensions;
+            this._extension = extension;
+            this._priority = priority;
+            this._project = Guid.Empty;
+            this._templateDir = "./NullPath";
+            this._resId = 0;
+            this._editorFactoryNotify = false;
+            this._extensions = extensions;
         }
 
         public ProvideEditorExtension2Attribute(object factoryType, string extension, int priority, __VSPHYSICALVIEWATTRIBUTES commonViewAttributes, params string[] extensions) :
             this(factoryType, extension, priority, extensions)
         {
-            _commonViewAttrs = commonViewAttributes;
+            this._commonViewAttrs = commonViewAttributes;
         }
 
         /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="ProvideEditorExtensionAttribute.Extension"]' />
@@ -87,7 +87,7 @@ namespace Microsoft.NodejsTools
         {
             get
             {
-                return _extension;
+                return this._extension;
             }
         }
 
@@ -99,7 +99,7 @@ namespace Microsoft.NodejsTools
         {
             get
             {
-                return _factory;
+                return this._factory;
             }
         }
 
@@ -111,28 +111,28 @@ namespace Microsoft.NodejsTools
         {
             get
             {
-                return _priority;
+                return this._priority;
             }
         }
 
         /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="ProvideEditorExtensionAttribute.ProjectGuid"]/*' />
         public string ProjectGuid
         {
-            set { _project = new System.Guid(value); }
-            get { return _project.ToString(); }
+            set { this._project = new System.Guid(value); }
+            get { return this._project.ToString(); }
         }
 
         public string LinkedEditorGuid
         {
-            get { return _linkedEditorGuid.ToString(); }
-            set { _linkedEditorGuid = new System.Guid(value); }
+            get { return this._linkedEditorGuid.ToString(); }
+            set { this._linkedEditorGuid = new System.Guid(value); }
         }
 
         public __VSPHYSICALVIEWATTRIBUTES CommonPhysicalViewAttributes
         {
             get
             {
-                return _commonViewAttrs;
+                return this._commonViewAttrs;
             }
         }
 
@@ -146,28 +146,28 @@ namespace Microsoft.NodejsTools
         /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="ProvideEditorExtensionAttribute.TemplateDir"]/*' />
         public string TemplateDir
         {
-            get { return _templateDir; }
-            set { _templateDir = value; }
+            get { return this._templateDir; }
+            set { this._templateDir = value; }
         }
 
         /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="ProvideEditorExtensionAttribute.NameResourceID"]/*' />
         public int NameResourceID
         {
-            get { return _resId; }
-            set { _resId = value; }
+            get { return this._resId; }
+            set { this._resId = value; }
         }
 
         public int EditorNameResourceId
         {
-            get { return _editorNameResId; }
-            set { _editorNameResId = value; }
+            get { return this._editorNameResId; }
+            set { this._editorNameResId = value; }
         }
 
         /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="ProvideEditorExtensionAttribute.DefaultName"]/*' />
         public string DefaultName
         {
-            get { return _editorName; }
-            set { _editorName = value; }
+            get { return this._editorName; }
+            set { this._editorName = value; }
         }
 
         /// <summary>
@@ -177,7 +177,7 @@ namespace Microsoft.NodejsTools
         {
             get
             {
-                return string.Format(CultureInfo.InvariantCulture, "Editors\\{0}", Factory.ToString("B"));
+                return string.Format(CultureInfo.InvariantCulture, "Editors\\{0}", this.Factory.ToString("B"));
             }
         }
 
@@ -188,7 +188,7 @@ namespace Microsoft.NodejsTools
         {
             return string.Format(CultureInfo.InvariantCulture,
                                  "Projects\\{0}\\AddItemTemplates\\TemplateDirs\\{1}",
-                                 _project.ToString("B"),
+                                 this._project.ToString("B"),
                                  context.ComponentType.GUID.ToString("B"));
         }
 
@@ -197,8 +197,8 @@ namespace Microsoft.NodejsTools
             get
             {
                 return string.Format(CultureInfo.InvariantCulture, "Projects\\{0}\\FileExtensions\\{1}",
-                                     _project.ToString("B"),
-                                     Extension);
+                                     this._project.ToString("B"),
+                                     this.Extension);
             }
         }
 
@@ -213,34 +213,34 @@ namespace Microsoft.NodejsTools
         /// </devdoc>
         public override void Register(RegistrationContext context)
         {
-            using (Key editorKey = context.CreateKey(RegKeyName))
+            using (Key editorKey = context.CreateKey(this.RegKeyName))
             {
-                if (!string.IsNullOrEmpty(DefaultName))
+                if (!string.IsNullOrEmpty(this.DefaultName))
                 {
-                    editorKey.SetValue(null, DefaultName);
+                    editorKey.SetValue(null, this.DefaultName);
                 }
-                if (0 != _editorNameResId)
-                    editorKey.SetValue("DisplayName", "#" + _editorNameResId.ToString(CultureInfo.InvariantCulture));
-                else if (0 != _resId)
-                    editorKey.SetValue("DisplayName", "#" + _resId.ToString(CultureInfo.InvariantCulture));
-                if (_linkedEditorGuid != Guid.Empty)
+                if (0 != this._editorNameResId)
+                    editorKey.SetValue("DisplayName", "#" + this._editorNameResId.ToString(CultureInfo.InvariantCulture));
+                else if (0 != this._resId)
+                    editorKey.SetValue("DisplayName", "#" + this._resId.ToString(CultureInfo.InvariantCulture));
+                if (this._linkedEditorGuid != Guid.Empty)
                 {
-                    editorKey.SetValue("LinkedEditorGuid", _linkedEditorGuid.ToString("B"));
+                    editorKey.SetValue("LinkedEditorGuid", this._linkedEditorGuid.ToString("B"));
                 }
-                if (_commonViewAttrs != 0)
+                if (this._commonViewAttrs != 0)
                 {
-                    editorKey.SetValue("CommonPhysicalViewAttributes", (int)_commonViewAttrs);
+                    editorKey.SetValue("CommonPhysicalViewAttributes", (int)this._commonViewAttrs);
                 }
                 editorKey.SetValue("Package", context.ComponentType.GUID.ToString("B"));
             }
 
-            using (Key extensionKey = context.CreateKey(RegKeyName + "\\Extensions"))
+            using (Key extensionKey = context.CreateKey(this.RegKeyName + "\\Extensions"))
             {
-                extensionKey.SetValue(Extension.Substring(1), Priority);
+                extensionKey.SetValue(this.Extension.Substring(1), this.Priority);
 
-                if (_extensions != null && _extensions.Length > 0)
+                if (this._extensions != null && this._extensions.Length > 0)
                 {
-                    foreach (var extension in _extensions)
+                    foreach (var extension in this._extensions)
                     {
                         var extensionAndPri = extension.Split(':');
                         int pri;
@@ -255,37 +255,37 @@ namespace Microsoft.NodejsTools
             }
 
             // Build the path of the registry key for the "Add file to project" entry
-            if (_project != Guid.Empty)
+            if (this._project != Guid.Empty)
             {
                 string prjRegKey = ProjectRegKeyName(context) + "\\/1";
                 using (Key projectKey = context.CreateKey(prjRegKey))
                 {
-                    if (0 != _resId)
-                        projectKey.SetValue("", "#" + _resId.ToString(CultureInfo.InvariantCulture));
-                    if (_templateDir.Length != 0)
+                    if (0 != this._resId)
+                        projectKey.SetValue("", "#" + this._resId.ToString(CultureInfo.InvariantCulture));
+                    if (this._templateDir.Length != 0)
                     {
                         Uri url = new Uri(context.ComponentType.Assembly.CodeBase);
                         string templates = url.LocalPath;
-                        templates = CommonUtils.GetAbsoluteDirectoryPath(Path.GetDirectoryName(templates), _templateDir);
+                        templates = CommonUtils.GetAbsoluteDirectoryPath(Path.GetDirectoryName(templates), this._templateDir);
                         templates = context.EscapePath(templates);
                         projectKey.SetValue("TemplatesDir", templates);
                     }
-                    projectKey.SetValue("SortPriority", Priority);
+                    projectKey.SetValue("SortPriority", this.Priority);
                 }
             }
 
             // Register the EditorFactoryNotify
-            if (EditorFactoryNotify)
+            if (this.EditorFactoryNotify)
             {
                 // The IVsEditorFactoryNotify interface is called by the project system, so it doesn't make sense to
                 // register it if there is no project associated to this editor.
-                if (_project == Guid.Empty)
+                if (this._project == Guid.Empty)
                     throw new ArgumentException("project");
 
                 // Create the registry key
-                using (Key edtFactoryNotifyKey = context.CreateKey(EditorFactoryNotifyKey))
+                using (Key edtFactoryNotifyKey = context.CreateKey(this.EditorFactoryNotifyKey))
                 {
-                    edtFactoryNotifyKey.SetValue("EditorFactoryNotify", Factory.ToString("B"));
+                    edtFactoryNotifyKey.SetValue("EditorFactoryNotify", this.Factory.ToString("B"));
                 }
             }
         }
@@ -297,12 +297,12 @@ namespace Microsoft.NodejsTools
         /// <param name="context"></param>
         public override void Unregister(RegistrationContext context)
         {
-            context.RemoveKey(RegKeyName);
-            if (_project != Guid.Empty)
+            context.RemoveKey(this.RegKeyName);
+            if (this._project != Guid.Empty)
             {
                 context.RemoveKey(ProjectRegKeyName(context));
-                if (EditorFactoryNotify)
-                    context.RemoveKey(EditorFactoryNotifyKey);
+                if (this.EditorFactoryNotify)
+                    context.RemoveKey(this.EditorFactoryNotifyKey);
             }
         }
     }

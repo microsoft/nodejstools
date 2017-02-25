@@ -38,35 +38,35 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public AD7StackFrame(AD7Engine engine, AD7Thread thread, NodeStackFrame stackFrame)
         {
-            _engine = engine;
-            _thread = thread;
-            _stackFrame = stackFrame;
+            this._engine = engine;
+            this._thread = thread;
+            this._stackFrame = stackFrame;
         }
 
         public NodeStackFrame StackFrame
         {
-            get { return _stackFrame; }
+            get { return this._stackFrame; }
         }
 
         public AD7Engine Engine
         {
-            get { return _engine; }
+            get { return this._engine; }
         }
 
         public AD7Thread Thread
         {
-            get { return _thread; }
+            get { return this._thread; }
         }
 
         private AD7MemoryAddress CodeContext
         {
             get
             {
-                if (_codeContext == null)
+                if (this._codeContext == null)
                 {
-                    _codeContext = new AD7MemoryAddress(_engine, _stackFrame);
+                    this._codeContext = new AD7MemoryAddress(this._engine, this._stackFrame);
                 }
-                return _codeContext;
+                return this._codeContext;
             }
         }
 
@@ -74,11 +74,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         {
             get
             {
-                if (_documentContext == null)
+                if (this._documentContext == null)
                 {
-                    _documentContext = new AD7DocumentContext(CodeContext);
+                    this._documentContext = new AD7DocumentContext(this.CodeContext);
                 }
-                return _documentContext;
+                return this._documentContext;
             }
         }
 
@@ -94,27 +94,27 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             // The optional information is requested by setting flags in the dwFieldSpec parameter.
             if ((dwFieldSpec & enum_FRAMEINFO_FLAGS.FIF_FUNCNAME) != 0)
             {
-                string funcName = _stackFrame.FunctionName;
+                string funcName = this._stackFrame.FunctionName;
                 if (funcName == "<module>")
                 {
-                    if (_stackFrame.FileName.IndexOfAny(Path.GetInvalidPathChars()) == -1)
+                    if (this._stackFrame.FileName.IndexOfAny(Path.GetInvalidPathChars()) == -1)
                     {
-                        funcName = Path.GetFileName(_stackFrame.FileName) + " module";
+                        funcName = Path.GetFileName(this._stackFrame.FileName) + " module";
                     }
-                    else if (_stackFrame.FileName.EndsWith("<string>", StringComparison.Ordinal))
+                    else if (this._stackFrame.FileName.EndsWith("<string>", StringComparison.Ordinal))
                     {
                         funcName = "<exec or eval>";
                     }
                     else
                     {
-                        funcName = _stackFrame.FileName + " unknown code";
+                        funcName = this._stackFrame.FileName + " unknown code";
                     }
                 }
                 else
                 {
-                    if (_stackFrame.FileName != "<unknown>")
+                    if (this._stackFrame.FileName != "<unknown>")
                     {
-                        funcName = string.Format(CultureInfo.InvariantCulture, "{0} [{1}]", funcName, Path.GetFileName(_stackFrame.FileName));
+                        funcName = string.Format(CultureInfo.InvariantCulture, "{0} [{1}]", funcName, Path.GetFileName(this._stackFrame.FileName));
                     }
                     else
                     {
@@ -122,25 +122,25 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                     }
                 }
 
-                frameInfo.m_bstrFuncName = string.Format(CultureInfo.InvariantCulture, "{0} Line {1}", funcName, _stackFrame.Line + 1);
+                frameInfo.m_bstrFuncName = string.Format(CultureInfo.InvariantCulture, "{0} Line {1}", funcName, this._stackFrame.Line + 1);
                 frameInfo.m_dwValidFields |= enum_FRAMEINFO_FLAGS.FIF_FUNCNAME;
             }
 
             if ((dwFieldSpec & enum_FRAMEINFO_FLAGS.FIF_LANGUAGE) != 0)
             {
                 Guid dummy;
-                AD7Engine.MapLanguageInfo(_stackFrame.FileName, out frameInfo.m_bstrLanguage, out dummy);
+                AD7Engine.MapLanguageInfo(this._stackFrame.FileName, out frameInfo.m_bstrLanguage, out dummy);
                 frameInfo.m_dwValidFields |= enum_FRAMEINFO_FLAGS.FIF_LANGUAGE;
             }
 
             // The debugger is requesting the name of the module for this stack frame.
             if ((dwFieldSpec & enum_FRAMEINFO_FLAGS.FIF_MODULE) != 0)
             {
-                if (_stackFrame.FileName.IndexOfAny(Path.GetInvalidPathChars()) == -1)
+                if (this._stackFrame.FileName.IndexOfAny(Path.GetInvalidPathChars()) == -1)
                 {
-                    frameInfo.m_bstrModule = Path.GetFileName(_stackFrame.FileName);
+                    frameInfo.m_bstrModule = Path.GetFileName(this._stackFrame.FileName);
                 }
-                else if (_stackFrame.FileName.EndsWith("<string>", StringComparison.Ordinal))
+                else if (this._stackFrame.FileName.EndsWith("<string>", StringComparison.Ordinal))
                 {
                     frameInfo.m_bstrModule = "<exec/eval>";
                 }
@@ -197,7 +197,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         private List<DEBUG_PROPERTY_INFO> CreateLocalProperties(uint radix)
         {
             var properties = new List<DEBUG_PROPERTY_INFO>();
-            IList<NodeEvaluationResult> locals = _stackFrame.Locals;
+            IList<NodeEvaluationResult> locals = this._stackFrame.Locals;
 
             for (int i = 0; i < locals.Count; i++)
             {
@@ -217,7 +217,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         private List<DEBUG_PROPERTY_INFO> CreateParameterProperties(uint radix)
         {
             var properties = new List<DEBUG_PROPERTY_INFO>();
-            IList<NodeEvaluationResult> parameters = _stackFrame.Parameters;
+            IList<NodeEvaluationResult> parameters = this._stackFrame.Parameters;
 
             for (int i = 0; i < parameters.Count; i++)
             {
@@ -269,7 +269,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             properties = properties.GroupBy(p => p.bstrName).Select(p => p.First()).ToList();
             elementsReturned = (uint)properties.Count;
 
-            enumObject = new AD7PropertyInfoEnum(properties.OrderBy(p => p.bstrName, _comparer).ToArray());
+            enumObject = new AD7PropertyInfoEnum(properties.OrderBy(p => p.bstrName, this._comparer).ToArray());
 
             return VSConstants.S_OK;
         }
@@ -277,7 +277,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         // Gets the code context for this stack frame. The code context represents the current instruction pointer in this stack frame.
         int IDebugStackFrame2.GetCodeContext(out IDebugCodeContext2 memoryAddress)
         {
-            memoryAddress = CodeContext;
+            memoryAddress = this.CodeContext;
             return VSConstants.S_OK;
         }
 
@@ -294,7 +294,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         // and will use it to open the correct source document for this stack frame.
         int IDebugStackFrame2.GetDocumentContext(out IDebugDocumentContext2 docContext)
         {
-            docContext = DocumentContext;
+            docContext = this.DocumentContext;
             return VSConstants.S_OK;
         }
 
@@ -319,7 +319,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         // In this sample, all the supported stack frames are C++
         int IDebugStackFrame2.GetLanguageInfo(ref string pbstrLanguage, ref Guid pguidLanguage)
         {
-            AD7Engine.MapLanguageInfo(_stackFrame.FileName, out pbstrLanguage, out pguidLanguage);
+            AD7Engine.MapLanguageInfo(this._stackFrame.FileName, out pbstrLanguage, out pguidLanguage);
             return VSConstants.S_OK;
         }
 
@@ -327,7 +327,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         // The name of a stack frame is typically the name of the method being executed.
         int IDebugStackFrame2.GetName(out string name)
         {
-            name = _stackFrame.FunctionName;
+            name = this._stackFrame.FunctionName;
             return 0;
         }
 
@@ -342,7 +342,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         // Gets the thread associated with a stack frame.
         int IDebugStackFrame2.GetThread(out IDebugThread2 thread)
         {
-            thread = _thread;
+            thread = this._thread;
             return VSConstants.S_OK;
         }
 
@@ -356,7 +356,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         // "{ function-name, source-file-name, module-file-name }"
         int IDebugExpressionContext2.GetName(out string pbstrName)
         {
-            pbstrName = string.Format(CultureInfo.InvariantCulture, "{{ {0} {1} }}", _stackFrame.FunctionName, _stackFrame.FileName);
+            pbstrName = string.Format(CultureInfo.InvariantCulture, "{{ {0} {1} }}", this._stackFrame.FunctionName, this._stackFrame.FileName);
             return VSConstants.S_OK;
         }
 
@@ -372,7 +372,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             pbstrError = String.Empty;
             pichError = 0;
 
-            IEnumerable<NodeEvaluationResult> evaluationResults = _stackFrame.Locals.Union(_stackFrame.Parameters);
+            IEnumerable<NodeEvaluationResult> evaluationResults = this._stackFrame.Locals.Union(this._stackFrame.Parameters);
             foreach (NodeEvaluationResult currVariable in evaluationResults)
             {
                 if (String.CompareOrdinal(currVariable.Expression, pszCode) == 0)
@@ -383,7 +383,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             }
 
             string errorMsg;
-            if (!_stackFrame.TryParseText(pszCode, out errorMsg))
+            if (!this._stackFrame.TryParseText(pszCode, out errorMsg))
             {
                 pbstrError = "Error: " + errorMsg;
                 pichError = (uint)pbstrError.Length;

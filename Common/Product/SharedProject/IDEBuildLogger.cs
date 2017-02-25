@@ -118,7 +118,7 @@ namespace Microsoft.VisualStudioTools.Project
             this.outputWindowPane = output;
             this.hierarchy = hierarchy;
             this.serviceProvider = new ServiceProvider(site);
-            serviceProvider.GetUIThread().MustBeCalledFromUIThread();
+            this.serviceProvider.GetUIThread().MustBeCalledFromUIThread();
             this.dispatcher = Dispatcher.CurrentDispatcher;
         }
 
@@ -159,18 +159,18 @@ namespace Microsoft.VisualStudioTools.Project
             this.taskQueue = new ConcurrentQueue<Func<ErrorTask>>();
             this.outputQueue = new ConcurrentQueue<OutputQueueEntry>();
 
-            eventSource.BuildStarted += new BuildStartedEventHandler(BuildStartedHandler);
-            eventSource.BuildFinished += new BuildFinishedEventHandler(BuildFinishedHandler);
-            eventSource.ProjectStarted += new ProjectStartedEventHandler(ProjectStartedHandler);
-            eventSource.ProjectFinished += new ProjectFinishedEventHandler(ProjectFinishedHandler);
-            eventSource.TargetStarted += new TargetStartedEventHandler(TargetStartedHandler);
-            eventSource.TargetFinished += new TargetFinishedEventHandler(TargetFinishedHandler);
-            eventSource.TaskStarted += new TaskStartedEventHandler(TaskStartedHandler);
-            eventSource.TaskFinished += new TaskFinishedEventHandler(TaskFinishedHandler);
-            eventSource.CustomEventRaised += new CustomBuildEventHandler(CustomHandler);
-            eventSource.ErrorRaised += new BuildErrorEventHandler(ErrorRaisedHandler);
-            eventSource.WarningRaised += new BuildWarningEventHandler(WarningHandler);
-            eventSource.MessageRaised += new BuildMessageEventHandler(MessageHandler);
+            eventSource.BuildStarted += new BuildStartedEventHandler(this.BuildStartedHandler);
+            eventSource.BuildFinished += new BuildFinishedEventHandler(this.BuildFinishedHandler);
+            eventSource.ProjectStarted += new ProjectStartedEventHandler(this.ProjectStartedHandler);
+            eventSource.ProjectFinished += new ProjectFinishedEventHandler(this.ProjectFinishedHandler);
+            eventSource.TargetStarted += new TargetStartedEventHandler(this.TargetStartedHandler);
+            eventSource.TargetFinished += new TargetFinishedEventHandler(this.TargetFinishedHandler);
+            eventSource.TaskStarted += new TaskStartedEventHandler(this.TaskStartedHandler);
+            eventSource.TaskFinished += new TaskFinishedEventHandler(this.TaskFinishedHandler);
+            eventSource.CustomEventRaised += new CustomBuildEventHandler(this.CustomHandler);
+            eventSource.ErrorRaised += new BuildErrorEventHandler(this.ErrorRaisedHandler);
+            eventSource.WarningRaised += new BuildWarningEventHandler(this.WarningHandler);
+            eventSource.MessageRaised += new BuildMessageEventHandler(this.MessageHandler);
         }
 
         #endregion
@@ -349,7 +349,7 @@ namespace Microsoft.VisualStudioTools.Project
             if (this.OutputWindowPane != null)
             {
                 // Enqueue the output text
-                this.outputQueue.Enqueue(new OutputQueueEntry(text, OutputWindowPane));
+                this.outputQueue.Enqueue(new OutputQueueEntry(text, this.OutputWindowPane));
 
                 // We want to interactively report the output. But we dont want to dispatch
                 // more than one at a time, otherwise we might overflow the main thread's
@@ -377,7 +377,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             // NOTE: This may run on a background thread!
             // We need to output this on the main thread. We must use BeginInvoke because the main thread may not be pumping events yet.
-            BeginInvokeWithErrorMessage(this.serviceProvider, this.dispatcher, FlushBuildOutput);
+            BeginInvokeWithErrorMessage(this.serviceProvider, this.dispatcher, this.FlushBuildOutput);
         }
 
         internal void FlushBuildOutput()
@@ -406,17 +406,17 @@ namespace Microsoft.VisualStudioTools.Project
 
             public NavigableErrorTask(IServiceProvider serviceProvider)
             {
-                _serviceProvider = serviceProvider;
+                this._serviceProvider = serviceProvider;
             }
 
             protected override void OnNavigate(EventArgs e)
             {
                 VsUtilities.NavigateTo(
-                    _serviceProvider,
-                    Document,
+                    this._serviceProvider,
+                    this.Document,
                     Guid.Empty,
-                    Line,
-                    Column - 1
+                    this.Line,
+                    this.Column - 1
                 );
                 base.OnNavigate(e);
             }
@@ -426,7 +426,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             this.taskQueue.Enqueue(() =>
             {
-                var task = new NavigableErrorTask(serviceProvider);
+                var task = new NavigableErrorTask(this.serviceProvider);
 
                 if (errorEvent is BuildErrorEventArgs)
                 {
@@ -449,7 +449,7 @@ namespace Microsoft.VisualStudioTools.Project
 
                 task.Text = errorEvent.Message;
                 task.Category = TaskCategory.BuildCompile;
-                task.HierarchyItem = hierarchy;
+                task.HierarchyItem = this.hierarchy;
 
                 return task;
             });
@@ -570,9 +570,9 @@ namespace Microsoft.VisualStudioTools.Project
 
             try
             {
-                serviceProvider.GetUIThread().MustBeCalledFromUIThread();
+                this.serviceProvider.GetUIThread().MustBeCalledFromUIThread();
 
-                var settings = new ShellSettingsManager(serviceProvider);
+                var settings = new ShellSettingsManager(this.serviceProvider);
                 var store = settings.GetReadOnlySettingsStore(SettingsScope.UserSettings);
                 if (store.CollectionExists(GeneralCollection) && store.PropertyExists(GeneralCollection, BuildVerbosityProperty))
                 {
@@ -650,8 +650,8 @@ namespace Microsoft.VisualStudioTools.Project
 
             public OutputQueueEntry(string message, IVsOutputWindowPane pane)
             {
-                Message = message;
-                Pane = pane;
+                this.Message = message;
+                this.Pane = pane;
             }
         }
     }

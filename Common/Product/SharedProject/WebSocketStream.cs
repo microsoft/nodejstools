@@ -30,16 +30,16 @@ namespace Microsoft.VisualStudioTools
 
         public WebSocketStream(WebSocket webSocket, bool ownsSocket = false)
         {
-            _webSocket = webSocket;
-            _ownsSocket = ownsSocket;
+            this._webSocket = webSocket;
+            this._ownsSocket = ownsSocket;
         }
 
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
-            if (disposing && _ownsSocket)
+            if (disposing && this._ownsSocket)
             {
-                _webSocket.Dispose();
+                this._webSocket.Dispose();
             }
         }
 
@@ -76,7 +76,7 @@ namespace Microsoft.VisualStudioTools
         {
             try
             {
-                return (await _webSocket.ReceiveAsync(new ArraySegment<byte>(buffer, offset, count), cancellationToken).ConfigureAwait(false)).Count;
+                return (await this._webSocket.ReceiveAsync(new ArraySegment<byte>(buffer, offset, count), cancellationToken).ConfigureAwait(false)).Count;
             }
             catch (WebSocketException ex)
             {
@@ -93,7 +93,7 @@ namespace Microsoft.VisualStudioTools
         {
             try
             {
-                await _webSocket.SendAsync(new ArraySegment<byte>(buffer, offset, count), WebSocketMessageType.Binary, true, cancellationToken).ConfigureAwait(false);
+                await this._webSocket.SendAsync(new ArraySegment<byte>(buffer, offset, count), WebSocketMessageType.Binary, true, cancellationToken).ConfigureAwait(false);
             }
             catch (WebSocketException ex)
             {

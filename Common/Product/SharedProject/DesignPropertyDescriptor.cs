@@ -85,7 +85,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 for (int i = 0; i < this.Attributes.Count; i++)
                 {
-                    EditorAttribute attr = Attributes[i] as EditorAttribute;
+                    EditorAttribute attr = this.Attributes[i] as EditorAttribute;
                     if (attr == null)
                     {
                         continue;
@@ -113,11 +113,11 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                if (converter == null)
+                if (this.converter == null)
                 {
-                    converter = property.Converter;
+                    this.converter = this.property.Converter;
                 }
-                return converter;
+                return this.converter;
             }
         }
 
@@ -169,13 +169,13 @@ namespace Microsoft.VisualStudioTools.Project
         public override bool ShouldSerializeValue(object component)
         {
             // If the user has set the AlwaysSerializedAttribute, do not attempt to bold.
-            if (property.ComponentType.GetProperty(property.Name).IsDefined(typeof(AlwaysSerializedAttribute)))
+            if (this.property.ComponentType.GetProperty(this.property.Name).IsDefined(typeof(AlwaysSerializedAttribute)))
             {
                 return false;
             }
             else
             {
-                bool result = property.ShouldSerializeValue(component);
+                bool result = this.property.ShouldSerializeValue(component);
                 return result;
             }
         }

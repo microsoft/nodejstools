@@ -300,8 +300,8 @@ namespace Microsoft.NodejsTools.Repl
 
             public NpmReplRedirector(IReplWindow window)
             {
-                _window = window;
-                HasErrors = false;
+                this._window = window;
+                this.HasErrors = false;
             }
             public bool HasErrors { get; set; }
 
@@ -328,13 +328,13 @@ namespace Microsoft.NodejsTools.Repl
 
                 outputString += NormalAnsiColor + substring;
 
-                _window.WriteLine(outputString);
+                this._window.WriteLine(outputString);
                 Debug.WriteLine(decodedString, "REPL npm");
             }
 
             public override void WriteErrorLine(string line)
             {
-                _window.WriteError(line);
+                this._window.WriteError(line);
             }
         }
     }

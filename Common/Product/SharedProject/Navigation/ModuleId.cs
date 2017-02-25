@@ -27,28 +27,28 @@ namespace Microsoft.VisualStudioTools.Navigation
 
         public ModuleId(IVsHierarchy owner, uint id)
         {
-            _ownerHierarchy = owner;
-            _itemId = id;
+            this._ownerHierarchy = owner;
+            this._itemId = id;
         }
 
         public IVsHierarchy Hierarchy
         {
-            get { return _ownerHierarchy; }
+            get { return this._ownerHierarchy; }
         }
 
         public uint ItemID
         {
-            get { return _itemId; }
+            get { return this._itemId; }
         }
 
         public override int GetHashCode()
         {
             int hash = 0;
-            if (null != _ownerHierarchy)
+            if (null != this._ownerHierarchy)
             {
-                hash = _ownerHierarchy.GetHashCode();
+                hash = this._ownerHierarchy.GetHashCode();
             }
-            hash = hash ^ (int)_itemId;
+            hash = hash ^ (int)this._itemId;
             return hash;
         }
 
@@ -59,11 +59,11 @@ namespace Microsoft.VisualStudioTools.Navigation
             {
                 return false;
             }
-            if (!_ownerHierarchy.Equals(other._ownerHierarchy))
+            if (!this._ownerHierarchy.Equals(other._ownerHierarchy))
             {
                 return false;
             }
-            return (_itemId == other._itemId);
+            return (this._itemId == other._itemId);
         }
     }
 }

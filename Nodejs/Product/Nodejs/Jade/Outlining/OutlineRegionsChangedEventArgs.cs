@@ -25,8 +25,8 @@ namespace Microsoft.NodejsTools.Jade
 
         public OutlineRegionsChangedEventArgs(OutlineRegionCollection regions, ITextRange changedRange)
         {
-            Regions = regions;
-            ChangedRange = changedRange;
+            this.Regions = regions;
+            this.ChangedRange = changedRange;
         }
     }
 }

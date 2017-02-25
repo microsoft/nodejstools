@@ -74,7 +74,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             int len = files.Length;
             VSQUERYADDFILERESULTS[] summary = new VSQUERYADDFILERESULTS[1];
-            ErrorHandler.ThrowOnFailure(this.GetIVsTrackProjectDocuments2().OnQueryAddFiles(projectMgr.GetOuterInterface<IVsProject>(), len, files, flags, summary, null));
+            ErrorHandler.ThrowOnFailure(this.GetIVsTrackProjectDocuments2().OnQueryAddFiles(this.projectMgr.GetOuterInterface<IVsProject>(), len, files, flags, summary, null));
             if (summary[0] == VSQUERYADDFILERESULTS.VSQUERYADDFILERESULTS_AddNotOK)
             {
                 return false;
@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             if ((this.projectMgr.EventTriggeringFlag & ProjectNode.EventTriggering.DoNotTriggerTrackerEvents) == 0)
             {
-                ErrorHandler.ThrowOnFailure(this.GetIVsTrackProjectDocuments2().OnAfterAddFilesEx(projectMgr.GetOuterInterface<IVsProject>(), 1, new string[1] { file }, new VSADDFILEFLAGS[1] { flag }));
+                ErrorHandler.ThrowOnFailure(this.GetIVsTrackProjectDocuments2().OnAfterAddFilesEx(this.projectMgr.GetOuterInterface<IVsProject>(), 1, new string[1] { file }, new VSADDFILEFLAGS[1] { flag }));
             }
         }
 
@@ -102,7 +102,7 @@ namespace Microsoft.VisualStudioTools.Project
             if ((this.projectMgr.EventTriggeringFlag & ProjectNode.EventTriggering.DoNotTriggerTrackerEvents) == 0)
             {
                 ErrorHandler.ThrowOnFailure(this.GetIVsTrackProjectDocuments2().OnAfterAddDirectoriesEx(
-                    projectMgr.GetOuterInterface<IVsProject>(), 1, new string[1] { folder }, new VSADDDIRECTORYFLAGS[1] { flag }));
+                    this.projectMgr.GetOuterInterface<IVsProject>(), 1, new string[1] { folder }, new VSADDDIRECTORYFLAGS[1] { flag }));
             }
         }
 
@@ -128,7 +128,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             VSQUERYREMOVEFILERESULTS[] summary = new VSQUERYREMOVEFILERESULTS[1];
 
-            ErrorHandler.ThrowOnFailure(this.GetIVsTrackProjectDocuments2().OnQueryRemoveFiles(projectMgr.GetOuterInterface<IVsProject>(), length, files, flags, summary, null));
+            ErrorHandler.ThrowOnFailure(this.GetIVsTrackProjectDocuments2().OnQueryRemoveFiles(this.projectMgr.GetOuterInterface<IVsProject>(), length, files, flags, summary, null));
             if (summary[0] == VSQUERYREMOVEFILERESULTS.VSQUERYREMOVEFILERESULTS_RemoveNotOK)
             {
                 return false;
@@ -144,7 +144,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             if ((this.projectMgr.EventTriggeringFlag & ProjectNode.EventTriggering.DoNotTriggerTrackerEvents) == 0)
             {
-                ErrorHandler.ThrowOnFailure(this.GetIVsTrackProjectDocuments2().OnAfterRemoveFiles(projectMgr.GetOuterInterface<IVsProject>(), 1, new string[1] { file }, new VSREMOVEFILEFLAGS[1] { flag }));
+                ErrorHandler.ThrowOnFailure(this.GetIVsTrackProjectDocuments2().OnAfterRemoveFiles(this.projectMgr.GetOuterInterface<IVsProject>(), 1, new string[1] { file }, new VSREMOVEFILEFLAGS[1] { flag }));
             }
         }
 
@@ -156,7 +156,7 @@ namespace Microsoft.VisualStudioTools.Project
             if ((this.projectMgr.EventTriggeringFlag & ProjectNode.EventTriggering.DoNotTriggerTrackerEvents) == 0)
             {
                 ErrorHandler.ThrowOnFailure(this.GetIVsTrackProjectDocuments2().OnAfterRemoveDirectories(
-                    projectMgr.GetOuterInterface<IVsProject>(),
+                    this.projectMgr.GetOuterInterface<IVsProject>(),
                     1,
                     new string[1] { folder },
                     new VSREMOVEDIRECTORYFLAGS[1] { flag }));
@@ -179,7 +179,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             int iCanContinue = 0;
-            ErrorHandler.ThrowOnFailure(this.GetIVsTrackProjectDocuments2().OnQueryRenameFile(projectMgr.GetOuterInterface<IVsProject>(), oldFileName, newFileName, flag, out iCanContinue));
+            ErrorHandler.ThrowOnFailure(this.GetIVsTrackProjectDocuments2().OnQueryRenameFile(this.projectMgr.GetOuterInterface<IVsProject>(), oldFileName, newFileName, flag, out iCanContinue));
             return (iCanContinue != 0);
         }
 
@@ -191,7 +191,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             if ((this.projectMgr.EventTriggeringFlag & ProjectNode.EventTriggering.DoNotTriggerTrackerEvents) == 0)
             {
-                ErrorHandler.ThrowOnFailure(this.GetIVsTrackProjectDocuments2().OnAfterRenameFile(projectMgr.GetOuterInterface<IVsProject>(), strOldName, strNewName, flag));
+                ErrorHandler.ThrowOnFailure(this.GetIVsTrackProjectDocuments2().OnAfterRenameFile(this.projectMgr.GetOuterInterface<IVsProject>(), strOldName, strNewName, flag));
             }
         }
         #endregion

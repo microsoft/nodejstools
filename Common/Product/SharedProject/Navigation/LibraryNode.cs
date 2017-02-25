@@ -47,15 +47,15 @@ namespace Microsoft.VisualStudioTools.Navigation
         {
             Debug.Assert(name != null);
 
-            _parent = parent;
-            _capabilities = capabilities;
-            _contextMenuID = contextMenuID;
-            _name = name;
-            _fullname = fullname;
-            _tooltip = name;
-            _type = type;
-            _filteredView = new Dictionary<LibraryNodeType, LibraryNode>();
-            _childrenByName = new Dictionary<string, LibraryNode[]>();
+            this._parent = parent;
+            this._capabilities = capabilities;
+            this._contextMenuID = contextMenuID;
+            this._name = name;
+            this._fullname = fullname;
+            this._tooltip = name;
+            this._type = type;
+            this._filteredView = new Dictionary<LibraryNodeType, LibraryNode>();
+            this._childrenByName = new Dictionary<string, LibraryNode[]>();
         }
 
         protected LibraryNode(LibraryNode node)
@@ -65,33 +65,33 @@ namespace Microsoft.VisualStudioTools.Navigation
 
         protected LibraryNode(LibraryNode node, string newFullName)
         {
-            _parent = node._parent;
-            _capabilities = node._capabilities;
-            _contextMenuID = node._contextMenuID;
-            _name = node._name;
-            _tooltip = node._tooltip;
-            _type = node._type;
-            _fullname = newFullName;
-            Children.AddRange(node.Children);
-            _childrenByName = new Dictionary<string, LibraryNode[]>(node._childrenByName);
-            _filteredView = new Dictionary<LibraryNodeType, LibraryNode>();
+            this._parent = node._parent;
+            this._capabilities = node._capabilities;
+            this._contextMenuID = node._contextMenuID;
+            this._name = node._name;
+            this._tooltip = node._tooltip;
+            this._type = node._type;
+            this._fullname = newFullName;
+            this.Children.AddRange(node.Children);
+            this._childrenByName = new Dictionary<string, LibraryNode[]>(node._childrenByName);
+            this._filteredView = new Dictionary<LibraryNodeType, LibraryNode>();
         }
 
         protected void SetCapabilityFlag(LibraryNodeCapabilities flag, bool value)
         {
             if (value)
             {
-                _capabilities |= flag;
+                this._capabilities |= flag;
             }
             else
             {
-                _capabilities &= ~flag;
+                this._capabilities &= ~flag;
             }
         }
 
         public LibraryNode Parent
         {
-            get { return _parent; }
+            get { return this._parent; }
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         /// </summary>
         public bool CanDelete
         {
-            get { return (0 != (_capabilities & LibraryNodeCapabilities.AllowDelete)); }
+            get { return (0 != (this._capabilities & LibraryNodeCapabilities.AllowDelete)); }
             set { SetCapabilityFlag(LibraryNodeCapabilities.AllowDelete, value); }
         }
 
@@ -108,7 +108,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         /// </summary>
         public bool CanGoToSource
         {
-            get { return (0 != (_capabilities & LibraryNodeCapabilities.HasSourceContext)); }
+            get { return (0 != (this._capabilities & LibraryNodeCapabilities.HasSourceContext)); }
             set { SetCapabilityFlag(LibraryNodeCapabilities.HasSourceContext, value); }
         }
 
@@ -117,7 +117,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         /// </summary>
         public bool CanRename
         {
-            get { return (0 != (_capabilities & LibraryNodeCapabilities.AllowRename)); }
+            get { return (0 != (this._capabilities & LibraryNodeCapabilities.AllowRename)); }
             set { SetCapabilityFlag(LibraryNodeCapabilities.AllowRename, value); }
         }
 
@@ -125,28 +125,28 @@ namespace Microsoft.VisualStudioTools.Navigation
         /// 
         /// </summary>
 
-        public override uint Capabilities { get { return (uint)_capabilities; } }
+        public override uint Capabilities { get { return (uint)this._capabilities; } }
 
         public string TooltipText
         {
-            get { return _tooltip; }
+            get { return this._tooltip; }
         }
 
         internal void AddNode(LibraryNode node)
         {
-            lock (Children)
+            lock (this.Children)
             {
-                Children.Add(node);
+                this.Children.Add(node);
                 LibraryNode[] nodes;
-                if (!_childrenByName.TryGetValue(node.Name, out nodes))
+                if (!this._childrenByName.TryGetValue(node.Name, out nodes))
                 {
                     // common case, no duplicates by name
-                    _childrenByName[node.Name] = new[] { node };
+                    this._childrenByName[node.Name] = new[] { node };
                 }
                 else
                 {
                     // uncommon case, duplicated by name
-                    _childrenByName[node.Name] = nodes = nodes.Append(node);
+                    this._childrenByName[node.Name] = nodes = nodes.Append(node);
                     foreach (var dupNode in nodes)
                     {
                         dupNode.DuplicatedByName = true;
@@ -160,17 +160,17 @@ namespace Microsoft.VisualStudioTools.Navigation
         {
             if (node != null)
             {
-                lock (Children)
+                lock (this.Children)
                 {
-                    Children.Remove(node);
+                    this.Children.Remove(node);
 
                     LibraryNode[] items;
-                    if (_childrenByName.TryGetValue(node.Name, out items))
+                    if (this._childrenByName.TryGetValue(node.Name, out items))
                     {
                         if (items.Length == 1)
                         {
                             System.Diagnostics.Debug.Assert(items[0] == node);
-                            _childrenByName.Remove(node.Name);
+                            this._childrenByName.Remove(node.Name);
                         }
                         else
                         {
@@ -182,7 +182,7 @@ namespace Microsoft.VisualStudioTools.Navigation
                                     newItems[write++] = items[i];
                                 }
                             }
-                            _childrenByName[node.Name] = newItems;
+                            this._childrenByName[node.Name] = newItems;
                         }
                     }
                 }
@@ -210,7 +210,7 @@ namespace Microsoft.VisualStudioTools.Navigation
                 case LIB_CATEGORY.LC_LISTTYPE:
                     {
                         LibraryNodeType subTypes = LibraryNodeType.None;
-                        foreach (LibraryNode node in Children)
+                        foreach (LibraryNode node in this.Children)
                         {
                             subTypes |= node._type;
                         }
@@ -267,14 +267,14 @@ namespace Microsoft.VisualStudioTools.Navigation
         public virtual void FillDescription(_VSOBJDESCOPTIONS flags, IVsObjectBrowserDescription3 description)
         {
             description.ClearDescriptionText();
-            description.AddDescriptionText3(_name, VSOBDESCRIPTIONSECTION.OBDS_NAME, null);
+            description.AddDescriptionText3(this._name, VSOBDESCRIPTIONSECTION.OBDS_NAME, null);
         }
 
         public IVsSimpleObjectList2 FilterView(uint filterType)
         {
             var libraryNodeType = (LibraryNodeType)filterType;
             LibraryNode filtered = null;
-            if (_filteredView.TryGetValue(libraryNodeType, out filtered))
+            if (this._filteredView.TryGetValue(libraryNodeType, out filtered))
             {
                 return filtered as IVsSimpleObjectList2;
             }
@@ -290,7 +290,7 @@ namespace Microsoft.VisualStudioTools.Navigation
                     i += 1;
                 }
             }
-            _filteredView.Add(libraryNodeType, filtered);
+            this._filteredView.Add(libraryNodeType, filtered);
             return filtered as IVsSimpleObjectList2;
         }
 
@@ -303,18 +303,18 @@ namespace Microsoft.VisualStudioTools.Navigation
         {
             get
             {
-                return _name;
+                return this._name;
             }
         }
 
         public virtual string GetTextRepresentation(VSTREETEXTOPTIONS options)
         {
-            return Name;
+            return this.Name;
         }
 
         public LibraryNodeType NodeType
         {
-            get { return _type; }
+            get { return this._type; }
         }
 
         /// <summary>
@@ -337,14 +337,14 @@ namespace Microsoft.VisualStudioTools.Navigation
 
         public virtual string UniqueName
         {
-            get { return Name; }
+            get { return this.Name; }
         }
 
         public string FullName
         {
             get
             {
-                return _fullname;
+                return this._fullname;
             }
         }
 
@@ -352,7 +352,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         {
             get
             {
-                return _contextMenuID;
+                return this._contextMenuID;
             }
         }
 
@@ -369,7 +369,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             get
             {
                 var res = new VSTREEDISPLAYDATA();
-                res.Image = res.SelectedImage = (ushort)GlyphType;
+                res.Image = res.SelectedImage = (ushort)this.GlyphType;
                 return res;
             }
         }
@@ -382,7 +382,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         public override void Update()
         {
             base.Update();
-            _filteredView.Clear();
+            this._filteredView.Clear();
         }
 
         /// <summary>
@@ -399,9 +399,9 @@ namespace Microsoft.VisualStudioTools.Navigation
 
             if (visitor.EnterNode(this, ct))
             {
-                lock (Children)
+                lock (this.Children)
                 {
-                    foreach (var child in Children)
+                    foreach (var child in this.Children)
                     {
                         if (ct.IsCancellationRequested)
                         {
@@ -420,13 +420,13 @@ namespace Microsoft.VisualStudioTools.Navigation
 
         int IVsNavInfoNode.get_Name(out string pbstrName)
         {
-            pbstrName = UniqueName;
+            pbstrName = this.UniqueName;
             return VSConstants.S_OK;
         }
 
         int IVsNavInfoNode.get_Type(out uint pllt)
         {
-            pllt = (uint)_type;
+            pllt = (uint)this._type;
             return VSConstants.S_OK;
         }
 
@@ -451,7 +451,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             AllowSourceControl = _LIB_LISTCAPABILITIES.LLC_ALLOWSCCOPS,
         }
 
-        public bool DuplicatedByName { get { return _duplicatedByName; } private set { _duplicatedByName = value; } }
+        public bool DuplicatedByName { get { return this._duplicatedByName; } private set { this._duplicatedByName = value; } }
 
         #region IVsNavInfo
 
@@ -461,12 +461,12 @@ namespace Microsoft.VisualStudioTools.Navigation
 
             public VsEnumNavInfoNodes(IEnumerator<IVsNavInfoNode> nodeEnum)
             {
-                _nodeEnum = nodeEnum;
+                this._nodeEnum = nodeEnum;
             }
 
             public int Clone(out IVsEnumNavInfoNodes ppEnum)
             {
-                ppEnum = new VsEnumNavInfoNodes(_nodeEnum);
+                ppEnum = new VsEnumNavInfoNodes(this._nodeEnum);
                 return VSConstants.S_OK;
             }
 
@@ -474,11 +474,11 @@ namespace Microsoft.VisualStudioTools.Navigation
             {
                 for (pceltFetched = 0; pceltFetched < celt; ++pceltFetched)
                 {
-                    if (!_nodeEnum.MoveNext())
+                    if (!this._nodeEnum.MoveNext())
                     {
                         return VSConstants.S_FALSE;
                     }
-                    rgelt[pceltFetched] = _nodeEnum.Current;
+                    rgelt[pceltFetched] = this._nodeEnum.Current;
                 }
                 return VSConstants.S_OK;
             }
@@ -492,7 +492,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             {
                 while (celt-- > 0)
                 {
-                    if (!_nodeEnum.MoveNext())
+                    if (!this._nodeEnum.MoveNext())
                     {
                         return VSConstants.S_FALSE;
                     }
@@ -526,7 +526,7 @@ namespace Microsoft.VisualStudioTools.Navigation
 
         public int GetSymbolType(out uint pdwType)
         {
-            pdwType = (uint)_type;
+            pdwType = (uint)this._type;
             return VSConstants.S_OK;
         }
 

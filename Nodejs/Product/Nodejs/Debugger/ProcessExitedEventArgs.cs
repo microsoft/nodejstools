@@ -24,7 +24,7 @@ namespace Microsoft.NodejsTools.Debugger
 
         public ProcessExitedEventArgs(int exitCode)
         {
-            ExitCode = exitCode;
+            this.ExitCode = exitCode;
         }
     }
 }

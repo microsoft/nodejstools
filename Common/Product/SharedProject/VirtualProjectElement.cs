@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudioTools.Project
         internal VirtualProjectElement(ProjectNode project)
             : base(project)
         {
-            _virtualProperties = new Dictionary<string, string>();
+            this._virtualProperties = new Dictionary<string, string>();
         }
 
         protected override string ItemType
@@ -58,7 +58,7 @@ namespace Microsoft.VisualStudioTools.Project
             Debug.Assert(String.Compare(attributeName, ProjectFileConstants.Include, StringComparison.OrdinalIgnoreCase) != 0, "Use rename as this won't work");
 
             // For virtual node, use our virtual property collection
-            _virtualProperties[attributeName] = attributeValue;
+            this._virtualProperties[attributeName] = attributeValue;
         }
 
         /// <summary>
@@ -69,17 +69,17 @@ namespace Microsoft.VisualStudioTools.Project
         public override string GetMetadata(string attributeName)
         {
             // For virtual items, use our virtual property collection
-            if (!_virtualProperties.ContainsKey(attributeName))
+            if (!this._virtualProperties.ContainsKey(attributeName))
             {
                 return String.Empty;
             }
 
-            return _virtualProperties[attributeName];
+            return this._virtualProperties[attributeName];
         }
 
         public override void Rename(string newPath)
         {
-            _virtualProperties[ProjectFileConstants.Include] = newPath;
+            this._virtualProperties[ProjectFileConstants.Include] = newPath;
         }
 
         public override bool Equals(object obj)

@@ -32,7 +32,7 @@ namespace Microsoft.NodejsTools.Jade
         public Token(T tokenType, ITextRange range)
             : base(range)
         {
-            _tokenType = tokenType;
+            this._tokenType = tokenType;
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace Microsoft.NodejsTools.Jade
         public Token(T tokenType, int start, int length)
             : base(start, length)
         {
-            _tokenType = tokenType;
+            this._tokenType = tokenType;
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace Microsoft.NodejsTools.Jade
         /// </summary>
         public virtual T TokenType
         {
-            get { return _tokenType; }
+            get { return this._tokenType; }
         }
 
         /// <summary>

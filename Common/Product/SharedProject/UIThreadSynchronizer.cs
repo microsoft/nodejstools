@@ -40,15 +40,15 @@ namespace Microsoft.VisualStudioTools.Project
 
         public UIThreadSynchronizer(TaskScheduler scheduler, Thread target)
         {
-            _scheduler = scheduler;
-            _thread = target;
+            this._scheduler = scheduler;
+            this._thread = target;
         }
 
         #region ISynchronizeInvoke Members
 
         public IAsyncResult BeginInvoke(Delegate method, params object[] args)
         {
-            return Task.Factory.StartNew(() => method.DynamicInvoke(args), default(System.Threading.CancellationToken), TaskCreationOptions.None, _scheduler);
+            return Task.Factory.StartNew(() => method.DynamicInvoke(args), default(System.Threading.CancellationToken), TaskCreationOptions.None, this._scheduler);
         }
 
         public object EndInvoke(IAsyncResult result)
@@ -58,14 +58,14 @@ namespace Microsoft.VisualStudioTools.Project
 
         public object Invoke(Delegate method, params object[] args)
         {
-            var task = Task.Factory.StartNew(() => method.DynamicInvoke(args), default(System.Threading.CancellationToken), TaskCreationOptions.None, _scheduler);
+            var task = Task.Factory.StartNew(() => method.DynamicInvoke(args), default(System.Threading.CancellationToken), TaskCreationOptions.None, this._scheduler);
             task.Wait();
             return task.Result;
         }
 
         public bool InvokeRequired
         {
-            get { return Thread.CurrentThread != _thread; }
+            get { return Thread.CurrentThread != this._thread; }
         }
 
         #endregion

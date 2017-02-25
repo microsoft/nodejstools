@@ -29,9 +29,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public AD7BreakpointResolution(AD7Engine engine, NodeBreakpointBinding address, AD7DocumentContext documentContext)
         {
-            _engine = engine;
-            _binding = address;
-            _documentContext = documentContext;
+            this._engine = engine;
+            this._binding = address;
+            this._documentContext = documentContext;
         }
 
         #region IDebugBreakpointResolution2 Members
@@ -54,8 +54,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
                 // The debugger will not QI the IDebugCodeContex2 interface returned here. We must pass the pointer
                 // to IDebugCodeContex2 and not IUnknown.
-                var codeContext = new AD7MemoryAddress(_engine, _binding.Target.FileName, _binding.Target.Line, _binding.Target.Column);
-                codeContext.SetDocumentContext(_documentContext);
+                var codeContext = new AD7MemoryAddress(this._engine, this._binding.Target.FileName, this._binding.Target.Line, this._binding.Target.Column);
+                codeContext.SetDocumentContext(this._documentContext);
                 location.unionmember1 = Marshal.GetComInterfaceForObject(codeContext, typeof(IDebugCodeContext2));
                 pBpResolutionInfo[0].bpResLocation = location;
                 pBpResolutionInfo[0].dwFields |= enum_BPRESI_FIELDS.BPRESI_BPRESLOCATION;
@@ -63,7 +63,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
             if ((dwFields & enum_BPRESI_FIELDS.BPRESI_PROGRAM) != 0)
             {
-                pBpResolutionInfo[0].pProgram = _engine;
+                pBpResolutionInfo[0].pProgram = this._engine;
                 pBpResolutionInfo[0].dwFields |= enum_BPRESI_FIELDS.BPRESI_PROGRAM;
             }
 

@@ -34,14 +34,14 @@ namespace Microsoft.NodejsTools.Debugger.Commands
             JToken body = response["body"];
 
             JArray breakpoints = (JArray)body["breakpoints"] ?? new JArray();
-            Breakpoints = new Dictionary<int, int>(breakpoints.Count);
+            this.Breakpoints = new Dictionary<int, int>(breakpoints.Count);
 
             foreach (JToken breakpoint in breakpoints)
             {
                 var breakpointId = (int)breakpoint["number"];
                 var hitCount = (int)breakpoint["hit_count"];
 
-                Breakpoints.Add(breakpointId, hitCount);
+                this.Breakpoints.Add(breakpointId, hitCount);
             }
         }
     }

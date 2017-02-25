@@ -43,21 +43,21 @@ namespace Microsoft.VisualStudioTools
 
         public ProvideDebugExceptionAttribute(string engineGuid, string category, params string[] path)
         {
-            _engineGuid = engineGuid;
-            _category = category;
-            _path = path;
-            _state = enum_EXCEPTION_STATE.EXCEPTION_JUST_MY_CODE_SUPPORTED | enum_EXCEPTION_STATE.EXCEPTION_STOP_USER_UNCAUGHT;
+            this._engineGuid = engineGuid;
+            this._category = category;
+            this._path = path;
+            this._state = enum_EXCEPTION_STATE.EXCEPTION_JUST_MY_CODE_SUPPORTED | enum_EXCEPTION_STATE.EXCEPTION_STOP_USER_UNCAUGHT;
         }
 
         public int Code
         {
             get
             {
-                return _code;
+                return this._code;
             }
             set
             {
-                _code = value;
+                this._code = value;
             }
         }
 
@@ -65,11 +65,11 @@ namespace Microsoft.VisualStudioTools
         {
             get
             {
-                return _state;
+                return this._state;
             }
             set
             {
-                _state = value;
+                this._state = value;
             }
         }
 
@@ -77,35 +77,35 @@ namespace Microsoft.VisualStudioTools
         {
             get
             {
-                return _state.HasFlag(enum_EXCEPTION_STATE.EXCEPTION_STOP_USER_UNCAUGHT);
+                return this._state.HasFlag(enum_EXCEPTION_STATE.EXCEPTION_STOP_USER_UNCAUGHT);
             }
             set
             {
                 if (value)
                 {
-                    _state |= enum_EXCEPTION_STATE.EXCEPTION_STOP_USER_UNCAUGHT;
+                    this._state |= enum_EXCEPTION_STATE.EXCEPTION_STOP_USER_UNCAUGHT;
                 }
                 else
                 {
-                    _state &= ~enum_EXCEPTION_STATE.EXCEPTION_STOP_USER_UNCAUGHT;
+                    this._state &= ~enum_EXCEPTION_STATE.EXCEPTION_STOP_USER_UNCAUGHT;
                 }
             }
         }
 
         public override void Register(RegistrationAttribute.RegistrationContext context)
         {
-            var engineKey = context.CreateKey("AD7Metrics\\Exception\\" + _engineGuid);
+            var engineKey = context.CreateKey("AD7Metrics\\Exception\\" + this._engineGuid);
 
-            var key = engineKey.CreateSubkey(_category);
-            foreach (var pathElem in _path)
+            var key = engineKey.CreateSubkey(this._category);
+            foreach (var pathElem in this._path)
             {
                 key = key.CreateSubkey(pathElem);
             }
-            key.SetValue("Code", _code);
-            key.SetValue("State", (int)_state);
+            key.SetValue("Code", this._code);
+            key.SetValue("State", (int)this._state);
 
-            string name = _path.LastOrDefault() ?? "*";
-            engineKey.SetValue(name, (int)(_state & DkmValidFlags));
+            string name = this._path.LastOrDefault() ?? "*";
+            engineKey.SetValue(name, (int)(this._state & DkmValidFlags));
         }
 
         public override void Unregister(RegistrationAttribute.RegistrationContext context)

@@ -24,11 +24,11 @@ namespace Microsoft.NodejsTools.Jade
         // plain text with possible #{foo} variable references
         private void OnHtml()
         {
-            Debug.Assert(_cs.CurrentChar == '<' && (_cs.NextChar == '/' || Char.IsLetter(_cs.NextChar)));
+            Debug.Assert(this._cs.CurrentChar == '<' && (this._cs.NextChar == '/' || Char.IsLetter(this._cs.NextChar)));
 
-            int length = _cs.NextChar == '/' ? 2 : 1;
-            AddToken(JadeTokenType.AngleBracket, _cs.Position, length);
-            _cs.Advance(length);
+            int length = this._cs.NextChar == '/' ? 2 : 1;
+            AddToken(JadeTokenType.AngleBracket, this._cs.Position, length);
+            this._cs.Advance(length);
 
             var range = GetAttribute();
             if (range.Length > 0)
@@ -36,8 +36,8 @@ namespace Microsoft.NodejsTools.Jade
 
             OnAttributes('>');
 
-            if (_cs.LookAhead(-1) == '>')
-                AddToken(JadeTokenType.AngleBracket, _cs.Position - 1, 1);
+            if (this._cs.LookAhead(-1) == '>')
+                AddToken(JadeTokenType.AngleBracket, this._cs.Position - 1, 1);
         }
     }
 }

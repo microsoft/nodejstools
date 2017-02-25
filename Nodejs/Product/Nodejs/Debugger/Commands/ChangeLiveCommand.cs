@@ -32,7 +32,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands
                 module.Source,
                 NodeConstants.ScriptWrapEnd);
 
-            _arguments = new Dictionary<string, object> {
+            this._arguments = new Dictionary<string, object> {
                 { "script_id", module.Id },
                 { "new_source", source },
                 { "preview_only", false },
@@ -41,7 +41,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands
 
         protected override IDictionary<string, object> Arguments
         {
-            get { return _arguments; }
+            get { return this._arguments; }
         }
 
         public bool Updated { get; private set; }
@@ -52,8 +52,8 @@ namespace Microsoft.NodejsTools.Debugger.Commands
             base.ProcessResponse(response);
 
             JToken result = response["body"]["result"];
-            Updated = (bool)result["updated"];
-            StackModified = (bool)result["stack_modified"];
+            this.Updated = (bool)result["updated"];
+            this.StackModified = (bool)result["stack_modified"];
         }
     }
 }

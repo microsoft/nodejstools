@@ -149,9 +149,9 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code. </returns>
         public virtual int GetProjectItem(out IVsHierarchy hier, out uint itemid)
         {
-            Utilities.CheckNotNull(node);
+            Utilities.CheckNotNull(this.node);
 
-            hier = node.ProjectMgr.GetOuterInterface<IVsHierarchy>();
+            hier = this.node.ProjectMgr.GetOuterInterface<IVsHierarchy>();
             itemid = this.node.ID;
             return VSConstants.S_OK;
         }
@@ -210,7 +210,7 @@ namespace Microsoft.VisualStudioTools.Project
                 // Retrieve the list of guids from hierarchy properties.
                 // Because a flavor could modify that list we must make sure we are calling the outer most implementation of IVsHierarchy
                 string guidsList = String.Empty;
-                IVsHierarchy hierarchy = HierarchyNode.ProjectMgr.GetOuterInterface<IVsHierarchy>();
+                IVsHierarchy hierarchy = this.HierarchyNode.ProjectMgr.GetOuterInterface<IVsHierarchy>();
                 object variant = null;
                 ErrorHandler.ThrowOnFailure(hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID2.VSHPROPID_PropertyPagesCLSIDList, out variant));
                 guidsList = (string)variant;
@@ -325,7 +325,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return HierarchyNode.IsLinkFile;
+                return this.HierarchyNode.IsLinkFile;
             }
         }
 
@@ -387,11 +387,11 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return HierarchyNode.ItemNode.ItemTypeName;
+                return this.HierarchyNode.ItemNode.ItemTypeName;
             }
             set
             {
-                HierarchyNode.ItemNode.ItemTypeName = value;
+                this.HierarchyNode.ItemNode.ItemTypeName = value;
             }
         }
 
@@ -404,7 +404,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                var res = BuildActionTypeConverter.Instance.ConvertFromString(HierarchyNode.ItemNode.ItemTypeName);
+                var res = BuildActionTypeConverter.Instance.ConvertFromString(this.HierarchyNode.ItemNode.ItemTypeName);
                 if (res is prjBuildAction)
                 {
                     return (prjBuildAction)res;
@@ -445,22 +445,22 @@ namespace Microsoft.VisualStudioTools.Project
         public bool ShouldSerializePublish()
         {
             // If compile, default should be true, else the default is false.
-            if (HierarchyNode.ItemNode.ItemTypeName == ProjectFileConstants.Compile)
+            if (this.HierarchyNode.ItemNode.ItemTypeName == ProjectFileConstants.Compile)
             {
-                return !Publish;
+                return !this.Publish;
             }
-            return Publish;
+            return this.Publish;
         }
 
         [Browsable(false)]
         public void ResetPublish()
         {
             // If compile, default should be true, else the default is false.
-            if (HierarchyNode.ItemNode.ItemTypeName == ProjectFileConstants.Compile)
+            if (this.HierarchyNode.ItemNode.ItemTypeName == ProjectFileConstants.Compile)
             {
-                Publish = true;
+                this.Publish = true;
             }
-            Publish = false;
+            this.Publish = false;
         }
 
         [Browsable(false)]
@@ -469,7 +469,7 @@ namespace Microsoft.VisualStudioTools.Project
             get
             {
                 // remove STATEICON_ and return rest of enum
-                return HierarchyNode.StateIconIndex.ToString().Substring(10);
+                return this.HierarchyNode.StateIconIndex.ToString().Substring(10);
             }
         }
 
@@ -507,11 +507,11 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return HierarchyNode.ItemNode.ItemTypeName;
+                return this.HierarchyNode.ItemNode.ItemTypeName;
             }
             set
             {
-                HierarchyNode.ItemNode.ItemTypeName = value;
+                this.HierarchyNode.ItemNode.ItemTypeName = value;
             }
         }
 
@@ -804,7 +804,7 @@ namespace Microsoft.VisualStudioTools.Project
             if (editorBaseType == typeof(ComponentEditor))
             {
                 IOleServiceProvider sp;
-                ErrorHandler.ThrowOnFailure(Node.ProjectMgr.GetSite(out sp));
+                ErrorHandler.ThrowOnFailure(this.Node.ProjectMgr.GetSite(out sp));
                 return new PropertiesEditorLauncher(new ServiceProvider(sp));
             }
 
@@ -832,7 +832,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         bool EnvDTE80.IInternalExtenderProvider.CanExtend(string extenderCATID, string extenderName, object extendeeObject)
         {
-            EnvDTE80.IInternalExtenderProvider outerHierarchy = Node.GetOuterInterface<EnvDTE80.IInternalExtenderProvider>();
+            EnvDTE80.IInternalExtenderProvider outerHierarchy = this.Node.GetOuterInterface<EnvDTE80.IInternalExtenderProvider>();
 
             if (outerHierarchy != null)
             {
@@ -843,7 +843,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         object EnvDTE80.IInternalExtenderProvider.GetExtender(string extenderCATID, string extenderName, object extendeeObject, EnvDTE.IExtenderSite extenderSite, int cookie)
         {
-            EnvDTE80.IInternalExtenderProvider outerHierarchy = Node.GetOuterInterface<EnvDTE80.IInternalExtenderProvider>();
+            EnvDTE80.IInternalExtenderProvider outerHierarchy = this.Node.GetOuterInterface<EnvDTE80.IInternalExtenderProvider>();
 
             if (outerHierarchy != null)
             {
@@ -876,10 +876,10 @@ namespace Microsoft.VisualStudioTools.Project
             }
             set
             {
-                HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                this.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
                 {
                     this.HierarchyNode.SetEditLabel(value);
-                    this.HierarchyNode.ProjectMgr.ReDrawNode(HierarchyNode, UIHierarchyElement.Caption);
+                    this.HierarchyNode.ProjectMgr.ReDrawNode(this.HierarchyNode, UIHierarchyElement.Caption);
                 });
             }
         }
@@ -895,10 +895,10 @@ namespace Microsoft.VisualStudioTools.Project
             }
             set
             {
-                HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                this.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
                 {
                     this.HierarchyNode.SetEditLabel(value);
-                    this.HierarchyNode.ProjectMgr.ReDrawNode(HierarchyNode, UIHierarchyElement.Caption);
+                    this.HierarchyNode.ProjectMgr.ReDrawNode(this.HierarchyNode, UIHierarchyElement.Caption);
                 });
             }
         }
@@ -1009,7 +1009,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return ((ProjectReferenceNode)Node).ReferencedProjectOutputPath;
+                return ((ProjectReferenceNode)this.Node).ReferencedProjectOutputPath;
             }
         }
         #endregion

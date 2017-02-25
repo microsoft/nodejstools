@@ -35,7 +35,7 @@ namespace Microsoft.NodejsTools
 
         protected void StartListenerThread()
         {
-            var debuggerThread = new Thread(ListenerThread);
+            var debuggerThread = new Thread(this.ListenerThread);
             debuggerThread.Name = GetType().Name + " Thread";
             debuggerThread.Start();
         }
@@ -47,22 +47,22 @@ namespace Microsoft.NodejsTools
 
             // Use a local for Socket to keep nulling of _socket field (on non listener thread)
             // from causing spurious null dereferences
-            var socket = _socket;
+            var socket = this._socket;
 
             try
             {
                 if (socket != null && socket.Connected)
                 {
                     // _socket == null || !_socket.Connected effectively stops listening and associated packet processing
-                    while (_socket != null && socket.Connected)
+                    while (this._socket != null && socket.Connected)
                     {
                         if (pos >= text.Length)
                         {
-                            ReadMoreData(socket.Receive(_socketBuffer), ref text, ref pos);
+                            ReadMoreData(socket.Receive(this._socketBuffer), ref text, ref pos);
                         }
 
                         Dictionary<string, string> headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                        while (_socket != null && socket.Connected)
+                        while (this._socket != null && socket.Connected)
                         {
                             int newPos = text.FirstNewLine(pos);
                             if (newPos == pos)
@@ -74,7 +74,7 @@ namespace Microsoft.NodejsTools
                             else if (newPos == -1)
                             {
                                 // we need to get more data...
-                                ReadMoreData(socket.Receive(_socketBuffer), ref text, ref pos);
+                                ReadMoreData(socket.Receive(this._socketBuffer), ref text, ref pos);
                             }
                             else
                             {
@@ -103,7 +103,7 @@ namespace Microsoft.NodejsTools
                             {
                                 StringBuilder bodyBuilder = new StringBuilder();
 
-                                while (_socket != null && socket.Connected)
+                                while (this._socket != null && socket.Connected)
                                 {
                                     int len = Math.Min(text.Length - pos, lengthRemaining);
                                     bodyBuilder.Append(Encoding.UTF8.GetString(text.Substring(pos, len)));
@@ -116,13 +116,13 @@ namespace Microsoft.NodejsTools
                                         break;
                                     }
 
-                                    ReadMoreData(socket.Receive(_socketBuffer), ref text, ref pos);
+                                    ReadMoreData(socket.Receive(this._socketBuffer), ref text, ref pos);
                                 }
                                 body = bodyBuilder.ToString();
                             }
                         }
 
-                        if (_socket != null && socket.Connected)
+                        if (this._socket != null && socket.Connected)
                         {
                             try
                             {
@@ -141,7 +141,7 @@ namespace Microsoft.NodejsTools
             }
             finally
             {
-                Debug.Assert(_socket == null || !_socket.Connected);
+                Debug.Assert(this._socket == null || !this._socket.Connected);
                 if (socket != null && socket.Connected)
                 {
                     socket.Disconnect(false);
@@ -157,7 +157,7 @@ namespace Microsoft.NodejsTools
         {
             byte[] combinedText = new byte[bytesRead + text.Length - pos];
             Buffer.BlockCopy(text, pos, combinedText, 0, text.Length - pos);
-            Buffer.BlockCopy(_socketBuffer, 0, combinedText, text.Length - pos, bytesRead);
+            Buffer.BlockCopy(this._socketBuffer, 0, combinedText, text.Length - pos, bytesRead);
             text = combinedText;
             pos = 0;
         }
@@ -166,11 +166,11 @@ namespace Microsoft.NodejsTools
         {
             get
             {
-                return _socket;
+                return this._socket;
             }
             set
             {
-                _socket = value;
+                this._socket = value;
             }
         }
     }
@@ -219,8 +219,8 @@ namespace Microsoft.NodejsTools
 
         public JsonResponse(Dictionary<string, string> headers, string body)
         {
-            Headers = headers;
-            Body = body;
+            this.Headers = headers;
+            this.Body = body;
         }
     }
 }

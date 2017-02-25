@@ -23,8 +23,8 @@ namespace Microsoft.NodejsTools.SourceMapping
 
         internal JavaScriptSourceMapInfo(SourceMap map, string[] lines)
         {
-            Map = map;
-            Lines = lines;
+            this.Map = map;
+            this.Lines = lines;
         }
     }
 }

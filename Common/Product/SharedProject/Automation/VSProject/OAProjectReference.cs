@@ -45,31 +45,31 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         }
         public override string Name
         {
-            get { return BaseReferenceNode.ReferencedProjectName; }
+            get { return this.BaseReferenceNode.ReferencedProjectName; }
         }
         public override string Identity
         {
             get
             {
-                return BaseReferenceNode.Caption;
+                return this.BaseReferenceNode.Caption;
             }
         }
         public override string Path
         {
             get
             {
-                return BaseReferenceNode.ReferencedProjectOutputPath;
+                return this.BaseReferenceNode.ReferencedProjectOutputPath;
             }
         }
         public override EnvDTE.Project SourceProject
         {
             get
             {
-                if (Guid.Empty == BaseReferenceNode.ReferencedProjectGuid)
+                if (Guid.Empty == this.BaseReferenceNode.ReferencedProjectGuid)
                 {
                     return null;
                 }
-                IVsHierarchy hierarchy = VsShellUtilities.GetHierarchy(BaseReferenceNode.ProjectMgr.Site, BaseReferenceNode.ReferencedProjectGuid);
+                IVsHierarchy hierarchy = VsShellUtilities.GetHierarchy(this.BaseReferenceNode.ProjectMgr.Site, this.BaseReferenceNode.ReferencedProjectGuid);
                 if (null == hierarchy)
                 {
                     return null;

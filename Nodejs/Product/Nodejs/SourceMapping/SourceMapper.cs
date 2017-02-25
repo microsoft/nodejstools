@@ -31,7 +31,7 @@ namespace Microsoft.NodejsTools.SourceMapping
         private JavaScriptSourceMapInfo TryGetMapInfo(string filename)
         {
             JavaScriptSourceMapInfo mapInfo;
-            if (!_originalFileToSourceMap.TryGetValue(filename, out mapInfo))
+            if (!this._originalFileToSourceMap.TryGetValue(filename, out mapInfo))
             {
                 if (File.Exists(filename))
                 {
@@ -64,11 +64,11 @@ namespace Microsoft.NodejsTools.SourceMapping
                                 using (StreamReader reader = new StreamReader(sourceMapFilename))
                                 {
                                     var sourceMap = new SourceMap(reader);
-                                    _originalFileToSourceMap[filename] = mapInfo = new JavaScriptSourceMapInfo(sourceMap, contents);
+                                    this._originalFileToSourceMap[filename] = mapInfo = new JavaScriptSourceMapInfo(sourceMap, contents);
                                     // clear all of our cached _generatedFileToSourceMap files...
-                                    foreach (var cachedInvalid in _generatedFileToSourceMap.Where(x => x.Value == null).Select(x => x.Key).ToArray())
+                                    foreach (var cachedInvalid in this._generatedFileToSourceMap.Where(x => x.Value == null).Select(x => x.Key).ToArray())
                                     {
-                                        _generatedFileToSourceMap.Remove(cachedInvalid);
+                                        this._generatedFileToSourceMap.Remove(cachedInvalid);
                                     }
                                 }
                             }
@@ -229,8 +229,8 @@ namespace Microsoft.NodejsTools.SourceMapping
 
             public ReverseSourceMap(SourceMap mapping, string javaScriptFile)
             {
-                Mapping = mapping;
-                JavaScriptFile = javaScriptFile;
+                this.Mapping = mapping;
+                this.JavaScriptFile = javaScriptFile;
             }
         }
 
@@ -240,17 +240,17 @@ namespace Microsoft.NodejsTools.SourceMapping
         private ReverseSourceMap GetReverseSourceMap(string fileName)
         {
             ReverseSourceMap sourceMap;
-            if (!_generatedFileToSourceMap.TryGetValue(fileName, out sourceMap))
+            if (!this._generatedFileToSourceMap.TryGetValue(fileName, out sourceMap))
             {
                 // See if we are using source maps for this file.
-                foreach (var keyValue in _originalFileToSourceMap)
+                foreach (var keyValue in this._originalFileToSourceMap)
                 {
                     foreach (var source in keyValue.Value.Map.Sources)
                     {
                         var path = GetFileRelativeToFile(keyValue.Key, source);
                         if (CommonUtils.IsSamePath(path, fileName))
                         {
-                            return _generatedFileToSourceMap[fileName] = new ReverseSourceMap(
+                            return this._generatedFileToSourceMap[fileName] = new ReverseSourceMap(
                                 keyValue.Value.Map,
                                 keyValue.Key
                             );
@@ -281,7 +281,7 @@ namespace Microsoft.NodejsTools.SourceMapping
                         {
                             using (StreamReader reader = new StreamReader(baseFile + NodejsConstants.JavaScriptExtension + NodejsConstants.MapExtension))
                             {
-                                _generatedFileToSourceMap[fileName] = sourceMap = new ReverseSourceMap(
+                                this._generatedFileToSourceMap[fileName] = sourceMap = new ReverseSourceMap(
                                     new SourceMap(reader),
                                     jsFile
                                 );
@@ -289,16 +289,16 @@ namespace Microsoft.NodejsTools.SourceMapping
                         }
                         catch (NotSupportedException)
                         {
-                            _generatedFileToSourceMap[fileName] = null;
+                            this._generatedFileToSourceMap[fileName] = null;
                         }
                         catch (InvalidOperationException)
                         {
-                            _generatedFileToSourceMap[fileName] = null;
+                            this._generatedFileToSourceMap[fileName] = null;
                         }
                     }
                     else
                     {
-                        _generatedFileToSourceMap[fileName] = null;
+                        this._generatedFileToSourceMap[fileName] = null;
                     }
                 }
             }

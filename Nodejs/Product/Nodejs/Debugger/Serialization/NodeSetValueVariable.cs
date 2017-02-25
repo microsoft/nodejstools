@@ -22,16 +22,16 @@ namespace Microsoft.NodejsTools.Debugger.Serialization
     {
         public NodeSetValueVariable(NodeStackFrame stackFrame, string name, JToken message)
         {
-            Id = (int)message["body"]["newValue"]["handle"];
-            StackFrame = stackFrame;
-            Parent = null;
-            Name = name;
-            TypeName = (string)message["body"]["newValue"]["type"];
-            Value = (string)message["body"]["newValue"]["value"];
-            Class = (string)message["body"]["newValue"]["className"];
-            Text = (string)message["body"]["newValue"]["text"];
-            Attributes = NodePropertyAttributes.None;
-            Type = NodePropertyType.Normal;
+            this.Id = (int)message["body"]["newValue"]["handle"];
+            this.StackFrame = stackFrame;
+            this.Parent = null;
+            this.Name = name;
+            this.TypeName = (string)message["body"]["newValue"]["type"];
+            this.Value = (string)message["body"]["newValue"]["value"];
+            this.Class = (string)message["body"]["newValue"]["className"];
+            this.Text = (string)message["body"]["newValue"]["text"];
+            this.Attributes = NodePropertyAttributes.None;
+            this.Type = NodePropertyType.Normal;
         }
 
         public int Id { get; private set; }

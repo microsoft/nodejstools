@@ -33,13 +33,13 @@ namespace Microsoft.NodejsTools.Options
 
         internal void SyncControlWithPageSettings(NodejsNpmOptionsPage page)
         {
-            _showOutputWhenRunningNpm.Checked = page.ShowOutputWindowWhenExecutingNpm;
-            _cacheClearedSuccessfully.Visible = false;
+            this._showOutputWhenRunningNpm.Checked = page.ShowOutputWindowWhenExecutingNpm;
+            this._cacheClearedSuccessfully.Visible = false;
         }
 
         internal void SyncPageWithControlSettings(NodejsNpmOptionsPage page)
         {
-            page.ShowOutputWindowWhenExecutingNpm = _showOutputWhenRunningNpm.Checked;
+            page.ShowOutputWindowWhenExecutingNpm = this._showOutputWhenRunningNpm.Checked;
         }
 
         private void ClearCacheButton_Click(object sender, EventArgs e)
@@ -56,7 +56,7 @@ namespace Microsoft.NodejsTools.Options
                    MessageBoxIcon.Information);
             }
 
-            _cacheClearedSuccessfully.Visible = didClearNpmCache && didClearTools;
+            this._cacheClearedSuccessfully.Visible = didClearNpmCache && didClearTools;
         }
 
         private static bool TryDeleteCacheDirectory(string cachePath)

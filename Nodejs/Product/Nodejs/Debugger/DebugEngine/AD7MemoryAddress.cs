@@ -36,11 +36,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         private AD7MemoryAddress(AD7Engine engine, NodeStackFrame frame, string fileName, int line, int column)
         {
-            _engine = engine;
-            _frame = frame;
-            _fileName = fileName;
-            _line = line;
-            _column = column;
+            this._engine = engine;
+            this._frame = frame;
+            this._fileName = fileName;
+            this._line = line;
+            this._column = column;
         }
 
         public AD7MemoryAddress(AD7Engine engine, string fileName, int line, int column)
@@ -55,32 +55,32 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public AD7Engine Engine
         {
-            get { return _engine; }
+            get { return this._engine; }
         }
 
         public NodeModule Module
         {
-            get { return _frame != null ? _frame.Module : null; }
+            get { return this._frame != null ? this._frame.Module : null; }
         }
 
         public string FileName
         {
-            get { return _frame != null ? _frame.FileName : _fileName; }
+            get { return this._frame != null ? this._frame.FileName : this._fileName; }
         }
 
         public int Line
         {
-            get { return _line; }
+            get { return this._line; }
         }
 
         public int Column
         {
-            get { return _column; }
+            get { return this._column; }
         }
 
         public void SetDocumentContext(IDebugDocumentContext2 docContext)
         {
-            _documentContext = docContext;
+            this._documentContext = docContext;
         }
 
         #region IDebugMemoryContext2 Members
@@ -88,7 +88,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         // Adds a specified value to the current context's address to create a new context.
         public int Add(ulong dwCount, out IDebugMemoryContext2 newAddress)
         {
-            newAddress = new AD7MemoryAddress(_engine, _frame, _fileName, _line + (int)dwCount, _column);
+            newAddress = new AD7MemoryAddress(this._engine, this._frame, this._fileName, this._line + (int)dwCount, this._column);
             return VSConstants.S_OK;
         }
 
@@ -108,7 +108,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                     continue;
                 }
 
-                if (!ReferenceEquals(_engine, compareTo._engine))
+                if (!ReferenceEquals(this._engine, compareTo._engine))
                 {
                     continue;
                 }
@@ -118,43 +118,43 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                 switch (contextCompare)
                 {
                     case enum_CONTEXT_COMPARE.CONTEXT_EQUAL:
-                        result = _line == compareTo._line;
+                        result = this._line == compareTo._line;
                         break;
 
                     case enum_CONTEXT_COMPARE.CONTEXT_LESS_THAN:
-                        result = _line < compareTo._line;
+                        result = this._line < compareTo._line;
                         break;
 
                     case enum_CONTEXT_COMPARE.CONTEXT_GREATER_THAN:
-                        result = _line > compareTo._line;
+                        result = this._line > compareTo._line;
                         break;
 
                     case enum_CONTEXT_COMPARE.CONTEXT_LESS_THAN_OR_EQUAL:
-                        result = _line <= compareTo._line;
+                        result = this._line <= compareTo._line;
                         break;
 
                     case enum_CONTEXT_COMPARE.CONTEXT_GREATER_THAN_OR_EQUAL:
-                        result = _line >= compareTo._line;
+                        result = this._line >= compareTo._line;
                         break;
 
                     case enum_CONTEXT_COMPARE.CONTEXT_SAME_SCOPE:
                     case enum_CONTEXT_COMPARE.CONTEXT_SAME_FUNCTION:
-                        if (_frame != null)
+                        if (this._frame != null)
                         {
-                            result = compareTo.FileName == FileName && compareTo._line >= _frame.StartLine && compareTo._line <= _frame.EndLine;
+                            result = compareTo.FileName == this.FileName && compareTo._line >= this._frame.StartLine && compareTo._line <= this._frame.EndLine;
                         }
                         else if (compareTo._frame != null)
                         {
-                            result = compareTo.FileName == FileName && _line >= compareTo._frame.StartLine && compareTo._line <= compareTo._frame.EndLine;
+                            result = compareTo.FileName == this.FileName && this._line >= compareTo._frame.StartLine && compareTo._line <= compareTo._frame.EndLine;
                         }
                         else
                         {
-                            result = _line == compareTo._line && FileName == compareTo.FileName;
+                            result = this._line == compareTo._line && this.FileName == compareTo.FileName;
                         }
                         break;
 
                     case enum_CONTEXT_COMPARE.CONTEXT_SAME_MODULE:
-                        result = FileName == compareTo.FileName;
+                        result = this.FileName == compareTo.FileName;
                         break;
 
                     case enum_CONTEXT_COMPARE.CONTEXT_SAME_PROCESS:
@@ -183,13 +183,13 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
             if ((dwFields & enum_CONTEXT_INFO_FIELDS.CIF_ADDRESS) != 0)
             {
-                pinfo[0].bstrAddress = _line.ToString(CultureInfo.InvariantCulture);
+                pinfo[0].bstrAddress = this._line.ToString(CultureInfo.InvariantCulture);
                 pinfo[0].dwFields |= enum_CONTEXT_INFO_FIELDS.CIF_ADDRESS;
             }
 
-            if ((dwFields & enum_CONTEXT_INFO_FIELDS.CIF_FUNCTION) != 0 && _frame != null)
+            if ((dwFields & enum_CONTEXT_INFO_FIELDS.CIF_FUNCTION) != 0 && this._frame != null)
             {
-                pinfo[0].bstrFunction = _frame.FunctionName;
+                pinfo[0].bstrFunction = this._frame.FunctionName;
                 pinfo[0].dwFields |= enum_CONTEXT_INFO_FIELDS.CIF_FUNCTION;
             }
 
@@ -220,7 +220,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         // Subtracts a specified value from the current context's address to create a new context.
         public int Subtract(ulong dwCount, out IDebugMemoryContext2 ppMemCxt)
         {
-            ppMemCxt = new AD7MemoryAddress(_engine, _frame, _fileName, _line - (int)dwCount, _column);
+            ppMemCxt = new AD7MemoryAddress(this._engine, this._frame, this._fileName, this._line - (int)dwCount, this._column);
             return VSConstants.S_OK;
         }
 
@@ -231,18 +231,18 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         // Gets the document context for this code-context
         public int GetDocumentContext(out IDebugDocumentContext2 ppSrcCxt)
         {
-            ppSrcCxt = _documentContext;
+            ppSrcCxt = this._documentContext;
             return VSConstants.S_OK;
         }
 
         // Gets the language information for this code context.
         public int GetLanguageInfo(ref string pbstrLanguage, ref Guid pguidLanguage)
         {
-            if (_documentContext != null)
+            if (this._documentContext != null)
             {
-                return _documentContext.GetLanguageInfo(ref pbstrLanguage, ref pguidLanguage);
+                return this._documentContext.GetLanguageInfo(ref pbstrLanguage, ref pguidLanguage);
             }
-            AD7Engine.MapLanguageInfo(FileName, out pbstrLanguage, out pguidLanguage);
+            AD7Engine.MapLanguageInfo(this.FileName, out pbstrLanguage, out pguidLanguage);
             return VSConstants.S_OK;
         }
 
@@ -255,7 +255,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         // the program being debugged.
         int IDebugCodeContext100.GetProgram(out IDebugProgram2 pProgram)
         {
-            pProgram = _engine;
+            pProgram = this._engine;
             return VSConstants.S_OK;
         }
 

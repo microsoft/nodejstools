@@ -26,9 +26,9 @@ namespace Microsoft.NodejsTools.Debugger
 
         public ExceptionRaisedEventArgs(NodeThread thread, NodeException exception, bool isUnhandled)
         {
-            Thread = thread;
-            Exception = exception;
-            IsUnhandled = isUnhandled;
+            this.Thread = thread;
+            this.Exception = exception;
+            this.IsUnhandled = isUnhandled;
         }
     }
 }

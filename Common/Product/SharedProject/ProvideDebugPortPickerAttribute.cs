@@ -25,17 +25,17 @@ namespace Microsoft.VisualStudioTools
 
         public ProvideDebugPortPickerAttribute(Type portPicker)
         {
-            _portPicker = portPicker;
+            this._portPicker = portPicker;
         }
 
         public override void Register(RegistrationContext context)
         {
             var clsidKey = context.CreateKey("CLSID");
-            var clsidGuidKey = clsidKey.CreateSubkey(_portPicker.GUID.ToString("B"));
-            clsidGuidKey.SetValue("Assembly", _portPicker.Assembly.FullName);
-            clsidGuidKey.SetValue("Class", _portPicker.FullName);
+            var clsidGuidKey = clsidKey.CreateSubkey(this._portPicker.GUID.ToString("B"));
+            clsidGuidKey.SetValue("Assembly", this._portPicker.Assembly.FullName);
+            clsidGuidKey.SetValue("Class", this._portPicker.FullName);
             clsidGuidKey.SetValue("InprocServer32", context.InprocServerPath);
-            clsidGuidKey.SetValue("CodeBase", Path.Combine(context.ComponentPath, _portPicker.Module.Name));
+            clsidGuidKey.SetValue("CodeBase", Path.Combine(context.ComponentPath, this._portPicker.Module.Name));
             clsidGuidKey.SetValue("ThreadingModel", "Free");
         }
 

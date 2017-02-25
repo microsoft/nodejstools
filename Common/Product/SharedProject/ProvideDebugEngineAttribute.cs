@@ -27,22 +27,22 @@ namespace Microsoft.VisualStudioTools
 
         public ProvideDebugEngineAttribute(string name, Type programProvider, Type debugEngine, string id, bool setNextStatement = true, bool hitCountBp = false, bool justMyCodeStepping = true)
         {
-            _name = name;
-            _programProvider = programProvider;
-            _debugEngine = debugEngine;
-            _id = id;
-            _setNextStatement = setNextStatement;
-            _hitCountBp = hitCountBp;
-            _justMyCodeStepping = justMyCodeStepping;
+            this._name = name;
+            this._programProvider = programProvider;
+            this._debugEngine = debugEngine;
+            this._id = id;
+            this._setNextStatement = setNextStatement;
+            this._hitCountBp = hitCountBp;
+            this._justMyCodeStepping = justMyCodeStepping;
         }
 
         public override void Register(RegistrationContext context)
         {
-            var engineKey = context.CreateKey("AD7Metrics\\Engine\\" + _id);
-            engineKey.SetValue("Name", _name);
+            var engineKey = context.CreateKey("AD7Metrics\\Engine\\" + this._id);
+            engineKey.SetValue("Name", this._name);
 
-            engineKey.SetValue("CLSID", _debugEngine.GUID.ToString("B"));
-            engineKey.SetValue("ProgramProvider", _programProvider.GUID.ToString("B"));
+            engineKey.SetValue("CLSID", this._debugEngine.GUID.ToString("B"));
+            engineKey.SetValue("ProgramProvider", this._programProvider.GUID.ToString("B"));
             engineKey.SetValue("PortSupplier", "{708C1ECA-FF48-11D2-904F-00C04FA302A1}"); // {708C1ECA-FF48-11D2-904F-00C04FA302A1}
 
             engineKey.SetValue("Attach", 1);
@@ -51,15 +51,15 @@ namespace Microsoft.VisualStudioTools
             engineKey.SetValue("CallstackBP", 1);
             engineKey.SetValue("ConditionalBP", 1);
             engineKey.SetValue("Exceptions", 1);
-            engineKey.SetValue("SetNextStatement", _setNextStatement ? 1 : 0);
+            engineKey.SetValue("SetNextStatement", this._setNextStatement ? 1 : 0);
             engineKey.SetValue("RemoteDebugging", 1);
-            engineKey.SetValue("HitCountBP", _hitCountBp ? 1 : 0);
-            engineKey.SetValue("JustMyCodeStepping", _justMyCodeStepping ? 1 : 0);
+            engineKey.SetValue("HitCountBP", this._hitCountBp ? 1 : 0);
+            engineKey.SetValue("JustMyCodeStepping", this._justMyCodeStepping ? 1 : 0);
             //engineKey.SetValue("FunctionBP", 1); // TODO: Implement PythonLanguageInfo.ResolveName
 
             // provide class / assembly so we can be created remotely from the GAC w/o registering a CLSID 
-            engineKey.SetValue("EngineClass", _debugEngine.FullName);
-            engineKey.SetValue("EngineAssembly", _debugEngine.Assembly.FullName);
+            engineKey.SetValue("EngineClass", this._debugEngine.FullName);
+            engineKey.SetValue("EngineAssembly", this._debugEngine.Assembly.FullName);
 
             // load locally so we don't need to create MSVSMon which would need to know how to
             // get at our provider type.  See AD7ProgramProvider.GetProviderProcessData for more info
@@ -86,23 +86,23 @@ namespace Microsoft.VisualStudioTools
             }
 
             var clsidKey = context.CreateKey("CLSID");
-            var clsidGuidKey = clsidKey.CreateSubkey(_debugEngine.GUID.ToString("B"));
-            clsidGuidKey.SetValue("Assembly", _debugEngine.Assembly.FullName);
-            clsidGuidKey.SetValue("Class", _debugEngine.FullName);
+            var clsidGuidKey = clsidKey.CreateSubkey(this._debugEngine.GUID.ToString("B"));
+            clsidGuidKey.SetValue("Assembly", this._debugEngine.Assembly.FullName);
+            clsidGuidKey.SetValue("Class", this._debugEngine.FullName);
             clsidGuidKey.SetValue("InprocServer32", context.InprocServerPath);
-            clsidGuidKey.SetValue("CodeBase", Path.Combine(context.ComponentPath, _debugEngine.Module.Name));
+            clsidGuidKey.SetValue("CodeBase", Path.Combine(context.ComponentPath, this._debugEngine.Module.Name));
             clsidGuidKey.SetValue("ThreadingModel", "Free");
 
-            clsidGuidKey = clsidKey.CreateSubkey(_programProvider.GUID.ToString("B"));
-            clsidGuidKey.SetValue("Assembly", _programProvider.Assembly.FullName);
-            clsidGuidKey.SetValue("Class", _programProvider.FullName);
+            clsidGuidKey = clsidKey.CreateSubkey(this._programProvider.GUID.ToString("B"));
+            clsidGuidKey.SetValue("Assembly", this._programProvider.Assembly.FullName);
+            clsidGuidKey.SetValue("Class", this._programProvider.FullName);
             clsidGuidKey.SetValue("InprocServer32", context.InprocServerPath);
-            clsidGuidKey.SetValue("CodeBase", Path.Combine(context.ComponentPath, _debugEngine.Module.Name));
+            clsidGuidKey.SetValue("CodeBase", Path.Combine(context.ComponentPath, this._debugEngine.Module.Name));
             clsidGuidKey.SetValue("ThreadingModel", "Free");
 
-            using (var exceptionAssistantKey = context.CreateKey("ExceptionAssistant\\KnownEngines\\" + _id))
+            using (var exceptionAssistantKey = context.CreateKey("ExceptionAssistant\\KnownEngines\\" + this._id))
             {
-                exceptionAssistantKey.SetValue("", _name);
+                exceptionAssistantKey.SetValue("", this._name);
             }
         }
 

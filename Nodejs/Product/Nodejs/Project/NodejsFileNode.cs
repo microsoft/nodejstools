@@ -32,15 +32,15 @@ namespace Microsoft.NodejsTools.Project
 
         protected override void OnParentSet(HierarchyNode parent)
         {
-            if (ProjectMgr == null)
+            if (this.ProjectMgr == null)
             {
                 return;
             }
 
-            if (Url.EndsWith(NodejsConstants.TypeScriptDeclarationExtension, StringComparison.OrdinalIgnoreCase)
-              && Url.StartsWith(Path.Combine(ProjectMgr.ProjectFolder, @"typings\"), StringComparison.OrdinalIgnoreCase))
+            if (this.Url.EndsWith(NodejsConstants.TypeScriptDeclarationExtension, StringComparison.OrdinalIgnoreCase)
+              && this.Url.StartsWith(Path.Combine(this.ProjectMgr.ProjectFolder, @"typings\"), StringComparison.OrdinalIgnoreCase))
             {
-                ProjectMgr.Site.GetUIThread().Invoke(() =>
+                this.ProjectMgr.Site.GetUIThread().Invoke(() =>
                 {
                     this.IncludeInProject(true);
                 });
@@ -57,7 +57,7 @@ namespace Microsoft.NodejsTools.Project
 
         internal override int IncludeInProject(bool includeChildren)
         {
-            if (!ItemNode.IsExcluded)
+            if (!this.ItemNode.IsExcluded)
             {
                 return 0;
             }
@@ -67,11 +67,11 @@ namespace Microsoft.NodejsTools.Project
 
         protected override NodeProperties CreatePropertiesObject()
         {
-            if (IsLinkFile)
+            if (this.IsLinkFile)
             {
                 return new NodejsLinkFileNodeProperties(this);
             }
-            else if (IsNonMemberItem)
+            else if (this.IsNonMemberItem)
             {
                 return new ExcludedFileNodeProperties(this);
             }

@@ -30,8 +30,8 @@ namespace Microsoft.NodejsTools
 
         public TaggerProviderMetadata(IDictionary<string, object> values)
         {
-            ContentTypes = (IEnumerable<string>)values["ContentTypes"];
-            TagTypes = (IEnumerable<Type>)values["TagTypes"];
+            this.ContentTypes = (IEnumerable<string>)values["ContentTypes"];
+            this.TagTypes = (IEnumerable<Type>)values["TagTypes"];
         }
     }
 }

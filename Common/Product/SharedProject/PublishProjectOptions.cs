@@ -24,15 +24,15 @@ namespace Microsoft.VisualStudioTools.Project
 
         public PublishProjectOptions(IPublishFile[] additionalFiles = null, string destinationUrl = null)
         {
-            _additionalFiles = additionalFiles ?? Default._additionalFiles;
-            _destination = destinationUrl;
+            this._additionalFiles = additionalFiles ?? Default._additionalFiles;
+            this._destination = destinationUrl;
         }
 
         public IList<IPublishFile> AdditionalFiles
         {
             get
             {
-                return _additionalFiles;
+                return this._additionalFiles;
             }
         }
 
@@ -43,7 +43,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return _destination;
+                return this._destination;
             }
         }
     }

@@ -42,12 +42,12 @@ namespace Microsoft.NodejsTools.Project
             IPackage package)
             : base(root)
         {
-            _projectNode = root;
-            _parent = parent;
-            Package = package;
+            this._projectNode = root;
+            this._parent = parent;
+            this.Package = package;
 
-            _displayString = GetInitialPackageDisplayString(package);
-            ExcludeNodeFromScc = true;
+            this._displayString = GetInitialPackageDisplayString(package);
+            this.ExcludeNodeFromScc = true;
         }
 
         public IPackage Package { get; internal set; }
@@ -56,9 +56,9 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                if (null != _projectNode)
+                if (null != this._projectNode)
                 {
-                    var modulesNode = _projectNode.ModulesNode;
+                    var modulesNode = this._projectNode.ModulesNode;
                     if (null != modulesNode)
                     {
                         return modulesNode.NpmController;
@@ -73,24 +73,24 @@ namespace Microsoft.NodejsTools.Project
         private string GetRelativeUrlFragment()
         {
             var buff = new StringBuilder();
-            if (null != _parent)
+            if (null != this._parent)
             {
-                buff.Append(_parent.GetRelativeUrlFragment());
+                buff.Append(this._parent.GetRelativeUrlFragment());
                 buff.Append('/');
             }
             buff.Append("node_modules/");
-            buff.Append(Package.Name);
+            buff.Append(this.Package.Name);
             return buff.ToString();
         }
 
         public override string Url
         {
-            get { return new Url(ProjectMgr.BaseURI, GetRelativeUrlFragment()).AbsoluteUrl; }
+            get { return new Url(this.ProjectMgr.BaseURI, GetRelativeUrlFragment()).AbsoluteUrl; }
         }
 
         public override string Caption
         {
-            get { return _displayString; }
+            get { return this._displayString; }
         }
 
         public override Guid ItemTypeGuid
@@ -111,24 +111,24 @@ namespace Microsoft.NodejsTools.Project
         [Obsolete]
         public override object GetIconHandle(bool open)
         {
-            int imageIndex = _projectNode.ImageIndexFromNameDictionary[NodejsProjectImageName.Dependency];
-            if (Package.IsMissing)
+            int imageIndex = this._projectNode.ImageIndexFromNameDictionary[NodejsProjectImageName.Dependency];
+            if (this.Package.IsMissing)
             {
-                imageIndex = _projectNode.ImageIndexFromNameDictionary[NodejsProjectImageName.DependencyMissing];
+                imageIndex = this._projectNode.ImageIndexFromNameDictionary[NodejsProjectImageName.DependencyMissing];
             }
             else
             {
-                if (!Package.IsListedInParentPackageJson)
+                if (!this.Package.IsListedInParentPackageJson)
                 {
-                    imageIndex = _projectNode.ImageIndexFromNameDictionary[NodejsProjectImageName.DependencyNotListed];
+                    imageIndex = this._projectNode.ImageIndexFromNameDictionary[NodejsProjectImageName.DependencyNotListed];
                 }
                 else
                 {
-                    imageIndex = _projectNode.ImageIndexFromNameDictionary[NodejsProjectImageName.Dependency];
+                    imageIndex = this._projectNode.ImageIndexFromNameDictionary[NodejsProjectImageName.Dependency];
                 }
             }
 
-            return _projectNode.ImageHandler.GetIconHandle(imageIndex);
+            return this._projectNode.ImageHandler.GetIconHandle(imageIndex);
         }
 
         public override string GetEditLabel()
@@ -177,19 +177,19 @@ namespace Microsoft.NodejsTools.Project
                         return VSConstants.S_OK;
                 }
 
-                if (null == _parent)
+                if (null == this._parent)
                 {
                     switch (cmd)
                     {
                         case PkgCmdId.cmdidNpmInstallSingleMissingModule:
-                            if (null == _projectNode.ModulesNode
-                                || _projectNode.ModulesNode.IsCurrentStateASuppressCommandsMode())
+                            if (null == this._projectNode.ModulesNode
+                                || this._projectNode.ModulesNode.IsCurrentStateASuppressCommandsMode())
                             {
                                 result = QueryStatusResult.SUPPORTED;
                             }
                             else
                             {
-                                if (null != Package && Package.IsMissing)
+                                if (null != this.Package && this.Package.IsMissing)
                                 {
                                     result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
                                 }
@@ -202,8 +202,8 @@ namespace Microsoft.NodejsTools.Project
 
                         case PkgCmdId.cmdidNpmUpdateSingleModule:
                         case PkgCmdId.cmdidNpmUninstallModule:
-                            if (null != _projectNode.ModulesNode &&
-                                !_projectNode.ModulesNode.IsCurrentStateASuppressCommandsMode())
+                            if (null != this._projectNode.ModulesNode &&
+                                !this._projectNode.ModulesNode.IsCurrentStateASuppressCommandsMode())
                             {
                                 result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
                             }
@@ -252,28 +252,28 @@ namespace Microsoft.NodejsTools.Project
                         }
                         return VSConstants.S_OK;
                 }
-                if (null == _parent)
+                if (null == this._parent)
                 {
                     switch (cmd)
                     {
                         case PkgCmdId.cmdidNpmInstallSingleMissingModule:
-                            if (null != _projectNode.ModulesNode)
+                            if (null != this._projectNode.ModulesNode)
                             {
-                                var t = _projectNode.ModulesNode.InstallMissingModule(this);
+                                var t = this._projectNode.ModulesNode.InstallMissingModule(this);
                             }
                             return VSConstants.S_OK;
 
                         case PkgCmdId.cmdidNpmUninstallModule:
-                            if (null != _projectNode.ModulesNode)
+                            if (null != this._projectNode.ModulesNode)
                             {
-                                var t = _projectNode.ModulesNode.UninstallModule(this);
+                                var t = this._projectNode.ModulesNode.UninstallModule(this);
                             }
                             return VSConstants.S_OK;
 
                         case PkgCmdId.cmdidNpmUpdateSingleModule:
-                            if (null != _projectNode.ModulesNode)
+                            if (null != this._projectNode.ModulesNode)
                             {
-                                var t = _projectNode.ModulesNode.UpdateModule(this);
+                                var t = this._projectNode.ModulesNode.UpdateModule(this);
                             }
                             return VSConstants.S_OK;
                     }

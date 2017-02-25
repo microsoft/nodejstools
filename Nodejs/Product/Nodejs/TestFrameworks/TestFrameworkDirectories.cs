@@ -29,14 +29,14 @@ namespace Microsoft.NodejsTools.TestFrameworks
 
         public TestFrameworkDirectories()
         {
-            _frameworkDirectories = new Dictionary<string, string>(System.StringComparer.OrdinalIgnoreCase);
+            this._frameworkDirectories = new Dictionary<string, string>(System.StringComparer.OrdinalIgnoreCase);
             foreach (string directory in Directory.GetDirectories(GetBaseTestframeworkFolder()))
             {
                 string name = Path.GetFileName(directory);
-                _frameworkDirectories.Add(name, directory);
+                this._frameworkDirectories.Add(name, directory);
             }
             string defaultFx;
-            _frameworkDirectories.TryGetValue(ExportRunnerFramework, out defaultFx);
+            this._frameworkDirectories.TryGetValue(ExportRunnerFramework, out defaultFx);
             if (defaultFx == null)
             {
                 throw new InvalidOperationException("Missing generic test framework");
@@ -45,12 +45,12 @@ namespace Microsoft.NodejsTools.TestFrameworks
 
         public List<string> GetFrameworkNames()
         {
-            return new List<string>(_frameworkDirectories.Keys);
+            return new List<string>(this._frameworkDirectories.Keys);
         }
 
         public List<string> GetFrameworkDirectories()
         {
-            return new List<string>(_frameworkDirectories.Values);
+            return new List<string>(this._frameworkDirectories.Values);
         }
 
         private static string GetBaseTestframeworkFolder()

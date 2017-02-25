@@ -40,8 +40,8 @@ namespace Microsoft.VisualStudioTools.Project
 
             // create and add the item to the project
 
-            _item = project.BuildProject.AddItem(itemType, Microsoft.Build.Evaluation.ProjectCollection.Escape(itemPath))[0];
-            _url = base.Url;
+            this._item = project.BuildProject.AddItem(itemType, Microsoft.Build.Evaluation.ProjectCollection.Escape(itemPath))[0];
+            this._url = base.Url;
         }
 
         /// <summary>
@@ -58,19 +58,19 @@ namespace Microsoft.VisualStudioTools.Project
             Utilities.ArgumentNotNull("existingItem", existingItem);
 
             // Keep a reference to project and item
-            _item = existingItem;
-            _url = base.Url;
+            this._item = existingItem;
+            this._url = base.Url;
         }
 
         protected override string ItemType
         {
             get
             {
-                return _item.ItemType;
+                return this._item.ItemType;
             }
             set
             {
-                _item.ItemType = value;
+                this._item.ItemType = value;
                 OnItemTypeChanged();
             }
         }
@@ -87,23 +87,23 @@ namespace Microsoft.VisualStudioTools.Project
             // Build Action is the type, not a property, so intercept
             if (String.Compare(attributeName, ProjectFileConstants.BuildAction, StringComparison.OrdinalIgnoreCase) == 0)
             {
-                _item.ItemType = attributeValue;
+                this._item.ItemType = attributeValue;
                 return;
             }
 
             // Check out the project file.
-            if (!ItemProject.QueryEditProjectFile(false))
+            if (!this.ItemProject.QueryEditProjectFile(false))
             {
                 throw Marshal.GetExceptionForHR(VSConstants.OLE_E_PROMPTSAVECANCELLED);
             }
 
             if (attributeValue == null)
             {
-                _item.RemoveMetadata(attributeName);
+                this._item.RemoveMetadata(attributeName);
             }
             else
             {
-                _item.SetMetadataValue(attributeName, attributeValue);
+                this._item.SetMetadataValue(attributeName, attributeValue);
             }
         }
 
@@ -117,38 +117,38 @@ namespace Microsoft.VisualStudioTools.Project
             // cannot ask MSBuild for Include, so intercept it and return the corresponding property
             if (String.Compare(attributeName, ProjectFileConstants.Include, StringComparison.OrdinalIgnoreCase) == 0)
             {
-                return _item.EvaluatedInclude;
+                return this._item.EvaluatedInclude;
             }
 
             // Build Action is the type, not a property, so intercept this one as well
             if (String.Compare(attributeName, ProjectFileConstants.BuildAction, StringComparison.OrdinalIgnoreCase) == 0)
             {
-                return _item.ItemType;
+                return this._item.ItemType;
             }
 
-            return _item.GetMetadataValue(attributeName);
+            return this._item.GetMetadataValue(attributeName);
         }
 
         public override void Rename(string newPath)
         {
             string escapedPath = Microsoft.Build.Evaluation.ProjectCollection.Escape(newPath);
 
-            _item.Rename(escapedPath);
+            this._item.Rename(escapedPath);
             this.RefreshProperties();
         }
 
         public override void RefreshProperties()
         {
-            ItemProject.BuildProject.ReevaluateIfNecessary();
+            this.ItemProject.BuildProject.ReevaluateIfNecessary();
 
-            _url = base.Url;
+            this._url = base.Url;
 
-            IEnumerable<ProjectItem> items = ItemProject.BuildProject.GetItems(_item.ItemType);
+            IEnumerable<ProjectItem> items = this.ItemProject.BuildProject.GetItems(this._item.ItemType);
             foreach (ProjectItem projectItem in items)
             {
-                if (projectItem != null && projectItem.UnevaluatedInclude.Equals(_item.UnevaluatedInclude))
+                if (projectItem != null && projectItem.UnevaluatedInclude.Equals(this._item.UnevaluatedInclude))
                 {
-                    _item = projectItem;
+                    this._item = projectItem;
                     return;
                 }
             }
@@ -161,9 +161,9 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public override void RemoveFromProjectFile()
         {
-            if (!Deleted)
+            if (!this.Deleted)
             {
-                ItemProject.BuildProject.RemoveItem(_item);
+                this.ItemProject.BuildProject.RemoveItem(this._item);
             }
 
             base.RemoveFromProjectFile();
@@ -173,7 +173,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return _item;
+                return this._item;
             }
         }
 
@@ -181,7 +181,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return _url;
+                return this._url;
             }
         }
 
@@ -200,7 +200,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             // Do they reference the same project?
-            if (!ItemProject.Equals(msBuildProjElem.ItemProject))
+            if (!this.ItemProject.Equals(msBuildProjElem.ItemProject))
                 return false;
 
             // Do they have the same include?

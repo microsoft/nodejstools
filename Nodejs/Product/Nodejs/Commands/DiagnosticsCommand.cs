@@ -30,7 +30,7 @@ namespace Microsoft.NodejsTools.Commands
 {
     internal sealed class DiagnosticsCommand : Command
     {
-        private static readonly string[] _interestingDteProperties = new[] {
+        private static readonly string[] InterestingDteProperties = new[] {
             "StartupFile",
             "WorkingDirectory",
             "PublishUrl",
@@ -38,7 +38,7 @@ namespace Microsoft.NodejsTools.Commands
             "CommandLineArguments"
         };
 
-        private static readonly string[] _interestingFileExtensions = new[] {
+        private static readonly string[] InterestingFileExtensions = new[] {
             ".js",
             ".jsx",
             ".tsx",
@@ -47,12 +47,11 @@ namespace Microsoft.NodejsTools.Commands
             ".html"
         };
 
-        public DiagnosticsCommand(IServiceProvider serviceProvider) { }
-
-        public override int CommandId
+        public DiagnosticsCommand(IServiceProvider serviceProvider)
         {
-            get { return (int)PkgCmdId.cmdidDiagnostics; }
         }
+
+        public override int CommandId => (int)PkgCmdId.cmdidDiagnostics;
 
         public override void DoCommand(object sender, EventArgs args)
         {
@@ -119,7 +118,7 @@ namespace Microsoft.NodejsTools.Commands
                 {
                     throw;
                 }
-                bool isNodejsProject = false;
+                var isNodejsProject = false;
                 try
                 {
                     isNodejsProject = Utilities.GuidEquals(Guids.NodejsProjectFactoryString, project.Kind);
@@ -152,7 +151,7 @@ namespace Microsoft.NodejsTools.Commands
             if (Utilities.GuidEquals(Guids.NodejsBaseProjectFactoryString, project.Kind))
             {
                 res.AppendLine("Kind: Node.js");
-                foreach (var prop in _interestingDteProperties)
+                foreach (var prop in InterestingDteProperties)
                 {
                     res.AppendLine(prop + ": " + GetProjectProperty(project, prop));
                 }
@@ -182,33 +181,21 @@ namespace Microsoft.NodejsTools.Commands
         /// </summary>
         private class FileTypeInfo
         {
-            private int _count = 0;
-            private int _maxLineLength = 0;
-            private int _totalLineLength = 0;
+            private int count = 0;
+            private int maxLineLength = 0;
+            private int totalLineLength = 0;
 
-            public int Count
-            {
-                get { return _count; }
-            }
-
-            public int MaxLineLength
-            {
-                get { return _maxLineLength; }
-            }
-
-            public int AverageLineLength
-            {
-                get { return _count > 0 ? _totalLineLength / _count : 0; }
-            }
-
+            public int Count => this.count;
+            public int MaxLineLength => this.maxLineLength;
+            public int AverageLineLength => this.count > 0 ? this.totalLineLength / this.count : 0;
             public void UpdateForFile(string file)
             {
                 try
                 {
                     int length = File.ReadLines(file).Count();
-                    ++_count;
-                    _totalLineLength += length;
-                    _maxLineLength = Math.Max(_maxLineLength, length);
+                    ++this.count;
+                    this.totalLineLength += length;
+                    this.maxLineLength = Math.Max(this.maxLineLength, length);
                 }
                 catch (IOException)
                 {
@@ -223,7 +210,7 @@ namespace Microsoft.NodejsTools.Commands
             foreach (var node in project.DiskNodes)
             {
                 var file = node.Key;
-                var matchedExt = _interestingFileExtensions.Where(ext => file.EndsWith(ext, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                var matchedExt = InterestingFileExtensions.Where(ext => file.EndsWith(ext, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
                 if (!string.IsNullOrEmpty(matchedExt))
                 {

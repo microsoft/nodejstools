@@ -267,14 +267,14 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         internal bool Removed
         {
-            get { return _removed; }
+            get { return this._removed; }
         }
 
         internal IVsHierarchy Hierarchy
         {
             get
             {
-                return _hierarchy;
+                return this._hierarchy;
             }
         }
 
@@ -284,7 +284,7 @@ namespace Microsoft.VisualStudioTools.Project
         internal BeforeProjectFileClosedEventArgs(IVsHierarchy hierarchy, bool removed)
         {
             this._removed = removed;
-            _hierarchy = hierarchy;
+            this._hierarchy = hierarchy;
         }
         #endregion
     }
@@ -307,17 +307,17 @@ namespace Microsoft.VisualStudioTools.Project
 
         public string NewValue
         {
-            get { return newValue; }
+            get { return this.newValue; }
         }
 
         public string OldValue
         {
-            get { return oldValue; }
+            get { return this.oldValue; }
         }
 
         public string PropertyName
         {
-            get { return propertyName; }
+            get { return this.propertyName; }
         }
     }
 

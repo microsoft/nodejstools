@@ -78,11 +78,11 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return platformName;
+                return this.platformName;
             }
             set
             {
-                platformName = value;
+                this.platformName = value;
             }
         }
 
@@ -102,14 +102,14 @@ namespace Microsoft.VisualStudioTools.Project
                         // Get the list of group names from the project.
                         // The main reason we get it from the project is to make it easier for someone to modify
                         // it by simply overriding that method and providing the correct MSBuild target(s).
-                        IList<KeyValuePair<string, string>> groupNames = project.GetOutputGroupNames();
+                        IList<KeyValuePair<string, string>> groupNames = this.project.GetOutputGroupNames();
 
                         if (groupNames != null)
                         {
                             // Populate the output array
                             foreach (KeyValuePair<string, string> group in groupNames)
                             {
-                                OutputGroup outputGroup = CreateOutputGroup(project, group);
+                                OutputGroup outputGroup = CreateOutputGroup(this.project, group);
                                 this.outputGroups.Add(outputGroup);
                             }
                         }
@@ -144,16 +144,16 @@ namespace Microsoft.VisualStudioTools.Project
                 this.configName = configuration;
             }
 
-            var flavoredCfgProvider = ProjectMgr.GetOuterInterface<IVsProjectFlavorCfgProvider>();
+            var flavoredCfgProvider = this.ProjectMgr.GetOuterInterface<IVsProjectFlavorCfgProvider>();
             Utilities.ArgumentNotNull("flavoredCfgProvider", flavoredCfgProvider);
-            ErrorHandler.ThrowOnFailure(flavoredCfgProvider.CreateProjectFlavorCfg(this, out flavoredCfg));
-            Utilities.ArgumentNotNull("flavoredCfg", flavoredCfg);
+            ErrorHandler.ThrowOnFailure(flavoredCfgProvider.CreateProjectFlavorCfg(this, out this.flavoredCfg));
+            Utilities.ArgumentNotNull("flavoredCfg", this.flavoredCfg);
 
             // if the flavored object support XML fragment, initialize it
-            IPersistXMLFragment persistXML = flavoredCfg as IPersistXMLFragment;
+            IPersistXMLFragment persistXML = this.flavoredCfg as IPersistXMLFragment;
             if (null != persistXML)
             {
-                this.project.LoadXmlFragment(persistXML, configName, platformName);
+                this.project.LoadXmlFragment(persistXML, this.configName, this.platformName);
             }
         }
         #endregion
@@ -168,7 +168,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public void PrepareBuild(bool clean)
         {
-            project.PrepareBuild(this.configName, clean);
+            this.project.PrepareBuild(this.configName, clean);
         }
 
         public virtual string GetConfigurationProperty(string propertyName, bool resetCache)
@@ -304,13 +304,13 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public virtual int get_DisplayName(out string name)
         {
-            if (!string.IsNullOrEmpty(PlatformName))
+            if (!string.IsNullOrEmpty(this.PlatformName))
             {
-                name = ConfigName + "|" + PlatformName;
+                name = this.ConfigName + "|" + this.PlatformName;
             }
             else
             {
-                name = DisplayName;
+                name = this.DisplayName;
             }
             return VSConstants.S_OK;
         }
@@ -325,7 +325,7 @@ namespace Microsoft.VisualStudioTools.Project
                 name = this.configName;
                 // currently, we only support one platform, so just add it..
                 IVsCfgProvider provider;
-                ErrorHandler.ThrowOnFailure(project.GetCfgProvider(out provider));
+                ErrorHandler.ThrowOnFailure(this.project.GetCfgProvider(out provider));
                 ErrorHandler.ThrowOnFailure(((IVsCfgProvider2)provider).GetPlatformNames(1, platform, actual));
                 if (!string.IsNullOrEmpty(platform[0]))
                 {
@@ -363,24 +363,24 @@ namespace Microsoft.VisualStudioTools.Project
 
         public virtual int get_BuildableProjectCfg(out IVsBuildableProjectCfg pb)
         {
-            if (project.BuildProject == null || !project.BuildProject.Targets.ContainsKey("CoreCompile"))
+            if (this.project.BuildProject == null || !this.project.BuildProject.Targets.ContainsKey("CoreCompile"))
             {
                 // The project is not buildable, so don't return a config. This
                 // will hide the 'Build' commands from the VS UI.
                 pb = null;
                 return VSConstants.E_NOTIMPL;
             }
-            if (buildableCfg == null)
+            if (this.buildableCfg == null)
             {
-                buildableCfg = new BuildableProjectConfig(this);
+                this.buildableCfg = new BuildableProjectConfig(this);
             }
-            pb = buildableCfg;
+            pb = this.buildableCfg;
             return VSConstants.S_OK;
         }
 
         public virtual int get_CanonicalName(out string name)
         {
-            name = configName;
+            name = this.configName;
             return VSConstants.S_OK;
         }
 
@@ -449,7 +449,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             ppIVsOutputGroup = null;
             // Search through our list of groups to find the one they are looking forgroupName
-            foreach (OutputGroup group in OutputGroups)
+            foreach (OutputGroup group in this.OutputGroups)
             {
                 string groupName;
                 group.get_CanonicalName(out groupName);
@@ -472,7 +472,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             // Delegate to the flavored configuration (to enable a flavor to take control)
             // Since we can be asked for Configuration we don't support, avoid throwing and return the HRESULT directly
-            int hr = flavoredCfg.get_CfgType(ref iidCfg, out ppCfg);
+            int hr = this.flavoredCfg.get_CfgType(ref iidCfg, out ppCfg);
 
             return hr;
         }
@@ -492,7 +492,7 @@ namespace Microsoft.VisualStudioTools.Project
                 {
                     throw new ArgumentNullException("pcActual");
                 }
-                pcActual[0] = (uint)OutputGroups.Count;
+                pcActual[0] = (uint)this.OutputGroups.Count;
                 return VSConstants.S_OK;
             }
 
@@ -504,7 +504,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             // Fill the array with our output groups
             uint count = 0;
-            foreach (OutputGroup group in OutputGroups)
+            foreach (OutputGroup group in this.OutputGroups)
             {
                 if (rgpcfg.Length > count && celt > count && group != null)
                 {
@@ -592,18 +592,18 @@ namespace Microsoft.VisualStudioTools.Project
 
         private MSBuildExecution.ProjectInstance GetCurrentConfig(bool resetCache = false)
         {
-            if (resetCache || currentConfig == null)
+            if (resetCache || this.currentConfig == null)
             {
                 // Get properties for current configuration from project file and cache it
-                project.SetConfiguration(ConfigName);
-                project.BuildProject.ReevaluateIfNecessary();
+                this.project.SetConfiguration(this.ConfigName);
+                this.project.BuildProject.ReevaluateIfNecessary();
                 // Create a snapshot of the evaluated project in its current state
-                currentConfig = project.BuildProject.CreateProjectInstance();
+                this.currentConfig = this.project.BuildProject.CreateProjectInstance();
 
                 // Restore configuration
-                project.SetCurrentConfiguration();
+                this.project.SetCurrentConfiguration();
             }
-            return currentConfig;
+            return this.currentConfig;
         }
 
         private MSBuildExecution.ProjectPropertyInstance GetMsBuildProperty(string propertyName, bool resetCache)
@@ -635,7 +635,7 @@ namespace Microsoft.VisualStudioTools.Project
             // Retrive the list of guids from hierarchy properties.
             // Because a flavor could modify that list we must make sure we are calling the outer most implementation of IVsHierarchy
             string guidsList = String.Empty;
-            IVsHierarchy hierarchy = project.GetOuterInterface<IVsHierarchy>();
+            IVsHierarchy hierarchy = this.project.GetOuterInterface<IVsHierarchy>();
             object variant = null;
             ErrorHandler.ThrowOnFailure(hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID2.VSHPROPID_CfgPropertyPagesCLSIDList, out variant), new int[] { VSConstants.DISP_E_MEMBERNOTFOUND, VSConstants.E_NOTIMPL });
             guidsList = (string)variant;
@@ -708,22 +708,22 @@ namespace Microsoft.VisualStudioTools.Project
 
         internal virtual bool IsUpToDate()
         {
-            var outputWindow = OutputWindowRedirector.GetGeneral(ProjectMgr.Site);
+            var outputWindow = OutputWindowRedirector.GetGeneral(this.ProjectMgr.Site);
 #if DEBUG
-            outputWindow.WriteLine(string.Format("Checking whether {0} needs to be rebuilt:", ProjectMgr.Caption));
+            outputWindow.WriteLine(string.Format("Checking whether {0} needs to be rebuilt:", this.ProjectMgr.Caption));
 #endif
 
             var latestInput = DateTime.MinValue;
             var earliestOutput = DateTime.MaxValue;
             bool mustRebuild = false;
 
-            var allInputs = new HashSet<string>(OutputGroups
+            var allInputs = new HashSet<string>(this.OutputGroups
                 .Where(g => IsInputGroup(g.Name))
                 .SelectMany(x => x.EnumerateOutputs())
                 .Select(input => input.CanonicalName),
                 StringComparer.OrdinalIgnoreCase
             );
-            foreach (var group in OutputGroups.Where(g => !IsInputGroup(g.Name)))
+            foreach (var group in this.OutputGroups.Where(g => !IsInputGroup(g.Name)))
             {
                 foreach (var output in group.EnumerateOutputs())
                 {
@@ -785,13 +785,13 @@ namespace Microsoft.VisualStudioTools.Project
 #if DEBUG
                 outputWindow.WriteLine(string.Format(
                     "Rebuilding {0} because mustRebuild is true",
-                    ProjectMgr.Caption
+                    this.ProjectMgr.Caption
                 ));
 #endif
                 return false;
             }
 
-            foreach (var group in OutputGroups.Where(g => IsInputGroup(g.Name)))
+            foreach (var group in this.OutputGroups.Where(g => IsInputGroup(g.Name)))
             {
                 foreach (var input in group.EnumerateOutputs())
                 {
@@ -833,7 +833,7 @@ namespace Microsoft.VisualStudioTools.Project
 #if DEBUG
                 outputWindow.WriteLine(string.Format(
                     "Rebuilding {0} because {1:s} < {2:s}",
-                    ProjectMgr.Caption,
+                    this.ProjectMgr.Caption,
                     earliestOutput,
                     latestInput
                 ));
@@ -845,7 +845,7 @@ namespace Microsoft.VisualStudioTools.Project
 #if DEBUG
                 outputWindow.WriteLine(string.Format(
                     "Not rebuilding {0} because {1:s} >= {2:s}",
-                    ProjectMgr.Caption,
+                    this.ProjectMgr.Caption,
                     earliestOutput,
                     latestInput
                 ));
@@ -930,13 +930,13 @@ namespace Microsoft.VisualStudioTools.Project
 
         public virtual int AdviseBuildStatusCallback(IVsBuildStatusCallback callback, out uint cookie)
         {
-            cookie = callbacks.Add(callback);
+            cookie = this.callbacks.Add(callback);
             return VSConstants.S_OK;
         }
 
         public virtual int get_ProjectCfg(out IVsProjectCfg p)
         {
-            p = config;
+            p = this.config;
             return VSConstants.S_OK;
         }
 
@@ -975,7 +975,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public virtual int StartBuild(IVsOutputWindowPane pane, uint options)
         {
-            config.PrepareBuild(false);
+            this.config.PrepareBuild(false);
 
             // Current version of MSBuild wish to be called in an STA
             uint flags = VSConstants.VS_BUILDABLEPROJECTCFGOPTS_REBUILD;
@@ -988,7 +988,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public virtual int StartClean(IVsOutputWindowPane pane, uint options)
         {
-            config.PrepareBuild(true);
+            this.config.PrepareBuild(true);
             // Current version of MSBuild wish to be called in an STA
             this.Build(options, pane, MsBuildTarget.Clean);
             return VSConstants.S_OK;
@@ -996,7 +996,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public virtual int StartUpToDateCheck(IVsOutputWindowPane pane, uint options)
         {
-            return config.IsUpToDate() ?
+            return this.config.IsUpToDate() ?
                 VSConstants.S_OK :
                 VSConstants.E_FAIL;
         }
@@ -1008,7 +1008,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public virtual int UnadviseBuildStatusCallback(uint cookie)
         {
-            callbacks.RemoveAt(cookie);
+            this.callbacks.RemoveAt(cookie);
             return VSConstants.S_OK;
         }
 
@@ -1024,7 +1024,7 @@ namespace Microsoft.VisualStudioTools.Project
         private bool NotifyBuildBegin()
         {
             int shouldContinue = 1;
-            foreach (IVsBuildStatusCallback cb in callbacks)
+            foreach (IVsBuildStatusCallback cb in this.callbacks)
             {
                 try
                 {
@@ -1049,7 +1049,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             int success = ((result == MSBuildResult.Successful) ? 1 : 0);
 
-            foreach (IVsBuildStatusCallback cb in callbacks)
+            foreach (IVsBuildStatusCallback cb in this.callbacks)
             {
                 try
                 {
@@ -1087,7 +1087,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             try
             {
-                config.ProjectMgr.BuildAsync(options, this.config.ConfigName, output, target, (result, buildTarget) => this.NotifyBuildEnd(result, buildTarget));
+                this.config.ProjectMgr.BuildAsync(options, this.config.ConfigName, output, target, (result, buildTarget) => this.NotifyBuildEnd(result, buildTarget));
             }
             catch (Exception e)
             {

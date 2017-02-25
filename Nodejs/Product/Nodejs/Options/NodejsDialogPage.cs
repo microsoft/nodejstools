@@ -37,7 +37,7 @@ namespace Microsoft.NodejsTools.Options
 
         internal NodejsDialogPage(string category)
         {
-            _category = category;
+            this._category = category;
         }
 
         internal virtual void SaveBool(string name, bool value)
@@ -52,7 +52,7 @@ namespace Microsoft.NodejsTools.Options
 
         internal void SaveString(string name, string value)
         {
-            SaveString(name, value, _category);
+            SaveString(name, value, this._category);
         }
 
         internal static void SaveString(string name, string value, string cat)
@@ -113,7 +113,7 @@ namespace Microsoft.NodejsTools.Options
 
         internal string LoadString(string name)
         {
-            return LoadString(name, _category);
+            return LoadString(name, this._category);
         }
 
         internal static string LoadString(string name, string cat)

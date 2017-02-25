@@ -31,10 +31,10 @@ namespace Microsoft.NodejsTools.Debugger.Commands
         public BacktraceCommand(int id, IEvaluationResultFactory resultFactory, int fromFrame, int toFrame, bool depthOnly = false)
             : base(id, "backtrace")
         {
-            _resultFactory = resultFactory;
-            _depthOnly = depthOnly;
+            this._resultFactory = resultFactory;
+            this._depthOnly = depthOnly;
 
-            _arguments = new Dictionary<string, object> {
+            this._arguments = new Dictionary<string, object> {
                 { "fromFrame", fromFrame },
                 { "toFrame", toFrame },
                 { "inlineRefs", true }
@@ -43,7 +43,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands
 
         protected override IDictionary<string, object> Arguments
         {
-            get { return _arguments; }
+            get { return this._arguments; }
         }
 
         public int CallstackDepth { get; private set; }
@@ -55,22 +55,22 @@ namespace Microsoft.NodejsTools.Debugger.Commands
             base.ProcessResponse(response);
 
             JToken body = response["body"];
-            CallstackDepth = (int)body["totalFrames"];
+            this.CallstackDepth = (int)body["totalFrames"];
 
             // Collect frames only if required
-            if (_depthOnly)
+            if (this._depthOnly)
             {
-                Modules = new Dictionary<int, NodeModule>();
-                StackFrames = new List<NodeStackFrame>();
+                this.Modules = new Dictionary<int, NodeModule>();
+                this.StackFrames = new List<NodeStackFrame>();
                 return;
             }
 
             // Extract scripts (if not provided)
-            Modules = GetModules((JArray)response["refs"]);
+            this.Modules = GetModules((JArray)response["refs"]);
 
             // Extract frames
             JArray frames = (JArray)body["frames"] ?? new JArray();
-            StackFrames = new List<NodeStackFrame>(frames.Count);
+            this.StackFrames = new List<NodeStackFrame>(frames.Count);
 
             foreach (JToken frame in frames)
             {
@@ -79,9 +79,9 @@ namespace Microsoft.NodejsTools.Debugger.Commands
                 var moduleId = (int?)frame["func"]["scriptId"];
 
                 NodeModule module;
-                if (!moduleId.HasValue || !Modules.TryGetValue(moduleId.Value, out module))
+                if (!moduleId.HasValue || !this.Modules.TryGetValue(moduleId.Value, out module))
                 {
-                    module = _unknownModule;
+                    module = this._unknownModule;
                 }
 
                 int line = (int?)frame["line"] ?? 0;
@@ -104,14 +104,14 @@ namespace Microsoft.NodejsTools.Debugger.Commands
                 variables = (JArray)frame["arguments"] ?? new JArray();
                 stackFrame.Parameters = GetVariables(stackFrame, variables);
 
-                StackFrames.Add(stackFrame);
+                this.StackFrames.Add(stackFrame);
             }
         }
 
         private List<NodeEvaluationResult> GetVariables(NodeStackFrame stackFrame, IEnumerable<JToken> variables)
         {
             return variables.Select(t => new NodeBacktraceVariable(stackFrame, t))
-                .Select(variableProvider => _resultFactory.Create(variableProvider)).ToList();
+                .Select(variableProvider => this._resultFactory.Create(variableProvider)).ToList();
         }
 
         private static string GetFunctionName(JToken frame)

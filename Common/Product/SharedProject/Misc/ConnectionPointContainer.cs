@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudioTools.Project
         private Dictionary<Guid, IConnectionPoint> connectionPoints;
         internal ConnectionPointContainer()
         {
-            connectionPoints = new Dictionary<Guid, IConnectionPoint>();
+            this.connectionPoints = new Dictionary<Guid, IConnectionPoint>();
         }
         internal void AddEventSource<SinkType>(IEventSource<SinkType> source)
             where SinkType : class
@@ -46,11 +46,11 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 throw new ArgumentNullException("source");
             }
-            if (connectionPoints.ContainsKey(typeof(SinkType).GUID))
+            if (this.connectionPoints.ContainsKey(typeof(SinkType).GUID))
             {
                 throw new ArgumentException("EventSource guid already added to the list of connection points", "source");
             }
-            connectionPoints.Add(typeof(SinkType).GUID, new ConnectionPoint<SinkType>(this, source));
+            this.connectionPoints.Add(typeof(SinkType).GUID, new ConnectionPoint<SinkType>(this, source));
         }
 
         #region IConnectionPointContainer Members
@@ -60,7 +60,7 @@ namespace Microsoft.VisualStudioTools.Project
         }
         void IConnectionPointContainer.FindConnectionPoint(ref Guid riid, out IConnectionPoint ppCP)
         {
-            ppCP = connectionPoints[riid];
+            ppCP = this.connectionPoints[riid];
         }
         #endregion
     }
@@ -84,8 +84,8 @@ namespace Microsoft.VisualStudioTools.Project
             }
             this.container = container;
             this.source = source;
-            sinks = new Dictionary<uint, SinkType>();
-            nextCookie = 1;
+            this.sinks = new Dictionary<uint, SinkType>();
+            this.nextCookie = 1;
         }
         #region IConnectionPoint Members
         public void Advise(object pUnkSink, out uint pdwCookie)
@@ -95,10 +95,10 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 Marshal.ThrowExceptionForHR(VSConstants.E_NOINTERFACE);
             }
-            sinks.Add(nextCookie, sink);
-            pdwCookie = nextCookie;
-            source.OnSinkAdded(sink);
-            nextCookie += 1;
+            this.sinks.Add(this.nextCookie, sink);
+            pdwCookie = this.nextCookie;
+            this.source.OnSinkAdded(sink);
+            this.nextCookie += 1;
         }
 
         public void EnumConnections(out IEnumConnections ppEnum)
@@ -120,9 +120,9 @@ namespace Microsoft.VisualStudioTools.Project
         public void Unadvise(uint dwCookie)
         {
             // This will throw if the cookie is not in the list.
-            SinkType sink = sinks[dwCookie];
-            sinks.Remove(dwCookie);
-            source.OnSinkRemoved(sink);
+            SinkType sink = this.sinks[dwCookie];
+            this.sinks.Remove(dwCookie);
+            this.source.OnSinkRemoved(sink);
         }
         #endregion
     }

@@ -44,25 +44,25 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return Node.Site.GetUIThread().Invoke(() =>
+                return this.Node.Site.GetUIThread().Invoke(() =>
                 {
-                    var res = Node.ProjectMgr.GetProjectProperty(CommonConstants.StartupFile, true);
+                    var res = this.Node.ProjectMgr.GetProjectProperty(CommonConstants.StartupFile, true);
                     if (res != null && !Path.IsPathRooted(res))
                     {
-                        res = CommonUtils.GetAbsoluteFilePath(Node.ProjectMgr.ProjectHome, res);
+                        res = CommonUtils.GetAbsoluteFilePath(this.Node.ProjectMgr.ProjectHome, res);
                     }
                     return res;
                 });
             }
             set
             {
-                Node.Site.GetUIThread().Invoke(() =>
+                this.Node.Site.GetUIThread().Invoke(() =>
                 {
                     this.Node.ProjectMgr.SetProjectProperty(
                         CommonConstants.StartupFile,
                         CommonUtils.GetRelativeFilePath(
-                            Node.ProjectMgr.ProjectHome,
-                            Path.Combine(Node.ProjectMgr.ProjectHome, value)
+                            this.Node.ProjectMgr.ProjectHome,
+                            Path.Combine(this.Node.ProjectMgr.ProjectHome, value)
                         )
                     );
                 });
@@ -79,14 +79,14 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return Node.Site.GetUIThread().Invoke(() =>
+                return this.Node.Site.GetUIThread().Invoke(() =>
                 {
                     return this.Node.ProjectMgr.GetProjectProperty(CommonConstants.WorkingDirectory, true);
                 });
             }
             set
             {
-                Node.Site.GetUIThread().Invoke(() =>
+                this.Node.Site.GetUIThread().Invoke(() =>
                 {
                     this.Node.ProjectMgr.SetProjectProperty(CommonConstants.WorkingDirectory, value);
                 });
@@ -101,14 +101,14 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return Node.Site.GetUIThread().Invoke(() =>
+                return this.Node.Site.GetUIThread().Invoke(() =>
                 {
                     return this.Node.ProjectMgr.GetProjectProperty(CommonConstants.PublishUrl, true);
                 });
             }
             set
             {
-                Node.Site.GetUIThread().Invoke(() =>
+                this.Node.Site.GetUIThread().Invoke(() =>
                 {
                     this.Node.ProjectMgr.SetProjectProperty(CommonConstants.PublishUrl, value);
                 });
@@ -140,7 +140,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return Node.ProjectMgr.ProjectHome;
+                return this.Node.ProjectMgr.ProjectHome;
             }
         }
 
@@ -150,9 +150,9 @@ namespace Microsoft.VisualStudioTools.Project
 
         int IVsCfgBrowseObject.GetCfg(out IVsCfg ppCfg)
         {
-            return Node.ProjectMgr.ConfigProvider.GetCfgOfName(
-                Node.ProjectMgr.CurrentConfig.GetPropertyValue(ProjectFileConstants.Configuration),
-                Node.ProjectMgr.CurrentConfig.GetPropertyValue(ProjectFileConstants.Platform),
+            return this.Node.ProjectMgr.ConfigProvider.GetCfgOfName(
+                this.Node.ProjectMgr.CurrentConfig.GetPropertyValue(ProjectFileConstants.Configuration),
+                this.Node.ProjectMgr.CurrentConfig.GetPropertyValue(ProjectFileConstants.Platform),
                 out ppCfg);
         }
 
@@ -165,7 +165,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return Node.ProjectMgr.ProjectFolder;
+                return this.Node.ProjectMgr.ProjectFolder;
             }
         }
 
@@ -174,11 +174,11 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                if (_activeCfgSettings == null)
+                if (this._activeCfgSettings == null)
                 {
-                    _activeCfgSettings = new OAProjectConfigurationProperties(Node.ProjectMgr);
+                    this._activeCfgSettings = new OAProjectConfigurationProperties(this.Node.ProjectMgr);
                 }
-                return _activeCfgSettings;
+                return this._activeCfgSettings;
             }
         }
 
@@ -456,18 +456,18 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return Node.Site.GetUIThread().Invoke(() =>
+                return this.Node.Site.GetUIThread().Invoke(() =>
                 {
-                    return Node.ProjectMgr.GetProjectProperty(CommonConstants.StartupFile);
+                    return this.Node.ProjectMgr.GetProjectProperty(CommonConstants.StartupFile);
                 });
             }
             set
             {
-                Node.Site.GetUIThread().Invoke(() =>
+                this.Node.Site.GetUIThread().Invoke(() =>
                 {
-                    Node.ProjectMgr.SetProjectProperty(
+                    this.Node.ProjectMgr.SetProjectProperty(
                         CommonConstants.StartupFile,
-                        CommonUtils.GetRelativeFilePath(Node.ProjectMgr.ProjectHome, value)
+                        CommonUtils.GetRelativeFilePath(this.Node.ProjectMgr.ProjectHome, value)
                     );
                 });
             }
@@ -476,7 +476,7 @@ namespace Microsoft.VisualStudioTools.Project
         [Browsable(false)]
         public string URL
         {
-            get { return CommonUtils.MakeUri(Node.ProjectMgr.Url, false, UriKind.Absolute).AbsoluteUri; }
+            get { return CommonUtils.MakeUri(this.Node.ProjectMgr.Url, false, UriKind.Absolute).AbsoluteUri; }
         }
 
         [Browsable(false)]

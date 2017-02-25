@@ -29,25 +29,25 @@ namespace Microsoft.VisualStudioTools.Navigation
 
         public LibraryTask(string fileName, ITextBuffer textBuffer, ModuleId moduleId)
         {
-            _fileName = fileName;
-            _textBuffer = textBuffer;
-            _moduleId = moduleId;
+            this._fileName = fileName;
+            this._textBuffer = textBuffer;
+            this._moduleId = moduleId;
         }
 
         public string FileName
         {
-            get { return _fileName; }
+            get { return this._fileName; }
         }
 
         public ModuleId ModuleID
         {
-            get { return _moduleId; }
-            set { _moduleId = value; }
+            get { return this._moduleId; }
+            set { this._moduleId = value; }
         }
 
         public ITextBuffer TextBuffer
         {
-            get { return _textBuffer; }
+            get { return this._textBuffer; }
         }
     }
 }

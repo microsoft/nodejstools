@@ -39,9 +39,9 @@ namespace Microsoft.VisualStudioTools.Parsing
         {
             ValidateLocation(index, line, column);
 
-            _index = index;
-            _line = line;
-            _column = column;
+            this._index = index;
+            this._line = line;
+            this._column = column;
         }
 
         private static void ValidateLocation(int index, int line, int column)
@@ -68,9 +68,9 @@ namespace Microsoft.VisualStudioTools.Parsing
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters")]
         private SourceLocation(int index, int line, int column, bool noChecks)
         {
-            _index = index;
-            _line = line;
-            _column = column;
+            this._index = index;
+            this._line = line;
+            this._column = column;
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace Microsoft.VisualStudioTools.Parsing
         /// </summary>
         public int Index
         {
-            get { return _index; }
+            get { return this._index; }
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace Microsoft.VisualStudioTools.Parsing
         /// </summary>
         public int Line
         {
-            get { return _line; }
+            get { return this._line; }
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace Microsoft.VisualStudioTools.Parsing
         /// </summary>
         public int Column
         {
-            get { return _column; }
+            get { return this._column; }
         }
 
         /// <summary>
@@ -212,22 +212,22 @@ namespace Microsoft.VisualStudioTools.Parsing
                 return false;
 
             SourceLocation other = (SourceLocation)obj;
-            return other._index == _index && other._line == _line && other._column == _column;
+            return other._index == this._index && other._line == this._line && other._column == this._column;
         }
 
         public override int GetHashCode()
         {
-            return (_line << 16) ^ _column;
+            return (this._line << 16) ^ this._column;
         }
 
         public override string ToString()
         {
-            return "(" + _line + "," + _column + ")";
+            return "(" + this._line + "," + this._column + ")";
         }
 
         internal string ToDebugString()
         {
-            return String.Format(CultureInfo.CurrentCulture, "({0},{1},{2})", _index, _line, _column);
+            return String.Format(CultureInfo.CurrentCulture, "({0},{1},{2})", this._index, this._line, this._column);
         }
     }
 }

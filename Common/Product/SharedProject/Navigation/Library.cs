@@ -32,14 +32,14 @@ namespace Microsoft.VisualStudioTools.Navigation
 
         public Library(Guid libraryGuid)
         {
-            _guid = libraryGuid;
-            _root = new LibraryNode(null, String.Empty, String.Empty, LibraryNodeType.Package);
+            this._guid = libraryGuid;
+            this._root = new LibraryNode(null, String.Empty, String.Empty, LibraryNodeType.Package);
         }
 
         public _LIB_FLAGS2 LibraryCapabilities
         {
-            get { return _capabilities; }
-            set { _capabilities = value; }
+            get { return this._capabilities; }
+            set { this._capabilities = value; }
         }
 
         internal void AddNode(LibraryNode node)
@@ -47,9 +47,9 @@ namespace Microsoft.VisualStudioTools.Navigation
             lock (this)
             {
                 // re-create root node here because we may have handed out the node before and don't want to mutate it's list.
-                _root = _root.Clone();
-                _root.AddNode(node);
-                _updateCount++;
+                this._root = this._root.Clone();
+                this._root.AddNode(node);
+                this._updateCount++;
             }
         }
 
@@ -57,9 +57,9 @@ namespace Microsoft.VisualStudioTools.Navigation
         {
             lock (this)
             {
-                _root = _root.Clone();
-                _root.RemoveNode(node);
-                _updateCount++;
+                this._root = this._root.Clone();
+                this._root.RemoveNode(node);
+                this._updateCount++;
             }
         }
 
@@ -84,13 +84,13 @@ namespace Microsoft.VisualStudioTools.Navigation
 
         public int GetGuid(out Guid pguidLib)
         {
-            pguidLib = _guid;
+            pguidLib = this._guid;
             return VSConstants.S_OK;
         }
 
         public int GetLibFlags2(out uint pgrfFlags)
         {
-            pgrfFlags = (uint)LibraryCapabilities;
+            pgrfFlags = (uint)this.LibraryCapabilities;
             return VSConstants.S_OK;
         }
 
@@ -127,7 +127,7 @@ namespace Microsoft.VisualStudioTools.Navigation
                         if ((colonIndex = srchText.LastIndexOf(':')) != -1)
                         {
                             string filename = srchText.Substring(0, srchText.LastIndexOf(':'));
-                            foreach (ProjectLibraryNode project in _root.Children)
+                            foreach (ProjectLibraryNode project in this._root.Children)
                             {
                                 foreach (var item in project.Children)
                                 {
@@ -149,7 +149,7 @@ namespace Microsoft.VisualStudioTools.Navigation
                     else if (pobSrch[0].eSrchType == VSOBSEARCHTYPE.SO_SUBSTRING && ListType == (uint)_LIB_LISTTYPE.LLT_NAMESPACES)
                     {
                         var lib = new LibraryNode(null, "Search results " + pobSrch[0].szName, "Search results " + pobSrch[0].szName, LibraryNodeType.Package);
-                        foreach (var item in SearchNodes(pobSrch[0], new SimpleObjectList<LibraryNode>(), _root).Children)
+                        foreach (var item in SearchNodes(pobSrch[0], new SimpleObjectList<LibraryNode>(), this._root).Children)
                         {
                             lib.Children.Add(item);
                         }
@@ -165,7 +165,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             }
             else
             {
-                ppIVsSimpleObjectList2 = _root as IVsSimpleObjectList2;
+                ppIVsSimpleObjectList2 = this._root as IVsSimpleObjectList2;
             }
             return VSConstants.S_OK;
         }
@@ -188,7 +188,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         {
             lock (this)
             {
-                _root.Visit(visitor, ct);
+                this._root.Visit(visitor, ct);
             }
         }
 
@@ -221,14 +221,14 @@ namespace Microsoft.VisualStudioTools.Navigation
 
         public int UpdateCounter(out uint pCurUpdate)
         {
-            pCurUpdate = _updateCount;
+            pCurUpdate = this._updateCount;
             return VSConstants.S_OK;
         }
 
         public void Update()
         {
-            _updateCount++;
-            _root.Update();
+            this._updateCount++;
+            this._root.Update();
         }
         #endregion
     }

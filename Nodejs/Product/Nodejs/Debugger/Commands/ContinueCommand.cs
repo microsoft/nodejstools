@@ -27,21 +27,21 @@ namespace Microsoft.NodejsTools.Debugger.Commands
             switch (stepping)
             {
                 case SteppingKind.Into:
-                    _arguments = new Dictionary<string, object> {
+                    this._arguments = new Dictionary<string, object> {
                         { "stepaction", "in" },
                         { "stepcount", stepCount }
                     };
                     break;
 
                 case SteppingKind.Out:
-                    _arguments = new Dictionary<string, object> {
+                    this._arguments = new Dictionary<string, object> {
                         { "stepaction", "out" },
                         { "stepcount", stepCount }
                     };
                     break;
 
                 case SteppingKind.Over:
-                    _arguments = new Dictionary<string, object> {
+                    this._arguments = new Dictionary<string, object> {
                         { "stepaction", "next" },
                         { "stepcount", stepCount }
                     };
@@ -51,7 +51,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands
 
         protected override IDictionary<string, object> Arguments
         {
-            get { return _arguments; }
+            get { return this._arguments; }
         }
     }
 }

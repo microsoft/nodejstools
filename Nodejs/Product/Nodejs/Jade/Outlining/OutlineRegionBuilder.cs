@@ -34,13 +34,13 @@ namespace Microsoft.NodejsTools.Jade
 
         protected OutlineRegionBuilder(ITextBuffer textBuffer)
         {
-            CurrentRegions = new OutlineRegionCollection(0);
+            this.CurrentRegions = new OutlineRegionCollection(0);
 
-            TextBuffer = textBuffer;
-            TextBuffer.Changed += OnTextBufferChanged;
+            this.TextBuffer = textBuffer;
+            this.TextBuffer.Changed += this.OnTextBufferChanged;
 
-            BackgroundTask = new IdleTimeAsyncTask(TaskAction, MainThreadAction);
-            BackgroundTask.DoTaskOnIdle(300);
+            this.BackgroundTask = new IdleTimeAsyncTask(this.TaskAction, this.MainThreadAction);
+            this.BackgroundTask.DoTaskOnIdle(300);
         }
 
         protected virtual void OnTextBufferChanged(object sender, TextContentChangedEventArgs e)
@@ -58,14 +58,14 @@ namespace Microsoft.NodejsTools.Jade
                 int changeStart = Int32.MaxValue;
                 int changeEnd = 0;
 
-                lock (_regionsLock)
+                lock (this._regionsLock)
                 {
                     // Remove affected regions and shift the remaining ones. Outlining 
                     // regions are not sorted and can overlap. Hence linear search.
 
-                    for (int i = 0; i < CurrentRegions.Count; i++)
+                    for (int i = 0; i < this.CurrentRegions.Count; i++)
                     {
-                        var region = CurrentRegions[i];
+                        var region = this.CurrentRegions[i];
 
                         if (region.End <= start)
                         {
@@ -82,7 +82,7 @@ namespace Microsoft.NodejsTools.Jade
                         }
                         else
                         {
-                            CurrentRegions.RemoveAt(i);
+                            this.CurrentRegions.RemoveAt(i);
                             i--;
                         }
 
@@ -91,13 +91,13 @@ namespace Microsoft.NodejsTools.Jade
                     }
 
                     if (changeStart < Int32.MaxValue)
-                        CurrentRegions.TextBufferVersion = TextBuffer.CurrentSnapshot.Version.VersionNumber;
+                        this.CurrentRegions.TextBufferVersion = this.TextBuffer.CurrentSnapshot.Version.VersionNumber;
                 }
 
                 if (changeStart < Int32.MaxValue)
                 {
-                    if (RegionsChanged != null)
-                        RegionsChanged(this, new OutlineRegionsChangedEventArgs(CurrentRegions, TextRange.FromBounds(changeStart, changeEnd)));
+                    if (this.RegionsChanged != null)
+                        this.RegionsChanged(this, new OutlineRegionsChangedEventArgs(this.CurrentRegions, TextRange.FromBounds(changeStart, changeEnd)));
                 }
             }
         }
@@ -106,21 +106,21 @@ namespace Microsoft.NodejsTools.Jade
 
         protected bool IsDisposed()
         {
-            return Interlocked.Read(ref _disposed) > 0;
+            return Interlocked.Read(ref this._disposed) > 0;
         }
 
         protected virtual object TaskAction()
         {
             if (!IsDisposed())
             {
-                var snapshot = TextBuffer.CurrentSnapshot;
+                var snapshot = this.TextBuffer.CurrentSnapshot;
                 var newRegions = new OutlineRegionCollection(snapshot.Version.VersionNumber);
 
                 BuildRegions(newRegions);
 
-                lock (_regionsLock)
+                lock (this._regionsLock)
                 {
-                    var changedRange = CompareRegions(newRegions, CurrentRegions, snapshot.Length);
+                    var changedRange = CompareRegions(newRegions, this.CurrentRegions, snapshot.Length);
                     return new OutlineRegionsChange(changedRange, newRegions);
                 }
             }
@@ -136,15 +136,15 @@ namespace Microsoft.NodejsTools.Jade
 
                 if (result != null && TextRange.IsValid(result.ChangedRange))
                 {
-                    lock (_regionsLock)
+                    lock (this._regionsLock)
                     {
-                        CurrentRegions = result.NewRegions;
+                        this.CurrentRegions = result.NewRegions;
                     }
 
-                    if (RegionsChanged != null)
+                    if (this.RegionsChanged != null)
                     {
-                        RegionsChanged(this,
-                            new OutlineRegionsChangedEventArgs(CurrentRegions.Clone() as OutlineRegionCollection,
+                        this.RegionsChanged(this,
+                            new OutlineRegionsChangedEventArgs(this.CurrentRegions.Clone() as OutlineRegionCollection,
                             result.ChangedRange)
                          );
                     }
@@ -180,19 +180,19 @@ namespace Microsoft.NodejsTools.Jade
 
         protected virtual void Dispose(bool disposing)
         {
-            if (Interlocked.Read(ref _disposed) == 0)
+            if (Interlocked.Read(ref this._disposed) == 0)
             {
-                Interlocked.Exchange(ref _disposed, 1);
-                if (TextBuffer != null)
+                Interlocked.Exchange(ref this._disposed, 1);
+                if (this.TextBuffer != null)
                 {
-                    TextBuffer.Changed -= OnTextBufferChanged;
-                    TextBuffer = null;
+                    this.TextBuffer.Changed -= this.OnTextBufferChanged;
+                    this.TextBuffer = null;
                 }
 
-                if (BackgroundTask != null)
+                if (this.BackgroundTask != null)
                 {
-                    BackgroundTask.Dispose();
-                    BackgroundTask = null;
+                    this.BackgroundTask.Dispose();
+                    this.BackgroundTask = null;
                 }
             }
         }

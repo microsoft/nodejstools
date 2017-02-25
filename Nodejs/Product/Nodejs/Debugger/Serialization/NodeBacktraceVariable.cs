@@ -28,23 +28,23 @@ namespace Microsoft.NodejsTools.Debugger.Serialization
             Utilities.ArgumentNotNull("parameter", parameter);
 
             JToken value = parameter["value"];
-            Id = (int)value["ref"];
-            Parent = null;
-            StackFrame = stackFrame;
-            Name = (string)parameter["name"] ?? NodeVariableType.AnonymousVariable;
-            TypeName = (string)value["type"];
-            Value = (string)value["value"];
-            Class = (string)value["className"];
+            this.Id = (int)value["ref"];
+            this.Parent = null;
+            this.StackFrame = stackFrame;
+            this.Name = (string)parameter["name"] ?? NodeVariableType.AnonymousVariable;
+            this.TypeName = (string)value["type"];
+            this.Value = (string)value["value"];
+            this.Class = (string)value["className"];
             try
             {
-                Text = (string)value["text"];
+                this.Text = (string)value["text"];
             }
             catch (ArgumentException)
             {
-                Text = String.Empty;
+                this.Text = String.Empty;
             }
-            Attributes = NodePropertyAttributes.None;
-            Type = NodePropertyType.Normal;
+            this.Attributes = NodePropertyAttributes.None;
+            this.Type = NodePropertyType.Normal;
         }
 
         public int Id { get; private set; }

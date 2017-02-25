@@ -21,12 +21,12 @@ namespace Microsoft.NodejsTools.Jade
         private void OnFilter()
         {
             // :markdown
-            _cs.MoveToNextChar();
+            this._cs.MoveToNextChar();
 
             var range = ParseIdentifier();
             if (range.Length > 0)
             {
-                var text = _cs.GetSubstringAt(range.Start, range.Length);
+                var text = this._cs.GetSubstringAt(range.Start, range.Length);
                 if (JadeFilters.IsFilter(text))
                 {
                     AddToken(JadeTokenType.Filter, range.Start - 1, range.Length + 1);

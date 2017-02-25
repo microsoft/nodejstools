@@ -34,7 +34,7 @@ namespace Microsoft.NodejsTools.Options
         {
             get
             {
-                switch (_surveyNewsCheckCombo.SelectedIndex)
+                switch (this._surveyNewsCheckCombo.SelectedIndex)
                 {
                     case SurveyNewsNeverIndex:
                         return SurveyNewsPolicy.Disabled;
@@ -53,16 +53,16 @@ namespace Microsoft.NodejsTools.Options
                 switch (value)
                 {
                     case SurveyNewsPolicy.Disabled:
-                        _surveyNewsCheckCombo.SelectedIndex = SurveyNewsNeverIndex;
+                        this._surveyNewsCheckCombo.SelectedIndex = SurveyNewsNeverIndex;
                         break;
                     case SurveyNewsPolicy.CheckOnceDay:
-                        _surveyNewsCheckCombo.SelectedIndex = SurveyNewsOnceDayIndex;
+                        this._surveyNewsCheckCombo.SelectedIndex = SurveyNewsOnceDayIndex;
                         break;
                     case SurveyNewsPolicy.CheckOnceWeek:
-                        _surveyNewsCheckCombo.SelectedIndex = SurveyNewsOnceWeekIndex;
+                        this._surveyNewsCheckCombo.SelectedIndex = SurveyNewsOnceWeekIndex;
                         break;
                     case SurveyNewsPolicy.CheckOnceMonth:
-                        _surveyNewsCheckCombo.SelectedIndex = SurveyNewsOnceMonthIndex;
+                        this._surveyNewsCheckCombo.SelectedIndex = SurveyNewsOnceMonthIndex;
                         break;
                 }
             }
@@ -70,20 +70,20 @@ namespace Microsoft.NodejsTools.Options
 
         internal void SyncControlWithPageSettings(NodejsGeneralOptionsPage page)
         {
-            SurveyNewsCheckCombo = page.SurveyNewsCheck;
-            _waitOnAbnormalExit.Checked = page.WaitOnAbnormalExit;
-            _waitOnNormalExit.Checked = page.WaitOnNormalExit;
-            _editAndContinue.Checked = page.EditAndContinue;
-            _checkForLongPaths.Checked = page.CheckForLongPaths;
+            this.SurveyNewsCheckCombo = page.SurveyNewsCheck;
+            this._waitOnAbnormalExit.Checked = page.WaitOnAbnormalExit;
+            this._waitOnNormalExit.Checked = page.WaitOnNormalExit;
+            this._editAndContinue.Checked = page.EditAndContinue;
+            this._checkForLongPaths.Checked = page.CheckForLongPaths;
         }
 
         internal void SyncPageWithControlSettings(NodejsGeneralOptionsPage page)
         {
-            page.SurveyNewsCheck = SurveyNewsCheckCombo;
-            page.WaitOnAbnormalExit = _waitOnAbnormalExit.Checked;
-            page.WaitOnNormalExit = _waitOnNormalExit.Checked;
-            page.EditAndContinue = _editAndContinue.Checked;
-            page.CheckForLongPaths = _checkForLongPaths.Checked;
+            page.SurveyNewsCheck = this.SurveyNewsCheckCombo;
+            page.WaitOnAbnormalExit = this._waitOnAbnormalExit.Checked;
+            page.WaitOnNormalExit = this._waitOnNormalExit.Checked;
+            page.EditAndContinue = this._editAndContinue.Checked;
+            page.CheckForLongPaths = this._checkForLongPaths.Checked;
         }
     }
 }

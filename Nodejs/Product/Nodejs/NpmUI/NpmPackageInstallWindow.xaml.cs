@@ -33,23 +33,23 @@ namespace Microsoft.NodejsTools.NpmUI
 
         internal NpmPackageInstallWindow(INpmController controller, NpmOutputViewModel executeVm, DependencyType dependencyType = DependencyType.Standard)
         {
-            DataContext = _vm = new NpmPackageInstallViewModel(executeVm, Dispatcher);
-            _vm.NpmController = controller;
+            this.DataContext = this._vm = new NpmPackageInstallViewModel(executeVm, this.Dispatcher);
+            this._vm.NpmController = controller;
             InitializeComponent();
-            DependencyComboBox.SelectedIndex = (int)dependencyType;
+            this.DependencyComboBox.SelectedIndex = (int)dependencyType;
         }
 
         public void Dispose()
         {
             //  This will unregister event handlers on the controller and prevent
             //  us from leaking view models.
-            if (_outputWindow != null)
+            if (this._outputWindow != null)
             {
-                _outputWindow.Closing -= _outputWindow_Closing;
-                _outputWindow.Close();
+                this._outputWindow.Closing -= this._outputWindow_Closing;
+                this._outputWindow.Close();
             }
 
-            _vm.NpmController = null;
+            this._vm.NpmController = null;
 
             // The catalog refresh operation spawns many long-lived Gen 2 objects,
             // so the garbage collector will take a while to get to them otherwise.
@@ -59,7 +59,7 @@ namespace Microsoft.NodejsTools.NpmUI
         private void _outputWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             e.Cancel = true;
-            _outputWindow.Hide();
+            this._outputWindow.Hide();
         }
 
         private void Close_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -75,34 +75,34 @@ namespace Microsoft.NodejsTools.NpmUI
 
         private void InstallCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            _vm.Install(e.Parameter as PackageCatalogEntryViewModel);
+            this._vm.Install(e.Parameter as PackageCatalogEntryViewModel);
         }
 
         private void InstallCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = !FilterTextBox.IsFocused && _vm.CanInstall(e.Parameter as PackageCatalogEntryViewModel);
+            e.CanExecute = !this.FilterTextBox.IsFocused && this._vm.CanInstall(e.Parameter as PackageCatalogEntryViewModel);
             e.Handled = true;
         }
 
         private void RefreshCatalogCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            _vm.RefreshCatalog();
+            this._vm.RefreshCatalog();
         }
 
         private void RefreshCatalogCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = _vm.CanRefreshCatalog;
+            e.CanExecute = this._vm.CanRefreshCatalog;
             e.Handled = true;
         }
 
         private void OpenHomepageCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            _vm.OpenHomepage(e.Parameter as string);
+            this._vm.OpenHomepage(e.Parameter as string);
         }
 
         private void OpenHomepageCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = _vm.CanOpenHomepage(e.Parameter as string);
+            e.CanExecute = this._vm.CanOpenHomepage(e.Parameter as string);
             e.Handled = true;
         }
 
@@ -120,9 +120,9 @@ namespace Microsoft.NodejsTools.NpmUI
             {
                 case Key.Down:
                 case Key.Enter:
-                    if (_packageList.SelectedIndex == -1 && _packageList.Items.Count > 0)
+                    if (this._packageList.SelectedIndex == -1 && this._packageList.Items.Count > 0)
                     {
-                        _packageList.SelectedIndex = 0;
+                        this._packageList.SelectedIndex = 0;
                     }
 
                     FocusOnSelectedItemInPackageList();
@@ -133,8 +133,8 @@ namespace Microsoft.NodejsTools.NpmUI
 
         private void FocusOnSelectedItemInPackageList()
         {
-            _packageList.ScrollIntoView(_packageList.SelectedItem);
-            var itemContainer = (ListViewItem)_packageList.ItemContainerGenerator.ContainerFromItem(_packageList.SelectedItem);
+            this._packageList.ScrollIntoView(this._packageList.SelectedItem);
+            var itemContainer = (ListViewItem)this._packageList.ItemContainerGenerator.ContainerFromItem(this._packageList.SelectedItem);
             if (itemContainer != null)
             {
                 itemContainer.Focus();
@@ -143,39 +143,39 @@ namespace Microsoft.NodejsTools.NpmUI
 
         private void _packageList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            _packageList.ScrollIntoView(_packageList.SelectedItem);
+            this._packageList.ScrollIntoView(this._packageList.SelectedItem);
         }
 
         private void _packageList_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Up && _packageList.SelectedIndex == 0)
+            if (e.Key == Key.Up && this._packageList.SelectedIndex == 0)
             {
-                FilterTextBox.Focus();
+                this.FilterTextBox.Focus();
                 e.Handled = true;
             }
         }
 
         private void ShowOutputWindow_Click(object sender, RoutedEventArgs e)
         {
-            if (_outputWindow == null)
+            if (this._outputWindow == null)
             {
-                _outputWindow = new NpmOutputWindow()
+                this._outputWindow = new NpmOutputWindow()
                 {
                     Owner = this,
                     WindowStartupLocation = System.Windows.WindowStartupLocation.Manual
                 };
 
-                _outputWindow.Left = Math.Max(0, this.Left - _outputWindow.Width - 30);
-                _outputWindow.Top = Math.Max(0, this.Top);
+                this._outputWindow.Left = Math.Max(0, this.Left - this._outputWindow.Width - 30);
+                this._outputWindow.Top = Math.Max(0, this.Top);
 
-                _outputWindow.Closing += _outputWindow_Closing;
-                _outputWindow.DataContext = _vm.ExecuteViewModel;
+                this._outputWindow.Closing += this._outputWindow_Closing;
+                this._outputWindow.DataContext = this._vm.ExecuteViewModel;
             }
 
-            _outputWindow.Show();
-            if (_outputWindow.WindowState == WindowState.Minimized)
+            this._outputWindow.Show();
+            if (this._outputWindow.WindowState == WindowState.Minimized)
             {
-                _outputWindow.WindowState = WindowState.Normal;
+                this._outputWindow.WindowState = WindowState.Normal;
             }
         }
 
@@ -184,15 +184,15 @@ namespace Microsoft.NodejsTools.NpmUI
             this.DependencyComboBox.SelectedIndex = (int)DependencyType.Standard;
             this.SaveToPackageJsonCheckbox.IsChecked = true;
 
-            ArgumentsTextBox.Text = string.Empty;
-            ArgumentsTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+            this.ArgumentsTextBox.Text = string.Empty;
+            this.ArgumentsTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
         }
 
         private void SelectedVersionComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (this.SelectedVersionComboBox.SelectedIndex == -1)
             {
-                SelectedVersionComboBox.SelectedIndex = 0;
+                this.SelectedVersionComboBox.SelectedIndex = 0;
             }
         }
     }

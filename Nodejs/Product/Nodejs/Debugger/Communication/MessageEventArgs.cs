@@ -22,7 +22,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
     {
         public MessageEventArgs(string message)
         {
-            Message = message;
+            this.Message = message;
         }
 
         public string Message { get; private set; }

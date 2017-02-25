@@ -23,12 +23,12 @@ namespace Microsoft.NodejsTools.Jade
         // plain text with possible #{foo} variable references
         private void OnText(bool strings, bool html, bool entities)
         {
-            while (!_cs.IsEndOfStream())
+            while (!this._cs.IsEndOfStream())
             {
-                if (_cs.IsAtNewLine())
+                if (this._cs.IsAtNewLine())
                     break;
 
-                if (_cs.CurrentChar == '#' && _cs.NextChar == '{')
+                if (this._cs.CurrentChar == '#' && this._cs.NextChar == '{')
                 {
                     var range = GetNonWSSequence('}', inclusive: true);
                     if (range.Length > 0)
@@ -36,34 +36,34 @@ namespace Microsoft.NodejsTools.Jade
                         AddToken(JadeTokenType.Variable, range.Start, range.Length);
                     }
                 }
-                else if (_cs.IsAtString() && strings)
+                else if (this._cs.IsAtString() && strings)
                 {
                     HandleString();
                 }
-                else if (_cs.CurrentChar == '<' && (_cs.NextChar == '/' || Char.IsLetter(_cs.NextChar)) && html)
+                else if (this._cs.CurrentChar == '<' && (this._cs.NextChar == '/' || Char.IsLetter(this._cs.NextChar)) && html)
                 {
                     OnHtml();
                 }
-                else if (_cs.CurrentChar == '&' && entities)
+                else if (this._cs.CurrentChar == '&' && entities)
                 {
                     // entity check
-                    _cs.MoveToNextChar();
+                    this._cs.MoveToNextChar();
 
                     var range = GetNonWSSequence(';', inclusive: false);
-                    if (_cs.CurrentChar == ';')
+                    if (this._cs.CurrentChar == ';')
                     {
-                        var candidate = _cs.GetSubstringAt(range.Start, range.Length);
+                        var candidate = this._cs.GetSubstringAt(range.Start, range.Length);
                         char mappedChar;
                         if (EntityTable.IsEntity(candidate, out mappedChar))
                         {
-                            _cs.MoveToNextChar();
+                            this._cs.MoveToNextChar();
                             AddToken(JadeTokenType.Entity, range.Start - 1, range.Length + 2);
                         }
                     }
                 }
                 else
                 {
-                    _cs.MoveToNextChar();
+                    this._cs.MoveToNextChar();
                 }
             }
         }

@@ -24,14 +24,14 @@ namespace Microsoft.NodejsTools.Debugger.Commands
 
         public ClearBreakpointCommand(int id, int breakpointId) : base(id, "clearbreakpoint")
         {
-            _arguments = new Dictionary<string, object> {
+            this._arguments = new Dictionary<string, object> {
                 { "breakpoint", breakpointId }
             };
         }
 
         protected override IDictionary<string, object> Arguments
         {
-            get { return _arguments; }
+            get { return this._arguments; }
         }
     }
 }

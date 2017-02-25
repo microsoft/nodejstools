@@ -24,17 +24,17 @@ namespace Microsoft.NodejsTools.Debugger.Events
     {
         public BreakpointEvent(JObject message)
         {
-            Running = false;
-            Line = (int)message["body"]["sourceLine"];
-            Column = (int)message["body"]["sourceColumn"];
+            this.Running = false;
+            this.Line = (int)message["body"]["sourceLine"];
+            this.Column = (int)message["body"]["sourceColumn"];
 
             var scriptId = (int)message["body"]["script"]["id"];
             var fileName = (string)message["body"]["script"]["name"];
 
-            Module = new NodeModule(scriptId, fileName);
+            this.Module = new NodeModule(scriptId, fileName);
 
             JToken breakpoints = message["body"]["breakpoints"];
-            Breakpoints = breakpoints != null
+            this.Breakpoints = breakpoints != null
                 ? breakpoints.Values<int>().ToList()
                 : new List<int>();
         }

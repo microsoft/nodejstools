@@ -470,7 +470,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         void IEnumSTATDATA.Clone(out IEnumSTATDATA clone)
         {
-            clone = new EnumSTATDATA(i);
+            clone = new EnumSTATDATA(this.i);
         }
 
         int IEnumSTATDATA.Next(uint celt, STATDATA[] d, out uint fetched)
@@ -479,9 +479,9 @@ namespace Microsoft.VisualStudioTools.Project
             //uint size = (fetched != null) ? fetched[0] : 0;
             for (uint i = 0; i < celt; i++)
             {
-                if (e.MoveNext())
+                if (this.e.MoveNext())
                 {
-                    STATDATA sdata = (STATDATA)e.Current;
+                    STATDATA sdata = (STATDATA)this.e.Current;
 
                     rc++;
                     if (d != null && d.Length > i)
@@ -497,7 +497,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         int IEnumSTATDATA.Reset()
         {
-            e.Reset();
+            this.e.Reset();
             return 0;
         }
 
@@ -505,7 +505,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             for (uint i = 0; i < celt; i++)
             {
-                e.MoveNext();
+                this.e.MoveNext();
             }
 
             return 0;
@@ -524,12 +524,12 @@ namespace Microsoft.VisualStudioTools.Project
         {
             this.cache = cache;
             this.dir = dir;
-            e = cache.GetEnumerator();
+            this.e = cache.GetEnumerator();
         }
 
         void IEnumFORMATETC.Clone(out IEnumFORMATETC clone)
         {
-            clone = new EnumFORMATETC(dir, cache);
+            clone = new EnumFORMATETC(this.dir, this.cache);
         }
 
         int IEnumFORMATETC.Next(uint celt, FORMATETC[] d, uint[] fetched)
@@ -538,9 +538,9 @@ namespace Microsoft.VisualStudioTools.Project
             //uint size = (fetched != null) ? fetched[0] : 0;
             for (uint i = 0; i < celt; i++)
             {
-                if (e.MoveNext())
+                if (this.e.MoveNext())
                 {
-                    DataCacheEntry entry = (DataCacheEntry)e.Current;
+                    DataCacheEntry entry = (DataCacheEntry)this.e.Current;
 
                     rc++;
                     if (d != null && d.Length > i)
@@ -561,7 +561,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         int IEnumFORMATETC.Reset()
         {
-            e.Reset();
+            this.e.Reset();
             return 0;
         }
 
@@ -569,7 +569,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             for (uint i = 0; i < celt; i++)
             {
-                e.MoveNext();
+                this.e.MoveNext();
             }
 
             return 0;

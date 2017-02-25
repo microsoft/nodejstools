@@ -25,8 +25,8 @@ namespace Microsoft.NodejsTools.Debugger
 
         public OutputEventArgs(NodeThread thread, string output)
         {
-            Thread = thread;
-            Output = output;
+            this.Thread = thread;
+            this.Output = output;
         }
     }
 }

@@ -27,13 +27,13 @@ namespace Microsoft.NodejsTools
 
         public NodejsProjectFactory(NodejsPackage package)
         {
-            _package = package;
+            this._package = package;
         }
 
         protected override object PreCreateForOuter(IntPtr outerProjectIUnknown)
         {
             var res = new NodejsProject();
-            res._package = _package;
+            res._package = this._package;
             return res;
         }
     }

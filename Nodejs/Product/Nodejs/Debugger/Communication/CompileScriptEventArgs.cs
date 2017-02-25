@@ -23,7 +23,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
     {
         public CompileScriptEventArgs(CompileScriptEvent compileScriptEvent)
         {
-            CompileScriptEvent = compileScriptEvent;
+            this.CompileScriptEvent = compileScriptEvent;
         }
 
         public CompileScriptEvent CompileScriptEvent { get; private set; }

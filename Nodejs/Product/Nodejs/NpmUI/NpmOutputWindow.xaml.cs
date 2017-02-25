@@ -34,11 +34,11 @@ namespace Microsoft.NodejsTools.NpmUI
             switch (e.Property.Name)
             {
                 case "DataContext":
-                    var vm = DataContext as NpmOutputViewModel;
+                    var vm = this.DataContext as NpmOutputViewModel;
                     if (null != vm)
                     {
-                        _textBox.Document = vm.Output;
-                        vm.OutputWritten += vm_OutputWritten;
+                        this._textBox.Document = vm.Output;
+                        vm.OutputWritten += this.vm_OutputWritten;
                     }
                     break;
             }
@@ -48,12 +48,12 @@ namespace Microsoft.NodejsTools.NpmUI
 
         private void vm_OutputWritten(object sender, EventArgs e)
         {
-            _textBox.ScrollToEnd();
+            this._textBox.ScrollToEnd();
         }
 
         private void OnClickCancel(object sender, RoutedEventArgs e)
         {
-            var vm = DataContext as NpmOutputViewModel;
+            var vm = this.DataContext as NpmOutputViewModel;
             if (null != vm)
             {
                 vm.Cancel();

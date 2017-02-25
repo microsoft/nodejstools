@@ -40,36 +40,36 @@ namespace Microsoft.VisualStudioTools.Navigation
         protected CommonLibraryNode(LibraryNode parent, IScopeNode scope, string namePrefix, IVsHierarchy hierarchy, uint itemId) :
             base(parent, GetLibraryNodeName(scope, namePrefix), namePrefix + scope.Name, scope.NodeType)
         {
-            _ownerHierarchy = hierarchy;
-            _fileId = itemId;
+            this._ownerHierarchy = hierarchy;
+            this._fileId = itemId;
 
             // Now check if we have all the information to navigate to the source location.
-            if ((null != _ownerHierarchy) && (VSConstants.VSITEMID_NIL != _fileId))
+            if ((null != this._ownerHierarchy) && (VSConstants.VSITEMID_NIL != this._fileId))
             {
                 if ((SourceLocation.Invalid != scope.Start) && (SourceLocation.Invalid != scope.End))
                 {
-                    _sourceSpan = new TextSpan();
-                    _sourceSpan.iStartIndex = scope.Start.Column - 1;
+                    this._sourceSpan = new TextSpan();
+                    this._sourceSpan.iStartIndex = scope.Start.Column - 1;
                     if (scope.Start.Line > 0)
                     {
-                        _sourceSpan.iStartLine = scope.Start.Line - 1;
+                        this._sourceSpan.iStartLine = scope.Start.Line - 1;
                     }
-                    _sourceSpan.iEndIndex = scope.End.Column;
+                    this._sourceSpan.iEndIndex = scope.End.Column;
                     if (scope.End.Line > 0)
                     {
-                        _sourceSpan.iEndLine = scope.End.Line - 1;
+                        this._sourceSpan.iEndLine = scope.End.Line - 1;
                     }
-                    CanGoToSource = true;
+                    this.CanGoToSource = true;
                 }
             }
-            _scope = scope;
+            this._scope = scope;
         }
 
         internal IScopeNode ScopeNode
         {
             get
             {
-                return _scope;
+                return this._scope;
             }
         }
 
@@ -77,7 +77,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         {
             get
             {
-                return _sourceSpan;
+                return this._sourceSpan;
             }
         }
 
@@ -90,20 +90,20 @@ namespace Microsoft.VisualStudioTools.Navigation
         protected CommonLibraryNode(CommonLibraryNode node) :
             base(node)
         {
-            _fileId = node._fileId;
-            _ownerHierarchy = node._ownerHierarchy;
-            _fileMoniker = node._fileMoniker;
-            _sourceSpan = node._sourceSpan;
+            this._fileId = node._fileId;
+            this._ownerHierarchy = node._ownerHierarchy;
+            this._fileMoniker = node._fileMoniker;
+            this._sourceSpan = node._sourceSpan;
         }
 
         protected CommonLibraryNode(CommonLibraryNode node, string newFullName) :
             base(node, newFullName)
         {
-            _scope = node._scope;
-            _fileId = node._fileId;
-            _ownerHierarchy = node._ownerHierarchy;
-            _fileMoniker = node._fileMoniker;
-            _sourceSpan = node._sourceSpan;
+            this._scope = node._scope;
+            this._fileId = node._fileId;
+            this._ownerHierarchy = node._ownerHierarchy;
+            this._fileMoniker = node._fileMoniker;
+            this._sourceSpan = node._sourceSpan;
         }
 
         public override uint CategoryField(LIB_CATEGORY category)
@@ -111,7 +111,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             switch (category)
             {
                 case (LIB_CATEGORY)_LIB_CATEGORY2.LC_MEMBERINHERITANCE:
-                    if (NodeType == LibraryNodeType.Members || NodeType == LibraryNodeType.Definitions)
+                    if (this.NodeType == LibraryNodeType.Members || this.NodeType == LibraryNodeType.Definitions)
                     {
                         return (uint)_LIBCAT_MEMBERINHERITANCE.LCMI_IMMEDIATE;
                     }
@@ -137,13 +137,13 @@ namespace Microsoft.VisualStudioTools.Navigation
             {
                 // Now we can try to open the editor. We assume that the owner hierarchy is
                 // a project and we want to use its OpenItem method.
-                IVsProject3 project = _ownerHierarchy as IVsProject3;
+                IVsProject3 project = this._ownerHierarchy as IVsProject3;
                 if (null == project)
                 {
                     return;
                 }
                 Guid viewGuid = VSConstants.LOGVIEWID_Code;
-                ErrorHandler.ThrowOnFailure(project.OpenItem(_fileId, ref viewGuid, documentData, out frame));
+                ErrorHandler.ThrowOnFailure(project.OpenItem(this._fileId, ref viewGuid, documentData, out frame));
             }
             finally
             {
@@ -177,20 +177,20 @@ namespace Microsoft.VisualStudioTools.Navigation
             ErrorHandler.ThrowOnFailure(codeWindow.GetPrimaryView(out textView));
 
             // Set the cursor at the beginning of the declaration.
-            ErrorHandler.ThrowOnFailure(textView.SetCaretPos(_sourceSpan.iStartLine, _sourceSpan.iStartIndex));
+            ErrorHandler.ThrowOnFailure(textView.SetCaretPos(this._sourceSpan.iStartLine, this._sourceSpan.iStartIndex));
             // Make sure that the text is visible.
             TextSpan visibleSpan = new TextSpan();
-            visibleSpan.iStartLine = _sourceSpan.iStartLine;
-            visibleSpan.iStartIndex = _sourceSpan.iStartIndex;
-            visibleSpan.iEndLine = _sourceSpan.iStartLine;
-            visibleSpan.iEndIndex = _sourceSpan.iStartIndex + 1;
+            visibleSpan.iStartLine = this._sourceSpan.iStartLine;
+            visibleSpan.iStartIndex = this._sourceSpan.iStartIndex;
+            visibleSpan.iEndLine = this._sourceSpan.iStartLine;
+            visibleSpan.iEndIndex = this._sourceSpan.iStartIndex + 1;
             ErrorHandler.ThrowOnFailure(textView.EnsureSpanVisible(visibleSpan));
         }
 
         public override void SourceItems(out IVsHierarchy hierarchy, out uint itemId, out uint itemsCount)
         {
-            hierarchy = _ownerHierarchy;
-            itemId = _fileId;
+            hierarchy = this._ownerHierarchy;
+            itemId = this._fileId;
             itemsCount = 1;
         }
 
@@ -198,11 +198,11 @@ namespace Microsoft.VisualStudioTools.Navigation
         {
             get
             {
-                if (string.IsNullOrEmpty(_fileMoniker))
+                if (string.IsNullOrEmpty(this._fileMoniker))
                 {
-                    ErrorHandler.ThrowOnFailure(_ownerHierarchy.GetCanonicalName(_fileId, out _fileMoniker));
+                    ErrorHandler.ThrowOnFailure(this._ownerHierarchy.GetCanonicalName(this._fileId, out this._fileMoniker));
                 }
-                return string.Format(CultureInfo.InvariantCulture, "{0}/{1}", _fileMoniker, Name);
+                return string.Format(CultureInfo.InvariantCulture, "{0}/{1}", this._fileMoniker, this.Name);
             }
         }
 
@@ -236,7 +236,7 @@ namespace Microsoft.VisualStudioTools.Navigation
                     ErrorHandler.ThrowOnFailure(
                         rdt.GetDocumentInfo(docCookie[0], out flags, out readLocks, out editLocks, out moniker, out docHierarchy, out docId, out docData));
                     // Check if this document is the one we are looking for.
-                    if ((docId == _fileId) && (_ownerHierarchy.Equals(docHierarchy)))
+                    if ((docId == this._fileId) && (this._ownerHierarchy.Equals(docHierarchy)))
                     {
                         documentData = docData;
                         docData = IntPtr.Zero;

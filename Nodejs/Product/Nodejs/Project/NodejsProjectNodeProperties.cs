@@ -70,18 +70,18 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                return this.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
                 {
                     return Nodejs.GetAbsoluteNodeExePath(
-                        ProjectHome,
-                        Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.NodeExePath, true));
+                        this.ProjectHome,
+                        this.Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.NodeExePath, true));
                 });
             }
             set
             {
-                HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                this.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
                 {
-                    Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.NodeExePath, value);
+                    this.Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.NodeExePath, value);
                 });
             }
         }
@@ -93,16 +93,16 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                return this.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
                 {
                     return this.Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.NodeExeArguments, true);
                 });
             }
             set
             {
-                HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                this.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
                 {
-                    Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.NodeExeArguments, value);
+                    this.Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.NodeExeArguments, value);
                 });
             }
         }
@@ -114,16 +114,16 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                return this.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
                 {
                     return this.Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.ScriptArguments, true);
                 });
             }
             set
             {
-                HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                this.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
                 {
-                    Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.ScriptArguments, value);
+                    this.Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.ScriptArguments, value);
                 });
             }
         }
@@ -135,10 +135,10 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke((Func<int?>)(() =>
+                return this.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke((Func<int?>)(() =>
                 {
                     int port;
-                    if (Int32.TryParse(Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.NodejsPort, true), out port))
+                    if (Int32.TryParse(this.Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.NodejsPort, true), out port))
                     {
                         return port;
                     }
@@ -147,9 +147,9 @@ namespace Microsoft.NodejsTools.Project
             }
             set
             {
-                HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                this.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
                 {
-                    Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.NodejsPort, value != null ? value.ToString() : String.Empty);
+                    this.Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.NodejsPort, value != null ? value.ToString() : String.Empty);
                 });
             }
         }
@@ -161,16 +161,16 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                return this.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
                 {
                     return this.Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.LaunchUrl, true);
                 });
             }
             set
             {
-                HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                this.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
                 {
-                    Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.LaunchUrl, value);
+                    this.Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.LaunchUrl, value);
                 });
             }
         }
@@ -182,10 +182,10 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                return this.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
                 {
                     bool res;
-                    if (Boolean.TryParse(Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.StartWebBrowser, true), out res))
+                    if (Boolean.TryParse(this.Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.StartWebBrowser, true), out res))
                     {
                         return res;
                     }
@@ -194,16 +194,16 @@ namespace Microsoft.NodejsTools.Project
             }
             set
             {
-                HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
+                this.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
                 {
-                    Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.StartWebBrowser, value.ToString());
+                    this.Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.StartWebBrowser, value.ToString());
                 });
             }
         }
 
         object EnvDTE80.IInternalExtenderProvider.GetExtender(string extenderCATID, string extenderName, object extendeeObject, EnvDTE.IExtenderSite extenderSite, int cookie)
         {
-            EnvDTE80.IInternalExtenderProvider outerHierarchy = Node.GetOuterInterface<EnvDTE80.IInternalExtenderProvider>();
+            EnvDTE80.IInternalExtenderProvider outerHierarchy = this.Node.GetOuterInterface<EnvDTE80.IInternalExtenderProvider>();
 
             if (outerHierarchy != null)
             {
@@ -228,14 +228,14 @@ namespace Microsoft.NodejsTools.Project
 
         public WebAppExtenderFilter(ICustomTypeDescriptor innerObject)
         {
-            _innerObject = innerObject;
+            this._innerObject = innerObject;
         }
 
         internal object InnerObject
         {
             get
             {
-                return _innerObject;
+                return this._innerObject;
             }
         }
 
@@ -243,53 +243,53 @@ namespace Microsoft.NodejsTools.Project
 
         public AttributeCollection GetAttributes()
         {
-            return _innerObject.GetAttributes();
+            return this._innerObject.GetAttributes();
         }
 
         public string GetClassName()
         {
-            return _innerObject.GetClassName();
+            return this._innerObject.GetClassName();
         }
 
         public string GetComponentName()
         {
-            return _innerObject.GetComponentName();
+            return this._innerObject.GetComponentName();
         }
 
         public TypeConverter GetConverter()
         {
-            return _innerObject.GetConverter();
+            return this._innerObject.GetConverter();
         }
 
         public EventDescriptor GetDefaultEvent()
         {
-            return _innerObject.GetDefaultEvent();
+            return this._innerObject.GetDefaultEvent();
         }
 
         public PropertyDescriptor GetDefaultProperty()
         {
-            return _innerObject.GetDefaultProperty();
+            return this._innerObject.GetDefaultProperty();
         }
 
         public object GetEditor(Type editorBaseType)
         {
-            return _innerObject.GetEditor(editorBaseType);
+            return this._innerObject.GetEditor(editorBaseType);
         }
 
         public EventDescriptorCollection GetEvents(Attribute[] attributes)
         {
-            return _innerObject.GetEvents(attributes);
+            return this._innerObject.GetEvents(attributes);
         }
 
         public EventDescriptorCollection GetEvents()
         {
-            return _innerObject.GetEvents();
+            return this._innerObject.GetEvents();
         }
 
         public PropertyDescriptorCollection GetProperties(Attribute[] attributes)
         {
             List<PropertyDescriptor> res = new List<PropertyDescriptor>();
-            var original = _innerObject.GetProperties(attributes);
+            var original = this._innerObject.GetProperties(attributes);
             foreach (PropertyDescriptor item in original)
             {
                 if (!IsFiltered(item))
@@ -309,7 +309,7 @@ namespace Microsoft.NodejsTools.Project
         public PropertyDescriptorCollection GetProperties()
         {
             List<PropertyDescriptor> res = new List<PropertyDescriptor>();
-            var original = _innerObject.GetProperties();
+            var original = this._innerObject.GetProperties();
             foreach (PropertyDescriptor item in original)
             {
                 if (!IsFiltered(item))
@@ -323,7 +323,7 @@ namespace Microsoft.NodejsTools.Project
 
         public object GetPropertyOwner(PropertyDescriptor pd)
         {
-            return _innerObject.GetPropertyOwner(pd);
+            return this._innerObject.GetPropertyOwner(pd);
         }
 
         #endregion

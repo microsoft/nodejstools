@@ -37,11 +37,11 @@ namespace Microsoft.NodejsTools.Project
 
         protected override NodeProperties CreatePropertiesObject()
         {
-            if (IsLinkFile)
+            if (this.IsLinkFile)
             {
                 return new NodejsTypeScriptLinkFileNodeProperties(this);
             }
-            else if (IsNonMemberItem)
+            else if (this.IsNonMemberItem)
             {
                 return new ExcludedFileNodeProperties(this);
             }

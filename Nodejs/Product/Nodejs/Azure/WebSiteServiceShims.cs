@@ -51,7 +51,7 @@ namespace Microsoft.VisualStudio.Web.WindowsAzure.Contracts.Shims
 
         protected ContractShim(object impl)
         {
-            _impl = impl;
+            this._impl = impl;
         }
 
         public static bool CanShim(object impl)
@@ -76,7 +76,7 @@ namespace Microsoft.VisualStudio.Web.WindowsAzure.Contracts.Shims
             }
             try
             {
-                return method.Invoke(_impl, args);
+                return method.Invoke(this._impl, args);
             }
             catch (TargetInvocationException tex)
             {
@@ -114,7 +114,7 @@ namespace Microsoft.VisualStudio.Web.WindowsAzure.Contracts.Shims
             }
             try
             {
-                return prop.GetValue(_impl);
+                return prop.GetValue(this._impl);
             }
             catch (TargetInvocationException tex)
             {

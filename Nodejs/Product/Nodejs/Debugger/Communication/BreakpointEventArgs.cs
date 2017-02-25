@@ -23,7 +23,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
     {
         public BreakpointEventArgs(BreakpointEvent breakpointEvent)
         {
-            BreakpointEvent = breakpointEvent;
+            this.BreakpointEvent = breakpointEvent;
         }
 
         public BreakpointEvent BreakpointEvent { get; private set; }

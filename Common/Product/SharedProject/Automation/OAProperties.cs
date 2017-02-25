@@ -67,7 +67,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// </summary>
         public int Count
         {
-            get { return properties.Count; }
+            get { return this.properties.Count; }
         }
 
         /// <summary>

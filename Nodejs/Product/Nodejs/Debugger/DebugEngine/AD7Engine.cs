@@ -123,7 +123,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         {
             LiveLogger.WriteLine("--------------------------------------------------------------------------------");
             LiveLogger.WriteLine("AD7Engine Created ({0})", GetHashCode());
-            _breakpointManager = new BreakpointManager(this);
+            this._breakpointManager = new BreakpointManager(this);
             Engines.Add(new WeakReference(this));
         }
 
@@ -170,7 +170,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         {
             get
             {
-                return _process;
+                return this._process;
             }
         }
 
@@ -178,7 +178,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         {
             get
             {
-                return _mainThread;
+                return this._mainThread;
             }
         }
 
@@ -186,7 +186,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         {
             get
             {
-                return _breakpointManager;
+                return this._breakpointManager;
             }
         }
 
@@ -198,7 +198,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             DebugWriteCommand("Attach");
 
             AssertMainThread();
-            Debug.Assert(_ad7ProgramId == Guid.Empty);
+            Debug.Assert(this._ad7ProgramId == Guid.Empty);
 
             if (celtPrograms != 1)
             {
@@ -214,42 +214,42 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                 return VSConstants.E_NOTIMPL;
             }
 
-            EngineUtils.RequireOk(rgpPrograms[0].GetProgramId(out _ad7ProgramId));
+            EngineUtils.RequireOk(rgpPrograms[0].GetProgramId(out this._ad7ProgramId));
 
             // Attach can either be called to attach to a new process, or to complete an attach
             // to a launched process
-            if (_process == null)
+            if (this._process == null)
             {
-                _events = ad7Callback;
+                this._events = ad7Callback;
 
                 var program = (NodeRemoteDebugProgram)rgpPrograms[0];
                 var process = program.DebugProcess;
                 var uri = process.DebugPort.Uri;
 
-                _process = new NodeDebugger(uri, process.Id);
+                this._process = new NodeDebugger(uri, process.Id);
 
                 // We only need to do fuzzy comparisons when debugging remotely
                 if (!uri.IsLoopback)
                 {
-                    _process.IsRemote = true;
-                    _process.FileNameMapper = new FuzzyLogicFileNameMapper(EnumerateSolutionFiles());
+                    this._process.IsRemote = true;
+                    this._process.FileNameMapper = new FuzzyLogicFileNameMapper(EnumerateSolutionFiles());
                 }
 
-                AttachEvents(_process);
-                _attached = true;
+                AttachEvents(this._process);
+                this._attached = true;
             }
             else
             {
-                if (processId != _process.Id)
+                if (processId != this._process.Id)
                 {
                     Debug.Fail("Asked to attach to a process while we are debugging");
                     return VSConstants.E_FAIL;
                 }
             }
 
-            lock (_syncLock)
+            lock (this._syncLock)
             {
-                _sdmAttached = true;
+                this._sdmAttached = true;
                 HandleLoadComplete();
             }
 
@@ -260,7 +260,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         private void HandleLoadComplete()
         {
             // Handle load complete once both sdm attached and process loaded
-            if (!_sdmAttached || !_processLoaded)
+            if (!this._sdmAttached || !this._processLoaded)
             {
                 return;
             }
@@ -271,39 +271,39 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
             AD7ProgramCreateEvent.Send(this);
 
-            foreach (var module in _modules.Values)
+            foreach (var module in this._modules.Values)
             {
                 SendModuleLoad(module);
             }
 
-            foreach (var thread in _threads.Values)
+            foreach (var thread in this._threads.Values)
             {
                 SendThreadCreate(thread);
             }
 
-            lock (_syncLock)
+            lock (this._syncLock)
             {
-                if (_processLoaded && _process.IsRunning())
+                if (this._processLoaded && this._process.IsRunning())
                 {
-                    Send(new AD7LoadCompleteRunningEvent(), AD7LoadCompleteRunningEvent.IID, _mainThread);
+                    Send(new AD7LoadCompleteRunningEvent(), AD7LoadCompleteRunningEvent.IID, this._mainThread);
                 }
                 else
                 {
-                    Send(new AD7LoadCompleteEvent(), AD7LoadCompleteEvent.IID, _mainThread);
+                    Send(new AD7LoadCompleteEvent(), AD7LoadCompleteEvent.IID, this._mainThread);
                 }
             }
 
-            _loadComplete = true;
+            this._loadComplete = true;
 
-            if (!String.IsNullOrWhiteSpace(_webBrowserUrl))
+            if (!String.IsNullOrWhiteSpace(this._webBrowserUrl))
             {
-                var uri = new Uri(_webBrowserUrl);
-                lock (_syncLock)
+                var uri = new Uri(this._webBrowserUrl);
+                lock (this._syncLock)
                 {
                     OnPortOpenedHandler.CreateHandler(
                         uri.Port,
-                        shortCircuitPredicate: () => !_processLoaded,
-                        action: LaunchBrowserDebugger
+                        shortCircuitPredicate: () => !this._processLoaded,
+                        action: this.LaunchBrowserDebugger
                     );
                 }
             }
@@ -349,18 +349,18 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
             if (eventObject is AD7ProgramDestroyEvent)
             {
-                var debuggedProcess = _process;
+                var debuggedProcess = this._process;
 
-                _events = null;
-                _process = null;
-                _ad7ProgramId = Guid.Empty;
-                _threads.Clear();
-                _modules.Clear();
+                this._events = null;
+                this._process = null;
+                this._ad7ProgramId = Guid.Empty;
+                this._threads.Clear();
+                this._modules.Clear();
 
-                if (_trackFileChanges)
+                if (this._trackFileChanges)
                 {
-                    _documentEvents.DocumentSaved -= OnDocumentSaved;
-                    _documentEvents = null;
+                    this._documentEvents.DocumentSaved -= this.OnDocumentSaved;
+                    this._documentEvents = null;
                 }
 
                 debuggedProcess.Close();
@@ -378,7 +378,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         int IDebugEngine2.CreatePendingBreakpoint(IDebugBreakpointRequest2 pBpRequest, out IDebugPendingBreakpoint2 ppPendingBp)
         {
             DebugWriteCommand("CreatePendingBreakpoint");
-            Debug.Assert(_breakpointManager != null);
+            Debug.Assert(this._breakpointManager != null);
             ppPendingBp = null;
 
             // Check whether breakpoint request for our language
@@ -399,7 +399,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                 }
             }
 
-            _breakpointManager.CreatePendingBreakpoint(pBpRequest, out ppPendingBp);
+            this._breakpointManager.CreatePendingBreakpoint(pBpRequest, out ppPendingBp);
             return VSConstants.S_OK;
         }
 
@@ -476,7 +476,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             DebugWriteCommand("RemoveAllSetExceptions");
             if (guidType == DebugEngineGuid || guidType == Guid.Empty)
             {
-                _process.ClearExceptionTreatment();
+                this._process.ClearExceptionTreatment();
             }
             return VSConstants.S_OK;
         }
@@ -484,14 +484,14 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         int IDebugEngine2.RemoveSetException(EXCEPTION_INFO[] pException)
         {
             DebugWriteCommand("RemoveSetException");
-            UpdateExceptionTreatment(pException, _process.ClearExceptionTreatment);
+            UpdateExceptionTreatment(pException, this._process.ClearExceptionTreatment);
             return VSConstants.S_OK;
         }
 
         int IDebugEngine2.SetException(EXCEPTION_INFO[] pException)
         {
             DebugWriteCommand("SetException");
-            UpdateExceptionTreatment(pException, _process.SetExceptionTreatment);
+            UpdateExceptionTreatment(pException, this._process.SetExceptionTreatment);
             return VSConstants.S_OK;
         }
 
@@ -530,11 +530,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             DebugWriteCommand("CanTerminateProcess");
             AssertMainThread();
 
-            Debug.Assert(_events != null);
-            Debug.Assert(_process != null);
+            Debug.Assert(this._events != null);
+            Debug.Assert(this._process != null);
 
             int processId = EngineUtils.GetProcessId(process);
-            if (processId == _process.Id)
+            if (processId == this._process.Id)
             {
                 return VSConstants.S_OK;
             }
@@ -553,11 +553,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             LiveLogger.WriteLine("AD7Engine LaunchSuspended Called with flags '{0}' ({1})", launchFlags, GetHashCode());
             AssertMainThread();
 
-            Debug.Assert(_events == null);
-            Debug.Assert(_process == null);
-            Debug.Assert(_ad7ProgramId == Guid.Empty);
+            Debug.Assert(this._events == null);
+            Debug.Assert(this._process == null);
+            Debug.Assert(this._ad7ProgramId == Guid.Empty);
 
-            _events = ad7Callback;
+            this._events = ad7Callback;
 
             var debugOptions = NodeDebugOptions.None;
             List<string[]> dirMapping = null;
@@ -612,7 +612,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                                 interpreterOptions = setting[1];
                                 break;
                             case WebBrowserUrl:
-                                _webBrowserUrl = setting[1];
+                                this._webBrowserUrl = setting[1];
                                 break;
                             case DebuggerPort:
                                 ushort dbgPortTmp;
@@ -626,7 +626,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                 }
             }
 
-            _process =
+            this._process =
                 new NodeDebugger(
                     exe,
                     args,
@@ -638,18 +638,18 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                 );
 
             LiveLogger.WriteLine("AD7Engine starting NodeDebugger");
-            _process.Start(false);
+            this._process.Start(false);
 
-            AttachEvents(_process);
+            AttachEvents(this._process);
 
             var adProcessId = new AD_PROCESS_ID();
             adProcessId.ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM;
-            adProcessId.dwProcessId = (uint)_process.Id;
+            adProcessId.dwProcessId = (uint)this._process.Id;
 
             EngineUtils.RequireOk(port.GetProcess(adProcessId, out process));
             LiveLogger.WriteLine("AD7Engine LaunchSuspended returning S_OK");
             Debug.Assert(process != null);
-            Debug.Assert(!_process.HasExited);
+            Debug.Assert(!this._process.HasExited);
 
             return VSConstants.S_OK;
         }
@@ -687,21 +687,21 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             DebugWriteCommand("ResumeProcess");
             AssertMainThread();
 
-            if (_events == null)
+            if (this._events == null)
             {
                 // process failed to start
                 LiveLogger.WriteLine("ResumeProcess fails, no events");
                 return VSConstants.E_FAIL;
             }
 
-            Debug.Assert(_events != null);
-            Debug.Assert(_process != null);
-            Debug.Assert(_process != null);
-            Debug.Assert(_ad7ProgramId == Guid.Empty);
+            Debug.Assert(this._events != null);
+            Debug.Assert(this._process != null);
+            Debug.Assert(this._process != null);
+            Debug.Assert(this._ad7ProgramId == Guid.Empty);
 
             int processId = EngineUtils.GetProcessId(process);
 
-            if (processId != _process.Id)
+            if (processId != this._process.Id)
             {
                 LiveLogger.WriteLine("ResumeProcess fails, wrong process");
                 return VSConstants.S_FALSE;
@@ -717,9 +717,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             IDebugPortNotify2 portNotify;
             EngineUtils.RequireOk(defaultPort.GetPortNotify(out portNotify));
 
-            EngineUtils.RequireOk(portNotify.AddProgramNode(new AD7ProgramNode(_process.Id)));
+            EngineUtils.RequireOk(portNotify.AddProgramNode(new AD7ProgramNode(this._process.Id)));
 
-            if (_ad7ProgramId == Guid.Empty)
+            if (this._ad7ProgramId == Guid.Empty)
             {
                 LiveLogger.WriteLine("ResumeProcess fails, empty program guid");
                 Debug.Fail("Unexpected problem -- IDebugEngine2.Attach wasn't called");
@@ -737,16 +737,16 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             DebugWriteCommand("TerminateProcess");
             AssertMainThread();
 
-            Debug.Assert(_events != null);
-            Debug.Assert(_process != null);
+            Debug.Assert(this._events != null);
+            Debug.Assert(this._process != null);
 
             int processId = EngineUtils.GetProcessId(process);
-            if (processId != _process.Id)
+            if (processId != this._process.Id)
             {
                 return VSConstants.S_FALSE;
             }
 
-            _process.Terminate();
+            this._process.Terminate();
 
             return VSConstants.S_OK;
         }
@@ -769,7 +769,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             DebugWriteCommand("CauseBreak");
             AssertMainThread();
 
-            _process.BreakAllAsync().Wait();
+            this._process.BreakAllAsync().Wait();
 
             return VSConstants.S_OK;
         }
@@ -797,17 +797,17 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             DebugWriteCommand("Detach");
             AssertMainThread();
 
-            _breakpointManager.ClearBreakpointBindingResults();
+            this._breakpointManager.ClearBreakpointBindingResults();
 
-            _process.Detach();
+            this._process.Detach();
 
             // Before unregistering event handlers, make sure that we have received thread exit and process exit events,
             // since we need to report these as AD7 events to VS to gracefully terminate the debugging session.
-            _threadExitedEvent.WaitOne(3000);
-            _processExitedEvent.WaitOne(3000);
+            this._threadExitedEvent.WaitOne(3000);
+            this._processExitedEvent.WaitOne(3000);
 
-            DetachEvents(_process);
-            _ad7ProgramId = Guid.Empty;
+            DetachEvents(this._process);
+            this._ad7ProgramId = Guid.Empty;
 
             return VSConstants.S_OK;
         }
@@ -844,9 +844,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             DebugWriteCommand("EnumModules");
             AssertMainThread();
 
-            var moduleObjects = new AD7Module[_modules.Count];
+            var moduleObjects = new AD7Module[this._modules.Count];
             int i = 0;
-            foreach (var keyValue in _modules)
+            foreach (var keyValue in this._modules)
             {
                 var adModule = keyValue.Value;
                 moduleObjects[i++] = adModule;
@@ -863,9 +863,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             DebugWriteCommand("EnumThreads");
             AssertMainThread();
 
-            var threadObjects = new AD7Thread[_threads.Count];
+            var threadObjects = new AD7Thread[this._threads.Count];
             int i = 0;
-            foreach (var keyValue in _threads)
+            foreach (var keyValue in this._threads)
             {
                 var adThread = keyValue.Value;
 
@@ -937,7 +937,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         public int GetProgramId(out Guid guidProgramId)
         {
             DebugWriteCommand("GetProgramId");
-            guidProgramId = _ad7ProgramId;
+            guidProgramId = this._ad7ProgramId;
             return guidProgramId == Guid.Empty ? VSConstants.E_FAIL : VSConstants.S_OK;
         }
 
@@ -994,7 +994,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             var thread = (AD7Thread)pThread;
             thread.GetDebuggedThread().ClearSteppingState();
 
-            _process.Resume();
+            this._process.Resume();
 
             return VSConstants.S_OK;
         }
@@ -1062,7 +1062,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             LiveLogger.WriteLine("AD7Engine Event: {0} ({1})", eventObject.GetType(), iidEvent);
 
             // Check that events was not disposed
-            var events = _events;
+            var events = this._events;
             if (events == null)
             {
                 return;
@@ -1107,22 +1107,22 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         {
             LiveLogger.WriteLine("AD7Engine attaching events to NodeDebugger");
 
-            process.ProcessLoaded += OnProcessLoaded;
-            process.ModuleLoaded += OnModuleLoaded;
-            process.ThreadCreated += OnThreadCreated;
+            process.ProcessLoaded += this.OnProcessLoaded;
+            process.ModuleLoaded += this.OnModuleLoaded;
+            process.ThreadCreated += this.OnThreadCreated;
 
-            process.BreakpointBound += OnBreakpointBound;
-            process.BreakpointUnbound += OnBreakpointUnbound;
-            process.BreakpointBindFailure += OnBreakpointBindFailure;
+            process.BreakpointBound += this.OnBreakpointBound;
+            process.BreakpointUnbound += this.OnBreakpointUnbound;
+            process.BreakpointBindFailure += this.OnBreakpointBindFailure;
 
-            process.BreakpointHit += OnBreakpointHit;
-            process.AsyncBreakComplete += OnAsyncBreakComplete;
-            process.ExceptionRaised += OnExceptionRaised;
-            process.ProcessExited += OnProcessExited;
-            process.EntryPointHit += OnEntryPointHit;
-            process.StepComplete += OnStepComplete;
-            process.ThreadExited += OnThreadExited;
-            process.DebuggerOutput += OnDebuggerOutput;
+            process.BreakpointHit += this.OnBreakpointHit;
+            process.AsyncBreakComplete += this.OnAsyncBreakComplete;
+            process.ExceptionRaised += this.OnExceptionRaised;
+            process.ProcessExited += this.OnProcessExited;
+            process.EntryPointHit += this.OnEntryPointHit;
+            process.StepComplete += this.OnStepComplete;
+            process.ThreadExited += this.OnThreadExited;
+            process.DebuggerOutput += this.OnDebuggerOutput;
 
             // Subscribe to document changes if Edit and Continue is enabled.
             var shell = (IVsShell)Package.GetGlobalService(typeof(SVsShell));
@@ -1137,12 +1137,12 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                 var nodejsPackage = package as NodejsPackage;
                 if (nodejsPackage != null)
                 {
-                    _trackFileChanges = nodejsPackage.GeneralOptionsPage.EditAndContinue;
+                    this._trackFileChanges = nodejsPackage.GeneralOptionsPage.EditAndContinue;
 
-                    if (_trackFileChanges)
+                    if (this._trackFileChanges)
                     {
-                        _documentEvents = nodejsPackage.DTE.Events.DocumentEvents;
-                        _documentEvents.DocumentSaved += OnDocumentSaved;
+                        this._documentEvents = nodejsPackage.DTE.Events.DocumentEvents;
+                        this._documentEvents.DocumentSaved += this.OnDocumentSaved;
                     }
                 }
             }
@@ -1152,26 +1152,26 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         private void DetachEvents(NodeDebugger process)
         {
-            process.ProcessLoaded -= OnProcessLoaded;
-            process.ModuleLoaded -= OnModuleLoaded;
-            process.ThreadCreated -= OnThreadCreated;
+            process.ProcessLoaded -= this.OnProcessLoaded;
+            process.ModuleLoaded -= this.OnModuleLoaded;
+            process.ThreadCreated -= this.OnThreadCreated;
 
-            process.BreakpointBound -= OnBreakpointBound;
-            process.BreakpointUnbound -= OnBreakpointUnbound;
-            process.BreakpointBindFailure -= OnBreakpointBindFailure;
+            process.BreakpointBound -= this.OnBreakpointBound;
+            process.BreakpointUnbound -= this.OnBreakpointUnbound;
+            process.BreakpointBindFailure -= this.OnBreakpointBindFailure;
 
-            process.BreakpointHit -= OnBreakpointHit;
-            process.AsyncBreakComplete -= OnAsyncBreakComplete;
-            process.ExceptionRaised -= OnExceptionRaised;
-            process.ProcessExited -= OnProcessExited;
-            process.EntryPointHit -= OnEntryPointHit;
-            process.StepComplete -= OnStepComplete;
-            process.ThreadExited -= OnThreadExited;
-            process.DebuggerOutput -= OnDebuggerOutput;
+            process.BreakpointHit -= this.OnBreakpointHit;
+            process.AsyncBreakComplete -= this.OnAsyncBreakComplete;
+            process.ExceptionRaised -= this.OnExceptionRaised;
+            process.ProcessExited -= this.OnProcessExited;
+            process.EntryPointHit -= this.OnEntryPointHit;
+            process.StepComplete -= this.OnStepComplete;
+            process.ThreadExited -= this.OnThreadExited;
+            process.DebuggerOutput -= this.OnDebuggerOutput;
 
-            if (_documentEvents != null)
+            if (this._documentEvents != null)
             {
-                _documentEvents.DocumentSaved -= OnDocumentSaved;
+                this._documentEvents.DocumentSaved -= this.OnDocumentSaved;
             }
         }
 
@@ -1179,10 +1179,10 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         {
             // TODO: Thread exit code
             AD7Thread oldThread;
-            _threads.TryGetValue(e.Thread, out oldThread);
-            _threads.Remove(e.Thread);
+            this._threads.TryGetValue(e.Thread, out oldThread);
+            this._threads.Remove(e.Thread);
 
-            _threadExitedEvent.Set();
+            this._threadExitedEvent.Set();
 
             if (oldThread != null)
             {
@@ -1194,20 +1194,20 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         {
             LiveLogger.WriteLine("Thread created: " + e.Thread.Id);
 
-            lock (_syncLock)
+            lock (this._syncLock)
             {
                 var newThread = new AD7Thread(this, e.Thread);
 
                 // Treat first thread created as main thread
                 // Should only be one for Node
-                Debug.Assert(_mainThread == null);
-                if (_mainThread == null)
+                Debug.Assert(this._mainThread == null);
+                if (this._mainThread == null)
                 {
-                    _mainThread = newThread;
+                    this._mainThread = newThread;
                 }
 
-                _threads.Add(e.Thread, newThread);
-                if (_loadComplete)
+                this._threads.Add(e.Thread, newThread);
+                if (this._loadComplete)
                 {
                     SendThreadCreate(newThread);
                 }
@@ -1234,7 +1234,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         private void OnEntryPointHit(object sender, ThreadEventArgs e)
         {
-            Send(new AD7EntryPointEvent(), AD7EntryPointEvent.IID, _threads[e.Thread]);
+            Send(new AD7EntryPointEvent(), AD7EntryPointEvent.IID, this._threads[e.Thread]);
         }
 
         private void LaunchBrowserDebugger()
@@ -1246,7 +1246,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             var info = new VsDebugTargetInfo2();
             var infoSize = Marshal.SizeOf(info);
             info.cbSize = (uint)infoSize;
-            info.bstrExe = _webBrowserUrl;
+            info.bstrExe = this._webBrowserUrl;
             info.dlo = (uint)_DEBUG_LAUNCH_OPERATION3.DLO_LaunchBrowser;
             var defaultBrowsers = GetDefaultBrowsers();
             if (defaultBrowsers.Count != 1 || defaultBrowsers[0].DisplayName != "Internet Explorer")
@@ -1279,14 +1279,14 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         private void OnStepComplete(object sender, ThreadEventArgs e)
         {
-            Send(new AD7SteppingCompleteEvent(), AD7SteppingCompleteEvent.IID, _threads[e.Thread]);
+            Send(new AD7SteppingCompleteEvent(), AD7SteppingCompleteEvent.IID, this._threads[e.Thread]);
         }
 
         private void OnProcessLoaded(object sender, ThreadEventArgs e)
         {
-            lock (_syncLock)
+            lock (this._syncLock)
             {
-                _processLoaded = true;
+                this._processLoaded = true;
                 HandleLoadComplete();
             }
         }
@@ -1295,10 +1295,10 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         {
             try
             {
-                _processExitedEvent.Set();
-                lock (_syncLock)
+                this._processExitedEvent.Set();
+                lock (this._syncLock)
                 {
-                    _processLoaded = false;
+                    this._processLoaded = false;
                     Send(new AD7ProgramDestroyEvent((uint)e.ExitCode), AD7ProgramDestroyEvent.IID, null);
                 }
             }
@@ -1310,10 +1310,10 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         private void OnModuleLoaded(object sender, ModuleLoadedEventArgs e)
         {
-            lock (_syncLock)
+            lock (this._syncLock)
             {
-                var adModule = _modules[e.Module] = new AD7Module(e.Module);
-                if (_loadComplete)
+                var adModule = this._modules[e.Module] = new AD7Module(e.Module);
+                if (this._loadComplete)
                 {
                     SendModuleLoad(adModule);
                 }
@@ -1324,7 +1324,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         {
             // Exception events are sent when an exception occurs in the debuggee that the debugger was not expecting.
             AD7Thread thread;
-            if (_threads.TryGetValue(e.Thread, out thread))
+            if (this._threads.TryGetValue(e.Thread, out thread))
             {
                 Send(
                     new AD7DebugExceptionEvent(e.Exception.TypeName, e.Exception.Description, e.IsUnhandled, this),
@@ -1336,19 +1336,19 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         private void OnBreakpointHit(object sender, BreakpointHitEventArgs e)
         {
-            var boundBreakpoint = _breakpointManager.GetBoundBreakpoint(e.BreakpointBinding);
-            Send(new AD7BreakpointEvent(new AD7BoundBreakpointsEnum(new[] { boundBreakpoint })), AD7BreakpointEvent.IID, _threads[e.Thread]);
+            var boundBreakpoint = this._breakpointManager.GetBoundBreakpoint(e.BreakpointBinding);
+            Send(new AD7BreakpointEvent(new AD7BoundBreakpointsEnum(new[] { boundBreakpoint })), AD7BreakpointEvent.IID, this._threads[e.Thread]);
         }
 
         private void OnBreakpointBound(object sender, BreakpointBindingEventArgs e)
         {
-            var pendingBreakpoint = _breakpointManager.GetPendingBreakpoint(e.Breakpoint);
+            var pendingBreakpoint = this._breakpointManager.GetPendingBreakpoint(e.Breakpoint);
             var breakpointBinding = e.BreakpointBinding;
             var codeContext = new AD7MemoryAddress(this, pendingBreakpoint.DocumentName, breakpointBinding.Target.Line, breakpointBinding.Target.Column);
             var documentContext = new AD7DocumentContext(codeContext);
             var breakpointResolution = new AD7BreakpointResolution(this, breakpointBinding, documentContext);
             var boundBreakpoint = new AD7BoundBreakpoint(breakpointBinding, pendingBreakpoint, breakpointResolution, breakpointBinding.Enabled);
-            _breakpointManager.AddBoundBreakpoint(breakpointBinding, boundBreakpoint);
+            this._breakpointManager.AddBoundBreakpoint(breakpointBinding, boundBreakpoint);
             Send(
                 new AD7BreakpointBoundEvent(pendingBreakpoint, boundBreakpoint),
                 AD7BreakpointBoundEvent.IID,
@@ -1359,10 +1359,10 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         private void OnBreakpointUnbound(object sender, BreakpointBindingEventArgs e)
         {
             var breakpointBinding = e.BreakpointBinding;
-            var boundBreakpoint = _breakpointManager.GetBoundBreakpoint(breakpointBinding);
+            var boundBreakpoint = this._breakpointManager.GetBoundBreakpoint(breakpointBinding);
             if (boundBreakpoint != null)
             {
-                _breakpointManager.RemoveBoundBreakpoint(breakpointBinding);
+                this._breakpointManager.RemoveBoundBreakpoint(breakpointBinding);
                 Send(
                     new AD7BreakpointUnboundEvent(boundBreakpoint),
                     AD7BreakpointUnboundEvent.IID,
@@ -1373,7 +1373,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         private void OnBreakpointBindFailure(object sender, BreakpointBindingEventArgs e)
         {
-            var pendingBreakpoint = _breakpointManager.GetPendingBreakpoint(e.Breakpoint);
+            var pendingBreakpoint = this._breakpointManager.GetPendingBreakpoint(e.Breakpoint);
             var breakpointErrorEvent = new AD7BreakpointErrorEvent(pendingBreakpoint, this);
             pendingBreakpoint.AddBreakpointError(breakpointErrorEvent);
             Send(breakpointErrorEvent, AD7BreakpointErrorEvent.IID, null);
@@ -1382,9 +1382,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         private void OnAsyncBreakComplete(object sender, ThreadEventArgs e)
         {
             AD7Thread thread;
-            if (!_threads.TryGetValue(e.Thread, out thread))
+            if (!this._threads.TryGetValue(e.Thread, out thread))
             {
-                _threads[e.Thread] = thread = new AD7Thread(this, e.Thread);
+                this._threads[e.Thread] = thread = new AD7Thread(this, e.Thread);
             }
             Send(new AD7AsyncBreakCompleteEvent(), AD7AsyncBreakCompleteEvent.IID, thread);
         }
@@ -1392,9 +1392,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         private void OnDebuggerOutput(object sender, OutputEventArgs e)
         {
             AD7Thread thread = null;
-            if (e.Thread != null && !_threads.TryGetValue(e.Thread, out thread))
+            if (e.Thread != null && !this._threads.TryGetValue(e.Thread, out thread))
             {
-                _threads[e.Thread] = thread = new AD7Thread(this, e.Thread);
+                this._threads[e.Thread] = thread = new AD7Thread(this, e.Thread);
             }
 
             // thread can be null for an output string event because it is not
@@ -1404,7 +1404,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         private void OnDocumentSaved(Document document)
         {
-            var module = Process.GetModuleForFilePath(document.FullName);
+            var module = this.Process.GetModuleForFilePath(document.FullName);
             if (module == null)
             {
                 return;
@@ -1423,7 +1423,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
             DebuggerClient.RunWithRequestExceptionsHandled(async () =>
             {
-                var currentProcess = Process;
+                var currentProcess = this.Process;
                 if (currentProcess == null || !await currentProcess.UpdateModuleSourceAsync(module).ConfigureAwait(false))
                 {
                     var statusBar = (IVsStatusbar)ServiceProvider.GlobalProvider.GetService(typeof(SVsStatusbar));

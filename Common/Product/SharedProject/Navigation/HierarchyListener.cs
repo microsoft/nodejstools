@@ -29,21 +29,21 @@ namespace Microsoft.VisualStudioTools.Navigation
 
         public HierarchyEventArgs(uint itemId, string canonicalName)
         {
-            _itemId = itemId;
-            _fileName = canonicalName;
+            this._itemId = itemId;
+            this._fileName = canonicalName;
         }
         public string CanonicalName
         {
-            get { return _fileName; }
+            get { return this._fileName; }
         }
         public uint ItemID
         {
-            get { return _itemId; }
+            get { return this._itemId; }
         }
         public IVsTextLines TextBuffer
         {
-            get { return _buffer; }
-            set { _buffer = value; }
+            get { return this._buffer; }
+            set { this._buffer = value; }
         }
     }
 
@@ -60,28 +60,28 @@ namespace Microsoft.VisualStudioTools.Navigation
                 Utilities.ArgumentNotNull("hierarchy", hierarchy);
                 Utilities.ArgumentNotNull("manager", manager);
 
-                _hierarchy = hierarchy;
-                _manager = manager;
+                this._hierarchy = hierarchy;
+                this._manager = manager;
             }
 
             protected IVsHierarchy Hierarchy
             {
-                get { return _hierarchy; }
+                get { return this._hierarchy; }
             }
 
             #region Public Methods
             public bool IsListening
             {
-                get { return (0 != _cookie); }
+                get { return (0 != this._cookie); }
             }
             public void StartListening(bool doInitialScan)
             {
-                if (0 != _cookie)
+                if (0 != this._cookie)
                 {
                     return;
                 }
                 ErrorHandler.ThrowOnFailure(
-                    _hierarchy.AdviseHierarchyEvents(this, out _cookie));
+                    this._hierarchy.AdviseHierarchyEvents(this, out this._cookie));
                 if (doInitialScan)
                 {
                     InternalScanHierarchy(VSConstants.VSITEMID_ROOT);
@@ -98,8 +98,8 @@ namespace Microsoft.VisualStudioTools.Navigation
             public void Dispose()
             {
                 InternalStopListening(false);
-                _cookie = 0;
-                _hierarchy = null;
+                this._cookie = 0;
+                this._hierarchy = null;
             }
 
             #endregion
@@ -128,7 +128,7 @@ namespace Microsoft.VisualStudioTools.Navigation
 
                 // This item is a my language file, so we can notify that it is added to the hierarchy.
                 HierarchyEventArgs args = new HierarchyEventArgs(itemidAdded, name);
-                _manager.OnNewFile(_hierarchy, args);
+                this._manager.OnNewFile(this._hierarchy, args);
                 return VSConstants.S_OK;
             }
 
@@ -141,7 +141,7 @@ namespace Microsoft.VisualStudioTools.Navigation
                     return VSConstants.S_OK;
                 }
                 HierarchyEventArgs args = new HierarchyEventArgs(itemid, name);
-                _manager.OnDeleteFile(_hierarchy, args);
+                this._manager.OnDeleteFile(this._hierarchy, args);
                 return VSConstants.S_OK;
             }
 
@@ -153,7 +153,7 @@ namespace Microsoft.VisualStudioTools.Navigation
 
             public int OnPropertyChanged(uint itemid, int propid, uint flags)
             {
-                if ((null == _hierarchy) || (0 == _cookie))
+                if ((null == this._hierarchy) || (0 == this._cookie))
                 {
                     return VSConstants.S_OK;
                 }
@@ -164,7 +164,7 @@ namespace Microsoft.VisualStudioTools.Navigation
                 }
                 if (propid == (int)__VSHPROPID.VSHPROPID_IsNonMemberItem)
                 {
-                    _manager.IsNonMemberItemChanged(_hierarchy, new HierarchyEventArgs(itemid, name));
+                    this._manager.IsNonMemberItemChanged(this._hierarchy, new HierarchyEventArgs(itemid, name));
                 }
                 return VSConstants.S_OK;
             }
@@ -172,16 +172,16 @@ namespace Microsoft.VisualStudioTools.Navigation
 
             private bool InternalStopListening(bool throwOnError)
             {
-                if ((null == _hierarchy) || (0 == _cookie))
+                if ((null == this._hierarchy) || (0 == this._cookie))
                 {
                     return false;
                 }
-                int hr = _hierarchy.UnadviseHierarchyEvents(_cookie);
+                int hr = this._hierarchy.UnadviseHierarchyEvents(this._cookie);
                 if (throwOnError)
                 {
                     ErrorHandler.ThrowOnFailure(hr);
                 }
-                _cookie = 0;
+                this._cookie = 0;
                 return ErrorHandler.Succeeded(hr);
             }
 
@@ -199,7 +199,7 @@ namespace Microsoft.VisualStudioTools.Navigation
                     if (IsAnalyzableSource(currentItem, out itemName))
                     {
                         HierarchyEventArgs args = new HierarchyEventArgs(currentItem, itemName);
-                        _manager.OnNewFile(_hierarchy, args);
+                        this._manager.OnNewFile(this._hierarchy, args);
                     }
 
                     // NOTE: At the moment we skip the nested hierarchies, so here  we look for the 
@@ -208,7 +208,7 @@ namespace Microsoft.VisualStudioTools.Navigation
                     // side effects to avoid unexpected behavior.
                     object propertyValue;
                     bool canScanSubitems = true;
-                    int hr = _hierarchy.GetProperty(currentItem, (int)__VSHPROPID.VSHPROPID_HasEnumerationSideEffects, out propertyValue);
+                    int hr = this._hierarchy.GetProperty(currentItem, (int)__VSHPROPID.VSHPROPID_HasEnumerationSideEffects, out propertyValue);
                     if ((VSConstants.S_OK == hr) && (propertyValue is bool))
                     {
                         canScanSubitems = !(bool)propertyValue;
@@ -217,7 +217,7 @@ namespace Microsoft.VisualStudioTools.Navigation
                     if (canScanSubitems)
                     {
                         object child;
-                        hr = _hierarchy.GetProperty(currentItem, (int)__VSHPROPID.VSHPROPID_FirstChild, out child);
+                        hr = this._hierarchy.GetProperty(currentItem, (int)__VSHPROPID.VSHPROPID_FirstChild, out child);
                         if (VSConstants.S_OK == hr)
                         {
                             // There is a sub-item, call this same function on it.
@@ -227,7 +227,7 @@ namespace Microsoft.VisualStudioTools.Navigation
 
                     // Move the current item to its first visible sibling.
                     object sibling;
-                    hr = _hierarchy.GetProperty(currentItem, (int)__VSHPROPID.VSHPROPID_NextSibling, out sibling);
+                    hr = this._hierarchy.GetProperty(currentItem, (int)__VSHPROPID.VSHPROPID_NextSibling, out sibling);
                     if (VSConstants.S_OK != hr)
                     {
                         currentItem = VSConstants.VSITEMID_NIL;
@@ -247,7 +247,7 @@ namespace Microsoft.VisualStudioTools.Navigation
                 int hr;
                 try
                 {
-                    hr = Hierarchy.GetGuidProperty(itemId, (int)__VSHPROPID.VSHPROPID_TypeGuid, out typeGuid);
+                    hr = this.Hierarchy.GetGuidProperty(itemId, (int)__VSHPROPID.VSHPROPID_TypeGuid, out typeGuid);
                 }
                 catch (System.Runtime.InteropServices.COMException)
                 {
@@ -261,13 +261,13 @@ namespace Microsoft.VisualStudioTools.Navigation
                 }
 
                 // This item is a file; find if current language can recognize it.
-                hr = Hierarchy.GetCanonicalName(itemId, out canonicalName);
+                hr = this.Hierarchy.GetCanonicalName(itemId, out canonicalName);
                 if (ErrorHandler.Failed(hr))
                 {
                     return false;
                 }
                 return (System.IO.Path.GetExtension(canonicalName).Equals(".xaml", StringComparison.OrdinalIgnoreCase)) ||
-                    _manager._package.IsRecognizedFile(canonicalName);
+                    this._manager._package.IsRecognizedFile(canonicalName);
             }
 
             /// <summary>

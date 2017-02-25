@@ -39,28 +39,28 @@ namespace Microsoft.VisualStudioTools
 
         public IdleManager(IServiceProvider serviceProvider)
         {
-            _serviceProvider = serviceProvider;
+            this._serviceProvider = serviceProvider;
         }
 
         private void EnsureInit()
         {
-            if (_compId == VSConstants.VSCOOKIE_NIL)
+            if (this._compId == VSConstants.VSCOOKIE_NIL)
             {
                 lock (this)
                 {
-                    if (_compId == VSConstants.VSCOOKIE_NIL)
+                    if (this._compId == VSConstants.VSCOOKIE_NIL)
                     {
-                        if (_compMgr == null)
+                        if (this._compMgr == null)
                         {
-                            _compMgr = (IOleComponentManager)_serviceProvider.GetService(typeof(SOleComponentManager));
+                            this._compMgr = (IOleComponentManager)this._serviceProvider.GetService(typeof(SOleComponentManager));
                             OLECRINFO[] crInfo = new OLECRINFO[1];
                             crInfo[0].cbSize = (uint)Marshal.SizeOf(typeof(OLECRINFO));
                             crInfo[0].grfcrf = (uint)_OLECRF.olecrfNeedIdleTime;
                             crInfo[0].grfcadvf = (uint)0;
                             crInfo[0].uIdleTimeInterval = 0;
-                            if (ErrorHandler.Failed(_compMgr.FRegisterComponent(this, crInfo, out _compId)))
+                            if (ErrorHandler.Failed(this._compMgr.FRegisterComponent(this, crInfo, out this._compId)))
                             {
-                                _compId = VSConstants.VSCOOKIE_NIL;
+                                this._compId = VSConstants.VSCOOKIE_NIL;
                             }
                         }
                     }
@@ -77,10 +77,10 @@ namespace Microsoft.VisualStudioTools
 
         public int FDoIdle(uint grfidlef)
         {
-            var onIdle = _onIdle;
+            var onIdle = this._onIdle;
             if (onIdle != null)
             {
-                onIdle(this, new ComponentManagerEventArgs(_compMgr));
+                onIdle(this, new ComponentManagerEventArgs(this._compMgr));
             }
 
             return 0;
@@ -91,12 +91,12 @@ namespace Microsoft.VisualStudioTools
             add
             {
                 EnsureInit();
-                _onIdle += value;
+                this._onIdle += value;
             }
             remove
             {
                 EnsureInit();
-                _onIdle -= value;
+                this._onIdle -= value;
             }
         }
 
@@ -144,10 +144,10 @@ namespace Microsoft.VisualStudioTools
 
         public void Dispose()
         {
-            if (_compId != VSConstants.VSCOOKIE_NIL)
+            if (this._compId != VSConstants.VSCOOKIE_NIL)
             {
-                _compMgr.FRevokeComponent(_compId);
-                _compId = VSConstants.VSCOOKIE_NIL;
+                this._compMgr.FRevokeComponent(this._compId);
+                this._compId = VSConstants.VSCOOKIE_NIL;
             }
         }
     }

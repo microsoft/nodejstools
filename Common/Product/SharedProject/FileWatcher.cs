@@ -35,21 +35,21 @@ namespace Microsoft.VisualStudioTools
 
         public FileWatcher(string path = "", string filter = "*.*")
         {
-            _fsw = new FileSystemWatcher(path, filter);
+            this._fsw = new FileSystemWatcher(path, filter);
         }
 
         public bool IsDisposing { get; private set; }
 
         public bool EnableRaisingEvents
         {
-            get { return !IsDisposing ? _fsw.EnableRaisingEvents : false; }
-            set { if (!IsDisposing) { _fsw.EnableRaisingEvents = value; } }
+            get { return !this.IsDisposing ? this._fsw.EnableRaisingEvents : false; }
+            set { if (!this.IsDisposing) { this._fsw.EnableRaisingEvents = value; } }
         }
 
         public bool IncludeSubdirectories
         {
-            get { return !IsDisposing ? _fsw.IncludeSubdirectories : false; }
-            set { if (!IsDisposing) { _fsw.IncludeSubdirectories = value; } }
+            get { return !this.IsDisposing ? this._fsw.IncludeSubdirectories : false; }
+            set { if (!this.IsDisposing) { this._fsw.IncludeSubdirectories = value; } }
         }
 
         /// <summary>
@@ -57,25 +57,25 @@ namespace Microsoft.VisualStudioTools
         /// </summary>
         public int InternalBufferSize
         {
-            get { return !IsDisposing ? _fsw.InternalBufferSize : 0; }
-            set { if (!IsDisposing) { _fsw.InternalBufferSize = value; } }
+            get { return !this.IsDisposing ? this._fsw.InternalBufferSize : 0; }
+            set { if (!this.IsDisposing) { this._fsw.InternalBufferSize = value; } }
         }
 
         public NotifyFilters NotifyFilter
         {
-            get { return !IsDisposing ? _fsw.NotifyFilter : new NotifyFilters(); }
-            set { if (!IsDisposing) { _fsw.NotifyFilter = value; } }
+            get { return !this.IsDisposing ? this._fsw.NotifyFilter : new NotifyFilters(); }
+            set { if (!this.IsDisposing) { this._fsw.NotifyFilter = value; } }
         }
 
         public event FileSystemEventHandler Changed
         {
             add
             {
-                _fsw.Changed += value;
+                this._fsw.Changed += value;
             }
             remove
             {
-                _fsw.Changed -= value;
+                this._fsw.Changed -= value;
             }
         }
 
@@ -83,11 +83,11 @@ namespace Microsoft.VisualStudioTools
         {
             add
             {
-                _fsw.Created += value;
+                this._fsw.Created += value;
             }
             remove
             {
-                _fsw.Created -= value;
+                this._fsw.Created -= value;
             }
         }
 
@@ -95,11 +95,11 @@ namespace Microsoft.VisualStudioTools
         {
             add
             {
-                _fsw.Deleted += value;
+                this._fsw.Deleted += value;
             }
             remove
             {
-                _fsw.Deleted -= value;
+                this._fsw.Deleted -= value;
             }
         }
 
@@ -107,11 +107,11 @@ namespace Microsoft.VisualStudioTools
         {
             add
             {
-                _fsw.Error += value;
+                this._fsw.Error += value;
             }
             remove
             {
-                _fsw.Error -= value;
+                this._fsw.Error -= value;
             }
         }
 
@@ -119,11 +119,11 @@ namespace Microsoft.VisualStudioTools
         {
             add
             {
-                _fsw.Renamed += value;
+                this._fsw.Renamed += value;
             }
             remove
             {
-                _fsw.Renamed -= value;
+                this._fsw.Renamed -= value;
             }
         }
 
@@ -131,12 +131,12 @@ namespace Microsoft.VisualStudioTools
             Justification = "Will be disposed on a separate thread to avoid deadlocks")]
         public void Dispose()
         {
-            if (!IsDisposing)
+            if (!this.IsDisposing)
             {
-                IsDisposing = true;
+                this.IsDisposing = true;
 
                 // Call the _fsw dispose method from the background so it doesn't block anything else.
-                var backgroundDispose = new Thread(BackgroundDispose);
+                var backgroundDispose = new Thread(this.BackgroundDispose);
                 backgroundDispose.IsBackground = true;
                 backgroundDispose.Start();
             }
@@ -146,7 +146,7 @@ namespace Microsoft.VisualStudioTools
         {
             try
             {
-                _fsw.Dispose();
+                this._fsw.Dispose();
             }
             catch (Exception) { }
         }

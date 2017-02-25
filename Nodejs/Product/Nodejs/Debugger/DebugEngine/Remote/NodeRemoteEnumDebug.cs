@@ -26,24 +26,24 @@ namespace Microsoft.NodejsTools.Debugger.Remote
 
         public NodeRemoteEnumDebug(T elem = null)
         {
-            _elem = elem;
+            this._elem = elem;
             Reset();
         }
 
         protected T Element
         {
-            get { return _elem; }
+            get { return this._elem; }
         }
 
         public int GetCount(out uint pcelt)
         {
-            pcelt = (_elem == null) ? 0u : 1u;
+            pcelt = (this._elem == null) ? 0u : 1u;
             return VSConstants.S_OK;
         }
 
         public int Next(uint celt, T[] rgelt, ref uint pceltFetched)
         {
-            if (_done)
+            if (this._done)
             {
                 pceltFetched = 0;
                 return VSConstants.S_FALSE;
@@ -51,15 +51,15 @@ namespace Microsoft.NodejsTools.Debugger.Remote
             else
             {
                 pceltFetched = 1;
-                rgelt[0] = _elem;
-                _done = true;
+                rgelt[0] = this._elem;
+                this._done = true;
                 return VSConstants.S_OK;
             }
         }
 
         public int Reset()
         {
-            _done = (_elem == null);
+            this._done = (this._elem == null);
             return VSConstants.S_OK;
         }
 
@@ -69,13 +69,13 @@ namespace Microsoft.NodejsTools.Debugger.Remote
             {
                 return VSConstants.S_OK;
             }
-            else if (_done)
+            else if (this._done)
             {
                 return VSConstants.S_FALSE;
             }
             else
             {
-                _done = true;
+                this._done = true;
                 return celt > 1 ? VSConstants.S_FALSE : VSConstants.S_OK;
             }
         }

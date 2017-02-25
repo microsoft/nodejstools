@@ -29,8 +29,8 @@ namespace Microsoft.NodejsTools.Jade
 
             public CodeBlock(int start, int indent)
             {
-                Start = start;
-                Indent = indent;
+                this.Start = start;
+                this.Indent = indent;
             }
         }
 
@@ -39,19 +39,19 @@ namespace Microsoft.NodejsTools.Jade
         public IndentBasedOutlineRegionBuilder(ITextBuffer textBuffer)
             : base(textBuffer)
         {
-            BackgroundTask.DoTaskOnIdle();
+            this.BackgroundTask.DoTaskOnIdle();
         }
 
         protected override void OnTextBufferChanged(object sender, TextContentChangedEventArgs e)
         {
             base.OnTextBufferChanged(sender, e);
 
-            BackgroundTask.DoTaskOnIdle();
+            this.BackgroundTask.DoTaskOnIdle();
         }
 
         protected override void BuildRegions(OutlineRegionCollection newRegions)
         {
-            BuildRegions(newRegions, TextBuffer.CurrentSnapshot);
+            BuildRegions(newRegions, this.TextBuffer.CurrentSnapshot);
         }
 
         private static void BuildRegions(OutlineRegionCollection newRegions, ITextSnapshot snapshot)

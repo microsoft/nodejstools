@@ -30,9 +30,9 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
         public OAProjectConfigurationProperties(ProjectNode node)
         {
-            _project = node;
+            this._project = node;
             AddEventSource<IPropertyNotifySink>(this);
-            _hierarchyListener = new HierarchyListener(_project, this);
+            this._hierarchyListener = new HierarchyListener(this._project, this);
         }
 
         #region ProjectConfigurationProperties Members
@@ -255,11 +255,11 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                return _project.Site.GetUIThread().Invoke(() => _project.GetProjectProperty("OutputPath"));
+                return this._project.Site.GetUIThread().Invoke(() => this._project.GetProjectProperty("OutputPath"));
             }
             set
             {
-                _project.Site.GetUIThread().Invoke(() => _project.SetProjectProperty("OutputPath", value));
+                this._project.Site.GetUIThread().Invoke(() => this._project.SetProjectProperty("OutputPath", value));
             }
         }
 
@@ -435,12 +435,12 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
         public void OnSinkAdded(IPropertyNotifySink sink)
         {
-            _sinks.Add(sink);
+            this._sinks.Add(sink);
         }
 
         public void OnSinkRemoved(IPropertyNotifySink sink)
         {
-            _sinks.Remove(sink);
+            this._sinks.Remove(sink);
         }
 
         #endregion
@@ -453,9 +453,9 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
             public HierarchyListener(IVsHierarchy hierarchy, OAProjectConfigurationProperties props)
             {
-                _hierarchy = hierarchy;
-                _props = props;
-                ErrorHandler.ThrowOnFailure(_hierarchy.AdviseHierarchyEvents(this, out _cookie));
+                this._hierarchy = hierarchy;
+                this._props = props;
+                ErrorHandler.ThrowOnFailure(this._hierarchy.AdviseHierarchyEvents(this, out this._cookie));
             }
 
             ~HierarchyListener()
@@ -492,7 +492,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
             public int OnPropertyChanged(uint itemid, int propid, uint flags)
             {
-                foreach (var sink in _props._sinks)
+                foreach (var sink in this._props._sinks)
                 {
                     sink.OnChanged(propid);
                 }

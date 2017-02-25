@@ -34,8 +34,8 @@ namespace Microsoft.NodejsTools.Jade
 
         private ServiceManager(IPropertyOwner propertyOwner)
         {
-            _propertyOwner = propertyOwner;
-            _propertyOwner.Properties.AddProperty(ServiceManagerId, this);
+            this._propertyOwner = propertyOwner;
+            this._propertyOwner.Properties.AddProperty(ServiceManagerId, this);
         }
 
         /// <summary>
@@ -197,15 +197,15 @@ namespace Microsoft.NodejsTools.Jade
 
         private T GetService<T>() where T : class
         {
-            lock (_lock)
+            lock (this._lock)
             {
                 object service = null;
 
-                if (!_servicesByType.TryGetValue(typeof(T), out service))
+                if (!this._servicesByType.TryGetValue(typeof(T), out service))
                 {
                     // try walk through and cast. Perhaps someone is asking for IFoo
                     // that is implemented on class Bar but Bar was added as Bar, not as IFoo
-                    foreach (var kvp in _servicesByType)
+                    foreach (var kvp in this._servicesByType)
                     {
                         service = kvp.Value as T;
                         if (service != null)
@@ -219,17 +219,17 @@ namespace Microsoft.NodejsTools.Jade
 
         private T GetService<T>(IContentType contentType) where T : class
         {
-            lock (_lock)
+            lock (this._lock)
             {
                 object service = null;
 
-                _servicesByContentType.TryGetValue(Tuple.Create(typeof(T), contentType.TypeName), out service);
+                this._servicesByContentType.TryGetValue(Tuple.Create(typeof(T), contentType.TypeName), out service);
                 if (service != null)
                     return service as T;
 
                 // Try walking through and cast. Perhaps someone is asking for IFoo
                 // that is implemented on class Bar but Bar was added as Bar, not as IFoo
-                foreach (var kvp in _servicesByContentType)
+                foreach (var kvp in this._servicesByContentType)
                 {
                     if (String.Compare(kvp.Key.Item2, contentType.TypeName, StringComparison.OrdinalIgnoreCase) == 0)
                     {
@@ -253,15 +253,15 @@ namespace Microsoft.NodejsTools.Jade
 
         private object GetService(ref Guid serviceGuid)
         {
-            lock (_lock)
+            lock (this._lock)
             {
-                foreach (var kvp in _servicesByGuid)
+                foreach (var kvp in this._servicesByGuid)
                 {
                     if (serviceGuid.Equals(kvp.Key))
                         return kvp.Value;
                 }
 
-                foreach (var kvp in _servicesByType)
+                foreach (var kvp in this._servicesByType)
                 {
                     if (serviceGuid.Equals(kvp.Value.GetType().GUID))
                         return kvp.Value;
@@ -275,9 +275,9 @@ namespace Microsoft.NodejsTools.Jade
         {
             var list = new List<T>();
 
-            lock (_lock)
+            lock (this._lock)
             {
-                foreach (var kvp in _servicesByType)
+                foreach (var kvp in this._servicesByType)
                 {
                     var service = kvp.Value as T;
                     if (service != null)
@@ -290,64 +290,64 @@ namespace Microsoft.NodejsTools.Jade
 
         private void AddService<T>(T serviceInstance) where T : class
         {
-            lock (_lock)
+            lock (this._lock)
             {
                 if (GetService<T>() == null)
                 {
-                    _servicesByType.Add(typeof(T), serviceInstance);
+                    this._servicesByType.Add(typeof(T), serviceInstance);
                 }
             }
         }
 
         private void AddService<T>(T serviceInstance, IContentType contentType) where T : class
         {
-            lock (_lock)
+            lock (this._lock)
             {
                 if (GetService<T>(contentType) == null)
                 {
-                    _servicesByContentType.Add(Tuple.Create(typeof(T), contentType.TypeName), serviceInstance);
+                    this._servicesByContentType.Add(Tuple.Create(typeof(T), contentType.TypeName), serviceInstance);
                 }
             }
         }
 
         private void AddService(ref Guid serviceGuid, object serviceInstance)
         {
-            lock (_lock)
+            lock (this._lock)
             {
                 if (GetService(ref serviceGuid) == null)
-                    _servicesByGuid.Add(serviceGuid, serviceInstance);
+                    this._servicesByGuid.Add(serviceGuid, serviceInstance);
             }
         }
 
         private void RemoveService<T>() where T : class
         {
-            _servicesByType.Remove(typeof(T));
+            this._servicesByType.Remove(typeof(T));
         }
 
         private void RemoveService<T>(IContentType contentType) where T : class
         {
-            lock (_lock)
+            lock (this._lock)
             {
-                _servicesByContentType.Remove(Tuple.Create(typeof(T), contentType.TypeName));
+                this._servicesByContentType.Remove(Tuple.Create(typeof(T), contentType.TypeName));
             }
         }
 
         private void RemoveService(ref Guid guidService)
         {
-            _servicesByGuid.Remove(guidService);
+            this._servicesByGuid.Remove(guidService);
         }
 
         public void Dispose()
         {
-            if (_propertyOwner != null)
+            if (this._propertyOwner != null)
             {
-                _propertyOwner.Properties.RemoveProperty(ServiceManagerId);
+                this._propertyOwner.Properties.RemoveProperty(ServiceManagerId);
 
-                _servicesByGuid.Clear();
-                _servicesByType.Clear();
-                _servicesByContentType.Clear();
+                this._servicesByGuid.Clear();
+                this._servicesByType.Clear();
+                this._servicesByContentType.Clear();
 
-                _propertyOwner = null;
+                this._propertyOwner = null;
             }
         }
     }

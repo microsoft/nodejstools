@@ -24,14 +24,14 @@ namespace Microsoft.NodejsTools.Commands
         public DiagnosticsForm(string content)
         {
             InitializeComponent();
-            _textBox.Text = content;
+            this._textBox.Text = content;
         }
 
         public TextBox TextBox
         {
             get
             {
-                return _textBox;
+                return this._textBox;
             }
         }
 
@@ -42,13 +42,13 @@ namespace Microsoft.NodejsTools.Commands
 
         private void _copy_Click(object sender, EventArgs e)
         {
-            _textBox.SelectAll();
-            Clipboard.SetText(_textBox.SelectedText);
+            this._textBox.SelectAll();
+            Clipboard.SetText(this._textBox.SelectedText);
         }
 
         private void _diagnosticLoggingCheckbox_CheckedChanged(object sender, EventArgs e)
         {
-            NodejsPackage.Instance.DiagnosticsOptionsPage.IsLiveDiagnosticsEnabled = _diagnosticLoggingCheckbox.Checked;
+            NodejsPackage.Instance.DiagnosticsOptionsPage.IsLiveDiagnosticsEnabled = this._diagnosticLoggingCheckbox.Checked;
         }
     }
 }

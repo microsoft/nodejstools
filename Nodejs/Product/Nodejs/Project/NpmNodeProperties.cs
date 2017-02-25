@@ -29,7 +29,7 @@ namespace Microsoft.NodejsTools.Project
 
         private AbstractNpmNode NpmNode
         {
-            get { return Node as AbstractNpmNode; }
+            get { return this.Node as AbstractNpmNode; }
         }
 
         public override string GetClassName()
@@ -55,7 +55,7 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                var node = NpmNode;
+                var node = this.NpmNode;
                 if (null != node)
                 {
                     var local = node as NodeModulesNode;

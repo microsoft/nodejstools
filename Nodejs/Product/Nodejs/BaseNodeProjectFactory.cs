@@ -34,7 +34,7 @@ namespace Microsoft.NodejsTools
 
         internal override ProjectNode CreateProject()
         {
-            NodejsProjectNode project = new NodejsProjectNode((NodejsProjectPackage)Site);
+            NodejsProjectNode project = new NodejsProjectNode((NodejsProjectPackage)this.Site);
             return project;
         }
 

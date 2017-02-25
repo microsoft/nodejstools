@@ -47,7 +47,7 @@ namespace Microsoft.NodejsTools.Debugger
         {
             // Try to find best file name match
             IEnumerable<string> pathComponents = GetPathComponents(remoteFileName);
-            ScriptTree curTree = _scripts;
+            ScriptTree curTree = this._scripts;
 
             // Walk up the remote path, matching it against known local files.
             int matchedCount = 0;
@@ -92,7 +92,7 @@ namespace Microsoft.NodejsTools.Debugger
 
         private void AddModuleToTree(string fileName)
         {
-            ScriptTree curTree = _scripts;
+            ScriptTree curTree = this._scripts;
             IEnumerable<string> pathComponents = GetPathComponents(fileName);
             foreach (string component in pathComponents.Reverse())
             {

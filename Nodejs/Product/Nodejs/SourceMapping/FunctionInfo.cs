@@ -28,11 +28,11 @@ namespace Microsoft.NodejsTools.SourceMapping
 
         internal FunctionInformation(string ns, string methodName, int? lineNo, string filename, bool isRecompilation)
         {
-            Namespace = ns;
-            Function = methodName;
-            LineNumber = lineNo;
-            Filename = filename;
-            IsRecompilation = isRecompilation;
+            this.Namespace = ns;
+            this.Function = methodName;
+            this.LineNumber = lineNo;
+            this.Filename = filename;
+            this.IsRecompilation = isRecompilation;
         }
     }
 }

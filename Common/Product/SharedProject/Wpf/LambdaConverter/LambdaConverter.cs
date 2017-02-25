@@ -43,12 +43,12 @@ namespace Microsoft.VisualStudioTools.Wpf
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return lambda(value);
+            return this.lambda(value);
         }
 
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            return multiLambda(values);
+            return this.multiLambda(values);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

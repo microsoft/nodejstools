@@ -132,7 +132,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             if (!this.ExcludeNodeFromScc)
             {
-                ProjectMgr.ReDrawNode(this.Parent, UIHierarchyElement.SccState);
+                this.ProjectMgr.ReDrawNode(this.Parent, UIHierarchyElement.SccState);
             }
         }
 
@@ -148,7 +148,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         internal override FileNode RenameFileNode(string oldFileName, string newFileName)
         {
-            return this.RenameFileNode(oldFileName, newFileName, Parent);
+            return this.RenameFileNode(oldFileName, newFileName, this.Parent);
         }
 
         #endregion

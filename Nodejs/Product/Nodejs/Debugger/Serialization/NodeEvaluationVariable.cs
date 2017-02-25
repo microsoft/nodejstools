@@ -26,16 +26,16 @@ namespace Microsoft.NodejsTools.Debugger.Serialization
             Utilities.ArgumentNotNull("name", name);
             Utilities.ArgumentNotNull("message", message);
 
-            Id = (int)message["handle"];
-            Parent = null;
-            StackFrame = stackFrame;
-            Name = name;
-            TypeName = (string)message["type"];
-            Value = (string)message["value"];
-            Class = (string)message["className"];
-            Text = (string)message["text"];
-            Attributes = NodePropertyAttributes.None;
-            Type = NodePropertyType.Normal;
+            this.Id = (int)message["handle"];
+            this.Parent = null;
+            this.StackFrame = stackFrame;
+            this.Name = name;
+            this.TypeName = (string)message["type"];
+            this.Value = (string)message["value"];
+            this.Class = (string)message["className"];
+            this.Text = (string)message["text"];
+            this.Attributes = NodePropertyAttributes.None;
+            this.Type = NodePropertyType.Normal;
         }
 
         public int Id { get; private set; }

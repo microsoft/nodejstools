@@ -27,21 +27,21 @@ namespace Microsoft.NodejsTools.Debugger.Serialization
             Utilities.ArgumentNotNull("property", property);
             Utilities.ArgumentNotNull("references", references);
 
-            Id = (int)property["ref"];
+            this.Id = (int)property["ref"];
             JToken reference;
-            if (!references.TryGetValue(Id, out reference))
+            if (!references.TryGetValue(this.Id, out reference))
             {
                 reference = property;
             }
-            Parent = parent;
-            StackFrame = parent != null ? parent.Frame : null;
-            Name = (string)property["name"];
-            TypeName = (string)reference["type"];
-            Value = (string)reference["value"];
-            Class = (string)reference["className"];
-            Text = (string)reference["text"];
-            Attributes = (NodePropertyAttributes)property.Value<int>("attributes");
-            Type = (NodePropertyType)property.Value<int>("propertyType");
+            this.Parent = parent;
+            this.StackFrame = parent != null ? parent.Frame : null;
+            this.Name = (string)property["name"];
+            this.TypeName = (string)reference["type"];
+            this.Value = (string)reference["value"];
+            this.Class = (string)reference["className"];
+            this.Text = (string)reference["text"];
+            this.Attributes = (NodePropertyAttributes)property.Value<int>("attributes");
+            this.Type = (NodePropertyType)property.Value<int>("propertyType");
         }
 
         public int Id { get; private set; }

@@ -36,7 +36,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             Utilities.ArgumentNotNull("project", project);
 
-            _itemProject = project;
+            this._itemProject = project;
         }
 
         public event EventHandler ItemTypeChanged;
@@ -50,7 +50,7 @@ namespace Microsoft.VisualStudioTools.Project
                 }
                 else
                 {
-                    return ItemType;
+                    return this.ItemType;
                 }
             }
             set
@@ -58,12 +58,12 @@ namespace Microsoft.VisualStudioTools.Project
                 if (!HasItemBeenDeleted())
                 {
                     // Check out the project file.
-                    if (!_itemProject.QueryEditProjectFile(false))
+                    if (!this._itemProject.QueryEditProjectFile(false))
                     {
                         throw Marshal.GetExceptionForHR(VSConstants.OLE_E_PROMPTSAVECANCELLED);
                     }
 
-                    ItemType = value;
+                    this.ItemType = value;
                 }
             }
         }
@@ -87,7 +87,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return _itemProject;
+                return this._itemProject;
             }
         }
 
@@ -95,7 +95,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return _deleted;
+                return this._deleted;
             }
         }
 
@@ -106,7 +106,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public virtual void RemoveFromProjectFile()
         {
-            _deleted = true;
+            this._deleted = true;
         }
 
         public virtual bool IsExcluded
@@ -166,12 +166,12 @@ namespace Microsoft.VisualStudioTools.Project
                 if (path.IndexOf('.', 0, path.Length - filename.Length) != -1)
                 {
                     // possibly non-canonical form...
-                    return CommonUtils.GetAbsoluteFilePath(_itemProject.ProjectHome, path);
+                    return CommonUtils.GetAbsoluteFilePath(this._itemProject.ProjectHome, path);
                 }
 
                 // fast path, we know ProjectHome is canonical, and with no dots
                 // in the directory name, so is path.
-                return Path.Combine(_itemProject.ProjectHome, path);
+                return Path.Combine(this._itemProject.ProjectHome, path);
             }
         }
 
@@ -180,7 +180,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         private bool HasItemBeenDeleted()
         {
-            return _deleted;
+            return this._deleted;
         }
 
         public static bool operator ==(ProjectElement element1, ProjectElement element2)

@@ -114,7 +114,7 @@ namespace Microsoft.VisualStudioTools.Project
                 return VSConstants.E_FAIL;
             }
 
-            if (IsOpenedByUs)
+            if (this.IsOpenedByUs)
             {
                 IVsUIShellOpenDocument shell = this.Node.ProjectMgr.Site.GetService(typeof(IVsUIShellOpenDocument)) as IVsUIShellOpenDocument;
                 Guid logicalView = Guid.Empty;
@@ -141,9 +141,9 @@ namespace Microsoft.VisualStudioTools.Project
         /// <remarks>The call to SaveDocData may return Microsoft.VisualStudio.Shell.Interop.PFF_RESULTS.STG_S_DATALOSS to indicate some characters could not be represented in the current codepage</remarks>
         public virtual void Save(bool saveIfDirty)
         {
-            if (saveIfDirty && IsDirty)
+            if (saveIfDirty && this.IsDirty)
             {
-                IVsPersistDocData persistDocData = DocData;
+                IVsPersistDocData persistDocData = this.DocData;
                 if (persistDocData != null)
                 {
                     string name;
@@ -162,13 +162,13 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                var docTable = (IVsRunningDocumentTable4)node.ProjectMgr.GetService(typeof(SVsRunningDocumentTable));
-                if (!docTable.IsMonikerValid(node.GetMkDocument()))
+                var docTable = (IVsRunningDocumentTable4)this.node.ProjectMgr.GetService(typeof(SVsRunningDocumentTable));
+                if (!docTable.IsMonikerValid(this.node.GetMkDocument()))
                 {
                     return false;
                 }
 
-                return docTable.IsDocumentDirty(docTable.GetDocumentCookie(node.GetMkDocument()));
+                return docTable.IsDocumentDirty(docTable.GetDocumentCookie(this.node.GetMkDocument()));
             }
         }
 
@@ -179,8 +179,8 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                var docTable = (IVsRunningDocumentTable4)node.ProjectMgr.GetService(typeof(SVsRunningDocumentTable));
-                if (!docTable.IsMonikerValid(node.GetMkDocument()))
+                var docTable = (IVsRunningDocumentTable4)this.node.ProjectMgr.GetService(typeof(SVsRunningDocumentTable));
+                if (!docTable.IsMonikerValid(this.node.GetMkDocument()))
                 {
                     return false;
                 }
@@ -188,11 +188,11 @@ namespace Microsoft.VisualStudioTools.Project
                 IVsHierarchy hierarchy;
                 uint itemId;
                 docTable.GetDocumentHierarchyItem(
-                    docTable.GetDocumentCookie(node.GetMkDocument()),
+                    docTable.GetDocumentCookie(this.node.GetMkDocument()),
                     out hierarchy,
                     out itemId
                 );
-                return Utilities.IsSameComObject(node.ProjectMgr, hierarchy);
+                return Utilities.IsSameComObject(this.node.ProjectMgr, hierarchy);
             }
         }
 
@@ -203,13 +203,13 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                var docTable = (IVsRunningDocumentTable4)node.ProjectMgr.GetService(typeof(SVsRunningDocumentTable));
-                if (!docTable.IsMonikerValid(node.GetMkDocument()))
+                var docTable = (IVsRunningDocumentTable4)this.node.ProjectMgr.GetService(typeof(SVsRunningDocumentTable));
+                if (!docTable.IsMonikerValid(this.node.GetMkDocument()))
                 {
                     return (uint)ShellConstants.VSDOCCOOKIE_NIL;
                 }
 
-                return docTable.GetDocumentCookie(node.GetMkDocument());
+                return docTable.GetDocumentCookie(this.node.GetMkDocument());
             }
         }
 
@@ -220,13 +220,13 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                var docTable = (IVsRunningDocumentTable4)node.ProjectMgr.GetService(typeof(SVsRunningDocumentTable));
-                if (!docTable.IsMonikerValid(node.GetMkDocument()))
+                var docTable = (IVsRunningDocumentTable4)this.node.ProjectMgr.GetService(typeof(SVsRunningDocumentTable));
+                if (!docTable.IsMonikerValid(this.node.GetMkDocument()))
                 {
                     return null;
                 }
 
-                return docTable.GetDocumentData(docTable.GetDocumentCookie(node.GetMkDocument())) as IVsPersistDocData;
+                return docTable.GetDocumentData(docTable.GetDocumentCookie(this.node.GetMkDocument())) as IVsPersistDocData;
             }
         }
 
@@ -283,7 +283,7 @@ namespace Microsoft.VisualStudioTools.Project
             Debug.Assert(this.node != null, "No node has been initialized for the document manager");
 
             object pvar;
-            ErrorHandler.ThrowOnFailure(node.ProjectMgr.GetProperty(node.ID, (int)__VSHPROPID.VSHPROPID_Caption, out pvar));
+            ErrorHandler.ThrowOnFailure(this.node.ProjectMgr.GetProperty(this.node.ID, (int)__VSHPROPID.VSHPROPID_Caption, out pvar));
 
             return (pvar as string);
         }

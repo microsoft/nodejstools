@@ -24,7 +24,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands
 
         public SetExceptionBreakCommand(int id, bool uncaughtExceptions, bool enabled) : base(id, "setexceptionbreak")
         {
-            _arguments = new Dictionary<string, object> {
+            this._arguments = new Dictionary<string, object> {
                 { "type", uncaughtExceptions ? "uncaught" : "all" },
                 { "enabled", enabled }
             };
@@ -32,7 +32,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands
 
         protected override IDictionary<string, object> Arguments
         {
-            get { return _arguments; }
+            get { return this._arguments; }
         }
     }
 }

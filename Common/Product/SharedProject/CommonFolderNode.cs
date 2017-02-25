@@ -31,20 +31,20 @@ namespace Microsoft.VisualStudioTools.Project
         public CommonFolderNode(CommonProjectNode root, ProjectElement element)
             : base(root, element)
         {
-            _project = root;
+            this._project = root;
         }
 
         public override bool IsNonMemberItem
         {
             get
             {
-                return ItemNode is AllFilesProjectElement;
+                return this.ItemNode is AllFilesProjectElement;
             }
         }
 
         protected override ImageMoniker GetIconMoniker(bool open)
         {
-            if (ItemNode.IsExcluded)
+            if (this.ItemNode.IsExcluded)
             {
                 return open ? KnownMonikers.HiddenFolderOpened : KnownMonikers.HiddenFolderClosed;
             }
@@ -59,14 +59,14 @@ namespace Microsoft.VisualStudioTools.Project
                 switch ((VsCommands2K)cmd)
                 {
                     case VsCommands2K.EXCLUDEFROMPROJECT:
-                        if (ItemNode.IsExcluded)
+                        if (this.ItemNode.IsExcluded)
                         {
                             result |= QueryStatusResult.NOTSUPPORTED | QueryStatusResult.INVISIBLE;
                             return VSConstants.S_OK;
                         }
                         break;
                     case VsCommands2K.INCLUDEINPROJECT:
-                        if (ItemNode.IsExcluded)
+                        if (this.ItemNode.IsExcluded)
                         {
                             result |= QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
                             return VSConstants.S_OK;
@@ -77,12 +77,12 @@ namespace Microsoft.VisualStudioTools.Project
                         return VSConstants.S_OK;
                 }
             }
-            else if (cmdGroup == ProjectMgr.SharedCommandGuid)
+            else if (cmdGroup == this.ProjectMgr.SharedCommandGuid)
             {
                 switch ((SharedCommands)cmd)
                 {
                     case SharedCommands.AddExistingFolder:
-                        if (!ItemNode.IsExcluded)
+                        if (!this.ItemNode.IsExcluded)
                         {
                             result |= QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
                             return VSConstants.S_OK;
@@ -103,12 +103,12 @@ namespace Microsoft.VisualStudioTools.Project
                     return VSConstants.S_OK;
                 }
             }
-            else if (cmdGroup == ProjectMgr.SharedCommandGuid)
+            else if (cmdGroup == this.ProjectMgr.SharedCommandGuid)
             {
                 switch ((SharedCommands)cmd)
                 {
                     case SharedCommands.AddExistingFolder:
-                        return ProjectMgr.AddExistingFolderToNode(this);
+                        return this.ProjectMgr.AddExistingFolderToNode(this);
                     case SharedCommands.OpenCommandPromptHere:
                         var psi = new ProcessStartInfo(
                             Path.Combine(
@@ -116,7 +116,7 @@ namespace Microsoft.VisualStudioTools.Project
                                 "cmd.exe"
                             )
                         );
-                        psi.WorkingDirectory = FullPathToChildren;
+                        psi.WorkingDirectory = this.FullPathToChildren;
                         Process.Start(psi);
                         return VSConstants.S_OK;
                 }
@@ -131,16 +131,16 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns></returns>
         internal override int ExcludeFromProject()
         {
-            ProjectMgr.Site.GetUIThread().MustBeCalledFromUIThread();
+            this.ProjectMgr.Site.GetUIThread().MustBeCalledFromUIThread();
 
             Debug.Assert(this.ProjectMgr != null, "The project item " + this.ToString() + " has not been initialised correctly. It has a null ProjectMgr");
-            if (!ProjectMgr.QueryEditProjectFile(false) ||
-                !ProjectMgr.QueryFolderRemove(Parent, Url))
+            if (!this.ProjectMgr.QueryEditProjectFile(false) ||
+                !this.ProjectMgr.QueryFolderRemove(this.Parent, this.Url))
             {
                 return VSConstants.E_FAIL;
             }
 
-            for (var child = FirstChild; child != null; child = child.NextSibling)
+            for (var child = this.FirstChild; child != null; child = child.NextSibling)
             {
                 // we automatically exclude all children below us too
                 int hr = child.ExcludeFromProject();
@@ -151,22 +151,22 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             ResetNodeProperties();
-            ItemNode.RemoveFromProjectFile();
-            if (!Directory.Exists(CommonUtils.TrimEndSeparator(Url)))
+            this.ItemNode.RemoveFromProjectFile();
+            if (!Directory.Exists(CommonUtils.TrimEndSeparator(this.Url)))
             {
-                ProjectMgr.OnItemDeleted(this);
-                Parent.RemoveChild(this);
+                this.ProjectMgr.OnItemDeleted(this);
+                this.Parent.RemoveChild(this);
             }
             else
             {
-                ItemNode = new AllFilesProjectElement(Url, ItemNode.ItemTypeName, ProjectMgr);
-                if (!ProjectMgr.IsShowingAllFiles)
+                this.ItemNode = new AllFilesProjectElement(this.Url, this.ItemNode.ItemTypeName, this.ProjectMgr);
+                if (!this.ProjectMgr.IsShowingAllFiles)
                 {
-                    IsVisible = false;
-                    ProjectMgr.OnInvalidateItems(Parent);
+                    this.IsVisible = false;
+                    this.ProjectMgr.OnInvalidateItems(this.Parent);
                 }
-                ProjectMgr.ReDrawNode(this, UIHierarchyElement.Icon);
-                ProjectMgr.OnPropertyChanged(this, (int)__VSHPROPID.VSHPROPID_IsNonMemberItem, 0);
+                this.ProjectMgr.ReDrawNode(this, UIHierarchyElement.Icon);
+                this.ProjectMgr.OnPropertyChanged(this, (int)__VSHPROPID.VSHPROPID_IsNonMemberItem, 0);
             }
             ((IVsUIShell)GetService(typeof(SVsUIShell))).RefreshPropertyBrowser(0);
 
@@ -178,7 +178,7 @@ namespace Microsoft.VisualStudioTools.Project
             using (new WaitDialog(
                 "Excluding files and folders...",
                 "Excluding files and folders in your project, this may take several seconds...",
-                ProjectMgr.Site))
+                this.ProjectMgr.Site))
             {
                 return base.ExcludeFromProjectWithProgress();
             }
@@ -186,32 +186,32 @@ namespace Microsoft.VisualStudioTools.Project
 
         internal override int IncludeInProject(bool includeChildren)
         {
-            if (Parent.ItemNode != null && Parent.ItemNode.IsExcluded)
+            if (this.Parent.ItemNode != null && this.Parent.ItemNode.IsExcluded)
             {
                 // if our parent is excluded it needs to first be included
-                int hr = Parent.IncludeInProject(false);
+                int hr = this.Parent.IncludeInProject(false);
                 if (ErrorHandler.Failed(hr))
                 {
                     return hr;
                 }
             }
 
-            if (!ProjectMgr.QueryEditProjectFile(false) ||
-                !ProjectMgr.QueryFolderAdd(Parent, Url))
+            if (!this.ProjectMgr.QueryEditProjectFile(false) ||
+                !this.ProjectMgr.QueryFolderAdd(this.Parent, this.Url))
             {
                 return VSConstants.E_FAIL;
             }
 
             ResetNodeProperties();
-            ItemNode = ProjectMgr.CreateMsBuildFileItem(
-                CommonUtils.GetRelativeDirectoryPath(ProjectMgr.ProjectHome, Url),
+            this.ItemNode = this.ProjectMgr.CreateMsBuildFileItem(
+                CommonUtils.GetRelativeDirectoryPath(this.ProjectMgr.ProjectHome, this.Url),
                 ProjectFileConstants.Folder
             );
-            IsVisible = true;
+            this.IsVisible = true;
 
             if (includeChildren)
             {
-                for (var child = FirstChild; child != null; child = child.NextSibling)
+                for (var child = this.FirstChild; child != null; child = child.NextSibling)
                 {
                     // we automatically include all children below us too
                     int hr = child.IncludeInProject(includeChildren);
@@ -221,8 +221,8 @@ namespace Microsoft.VisualStudioTools.Project
                     }
                 }
             }
-            ProjectMgr.ReDrawNode(this, UIHierarchyElement.Icon);
-            ProjectMgr.OnPropertyChanged(this, (int)__VSHPROPID.VSHPROPID_IsNonMemberItem, 0);
+            this.ProjectMgr.ReDrawNode(this, UIHierarchyElement.Icon);
+            this.ProjectMgr.OnPropertyChanged(this, (int)__VSHPROPID.VSHPROPID_IsNonMemberItem, 0);
             ((IVsUIShell)GetService(typeof(SVsUIShell))).RefreshPropertyBrowser(0);
 
             // On include, the folder should be added to source control.
@@ -236,7 +236,7 @@ namespace Microsoft.VisualStudioTools.Project
             using (new WaitDialog(
                 "Including files and folders...",
                 "Including files and folders to your project, this may take several seconds...",
-                ProjectMgr.Site))
+                this.ProjectMgr.Site))
             {
                 return IncludeInProject(includeChildren);
             }
@@ -244,27 +244,27 @@ namespace Microsoft.VisualStudioTools.Project
 
         public override void RenameFolder(string newName)
         {
-            string oldName = Url;
-            _project.SuppressFileChangeNotifications();
+            string oldName = this.Url;
+            this._project.SuppressFileChangeNotifications();
             try
             {
                 base.RenameFolder(newName);
             }
             finally
             {
-                _project.RestoreFileChangeNotifications();
+                this._project.RestoreFileChangeNotifications();
             }
 
-            if (ProjectMgr.TryDeactivateSymLinkWatcher(this))
+            if (this.ProjectMgr.TryDeactivateSymLinkWatcher(this))
             {
-                ProjectMgr.CreateSymLinkWatcher(Url);
+                this.ProjectMgr.CreateSymLinkWatcher(this.Url);
             }
         }
 
         public override void Remove(bool removeFromStorage)
         {
             // if we were a symlink folder, we need to stop watching now.
-            ProjectMgr.TryDeactivateSymLinkWatcher(this);
+            this.ProjectMgr.TryDeactivateSymLinkWatcher(this);
 
             base.Remove(removeFromStorage);
         }
@@ -272,7 +272,7 @@ namespace Microsoft.VisualStudioTools.Project
         public override void Close()
         {
             // make sure this thing isn't hanging around...
-            ProjectMgr.TryDeactivateSymLinkWatcher(this);
+            this.ProjectMgr.TryDeactivateSymLinkWatcher(this);
 
             base.Close();
         }

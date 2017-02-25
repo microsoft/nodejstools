@@ -47,13 +47,13 @@ namespace Microsoft.NodejsTools.Project
 
         public NodejsProjectLauncher(NodejsProjectNode project)
         {
-            _project = project;
+            this._project = project;
 
-            var portNumber = _project.GetProjectProperty(NodeProjectProperty.NodejsPort);
+            var portNumber = this._project.GetProjectProperty(NodeProjectProperty.NodejsPort);
             int portNum;
             if (Int32.TryParse(portNumber, out portNum))
             {
-                _testServerPort = portNum;
+                this._testServerPort = portNum;
             }
         }
 
@@ -93,7 +93,7 @@ namespace Microsoft.NodejsTools.Project
 
                 psi.FileName = nodePath;
                 psi.Arguments = GetFullArguments(file);
-                psi.WorkingDirectory = _project.GetWorkingDirectory();
+                psi.WorkingDirectory = this._project.GetWorkingDirectory();
 
                 string webBrowserUrl = GetFullUrl();
                 Uri uri = null;
@@ -113,7 +113,7 @@ namespace Microsoft.NodejsTools.Project
                     psi,
                     NodejsPackage.Instance.GeneralOptionsPage.WaitOnAbnormalExit,
                     NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit);
-                _project.OnDispose += process.ResponseToTerminateEvent;
+                this._project.OnDispose += process.ResponseToTerminateEvent;
 
                 if (startBrowser && uri != null)
                 {
@@ -135,14 +135,14 @@ namespace Microsoft.NodejsTools.Project
             string res = String.Empty;
             if (includeNodeArgs)
             {
-                var nodeArgs = _project.GetProjectProperty(NodeProjectProperty.NodeExeArguments);
+                var nodeArgs = this._project.GetProjectProperty(NodeProjectProperty.NodeExeArguments);
                 if (!String.IsNullOrWhiteSpace(nodeArgs))
                 {
                     res = nodeArgs + " ";
                 }
             }
             res += "\"" + file + "\"";
-            var scriptArgs = _project.GetProjectProperty(NodeProjectProperty.ScriptArguments);
+            var scriptArgs = this._project.GetProjectProperty(NodeProjectProperty.ScriptArguments);
             if (!String.IsNullOrWhiteSpace(scriptArgs))
             {
                 res += " " + scriptArgs;
@@ -152,19 +152,19 @@ namespace Microsoft.NodejsTools.Project
 
         private string GetNodePath()
         {
-            var overridePath = _project.GetProjectProperty(NodeProjectProperty.NodeExePath);
-            return Nodejs.GetAbsoluteNodeExePath(_project.ProjectHome, overridePath);
+            var overridePath = this._project.GetProjectProperty(NodeProjectProperty.NodeExePath);
+            return Nodejs.GetAbsoluteNodeExePath(this._project.ProjectHome, overridePath);
         }
 
         #endregion
 
         private string GetFullUrl()
         {
-            var host = _project.GetProjectProperty(NodeProjectProperty.LaunchUrl);
+            var host = this._project.GetProjectProperty(NodeProjectProperty.LaunchUrl);
 
             try
             {
-                return GetFullUrl(host, TestServerPort);
+                return GetFullUrl(host, this.TestServerPort);
             }
             catch (UriFormatException)
             {
@@ -200,11 +200,11 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                if (!_testServerPort.HasValue)
+                if (!this._testServerPort.HasValue)
                 {
-                    _testServerPort = GetFreePort();
+                    this._testServerPort = GetFreePort();
                 }
-                return _testServerPort.Value;
+                return this._testServerPort.Value;
             }
         }
 
@@ -218,7 +218,7 @@ namespace Microsoft.NodejsTools.Project
 
             if (SetupDebugInfo(ref dbgInfo, startupFile))
             {
-                LaunchDebugger(_project.Site, dbgInfo);
+                LaunchDebugger(this._project.Site, dbgInfo);
             }
         }
 
@@ -240,7 +240,7 @@ namespace Microsoft.NodejsTools.Project
 
         private bool DoesProjectSupportDebugging()
         {
-            var typeScriptOutFile = _project.GetProjectProperty("TypeScriptOutFile");
+            var typeScriptOutFile = this._project.GetProjectProperty("TypeScriptOutFile");
             if (!string.IsNullOrEmpty(typeScriptOutFile))
             {
                 return MessageBox.Show(
@@ -272,10 +272,10 @@ namespace Microsoft.NodejsTools.Project
             dbgInfo.dlo = DEBUG_LAUNCH_OPERATION.DLO_CreateProcess;
 
             dbgInfo.bstrExe = GetNodePath();
-            dbgInfo.bstrCurDir = _project.GetWorkingDirectory();
+            dbgInfo.bstrCurDir = this._project.GetWorkingDirectory();
             dbgInfo.bstrArg = GetFullArguments(startupFile, includeNodeArgs: false);    // we need to supply node args via options
             dbgInfo.bstrRemoteMachine = null;
-            var nodeArgs = _project.GetProjectProperty(NodeProjectProperty.NodeExeArguments);
+            var nodeArgs = this._project.GetProjectProperty(NodeProjectProperty.NodeExeArguments);
             if (!String.IsNullOrWhiteSpace(nodeArgs))
             {
                 AppendOption(ref dbgInfo, AD7Engine.InterpreterOptions, nodeArgs);
@@ -287,7 +287,7 @@ namespace Microsoft.NodejsTools.Project
                 AppendOption(ref dbgInfo, AD7Engine.WebBrowserUrl, url);
             }
 
-            var debuggerPort = _project.GetProjectProperty(NodeProjectProperty.DebuggerPort);
+            var debuggerPort = this._project.GetProjectProperty(NodeProjectProperty.DebuggerPort);
             if (!String.IsNullOrWhiteSpace(debuggerPort))
             {
                 AppendOption(ref dbgInfo, AD7Engine.DebuggerPort, debuggerPort);
@@ -350,7 +350,7 @@ namespace Microsoft.NodejsTools.Project
 
         private bool ShouldStartBrowser()
         {
-            var startBrowser = _project.GetProjectProperty(NodeProjectProperty.StartWebBrowser);
+            var startBrowser = this._project.GetProjectProperty(NodeProjectProperty.StartWebBrowser);
             bool fStartBrowser;
             if (!String.IsNullOrEmpty(startBrowser) &&
                 Boolean.TryParse(startBrowser, out fStartBrowser))
@@ -363,7 +363,7 @@ namespace Microsoft.NodejsTools.Project
 
         private IEnumerable<KeyValuePair<string, string>> GetEnvironmentVariables()
         {
-            var envVars = _project.GetProjectProperty(NodeProjectProperty.Environment);
+            var envVars = this._project.GetProjectProperty(NodeProjectProperty.Environment);
             if (envVars != null)
             {
                 foreach (var envVar in envVars.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
@@ -387,7 +387,7 @@ namespace Microsoft.NodejsTools.Project
 
         private string ResolveStartupFile()
         {
-            string startupFile = _project.GetStartupFile();
+            string startupFile = this._project.GetStartupFile();
             if (string.IsNullOrEmpty(startupFile))
             {
                 throw new ApplicationException(Resources.DebugCouldNotResolveStartupFileErrorMessage);
@@ -395,7 +395,7 @@ namespace Microsoft.NodejsTools.Project
 
             if (TypeScriptHelpers.IsTypeScriptFile(startupFile))
             {
-                startupFile = TypeScriptHelpers.GetTypeScriptBackedJavaScriptFile(_project, startupFile);
+                startupFile = TypeScriptHelpers.GetTypeScriptBackedJavaScriptFile(this._project, startupFile);
             }
             return startupFile;
         }
@@ -420,15 +420,15 @@ namespace Microsoft.NodejsTools.Project
                 Action action = null
             )
             {
-                Port = port;
+                this.Port = port;
                 if (timeout.HasValue)
                 {
-                    Timeout = TimeSpan.FromMilliseconds(Convert.ToDouble(timeout));
+                    this.Timeout = TimeSpan.FromMilliseconds(Convert.ToDouble(timeout));
                 }
-                Sleep = sleep ?? 500;                                   // 1/2 second sleep
-                ShortCircuitPredicate = shortCircuitPredicate ?? (() => false);
-                Action = action ?? (() => { });
-                StartTime = System.DateTime.Now;
+                this.Sleep = sleep ?? 500;                                   // 1/2 second sleep
+                this.ShortCircuitPredicate = shortCircuitPredicate ?? (() => false);
+                this.Action = action ?? (() => { });
+                this.StartTime = System.DateTime.Now;
             }
         }
 

@@ -130,7 +130,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public override void Remove(bool removeFromStorage)
         {
-            ReferenceContainerNode parent = Parent as ReferenceContainerNode;
+            ReferenceContainerNode parent = this.Parent as ReferenceContainerNode;
             base.Remove(removeFromStorage);
             if (parent != null)
             {
@@ -193,7 +193,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public virtual void AddReference()
         {
-            ProjectMgr.Site.GetUIThread().MustBeCalledFromUIThread();
+            this.ProjectMgr.Site.GetUIThread().MustBeCalledFromUIThread();
 
             ReferenceContainerNode referencesFolder = this.ProjectMgr.GetReferenceContainer() as ReferenceContainerNode;
             Utilities.CheckNotNull(referencesFolder, "Could not find the References node");
@@ -226,7 +226,7 @@ namespace Microsoft.VisualStudioTools.Project
         internal virtual void RefreshReference()
         {
             this.ResolveReference();
-            ProjectMgr.ReDrawNode(this, UIHierarchyElement.Icon);
+            this.ProjectMgr.ReDrawNode(this, UIHierarchyElement.Icon);
         }
 
         /// <summary>

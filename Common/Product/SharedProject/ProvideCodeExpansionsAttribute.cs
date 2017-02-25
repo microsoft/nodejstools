@@ -42,12 +42,12 @@ namespace Microsoft.VisualStudioTools
                                           string languageStringId, string indexPath,
                                           string paths)
         {
-            _languageGuid = new Guid(languageGuid);
-            _showRoots = showRoots;
-            _displayName = displayName;
-            _languageStringId = languageStringId;
-            _indexPath = indexPath;
-            _paths = paths;
+            this._languageGuid = new Guid(languageGuid);
+            this._showRoots = showRoots;
+            this._displayName = displayName;
+            this._languageStringId = languageStringId;
+            this._indexPath = indexPath;
+            this._paths = paths;
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudioTools
         /// </summary>
         public string LanguageGuid
         {
-            get { return _languageGuid.ToString("B"); }
+            get { return this._languageGuid.ToString("B"); }
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace Microsoft.VisualStudioTools
         /// </summary>
         public bool ShowRoots
         {
-            get { return _showRoots; }
+            get { return this._showRoots; }
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace Microsoft.VisualStudioTools
         /// </summary>
         public short DisplayName
         {
-            get { return _displayName; }
+            get { return this._displayName; }
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace Microsoft.VisualStudioTools
         /// </summary>
         public string LanguageStringId
         {
-            get { return _languageStringId; }
+            get { return this._languageStringId; }
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace Microsoft.VisualStudioTools
         /// </summary>
         public string IndexPath
         {
-            get { return _indexPath; }
+            get { return this._indexPath; }
         }
 
         /// <summary>
@@ -95,7 +95,7 @@ namespace Microsoft.VisualStudioTools
         /// </summary>
         public string Paths
         {
-            get { return _paths; }
+            get { return this._paths; }
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace Microsoft.VisualStudioTools
         /// </summary>
         private string LanguageName()
         {
-            return string.Format(CultureInfo.InvariantCulture, "Languages\\CodeExpansions\\{0}", LanguageStringId);
+            return string.Format(CultureInfo.InvariantCulture, "Languages\\CodeExpansions\\{0}", this.LanguageStringId);
         }
 
         /// <summary>
@@ -121,32 +121,32 @@ namespace Microsoft.VisualStudioTools
             }
             using (Key childKey = context.CreateKey(LanguageName()))
             {
-                childKey.SetValue("", LanguageGuid);
+                childKey.SetValue("", this.LanguageGuid);
 
                 string snippetIndexPath = context.ComponentPath;
-                snippetIndexPath = System.IO.Path.Combine(snippetIndexPath, IndexPath);
+                snippetIndexPath = System.IO.Path.Combine(snippetIndexPath, this.IndexPath);
                 snippetIndexPath = context.EscapePath(System.IO.Path.GetFullPath(snippetIndexPath));
 
-                childKey.SetValue("DisplayName", DisplayName.ToString(CultureInfo.InvariantCulture));
+                childKey.SetValue("DisplayName", this.DisplayName.ToString(CultureInfo.InvariantCulture));
                 childKey.SetValue("IndexPath", snippetIndexPath);
-                childKey.SetValue("LangStringId", LanguageStringId.ToLowerInvariant());
+                childKey.SetValue("LangStringId", this.LanguageStringId.ToLowerInvariant());
                 childKey.SetValue("Package", context.ComponentType.GUID.ToString("B"));
-                childKey.SetValue("ShowRoots", ShowRoots ? 1 : 0);
+                childKey.SetValue("ShowRoots", this.ShowRoots ? 1 : 0);
 
                 string snippetPaths = context.ComponentPath;
-                snippetPaths = System.IO.Path.Combine(snippetPaths, Paths);
+                snippetPaths = System.IO.Path.Combine(snippetPaths, this.Paths);
                 snippetPaths = context.EscapePath(System.IO.Path.GetFullPath(snippetPaths));
 
                 //The following enables VS to look into a user directory for more user-created snippets
-                string myDocumentsPath = @";%MyDocs%\Code Snippets\" + _languageStringId + @"\My Code Snippets\";
+                string myDocumentsPath = @";%MyDocs%\Code Snippets\" + this._languageStringId + @"\My Code Snippets\";
                 using (Key forceSubKey = childKey.CreateSubkey("ForceCreateDirs"))
                 {
-                    forceSubKey.SetValue(LanguageStringId, snippetPaths + myDocumentsPath);
+                    forceSubKey.SetValue(this.LanguageStringId, snippetPaths + myDocumentsPath);
                 }
 
                 using (Key pathsSubKey = childKey.CreateSubkey("Paths"))
                 {
-                    pathsSubKey.SetValue(LanguageStringId, snippetPaths + myDocumentsPath);
+                    pathsSubKey.SetValue(this.LanguageStringId, snippetPaths + myDocumentsPath);
                 }
             }
         }

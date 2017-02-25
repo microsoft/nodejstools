@@ -34,25 +34,25 @@ namespace Microsoft.NodejsTools.Jade
 
         public TextProvider(ITextSnapshot snapshot, bool partial = false)
         {
-            _snapshot = snapshot;
-            Length = _snapshot.Length;
-            _partial = partial;
+            this._snapshot = snapshot;
+            this.Length = this._snapshot.Length;
+            this._partial = partial;
 
             UpdateCachedBlock(0, partial ? BlockLength : snapshot.Length);
         }
 
         private void UpdateCachedBlock(int position, int length)
         {
-            if (!_partial && _cachedBlock != null)
+            if (!this._partial && this._cachedBlock != null)
                 return;
 
-            if (_cachedBlock == null || position < _basePosition || (_basePosition + _cachedBlock.Length < position + length))
+            if (this._cachedBlock == null || position < this._basePosition || (this._basePosition + this._cachedBlock.Length < position + length))
             {
                 length = Math.Max(length, BlockLength);
-                length = Math.Min(length, _snapshot.Length - position);
+                length = Math.Min(length, this._snapshot.Length - position);
 
-                _cachedBlock = _snapshot.GetText(position, length);
-                _basePosition = position;
+                this._cachedBlock = this._snapshot.GetText(position, length);
+                this._basePosition = position;
             }
         }
 
@@ -62,18 +62,18 @@ namespace Microsoft.NodejsTools.Jade
         {
             get
             {
-                if (position < 0 || position >= Length)
+                if (position < 0 || position >= this.Length)
                     return '\0';
 
                 UpdateCachedBlock(position, 1);
-                return _cachedBlock[position - _basePosition];
+                return this._cachedBlock[position - this._basePosition];
             }
         }
 
         public string GetText(int position, int length)
         {
             UpdateCachedBlock(position, length);
-            return _cachedBlock.Substring(position - _basePosition, length);
+            return this._cachedBlock.Substring(position - this._basePosition, length);
         }
 
         public string GetText(ITextRange range)
@@ -128,19 +128,19 @@ namespace Microsoft.NodejsTools.Jade
 
             UpdateCachedBlock(position, Math.Max(length, text.Length));
 
-            return String.Compare(_cachedBlock, position - _basePosition,
+            return String.Compare(this._cachedBlock, position - this._basePosition,
                                   text, 0, text.Length,
                                   ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal) == 0;
         }
 
         public ITextProvider Clone()
         {
-            return new TextProvider(_snapshot, _partial);
+            return new TextProvider(this._snapshot, this._partial);
         }
 
         public int Version
         {
-            get { return _snapshot.Version.VersionNumber; }
+            get { return this._snapshot.Version.VersionNumber; }
         }
 
 #pragma warning disable 0067
@@ -150,7 +150,7 @@ namespace Microsoft.NodejsTools.Jade
 
         public ITextSnapshot Snapshot
         {
-            get { return _snapshot; }
+            get { return this._snapshot; }
         }
 
         #endregion

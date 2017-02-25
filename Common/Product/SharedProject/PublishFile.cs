@@ -20,20 +20,20 @@ namespace Microsoft.VisualStudioTools.Project
 
         public PublishFile(string filename, string destFile)
         {
-            _filename = filename;
-            _destFile = destFile;
+            this._filename = filename;
+            this._destFile = destFile;
         }
 
         #region IPublishFile Members
 
         public string SourceFile
         {
-            get { return _filename; }
+            get { return this._filename; }
         }
 
         public string DestinationFile
         {
-            get { return _destFile; }
+            get { return this._destFile; }
         }
 
         #endregion

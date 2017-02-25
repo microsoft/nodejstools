@@ -53,8 +53,8 @@ namespace Microsoft.NodejsTools.Jade
         public TextChange(int start, int oldLength, int newLength) :
             this()
         {
-            OldRange = new TextRange(start, start + oldLength);
-            NewRange = new TextRange(start, start + newLength);
+            this.OldRange = new TextRange(start, start + oldLength);
+            this.NewRange = new TextRange(start, start + newLength);
         }
 
         public TextChange(int start, int oldLength, int newLength, ITextProvider oldText, ITextProvider newText)
@@ -62,8 +62,8 @@ namespace Microsoft.NodejsTools.Jade
         {
             this.Combine(new TextChange(start, oldLength, newLength));
 
-            OldText = oldText;
-            NewText = newText;
+            this.OldText = oldText;
+            this.NewText = newText;
         }
 
         public TextChange(TextChange change, ITextProvider oldText, ITextProvider newText)
@@ -71,17 +71,17 @@ namespace Microsoft.NodejsTools.Jade
         {
             this.Combine(change);
 
-            OldText = oldText;
-            NewText = newText;
+            this.OldText = oldText;
+            this.NewText = newText;
         }
 
         public virtual void Clear()
         {
-            OldRange = TextRange.EmptyRange;
-            NewRange = TextRange.EmptyRange;
+            this.OldRange = TextRange.EmptyRange;
+            this.NewRange = TextRange.EmptyRange;
 
-            OldText = null;
-            NewText = null;
+            this.OldText = null;
+            this.NewText = null;
         }
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace Microsoft.NodejsTools.Jade
         /// </summary>
         public virtual bool IsEmpty()
         {
-            return (OldRange.Length == 0 && NewRange.Length == 0);
+            return (this.OldRange.Length == 0 && this.NewRange.Length == 0);
         }
 
         public void Combine(TextChange other)
@@ -97,10 +97,10 @@ namespace Microsoft.NodejsTools.Jade
             if (other.IsEmpty())
                 return;
 
-            if (OldRange == TextRange.EmptyRange || NewRange == TextRange.EmptyRange)
+            if (this.OldRange == TextRange.EmptyRange || this.NewRange == TextRange.EmptyRange)
             {
-                OldRange = other.OldRange;
-                NewRange = other.NewRange;
+                this.OldRange = other.OldRange;
+                this.NewRange = other.NewRange;
             }
             else
             {
@@ -114,7 +114,7 @@ namespace Microsoft.NodejsTools.Jade
                 this.NewRange = new TextRange(newStart, newEnd);
             }
 
-            Version = Math.Max(this.Version, other.Version);
+            this.Version = Math.Max(this.Version, other.Version);
         }
 
         #region ICloneable Members

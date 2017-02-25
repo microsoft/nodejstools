@@ -38,14 +38,14 @@ namespace Microsoft.NodejsTools
         public ProvideLanguageTemplatesAttribute(string projectFactory, string languageName, string package,
             string templateGroup, string description, string languageProjectGuid, string codeFileExtension, string templateFolder, string webProjectGuid)
         {
-            _projectFactory = projectFactory;
-            _languageName = languageName;
-            _package = package;
-            _description = description;
-            _languageGuid = languageProjectGuid;
-            _codeFileExtension = codeFileExtension;
-            _templateFolder = templateGroup;
-            _webProjectGuid = webProjectGuid;
+            this._projectFactory = projectFactory;
+            this._languageName = languageName;
+            this._package = package;
+            this._description = description;
+            this._languageGuid = languageProjectGuid;
+            this._codeFileExtension = codeFileExtension;
+            this._templateFolder = templateGroup;
+            this._webProjectGuid = webProjectGuid;
         }
 
         /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="Register"]' />
@@ -59,25 +59,25 @@ namespace Microsoft.NodejsTools
         /// </devdoc>
         public override void Register(RegistrationContext context)
         {
-            string langTemplates = string.Format(CultureInfo.InvariantCulture, "Projects\\{0}\\LanguageTemplates", _projectFactory);
+            string langTemplates = string.Format(CultureInfo.InvariantCulture, "Projects\\{0}\\LanguageTemplates", this._projectFactory);
 
             using (Key projectKey = context.CreateKey(langTemplates))
             {
-                projectKey.SetValue(_languageGuid, _webProjectGuid);
+                projectKey.SetValue(this._languageGuid, this._webProjectGuid);
             }
 
-            var newProject = string.Format(CultureInfo.InvariantCulture, "Projects\\{0}", _webProjectGuid);
+            var newProject = string.Format(CultureInfo.InvariantCulture, "Projects\\{0}", this._webProjectGuid);
             using (Key projectKey = context.CreateKey(newProject))
             {
-                projectKey.SetValue(null, _description);
-                projectKey.SetValue("Language(VsTemplate)", _languageName);
-                projectKey.SetValue("Package", _package);
+                projectKey.SetValue(null, this._description);
+                projectKey.SetValue("Language(VsTemplate)", this._languageName);
+                projectKey.SetValue("Package", this._package);
                 projectKey.SetValue("ShowOnlySpecifiedTemplates(VsTemplate)", 0);
 
                 using (Key propKey = projectKey.CreateSubkey("WebApplicationProperties"))
                 {
-                    propKey.SetValue("CodeFileExtension", _codeFileExtension);
-                    propKey.SetValue("TemplateFolder", _templateFolder);
+                    propKey.SetValue("CodeFileExtension", this._codeFileExtension);
+                    propKey.SetValue("TemplateFolder", this._templateFolder);
                 }
             }
         }

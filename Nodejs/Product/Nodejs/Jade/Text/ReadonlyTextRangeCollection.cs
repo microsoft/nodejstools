@@ -26,43 +26,43 @@ namespace Microsoft.NodejsTools.Jade
 
         public ReadOnlyTextRangeCollection(TextRangeCollection<T> collection)
         {
-            _collection = collection;
+            this._collection = collection;
         }
 
-        public int Start { get { return _collection.Start; } }
-        public int End { get { return _collection.End; } }
+        public int Start { get { return this._collection.Start; } }
+        public int End { get { return this._collection.End; } }
 
-        public int Length { get { return _collection.Length; } }
+        public int Length { get { return this._collection.Length; } }
 
-        public bool Contains(int position) { return _collection.Contains(position); }
+        public bool Contains(int position) { return this._collection.Contains(position); }
 
         public IList<T> ItemsInRange(ITextRange range)
         {
-            return _collection.ItemsInRange(range);
+            return this._collection.ItemsInRange(range);
         }
 
         public IList<T> ItemsInRange(int start)
         {
-            return _collection.ItemsInRange(TextRange.FromBounds(start, start));
+            return this._collection.ItemsInRange(TextRange.FromBounds(start, start));
         }
 
         public IList<int> GetItemsContainingInclusiveEnd(int position)
         {
-            return _collection.GetItemsContainingInclusiveEnd(position);
+            return this._collection.GetItemsContainingInclusiveEnd(position);
         }
 
-        public int Count { get { return _collection.Count; } }
+        public int Count { get { return this._collection.Count; } }
 
         /// <summary>
         /// Sorted list of comment tokens in the document.
         /// A new readonly collection is generated on every call to this method
         /// </summary>
-        public ReadOnlyCollection<T> Items { get { return new ReadOnlyCollection<T>(_collection.Items); } }
+        public ReadOnlyCollection<T> Items { get { return new ReadOnlyCollection<T>(this._collection.Items); } }
 
         /// <summary>
         /// Retrieves Nth item in the collection
         /// </summary>
-        public T this[int index] { get { return _collection[index]; } }
+        public T this[int index] { get { return this._collection[index]; } }
 
         /// <summary>
         /// Returns index of item that starts at the given position if exists, -1 otherwise.
@@ -71,27 +71,27 @@ namespace Microsoft.NodejsTools.Jade
         /// <returns>Item index or -1 if not found</returns>
         public int GetItemAtPosition(int position)
         {
-            return _collection.GetItemAtPosition(position);
+            return this._collection.GetItemAtPosition(position);
         }
 
         public virtual int GetItemContaining(int position)
         {
-            return _collection.GetItemContaining(position);
+            return this._collection.GetItemContaining(position);
         }
 
         public virtual int GetFirstItemBeforePosition(int position)
         {
-            return _collection.GetFirstItemBeforePosition(position);
+            return this._collection.GetFirstItemBeforePosition(position);
         }
 
         public virtual int GetFirstItemAfterPosition(int position)
         {
-            return _collection.GetFirstItemAfterPosition(position);
+            return this._collection.GetFirstItemAfterPosition(position);
         }
 
         public T[] ToArray()
         {
-            return _collection.ToArray();
+            return this._collection.ToArray();
         }
 
         //class RangeItemComparer : IComparer<T>
@@ -107,14 +107,14 @@ namespace Microsoft.NodejsTools.Jade
         #region IEnumerable<T> Members
         public IEnumerator<T> GetEnumerator()
         {
-            return _collection.GetEnumerator();
+            return this._collection.GetEnumerator();
         }
         #endregion
 
         #region IEnumerable Members
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return _collection.GetEnumerator();
+            return this._collection.GetEnumerator();
         }
         #endregion
     }

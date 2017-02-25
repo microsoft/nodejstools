@@ -46,24 +46,24 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public AD7Document(AD7DocumentContext documentContext)
         {
-            _documentContext = documentContext;
+            this._documentContext = documentContext;
         }
 
         private char[] ScriptText
         {
             get
             {
-                if (_scriptText == null)
+                if (this._scriptText == null)
                 {
-                    var moduleId = _documentContext.Module.Id;
-                    var scriptText = _documentContext.Engine.Process.GetScriptTextAsync(moduleId).Result;
+                    var moduleId = this._documentContext.Module.Id;
+                    var scriptText = this._documentContext.Engine.Process.GetScriptTextAsync(moduleId).Result;
                     if (scriptText != null)
                     {
-                        _scriptText = scriptText.ToCharArray();
+                        this._scriptText = scriptText.ToCharArray();
                     }
                 }
 
-                return _scriptText;
+                return this._scriptText;
             }
         }
 
@@ -71,20 +71,20 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         {
             get
             {
-                if (_scriptLines == null)
+                if (this._scriptLines == null)
                 {
                     var scriptLines = new List<int> { 0 };
-                    if (ScriptText != null)
+                    if (this.ScriptText != null)
                     {
-                        for (var i = 0; i < ScriptText.Length; ++i)
+                        for (var i = 0; i < this.ScriptText.Length; ++i)
                         {
                             // Treat combinations of carriage return and line feed as line endings
-                            var curChar = ScriptText[i];
+                            var curChar = this.ScriptText[i];
                             if (curChar == '\r' || curChar == '\n')
                             {
-                                if (curChar == '\r' && i + 1 < ScriptText.Length)
+                                if (curChar == '\r' && i + 1 < this.ScriptText.Length)
                                 {
-                                    if (ScriptText[i + 1] == '\n')
+                                    if (this.ScriptText[i + 1] == '\n')
                                     {
                                         ++i;
                                     }
@@ -93,9 +93,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                             }
                         }
                     }
-                    _scriptLines = scriptLines.ToArray();
+                    this._scriptLines = scriptLines.ToArray();
                 }
-                return _scriptLines;
+                return this._scriptLines;
             }
         }
 
@@ -107,7 +107,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                 return (int)textPosition.dwColumn;
             }
 
-            var scriptLines = ScriptLines;
+            var scriptLines = this.ScriptLines;
             var line = textPosition.dwLine < scriptLines.Length ? (int)textPosition.dwLine : scriptLines.Length - 1;
             return scriptLines[line] + (int)textPosition.dwColumn;
         }
@@ -131,7 +131,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public int GetName(enum_GETNAME_TYPE gnType, out string pbstrFileName)
         {
-            return ((IDebugDocumentContext2)_documentContext).GetName(gnType, out pbstrFileName);
+            return ((IDebugDocumentContext2)this._documentContext).GetName(gnType, out pbstrFileName);
         }
 
         #endregion
@@ -140,8 +140,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public int GetSize(IntPtr pcNumLines, IntPtr pcNumChars)
         {
-            SetOutParameterValue(pcNumLines, () => ScriptLines.Length);
-            SetOutParameterValue(pcNumChars, () => ScriptText != null ? ScriptText.Length : 0);
+            SetOutParameterValue(pcNumLines, () => this.ScriptLines.Length);
+            SetOutParameterValue(pcNumChars, () => this.ScriptText != null ? this.ScriptText.Length : 0);
             return VSConstants.S_OK;
         }
 
@@ -152,12 +152,12 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             {
                 return VSConstants.E_INVALIDARG;
             }
-            if (ScriptText != null)
+            if (this.ScriptText != null)
             {
                 var charPos = CharPosFromTextPos(pos);
-                var availChars = ScriptText.Length > charPos ? ScriptText.Length - charPos : 0;
+                var availChars = this.ScriptText.Length > charPos ? this.ScriptText.Length - charPos : 0;
                 var cNumChars = Math.Min((int)cMaxChars, availChars);
-                Marshal.Copy(ScriptText, 0, pText, cNumChars);
+                Marshal.Copy(this.ScriptText, 0, pText, cNumChars);
                 SetOutParameterValue(pcNumChars, () => cNumChars);
             }
             return VSConstants.S_OK;

@@ -46,43 +46,43 @@ namespace Microsoft.NodejsTools.NpmUI
         {
             if (lastRefreshTime == DateTime.MinValue)
             {
-                Days = int.MaxValue;
-                Description = Resources.PackageCatalogRefreshFailed;
+                this.Days = int.MaxValue;
+                this.Description = Resources.PackageCatalogRefreshFailed;
             }
             else
             {
-                Days = (int)(DateTime.Now.Date - lastRefreshTime.Date).TotalDays;
-                if (Days == 0)
+                this.Days = (int)(DateTime.Now.Date - lastRefreshTime.Date).TotalDays;
+                if (this.Days == 0)
                 {
-                    Description = string.Format(CultureInfo.CurrentCulture, Resources.PackageCatalogRefresh0Days, lastRefreshTime);
+                    this.Description = string.Format(CultureInfo.CurrentCulture, Resources.PackageCatalogRefresh0Days, lastRefreshTime);
                 }
-                else if (Days == 1)
+                else if (this.Days == 1)
                 {
-                    Description = string.Format(CultureInfo.CurrentCulture, Resources.PackageCatalogRefresh1Day, lastRefreshTime);
+                    this.Description = string.Format(CultureInfo.CurrentCulture, Resources.PackageCatalogRefresh1Day, lastRefreshTime);
                 }
-                else if (Days <= 7)
+                else if (this.Days <= 7)
                 {
-                    Description = string.Format(CultureInfo.CurrentCulture, Resources.PackageCatalogRefresh2To7Days, Days);
+                    this.Description = string.Format(CultureInfo.CurrentCulture, Resources.PackageCatalogRefresh2To7Days, this.Days);
                 }
-                else if (Days <= 14)
+                else if (this.Days <= 14)
                 {
-                    Description = Resources.PackageCatalogRefresh1Week;
+                    this.Description = Resources.PackageCatalogRefresh1Week;
                 }
-                else if (Days <= 21)
+                else if (this.Days <= 21)
                 {
-                    Description = Resources.PackageCatalogRefresh2Weeks;
+                    this.Description = Resources.PackageCatalogRefresh2Weeks;
                 }
-                else if (Days <= 31)
+                else if (this.Days <= 31)
                 {
-                    Description = Resources.PackageCatalogRefresh3Weeks;
+                    this.Description = Resources.PackageCatalogRefresh3Weeks;
                 }
-                else if (Days <= 92)
+                else if (this.Days <= 92)
                 {
-                    Description = Resources.PackageCatalogRefresh1Month;
+                    this.Description = Resources.PackageCatalogRefresh1Month;
                 }
                 else
                 {
-                    Description = Resources.PackageCatalogRefresh3Months;
+                    this.Description = Resources.PackageCatalogRefresh3Months;
                 }
             }
         }

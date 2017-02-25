@@ -37,10 +37,10 @@ namespace Microsoft.VisualStudioTools
         {
             Utilities.ArgumentNotNull(categoryName, "categoryName");
 
-            _categoryName = categoryName;
-            _categoryResourceId = categoryResourceId;
-            _descriptionResourceId = descriptionResourceId;
-            _migrationType = migrationType;
+            this._categoryName = categoryName;
+            this._categoryResourceId = categoryResourceId;
+            this._descriptionResourceId = descriptionResourceId;
+            this._migrationType = migrationType;
         }
 
         public override object TypeId
@@ -75,20 +75,20 @@ namespace Microsoft.VisualStudioTools
 
         private string AutomationCategoryRegKey
         {
-            get { return string.Format(CultureInfo.InvariantCulture, "{0}\\{1}", AutomationTextEditorRegKey, CategoryName); }
+            get { return string.Format(CultureInfo.InvariantCulture, "{0}\\{1}", this.AutomationTextEditorRegKey, this.CategoryName); }
         }
 
         public override void Register(RegistrationContext context)
         {
-            using (Key automationKey = context.CreateKey(AutomationCategoryRegKey))
+            using (Key automationKey = context.CreateKey(this.AutomationCategoryRegKey))
             {
-                automationKey.SetValue(null, "#" + CategoryResourceId);
-                automationKey.SetValue("Description", "#" + DescriptionResourceId);
-                automationKey.SetValue("Name", CategoryName);
+                automationKey.SetValue(null, "#" + this.CategoryResourceId);
+                automationKey.SetValue("Description", "#" + this.DescriptionResourceId);
+                automationKey.SetValue("Name", this.CategoryName);
                 automationKey.SetValue("Package", CommonConstants.TextEditorPackage);
                 automationKey.SetValue("ProfileSave", 1);
                 automationKey.SetValue("ResourcePackage", context.ComponentType.GUID.ToString("B"));
-                automationKey.SetValue("VsSettingsMigration", (int)MigrationType);
+                automationKey.SetValue("VsSettingsMigration", (int)this.MigrationType);
             }
         }
 

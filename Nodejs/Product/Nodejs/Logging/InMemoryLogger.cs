@@ -42,18 +42,18 @@ namespace Microsoft.NodejsTools.Logging
                 case NodejsToolsLogEvent.Launch:
                     if ((int)argument != 0)
                     {
-                        _debugLaunchCount++;
+                        this._debugLaunchCount++;
                     }
                     else
                     {
-                        _normalLaunchCount++;
+                        this._normalLaunchCount++;
                     }
                     break;
                 case NodejsToolsLogEvent.SurveyNewsFrequency:
                     val = (int)argument;
                     if (Enum.IsDefined(typeof(SurveyNewsPolicy), val))
                     {
-                        _surveyNewsPolicy = (SurveyNewsPolicy)val;
+                        this._surveyNewsPolicy = (SurveyNewsPolicy)val;
                     }
                     break;
             }
@@ -64,9 +64,9 @@ namespace Microsoft.NodejsTools.Logging
         public override string ToString()
         {
             StringBuilder res = new StringBuilder();
-            res.AppendLine("    SurveyNewsFrequency: " + _surveyNewsPolicy);
-            res.AppendLine("    Debug Launches: " + _debugLaunchCount);
-            res.AppendLine("    Normal Launches: " + _normalLaunchCount);
+            res.AppendLine("    SurveyNewsFrequency: " + this._surveyNewsPolicy);
+            res.AppendLine("    Debug Launches: " + this._debugLaunchCount);
+            res.AppendLine("    Normal Launches: " + this._normalLaunchCount);
             return res.ToString();
         }
     }

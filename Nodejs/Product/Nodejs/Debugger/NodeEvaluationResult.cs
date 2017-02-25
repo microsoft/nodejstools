@@ -34,14 +34,14 @@ namespace Microsoft.NodejsTools.Debugger
         /// </summary>
         public NodeEvaluationResult(int handle, string stringValue, string hexValue, string typeName, string expression, string fullName, NodeExpressionType type, NodeStackFrame frame)
         {
-            Handle = handle;
-            Frame = frame;
-            Expression = expression;
-            StringValue = stringValue;
-            HexValue = hexValue;
-            TypeName = typeName;
-            FullName = fullName;
-            Type = type;
+            this.Handle = handle;
+            this.Frame = frame;
+            this.Expression = expression;
+            this.StringValue = stringValue;
+            this.HexValue = hexValue;
+            this.TypeName = typeName;
+            this.FullName = fullName;
+            this.Type = type;
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace Microsoft.NodejsTools.Debugger
         /// </summary>
         public int StringLength
         {
-            get { return GetStringLength(StringValue); }
+            get { return GetStringLength(this.StringValue); }
         }
 
         /// <summary>
@@ -102,12 +102,12 @@ namespace Microsoft.NodejsTools.Debugger
         /// </summary>
         public async Task<List<NodeEvaluationResult>> GetChildrenAsync(CancellationToken cancellationToken = new CancellationToken())
         {
-            if (!Type.HasFlag(NodeExpressionType.Expandable))
+            if (!this.Type.HasFlag(NodeExpressionType.Expandable))
             {
                 return null;
             }
 
-            return await Frame.Process.EnumChildrenAsync(this, cancellationToken).ConfigureAwait(false);
+            return await this.Frame.Process.EnumChildrenAsync(this, cancellationToken).ConfigureAwait(false);
         }
 
         private int GetStringLength(string stringValue)
@@ -117,7 +117,7 @@ namespace Microsoft.NodejsTools.Debugger
                 return 0;
             }
 
-            Match match = _stringLengthExpression.Match(stringValue);
+            Match match = this._stringLengthExpression.Match(stringValue);
             if (!match.Success)
             {
                 return stringValue.Length;

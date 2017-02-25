@@ -35,11 +35,11 @@ namespace Microsoft.NodejsTools.Debugger.Commands
             Utilities.ArgumentNotNull("stackFrame", stackFrame);
             Utilities.ArgumentNotNullOrEmpty("name", name);
 
-            _resultFactory = resultFactory;
-            _stackFrame = stackFrame;
-            _name = name;
+            this._resultFactory = resultFactory;
+            this._stackFrame = stackFrame;
+            this._name = name;
 
-            _arguments = new Dictionary<string, object> {
+            this._arguments = new Dictionary<string, object> {
                 { "name", name },
                 { "newValue", new { handle } },
                 { "scope", new { frameNumber = stackFrame.FrameId, number = 0 } }
@@ -48,7 +48,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands
 
         protected override IDictionary<string, object> Arguments
         {
-            get { return _arguments; }
+            get { return this._arguments; }
         }
 
         public NodeEvaluationResult Result { get; private set; }
@@ -57,8 +57,8 @@ namespace Microsoft.NodejsTools.Debugger.Commands
         {
             base.ProcessResponse(response);
 
-            var variableProvider = new NodeSetValueVariable(_stackFrame, _name, response);
-            Result = _resultFactory.Create(variableProvider);
+            var variableProvider = new NodeSetValueVariable(this._stackFrame, this._name, response);
+            this.Result = this._resultFactory.Create(variableProvider);
         }
     }
 }

@@ -29,22 +29,22 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public BreakpointManager(AD7Engine engine)
         {
-            m_engine = engine;
-            m_pendingBreakpoints = new System.Collections.Generic.List<AD7PendingBreakpoint>();
+            this.m_engine = engine;
+            this.m_pendingBreakpoints = new System.Collections.Generic.List<AD7PendingBreakpoint>();
         }
 
         // A helper method used to construct a new pending breakpoint.
         public void CreatePendingBreakpoint(IDebugBreakpointRequest2 pBPRequest, out IDebugPendingBreakpoint2 ppPendingBP)
         {
-            AD7PendingBreakpoint pendingBreakpoint = new AD7PendingBreakpoint(pBPRequest, m_engine, this);
+            AD7PendingBreakpoint pendingBreakpoint = new AD7PendingBreakpoint(pBPRequest, this.m_engine, this);
             ppPendingBP = (IDebugPendingBreakpoint2)pendingBreakpoint;
-            m_pendingBreakpoints.Add(pendingBreakpoint);
+            this.m_pendingBreakpoints.Add(pendingBreakpoint);
         }
 
         // Called from the engine's detach method to remove the debugger's breakpoint instructions.
         public void ClearBreakpointBindingResults()
         {
-            foreach (AD7PendingBreakpoint pendingBreakpoint in m_pendingBreakpoints)
+            foreach (AD7PendingBreakpoint pendingBreakpoint in this.m_pendingBreakpoints)
             {
                 pendingBreakpoint.ClearBreakpointBindingResults();
             }
@@ -52,33 +52,33 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public void AddPendingBreakpoint(NodeBreakpoint breakpoint, AD7PendingBreakpoint pendingBreakpoint)
         {
-            _breakpointMap[breakpoint] = pendingBreakpoint;
+            this._breakpointMap[breakpoint] = pendingBreakpoint;
         }
 
         public void RemovePendingBreakpoint(NodeBreakpoint breakpoint)
         {
-            _breakpointMap.Remove(breakpoint);
+            this._breakpointMap.Remove(breakpoint);
         }
 
         public AD7PendingBreakpoint GetPendingBreakpoint(NodeBreakpoint breakpoint)
         {
-            return _breakpointMap[breakpoint];
+            return this._breakpointMap[breakpoint];
         }
 
         public void AddBoundBreakpoint(NodeBreakpointBinding breakpointBinding, AD7BoundBreakpoint boundBreakpoint)
         {
-            _breakpointBindingMap[breakpointBinding] = boundBreakpoint;
+            this._breakpointBindingMap[breakpointBinding] = boundBreakpoint;
         }
 
         public void RemoveBoundBreakpoint(NodeBreakpointBinding breakpointBinding)
         {
-            _breakpointBindingMap.Remove(breakpointBinding);
+            this._breakpointBindingMap.Remove(breakpointBinding);
         }
 
         public AD7BoundBreakpoint GetBoundBreakpoint(NodeBreakpointBinding breakpointBinding)
         {
             AD7BoundBreakpoint boundBreakpoint;
-            return _breakpointBindingMap.TryGetValue(breakpointBinding, out boundBreakpoint) ? boundBreakpoint : null;
+            return this._breakpointBindingMap.TryGetValue(breakpointBinding, out boundBreakpoint) ? boundBreakpoint : null;
         }
     }
 }

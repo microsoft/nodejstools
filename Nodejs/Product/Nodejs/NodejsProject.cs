@@ -48,37 +48,37 @@ namespace Microsoft.NodejsTools
 
         protected override void Close()
         {
-            if (_menuService != null)
+            if (this._menuService != null)
             {
-                foreach (var command in _commands)
+                foreach (var command in this._commands)
                 {
-                    _menuService.RemoveCommand(command);
+                    this._menuService.RemoveCommand(command);
                 }
-                _menuService.Dispose();
+                this._menuService.Dispose();
             }
-            _commands.Clear();
+            this._commands.Clear();
             base.Close();
         }
 
         protected override void InitializeForOuter(string fileName, string location, string name, uint flags, ref Guid guidProject, out bool cancel)
         {
             CommandID menuCommandID = new CommandID(VSConstants.GUID_VSStandardCommandSet97, (int)VSConstants.VSStd97CmdID.Open);
-            OleMenuCommand menuItem = new OleMenuCommand(OpenFile, null, OpenFileBeforeQueryStatus, menuCommandID);
+            OleMenuCommand menuItem = new OleMenuCommand(this.OpenFile, null, this.OpenFileBeforeQueryStatus, menuCommandID);
             AddCommand(menuItem);
 
             menuCommandID = new CommandID(VSConstants.GUID_VSStandardCommandSet97, (int)VSConstants.VSStd97CmdID.ViewCode);
-            menuItem = new OleMenuCommand(OpenFile, null, OpenFileBeforeQueryStatus, menuCommandID);
+            menuItem = new OleMenuCommand(this.OpenFile, null, this.OpenFileBeforeQueryStatus, menuCommandID);
             AddCommand(menuItem);
 
             menuCommandID = new CommandID(VSConstants.VSStd2K, (int)VSConstants.VSStd2KCmdID.ECMD_VIEWMARKUP);
-            menuItem = new OleMenuCommand(OpenFile, null, OpenFileBeforeQueryStatus, menuCommandID);
+            menuItem = new OleMenuCommand(this.OpenFile, null, this.OpenFileBeforeQueryStatus, menuCommandID);
             AddCommand(menuItem);
 
             base.InitializeForOuter(fileName, location, name, flags, ref guidProject, out cancel);
 
             object extObject;
             ErrorHandler.ThrowOnFailure(
-                _innerVsHierarchy.GetProperty(
+                this._innerVsHierarchy.GetProperty(
                     VSConstants.VSITEMID_ROOT,
                     (int)__VSHPROPID.VSHPROPID_ExtObject,
                     out extObject
@@ -105,8 +105,8 @@ namespace Microsoft.NodejsTools
 
         private void AddCommand(OleMenuCommand menuItem)
         {
-            _menuService.AddCommand(menuItem);
-            _commands.Add(menuItem);
+            this._menuService.AddCommand(menuItem);
+            this._commands.Add(menuItem);
         }
 
         private void OpenFile(object sender, EventArgs e)
@@ -160,7 +160,7 @@ namespace Microsoft.NodejsTools
         {
             Guid view = Guid.Empty;
             IVsWindowFrame frame;
-            int hr = ((IVsProject)_innerVsHierarchy).OpenItem(
+            int hr = ((IVsProject)this._innerVsHierarchy).OpenItem(
                 selectionItemId,
                 ref view,
                 IntPtr.Zero,
@@ -179,10 +179,10 @@ namespace Microsoft.NodejsTools
 
             // The reason why we keep a reference to those is that doing a QI after being
             // aggregated would do the AddRef on the outer object.
-            _innerProject = inner as IVsProject;
-            _innerProject3 = inner as IVsProject3;
-            _innerVsHierarchy = inner as IVsHierarchy;
-            _innerVsProjectFlavorCfgProvider = inner as IVsProjectFlavorCfgProvider;
+            this._innerProject = inner as IVsProject;
+            this._innerProject3 = inner as IVsProject3;
+            this._innerVsHierarchy = inner as IVsHierarchy;
+            this._innerVsProjectFlavorCfgProvider = inner as IVsProjectFlavorCfgProvider;
 
             // Ensure we have a service provider as this is required for menu items to work
             if (this.serviceProvider == null)
@@ -192,7 +192,7 @@ namespace Microsoft.NodejsTools
             base.SetInnerProject(innerIUnknown);
 
             // Add our commands (this must run after we called base.SetInnerProject)            
-            _menuService = ((System.IServiceProvider)this).GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
+            this._menuService = ((System.IServiceProvider)this).GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
         }
 
         private bool TryHandleRightClick(IntPtr pvaIn, out int res)
@@ -213,7 +213,7 @@ namespace Microsoft.NodejsTools
         /// <returns></returns>
         private IEnumerable<VSITEMSELECTION> GetSelectedItems()
         {
-            IVsMonitorSelection monitorSelection = _package.GetService(typeof(IVsMonitorSelection)) as IVsMonitorSelection;
+            IVsMonitorSelection monitorSelection = this._package.GetService(typeof(IVsMonitorSelection)) as IVsMonitorSelection;
 
             IntPtr hierarchyPtr = IntPtr.Zero;
             IntPtr selectionContainer = IntPtr.Zero;
@@ -340,7 +340,7 @@ namespace Microsoft.NodejsTools
         /// <param name="points">The location at which to show the menu.</param>
         internal int ShowContextMenu(int menuId, Guid menuGroup, POINTS points)
         {
-            IVsUIShell shell = _package.GetService(typeof(SVsUIShell)) as IVsUIShell;
+            IVsUIShell shell = this._package.GetService(typeof(SVsUIShell)) as IVsUIShell;
 
             Debug.Assert(shell != null, "Could not get the ui shell from the project");
             if (shell == null)
@@ -369,7 +369,7 @@ namespace Microsoft.NodejsTools
                     case VSConstants.VsUIHierarchyWindowCmdIds.UIHWCMDID_DoubleClick:
                     case VSConstants.VsUIHierarchyWindowCmdIds.UIHWCMDID_EnterKey:
                         // open the document if it's an JavaScript file
-                        if (IsJavaScriptFile(_innerVsHierarchy, itemid))
+                        if (IsJavaScriptFile(this._innerVsHierarchy, itemid))
                         {
                             int hr = OpenWithNodejsEditor(itemid);
 
@@ -388,7 +388,7 @@ namespace Microsoft.NodejsTools
 
         int IOleCommandTarget.Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
-            return ((IOleCommandTarget)_menuService).Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+            return ((IOleCommandTarget)this._menuService).Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
         }
 
         private bool IsJavaScriptFile(IVsHierarchy iVsHierarchy, uint itemid)
@@ -494,7 +494,7 @@ namespace Microsoft.NodejsTools
                 }
             }
 
-            return ((IOleCommandTarget)_menuService).QueryStatus(ref pguidCmdGroup, cCmds, prgCmds, pCmdText);
+            return ((IOleCommandTarget)this._menuService).QueryStatus(ref pguidCmdGroup, cCmds, prgCmds, pCmdText);
         }
 
         #region IVsProjectFlavorCfgProvider Members
@@ -507,7 +507,7 @@ namespace Microsoft.NodejsTools
             // base Node.js project handle it.  So we keep the base Node.js project config here.
             IVsProjectFlavorCfg webCfg;
             ErrorHandler.ThrowOnFailure(
-                _innerVsProjectFlavorCfgProvider.CreateProjectFlavorCfg(
+                this._innerVsProjectFlavorCfgProvider.CreateProjectFlavorCfg(
                     pBaseProjectCfg,
                     out webCfg
                 )
@@ -641,7 +641,7 @@ namespace Microsoft.NodejsTools
         {
             // If the item type of this file is not compile, we don't actually want to open with Nodejs and should instead use the default.
             Guid ourEditor = Guid.Empty;
-            var properties = GetExtensionObject(_innerVsHierarchy, selectionItemId).Properties;
+            var properties = GetExtensionObject(this._innerVsHierarchy, selectionItemId).Properties;
 
             Guid view = Guid.Empty;
             IVsWindowFrame frame;
@@ -650,7 +650,7 @@ namespace Microsoft.NodejsTools
             // Force OpenStandardEditor to lookup if the document is currently open or not, and if it is.  If it's
             // open in a different editor the user will be prompted to close it.
             var docDataExistingUnknown = new IntPtr(-1);
-            int hr = ((IVsProject3)_innerVsHierarchy).OpenItemWithSpecific(
+            int hr = ((IVsProject3)this._innerVsHierarchy).OpenItemWithSpecific(
                 selectionItemId,
                 0,
                 ref ourEditor,
@@ -672,7 +672,7 @@ namespace Microsoft.NodejsTools
         {
             // Check if we are adding an item to a folder that consists of browser-side code.
             // In this case, we will want to open the file with the default editor.
-            var project = _innerVsHierarchy.GetProject().GetNodejsProject();
+            var project = this._innerVsHierarchy.GetProject().GetNodejsProject();
 
             var selectedItems = this.GetSelectedItems().GetEnumerator();
             if (selectedItems.MoveNext())
@@ -683,11 +683,11 @@ namespace Microsoft.NodejsTools
                 var nodeFolderNode = project.FindNodeByFullPath(name) as NodejsFolderNode;
             }
 
-            if (_innerProject3 != null && IsJavaScriptFile(pszItemName))
+            if (this._innerProject3 != null && IsJavaScriptFile(pszItemName))
             {
                 Guid ourEditor = Guid.Empty;
                 Guid view = Guid.Empty;
-                return _innerProject3.AddItemWithSpecific(
+                return this._innerProject3.AddItemWithSpecific(
                     itemidLoc,
                     dwAddItemOperation,
                     pszItemName,
@@ -703,37 +703,37 @@ namespace Microsoft.NodejsTools
                     pResult
                 );
             }
-            return _innerProject.AddItem(itemidLoc, dwAddItemOperation, pszItemName, cFilesToOpen, rgpszFilesToOpen, hwndDlgOwner, pResult);
+            return this._innerProject.AddItem(itemidLoc, dwAddItemOperation, pszItemName, cFilesToOpen, rgpszFilesToOpen, hwndDlgOwner, pResult);
         }
 
         public int GenerateUniqueItemName(uint itemidLoc, string pszExt, string pszSuggestedRoot, out string pbstrItemName)
         {
-            return _innerProject.GenerateUniqueItemName(itemidLoc, pszExt, pszSuggestedRoot, out pbstrItemName);
+            return this._innerProject.GenerateUniqueItemName(itemidLoc, pszExt, pszSuggestedRoot, out pbstrItemName);
         }
 
         public int GetItemContext(uint itemid, out VisualStudio.OLE.Interop.IServiceProvider ppSP)
         {
-            return _innerProject.GetItemContext(itemid, out ppSP);
+            return this._innerProject.GetItemContext(itemid, out ppSP);
         }
 
         public int GetMkDocument(uint itemid, out string pbstrMkDocument)
         {
-            return _innerProject.GetMkDocument(itemid, out pbstrMkDocument);
+            return this._innerProject.GetMkDocument(itemid, out pbstrMkDocument);
         }
 
         public int IsDocumentInProject(string pszMkDocument, out int pfFound, VSDOCUMENTPRIORITY[] pdwPriority, out uint pitemid)
         {
-            return _innerProject.IsDocumentInProject(pszMkDocument, out pfFound, pdwPriority, out pitemid);
+            return this._innerProject.IsDocumentInProject(pszMkDocument, out pfFound, pdwPriority, out pitemid);
         }
 
         public int OpenItem(uint itemid, ref Guid rguidLogicalView, IntPtr punkDocDataExisting, out IVsWindowFrame ppWindowFrame)
         {
-            if (_innerProject3 != null && IsJavaScriptFile(GetItemName(_innerVsHierarchy, itemid)))
+            if (this._innerProject3 != null && IsJavaScriptFile(GetItemName(this._innerVsHierarchy, itemid)))
             {
                 // force .js files opened w/o an editor type to be opened w/ our editor factory.
                 Guid guid = Guid.Empty;
                 Guid view = Guid.Empty;
-                int hr = _innerProject3.OpenItemWithSpecific(
+                int hr = this._innerProject3.OpenItemWithSpecific(
                     itemid,
                     0,
                     ref guid,
@@ -745,7 +745,7 @@ namespace Microsoft.NodejsTools
                 return hr;
             }
 
-            return _innerProject.OpenItem(itemid, rguidLogicalView, punkDocDataExisting, out ppWindowFrame);
+            return this._innerProject.OpenItem(itemid, rguidLogicalView, punkDocDataExisting, out ppWindowFrame);
         }
 
         #endregion
@@ -754,9 +754,9 @@ namespace Microsoft.NodejsTools
 
         public int RemoveItem(uint dwReserved, uint itemid, out int pfResult)
         {
-            if (_innerProject3 != null)
+            if (this._innerProject3 != null)
             {
-                return _innerProject3.RemoveItem(dwReserved, itemid, out pfResult);
+                return this._innerProject3.RemoveItem(dwReserved, itemid, out pfResult);
             }
             pfResult = 0;
             return VSConstants.E_NOTIMPL;
@@ -764,16 +764,16 @@ namespace Microsoft.NodejsTools
 
         public int ReopenItem(uint itemid, ref Guid rguidEditorType, string pszPhysicalView, ref Guid rguidLogicalView, IntPtr punkDocDataExisting, out IVsWindowFrame ppWindowFrame)
         {
-            if (_innerProject3 != null)
+            if (this._innerProject3 != null)
             {
-                if (IsJavaScriptFile(GetItemName(_innerVsHierarchy, itemid)))
+                if (IsJavaScriptFile(GetItemName(this._innerVsHierarchy, itemid)))
                 {
                     // force .js files opened w/o an editor type to be opened w/ our editor factory.
                     // If the item type of this file is not compile, we don't actually want to open with Nodejs and should instead use the default.
-                    var itemType = GetExtensionObject(_innerVsHierarchy, itemid).Properties.Item("ItemType").Value;
+                    var itemType = GetExtensionObject(this._innerVsHierarchy, itemid).Properties.Item("ItemType").Value;
                     Guid guid = Guid.Empty;
 
-                    return _innerProject3.ReopenItem(
+                    return this._innerProject3.ReopenItem(
                         itemid,
                         ref guid,
                         pszPhysicalView,
@@ -782,7 +782,7 @@ namespace Microsoft.NodejsTools
                         out ppWindowFrame
                     );
                 }
-                return _innerProject3.ReopenItem(itemid, ref rguidEditorType, pszPhysicalView, ref rguidLogicalView, punkDocDataExisting, out ppWindowFrame);
+                return this._innerProject3.ReopenItem(itemid, ref rguidEditorType, pszPhysicalView, ref rguidLogicalView, punkDocDataExisting, out ppWindowFrame);
             }
             ppWindowFrame = null;
             return VSConstants.E_NOTIMPL;
@@ -803,7 +803,7 @@ namespace Microsoft.NodejsTools
             {
                 string caption;
                 object captionObj;
-                if (ErrorHandler.Failed(_innerVsHierarchy.GetProperty(
+                if (ErrorHandler.Failed(this._innerVsHierarchy.GetProperty(
                     (uint)VSConstants.VSITEMID.Root,
                     (int)__VSHPROPID.VSHPROPID_Caption,
                     out captionObj
@@ -980,12 +980,12 @@ namespace Microsoft.NodejsTools
 
             public StringWriterWithEncoding(Encoding encoding)
             {
-                _encoding = encoding;
+                this._encoding = encoding;
             }
 
             public override Encoding Encoding
             {
-                get { return _encoding; }
+                get { return this._encoding; }
             }
         }
 

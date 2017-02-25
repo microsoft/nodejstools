@@ -30,11 +30,11 @@ namespace Microsoft.NodejsTools.Debugger.Commands
         public EvaluateCommand(int id, IEvaluationResultFactory resultFactory, string expression, NodeStackFrame stackFrame = null)
             : base(id, "evaluate")
         {
-            _resultFactory = resultFactory;
-            _expression = expression;
-            _stackFrame = stackFrame;
+            this._resultFactory = resultFactory;
+            this._expression = expression;
+            this._stackFrame = stackFrame;
 
-            _arguments = new Dictionary<string, object> {
+            this._arguments = new Dictionary<string, object> {
                 { "expression", _expression },
                 { "frame", _stackFrame != null ? _stackFrame.FrameId : 0 },
                 { "global", false },
@@ -46,11 +46,11 @@ namespace Microsoft.NodejsTools.Debugger.Commands
         public EvaluateCommand(int id, IEvaluationResultFactory resultFactory, int variableId, NodeStackFrame stackFrame = null)
             : base(id, "evaluate")
         {
-            _resultFactory = resultFactory;
-            _expression = "variable";
-            _stackFrame = stackFrame;
+            this._resultFactory = resultFactory;
+            this._expression = "variable";
+            this._stackFrame = stackFrame;
 
-            _arguments = new Dictionary<string, object> {
+            this._arguments = new Dictionary<string, object> {
                 { "expression", _expression + ".toString()" },
                 { "frame", _stackFrame != null ? _stackFrame.FrameId : 0 },
                 { "global", false },
@@ -62,7 +62,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands
 
         protected override IDictionary<string, object> Arguments
         {
-            get { return _arguments; }
+            get { return this._arguments; }
         }
 
         public NodeEvaluationResult Result { get; private set; }
@@ -71,8 +71,8 @@ namespace Microsoft.NodejsTools.Debugger.Commands
         {
             base.ProcessResponse(response);
 
-            var variableProvider = new NodeEvaluationVariable(_stackFrame, _expression, response["body"]);
-            Result = _resultFactory.Create(variableProvider);
+            var variableProvider = new NodeEvaluationVariable(this._stackFrame, this._expression, response["body"]);
+            this.Result = this._resultFactory.Create(variableProvider);
         }
     }
 }

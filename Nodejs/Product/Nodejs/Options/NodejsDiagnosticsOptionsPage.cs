@@ -23,18 +23,18 @@ namespace Microsoft.NodejsTools.Options
 
         public NodejsDiagnosticsOptionsPage() : base("Diagnostics")
         {
-            _isLiveDiagnosticsEnabled = !NodejsPackage.Instance.Zombied && (LoadBool(IsLiveDiagnosticsEnabledSetting) ?? false);
+            this._isLiveDiagnosticsEnabled = !NodejsPackage.Instance.Zombied && (LoadBool(IsLiveDiagnosticsEnabledSetting) ?? false);
         }
 
         public bool IsLiveDiagnosticsEnabled
         {
             get
             {
-                return !NodejsPackage.Instance.Zombied && _isLiveDiagnosticsEnabled;
+                return !NodejsPackage.Instance.Zombied && this._isLiveDiagnosticsEnabled;
             }
             set
             {
-                _isLiveDiagnosticsEnabled = value;
+                this._isLiveDiagnosticsEnabled = value;
                 SaveBool(IsLiveDiagnosticsEnabledSetting, value);
             }
         }

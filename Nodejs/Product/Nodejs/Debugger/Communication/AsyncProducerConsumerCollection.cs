@@ -27,15 +27,15 @@ namespace Microsoft.NodejsTools.Debugger.Communication
         public void Add(T item)
         {
             TaskCompletionSource<T> tcs = null;
-            lock (_collection)
+            lock (this._collection)
             {
-                if (_waiting.Count > 0)
+                if (this._waiting.Count > 0)
                 {
-                    tcs = _waiting.Dequeue();
+                    tcs = this._waiting.Dequeue();
                 }
                 else
                 {
-                    _collection.Enqueue(item);
+                    this._collection.Enqueue(item);
                 }
             }
             if (tcs != null)
@@ -46,14 +46,14 @@ namespace Microsoft.NodejsTools.Debugger.Communication
 
         public Task<T> TakeAsync()
         {
-            lock (_collection)
+            lock (this._collection)
             {
-                if (_collection.Count > 0)
+                if (this._collection.Count > 0)
                 {
-                    return Task.FromResult(_collection.Dequeue());
+                    return Task.FromResult(this._collection.Dequeue());
                 }
                 var tcs = new TaskCompletionSource<T>();
-                _waiting.Enqueue(tcs);
+                this._waiting.Enqueue(tcs);
                 return tcs.Task;
             }
         }

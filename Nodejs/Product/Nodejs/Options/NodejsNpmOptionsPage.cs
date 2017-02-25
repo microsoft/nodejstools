@@ -36,12 +36,12 @@ namespace Microsoft.NodejsTools.Options
         {
             get
             {
-                if (_window == null)
+                if (this._window == null)
                 {
-                    _window = new NodejsNpmOptionsControl();
+                    this._window = new NodejsNpmOptionsControl();
                     LoadSettingsFromStorage();
                 }
-                return _window;
+                return this._window;
             }
         }
 
@@ -58,31 +58,31 @@ namespace Microsoft.NodejsTools.Options
         /// </summary>
         public override void ResetSettings()
         {
-            ShowOutputWindowWhenExecutingNpm = true;
+            this.ShowOutputWindowWhenExecutingNpm = true;
         }
 
         public override void LoadSettingsFromStorage()
         {
             // Load settings from storage.
-            ShowOutputWindowWhenExecutingNpm = LoadBool(ShowOutputWindowRunningNpm) ?? true;
+            this.ShowOutputWindowWhenExecutingNpm = LoadBool(ShowOutputWindowRunningNpm) ?? true;
 
             // Synchronize UI with backing properties.
-            if (_window != null)
+            if (this._window != null)
             {
-                _window.SyncControlWithPageSettings(this);
+                this._window.SyncControlWithPageSettings(this);
             }
         }
 
         public override void SaveSettingsToStorage()
         {
             // Synchronize backing properties with UI.
-            if (_window != null)
+            if (this._window != null)
             {
-                _window.SyncPageWithControlSettings(this);
+                this._window.SyncPageWithControlSettings(this);
             }
 
             // Save settings.
-            SaveBool(ShowOutputWindowRunningNpm, ShowOutputWindowWhenExecutingNpm);
+            SaveBool(ShowOutputWindowRunningNpm, this.ShowOutputWindowWhenExecutingNpm);
         }
     }
 }

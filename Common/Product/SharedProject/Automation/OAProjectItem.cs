@@ -297,7 +297,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
                 using (AutomationScope scope = new AutomationScope(this.Node.ProjectMgr.Site))
                 {
-                    Node.ProjectMgr.Site.GetUIThread().Invoke(() => this.node.SetEditLabel(value));
+                    this.Node.ProjectMgr.Site.GetUIThread().Invoke(() => this.node.SetEditLabel(value));
                 }
             }
         }
@@ -322,7 +322,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
             using (AutomationScope scope = new AutomationScope(this.Node.ProjectMgr.Site))
             {
-                Node.ProjectMgr.Site.GetUIThread().Invoke(() => this.node.Remove(false));
+                this.Node.ProjectMgr.Site.GetUIThread().Invoke(() => this.node.Remove(false));
             }
         }
 
@@ -335,7 +335,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
             using (AutomationScope scope = new AutomationScope(this.Node.ProjectMgr.Site))
             {
-                Node.ProjectMgr.Site.GetUIThread().Invoke(() => this.node.Remove(true));
+                this.Node.ProjectMgr.Site.GetUIThread().Invoke(() => this.node.Remove(true));
             }
         }
 
@@ -388,7 +388,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
             using (AutomationScope scope = new AutomationScope(this.Node.ProjectMgr.Site))
             {
-                Node.ProjectMgr.Site.GetUIThread().Invoke(() => node.ExpandItem(EXPANDFLAGS.EXPF_ExpandFolder));
+                this.Node.ProjectMgr.Site.GetUIThread().Invoke(() => this.node.ExpandItem(EXPANDFLAGS.EXPF_ExpandFolder));
             }
         }
 

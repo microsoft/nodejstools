@@ -26,19 +26,19 @@ namespace Microsoft.VisualStudioTools.Project
 
         public EnumBSTR(IEnumerable<string> items)
         {
-            _enumerable = items;
-            _enumerator = _enumerable.GetEnumerator();
+            this._enumerable = items;
+            this._enumerator = this._enumerable.GetEnumerator();
         }
 
         public int Clone(out IVsEnumBSTR ppenum)
         {
-            ppenum = new EnumBSTR(_enumerable);
+            ppenum = new EnumBSTR(this._enumerable);
             return VSConstants.S_OK;
         }
 
         public int GetCount(out uint pceltCount)
         {
-            var coll = _enumerable as ICollection<string>;
+            var coll = this._enumerable as ICollection<string>;
             if (coll != null)
             {
                 pceltCount = checked((uint)coll.Count);
@@ -56,10 +56,10 @@ namespace Microsoft.VisualStudioTools.Project
             pceltFetched = 0;
 
             int i = 0;
-            for (; i < celt && _enumerator.MoveNext(); ++i)
+            for (; i < celt && this._enumerator.MoveNext(); ++i)
             {
                 ++pceltFetched;
-                rgelt[i] = _enumerator.Current;
+                rgelt[i] = this._enumerator.Current;
             }
             for (; i < celt; ++i)
             {
@@ -71,13 +71,13 @@ namespace Microsoft.VisualStudioTools.Project
 
         public int Reset()
         {
-            _enumerator = _enumerable.GetEnumerator();
+            this._enumerator = this._enumerable.GetEnumerator();
             return VSConstants.S_OK;
         }
 
         public int Skip(uint celt)
         {
-            while (celt != 0 && _enumerator.MoveNext())
+            while (celt != 0 && this._enumerator.MoveNext())
             {
                 celt--;
             }

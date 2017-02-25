@@ -62,11 +62,11 @@ namespace Microsoft.NodejsTools.Jade
         [DebuggerStepThrough]
         public TextChangeEventArgs(int start, int oldLength, int newLength, ITextProvider oldText, ITextProvider newText)
         {
-            Start = start;
-            OldLength = oldLength;
-            NewLength = newLength;
-            OldText = oldText;
-            NewText = newText;
+            this.Start = start;
+            this.OldLength = oldLength;
+            this.NewLength = newLength;
+            this.OldText = oldText;
+            this.NewText = newText;
         }
     }
 }

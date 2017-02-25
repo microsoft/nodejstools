@@ -33,7 +33,7 @@ namespace Microsoft.NodejsTools.Debugger
 
         public ScriptTree(string filename)
         {
-            Filename = filename;
+            this.Filename = filename;
         }
     }
 }

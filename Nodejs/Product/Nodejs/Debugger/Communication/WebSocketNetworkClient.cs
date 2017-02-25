@@ -45,23 +45,23 @@ namespace Microsoft.NodejsTools.Debugger.Communication
                 // If it fails or times out, just go ahead and try to connect anyway, and rely on normal error reporting path.
             }
 
-            _webSocket = new ClientWebSocket();
-            _webSocket.ConnectAsync(uri, CancellationToken.None).GetAwaiter().GetResult();
-            _stream = new WebSocketStream(_webSocket);
+            this._webSocket = new ClientWebSocket();
+            this._webSocket.ConnectAsync(uri, CancellationToken.None).GetAwaiter().GetResult();
+            this._stream = new WebSocketStream(this._webSocket);
         }
 
         public bool Connected
         {
-            get { return _webSocket.State == WebSocketState.Open; }
+            get { return this._webSocket.State == WebSocketState.Open; }
         }
 
         public void Dispose()
         {
-            _stream.Dispose();
+            this._stream.Dispose();
             try
             {
-                _webSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None).GetAwaiter().GetResult();
-                _webSocket.Dispose();
+                this._webSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None).GetAwaiter().GetResult();
+                this._webSocket.Dispose();
             }
             catch (WebSocketException)
             {
@@ -71,7 +71,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
 
         public Stream GetStream()
         {
-            return _stream;
+            return this._stream;
         }
     }
 }

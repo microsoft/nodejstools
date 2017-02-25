@@ -31,22 +31,22 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public AD7DocumentContext(AD7MemoryAddress codeContext)
         {
-            _codeContext = codeContext;
+            this._codeContext = codeContext;
         }
 
         public AD7Engine Engine
         {
-            get { return _codeContext.Engine; }
+            get { return this._codeContext.Engine; }
         }
 
         public NodeModule Module
         {
-            get { return _codeContext.Module; }
+            get { return this._codeContext.Module; }
         }
 
         public string FileName
         {
-            get { return _codeContext.FileName; }
+            get { return this._codeContext.FileName; }
         }
 
         public bool Downloaded
@@ -54,7 +54,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             get
             {
                 // No directory separator characters implies downloaded
-                return (FileName.IndexOf(Path.DirectorySeparatorChar) == -1);
+                return (this.FileName.IndexOf(Path.DirectorySeparatorChar) == -1);
             }
         }
 
@@ -74,7 +74,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         int IDebugDocumentContext2.EnumCodeContexts(out IEnumDebugCodeContexts2 ppEnumCodeCxts)
         {
             var codeContexts = new AD7MemoryAddress[1];
-            codeContexts[0] = _codeContext;
+            codeContexts[0] = this._codeContext;
             ppEnumCodeCxts = new AD7CodeContextEnum(codeContexts);
             return VSConstants.S_OK;
         }
@@ -86,9 +86,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         {
             // Expose document for downloaded modules
             ppDocument = null;
-            if (Downloaded)
+            if (this.Downloaded)
             {
-                NodeModule module = Module;
+                NodeModule module = this.Module;
                 if (module != null)
                 {
                     // Lazily create document per module
@@ -107,14 +107,14 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         // The language for this sample is always C++
         int IDebugDocumentContext2.GetLanguageInfo(ref string pbstrLanguage, ref Guid pguidLanguage)
         {
-            AD7Engine.MapLanguageInfo(FileName, out pbstrLanguage, out pguidLanguage);
+            AD7Engine.MapLanguageInfo(this.FileName, out pbstrLanguage, out pguidLanguage);
             return VSConstants.S_OK;
         }
 
         // Gets the displayable name of the document that contains this document context.
         int IDebugDocumentContext2.GetName(enum_GETNAME_TYPE gnType, out string pbstrFileName)
         {
-            pbstrFileName = FileName;
+            pbstrFileName = this.FileName;
             return pbstrFileName != null ? VSConstants.S_OK : VSConstants.E_FAIL;
         }
 
@@ -132,11 +132,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         // A statement range is the range of the lines that contributed the code to which this document context refers.
         int IDebugDocumentContext2.GetStatementRange(TEXT_POSITION[] pBegPosition, TEXT_POSITION[] pEndPosition)
         {
-            pBegPosition[0].dwColumn = (uint)_codeContext.Column;
-            pBegPosition[0].dwLine = (uint)_codeContext.Line;
+            pBegPosition[0].dwColumn = (uint)this._codeContext.Column;
+            pBegPosition[0].dwLine = (uint)this._codeContext.Line;
 
-            pEndPosition[0].dwColumn = (uint)_codeContext.Column;
-            pEndPosition[0].dwLine = (uint)_codeContext.Line;
+            pEndPosition[0].dwColumn = (uint)this._codeContext.Column;
+            pEndPosition[0].dwLine = (uint)this._codeContext.Line;
 
             return VSConstants.S_OK;
         }

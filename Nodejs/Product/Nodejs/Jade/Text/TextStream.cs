@@ -34,13 +34,13 @@ namespace Microsoft.NodejsTools.Jade
         [DebuggerStepThrough]
         public TextStream(string text)
         {
-            _text = text;
+            this._text = text;
         }
 
         [DebuggerStepThrough]
         public override string ToString()
         {
-            return _text;
+            return this._text;
         }
 
         #region ITextStream
@@ -50,7 +50,7 @@ namespace Microsoft.NodejsTools.Jade
         /// </summary>
         public int Length
         {
-            get { return _text.Length; }
+            get { return this._text.Length; }
         }
 
         /// <summary>
@@ -60,10 +60,10 @@ namespace Microsoft.NodejsTools.Jade
         {
             get
             {
-                if (position < 0 || position >= _text.Length)
+                if (position < 0 || position >= this._text.Length)
                     return '\0';
 
-                return _text[position];
+                return this._text[position];
             }
         }
 
@@ -75,8 +75,8 @@ namespace Microsoft.NodejsTools.Jade
             if (length == 0)
                 return String.Empty;
 
-            Debug.Assert(position >= 0 && length >= 0 && position + length <= _text.Length);
-            return _text.Substring(position, length);
+            Debug.Assert(position >= 0 && length >= 0 && position + length <= this._text.Length);
+            return this._text.Substring(position, length);
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace Microsoft.NodejsTools.Jade
         /// <returns>Character index of the first string appearance or -1 if string was not found</returns>
         public int IndexOf(string stringToFind, int startPosition, bool ignoreCase)
         {
-            return _text.IndexOf(stringToFind, startPosition, ignoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture);
+            return this._text.IndexOf(stringToFind, startPosition, ignoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture);
         }
 
         /// <summary>
@@ -110,27 +110,27 @@ namespace Microsoft.NodejsTools.Jade
         /// <returns>Character index of the first string appearance or -1 if string was not found</returns>
         public int IndexOf(string stringToFind, ITextRange range, bool ignoreCase)
         {
-            if (range.Start + stringToFind.Length > _text.Length)
+            if (range.Start + stringToFind.Length > this._text.Length)
                 return -1;
 
-            if (range.End > _text.Length)
+            if (range.End > this._text.Length)
                 return -1;
 
             var comparison = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
 
-            return _text.IndexOf(stringToFind, range.Start, range.Length, comparison);
+            return this._text.IndexOf(stringToFind, range.Start, range.Length, comparison);
         }
 
         public bool CompareTo(int position, int length, string compareTo, bool ignoreCase)
         {
             var comparison = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
 
-            return String.Compare(_text, position, compareTo, 0, length, comparison) == 0;
+            return String.Compare(this._text, position, compareTo, 0, length, comparison) == 0;
         }
 
         public ITextProvider Clone()
         {
-            return new TextStream(_text);
+            return new TextStream(this._text);
         }
 
         public int Version { get { return 0; } }
@@ -145,7 +145,7 @@ namespace Microsoft.NodejsTools.Jade
         #region Dispose
         public void Dispose()
         {
-            _text = null;
+            this._text = null;
         }
         #endregion
     }

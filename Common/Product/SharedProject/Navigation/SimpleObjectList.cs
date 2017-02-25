@@ -36,109 +36,109 @@ namespace Microsoft.VisualStudioTools.Navigation
 
         public SimpleObjectList()
         {
-            _children = new List<T>();
+            this._children = new List<T>();
         }
 
         public List<T> Children
         {
             get
             {
-                return _children;
+                return this._children;
             }
         }
 
         public virtual void Update()
         {
-            _updateCount++;
+            this._updateCount++;
         }
 
         public uint UpdateCount
         {
-            get { return _updateCount; }
-            set { _updateCount = value; }
+            get { return this._updateCount; }
+            set { this._updateCount = value; }
         }
 
         public const uint NullIndex = (uint)0xFFFFFFFF;
 
         int IVsSimpleObjectList2.CanDelete(uint index, out int pfOK)
         {
-            if (index >= (uint)_children.Count)
+            if (index >= (uint)this._children.Count)
             {
                 throw new ArgumentOutOfRangeException("index");
             }
-            pfOK = _children[(int)index].CanDelete ? 1 : 0;
+            pfOK = this._children[(int)index].CanDelete ? 1 : 0;
             return VSConstants.S_OK;
         }
 
         int IVsSimpleObjectList2.CanGoToSource(uint index, VSOBJGOTOSRCTYPE SrcType, out int pfOK)
         {
-            if (index >= (uint)_children.Count)
+            if (index >= (uint)this._children.Count)
             {
                 throw new ArgumentOutOfRangeException("index");
             }
-            pfOK = _children[(int)index].CanGoToSource ? 1 : 0;
+            pfOK = this._children[(int)index].CanGoToSource ? 1 : 0;
             return VSConstants.S_OK;
         }
 
         int IVsSimpleObjectList2.CanRename(uint index, string pszNewName, out int pfOK)
         {
-            if (index >= (uint)_children.Count)
+            if (index >= (uint)this._children.Count)
             {
                 throw new ArgumentOutOfRangeException("index");
             }
-            pfOK = _children[(int)index].CanRename ? 1 : 0;
+            pfOK = this._children[(int)index].CanRename ? 1 : 0;
             return VSConstants.S_OK;
         }
 
         int IVsSimpleObjectList2.CountSourceItems(uint index, out IVsHierarchy ppHier, out uint pItemid, out uint pcItems)
         {
-            if (index >= (uint)_children.Count)
+            if (index >= (uint)this._children.Count)
             {
                 throw new ArgumentOutOfRangeException("index");
             }
-            _children[(int)index].SourceItems(out ppHier, out pItemid, out pcItems);
+            this._children[(int)index].SourceItems(out ppHier, out pItemid, out pcItems);
             return VSConstants.S_OK;
         }
 
         int IVsSimpleObjectList2.DoDelete(uint index, uint grfFlags)
         {
-            if (index >= (uint)_children.Count)
+            if (index >= (uint)this._children.Count)
             {
                 throw new ArgumentOutOfRangeException("index");
             }
-            _children[(int)index].Delete();
-            _children.RemoveAt((int)index);
+            this._children[(int)index].Delete();
+            this._children.RemoveAt((int)index);
             return VSConstants.S_OK;
         }
 
         int IVsSimpleObjectList2.DoDragDrop(uint index, IDataObject pDataObject, uint grfKeyState, ref uint pdwEffect)
         {
-            if (index >= (uint)_children.Count)
+            if (index >= (uint)this._children.Count)
             {
                 throw new ArgumentOutOfRangeException("index");
             }
             OleDataObject dataObject = new OleDataObject(pDataObject);
-            _children[(int)index].DoDragDrop(dataObject, grfKeyState, pdwEffect);
+            this._children[(int)index].DoDragDrop(dataObject, grfKeyState, pdwEffect);
             return VSConstants.S_OK;
         }
 
         int IVsSimpleObjectList2.DoRename(uint index, string pszNewName, uint grfFlags)
         {
-            if (index >= (uint)_children.Count)
+            if (index >= (uint)this._children.Count)
             {
                 throw new ArgumentOutOfRangeException("index");
             }
-            _children[(int)index].Rename(pszNewName, grfFlags);
+            this._children[(int)index].Rename(pszNewName, grfFlags);
             return VSConstants.S_OK;
         }
 
         int IVsSimpleObjectList2.EnumClipboardFormats(uint index, uint grfFlags, uint celt, VSOBJCLIPFORMAT[] rgcfFormats, uint[] pcActual)
         {
-            if (index >= (uint)_children.Count)
+            if (index >= (uint)this._children.Count)
             {
                 throw new ArgumentOutOfRangeException("index");
             }
-            uint copied = _children[(int)index].EnumClipboardFormats((_VSOBJCFFLAGS)grfFlags, rgcfFormats);
+            uint copied = this._children[(int)index].EnumClipboardFormats((_VSOBJCFFLAGS)grfFlags, rgcfFormats);
             if ((null != pcActual) && (pcActual.Length > 0))
             {
                 pcActual[0] = copied;
@@ -148,21 +148,21 @@ namespace Microsoft.VisualStudioTools.Navigation
 
         int IVsSimpleObjectList2.FillDescription2(uint index, uint grfOptions, IVsObjectBrowserDescription3 pobDesc)
         {
-            if (index >= (uint)_children.Count)
+            if (index >= (uint)this._children.Count)
             {
                 throw new ArgumentOutOfRangeException("index");
             }
-            _children[(int)index].FillDescription((_VSOBJDESCOPTIONS)grfOptions, pobDesc);
+            this._children[(int)index].FillDescription((_VSOBJDESCOPTIONS)grfOptions, pobDesc);
             return VSConstants.S_OK;
         }
 
         int IVsSimpleObjectList2.GetBrowseObject(uint index, out object ppdispBrowseObj)
         {
-            if (index >= (uint)_children.Count)
+            if (index >= (uint)this._children.Count)
             {
                 throw new ArgumentOutOfRangeException("index");
             }
-            ppdispBrowseObj = _children[(int)index].BrowseObject;
+            ppdispBrowseObj = this._children[(int)index].BrowseObject;
             if (null == ppdispBrowseObj)
             {
                 return VSConstants.E_NOTIMPL;
@@ -172,7 +172,7 @@ namespace Microsoft.VisualStudioTools.Navigation
 
         int IVsSimpleObjectList2.GetCapabilities2(out uint pgrfCapabilities)
         {
-            pgrfCapabilities = (uint)Capabilities;
+            pgrfCapabilities = (uint)this.Capabilities;
             return VSConstants.S_OK;
         }
 
@@ -182,9 +182,9 @@ namespace Microsoft.VisualStudioTools.Navigation
             {
                 pfCatField = CategoryField((LIB_CATEGORY)Category);
             }
-            else if (index < (uint)_children.Count)
+            else if (index < (uint)this._children.Count)
             {
-                pfCatField = _children[(int)index].CategoryField((LIB_CATEGORY)Category);
+                pfCatField = this._children[(int)index].CategoryField((LIB_CATEGORY)Category);
             }
             else
             {
@@ -200,11 +200,11 @@ namespace Microsoft.VisualStudioTools.Navigation
 
         int IVsSimpleObjectList2.GetContextMenu(uint index, out Guid pclsidActive, out int pnMenuId, out IOleCommandTarget ppCmdTrgtActive)
         {
-            if (index >= (uint)_children.Count)
+            if (index >= (uint)this._children.Count)
             {
                 throw new ArgumentOutOfRangeException("index");
             }
-            CommandID commandId = _children[(int)index].ContextMenuID;
+            CommandID commandId = this._children[(int)index].ContextMenuID;
             if (null == commandId)
             {
                 pclsidActive = Guid.Empty;
@@ -214,17 +214,17 @@ namespace Microsoft.VisualStudioTools.Navigation
             }
             pclsidActive = commandId.Guid;
             pnMenuId = commandId.ID;
-            ppCmdTrgtActive = _children[(int)index] as IOleCommandTarget;
+            ppCmdTrgtActive = this._children[(int)index] as IOleCommandTarget;
             return VSConstants.S_OK;
         }
 
         int IVsSimpleObjectList2.GetDisplayData(uint index, VSTREEDISPLAYDATA[] pData)
         {
-            if (index >= (uint)_children.Count)
+            if (index >= (uint)this._children.Count)
             {
                 throw new ArgumentOutOfRangeException("index");
             }
-            pData[0] = _children[(int)index].DisplayData;
+            pData[0] = this._children[(int)index].DisplayData;
             return VSConstants.S_OK;
         }
 
@@ -244,24 +244,24 @@ namespace Microsoft.VisualStudioTools.Navigation
 
         int IVsSimpleObjectList2.GetFlags(out uint pFlags)
         {
-            pFlags = (uint)Flags;
+            pFlags = (uint)this.Flags;
             return VSConstants.S_OK;
         }
 
         int IVsSimpleObjectList2.GetItemCount(out uint pCount)
         {
-            pCount = (uint)_children.Count;
+            pCount = (uint)this._children.Count;
             return VSConstants.S_OK;
         }
 
         int IVsSimpleObjectList2.GetList2(uint index, uint ListType, uint flags, VSOBSEARCHCRITERIA2[] pobSrch, out IVsSimpleObjectList2 ppIVsSimpleObjectList2)
         {
             // TODO: Use the flags and list type to actually filter the result.
-            if (index >= (uint)_children.Count)
+            if (index >= (uint)this._children.Count)
             {
                 throw new ArgumentOutOfRangeException("index");
             }
-            ppIVsSimpleObjectList2 = _children[(int)index].FilterView(ListType);
+            ppIVsSimpleObjectList2 = this._children[(int)index].FilterView(ListType);
             return VSConstants.S_OK;
         }
 
@@ -272,21 +272,21 @@ namespace Microsoft.VisualStudioTools.Navigation
 
         int IVsSimpleObjectList2.GetNavInfo(uint index, out IVsNavInfo ppNavInfo)
         {
-            if (index >= (uint)_children.Count)
+            if (index >= (uint)this._children.Count)
             {
                 throw new ArgumentOutOfRangeException("index");
             }
-            ppNavInfo = _children[(int)index] as IVsNavInfo;
+            ppNavInfo = this._children[(int)index] as IVsNavInfo;
             return ppNavInfo == null ? VSConstants.E_NOTIMPL : VSConstants.S_OK;
         }
 
         int IVsSimpleObjectList2.GetNavInfoNode(uint index, out IVsNavInfoNode ppNavInfoNode)
         {
-            if (index >= (uint)_children.Count)
+            if (index >= (uint)this._children.Count)
             {
                 throw new ArgumentOutOfRangeException("index");
             }
-            ppNavInfoNode = _children[(int)index] as IVsNavInfoNode;
+            ppNavInfoNode = this._children[(int)index] as IVsNavInfoNode;
             return VSConstants.S_OK;
         }
 
@@ -294,7 +294,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         {
             if (propid == (int)_VSOBJLISTELEMPROPID.VSOBJLISTELEMPROPID_FULLNAME)
             {
-                pvar = _children[(int)index].FullName;
+                pvar = this._children[(int)index].FullName;
                 return VSConstants.S_OK;
             }
 
@@ -312,22 +312,22 @@ namespace Microsoft.VisualStudioTools.Navigation
         int IVsSimpleObjectList2.GetTextWithOwnership(uint index, VSTREETEXTOPTIONS tto, out string pbstrText)
         {
             // TODO: make use of the text option.
-            if (index >= (uint)_children.Count)
+            if (index >= (uint)this._children.Count)
             {
                 throw new ArgumentOutOfRangeException("index");
             }
-            pbstrText = _children[(int)index].GetTextRepresentation(tto);
+            pbstrText = this._children[(int)index].GetTextRepresentation(tto);
             return VSConstants.S_OK;
         }
 
         int IVsSimpleObjectList2.GetTipTextWithOwnership(uint index, VSTREETOOLTIPTYPE eTipType, out string pbstrText)
         {
             // TODO: Make use of the tooltip type.
-            if (index >= (uint)_children.Count)
+            if (index >= (uint)this._children.Count)
             {
                 throw new ArgumentOutOfRangeException("index");
             }
-            pbstrText = _children[(int)index].TooltipText;
+            pbstrText = this._children[(int)index].TooltipText;
             return VSConstants.S_OK;
         }
 
@@ -339,11 +339,11 @@ namespace Microsoft.VisualStudioTools.Navigation
 
         int IVsSimpleObjectList2.GoToSource(uint index, VSOBJGOTOSRCTYPE SrcType)
         {
-            if (index >= (uint)_children.Count)
+            if (index >= (uint)this._children.Count)
             {
                 throw new ArgumentOutOfRangeException("index");
             }
-            _children[(int)index].GotoSource(SrcType);
+            this._children[(int)index].GotoSource(SrcType);
             return VSConstants.S_OK;
         }
 
@@ -354,9 +354,9 @@ namespace Microsoft.VisualStudioTools.Navigation
             pulIndex = NullIndex;
             string nodeName;
             ErrorHandler.ThrowOnFailure(pNavInfoNode.get_Name(out nodeName));
-            for (int i = 0; i < _children.Count; i++)
+            for (int i = 0; i < this._children.Count; i++)
             {
-                if (0 == string.Compare(_children[i].UniqueName, nodeName, StringComparison.OrdinalIgnoreCase))
+                if (0 == string.Compare(this._children[i].UniqueName, nodeName, StringComparison.OrdinalIgnoreCase))
                 {
                     pulIndex = (uint)i;
                     return VSConstants.S_OK;
@@ -383,7 +383,7 @@ namespace Microsoft.VisualStudioTools.Navigation
 
         int IVsSimpleObjectList2.UpdateCounter(out uint pCurUpdate)
         {
-            pCurUpdate = _updateCount;
+            pCurUpdate = this._updateCount;
             return VSConstants.S_OK;
         }
 

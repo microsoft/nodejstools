@@ -32,16 +32,16 @@ namespace Microsoft.NodejsTools.Debugger.Commands
         public LookupCommand(int id, IEvaluationResultFactory resultFactory, IEnumerable<NodeEvaluationResult> parents)
             : this(id, resultFactory, EnsureUniqueHandles(ref parents).Select(p => p.Handle).ToArray())
         {
-            _parents = parents.ToDictionary(p => p.Handle);
+            this._parents = parents.ToDictionary(p => p.Handle);
         }
 
         public LookupCommand(int id, IEvaluationResultFactory resultFactory, int[] handles)
             : base(id, "lookup")
         {
-            _resultFactory = resultFactory;
-            _handles = handles;
+            this._resultFactory = resultFactory;
+            this._handles = handles;
 
-            _arguments = new Dictionary<string, object> {
+            this._arguments = new Dictionary<string, object> {
                 { "handles", handles },
                 { "includeSource", false }
             };
@@ -69,7 +69,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands
 
         protected override IDictionary<string, object> Arguments
         {
-            get { return _arguments; }
+            get { return this._arguments; }
         }
 
         public Dictionary<int, List<NodeEvaluationResult>> Results { get; private set; }
@@ -90,9 +90,9 @@ namespace Microsoft.NodejsTools.Debugger.Commands
 
             // Retrieve properties
             JToken body = response["body"];
-            Results = new Dictionary<int, List<NodeEvaluationResult>>(_handles.Length);
+            this.Results = new Dictionary<int, List<NodeEvaluationResult>>(this._handles.Length);
 
-            foreach (int handle in _handles)
+            foreach (int handle in this._handles)
             {
                 string id = handle.ToString(CultureInfo.InvariantCulture);
                 JToken data = body[id];
@@ -102,9 +102,9 @@ namespace Microsoft.NodejsTools.Debugger.Commands
                 }
 
                 NodeEvaluationResult parent = null;
-                if (_parents != null)
+                if (this._parents != null)
                 {
-                    _parents.TryGetValue(handle, out parent);
+                    this._parents.TryGetValue(handle, out parent);
                 }
 
                 List<NodeEvaluationResult> properties = GetProperties(data, parent, references);
@@ -112,11 +112,11 @@ namespace Microsoft.NodejsTools.Debugger.Commands
                 {
                     // Primitive javascript type
                     var variable = new NodeEvaluationVariable(null, id, data);
-                    NodeEvaluationResult property = _resultFactory.Create(variable);
+                    NodeEvaluationResult property = this._resultFactory.Create(variable);
                     properties.Add(property);
                 }
 
-                Results.Add(handle, properties);
+                this.Results.Add(handle, properties);
             }
         }
 
@@ -128,7 +128,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands
             if (props != null)
             {
                 properties.AddRange(props.Select(property => new NodeLookupVariable(parent, property, references))
-                    .Select(variableProvider => _resultFactory.Create(variableProvider)));
+                    .Select(variableProvider => this._resultFactory.Create(variableProvider)));
             }
 
             // Try to get prototype
@@ -136,7 +136,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands
             if (prototype != null)
             {
                 var variableProvider = new NodePrototypeVariable(parent, prototype, references);
-                NodeEvaluationResult result = _resultFactory.Create(variableProvider);
+                NodeEvaluationResult result = this._resultFactory.Create(variableProvider);
                 properties.Add(result);
             }
 

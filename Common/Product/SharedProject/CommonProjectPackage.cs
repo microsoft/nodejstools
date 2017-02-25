@@ -77,27 +77,27 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 RegisterEditorFactory(encodingEditorFactory);
             }
-            var componentManager = _compMgr = (IOleComponentManager)GetService(typeof(SOleComponentManager));
+            var componentManager = this._compMgr = (IOleComponentManager)GetService(typeof(SOleComponentManager));
             OLECRINFO[] crinfo = new OLECRINFO[1];
             crinfo[0].cbSize = (uint)Marshal.SizeOf(typeof(OLECRINFO));
             crinfo[0].grfcrf = (uint)_OLECRF.olecrfNeedIdleTime;
             crinfo[0].grfcadvf = (uint)_OLECADVF.olecadvfModal | (uint)_OLECADVF.olecadvfRedrawOff | (uint)_OLECADVF.olecadvfWarningsOff;
             crinfo[0].uIdleTimeInterval = 0;
-            ErrorHandler.ThrowOnFailure(componentManager.FRegisterComponent(this, crinfo, out _componentID));
+            ErrorHandler.ThrowOnFailure(componentManager.FRegisterComponent(this, crinfo, out this._componentID));
         }
 
         protected override void Dispose(bool disposing)
         {
             try
             {
-                if (_componentID != 0)
+                if (this._componentID != 0)
                 {
                     IOleComponentManager mgr = GetService(typeof(SOleComponentManager)) as IOleComponentManager;
                     if (mgr != null)
                     {
-                        mgr.FRevokeComponent(_componentID);
+                        mgr.FRevokeComponent(this._componentID);
                     }
-                    _componentID = 0;
+                    this._componentID = 0;
                 }
             }
             finally
@@ -201,7 +201,7 @@ namespace Microsoft.VisualStudioTools.Project
             var onIdle = OnIdle;
             if (onIdle != null)
             {
-                onIdle(this, new ComponentManagerEventArgs(_compMgr));
+                onIdle(this, new ComponentManagerEventArgs(this._compMgr));
             }
 
             return 0;

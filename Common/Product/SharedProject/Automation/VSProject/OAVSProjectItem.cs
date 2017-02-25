@@ -40,12 +40,12 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
         public virtual EnvDTE.Project ContainingProject
         {
-            get { return fileNode.ProjectMgr.GetAutomationObject() as EnvDTE.Project; }
+            get { return this.fileNode.ProjectMgr.GetAutomationObject() as EnvDTE.Project; }
         }
 
         public virtual ProjectItem ProjectItem
         {
-            get { return fileNode.GetAutomationObject() as ProjectItem; }
+            get { return this.fileNode.GetAutomationObject() as ProjectItem; }
         }
 
         public virtual DTE DTE
@@ -67,11 +67,11 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                return fileNode;
+                return this.fileNode;
             }
             set
             {
-                fileNode = value;
+                this.fileNode = value;
             }
         }
         #endregion

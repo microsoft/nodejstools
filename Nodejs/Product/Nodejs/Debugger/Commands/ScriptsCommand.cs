@@ -26,19 +26,19 @@ namespace Microsoft.NodejsTools.Debugger.Commands
 
         public ScriptsCommand(int id, bool includeSource = false, int? moduleId = null) : base(id, "scripts")
         {
-            _arguments = new Dictionary<string, object> {
+            this._arguments = new Dictionary<string, object> {
                 { "includeSource", includeSource }
             };
 
             if (moduleId != null)
             {
-                _arguments["ids"] = new object[] { moduleId };
+                this._arguments["ids"] = new object[] { moduleId };
             }
         }
 
         protected override IDictionary<string, object> Arguments
         {
-            get { return _arguments; }
+            get { return this._arguments; }
         }
 
         public List<NodeModule> Modules { get; private set; }
@@ -48,7 +48,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands
             base.ProcessResponse(response);
 
             JArray body = (JArray)response["body"] ?? new JArray();
-            Modules = new List<NodeModule>(body.Count);
+            this.Modules = new List<NodeModule>(body.Count);
 
             foreach (JToken module in body)
             {
@@ -69,7 +69,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands
                         source.Length - NodeConstants.ScriptWrapBegin.Length - NodeConstants.ScriptWrapEnd.Length);
                 }
 
-                Modules.Add(new NodeModule(id, fileName) { Source = source });
+                this.Modules.Add(new NodeModule(id, fileName) { Source = source });
             }
         }
     }

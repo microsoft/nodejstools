@@ -25,8 +25,8 @@ namespace Microsoft.NodejsTools.Debugger
 
         public BreakpointBindingEventArgs(NodeBreakpoint breakpoint, NodeBreakpointBinding breakpointBinding)
         {
-            Breakpoint = breakpoint;
-            BreakpointBinding = breakpointBinding;
+            this.Breakpoint = breakpoint;
+            this.BreakpointBinding = breakpointBinding;
         }
     }
 }

@@ -29,7 +29,7 @@ namespace Microsoft.VisualStudioTools.Project
         public uint Add(HierarchyNode node)
         {
 #if DEBUG
-            foreach (var reference in _ids)
+            foreach (var reference in this._ids)
             {
                 if (reference != null)
                 {
@@ -41,17 +41,17 @@ namespace Microsoft.VisualStudioTools.Project
                 }
             }
 #endif
-            if (_freedIds.Count > 0)
+            if (this._freedIds.Count > 0)
             {
-                var i = _freedIds.Pop();
-                _ids[i] = new WeakReference<HierarchyNode>(node);
+                var i = this._freedIds.Pop();
+                this._ids[i] = new WeakReference<HierarchyNode>(node);
                 return (uint)i + 1;
             }
             else
             {
-                _ids.Add(new WeakReference<HierarchyNode>(node));
+                this._ids.Add(new WeakReference<HierarchyNode>(node));
                 // ids are 1 based
-                return (uint)_ids.Count;
+                return (uint)this._ids.Count;
             }
         }
 
@@ -63,14 +63,14 @@ namespace Microsoft.VisualStudioTools.Project
             int i = (int)node.ID - 1;
             HierarchyNode found;
             if (i < 0 ||
-                i >= _ids.Count ||
-                (_ids[i].TryGetTarget(out found) && !object.ReferenceEquals(node, found)))
+                i >= this._ids.Count ||
+                (this._ids[i].TryGetTarget(out found) && !object.ReferenceEquals(node, found)))
             {
                 throw new InvalidOperationException("Removing node with invalid ID or map is corrupted");
             }
 
-            _ids[i] = null;
-            _freedIds.Push(i);
+            this._ids[i] = null;
+            this._freedIds.Push(i);
         }
 
         /// <summary>
@@ -81,9 +81,9 @@ namespace Microsoft.VisualStudioTools.Project
             get
             {
                 int i = (int)itemId - 1;
-                if (0 <= i && i < _ids.Count)
+                if (0 <= i && i < this._ids.Count)
                 {
-                    var reference = _ids[i];
+                    var reference = this._ids[i];
                     HierarchyNode node;
                     if (reference != null && reference.TryGetTarget(out node))
                     {

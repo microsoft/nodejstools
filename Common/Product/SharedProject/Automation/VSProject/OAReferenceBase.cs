@@ -40,7 +40,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         #region properties
         internal ReferenceNode BaseReferenceNode
         {
-            get { return referenceNode; }
+            get { return this.referenceNode; }
         }
         #endregion
 
@@ -54,7 +54,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                return BaseReferenceNode.Parent.Object as References;
+                return this.BaseReferenceNode.Parent.Object as References;
             }
         }
 
@@ -62,7 +62,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                return BaseReferenceNode.ProjectMgr.GetAutomationObject() as EnvDTE.Project;
+                return this.BaseReferenceNode.ProjectMgr.GetAutomationObject() as EnvDTE.Project;
             }
         }
 
@@ -87,7 +87,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                return BaseReferenceNode.ProjectMgr.Site.GetService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
+                return this.BaseReferenceNode.ProjectMgr.Site.GetService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
             }
         }
 
@@ -133,7 +133,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                return BaseReferenceNode.Url;
+                return this.BaseReferenceNode.Url;
             }
         }
 
@@ -144,7 +144,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
         public virtual void Remove()
         {
-            BaseReferenceNode.Remove(false);
+            this.BaseReferenceNode.Remove(false);
         }
 
         public virtual int RevisionNumber

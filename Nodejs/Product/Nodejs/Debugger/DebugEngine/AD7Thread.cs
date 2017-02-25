@@ -29,13 +29,13 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public AD7Thread(AD7Engine engine, NodeThread debuggedThread)
         {
-            _engine = engine;
-            _debuggedThread = debuggedThread;
+            this._engine = engine;
+            this._debuggedThread = debuggedThread;
         }
 
         private string GetCurrentLocation(bool fIncludeModuleName)
         {
-            var topStackFrame = _debuggedThread.TopStackFrame;
+            var topStackFrame = this._debuggedThread.TopStackFrame;
             if (topStackFrame != null)
             {
                 return topStackFrame.FunctionName;
@@ -45,7 +45,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         internal NodeThread GetDebuggedThread()
         {
-            return _debuggedThread;
+            return this._debuggedThread;
         }
 
         #region IDebugThread2 Members
@@ -61,7 +61,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         // We currently call into the process and get the frames.  We might want to cache the frame info.
         int IDebugThread2.EnumFrameInfo(enum_FRAMEINFO_FLAGS dwFieldSpec, uint nRadix, out IEnumDebugFrameInfo2 enumObject)
         {
-            var stackFrames = _debuggedThread.Frames;
+            var stackFrames = this._debuggedThread.Frames;
             if (stackFrames == null)
             {
                 enumObject = null;
@@ -73,7 +73,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
             for (int i = 0; i < numStackFrames; i++)
             {
-                var frame = new AD7StackFrame(_engine, this, stackFrames[i]);
+                var frame = new AD7StackFrame(this._engine, this, stackFrames[i]);
                 frame.SetFrameInfo(dwFieldSpec, out frameInfoArray[i]);
             }
 
@@ -84,21 +84,21 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         // Get the name of the thread. For the sample engine, the name of the thread is always "Sample Engine Thread"
         int IDebugThread2.GetName(out string threadName)
         {
-            threadName = _debuggedThread.Name;
+            threadName = this._debuggedThread.Name;
             return VSConstants.S_OK;
         }
 
         // Return the program that this thread belongs to.
         int IDebugThread2.GetProgram(out IDebugProgram2 program)
         {
-            program = _engine;
+            program = this._engine;
             return VSConstants.S_OK;
         }
 
         // Gets the system thread identifier.
         int IDebugThread2.GetThreadId(out uint threadId)
         {
-            threadId = (uint)_debuggedThread.Id;
+            threadId = (uint)this._debuggedThread.Id;
             return VSConstants.S_OK;
         }
 
@@ -109,7 +109,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
             if ((dwFields & enum_THREADPROPERTY_FIELDS.TPF_ID) != 0)
             {
-                props.dwThreadId = (uint)_debuggedThread.Id;
+                props.dwThreadId = (uint)this._debuggedThread.Id;
                 props.dwFields |= enum_THREADPROPERTY_FIELDS.TPF_ID;
             }
             if ((dwFields & enum_THREADPROPERTY_FIELDS.TPF_SUSPENDCOUNT) != 0)
@@ -129,7 +129,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             }
             if ((dwFields & enum_THREADPROPERTY_FIELDS.TPF_NAME) != 0)
             {
-                props.bstrName = _debuggedThread.Name;
+                props.bstrName = this._debuggedThread.Name;
                 props.dwFields |= enum_THREADPROPERTY_FIELDS.TPF_NAME;
             }
             if ((dwFields & enum_THREADPROPERTY_FIELDS.TPF_LOCATION) != 0)
@@ -228,7 +228,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                 if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_DISPLAY_NAME) != 0)
                 {
                     // Thread display name is being requested
-                    props[0].bstrDisplayName = _debuggedThread.Name;
+                    props[0].bstrDisplayName = this._debuggedThread.Name;
                     props[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_DISPLAY_NAME;
 
                     // Give this display name a higher priority than the default (0)
@@ -240,7 +240,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                 if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_CATEGORY) != 0)
                 {
                     // Thread category is being requested
-                    if (_debuggedThread.IsWorkerThread)
+                    if (this._debuggedThread.IsWorkerThread)
                     {
                         props[0].dwThreadCategory = (uint)enum_THREADCATEGORY.THREADCATEGORY_Worker;
                     }
@@ -255,7 +255,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                 if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_ID) != 0)
                 {
                     // Thread category is being requested
-                    props[0].dwThreadId = (uint)_debuggedThread.Id;
+                    props[0].dwThreadId = (uint)this._debuggedThread.Id;
                     props[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_ID;
                 }
 

@@ -36,21 +36,21 @@ namespace Microsoft.NodejsTools.Debugger.Remote
 
         public NodeRemoteDebugProcess(NodeRemoteDebugPort port, string exe, string username, string version)
         {
-            _port = port;
-            _id = RemoteId;
-            _username = username;
-            _exe = string.IsNullOrEmpty(exe) ? "<node>" : exe;
-            _version = version;
+            this._port = port;
+            this._id = RemoteId;
+            this._username = username;
+            this._exe = string.IsNullOrEmpty(exe) ? "<node>" : exe;
+            this._version = version;
         }
 
         public NodeRemoteDebugPort DebugPort
         {
-            get { return _port; }
+            get { return this._port; }
         }
 
         public int Id
         {
-            get { return _id; }
+            get { return this._id; }
         }
 
         public int Attach(IDebugEventCallback2 pCallback, Guid[] rgguidSpecificEngines, uint celtSpecificEngines, int[] rghrEngineAttach)
@@ -75,12 +75,12 @@ namespace Microsoft.NodejsTools.Debugger.Remote
 
         public int EnumPrograms(out IEnumDebugPrograms2 ppEnum)
         {
-            if (_programs != null)
+            if (this._programs != null)
             {
-                return _programs.Clone(out ppEnum);
+                return this._programs.Clone(out ppEnum);
             }
-            _programs = new NodeRemoteEnumDebugPrograms(this);
-            ppEnum = _programs;
+            this._programs = new NodeRemoteEnumDebugPrograms(this);
+            ppEnum = this._programs;
             return VSConstants.S_OK;
         }
 
@@ -99,10 +99,10 @@ namespace Microsoft.NodejsTools.Debugger.Remote
             // The various string fields should match the strings returned by GetName - keep them in sync when making any changes here.
             var pi = new PROCESS_INFO();
             pi.Fields = Fields;
-            pi.bstrFileName = _exe;
-            pi.bstrBaseName = BaseName;
-            pi.bstrTitle = Title;
-            pi.ProcessId.dwProcessId = (uint)_id;
+            pi.bstrFileName = this._exe;
+            pi.bstrBaseName = this.BaseName;
+            pi.bstrTitle = this.Title;
+            pi.ProcessId.dwProcessId = (uint)this._id;
             pProcessInfo[0] = pi;
             return VSConstants.S_OK;
         }
@@ -113,14 +113,14 @@ namespace Microsoft.NodejsTools.Debugger.Remote
             switch (gnType)
             {
                 case enum_GETNAME_TYPE.GN_FILENAME:
-                    pbstrName = _exe;
+                    pbstrName = this._exe;
                     break;
                 case enum_GETNAME_TYPE.GN_BASENAME:
-                    pbstrName = BaseName;
+                    pbstrName = this.BaseName;
                     break;
                 case enum_GETNAME_TYPE.GN_NAME:
                 case enum_GETNAME_TYPE.GN_TITLE:
-                    pbstrName = _version;
+                    pbstrName = this._version;
                     break;
                 default:
                     pbstrName = null;
@@ -132,20 +132,20 @@ namespace Microsoft.NodejsTools.Debugger.Remote
         public int GetPhysicalProcessId(AD_PROCESS_ID[] pProcessId)
         {
             var pidStruct = new AD_PROCESS_ID();
-            pidStruct.dwProcessId = (uint)_id;
+            pidStruct.dwProcessId = (uint)this._id;
             pProcessId[0] = pidStruct;
             return VSConstants.S_OK;
         }
 
         public int GetPort(out IDebugPort2 ppPort)
         {
-            ppPort = _port;
+            ppPort = this._port;
             return VSConstants.S_OK;
         }
 
         public int GetProcessId(out Guid pguidProcessId)
         {
-            pguidProcessId = _guid;
+            pguidProcessId = this._guid;
             return VSConstants.S_OK;
         }
 
@@ -161,7 +161,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote
 
         public int GetUserName(out string pbstrUserName)
         {
-            pbstrUserName = _username;
+            pbstrUserName = this._username;
             return VSConstants.S_OK;
         }
 
@@ -175,14 +175,14 @@ namespace Microsoft.NodejsTools.Debugger.Remote
             get
             {
                 string portName;
-                _port.GetPortName(out portName);
-                return Path.GetFileName(_exe) + " @ " + portName;
+                this._port.GetPortName(out portName);
+                return Path.GetFileName(this._exe) + " @ " + portName;
             }
         }
 
         private string Title
         {
-            get { return _version; }
+            get { return this._version; }
         }
     }
 }

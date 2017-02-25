@@ -36,8 +36,8 @@ namespace Microsoft.VisualStudioTools.Project
         {
             Utilities.ArgumentNotNull("projectManager", projectManager);
 
-            project = projectManager;
-            output = outputAssembly;
+            this.project = projectManager;
+            this.output = outputAssembly;
         }
 
         internal string CanonicalName
@@ -59,18 +59,18 @@ namespace Microsoft.VisualStudioTools.Project
 
         public int get_CanonicalName(out string pbstrCanonicalName)
         {
-            if (output == null)
+            if (this.output == null)
             {
-                pbstrCanonicalName = project.Url;
+                pbstrCanonicalName = this.project.Url;
                 return VSConstants.S_OK;
             }
 
             // Get the output assembly path (including the name)
-            pbstrCanonicalName = output.GetMetadataValue("FullPath");
+            pbstrCanonicalName = this.output.GetMetadataValue("FullPath");
             Debug.Assert(!String.IsNullOrEmpty(pbstrCanonicalName), "Output Assembly not defined");
 
             // Make sure we have a full path
-            pbstrCanonicalName = CommonUtils.GetAbsoluteFilePath(project.ProjectHome, pbstrCanonicalName);
+            pbstrCanonicalName = CommonUtils.GetAbsoluteFilePath(this.project.ProjectHome, pbstrCanonicalName);
             return VSConstants.S_OK;
         }
 
@@ -82,17 +82,17 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public virtual int get_DeploySourceURL(out string pbstrDeploySourceURL)
         {
-            if (output == null)
+            if (this.output == null)
             {
                 // we're lying here to keep callers happy who expect a path...  See also OutputGroup.get_KeyOutputObject
                 pbstrDeploySourceURL = GetType().Assembly.CodeBase;
                 return VSConstants.S_OK;
             }
 
-            string path = output.GetMetadataValue(ProjectFileConstants.FinalOutputPath);
+            string path = this.output.GetMetadataValue(ProjectFileConstants.FinalOutputPath);
             if (string.IsNullOrEmpty(path))
             {
-                pbstrDeploySourceURL = new Url(output.GetMetadataValue("FullPath")).Uri.AbsoluteUri;
+                pbstrDeploySourceURL = new Url(this.output.GetMetadataValue("FullPath")).Uri.AbsoluteUri;
                 return VSConstants.S_OK;
             }
             if (path.Length < 9 || String.Compare(path.Substring(0, 8), "file:///", StringComparison.OrdinalIgnoreCase) != 0)
@@ -108,7 +108,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public virtual int get_Property(string szProperty, out object pvar)
         {
-            if (output == null)
+            if (this.output == null)
             {
                 switch (szProperty)
                 {
@@ -119,7 +119,7 @@ namespace Microsoft.VisualStudioTools.Project
                 pvar = null;
                 return VSConstants.E_NOTIMPL;
             }
-            String value = output.GetMetadataValue(szProperty);
+            String value = this.output.GetMetadataValue(szProperty);
             pvar = value;
 
             // If we don't have a value, we are expected to return unimplemented
@@ -128,9 +128,9 @@ namespace Microsoft.VisualStudioTools.Project
 
         public int get_RootRelativeURL(out string pbstrRelativePath)
         {
-            if (output == null)
+            if (this.output == null)
             {
-                pbstrRelativePath = project.ProjectHome;
+                pbstrRelativePath = this.project.ProjectHome;
                 return VSConstants.E_FAIL;
             }
 
@@ -149,8 +149,8 @@ namespace Microsoft.VisualStudioTools.Project
             }
             else
             {
-                string baseDir = project.ProjectHome;
-                string fullPath = output.GetMetadataValue("FullPath");
+                string baseDir = this.project.ProjectHome;
+                string fullPath = this.output.GetMetadataValue("FullPath");
                 if (CommonUtils.IsSubpathOf(baseDir, fullPath))
                 {
                     pbstrRelativePath = CommonUtils.GetRelativeFilePath(baseDir, fullPath);

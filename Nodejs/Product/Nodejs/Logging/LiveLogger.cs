@@ -44,11 +44,11 @@ namespace Microsoft.NodejsTools.Logging
         {
             get
             {
-                if (_diagnosticsOptions == null && NodejsPackage.Instance != null)
+                if (this._diagnosticsOptions == null && NodejsPackage.Instance != null)
                 {
-                    _diagnosticsOptions = NodejsPackage.Instance.DiagnosticsOptionsPage;
+                    this._diagnosticsOptions = NodejsPackage.Instance.DiagnosticsOptionsPage;
                 }
-                return _diagnosticsOptions;
+                return this._diagnosticsOptions;
             }
         }
 
@@ -91,7 +91,7 @@ namespace Microsoft.NodejsTools.Logging
         {
             Debug.WriteLine(message);
 
-            if (DiagnosticsOptions != null && DiagnosticsOptions.IsLiveDiagnosticsEnabled)
+            if (this.DiagnosticsOptions != null && this.DiagnosticsOptions.IsLiveDiagnosticsEnabled)
             {
                 var pane = OutputWindowRedirector.Get(VisualStudio.Shell.ServiceProvider.GlobalProvider, LiveDiagnosticLogPaneGuid, LiveDiagnosticLogPaneName);
                 if (pane != null)

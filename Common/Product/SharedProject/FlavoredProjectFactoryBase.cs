@@ -35,7 +35,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <include file='doc\FlavoredProjectFactoryBase.uex' path='docs/doc[@for="FlavoredProjectFactoryBase.FlavoredProjectFactoryBase"]/*' />
         public FlavoredProjectFactoryBase(System.IServiceProvider serviceProvider)
         {
-            _serviceProvider = serviceProvider;
+            this._serviceProvider = serviceProvider;
         }
 
         #region IVsProjectFactory
@@ -121,7 +121,7 @@ namespace Microsoft.VisualStudioTools.Project
             object newProject = PreCreateForOuter(outerProjectIUnknown);
 
             IntPtr newProjectIUnknown = IntPtr.Zero;
-            ILocalRegistryCorrected localRegistry = (ILocalRegistryCorrected)_serviceProvider.GetService(typeof(SLocalRegistry));
+            ILocalRegistryCorrected localRegistry = (ILocalRegistryCorrected)this._serviceProvider.GetService(typeof(SLocalRegistry));
             Debug.Assert(localRegistry != null, "Could not get the ILocalRegistry object");
             if (localRegistry == null)
             {

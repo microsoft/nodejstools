@@ -33,9 +33,9 @@ namespace Microsoft.VisualStudioTools
             {
                 SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
             }
-            _scheduler = TaskScheduler.FromCurrentSynchronizationContext();
-            _factory = new TaskFactory(_scheduler);
-            _uiThread = Thread.CurrentThread;
+            this._scheduler = TaskScheduler.FromCurrentSynchronizationContext();
+            this._factory = new TaskFactory(this._scheduler);
+            this._uiThread = Thread.CurrentThread;
         }
 
         public static void EnsureService(IServiceContainer container)
@@ -50,13 +50,13 @@ namespace Microsoft.VisualStudioTools
         {
             get
             {
-                return Thread.CurrentThread != _uiThread;
+                return Thread.CurrentThread != this._uiThread;
             }
         }
 
         public override void MustBeCalledFromUIThreadOrThrow()
         {
-            if (InvokeRequired)
+            if (this.InvokeRequired)
             {
                 const int RPC_E_WRONG_THREAD = unchecked((int)0x8001010E);
                 throw new COMException("Invalid cross-thread call", RPC_E_WRONG_THREAD);
@@ -72,9 +72,9 @@ namespace Microsoft.VisualStudioTools
         /// </remarks>
         public override void Invoke(Action action)
         {
-            if (InvokeRequired)
+            if (this.InvokeRequired)
             {
-                _factory.StartNew(action).GetAwaiter().GetResult();
+                this._factory.StartNew(action).GetAwaiter().GetResult();
             }
             else
             {
@@ -92,9 +92,9 @@ namespace Microsoft.VisualStudioTools
         /// </remarks>
         public override T Invoke<T>(Func<T> func)
         {
-            if (InvokeRequired)
+            if (this.InvokeRequired)
             {
-                return _factory.StartNew(func).GetAwaiter().GetResult();
+                return this._factory.StartNew(func).GetAwaiter().GetResult();
             }
             else
             {
@@ -112,9 +112,9 @@ namespace Microsoft.VisualStudioTools
         public override Task InvokeAsync(Action action)
         {
             var tcs = new TaskCompletionSource<object>();
-            if (InvokeRequired)
+            if (this.InvokeRequired)
             {
-                return _factory.StartNew(action);
+                return this._factory.StartNew(action);
             }
             else
             {
@@ -135,9 +135,9 @@ namespace Microsoft.VisualStudioTools
         public override Task<T> InvokeAsync<T>(Func<T> func)
         {
             var tcs = new TaskCompletionSource<T>();
-            if (InvokeRequired)
+            if (this.InvokeRequired)
             {
-                return _factory.StartNew(func);
+                return this._factory.StartNew(func);
             }
             else
             {
@@ -159,7 +159,7 @@ namespace Microsoft.VisualStudioTools
         public override Task InvokeTask(Func<Task> func)
         {
             var tcs = new TaskCompletionSource<object>();
-            if (InvokeRequired)
+            if (this.InvokeRequired)
             {
                 InvokeAsync(() => InvokeTaskHelper(func, tcs));
             }
@@ -183,7 +183,7 @@ namespace Microsoft.VisualStudioTools
         public override Task<T> InvokeTask<T>(Func<Task<T>> func)
         {
             var tcs = new TaskCompletionSource<T>();
-            if (InvokeRequired)
+            if (this.InvokeRequired)
             {
                 InvokeAsync(() => InvokeTaskHelper(func, tcs));
             }

@@ -26,12 +26,12 @@ namespace Microsoft.NodejsTools.Logging
 
         public NodejsToolsLogger(INodejsToolsLogger[] loggers)
         {
-            _loggers = loggers;
+            this._loggers = loggers;
         }
 
         public void LogEvent(NodejsToolsLogEvent logEvent, object data = null)
         {
-            foreach (var logger in _loggers)
+            foreach (var logger in this._loggers)
             {
                 logger.LogEvent(logEvent, data);
             }

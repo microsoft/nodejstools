@@ -167,7 +167,7 @@ namespace Microsoft.NodejsTools
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
 
-            if (!_hasRequiredTypescriptVersion.Value)
+            if (!this._hasRequiredTypescriptVersion.Value)
             {
                 MessageBox.Show(
                    string.Format(CultureInfo.CurrentCulture, Resources.TypeScriptMinVersionNotInstalled, _minRequiredTypescriptVersion.ToString()),
@@ -238,7 +238,7 @@ namespace Microsoft.NodejsTools
             EnvDTE._dispCommandEvents_AfterExecuteEventHandler afterExecute = null)
         {
             var commandEventGuid = typeof(VSConstants.VSStd97CmdID).GUID.ToString("B");
-            var targetEvent = DTE.Events.CommandEvents[commandEventGuid, eventId];
+            var targetEvent = this.DTE.Events.CommandEvents[commandEventGuid, eventId];
             if (beforeExecute != null)
             {
                 targetEvent.BeforeExecute += beforeExecute;
@@ -247,15 +247,15 @@ namespace Microsoft.NodejsTools
             {
                 targetEvent.AfterExecute += afterExecute;
             }
-            _subscribedCommandEvents.Add(targetEvent);
+            this._subscribedCommandEvents.Add(targetEvent);
         }
 
         private void InitializeLogging()
         {
-            _logger = new NodejsToolsLogger(ComponentModel.GetExtensions<INodejsToolsLogger>().ToArray());
+            this._logger = new NodejsToolsLogger(this.ComponentModel.GetExtensions<INodejsToolsLogger>().ToArray());
 
             // log interesting stats on startup
-            _logger.LogEvent(NodejsToolsLogEvent.SurveyNewsFrequency, GeneralOptionsPage.SurveyNewsCheck);
+            this._logger.LogEvent(NodejsToolsLogEvent.SurveyNewsFrequency, this.GeneralOptionsPage.SurveyNewsCheck);
         }
 
         private void InitializeTelemetry()
@@ -263,9 +263,9 @@ namespace Microsoft.NodejsTools
             var thisAssembly = typeof(NodejsPackage).Assembly;
 
             // Get telemetry logger
-            _telemetryLogger = TelemetrySetup.Instance.GetLogger(thisAssembly);
+            this._telemetryLogger = TelemetrySetup.Instance.GetLogger(thisAssembly);
 
-            TelemetrySetup.Instance.LogPackageLoad(_telemetryLogger, Guid.Parse(Guids.NodejsPackageString), thisAssembly, Application.ProductVersion);
+            TelemetrySetup.Instance.LogPackageLoad(this._telemetryLogger, Guid.Parse(Guids.NodejsPackageString), thisAssembly, Application.ProductVersion);
         }
 
         public new IComponentModel ComponentModel
@@ -280,7 +280,7 @@ namespace Microsoft.NodejsTools
         {
             get
             {
-                return _logger;
+                return this._logger;
             }
         }
 
@@ -288,7 +288,7 @@ namespace Microsoft.NodejsTools
         {
             get
             {
-                return _telemetryLogger;
+                return this._telemetryLogger;
             }
         }
 
@@ -309,14 +309,14 @@ namespace Microsoft.NodejsTools
 
         internal IReplWindow2 OpenReplWindow(bool focus = true)
         {
-            var compModel = ComponentModel;
+            var compModel = this.ComponentModel;
             var provider = compModel.GetService<IReplWindowProvider>();
 
             var window = (IReplWindow2)provider.FindReplWindow(NodejsReplEvaluatorProvider.NodeReplId);
             if (window == null)
             {
                 window = (IReplWindow2)provider.CreateReplWindow(
-                    ReplContentType,
+                    this.ReplContentType,
                     Resources.InteractiveWindowTitle,
                     Guids.TypeScriptLanguageInfo,
                     NodejsReplEvaluatorProvider.NodeReplId
@@ -361,11 +361,11 @@ namespace Microsoft.NodejsTools
         {
             get
             {
-                if (_contentType == null)
+                if (this._contentType == null)
                 {
-                    _contentType = ComponentModel.GetService<IContentTypeRegistryService>().GetContentType(NodejsConstants.TypeScript);
+                    this._contentType = this.ComponentModel.GetService<IContentTypeRegistryService>().GetContentType(NodejsConstants.TypeScript);
                 }
-                return _contentType;
+                return this._contentType;
             }
         }
 
@@ -455,26 +455,26 @@ namespace Microsoft.NodejsTools
 
         private void BrowseSurveyNewsOnIdle(object sender, ComponentManagerEventArgs e)
         {
-            this.OnIdle -= BrowseSurveyNewsOnIdle;
+            this.OnIdle -= this.BrowseSurveyNewsOnIdle;
 
-            lock (_surveyNewsUrlLock)
+            lock (this._surveyNewsUrlLock)
             {
-                if (!string.IsNullOrEmpty(_surveyNewsUrl))
+                if (!string.IsNullOrEmpty(this._surveyNewsUrl))
                 {
-                    OpenVsWebBrowser(this, _surveyNewsUrl);
-                    _surveyNewsUrl = null;
+                    OpenVsWebBrowser(this, this._surveyNewsUrl);
+                    this._surveyNewsUrl = null;
                 }
             }
         }
 
         internal void BrowseSurveyNews(string url)
         {
-            lock (_surveyNewsUrlLock)
+            lock (this._surveyNewsUrlLock)
             {
-                _surveyNewsUrl = url;
+                this._surveyNewsUrl = url;
             }
 
-            this.OnIdle += BrowseSurveyNewsOnIdle;
+            this.OnIdle += this.BrowseSurveyNewsOnIdle;
         }
 
         private void CheckSurveyNewsThread(Uri url, bool warnIfNoneAvailable)
@@ -489,7 +489,7 @@ namespace Microsoft.NodejsTools
             {
                 var br = new WebBrowser();
                 br.Tag = warnIfNoneAvailable;
-                br.DocumentCompleted += OnSurveyNewsDocumentCompleted;
+                br.DocumentCompleted += this.OnSurveyNewsDocumentCompleted;
                 br.Navigate(url);
                 Application.Run();
             });
@@ -556,7 +556,7 @@ namespace Microsoft.NodejsTools
                 {
                     if (available != null)
                     {
-                        BrowseSurveyNews(GeneralOptionsPage.SurveyNewsIndexUrl);
+                        BrowseSurveyNews(this.GeneralOptionsPage.SurveyNewsIndexUrl);
                     }
                     else
                     {
@@ -572,7 +572,7 @@ namespace Microsoft.NodejsTools
         {
             if (forceCheckAndWarnIfNoneAvailable || ShouldQuerySurveryNewsServer())
             {
-                var options = GeneralOptionsPage;
+                var options = this.GeneralOptionsPage;
                 options.SurveyNewsLastCheck = DateTime.Now;
                 options.SaveSettingsToStorage();
                 CheckSurveyNewsThread(new Uri(options.SurveyNewsFeedUrl), forceCheckAndWarnIfNoneAvailable);
@@ -581,7 +581,7 @@ namespace Microsoft.NodejsTools
 
         private bool ShouldQuerySurveryNewsServer()
         {
-            var options = GeneralOptionsPage;
+            var options = this.GeneralOptionsPage;
             // Ensure that we don't prompt the user on their very first project creation.
             // Delay by 3 days by pretending we checked 4 days ago (the default of check
             // once a week ensures we'll check again in 3 days).

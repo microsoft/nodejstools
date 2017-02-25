@@ -41,24 +41,24 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                if ((null == BaseReferenceNode.ResolvedAssembly) ||
-                    (null == BaseReferenceNode.ResolvedAssembly.Version))
+                if ((null == this.BaseReferenceNode.ResolvedAssembly) ||
+                    (null == this.BaseReferenceNode.ResolvedAssembly.Version))
                 {
                     return 0;
                 }
-                return BaseReferenceNode.ResolvedAssembly.Version.Build;
+                return this.BaseReferenceNode.ResolvedAssembly.Version.Build;
             }
         }
         public override string Culture
         {
             get
             {
-                if ((null == BaseReferenceNode.ResolvedAssembly) ||
-                    (null == BaseReferenceNode.ResolvedAssembly.CultureInfo))
+                if ((null == this.BaseReferenceNode.ResolvedAssembly) ||
+                    (null == this.BaseReferenceNode.ResolvedAssembly.CultureInfo))
                 {
                     return string.Empty;
                 }
-                return BaseReferenceNode.ResolvedAssembly.CultureInfo.Name;
+                return this.BaseReferenceNode.ResolvedAssembly.CultureInfo.Name;
             }
         }
         public override string Identity
@@ -68,36 +68,36 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                 // Note that in this function we use the assembly name instead of the resolved one
                 // because the identity of this reference is the assembly name needed by the project,
                 // not the specific instance found in this machine / environment.
-                if (null == BaseReferenceNode.AssemblyName)
+                if (null == this.BaseReferenceNode.AssemblyName)
                 {
                     return null;
                 }
                 // changed from MPFProj, http://mpfproj10.codeplex.com/workitem/11274
-                return BaseReferenceNode.AssemblyName.Name;
+                return this.BaseReferenceNode.AssemblyName.Name;
             }
         }
         public override int MajorVersion
         {
             get
             {
-                if ((null == BaseReferenceNode.ResolvedAssembly) ||
-                    (null == BaseReferenceNode.ResolvedAssembly.Version))
+                if ((null == this.BaseReferenceNode.ResolvedAssembly) ||
+                    (null == this.BaseReferenceNode.ResolvedAssembly.Version))
                 {
                     return 0;
                 }
-                return BaseReferenceNode.ResolvedAssembly.Version.Major;
+                return this.BaseReferenceNode.ResolvedAssembly.Version.Major;
             }
         }
         public override int MinorVersion
         {
             get
             {
-                if ((null == BaseReferenceNode.ResolvedAssembly) ||
-                    (null == BaseReferenceNode.ResolvedAssembly.Version))
+                if ((null == this.BaseReferenceNode.ResolvedAssembly) ||
+                    (null == this.BaseReferenceNode.ResolvedAssembly.Version))
                 {
                     return 0;
                 }
-                return BaseReferenceNode.ResolvedAssembly.Version.Minor;
+                return this.BaseReferenceNode.ResolvedAssembly.Version.Minor;
             }
         }
 
@@ -105,13 +105,13 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                if ((null == BaseReferenceNode.ResolvedAssembly) ||
-                (null == BaseReferenceNode.ResolvedAssembly.GetPublicKeyToken()))
+                if ((null == this.BaseReferenceNode.ResolvedAssembly) ||
+                (null == this.BaseReferenceNode.ResolvedAssembly.GetPublicKeyToken()))
                 {
                     return null;
                 }
                 StringBuilder builder = new StringBuilder();
-                byte[] publicKeyToken = BaseReferenceNode.ResolvedAssembly.GetPublicKeyToken();
+                byte[] publicKeyToken = this.BaseReferenceNode.ResolvedAssembly.GetPublicKeyToken();
                 for (int i = 0; i < publicKeyToken.Length; i++)
                 {
                     // changed from MPFProj:
@@ -126,13 +126,13 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                if (null != BaseReferenceNode.ResolvedAssembly)
+                if (null != this.BaseReferenceNode.ResolvedAssembly)
                 {
-                    return BaseReferenceNode.ResolvedAssembly.Name;
+                    return this.BaseReferenceNode.ResolvedAssembly.Name;
                 }
-                if (null != BaseReferenceNode.AssemblyName)
+                if (null != this.BaseReferenceNode.AssemblyName)
                 {
-                    return BaseReferenceNode.AssemblyName.Name;
+                    return this.BaseReferenceNode.AssemblyName.Name;
                 }
                 return null;
             }
@@ -141,20 +141,20 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                if ((null == BaseReferenceNode.ResolvedAssembly) ||
-                    (null == BaseReferenceNode.ResolvedAssembly.Version))
+                if ((null == this.BaseReferenceNode.ResolvedAssembly) ||
+                    (null == this.BaseReferenceNode.ResolvedAssembly.Version))
                 {
                     return 0;
                 }
-                return BaseReferenceNode.ResolvedAssembly.Version.Revision;
+                return this.BaseReferenceNode.ResolvedAssembly.Version.Revision;
             }
         }
         public override bool StrongName
         {
             get
             {
-                if ((null == BaseReferenceNode.ResolvedAssembly) ||
-                    (0 == (BaseReferenceNode.ResolvedAssembly.Flags & AssemblyNameFlags.PublicKey)))
+                if ((null == this.BaseReferenceNode.ResolvedAssembly) ||
+                    (0 == (this.BaseReferenceNode.ResolvedAssembly.Flags & AssemblyNameFlags.PublicKey)))
                 {
                     return false;
                 }
@@ -172,12 +172,12 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                if ((null == BaseReferenceNode.ResolvedAssembly) ||
-                    (null == BaseReferenceNode.ResolvedAssembly.Version))
+                if ((null == this.BaseReferenceNode.ResolvedAssembly) ||
+                    (null == this.BaseReferenceNode.ResolvedAssembly.Version))
                 {
                     return string.Empty;
                 }
-                return BaseReferenceNode.ResolvedAssembly.Version.ToString();
+                return this.BaseReferenceNode.ResolvedAssembly.Version.ToString();
             }
         }
         #endregion

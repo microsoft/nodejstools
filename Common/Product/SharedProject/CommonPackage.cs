@@ -97,19 +97,19 @@ namespace Microsoft.VisualStudioTools
         {
             try
             {
-                if (_componentID != 0)
+                if (this._componentID != 0)
                 {
                     IOleComponentManager mgr = GetService(typeof(SOleComponentManager)) as IOleComponentManager;
                     if (mgr != null)
                     {
-                        mgr.FRevokeComponent(_componentID);
+                        mgr.FRevokeComponent(this._componentID);
                     }
-                    _componentID = 0;
+                    this._componentID = 0;
                 }
-                if (null != _libraryManager)
+                if (null != this._libraryManager)
                 {
-                    _libraryManager.Dispose();
-                    _libraryManager = null;
+                    this._libraryManager.Dispose();
+                    this._libraryManager = null;
                 }
             }
             finally
@@ -122,7 +122,7 @@ namespace Microsoft.VisualStudioTools
         {
             if (GetLibraryManagerType() == serviceType)
             {
-                return _libraryManager = CreateLibraryManager(this);
+                return this._libraryManager = CreateLibraryManager(this);
             }
             return null;
         }
@@ -234,15 +234,15 @@ namespace Microsoft.VisualStudioTools
         {
             var container = (IServiceContainer)this;
             UIThread.EnsureService(this);
-            container.AddService(GetLibraryManagerType(), CreateService, true);
+            container.AddService(GetLibraryManagerType(), this.CreateService, true);
 
-            var componentManager = _compMgr = (IOleComponentManager)GetService(typeof(SOleComponentManager));
+            var componentManager = this._compMgr = (IOleComponentManager)GetService(typeof(SOleComponentManager));
             OLECRINFO[] crinfo = new OLECRINFO[1];
             crinfo[0].cbSize = (uint)Marshal.SizeOf(typeof(OLECRINFO));
             crinfo[0].grfcrf = (uint)_OLECRF.olecrfNeedIdleTime;
             crinfo[0].grfcadvf = (uint)_OLECADVF.olecadvfModal | (uint)_OLECADVF.olecadvfRedrawOff | (uint)_OLECADVF.olecadvfWarningsOff;
             crinfo[0].uIdleTimeInterval = 0;
-            ErrorHandler.ThrowOnFailure(componentManager.FRegisterComponent(this, crinfo, out _componentID));
+            ErrorHandler.ThrowOnFailure(componentManager.FRegisterComponent(this, crinfo, out this._componentID));
 
             base.Initialize();
         }
@@ -280,15 +280,15 @@ namespace Microsoft.VisualStudioTools
 
         public virtual int FDoIdle(uint grfidlef)
         {
-            if (null != _libraryManager)
+            if (null != this._libraryManager)
             {
-                _libraryManager.OnIdle(_compMgr);
+                this._libraryManager.OnIdle(this._compMgr);
             }
 
             var onIdle = OnIdle;
             if (onIdle != null)
             {
-                onIdle(this, new ComponentManagerEventArgs(_compMgr));
+                onIdle(this, new ComponentManagerEventArgs(this._compMgr));
             }
 
             return 0;
@@ -345,14 +345,14 @@ namespace Microsoft.VisualStudioTools
 
         public ComponentManagerEventArgs(IOleComponentManager compMgr)
         {
-            _compMgr = compMgr;
+            this._compMgr = compMgr;
         }
 
         public IOleComponentManager ComponentManager
         {
             get
             {
-                return _compMgr;
+                return this._compMgr;
             }
         }
     }

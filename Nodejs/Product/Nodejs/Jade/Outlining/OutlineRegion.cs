@@ -35,7 +35,7 @@ namespace Microsoft.NodejsTools.Jade
         public OutlineRegion(ITextBuffer textBuffer, int start, int length)
             : base(start, length)
         {
-            _textBuffer = textBuffer;
+            this._textBuffer = textBuffer;
         }
 
         public static OutlineRegion FromBounds(ITextBuffer textBuffer, int start, int end)
@@ -50,12 +50,12 @@ namespace Microsoft.NodejsTools.Jade
         {
             get
             {
-                if (_textBuffer != null)
+                if (this._textBuffer != null)
                 {
                     int hoverTextLength = Math.Min(this.Length, 512);
-                    hoverTextLength = Math.Min(hoverTextLength, _textBuffer.CurrentSnapshot.Length - this.Start);
+                    hoverTextLength = Math.Min(hoverTextLength, this._textBuffer.CurrentSnapshot.Length - this.Start);
 
-                    var text = _textBuffer.CurrentSnapshot.GetText(this.Start, hoverTextLength);
+                    var text = this._textBuffer.CurrentSnapshot.GetText(this.Start, hoverTextLength);
                     if (hoverTextLength < this.Length)
                         text += "...";
 

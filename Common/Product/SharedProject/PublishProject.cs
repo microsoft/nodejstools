@@ -30,10 +30,10 @@ namespace Microsoft.VisualStudioTools.Project
 
         public PublishProject(CommonProjectNode node, PublishProjectOptions options)
         {
-            _statusBar = (IVsStatusbar)node.Site.GetService(typeof(SVsStatusbar));
-            _statusBar.SetText("Starting publish...");
-            _node = node;
-            _options = options;
+            this._statusBar = (IVsStatusbar)node.Site.GetService(typeof(SVsStatusbar));
+            this._statusBar.SetText("Starting publish...");
+            this._node = node;
+            this._options = options;
         }
 
         #region IPublishProject Members
@@ -42,10 +42,10 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                if (_files == null)
+                if (this._files == null)
                 {
                     List<IPublishFile> files = new List<IPublishFile>();
-                    foreach (var item in _node.CurrentConfig.Items)
+                    foreach (var item in this._node.CurrentConfig.Items)
                     {
                         bool? publish = GetPublishSetting(item);
 
@@ -57,9 +57,9 @@ namespace Microsoft.VisualStudioTools.Project
                             string file = item.GetMetadataValue("FullPath");
 
                             string destFile = Path.GetFileName(file);
-                            if (CommonUtils.IsSubpathOf(_node.ProjectHome, file))
+                            if (CommonUtils.IsSubpathOf(this._node.ProjectHome, file))
                             {
-                                destFile = CommonUtils.GetRelativeFilePath(_node.ProjectHome, file);
+                                destFile = CommonUtils.GetRelativeFilePath(this._node.ProjectHome, file);
                             }
                             else
                             {
@@ -70,15 +70,15 @@ namespace Microsoft.VisualStudioTools.Project
                         }
                     }
 
-                    foreach (var file in _options.AdditionalFiles)
+                    foreach (var file in this._options.AdditionalFiles)
                     {
                         files.Add(file);
                     }
 
-                    _files = new ReadOnlyCollection<IPublishFile>(files);
+                    this._files = new ReadOnlyCollection<IPublishFile>(files);
                 }
 
-                return _files;
+                return this._files;
             }
         }
 
@@ -98,7 +98,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return _node.ProjectHome;
+                return this._node.ProjectHome;
             }
         }
 
@@ -106,12 +106,12 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return _progress;
+                return this._progress;
             }
             set
             {
-                _progress = value;
-                _statusBar.SetText(String.Format("Publish {0}% done...", _progress));
+                this._progress = value;
+                this._statusBar.SetText(String.Format("Publish {0}% done...", this._progress));
             }
         }
 
@@ -119,12 +119,12 @@ namespace Microsoft.VisualStudioTools.Project
 
         internal void Done()
         {
-            _statusBar.SetText("Publish succeeded");
+            this._statusBar.SetText("Publish succeeded");
         }
 
         internal void Failed(string msg)
         {
-            _statusBar.SetText("Publish failed: " + msg);
+            this._statusBar.SetText("Publish failed: " + msg);
         }
     }
 }

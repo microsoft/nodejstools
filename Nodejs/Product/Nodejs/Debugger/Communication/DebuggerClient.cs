@@ -44,9 +44,9 @@ namespace Microsoft.NodejsTools.Debugger.Communication
         {
             Utilities.ArgumentNotNull("connection", connection);
 
-            _connection = connection;
-            _connection.OutputMessage += OnOutputMessage;
-            _connection.ConnectionClosed += OnConnectionClosed;
+            this._connection = connection;
+            this._connection.OutputMessage += this.OnOutputMessage;
+            this._connection.ConnectionClosed += this.OnConnectionClosed;
         }
 
         /// <summary>
@@ -60,8 +60,8 @@ namespace Microsoft.NodejsTools.Debugger.Communication
 
             try
             {
-                TaskCompletionSource<JObject> promise = _messages.GetOrAdd(command.Id, i => new TaskCompletionSource<JObject>());
-                _connection.SendMessage(command.ToString());
+                TaskCompletionSource<JObject> promise = this._messages.GetOrAdd(command.Id, i => new TaskCompletionSource<JObject>());
+                this._connection.SendMessage(command.ToString());
                 cancellationToken.ThrowIfCancellationRequested();
 
                 cancellationToken.Register(() => promise.TrySetCanceled(), false);
@@ -74,7 +74,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
             finally
             {
                 TaskCompletionSource<JObject> promise;
-                _messages.TryRemove(command.Id, out promise);
+                this._messages.TryRemove(command.Id, out promise);
             }
         }
 
@@ -122,7 +122,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
         /// <param name="e">Event arguments.</param>
         private void OnConnectionClosed(object sender, EventArgs e)
         {
-            ConcurrentDictionary<int, TaskCompletionSource<JObject>> messages = Interlocked.Exchange(ref _messages, new ConcurrentDictionary<int, TaskCompletionSource<JObject>>());
+            ConcurrentDictionary<int, TaskCompletionSource<JObject>> messages = Interlocked.Exchange(ref this._messages, new ConcurrentDictionary<int, TaskCompletionSource<JObject>>());
             foreach (var kv in messages)
             {
                 var exception = new IOException(Resources.DebuggerConnectionClosed);
@@ -216,7 +216,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
             TaskCompletionSource<JObject> promise;
             var messageId = (int)message["request_seq"];
 
-            if (_messages.TryGetValue(messageId, out promise))
+            if (this._messages.TryGetValue(messageId, out promise))
             {
                 promise.SetResult(message);
             }

@@ -1173,7 +1173,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return right - left;
+                return this.right - this.left;
             }
         }
 
@@ -1181,7 +1181,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return bottom - top;
+                return this.bottom - this.top;
             }
         }
     }

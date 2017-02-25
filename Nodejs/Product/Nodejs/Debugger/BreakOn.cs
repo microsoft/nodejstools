@@ -30,8 +30,8 @@ namespace Microsoft.NodejsTools.Debugger
                 throw new ArgumentException("Invalid BreakOn count");
             }
 
-            Kind = kind;
-            Count = count;
+            this.Kind = kind;
+            this.Count = count;
         }
     }
 }

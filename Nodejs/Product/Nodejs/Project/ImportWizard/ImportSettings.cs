@@ -58,9 +58,9 @@ namespace Microsoft.NodejsTools.Project.ImportWizard
 
         public ImportSettings()
         {
-            TopLevelJavaScriptFiles = new BulkObservableCollection<string>();
+            this.TopLevelJavaScriptFiles = new BulkObservableCollection<string>();
 
-            Filters = DefaultLanguageExtensionsFilter;
+            this.Filters = DefaultLanguageExtensionsFilter;
         }
 
         public string ProjectPath
@@ -259,10 +259,10 @@ namespace Microsoft.NodejsTools.Project.ImportWizard
 
         public Task<string> CreateRequestedProjectAsync()
         {
-            string projectPath = ProjectPath;
-            string sourcePath = SourcePath;
-            string filters = Filters;
-            string startupFile = StartupFile;
+            string projectPath = this.ProjectPath;
+            string sourcePath = this.SourcePath;
+            string filters = this.Filters;
+            string startupFile = this.StartupFile;
 
             return Task.Run<string>(() =>
             {

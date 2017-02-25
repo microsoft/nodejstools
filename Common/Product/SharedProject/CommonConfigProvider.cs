@@ -35,14 +35,14 @@ namespace Microsoft.VisualStudioTools.Project
             : base(project)
         {
             bool appxPackage, windowsAppContainer;
-            _project = project;
-            bool.TryParse(this.ProjectMgr.BuildProject.GetPropertyValue(ProjectFileConstants.PlatformAware), out _isPlatformAware);
+            this._project = project;
+            bool.TryParse(this.ProjectMgr.BuildProject.GetPropertyValue(ProjectFileConstants.PlatformAware), out this._isPlatformAware);
 
-            if (!_isPlatformAware)
+            if (!this._isPlatformAware)
             {
                 bool.TryParse(this.ProjectMgr.BuildProject.GetPropertyValue(ProjectFileConstants.AppxPackage), out appxPackage);
                 bool.TryParse(this.ProjectMgr.BuildProject.GetPropertyValue(ProjectFileConstants.WindowsAppContainer), out windowsAppContainer);
-                _isPlatformAware = appxPackage && windowsAppContainer;
+                this._isPlatformAware = appxPackage && windowsAppContainer;
             }
         }
 
@@ -50,7 +50,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         protected override ProjectConfig CreateProjectConfiguration(string configName)
         {
-            if (_isPlatformAware)
+            if (this._isPlatformAware)
             {
                 if (configName != null)
                 {
@@ -58,19 +58,19 @@ namespace Microsoft.VisualStudioTools.Project
 
                     if (configParts.Length == 2)
                     {
-                        var config = _project.MakeConfiguration(configName);
+                        var config = this._project.MakeConfiguration(configName);
                         config.PlatformName = configParts[1];
                         return config;
                     }
                 }
             }
 
-            return _project.MakeConfiguration(configName);
+            return this._project.MakeConfiguration(configName);
         }
 
         public override int GetPlatformNames(uint celt, string[] names, uint[] actual)
         {
-            if (_isPlatformAware)
+            if (this._isPlatformAware)
             {
                 var platforms = GetSupportedPlatformsFromProject();
                 return GetPlatforms(celt, names, actual, platforms);
@@ -93,7 +93,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public override int GetSupportedPlatformNames(uint celt, string[] names, uint[] actual)
         {
-            if (_isPlatformAware)
+            if (this._isPlatformAware)
             {
                 var platforms = GetSupportedPlatformsFromProject();
                 return GetPlatforms(celt, names, actual, platforms);
@@ -116,7 +116,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public override int GetCfgs(uint celt, IVsCfg[] a, uint[] actual, uint[] flags)
         {
-            if (_isPlatformAware)
+            if (this._isPlatformAware)
             {
                 if (flags != null)
                 {

@@ -30,17 +30,17 @@ namespace Microsoft.NodejsTools.Jade
         public JadeToken(JadeTokenType type, IClassificationType classification, int start, int length)
             : base(type, start, length)
         {
-            Classification = classification;
+            this.Classification = classification;
         }
 
         public override bool IsComment
         {
-            get { return TokenType == JadeTokenType.Comment; }
+            get { return this.TokenType == JadeTokenType.Comment; }
         }
 
         public override bool IsString
         {
-            get { return TokenType == JadeTokenType.String; }
+            get { return this.TokenType == JadeTokenType.String; }
         }
     }
 }

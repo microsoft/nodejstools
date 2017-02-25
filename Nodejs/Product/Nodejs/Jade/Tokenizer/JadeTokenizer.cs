@@ -31,17 +31,17 @@ namespace Microsoft.NodejsTools.Jade
 
         public JadeTokenizer(JadeClassifierProvider provider)
         {
-            CComments = false;
-            MultilineCppComments = true;
+            this.CComments = false;
+            this.MultilineCppComments = true;
             if (provider != null && provider.JsTaggerProvider != null)
             {
-                _jsBuffer = provider.BufferFactoryService.CreateTextBuffer(provider.JsContentType);
-                _jsTagger = provider.JsTaggerProvider.CreateTagger<ClassificationTag>(_jsBuffer);
+                this._jsBuffer = provider.BufferFactoryService.CreateTextBuffer(provider.JsContentType);
+                this._jsTagger = provider.JsTaggerProvider.CreateTagger<ClassificationTag>(this._jsBuffer);
             }
             if (provider != null && provider.CssClassifierProvider != null)
             {
-                _cssBuffer = provider.BufferFactoryService.CreateTextBuffer(provider.CssContentType);
-                _cssClassifier = provider.CssClassifierProvider.GetClassifier(_cssBuffer);
+                this._cssBuffer = provider.BufferFactoryService.CreateTextBuffer(provider.CssContentType);
+                this._cssClassifier = provider.CssClassifierProvider.GetClassifier(this._cssBuffer);
             }
         }
 
@@ -50,7 +50,7 @@ namespace Microsoft.NodejsTools.Jade
         {
             SkipWhiteSpace();
 
-            if (_cs.IsEndOfStream())
+            if (this._cs.IsEndOfStream())
                 return true;
 
             // C++ style comments must be placed on their own line
@@ -61,19 +61,19 @@ namespace Microsoft.NodejsTools.Jade
             }
 
             // We should always be in the beginning of the line here.
-            if (_cs.CurrentChar == '!' && _cs.NextChar == '!' && _cs.LookAhead(2) == '!')
+            if (this._cs.CurrentChar == '!' && this._cs.NextChar == '!' && this._cs.LookAhead(2) == '!')
             {
                 SkipToEndOfLine();
                 return true;
             }
 
-            if (_cs.CurrentChar == ':')
+            if (this._cs.CurrentChar == ':')
             {
                 OnFilter();
                 return true;
             }
 
-            if (_cs.CurrentChar == '-' || _cs.CurrentChar == '=')
+            if (this._cs.CurrentChar == '-' || this._cs.CurrentChar == '=')
             {
                 // Inline code
                 // - if (moo)
@@ -82,7 +82,7 @@ namespace Microsoft.NodejsTools.Jade
                 return true;
             }
 
-            if (_cs.CurrentChar == '|')
+            if (this._cs.CurrentChar == '|')
             {
                 // Text block
                 OnText(strings: false, html: true, entities: true);
@@ -100,7 +100,7 @@ namespace Microsoft.NodejsTools.Jade
 
         protected override JadeToken GetStringToken(int start, int length)
         {
-            if (_attributeState)
+            if (this._attributeState)
                 return new JadeToken(JadeTokenType.AttributeValue, start, length);
 
             return new JadeToken(JadeTokenType.String, start, length);
@@ -112,12 +112,12 @@ namespace Microsoft.NodejsTools.Jade
             int indent;
 
             // Move  to the next line
-            while (!_cs.IsEndOfStream())
+            while (!this._cs.IsEndOfStream())
             {
                 SkipToWhiteSpace(); // typically at eol now
 
                 // Skip ws and eol, if any
-                if (SkipWhiteSpace() && !_cs.IsEndOfStream())
+                if (SkipWhiteSpace() && !this._cs.IsEndOfStream())
                 {
                     // Check if indentation changed back to base
                     indent = CalculateLineIndent();
@@ -133,85 +133,85 @@ namespace Microsoft.NodejsTools.Jade
 
         protected override ITextRange HandleString(bool addToken = true)
         {
-            int start = _cs.Position;
-            char quote = _cs.CurrentChar;
+            int start = this._cs.Position;
+            char quote = this._cs.CurrentChar;
 
             // since the escape char is exactly the string openning char we say we start in escaped mode
             // it will get reset by the first char regardless what it is, but it will keep the '' case honest
-            _cs.MoveToNextChar();
+            this._cs.MoveToNextChar();
 
-            while (!_cs.IsEndOfStream() && !_cs.IsAtNewLine())
+            while (!this._cs.IsEndOfStream() && !this._cs.IsAtNewLine())
             {
-                if (_cs.CurrentChar == '\\' && _cs.NextChar == quote)
+                if (this._cs.CurrentChar == '\\' && this._cs.NextChar == quote)
                 {
-                    _cs.Advance(2);
+                    this._cs.Advance(2);
                 }
 
-                if (_cs.CurrentChar == quote)
+                if (this._cs.CurrentChar == quote)
                 {
-                    _cs.MoveToNextChar();
+                    this._cs.MoveToNextChar();
                     break;
                 }
 
-                if (_cs.CurrentChar == '<' && (_cs.NextChar == '/' || Char.IsLetter(_cs.NextChar)))
+                if (this._cs.CurrentChar == '<' && (this._cs.NextChar == '/' || Char.IsLetter(this._cs.NextChar)))
                 {
-                    if (_cs.Position > start)
-                        Tokens.Add(GetStringToken(start, _cs.Position - start));
+                    if (this._cs.Position > start)
+                        this.Tokens.Add(GetStringToken(start, this._cs.Position - start));
 
                     OnHtml();
 
-                    start = _cs.Position;
+                    start = this._cs.Position;
                 }
                 else
                 {
-                    _cs.MoveToNextChar();
+                    this._cs.MoveToNextChar();
                 }
             }
 
-            var range = TextRange.FromBounds(start, _cs.Position);
+            var range = TextRange.FromBounds(start, this._cs.Position);
             if (range.Length > 0)
-                Tokens.Add(GetStringToken(start, range.Length));
+                this.Tokens.Add(GetStringToken(start, range.Length));
 
             return range;
         }
 
         private ITextRange GetAttribute()
         {
-            int start = _cs.Position;
+            int start = this._cs.Position;
 
-            while (!_cs.IsEndOfStream() && !_cs.IsWhiteSpace() &&
-                  (_cs.IsAnsiLetter() || _cs.IsDecimal() ||
-                  _cs.CurrentChar == '_' || _cs.CurrentChar == '-' ||
-                  _cs.CurrentChar == ':') || _cs.CurrentChar == '.')
+            while (!this._cs.IsEndOfStream() && !this._cs.IsWhiteSpace() &&
+                  (this._cs.IsAnsiLetter() || this._cs.IsDecimal() ||
+                  this._cs.CurrentChar == '_' || this._cs.CurrentChar == '-' ||
+                  this._cs.CurrentChar == ':') || this._cs.CurrentChar == '.')
             {
-                _cs.MoveToNextChar();
+                this._cs.MoveToNextChar();
             }
 
-            return TextRange.FromBounds(start, _cs.Position);
+            return TextRange.FromBounds(start, this._cs.Position);
         }
 
         private ITextRange GetAttributeValue()
         {
-            int start = _cs.Position;
+            int start = this._cs.Position;
 
-            while (!_cs.IsEndOfStream() && !_cs.IsWhiteSpace() && _cs.CurrentChar != ')')
+            while (!this._cs.IsEndOfStream() && !this._cs.IsWhiteSpace() && this._cs.CurrentChar != ')')
             {
-                _cs.MoveToNextChar();
+                this._cs.MoveToNextChar();
             }
 
-            return TextRange.FromBounds(start, _cs.Position);
+            return TextRange.FromBounds(start, this._cs.Position);
         }
 
         private void AddToken(JadeTokenType type, int start, int length)
         {
             var token = new JadeToken(type, start, length);
-            Tokens.Add(token);
+            this.Tokens.Add(token);
         }
 
         private void AddToken(IClassificationType type, int start, int length)
         {
             var token = new JadeToken(JadeTokenType.None, type, start, length);
-            Tokens.Add(token);
+            this.Tokens.Add(token);
         }
     }
 }

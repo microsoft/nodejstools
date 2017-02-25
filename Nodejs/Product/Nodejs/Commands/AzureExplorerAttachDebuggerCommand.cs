@@ -42,7 +42,7 @@ namespace Microsoft.NodejsTools.Commands
     /// </summary>
     internal class AzureExplorerAttachDebuggerCommand : Command
     {
-        private readonly Type _azureServicesType;
+        private readonly Type azureServicesType;
 
         public AzureExplorerAttachDebuggerCommand()
         {
@@ -52,7 +52,7 @@ namespace Microsoft.NodejsTools.Commands
             try
             {
                 var contractsAssembly = Assembly.Load("Microsoft.VisualStudio.Web.WindowsAzure.Contracts, Version=2.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a");
-                _azureServicesType = contractsAssembly.GetType("Microsoft.VisualStudio.Web.WindowsAzure.Contracts.IVsAzureServices", throwOnError: true);
+                this.azureServicesType = contractsAssembly.GetType("Microsoft.VisualStudio.Web.WindowsAzure.Contracts.IVsAzureServices", throwOnError: true);
             }
             catch (FileNotFoundException)
             {
@@ -68,10 +68,7 @@ namespace Microsoft.NodejsTools.Commands
             }
         }
 
-        public override int CommandId
-        {
-            get { return (int)PkgCmdId.cmdidAzureExplorerAttachNodejsDebugger; }
-        }
+        public override int CommandId => (int)PkgCmdId.cmdidAzureExplorerAttachNodejsDebugger;
 
         public override EventHandler BeforeQueryStatus
         {
@@ -98,7 +95,7 @@ namespace Microsoft.NodejsTools.Commands
             {
                 if (!attachTask.Result)
                 {
-                    string msg = string.Format(CultureInfo.CurrentCulture, Resources.AzureRemoveDebugCouldNotAttachToWebsiteErrorMessage, webSite.Uri);
+                    var msg = string.Format(CultureInfo.CurrentCulture, Resources.AzureRemoveDebugCouldNotAttachToWebsiteErrorMessage, webSite.Uri);
                     if (MessageBox.Show(msg, null, MessageBoxButtons.RetryCancel, MessageBoxIcon.Error) == DialogResult.Retry)
                     {
                         AttachWorker(webSite).ContinueWith(onAttach);
@@ -121,25 +118,20 @@ namespace Microsoft.NodejsTools.Commands
 
             var shell = (IVsUIShell)NodejsPackage.GetGlobalService(typeof(SVsUIShell));
             var serverExplorerToolWindowGuid = new Guid(ToolWindowGuids.ServerExplorer);
-            IVsWindowFrame serverExplorerFrame;
-            shell.FindToolWindow(0, ref serverExplorerToolWindowGuid, out serverExplorerFrame);
+            shell.FindToolWindow(0, ref serverExplorerToolWindowGuid, out var serverExplorerFrame);
             if (serverExplorerFrame == null)
             {
                 return null;
             }
 
-            object obj;
-            serverExplorerFrame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out obj);
+            serverExplorerFrame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out var obj);
             var serverExplorerHierWnd = obj as IVsUIHierarchyWindow;
             if (serverExplorerHierWnd == null)
             {
                 return null;
             }
 
-            IntPtr hierPtr;
-            uint itemid;
-            IVsMultiItemSelect mis;
-            serverExplorerHierWnd.GetCurrentSelection(out hierPtr, out itemid, out mis);
+            serverExplorerHierWnd.GetCurrentSelection(out var hierPtr, out var itemid, out var mis);
             if (hierPtr == IntPtr.Zero)
             {
                 return null;
@@ -188,7 +180,7 @@ namespace Microsoft.NodejsTools.Commands
             }
 
             // Is the website running?
-            int status = (int)statusProp.GetValue(obj);
+            var status = (int)statusProp.GetValue(obj);
             if (status != 1)
             {
                 return null;
@@ -200,8 +192,7 @@ namespace Microsoft.NodejsTools.Commands
             {
                 return null;
             }
-            Uri uri;
-            if (!Uri.TryCreate((string)urlProp.GetValue(obj), UriKind.Absolute, out uri))
+            if (!Uri.TryCreate((string)urlProp.GetValue(obj), UriKind.Absolute, out var uri))
             {
                 return null;
             }
@@ -212,7 +203,7 @@ namespace Microsoft.NodejsTools.Commands
             {
                 return null;
             }
-            string subscriptionId = (string)subIdProp.GetValue(obj);
+            var subscriptionId = (string)subIdProp.GetValue(obj);
 
             return new AzureWebSiteInfo(uri, subscriptionId);
         }
@@ -314,8 +305,7 @@ namespace Microsoft.NodejsTools.Commands
             }
             publishUrl += "web.config";
 
-            Uri webConfigUri;
-            if (!Uri.TryCreate(publishUrl, UriKind.Absolute, out webConfigUri))
+            if (!Uri.TryCreate(publishUrl, UriKind.Absolute, out var webConfigUri))
             {
                 return null;
             }
@@ -349,7 +339,7 @@ namespace Microsoft.NodejsTools.Commands
             // but we only have subscription ID and the public URL of the site at this point. Use the Azure Website service to look up
             // the site from those two, and retrieve the missing info.
 
-            IVsAzureServices webSiteServices = new VsAzureServicesShim(NodejsPackage.GetGlobalService(_azureServicesType));
+            var webSiteServices = new VsAzureServicesShim(NodejsPackage.GetGlobalService(this.azureServicesType));
             if (webSiteServices == null)
             {
                 return null;
@@ -371,8 +361,7 @@ namespace Microsoft.NodejsTools.Commands
             var resources = await subscription.GetResourcesAsync(false);
             var webSite = resources.OfType<IAzureWebSite>().FirstOrDefault(ws =>
             {
-                Uri browseUri;
-                Uri.TryCreate(ws.BrowseURL, UriKind.Absolute, out browseUri);
+                Uri.TryCreate(ws.BrowseURL, UriKind.Absolute, out var browseUri);
                 return browseUri != null && browseUri.Equals(webSiteInfo.Uri);
             });
             if (webSite == null)
@@ -382,13 +371,13 @@ namespace Microsoft.NodejsTools.Commands
 
             // Prepare a web request to get the publish settings.
             // See http://msdn.microsoft.com/en-us/library/windowsazure/dn166996.aspx
-            string requestPath = string.Format(CultureInfo.InvariantCulture,
+            var requestPath = string.Format(CultureInfo.InvariantCulture,
                 "{0}/services/WebSpaces/{1}/sites/{2}/publishxml",
                 subscription.SubscriptionId,
                 webSite.WebSpace,
                 webSite.Name);
-            Uri requestUri = new Uri(((IAzureSubscription)subscription).ServiceManagementEndpointUri, requestPath);
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(requestUri);
+            var requestUri = new Uri(((IAzureSubscription)subscription).ServiceManagementEndpointUri, requestPath);
+            var request = (HttpWebRequest)WebRequest.Create(requestUri);
             request.Method = "GET";
             request.ContentType = "application/xml";
             request.Headers.Add("x-ms-version", "2010-10-28");
@@ -396,18 +385,16 @@ namespace Microsoft.NodejsTools.Commands
             // Set up authentication for the request, depending on whether the associated subscription context is 
             // account-based or certificate-based.
             object context = subscription.AzureCredentials;
-            var certContext = context as IAzureAuthenticationCertificateSubscriptionContext;
-            if (certContext != null)
+            if (context is IAzureAuthenticationCertificateSubscriptionContext certContext)
             {
                 var cert = await certContext.AuthenticationCertificate.GetCertificateFromStoreAsync();
                 request.ClientCertificates.Add(cert);
             }
             else
             {
-                var accountCountext = context as IAzureUserAccountSubscriptionContext;
-                if (accountCountext != null)
+                if (context is IAzureUserAccountSubscriptionContext accountCountext)
                 {
-                    string authHeader = await accountCountext.GetAuthenticationHeaderAsync(false);
+                    var authHeader = await accountCountext.GetAuthenticationHeaderAsync(false);
                     request.Headers.Add(HttpRequestHeader.Authorization, authHeader);
                 }
                 else
@@ -416,8 +403,8 @@ namespace Microsoft.NodejsTools.Commands
                 }
             }
 
-            using (WebResponse response = await request.GetResponseAsync())
-            using (Stream stream = response.GetResponseStream())
+            using (var response = await request.GetResponseAsync())
+            using (var stream = response.GetResponseStream())
             {
                 // There is no XDocument.LoadAsync, but we want the networked I/O at least to be async, even if parsing is not.
                 Stream xmlData = new MemoryStream();
@@ -461,8 +448,8 @@ namespace Microsoft.NodejsTools.Commands
 
             public AzureWebSiteInfo(Uri uri, string subscriptionId)
             {
-                Uri = uri;
-                SubscriptionId = subscriptionId;
+                this.Uri = uri;
+                this.SubscriptionId = subscriptionId;
             }
         }
     }

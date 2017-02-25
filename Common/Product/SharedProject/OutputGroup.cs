@@ -50,10 +50,10 @@ namespace Microsoft.VisualStudioTools.Project
             Utilities.ArgumentNotNull("projectManager", projectManager);
             Utilities.ArgumentNotNull("configuration", configuration);
 
-            _name = outputName;
-            _targetName = msBuildTargetName;
-            _project = projectManager;
-            _projectCfg = configuration;
+            this._name = outputName;
+            this._targetName = msBuildTargetName;
+            this._project = projectManager;
+            this._projectCfg = configuration;
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         protected ProjectConfig ProjectCfg
         {
-            get { return _projectCfg; }
+            get { return this._projectCfg; }
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         internal ProjectNode Project
         {
-            get { return _project; }
+            get { return this._project; }
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         protected string TargetName
         {
-            get { return _targetName; }
+            get { return this._targetName; }
         }
 
         /// <summary>
@@ -99,64 +99,64 @@ namespace Microsoft.VisualStudioTools.Project
         protected virtual void Refresh()
         {
             // Let MSBuild know which configuration we are working with
-            _project.SetConfiguration(_projectCfg.ConfigName);
+            this._project.SetConfiguration(this._projectCfg.ConfigName);
 
             // Generate dependencies if such a task exist
-            if (_project.BuildProject.Targets.ContainsKey(_targetName))
+            if (this._project.BuildProject.Targets.ContainsKey(this._targetName))
             {
                 bool succeeded = false;
-                _project.BuildTarget(_targetName, out succeeded);
+                this._project.BuildTarget(this._targetName, out succeeded);
                 if (!succeeded)
                 {
-                    Debug.WriteLine("Failed to build target {0}", _targetName);
+                    Debug.WriteLine("Failed to build target {0}", this._targetName);
                     this._outputs.Clear();
                     return;
                 }
             }
 
             // Rebuild the content of our list of output
-            string outputType = _targetName + "Output";
+            string outputType = this._targetName + "Output";
             this._outputs.Clear();
 
-            if (_project.CurrentConfig != null)
+            if (this._project.CurrentConfig != null)
             {
-                foreach (MSBuildExecution.ProjectItemInstance assembly in _project.CurrentConfig.GetItems(outputType))
+                foreach (MSBuildExecution.ProjectItemInstance assembly in this._project.CurrentConfig.GetItems(outputType))
                 {
-                    Output output = new Output(_project, assembly);
-                    _outputs.Add(output);
+                    Output output = new Output(this._project, assembly);
+                    this._outputs.Add(output);
 
                     // See if it is our key output
-                    if (_keyOutput == null ||
+                    if (this._keyOutput == null ||
                         String.Compare(assembly.GetMetadataValue("IsKeyOutput"), true.ToString(), StringComparison.OrdinalIgnoreCase) == 0)
                     {
-                        _keyOutput = output;
+                        this._keyOutput = output;
                     }
                 }
             }
 
-            _project.SetCurrentConfiguration();
+            this._project.SetCurrentConfiguration();
 
             // Now that the group is built we have to check if it is invalidated by a property
             // change on the project.
-            _project.OnProjectPropertyChanged += new EventHandler<ProjectPropertyChangedArgs>(OnProjectPropertyChanged);
+            this._project.OnProjectPropertyChanged += new EventHandler<ProjectPropertyChangedArgs>(this.OnProjectPropertyChanged);
         }
 
         public virtual IList<Output> EnumerateOutputs()
         {
-            _project.Site.GetUIThread().Invoke(Refresh);
-            return _outputs;
+            this._project.Site.GetUIThread().Invoke(this.Refresh);
+            return this._outputs;
         }
 
         public virtual void InvalidateGroup()
         {
             // Set keyOutput to null so that a refresh will be performed the next time
             // a property getter is called.
-            if (null != _keyOutput)
+            if (null != this._keyOutput)
             {
                 // Once the group is invalidated there is no more reason to listen for events.
-                _project.OnProjectPropertyChanged -= new EventHandler<ProjectPropertyChangedArgs>(OnProjectPropertyChanged);
+                this._project.OnProjectPropertyChanged -= new EventHandler<ProjectPropertyChangedArgs>(this.OnProjectPropertyChanged);
             }
-            _keyOutput = null;
+            this._keyOutput = null;
         }
         #endregion
 
@@ -207,30 +207,30 @@ namespace Microsoft.VisualStudioTools.Project
         public virtual int get_KeyOutput(out string pbstrCanonicalName)
         {
             pbstrCanonicalName = null;
-            if (_keyOutput == null)
+            if (this._keyOutput == null)
                 Refresh();
-            if (_keyOutput == null)
+            if (this._keyOutput == null)
             {
                 pbstrCanonicalName = String.Empty;
                 return VSConstants.S_FALSE;
             }
-            return _keyOutput.get_CanonicalName(out pbstrCanonicalName);
+            return this._keyOutput.get_CanonicalName(out pbstrCanonicalName);
         }
 
         public virtual int get_KeyOutputObject(out IVsOutput2 ppKeyOutput)
         {
-            if (_keyOutput == null)
+            if (this._keyOutput == null)
             {
                 Refresh();
-                if (_keyOutput == null)
+                if (this._keyOutput == null)
                 {
                     // horrible hack: we don't really have outputs but the Cider designer insists 
                     // that we have an output so it can figure out our output assembly name.  So we
                     // lie here, and then lie again to give a path in Output.get_Property
-                    _keyOutput = new Output(_project, null);
+                    this._keyOutput = new Output(this._project, null);
                 }
             }
-            ppKeyOutput = _keyOutput;
+            ppKeyOutput = this._keyOutput;
             if (ppKeyOutput == null)
                 return VSConstants.S_FALSE;
             return VSConstants.S_OK;
@@ -255,13 +255,13 @@ namespace Microsoft.VisualStudioTools.Project
             if (celt == 0 || rgpcfg == null)
             {
                 if (pcActual != null && pcActual.Length > 0)
-                    pcActual[0] = (uint)_outputs.Count;
+                    pcActual[0] = (uint)this._outputs.Count;
                 return VSConstants.S_OK;
             }
 
             // Fill the array with our outputs
             uint count = 0;
-            foreach (Output output in _outputs)
+            foreach (Output output in this._outputs)
             {
                 if (rgpcfg.Length > count && celt > count && output != null)
                 {
@@ -285,7 +285,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public virtual int get_Property(string pszProperty, out object pvar)
         {
-            pvar = _project.GetProjectProperty(pszProperty);
+            pvar = this._project.GetProjectProperty(pszProperty);
             return VSConstants.S_OK;
         }
 

@@ -39,26 +39,26 @@ namespace Microsoft.VisualStudioTools.Project
 
         public CommonEditorFactory(Package package)
         {
-            _package = package;
+            this._package = package;
         }
 
         public CommonEditorFactory(Package package, bool promptEncodingOnLoad)
         {
-            _package = package;
-            _promptEncodingOnLoad = promptEncodingOnLoad;
+            this._package = package;
+            this._promptEncodingOnLoad = promptEncodingOnLoad;
         }
 
         #region IVsEditorFactory Members
 
         public virtual int SetSite(Microsoft.VisualStudio.OLE.Interop.IServiceProvider psp)
         {
-            _serviceProvider = new ServiceProvider(psp);
+            this._serviceProvider = new ServiceProvider(psp);
             return VSConstants.S_OK;
         }
 
         public virtual object GetService(Type serviceType)
         {
-            return _serviceProvider.GetService(serviceType);
+            return this._serviceProvider.GetService(serviceType);
         }
 
         // This method is called by the Environment (inside IVsUIShellOpenDocument::
@@ -166,7 +166,7 @@ namespace Microsoft.VisualStudioTools.Project
                 return VSConstants.E_INVALIDARG;
             }
 
-            if (_promptEncodingOnLoad && docDataExisting != IntPtr.Zero)
+            if (this._promptEncodingOnLoad && docDataExisting != IntPtr.Zero)
             {
                 return VSConstants.VS_E_INCOMPATIBLEDOCDATA;
             }
@@ -216,10 +216,10 @@ namespace Microsoft.VisualStudioTools.Project
                 Type textLinesType = typeof(IVsTextLines);
                 Guid riid = textLinesType.GUID;
                 Guid clsid = typeof(VsTextBufferClass).GUID;
-                textLines = _package.CreateInstance(ref clsid, ref riid, textLinesType) as IVsTextLines;
+                textLines = this._package.CreateInstance(ref clsid, ref riid, textLinesType) as IVsTextLines;
 
                 // set the buffer's site
-                ((IObjectWithSite)textLines).SetSite(_serviceProvider.GetService(typeof(IOleServiceProvider)));
+                ((IObjectWithSite)textLines).SetSite(this._serviceProvider.GetService(typeof(IOleServiceProvider)));
             }
             else
             {
@@ -279,7 +279,7 @@ namespace Microsoft.VisualStudioTools.Project
             bool loaderInitalized = false;
             try
             {
-                IOleServiceProvider provider = _serviceProvider.GetService(typeof(IOleServiceProvider)) as IOleServiceProvider;
+                IOleServiceProvider provider = this._serviceProvider.GetService(typeof(IOleServiceProvider)) as IOleServiceProvider;
                 // Initialize designer loader 
                 designerLoader.Initialize(provider, hierarchy, (int)itemid, textLines);
                 loaderInitalized = true;
@@ -316,7 +316,7 @@ namespace Microsoft.VisualStudioTools.Project
             Type codeWindowType = typeof(IVsCodeWindow);
             Guid riid = codeWindowType.GUID;
             Guid clsid = typeof(VsCodeWindowClass).GUID;
-            IVsCodeWindow window = (IVsCodeWindow)_package.CreateInstance(ref clsid, ref riid, codeWindowType);
+            IVsCodeWindow window = (IVsCodeWindow)this._package.CreateInstance(ref clsid, ref riid, codeWindowType);
             ErrorHandler.ThrowOnFailure(window.SetBuffer(textLines));
             ErrorHandler.ThrowOnFailure(window.SetBaseEditorCaption(null));
             ErrorHandler.ThrowOnFailure(window.GetEditorCaption(READONLYSTATUS.ROSTATUS_Unknown, out editorCaption));
@@ -324,7 +324,7 @@ namespace Microsoft.VisualStudioTools.Project
             IVsUserData userData = textLines as IVsUserData;
             if (userData != null)
             {
-                if (_promptEncodingOnLoad)
+                if (this._promptEncodingOnLoad)
                 {
                     var guid = VSConstants.VsTextBufferUserDataGuid.VsBufferEncodingPromptOnLoad_guid;
                     userData.SetData(ref guid, (uint)1);

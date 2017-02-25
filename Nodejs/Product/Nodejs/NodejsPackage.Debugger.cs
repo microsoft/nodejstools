@@ -27,8 +27,8 @@ namespace Microsoft.NodejsTools
 
         public ProvideNodeDebugExceptionAttribute(params string[] exceptionPath) : base(AD7Engine.DebugEngineId, "Node.js Exceptions", exceptionPath)
         {
-            State = enum_EXCEPTION_STATE.EXCEPTION_NONE;
-            ExceptionName = exceptionPath.LastOrDefault();
+            this.State = enum_EXCEPTION_STATE.EXCEPTION_NONE;
+            this.ExceptionName = exceptionPath.LastOrDefault();
         }
     }
 

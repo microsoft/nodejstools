@@ -66,7 +66,7 @@ namespace Microsoft.VisualStudioTools.Project
         private readonly IVsWindowFrame _window;
         private readonly IVsOutputWindowPane _pane;
 
-        public IVsOutputWindowPane Pane { get { return _pane; } }
+        public IVsOutputWindowPane Pane { get { return this._pane; } }
 
         /// <summary>
         /// Creates a redirector to the specified output pane.
@@ -83,21 +83,21 @@ namespace Microsoft.VisualStudioTools.Project
         /// </exception>
         public OutputWindowRedirector(IServiceProvider provider, Guid paneGuid)
         {
-            _serviceProvider = provider;
+            this._serviceProvider = provider;
             var shell = provider.GetService(typeof(SVsUIShell)) as IVsUIShell;
             if (shell != null)
             {
                 // Ignore errors - we just won't support opening the window if
                 // we don't find it.
                 var windowGuid = OutputWindowGuid;
-                shell.FindToolWindow(0, ref windowGuid, out _window);
+                shell.FindToolWindow(0, ref windowGuid, out this._window);
             }
             var outputWindow = provider.GetService(typeof(SVsOutputWindow)) as IVsOutputWindow;
             if (outputWindow == null)
             {
                 throw new InvalidOperationException("Unable to get output window service");
             }
-            if (ErrorHandler.Failed(outputWindow.GetPane(paneGuid, out _pane)))
+            if (ErrorHandler.Failed(outputWindow.GetPane(paneGuid, out this._pane)))
             {
                 throw new InvalidOperationException("Unable to get output pane");
             }
@@ -105,30 +105,30 @@ namespace Microsoft.VisualStudioTools.Project
 
         public override void Show()
         {
-            _serviceProvider.GetUIThread().Invoke(() => ErrorHandler.ThrowOnFailure(_pane.Activate()));
+            this._serviceProvider.GetUIThread().Invoke(() => ErrorHandler.ThrowOnFailure(this._pane.Activate()));
         }
 
         public override void ShowAndActivate()
         {
-            _serviceProvider.GetUIThread().Invoke(() =>
+            this._serviceProvider.GetUIThread().Invoke(() =>
             {
-                ErrorHandler.ThrowOnFailure(_pane.Activate());
-                if (_window != null)
+                ErrorHandler.ThrowOnFailure(this._pane.Activate());
+                if (this._window != null)
                 {
-                    ErrorHandler.ThrowOnFailure(_window.ShowNoActivate());
+                    ErrorHandler.ThrowOnFailure(this._window.ShowNoActivate());
                 }
             });
         }
 
         public override void WriteLine(string line)
         {
-            _pane.OutputStringThreadSafe(line + Environment.NewLine);
+            this._pane.OutputStringThreadSafe(line + Environment.NewLine);
             Debug.WriteLine(line, "Output Window");
         }
 
         public override void WriteErrorLine(string line)
         {
-            _pane.OutputStringThreadSafe(line + Environment.NewLine);
+            this._pane.OutputStringThreadSafe(line + Environment.NewLine);
             Debug.WriteLine(line, "Output Window");
         }
     }

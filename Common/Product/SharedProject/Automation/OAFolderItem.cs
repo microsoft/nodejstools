@@ -54,7 +54,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                return new OAProjectItems(Project, Node);
+                return new OAProjectItems(this.Project, this.Node);
             }
         }
         #endregion

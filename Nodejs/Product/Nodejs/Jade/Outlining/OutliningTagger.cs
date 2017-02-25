@@ -29,24 +29,24 @@ namespace Microsoft.NodejsTools.Jade
 
         public OutliningTagger(ITextBuffer textBuffer, OutlineRegionBuilder regionBuilder)
         {
-            _textBuffer = textBuffer;
-            _regionBuilder = regionBuilder;
-            _regionBuilder.RegionsChanged += OnRegionsChanged;
+            this._textBuffer = textBuffer;
+            this._regionBuilder = regionBuilder;
+            this._regionBuilder.RegionsChanged += this.OnRegionsChanged;
         }
 
         #region ITagger<IOutliningRegionTag>
         public IEnumerable<ITagSpan<IOutliningRegionTag>> GetTags(NormalizedSnapshotSpanCollection spans)
         {
-            if (spans.Count == 0 || _currentRegions == null || _currentRegions.Count == 0)
+            if (spans.Count == 0 || this._currentRegions == null || this._currentRegions.Count == 0)
                 yield break;
 
-            var snapshot = _textBuffer.CurrentSnapshot;
+            var snapshot = this._textBuffer.CurrentSnapshot;
             SnapshotSpan entire = new SnapshotSpan(spans[0].Start, spans[spans.Count - 1].End).TranslateTo(snapshot, SpanTrackingMode.EdgeExclusive);
 
             int startPosition = entire.Start.GetContainingLine().Start;
             int endPosition = entire.End.GetContainingLine().End;
 
-            foreach (var region in _currentRegions)
+            foreach (var region in this._currentRegions)
             {
                 int end = Math.Min(region.End, snapshot.Length);
 
@@ -64,9 +64,9 @@ namespace Microsoft.NodejsTools.Jade
 
         private void OnRegionsChanged(object sender, OutlineRegionsChangedEventArgs e)
         {
-            var snapshot = _textBuffer.CurrentSnapshot;
+            var snapshot = this._textBuffer.CurrentSnapshot;
 
-            if (e.Regions.TextBufferVersion == _textBuffer.CurrentSnapshot.Version.VersionNumber)
+            if (e.Regions.TextBufferVersion == this._textBuffer.CurrentSnapshot.Version.VersionNumber)
             {
                 if (TagsChanged != null)
                 {
@@ -77,7 +77,7 @@ namespace Microsoft.NodejsTools.Jade
                         new SnapshotSpan(snapshot, Span.FromBounds(start, end))));
                 }
 
-                _currentRegions = e.Regions;
+                this._currentRegions = e.Regions;
             }
         }
     }

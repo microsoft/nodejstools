@@ -59,8 +59,8 @@ namespace Microsoft.NodejsTools.Jade
         /// <param name="position">Start position</param>
         public TextRange(int position)
         {
-            _start = position;
-            _end = position < Int32.MaxValue ? position + 1 : position;
+            this._start = position;
+            this._end = position < Int32.MaxValue ? position + 1 : position;
         }
 
         /// <summary>
@@ -74,8 +74,8 @@ namespace Microsoft.NodejsTools.Jade
             if (length < 0)
                 throw new ArgumentException("Length must not be negative");
 
-            _start = start;
-            _end = start + length;
+            this._start = start;
+            this._end = start + length;
         }
 
         /// <summary>
@@ -92,8 +92,8 @@ namespace Microsoft.NodejsTools.Jade
         /// </summary>
         public void Empty()
         {
-            _start = 0;
-            _end = 0;
+            this._start = 0;
+            this._end = 0;
         }
 
         /// <summary>
@@ -140,19 +140,19 @@ namespace Microsoft.NodejsTools.Jade
         /// <summary>
         /// Text range start position
         /// </summary>
-        public int Start { get { return _start; } }
+        public int Start { get { return this._start; } }
 
         /// <summary>
         /// Text range end position (excluded)
         /// </summary>
-        public int End { get { return _end; } }
+        public int End { get { return this._end; } }
 
         /// <summary>
         /// Text range length
         /// </summary>
         public int Length
         {
-            get { return End - Start; }
+            get { return this.End - this.Start; }
         }
 
         /// <summary>
@@ -200,24 +200,24 @@ namespace Microsoft.NodejsTools.Jade
         /// </summary>
         public void Shift(int offset)
         {
-            _start += offset;
-            _end += offset;
+            this._start += offset;
+            this._end += offset;
         }
 
         public void Expand(int startOffset, int endOffset)
         {
-            if (_start + startOffset > _end + endOffset)
+            if (this._start + startOffset > this._end + endOffset)
                 throw new ArgumentException("Combination of start and end offsets should not be making range invalid");
 
-            _start += startOffset;
-            _end += endOffset;
+            this._start += startOffset;
+            this._end += endOffset;
         }
         #endregion
 
         [ExcludeFromCodeCoverage]
         public override string ToString()
         {
-            return string.Format(CultureInfo.InvariantCulture, "[{0}...{1}]", Start, End);
+            return string.Format(CultureInfo.InvariantCulture, "[{0}...{1}]", this.Start, this.End);
         }
 
         /// <summary>

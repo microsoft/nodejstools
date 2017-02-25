@@ -76,11 +76,11 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return newCfgProps;
+                return this.newCfgProps;
             }
             set
             {
-                newCfgProps = value;
+                this.newCfgProps = value;
             }
         }
 
@@ -92,13 +92,13 @@ namespace Microsoft.VisualStudioTools.Project
         protected ProjectConfig GetProjectConfiguration(string configName)
         {
             // if we already created it, return the cached one
-            if (configurationsList.ContainsKey(configName))
+            if (this.configurationsList.ContainsKey(configName))
             {
-                return configurationsList[configName];
+                return this.configurationsList[configName];
             }
 
             ProjectConfig requestedConfiguration = CreateProjectConfiguration(configName);
-            configurationsList.Add(configName, requestedConfiguration);
+            this.configurationsList.Add(configName, requestedConfiguration);
 
             return requestedConfiguration;
         }
@@ -423,11 +423,11 @@ namespace Microsoft.VisualStudioTools.Project
                 // Change the name 
                 config.Condition = String.Format(CultureInfo.InvariantCulture, configString, newname);
                 // Update the name in our config list
-                if (configurationsList.ContainsKey(old))
+                if (this.configurationsList.ContainsKey(old))
                 {
-                    ProjectConfig configuration = configurationsList[old];
-                    configurationsList.Remove(old);
-                    configurationsList.Add(newname, configuration);
+                    ProjectConfig configuration = this.configurationsList[old];
+                    this.configurationsList.Remove(old);
+                    this.configurationsList.Add(newname, configuration);
                     // notify the configuration of its new name
                     configuration.ConfigName = newname;
                 }

@@ -23,7 +23,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
     {
         public ExceptionEventArgs(ExceptionEvent exceptionEvent)
         {
-            ExceptionEvent = exceptionEvent;
+            this.ExceptionEvent = exceptionEvent;
         }
 
         public ExceptionEvent ExceptionEvent { get; private set; }

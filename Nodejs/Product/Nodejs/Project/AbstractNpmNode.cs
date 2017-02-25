@@ -17,8 +17,8 @@ namespace Microsoft.NodejsTools.Project
         protected AbstractNpmNode(NodejsProjectNode root)
             : base(root)
         {
-            _projectNode = root;
-            ExcludeNodeFromScc = true;
+            this._projectNode = root;
+            this.ExcludeNodeFromScc = true;
         }
 
         #region HierarchyNode implementation
@@ -85,7 +85,7 @@ namespace Microsoft.NodejsTools.Project
             foreach (var obsolete in remove)
             {
                 parent.RemoveChild(obsolete);
-                ProjectMgr.OnItemDeleted(obsolete);
+                this.ProjectMgr.OnItemDeleted(obsolete);
             }
         }
 
@@ -107,13 +107,13 @@ namespace Microsoft.NodejsTools.Project
                 }
                 else
                 {
-                    child = new DependencyNode(_projectNode, parent as DependencyNode, package);
+                    child = new DependencyNode(this._projectNode, parent as DependencyNode, package);
                     parent.AddChild(child);
                     newModules.Add(package);
                 }
 
                 ReloadHierarchy(child, package.Modules);
-                if (ProjectMgr.ParentHierarchy != null)
+                if (this.ProjectMgr.ParentHierarchy != null)
                 {
                     child.ExpandItem(EXPANDFLAGS.EXPF_CollapseFolder);
                 }

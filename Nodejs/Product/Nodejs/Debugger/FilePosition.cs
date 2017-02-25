@@ -27,9 +27,9 @@ namespace Microsoft.NodejsTools.Debugger
 
         public FilePosition(string fileName, int line, int column)
         {
-            FileName = fileName;
-            Line = line;
-            Column = column;
+            this.FileName = fileName;
+            this.Line = line;
+            this.Column = column;
         }
     }
 }

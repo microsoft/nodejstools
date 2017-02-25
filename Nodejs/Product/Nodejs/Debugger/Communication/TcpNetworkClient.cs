@@ -25,22 +25,22 @@ namespace Microsoft.NodejsTools.Debugger.Communication
 
         public TcpNetworkClient(string hostName, int portNumber)
         {
-            _tcpClient = new TcpClient(hostName, portNumber);
+            this._tcpClient = new TcpClient(hostName, portNumber);
         }
 
         public bool Connected
         {
-            get { return _tcpClient.Connected; }
+            get { return this._tcpClient.Connected; }
         }
 
         public void Dispose()
         {
-            _tcpClient.Close();
+            this._tcpClient.Close();
         }
 
         public Stream GetStream()
         {
-            return _tcpClient.GetStream();
+            return this._tcpClient.GetStream();
         }
     }
 }

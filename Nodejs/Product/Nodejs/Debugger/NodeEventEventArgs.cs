@@ -25,7 +25,7 @@ namespace Microsoft.NodejsTools.Debugger
 
         public NodeEventEventArgs(Dictionary<string, object> data)
         {
-            Data = data;
+            this.Data = data;
         }
     }
 }

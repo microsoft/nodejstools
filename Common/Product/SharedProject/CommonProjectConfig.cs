@@ -26,12 +26,12 @@ namespace Microsoft.VisualStudioTools.Project
         public CommonProjectConfig(CommonProjectNode/*!*/ project, string configuration)
             : base(project, configuration)
         {
-            _project = project;
+            this._project = project;
         }
 
         public override int DebugLaunch(uint flags)
         {
-            IProjectLauncher starter = _project.GetLauncher();
+            IProjectLauncher starter = this._project.GetLauncher();
 
             __VSDBGLAUNCHFLAGS launchFlags = (__VSDBGLAUNCHFLAGS)flags;
             if ((launchFlags & __VSDBGLAUNCHFLAGS.DBGLAUNCH_NoDebug) == __VSDBGLAUNCHFLAGS.DBGLAUNCH_NoDebug)

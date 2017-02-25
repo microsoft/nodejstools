@@ -63,40 +63,40 @@ namespace Microsoft.NodejsTools.SourceMapping
         internal SourceMap(TextReader input)
         {
             var serializer = new JavaScriptSerializer();
-            _mapInfo = serializer.Deserialize<Dictionary<string, object>>(input.ReadToEnd());
-            if (Version != 3)
+            this._mapInfo = serializer.Deserialize<Dictionary<string, object>>(input.ReadToEnd());
+            if (this.Version != 3)
             {
                 throw new NotSupportedException("Only V3 source maps are supported");
             }
 
             object value;
-            if (_mapInfo.TryGetValue("sources", out value))
+            if (this._mapInfo.TryGetValue("sources", out value))
             {
-                var sourceRoot = SourceRoot;
+                var sourceRoot = this.SourceRoot;
 
                 var sources = value as ArrayList;
-                _sources = sources.Cast<string>()
+                this._sources = sources.Cast<string>()
                     .Select(x => sourceRoot + x)
                     .ToArray();
             }
             else
             {
-                _sources = Array.Empty<string>();
+                this._sources = Array.Empty<string>();
             }
 
-            if (_mapInfo.TryGetValue("names", out value))
+            if (this._mapInfo.TryGetValue("names", out value))
             {
                 var names = value as ArrayList;
-                _names = names.Cast<string>().ToArray();
+                this._names = names.Cast<string>().ToArray();
             }
             else
             {
-                _names = Array.Empty<string>();
+                this._names = Array.Empty<string>();
             }
 
             List<LineInfo> lineInfos = new List<LineInfo>();
             object mappingsObj;
-            if (_mapInfo.TryGetValue("mappings", out mappingsObj) && mappingsObj is string)
+            if (this._mapInfo.TryGetValue("mappings", out mappingsObj) && mappingsObj is string)
             {
                 var mappings = (string)mappingsObj;
                 var lines = mappings.Split(';');
@@ -162,7 +162,7 @@ namespace Microsoft.NodejsTools.SourceMapping
                     lineInfos.Add(new LineInfo(segmentInfos.ToArray()));
                 }
             }
-            _lines = lineInfos.ToArray();
+            this._lines = lineInfos.ToArray();
         }
 
         private const int VLQ_CONTINUATION_MASK = 0x20;
@@ -255,7 +255,7 @@ namespace Microsoft.NodejsTools.SourceMapping
         {
             get
             {
-                return new ReadOnlyCollection<string>(_sources);
+                return new ReadOnlyCollection<string>(this._sources);
             }
         }
 
@@ -266,7 +266,7 @@ namespace Microsoft.NodejsTools.SourceMapping
         {
             get
             {
-                return new ReadOnlyCollection<string>(_names);
+                return new ReadOnlyCollection<string>(this._names);
             }
         }
 
@@ -275,9 +275,9 @@ namespace Microsoft.NodejsTools.SourceMapping
         /// </summary>
         internal bool TryMapPoint(int lineNo, int columnNo, out SourceMapInfo res)
         {
-            if (lineNo < _lines.Length)
+            if (lineNo < this._lines.Length)
             {
-                var line = _lines[lineNo];
+                var line = this._lines[lineNo];
                 for (int i = line.Segments.Length - 1; i >= 0; i--)
                 {
                     if (line.Segments[i].GeneratedColumn <= columnNo)
@@ -286,8 +286,8 @@ namespace Microsoft.NodejsTools.SourceMapping
                         res = new SourceMapInfo(
                             line.Segments[i].OriginalLine,
                             line.Segments[i].OriginalColumn,
-                            line.Segments[i].SourceIndex < Sources.Count ? Sources[line.Segments[i].SourceIndex] : null,
-                            line.Segments[i].OriginalName < Names.Count ? Names[line.Segments[i].OriginalName] : null
+                            line.Segments[i].SourceIndex < this.Sources.Count ? this.Sources[line.Segments[i].SourceIndex] : null,
+                            line.Segments[i].OriginalName < this.Names.Count ? this.Names[line.Segments[i].OriginalName] : null
                         );
                         return true;
                     }
@@ -298,8 +298,8 @@ namespace Microsoft.NodejsTools.SourceMapping
                     res = new SourceMapInfo(
                         line.Segments[0].OriginalLine,
                         line.Segments[0].OriginalColumn,
-                        line.Segments[0].SourceIndex < Sources.Count ? Sources[line.Segments[0].SourceIndex] : null,
-                        line.Segments[0].OriginalName < Names.Count ? Names[line.Segments[0].OriginalName] : null
+                        line.Segments[0].SourceIndex < this.Sources.Count ? this.Sources[line.Segments[0].SourceIndex] : null,
+                        line.Segments[0].OriginalName < this.Names.Count ? this.Names[line.Segments[0].OriginalName] : null
                     );
                     return true;
                 }
@@ -313,17 +313,17 @@ namespace Microsoft.NodejsTools.SourceMapping
         /// </summary>
         internal bool TryMapLine(int lineNo, out SourceMapInfo res)
         {
-            if (lineNo < _lines.Length)
+            if (lineNo < this._lines.Length)
             {
-                var line = _lines[lineNo];
+                var line = this._lines[lineNo];
                 if (line.Segments.Length > 0)
                 {
                     res = new SourceMapInfo(
                         line.Segments[0].OriginalLine,
                         0,
-                        Sources[line.Segments[0].SourceIndex],
-                        line.Segments[0].OriginalName < Names.Count ?
-                            Names[line.Segments[0].OriginalName] :
+                        this.Sources[line.Segments[0].SourceIndex],
+                        line.Segments[0].OriginalName < this.Names.Count ?
+                            this.Names[line.Segments[0].OriginalName] :
                             null
                     );
                     return true;
@@ -339,9 +339,9 @@ namespace Microsoft.NodejsTools.SourceMapping
         internal bool TryMapPointBack(int lineNo, int columnNo, out SourceMapInfo res)
         {
             int? firstBestLine = null, secondBestLine = null;
-            for (int i = 0; i < _lines.Length; i++)
+            for (int i = 0; i < this._lines.Length; i++)
             {
-                var line = _lines[i];
+                var line = this._lines[i];
                 int? originalColumn = null;
                 foreach (var segment in line.Segments)
                 {
@@ -356,7 +356,7 @@ namespace Microsoft.NodejsTools.SourceMapping
                             res = new SourceMapInfo(
                                 i,
                                 columnNo - originalColumn.Value,
-                                File,
+                                this.File,
                                 null
                             );
                             return true;
@@ -385,7 +385,7 @@ namespace Microsoft.NodejsTools.SourceMapping
                     else if (segment.OriginalLine > lineNo && firstBestLine != null)
                     {
                         // not a perfect matching on column (e.g. requested 0, mapping starts at 4)
-                        res = new SourceMapInfo(secondBestLine ?? firstBestLine.Value, 0, File, null);
+                        res = new SourceMapInfo(secondBestLine ?? firstBestLine.Value, 0, this.File, null);
                         return true;
                     }
                 }
@@ -398,7 +398,7 @@ namespace Microsoft.NodejsTools.SourceMapping
         private T GetValue<T>(string name, T defaultValue)
         {
             object version;
-            if (_mapInfo.TryGetValue(name, out version) && version is T)
+            if (this._mapInfo.TryGetValue(name, out version) && version is T)
             {
                 return (T)version;
             }
@@ -423,7 +423,7 @@ namespace Microsoft.NodejsTools.SourceMapping
 
             public LineInfo(SegmentInfo[] segments)
             {
-                Segments = segments;
+                this.Segments = segments;
             }
         }
 
@@ -437,11 +437,11 @@ namespace Microsoft.NodejsTools.SourceMapping
 
             internal SegmentInfo(int generatedColumn, int sourceIndex, int originalLine, int originalColumn, int originalName)
             {
-                GeneratedColumn = generatedColumn;
-                SourceIndex = sourceIndex;
-                OriginalLine = originalLine;
-                OriginalColumn = originalColumn;
-                OriginalName = originalName;
+                this.GeneratedColumn = generatedColumn;
+                this.SourceIndex = sourceIndex;
+                this.OriginalLine = originalLine;
+                this.OriginalColumn = originalColumn;
+                this.OriginalName = originalName;
             }
         }
     }
@@ -453,10 +453,10 @@ namespace Microsoft.NodejsTools.SourceMapping
 
         internal SourceMapInfo(int line, int column, string filename, string name)
         {
-            Line = line;
-            Column = column;
-            FileName = filename;
-            Name = name;
+            this.Line = line;
+            this.Column = column;
+            this.FileName = filename;
+            this.Name = name;
         }
     }
 }

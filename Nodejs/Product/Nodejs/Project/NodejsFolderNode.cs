@@ -27,7 +27,7 @@ namespace Microsoft.NodejsTools.Project
 
         public NodejsFolderNode(CommonProjectNode root, ProjectElement element) : base(root, element)
         {
-            _project = root;
+            this._project = root;
         }
 
         public override string Caption
@@ -48,8 +48,8 @@ namespace Microsoft.NodejsTools.Project
             // Include node_modules folder is generally unecessary and can cause VS to hang.
             // http://nodejstools.codeplex.com/workitem/1432
             // Check if the folder is node_modules, and warn the user to ensure they don't run into this issue or at least set expectations appropriately.
-            string nodeModulesPath = Path.Combine(_project.FullPathToChildren, "node_modules");
-            if (CommonUtils.IsSameDirectory(nodeModulesPath, ItemNode.Url) &&
+            string nodeModulesPath = Path.Combine(this._project.FullPathToChildren, "node_modules");
+            if (CommonUtils.IsSameDirectory(nodeModulesPath, this.ItemNode.Url) &&
                 !ShouldIncludeNodeModulesFolderInProject())
             {
                 return VSConstants.S_OK;
@@ -61,7 +61,7 @@ namespace Microsoft.NodejsTools.Project
         {
             var includeNodeModulesButton = new TaskDialogButton(Resources.IncludeNodeModulesIncludeTitle, Resources.IncludeNodeModulesIncludeDescription);
             var cancelOperationButton = new TaskDialogButton(Resources.IncludeNodeModulesCancelTitle);
-            var taskDialog = new TaskDialog(_project.ProjectMgr.Site)
+            var taskDialog = new TaskDialog(this._project.ProjectMgr.Site)
             {
                 AllowCancellation = true,
                 EnableHyperlinks = true,

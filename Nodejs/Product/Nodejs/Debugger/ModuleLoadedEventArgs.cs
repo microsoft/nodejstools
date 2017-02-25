@@ -24,7 +24,7 @@ namespace Microsoft.NodejsTools.Debugger
 
         public ModuleLoadedEventArgs(NodeModule module)
         {
-            Module = module;
+            this.Module = module;
         }
     }
 }

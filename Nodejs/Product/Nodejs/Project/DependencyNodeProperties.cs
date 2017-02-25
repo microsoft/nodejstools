@@ -28,13 +28,13 @@ namespace Microsoft.NodejsTools.Project
     {
         internal DependencyNodeProperties(DependencyNode node) : base(node) { }
 
-        private DependencyNode DependencyNode { get { return Node as DependencyNode; } }
+        private DependencyNode DependencyNode { get { return this.Node as DependencyNode; } }
 
-        private IPackage Package { get { return DependencyNode.Package; } }
+        private IPackage Package { get { return this.DependencyNode.Package; } }
 
         public override string GetClassName()
         {
-            return IsSubPackage
+            return this.IsSubPackage
                 ? Resources.PropertiesClassLocalSubPackage
                 : Resources.PropertiesClassLocalPackage;
         }
@@ -46,7 +46,7 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                return null == Package ? null : Package.Name;
+                return null == this.Package ? null : this.Package.Name;
             }
         }
 
@@ -57,7 +57,7 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                return null == Package ? null : Package.Version.ToString();
+                return null == this.Package ? null : this.Package.Version.ToString();
             }
         }
 
@@ -68,7 +68,7 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                var range = null == Package ? null : Package.RequestedVersionRange;
+                var range = null == this.Package ? null : this.Package.RequestedVersionRange;
                 return range ?? Resources.RequestedVersionRangeNone;
             }
         }
@@ -107,7 +107,7 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                return null == Package ? null : Package.Description;
+                return null == this.Package ? null : this.Package.Description;
             }
         }
 
@@ -118,13 +118,13 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                if (null == Package)
+                if (null == this.Package)
                 {
                     return null;
                 }
 
                 var buff = new StringBuilder();
-                foreach (var keyword in Package.Keywords)
+                foreach (var keyword in this.Package.Keywords)
                 {
                     if (buff.Length > 0)
                     {
@@ -143,7 +143,7 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                var author = null == Package ? null : Package.Author;
+                var author = null == this.Package ? null : this.Package.Author;
                 return null == author ? null : author.ToString();
             }
         }
@@ -155,7 +155,7 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                return null == Package ? null : Package.Path;
+                return null == this.Package ? null : this.Package.Path;
             }
         }
 
@@ -163,7 +163,7 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                var node = DependencyNode as HierarchyNode;
+                var node = this.DependencyNode as HierarchyNode;
                 if (null != node && node.Parent is DependencyNode)
                 {
                     return true;
@@ -179,7 +179,7 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                return IsSubPackage
+                return this.IsSubPackage
                     ? Resources.PackageTypeLocalSubpackage
                     : Resources.PackageTypeLocal;
             }
@@ -192,7 +192,7 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                if (IsSubPackage)
+                if (this.IsSubPackage)
                 {
                     return Resources.LinkStatusNotApplicableSubPackages;
                 }
@@ -207,7 +207,7 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                return null != Package && Package.IsListedInParentPackageJson;
+                return null != this.Package && this.Package.IsListedInParentPackageJson;
             }
         }
 
@@ -218,7 +218,7 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                return null != Package && Package.IsMissing;
+                return null != this.Package && this.Package.IsMissing;
             }
         }
 
@@ -229,7 +229,7 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                return null != Package && Package.IsDevDependency;
+                return null != this.Package && this.Package.IsDevDependency;
             }
         }
 
@@ -240,7 +240,7 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                return null != Package && Package.IsOptionalDependency;
+                return null != this.Package && this.Package.IsOptionalDependency;
             }
         }
 
@@ -251,7 +251,7 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                return null != Package && Package.IsBundledDependency;
+                return null != this.Package && this.Package.IsBundledDependency;
             }
         }
     }

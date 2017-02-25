@@ -48,11 +48,11 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return _itemType;
+                return this._itemType;
             }
             set
             {
-                _itemType = value;
+                this._itemType = value;
                 OnItemTypeChanged();
             }
         }

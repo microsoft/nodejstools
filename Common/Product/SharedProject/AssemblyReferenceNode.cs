@@ -63,7 +63,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         internal System.Reflection.AssemblyName ResolvedAssembly
         {
-            get { return resolvedAssemblyName; }
+            get { return this.resolvedAssemblyName; }
         }
 
         public override string Url
@@ -87,11 +87,11 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                if (null == assemblyRef)
+                if (null == this.assemblyRef)
                 {
-                    assemblyRef = new Automation.OAAssemblyReference(this);
+                    this.assemblyRef = new Automation.OAAssemblyReference(this);
                 }
-                return assemblyRef;
+                return this.assemblyRef;
             }
         }
         #endregion
@@ -107,7 +107,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             this.InitializeFileChangeEvents();
 
-            if (File.Exists(assemblyPath))
+            if (File.Exists(this.assemblyPath))
             {
                 this.fileChangeListener.ObserveItem(this.assemblyPath);
             }
@@ -162,7 +162,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         protected override void BindReferenceData()
         {
-            ProjectMgr.Site.GetUIThread().MustBeCalledFromUIThread();
+            this.ProjectMgr.Site.GetUIThread().MustBeCalledFromUIThread();
 
             Debug.Assert(this.assemblyName != null, "The AssemblyName field has not been initialized");
 
@@ -220,9 +220,9 @@ namespace Microsoft.VisualStudioTools.Project
                     this.assemblyName = System.Reflection.AssemblyName.GetAssemblyName(this.assemblyPath);
                 }
             }
-            if (null == resolvedAssemblyName)
+            if (null == this.resolvedAssemblyName)
             {
-                resolvedAssemblyName = assemblyName;
+                this.resolvedAssemblyName = this.assemblyName;
             }
         }
 
@@ -265,7 +265,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns></returns>
         protected override bool CanShowDefaultIcon()
         {
-            return File.Exists(assemblyPath);
+            return File.Exists(this.assemblyPath);
         }
 
         private void GetPathNameFromProjectFile()
@@ -339,14 +339,14 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         private void SetReferenceProperties()
         {
-            ProjectMgr.Site.GetUIThread().MustBeCalledFromUIThread();
+            this.ProjectMgr.Site.GetUIThread().MustBeCalledFromUIThread();
 
             // Set a default HintPath for msbuild to be able to resolve the reference.
             this.ItemNode.SetMetadata(ProjectFileConstants.HintPath, this.assemblyPath);
 
             // Resolve assembly referernces. This is needed to make sure that properties like the full path
             // to the assembly or the hint path are set.
-            if (!ProjectMgr.BuildProject.Targets.ContainsKey(MsBuildTarget.ResolveAssemblyReferences))
+            if (!this.ProjectMgr.BuildProject.Targets.ContainsKey(MsBuildTarget.ResolveAssemblyReferences))
             {
                 return;
             }
@@ -443,7 +443,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             if (CommonUtils.IsSamePath(e.FileName, this.assemblyPath))
             {
-                ProjectMgr.OnInvalidateItems(this.Parent);
+                this.ProjectMgr.OnInvalidateItems(this.Parent);
             }
         }
 
@@ -460,7 +460,7 @@ namespace Microsoft.VisualStudioTools.Project
             this.ItemNode.RemoveFromProjectFile();
 
             // Notify hierarchy event listeners that items have been invalidated
-            ProjectMgr.OnInvalidateItems(this);
+            this.ProjectMgr.OnInvalidateItems(this);
 
             // Dispose the node now that is deleted.
             Dispose(true);

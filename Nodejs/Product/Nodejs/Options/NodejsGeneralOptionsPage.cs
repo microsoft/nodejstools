@@ -49,12 +49,12 @@ namespace Microsoft.NodejsTools.Options
         {
             get
             {
-                if (_window == null)
+                if (this._window == null)
                 {
-                    _window = new NodejsGeneralOptionsControl();
+                    this._window = new NodejsGeneralOptionsControl();
                     LoadSettingsFromStorage();
                 }
-                return _window;
+                return this._window;
             }
         }
 
@@ -86,8 +86,8 @@ namespace Microsoft.NodejsTools.Options
         /// </summary>
         public SurveyNewsPolicy SurveyNewsCheck
         {
-            get { return _surveyNewsCheck; }
-            set { _surveyNewsCheck = value; }
+            get { return this._surveyNewsCheck; }
+            set { this._surveyNewsCheck = value; }
         }
 
         /// <summary>
@@ -95,8 +95,8 @@ namespace Microsoft.NodejsTools.Options
         /// </summary>
         public DateTime SurveyNewsLastCheck
         {
-            get { return _surveyNewsLastCheck; }
-            set { _surveyNewsLastCheck = value; }
+            get { return this._surveyNewsLastCheck; }
+            set { this._surveyNewsLastCheck = value; }
         }
 
         /// <summary>
@@ -104,8 +104,8 @@ namespace Microsoft.NodejsTools.Options
         /// </summary>
         public string SurveyNewsFeedUrl
         {
-            get { return _surveyNewsFeedUrl; }
-            set { _surveyNewsFeedUrl = value; }
+            get { return this._surveyNewsFeedUrl; }
+            set { this._surveyNewsFeedUrl = value; }
         }
 
         /// <summary>
@@ -113,8 +113,8 @@ namespace Microsoft.NodejsTools.Options
         /// </summary>
         public string SurveyNewsIndexUrl
         {
-            get { return _surveyNewsIndexUrl; }
-            set { _surveyNewsIndexUrl = value; }
+            get { return this._surveyNewsIndexUrl; }
+            set { this._surveyNewsIndexUrl = value; }
         }
 
         /// <summary>
@@ -124,50 +124,50 @@ namespace Microsoft.NodejsTools.Options
         /// </summary>
         public override void ResetSettings()
         {
-            _surveyNewsCheck = SurveyNewsPolicy.CheckOnceWeek;
-            _surveyNewsLastCheck = DateTime.MinValue;
-            _surveyNewsFeedUrl = DefaultSurveyNewsFeedUrl;
-            _surveyNewsIndexUrl = DefaultSurveyNewsIndexUrl;
-            WaitOnAbnormalExit = true;
-            WaitOnNormalExit = false;
-            EditAndContinue = true;
-            CheckForLongPaths = true;
+            this._surveyNewsCheck = SurveyNewsPolicy.CheckOnceWeek;
+            this._surveyNewsLastCheck = DateTime.MinValue;
+            this._surveyNewsFeedUrl = DefaultSurveyNewsFeedUrl;
+            this._surveyNewsIndexUrl = DefaultSurveyNewsIndexUrl;
+            this.WaitOnAbnormalExit = true;
+            this.WaitOnNormalExit = false;
+            this.EditAndContinue = true;
+            this.CheckForLongPaths = true;
         }
 
         public override void LoadSettingsFromStorage()
         {
             // Load settings from storage.
-            _surveyNewsCheck = LoadEnum<SurveyNewsPolicy>(SurveyNewsCheckSetting) ?? SurveyNewsPolicy.CheckOnceWeek;
-            _surveyNewsLastCheck = LoadDateTime(SurveyNewsLastCheckSetting) ?? DateTime.MinValue;
-            _surveyNewsFeedUrl = LoadString(SurveyNewsFeedUrlSetting) ?? DefaultSurveyNewsFeedUrl;
-            _surveyNewsIndexUrl = LoadString(SurveyNewsIndexUrlSetting) ?? DefaultSurveyNewsIndexUrl;
-            WaitOnAbnormalExit = LoadBool(WaitOnAbnormalExitSetting) ?? true;
-            WaitOnNormalExit = LoadBool(WaitOnNormalExitSetting) ?? false;
-            EditAndContinue = LoadBool(EditAndContinueSetting) ?? true;
-            CheckForLongPaths = LoadBool(CheckForLongPathsSetting) ?? true;
+            this._surveyNewsCheck = LoadEnum<SurveyNewsPolicy>(SurveyNewsCheckSetting) ?? SurveyNewsPolicy.CheckOnceWeek;
+            this._surveyNewsLastCheck = LoadDateTime(SurveyNewsLastCheckSetting) ?? DateTime.MinValue;
+            this._surveyNewsFeedUrl = LoadString(SurveyNewsFeedUrlSetting) ?? DefaultSurveyNewsFeedUrl;
+            this._surveyNewsIndexUrl = LoadString(SurveyNewsIndexUrlSetting) ?? DefaultSurveyNewsIndexUrl;
+            this.WaitOnAbnormalExit = LoadBool(WaitOnAbnormalExitSetting) ?? true;
+            this.WaitOnNormalExit = LoadBool(WaitOnNormalExitSetting) ?? false;
+            this.EditAndContinue = LoadBool(EditAndContinueSetting) ?? true;
+            this.CheckForLongPaths = LoadBool(CheckForLongPathsSetting) ?? true;
 
             // Synchronize UI with backing properties.
-            if (_window != null)
+            if (this._window != null)
             {
-                _window.SyncControlWithPageSettings(this);
+                this._window.SyncControlWithPageSettings(this);
             }
         }
 
         public override void SaveSettingsToStorage()
         {
             // Synchronize backing properties with UI.
-            if (_window != null)
+            if (this._window != null)
             {
-                _window.SyncPageWithControlSettings(this);
+                this._window.SyncPageWithControlSettings(this);
             }
 
             // Save settings.
-            SaveEnum(SurveyNewsCheckSetting, _surveyNewsCheck);
-            SaveDateTime(SurveyNewsLastCheckSetting, _surveyNewsLastCheck);
-            SaveBool(WaitOnNormalExitSetting, WaitOnNormalExit);
-            SaveBool(WaitOnAbnormalExitSetting, WaitOnAbnormalExit);
-            SaveBool(EditAndContinueSetting, EditAndContinue);
-            SaveBool(CheckForLongPathsSetting, CheckForLongPaths);
+            SaveEnum(SurveyNewsCheckSetting, this._surveyNewsCheck);
+            SaveDateTime(SurveyNewsLastCheckSetting, this._surveyNewsLastCheck);
+            SaveBool(WaitOnNormalExitSetting, this.WaitOnNormalExit);
+            SaveBool(WaitOnAbnormalExitSetting, this.WaitOnAbnormalExit);
+            SaveBool(EditAndContinueSetting, this.EditAndContinue);
+            SaveBool(CheckForLongPathsSetting, this.CheckForLongPaths);
         }
     }
 }

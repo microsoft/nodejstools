@@ -49,7 +49,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             CheckProjectIsValid();
 
-            return Project.ProjectNode.Site.GetUIThread().Invoke<EnvDTE.ProjectItem>(() =>
+            return this.Project.ProjectNode.Site.GetUIThread().Invoke<EnvDTE.ProjectItem>(() =>
             {
                 ProjectItem result = AddFolder(directory, null);
 
@@ -88,7 +88,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                 // We should run the wizard only if the extension is vstemplate
                 // otherwise it's a clone operation
                 VSADDITEMOPERATION op;
-                Project.ProjectNode.Site.GetUIThread().Invoke(() =>
+                this.Project.ProjectNode.Site.GetUIThread().Invoke(() =>
                 {
                     if (Utilities.IsTemplateFile(fileName))
                     {
@@ -134,7 +134,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <returns>A ProjectItem representing the newly added folder.</returns>
         public override ProjectItem AddFolder(string name, string kind)
         {
-            Project.CheckProjectIsValid();
+            this.Project.CheckProjectIsValid();
 
             //Verify name is not null or empty
             Utilities.ValidateFileName(this.Project.ProjectNode.Site, name);
@@ -145,7 +145,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                 throw new ArgumentException("Parameter specification for AddFolder was not meet", "kind");
             }
 
-            return Project.ProjectNode.Site.GetUIThread().Invoke<EnvDTE.ProjectItem>(() =>
+            return this.Project.ProjectNode.Site.GetUIThread().Invoke<EnvDTE.ProjectItem>(() =>
             {
                 var existingChild = this.NodeWithItems.FindImmediateChildByName(name);
                 if (existingChild != null)
@@ -164,7 +164,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                 {
                     //In the case that we are adding a folder to a folder, we need to build up
                     //the path to the project node.
-                    name = Path.Combine(NodeWithItems.FullPathToChildren, name);
+                    name = Path.Combine(this.NodeWithItems.FullPathToChildren, name);
 
                     newFolder = proj.CreateFolderNodes(name);
                 }
@@ -205,7 +205,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         protected virtual EnvDTE.ProjectItem AddItem(string path, VSADDITEMOPERATION op)
         {
             CheckProjectIsValid();
-            return Project.ProjectNode.Site.GetUIThread().Invoke<EnvDTE.ProjectItem>(() =>
+            return this.Project.ProjectNode.Site.GetUIThread().Invoke<EnvDTE.ProjectItem>(() =>
             {
                 ProjectNode proj = this.Project.ProjectNode;
                 EnvDTE.ProjectItem itemAdded = null;
@@ -241,7 +241,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <returns>A ProjectItem object.</returns>
         private EnvDTE.ProjectItem EvaluateAddResult(VSADDRESULT result, string path)
         {
-            return Project.ProjectNode.Site.GetUIThread().Invoke<EnvDTE.ProjectItem>(() =>
+            return this.Project.ProjectNode.Site.GetUIThread().Invoke<EnvDTE.ProjectItem>(() =>
             {
                 if (result != VSADDRESULT.ADDRESULT_Failure)
                 {

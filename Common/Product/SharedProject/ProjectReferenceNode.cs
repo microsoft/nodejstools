@@ -135,16 +135,16 @@ namespace Microsoft.VisualStudioTools.Project
                 {
                     // Search for the project in the collection of the projects in the
                     // current solution.
-                    var dte = (EnvDTE.DTE)ProjectMgr.GetService(typeof(EnvDTE.DTE));
+                    var dte = (EnvDTE.DTE)this.ProjectMgr.GetService(typeof(EnvDTE.DTE));
                     if (null == dte || null == dte.Solution)
                     {
                         return null;
                     }
                     var unmodeled = new Guid(EnvDTE.Constants.vsProjectKindUnmodeled);
-                    referencedProject = dte.Solution.Projects
+                    this.referencedProject = dte.Solution.Projects
                         .Cast<EnvDTE.Project>()
                         .Where(prj => !Utilities.GuidEquals(unmodeled, prj.Kind))
-                        .FirstOrDefault(prj => CommonUtils.IsSamePath(referencedProjectFullPath, prj.FullName));
+                        .FirstOrDefault(prj => CommonUtils.IsSamePath(this.referencedProjectFullPath, prj.FullName));
                 }
 
                 return this.referencedProject;
@@ -198,7 +198,7 @@ namespace Microsoft.VisualStudioTools.Project
                 // Usually the output path is relative to the project path. If it is set as an
                 // absolute path, this call has no effect.
                 string outputPath = CommonUtils.GetAbsoluteDirectoryPath(
-                    Path.GetDirectoryName(referencedProjectFullPath),
+                    Path.GetDirectoryName(this.referencedProjectFullPath),
                     outputPathProperty.Value.ToString());
 
                 // Now get the name of the assembly from the project.
@@ -248,8 +248,8 @@ namespace Microsoft.VisualStudioTools.Project
                 // Now get the name of the assembly from the project.
                 // Some project system throw if the property does not exist. We expect an ArgumentException.
                 EnvDTE.Property assemblyNameProperty = null;
-                if (ReferencedProjectObject != null &&
-                    !(ReferencedProjectObject is Automation.OAProject)) // our own projects don't have assembly names
+                if (this.ReferencedProjectObject != null &&
+                    !(this.ReferencedProjectObject is Automation.OAProject)) // our own projects don't have assembly names
                 {
                     try
                     {
@@ -272,11 +272,11 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                if (null == projectReference)
+                if (null == this.projectReference)
                 {
-                    projectReference = new Automation.OAProjectReference(this);
+                    this.projectReference = new Automation.OAProjectReference(this);
                 }
-                return projectReference;
+                return this.projectReference;
             }
         }
         #endregion
@@ -461,7 +461,7 @@ namespace Microsoft.VisualStudioTools.Project
             errorHandler = null;
             if (this.IsThisProjectReferenceInCycle())
             {
-                errorHandler = new CannotAddReferenceErrorMessage(ShowCircularReferenceErrorMessage);
+                errorHandler = new CannotAddReferenceErrorMessage(this.ShowCircularReferenceErrorMessage);
                 return false;
             }
 

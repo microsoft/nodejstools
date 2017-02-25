@@ -39,24 +39,24 @@ namespace Microsoft.NodejsTools.Debugger.Events
 
         public ExceptionEvent(JObject message)
         {
-            Running = false;
+            this.Running = false;
 
             JToken body = message["body"];
-            Line = (int?)body["sourceLine"];
-            Column = (int?)body["sourceColumn"];
-            Uncaught = (bool)body["uncaught"];
-            ExceptionId = (int)body["exception"]["handle"];
-            Description = (string)body["exception"]["text"];
-            TypeName = GetExceptionType(body);
-            ExceptionName = GetExceptionName(message);
-            ErrorNumber = GetExceptionCodeRef(body);
+            this.Line = (int?)body["sourceLine"];
+            this.Column = (int?)body["sourceColumn"];
+            this.Uncaught = (bool)body["uncaught"];
+            this.ExceptionId = (int)body["exception"]["handle"];
+            this.Description = (string)body["exception"]["text"];
+            this.TypeName = GetExceptionType(body);
+            this.ExceptionName = GetExceptionName(message);
+            this.ErrorNumber = GetExceptionCodeRef(body);
 
             JToken script = body["script"];
             if (script != null)
             {
                 var scriptId = (int)script["id"];
                 var fileName = (string)script["name"];
-                Module = new NodeModule(scriptId, fileName);
+                this.Module = new NodeModule(scriptId, fileName);
             }
         }
 
@@ -104,7 +104,7 @@ namespace Microsoft.NodejsTools.Debugger.Events
                     name = (string)refRecord["name"];
                 }
             }
-            return _typeNameMappings.ContainsKey(name) ? _typeNameMappings[name] : name;
+            return this._typeNameMappings.ContainsKey(name) ? this._typeNameMappings[name] : name;
         }
 
         private JToken GetRefRecord(JArray refs, int handle)
@@ -125,7 +125,7 @@ namespace Microsoft.NodejsTools.Debugger.Events
         {
             string name = (string)body["exception"]["className"]
                           ?? (string)body["exception"]["type"];
-            return _typeNameMappings.ContainsKey(name) ? _typeNameMappings[name] : name;
+            return this._typeNameMappings.ContainsKey(name) ? this._typeNameMappings[name] : name;
         }
     }
 }

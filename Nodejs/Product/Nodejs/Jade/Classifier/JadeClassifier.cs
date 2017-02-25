@@ -26,7 +26,7 @@ namespace Microsoft.NodejsTools.Jade
         public JadeClassifier(ITextBuffer textBuffer, JadeClassifierProvider provider) :
             base(textBuffer, new JadeTokenizer(provider), new JadeClassificationNameProvider(provider.ClassificationRegistryService))
         {
-            LineBasedClassification = true;
+            this.LineBasedClassification = true;
             ServiceManager.AddService<JadeClassifier>(this, textBuffer);
         }
 
@@ -34,7 +34,7 @@ namespace Microsoft.NodejsTools.Jade
         {
             if (tokens.Count > 0)
             {
-                var line = TextBuffer.CurrentSnapshot.GetLineFromPosition(position);
+                var line = this.TextBuffer.CurrentSnapshot.GetLineFromPosition(position);
                 var index = tokens.GetFirstItemAfterPosition(line.Start);
                 if (index >= 0)
                 {
@@ -42,7 +42,7 @@ namespace Microsoft.NodejsTools.Jade
                     {
                         if (IsAnchorToken(tokens[i].TokenType))
                         {
-                            line = TextBuffer.CurrentSnapshot.GetLineFromPosition(tokens[i].Start);
+                            line = this.TextBuffer.CurrentSnapshot.GetLineFromPosition(tokens[i].Start);
                             break;
                         }
                     }
@@ -60,21 +60,21 @@ namespace Microsoft.NodejsTools.Jade
 
         protected override int GetAnchorPosition(int position)
         {
-            var snapshot = TextBuffer.CurrentSnapshot;
+            var snapshot = this.TextBuffer.CurrentSnapshot;
             if (position < snapshot.Length)
             {
                 var line = snapshot.GetLineFromPosition(position);
                 position = line.Start;
 
-                var index = Tokens.GetFirstItemAfterPosition(line.Start);
+                var index = this.Tokens.GetFirstItemAfterPosition(line.Start);
                 if (index < 0)
-                    index = Tokens.Count - 1;
+                    index = this.Tokens.Count - 1;
 
                 for (int i = index; i >= 0; i--)
                 {
-                    if (IsAnchorToken(Tokens[i].TokenType))
+                    if (IsAnchorToken(this.Tokens[i].TokenType))
                     {
-                        line = snapshot.GetLineFromPosition(Tokens[i].Start);
+                        line = snapshot.GetLineFromPosition(this.Tokens[i].Start);
                         position = line.Start;
                         break;
                     }

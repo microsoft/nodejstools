@@ -54,7 +54,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return Url;
+                return this.Url;
             }
         }
 
@@ -127,22 +127,22 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>VSConstants.S_OK, if succeeded</returns>
         public override int SetEditLabel(string label)
         {
-            if (IsBeingCreated)
+            if (this.IsBeingCreated)
             {
                 return FinishFolderAdd(label, false);
             }
             else
             {
-                if (String.Equals(CommonUtils.GetFileOrDirectoryName(Url), label, StringComparison.Ordinal))
+                if (String.Equals(CommonUtils.GetFileOrDirectoryName(this.Url), label, StringComparison.Ordinal))
                 {
                     // Label matches current Name
                     return VSConstants.S_OK;
                 }
 
-                string newPath = CommonUtils.GetAbsoluteDirectoryPath(CommonUtils.GetParent(Url), label);
+                string newPath = CommonUtils.GetAbsoluteDirectoryPath(CommonUtils.GetParent(this.Url), label);
 
                 // Verify that No Directory/file already exists with the new name among current children
-                var existingChild = Parent.FindImmediateChildByName(label);
+                var existingChild = this.Parent.FindImmediateChildByName(label);
                 if (existingChild != null && existingChild != this)
                 {
                     return ShowFileOrFolderAlreadyExistsErrorMessage(newPath);
@@ -150,12 +150,12 @@ namespace Microsoft.VisualStudioTools.Project
 
                 // Verify that No Directory/file already exists with the new name on disk.
                 // Unless the path exists because it is the path to the source file also.
-                if ((Directory.Exists(newPath) || File.Exists(newPath)) && !CommonUtils.IsSamePath(Url, newPath))
+                if ((Directory.Exists(newPath) || File.Exists(newPath)) && !CommonUtils.IsSamePath(this.Url, newPath))
                 {
                     return ShowFileOrFolderAlreadyExistsErrorMessage(newPath);
                 }
 
-                if (!ProjectMgr.Tracker.CanRenameItem(Url, newPath, VSRENAMEFILEFLAGS.VSRENAMEFILEFLAGS_Directory))
+                if (!this.ProjectMgr.Tracker.CanRenameItem(this.Url, newPath, VSRENAMEFILEFLAGS.VSRENAMEFILEFLAGS_Directory))
                 {
                     return VSConstants.S_OK;
                 }
@@ -164,14 +164,14 @@ namespace Microsoft.VisualStudioTools.Project
             try
             {
                 var oldTriggerFlag = this.ProjectMgr.EventTriggeringFlag;
-                ProjectMgr.EventTriggeringFlag |= ProjectNode.EventTriggering.DoNotTriggerTrackerQueryEvents;
+                this.ProjectMgr.EventTriggeringFlag |= ProjectNode.EventTriggering.DoNotTriggerTrackerQueryEvents;
                 try
                 {
                     RenameFolder(label);
                 }
                 finally
                 {
-                    ProjectMgr.EventTriggeringFlag = oldTriggerFlag;
+                    this.ProjectMgr.EventTriggeringFlag = oldTriggerFlag;
                 }
 
                 //Refresh the properties in the properties window
@@ -181,7 +181,7 @@ namespace Microsoft.VisualStudioTools.Project
 
                 // Notify the listeners that the name of this folder is changed. This will
                 // also force a refresh of the SolutionExplorer's node.
-                ProjectMgr.OnPropertyChanged(this, (int)__VSHPROPID.VSHPROPID_Caption, 0);
+                this.ProjectMgr.OnPropertyChanged(this, (int)__VSHPROPID.VSHPROPID_Caption, 0);
             }
             catch (Exception e)
             {
@@ -213,7 +213,7 @@ namespace Microsoft.VisualStudioTools.Project
                 return VSConstants.E_FAIL;
             }
 
-            var path = Path.Combine(Parent.FullPathToChildren, label);
+            var path = Path.Combine(this.Parent.FullPathToChildren, label);
             if (path.Length >= NativeMethods.MAX_FOLDER_PATH)
             {
                 if (wasCancelled)
@@ -221,7 +221,7 @@ namespace Microsoft.VisualStudioTools.Project
                     // cancelling an edit label doesn't result in the error
                     // being displayed, so we'll display one for the user.
                     Utilities.ShowMessageBox(
-                        ProjectMgr.Site,
+                        this.ProjectMgr.Site,
                         null,
                         PathTooLongMessage,
                         OLEMSGICON.OLEMSGICON_CRITICAL,
@@ -236,27 +236,27 @@ namespace Microsoft.VisualStudioTools.Project
                 return VSConstants.E_FAIL;
             }
 
-            if (filename == GetItemName() || Parent.FindImmediateChildByName(filename) == null)
+            if (filename == GetItemName() || this.Parent.FindImmediateChildByName(filename) == null)
             {
-                if (ProjectMgr.QueryFolderAdd(Parent, path))
+                if (this.ProjectMgr.QueryFolderAdd(this.Parent, path))
                 {
                     Directory.CreateDirectory(path);
-                    IsBeingCreated = false;
+                    this.IsBeingCreated = false;
                     var relativePath = CommonUtils.GetRelativeDirectoryPath(
-                        ProjectMgr.ProjectHome,
-                        CommonUtils.GetAbsoluteDirectoryPath(CommonUtils.GetParent(Url), label)
+                        this.ProjectMgr.ProjectHome,
+                        CommonUtils.GetAbsoluteDirectoryPath(CommonUtils.GetParent(this.Url), label)
                     );
                     this.ItemNode.Rename(relativePath);
 
-                    ProjectMgr.OnItemDeleted(this);
+                    this.ProjectMgr.OnItemDeleted(this);
                     this.Parent.RemoveChild(this);
-                    ProjectMgr.Site.GetUIThread().MustBeCalledFromUIThread();
-                    this.ID = ProjectMgr.ItemIdMap.Add(this);
+                    this.ProjectMgr.Site.GetUIThread().MustBeCalledFromUIThread();
+                    this.ID = this.ProjectMgr.ItemIdMap.Add(this);
                     this.Parent.AddChild(this);
 
                     ExpandItem(EXPANDFLAGS.EXPF_SelectItem);
 
-                    ProjectMgr.Tracker.OnFolderAdded(
+                    this.ProjectMgr.Tracker.OnFolderAdded(
                         path,
                         VSADDDIRECTORYFLAGS.VSADDDIRECTORYFLAGS_NoFlags
                     );
@@ -289,7 +289,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return CommonUtils.EnsureEndSeparator(ItemNode.Url);
+                return CommonUtils.EnsureEndSeparator(this.ItemNode.Url);
             }
         }
 
@@ -299,7 +299,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 // it might have a backslash at the end... 
                 // and it might consist of Grandparent\parent\this\
-                return CommonUtils.GetFileOrDirectoryName(Url);
+                return CommonUtils.GetFileOrDirectoryName(this.Url);
             }
         }
 
@@ -336,7 +336,7 @@ namespace Microsoft.VisualStudioTools.Project
                         return VSConstants.S_OK;
 
                     case VsCommands.NewFolder:
-                        if (!IsNonMemberItem)
+                        if (!this.IsNonMemberItem)
                         {
                             result |= QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
                             return VSConstants.S_OK;
@@ -352,7 +352,7 @@ namespace Microsoft.VisualStudioTools.Project
                     return VSConstants.S_OK;
                 }
             }
-            else if (cmdGroup != ProjectMgr.SharedCommandGuid)
+            else if (cmdGroup != this.ProjectMgr.SharedCommandGuid)
             {
                 return (int)OleConstants.OLECMDERR_E_UNKNOWNGROUP;
             }
@@ -456,9 +456,9 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             // on a new dir && enter, we get called with the same name (so do nothing if name is the same
-            string strNewDir = CommonUtils.GetAbsoluteDirectoryPath(CommonUtils.GetParent(Url), newName);
+            string strNewDir = CommonUtils.GetAbsoluteDirectoryPath(CommonUtils.GetParent(this.Url), newName);
 
-            if (!CommonUtils.IsSameDirectory(Url, strNewDir))
+            if (!CommonUtils.IsSameDirectory(this.Url, strNewDir))
             {
                 if (Directory.Exists(strNewDir))
                 {
@@ -502,11 +502,11 @@ namespace Microsoft.VisualStudioTools.Project
 
         void IDiskBasedNode.RenameForDeferredSave(string basePath, string baseNewPath)
         {
-            string oldPath = Path.Combine(basePath, ItemNode.GetMetadata(ProjectFileConstants.Include));
-            string newPath = Path.Combine(baseNewPath, ItemNode.GetMetadata(ProjectFileConstants.Include));
+            string oldPath = Path.Combine(basePath, this.ItemNode.GetMetadata(ProjectFileConstants.Include));
+            string newPath = Path.Combine(baseNewPath, this.ItemNode.GetMetadata(ProjectFileConstants.Include));
             Directory.CreateDirectory(newPath);
 
-            ProjectMgr.UpdatePathForDeferredSave(oldPath, newPath);
+            this.ProjectMgr.UpdatePathForDeferredSave(oldPath, newPath);
         }
 
         #endregion
@@ -519,19 +519,19 @@ namespace Microsoft.VisualStudioTools.Project
         public virtual void RenameFolder(string newName)
         {
             // Do the rename (note that we only do the physical rename if the leaf name changed)
-            string newPath = Path.Combine(Parent.FullPathToChildren, newName);
-            string oldPath = Url;
-            if (!String.Equals(Path.GetFileName(Url), newName, StringComparison.Ordinal))
+            string newPath = Path.Combine(this.Parent.FullPathToChildren, newName);
+            string oldPath = this.Url;
+            if (!String.Equals(Path.GetFileName(this.Url), newName, StringComparison.Ordinal))
             {
-                RenameDirectory(CommonUtils.GetAbsoluteDirectoryPath(ProjectMgr.ProjectHome, newPath));
+                RenameDirectory(CommonUtils.GetAbsoluteDirectoryPath(this.ProjectMgr.ProjectHome, newPath));
             }
 
             bool wasExpanded = GetIsExpanded();
 
             ReparentFolder(newPath);
 
-            var oldTriggerFlag = ProjectMgr.EventTriggeringFlag;
-            ProjectMgr.EventTriggeringFlag |= ProjectNode.EventTriggering.DoNotTriggerTrackerEvents;
+            var oldTriggerFlag = this.ProjectMgr.EventTriggeringFlag;
+            this.ProjectMgr.EventTriggeringFlag |= ProjectNode.EventTriggering.DoNotTriggerTrackerEvents;
             try
             {
                 // Let all children know of the new path
@@ -551,10 +551,10 @@ namespace Microsoft.VisualStudioTools.Project
             }
             finally
             {
-                ProjectMgr.EventTriggeringFlag = oldTriggerFlag;
+                this.ProjectMgr.EventTriggeringFlag = oldTriggerFlag;
             }
 
-            ProjectMgr.Tracker.OnItemRenamed(oldPath, newPath, VSRENAMEFILEFLAGS.VSRENAMEFILEFLAGS_Directory);
+            this.ProjectMgr.Tracker.OnItemRenamed(oldPath, newPath, VSRENAMEFILEFLAGS.VSRENAMEFILEFLAGS_Directory);
 
             // Some of the previous operation may have changed the selection so set it back to us
             ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
@@ -573,13 +573,13 @@ namespace Microsoft.VisualStudioTools.Project
         internal void ReparentFolder(string newPath)
         {
             // Reparent the folder
-            ProjectMgr.OnItemDeleted(this);
-            Parent.RemoveChild(this);
-            ProjectMgr.Site.GetUIThread().MustBeCalledFromUIThread();
-            ID = ProjectMgr.ItemIdMap.Add(this);
+            this.ProjectMgr.OnItemDeleted(this);
+            this.Parent.RemoveChild(this);
+            this.ProjectMgr.Site.GetUIThread().MustBeCalledFromUIThread();
+            this.ID = this.ProjectMgr.ItemIdMap.Add(this);
 
-            ItemNode.Rename(CommonUtils.GetRelativeDirectoryPath(ProjectMgr.ProjectHome, newPath));
-            var parent = ProjectMgr.GetParentFolderForPath(newPath);
+            this.ItemNode.Rename(CommonUtils.GetRelativeDirectoryPath(this.ProjectMgr.ProjectHome, newPath));
+            var parent = this.ProjectMgr.GetParentFolderForPath(newPath);
             Debug.Assert(parent != null, "ReparentFolder called without full path to parent being created");
             parent.AddChild(this);
         }
@@ -611,7 +611,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         protected override void OnCancelLabelEdit()
         {
-            if (IsBeingCreated)
+            if (this.IsBeingCreated)
             {
                 // finish the creation
                 FinishFolderAdd(GetItemName(), true);
@@ -622,17 +622,17 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return ProjectMgr.FolderBeingCreated == this;
+                return this.ProjectMgr.FolderBeingCreated == this;
             }
             set
             {
                 if (value)
                 {
-                    ProjectMgr.FolderBeingCreated = this;
+                    this.ProjectMgr.FolderBeingCreated = this;
                 }
                 else
                 {
-                    ProjectMgr.FolderBeingCreated = null;
+                    this.ProjectMgr.FolderBeingCreated = null;
                 }
             }
         }

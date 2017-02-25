@@ -33,16 +33,16 @@ namespace Microsoft.NodejsTools.Debugger
 
         public NodeBreakpoint(NodeDebugger process, FilePosition target, bool enabled, BreakOn breakOn, string condition)
         {
-            _process = process;
-            _target = target;
-            _enabled = enabled;
-            _breakOn = breakOn;
-            _condition = condition;
+            this._process = process;
+            this._target = target;
+            this._enabled = enabled;
+            this._breakOn = breakOn;
+            this._condition = condition;
         }
 
         public NodeDebugger Process
         {
-            get { return _process; }
+            get { return this._process; }
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace Microsoft.NodejsTools.Debugger
         /// </summary>
         public FilePosition Target
         {
-            get { return _target; }
+            get { return this._target; }
         }
 
         /// <summary>
@@ -68,38 +68,38 @@ namespace Microsoft.NodejsTools.Debugger
             int javaScriptColumn;
 
             if (mapper != null &&
-                mapper.MapToJavaScript(Target.FileName, Target.Line, Target.Column, out javaScriptFileName, out javaScriptLine, out javaScriptColumn))
+                mapper.MapToJavaScript(this.Target.FileName, this.Target.Line, this.Target.Column, out javaScriptFileName, out javaScriptLine, out javaScriptColumn))
             {
                 return new FilePosition(javaScriptFileName, javaScriptLine, javaScriptColumn);
             }
 
-            return Target;
+            return this.Target;
         }
 
         public bool Enabled
         {
-            get { return _enabled; }
+            get { return this._enabled; }
         }
 
         public bool Deleted
         {
-            get { return _deleted; }
-            set { _deleted = value; }
+            get { return this._deleted; }
+            set { this._deleted = value; }
         }
 
         public BreakOn BreakOn
         {
-            get { return _breakOn; }
+            get { return this._breakOn; }
         }
 
         public string Condition
         {
-            get { return _condition; }
+            get { return this._condition; }
         }
 
         public bool HasPredicate
         {
-            get { return (!string.IsNullOrEmpty(_condition) || NodeBreakpointBinding.GetEngineIgnoreCount(_breakOn, 0) > 0); }
+            get { return (!string.IsNullOrEmpty(this._condition) || NodeBreakpointBinding.GetEngineIgnoreCount(this._breakOn, 0) > 0); }
         }
 
         /// <summary>
@@ -108,24 +108,24 @@ namespace Microsoft.NodejsTools.Debugger
         /// </summary>
         public Task<NodeBreakpointBinding> BindAsync()
         {
-            return _process.BindBreakpointAsync(this);
+            return this._process.BindBreakpointAsync(this);
         }
 
         internal NodeBreakpointBinding CreateBinding(FilePosition target, FilePosition position, int breakpointId, int? scriptId, bool fullyBound)
         {
             var binding = new NodeBreakpointBinding(this, target, position, breakpointId, scriptId, fullyBound);
-            _bindings[breakpointId] = binding;
+            this._bindings[breakpointId] = binding;
             return binding;
         }
 
         internal void RemoveBinding(NodeBreakpointBinding binding)
         {
-            _bindings.Remove(binding.BreakpointId);
+            this._bindings.Remove(binding.BreakpointId);
         }
 
         internal IEnumerable<NodeBreakpointBinding> GetBindings()
         {
-            return _bindings.Values.ToArray();
+            return this._bindings.Values.ToArray();
         }
     }
 }

@@ -36,18 +36,18 @@ namespace Microsoft.VisualStudioTools.Project
         public ProjectDocumentsListenerForStartupFileUpdates(System.IServiceProvider serviceProvider, CommonProjectNode project)
             : base(serviceProvider)
         {
-            _project = project;
+            this._project = project;
         }
         #endregion
 
         #region overriden methods
         public override int OnAfterRenameFiles(int cProjects, int cFiles, IVsProject[] projects, int[] firstIndices, string[] oldFileNames, string[] newFileNames, VSRENAMEFILEFLAGS[] flags)
         {
-            if (!_project.IsRefreshing)
+            if (!this._project.IsRefreshing)
             {
                 //Get the current value of the StartupFile Property
-                string currentStartupFile = _project.GetProjectProperty(CommonConstants.StartupFile, true);
-                string fullPathToStartupFile = CommonUtils.GetAbsoluteFilePath(_project.ProjectHome, currentStartupFile);
+                string currentStartupFile = this._project.GetProjectProperty(CommonConstants.StartupFile, true);
+                string fullPathToStartupFile = CommonUtils.GetAbsoluteFilePath(this._project.ProjectHome, currentStartupFile);
 
                 //Investigate all of the oldFileNames if they are equal to the current StartupFile
                 int index = 0;
@@ -64,7 +64,7 @@ namespace Microsoft.VisualStudioTools.Project
                                 CommonUtils.GetRelativeFilePath(oldfile, fullPathToStartupFile)
                             );
 
-                            node = _project.FindNodeByFullPath(newfilename) as FileNode;
+                            node = this._project.FindNodeByFullPath(newfilename) as FileNode;
                             Debug.Assert(node != null);
                         }
                     }
@@ -72,16 +72,16 @@ namespace Microsoft.VisualStudioTools.Project
                     {
                         //Get the newfilename and update the StartupFile property
                         string newfilename = newFileNames[index];
-                        node = _project.FindNodeByFullPath(newfilename) as FileNode;
+                        node = this._project.FindNodeByFullPath(newfilename) as FileNode;
                         Debug.Assert(node != null);
                     }
 
                     if (node != null)
                     {
                         // Startup file has been renamed
-                        _project.SetProjectProperty(
+                        this._project.SetProjectProperty(
                             CommonConstants.StartupFile,
-                            CommonUtils.GetRelativeFilePath(_project.ProjectHome, node.Url));
+                            CommonUtils.GetRelativeFilePath(this._project.ProjectHome, node.Url));
                         break;
                     }
                     index++;
@@ -92,11 +92,11 @@ namespace Microsoft.VisualStudioTools.Project
 
         public override int OnAfterRemoveFiles(int cProjects, int cFiles, IVsProject[] projects, int[] firstIndices, string[] oldFileNames, VSREMOVEFILEFLAGS[] flags)
         {
-            if (!_project.IsRefreshing)
+            if (!this._project.IsRefreshing)
             {
                 //Get the current value of the StartupFile Property
-                string currentStartupFile = _project.GetProjectProperty(CommonConstants.StartupFile, true);
-                string fullPathToStartupFile = CommonUtils.GetAbsoluteFilePath(_project.ProjectHome, currentStartupFile);
+                string currentStartupFile = this._project.GetProjectProperty(CommonConstants.StartupFile, true);
+                string fullPathToStartupFile = CommonUtils.GetAbsoluteFilePath(this._project.ProjectHome, currentStartupFile);
 
                 //Investigate all of the oldFileNames if they are equal to the current StartupFile
                 int index = 0;
@@ -106,7 +106,7 @@ namespace Microsoft.VisualStudioTools.Project
                     if (CommonUtils.IsSamePath(oldfile, fullPathToStartupFile))
                     {
                         //Startup file has been removed
-                        _project.SetProjectProperty(CommonConstants.StartupFile, null);
+                        this._project.SetProjectProperty(CommonConstants.StartupFile, null);
                         break;
                     }
                     index++;

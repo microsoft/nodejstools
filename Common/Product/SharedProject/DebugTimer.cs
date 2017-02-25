@@ -41,9 +41,9 @@ namespace Microsoft.VisualStudioTools
         public DebugTimer(string description, long minReportTime = 0)
         {
 #if DEBUG
-            _start = _timer.ElapsedMilliseconds;
-            _description = description;
-            _minReportTime = minReportTime;
+            this._start = _timer.ElapsedMilliseconds;
+            this._description = description;
+            this._minReportTime = minReportTime;
 #endif
         }
 
@@ -52,11 +52,11 @@ namespace Microsoft.VisualStudioTools
         public void Dispose()
         {
 #if DEBUG
-            var elapsed = _timer.ElapsedMilliseconds - _start;
-            if (elapsed >= _minReportTime)
+            var elapsed = _timer.ElapsedMilliseconds - this._start;
+            if (elapsed >= this._minReportTime)
             {
-                Debug.WriteLine(String.Format("{0}: {1}ms elapsed", _description, elapsed));
-                Console.WriteLine(String.Format("{0}: {1}ms elapsed", _description, elapsed));
+                Debug.WriteLine(String.Format("{0}: {1}ms elapsed", this._description, elapsed));
+                Console.WriteLine(String.Format("{0}: {1}ms elapsed", this._description, elapsed));
             }
 #endif
         }

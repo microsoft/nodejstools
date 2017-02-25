@@ -36,10 +36,10 @@ namespace Microsoft.NodejsTools.Project
         public LocalModulesNode(NodejsProjectNode root, NodeModulesNode parent, string caption, string virtualName, DependencyType dependencyType)
             : base(root)
         {
-            _parent = parent;
-            _caption = caption;
-            VirtualName = virtualName;
-            PackagesDependencyType = dependencyType;
+            this._parent = parent;
+            this._caption = caption;
+            this.VirtualName = virtualName;
+            this.PackagesDependencyType = dependencyType;
         }
 
         public DependencyType PackagesDependencyType { get; private set; }
@@ -48,12 +48,12 @@ namespace Microsoft.NodejsTools.Project
 
         public override string Url
         {
-            get { return VirtualName; }
+            get { return this.VirtualName; }
         }
 
         public override string Caption
         {
-            get { return _caption; }
+            get { return this._caption; }
         }
 
         public override int SortPriority
@@ -65,13 +65,13 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                return _packages;
+                return this._packages;
             }
             set
             {
-                _packages = value;
-                IsVisible = value == null || value.Any();
-                this.ProjectMgr.OnInvalidateItems(_parent);
+                this._packages = value;
+                this.IsVisible = value == null || value.Any();
+                this.ProjectMgr.OnInvalidateItems(this._parent);
             }
         }
 
@@ -82,13 +82,13 @@ namespace Microsoft.NodejsTools.Project
                 switch (cmd)
                 {
                     case PkgCmdId.cmdidNpmUpdateModules:
-                        if (_parent.IsCurrentStateASuppressCommandsMode())
+                        if (this._parent.IsCurrentStateASuppressCommandsMode())
                         {
                             result = QueryStatusResult.SUPPORTED;
                         }
                         else
                         {
-                            if (AllChildren.Any())
+                            if (this.AllChildren.Any())
                             {
                                 result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
                             }
@@ -119,7 +119,7 @@ namespace Microsoft.NodejsTools.Project
                 switch (cmd)
                 {
                     case PkgCmdId.cmdidNpmUpdateModules:
-                        var t = _parent.UpdateModules(AllChildren.ToList());
+                        var t = this._parent.UpdateModules(this.AllChildren.ToList());
                         return VSConstants.S_OK;
                 }
             }
@@ -129,7 +129,7 @@ namespace Microsoft.NodejsTools.Project
 
         public override void ManageNpmModules()
         {
-            _parent.ManageModules(PackagesDependencyType);
+            this._parent.ManageModules(this.PackagesDependencyType);
         }
     }
 }

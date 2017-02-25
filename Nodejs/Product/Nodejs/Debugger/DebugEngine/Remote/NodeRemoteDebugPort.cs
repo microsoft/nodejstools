@@ -30,14 +30,14 @@ namespace Microsoft.NodejsTools.Debugger.Remote
 
         public NodeRemoteDebugPort(NodeRemoteDebugPortSupplier supplier, IDebugPortRequest2 request, Uri uri)
         {
-            _supplier = supplier;
-            _request = request;
-            _uri = uri;
+            this._supplier = supplier;
+            this._request = request;
+            this._uri = uri;
         }
 
         public Uri Uri
         {
-            get { return _uri; }
+            get { return this._uri; }
         }
 
         public int EnumProcesses(out IEnumDebugProcesses2 ppEnum)
@@ -48,25 +48,25 @@ namespace Microsoft.NodejsTools.Debugger.Remote
 
         public int GetPortId(out Guid pguidPort)
         {
-            pguidPort = _guid;
+            pguidPort = this._guid;
             return VSConstants.S_OK;
         }
 
         public int GetPortName(out string pbstrName)
         {
-            pbstrName = _uri.ToString();
+            pbstrName = this._uri.ToString();
             return VSConstants.S_OK;
         }
 
         public int GetPortRequest(out IDebugPortRequest2 ppRequest)
         {
-            ppRequest = _request;
+            ppRequest = this._request;
             return VSConstants.S_OK;
         }
 
         public int GetPortSupplier(out IDebugPortSupplier2 ppSupplier)
         {
-            ppSupplier = _supplier;
+            ppSupplier = this._supplier;
             return VSConstants.S_OK;
         }
 

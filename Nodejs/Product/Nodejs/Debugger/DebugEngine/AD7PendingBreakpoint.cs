@@ -41,33 +41,33 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public AD7PendingBreakpoint(IDebugBreakpointRequest2 pBpRequest, AD7Engine engine, BreakpointManager bpManager)
         {
-            _bpRequest = pBpRequest;
+            this._bpRequest = pBpRequest;
             var requestInfo = new BP_REQUEST_INFO[1];
-            EngineUtils.CheckOk(_bpRequest.GetRequestInfo(enum_BPREQI_FIELDS.BPREQI_BPLOCATION | enum_BPREQI_FIELDS.BPREQI_CONDITION | enum_BPREQI_FIELDS.BPREQI_ALLFIELDS, requestInfo));
-            _bpRequestInfo = requestInfo[0];
+            EngineUtils.CheckOk(this._bpRequest.GetRequestInfo(enum_BPREQI_FIELDS.BPREQI_BPLOCATION | enum_BPREQI_FIELDS.BPREQI_CONDITION | enum_BPREQI_FIELDS.BPREQI_ALLFIELDS, requestInfo));
+            this._bpRequestInfo = requestInfo[0];
 
-            _engine = engine;
-            _bpManager = bpManager;
+            this._engine = engine;
+            this._bpManager = bpManager;
 
-            _enabled = true;
-            _deleted = false;
+            this._enabled = true;
+            this._deleted = false;
         }
 
         public BP_PASSCOUNT PassCount
         {
-            get { return _bpRequestInfo.bpPassCount; }
+            get { return this._bpRequestInfo.bpPassCount; }
         }
 
         public string DocumentName
         {
             get
             {
-                if (_documentName == null)
+                if (this._documentName == null)
                 {
-                    var docPosition = (IDebugDocumentPosition2)(Marshal.GetObjectForIUnknown(_bpRequestInfo.bpLocation.unionmember2));
-                    EngineUtils.CheckOk(docPosition.GetFileName(out _documentName));
+                    var docPosition = (IDebugDocumentPosition2)(Marshal.GetObjectForIUnknown(this._bpRequestInfo.bpLocation.unionmember2));
+                    EngineUtils.CheckOk(docPosition.GetFileName(out this._documentName));
                 }
-                return _documentName;
+                return this._documentName;
             }
         }
 
@@ -82,20 +82,20 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                 var startPosition = new TEXT_POSITION[1];
                 var endPosition = new TEXT_POSITION[1];
                 string fileName;
-                var docPosition = (IDebugDocumentPosition2)(Marshal.GetObjectForIUnknown(_bpRequestInfo.bpLocation.unionmember2));
+                var docPosition = (IDebugDocumentPosition2)(Marshal.GetObjectForIUnknown(this._bpRequestInfo.bpLocation.unionmember2));
                 EngineUtils.CheckOk(docPosition.GetRange(startPosition, endPosition));
                 EngineUtils.CheckOk(docPosition.GetFileName(out fileName));
 
-                _breakpoint = _engine.Process.AddBreakpoint(
+                this._breakpoint = this._engine.Process.AddBreakpoint(
                     fileName,
                     (int)startPosition[0].dwLine,
                     (int)startPosition[0].dwColumn,
-                    _enabled,
-                    AD7BoundBreakpoint.GetBreakOnForPassCount(_bpRequestInfo.bpPassCount),
-                    _bpRequestInfo.bpCondition.bstrCondition);
+                    this._enabled,
+                    AD7BoundBreakpoint.GetBreakOnForPassCount(this._bpRequestInfo.bpPassCount),
+                    this._bpRequestInfo.bpCondition.bstrCondition);
 
-                _bpManager.AddPendingBreakpoint(_breakpoint, this);
-                _breakpoint.BindAsync().WaitAsync(TimeSpan.FromSeconds(2)).Wait();
+                this._bpManager.AddPendingBreakpoint(this._breakpoint, this);
+                this._breakpoint.BindAsync().WaitAsync(TimeSpan.FromSeconds(2)).Wait();
 
                 return VSConstants.S_OK;
             }
@@ -128,22 +128,22 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         int IDebugPendingBreakpoint2.Delete()
         {
             ClearBreakpointBindingResults();
-            _deleted = true;
+            this._deleted = true;
             return VSConstants.S_OK;
         }
 
         // Toggles the enabled state of this pending breakpoint.
         int IDebugPendingBreakpoint2.Enable(int fEnable)
         {
-            _enabled = fEnable != 0;
+            this._enabled = fEnable != 0;
 
-            if (_breakpoint != null)
+            if (this._breakpoint != null)
             {
-                lock (_breakpoint)
+                lock (this._breakpoint)
                 {
-                    foreach (NodeBreakpointBinding binding in _breakpoint.GetBindings())
+                    foreach (NodeBreakpointBinding binding in this._breakpoint.GetBindings())
                     {
-                        var boundBreakpoint = (IDebugBoundBreakpoint2)_bpManager.GetBoundBreakpoint(binding);
+                        var boundBreakpoint = (IDebugBoundBreakpoint2)this._bpManager.GetBoundBreakpoint(binding);
                         boundBreakpoint.Enable(fEnable);
                     }
                 }
@@ -157,12 +157,12 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         {
             ppEnum = null;
 
-            if (_breakpoint != null)
+            if (this._breakpoint != null)
             {
-                lock (_breakpoint)
+                lock (this._breakpoint)
                 {
-                    IDebugBoundBreakpoint2[] boundBreakpoints = _breakpoint.GetBindings()
-                        .Select(binding => _bpManager.GetBoundBreakpoint(binding))
+                    IDebugBoundBreakpoint2[] boundBreakpoints = this._breakpoint.GetBindings()
+                        .Select(binding => this._bpManager.GetBoundBreakpoint(binding))
                         .Cast<IDebugBoundBreakpoint2>().ToArray();
 
                     ppEnum = new AD7BoundBreakpointsEnum(boundBreakpoints);
@@ -178,9 +178,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             // Called when a pending breakpoint could not be bound. This may occur for many reasons such as an invalid location, an invalid expression, etc...
             // Return a valid enumeration of IDebugErrorBreakpoint2 from IDebugPendingBreakpoint2::EnumErrorBreakpoints, allowing the debugger to
             // display information about why the breakpoint did not bind to the user.
-            lock (_breakpointErrors)
+            lock (this._breakpointErrors)
             {
-                IDebugErrorBreakpoint2[] breakpointErrors = _breakpointErrors.Cast<IDebugErrorBreakpoint2>().ToArray();
+                IDebugErrorBreakpoint2[] breakpointErrors = this._breakpointErrors.Cast<IDebugErrorBreakpoint2>().ToArray();
                 ppEnum = new AD7ErrorBreakpointsEnum(breakpointErrors);
             }
 
@@ -190,18 +190,18 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         // Gets the breakpoint request that was used to create this pending breakpoint
         int IDebugPendingBreakpoint2.GetBreakpointRequest(out IDebugBreakpointRequest2 ppBpRequest)
         {
-            ppBpRequest = _bpRequest;
+            ppBpRequest = this._bpRequest;
             return VSConstants.S_OK;
         }
 
         // Gets the state of this pending breakpoint.
         int IDebugPendingBreakpoint2.GetState(PENDING_BP_STATE_INFO[] pState)
         {
-            if (_deleted)
+            if (this._deleted)
             {
                 pState[0].state = (enum_PENDING_BP_STATE)enum_BP_STATE.BPS_DELETED;
             }
-            else if (_enabled)
+            else if (this._enabled)
             {
                 pState[0].state = (enum_PENDING_BP_STATE)enum_BP_STATE.BPS_ENABLED;
             }
@@ -220,13 +220,13 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                 return VSConstants.E_NOTIMPL;
             }
 
-            _bpRequestInfo.bpCondition = bpCondition;
+            this._bpRequestInfo.bpCondition = bpCondition;
             return VSConstants.S_OK;
         }
 
         int IDebugPendingBreakpoint2.SetPassCount(BP_PASSCOUNT bpPassCount)
         {
-            _bpRequestInfo.bpPassCount = bpPassCount;
+            this._bpRequestInfo.bpPassCount = bpPassCount;
             return VSConstants.S_OK;
         }
 
@@ -243,9 +243,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         private bool CanBind()
         {
             // Reject binding breakpoints which are deleted, not code file line, and on condition changed
-            if (_deleted ||
-                _bpRequestInfo.bpLocation.bpLocationType != (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FILE_LINE ||
-                _bpRequestInfo.bpCondition.styleCondition == enum_BP_COND_STYLE.BP_COND_WHEN_CHANGED)
+            if (this._deleted ||
+                this._bpRequestInfo.bpLocation.bpLocationType != (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FILE_LINE ||
+                this._bpRequestInfo.bpCondition.styleCondition == enum_BP_COND_STYLE.BP_COND_WHEN_CHANGED)
             {
                 return false;
             }
@@ -255,19 +255,19 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public void AddBreakpointError(AD7BreakpointErrorEvent breakpointError)
         {
-            _breakpointErrors.Add(breakpointError);
+            this._breakpointErrors.Add(breakpointError);
         }
 
         // Remove all of the bound breakpoints for this pending breakpoint
         public void ClearBreakpointBindingResults()
         {
-            if (_breakpoint != null)
+            if (this._breakpoint != null)
             {
-                lock (_breakpoint)
+                lock (this._breakpoint)
                 {
-                    foreach (NodeBreakpointBinding binding in _breakpoint.GetBindings())
+                    foreach (NodeBreakpointBinding binding in this._breakpoint.GetBindings())
                     {
-                        var boundBreakpoint = (IDebugBoundBreakpoint2)_bpManager.GetBoundBreakpoint(binding);
+                        var boundBreakpoint = (IDebugBoundBreakpoint2)this._bpManager.GetBoundBreakpoint(binding);
                         if (boundBreakpoint != null)
                         {
                             boundBreakpoint.Delete();
@@ -276,12 +276,12 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                     }
                 }
 
-                _bpManager.RemovePendingBreakpoint(_breakpoint);
-                _breakpoint.Deleted = true;
-                _breakpoint = null;
+                this._bpManager.RemovePendingBreakpoint(this._breakpoint);
+                this._breakpoint.Deleted = true;
+                this._breakpoint = null;
             }
 
-            _breakpointErrors.Clear();
+            this._breakpointErrors.Clear();
         }
     }
 }

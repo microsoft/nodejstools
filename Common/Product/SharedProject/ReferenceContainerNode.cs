@@ -95,11 +95,11 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                if (null == references)
+                if (null == this.references)
                 {
-                    references = new Automation.OAReferences(this, ProjectMgr);
+                    this.references = new Automation.OAReferences(this, this.ProjectMgr);
                 }
-                return references;
+                return this.references;
             }
         }
 
@@ -233,16 +233,16 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public void LoadReferencesFromBuildProject(MSBuild.Project buildProject)
         {
-            ProjectMgr.Site.GetUIThread().MustBeCalledFromUIThread();
+            this.ProjectMgr.Site.GetUIThread().MustBeCalledFromUIThread();
 
-            foreach (string referenceType in SupportedReferenceTypes)
+            foreach (string referenceType in this.SupportedReferenceTypes)
             {
                 IEnumerable<MSBuild.ProjectItem> referencesGroup = this.ProjectMgr.BuildProject.GetItems(referenceType);
 
                 bool isAssemblyReference = referenceType == ProjectFileConstants.Reference;
                 // If the project was loaded for browsing we should still create the nodes but as not resolved.
                 if (isAssemblyReference &&
-                    (!ProjectMgr.BuildProject.Targets.ContainsKey(MsBuildTarget.ResolveAssemblyReferences) || this.ProjectMgr.Build(MsBuildTarget.ResolveAssemblyReferences) != MSBuildResult.Successful))
+                    (!this.ProjectMgr.BuildProject.Targets.ContainsKey(MsBuildTarget.ResolveAssemblyReferences) || this.ProjectMgr.Build(MsBuildTarget.ResolveAssemblyReferences) != MSBuildResult.Successful))
                 {
                     continue;
                 }
@@ -314,10 +314,10 @@ namespace Microsoft.VisualStudioTools.Project
                     // is not inside the project.
                     return null;
                 }
-                var added = onChildAdded;
+                var added = this.onChildAdded;
                 if (added != null)
                 {
-                    onChildAdded(this, new HierarchyNodeEventArgs(node));
+                    this.onChildAdded(this, new HierarchyNodeEventArgs(node));
                 }
             }
 
@@ -435,7 +435,7 @@ namespace Microsoft.VisualStudioTools.Project
                     return null;
                 }
 
-                node = ProjectMgr.CreateReferenceNodeForFile(selectorData.bstrFile);
+                node = this.ProjectMgr.CreateReferenceNodeForFile(selectorData.bstrFile);
             }
 
             return node;
@@ -512,18 +512,18 @@ namespace Microsoft.VisualStudioTools.Project
 
         internal event EventHandler<HierarchyNodeEventArgs> OnChildAdded
         {
-            add { onChildAdded += value; }
-            remove { onChildAdded -= value; }
+            add { this.onChildAdded += value; }
+            remove { this.onChildAdded -= value; }
         }
         internal event EventHandler<HierarchyNodeEventArgs> OnChildRemoved
         {
-            add { onChildRemoved += value; }
-            remove { onChildRemoved -= value; }
+            add { this.onChildRemoved += value; }
+            remove { this.onChildRemoved -= value; }
         }
 
         internal void FireChildRemoved(ReferenceNode referenceNode)
         {
-            var removed = onChildRemoved;
+            var removed = this.onChildRemoved;
             if (removed != null)
             {
                 removed(this, new HierarchyNodeEventArgs(referenceNode));

@@ -68,19 +68,19 @@ namespace Microsoft.NodejsTools.Project
         public NodeModulesNode(NodejsProjectNode root)
             : base(root)
         {
-            _npmController = DefaultNpmController(_projectNode.ProjectHome, new NpmPathProvider(this));
-            RegisterWithNpmController(_npmController);
+            this._npmController = DefaultNpmController(this._projectNode.ProjectHome, new NpmPathProvider(this));
+            RegisterWithNpmController(this._npmController);
 
-            _devModulesNode = new LocalModulesNode(root, this, "dev", "DevelopmentModules", DependencyType.Development);
-            AddChild(_devModulesNode);
+            this._devModulesNode = new LocalModulesNode(root, this, "dev", "DevelopmentModules", DependencyType.Development);
+            AddChild(this._devModulesNode);
 
-            _optionalModulesNode = new LocalModulesNode(root, this, "optional", "OptionalModules", DependencyType.Optional);
-            AddChild(_optionalModulesNode);
+            this._optionalModulesNode = new LocalModulesNode(root, this, "optional", "OptionalModules", DependencyType.Optional);
+            AddChild(this._optionalModulesNode);
         }
 
         private void CheckNotDisposed()
         {
-            if (_isDisposed)
+            if (this._isDisposed)
             {
                 throw new ObjectDisposedException(
                     "This NodeModulesNode has been disposed of and should no longer be used.");
@@ -89,29 +89,29 @@ namespace Microsoft.NodejsTools.Project
 
         protected override void Dispose(bool disposing)
         {
-            if (!_isDisposed)
+            if (!this._isDisposed)
             {
-                _npmController.Dispose();
+                this._npmController.Dispose();
 
-                if (null != _npmIdleTimer)
+                if (null != this._npmIdleTimer)
                 {
-                    _npmIdleTimer.Dispose();
-                    _npmIdleTimer = null;
+                    this._npmIdleTimer.Dispose();
+                    this._npmIdleTimer = null;
                 }
 
-                if (null != _npmController)
+                if (null != this._npmController)
                 {
-                    _npmController.CommandStarted -= NpmController_CommandStarted;
-                    _npmController.OutputLogged -= NpmController_OutputLogged;
-                    _npmController.ErrorLogged -= NpmController_ErrorLogged;
-                    _npmController.ExceptionLogged -= NpmController_ExceptionLogged;
-                    _npmController.CommandCompleted -= NpmController_CommandCompleted;
+                    this._npmController.CommandStarted -= this.NpmController_CommandStarted;
+                    this._npmController.OutputLogged -= this.NpmController_OutputLogged;
+                    this._npmController.ErrorLogged -= this.NpmController_ErrorLogged;
+                    this._npmController.ExceptionLogged -= this.NpmController_ExceptionLogged;
+                    this._npmController.CommandCompleted -= this.NpmController_CommandCompleted;
                 }
 
-                _devModulesNode.Dispose();
-                _optionalModulesNode.Dispose();
+                this._devModulesNode.Dispose();
+                this._optionalModulesNode.Dispose();
 
-                _isDisposed = true;
+                this._isDisposed = true;
             }
 
             base.Dispose(disposing);
@@ -123,7 +123,7 @@ namespace Microsoft.NodejsTools.Project
 
         private string GetNpmPathFromNodePathInProject()
         {
-            var props = ProjectMgr.NodeProperties as NodejsProjectNodeProperties;
+            var props = this.ProjectMgr.NodeProperties as NodejsProjectNodeProperties;
             return NpmHelpers.GetPathToNpm(props != null ? props.NodeExePath : null);
         }
 
@@ -132,14 +132,14 @@ namespace Microsoft.NodejsTools.Project
             private NodeModulesNode _owner;
             internal NpmPathProvider(NodeModulesNode owner)
             {
-                _owner = owner;
+                this._owner = owner;
             }
 
             public string PathToNpm
             {
                 get
                 {
-                    return _owner.GetNpmPathFromNodePathInProject();
+                    return this._owner.GetNpmPathFromNodePathInProject();
                 }
             }
         }
@@ -155,11 +155,11 @@ namespace Microsoft.NodejsTools.Project
 
         private void RegisterWithNpmController(INpmController controller)
         {
-            controller.CommandStarted += NpmController_CommandStarted;
-            controller.OutputLogged += NpmController_OutputLogged;
-            controller.ErrorLogged += NpmController_ErrorLogged;
-            controller.ExceptionLogged += NpmController_ExceptionLogged;
-            controller.CommandCompleted += NpmController_CommandCompleted;
+            controller.CommandStarted += this.NpmController_CommandStarted;
+            controller.OutputLogged += this.NpmController_OutputLogged;
+            controller.ErrorLogged += this.NpmController_ErrorLogged;
+            controller.ExceptionLogged += this.NpmController_ExceptionLogged;
+            controller.CommandCompleted += this.NpmController_CommandCompleted;
         }
 
         private void NpmController_FinishedRefresh(object sender, EventArgs e)
@@ -171,7 +171,7 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                return _npmController;
+                return this._npmController;
             }
         }
 
@@ -179,7 +179,7 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                var controller = NpmController;
+                var controller = this.NpmController;
                 return null == controller ? null : controller.RootPackage;
             }
         }
@@ -188,7 +188,7 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                var root = RootPackage;
+                var root = this.RootPackage;
                 return null == root ? null : root.Modules;
             }
         }
@@ -197,7 +197,7 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                var modules = RootModules;
+                var modules = this.RootModules;
                 return null != modules && modules.HasMissingModules;
             }
         }
@@ -206,7 +206,7 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                var modules = RootModules;
+                var modules = this.RootModules;
                 return null != modules && modules.Count > 0;
             }
         }
@@ -219,7 +219,7 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                return _projectNode.NpmOutputPane;
+                return this._projectNode.NpmOutputPane;
             }
         }
 
@@ -227,7 +227,7 @@ namespace Microsoft.NodejsTools.Project
         {
             if (NodejsPackage.Instance.NpmOptionsPage.ShowOutputWindowWhenExecutingNpm)
             {
-                NpmOutputPane?.ShowAndActivate();
+                this.NpmOutputPane?.ShowAndActivate();
             }
         }
         private void ForceUpdateStatusBarWithNpmActivity(string activity)
@@ -242,7 +242,7 @@ namespace Microsoft.NodejsTools.Project
                 activity = string.Format(CultureInfo.CurrentCulture, "npm: {0}", activity);
             }
 
-            var statusBar = (IVsStatusbar)_projectNode.GetService(typeof(SVsStatusbar));
+            var statusBar = (IVsStatusbar)this._projectNode.GetService(typeof(SVsStatusbar));
             if (null != statusBar)
             {
                 statusBar.SetText(activity);
@@ -251,16 +251,16 @@ namespace Microsoft.NodejsTools.Project
 
         private void ForceUpdateStatusBarWithNpmActivitySafe(string activity)
         {
-            ProjectMgr.Site.GetUIThread().InvokeAsync(() => ForceUpdateStatusBarWithNpmActivity(activity))
+            this.ProjectMgr.Site.GetUIThread().InvokeAsync(() => ForceUpdateStatusBarWithNpmActivity(activity))
                 .HandleAllExceptions(SR.ProductName)
                 .DoNotWait();
         }
 
         private void UpdateStatusBarWithNpmActivity(string activity)
         {
-            lock (_commandCountLock)
+            lock (this._commandCountLock)
             {
-                if (_npmCommandsExecuting == 0)
+                if (this._npmCommandsExecuting == 0)
                 {
                     return;
                 }
@@ -290,7 +290,7 @@ namespace Microsoft.NodejsTools.Project
 
         private void WriteNpmLogToOutputWindow(string logText)
         {
-            NpmOutputPane?.WriteLine(logText);
+            this.NpmOutputPane?.WriteLine(logText);
         }
 
         private void WriteNpmLogToOutputWindow(NpmLogEventArgs args)
@@ -301,9 +301,9 @@ namespace Microsoft.NodejsTools.Project
         private void NpmController_CommandStarted(object sender, EventArgs e)
         {
             StopNpmIdleTimer();
-            lock (_commandCountLock)
+            lock (this._commandCountLock)
             {
-                ++_npmCommandsExecuting;
+                ++this._npmCommandsExecuting;
             }
         }
 
@@ -324,12 +324,12 @@ namespace Microsoft.NodejsTools.Project
 
         private void NpmController_CommandCompleted(object sender, NpmCommandCompletedEventArgs e)
         {
-            lock (_commandCountLock)
+            lock (this._commandCountLock)
             {
-                --_npmCommandsExecuting;
-                if (_npmCommandsExecuting < 0)
+                --this._npmCommandsExecuting;
+                if (this._npmCommandsExecuting < 0)
                 {
-                    _npmCommandsExecuting = 0;
+                    this._npmCommandsExecuting = 0;
                 }
             }
 
@@ -337,8 +337,8 @@ namespace Microsoft.NodejsTools.Project
             ForceUpdateStatusBarWithNpmActivitySafe(message);
 
             StopNpmIdleTimer();
-            _npmIdleTimer = new Timer(
-                _ => ProjectMgr.Site.GetUIThread().Invoke(() => _projectNode.CheckForLongPaths(e.Arguments).HandleAllExceptions(SR.ProductName).DoNotWait()),
+            this._npmIdleTimer = new Timer(
+                _ => this.ProjectMgr.Site.GetUIThread().Invoke(() => this._projectNode.CheckForLongPaths(e.Arguments).HandleAllExceptions(SR.ProductName).DoNotWait()),
                 null, 1000, Timeout.Infinite);
         }
 
@@ -359,9 +359,9 @@ namespace Microsoft.NodejsTools.Project
 
         private void StopNpmIdleTimer()
         {
-            if (null != _npmIdleTimer)
+            if (null != this._npmIdleTimer)
             {
-                _npmIdleTimer.Dispose();
+                this._npmIdleTimer.Dispose();
             }
         }
 
@@ -371,19 +371,19 @@ namespace Microsoft.NodejsTools.Project
 
         internal void ReloadHierarchySafe()
         {
-            NodejsPackage.Instance.GetUIThread().InvokeAsync(ReloadHierarchy)
+            NodejsPackage.Instance.GetUIThread().InvokeAsync(this.ReloadHierarchy)
                 .HandleAllExceptions(SR.ProductName)
                 .DoNotWait();
         }
 
         private void ReloadHierarchy()
         {
-            if (ProjectMgr.IsClosed)
+            if (this.ProjectMgr.IsClosed)
             {
                 return;
             }
 
-            var controller = _npmController;
+            var controller = this._npmController;
             if (null == controller)
             {
                 return;
@@ -391,10 +391,10 @@ namespace Microsoft.NodejsTools.Project
 
             ReloadPackageHierarchies(controller);
 
-            if (_firstHierarchyLoad)
+            if (this._firstHierarchyLoad)
             {
-                controller.FinishedRefresh += NpmController_FinishedRefresh;
-                _firstHierarchyLoad = false;
+                controller.FinishedRefresh += this.NpmController_FinishedRefresh;
+                this._firstHierarchyLoad = false;
             }
         }
 
@@ -414,15 +414,15 @@ namespace Microsoft.NodejsTools.Project
         private void ReloadOptionalPackageHierarchy(INpmController controller)
         {
             var optional = GetOptionalPackages(controller);
-            _optionalModulesNode.Packages = optional;
-            ReloadHierarchy(_optionalModulesNode, optional);
+            this._optionalModulesNode.Packages = optional;
+            ReloadHierarchy(this._optionalModulesNode, optional);
         }
 
         private void ReloadDevPackageHierarchy(INpmController controller)
         {
             var dev = GetDevPackages(controller);
-            _devModulesNode.Packages = dev;
-            ReloadHierarchy(_devModulesNode, dev);
+            this._devModulesNode.Packages = dev;
+            ReloadHierarchy(this._devModulesNode, dev);
         }
 
         #endregion
@@ -450,17 +450,17 @@ namespace Microsoft.NodejsTools.Project
 
         internal bool IsCurrentStateASuppressCommandsMode()
         {
-            return _suppressCommands || ProjectMgr.IsCurrentStateASuppressCommandsMode();
+            return this._suppressCommands || this.ProjectMgr.IsCurrentStateASuppressCommandsMode();
         }
 
         private void SuppressCommands()
         {
-            _suppressCommands = true;
+            this._suppressCommands = true;
         }
 
         private void AllowCommands()
         {
-            _suppressCommands = false;
+            this._suppressCommands = false;
         }
 
         internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result)
@@ -476,7 +476,7 @@ namespace Microsoft.NodejsTools.Project
                         }
                         else
                         {
-                            if (HasMissingModules)
+                            if (this.HasMissingModules)
                             {
                                 result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
                             }
@@ -494,7 +494,7 @@ namespace Microsoft.NodejsTools.Project
                         }
                         else
                         {
-                            if (HasModules)
+                            if (this.HasModules)
                             {
                                 result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
                             }
@@ -540,18 +540,18 @@ namespace Microsoft.NodejsTools.Project
         {
             CheckNotDisposed();
 
-            if (NpmController.RootPackage == null)
+            if (this.NpmController.RootPackage == null)
             {
-                NpmController.Refresh();
-                if (NpmController.RootPackage == null)
+                this.NpmController.Refresh();
+                if (this.NpmController.RootPackage == null)
                 {
                     MessageBox.Show(string.Format(CultureInfo.CurrentCulture, Resources.NodeModulesCouldNotParsePackageJsonErrorMessageText, NodejsConstants.PackageJsonFile));
                     return;
                 }
             }
 
-            using (var executeVm = new NpmOutputViewModel(NpmController))
-            using (var manager = new NpmPackageInstallWindow(NpmController, executeVm, dependencyType))
+            using (var executeVm = new NpmOutputViewModel(this.NpmController))
+            using (var manager = new NpmPackageInstallWindow(this.NpmController, executeVm, dependencyType))
             {
                 manager.Owner = System.Windows.Application.Current.MainWindow;
                 manager.ShowModal();
@@ -590,7 +590,7 @@ namespace Microsoft.NodejsTools.Project
             DoPreCommandActions();
             try
             {
-                using (var commander = NpmController.CreateNpmCommander())
+                using (var commander = this.NpmController.CreateNpmCommander())
                 {
                     await impl(commander);
                 }
@@ -617,7 +617,7 @@ namespace Microsoft.NodejsTools.Project
                 return;
             }
 
-            var root = _npmController.RootPackage;
+            var root = this._npmController.RootPackage;
             if (null == root)
             {
                 return;
@@ -652,7 +652,7 @@ namespace Microsoft.NodejsTools.Project
                 }
                 else
                 {
-                    var valid = nodes.OfType<DependencyNode>().Where(CheckValidCommandTarget).ToList();
+                    var valid = nodes.OfType<DependencyNode>().Where(this.CheckValidCommandTarget).ToList();
                     var list = valid.Select(node => node.Package).ToList();
                     if (list.Count > 0)
                     {
@@ -664,7 +664,7 @@ namespace Microsoft.NodejsTools.Project
 
         public void UpdateModules()
         {
-            var t = UpdateModules(_projectNode.GetSelectedNodes());
+            var t = UpdateModules(this._projectNode.GetSelectedNodes());
         }
 
         public async System.Threading.Tasks.Task UpdateModule(DependencyNode node)
@@ -681,10 +681,10 @@ namespace Microsoft.NodejsTools.Project
 
         public System.Threading.Tasks.Task UninstallModules()
         {
-            var selected = _projectNode.GetSelectedNodes();
+            var selected = this._projectNode.GetSelectedNodes();
             return RunNpmCommand(async commander =>
             {
-                foreach (var node in selected.OfType<DependencyNode>().Where(CheckValidCommandTarget))
+                foreach (var node in selected.OfType<DependencyNode>().Where(this.CheckValidCommandTarget))
                 {
                     await commander.UninstallPackageAsync(node.Package.Name);
                 }

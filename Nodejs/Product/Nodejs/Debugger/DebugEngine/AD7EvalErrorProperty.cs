@@ -26,7 +26,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public AD7EvalErrorProperty(string errorText)
         {
-            _errorText = errorText;
+            this._errorText = errorText;
         }
 
         public int GetPropertyInfo(enum_DEBUGPROP_INFO_FLAGS dwFields, uint dwRadix, uint dwTimeout, IDebugReference2[] rgpArgs, uint dwArgCount, DEBUG_PROPERTY_INFO[] pPropertyInfo)
@@ -41,7 +41,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
             if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE))
             {
-                pPropertyInfo[0].bstrValue = _errorText;
+                pPropertyInfo[0].bstrValue = this._errorText;
                 pPropertyInfo[0].dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE;
             }
 

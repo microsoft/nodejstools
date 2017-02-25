@@ -38,13 +38,13 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             Utilities.ArgumentNotNull("provider", provider);
 
-            extensibility = provider.GetService(typeof(EnvDTE.IVsExtensibility)) as IVsExtensibility3;
-            if (null == extensibility)
+            this.extensibility = provider.GetService(typeof(EnvDTE.IVsExtensibility)) as IVsExtensibility3;
+            if (null == this.extensibility)
             {
                 throw new InvalidOperationException();
             }
-            ErrorHandler.ThrowOnFailure(extensibility.EnterAutomationFunction());
-            inAutomation = true;
+            ErrorHandler.ThrowOnFailure(this.extensibility.EnterAutomationFunction());
+            this.inAutomation = true;
         }
 
         /// <summary>
@@ -53,10 +53,10 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// </summary>
         public void ExitAutomation()
         {
-            if (inAutomation)
+            if (this.inAutomation)
             {
-                ErrorHandler.ThrowOnFailure(extensibility.ExitAutomationFunction());
-                inAutomation = false;
+                ErrorHandler.ThrowOnFailure(this.extensibility.ExitAutomationFunction());
+                this.inAutomation = false;
             }
         }
 
@@ -65,7 +65,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// </summary>
         public IVsExtensibility3 Extensibility
         {
-            get { return extensibility; }
+            get { return this.extensibility; }
         }
 
         /// <summary>

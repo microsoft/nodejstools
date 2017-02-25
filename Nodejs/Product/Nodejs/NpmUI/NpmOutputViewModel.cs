@@ -47,18 +47,18 @@ namespace Microsoft.NodejsTools.NpmUI
 
         public NpmOutputViewModel(INpmController controller)
         {
-            _npmController = controller;
+            this._npmController = controller;
 
             var style = new Style(typeof(Paragraph));
             style.Setters.Add(new Setter(Block.MarginProperty, new Thickness(0)));
-            _output.Resources.Add(typeof(Paragraph), style);
+            this._output.Resources.Add(typeof(Paragraph), style);
 
-            _statusText = Resources.NpmStatusReady;
+            this._statusText = Resources.NpmStatusReady;
 
-            _worker = new Thread(Run);
-            _worker.Name = "npm UI Execution";
-            _worker.IsBackground = true;
-            _worker.Start();
+            this._worker = new Thread(this.Run);
+            this._worker.Name = "npm UI Execution";
+            this._worker.IsBackground = true;
+            this._worker.Start();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -71,28 +71,28 @@ namespace Microsoft.NodejsTools.NpmUI
 
         private void Pulse()
         {
-            lock (_lock)
+            lock (this._lock)
             {
-                Monitor.PulseAll(_lock);
+                Monitor.PulseAll(this._lock);
             }
         }
 
         public string StatusText
         {
-            get { return _statusText; }
+            get { return this._statusText; }
             set
             {
-                _statusText = value;
+                this._statusText = value;
                 OnPropertyChanged();
             }
         }
 
         public bool WithErrors
         {
-            get { return _withErrors; }
+            get { return this._withErrors; }
             set
             {
-                _withErrors = value;
+                this._withErrors = value;
                 OnPropertyChanged();
             }
         }
@@ -101,16 +101,16 @@ namespace Microsoft.NodejsTools.NpmUI
         {
             get
             {
-                lock (_lock)
+                lock (this._lock)
                 {
-                    return _isExecutingCommand;
+                    return this._isExecutingCommand;
                 }
             }
             set
             {
-                lock (_lock)
+                lock (this._lock)
                 {
-                    _isExecutingCommand = value;
+                    this._isExecutingCommand = value;
                     Pulse();
                 }
                 OnPropertyChanged();
@@ -122,27 +122,27 @@ namespace Microsoft.NodejsTools.NpmUI
 
         public Visibility ExecutionIdleVisibility
         {
-            get { return IsExecutingCommand ? Visibility.Collapsed : Visibility.Visible; }
+            get { return this.IsExecutingCommand ? Visibility.Collapsed : Visibility.Visible; }
         }
 
         public Visibility ExecutionProgressVisibility
         {
-            get { return IsExecutingCommand ? Visibility.Visible : Visibility.Collapsed; }
+            get { return this.IsExecutingCommand ? Visibility.Visible : Visibility.Collapsed; }
         }
 
         public Visibility CommandCancelVisibility
         {
-            get { return _commandCancelVisibility; }
+            get { return this._commandCancelVisibility; }
             set
             {
-                _commandCancelVisibility = value;
+                this._commandCancelVisibility = value;
                 OnPropertyChanged();
             }
         }
 
         private void SetCancellable(bool cancellable)
         {
-            CommandCancelVisibility = cancellable ? Visibility.Visible : Visibility.Collapsed;
+            this.CommandCancelVisibility = cancellable ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public void SetCancellableSafe(bool cancellable)
@@ -155,23 +155,23 @@ namespace Microsoft.NodejsTools.NpmUI
         {
             get
             {
-                lock (_lock)
+                lock (this._lock)
                 {
-                    return _commandQueue.Count > 0 || IsExecutingCommand;
+                    return this._commandQueue.Count > 0 || this.IsExecutingCommand;
                 }
             }
         }
 
         public void Cancel()
         {
-            lock (_lock)
+            lock (this._lock)
             {
-                _commandQueue.Clear();
-                if (null != _commander)
+                this._commandQueue.Clear();
+                if (null != this._commander)
                 {
-                    _commander.CancelCurrentCommand();
+                    this._commander.CancelCurrentCommand();
                 }
-                IsExecutingCommand = false;
+                this.IsExecutingCommand = false;
             }
 
             UpdateStatusMessage();
@@ -180,15 +180,15 @@ namespace Microsoft.NodejsTools.NpmUI
 
         private void QueueCommand(QueuedNpmCommandInfo info)
         {
-            lock (_lock)
+            lock (this._lock)
             {
-                if (_commandQueue.Contains(info)
-                    || info.Equals(_currentCommand))
+                if (this._commandQueue.Contains(info)
+                    || info.Equals(this._currentCommand))
                 {
                     return;
                 }
-                _commandQueue.Enqueue(info);
-                Monitor.PulseAll(_lock);
+                this._commandQueue.Enqueue(info);
+                Monitor.PulseAll(this._lock);
             }
 
             UpdateStatusMessageSafe();
@@ -215,18 +215,18 @@ namespace Microsoft.NodejsTools.NpmUI
 
         private async void Execute(QueuedNpmCommandInfo info)
         {
-            IsExecutingCommand = true;
+            this.IsExecutingCommand = true;
             INpmCommander cmdr = null;
             try
             {
-                lock (_lock)
+                lock (this._lock)
                 {
-                    cmdr = _npmController.CreateNpmCommander();
-                    cmdr.OutputLogged += commander_OutputLogged;
-                    cmdr.ErrorLogged += commander_ErrorLogged;
-                    cmdr.ExceptionLogged += commander_ExceptionLogged;
-                    cmdr.CommandCompleted += commander_CommandCompleted;
-                    _commander = cmdr;
+                    cmdr = this._npmController.CreateNpmCommander();
+                    cmdr.OutputLogged += this.commander_OutputLogged;
+                    cmdr.ErrorLogged += this.commander_ErrorLogged;
+                    cmdr.ExceptionLogged += this.commander_ExceptionLogged;
+                    cmdr.CommandCompleted += this.commander_CommandCompleted;
+                    this._commander = cmdr;
                 }
 
                 if (info.IsFreeformArgumentCommand)
@@ -244,15 +244,15 @@ namespace Microsoft.NodejsTools.NpmUI
             }
             finally
             {
-                lock (_lock)
+                lock (this._lock)
                 {
-                    _commander = null;
+                    this._commander = null;
                     if (null != cmdr)
                     {
-                        cmdr.OutputLogged -= commander_OutputLogged;
-                        cmdr.ErrorLogged -= commander_ErrorLogged;
-                        cmdr.ExceptionLogged -= commander_ExceptionLogged;
-                        cmdr.CommandCompleted -= commander_CommandCompleted;
+                        cmdr.OutputLogged -= this.commander_OutputLogged;
+                        cmdr.ErrorLogged -= this.commander_ErrorLogged;
+                        cmdr.ExceptionLogged -= this.commander_ExceptionLogged;
+                        cmdr.CommandCompleted -= this.commander_CommandCompleted;
                     }
                 }
             }
@@ -266,14 +266,14 @@ namespace Microsoft.NodejsTools.NpmUI
 
         private void commander_CommandCompleted(object sender, NpmCommandCompletedEventArgs e)
         {
-            IsExecutingCommand = false;
+            this.IsExecutingCommand = false;
             Application.Current.Dispatcher.BeginInvoke(
-                new Action(HandleCompletionSafe));
+                new Action(this.HandleCompletionSafe));
         }
 
         public FlowDocument Output
         {
-            get { return _output; }
+            get { return this._output; }
         }
 
         public event EventHandler OutputWritten;
@@ -297,7 +297,7 @@ namespace Microsoft.NodejsTools.NpmUI
             text = Preprocess(text);
             if (forceError)
             {
-                WithErrors = true;
+                this.WithErrors = true;
             }
             foreach (var line in text.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None))
             {
@@ -310,11 +310,11 @@ namespace Microsoft.NodejsTools.NpmUI
                     sub = sub.Length > 4 ? sub.Substring(4) : string.Empty;
                     if (sub.StartsWith("ERR!"))
                     {
-                        WithErrors = true;
-                        var arguments = _currentCommand.Arguments.Split(' ');
+                        this.WithErrors = true;
+                        var arguments = this._currentCommand.Arguments.Split(' ');
                         if (arguments.Length >= 2)
                         {
-                            _failedCommands.Add(arguments[1]);
+                            this._failedCommands.Add(arguments[1]);
                         }
 
                         paragraph.Inlines.Add(new Run(sub.Substring(0, 4)) { Foreground = Brushes.Red });
@@ -329,7 +329,7 @@ namespace Microsoft.NodejsTools.NpmUI
 
                 paragraph.Inlines.Add(new Run(sub));
 
-                _output.Blocks.Add(paragraph);
+                this._output.Blocks.Add(paragraph);
             }
 
             OnOutputWritten();
@@ -356,15 +356,15 @@ namespace Microsoft.NodejsTools.NpmUI
             bool executingCommand;
             QueuedNpmCommandInfo command;
             int count;
-            lock (_lock)
+            lock (this._lock)
             {
-                executingCommand = IsExecutingCommand;
-                command = _currentCommand;
-                count = _commandQueue.Count;
+                executingCommand = this.IsExecutingCommand;
+                command = this._currentCommand;
+                count = this._commandQueue.Count;
             }
 
             string status;
-            var errorsInfo = string.Join(", ", _failedCommands);
+            var errorsInfo = string.Join(", ", this._failedCommands);
 
             if (executingCommand && null != command)
             {
@@ -372,7 +372,7 @@ namespace Microsoft.NodejsTools.NpmUI
                 if (count > 0)
                 {
                     status = string.Format(CultureInfo.CurrentCulture,
-                        WithErrors ? Resources.NpmStatusExecutingQueuedErrors : Resources.NpmStatusExecutingQueued,
+                        this.WithErrors ? Resources.NpmStatusExecutingQueuedErrors : Resources.NpmStatusExecutingQueued,
                         commandText,
                         count,
                         errorsInfo);
@@ -380,7 +380,7 @@ namespace Microsoft.NodejsTools.NpmUI
                 else
                 {
                     status = string.Format(CultureInfo.CurrentCulture,
-                        WithErrors ? Resources.NpmStatusExecutingErrors : Resources.NpmStatusExecuting,
+                        this.WithErrors ? Resources.NpmStatusExecutingErrors : Resources.NpmStatusExecuting,
                         commandText,
                         errorsInfo);
                 }
@@ -388,16 +388,16 @@ namespace Microsoft.NodejsTools.NpmUI
             else
             {
                 status = string.Format(CultureInfo.CurrentCulture,
-                    WithErrors ? Resources.NpmStatusReadyWithErrors : Resources.NpmStatusReady,
+                    this.WithErrors ? Resources.NpmStatusReadyWithErrors : Resources.NpmStatusReady,
                     errorsInfo);
             }
 
-            StatusText = status;
+            this.StatusText = status;
         }
 
         private void UpdateStatusMessageSafe()
         {
-            Application.Current.Dispatcher.BeginInvoke(new Action(UpdateStatusMessage));
+            Application.Current.Dispatcher.BeginInvoke(new Action(this.UpdateStatusMessage));
         }
 
         private void Run()
@@ -406,31 +406,31 @@ namespace Microsoft.NodejsTools.NpmUI
             // We want the thread to continue running queued commands before
             // exiting so the user can close the install window without having to wait
             // for commands to complete.
-            while (!_isDisposed || count > 0)
+            while (!this._isDisposed || count > 0)
             {
-                lock (_lock)
+                lock (this._lock)
                 {
-                    while ((_commandQueue.Count == 0 && !_isDisposed)
-                        || null == _npmController
-                        || IsExecutingCommand)
+                    while ((this._commandQueue.Count == 0 && !this._isDisposed)
+                        || null == this._npmController
+                        || this.IsExecutingCommand)
                     {
-                        Monitor.Wait(_lock);
+                        Monitor.Wait(this._lock);
                     }
 
-                    if (_commandQueue.Count > 0)
+                    if (this._commandQueue.Count > 0)
                     {
-                        _currentCommand = _commandQueue.Dequeue();
+                        this._currentCommand = this._commandQueue.Dequeue();
                     }
                     else
                     {
-                        _currentCommand = null;
+                        this._currentCommand = null;
                     }
-                    count = _commandQueue.Count;
+                    count = this._commandQueue.Count;
                 }
 
-                if (null != _currentCommand)
+                if (null != this._currentCommand)
                 {
-                    Execute(_currentCommand);
+                    Execute(this._currentCommand);
                     UpdateStatusMessageSafe();
                 }
             }
@@ -438,7 +438,7 @@ namespace Microsoft.NodejsTools.NpmUI
 
         public void Dispose()
         {
-            _isDisposed = true;
+            this._isDisposed = true;
             OutputWritten = null;
             Pulse();
         }
@@ -447,22 +447,22 @@ namespace Microsoft.NodejsTools.NpmUI
         {
             public QueuedNpmCommandInfo(string arguments)
             {
-                Name = arguments;
-                IsFreeformArgumentCommand = true;
+                this.Name = arguments;
+                this.IsFreeformArgumentCommand = true;
             }
 
             public QueuedNpmCommandInfo(string name, string version, DependencyType depType)
             {
-                Name = name;
-                Version = version;
-                IsFreeformArgumentCommand = false;
-                DependencyType = depType;
+                this.Name = name;
+                this.Version = version;
+                this.IsFreeformArgumentCommand = false;
+                this.DependencyType = depType;
             }
 
             public bool IsFreeformArgumentCommand { get; private set; }
             public string Arguments
             {
-                get { return Name; }
+                get { return this.Name; }
             }
             public string Name { get; private set; }
             public string Version { get; private set; }
@@ -486,16 +486,16 @@ namespace Microsoft.NodejsTools.NpmUI
             public override string ToString()
             {
                 var buff = new StringBuilder("npm ");
-                if (IsFreeformArgumentCommand)
+                if (this.IsFreeformArgumentCommand)
                 {
-                    buff.Append(Arguments);
+                    buff.Append(this.Arguments);
                 }
                 else
                 {
                     buff.Append(NpmArgumentBuilder.GetNpmInstallArguments(
-                        Name,
-                        Version,
-                        DependencyType,
+                        this.Name,
+                        this.Version,
+                        this.DependencyType,
                         false,
                         true));
                 }

@@ -102,7 +102,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             handled = false;
 
-            if (IsClosed)
+            if (this.IsClosed)
             {
                 return VSConstants.E_FAIL;
             }
@@ -170,7 +170,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code.</returns>
         protected virtual int InternalExecCommand(Guid cmdGroup, uint cmdId, uint cmdExecOpt, IntPtr vaIn, IntPtr vaOut, CommandOrigin commandOrigin)
         {
-            if (IsClosed)
+            if (this.IsClosed)
             {
                 return (int)OleConstants.OLECMDERR_E_NOTSUPPORTED;
             }
@@ -374,7 +374,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>A QueryStatusResult describing the status of the menu.</returns>
         protected virtual bool DisableCmdInCurrentMode(Guid commandGroup, uint command)
         {
-            if (IsClosed)
+            if (this.IsClosed)
             {
                 return false;
             }
@@ -382,7 +382,7 @@ namespace Microsoft.VisualStudioTools.Project
             // Don't ask if it is not these commandgroups.
             if (commandGroup == VsMenus.guidStandardCommandSet97 ||
                 commandGroup == VsMenus.guidStandardCommandSet2K ||
-                commandGroup == SharedCommandGuid)
+                commandGroup == this.SharedCommandGuid)
             {
                 if (this.IsCurrentStateASuppressCommandsMode())
                 {
@@ -420,7 +420,7 @@ namespace Microsoft.VisualStudioTools.Project
                                 return true;
                         }
                     }
-                    else if (commandGroup == SharedCommandGuid)
+                    else if (commandGroup == this.SharedCommandGuid)
                     {
                         switch ((SharedCommands)command)
                         {
@@ -450,7 +450,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code.</returns>
         protected virtual int QueryStatusSelection(Guid cmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText, CommandOrigin commandOrigin)
         {
-            if (IsClosed)
+            if (this.IsClosed)
             {
                 return (int)OleConstants.OLECMDERR_E_NOTSUPPORTED;
             }

@@ -23,8 +23,8 @@ namespace Microsoft.NodejsTools.Jade
 
         public OutlineRegionsChange(ITextRange changedRange, OutlineRegionCollection newRegions)
         {
-            ChangedRange = changedRange;
-            NewRegions = newRegions;
+            this.ChangedRange = changedRange;
+            this.NewRegions = newRegions;
         }
     }
 }

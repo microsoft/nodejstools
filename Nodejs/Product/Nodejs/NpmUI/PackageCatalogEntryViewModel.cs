@@ -46,70 +46,70 @@ namespace Microsoft.NodejsTools.NpmUI
             SemverVersion? localVersion
         )
         {
-            _name = name;
-            _version = version;
-            _availableVersions = availableVersions != null ? availableVersions.ToList() : new List<SemverVersion>();
-            _author = author;
-            _description = description;
-            _homepages = homepages != null ? homepages.ToList() : new List<string>();
-            _keywords = keywords;
-            _localVersion = localVersion;
+            this._name = name;
+            this._version = version;
+            this._availableVersions = availableVersions != null ? availableVersions.ToList() : new List<SemverVersion>();
+            this._author = author;
+            this._description = description;
+            this._homepages = homepages != null ? homepages.ToList() : new List<string>();
+            this._keywords = keywords;
+            this._localVersion = localVersion;
         }
 
         public virtual string Name
         {
-            get { return _name; }
+            get { return this._name; }
         }
 
         public string Version
         {
-            get { return ToString(_version); }
+            get { return ToString(this._version); }
         }
 
         public IEnumerable<SemverVersion> AvailableVersions
         {
-            get { return _availableVersions; }
+            get { return this._availableVersions; }
         }
 
         public string Author
         {
-            get { return _author; }
+            get { return this._author; }
         }
 
         public Visibility AuthorVisibility
         {
-            get { return string.IsNullOrEmpty(_author) ? Visibility.Collapsed : Visibility.Visible; }
+            get { return string.IsNullOrEmpty(this._author) ? Visibility.Collapsed : Visibility.Visible; }
         }
 
-        public string Description { get { return _description; } }
+        public string Description { get { return this._description; } }
 
-        public Visibility DescriptionVisibility { get { return string.IsNullOrEmpty(_description) ? Visibility.Collapsed : Visibility.Visible; } }
+        public Visibility DescriptionVisibility { get { return string.IsNullOrEmpty(this._description) ? Visibility.Collapsed : Visibility.Visible; } }
 
-        public IEnumerable<string> Homepages { get { return _homepages; } }
+        public IEnumerable<string> Homepages { get { return this._homepages; } }
 
         public Visibility HomepagesVisibility
         {
-            get { return _homepages.Any() ? Visibility.Visible : Visibility.Collapsed; }
+            get { return this._homepages.Any() ? Visibility.Visible : Visibility.Collapsed; }
         }
 
         public string Keywords
         {
-            get { return _keywords; }
+            get { return this._keywords; }
         }
 
         public bool IsInstalledLocally
         {
-            get { return _localVersion.HasValue; }
+            get { return this._localVersion.HasValue; }
         }
 
         public bool IsLocalInstallOutOfDate
         {
-            get { return _localVersion.HasValue && _localVersion < _version; }
+            get { return this._localVersion.HasValue && this._localVersion < this._version; }
         }
 
         public string LocalVersion
         {
-            get { return ToString(_localVersion); }
+            get { return ToString(this._localVersion); }
         }
 
         private static string ToString(SemverVersion? version)
@@ -134,7 +134,7 @@ namespace Microsoft.NodejsTools.NpmUI
                 localInstall != null ? (SemverVersion?)localInstall.Version : null
             )
         {
-            if (string.IsNullOrEmpty(Name))
+            if (string.IsNullOrEmpty(this.Name))
             {
                 throw new ArgumentNullException("package.Name");
             }

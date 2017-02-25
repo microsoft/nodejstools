@@ -20,31 +20,31 @@ namespace Microsoft.NodejsTools.Jade
     {
         private void OnAttributes(char terminator)
         {
-            _attributeState = true;
+            this._attributeState = true;
 
-            if (_cs.CurrentChar == '(')
-                _cs.MoveToNextChar();
+            if (this._cs.CurrentChar == '(')
+                this._cs.MoveToNextChar();
 
-            while (!_cs.IsEndOfStream())
+            while (!this._cs.IsEndOfStream())
             {
                 // newlines are permitted in attributes
                 SkipWhiteSpace();
 
-                if (_cs.CurrentChar == terminator)
+                if (this._cs.CurrentChar == terminator)
                 {
-                    _cs.MoveToNextChar();
+                    this._cs.MoveToNextChar();
                     break;
                 }
 
-                if (_cs.IsAtString())
+                if (this._cs.IsAtString())
                 {
                     HandleString();
                     continue;
                 }
 
-                if (_cs.CurrentChar == ',')
+                if (this._cs.CurrentChar == ',')
                 {
-                    _cs.MoveToNextChar();
+                    this._cs.MoveToNextChar();
                     continue;
                 }
 
@@ -55,10 +55,10 @@ namespace Microsoft.NodejsTools.Jade
 
                     SkipWhiteSpace();
 
-                    if (_cs.CurrentChar == '=')
+                    if (this._cs.CurrentChar == '=')
                     {
-                        AddToken(JadeTokenType.Operator, _cs.Position, 1);
-                        _cs.MoveToNextChar();
+                        AddToken(JadeTokenType.Operator, this._cs.Position, 1);
+                        this._cs.MoveToNextChar();
 
                         SkipWhiteSpace();
 
@@ -66,7 +66,7 @@ namespace Microsoft.NodejsTools.Jade
                         {
                             range = HandleString();
                         }
-                        else if (_cs.IsAnsiLetter() || _cs.IsDecimal())
+                        else if (this._cs.IsAnsiLetter() || this._cs.IsDecimal())
                         {
                             range = GetAttributeValue();
                             if (range.Length > 0)
@@ -80,7 +80,7 @@ namespace Microsoft.NodejsTools.Jade
                 }
             }
 
-            _attributeState = false;
+            this._attributeState = false;
         }
 
         /// <summary>
@@ -89,15 +89,15 @@ namespace Microsoft.NodejsTools.Jade
         /// <returns>Identifier range</returns>
         protected override ITextRange ParseIdentifier()
         {
-            int start = _cs.Position;
+            int start = this._cs.Position;
 
-            while (!_cs.IsEndOfStream() && !_cs.IsWhiteSpace() &&
-                  (_cs.IsAnsiLetter() || _cs.IsDecimal() || _cs.CurrentChar == '_'))
+            while (!this._cs.IsEndOfStream() && !this._cs.IsWhiteSpace() &&
+                  (this._cs.IsAnsiLetter() || this._cs.IsDecimal() || this._cs.CurrentChar == '_'))
             {
-                _cs.MoveToNextChar();
+                this._cs.MoveToNextChar();
             }
 
-            return TextRange.FromBounds(start, _cs.Position);
+            return TextRange.FromBounds(start, this._cs.Position);
         }
     }
 }

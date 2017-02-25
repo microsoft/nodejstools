@@ -35,10 +35,10 @@ namespace Microsoft.NodejsTools.Debugger
 
         public NodeProcess(ProcessStartInfo psi, bool waitOnAbnormal, bool waitOnNormal, bool enableRaisingEvents)
         {
-            _psi = psi;
-            _waitOnAbnormal = waitOnAbnormal;
-            _waitOnNormal = waitOnNormal;
-            _enableRaisingEvents = enableRaisingEvents;
+            this._psi = psi;
+            this._waitOnAbnormal = waitOnAbnormal;
+            this._waitOnNormal = waitOnNormal;
+            this._enableRaisingEvents = enableRaisingEvents;
         }
 
         public static NodeProcess Start(ProcessStartInfo psi, bool waitOnAbnormal, bool waitOnNormal)
@@ -56,15 +56,15 @@ namespace Microsoft.NodejsTools.Debugger
         public void Start()
         {
             string waitMode;
-            if (_waitOnNormal && _waitOnAbnormal)
+            if (this._waitOnNormal && this._waitOnAbnormal)
             {
                 waitMode = "both";
             }
-            else if (_waitOnAbnormal)
+            else if (this._waitOnAbnormal)
             {
                 waitMode = "abnormal";
             }
-            else if (_waitOnNormal)
+            else if (this._waitOnNormal)
             {
                 waitMode = "normal";
             }
@@ -76,17 +76,17 @@ namespace Microsoft.NodejsTools.Debugger
             if (waitMode != null)
             {
                 var pidFile = Path.GetTempFileName();
-                _psi.Arguments = string.Format(CultureInfo.InvariantCulture, "{0} {1} {2} {3}",
+                this._psi.Arguments = string.Format(CultureInfo.InvariantCulture, "{0} {1} {2} {3}",
                     waitMode,
                     ProcessOutput.QuoteSingleArgument(pidFile),
-                    ProcessOutput.QuoteSingleArgument(_psi.FileName),
-                    _psi.Arguments
+                    ProcessOutput.QuoteSingleArgument(this._psi.FileName),
+                    this._psi.Arguments
                 );
-                _psi.FileName = Path.Combine(
+                this._psi.FileName = Path.Combine(
                     Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                     "Microsoft.NodejsTools.PressAnyKey.exe"
                 );
-                var process = _pressAnyKeyProcess = Process.Start(_psi);
+                var process = this._pressAnyKeyProcess = Process.Start(this._psi);
                 int? pid = null;
                 while (!process.HasExited)
                 {
@@ -116,42 +116,42 @@ namespace Microsoft.NodejsTools.Debugger
                 {
                     throw new Win32Exception("failed to start proess");
                 }
-                _process = Process.GetProcessById(pid.Value);
+                this._process = Process.GetProcessById(pid.Value);
             }
             else
             {
-                _process = Process.Start(_psi);
+                this._process = Process.Start(this._psi);
             }
-            _process.EnableRaisingEvents = _enableRaisingEvents;
+            this._process.EnableRaisingEvents = this._enableRaisingEvents;
         }
 
         public void WaitForExit()
         {
-            if (_process == null)
+            if (this._process == null)
             {
                 return;
             }
-            _process.WaitForExit();
+            this._process.WaitForExit();
         }
 
         public bool WaitForExit(int milliseconds)
         {
-            if (_process == null)
+            if (this._process == null)
             {
                 return true;
             }
-            return _process.WaitForExit(milliseconds);
+            return this._process.WaitForExit(milliseconds);
         }
 
         public bool HasExited
         {
             get
             {
-                if (_process == null)
+                if (this._process == null)
                 {
                     return false;
                 }
-                return _process.HasExited;
+                return this._process.HasExited;
             }
         }
 
@@ -159,24 +159,24 @@ namespace Microsoft.NodejsTools.Debugger
         {
             get
             {
-                if (_process == null)
+                if (this._process == null)
                 {
                     throw new InvalidOperationException();
                 }
-                return _process.Id;
+                return this._process.Id;
             }
         }
 
         internal void Kill()
         {
-            if (_pressAnyKeyProcess != null)
+            if (this._pressAnyKeyProcess != null)
             {
-                _pressAnyKeyProcess.Kill();
+                this._pressAnyKeyProcess.Kill();
             }
 
-            if (_process != null)
+            if (this._process != null)
             {
-                _process.Kill();
+                this._process.Kill();
             }
         }
 
@@ -184,23 +184,23 @@ namespace Microsoft.NodejsTools.Debugger
         {
             get
             {
-                if (_process == null)
+                if (this._process == null)
                 {
                     throw new InvalidOperationException();
                 }
-                return _process.ExitCode;
+                return this._process.ExitCode;
             }
         }
 
         public void Dispose()
         {
-            if (_pressAnyKeyProcess != null)
+            if (this._pressAnyKeyProcess != null)
             {
-                _pressAnyKeyProcess.Dispose();
+                this._pressAnyKeyProcess.Dispose();
             }
-            if (_process != null)
+            if (this._process != null)
             {
-                _process.Dispose();
+                this._process.Dispose();
             }
         }
     }

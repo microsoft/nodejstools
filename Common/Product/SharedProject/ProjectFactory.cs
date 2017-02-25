@@ -84,7 +84,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             this.site = serviceProvider;
             this.buildEngine = MSBuild.ProjectCollection.GlobalProjectCollection;
-            this.taskSchedulerService = new Lazy<IVsTaskSchedulerService>(() => Site.GetService(typeof(SVsTaskSchedulerService)) as IVsTaskSchedulerService);
+            this.taskSchedulerService = new Lazy<IVsTaskSchedulerService>(() => this.Site.GetService(typeof(SVsTaskSchedulerService)) as IVsTaskSchedulerService);
         }
 
         #endregion
@@ -163,7 +163,7 @@ namespace Microsoft.VisualStudioTools.Project
             this.buildProject = Utilities.ReinitializeMsBuildProject(this.buildEngine, file, this.buildProject);
 
             // Retrieve the list of GUIDs, if it is not specify, make it our GUID
-            string guids = buildProject.GetPropertyValue(ProjectFileConstants.ProjectTypeGuids);
+            string guids = this.buildProject.GetPropertyValue(ProjectFileConstants.ProjectTypeGuids);
             if (String.IsNullOrEmpty(guids))
                 guids = this.GetType().GUID.ToString("B");
 
@@ -183,7 +183,7 @@ namespace Microsoft.VisualStudioTools.Project
         public IVsTask CreateProjectAsync(ref Guid rguidProjectID, string filename, string location, string pszName, uint flags)
         {
             Guid iid = typeof(IVsHierarchy).GUID;
-            return VsTaskLibraryHelper.CreateAndStartTask(taskSchedulerService.Value, VsTaskRunContext.UIThreadBackgroundPriority, VsTaskLibraryHelper.CreateTaskBody(() =>
+            return VsTaskLibraryHelper.CreateAndStartTask(this.taskSchedulerService.Value, VsTaskRunContext.UIThreadBackgroundPriority, VsTaskLibraryHelper.CreateTaskBody(() =>
             {
                 IntPtr project;
                 int cancelled;
@@ -270,16 +270,16 @@ namespace Microsoft.VisualStudioTools.Project
 
             public UpgradeLogger(string projectFile, IVsUpgradeLogger logger)
             {
-                _projectFile = projectFile;
-                _projectName = Path.GetFileNameWithoutExtension(projectFile);
-                _logger = logger;
+                this._projectFile = projectFile;
+                this._projectName = Path.GetFileNameWithoutExtension(projectFile);
+                this._logger = logger;
             }
 
             public void Log(__VSUL_ERRORLEVEL level, string text)
             {
-                if (_logger != null)
+                if (this._logger != null)
                 {
-                    ErrorHandler.ThrowOnFailure(_logger.LogMessage((uint)level, _projectName, _projectFile, text));
+                    ErrorHandler.ThrowOnFailure(this._logger.LogMessage((uint)level, this._projectName, this._projectFile, text));
                 }
             }
         }
@@ -292,12 +292,12 @@ namespace Microsoft.VisualStudioTools.Project
             out string pbstrProvider
         )
         {
-            if (string.Equals(_cachedSccProject, bstrProjectFileName, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(this._cachedSccProject, bstrProjectFileName, StringComparison.OrdinalIgnoreCase))
             {
-                pbstrSccProjectName = _cachedSccProjectName;
-                pbstrSccAuxPath = _cachedSccAuxPath;
-                pbstrSccLocalPath = _cachedSccLocalPath;
-                pbstrProvider = _cachedSccProvider;
+                pbstrSccProjectName = this._cachedSccProjectName;
+                pbstrSccAuxPath = this._cachedSccAuxPath;
+                pbstrSccLocalPath = this._cachedSccLocalPath;
+                pbstrProvider = this._cachedSccProvider;
                 return VSConstants.S_OK;
             }
             pbstrSccProjectName = null;
@@ -424,7 +424,7 @@ namespace Microsoft.VisualStudioTools.Project
                     //}
                 }
 
-                var queryEdit = site.GetService(typeof(SVsQueryEditQuerySave)) as IVsQueryEditQuerySave2;
+                var queryEdit = this.site.GetService(typeof(SVsQueryEditQuerySave)) as IVsQueryEditQuerySave2;
                 if (queryEdit != null)
                 {
                     uint editVerdict;
@@ -490,26 +490,26 @@ namespace Microsoft.VisualStudioTools.Project
                 // Get the SCC info from the project file.
                 if (projectXml != null)
                 {
-                    _cachedSccProject = bstrFileName;
-                    _cachedSccProjectName = string.Empty;
-                    _cachedSccAuxPath = string.Empty;
-                    _cachedSccLocalPath = string.Empty;
-                    _cachedSccProvider = string.Empty;
+                    this._cachedSccProject = bstrFileName;
+                    this._cachedSccProjectName = string.Empty;
+                    this._cachedSccAuxPath = string.Empty;
+                    this._cachedSccLocalPath = string.Empty;
+                    this._cachedSccProvider = string.Empty;
                     foreach (var property in projectXml.Properties)
                     {
                         switch (property.Name)
                         {
                             case ProjectFileConstants.SccProjectName:
-                                _cachedSccProjectName = property.Value;
+                                this._cachedSccProjectName = property.Value;
                                 break;
                             case ProjectFileConstants.SccAuxPath:
-                                _cachedSccAuxPath = property.Value;
+                                this._cachedSccAuxPath = property.Value;
                                 break;
                             case ProjectFileConstants.SccLocalPath:
-                                _cachedSccLocalPath = property.Value;
+                                this._cachedSccLocalPath = property.Value;
                                 break;
                             case ProjectFileConstants.SccProvider:
-                                _cachedSccProvider = property.Value;
+                                this._cachedSccProvider = property.Value;
                                 break;
                             default:
                                 break;

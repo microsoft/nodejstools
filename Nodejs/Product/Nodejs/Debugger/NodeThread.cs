@@ -26,43 +26,43 @@ namespace Microsoft.NodejsTools.Debugger
 
         internal NodeThread(NodeDebugger process, int identity, bool isWorkerThread)
         {
-            _process = process;
-            _identity = identity;
-            _isWorkerThread = isWorkerThread;
-            Name = "main thread";
+            this._process = process;
+            this._identity = identity;
+            this._isWorkerThread = isWorkerThread;
+            this.Name = "main thread";
         }
 
         public void StepInto()
         {
-            _process.SendStepInto(_identity);
+            this._process.SendStepInto(this._identity);
         }
 
         public void StepOver()
         {
-            _process.SendStepOver(_identity);
+            this._process.SendStepOver(this._identity);
         }
 
         public void StepOut()
         {
-            _process.SendStepOut(_identity);
+            this._process.SendStepOut(this._identity);
         }
 
         public void Resume()
         {
-            _process.SendResumeThread(_identity);
+            this._process.SendResumeThread(this._identity);
         }
 
         public bool IsWorkerThread
         {
             get
             {
-                return _isWorkerThread;
+                return this._isWorkerThread;
             }
         }
 
         internal void ClearSteppingState()
         {
-            _process.SendClearStepping(_identity);
+            this._process.SendClearStepping(this._identity);
         }
 
         public IList<NodeStackFrame> Frames { get; set; }
@@ -71,7 +71,7 @@ namespace Microsoft.NodejsTools.Debugger
         {
             get
             {
-                return Frames != null ? Frames.Count : 0;
+                return this.Frames != null ? this.Frames.Count : 0;
             }
         }
 
@@ -79,7 +79,7 @@ namespace Microsoft.NodejsTools.Debugger
         {
             get
             {
-                return Frames != null && Frames.Count > 0 ? Frames[0] : null;
+                return this.Frames != null && this.Frames.Count > 0 ? this.Frames[0] : null;
             }
         }
 
@@ -87,7 +87,7 @@ namespace Microsoft.NodejsTools.Debugger
         {
             get
             {
-                return _process;
+                return this._process;
             }
         }
 
@@ -97,7 +97,7 @@ namespace Microsoft.NodejsTools.Debugger
         {
             get
             {
-                return _identity;
+                return this._identity;
             }
         }
     }

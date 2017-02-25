@@ -25,8 +25,8 @@ namespace Microsoft.VisualStudioTools.Project
 
         public WaitDialog(string waitCaption, string waitMessage, IServiceProvider serviceProvider, int displayDelay = 1, bool isCancelable = false, bool showProgress = false)
         {
-            _waitDialog = (IVsThreadedWaitDialog2)serviceProvider.GetService(typeof(SVsThreadedWaitDialog));
-            _waitResult = _waitDialog.StartWaitDialog(
+            this._waitDialog = (IVsThreadedWaitDialog2)serviceProvider.GetService(typeof(SVsThreadedWaitDialog));
+            this._waitResult = this._waitDialog.StartWaitDialog(
                 waitCaption,
                 waitMessage,
                 null,
@@ -41,7 +41,7 @@ namespace Microsoft.VisualStudioTools.Project
         public void UpdateProgress(int currentSteps, int totalSteps)
         {
             bool canceled;
-            _waitDialog.UpdateProgress(
+            this._waitDialog.UpdateProgress(
                 null,
                 null,
                 null,
@@ -57,7 +57,7 @@ namespace Microsoft.VisualStudioTools.Project
             get
             {
                 bool canceled;
-                ErrorHandler.ThrowOnFailure(_waitDialog.HasCanceled(out canceled));
+                ErrorHandler.ThrowOnFailure(this._waitDialog.HasCanceled(out canceled));
                 return canceled;
             }
         }
@@ -66,10 +66,10 @@ namespace Microsoft.VisualStudioTools.Project
 
         public void Dispose()
         {
-            if (ErrorHandler.Succeeded(_waitResult))
+            if (ErrorHandler.Succeeded(this._waitResult))
             {
                 int cancelled = 0;
-                _waitDialog.EndWaitDialog(out cancelled);
+                this._waitDialog.EndWaitDialog(out cancelled);
             }
         }
 

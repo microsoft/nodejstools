@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudioTools
 
         public ProjectEventArgs(IVsProject project)
         {
-            Project = project;
+            this.Project = project;
         }
     }
 
@@ -54,12 +54,12 @@ namespace Microsoft.VisualStudioTools
                 throw new ArgumentNullException("serviceProvider");
             }
 
-            _solution = serviceProvider.GetService(typeof(SVsSolution)) as IVsSolution;
-            if (_solution == null)
+            this._solution = serviceProvider.GetService(typeof(SVsSolution)) as IVsSolution;
+            if (this._solution == null)
             {
                 throw new InvalidOperationException("Cannot get solution service");
             }
-            _buildManager = serviceProvider.GetService(typeof(SVsSolutionBuildManager)) as IVsSolutionBuildManager3;
+            this._buildManager = serviceProvider.GetService(typeof(SVsSolutionBuildManager)) as IVsSolutionBuildManager3;
         }
 
         public SolutionEventsListener(IVsSolution service, IVsSolutionBuildManager3 buildManager = null)
@@ -68,41 +68,41 @@ namespace Microsoft.VisualStudioTools
             {
                 throw new ArgumentNullException("service");
             }
-            _solution = service;
-            _buildManager = buildManager;
+            this._solution = service;
+            this._buildManager = buildManager;
         }
 
         public void StartListeningForChanges()
         {
-            ErrorHandler.ThrowOnFailure(_solution.AdviseSolutionEvents(this, out _cookie1));
-            if (_buildManager != null)
+            ErrorHandler.ThrowOnFailure(this._solution.AdviseSolutionEvents(this, out this._cookie1));
+            if (this._buildManager != null)
             {
-                var bm2 = _buildManager as IVsSolutionBuildManager2;
+                var bm2 = this._buildManager as IVsSolutionBuildManager2;
                 if (bm2 != null)
                 {
-                    ErrorHandler.ThrowOnFailure(bm2.AdviseUpdateSolutionEvents(this, out _cookie2));
+                    ErrorHandler.ThrowOnFailure(bm2.AdviseUpdateSolutionEvents(this, out this._cookie2));
                 }
-                ErrorHandler.ThrowOnFailure(_buildManager.AdviseUpdateSolutionEvents3(this, out _cookie3));
+                ErrorHandler.ThrowOnFailure(this._buildManager.AdviseUpdateSolutionEvents3(this, out this._cookie3));
             }
         }
 
         public void Dispose()
         {
             // Ignore failures in UnadviseSolutionEvents
-            if (_cookie1 != VSConstants.VSCOOKIE_NIL)
+            if (this._cookie1 != VSConstants.VSCOOKIE_NIL)
             {
-                _solution.UnadviseSolutionEvents(_cookie1);
-                _cookie1 = VSConstants.VSCOOKIE_NIL;
+                this._solution.UnadviseSolutionEvents(this._cookie1);
+                this._cookie1 = VSConstants.VSCOOKIE_NIL;
             }
-            if (_cookie2 != VSConstants.VSCOOKIE_NIL)
+            if (this._cookie2 != VSConstants.VSCOOKIE_NIL)
             {
-                ((IVsSolutionBuildManager2)_buildManager).UnadviseUpdateSolutionEvents(_cookie2);
-                _cookie2 = VSConstants.VSCOOKIE_NIL;
+                ((IVsSolutionBuildManager2)this._buildManager).UnadviseUpdateSolutionEvents(this._cookie2);
+                this._cookie2 = VSConstants.VSCOOKIE_NIL;
             }
-            if (_cookie3 != VSConstants.VSCOOKIE_NIL)
+            if (this._cookie3 != VSConstants.VSCOOKIE_NIL)
             {
-                _buildManager.UnadviseUpdateSolutionEvents3(_cookie3);
-                _cookie3 = VSConstants.VSCOOKIE_NIL;
+                this._buildManager.UnadviseUpdateSolutionEvents3(this._cookie3);
+                this._cookie3 = VSConstants.VSCOOKIE_NIL;
             }
         }
 

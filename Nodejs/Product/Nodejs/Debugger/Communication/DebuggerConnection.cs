@@ -45,7 +45,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
         {
             Utilities.ArgumentNotNull("networkClientFactory", networkClientFactory);
 
-            _networkClientFactory = networkClientFactory;
+            this._networkClientFactory = networkClientFactory;
         }
 
         public void Dispose()
@@ -58,14 +58,14 @@ namespace Microsoft.NodejsTools.Debugger.Communication
         /// </summary>
         public void Close()
         {
-            _isClosed = true;
+            this._isClosed = true;
 
-            lock (_networkClientLock)
+            lock (this._networkClientLock)
             {
-                if (_networkClient != null)
+                if (this._networkClient != null)
                 {
-                    _networkClient.Dispose();
-                    _networkClient = null;
+                    this._networkClient.Dispose();
+                    this._networkClient = null;
                 }
             }
         }
@@ -78,7 +78,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
         {
             Utilities.ArgumentNotNullOrEmpty("message", message);
 
-            if (!Connected)
+            if (!this.Connected)
             {
                 return;
             }
@@ -87,8 +87,8 @@ namespace Microsoft.NodejsTools.Debugger.Communication
 
             var messageBody = _encoding.GetBytes(message);
             var messageHeader = _encoding.GetBytes(string.Format(CultureInfo.InvariantCulture, "Content-Length: {0}\r\n\r\n", messageBody.Length));
-            _packetsToSend.Add(messageHeader);
-            _packetsToSend.Add(messageBody);
+            this._packetsToSend.Add(messageHeader);
+            this._packetsToSend.Add(messageBody);
         }
 
         /// <summary>
@@ -108,9 +108,9 @@ namespace Microsoft.NodejsTools.Debugger.Communication
         {
             get
             {
-                lock (_networkClientLock)
+                lock (this._networkClientLock)
                 {
-                    return _networkClient != null && _networkClient.Connected;
+                    return this._networkClient != null && this._networkClient.Connected;
                 }
             }
         }
@@ -120,7 +120,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
         /// </summary>
         public Version NodeVersion
         {
-            get { return _nodeVersion; }
+            get { return this._nodeVersion; }
         }
 
         /// <summary>
@@ -133,7 +133,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
             LiveLogger.WriteLine("Debugger connecting to URI: {0}", uri);
 
             Close();
-            lock (_networkClientLock)
+            lock (this._networkClientLock)
             {
                 int connection_attempts = 0;
                 const int MAX_ATTEMPTS = 5;
@@ -146,12 +146,12 @@ namespace Microsoft.NodejsTools.Debugger.Communication
                         // constructor, which is a blocking call, and can take a couple of seconds
                         // to connect (with timeouts and retries). This code is running on the UI
                         // thread. Ideally this should be connecting async, or moved off the UI thread.
-                        _networkClient = _networkClientFactory.CreateNetworkClient(uri);
+                        this._networkClient = this._networkClientFactory.CreateNetworkClient(uri);
 
                         // Unclear if the above can succeed and not be connected, but check for safety.
                         // The code needs to either break out the while loop, or hit the retry logic
                         // in the exception handler.
-                        if (_networkClient.Connected)
+                        if (this._networkClient.Connected)
                         {
                             LiveLogger.WriteLine("Debugger connected successfully");
                             break;
@@ -168,7 +168,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
                             throw;
                         }
                         LiveLogger.WriteLine("Connection attempt {0} failed with: {1}", connection_attempts, ex);
-                        if (_isClosed || connection_attempts >= MAX_ATTEMPTS)
+                        if (this._isClosed || connection_attempts >= MAX_ATTEMPTS)
                         {
                             throw;
                         }
@@ -184,8 +184,8 @@ namespace Microsoft.NodejsTools.Debugger.Communication
                 }
             }
 
-            Task.Factory.StartNew(ReceiveAndDispatchMessagesWorker);
-            Task.Factory.StartNew(SendPacketsWorker);
+            Task.Factory.StartNew(this.ReceiveAndDispatchMessagesWorker);
+            Task.Factory.StartNew(this.SendPacketsWorker);
         }
 
         /// <summary>
@@ -194,9 +194,9 @@ namespace Microsoft.NodejsTools.Debugger.Communication
         private async void SendPacketsWorker()
         {
             INetworkClient networkClient;
-            lock (_networkClientLock)
+            lock (this._networkClientLock)
             {
-                networkClient = _networkClient;
+                networkClient = this._networkClient;
             }
             if (networkClient == null)
             {
@@ -206,9 +206,9 @@ namespace Microsoft.NodejsTools.Debugger.Communication
             try
             {
                 var stream = networkClient.GetStream();
-                while (Connected)
+                while (this.Connected)
                 {
-                    byte[] packet = await _packetsToSend.TakeAsync().ConfigureAwait(false);
+                    byte[] packet = await this._packetsToSend.TakeAsync().ConfigureAwait(false);
                     await stream.WriteAsync(packet, 0, packet.Length).ConfigureAwait(false);
                     await stream.FlushAsync().ConfigureAwait(false);
                 }
@@ -240,9 +240,9 @@ namespace Microsoft.NodejsTools.Debugger.Communication
             LiveLogger.WriteLine("Established connection.", typeof(DebuggerConnection));
 
             INetworkClient networkClient;
-            lock (_networkClientLock)
+            lock (this._networkClientLock)
             {
-                networkClient = _networkClient;
+                networkClient = this._networkClient;
             }
             if (networkClient == null)
             {
@@ -307,14 +307,14 @@ namespace Microsoft.NodejsTools.Debugger.Communication
 
                         // Embedding-Host, which contains the Node.js version number. Only try parsing that if we don't know the version yet -
                         // it normally comes in the very first packet, so this saves time trying to parse all the consequent ones.
-                        if (NodeVersion == null)
+                        if (this.NodeVersion == null)
                         {
                             match = _nodeVersionFieldRegex.Match(field);
                             if (match.Success)
                             {
                                 Version nodeVersion;
                                 Version.TryParse(match.Groups[1].Value, out nodeVersion);
-                                _nodeVersion = nodeVersion;
+                                this._nodeVersion = nodeVersion;
                             }
                         }
                     }

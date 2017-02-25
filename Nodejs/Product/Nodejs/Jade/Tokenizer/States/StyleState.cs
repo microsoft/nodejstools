@@ -22,22 +22,22 @@ namespace Microsoft.NodejsTools.Jade
     {
         private void OnStyle(int blockIndent)
         {
-            if (_cssClassifier != null)
+            if (this._cssClassifier != null)
             {
-                int start = _cs.Position;
+                int start = this._cs.Position;
 
                 SkipToEndOfBlock(blockIndent, text: false);
 
-                int end = _cs.Position;
+                int end = this._cs.Position;
                 int length = end - start;
                 if (length > 0)
                 {
-                    _cssBuffer.Replace(
-                        new Span(0, _cssBuffer.CurrentSnapshot.Length),
-                        _cs.Text.GetText(new TextRange(start, length))
+                    this._cssBuffer.Replace(
+                        new Span(0, this._cssBuffer.CurrentSnapshot.Length),
+                        this._cs.Text.GetText(new TextRange(start, length))
                     );
 
-                    var tokens = _cssClassifier.GetClassificationSpans(new SnapshotSpan(_cssBuffer.CurrentSnapshot, 0, _cssBuffer.CurrentSnapshot.Length));
+                    var tokens = this._cssClassifier.GetClassificationSpans(new SnapshotSpan(this._cssBuffer.CurrentSnapshot, 0, this._cssBuffer.CurrentSnapshot.Length));
                     foreach (var t in tokens)
                     {
                         AddToken(t.ClassificationType, t.Span.Start.Position + start, t.Span.Length);

@@ -30,9 +30,9 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         protected override void DoDefaultAction()
         {
-            if ("WebBrowser".Equals(SubType, StringComparison.OrdinalIgnoreCase))
+            if ("WebBrowser".Equals(this.SubType, StringComparison.OrdinalIgnoreCase))
             {
-                CommonPackage.OpenVsWebBrowser(ProjectMgr.Site, Url);
+                CommonPackage.OpenVsWebBrowser(this.ProjectMgr.Site, this.Url);
                 return;
             }
 

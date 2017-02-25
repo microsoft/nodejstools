@@ -25,27 +25,27 @@ namespace Microsoft.NodejsTools.Debugger.Commands
         public ChangeBreakpointCommand(int id, int breakpointId, bool? enabled = null, string condition = null, int? ignoreCount = null)
             : base(id, "changebreakpoint")
         {
-            _arguments = new Dictionary<string, object> { { "breakpoint", breakpointId } };
+            this._arguments = new Dictionary<string, object> { { "breakpoint", breakpointId } };
 
             if (enabled != null)
             {
-                _arguments["enabled"] = enabled.Value;
+                this._arguments["enabled"] = enabled.Value;
             }
 
             if (condition != null)
             {
-                _arguments["condition"] = condition;
+                this._arguments["condition"] = condition;
             }
 
             if (ignoreCount != null)
             {
-                _arguments["ignoreCount"] = ignoreCount.Value;
+                this._arguments["ignoreCount"] = ignoreCount.Value;
             }
         }
 
         protected override IDictionary<string, object> Arguments
         {
-            get { return _arguments; }
+            get { return this._arguments; }
         }
     }
 }

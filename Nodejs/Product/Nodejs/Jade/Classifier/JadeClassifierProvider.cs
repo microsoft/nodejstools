@@ -42,19 +42,19 @@ namespace Microsoft.NodejsTools.Jade
             [ImportMany(typeof(ITaggerProvider))]Lazy<ITaggerProvider, TaggerProviderMetadata>[] taggerProviders,
             [ImportMany(typeof(IClassifierProvider))]Lazy<IClassifierProvider, IClassifierProviderMetadata>[] classifierProviders)
         {
-            ClassificationRegistryService = registryService;
-            BufferFactoryService = bufferFact;
-            JsContentType = contentTypeService.GetContentType(NodejsConstants.JavaScript);
-            CssContentType = contentTypeService.GetContentType(NodejsConstants.CSS);
+            this.ClassificationRegistryService = registryService;
+            this.BufferFactoryService = bufferFact;
+            this.JsContentType = contentTypeService.GetContentType(NodejsConstants.JavaScript);
+            this.CssContentType = contentTypeService.GetContentType(NodejsConstants.CSS);
 
             var jsTagger = taggerProviders.Where(
                 provider =>
                     provider.Metadata.ContentTypes.Contains(NodejsConstants.JavaScript) &&
                     provider.Metadata.TagTypes.Any(tagType => tagType.IsSubclassOf(typeof(ClassificationTag)))
             ).FirstOrDefault();
-            if (JsTaggerProvider != null)
+            if (this.JsTaggerProvider != null)
             {
-                JsTaggerProvider = jsTagger.Value;
+                this.JsTaggerProvider = jsTagger.Value;
             }
 
             var cssTagger = classifierProviders.Where(
@@ -62,7 +62,7 @@ namespace Microsoft.NodejsTools.Jade
             ).FirstOrDefault();
             if (cssTagger != null)
             {
-                CssClassifierProvider = cssTagger.Value;
+                this.CssClassifierProvider = cssTagger.Value;
             }
         }
 

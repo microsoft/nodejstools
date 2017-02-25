@@ -50,7 +50,7 @@ namespace Microsoft.VisualStudioTools.Project
         public ImageHandler(Stream resourceStream)
         {
             Utilities.ArgumentNotNull("resourceStream", resourceStream);
-            imageList = Utilities.GetImageList(resourceStream);
+            this.imageList = Utilities.GetImageList(resourceStream);
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             Utilities.ArgumentNotNull("list", list);
 
-            imageList = list;
+            this.imageList = list;
         }
 
         /// <summary>
@@ -68,22 +68,22 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public void Close()
         {
-            if (null != iconHandles)
+            if (null != this.iconHandles)
             {
-                foreach (IntPtr hnd in iconHandles)
+                foreach (IntPtr hnd in this.iconHandles)
                 {
                     if (hnd != IntPtr.Zero)
                     {
                         NativeMethods.DestroyIcon(hnd);
                     }
                 }
-                iconHandles = null;
+                this.iconHandles = null;
             }
 
-            if (null != imageList)
+            if (null != this.imageList)
             {
-                imageList.Dispose();
-                imageList = null;
+                this.imageList.Dispose();
+                this.imageList = null;
             }
         }
 
@@ -94,14 +94,14 @@ namespace Microsoft.VisualStudioTools.Project
         public void AddImage(Image image)
         {
             Utilities.ArgumentNotNull("image", image);
-            if (null == imageList)
+            if (null == this.imageList)
             {
-                imageList = new ImageList();
+                this.imageList = new ImageList();
             }
-            imageList.Images.Add(image);
-            if (null != iconHandles)
+            this.imageList.Images.Add(image);
+            if (null != this.iconHandles)
             {
-                iconHandles.Add(IntPtr.Zero);
+                this.iconHandles.Add(IntPtr.Zero);
             }
         }
 
@@ -110,11 +110,11 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public ImageList ImageList
         {
-            get { return imageList; }
+            get { return this.imageList; }
             set
             {
                 Close();
-                imageList = value;
+                this.imageList = value;
             }
         }
 
@@ -124,23 +124,23 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public IntPtr GetIconHandle(int iconIndex)
         {
-            Utilities.CheckNotNull(imageList);
+            Utilities.CheckNotNull(this.imageList);
             // Make sure that the list of handles is initialized.
-            if (null == iconHandles)
+            if (null == this.iconHandles)
             {
                 InitHandlesList();
             }
 
             // Verify that the index is inside the expected range.
-            if ((iconIndex < 0) || (iconIndex >= iconHandles.Count))
+            if ((iconIndex < 0) || (iconIndex >= this.iconHandles.Count))
             {
                 throw new ArgumentOutOfRangeException("iconIndex");
             }
 
             // Check if the icon is in the cache.
-            if (IntPtr.Zero == iconHandles[iconIndex])
+            if (IntPtr.Zero == this.iconHandles[iconIndex])
             {
-                Bitmap bitmap = imageList.Images[iconIndex] as Bitmap;
+                Bitmap bitmap = this.imageList.Images[iconIndex] as Bitmap;
                 // If the image is not a bitmap, then we can not build the icon,
                 // so we have to return a null handle.
                 if (null == bitmap)
@@ -148,18 +148,18 @@ namespace Microsoft.VisualStudioTools.Project
                     return IntPtr.Zero;
                 }
 
-                iconHandles[iconIndex] = bitmap.GetHicon();
+                this.iconHandles[iconIndex] = bitmap.GetHicon();
             }
 
-            return iconHandles[iconIndex];
+            return this.iconHandles[iconIndex];
         }
 
         private void InitHandlesList()
         {
-            iconHandles = new List<IntPtr>(imageList.Images.Count);
-            for (int i = 0; i < imageList.Images.Count; ++i)
+            this.iconHandles = new List<IntPtr>(this.imageList.Images.Count);
+            for (int i = 0; i < this.imageList.Images.Count; ++i)
             {
-                iconHandles.Add(IntPtr.Zero);
+                this.iconHandles.Add(IntPtr.Zero);
             }
         }
 

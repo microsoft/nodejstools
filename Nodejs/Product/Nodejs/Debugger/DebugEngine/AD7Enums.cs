@@ -30,8 +30,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public AD7Enum(T[] data)
         {
-            m_data = data;
-            m_position = 0;
+            this.m_data = data;
+            this.m_position = 0;
         }
 
         public int Clone(out I ppEnum)
@@ -42,7 +42,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public int GetCount(out uint pcelt)
         {
-            pcelt = (uint)m_data.Length;
+            pcelt = (uint)this.m_data.Length;
             return VSConstants.S_OK;
         }
 
@@ -55,7 +55,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         {
             lock (this)
             {
-                m_position = 0;
+                this.m_position = 0;
 
                 return VSConstants.S_OK;
             }
@@ -73,7 +73,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             lock (this)
             {
                 int hr = VSConstants.S_OK;
-                celtFetched = (uint)m_data.Length - m_position;
+                celtFetched = (uint)this.m_data.Length - this.m_position;
 
                 if (celt > celtFetched)
                 {
@@ -88,11 +88,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                 {
                     for (int c = 0; c < celtFetched; c++)
                     {
-                        rgelt[c] = m_data[m_position + c];
+                        rgelt[c] = this.m_data[this.m_position + c];
                     }
                 }
 
-                m_position += celtFetched;
+                this.m_position += celtFetched;
 
                 return hr;
             }

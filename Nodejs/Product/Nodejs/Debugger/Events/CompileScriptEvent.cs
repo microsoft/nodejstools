@@ -23,12 +23,12 @@ namespace Microsoft.NodejsTools.Debugger.Events
     {
         public CompileScriptEvent(JObject message)
         {
-            Running = (bool)message["running"];
+            this.Running = (bool)message["running"];
 
             var scriptId = (int)message["body"]["script"]["id"];
             string fileName = (string)message["body"]["script"]["name"] ?? NodeVariableType.UnknownModule;
 
-            Module = new NodeModule(scriptId, fileName);
+            this.Module = new NodeModule(scriptId, fileName);
         }
 
         public NodeModule Module { get; private set; }

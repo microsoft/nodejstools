@@ -40,49 +40,49 @@ namespace Microsoft.NodejsTools.Debugger.Commands
         {
             Utilities.ArgumentNotNull("breakpoint", breakpoint);
 
-            _module = module;
-            _breakpoint = breakpoint;
-            _sourceMapper = sourceMapper;
+            this._module = module;
+            this._breakpoint = breakpoint;
+            this._sourceMapper = sourceMapper;
 
-            _position = breakpoint.GetPosition(_sourceMapper);
+            this._position = breakpoint.GetPosition(this._sourceMapper);
 
             // Zero based line numbers
-            int line = _position.Line;
+            int line = this._position.Line;
 
             // Zero based column numbers
             // Special case column to avoid (line 0, column 0) which
             // Node (V8) treats specially for script loaded via require
             // Script wrapping process: https://github.com/joyent/node/blob/v0.10.26-release/src/node.js#L880
-            int column = _position.Column;
+            int column = this._position.Column;
             if (line == 0)
             {
                 column += NodeConstants.ScriptWrapBegin.Length;
             }
 
-            _arguments = new Dictionary<string, object> {
+            this._arguments = new Dictionary<string, object> {
                 { "line", line },
                 { "column", column }
             };
 
-            if (_module != null)
+            if (this._module != null)
             {
-                _arguments["type"] = "scriptId";
-                _arguments["target"] = _module.Id;
+                this._arguments["type"] = "scriptId";
+                this._arguments["target"] = this._module.Id;
             }
             else if (remote)
             {
-                _arguments["type"] = "scriptRegExp";
-                _arguments["target"] = CreateRemoteScriptRegExp(_position.FileName);
+                this._arguments["type"] = "scriptRegExp";
+                this._arguments["target"] = CreateRemoteScriptRegExp(this._position.FileName);
             }
             else
             {
-                _arguments["type"] = "scriptRegExp";
-                _arguments["target"] = CreateLocalScriptRegExp(_position.FileName);
+                this._arguments["type"] = "scriptRegExp";
+                this._arguments["target"] = CreateLocalScriptRegExp(this._position.FileName);
             }
 
-            if (!NodeBreakpointBinding.GetEngineEnabled(_breakpoint.Enabled, _breakpoint.BreakOn, 0))
+            if (!NodeBreakpointBinding.GetEngineEnabled(this._breakpoint.Enabled, this._breakpoint.BreakOn, 0))
             {
-                _arguments["enabled"] = false;
+                this._arguments["enabled"] = false;
             }
 
             if (withoutPredicate)
@@ -90,21 +90,21 @@ namespace Microsoft.NodejsTools.Debugger.Commands
                 return;
             }
 
-            int ignoreCount = NodeBreakpointBinding.GetEngineIgnoreCount(_breakpoint.BreakOn, 0);
+            int ignoreCount = NodeBreakpointBinding.GetEngineIgnoreCount(this._breakpoint.BreakOn, 0);
             if (ignoreCount > 0)
             {
-                _arguments["ignoreCount"] = ignoreCount;
+                this._arguments["ignoreCount"] = ignoreCount;
             }
 
-            if (!string.IsNullOrEmpty(_breakpoint.Condition))
+            if (!string.IsNullOrEmpty(this._breakpoint.Condition))
             {
-                _arguments["condition"] = _breakpoint.Condition;
+                this._arguments["condition"] = this._breakpoint.Condition;
             }
         }
 
         protected override IDictionary<string, object> Arguments
         {
-            get { return _arguments; }
+            get { return this._arguments; }
         }
 
         public int BreakpointId { get; private set; }
@@ -120,25 +120,25 @@ namespace Microsoft.NodejsTools.Debugger.Commands
             base.ProcessResponse(response);
 
             JToken body = response["body"];
-            BreakpointId = (int)body["breakpoint"];
+            this.BreakpointId = (int)body["breakpoint"];
 
-            int? moduleId = _module != null ? _module.Id : (int?)null;
-            ScriptId = (int?)body["script_id"] ?? moduleId;
+            int? moduleId = this._module != null ? this._module.Id : (int?)null;
+            this.ScriptId = (int?)body["script_id"] ?? moduleId;
 
             // Handle breakpoint actual location fixup
             JArray actualLocations = (JArray)body["actual_locations"] ?? new JArray();
             if (actualLocations.Count > 0)
             {
                 var location = actualLocations[0];
-                ScriptId = ScriptId ?? (int?)location["script_id"];
-                Line = (int)location["line"];
+                this.ScriptId = this.ScriptId ?? (int?)location["script_id"];
+                this.Line = (int)location["line"];
                 var column = (int)location["column"];
-                Column = Line == 0 ? column - NodeConstants.ScriptWrapBegin.Length : column;
+                this.Column = this.Line == 0 ? column - NodeConstants.ScriptWrapBegin.Length : column;
             }
             else
             {
-                Line = _position.Line;
-                Column = _position.Column;
+                this.Line = this._position.Line;
+                this.Column = this._position.Column;
             }
         }
 

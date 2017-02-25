@@ -51,13 +51,13 @@ namespace Microsoft.VisualStudioTools.Navigation
         {
             get
             {
-                return Name;
+                return this.Name;
             }
         }
 
         public virtual string GetTextRepresentation(VSTREETEXTOPTIONS options)
         {
-            return Name;
+            return this.Name;
         }
 
         public virtual string TooltipText

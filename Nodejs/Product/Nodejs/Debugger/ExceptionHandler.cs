@@ -26,15 +26,15 @@ namespace Microsoft.NodejsTools.Debugger
 
         public ExceptionHandler()
         {
-            _exceptionTreatments = GetDefaultExceptionTreatments();
+            this._exceptionTreatments = GetDefaultExceptionTreatments();
         }
 
         public bool BreakOnAllExceptions
         {
             get
             {
-                return _defaultExceptionTreatment != ExceptionHitTreatment.BreakNever ||
-                       _exceptionTreatments.Values.Any(value => value != ExceptionHitTreatment.BreakNever);
+                return this._defaultExceptionTreatment != ExceptionHitTreatment.BreakNever ||
+                       this._exceptionTreatments.Values.Any(value => value != ExceptionHitTreatment.BreakNever);
             }
         }
 
@@ -44,10 +44,10 @@ namespace Microsoft.NodejsTools.Debugger
             foreach (var exceptionTreatment in exceptionTreatments)
             {
                 ExceptionHitTreatment treatmentValue;
-                if (!_exceptionTreatments.TryGetValue(exceptionTreatment.Key, out treatmentValue) ||
+                if (!this._exceptionTreatments.TryGetValue(exceptionTreatment.Key, out treatmentValue) ||
                     (exceptionTreatment.Value != treatmentValue))
                 {
-                    _exceptionTreatments[exceptionTreatment.Key] = exceptionTreatment.Value;
+                    this._exceptionTreatments[exceptionTreatment.Key] = exceptionTreatment.Value;
                     updated = true;
                 }
             }
@@ -60,9 +60,9 @@ namespace Microsoft.NodejsTools.Debugger
             foreach (var exceptionTreatment in exceptionTreatments)
             {
                 ExceptionHitTreatment treatmentValue;
-                if (_exceptionTreatments.TryGetValue(exceptionTreatment.Key, out treatmentValue))
+                if (this._exceptionTreatments.TryGetValue(exceptionTreatment.Key, out treatmentValue))
                 {
-                    _exceptionTreatments.Remove(exceptionTreatment.Key);
+                    this._exceptionTreatments.Remove(exceptionTreatment.Key);
                     updated = true;
                 }
             }
@@ -72,9 +72,9 @@ namespace Microsoft.NodejsTools.Debugger
         public bool ResetExceptionTreatments()
         {
             bool updated = false;
-            if (_exceptionTreatments.Values.Any(value => value != _defaultExceptionTreatment))
+            if (this._exceptionTreatments.Values.Any(value => value != this._defaultExceptionTreatment))
             {
-                _exceptionTreatments = GetDefaultExceptionTreatments();
+                this._exceptionTreatments = GetDefaultExceptionTreatments();
                 updated = true;
             }
             return updated;
@@ -82,9 +82,9 @@ namespace Microsoft.NodejsTools.Debugger
 
         public bool SetDefaultExceptionHitTreatment(ExceptionHitTreatment exceptionTreatment)
         {
-            if (_defaultExceptionTreatment != exceptionTreatment)
+            if (this._defaultExceptionTreatment != exceptionTreatment)
             {
-                _defaultExceptionTreatment = exceptionTreatment;
+                this._defaultExceptionTreatment = exceptionTreatment;
                 return true;
             }
             return false;
@@ -93,9 +93,9 @@ namespace Microsoft.NodejsTools.Debugger
         public ExceptionHitTreatment GetExceptionHitTreatment(string exceptionName)
         {
             ExceptionHitTreatment exceptionTreatment;
-            if (!_exceptionTreatments.TryGetValue(exceptionName, out exceptionTreatment))
+            if (!this._exceptionTreatments.TryGetValue(exceptionName, out exceptionTreatment))
             {
-                exceptionTreatment = _defaultExceptionTreatment;
+                exceptionTreatment = this._defaultExceptionTreatment;
             }
             return exceptionTreatment;
         }

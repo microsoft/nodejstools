@@ -20,11 +20,11 @@ namespace Microsoft.NodejsTools.Jade
     {
         private void OnInlineCode()
         {
-            if (_cs.CurrentChar == '-' || _cs.CurrentChar == '=')
-                _cs.MoveToNextChar();
+            if (this._cs.CurrentChar == '-' || this._cs.CurrentChar == '=')
+                this._cs.MoveToNextChar();
 
             // Make tokens for code keywords
-            while (!_cs.IsEndOfStream())
+            while (!this._cs.IsEndOfStream())
             {
                 if (SkipWhiteSpace())
                     break;
@@ -33,20 +33,20 @@ namespace Microsoft.NodejsTools.Jade
                 {
                     HandleString();
                 }
-                else if (_cs.IsAnsiLetter())
+                else if (this._cs.IsAnsiLetter())
                 {
                     var range = ParseIdentifier();
-                    var ident = _cs.GetSubstringAt(range.Start, range.Length);
+                    var ident = this._cs.GetSubstringAt(range.Start, range.Length);
 
                     if (JadeCodeKeywords.IsKeyword(ident))
                         AddToken(JadeTokenType.CodeKeyword, range.Start, range.Length);
                 }
-                else if (_cs.CurrentChar == '=' || _cs.CurrentChar == '+' || _cs.CurrentChar == '*' || _cs.CurrentChar == '/' || _cs.CurrentChar == '-')
+                else if (this._cs.CurrentChar == '=' || this._cs.CurrentChar == '+' || this._cs.CurrentChar == '*' || this._cs.CurrentChar == '/' || this._cs.CurrentChar == '-')
                 {
-                    AddToken(JadeTokenType.Operator, _cs.Position, 1);
-                    _cs.MoveToNextChar();
+                    AddToken(JadeTokenType.Operator, this._cs.Position, 1);
+                    this._cs.MoveToNextChar();
                 }
-                else if (_cs.CurrentChar == '#' && _cs.NextChar == '{')
+                else if (this._cs.CurrentChar == '#' && this._cs.NextChar == '{')
                 {
                     var range = GetNonWSSequence('}', inclusive: true);
                     if (range.Length > 0)
@@ -56,7 +56,7 @@ namespace Microsoft.NodejsTools.Jade
                 }
                 else
                 {
-                    _cs.MoveToNextChar();
+                    this._cs.MoveToNextChar();
                 }
             }
         }

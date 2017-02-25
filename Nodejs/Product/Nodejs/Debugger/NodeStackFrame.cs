@@ -27,7 +27,7 @@ namespace Microsoft.NodejsTools.Debugger
 
         public NodeStackFrame(int frameId)
         {
-            _frameId = frameId;
+            this._frameId = frameId;
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace Microsoft.NodejsTools.Debugger
         /// </summary>
         public int StartLine
         {
-            get { return Line; }
+            get { return this.Line; }
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace Microsoft.NodejsTools.Debugger
         /// </summary>
         public int EndLine
         {
-            get { return Line; }
+            get { return this.Line; }
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace Microsoft.NodejsTools.Debugger
         /// </summary>
         public string FileName
         {
-            get { return Module != null ? Module.FileName : null; }
+            get { return this.Module != null ? this.Module.FileName : null; }
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace Microsoft.NodejsTools.Debugger
         /// </summary>
         public int FrameId
         {
-            get { return _frameId; }
+            get { return this._frameId; }
         }
 
         /// <summary>
@@ -131,9 +131,9 @@ namespace Microsoft.NodejsTools.Debugger
         /// <param name="cancellationToken">Cancellation token.</param>
         public Task<NodeEvaluationResult> ExecuteTextAsync(string text, CancellationToken cancellationToken = new CancellationToken())
         {
-            Utilities.CheckNotNull(Process);
+            Utilities.CheckNotNull(this.Process);
 
-            return Process.ExecuteTextAsync(this, text, cancellationToken);
+            return this.Process.ExecuteTextAsync(this, text, cancellationToken);
         }
 
         /// <summary>
@@ -144,9 +144,9 @@ namespace Microsoft.NodejsTools.Debugger
         /// <param name="cancellationToken">Cancellation token.</param>
         public async Task<NodeEvaluationResult> SetVariableValueAsync(string name, string value, CancellationToken cancellationToken = new CancellationToken())
         {
-            Utilities.CheckNotNull(Process);
+            Utilities.CheckNotNull(this.Process);
 
-            NodeEvaluationResult result = await Process.SetVariableValueAsync(this, name, value, cancellationToken).ConfigureAwait(false);
+            NodeEvaluationResult result = await this.Process.SetVariableValueAsync(this, name, value, cancellationToken).ConfigureAwait(false);
 
             if (result == null)
             {
@@ -154,22 +154,22 @@ namespace Microsoft.NodejsTools.Debugger
             }
 
             // Update variable in locals
-            for (int i = 0; i < Locals.Count; i++)
+            for (int i = 0; i < this.Locals.Count; i++)
             {
-                NodeEvaluationResult evaluationResult = Locals[i];
+                NodeEvaluationResult evaluationResult = this.Locals[i];
                 if (evaluationResult.Expression == name)
                 {
-                    Locals[i] = result;
+                    this.Locals[i] = result;
                 }
             }
 
             // Update variable in parameters
-            for (int i = 0; i < Parameters.Count; i++)
+            for (int i = 0; i < this.Parameters.Count; i++)
             {
-                NodeEvaluationResult evaluationResult = Parameters[i];
+                NodeEvaluationResult evaluationResult = this.Parameters[i];
                 if (evaluationResult.Expression == name)
                 {
-                    Parameters[i] = result;
+                    this.Parameters[i] = result;
                 }
             }
 

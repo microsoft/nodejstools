@@ -28,12 +28,12 @@ namespace Microsoft.NodejsTools.Project
 
         public NodejsGeneralPropertyPage()
         {
-            _control = new NodejsGeneralPropertyPageControl(this);
+            this._control = new NodejsGeneralPropertyPageControl(this);
         }
 
         public override System.Windows.Forms.Control Control
         {
-            get { return _control; }
+            get { return this._control; }
         }
 
         internal override CommonProjectNode Project
@@ -57,45 +57,45 @@ namespace Microsoft.NodejsTools.Project
         }
         public override void Apply()
         {
-            Project.SetProjectProperty(NodeProjectProperty.NodeExePath, _control.NodeExePath);
-            Project.SetProjectProperty(NodeProjectProperty.NodeExeArguments, _control.NodeExeArguments);
-            Project.SetProjectProperty(CommonConstants.StartupFile, _control.ScriptFile);
-            Project.SetProjectProperty(NodeProjectProperty.ScriptArguments, _control.ScriptArguments);
-            Project.SetProjectProperty(NodeProjectProperty.NodejsPort, _control.NodejsPort);
-            Project.SetProjectProperty(NodeProjectProperty.StartWebBrowser, _control.StartWebBrowser.ToString());
-            Project.SetProjectProperty(CommonConstants.WorkingDirectory, _control.WorkingDirectory);
-            Project.SetProjectProperty(NodeProjectProperty.LaunchUrl, _control.LaunchUrl);
-            Project.SetProjectProperty(NodeProjectProperty.DebuggerPort, _control.DebuggerPort);
-            Project.SetProjectProperty(NodeProjectProperty.Environment, _control.Environment);
-            IsDirty = false;
+            this.Project.SetProjectProperty(NodeProjectProperty.NodeExePath, this._control.NodeExePath);
+            this.Project.SetProjectProperty(NodeProjectProperty.NodeExeArguments, this._control.NodeExeArguments);
+            this.Project.SetProjectProperty(CommonConstants.StartupFile, this._control.ScriptFile);
+            this.Project.SetProjectProperty(NodeProjectProperty.ScriptArguments, this._control.ScriptArguments);
+            this.Project.SetProjectProperty(NodeProjectProperty.NodejsPort, this._control.NodejsPort);
+            this.Project.SetProjectProperty(NodeProjectProperty.StartWebBrowser, this._control.StartWebBrowser.ToString());
+            this.Project.SetProjectProperty(CommonConstants.WorkingDirectory, this._control.WorkingDirectory);
+            this.Project.SetProjectProperty(NodeProjectProperty.LaunchUrl, this._control.LaunchUrl);
+            this.Project.SetProjectProperty(NodeProjectProperty.DebuggerPort, this._control.DebuggerPort);
+            this.Project.SetProjectProperty(NodeProjectProperty.Environment, this._control.Environment);
+            this.IsDirty = false;
         }
 
         public override void LoadSettings()
         {
-            Loading = true;
+            this.Loading = true;
             try
             {
-                _control.NodeExeArguments = Project.GetUnevaluatedProperty(NodeProjectProperty.NodeExeArguments);
-                _control.NodeExePath = Project.GetUnevaluatedProperty(NodeProjectProperty.NodeExePath);
-                _control.ScriptFile = Project.GetUnevaluatedProperty(CommonConstants.StartupFile);
-                _control.ScriptArguments = Project.GetUnevaluatedProperty(NodeProjectProperty.ScriptArguments);
-                _control.WorkingDirectory = Project.GetUnevaluatedProperty(CommonConstants.WorkingDirectory);
-                _control.LaunchUrl = Project.GetUnevaluatedProperty(NodeProjectProperty.LaunchUrl);
-                _control.NodejsPort = Project.GetUnevaluatedProperty(NodeProjectProperty.NodejsPort);
-                _control.DebuggerPort = Project.GetUnevaluatedProperty(NodeProjectProperty.DebuggerPort);
-                _control.Environment = Project.GetUnevaluatedProperty(NodeProjectProperty.Environment);
+                this._control.NodeExeArguments = this.Project.GetUnevaluatedProperty(NodeProjectProperty.NodeExeArguments);
+                this._control.NodeExePath = this.Project.GetUnevaluatedProperty(NodeProjectProperty.NodeExePath);
+                this._control.ScriptFile = this.Project.GetUnevaluatedProperty(CommonConstants.StartupFile);
+                this._control.ScriptArguments = this.Project.GetUnevaluatedProperty(NodeProjectProperty.ScriptArguments);
+                this._control.WorkingDirectory = this.Project.GetUnevaluatedProperty(CommonConstants.WorkingDirectory);
+                this._control.LaunchUrl = this.Project.GetUnevaluatedProperty(NodeProjectProperty.LaunchUrl);
+                this._control.NodejsPort = this.Project.GetUnevaluatedProperty(NodeProjectProperty.NodejsPort);
+                this._control.DebuggerPort = this.Project.GetUnevaluatedProperty(NodeProjectProperty.DebuggerPort);
+                this._control.Environment = this.Project.GetUnevaluatedProperty(NodeProjectProperty.Environment);
 
                 // Attempt to parse the boolean.  If we fail, assume it is true.
                 bool startWebBrowser;
-                if (!Boolean.TryParse(Project.GetUnevaluatedProperty(NodeProjectProperty.StartWebBrowser), out startWebBrowser))
+                if (!Boolean.TryParse(this.Project.GetUnevaluatedProperty(NodeProjectProperty.StartWebBrowser), out startWebBrowser))
                 {
                     startWebBrowser = true;
                 }
-                _control.StartWebBrowser = startWebBrowser;
+                this._control.StartWebBrowser = startWebBrowser;
             }
             finally
             {
-                Loading = false;
+                this.Loading = false;
             }
         }
 

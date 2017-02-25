@@ -31,19 +31,19 @@ namespace Microsoft.NodejsTools.Jade
             var range = ParseTagName();
             if (range.Length > 0)
             {
-                ident = _cs.GetSubstringAt(range.Start, range.Length);
+                ident = this._cs.GetSubstringAt(range.Start, range.Length);
 
                 if (JadeTagKeywords.IsKeyword(ident))
                 {
                     // extends, javascripts:, stylesheets:
-                    int length = _cs.CurrentChar == ':' ? range.Length + 1 : range.Length;
+                    int length = this._cs.CurrentChar == ':' ? range.Length + 1 : range.Length;
                     AddToken(JadeTokenType.TagKeyword, range.Start, length);
 
-                    if (_cs.CurrentChar != ':' && String.Compare(ident, "mixin", StringComparison.Ordinal) == 0)
+                    if (this._cs.CurrentChar != ':' && String.Compare(ident, "mixin", StringComparison.Ordinal) == 0)
                     {
                         SkipWhiteSpace();
 
-                        if (!_cs.IsAtNewLine())
+                        if (!this._cs.IsAtNewLine())
                             OnTag();
                     }
                     else
@@ -54,16 +54,16 @@ namespace Microsoft.NodejsTools.Jade
                     return;
                 }
 
-                if (_cs.CurrentChar == ':')
+                if (this._cs.CurrentChar == ':')
                 {
                     // Block expansion like 
                     //   li.first: a(href='#') foo
                     AddToken(JadeTokenType.TagName, range.Start, range.Length);
-                    _cs.MoveToNextChar();
+                    this._cs.MoveToNextChar();
 
                     SkipWhiteSpace();
 
-                    if (!_cs.IsAtNewLine())
+                    if (!this._cs.IsAtNewLine())
                         OnTag();
 
                     return;
@@ -79,41 +79,41 @@ namespace Microsoft.NodejsTools.Jade
                 AddToken(JadeTokenType.TagName, range.Start, range.Length);
             }
 
-            while (!_cs.IsWhiteSpace() && !_cs.IsEndOfStream())
+            while (!this._cs.IsWhiteSpace() && !this._cs.IsEndOfStream())
             {
-                if (_cs.CurrentChar == '.' && Char.IsWhiteSpace(_cs.NextChar))
+                if (this._cs.CurrentChar == '.' && Char.IsWhiteSpace(this._cs.NextChar))
                 {
                     // If this is last ., then what follows is a text literal
                     if (String.Compare(ident, "script", StringComparison.OrdinalIgnoreCase) == 0)
                     {
-                        _cs.MoveToNextChar();
+                        this._cs.MoveToNextChar();
                         OnScript(blockIndent);
                     }
                     else if (String.Compare(ident, "style", StringComparison.OrdinalIgnoreCase) == 0)
                     {
-                        _cs.MoveToNextChar();
+                        this._cs.MoveToNextChar();
                         OnStyle(blockIndent);
                     }
-                    else if (IsAllWhiteSpaceBeforeEndOfLine(_cs.Position + 1))
+                    else if (IsAllWhiteSpaceBeforeEndOfLine(this._cs.Position + 1))
                     {
                         SkipToEndOfBlock(blockIndent, text: true);
                     }
                     else
                     {
-                        _cs.MoveToNextChar();
+                        this._cs.MoveToNextChar();
                     }
 
                     return;
                 }
 
-                if (_cs.CurrentChar == '(')
+                if (this._cs.CurrentChar == '(')
                 {
                     OnAttributes(')');
                 }
 
-                if (_cs.CurrentChar == '#' || _cs.CurrentChar == '.')
+                if (this._cs.CurrentChar == '#' || this._cs.CurrentChar == '.')
                 {
-                    bool isID = _cs.CurrentChar == '#';
+                    bool isID = this._cs.CurrentChar == '#';
                     // container(a=b).bar or container(a=b)#bar
                     var selectorRange = GetNonWSSequence("(:=.#");
 
@@ -125,44 +125,44 @@ namespace Microsoft.NodejsTools.Jade
                             selectorRange.Length
                         );
 
-                        if (Char.IsWhiteSpace(_cs.CurrentChar) && _cs.LookAhead(-1) == '.')
+                        if (Char.IsWhiteSpace(this._cs.CurrentChar) && this._cs.LookAhead(-1) == '.')
                         {
-                            _cs.Position--;
+                            this._cs.Position--;
                         }
                     }
                 }
 
-                if (_cs.CurrentChar != '.' && _cs.CurrentChar != '#' && _cs.CurrentChar != '(')
+                if (this._cs.CurrentChar != '.' && this._cs.CurrentChar != '#' && this._cs.CurrentChar != '(')
                     break;
             }
 
-            if (_cs.CurrentChar == ':')
+            if (this._cs.CurrentChar == ':')
             {
                 // Block expansion like 
                 //   li.first: a(href='#') foo
 
-                _cs.MoveToNextChar();
+                this._cs.MoveToNextChar();
                 SkipWhiteSpace();
 
-                if (!_cs.IsAtNewLine())
+                if (!this._cs.IsAtNewLine())
                     OnTag();
 
                 return;
             }
 
             // There may be ws between tag name and = sign. However, = must be on the same line.
-            bool allWsToEol = IsAllWhiteSpaceBeforeEndOfLine(_cs.Position);
+            bool allWsToEol = IsAllWhiteSpaceBeforeEndOfLine(this._cs.Position);
             if (!allWsToEol)
             {
                 SkipWhiteSpace();
 
-                if (_cs.CurrentChar == '=' || (_cs.CurrentChar == '!' && _cs.NextChar == '='))
+                if (this._cs.CurrentChar == '=' || (this._cs.CurrentChar == '!' && this._cs.NextChar == '='))
                 {
                     // Something like 'foo ='
-                    int length = _cs.CurrentChar == '!' ? 2 : 1;
+                    int length = this._cs.CurrentChar == '!' ? 2 : 1;
 
-                    AddToken(JadeTokenType.Operator, _cs.Position, length);
-                    _cs.Advance(length);
+                    AddToken(JadeTokenType.Operator, this._cs.Position, length);
+                    this._cs.Advance(length);
 
                     OnInlineCode();
                 }
@@ -190,23 +190,23 @@ namespace Microsoft.NodejsTools.Jade
 
         protected ITextRange ParseTagName()
         {
-            int start = _cs.Position;
+            int start = this._cs.Position;
             int count = 0;
 
-            while (!_cs.IsEndOfStream() && !_cs.IsWhiteSpace() &&
-                  (_cs.IsAnsiLetter() || _cs.IsDecimal() || _cs.CurrentChar == '_' || (count > 0 && _cs.CurrentChar == '-')))
+            while (!this._cs.IsEndOfStream() && !this._cs.IsWhiteSpace() &&
+                  (this._cs.IsAnsiLetter() || this._cs.IsDecimal() || this._cs.CurrentChar == '_' || (count > 0 && this._cs.CurrentChar == '-')))
             {
-                if (_cs.CurrentChar == ':')
+                if (this._cs.CurrentChar == ':')
                 {
-                    if (_cs.NextChar != '_' && (_cs.NextChar < 'A' || _cs.NextChar > 'z'))
+                    if (this._cs.NextChar != '_' && (this._cs.NextChar < 'A' || this._cs.NextChar > 'z'))
                         break; // allow tags with namespaces
                 }
 
-                _cs.MoveToNextChar();
+                this._cs.MoveToNextChar();
                 count++;
             }
 
-            return TextRange.FromBounds(start, _cs.Position);
+            return TextRange.FromBounds(start, this._cs.Position);
         }
     }
 }

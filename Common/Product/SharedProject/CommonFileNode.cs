@@ -42,7 +42,7 @@ namespace Microsoft.VisualStudioTools.Project
         public CommonFileNode(CommonProjectNode root, ProjectElement e)
             : base(root, e)
         {
-            _project = root;
+            this._project = root;
         }
 
         #region properties
@@ -79,11 +79,11 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                if (null == _vsProjectItem)
+                if (null == this._vsProjectItem)
                 {
-                    _vsProjectItem = new OAVSProjectItem(this);
+                    this._vsProjectItem = new OAVSProjectItem(this);
                 }
-                return _vsProjectItem;
+                return this._vsProjectItem;
             }
         }
 
@@ -123,7 +123,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         protected virtual ImageMoniker StartupCodeFileIconMoniker
         {
-            get { return CodeFileIconMoniker; }
+            get { return this.CodeFileIconMoniker; }
         }
 
         protected virtual ImageMoniker FormFileIconMoniker
@@ -133,27 +133,27 @@ namespace Microsoft.VisualStudioTools.Project
 
         protected override ImageMoniker GetIconMoniker(bool open)
         {
-            if (ItemNode.IsExcluded)
+            if (this.ItemNode.IsExcluded)
             {
                 return KnownMonikers.HiddenFile;
             }
-            else if (!File.Exists(Url))
+            else if (!File.Exists(this.Url))
             {
                 return KnownMonikers.DocumentWarning;
             }
-            else if (IsFormSubType)
+            else if (this.IsFormSubType)
             {
-                return FormFileIconMoniker;
+                return this.FormFileIconMoniker;
             }
-            else if (this._project.IsCodeFile(FileName))
+            else if (this._project.IsCodeFile(this.FileName))
             {
-                if (CommonUtils.IsSamePath(this.Url, _project.GetStartupFile()))
+                if (CommonUtils.IsSamePath(this.Url, this._project.GetStartupFile()))
                 {
-                    return StartupCodeFileIconMoniker;
+                    return this.StartupCodeFileIconMoniker;
                 }
                 else
                 {
-                    return CodeFileIconMoniker;
+                    return this.CodeFileIconMoniker;
                 }
             }
             return default(ImageMoniker);
@@ -168,7 +168,7 @@ namespace Microsoft.VisualStudioTools.Project
             Utilities.CheckNotNull(manager, "Could not get the FileDocumentManager");
 
             Guid viewGuid =
-                (IsFormSubType ? VSConstants.LOGVIEWID_Designer : VSConstants.LOGVIEWID_Code);
+                (this.IsFormSubType ? VSConstants.LOGVIEWID_Designer : VSConstants.LOGVIEWID_Code);
             IVsWindowFrame frame;
             manager.Open(false, false, viewGuid, out frame, WindowFrameShowAction.Show);
         }
@@ -186,7 +186,7 @@ namespace Microsoft.VisualStudioTools.Project
             // into IVsEditorAdaptersFactoryService we don't go through a COM boundary (it's a managed
             // call) and we therefore don't get the marshaled value, and it doesn't know what we're
             // talking about.  So run the whole operation on the UI thread.
-            return ProjectMgr.Site.GetUIThread().Invoke(() => GetTextBufferOnUIThread(create));
+            return this.ProjectMgr.Site.GetUIThread().Invoke(() => GetTextBufferOnUIThread(create));
         }
 
         private ITextBuffer GetTextBufferOnUIThread(bool create)
@@ -196,7 +196,7 @@ namespace Microsoft.VisualStudioTools.Project
             var adapter = model.GetService<IVsEditorAdaptersFactoryService>();
             uint itemid;
 
-            IVsRunningDocumentTable rdt = ProjectMgr.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
+            IVsRunningDocumentTable rdt = this.ProjectMgr.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
             if (rdt != null)
             {
                 IVsHierarchy hier;
@@ -272,7 +272,7 @@ namespace Microsoft.VisualStudioTools.Project
             IVsWindowFrame pWindowFrame;
 
             VsShellUtilities.OpenDocument(
-                ProjectMgr.Site,
+                this.ProjectMgr.Site,
                 this.GetMkDocument(),
                 Guid.Empty,
                 out hierarchy,
@@ -299,29 +299,29 @@ namespace Microsoft.VisualStudioTools.Project
         internal override int ExcludeFromProject()
         {
             Debug.Assert(this.ProjectMgr != null, "The project item " + this.ToString() + " has not been initialised correctly. It has a null ProjectMgr");
-            if (!ProjectMgr.QueryEditProjectFile(false) ||
-                !ProjectMgr.Tracker.CanRemoveItems(new[] { Url }, new[] { VSQUERYREMOVEFILEFLAGS.VSQUERYREMOVEFILEFLAGS_NoFlags }))
+            if (!this.ProjectMgr.QueryEditProjectFile(false) ||
+                !this.ProjectMgr.Tracker.CanRemoveItems(new[] { this.Url }, new[] { VSQUERYREMOVEFILEFLAGS.VSQUERYREMOVEFILEFLAGS_NoFlags }))
             {
                 return VSConstants.E_FAIL;
             }
 
             ResetNodeProperties();
-            ItemNode.RemoveFromProjectFile();
-            if (!File.Exists(Url) || IsLinkFile)
+            this.ItemNode.RemoveFromProjectFile();
+            if (!File.Exists(this.Url) || this.IsLinkFile)
             {
-                ProjectMgr.OnItemDeleted(this);
-                Parent.RemoveChild(this);
+                this.ProjectMgr.OnItemDeleted(this);
+                this.Parent.RemoveChild(this);
             }
             else
             {
-                ItemNode = new AllFilesProjectElement(Url, ItemNode.ItemTypeName, ProjectMgr);
-                if (!ProjectMgr.IsShowingAllFiles)
+                this.ItemNode = new AllFilesProjectElement(this.Url, this.ItemNode.ItemTypeName, this.ProjectMgr);
+                if (!this.ProjectMgr.IsShowingAllFiles)
                 {
-                    IsVisible = false;
-                    ProjectMgr.OnInvalidateItems(Parent);
+                    this.IsVisible = false;
+                    this.ProjectMgr.OnInvalidateItems(this.Parent);
                 }
-                ProjectMgr.ReDrawNode(this, UIHierarchyElement.Icon);
-                ProjectMgr.OnPropertyChanged(this, (int)__VSHPROPID.VSHPROPID_IsNonMemberItem, 0);
+                this.ProjectMgr.ReDrawNode(this, UIHierarchyElement.Icon);
+                this.ProjectMgr.OnPropertyChanged(this, (int)__VSHPROPID.VSHPROPID_IsNonMemberItem, 0);
             }
             ((IVsUIShell)GetService(typeof(SVsUIShell))).RefreshPropertyBrowser(0);
             return VSConstants.S_OK;
@@ -329,38 +329,38 @@ namespace Microsoft.VisualStudioTools.Project
 
         internal override int IncludeInProject(bool includeChildren)
         {
-            if (Parent.ItemNode != null && Parent.ItemNode.IsExcluded)
+            if (this.Parent.ItemNode != null && this.Parent.ItemNode.IsExcluded)
             {
                 // if our parent is excluded it needs to first be included
-                int hr = Parent.IncludeInProject(false);
+                int hr = this.Parent.IncludeInProject(false);
                 if (ErrorHandler.Failed(hr))
                 {
                     return hr;
                 }
             }
 
-            if (!ProjectMgr.QueryEditProjectFile(false) ||
-                !ProjectMgr.Tracker.CanAddItems(new[] { Url }, new[] { VSQUERYADDFILEFLAGS.VSQUERYADDFILEFLAGS_NoFlags }))
+            if (!this.ProjectMgr.QueryEditProjectFile(false) ||
+                !this.ProjectMgr.Tracker.CanAddItems(new[] { this.Url }, new[] { VSQUERYADDFILEFLAGS.VSQUERYADDFILEFLAGS_NoFlags }))
             {
                 return VSConstants.E_FAIL;
             }
 
             ResetNodeProperties();
 
-            ItemNode = ProjectMgr.CreateMsBuildFileItem(
-                CommonUtils.GetRelativeFilePath(ProjectMgr.ProjectHome, Url), ProjectMgr.GetItemType(Url)
+            this.ItemNode = this.ProjectMgr.CreateMsBuildFileItem(
+                CommonUtils.GetRelativeFilePath(this.ProjectMgr.ProjectHome, this.Url), this.ProjectMgr.GetItemType(this.Url)
             );
 
-            IsVisible = true;
-            ProjectMgr.ReDrawNode(this, UIHierarchyElement.Icon);
-            ProjectMgr.OnPropertyChanged(this, (int)__VSHPROPID.VSHPROPID_IsNonMemberItem, 0);
+            this.IsVisible = true;
+            this.ProjectMgr.ReDrawNode(this, UIHierarchyElement.Icon);
+            this.ProjectMgr.OnPropertyChanged(this, (int)__VSHPROPID.VSHPROPID_IsNonMemberItem, 0);
 
             // https://nodejstools.codeplex.com/workitem/273, refresh the property browser...
             ((IVsUIShell)GetService(typeof(SVsUIShell))).RefreshPropertyBrowser(0);
 
-            if (CommonUtils.IsSamePath(ProjectMgr.GetStartupFile(), Url))
+            if (CommonUtils.IsSamePath(this.ProjectMgr.GetStartupFile(), this.Url))
             {
-                ProjectMgr.BoldItem(this, true);
+                this.ProjectMgr.BoldItem(this, true);
             }
 
             // On include, the file should be added to source control.
@@ -382,14 +382,14 @@ namespace Microsoft.VisualStudioTools.Project
                         result |= QueryStatusResult.NOTSUPPORTED | QueryStatusResult.INVISIBLE;
                         return VSConstants.S_OK;
                     case VsCommands2K.EXCLUDEFROMPROJECT:
-                        if (ItemNode.IsExcluded)
+                        if (this.ItemNode.IsExcluded)
                         {
                             result |= QueryStatusResult.NOTSUPPORTED | QueryStatusResult.INVISIBLE;
                             return VSConstants.S_OK;
                         }
                         break;
                     case VsCommands2K.INCLUDEINPROJECT:
-                        if (ItemNode.IsExcluded)
+                        if (this.ItemNode.IsExcluded)
                         {
                             result |= QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
                             return VSConstants.S_OK;
@@ -406,7 +406,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>        
         internal override bool CanDeleteItem(__VSDELETEITEMOPERATION deleteOperation)
         {
-            if (IsLinkFile)
+            if (this.IsLinkFile)
             {
                 // we don't delete link items, we only remove them from the project.  If we were
                 // to return true when queried for both delete from storage and remove from project
@@ -421,7 +421,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             if (guidService == typeof(VSLangProj.VSProject).GUID)
             {
-                result = ProjectMgr.VSProject;
+                result = this.ProjectMgr.VSProject;
                 return VSConstants.S_OK;
             }
 

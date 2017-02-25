@@ -44,7 +44,7 @@ namespace Microsoft.NodejsTools.Jade
         {
             internal KeywordClassificationFormat()
             {
-                ForegroundColor = Colors.OrangeRed;
+                this.ForegroundColor = Colors.OrangeRed;
                 this.DisplayName = "Jade Keyword";
             }
         }
@@ -68,7 +68,7 @@ namespace Microsoft.NodejsTools.Jade
         {
             internal FilterClassificationFormat()
             {
-                ForegroundColor = Colors.DarkRed;
+                this.ForegroundColor = Colors.DarkRed;
                 this.DisplayName = "Jade Filter";
             }
         }
@@ -93,7 +93,7 @@ namespace Microsoft.NodejsTools.Jade
         {
             internal ClassLiteralClassificationFormat()
             {
-                ForegroundColor = new Color() { R = 255, G = 128, B = 0 };
+                this.ForegroundColor = new Color() { R = 255, G = 128, B = 0 };
                 this.DisplayName = "Jade Class Literal";
             }
         }
@@ -119,7 +119,7 @@ namespace Microsoft.NodejsTools.Jade
         {
             internal IdLiteralClassificationFormat()
             {
-                ForegroundColor = Colors.Maroon;
+                this.ForegroundColor = Colors.Maroon;
                 this.DisplayName = "Jade Id Literal";
             }
         }
@@ -144,7 +144,7 @@ namespace Microsoft.NodejsTools.Jade
         {
             internal VariableClassificationFormat()
             {
-                ForegroundColor = Colors.Blue;
+                this.ForegroundColor = Colors.Blue;
                 this.DisplayName = "Jade Variable";
             }
         }

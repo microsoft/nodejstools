@@ -52,17 +52,17 @@ namespace Microsoft.NodejsTools.Jade
 
         public int Start
         {
-            get { return Count > 0 ? this[0].Start : 0; }
+            get { return this.Count > 0 ? this[0].Start : 0; }
         }
 
         public int End
         {
-            get { return Count > 0 ? this[Count - 1].End : 0; }
+            get { return this.Count > 0 ? this[this.Count - 1].End : 0; }
         }
 
         public int Length
         {
-            get { return End - Start; }
+            get { return this.End - this.Start; }
         }
 
         public virtual bool Contains(int position)
@@ -72,7 +72,7 @@ namespace Microsoft.NodejsTools.Jade
 
         public void Shift(int offset)
         {
-            foreach (var ct in _items)
+            foreach (var ct in this._items)
             {
                 ct.Shift(offset);
             }
@@ -84,17 +84,17 @@ namespace Microsoft.NodejsTools.Jade
         /// <summary>
         /// Number of comments in the collection.
         /// </summary>
-        public int Count { get { return _items.Count; } }
+        public int Count { get { return this._items.Count; } }
 
         /// <summary>
         /// Sorted list of comment tokens in the document.
         /// </summary>
-        public IList<T> Items { get { return _items; } }
+        public IList<T> Items { get { return this._items; } }
 
         /// <summary>
         /// Retrieves Nth item in the collection
         /// </summary>
-        public T this[int index] { get { return _items[index]; } }
+        public T this[int index] { get { return this._items[index]; } }
 
         /// <summary>
         /// Adds item to collection.
@@ -102,7 +102,7 @@ namespace Microsoft.NodejsTools.Jade
         /// <param name="item">Item to add</param>
         public virtual void Add(T item)
         {
-            _items.Add(item);
+            this._items.Add(item);
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace Microsoft.NodejsTools.Jade
         /// <param name="items">Items to add</param>
         public void Add(IEnumerable<T> items)
         {
-            _items.AddRange(items);
+            this._items.AddRange(items);
         }
 
         /// <summary>
@@ -121,17 +121,17 @@ namespace Microsoft.NodejsTools.Jade
         /// <returns>Item index or -1 if not found</returns>
         public virtual int GetItemAtPosition(int position)
         {
-            if (Count == 0)
+            if (this.Count == 0)
                 return -1;
 
             if (position < this[0].Start)
                 return -1;
 
-            if (position >= this[Count - 1].End)
+            if (position >= this[this.Count - 1].End)
                 return -1;
 
             int min = 0;
-            int max = Count - 1;
+            int max = this.Count - 1;
 
             while (min <= max)
             {
@@ -161,17 +161,17 @@ namespace Microsoft.NodejsTools.Jade
         /// <returns>Item index or -1 if not found</returns>
         public virtual int GetItemContaining(int position)
         {
-            if (Count == 0)
+            if (this.Count == 0)
                 return -1;
 
             if (position < this[0].Start)
                 return -1;
 
-            if (position > this[Count - 1].End)
+            if (position > this[this.Count - 1].End)
                 return -1;
 
             int min = 0;
-            int max = Count - 1;
+            int max = this.Count - 1;
 
             while (min <= max)
             {
@@ -181,7 +181,7 @@ namespace Microsoft.NodejsTools.Jade
                 if (item.Contains(position))
                     return mid;
 
-                if (mid < Count - 1 && item.End <= position && position < this[mid + 1].Start)
+                if (mid < this.Count - 1 && item.End <= position && position < this[mid + 1].Start)
                     return -1;
 
                 if (position < item.Start)
@@ -204,14 +204,14 @@ namespace Microsoft.NodejsTools.Jade
         /// <returns>Item index or -1 if not found</returns>
         public virtual int GetFirstItemAfterPosition(int position)
         {
-            if (Count == 0 || position > this[Count - 1].End)
+            if (this.Count == 0 || position > this[this.Count - 1].End)
                 return -1;
 
             if (position < this[0].Start)
                 return 0;
 
             int min = 0;
-            int max = Count - 1;
+            int max = this.Count - 1;
 
             while (min <= max)
             {
@@ -267,7 +267,7 @@ namespace Microsoft.NodejsTools.Jade
         // assuming the item at index already contains the position
         private int GetLastElementContainingPosition(int index, int position)
         {
-            for (int i = index; i < Count; i++)
+            for (int i = index; i < this.Count; i++)
             {
                 var item = this[i];
 
@@ -277,7 +277,7 @@ namespace Microsoft.NodejsTools.Jade
                 }
             }
 
-            return Count - 1;
+            return this.Count - 1;
         }
 
         /// <summary>
@@ -287,14 +287,14 @@ namespace Microsoft.NodejsTools.Jade
         /// <returns>Item index or -1 if not found</returns>
         public virtual int GetLastItemBeforeOrAtPosition(int position)
         {
-            if (Count == 0 || position < this[0].Start)
+            if (this.Count == 0 || position < this[0].Start)
                 return -1;
 
-            if (position >= this[Count - 1].End)
-                return Count - 1;
+            if (position >= this[this.Count - 1].End)
+                return this.Count - 1;
 
             int min = 0;
-            int max = Count - 1;
+            int max = this.Count - 1;
 
             while (min <= max)
             {
@@ -334,12 +334,12 @@ namespace Microsoft.NodejsTools.Jade
         /// <returns>Item index or -1 if not found</returns>
         public virtual int GetFirstItemBeforePosition(int position)
         {
-            if (Count == 0 || position < this[0].End)
+            if (this.Count == 0 || position < this[0].End)
                 return -1;
 
             int min = 0;
-            int lastIndex = Count - 1;
-            int max = Count - 1;
+            int lastIndex = this.Count - 1;
+            int max = this.Count - 1;
 
             if (position >= this[lastIndex].End)
                 return max;
@@ -381,12 +381,12 @@ namespace Microsoft.NodejsTools.Jade
         {
             IList<int> list = new List<int>();
 
-            if (Count > 0 &&
+            if (this.Count > 0 &&
                 position >= this[0].Start &&
-                position <= this[Count - 1].End)
+                position <= this[this.Count - 1].End)
             {
                 int min = 0;
-                int max = Count - 1;
+                int max = this.Count - 1;
 
                 while (min <= max)
                 {
@@ -399,7 +399,7 @@ namespace Microsoft.NodejsTools.Jade
                         break;
                     }
 
-                    if (mid < Count - 1 && item.End <= position && position < this[mid + 1].Start)
+                    if (mid < this.Count - 1 && item.End <= position && position < this[mid + 1].Start)
                         break;
 
                     if (position < item.Start)
@@ -418,7 +418,7 @@ namespace Microsoft.NodejsTools.Jade
 
         private IList<int> GetItemsContainingInclusiveEndLinearFromAPoint(int startingPoint, int position)
         {
-            Debug.Assert(Count > 0 && startingPoint < Count, "Starting point not in token list");
+            Debug.Assert(this.Count > 0 && startingPoint < this.Count, "Starting point not in token list");
 
             var list = new List<int>();
 
@@ -436,9 +436,9 @@ namespace Microsoft.NodejsTools.Jade
                 }
             }
 
-            if (startingPoint + 1 < Count)
+            if (startingPoint + 1 < this.Count)
             {
-                for (int i = startingPoint + 1; i < Count; i++)
+                for (int i = startingPoint + 1; i < this.Count; i++)
                 {
                     var item = this[i];
 
@@ -463,9 +463,9 @@ namespace Microsoft.NodejsTools.Jade
         public virtual void ShiftStartingFrom(int position, int offset)
         {
             int min = 0;
-            int max = Count - 1;
+            int max = this.Count - 1;
 
-            if (Count == 0)
+            if (this.Count == 0)
                 return;
 
             if (position <= this[0].Start)
@@ -495,17 +495,17 @@ namespace Microsoft.NodejsTools.Jade
                         }
 
                         // Now shift all remaining siblings that are below this one
-                        for (int i = mid + 1; i < Count; i++)
+                        for (int i = mid + 1; i < this.Count; i++)
                         {
                             this[i].Shift(offset);
                         }
 
                         return;
                     }
-                    else if (mid < Count - 1 && this[mid].End <= position && position <= this[mid + 1].Start)
+                    else if (mid < this.Count - 1 && this[mid].End <= position && position <= this[mid + 1].Start)
                     {
                         // Between this item and the next sibling. Shift siblings
-                        for (int i = mid + 1; i < Count; i++)
+                        for (int i = mid + 1; i < this.Count; i++)
                         {
                             this[i].Shift(offset);
                         }
@@ -547,17 +547,17 @@ namespace Microsoft.NodejsTools.Jade
 
             if (first >= 0)
             {
-                for (int i = first; i < Count; i++)
+                for (int i = first; i < this.Count; i++)
                 {
-                    if (_items[i].Start >= range.End)
+                    if (this._items[i].Start >= range.End)
                         break;
 
-                    if (TextRange.Intersect(_items[i], range))
+                    if (TextRange.Intersect(this._items[i], range))
                     {
                         if (list == _emptyList)
                             list = new List<T>();
 
-                        list.Add(_items[i]);
+                        list.Add(this._items[i]);
                     }
                 }
             }
@@ -602,7 +602,7 @@ namespace Microsoft.NodejsTools.Jade
             {
                 for (int i = lastCandidate; i >= first; i--)
                 {
-                    var item = _items[i];
+                    var item = this._items[i];
 
                     if (item.Start < range.End)
                     {
@@ -623,10 +623,10 @@ namespace Microsoft.NodejsTools.Jade
 
                 for (int i = first; i <= last; i++)
                 {
-                    removed.Add(_items[i]);
+                    removed.Add(this._items[i]);
                 }
 
-                _items.RemoveRange(first, last - first + 1);
+                this._items.RemoveRange(first, last - first + 1);
             }
 
             return removed;
@@ -798,22 +798,22 @@ namespace Microsoft.NodejsTools.Jade
 
         public virtual void RemoveAt(int index)
         {
-            Items.RemoveAt(index);
+            this.Items.RemoveAt(index);
         }
 
         public virtual void RemoveRange(int startIndex, int count)
         {
-            _items.RemoveRange(startIndex, count);
+            this._items.RemoveRange(startIndex, count);
         }
 
         public virtual void Clear()
         {
-            _items.Clear();
+            this._items.Clear();
         }
 
         public virtual void ReplaceAt(int index, T newItem)
         {
-            _items[index] = newItem;
+            this._items[index] = newItem;
         }
 
         /// <summary>
@@ -821,7 +821,7 @@ namespace Microsoft.NodejsTools.Jade
         /// </summary>
         public void Sort()
         {
-            _items.Sort(new RangeItemComparer());
+            this._items.Sort(new RangeItemComparer());
         }
         #endregion
 
@@ -830,7 +830,7 @@ namespace Microsoft.NodejsTools.Jade
         /// </summary>
         public T[] ToArray()
         {
-            return _items.ToArray();
+            return this._items.ToArray();
         }
 
         /// <summary>
@@ -840,7 +840,7 @@ namespace Microsoft.NodejsTools.Jade
         {
             var list = new List<T>();
 
-            list.AddRange(_items);
+            list.AddRange(this._items);
             return list;
         }
 
@@ -965,14 +965,14 @@ namespace Microsoft.NodejsTools.Jade
         #region IEnumerable<T> Members
         public IEnumerator<T> GetEnumerator()
         {
-            return _items.GetEnumerator();
+            return this._items.GetEnumerator();
         }
         #endregion
 
         #region IEnumerable Members
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return _items.GetEnumerator();
+            return this._items.GetEnumerator();
         }
         #endregion
     }

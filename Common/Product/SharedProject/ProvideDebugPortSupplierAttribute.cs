@@ -26,28 +26,28 @@ namespace Microsoft.VisualStudioTools
 
         public ProvideDebugPortSupplierAttribute(string name, Type portSupplier, string id, Type portPicker = null)
         {
-            _name = name;
-            _portSupplier = portSupplier;
-            _id = id;
-            _portPicker = portPicker;
+            this._name = name;
+            this._portSupplier = portSupplier;
+            this._id = id;
+            this._portPicker = portPicker;
         }
 
         public override void Register(RegistrationContext context)
         {
-            var engineKey = context.CreateKey("AD7Metrics\\PortSupplier\\" + _id);
-            engineKey.SetValue("Name", _name);
-            engineKey.SetValue("CLSID", _portSupplier.GUID.ToString("B"));
-            if (_portPicker != null)
+            var engineKey = context.CreateKey("AD7Metrics\\PortSupplier\\" + this._id);
+            engineKey.SetValue("Name", this._name);
+            engineKey.SetValue("CLSID", this._portSupplier.GUID.ToString("B"));
+            if (this._portPicker != null)
             {
-                engineKey.SetValue("PortPickerCLSID", _portPicker.GUID.ToString("B"));
+                engineKey.SetValue("PortPickerCLSID", this._portPicker.GUID.ToString("B"));
             }
 
             var clsidKey = context.CreateKey("CLSID");
-            var clsidGuidKey = clsidKey.CreateSubkey(_portSupplier.GUID.ToString("B"));
-            clsidGuidKey.SetValue("Assembly", _portSupplier.Assembly.FullName);
-            clsidGuidKey.SetValue("Class", _portSupplier.FullName);
+            var clsidGuidKey = clsidKey.CreateSubkey(this._portSupplier.GUID.ToString("B"));
+            clsidGuidKey.SetValue("Assembly", this._portSupplier.Assembly.FullName);
+            clsidGuidKey.SetValue("Class", this._portSupplier.FullName);
             clsidGuidKey.SetValue("InprocServer32", context.InprocServerPath);
-            clsidGuidKey.SetValue("CodeBase", Path.Combine(context.ComponentPath, _portSupplier.Module.Name));
+            clsidGuidKey.SetValue("CodeBase", Path.Combine(context.ComponentPath, this._portSupplier.Module.Name));
             clsidGuidKey.SetValue("ThreadingModel", "Free");
         }
 

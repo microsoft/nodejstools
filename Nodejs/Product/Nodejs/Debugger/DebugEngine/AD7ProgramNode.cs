@@ -30,7 +30,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public AD7ProgramNode(int processId)
         {
-            m_processId = processId;
+            this.m_processId = processId;
         }
 
         #region IDebugProgramNode2 Members
@@ -49,7 +49,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         {
             // Return the process id of the debugged process
             pHostProcessId[0].ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM;
-            pHostProcessId[0].dwProcessId = (uint)m_processId;
+            pHostProcessId[0].dwProcessId = (uint)this.m_processId;
 
             return VSConstants.S_OK;
         }

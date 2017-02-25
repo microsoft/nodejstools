@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                return project.Caption;
+                return this.project.Caption;
             }
             set
             {
@@ -63,9 +63,9 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
                 using (AutomationScope scope = new AutomationScope(this.project.Site))
                 {
-                    ProjectNode.Site.GetUIThread().Invoke(() =>
+                    this.ProjectNode.Site.GetUIThread().Invoke(() =>
                     {
-                        project.SetEditLabel(value);
+                        this.project.SetEditLabel(value);
                     });
                 }
             }
@@ -73,7 +73,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
         public void Dispose()
         {
-            configurationManager = null;
+            this.configurationManager = null;
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                return project.ProjectFile;
+                return this.project.ProjectFile;
             }
         }
 
@@ -96,7 +96,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             {
                 int dirty;
 
-                ErrorHandler.ThrowOnFailure(project.IsDirty(out dirty));
+                ErrorHandler.ThrowOnFailure(this.project.IsDirty(out dirty));
                 return dirty != 0;
             }
             set
@@ -105,9 +105,9 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
                 using (AutomationScope scope = new AutomationScope(this.project.Site))
                 {
-                    ProjectNode.Site.GetUIThread().Invoke(() =>
+                    this.ProjectNode.Site.GetUIThread().Invoke(() =>
                     {
-                        project.isDirty = value;
+                        this.project.isDirty = value;
                     });
                 }
             }
@@ -145,7 +145,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// </summary>
         public virtual string Kind
         {
-            get { return project.ProjectGuid.ToString("B"); }
+            get { return this.project.ProjectGuid.ToString("B"); }
         }
 
         /// <summary>
@@ -155,7 +155,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                return new OAProjectItems(this, project);
+                return new OAProjectItems(this, this.project);
             }
         }
 
@@ -193,7 +193,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
                     ErrorHandler.ThrowOnFailure(
                         solution.GetUniqueNameOfProject(
-                            project.GetOuterInterface<IVsHierarchy>(),
+                            this.project.GetOuterInterface<IVsHierarchy>(),
                             out uniqueName
                         )
                     );
@@ -219,7 +219,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             Utilities.ArgumentNotNull("name", name);
 
-            return DTE.ObjectExtenders.GetExtender(project.NodeProperties.ExtenderCATID.ToUpper(), name, project.NodeProperties);
+            return this.DTE.ObjectExtenders.GetExtender(this.project.NodeProperties.ExtenderCATID.ToUpper(), name, this.project.NodeProperties);
         }
 
         /// <summary>
@@ -227,7 +227,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// </summary>
         public virtual object ExtenderNames
         {
-            get { return DTE.ObjectExtenders.GetExtenderNames(project.NodeProperties.ExtenderCATID.ToUpper(), project.NodeProperties); }
+            get { return this.DTE.ObjectExtenders.GetExtenderNames(this.project.NodeProperties.ExtenderCATID.ToUpper(), this.project.NodeProperties); }
         }
 
         /// <summary>
@@ -235,7 +235,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// </summary>
         public virtual string ExtenderCATID
         {
-            get { return project.NodeProperties.ExtenderCATID; }
+            get { return this.project.NodeProperties.ExtenderCATID; }
         }
 
         /// <summary>
@@ -247,7 +247,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             {
                 string filename;
                 uint format;
-                ErrorHandler.ThrowOnFailure(project.GetCurFile(out filename, out format));
+                ErrorHandler.ThrowOnFailure(this.project.GetCurFile(out filename, out format));
                 return filename;
             }
         }
@@ -263,7 +263,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             }
             set
             {
-                IsDirty = !value;
+                this.IsDirty = !value;
             }
         }
 
@@ -274,7 +274,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                return ProjectNode.Site.GetUIThread().Invoke(() =>
+                return this.ProjectNode.Site.GetUIThread().Invoke(() =>
                 {
                     if (this.configurationManager == null)
                     {
@@ -331,7 +331,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <exception cref="ArgumentNullException">Is thrown if fileName is null.</exception>        
         public virtual void SaveAs(string fileName)
         {
-            ProjectNode.Site.GetUIThread().Invoke(() =>
+            this.ProjectNode.Site.GetUIThread().Invoke(() =>
             {
                 this.DoSave(true, fileName);
             });
@@ -345,7 +345,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <exception cref="ArgumentNullException">Is thrown if fileName is null.</exception>        
         public virtual void Save(string fileName)
         {
-            ProjectNode.Site.GetUIThread().Invoke(() =>
+            this.ProjectNode.Site.GetUIThread().Invoke(() =>
             {
                 this.DoSave(false, fileName);
             });
@@ -360,7 +360,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
             using (AutomationScope scope = new AutomationScope(this.project.Site))
             {
-                ProjectNode.Site.GetUIThread().Invoke(() =>
+                this.ProjectNode.Site.GetUIThread().Invoke(() =>
                 {
                     this.project.Remove(false);
                 });
@@ -421,7 +421,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                     }
 
                     // Get the IVsHierarchy for the project.
-                    IVsHierarchy prjHierarchy = project.GetOuterInterface<IVsHierarchy>();
+                    IVsHierarchy prjHierarchy = this.project.GetOuterInterface<IVsHierarchy>();
 
                     // Now get the soulution.
                     IVsSolution solution = this.project.Site.GetService(typeof(SVsSolution)) as IVsSolution;
@@ -442,7 +442,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                     string fullPath = fileName;
                     try
                     {
-                        fullPath = CommonUtils.GetAbsoluteFilePath(((ProjectNode)Project).ProjectFolder, fileName);
+                        fullPath = CommonUtils.GetAbsoluteFilePath(((ProjectNode)this.Project).ProjectFolder, fileName);
                     }
                     // We want to be consistent in the error message and exception we throw. fileName could be for example #¤&%"¤&"%  and that would trigger an ArgumentException on Path.IsRooted.
                     catch (ArgumentException ex)
@@ -485,7 +485,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
         public PropertyNameAttribute(string name)
         {
-            Name = name;
+            this.Name = name;
         }
     }
 }

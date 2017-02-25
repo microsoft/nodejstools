@@ -26,8 +26,8 @@ namespace Microsoft.NodejsTools.Debugger.Commands
 
         protected DebuggerCommand(int id, string commandName)
         {
-            Id = id;
-            _commandName = commandName;
+            this.Id = id;
+            this._commandName = commandName;
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands
         /// <returns>Indicates whether command execution succeeded.</returns>
         public virtual void ProcessResponse(JObject response)
         {
-            Running = (bool?)response["running"] ?? false;
+            this.Running = (bool?)response["running"] ?? false;
 
             if (!(bool)response["success"])
             {

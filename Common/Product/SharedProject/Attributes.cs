@@ -24,14 +24,14 @@ namespace Microsoft.VisualStudioTools.Project
 
         public SRDisplayNameAttribute(string name)
         {
-            _name = name;
+            this._name = name;
         }
 
         public override string DisplayName
         {
             get
             {
-                return SR.GetString(_name);
+                return SR.GetString(this._name);
             }
         }
     }
@@ -50,10 +50,10 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                if (!_replaced)
+                if (!this._replaced)
                 {
-                    _replaced = true;
-                    DescriptionValue = SR.GetString(base.Description);
+                    this._replaced = true;
+                    this.DescriptionValue = SR.GetString(base.Description);
                 }
                 return base.Description;
             }

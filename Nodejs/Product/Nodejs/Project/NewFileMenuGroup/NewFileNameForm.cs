@@ -24,26 +24,26 @@ namespace Microsoft.NodejsTools.Project
         public NewFileNameForm(string initialFileName)
         {
             InitializeComponent();
-            TextBox.Text = initialFileName;
+            this.TextBox.Text = initialFileName;
         }
 
         public TextBox TextBox
         {
             get
             {
-                return textBox;
+                return this.textBox;
             }
         }
 
         private void TextBox_TextChanged(object sender, EventArgs e)
         {
-            if (TextBox.Text.Trim().Length == 0)
+            if (this.TextBox.Text.Trim().Length == 0)
             {
-                okButton.Enabled = false;
+                this.okButton.Enabled = false;
             }
             else
             {
-                okButton.Enabled = true;
+                this.okButton.Enabled = true;
             }
         }
     }
