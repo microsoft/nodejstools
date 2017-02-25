@@ -28,23 +28,11 @@ namespace Microsoft.VisualStudioTools.Project
             this._destination = destinationUrl;
         }
 
-        public IList<IPublishFile> AdditionalFiles
-        {
-            get
-            {
-                return this._additionalFiles;
-            }
-        }
+        public IList<IPublishFile> AdditionalFiles => this._additionalFiles;
 
         /// <summary>
         /// Gets an URL which overrides the project publish settings or returns null if no override is specified.
         /// </summary>
-        public string DestinationUrl
-        {
-            get
-            {
-                return this._destination;
-            }
-        }
+        public string DestinationUrl => this._destination;
     }
 }

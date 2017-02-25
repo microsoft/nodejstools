@@ -57,12 +57,6 @@ namespace Microsoft.VisualStudioTools
         /// is displayed.  This can enable, disable, or hide the menu command.  By default returns
         /// null.
         /// </summary>
-        public virtual EventHandler BeforeQueryStatus
-        {
-            get
-            {
-                return null;
-            }
-        }
+        public virtual EventHandler BeforeQueryStatus => null;
     }
 }

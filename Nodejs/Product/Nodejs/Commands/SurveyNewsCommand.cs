@@ -26,9 +26,6 @@ namespace Microsoft.NodejsTools.Commands
             NodejsPackage.Instance.CheckSurveyNews(true);
         }
 
-        public override int CommandId
-        {
-            get { return (int)PkgCmdId.cmdidSurveyNews; }
-        }
+        public override int CommandId => (int)PkgCmdId.cmdidSurveyNews;
     }
 }

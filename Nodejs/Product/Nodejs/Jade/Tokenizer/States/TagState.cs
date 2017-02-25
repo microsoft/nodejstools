@@ -22,8 +22,8 @@ namespace Microsoft.NodejsTools.Jade
     {
         private void OnTag()
         {
-            string ident = String.Empty;
-            int blockIndent = CalculateLineIndent();
+            var ident = String.Empty;
+            var blockIndent = CalculateLineIndent();
 
             // regular tag like
             // html
@@ -36,7 +36,7 @@ namespace Microsoft.NodejsTools.Jade
                 if (JadeTagKeywords.IsKeyword(ident))
                 {
                     // extends, javascripts:, stylesheets:
-                    int length = this._cs.CurrentChar == ':' ? range.Length + 1 : range.Length;
+                    var length = this._cs.CurrentChar == ':' ? range.Length + 1 : range.Length;
                     AddToken(JadeTokenType.TagKeyword, range.Start, length);
 
                     if (this._cs.CurrentChar != ':' && String.Compare(ident, "mixin", StringComparison.Ordinal) == 0)
@@ -113,7 +113,7 @@ namespace Microsoft.NodejsTools.Jade
 
                 if (this._cs.CurrentChar == '#' || this._cs.CurrentChar == '.')
                 {
-                    bool isID = this._cs.CurrentChar == '#';
+                    var isID = this._cs.CurrentChar == '#';
                     // container(a=b).bar or container(a=b)#bar
                     var selectorRange = GetNonWSSequence("(:=.#");
 
@@ -151,7 +151,7 @@ namespace Microsoft.NodejsTools.Jade
             }
 
             // There may be ws between tag name and = sign. However, = must be on the same line.
-            bool allWsToEol = IsAllWhiteSpaceBeforeEndOfLine(this._cs.Position);
+            var allWsToEol = IsAllWhiteSpaceBeforeEndOfLine(this._cs.Position);
             if (!allWsToEol)
             {
                 SkipWhiteSpace();
@@ -159,7 +159,7 @@ namespace Microsoft.NodejsTools.Jade
                 if (this._cs.CurrentChar == '=' || (this._cs.CurrentChar == '!' && this._cs.NextChar == '='))
                 {
                     // Something like 'foo ='
-                    int length = this._cs.CurrentChar == '!' ? 2 : 1;
+                    var length = this._cs.CurrentChar == '!' ? 2 : 1;
 
                     AddToken(JadeTokenType.Operator, this._cs.Position, length);
                     this._cs.Advance(length);
@@ -190,8 +190,8 @@ namespace Microsoft.NodejsTools.Jade
 
         protected ITextRange ParseTagName()
         {
-            int start = this._cs.Position;
-            int count = 0;
+            var start = this._cs.Position;
+            var count = 0;
 
             while (!this._cs.IsEndOfStream() && !this._cs.IsWhiteSpace() &&
                   (this._cs.IsAnsiLetter() || this._cs.IsDecimal() || this._cs.CurrentChar == '_' || (count > 0 && this._cs.CurrentChar == '-')))

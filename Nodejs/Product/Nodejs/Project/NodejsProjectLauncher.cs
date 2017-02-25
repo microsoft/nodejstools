@@ -73,14 +73,14 @@ namespace Microsoft.NodejsTools.Project
 
         private int Start(string file, bool debug)
         {
-            string nodePath = GetNodePath();
+            var nodePath = GetNodePath();
             if (nodePath == null)
             {
                 Nodejs.ShowNodejsNotInstalled();
                 return VSConstants.S_OK;
             }
 
-            bool startBrowser = ShouldStartBrowser();
+            var startBrowser = ShouldStartBrowser();
 
             if (debug)
             {
@@ -95,7 +95,7 @@ namespace Microsoft.NodejsTools.Project
                 psi.Arguments = GetFullArguments(file);
                 psi.WorkingDirectory = this._project.GetWorkingDirectory();
 
-                string webBrowserUrl = GetFullUrl();
+                var webBrowserUrl = GetFullUrl();
                 Uri uri = null;
                 if (!String.IsNullOrWhiteSpace(webBrowserUrl))
                 {
@@ -132,7 +132,7 @@ namespace Microsoft.NodejsTools.Project
 
         private string GetFullArguments(string file, bool includeNodeArgs = true)
         {
-            string res = String.Empty;
+            var res = String.Empty;
             if (includeNodeArgs)
             {
                 var nodeArgs = this._project.GetProjectProperty(NodeProjectProperty.NodeExeArguments);
@@ -213,7 +213,7 @@ namespace Microsoft.NodejsTools.Project
         /// </summary>
         private void StartWithDebugger(string startupFile)
         {
-            VsDebugTargetInfo dbgInfo = new VsDebugTargetInfo();
+            var dbgInfo = new VsDebugTargetInfo();
             dbgInfo.cbSize = (uint)Marshal.SizeOf(dbgInfo);
 
             if (SetupDebugInfo(ref dbgInfo, startupFile))
@@ -305,10 +305,10 @@ namespace Microsoft.NodejsTools.Project
 
             dbgInfo.fSendStdoutToOutputWindow = 0;
 
-            StringDictionary env = new StringDictionary();
+            var env = new StringDictionary();
             if (!String.IsNullOrWhiteSpace(url))
             {
-                Uri webUrl = new Uri(url);
+                var webUrl = new Uri(url);
                 env["PORT"] = webUrl.Port.ToString();
             }
 
@@ -323,7 +323,7 @@ namespace Microsoft.NodejsTools.Project
                 var variables = Environment.GetEnvironmentVariables();
                 foreach (var key in variables.Keys)
                 {
-                    string strKey = (string)key;
+                    var strKey = (string)key;
                     if (!env.ContainsKey(strKey))
                     {
                         env.Add(strKey, (string)variables[key]);
@@ -333,7 +333,7 @@ namespace Microsoft.NodejsTools.Project
                 //Environemnt variables should be passed as a
                 //null-terminated block of null-terminated strings. 
                 //Each string is in the following form:name=value\0
-                StringBuilder buf = new StringBuilder();
+                var buf = new StringBuilder();
                 foreach (DictionaryEntry entry in env)
                 {
                     buf.AppendFormat("{0}={1}\0", entry.Key, entry.Value);
@@ -387,7 +387,7 @@ namespace Microsoft.NodejsTools.Project
 
         private string ResolveStartupFile()
         {
-            string startupFile = this._project.GetStartupFile();
+            var startupFile = this._project.GetStartupFile();
             if (string.IsNullOrEmpty(startupFile))
             {
                 throw new ApplicationException(Resources.DebugCouldNotResolveStartupFileErrorMessage);

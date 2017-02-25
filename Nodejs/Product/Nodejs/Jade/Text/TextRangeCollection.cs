@@ -50,21 +50,9 @@ namespace Microsoft.NodejsTools.Jade
 
         #region ITextRange
 
-        public int Start
-        {
-            get { return this.Count > 0 ? this[0].Start : 0; }
-        }
-
-        public int End
-        {
-            get { return this.Count > 0 ? this[this.Count - 1].End : 0; }
-        }
-
-        public int Length
-        {
-            get { return this.End - this.Start; }
-        }
-
+        public int Start => this.Count > 0 ? this[0].Start : 0;
+        public int End => this.Count > 0 ? this[this.Count - 1].End : 0;
+        public int Length => this.End - this.Start;
         public virtual bool Contains(int position)
         {
             return TextRange.Contains(this, position);
@@ -84,13 +72,11 @@ namespace Microsoft.NodejsTools.Jade
         /// <summary>
         /// Number of comments in the collection.
         /// </summary>
-        public int Count { get { return this._items.Count; } }
-
+        public int Count => this._items.Count;
         /// <summary>
         /// Sorted list of comment tokens in the document.
         /// </summary>
-        public IList<T> Items { get { return this._items; } }
-
+        public IList<T> Items => this._items;
         /// <summary>
         /// Retrieves Nth item in the collection
         /// </summary>
@@ -130,12 +116,12 @@ namespace Microsoft.NodejsTools.Jade
             if (position >= this[this.Count - 1].End)
                 return -1;
 
-            int min = 0;
-            int max = this.Count - 1;
+            var min = 0;
+            var max = this.Count - 1;
 
             while (min <= max)
             {
-                int mid = min + (max - min) / 2;
+                var mid = min + (max - min) / 2;
                 var item = this[mid];
 
                 if (item.Start == position)
@@ -170,12 +156,12 @@ namespace Microsoft.NodejsTools.Jade
             if (position > this[this.Count - 1].End)
                 return -1;
 
-            int min = 0;
-            int max = this.Count - 1;
+            var min = 0;
+            var max = this.Count - 1;
 
             while (min <= max)
             {
-                int mid = min + (max - min) / 2;
+                var mid = min + (max - min) / 2;
                 var item = this[mid];
 
                 if (item.Contains(position))
@@ -210,12 +196,12 @@ namespace Microsoft.NodejsTools.Jade
             if (position < this[0].Start)
                 return 0;
 
-            int min = 0;
-            int max = this.Count - 1;
+            var min = 0;
+            var max = this.Count - 1;
 
             while (min <= max)
             {
-                int mid = min + (max - min) / 2;
+                var mid = min + (max - min) / 2;
                 var item = this[mid];
 
                 if (item.Contains(position))
@@ -246,7 +232,7 @@ namespace Microsoft.NodejsTools.Jade
 
         private int GetFirstElementContainingPosition(int index, int position)
         {
-            for (int i = index - 1; i >= 0; i--)
+            for (var i = index - 1; i >= 0; i--)
             {
                 var item = this[i];
 
@@ -267,7 +253,7 @@ namespace Microsoft.NodejsTools.Jade
         // assuming the item at index already contains the position
         private int GetLastElementContainingPosition(int index, int position)
         {
-            for (int i = index; i < this.Count; i++)
+            for (var i = index; i < this.Count; i++)
             {
                 var item = this[i];
 
@@ -293,12 +279,12 @@ namespace Microsoft.NodejsTools.Jade
             if (position >= this[this.Count - 1].End)
                 return this.Count - 1;
 
-            int min = 0;
-            int max = this.Count - 1;
+            var min = 0;
+            var max = this.Count - 1;
 
             while (min <= max)
             {
-                int mid = min + (max - min) / 2;
+                var mid = min + (max - min) / 2;
                 var item = this[mid];
 
                 if (item.Contains(position))
@@ -337,16 +323,16 @@ namespace Microsoft.NodejsTools.Jade
             if (this.Count == 0 || position < this[0].End)
                 return -1;
 
-            int min = 0;
-            int lastIndex = this.Count - 1;
-            int max = this.Count - 1;
+            var min = 0;
+            var lastIndex = this.Count - 1;
+            var max = this.Count - 1;
 
             if (position >= this[lastIndex].End)
                 return max;
 
             while (min <= max)
             {
-                int mid = min + (max - min) / 2;
+                var mid = min + (max - min) / 2;
                 var item = this[mid];
 
                 if (item.Contains(position)) // guaranteed not to be negative by the first if in this method
@@ -385,12 +371,12 @@ namespace Microsoft.NodejsTools.Jade
                 position >= this[0].Start &&
                 position <= this[this.Count - 1].End)
             {
-                int min = 0;
-                int max = this.Count - 1;
+                var min = 0;
+                var max = this.Count - 1;
 
                 while (min <= max)
                 {
-                    int mid = min + (max - min) / 2;
+                    var mid = min + (max - min) / 2;
                     var item = this[mid];
 
                     if (item.Contains(position) || item.End == position)
@@ -422,7 +408,7 @@ namespace Microsoft.NodejsTools.Jade
 
             var list = new List<int>();
 
-            for (int i = startingPoint; i >= 0; i--)
+            for (var i = startingPoint; i >= 0; i--)
             {
                 var item = this[i];
 
@@ -438,7 +424,7 @@ namespace Microsoft.NodejsTools.Jade
 
             if (startingPoint + 1 < this.Count)
             {
-                for (int i = startingPoint + 1; i < this.Count; i++)
+                for (var i = startingPoint + 1; i < this.Count; i++)
                 {
                     var item = this[i];
 
@@ -462,8 +448,8 @@ namespace Microsoft.NodejsTools.Jade
         /// </summary>
         public virtual void ShiftStartingFrom(int position, int offset)
         {
-            int min = 0;
-            int max = this.Count - 1;
+            var min = 0;
+            var max = this.Count - 1;
 
             if (this.Count == 0)
                 return;
@@ -477,7 +463,7 @@ namespace Microsoft.NodejsTools.Jade
             {
                 while (min <= max)
                 {
-                    int mid = min + (max - min) / 2;
+                    var mid = min + (max - min) / 2;
 
                     if (this[mid].Contains(position))
                     {
@@ -495,7 +481,7 @@ namespace Microsoft.NodejsTools.Jade
                         }
 
                         // Now shift all remaining siblings that are below this one
-                        for (int i = mid + 1; i < this.Count; i++)
+                        for (var i = mid + 1; i < this.Count; i++)
                         {
                             this[i].Shift(offset);
                         }
@@ -505,7 +491,7 @@ namespace Microsoft.NodejsTools.Jade
                     else if (mid < this.Count - 1 && this[mid].End <= position && position <= this[mid + 1].Start)
                     {
                         // Between this item and the next sibling. Shift siblings
-                        for (int i = mid + 1; i < this.Count; i++)
+                        for (var i = mid + 1; i < this.Count; i++)
                         {
                             this[i].Shift(offset);
                         }
@@ -539,7 +525,7 @@ namespace Microsoft.NodejsTools.Jade
         {
             var list = _emptyList;
 
-            int first = GetItemContaining(range.Start);
+            var first = GetItemContaining(range.Start);
             if (first < 0)
             {
                 first = GetFirstItemAfterPosition(range.Start);
@@ -547,7 +533,7 @@ namespace Microsoft.NodejsTools.Jade
 
             if (first >= 0)
             {
-                for (int i = first; i < this.Count; i++)
+                for (var i = first; i < this.Count; i++)
                 {
                     if (this._items[i].Start >= range.End)
                         break;
@@ -583,15 +569,15 @@ namespace Microsoft.NodejsTools.Jade
         /// <returns>Collection of removed items</returns>
         public virtual ICollection<T> RemoveInRange(ITextRange range, bool inclusiveEnds)
         {
-            IList<T> removed = _emptyList;
+            var removed = _emptyList;
 
-            int first = GetFirstItemAfterPosition(range.Start);
+            var first = GetFirstItemAfterPosition(range.Start);
 
             if (first < 0 || (!inclusiveEnds && this[first].Start >= range.End) || (inclusiveEnds && this[first].Start > range.End))
                 return removed;
 
-            int lastCandidate = GetLastItemBeforeOrAtPosition(range.End);
-            int last = -1;
+            var lastCandidate = GetLastItemBeforeOrAtPosition(range.End);
+            var last = -1;
 
             if (lastCandidate < first)
             {
@@ -600,7 +586,7 @@ namespace Microsoft.NodejsTools.Jade
 
             if (!inclusiveEnds && first >= 0)
             {
-                for (int i = lastCandidate; i >= first; i--)
+                for (var i = lastCandidate; i >= first; i--)
                 {
                     var item = this._items[i];
 
@@ -621,7 +607,7 @@ namespace Microsoft.NodejsTools.Jade
                 if (removed == _emptyList)
                     removed = new List<T>();
 
-                for (int i = first; i <= last; i++)
+                for (var i = first; i <= last; i++)
                 {
                     removed.Add(this._items[i]);
                 }
@@ -679,8 +665,8 @@ namespace Microsoft.NodejsTools.Jade
         /// <returns>Collection or removed blocks</returns>
         public virtual ICollection<T> ReflectTextChange(int start, int oldLength, int newLength, bool startInclusive)
         {
-            int indexStart = GetItemContaining(start);
-            int indexEnd = GetItemContaining(start + oldLength);
+            var indexStart = GetItemContaining(start);
+            var indexEnd = GetItemContaining(start + oldLength);
             ICollection<T> removed = _emptyList;
 
             // Make sure that end of the deleted range is not simply touching start 
@@ -700,7 +686,7 @@ namespace Microsoft.NodejsTools.Jade
 
             if (this.Count > 0)
             {
-                int offset = newLength - oldLength;
+                var offset = newLength - oldLength;
 
                 if (removed != _emptyList && removed.Count > 0)
                     indexStart = GetItemContaining(start);
@@ -757,7 +743,7 @@ namespace Microsoft.NodejsTools.Jade
                         }
                     }
 
-                    for (int i = indexStart + 1; i < this.Count; i++)
+                    for (var i = indexStart + 1; i < this.Count; i++)
                     {
                         this[i].Shift(offset);
                     }
@@ -773,7 +759,7 @@ namespace Microsoft.NodejsTools.Jade
 
         public bool IsEqual(IEnumerable<T> other)
         {
-            int otherCount = 0;
+            var otherCount = 0;
 
             foreach (var item in other)
                 otherCount++;
@@ -781,7 +767,7 @@ namespace Microsoft.NodejsTools.Jade
             if (this.Count != otherCount)
                 return false;
 
-            int i = 0;
+            var i = 0;
             foreach (var item in other)
             {
                 if (this[i].Start != item.Start)
@@ -866,9 +852,9 @@ namespace Microsoft.NodejsTools.Jade
             if (other.Count == 0)
                 return TextRange.FromBounds(lowerBound, upperBound);
 
-            int minCount = Math.Min(this.Count, other.Count);
-            int start = 0;
-            int end = 0;
+            var minCount = Math.Min(this.Count, other.Count);
+            var start = 0;
+            var end = 0;
             int i, j;
 
             for (i = 0; i < minCount; i++)
@@ -912,9 +898,9 @@ namespace Microsoft.NodejsTools.Jade
         /// <param name="other"></param>
         public void Merge(TextRangeCollection<T> other)
         {
-            int i = 0;
-            int j = 0;
-            int count = this.Count;
+            var i = 0;
+            var j = 0;
+            var count = this.Count;
 
             while (true)
             {

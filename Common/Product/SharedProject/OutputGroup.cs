@@ -59,28 +59,16 @@ namespace Microsoft.VisualStudioTools.Project
         /// <summary>
         /// Get the project configuration object associated with this output group
         /// </summary>
-        protected ProjectConfig ProjectCfg
-        {
-            get { return this._projectCfg; }
-        }
-
+        protected ProjectConfig ProjectCfg => this._projectCfg;
         /// <summary>
         /// Get the project object that produces this output group.
         /// </summary>
-        internal ProjectNode Project
-        {
-            get { return this._project; }
-        }
-
+        internal ProjectNode Project => this._project;
         /// <summary>
         /// Gets the msbuild target name which is assciated to the outputgroup.
         /// ProjectNode defines a static collection of output group names and their associated MsBuild target
         /// </summary>
-        protected string TargetName
-        {
-            get { return this._targetName; }
-        }
-
+        protected string TargetName => this._targetName;
         /// <summary>
         /// Easy access to the canonical name of the group.
         /// </summary>
@@ -104,7 +92,7 @@ namespace Microsoft.VisualStudioTools.Project
             // Generate dependencies if such a task exist
             if (this._project.BuildProject.Targets.ContainsKey(this._targetName))
             {
-                bool succeeded = false;
+                var succeeded = false;
                 this._project.BuildTarget(this._targetName, out succeeded);
                 if (!succeeded)
                 {
@@ -115,14 +103,14 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             // Rebuild the content of our list of output
-            string outputType = this._targetName + "Output";
+            var outputType = this._targetName + "Output";
             this._outputs.Clear();
 
             if (this._project.CurrentConfig != null)
             {
-                foreach (MSBuildExecution.ProjectItemInstance assembly in this._project.CurrentConfig.GetItems(outputType))
+                foreach (var assembly in this._project.CurrentConfig.GetItems(outputType))
                 {
-                    Output output = new Output(this._project, assembly);
+                    var output = new Output(this._project, assembly);
                     this._outputs.Add(output);
 
                     // See if it is our key output
@@ -187,7 +175,7 @@ namespace Microsoft.VisualStudioTools.Project
             pbstrDescription = null;
 
             string description;
-            int hr = this.get_CanonicalName(out description);
+            var hr = this.get_CanonicalName(out description);
             if (ErrorHandler.Succeeded(hr))
                 pbstrDescription = this.Project.GetOutputGroupDescription(description);
             return hr;
@@ -198,7 +186,7 @@ namespace Microsoft.VisualStudioTools.Project
             pbstrDisplayName = null;
 
             string displayName;
-            int hr = this.get_CanonicalName(out displayName);
+            var hr = this.get_CanonicalName(out displayName);
             if (ErrorHandler.Succeeded(hr))
                 pbstrDisplayName = this.Project.GetOutputGroupDisplayName(displayName);
             return hr;
@@ -261,7 +249,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             // Fill the array with our outputs
             uint count = 0;
-            foreach (Output output in this._outputs)
+            foreach (var output in this._outputs)
             {
                 if (rgpcfg.Length > count && celt > count && output != null)
                 {

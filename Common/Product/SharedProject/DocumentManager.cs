@@ -35,13 +35,7 @@ namespace Microsoft.VisualStudioTools.Project
         #endregion
 
         #region properties
-        protected HierarchyNode Node
-        {
-            get
-            {
-                return this.node;
-            }
-        }
+        protected HierarchyNode Node => this.node;
         #endregion
 
         #region ctors
@@ -116,11 +110,11 @@ namespace Microsoft.VisualStudioTools.Project
 
             if (this.IsOpenedByUs)
             {
-                IVsUIShellOpenDocument shell = this.Node.ProjectMgr.Site.GetService(typeof(IVsUIShellOpenDocument)) as IVsUIShellOpenDocument;
-                Guid logicalView = Guid.Empty;
+                var shell = this.Node.ProjectMgr.Site.GetService(typeof(IVsUIShellOpenDocument)) as IVsUIShellOpenDocument;
+                var logicalView = Guid.Empty;
                 uint grfIDO = 0;
                 IVsUIHierarchy pHierOpen;
-                uint[] itemIdOpen = new uint[1];
+                var itemIdOpen = new uint[1];
                 IVsWindowFrame windowFrame;
                 int fOpen;
                 ErrorHandler.ThrowOnFailure(shell.IsDocumentOpen(this.Node.ProjectMgr, this.Node.ID, this.Node.Url, ref logicalView, grfIDO, out pHierOpen, itemIdOpen, out windowFrame, out fOpen));
@@ -143,7 +137,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             if (saveIfDirty && this.IsDirty)
             {
-                IVsPersistDocData persistDocData = this.DocData;
+                var persistDocData = this.DocData;
                 if (persistDocData != null)
                 {
                     string name;
@@ -305,7 +299,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         protected string GetFullPathForDocument()
         {
-            string fullPath = String.Empty;
+            var fullPath = String.Empty;
 
             // Get the URL representing the item
             fullPath = this.node.GetMkDocument();
@@ -332,19 +326,19 @@ namespace Microsoft.VisualStudioTools.Project
                 throw new ArgumentException(SR.GetString(SR.ParameterCannotBeNullOrEmpty), "caption");
             }
 
-            IVsUIShell uiShell = site.GetService(typeof(SVsUIShell)) as IVsUIShell;
+            var uiShell = site.GetService(typeof(SVsUIShell)) as IVsUIShell;
 
             // We need to tell the windows to update their captions. 
             IEnumWindowFrames windowFramesEnum;
             ErrorHandler.ThrowOnFailure(uiShell.GetDocumentWindowEnum(out windowFramesEnum));
-            IVsWindowFrame[] windowFrames = new IVsWindowFrame[1];
+            var windowFrames = new IVsWindowFrame[1];
             uint fetched;
             while (windowFramesEnum.Next(1, windowFrames, out fetched) == VSConstants.S_OK && fetched == 1)
             {
-                IVsWindowFrame windowFrame = windowFrames[0];
+                var windowFrame = windowFrames[0];
                 object data;
                 ErrorHandler.ThrowOnFailure(windowFrame.GetProperty((int)__VSFPROPID.VSFPROPID_DocData, out data));
-                IntPtr ptr = Marshal.GetIUnknownForObject(data);
+                var ptr = Marshal.GetIUnknownForObject(data);
                 try
                 {
                     if (ptr == docData)
@@ -388,7 +382,7 @@ namespace Microsoft.VisualStudioTools.Project
                 throw new ArgumentNullException("newItemId");
             }
 
-            IVsRunningDocumentTable pRDT = site.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
+            var pRDT = site.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
 
             if (pRDT == null)
                 return;
@@ -403,8 +397,8 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 try
                 {
-                    IntPtr pUnk = Marshal.GetIUnknownForObject(pIVsHierarchy);
-                    Guid iid = typeof(IVsHierarchy).GUID;
+                    var pUnk = Marshal.GetIUnknownForObject(pIVsHierarchy);
+                    var iid = typeof(IVsHierarchy).GUID;
                     IntPtr pHier;
                     Marshal.QueryInterface(pUnk, ref iid, out pHier);
                     try

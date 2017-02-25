@@ -53,7 +53,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                string result = this.ItemNode.GetMetadata(ProjectFileConstants.SubType);
+                var result = this.ItemNode.GetMetadata(ProjectFileConstants.SubType);
                 if (!String.IsNullOrEmpty(result) && string.Compare(result, ProjectFileAttributeValue.Form, true, CultureInfo.InvariantCulture) == 0)
                     return true;
                 else
@@ -87,50 +87,22 @@ namespace Microsoft.VisualStudioTools.Project
             }
         }
 
-        public override __VSPROVISIONALVIEWINGSTATUS ProvisionalViewingStatus
-        {
-            get
-            {
-                return __VSPROVISIONALVIEWINGSTATUS.PVS_Enabled;
-            }
-        }
+        public override __VSPROVISIONALVIEWINGSTATUS ProvisionalViewingStatus => __VSPROVISIONALVIEWINGSTATUS.PVS_Enabled;
 
         #endregion
 
         #region overridden properties
 
-        internal override object Object
-        {
-            get
-            {
-                return this.VSProjectItem;
-            }
-        }
+        internal override object Object => this.VSProjectItem;
 
         #endregion
 
         #region overridden methods
 
-        protected override bool SupportsIconMonikers
-        {
-            get { return true; }
-        }
-
-        protected virtual ImageMoniker CodeFileIconMoniker
-        {
-            get { return KnownMonikers.Document; }
-        }
-
-        protected virtual ImageMoniker StartupCodeFileIconMoniker
-        {
-            get { return this.CodeFileIconMoniker; }
-        }
-
-        protected virtual ImageMoniker FormFileIconMoniker
-        {
-            get { return KnownMonikers.WindowsForm; }
-        }
-
+        protected override bool SupportsIconMonikers => true;
+        protected virtual ImageMoniker CodeFileIconMoniker => KnownMonikers.Document;
+        protected virtual ImageMoniker StartupCodeFileIconMoniker => this.CodeFileIconMoniker;
+        protected virtual ImageMoniker FormFileIconMoniker => KnownMonikers.WindowsForm;
         protected override ImageMoniker GetIconMoniker(bool open)
         {
             if (this.ItemNode.IsExcluded)
@@ -164,10 +136,10 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         protected override void DoDefaultAction()
         {
-            FileDocumentManager manager = this.GetDocumentManager() as FileDocumentManager;
+            var manager = this.GetDocumentManager() as FileDocumentManager;
             Utilities.CheckNotNull(manager, "Could not get the FileDocumentManager");
 
-            Guid viewGuid =
+            var viewGuid =
                 (this.IsFormSubType ? VSConstants.LOGVIEWID_Designer : VSConstants.LOGVIEWID_Code);
             IVsWindowFrame frame;
             manager.Open(false, false, viewGuid, out frame, WindowFrameShowAction.Show);
@@ -191,20 +163,20 @@ namespace Microsoft.VisualStudioTools.Project
 
         private ITextBuffer GetTextBufferOnUIThread(bool create)
         {
-            IVsTextManager textMgr = (IVsTextManager)GetService(typeof(SVsTextManager));
+            var textMgr = (IVsTextManager)GetService(typeof(SVsTextManager));
             var model = GetService(typeof(SComponentModel)) as IComponentModel;
             var adapter = model.GetService<IVsEditorAdaptersFactoryService>();
             uint itemid;
 
-            IVsRunningDocumentTable rdt = this.ProjectMgr.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
+            var rdt = this.ProjectMgr.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
             if (rdt != null)
             {
                 IVsHierarchy hier;
                 IVsPersistDocData persistDocData;
                 uint cookie;
-                bool docInRdt = true;
-                IntPtr docData = IntPtr.Zero;
-                int hr = NativeMethods.E_FAIL;
+                var docInRdt = true;
+                var docData = IntPtr.Zero;
+                var hr = NativeMethods.E_FAIL;
                 try
                 {
                     //Getting a read lock on the document. Must be released later.
@@ -215,10 +187,10 @@ namespace Microsoft.VisualStudioTools.Project
                         {
                             return null;
                         }
-                        Guid iid = VSConstants.IID_IUnknown;
+                        var iid = VSConstants.IID_IUnknown;
                         cookie = 0;
                         docInRdt = false;
-                        ILocalRegistry localReg = this.ProjectMgr.GetService(typeof(SLocalRegistry)) as ILocalRegistry;
+                        var localReg = this.ProjectMgr.GetService(typeof(SLocalRegistry)) as ILocalRegistry;
                         ErrorHandler.ThrowOnFailure(localReg.CreateInstance(CLSID_VsTextBuffer, null, ref iid, (uint)CLSCTX.CLSCTX_INPROC_SERVER, out docData));
                     }
                     persistDocData = Marshal.GetObjectForIUnknown(docData) as IVsPersistDocData;
@@ -232,11 +204,11 @@ namespace Microsoft.VisualStudioTools.Project
                 }
 
                 //Try to get the Text lines
-                IVsTextLines srpTextLines = persistDocData as IVsTextLines;
+                var srpTextLines = persistDocData as IVsTextLines;
                 if (srpTextLines == null)
                 {
                     // Try getting a text buffer provider first
-                    IVsTextBufferProvider srpTextBufferProvider = persistDocData as IVsTextBufferProvider;
+                    var srpTextBufferProvider = persistDocData as IVsTextBufferProvider;
                     if (srpTextBufferProvider != null)
                     {
                         hr = srpTextBufferProvider.GetTextBuffer(out srpTextLines);
@@ -255,7 +227,7 @@ namespace Microsoft.VisualStudioTools.Project
                 }
             }
 
-            IWpfTextView view = GetTextView();
+            var view = GetTextView();
 
             return view.TextBuffer;
         }
@@ -267,7 +239,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             IVsTextView viewAdapter;
             uint itemid;
-            IVsUIShellOpenDocument uiShellOpenDocument = GetService(typeof(SVsUIShellOpenDocument)) as IVsUIShellOpenDocument;
+            var uiShellOpenDocument = GetService(typeof(SVsUIShellOpenDocument)) as IVsUIShellOpenDocument;
             IVsUIHierarchy hierarchy;
             IVsWindowFrame pWindowFrame;
 
@@ -284,13 +256,7 @@ namespace Microsoft.VisualStudioTools.Project
             return adapter.GetWpfTextView(viewAdapter);
         }
 
-        public new CommonProjectNode ProjectMgr
-        {
-            get
-            {
-                return (CommonProjectNode)base.ProjectMgr;
-            }
-        }
+        public new CommonProjectNode ProjectMgr => (CommonProjectNode)base.ProjectMgr;
 
         /// <summary>
         /// Handles the exclude from project command.
@@ -332,7 +298,7 @@ namespace Microsoft.VisualStudioTools.Project
             if (this.Parent.ItemNode != null && this.Parent.ItemNode.IsExcluded)
             {
                 // if our parent is excluded it needs to first be included
-                int hr = this.Parent.IncludeInProject(false);
+                var hr = this.Parent.IncludeInProject(false);
                 if (ErrorHandler.Failed(hr))
                 {
                     return hr;

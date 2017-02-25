@@ -34,7 +34,7 @@ namespace Microsoft.NodejsTools
 
         internal override ProjectNode CreateProject()
         {
-            NodejsProjectNode project = new NodejsProjectNode((NodejsProjectPackage)this.Site);
+            var project = new NodejsProjectNode((NodejsProjectPackage)this.Site);
             return project;
         }
 
@@ -63,7 +63,7 @@ namespace Microsoft.NodejsTools
 
         private static void AddOrSetProperty(ProjectPropertyGroupElement group, string name, string value)
         {
-            bool anySet = false;
+            var anySet = false;
             foreach (var prop in group.Properties.Where(p => p.Name == name))
             {
                 prop.Value = value;

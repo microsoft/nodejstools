@@ -53,31 +53,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         {
         }
 
-        public AD7Engine Engine
-        {
-            get { return this._engine; }
-        }
-
-        public NodeModule Module
-        {
-            get { return this._frame != null ? this._frame.Module : null; }
-        }
-
-        public string FileName
-        {
-            get { return this._frame != null ? this._frame.FileName : this._fileName; }
-        }
-
-        public int Line
-        {
-            get { return this._line; }
-        }
-
-        public int Column
-        {
-            get { return this._column; }
-        }
-
+        public AD7Engine Engine => this._engine;
+        public NodeModule Module => this._frame != null ? this._frame.Module : null;
+        public string FileName => this._frame != null ? this._frame.FileName : this._fileName;
+        public int Line => this._line;
+        public int Column => this._column;
         public void SetDocumentContext(IDebugDocumentContext2 docContext)
         {
             this._documentContext = docContext;
@@ -98,7 +78,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         {
             foundIndex = uint.MaxValue;
 
-            enum_CONTEXT_COMPARE contextCompare = uContextCompare;
+            var contextCompare = uContextCompare;
 
             for (uint c = 0; c < compareToLength; c++)
             {

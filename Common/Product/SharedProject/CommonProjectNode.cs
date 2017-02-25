@@ -131,11 +131,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         #region Properties
 
-        public int ImageOffset
-        {
-            get { return this._imageOffset; }
-        }
-
+        public int ImageOffset => this._imageOffset;
         /// <summary>
         /// Get the VSProject corresponding to this project
         /// </summary>
@@ -153,14 +149,14 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                IntPtr unknownPtr = Utilities.QueryInterfaceIUnknown(this);
+                var unknownPtr = Utilities.QueryInterfaceIUnknown(this);
                 if (IntPtr.Zero == unknownPtr)
                 {
                     return null;
                 }
                 try
                 {
-                    IVsHierarchy hier = Marshal.GetObjectForIUnknown(unknownPtr) as IVsHierarchy;
+                    var hier = Marshal.GetObjectForIUnknown(unknownPtr) as IVsHierarchy;
                     return hier;
                 }
                 finally
@@ -200,77 +196,29 @@ namespace Microsoft.VisualStudioTools.Project
             set { this._propPage = value; }
         }
 
-        protected internal MSBuild.Project UserBuildProject
-        {
-            get
-            {
-                return this._userBuildProject;
-            }
-        }
+        protected internal MSBuild.Project UserBuildProject => this._userBuildProject;
 
-        protected bool IsUserProjectFileDirty
-        {
-            get
-            {
-                return this._userBuildProject != null &&
+        protected bool IsUserProjectFileDirty => this._userBuildProject != null &&
                     this._userBuildProject.Xml.HasUnsavedChanges;
-            }
-        }
 
         #endregion
 
         #region overridden properties
 
-        public override bool CanShowAllFiles
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool CanShowAllFiles => true;
 
-        public override bool IsShowingAllFiles
-        {
-            get
-            {
-                return this._showingAllFiles;
-            }
-        }
+        public override bool IsShowingAllFiles => this._showingAllFiles;
 
         /// <summary>
         /// Since we appended the language images to the base image list in the constructor,
         /// this should be the offset in the ImageList of the langauge project icon.
         /// </summary>
         [Obsolete("Use GetIconMoniker() to specify the icon and GetIconHandle() for back-compat")]
-        public override int ImageIndex
-        {
-            get
-            {
-                return this._imageOffset + (int)CommonImageName.Project;
-            }
-        }
+        public override int ImageIndex => this._imageOffset + (int)CommonImageName.Project;
 
-        public override Guid ProjectGuid
-        {
-            get
-            {
-                return GetProjectFactoryType().GUID;
-            }
-        }
-        public override string ProjectType
-        {
-            get
-            {
-                return GetProjectName();
-            }
-        }
-        internal override object Object
-        {
-            get
-            {
-                return this.VSProject;
-            }
-        }
+        public override Guid ProjectGuid => GetProjectFactoryType().GUID;
+        public override string ProjectType => GetProjectName();
+        internal override object Object => this.VSProject;
         #endregion
 
         #region overridden methods
@@ -334,13 +282,7 @@ namespace Microsoft.VisualStudioTools.Project
             return base.QueryStatusOnNode(cmdGroup, cmd, pCmdText, ref result);
         }
 
-        private bool IsPublishingEnabled
-        {
-            get
-            {
-                return !String.IsNullOrWhiteSpace(GetProjectProperty(CommonConstants.PublishUrl));
-            }
-        }
+        private bool IsPublishingEnabled => !String.IsNullOrWhiteSpace(GetProjectProperty(CommonConstants.PublishUrl));
 
         internal override int ExecCommandOnNode(Guid cmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
@@ -394,8 +336,8 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public virtual bool Publish(PublishProjectOptions publishOptions, bool async)
         {
-            string publishUrl = publishOptions.DestinationUrl ?? GetProjectProperty(CommonConstants.PublishUrl);
-            bool found = false;
+            var publishUrl = publishOptions.DestinationUrl ?? GetProjectProperty(CommonConstants.PublishUrl);
+            var found = false;
             if (!String.IsNullOrWhiteSpace(publishUrl))
             {
                 var url = new Url(publishUrl);
@@ -483,7 +425,7 @@ namespace Microsoft.VisualStudioTools.Project
                 this._watcher.Dispose();
             }
 
-            string userProjectFilename = this.FileName + PerUserFileExtension;
+            var userProjectFilename = this.FileName + PerUserFileExtension;
             if (File.Exists(userProjectFilename))
             {
                 this._userBuildProject = this.BuildProject.ProjectCollection.LoadProject(userProjectFilename);
@@ -660,7 +602,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             this._showingAllFiles = !this._showingAllFiles;
 
-            string newPropValue = this._showingAllFiles ? CommonConstants.ShowAllFiles : CommonConstants.ProjectFiles;
+            var newPropValue = this._showingAllFiles ? CommonConstants.ShowAllFiles : CommonConstants.ProjectFiles;
 
             var projProperty = this.BuildProject.GetProperty(CommonConstants.ProjectView);
             if (projProperty != null &&
@@ -705,7 +647,7 @@ namespace Microsoft.VisualStudioTools.Project
         private static bool? GetShowAllFilesSetting(string showAllFilesValue)
         {
             bool? showAllFiles = null;
-            string showAllFilesSetting = showAllFilesValue.Trim();
+            var showAllFilesSetting = showAllFilesValue.Trim();
             if (String.Equals(showAllFilesSetting, CommonConstants.ProjectFiles))
             {
                 showAllFiles = false;
@@ -768,7 +710,7 @@ namespace Microsoft.VisualStudioTools.Project
                     return true;
                 }
 
-                HashSet<HierarchyNode> missingChildren = new HashSet<HierarchyNode>(dir.Parent.AllChildren);
+                var missingChildren = new HashSet<HierarchyNode>(dir.Parent.AllChildren);
                 IEnumerable<string> dirs;
                 try
                 {
@@ -780,7 +722,7 @@ namespace Microsoft.VisualStudioTools.Project
                     return true;
                 }
 
-                bool wasExpanded = hierarchyCreated ? dir.Parent.GetIsExpanded() : false;
+                var wasExpanded = hierarchyCreated ? dir.Parent.GetIsExpanded() : false;
                 foreach (var curDir in dirs)
                 {
                     if (this._project.IsFileHidden(curDir))
@@ -934,7 +876,7 @@ namespace Microsoft.VisualStudioTools.Project
                 parentDir = GetFinalPathName(parentDir);
             }
 
-            string finalPath = GetFinalPathName(childDir);
+            var finalPath = GetFinalPathName(childDir);
             // check and see if we're recursing infinitely...
             if (CommonUtils.IsSubpathOf(finalPath, parentDir))
             {
@@ -1381,7 +1323,7 @@ namespace Microsoft.VisualStudioTools.Project
                     }
 
                     // creating a new item, need to create the on all files node
-                    HierarchyNode parent = this._project.GetParentFolderForPath(this._path);
+                    var parent = this._project.GetParentFolderForPath(this._path);
 
                     if (parent == null)
                     {
@@ -1391,13 +1333,13 @@ namespace Microsoft.VisualStudioTools.Project
                         return;
                     }
 
-                    bool wasExpanded = parent.GetIsExpanded();
+                    var wasExpanded = parent.GetIsExpanded();
 
                     if (Directory.Exists(this._path))
                     {
                         if (IsFileSymLink(this._path))
                         {
-                            string parentDir = CommonUtils.GetParent(this._path);
+                            var parentDir = CommonUtils.GetParent(this._path);
                             if (IsRecursiveSymLink(parentDir, this._path))
                             {
                                 // don't add recusrive sym link directory
@@ -1409,7 +1351,7 @@ namespace Microsoft.VisualStudioTools.Project
                         }
 
                         var folderNode = this._project.AddAllFilesFolder(parent, this._path + Path.DirectorySeparatorChar);
-                        bool folderNodeWasExpanded = folderNode.GetIsExpanded();
+                        var folderNodeWasExpanded = folderNode.GetIsExpanded();
 
                         // then add the folder nodes
                         this._project.MergeDiskNodes(folderNode, this._path);
@@ -1456,7 +1398,7 @@ namespace Microsoft.VisualStudioTools.Project
                 this._projectDocListenerForStartupFileUpdates.Dispose();
                 this._projectDocListenerForStartupFileUpdates = null;
             }
-            LibraryManager libraryManager = this.Site.GetService(GetLibraryManagerType()) as LibraryManager;
+            var libraryManager = this.Site.GetService(GetLibraryManagerType()) as LibraryManager;
             if (null != libraryManager)
             {
                 libraryManager.UnregisterHierarchy(this.InteropSafeHierarchy);
@@ -1490,7 +1432,7 @@ namespace Microsoft.VisualStudioTools.Project
         public override void Load(string filename, string location, string name, uint flags, ref Guid iidProject, out int canceled)
         {
             base.Load(filename, location, name, flags, ref iidProject, out canceled);
-            LibraryManager libraryManager = this.Site.GetService(GetLibraryManagerType()) as LibraryManager;
+            var libraryManager = this.Site.GetService(GetLibraryManagerType()) as LibraryManager;
             if (null != libraryManager)
             {
                 libraryManager.RegisterHierarchy(this.InteropSafeHierarchy);
@@ -1663,7 +1605,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             Utilities.ArgumentNotNull("item", item);
 
-            string url = item.Url;
+            var url = item.Url;
             CommonFileNode newNode;
             if (IsCodeFile(url))
             {
@@ -1674,7 +1616,7 @@ namespace Microsoft.VisualStudioTools.Project
                 newNode = CreateNonCodeFileNode(item);
             }
 
-            string link = item.GetMetadata(ProjectFileConstants.Link);
+            var link = item.GetMetadata(ProjectFileConstants.Link);
             if (!String.IsNullOrWhiteSpace(link) ||
                 !CommonUtils.IsSubpathOf(this.ProjectHome, url))
             {
@@ -1692,7 +1634,7 @@ namespace Microsoft.VisualStudioTools.Project
             // Avoid adding files to the project multiple times.  Ultimately           
             // we should not use project items and instead should have virtual items.       
 
-            string path = CommonUtils.GetRelativeFilePath(this.ProjectHome, absFileName);
+            var path = CommonUtils.GetRelativeFilePath(this.ProjectHome, absFileName);
             return CreateFileNode(new MsBuildProjectElement(this, path, GetItemType(path)));
         }
 
@@ -1716,7 +1658,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public override int IsDirty(out int isDirty)
         {
-            int hr = base.IsDirty(out isDirty);
+            var hr = base.IsDirty(out isDirty);
 
             if (ErrorHandler.Failed(hr))
             {
@@ -1761,7 +1703,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public string GetWorkingDirectory()
         {
-            string workDir = CommonUtils.UnquotePath(GetProjectProperty(CommonConstants.WorkingDirectory, resetCache: false));
+            var workDir = CommonUtils.UnquotePath(GetProjectProperty(CommonConstants.WorkingDirectory, resetCache: false));
             return CommonUtils.GetAbsoluteDirectoryPath(this.ProjectHome, workDir);
         }
 
@@ -1770,7 +1712,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         internal string GetStartupFile()
         {
-            string startupFile = GetProjectProperty(CommonConstants.StartupFile, resetCache: false);
+            var startupFile = GetProjectProperty(CommonConstants.StartupFile, resetCache: false);
 
             if (string.IsNullOrEmpty(startupFile))
             {
@@ -1802,7 +1744,7 @@ namespace Microsoft.VisualStudioTools.Project
         private void RefreshStartupFile(HierarchyNode parent, string oldFile, string newFile)
         {
             AssertHasParentHierarchy();
-            IVsUIHierarchyWindow2 windows = UIHierarchyUtilities.GetUIHierarchyWindow(
+            var windows = UIHierarchyUtilities.GetUIHierarchyWindow(
                 this.Site,
                 new Guid(ToolWindowGuids80.SolutionExplorer)) as IVsUIHierarchyWindow2;
 
@@ -1811,7 +1753,7 @@ namespace Microsoft.VisualStudioTools.Project
                 return;
             }
 
-            for (HierarchyNode n = parent.FirstChild; n != null; n = n.NextSibling)
+            for (var n = parent.FirstChild; n != null; n = n.NextSibling)
             {
                 // TODO: Distinguish between real Urls and fake ones (eg. "References")
                 if (windows != null)
@@ -1941,7 +1883,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 return hr;
             }
-            HierarchyNode hierNode = NodeFromItemId(itemid);
+            var hierNode = NodeFromItemId(itemid);
             if (hierNode == null || ((hierNode as CommonFileNode) == null))
                 return VSConstants.E_NOTIMPL;
 
@@ -1992,12 +1934,12 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public virtual int SaveProjectToLocation(string pszProjectFilename)
         {
-            string oldName = this.Url;
-            string basePath = CommonUtils.NormalizeDirectoryPath(Path.GetDirectoryName(this.FileName));
-            string newName = Path.GetDirectoryName(pszProjectFilename);
+            var oldName = this.Url;
+            var basePath = CommonUtils.NormalizeDirectoryPath(Path.GetDirectoryName(this.FileName));
+            var newName = Path.GetDirectoryName(pszProjectFilename);
 
-            IVsUIShell shell = this.Site.GetService(typeof(SVsUIShell)) as IVsUIShell;
-            IVsSolution vsSolution = (IVsSolution)this.GetService(typeof(SVsSolution));
+            var shell = this.Site.GetService(typeof(SVsUIShell)) as IVsUIShell;
+            var vsSolution = (IVsSolution)this.GetService(typeof(SVsSolution));
 
             int canContinue;
             vsSolution.QueryRenameProject(this, this.FileName, pszProjectFilename, 0, out canContinue);
@@ -2077,7 +2019,7 @@ namespace Microsoft.VisualStudioTools.Project
                         );
                     }
 
-                    IDiskBasedNode diskNode = child as IDiskBasedNode;
+                    var diskNode = child as IDiskBasedNode;
                     if (diskNode != null)
                     {
                         diskNode.RenameForDeferredSave(basePath, baseNewPath);

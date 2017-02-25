@@ -34,13 +34,7 @@ namespace Microsoft.VisualStudioTools.Project
             this._project = root;
         }
 
-        public override bool IsNonMemberItem
-        {
-            get
-            {
-                return this.ItemNode is AllFilesProjectElement;
-            }
-        }
+        public override bool IsNonMemberItem => this.ItemNode is AllFilesProjectElement;
 
         protected override ImageMoniker GetIconMoniker(bool open)
         {
@@ -143,7 +137,7 @@ namespace Microsoft.VisualStudioTools.Project
             for (var child = this.FirstChild; child != null; child = child.NextSibling)
             {
                 // we automatically exclude all children below us too
-                int hr = child.ExcludeFromProject();
+                var hr = child.ExcludeFromProject();
                 if (ErrorHandler.Failed(hr))
                 {
                     return hr;
@@ -189,7 +183,7 @@ namespace Microsoft.VisualStudioTools.Project
             if (this.Parent.ItemNode != null && this.Parent.ItemNode.IsExcluded)
             {
                 // if our parent is excluded it needs to first be included
-                int hr = this.Parent.IncludeInProject(false);
+                var hr = this.Parent.IncludeInProject(false);
                 if (ErrorHandler.Failed(hr))
                 {
                     return hr;
@@ -214,7 +208,7 @@ namespace Microsoft.VisualStudioTools.Project
                 for (var child = this.FirstChild; child != null; child = child.NextSibling)
                 {
                     // we automatically include all children below us too
-                    int hr = child.IncludeInProject(includeChildren);
+                    var hr = child.IncludeInProject(includeChildren);
                     if (ErrorHandler.Failed(hr))
                     {
                         return hr;
@@ -244,7 +238,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public override void RenameFolder(string newName)
         {
-            string oldName = this.Url;
+            var oldName = this.Url;
             this._project.SuppressFileChangeNotifications();
             try
             {
@@ -285,12 +279,6 @@ namespace Microsoft.VisualStudioTools.Project
             return deleteOperation == __VSDELETEITEMOPERATION.DELITEMOP_DeleteFromStorage;
         }
 
-        public new CommonProjectNode ProjectMgr
-        {
-            get
-            {
-                return (CommonProjectNode)base.ProjectMgr;
-            }
-        }
+        public new CommonProjectNode ProjectMgr => (CommonProjectNode)base.ProjectMgr;
     }
 }

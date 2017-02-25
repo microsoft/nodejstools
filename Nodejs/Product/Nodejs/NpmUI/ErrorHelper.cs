@@ -75,7 +75,7 @@ namespace Microsoft.NodejsTools.NpmUI
             {
                 //  Don't want to keep bombarding user with same message - there's a real danger this popup
                 //  could appear quite a lot if changes are made to the filesystem.
-                bool report = (null == _lastNpmNotFoundException || ex.Message != _lastNpmNotFoundException.Message);
+                var report = (null == _lastNpmNotFoundException || ex.Message != _lastNpmNotFoundException.Message);
 
                 _lastNpmNotFoundException = nnfe;
 

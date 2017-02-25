@@ -67,11 +67,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands
             return parents = parents.Distinct(HandleEqualityComparer.Instance);
         }
 
-        protected override IDictionary<string, object> Arguments
-        {
-            get { return this._arguments; }
-        }
-
+        protected override IDictionary<string, object> Arguments => this._arguments;
         public Dictionary<int, List<NodeEvaluationResult>> Results { get; private set; }
 
         public override void ProcessResponse(JObject response)
@@ -79,23 +75,23 @@ namespace Microsoft.NodejsTools.Debugger.Commands
             base.ProcessResponse(response);
 
             // Retrieve references
-            JArray refs = (JArray)response["refs"] ?? new JArray();
+            var refs = (JArray)response["refs"] ?? new JArray();
             var references = new Dictionary<int, JToken>(refs.Count);
 
-            foreach (JToken reference in refs)
+            foreach (var reference in refs)
             {
                 var id = (int)reference["handle"];
                 references.Add(id, reference);
             }
 
             // Retrieve properties
-            JToken body = response["body"];
+            var body = response["body"];
             this.Results = new Dictionary<int, List<NodeEvaluationResult>>(this._handles.Length);
 
-            foreach (int handle in this._handles)
+            foreach (var handle in this._handles)
             {
-                string id = handle.ToString(CultureInfo.InvariantCulture);
-                JToken data = body[id];
+                var id = handle.ToString(CultureInfo.InvariantCulture);
+                var data = body[id];
                 if (data == null)
                 {
                     continue;
@@ -107,12 +103,12 @@ namespace Microsoft.NodejsTools.Debugger.Commands
                     this._parents.TryGetValue(handle, out parent);
                 }
 
-                List<NodeEvaluationResult> properties = GetProperties(data, parent, references);
+                var properties = GetProperties(data, parent, references);
                 if (properties.Count == 0)
                 {
                     // Primitive javascript type
                     var variable = new NodeEvaluationVariable(null, id, data);
-                    NodeEvaluationResult property = this._resultFactory.Create(variable);
+                    var property = this._resultFactory.Create(variable);
                     properties.Add(property);
                 }
 
@@ -132,11 +128,11 @@ namespace Microsoft.NodejsTools.Debugger.Commands
             }
 
             // Try to get prototype
-            JToken prototype = data["protoObject"];
+            var prototype = data["protoObject"];
             if (prototype != null)
             {
                 var variableProvider = new NodePrototypeVariable(parent, prototype, references);
-                NodeEvaluationResult result = this._resultFactory.Create(variableProvider);
+                var result = this._resultFactory.Create(variableProvider);
                 properties.Add(result);
             }
 

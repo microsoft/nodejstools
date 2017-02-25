@@ -40,20 +40,12 @@ namespace Microsoft.NodejsTools.Debugger
             this._condition = condition;
         }
 
-        public NodeDebugger Process
-        {
-            get { return this._process; }
-        }
-
+        public NodeDebugger Process => this._process;
         /// <summary>
         /// The file name, line and column where the breakpoint was requested to be set.
         /// If source maps are in use this can be different than Position.
         /// </summary>
-        public FilePosition Target
-        {
-            get { return this._target; }
-        }
-
+        public FilePosition Target => this._target;
         /// <summary>
         /// Gets the position in the target JavaScript file using the provided SourceMapper.
         /// 
@@ -76,32 +68,16 @@ namespace Microsoft.NodejsTools.Debugger
             return this.Target;
         }
 
-        public bool Enabled
-        {
-            get { return this._enabled; }
-        }
-
+        public bool Enabled => this._enabled;
         public bool Deleted
         {
             get { return this._deleted; }
             set { this._deleted = value; }
         }
 
-        public BreakOn BreakOn
-        {
-            get { return this._breakOn; }
-        }
-
-        public string Condition
-        {
-            get { return this._condition; }
-        }
-
-        public bool HasPredicate
-        {
-            get { return (!string.IsNullOrEmpty(this._condition) || NodeBreakpointBinding.GetEngineIgnoreCount(this._breakOn, 0) > 0); }
-        }
-
+        public BreakOn BreakOn => this._breakOn;
+        public string Condition => this._condition;
+        public bool HasPredicate => (!string.IsNullOrEmpty(this._condition) || NodeBreakpointBinding.GetEngineIgnoreCount(this._breakOn, 0) > 0);
         /// <summary>
         /// Requests the remote process enable the break point.  An event will be raised on the process
         /// when the break point is received.

@@ -198,10 +198,10 @@ namespace Microsoft.VisualStudioTools.Project
                 return VSConstants.S_OK;
             }
 
-            IList<HierarchyNode> selectedNodes = GetSelectedNodes();
+            var selectedNodes = GetSelectedNodes();
 
             // Check if all nodes can execute a command. If there is at least one that cannot return not handled.
-            foreach (HierarchyNode node in selectedNodes)
+            foreach (var node in selectedNodes)
             {
                 if (!node.CanExecuteCommand)
                 {
@@ -210,8 +210,8 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             // Handle commands that are independent of a selection.
-            bool handled = false;
-            int returnValue = this.ExecCommandIndependentOfSelection(cmdGroup, cmdId, cmdExecOpt, vaIn, vaOut, commandOrigin, out handled);
+            var handled = false;
+            var returnValue = this.ExecCommandIndependentOfSelection(cmdGroup, cmdId, cmdExecOpt, vaIn, vaOut, commandOrigin, out handled);
             if (handled)
             {
                 return returnValue;
@@ -227,7 +227,7 @@ namespace Microsoft.VisualStudioTools.Project
             returnValue = (int)OleConstants.OLECMDERR_E_NOTSUPPORTED;
 
             // Handle commands iteratively. The same action will be executed for all of the selected items.
-            foreach (HierarchyNode node in selectedNodes)
+            foreach (var node in selectedNodes)
             {
                 try
                 {
@@ -323,7 +323,7 @@ namespace Microsoft.VisualStudioTools.Project
         protected virtual QueryStatusResult DisableCommandOnNodesThatDoNotSupportMultiSelection(Guid cmdGroup, uint cmd, IList<HierarchyNode> selectedNodes, out bool handled)
         {
             handled = false;
-            QueryStatusResult queryResult = QueryStatusResult.NOTSUPPORTED;
+            var queryResult = QueryStatusResult.NOTSUPPORTED;
             if (selectedNodes == null || selectedNodes.Count == 1)
             {
                 return queryResult;
@@ -462,8 +462,8 @@ namespace Microsoft.VisualStudioTools.Project
 
             Utilities.ArgumentNotNull("prgCmds", prgCmds);
 
-            uint cmd = prgCmds[0].cmdID;
-            QueryStatusResult queryResult = QueryStatusResult.NOTSUPPORTED;
+            var cmd = prgCmds[0].cmdID;
+            var queryResult = QueryStatusResult.NOTSUPPORTED;
 
             // For now ask this node (that is the project node) to disable or enable a node.
             // This is an optimization. Why should we ask each node for its current state? They all are in the same state.
@@ -478,7 +478,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
             else
             {
-                bool handled = false;
+                var handled = false;
 
                 if (commandOrigin == CommandOrigin.OleCommandTarget)
                 {
@@ -487,7 +487,7 @@ namespace Microsoft.VisualStudioTools.Project
 
                 if (!handled)
                 {
-                    IList<HierarchyNode> selectedNodes = GetSelectedNodes();
+                    var selectedNodes = GetSelectedNodes();
 
                     // Want to disable in multiselect case.
                     if (selectedNodes != null && selectedNodes.Count > 1)
@@ -549,14 +549,14 @@ namespace Microsoft.VisualStudioTools.Project
                 return QueryStatusResult.NOTSUPPORTED;
             }
 
-            int result = 0;
-            bool supported = false;
-            bool enabled = true;
-            bool invisible = false;
-            bool latched = true;
-            QueryStatusResult tempQueryResult = QueryStatusResult.NOTSUPPORTED;
+            var result = 0;
+            var supported = false;
+            var enabled = true;
+            var invisible = false;
+            var latched = true;
+            var tempQueryResult = QueryStatusResult.NOTSUPPORTED;
 
-            foreach (HierarchyNode node in selectedNodes)
+            foreach (var node in selectedNodes)
             {
                 result = node.QueryStatusOnNode(cmdGroup, cmd, pCmdText, ref tempQueryResult);
                 if (result < 0)
@@ -574,7 +574,7 @@ namespace Microsoft.VisualStudioTools.Project
                 latched = latched && ((tempQueryResult & QueryStatusResult.LATCHED) != 0);
             }
 
-            QueryStatusResult queryResult = QueryStatusResult.NOTSUPPORTED;
+            var queryResult = QueryStatusResult.NOTSUPPORTED;
 
             if (result >= 0 && supported)
             {

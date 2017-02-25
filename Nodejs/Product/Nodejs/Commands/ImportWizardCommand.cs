@@ -38,12 +38,12 @@ namespace Microsoft.NodejsTools.Commands
             statusBar.SetText(Resources.ImportingProjectStatusText);
 
             var dlg = new Microsoft.NodejsTools.Project.ImportWizard.ImportWizard();
-            int commandIdToRaise = (int)VSConstants.VSStd97CmdID.OpenProject;
+            var commandIdToRaise = (int)VSConstants.VSStd97CmdID.OpenProject;
 
-            Microsoft.VisualStudio.Shell.OleMenuCmdEventArgs oleArgs = args as Microsoft.VisualStudio.Shell.OleMenuCmdEventArgs;
+            var oleArgs = args as Microsoft.VisualStudio.Shell.OleMenuCmdEventArgs;
             if (oleArgs != null)
             {
-                string projectArgs = oleArgs.InValue as string;
+                var projectArgs = oleArgs.InValue as string;
                 if (projectArgs != null)
                 {
                     var argItems = projectArgs.Split('|');
@@ -82,7 +82,7 @@ namespace Microsoft.NodejsTools.Commands
                             }
                             else
                             {
-                                string exName = String.Empty;
+                                var exName = String.Empty;
                                 if (ex.InnerException != null)
                                 {
                                     exName = "(" + ex.InnerException.GetType().Name + ")";
@@ -115,9 +115,6 @@ namespace Microsoft.NodejsTools.Commands
             }
         }
 
-        public override int CommandId
-        {
-            get { return (int)PkgCmdId.cmdidImportWizard; }
-        }
+        public override int CommandId => (int)PkgCmdId.cmdidImportWizard;
     }
 }

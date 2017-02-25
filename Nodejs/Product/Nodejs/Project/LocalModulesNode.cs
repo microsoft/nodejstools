@@ -46,21 +46,9 @@ namespace Microsoft.NodejsTools.Project
 
         public string VirtualName { get; private set; }
 
-        public override string Url
-        {
-            get { return this.VirtualName; }
-        }
-
-        public override string Caption
-        {
-            get { return this._caption; }
-        }
-
-        public override int SortPriority
-        {
-            get { return -1; /* DefaultSortOrderNode.FolderNode; */ }
-        }
-
+        public override string Url => this.VirtualName;
+        public override string Caption => this._caption;
+        public override int SortPriority => -1; /* DefaultSortOrderNode.FolderNode; */
         internal IEnumerable<IPackage> Packages
         {
             get

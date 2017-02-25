@@ -89,11 +89,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             }
         }
 
-        public LibraryNode Parent
-        {
-            get { return this._parent; }
-        }
-
+        public LibraryNode Parent => this._parent;
         /// <summary>
         /// Get or Set if the node can be deleted.
         /// </summary>
@@ -125,13 +121,8 @@ namespace Microsoft.VisualStudioTools.Navigation
         /// 
         /// </summary>
 
-        public override uint Capabilities { get { return (uint)this._capabilities; } }
-
-        public string TooltipText
-        {
-            get { return this._tooltip; }
-        }
-
+        public override uint Capabilities => (uint)this._capabilities;
+        public string TooltipText => this._tooltip;
         internal void AddNode(LibraryNode node)
         {
             lock (this.Children)
@@ -190,11 +181,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             }
         }
 
-        public virtual object BrowseObject
-        {
-            get { return null; }
-        }
-
+        public virtual object BrowseObject => null;
         public override uint CategoryField(LIB_CATEGORY category)
         {
             uint fieldValue = 0;
@@ -209,8 +196,8 @@ namespace Microsoft.VisualStudioTools.Navigation
                     break;
                 case LIB_CATEGORY.LC_LISTTYPE:
                     {
-                        LibraryNodeType subTypes = LibraryNodeType.None;
-                        foreach (LibraryNode node in this.Children)
+                        var subTypes = LibraryNodeType.None;
+                        foreach (var node in this.Children)
                         {
                             subTypes |= node._type;
                         }
@@ -279,7 +266,7 @@ namespace Microsoft.VisualStudioTools.Navigation
                 return filtered as IVsSimpleObjectList2;
             }
             filtered = this.Clone();
-            for (int i = 0; i < filtered.Children.Count;)
+            for (var i = 0; i < filtered.Children.Count;)
             {
                 if (0 == (filtered.Children[i]._type & libraryNodeType))
                 {
@@ -299,24 +286,14 @@ namespace Microsoft.VisualStudioTools.Navigation
             // Do nothing.
         }
 
-        public virtual string Name
-        {
-            get
-            {
-                return this._name;
-            }
-        }
+        public virtual string Name => this._name;
 
         public virtual string GetTextRepresentation(VSTREETEXTOPTIONS options)
         {
             return this.Name;
         }
 
-        public LibraryNodeType NodeType
-        {
-            get { return this._type; }
-        }
-
+        public LibraryNodeType NodeType => this._type;
         /// <summary>
         /// Finds the source files associated with this node.
         /// </summary>
@@ -335,34 +312,12 @@ namespace Microsoft.VisualStudioTools.Navigation
             this._name = newName;
         }
 
-        public virtual string UniqueName
-        {
-            get { return this.Name; }
-        }
+        public virtual string UniqueName => this.Name;
+        public string FullName => this._fullname;
 
-        public string FullName
-        {
-            get
-            {
-                return this._fullname;
-            }
-        }
+        public CommandID ContextMenuID => this._contextMenuID;
 
-        public CommandID ContextMenuID
-        {
-            get
-            {
-                return this._contextMenuID;
-            }
-        }
-
-        public virtual StandardGlyphGroup GlyphType
-        {
-            get
-            {
-                return StandardGlyphGroup.GlyphGroupModule;
-            }
-        }
+        public virtual StandardGlyphGroup GlyphType => StandardGlyphGroup.GlyphGroupModule;
 
         public virtual VSTREEDISPLAYDATA DisplayData
         {
@@ -515,7 +470,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         public int EnumPresentationNodes(uint dwFlags, out IVsEnumNavInfoNodes ppEnum)
         {
             var path = new Stack<LibraryNode>();
-            for (LibraryNode node = this; node != null; node = node.Parent)
+            for (var node = this; node != null; node = node.Parent)
             {
                 path.Push(node);
             }

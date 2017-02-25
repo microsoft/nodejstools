@@ -430,12 +430,12 @@ namespace Microsoft.VisualStudioTools
                 return string.Empty;
             }
 
-            int last = path.LastIndexOfAny(DirectorySeparators);
+            var last = path.LastIndexOfAny(DirectorySeparators);
 
-            string result = string.Empty;
+            var result = string.Empty;
             while (last > 1)
             {
-                int first = path.LastIndexOfAny(DirectorySeparators, last - 1);
+                var first = path.LastIndexOfAny(DirectorySeparators, last - 1);
                 if (first < 0)
                 {
                     if (path.IndexOf(':') < last)
@@ -481,7 +481,7 @@ namespace Microsoft.VisualStudioTools
                 return string.Empty;
             }
 
-            int last = path.Length - 1;
+            var last = path.Length - 1;
             if (DirectorySeparators.Contains(path[last]))
             {
                 last -= 1;
@@ -517,7 +517,7 @@ namespace Microsoft.VisualStudioTools
                 return string.Empty;
             }
 
-            int last = path.Length - 1;
+            var last = path.Length - 1;
             if (DirectorySeparators.Contains(path[last]))
             {
                 last -= 1;
@@ -528,7 +528,7 @@ namespace Microsoft.VisualStudioTools
                 return string.Empty;
             }
 
-            int start = path.LastIndexOfAny(DirectorySeparators, last);
+            var start = path.LastIndexOfAny(DirectorySeparators, last);
 
             return path.Substring(start + 1, last - start);
         }
@@ -592,7 +592,7 @@ namespace Microsoft.VisualStudioTools
         /// </summary>
         private static string TrimUpPaths(string path)
         {
-            int actualStart = 0;
+            var actualStart = 0;
             while (actualStart + 2 < path.Length)
             {
                 if (path[actualStart] == '.' && path[actualStart + 1] == '.' &&
@@ -716,7 +716,7 @@ namespace Microsoft.VisualStudioTools
         public static string GetAvailableFilename(string location, string basename, string extension)
         {
             var newPath = Path.Combine(location, basename);
-            int index = 0;
+            var index = 0;
             if (File.Exists(newPath + extension))
             {
                 string candidateNewPath;
@@ -726,7 +726,7 @@ namespace Microsoft.VisualStudioTools
                 } while (File.Exists(candidateNewPath + extension));
                 newPath = candidateNewPath;
             }
-            string final = newPath + extension;
+            var final = newPath + extension;
             return final;
         }
     }

@@ -166,29 +166,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             return engines;
         }
 
-        internal NodeDebugger Process
-        {
-            get
-            {
-                return this._process;
-            }
-        }
+        internal NodeDebugger Process => this._process;
 
-        internal AD7Thread MainThread
-        {
-            get
-            {
-                return this._mainThread;
-            }
-        }
+        internal AD7Thread MainThread => this._mainThread;
 
-        internal BreakpointManager BreakpointManager
-        {
-            get
-            {
-                return this._breakpointManager;
-            }
-        }
+        internal BreakpointManager BreakpointManager => this._breakpointManager;
 
         #region IDebugEngine2 Members
 
@@ -206,7 +188,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                 throw new ArgumentException();
             }
 
-            int processId = EngineUtils.GetProcessId(rgpPrograms[0]);
+            var processId = EngineUtils.GetProcessId(rgpPrograms[0]);
             if (processId == 0)
             {
                 // engine only supports system processes
@@ -448,7 +430,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         {
             ExceptionHitTreatment? defaultExceptionTreatment = null;
             var exceptionTreatments = new List<KeyValuePair<string, ExceptionHitTreatment>>();
-            bool sendUpdate = false;
+            var sendUpdate = false;
             foreach (var exceptionInfo in exceptionInfos)
             {
                 if (exceptionInfo.guidType == DebugEngineGuid)
@@ -533,7 +515,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             Debug.Assert(this._events != null);
             Debug.Assert(this._process != null);
 
-            int processId = EngineUtils.GetProcessId(process);
+            var processId = EngineUtils.GetProcessId(process);
             if (processId == this._process.Id)
             {
                 return VSConstants.S_OK;
@@ -597,7 +579,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                                 }
                                 break;
                             case DirMappingSetting:
-                                string[] dirs = setting[1].Split('|');
+                                var dirs = setting[1].Split('|');
                                 if (dirs.Length == 2)
                                 {
                                     if (dirMapping == null)
@@ -657,8 +639,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         private static IEnumerable<string> SplitOptions(string options)
         {
             var res = new List<string>();
-            int lastStart = 0;
-            for (int i = 0; i < options.Length; i++)
+            var lastStart = 0;
+            for (var i = 0; i < options.Length; i++)
             {
                 if (options[i] == ';')
                 {
@@ -699,7 +681,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             Debug.Assert(this._process != null);
             Debug.Assert(this._ad7ProgramId == Guid.Empty);
 
-            int processId = EngineUtils.GetProcessId(process);
+            var processId = EngineUtils.GetProcessId(process);
 
             if (processId != this._process.Id)
             {
@@ -740,7 +722,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             Debug.Assert(this._events != null);
             Debug.Assert(this._process != null);
 
-            int processId = EngineUtils.GetProcessId(process);
+            var processId = EngineUtils.GetProcessId(process);
             if (processId != this._process.Id)
             {
                 return VSConstants.S_FALSE;
@@ -845,7 +827,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             AssertMainThread();
 
             var moduleObjects = new AD7Module[this._modules.Count];
-            int i = 0;
+            var i = 0;
             foreach (var keyValue in this._modules)
             {
                 var adModule = keyValue.Value;
@@ -864,7 +846,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             AssertMainThread();
 
             var threadObjects = new AD7Thread[this._threads.Count];
-            int i = 0;
+            var i = 0;
             foreach (var keyValue in this._threads)
             {
                 var adThread = keyValue.Value;
@@ -1218,7 +1200,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         {
             var browserList = new List<IVsDocumentPreviewer>();
             var doc3 = (IVsUIShellOpenDocument3)NodejsPackage.Instance.GetService(typeof(SVsUIShellOpenDocument));
-            IVsEnumDocumentPreviewers previewersEnum = doc3.DocumentPreviewersEnum;
+            var previewersEnum = doc3.DocumentPreviewersEnum;
 
             var rgPreviewers = new IVsDocumentPreviewer[1];
             uint celtFetched;
@@ -1259,7 +1241,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             }
 
             info.guidLaunchDebugEngine = DebugEngineGuid;
-            IntPtr infoPtr = Marshal.AllocCoTaskMem(infoSize);
+            var infoPtr = Marshal.AllocCoTaskMem(infoSize);
             Marshal.StructureToPtr(info, infoPtr, false);
 
             try
@@ -1457,9 +1439,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             var solution = Package.GetGlobalService(typeof(SVsSolution)) as IVsSolution;
             if (solution != null)
             {
-                foreach (IVsProject project in solution.EnumerateLoadedProjects(false))
+                foreach (var project in solution.EnumerateLoadedProjects(false))
                 {
-                    foreach (uint itemid in project.EnumerateProjectItems())
+                    foreach (var itemid in project.EnumerateProjectItems())
                     {
                         string moniker;
                         if (ErrorHandler.Succeeded(project.GetMkDocument(itemid, out moniker)) && moniker != null)

@@ -60,13 +60,13 @@ namespace Microsoft.NodejsTools.Debugger.Communication
 
             try
             {
-                TaskCompletionSource<JObject> promise = this._messages.GetOrAdd(command.Id, i => new TaskCompletionSource<JObject>());
+                var promise = this._messages.GetOrAdd(command.Id, i => new TaskCompletionSource<JObject>());
                 this._connection.SendMessage(command.ToString());
                 cancellationToken.ThrowIfCancellationRequested();
 
                 cancellationToken.Register(() => promise.TrySetCanceled(), false);
 
-                JObject response = await promise.Task.ConfigureAwait(false);
+                var response = await promise.Task.ConfigureAwait(false);
                 cancellationToken.ThrowIfCancellationRequested();
 
                 command.ProcessResponse(response);
@@ -122,7 +122,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
         /// <param name="e">Event arguments.</param>
         private void OnConnectionClosed(object sender, EventArgs e)
         {
-            ConcurrentDictionary<int, TaskCompletionSource<JObject>> messages = Interlocked.Exchange(ref this._messages, new ConcurrentDictionary<int, TaskCompletionSource<JObject>>());
+            var messages = Interlocked.Exchange(ref this._messages, new ConcurrentDictionary<int, TaskCompletionSource<JObject>>());
             foreach (var kv in messages)
             {
                 var exception = new IOException(Resources.DebuggerConnectionClosed);

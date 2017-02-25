@@ -26,16 +26,8 @@ namespace Microsoft.VisualStudioTools.Project
 
         #region IPublishFile Members
 
-        public string SourceFile
-        {
-            get { return this._filename; }
-        }
-
-        public string DestinationFile
-        {
-            get { return this._destFile; }
-        }
-
+        public string SourceFile => this._filename;
+        public string DestinationFile => this._destFile;
         #endregion
     }
 }

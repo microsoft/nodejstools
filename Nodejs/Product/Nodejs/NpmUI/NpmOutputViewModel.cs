@@ -120,16 +120,8 @@ namespace Microsoft.NodejsTools.NpmUI
             }
         }
 
-        public Visibility ExecutionIdleVisibility
-        {
-            get { return this.IsExecutingCommand ? Visibility.Collapsed : Visibility.Visible; }
-        }
-
-        public Visibility ExecutionProgressVisibility
-        {
-            get { return this.IsExecutingCommand ? Visibility.Visible : Visibility.Collapsed; }
-        }
-
+        public Visibility ExecutionIdleVisibility => this.IsExecutingCommand ? Visibility.Collapsed : Visibility.Visible;
+        public Visibility ExecutionProgressVisibility => this.IsExecutingCommand ? Visibility.Visible : Visibility.Collapsed;
         public Visibility CommandCancelVisibility
         {
             get { return this._commandCancelVisibility; }
@@ -271,11 +263,7 @@ namespace Microsoft.NodejsTools.NpmUI
                 new Action(this.HandleCompletionSafe));
         }
 
-        public FlowDocument Output
-        {
-            get { return this._output; }
-        }
-
+        public FlowDocument Output => this._output;
         public event EventHandler OutputWritten;
 
         private void OnOutputWritten()
@@ -402,7 +390,7 @@ namespace Microsoft.NodejsTools.NpmUI
 
         private void Run()
         {
-            int count = 0;
+            var count = 0;
             // We want the thread to continue running queued commands before
             // exiting so the user can close the install window without having to wait
             // for commands to complete.
@@ -460,11 +448,7 @@ namespace Microsoft.NodejsTools.NpmUI
             }
 
             public bool IsFreeformArgumentCommand { get; private set; }
-            public string Arguments
-            {
-                get { return this.Name; }
-            }
-            public string Name { get; private set; }
+            public string Arguments => this.Name; public string Name { get; private set; }
             public string Version { get; private set; }
             public DependencyType DependencyType { get; private set; }
 

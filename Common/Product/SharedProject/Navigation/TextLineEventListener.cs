@@ -33,21 +33,17 @@ namespace Microsoft.VisualStudioTools.Navigation
             this._buffer = buffer;
             this._fileId = id;
             this._fileName = fileName;
-            IConnectionPointContainer container = buffer as IConnectionPointContainer;
+            var container = buffer as IConnectionPointContainer;
             if (null != container)
             {
-                Guid eventsGuid = typeof(IVsTextLinesEvents).GUID;
+                var eventsGuid = typeof(IVsTextLinesEvents).GUID;
                 container.FindConnectionPoint(ref eventsGuid, out this._connectionPoint);
                 this._connectionPoint.Advise(this as IVsTextLinesEvents, out this._connectionCookie);
             }
         }
 
         #region Properties
-        public ModuleId FileID
-        {
-            get { return this._fileId; }
-        }
-        public string FileName
+        public ModuleId FileID => this._fileId; public string FileName
         {
             get { return this._fileName; }
             set { this._fileName = value; }
@@ -104,7 +100,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             var onFileChanged = OnFileChanged;
             if (null != onFileChanged)
             {
-                HierarchyEventArgs args = new HierarchyEventArgs(this._fileId.ItemID, this._fileName);
+                var args = new HierarchyEventArgs(this._fileId.ItemID, this._fileName);
                 args.TextBuffer = this._buffer;
                 onFileChanged(this._fileId.Hierarchy, args);
             }

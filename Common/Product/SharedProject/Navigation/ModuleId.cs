@@ -31,19 +31,11 @@ namespace Microsoft.VisualStudioTools.Navigation
             this._itemId = id;
         }
 
-        public IVsHierarchy Hierarchy
-        {
-            get { return this._ownerHierarchy; }
-        }
-
-        public uint ItemID
-        {
-            get { return this._itemId; }
-        }
-
+        public IVsHierarchy Hierarchy => this._ownerHierarchy;
+        public uint ItemID => this._itemId;
         public override int GetHashCode()
         {
-            int hash = 0;
+            var hash = 0;
             if (null != this._ownerHierarchy)
             {
                 hash = this._ownerHierarchy.GetHashCode();
@@ -54,7 +46,7 @@ namespace Microsoft.VisualStudioTools.Navigation
 
         public override bool Equals(object obj)
         {
-            ModuleId other = obj as ModuleId;
+            var other = obj as ModuleId;
             if (null == other)
             {
                 return false;

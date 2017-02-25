@@ -99,8 +99,8 @@ namespace Microsoft.NodejsTools.Jade
             // However / is technically outside of the changed area and hence may end up
             // lingering on.
 
-            int initialIndex = -1;
-            int changeStart = start;
+            var initialIndex = -1;
+            var changeStart = start;
 
             var touchingTokens = this.Tokens.GetItemsContainingInclusiveEnd(start);
 
@@ -164,12 +164,12 @@ namespace Microsoft.NodejsTools.Jade
 
         public virtual IList<ClassificationSpan> GetClassificationSpans(SnapshotSpan span)
         {
-            List<ClassificationSpan> classifications = new List<ClassificationSpan>();
-            ITextSnapshot textSnapshot = this.TextBuffer.CurrentSnapshot;
+            var classifications = new List<ClassificationSpan>();
+            var textSnapshot = this.TextBuffer.CurrentSnapshot;
 
             if (span.Length <= 2)
             {
-                string ws = textSnapshot.GetText(span);
+                var ws = textSnapshot.GetText(span);
                 if (String.IsNullOrWhiteSpace(ws))
                     return classifications;
             }
@@ -183,7 +183,7 @@ namespace Microsoft.NodejsTools.Jade
                 // tokenize from end of the last good token. If last token intersected last change
                 // it would have been removed from the collection by now.
 
-                int tokenizeFrom = this.Tokens.Count > 0 ? this.Tokens[this.Tokens.Count - 1].End : new SnapshotPoint(textSnapshot, 0);
+                var tokenizeFrom = this.Tokens.Count > 0 ? this.Tokens[this.Tokens.Count - 1].End : new SnapshotPoint(textSnapshot, 0);
                 var tokenizeAnchor = GetAnchorPosition(tokenizeFrom);
 
                 if (tokenizeAnchor < tokenizeFrom)
@@ -242,8 +242,8 @@ namespace Microsoft.NodejsTools.Jade
             var ct = this._classificationNameProvider.GetClassificationType(token);
             if (ct != null)
             {
-                Span tokenSpan = new Span(token.Start, token.Length);
-                ClassificationSpan cs = new ClassificationSpan(new SnapshotSpan(textSnapshot, tokenSpan), ct);
+                var tokenSpan = new Span(token.Start, token.Length);
+                var cs = new ClassificationSpan(new SnapshotSpan(textSnapshot, tokenSpan), ct);
                 classifications.Add(cs);
             }
         }

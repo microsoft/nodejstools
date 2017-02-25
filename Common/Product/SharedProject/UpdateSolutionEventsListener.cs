@@ -91,35 +91,17 @@ namespace Microsoft.VisualStudioTools.Project
         /// <summary>
         /// The associated service provider.
         /// </summary>
-        protected IServiceProvider ServiceProvider
-        {
-            get
-            {
-                return this.serviceProvider;
-            }
-        }
+        protected IServiceProvider ServiceProvider => this.serviceProvider;
 
         /// <summary>
         /// The solution build manager object controlling the solution events.
         /// </summary>
-        protected IVsSolutionBuildManager2 SolutionBuildManager2
-        {
-            get
-            {
-                return this.solutionBuildManager;
-            }
-        }
+        protected IVsSolutionBuildManager2 SolutionBuildManager2 => this.solutionBuildManager;
 
         /// <summary>
         /// The solution build manager object controlling the solution events.
         /// </summary>
-        protected IVsSolutionBuildManager3 SolutionBuildManager3
-        {
-            get
-            {
-                return (IVsSolutionBuildManager3)this.solutionBuildManager;
-            }
-        }
+        protected IVsSolutionBuildManager3 SolutionBuildManager3 => (IVsSolutionBuildManager3)this.solutionBuildManager;
         #endregion
 
         #region IVsUpdateSolutionEvents3 Members

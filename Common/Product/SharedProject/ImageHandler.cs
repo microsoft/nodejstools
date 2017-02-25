@@ -70,7 +70,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             if (null != this.iconHandles)
             {
-                foreach (IntPtr hnd in this.iconHandles)
+                foreach (var hnd in this.iconHandles)
                 {
                     if (hnd != IntPtr.Zero)
                     {
@@ -140,7 +140,7 @@ namespace Microsoft.VisualStudioTools.Project
             // Check if the icon is in the cache.
             if (IntPtr.Zero == this.iconHandles[iconIndex])
             {
-                Bitmap bitmap = this.imageList.Images[iconIndex] as Bitmap;
+                var bitmap = this.imageList.Images[iconIndex] as Bitmap;
                 // If the image is not a bitmap, then we can not build the icon,
                 // so we have to return a null handle.
                 if (null == bitmap)
@@ -157,7 +157,7 @@ namespace Microsoft.VisualStudioTools.Project
         private void InitHandlesList()
         {
             this.iconHandles = new List<IntPtr>(this.imageList.Images.Count);
-            for (int i = 0; i < this.imageList.Images.Count; ++i)
+            for (var i = 0; i < this.imageList.Images.Count; ++i)
             {
                 this.iconHandles.Add(IntPtr.Zero);
             }

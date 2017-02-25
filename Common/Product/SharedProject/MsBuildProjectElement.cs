@@ -131,7 +131,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public override void Rename(string newPath)
         {
-            string escapedPath = Microsoft.Build.Evaluation.ProjectCollection.Escape(newPath);
+            var escapedPath = Microsoft.Build.Evaluation.ProjectCollection.Escape(newPath);
 
             this._item.Rename(escapedPath);
             this.RefreshProperties();
@@ -144,7 +144,7 @@ namespace Microsoft.VisualStudioTools.Project
             this._url = base.Url;
 
             IEnumerable<ProjectItem> items = this.ItemProject.BuildProject.GetItems(this._item.ItemType);
-            foreach (ProjectItem projectItem in items)
+            foreach (var projectItem in items)
             {
                 if (projectItem != null && projectItem.UnevaluatedInclude.Equals(this._item.UnevaluatedInclude))
                 {
@@ -169,21 +169,9 @@ namespace Microsoft.VisualStudioTools.Project
             base.RemoveFromProjectFile();
         }
 
-        internal MSBuild.ProjectItem Item
-        {
-            get
-            {
-                return this._item;
-            }
-        }
+        internal MSBuild.ProjectItem Item => this._item;
 
-        public override string Url
-        {
-            get
-            {
-                return this._url;
-            }
-        }
+        public override string Url => this._url;
 
         public override bool Equals(object obj)
         {
@@ -193,7 +181,7 @@ namespace Microsoft.VisualStudioTools.Project
                 return true;
             }
 
-            MsBuildProjectElement msBuildProjElem = obj as MsBuildProjectElement;
+            var msBuildProjElem = obj as MsBuildProjectElement;
             if (Object.ReferenceEquals(msBuildProjElem, null))
             {
                 return false;
@@ -204,8 +192,8 @@ namespace Microsoft.VisualStudioTools.Project
                 return false;
 
             // Do they have the same include?
-            string include1 = GetMetadata(ProjectFileConstants.Include);
-            string include2 = msBuildProjElem.GetMetadata(ProjectFileConstants.Include);
+            var include1 = GetMetadata(ProjectFileConstants.Include);
+            var include2 = msBuildProjElem.GetMetadata(ProjectFileConstants.Include);
 
             // Unfortunately the checking for nulls have to be done again, since neither String.Equals nor String.Compare can handle nulls.
             // Virtual folders should not be handled here.

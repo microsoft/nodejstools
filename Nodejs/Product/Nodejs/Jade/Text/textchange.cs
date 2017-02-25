@@ -104,11 +104,11 @@ namespace Microsoft.NodejsTools.Jade
             }
             else
             {
-                int oldStart = Math.Min(other.OldRange.Start, this.OldRange.Start);
-                int oldEnd = Math.Max(other.OldRange.End, this.OldRange.End);
+                var oldStart = Math.Min(other.OldRange.Start, this.OldRange.Start);
+                var oldEnd = Math.Max(other.OldRange.End, this.OldRange.End);
 
-                int newStart = Math.Min(other.NewRange.Start, this.NewRange.Start);
-                int newEnd = Math.Max(other.NewRange.End, this.NewRange.End);
+                var newStart = Math.Min(other.NewRange.Start, this.NewRange.Start);
+                var newEnd = Math.Max(other.NewRange.End, this.NewRange.End);
 
                 this.OldRange = new TextRange(oldStart, oldEnd);
                 this.NewRange = new TextRange(newStart, newEnd);
@@ -120,7 +120,7 @@ namespace Microsoft.NodejsTools.Jade
         #region ICloneable Members
         public object Clone()
         {
-            TextChange clone = this.MemberwiseClone() as TextChange;
+            var clone = this.MemberwiseClone() as TextChange;
 
             clone.OldRange = this.OldRange.Clone() as TextRange;
             clone.NewRange = this.NewRange.Clone() as TextRange;

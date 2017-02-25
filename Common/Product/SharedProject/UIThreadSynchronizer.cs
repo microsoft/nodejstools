@@ -63,11 +63,7 @@ namespace Microsoft.VisualStudioTools.Project
             return task.Result;
         }
 
-        public bool InvokeRequired
-        {
-            get { return Thread.CurrentThread != this._thread; }
-        }
-
+        public bool InvokeRequired => Thread.CurrentThread != this._thread;
         #endregion
     }
 }

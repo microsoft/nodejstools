@@ -43,21 +43,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             this._stackFrame = stackFrame;
         }
 
-        public NodeStackFrame StackFrame
-        {
-            get { return this._stackFrame; }
-        }
-
-        public AD7Engine Engine
-        {
-            get { return this._engine; }
-        }
-
-        public AD7Thread Thread
-        {
-            get { return this._thread; }
-        }
-
+        public NodeStackFrame StackFrame => this._stackFrame;
+        public AD7Engine Engine => this._engine;
+        public AD7Thread Thread => this._thread;
         private AD7MemoryAddress CodeContext
         {
             get
@@ -94,7 +82,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             // The optional information is requested by setting flags in the dwFieldSpec parameter.
             if ((dwFieldSpec & enum_FRAMEINFO_FLAGS.FIF_FUNCNAME) != 0)
             {
-                string funcName = this._stackFrame.FunctionName;
+                var funcName = this._stackFrame.FunctionName;
                 if (funcName == "<module>")
                 {
                     if (this._stackFrame.FileName.IndexOfAny(Path.GetInvalidPathChars()) == -1)
@@ -197,9 +185,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         private List<DEBUG_PROPERTY_INFO> CreateLocalProperties(uint radix)
         {
             var properties = new List<DEBUG_PROPERTY_INFO>();
-            IList<NodeEvaluationResult> locals = this._stackFrame.Locals;
+            var locals = this._stackFrame.Locals;
 
-            for (int i = 0; i < locals.Count; i++)
+            for (var i = 0; i < locals.Count; i++)
             {
                 var property = new AD7Property(this, locals[i]);
                 properties.Add(
@@ -217,9 +205,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         private List<DEBUG_PROPERTY_INFO> CreateParameterProperties(uint radix)
         {
             var properties = new List<DEBUG_PROPERTY_INFO>();
-            IList<NodeEvaluationResult> parameters = this._stackFrame.Parameters;
+            var parameters = this._stackFrame.Parameters;
 
-            for (int i = 0; i < parameters.Count; i++)
+            for (var i = 0; i < parameters.Count; i++)
             {
                 var property = new AD7Property(this, parameters[i]);
                 properties.Add(
@@ -372,8 +360,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             pbstrError = String.Empty;
             pichError = 0;
 
-            IEnumerable<NodeEvaluationResult> evaluationResults = this._stackFrame.Locals.Union(this._stackFrame.Parameters);
-            foreach (NodeEvaluationResult currVariable in evaluationResults)
+            var evaluationResults = this._stackFrame.Locals.Union(this._stackFrame.Parameters);
+            foreach (var currVariable in evaluationResults)
             {
                 if (String.CompareOrdinal(currVariable.Expression, pszCode) == 0)
                 {

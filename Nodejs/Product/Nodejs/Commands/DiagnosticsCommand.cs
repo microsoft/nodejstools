@@ -192,7 +192,7 @@ namespace Microsoft.NodejsTools.Commands
             {
                 try
                 {
-                    int length = File.ReadLines(file).Count();
+                    var length = File.ReadLines(file).Count();
                     ++this.count;
                     this.totalLineLength += length;
                     this.maxLineLength = Math.Max(this.maxLineLength, length);

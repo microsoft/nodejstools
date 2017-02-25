@@ -48,29 +48,11 @@ namespace Microsoft.VisualStudioTools.Project
         #endregion
 
         #region properties
-        protected uint EventsCookie
-        {
-            get
-            {
-                return this.eventsCookie;
-            }
-        }
+        protected uint EventsCookie => this.eventsCookie;
 
-        protected IVsTrackProjectDocuments2 ProjectDocumentTracker2
-        {
-            get
-            {
-                return this.projectDocTracker;
-            }
-        }
+        protected IVsTrackProjectDocuments2 ProjectDocumentTracker2 => this.projectDocTracker;
 
-        protected IServiceProvider ServiceProvider
-        {
-            get
-            {
-                return this.serviceProvider;
-            }
-        }
+        protected IServiceProvider ServiceProvider => this.serviceProvider;
         #endregion
 
         #region IVsTrackProjectDocumentsEvents2 Members

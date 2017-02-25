@@ -54,31 +54,11 @@ namespace Microsoft.VisualStudioTools.Project
         #endregion
 
         #region overridden properties
-        public override int MenuCommandId
-        {
-            get { return VsMenus.IDM_VS_CTXT_REFERENCE; }
-        }
+        public override int MenuCommandId => VsMenus.IDM_VS_CTXT_REFERENCE;
+        public override Guid ItemTypeGuid => Guid.Empty;
+        public override string Url => String.Empty;
 
-        public override Guid ItemTypeGuid
-        {
-            get { return Guid.Empty; }
-        }
-
-        public override string Url
-        {
-            get
-            {
-                return String.Empty;
-            }
-        }
-
-        public override string Caption
-        {
-            get
-            {
-                return String.Empty;
-            }
-        }
+        public override string Caption => String.Empty;
         #endregion
 
         #region overridden methods
@@ -110,11 +90,7 @@ namespace Microsoft.VisualStudioTools.Project
             return null;
         }
 
-        protected override bool SupportsIconMonikers
-        {
-            get { return true; }
-        }
-
+        protected override bool SupportsIconMonikers => true;
         protected override ImageMoniker GetIconMoniker(bool open)
         {
             return CanShowDefaultIcon() ? KnownMonikers.Reference : KnownMonikers.ReferenceWarning;
@@ -130,7 +106,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public override void Remove(bool removeFromStorage)
         {
-            ReferenceContainerNode parent = this.Parent as ReferenceContainerNode;
+            var parent = this.Parent as ReferenceContainerNode;
             base.Remove(removeFromStorage);
             if (parent != null)
             {
@@ -195,7 +171,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             this.ProjectMgr.Site.GetUIThread().MustBeCalledFromUIThread();
 
-            ReferenceContainerNode referencesFolder = this.ProjectMgr.GetReferenceContainer() as ReferenceContainerNode;
+            var referencesFolder = this.ProjectMgr.GetReferenceContainer() as ReferenceContainerNode;
             Utilities.CheckNotNull(referencesFolder, "Could not find the References node");
 
             CannotAddReferenceErrorMessage referenceErrorMessageHandler = null;
@@ -259,12 +235,12 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>true if the assembly has already been added.</returns>
         protected virtual bool IsAlreadyAdded()
         {
-            ReferenceContainerNode referencesFolder = this.ProjectMgr.GetReferenceContainer() as ReferenceContainerNode;
+            var referencesFolder = this.ProjectMgr.GetReferenceContainer() as ReferenceContainerNode;
             Utilities.CheckNotNull(referencesFolder, "Could not find the References node");
 
-            for (HierarchyNode n = referencesFolder.FirstChild; n != null; n = n.NextSibling)
+            for (var n = referencesFolder.FirstChild; n != null; n = n.NextSibling)
             {
-                ReferenceNode refererenceNode = n as ReferenceNode;
+                var refererenceNode = n as ReferenceNode;
                 if (null != refererenceNode)
                 {
                     // We check if the Url of the assemblies is the same.
@@ -292,19 +268,19 @@ namespace Microsoft.VisualStudioTools.Project
             // Request unmanaged code permission in order to be able to create the unmanaged memory representing the guid.
             new SecurityPermission(SecurityPermissionFlag.UnmanagedCode).Demand();
 
-            Guid guid = VSConstants.guidCOMPLUSLibrary;
-            IntPtr ptr = System.Runtime.InteropServices.Marshal.AllocCoTaskMem(guid.ToByteArray().Length);
+            var guid = VSConstants.guidCOMPLUSLibrary;
+            var ptr = System.Runtime.InteropServices.Marshal.AllocCoTaskMem(guid.ToByteArray().Length);
 
             System.Runtime.InteropServices.Marshal.StructureToPtr(guid, ptr, false);
-            int returnValue = VSConstants.S_OK;
+            var returnValue = VSConstants.S_OK;
             try
             {
-                VSOBJECTINFO[] objInfo = new VSOBJECTINFO[1];
+                var objInfo = new VSOBJECTINFO[1];
 
                 objInfo[0].pguidLib = ptr;
                 objInfo[0].pszLibName = this.Url;
 
-                IVsObjBrowser objBrowser = this.ProjectMgr.Site.GetService(typeof(SVsObjBrowser)) as IVsObjBrowser;
+                var objBrowser = this.ProjectMgr.Site.GetService(typeof(SVsObjBrowser)) as IVsObjBrowser;
 
                 ErrorHandler.ThrowOnFailure(objBrowser.NavigateTo(objInfo, 0));
             }

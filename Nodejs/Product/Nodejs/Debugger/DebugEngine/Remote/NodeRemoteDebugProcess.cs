@@ -43,16 +43,8 @@ namespace Microsoft.NodejsTools.Debugger.Remote
             this._version = version;
         }
 
-        public NodeRemoteDebugPort DebugPort
-        {
-            get { return this._port; }
-        }
-
-        public int Id
-        {
-            get { return this._id; }
-        }
-
+        public NodeRemoteDebugPort DebugPort => this._port;
+        public int Id => this._id;
         public int Attach(IDebugEventCallback2 pCallback, Guid[] rgguidSpecificEngines, uint celtSpecificEngines, int[] rghrEngineAttach)
         {
             throw new NotImplementedException();
@@ -180,9 +172,6 @@ namespace Microsoft.NodejsTools.Debugger.Remote
             }
         }
 
-        private string Title
-        {
-            get { return this._version; }
-        }
+        private string Title => this._version;
     }
 }

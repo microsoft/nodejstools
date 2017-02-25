@@ -51,16 +51,16 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
             return this.Project.ProjectNode.Site.GetUIThread().Invoke<EnvDTE.ProjectItem>(() =>
             {
-                ProjectItem result = AddFolder(directory, null);
+                var result = AddFolder(directory, null);
 
-                foreach (string subdirectory in Directory.EnumerateDirectories(directory))
+                foreach (var subdirectory in Directory.EnumerateDirectories(directory))
                 {
                     result.ProjectItems.AddFromDirectory(Path.Combine(directory, subdirectory));
                 }
 
                 foreach (var extension in this.Project.ProjectNode.CodeFileExtensions)
                 {
-                    foreach (string filename in Directory.EnumerateFiles(directory, "*" + extension))
+                    foreach (var filename in Directory.EnumerateFiles(directory, "*" + extension))
                     {
                         result.ProjectItems.AddFromFile(Path.Combine(directory, filename));
                     }
@@ -79,10 +79,10 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             CheckProjectIsValid();
 
-            ProjectNode proj = this.Project.ProjectNode;
+            var proj = this.Project.ProjectNode;
             EnvDTE.ProjectItem itemAdded = null;
 
-            using (AutomationScope scope = new AutomationScope(this.Project.ProjectNode.Site))
+            using (var scope = new AutomationScope(this.Project.ProjectNode.Site))
             {
                 // Determine the operation based on the extension of the filename.
                 // We should run the wizard only if the extension is vstemplate
@@ -99,15 +99,15 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                         op = VSADDITEMOPERATION.VSADDITEMOP_CLONEFILE;
                     }
 
-                    VSADDRESULT[] result = new VSADDRESULT[1];
+                    var result = new VSADDRESULT[1];
 
                     // It is not a very good idea to throw since the AddItem might return Cancel or Abort.
                     // The problem is that up in the call stack the wizard code does not check whether it has received a ProjectItem or not and will crash.
                     // The other problem is that we cannot get add wizard dialog back if a cancel or abort was returned because we throw and that code will never be executed. Typical catch 22.
                     ErrorHandler.ThrowOnFailure(proj.AddItem(this.NodeWithItems.ID, op, name, 0, new string[1] { fileName }, IntPtr.Zero, result));
 
-                    string fileDirectory = proj.GetBaseDirectoryForAddingFiles(this.NodeWithItems);
-                    string templateFilePath = System.IO.Path.Combine(fileDirectory, name);
+                    var fileDirectory = proj.GetBaseDirectoryForAddingFiles(this.NodeWithItems);
+                    var templateFilePath = System.IO.Path.Combine(fileDirectory, name);
                     itemAdded = this.EvaluateAddResult(result[0], templateFilePath);
                 });
             }
@@ -157,10 +157,10 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                     throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, "Folder already exists with the name '{0}'", name));
                 }
 
-                ProjectNode proj = this.Project.ProjectNode;
+                var proj = this.Project.ProjectNode;
 
                 HierarchyNode newFolder = null;
-                using (AutomationScope scope = new AutomationScope(this.Project.ProjectNode.Site))
+                using (var scope = new AutomationScope(this.Project.ProjectNode.Site))
                 {
                     //In the case that we are adding a folder to a folder, we need to build up
                     //the path to the project node.
@@ -207,18 +207,18 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             CheckProjectIsValid();
             return this.Project.ProjectNode.Site.GetUIThread().Invoke<EnvDTE.ProjectItem>(() =>
             {
-                ProjectNode proj = this.Project.ProjectNode;
+                var proj = this.Project.ProjectNode;
                 EnvDTE.ProjectItem itemAdded = null;
-                using (AutomationScope scope = new AutomationScope(this.Project.ProjectNode.Site))
+                using (var scope = new AutomationScope(this.Project.ProjectNode.Site))
                 {
-                    VSADDRESULT[] result = new VSADDRESULT[1];
+                    var result = new VSADDRESULT[1];
                     ErrorHandler.ThrowOnFailure(proj.AddItem(this.NodeWithItems.ID, op, path, 0, new string[1] { path }, IntPtr.Zero, result));
 
                     string realPath = null;
                     if (op != VSADDITEMOPERATION.VSADDITEMOP_LINKTOFILE)
                     {
-                        string fileName = Path.GetFileName(path);
-                        string fileDirectory = proj.GetBaseDirectoryForAddingFiles(this.NodeWithItems);
+                        var fileName = Path.GetFileName(path);
+                        var fileDirectory = proj.GetBaseDirectoryForAddingFiles(this.NodeWithItems);
                         realPath = Path.Combine(fileDirectory, fileName);
                     }
                     else
@@ -249,7 +249,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                     {
                         path = CommonUtils.EnsureEndSeparator(path);
                     }
-                    HierarchyNode nodeAdded = this.NodeWithItems.ProjectMgr.FindNodeByFullPath(path);
+                    var nodeAdded = this.NodeWithItems.ProjectMgr.FindNodeByFullPath(path);
                     Debug.Assert(nodeAdded != null, "We should have been able to find the new element in the hierarchy");
                     if (nodeAdded != null)
                     {

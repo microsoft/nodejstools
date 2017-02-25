@@ -28,21 +28,9 @@ namespace Microsoft.VisualStudioTools.Project
             Rename(path);
         }
 
-        public override bool IsExcluded
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool IsExcluded => true;
 
-        public new CommonProjectNode ItemProject
-        {
-            get
-            {
-                return (CommonProjectNode)base.ItemProject;
-            }
-        }
+        public new CommonProjectNode ItemProject => (CommonProjectNode)base.ItemProject;
 
         protected override string ItemType
         {

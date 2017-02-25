@@ -35,24 +35,12 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <summary>
         /// Defines a relationship to the associated project.
         /// </summary>
-        internal OAProject Project
-        {
-            get
-            {
-                return this.project;
-            }
-        }
+        internal OAProject Project => this.project;
 
         /// <summary>
         /// Defines the node that contains the items
         /// </summary>
-        internal HierarchyNode NodeWithItems
-        {
-            get
-            {
-                return this.nodeWithItems;
-            }
-        }
+        internal HierarchyNode NodeWithItems => this.nodeWithItems;
         #endregion
 
         #region ctor
@@ -78,11 +66,11 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                int count = 0;
+                var count = 0;
 
                 this.project.ProjectNode.Site.GetUIThread().Invoke(() =>
                 {
-                    for (HierarchyNode child = this.NodeWithItems.FirstChild; child != null; child = child.NextSibling)
+                    for (var child = this.NodeWithItems.FirstChild; child != null; child = child.NextSibling)
                     {
                         if (!child.IsNonMemberItem && child.GetAutomationObject() is EnvDTE.ProjectItem)
                         {
@@ -97,47 +85,24 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <summary>
         /// Gets the immediate parent object of a ProjectItems collection.
         /// </summary>
-        public virtual object Parent
-        {
-            get
-            {
-                return this.nodeWithItems.GetAutomationObject();
-            }
-        }
+        public virtual object Parent => this.nodeWithItems.GetAutomationObject();
 
         /// <summary>
         /// Gets an enumeration indicating the type of object.
         /// </summary>
-        public virtual string Kind
-        {
-            get
-            {
+        public virtual string Kind =>
                 // TODO:  Add OAProjectItems.Kind getter implementation
-                return null;
-            }
-        }
+                null;
 
         /// <summary>
         /// Gets the top-level extensibility object.
         /// </summary>
-        public virtual EnvDTE.DTE DTE
-        {
-            get
-            {
-                return (EnvDTE.DTE)this.project.DTE;
-            }
-        }
+        public virtual EnvDTE.DTE DTE => (EnvDTE.DTE)this.project.DTE;
 
         /// <summary>
         /// Gets the project hosting the project item or items.
         /// </summary>
-        public virtual EnvDTE.Project ContainingProject
-        {
-            get
-            {
-                return this.project;
-            }
-        }
+        public virtual EnvDTE.Project ContainingProject => this.project;
 
         /// <summary>
         /// Adds one or more ProjectItem objects from a directory to the ProjectItems collection. 
@@ -201,10 +166,10 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             // Changed from MPFProj: throws ArgumentException instead of returning null (http://mpfproj10.codeplex.com/workitem/9158)
             if (index is int)
             {
-                int realIndex = (int)index - 1;
+                var realIndex = (int)index - 1;
                 if (realIndex >= 0)
                 {
-                    for (HierarchyNode child = this.NodeWithItems.FirstChild; child != null; child = child.NextSibling)
+                    for (var child = this.NodeWithItems.FirstChild; child != null; child = child.NextSibling)
                     {
                         if (child.IsNonMemberItem)
                         {
@@ -224,8 +189,8 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             }
             else if (index is string)
             {
-                string name = (string)index;
-                for (HierarchyNode child = this.NodeWithItems.FirstChild; child != null; child = child.NextSibling)
+                var name = (string)index;
+                for (var child = this.NodeWithItems.FirstChild; child != null; child = child.NextSibling)
                 {
                     if (child.IsNonMemberItem)
                     {
@@ -247,7 +212,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <returns>An IEnumerator for this object.</returns>
         public virtual IEnumerator GetEnumerator()
         {
-            for (HierarchyNode child = this.NodeWithItems.FirstChild; child != null; child = child.NextSibling)
+            for (var child = this.NodeWithItems.FirstChild; child != null; child = child.NextSibling)
             {
                 if (child.IsNonMemberItem)
                 {

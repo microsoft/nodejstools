@@ -28,10 +28,8 @@ namespace Microsoft.NodejsTools.Project
     {
         internal DependencyNodeProperties(DependencyNode node) : base(node) { }
 
-        private DependencyNode DependencyNode { get { return this.Node as DependencyNode; } }
-
-        private IPackage Package { get { return this.DependencyNode.Package; } }
-
+        private DependencyNode DependencyNode => this.Node as DependencyNode;
+        private IPackage Package => this.DependencyNode.Package;
         public override string GetClassName()
         {
             return this.IsSubPackage
@@ -42,24 +40,12 @@ namespace Microsoft.NodejsTools.Project
         [SRCategory(SR.General)]
         [ResourcesDisplayName(nameof(Resources.NpmPackageName))]
         [ResourcesDescription(nameof(Resources.NpmPackageNameDescription))]
-        public string PackageName
-        {
-            get
-            {
-                return null == this.Package ? null : this.Package.Name;
-            }
-        }
+        public string PackageName => null == this.Package ? null : this.Package.Name;
 
         [ResourcesCategory(nameof(Resources.CategoryVersion))]
         [ResourcesDisplayName(nameof(Resources.NpmPackageVersion))]
         [ResourcesDescription(nameof(Resources.NpmPackageVersionDescription))]
-        public string PackageVersion
-        {
-            get
-            {
-                return null == this.Package ? null : this.Package.Version.ToString();
-            }
-        }
+        public string PackageVersion => null == this.Package ? null : this.Package.Version.ToString();
 
         [ResourcesCategory(nameof(Resources.CategoryVersion))]
         [ResourcesDisplayName(nameof(Resources.NpmPackageRequestedVersionRange))]
@@ -103,13 +89,7 @@ namespace Microsoft.NodejsTools.Project
         [SRCategory(SR.General)]
         [ResourcesDisplayName(nameof(Resources.NpmPackageDescription))]
         [ResourcesDescription(nameof(Resources.NpmPackageDescriptionDescription))]
-        public string Description
-        {
-            get
-            {
-                return null == this.Package ? null : this.Package.Description;
-            }
-        }
+        public string Description => null == this.Package ? null : this.Package.Description;
 
         [SRCategory(SR.General)]
         [ResourcesDisplayName(nameof(Resources.NpmPackageKeywords))]
@@ -151,13 +131,7 @@ namespace Microsoft.NodejsTools.Project
         [SRCategory(SR.General)]
         [ResourcesDisplayName(nameof(Resources.NpmPackagePath))]
         [ResourcesDescription(nameof(Resources.NpmPackagePathDescription))]
-        public string Path
-        {
-            get
-            {
-                return null == this.Package ? null : this.Package.Path;
-            }
-        }
+        public string Path => null == this.Package ? null : this.Package.Path;
 
         internal bool IsSubPackage
         {
@@ -175,15 +149,9 @@ namespace Microsoft.NodejsTools.Project
         [SRCategory(SR.General)]
         [ResourcesDisplayName(nameof(Resources.NpmPackageType))]
         [ResourcesDescription(nameof(Resources.NpmPackageTypeDescription))]
-        public string PackageType
-        {
-            get
-            {
-                return this.IsSubPackage
+        public string PackageType => this.IsSubPackage
                     ? Resources.PackageTypeLocalSubpackage
                     : Resources.PackageTypeLocal;
-            }
-        }
 
         [SRCategory(SR.General)]
         [ResourcesDisplayName(nameof(Resources.NpmPackageLinkStatus))]
@@ -203,56 +171,26 @@ namespace Microsoft.NodejsTools.Project
         [ResourcesCategory(nameof(Resources.CategoryStatus))]
         [ResourcesDisplayName(nameof(Resources.NpmPackageIsListedInParentPackageJson))]
         [ResourcesDescription(nameof(Resources.NpmPackageIsListedInParentPackageJsonDescription))]
-        public bool IsListedInParentPackageJson
-        {
-            get
-            {
-                return null != this.Package && this.Package.IsListedInParentPackageJson;
-            }
-        }
+        public bool IsListedInParentPackageJson => null != this.Package && this.Package.IsListedInParentPackageJson;
 
         [ResourcesCategory(nameof(Resources.CategoryStatus))]
         [ResourcesDisplayName(nameof(Resources.NpmPackageIsMissing))]
         [ResourcesDescription(nameof(Resources.NpmPackageIsMissingDescription))]
-        public bool IsMissing
-        {
-            get
-            {
-                return null != this.Package && this.Package.IsMissing;
-            }
-        }
+        public bool IsMissing => null != this.Package && this.Package.IsMissing;
 
         [ResourcesCategory(nameof(Resources.CategoryStatus))]
         [ResourcesDisplayName(nameof(Resources.NpmPackageIsDevDependency))]
         [ResourcesDescription(nameof(Resources.NpmPackageIsDevDependencyDescription))]
-        public bool IsDevDependency
-        {
-            get
-            {
-                return null != this.Package && this.Package.IsDevDependency;
-            }
-        }
+        public bool IsDevDependency => null != this.Package && this.Package.IsDevDependency;
 
         [ResourcesCategory(nameof(Resources.CategoryStatus))]
         [ResourcesDisplayName(nameof(Resources.NpmPackageIsOptionalDependency))]
         [ResourcesDescription(nameof(Resources.NpmPackageIsOptionalDependencyDescription))]
-        public bool IsOptionalDependency
-        {
-            get
-            {
-                return null != this.Package && this.Package.IsOptionalDependency;
-            }
-        }
+        public bool IsOptionalDependency => null != this.Package && this.Package.IsOptionalDependency;
 
         [ResourcesCategory(nameof(Resources.CategoryStatus))]
         [ResourcesDisplayName(nameof(Resources.NpmPackageIsBundledDependency))]
         [ResourcesDescription(nameof(Resources.NpmPackageIsBundledDependencyDescription))]
-        public bool IsBundledDependency
-        {
-            get
-            {
-                return null != this.Package && this.Package.IsBundledDependency;
-            }
-        }
+        public bool IsBundledDependency => null != this.Package && this.Package.IsBundledDependency;
     }
 }

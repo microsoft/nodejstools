@@ -68,10 +68,10 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                 return VSConstants.E_FAIL;
             }
 
-            int numStackFrames = stackFrames.Count;
+            var numStackFrames = stackFrames.Count;
             var frameInfoArray = new FRAMEINFO[numStackFrames];
 
-            for (int i = 0; i < numStackFrames; i++)
+            for (var i = 0; i < numStackFrames; i++)
             {
                 var frame = new AD7StackFrame(this._engine, this, stackFrames[i]);
                 frame.SetFrameInfo(dwFieldSpec, out frameInfoArray[i]);
@@ -105,7 +105,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         // Gets properties that describe a thread.
         int IDebugThread2.GetThreadProperties(enum_THREADPROPERTY_FIELDS dwFields, THREADPROPERTIES[] propertiesArray)
         {
-            THREADPROPERTIES props = new THREADPROPERTIES();
+            var props = new THREADPROPERTIES();
 
             if ((dwFields & enum_THREADPROPERTY_FIELDS.TPF_ID) != 0)
             {
@@ -211,9 +211,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         int IDebugThread100.GetThreadProperties100(uint dwFields, THREADPROPERTIES100[] props)
         {
             // Invoke GetThreadProperties to get the VS7/8/9 properties
-            THREADPROPERTIES[] props90 = new THREADPROPERTIES[1];
-            enum_THREADPROPERTY_FIELDS dwFields90 = (enum_THREADPROPERTY_FIELDS)(dwFields & 0x3f);
-            int hRes = ((IDebugThread2)this).GetThreadProperties(dwFields90, props90);
+            var props90 = new THREADPROPERTIES[1];
+            var dwFields90 = (enum_THREADPROPERTY_FIELDS)(dwFields & 0x3f);
+            var hRes = ((IDebugThread2)this).GetThreadProperties(dwFields90, props90);
             props[0].bstrLocation = props90[0].bstrLocation;
             props[0].bstrName = props90[0].bstrName;
             props[0].bstrPriority = props90[0].bstrPriority;

@@ -95,7 +95,7 @@ namespace Microsoft.VisualStudioTools.Project
             // initialize out parameter
             physicalView = null;
 
-            bool isSupportedView = false;
+            var isSupportedView = false;
             // Determine the physical view
             if (VSConstants.LOGVIEWID_Primary == logicalView ||
                 VSConstants.LOGVIEWID_Debugging == logicalView ||
@@ -172,7 +172,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             // Get a text buffer
-            IVsTextLines textLines = GetTextBuffer(docDataExisting);
+            var textLines = GetTextBuffer(docDataExisting);
 
             // Assign docData IntPtr to either existing docData or the new text buffer
             if (docDataExisting != IntPtr.Zero)
@@ -213,9 +213,9 @@ namespace Microsoft.VisualStudioTools.Project
             if (docDataExisting == IntPtr.Zero)
             {
                 // Create a new IVsTextLines buffer.
-                Type textLinesType = typeof(IVsTextLines);
-                Guid riid = textLinesType.GUID;
-                Guid clsid = typeof(VsTextBufferClass).GUID;
+                var textLinesType = typeof(IVsTextLines);
+                var riid = textLinesType.GUID;
+                var clsid = typeof(VsTextBufferClass).GUID;
                 textLines = this._package.CreateInstance(ref clsid, ref riid, textLinesType) as IVsTextLines;
 
                 // set the buffer's site
@@ -224,12 +224,12 @@ namespace Microsoft.VisualStudioTools.Project
             else
             {
                 // Use the existing text buffer
-                Object dataObject = Marshal.GetObjectForIUnknown(docDataExisting);
+                var dataObject = Marshal.GetObjectForIUnknown(docDataExisting);
                 textLines = dataObject as IVsTextLines;
                 if (textLines == null)
                 {
                     // Try get the text buffer from textbuffer provider
-                    IVsTextBufferProvider textBufferProvider = dataObject as IVsTextBufferProvider;
+                    var textBufferProvider = dataObject as IVsTextBufferProvider;
                     if (textBufferProvider != null)
                     {
                         textBufferProvider.GetTextBuffer(out textLines);
@@ -271,21 +271,21 @@ namespace Microsoft.VisualStudioTools.Project
         private IntPtr CreateFormView(IVsHierarchy hierarchy, uint itemid, IVsTextLines textLines, ref string editorCaption, ref Guid cmdUI)
         {
             // Request the Designer Service
-            IVSMDDesignerService designerService = (IVSMDDesignerService)GetService(typeof(IVSMDDesignerService));
+            var designerService = (IVSMDDesignerService)GetService(typeof(IVSMDDesignerService));
 
             // Create loader for the designer
-            IVSMDDesignerLoader designerLoader = (IVSMDDesignerLoader)designerService.CreateDesignerLoader("Microsoft.VisualStudio.Designer.Serialization.VSDesignerLoader");
+            var designerLoader = (IVSMDDesignerLoader)designerService.CreateDesignerLoader("Microsoft.VisualStudio.Designer.Serialization.VSDesignerLoader");
 
-            bool loaderInitalized = false;
+            var loaderInitalized = false;
             try
             {
-                IOleServiceProvider provider = this._serviceProvider.GetService(typeof(IOleServiceProvider)) as IOleServiceProvider;
+                var provider = this._serviceProvider.GetService(typeof(IOleServiceProvider)) as IOleServiceProvider;
                 // Initialize designer loader 
                 designerLoader.Initialize(provider, hierarchy, (int)itemid, textLines);
                 loaderInitalized = true;
 
                 // Create the designer
-                IVSMDDesigner designer = designerService.CreateDesigner(provider, designerLoader);
+                var designer = designerService.CreateDesigner(provider, designerLoader);
 
                 // Get editor caption
                 editorCaption = designerLoader.GetEditorCaption((int)READONLYSTATUS.ROSTATUS_Unknown);
@@ -313,15 +313,15 @@ namespace Microsoft.VisualStudioTools.Project
 
         private IntPtr CreateCodeView(string documentMoniker, IVsTextLines textLines, ref string editorCaption, ref Guid cmdUI)
         {
-            Type codeWindowType = typeof(IVsCodeWindow);
-            Guid riid = codeWindowType.GUID;
-            Guid clsid = typeof(VsCodeWindowClass).GUID;
-            IVsCodeWindow window = (IVsCodeWindow)this._package.CreateInstance(ref clsid, ref riid, codeWindowType);
+            var codeWindowType = typeof(IVsCodeWindow);
+            var riid = codeWindowType.GUID;
+            var clsid = typeof(VsCodeWindowClass).GUID;
+            var window = (IVsCodeWindow)this._package.CreateInstance(ref clsid, ref riid, codeWindowType);
             ErrorHandler.ThrowOnFailure(window.SetBuffer(textLines));
             ErrorHandler.ThrowOnFailure(window.SetBaseEditorCaption(null));
             ErrorHandler.ThrowOnFailure(window.GetEditorCaption(READONLYSTATUS.ROSTATUS_Unknown, out editorCaption));
 
-            IVsUserData userData = textLines as IVsUserData;
+            var userData = textLines as IVsUserData;
             if (userData != null)
             {
                 if (this._promptEncodingOnLoad)
@@ -352,12 +352,12 @@ namespace Microsoft.VisualStudioTools.Project
 
         protected void InitializeLanguageService(IVsTextLines textLines, Guid langSid)
         {
-            IVsUserData userData = textLines as IVsUserData;
+            var userData = textLines as IVsUserData;
             if (userData != null)
             {
                 if (langSid != Guid.Empty)
                 {
-                    Guid vsCoreSid = new Guid("{8239bec4-ee87-11d0-8c98-00c04fc2ab22}");
+                    var vsCoreSid = new Guid("{8239bec4-ee87-11d0-8c98-00c04fc2ab22}");
                     Guid currentSid;
                     ErrorHandler.ThrowOnFailure(textLines.GetLanguageServiceID(out currentSid));
                     // If the language service is set to the default SID, then
@@ -372,7 +372,7 @@ namespace Microsoft.VisualStudioTools.Project
                         throw new COMException("Incompatible doc data", VSConstants.VS_E_INCOMPATIBLEDOCDATA);
                     }
 
-                    Guid bufferDetectLang = VSConstants.VsTextBufferUserDataGuid.VsBufferDetectLangSID_guid;
+                    var bufferDetectLang = VSConstants.VsTextBufferUserDataGuid.VsBufferDetectLangSID_guid;
                     ErrorHandler.ThrowOnFailure(userData.SetData(ref bufferDetectLang, false));
                 }
             }

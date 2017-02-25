@@ -119,11 +119,7 @@ namespace Microsoft.NodejsTools.NpmUI
             StartFilter();
         }
 
-        public NpmOutputViewModel ExecuteViewModel
-        {
-            get { return this._executeViewModel; }
-        }
-
+        public NpmOutputViewModel ExecuteViewModel => this._executeViewModel;
         #region Catalog control and refresh
         public bool IsLoadingCatalog
         {
@@ -136,11 +132,7 @@ namespace Microsoft.NodejsTools.NpmUI
             }
         }
 
-        public bool CanRefreshCatalog
-        {
-            get { return !this.IsLoadingCatalog; }
-        }
-
+        public bool CanRefreshCatalog => !this.IsLoadingCatalog;
         public bool IsCatalogEmpty
         {
             get { return this._isCatalogEmpty; }
@@ -461,11 +453,7 @@ namespace Microsoft.NodejsTools.NpmUI
             }
         }
 
-        public Visibility FilterControlsVisibility
-        {
-            get { return this.LoadingCatalogControlVisibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible; }
-        }
-
+        public Visibility FilterControlsVisibility => this.LoadingCatalogControlVisibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
         #endregion
 
         #region Installation

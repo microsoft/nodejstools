@@ -33,13 +33,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
         #endregion
 
-        private new ReferenceNode Node
-        {
-            get
-            {
-                return (ReferenceNode)base.Node;
-            }
-        }
+        private new ReferenceNode Node => (ReferenceNode)base.Node;
 
         #region overridden methods
         /// <summary>
@@ -83,7 +77,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             get
             {
                 // Get the parent node (ReferenceContainerNode)
-                ReferenceContainerNode parentNode = this.Node.Parent as ReferenceContainerNode;
+                var parentNode = this.Node.Parent as ReferenceContainerNode;
                 Debug.Assert(parentNode != null, "Failed to get the parent node");
 
                 // Get the ProjectItems object for the parent node

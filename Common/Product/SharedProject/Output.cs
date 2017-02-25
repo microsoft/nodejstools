@@ -89,7 +89,7 @@ namespace Microsoft.VisualStudioTools.Project
                 return VSConstants.S_OK;
             }
 
-            string path = this.output.GetMetadataValue(ProjectFileConstants.FinalOutputPath);
+            var path = this.output.GetMetadataValue(ProjectFileConstants.FinalOutputPath);
             if (string.IsNullOrEmpty(path))
             {
                 pbstrDeploySourceURL = new Url(this.output.GetMetadataValue("FullPath")).Uri.AbsoluteUri;
@@ -119,7 +119,7 @@ namespace Microsoft.VisualStudioTools.Project
                 pvar = null;
                 return VSConstants.E_NOTIMPL;
             }
-            String value = this.output.GetMetadataValue(szProperty);
+            var value = this.output.GetMetadataValue(szProperty);
             pvar = value;
 
             // If we don't have a value, we are expected to return unimplemented
@@ -140,7 +140,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             if (ErrorHandler.Succeeded(this.get_Property("TargetPath", out variant)))
             {
-                string var = variant as String;
+                var var = variant as String;
 
                 if (var != null)
                 {
@@ -149,8 +149,8 @@ namespace Microsoft.VisualStudioTools.Project
             }
             else
             {
-                string baseDir = this.project.ProjectHome;
-                string fullPath = this.output.GetMetadataValue("FullPath");
+                var baseDir = this.project.ProjectHome;
+                var fullPath = this.output.GetMetadataValue("FullPath");
                 if (CommonUtils.IsSubpathOf(baseDir, fullPath))
                 {
                     pbstrRelativePath = CommonUtils.GetRelativeFilePath(baseDir, fullPath);

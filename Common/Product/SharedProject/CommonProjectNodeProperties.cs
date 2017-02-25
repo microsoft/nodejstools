@@ -136,13 +136,7 @@ namespace Microsoft.VisualStudioTools.Project
         [SRCategoryAttribute(SR.Misc)]
         [SRDisplayName(SR.ProjectHome)]
         [SRDescriptionAttribute(SR.ProjectHomeDescription)]
-        public string ProjectHome
-        {
-            get
-            {
-                return this.Node.ProjectMgr.ProjectHome;
-            }
-        }
+        public string ProjectHome => this.Node.ProjectMgr.ProjectHome;
 
         #endregion
 
@@ -161,13 +155,7 @@ namespace Microsoft.VisualStudioTools.Project
         #region ProjectProperties Members
 
         [Browsable(false)]
-        public string AbsoluteProjectDirectory
-        {
-            get
-            {
-                return this.Node.ProjectMgr.ProjectFolder;
-            }
-        }
+        public string AbsoluteProjectDirectory => this.Node.ProjectMgr.ProjectFolder;
 
         [Browsable(false)]
         public VSLangProj.ProjectConfigurationProperties ActiveConfigurationSettings
@@ -183,17 +171,9 @@ namespace Microsoft.VisualStudioTools.Project
         }
 
         [Browsable(false)]
-        public string ActiveFileSharePath
-        {
-            get { throw new NotImplementedException(); }
-        }
-
+        public string ActiveFileSharePath => throw new NotImplementedException();
         [Browsable(false)]
-        public VSLangProj.prjWebAccessMethod ActiveWebAccessMethod
-        {
-            get { throw new NotImplementedException(); }
-        }
-
+        public VSLangProj.prjWebAccessMethod ActiveWebAccessMethod => throw new NotImplementedException();
         [Browsable(false)]
         public string ApplicationIcon
         {
@@ -325,11 +305,7 @@ namespace Microsoft.VisualStudioTools.Project
         }
 
         [Browsable(false)]
-        public new object ExtenderNames
-        {
-            get { throw new NotImplementedException(); }
-        }
-
+        public new object ExtenderNames => throw new NotImplementedException();
         [Browsable(false)]
         public string FileSharePath
         {
@@ -357,17 +333,9 @@ namespace Microsoft.VisualStudioTools.Project
         }
 
         [Browsable(false)]
-        public string LocalPath
-        {
-            get { throw new NotImplementedException(); }
-        }
-
+        public string LocalPath => throw new NotImplementedException();
         [Browsable(false)]
-        public string OfflineURL
-        {
-            get { throw new NotImplementedException(); }
-        }
-
+        public string OfflineURL => throw new NotImplementedException();
         [Browsable(false)]
         public VSLangProj.prjCompare OptionCompare
         {
@@ -408,11 +376,7 @@ namespace Microsoft.VisualStudioTools.Project
         }
 
         [Browsable(false)]
-        public string OutputFileName
-        {
-            get { throw new NotImplementedException(); }
-        }
-
+        public string OutputFileName => throw new NotImplementedException();
         [Browsable(false)]
         public VSLangProj.prjOutputType OutputType
         {
@@ -427,11 +391,7 @@ namespace Microsoft.VisualStudioTools.Project
         }
 
         [Browsable(false)]
-        public VSLangProj.prjProjectType ProjectType
-        {
-            get { throw new NotImplementedException(); }
-        }
-
+        public VSLangProj.prjProjectType ProjectType => throw new NotImplementedException();
         [Browsable(false)]
         public string ReferencePath
         {
@@ -446,11 +406,7 @@ namespace Microsoft.VisualStudioTools.Project
         }
 
         [Browsable(false)]
-        public string ServerExtensionsVersion
-        {
-            get { throw new NotImplementedException(); }
-        }
-
+        public string ServerExtensionsVersion => throw new NotImplementedException();
         [Browsable(false)]
         public string StartupObject
         {
@@ -474,11 +430,7 @@ namespace Microsoft.VisualStudioTools.Project
         }
 
         [Browsable(false)]
-        public string URL
-        {
-            get { return CommonUtils.MakeUri(this.Node.ProjectMgr.Url, false, UriKind.Absolute).AbsoluteUri; }
-        }
-
+        public string URL => CommonUtils.MakeUri(this.Node.ProjectMgr.Url, false, UriKind.Absolute).AbsoluteUri;
         [Browsable(false)]
         public VSLangProj.prjWebAccessMethod WebAccessMethod
         {
@@ -493,29 +445,13 @@ namespace Microsoft.VisualStudioTools.Project
         }
 
         [Browsable(false)]
-        public string WebServer
-        {
-            get { throw new NotImplementedException(); }
-        }
-
+        public string WebServer => throw new NotImplementedException();
         [Browsable(false)]
-        public string WebServerVersion
-        {
-            get { throw new NotImplementedException(); }
-        }
-
+        public string WebServerVersion => throw new NotImplementedException();
         [Browsable(false)]
-        public string __id
-        {
-            get { throw new NotImplementedException(); }
-        }
-
+        public string __id => throw new NotImplementedException();
         [Browsable(false)]
-        public object __project
-        {
-            get { throw new NotImplementedException(); }
-        }
-
+        public object __project => throw new NotImplementedException();
         [Browsable(false)]
         public object get_Extender(string ExtenderName)
         {

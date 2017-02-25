@@ -50,11 +50,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
             this._stream = new WebSocketStream(this._webSocket);
         }
 
-        public bool Connected
-        {
-            get { return this._webSocket.State == WebSocketState.Open; }
-        }
-
+        public bool Connected => this._webSocket.State == WebSocketState.Open;
         public void Dispose()
         {
             this._stream.Dispose();

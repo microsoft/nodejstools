@@ -36,10 +36,10 @@ namespace Microsoft.VisualStudioTools.Project
                 return;
             }
 
-            FileDocumentManager manager = this.GetDocumentManager() as FileDocumentManager;
+            var manager = this.GetDocumentManager() as FileDocumentManager;
             Utilities.CheckNotNull(manager, "Could not get the FileDocumentManager");
 
-            Guid viewGuid = Guid.Empty;
+            var viewGuid = Guid.Empty;
             IVsWindowFrame frame;
             manager.Open(false, false, viewGuid, out frame, WindowFrameShowAction.Show);
         }

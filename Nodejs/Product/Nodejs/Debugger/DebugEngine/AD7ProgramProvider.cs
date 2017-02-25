@@ -49,13 +49,13 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                 IDebugCoreServer3 server;
                 if (ErrorHandler.Succeeded(port.GetServer(out server)))
                 {
-                    IDebugCoreServer90 dbgServer = server as IDebugCoreServer90;
+                    var dbgServer = server as IDebugCoreServer90;
                     if (dbgServer != null)
                     {
-                        Guid g = typeof(IDebugProgramProvider2).GUID;
+                        var g = typeof(IDebugProgramProvider2).GUID;
                         IntPtr remoteProviderPunk;
 
-                        int hr = dbgServer.CreateManagedInstanceInServer(typeof(AD7ProgramProvider).FullName, typeof(AD7ProgramProvider).Assembly.FullName, 0, ref g, out remoteProviderPunk);
+                        var hr = dbgServer.CreateManagedInstanceInServer(typeof(AD7ProgramProvider).FullName, typeof(AD7ProgramProvider).Assembly.FullName, 0, ref g, out remoteProviderPunk);
                         try
                         {
                             if (ErrorHandler.Succeeded(hr))

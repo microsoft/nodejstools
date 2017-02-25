@@ -23,21 +23,9 @@ namespace Microsoft.NodejsTools.Project
 
         #region HierarchyNode implementation
 
-        public override Guid ItemTypeGuid
-        {
-            get { return VSConstants.GUID_ItemType_VirtualFolder; }
-        }
-
-        public override Guid MenuGroupId
-        {
-            get { return Guids.NodejsNpmCmdSet; }
-        }
-
-        public override int MenuCommandId
-        {
-            get { return PkgCmdId.menuIdNpm; }
-        }
-
+        public override Guid ItemTypeGuid => VSConstants.GUID_ItemType_VirtualFolder;
+        public override Guid MenuGroupId => Guids.NodejsNpmCmdSet;
+        public override int MenuCommandId => PkgCmdId.menuIdNpm;
         /// <summary>
         /// Disable inline editing of Caption.
         /// </summary>
@@ -46,11 +34,7 @@ namespace Microsoft.NodejsTools.Project
             return null;
         }
 
-        protected override bool SupportsIconMonikers
-        {
-            get { return true; }
-        }
-
+        protected override bool SupportsIconMonikers => true;
         /// <summary>
         /// Returns the icon to use.
         /// </summary>

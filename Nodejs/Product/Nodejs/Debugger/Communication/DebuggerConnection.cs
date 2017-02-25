@@ -118,11 +118,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
         /// <summary>
         /// Gets a Node.js version, or <c>null</c> if it was not supplied by the debuggee.
         /// </summary>
-        public Version NodeVersion
-        {
-            get { return this._nodeVersion; }
-        }
-
+        public Version NodeVersion => this._nodeVersion;
         /// <summary>
         /// Connect to specified debugger endpoint.
         /// </summary>
@@ -135,7 +131,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
             Close();
             lock (this._networkClientLock)
             {
-                int connection_attempts = 0;
+                var connection_attempts = 0;
                 const int MAX_ATTEMPTS = 5;
                 while (true)
                 {
@@ -208,7 +204,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
                 var stream = networkClient.GetStream();
                 while (this.Connected)
                 {
-                    byte[] packet = await this._packetsToSend.TakeAsync().ConfigureAwait(false);
+                    var packet = await this._packetsToSend.TakeAsync().ConfigureAwait(false);
                     await stream.WriteAsync(packet, 0, packet.Length).ConfigureAwait(false);
                     await stream.FlushAsync().ConfigureAwait(false);
                 }
@@ -262,7 +258,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
                 while (true)
                 {
                     // Read the header of this message.
-                    int contentLength = 0;
+                    var contentLength = 0;
                     while (true)
                     {
                         // Read a single header field.
@@ -270,7 +266,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
                         sb.Clear();
                         while (true)
                         {
-                            int bytesRead = await stream.ReadAsync(buffer, 0, 1).ConfigureAwait(false);
+                            var bytesRead = await stream.ReadAsync(buffer, 0, 1).ConfigureAwait(false);
                             if (bytesRead < 1)
                             {
                                 // End of stream - we are disconnected from debuggee.
@@ -332,12 +328,12 @@ namespace Microsoft.NodejsTools.Debugger.Communication
                     // because of a single long message.
                     var bodyBuffer = buffer.Length >= contentLength ? buffer : new byte[contentLength];
 
-                    for (int i = 0; i < contentLength;)
+                    for (var i = 0; i < contentLength;)
                     {
                         i += await stream.ReadAsync(bodyBuffer, i, contentLength - i).ConfigureAwait(false);
                     }
 
-                    string message = _encoding.GetString(bodyBuffer, 0, contentLength);
+                    var message = _encoding.GetString(bodyBuffer, 0, contentLength);
                     LiveLogger.WriteLine("Response: " + message, typeof(DebuggerConnection));
 
                     // Notify subscribers.

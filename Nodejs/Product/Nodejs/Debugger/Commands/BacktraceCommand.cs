@@ -41,11 +41,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands
             };
         }
 
-        protected override IDictionary<string, object> Arguments
-        {
-            get { return this._arguments; }
-        }
-
+        protected override IDictionary<string, object> Arguments => this._arguments;
         public int CallstackDepth { get; private set; }
         public List<NodeStackFrame> StackFrames { get; private set; }
         public Dictionary<int, NodeModule> Modules { get; private set; }
@@ -54,7 +50,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands
         {
             base.ProcessResponse(response);
 
-            JToken body = response["body"];
+            var body = response["body"];
             this.CallstackDepth = (int)body["totalFrames"];
 
             // Collect frames only if required
@@ -69,13 +65,13 @@ namespace Microsoft.NodejsTools.Debugger.Commands
             this.Modules = GetModules((JArray)response["refs"]);
 
             // Extract frames
-            JArray frames = (JArray)body["frames"] ?? new JArray();
+            var frames = (JArray)body["frames"] ?? new JArray();
             this.StackFrames = new List<NodeStackFrame>(frames.Count);
 
-            foreach (JToken frame in frames)
+            foreach (var frame in frames)
             {
                 // Create stack frame
-                string functionName = GetFunctionName(frame);
+                var functionName = GetFunctionName(frame);
                 var moduleId = (int?)frame["func"]["scriptId"];
 
                 NodeModule module;
@@ -84,9 +80,9 @@ namespace Microsoft.NodejsTools.Debugger.Commands
                     module = this._unknownModule;
                 }
 
-                int line = (int?)frame["line"] ?? 0;
-                int column = (int?)frame["column"] ?? 0;
-                int frameId = (int?)frame["index"] ?? 0;
+                var line = (int?)frame["line"] ?? 0;
+                var column = (int?)frame["column"] ?? 0;
+                var frameId = (int?)frame["index"] ?? 0;
 
                 var stackFrame = new NodeStackFrame(frameId)
                 {
@@ -97,7 +93,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands
                 };
 
                 // Locals
-                JArray variables = (JArray)frame["locals"] ?? new JArray();
+                var variables = (JArray)frame["locals"] ?? new JArray();
                 stackFrame.Locals = GetVariables(stackFrame, variables);
 
                 // Arguments
@@ -116,7 +112,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands
 
         private static string GetFunctionName(JToken frame)
         {
-            JToken func = frame["func"];
+            var func = frame["func"];
             var framename = (string)func["name"];
             if (string.IsNullOrEmpty(framename))
             {
@@ -132,7 +128,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands
         private static Dictionary<int, NodeModule> GetModules(JArray references)
         {
             var scripts = new Dictionary<int, NodeModule>(references.Count);
-            foreach (JToken reference in references)
+            foreach (var reference in references)
             {
                 var scriptId = (int)reference["id"];
                 var fileName = (string)reference["name"];

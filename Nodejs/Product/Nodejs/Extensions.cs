@@ -30,8 +30,8 @@ namespace Microsoft.NodejsTools
     {
         internal static bool IsPlatformAware(this ProjectNode projectNode)
         {
-            string platAwarePropStr = projectNode.BuildProject.GetPropertyValue(ProjectFileConstants.PlatformAware);
-            bool isPlatformAware = false;
+            var platAwarePropStr = projectNode.BuildProject.GetPropertyValue(ProjectFileConstants.PlatformAware);
+            var isPlatformAware = false;
             bool.TryParse(platAwarePropStr, out isPlatformAware);
             return isPlatformAware;
         }
@@ -48,7 +48,7 @@ namespace Microsoft.NodejsTools
                 flags,
                 ref guid,
                 out hierarchies)));
-            IVsHierarchy[] hierarchy = new IVsHierarchy[1];
+            var hierarchy = new IVsHierarchy[1];
             uint fetched;
             while (ErrorHandler.Succeeded(hierarchies.Next(1, hierarchy, out fetched)) && fetched == 1)
             {
@@ -76,7 +76,7 @@ namespace Microsoft.NodejsTools
                 {
                     if (enumHierarchyItems != null)
                     {
-                        VSITEMSELECTION[] rgelt = new VSITEMSELECTION[1];
+                        var rgelt = new VSITEMSELECTION[1];
                         uint fetched;
                         while (VSConstants.S_OK == enumHierarchyItems.Next(1, rgelt, out fetched) && fetched == 1)
                         {
@@ -114,7 +114,7 @@ namespace Microsoft.NodejsTools
 
         internal static T[] Append<T>(this T[] list, T item)
         {
-            T[] res = new T[list.Length + 1];
+            var res = new T[list.Length + 1];
             list.CopyTo(res, 0);
             res[res.Length - 1] = item;
             return res;

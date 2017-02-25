@@ -46,13 +46,7 @@ namespace Microsoft.VisualStudioTools
             }
         }
 
-        public override bool InvokeRequired
-        {
-            get
-            {
-                return Thread.CurrentThread != this._uiThread;
-            }
-        }
+        public override bool InvokeRequired => Thread.CurrentThread != this._uiThread;
 
         public override void MustBeCalledFromUIThreadOrThrow()
         {

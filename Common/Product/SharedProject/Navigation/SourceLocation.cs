@@ -76,27 +76,15 @@ namespace Microsoft.VisualStudioTools.Parsing
         /// <summary>
         /// The index in the source stream the location represents (0-based).
         /// </summary>
-        public int Index
-        {
-            get { return this._index; }
-        }
-
+        public int Index => this._index;
         /// <summary>
         /// The line in the source stream the location represents (1-based).
         /// </summary>
-        public int Line
-        {
-            get { return this._line; }
-        }
-
+        public int Line => this._line;
         /// <summary>
         /// The column in the source stream the location represents (1-based).
         /// </summary>
-        public int Column
-        {
-            get { return this._column; }
-        }
-
+        public int Column => this._column;
         /// <summary>
         /// Compares two specified location values to see if they are equal.
         /// </summary>
@@ -198,20 +186,14 @@ namespace Microsoft.VisualStudioTools.Parsing
         /// Whether the location is a valid location.
         /// </summary>
         /// <returns>True if the location is valid, False otherwise.</returns>
-        public bool IsValid
-        {
-            get
-            {
-                return this._line != 0 && this._column != 0;
-            }
-        }
+        public bool IsValid => this._line != 0 && this._column != 0;
 
         public override bool Equals(object obj)
         {
             if (!(obj is SourceLocation))
                 return false;
 
-            SourceLocation other = (SourceLocation)obj;
+            var other = (SourceLocation)obj;
             return other._index == this._index && other._line == this._line && other._column == this._column;
         }
 

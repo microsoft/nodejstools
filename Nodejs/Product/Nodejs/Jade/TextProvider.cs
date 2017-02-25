@@ -88,16 +88,16 @@ namespace Microsoft.NodejsTools.Jade
 
         public int IndexOf(string text, ITextRange range, bool ignoreCase)
         {
-            for (int i = range.Start; i < range.End; i++)
+            for (var i = range.Start; i < range.End; i++)
             {
-                bool found = true;
-                int k = i;
+                var found = true;
+                var k = i;
                 int j;
 
                 for (j = 0; j < text.Length && k < range.End; j++, k++)
                 {
-                    char ch1 = text[j];
-                    char ch2 = this[k];
+                    var ch1 = text[j];
+                    var ch2 = this[k];
 
                     if (ignoreCase)
                     {
@@ -138,21 +138,13 @@ namespace Microsoft.NodejsTools.Jade
             return new TextProvider(this._snapshot, this._partial);
         }
 
-        public int Version
-        {
-            get { return this._snapshot.Version.VersionNumber; }
-        }
-
+        public int Version => this._snapshot.Version.VersionNumber;
 #pragma warning disable 0067
         public event System.EventHandler<TextChangeEventArgs> OnTextChange;
 
         #region ITextSnapshotProvider
 
-        public ITextSnapshot Snapshot
-        {
-            get { return this._snapshot; }
-        }
-
+        public ITextSnapshot Snapshot => this._snapshot;
         #endregion
     }
 }

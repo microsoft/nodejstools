@@ -80,9 +80,6 @@ namespace Microsoft.VisualStudioTools
             throw new NotImplementedException();
         }
 
-        public override bool InvokeRequired
-        {
-            get { throw new NotImplementedException(); }
-        }
+        public override bool InvokeRequired => throw new NotImplementedException();
     }
 }

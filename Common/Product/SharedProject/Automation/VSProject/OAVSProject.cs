@@ -45,14 +45,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             throw new NotImplementedException();
         }
 
-        public virtual BuildManager BuildManager
-        {
-            get
-            {
-                throw new NotImplementedException();
-                //return new OABuildManager(this.project);
-            }
-        }
+        public virtual BuildManager BuildManager => throw new NotImplementedException();
 
         public virtual void CopyProject(string bstrDestFolder, string bstrDestUNCPath, prjCopyProjectOption copyProjectOption, string bstrUsername, string bstrPassword)
         {
@@ -64,13 +57,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             throw new NotImplementedException();
         }
 
-        public virtual DTE DTE
-        {
-            get
-            {
-                return (EnvDTE.DTE)this.project.Site.GetService(typeof(EnvDTE.DTE));
-            }
-        }
+        public virtual DTE DTE => (EnvDTE.DTE)this.project.Site.GetService(typeof(EnvDTE.DTE));
 
         public virtual VSProjectEvents Events
         {
@@ -97,27 +84,15 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             throw new NotImplementedException(); ;
         }
 
-        public virtual Imports Imports
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public virtual Imports Imports => throw new NotImplementedException();
 
-        public virtual EnvDTE.Project Project
-        {
-            get
-            {
-                return this.project.GetAutomationObject() as EnvDTE.Project;
-            }
-        }
+        public virtual EnvDTE.Project Project => this.project.GetAutomationObject() as EnvDTE.Project;
 
         public virtual References References
         {
             get
             {
-                ReferenceContainerNode references = this.project.GetReferenceContainer() as ReferenceContainerNode;
+                var references = this.project.GetReferenceContainer() as ReferenceContainerNode;
                 if (null == references)
                 {
                     return new OAReferences(null, this.project);
@@ -130,21 +105,9 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
         }
 
-        public virtual string TemplatePath
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public virtual string TemplatePath => throw new NotImplementedException();
 
-        public virtual ProjectItem WebReferencesFolder
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public virtual ProjectItem WebReferencesFolder => throw new NotImplementedException();
 
         public virtual bool WorkOffline
         {
@@ -180,29 +143,11 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
         #region VSProjectEvents Members
 
-        public virtual BuildManagerEvents BuildManagerEvents
-        {
-            get
-            {
-                return this.vsProject.BuildManager as BuildManagerEvents;
-            }
-        }
+        public virtual BuildManagerEvents BuildManagerEvents => this.vsProject.BuildManager as BuildManagerEvents;
 
-        public virtual ImportsEvents ImportsEvents
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public virtual ImportsEvents ImportsEvents => throw new NotImplementedException();
 
-        public virtual ReferencesEvents ReferencesEvents
-        {
-            get
-            {
-                return this.vsProject.References as ReferencesEvents;
-            }
-        }
+        public virtual ReferencesEvents ReferencesEvents => this.vsProject.References as ReferencesEvents;
 
         #endregion
     }

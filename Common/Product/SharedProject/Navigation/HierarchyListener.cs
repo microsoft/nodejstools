@@ -32,15 +32,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             this._itemId = itemId;
             this._fileName = canonicalName;
         }
-        public string CanonicalName
-        {
-            get { return this._fileName; }
-        }
-        public uint ItemID
-        {
-            get { return this._itemId; }
-        }
-        public IVsTextLines TextBuffer
+        public string CanonicalName => this._fileName; public uint ItemID => this._itemId; public IVsTextLines TextBuffer
         {
             get { return this._buffer; }
             set { this._buffer = value; }
@@ -64,17 +56,9 @@ namespace Microsoft.VisualStudioTools.Navigation
                 this._manager = manager;
             }
 
-            protected IVsHierarchy Hierarchy
-            {
-                get { return this._hierarchy; }
-            }
-
+            protected IVsHierarchy Hierarchy => this._hierarchy;
             #region Public Methods
-            public bool IsListening
-            {
-                get { return (0 != this._cookie); }
-            }
-            public void StartListening(bool doInitialScan)
+            public bool IsListening => (0 != this._cookie); public void StartListening(bool doInitialScan)
             {
                 if (0 != this._cookie)
                 {
@@ -127,7 +111,7 @@ namespace Microsoft.VisualStudioTools.Navigation
                 }
 
                 // This item is a my language file, so we can notify that it is added to the hierarchy.
-                HierarchyEventArgs args = new HierarchyEventArgs(itemidAdded, name);
+                var args = new HierarchyEventArgs(itemidAdded, name);
                 this._manager.OnNewFile(this._hierarchy, args);
                 return VSConstants.S_OK;
             }
@@ -140,7 +124,7 @@ namespace Microsoft.VisualStudioTools.Navigation
                 {
                     return VSConstants.S_OK;
                 }
-                HierarchyEventArgs args = new HierarchyEventArgs(itemid, name);
+                var args = new HierarchyEventArgs(itemid, name);
                 this._manager.OnDeleteFile(this._hierarchy, args);
                 return VSConstants.S_OK;
             }
@@ -176,7 +160,7 @@ namespace Microsoft.VisualStudioTools.Navigation
                 {
                     return false;
                 }
-                int hr = this._hierarchy.UnadviseHierarchyEvents(this._cookie);
+                var hr = this._hierarchy.UnadviseHierarchyEvents(this._cookie);
                 if (throwOnError)
                 {
                     ErrorHandler.ThrowOnFailure(hr);
@@ -191,14 +175,14 @@ namespace Microsoft.VisualStudioTools.Navigation
             /// </summary>
             private void InternalScanHierarchy(uint itemId)
             {
-                uint currentItem = itemId;
+                var currentItem = itemId;
                 while (VSConstants.VSITEMID_NIL != currentItem)
                 {
                     // If this item is a my language file, then send the add item event.
                     string itemName;
                     if (IsAnalyzableSource(currentItem, out itemName))
                     {
-                        HierarchyEventArgs args = new HierarchyEventArgs(currentItem, itemName);
+                        var args = new HierarchyEventArgs(currentItem, itemName);
                         this._manager.OnNewFile(this._hierarchy, args);
                     }
 
@@ -207,8 +191,8 @@ namespace Microsoft.VisualStudioTools.Navigation
                     // Before looking at the children we have to make sure that the enumeration has not
                     // side effects to avoid unexpected behavior.
                     object propertyValue;
-                    bool canScanSubitems = true;
-                    int hr = this._hierarchy.GetProperty(currentItem, (int)__VSHPROPID.VSHPROPID_HasEnumerationSideEffects, out propertyValue);
+                    var canScanSubitems = true;
+                    var hr = this._hierarchy.GetProperty(currentItem, (int)__VSHPROPID.VSHPROPID_HasEnumerationSideEffects, out propertyValue);
                     if ((VSConstants.S_OK == hr) && (propertyValue is bool))
                     {
                         canScanSubitems = !(bool)propertyValue;

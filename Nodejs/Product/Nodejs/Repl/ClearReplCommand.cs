@@ -35,23 +35,9 @@ namespace Microsoft.NodejsTools.Repl
             return ExecutionResult.Succeeded;
         }
 
-        public string Description
-        {
-            get { return "Resets the context object to an empty object and clears any multi-line expression."; }
-        }
-
-        public string Command
-        {
-            get { return "clear"; }
-        }
-
-        public object ButtonContent
-        {
-            get
-            {
-                return null;
-            }
-        }
+        public string Description => "Resets the context object to an empty object and clears any multi-line expression.";
+        public string Command => "clear";
+        public object ButtonContent => null;
 
         #endregion
     }

@@ -495,18 +495,18 @@ namespace Microsoft.VisualStudioTools.Project
         {
             public static void SetText(IntPtr pCmdTextInt, string text)
             {
-                Microsoft.VisualStudio.OLE.Interop.OLECMDTEXT pCmdText = (Microsoft.VisualStudio.OLE.Interop.OLECMDTEXT)Marshal.PtrToStructure(pCmdTextInt, typeof(Microsoft.VisualStudio.OLE.Interop.OLECMDTEXT));
-                char[] menuText = text.ToCharArray();
+                var pCmdText = (Microsoft.VisualStudio.OLE.Interop.OLECMDTEXT)Marshal.PtrToStructure(pCmdTextInt, typeof(Microsoft.VisualStudio.OLE.Interop.OLECMDTEXT));
+                var menuText = text.ToCharArray();
 
                 // Get the offset to the rgsz param.  This is where we will stuff our text
                 //
-                IntPtr offset = Marshal.OffsetOf(typeof(Microsoft.VisualStudio.OLE.Interop.OLECMDTEXT), "rgwz");
-                IntPtr offsetToCwActual = Marshal.OffsetOf(typeof(Microsoft.VisualStudio.OLE.Interop.OLECMDTEXT), "cwActual");
+                var offset = Marshal.OffsetOf(typeof(Microsoft.VisualStudio.OLE.Interop.OLECMDTEXT), "rgwz");
+                var offsetToCwActual = Marshal.OffsetOf(typeof(Microsoft.VisualStudio.OLE.Interop.OLECMDTEXT), "cwActual");
 
                 // The max chars we copy is our string, or one less than the buffer size,
                 // since we need a null at the end.
                 //
-                int maxChars = Math.Min((int)pCmdText.cwBuf - 1, menuText.Length);
+                var maxChars = Math.Min((int)pCmdText.cwBuf - 1, menuText.Length);
 
                 Marshal.Copy(menuText, 0, (IntPtr)((long)pCmdTextInt + (long)offset), maxChars);
 
@@ -525,7 +525,7 @@ namespace Microsoft.VisualStudioTools.Project
             /// <returns>The value of the flags.</returns>
             public static OLECMDTEXTF GetFlags(IntPtr pCmdTextInt)
             {
-                Microsoft.VisualStudio.OLE.Interop.OLECMDTEXT pCmdText = (Microsoft.VisualStudio.OLE.Interop.OLECMDTEXT)Marshal.PtrToStructure(pCmdTextInt, typeof(Microsoft.VisualStudio.OLE.Interop.OLECMDTEXT));
+                var pCmdText = (Microsoft.VisualStudio.OLE.Interop.OLECMDTEXT)Marshal.PtrToStructure(pCmdTextInt, typeof(Microsoft.VisualStudio.OLE.Interop.OLECMDTEXT));
 
                 if ((pCmdText.cmdtextf & (int)OLECMDTEXTF.OLECMDTEXTF_NAME) != 0)
                     return OLECMDTEXTF.OLECMDTEXTF_NAME;
@@ -594,7 +594,7 @@ namespace Microsoft.VisualStudioTools.Project
             errInfo.SetHelpFile(null);
             errInfo.SetHelpContext(0);
             errInfo.SetSource("");
-            IErrorInfo errorInfo = errInfo as IErrorInfo;
+            var errorInfo = errInfo as IErrorInfo;
             SetErrorInfo(0, errorInfo);
         }
 
@@ -935,7 +935,7 @@ namespace Microsoft.VisualStudioTools.Project
             const int FILE_FLAG_BACKUP_SEMANTICS = 0x02000000;
             const int DEVICE_QUERY_ACCESS = 0;
 
-            using (SafeFileHandle directoryHandle = CreateFile(
+            using (var directoryHandle = CreateFile(
                 symlink,
                 DEVICE_QUERY_ACCESS,
                 FileShare.Write,
@@ -949,8 +949,8 @@ namespace Microsoft.VisualStudioTools.Project
                     Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
                 }
 
-                StringBuilder path = new StringBuilder(512);
-                int pathSize = GetFinalPathNameByHandle(directoryHandle, path, path.Capacity, 0);
+                var path = new StringBuilder(512);
+                var pathSize = GetFinalPathNameByHandle(directoryHandle, path, path.Capacity, 0);
                 if (pathSize < 0)
                 {
                     Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
@@ -1169,21 +1169,9 @@ namespace Microsoft.VisualStudioTools.Project
         public int right;
         public int bottom;
 
-        public int Width
-        {
-            get
-            {
-                return this.right - this.left;
-            }
-        }
+        public int Width => this.right - this.left;
 
-        public int Height
-        {
-            get
-            {
-                return this.bottom - this.top;
-            }
-        }
+        public int Height => this.bottom - this.top;
     }
 
     [Guid("22F03340-547D-101B-8E65-08002B2BD119")]

@@ -66,8 +66,7 @@ namespace Microsoft.VisualStudioTools.Project
         private readonly IVsWindowFrame _window;
         private readonly IVsOutputWindowPane _pane;
 
-        public IVsOutputWindowPane Pane { get { return this._pane; } }
-
+        public IVsOutputWindowPane Pane => this._pane;
         /// <summary>
         /// Creates a redirector to the specified output pane.
         /// </summary>

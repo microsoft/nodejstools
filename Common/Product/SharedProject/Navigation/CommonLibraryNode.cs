@@ -65,21 +65,9 @@ namespace Microsoft.VisualStudioTools.Navigation
             this._scope = scope;
         }
 
-        internal IScopeNode ScopeNode
-        {
-            get
-            {
-                return this._scope;
-            }
-        }
+        internal IScopeNode ScopeNode => this._scope;
 
-        public TextSpan SourceSpan
-        {
-            get
-            {
-                return this._sourceSpan;
-            }
-        }
+        public TextSpan SourceSpan => this._sourceSpan;
 
         private static string GetLibraryNodeName(IScopeNode node, string namePrefix)
         {
@@ -132,17 +120,17 @@ namespace Microsoft.VisualStudioTools.Navigation
             // don't check for the other flags.
 
             IVsWindowFrame frame = null;
-            IntPtr documentData = FindDocDataFromRDT();
+            var documentData = FindDocDataFromRDT();
             try
             {
                 // Now we can try to open the editor. We assume that the owner hierarchy is
                 // a project and we want to use its OpenItem method.
-                IVsProject3 project = this._ownerHierarchy as IVsProject3;
+                var project = this._ownerHierarchy as IVsProject3;
                 if (null == project)
                 {
                     return;
                 }
-                Guid viewGuid = VSConstants.LOGVIEWID_Code;
+                var viewGuid = VSConstants.LOGVIEWID_Code;
                 ErrorHandler.ThrowOnFailure(project.OpenItem(this._fileId, ref viewGuid, documentData, out frame));
             }
             finally
@@ -160,7 +148,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             // Get the code window from the window frame.
             object docView;
             ErrorHandler.ThrowOnFailure(frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView));
-            IVsCodeWindow codeWindow = docView as IVsCodeWindow;
+            var codeWindow = docView as IVsCodeWindow;
             if (null == codeWindow)
             {
                 object docData;
@@ -179,7 +167,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             // Set the cursor at the beginning of the declaration.
             ErrorHandler.ThrowOnFailure(textView.SetCaretPos(this._sourceSpan.iStartLine, this._sourceSpan.iStartIndex));
             // Make sure that the text is visible.
-            TextSpan visibleSpan = new TextSpan();
+            var visibleSpan = new TextSpan();
             visibleSpan.iStartLine = this._sourceSpan.iStartLine;
             visibleSpan.iStartIndex = this._sourceSpan.iStartIndex;
             visibleSpan.iEndLine = this._sourceSpan.iStartLine;
@@ -209,7 +197,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         private IntPtr FindDocDataFromRDT()
         {
             // Get a reference to the RDT.
-            IVsRunningDocumentTable rdt = Package.GetGlobalService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
+            var rdt = Package.GetGlobalService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
             if (null == rdt)
             {
                 return IntPtr.Zero;
@@ -219,8 +207,8 @@ namespace Microsoft.VisualStudioTools.Navigation
             IEnumRunningDocuments documents;
             ErrorHandler.ThrowOnFailure(rdt.GetRunningDocumentsEnum(out documents));
 
-            IntPtr documentData = IntPtr.Zero;
-            uint[] docCookie = new uint[1];
+            var documentData = IntPtr.Zero;
+            var docCookie = new uint[1];
             uint fetched;
             while ((VSConstants.S_OK == documents.Next(1, docCookie, out fetched)) && (1 == fetched))
             {
@@ -230,7 +218,7 @@ namespace Microsoft.VisualStudioTools.Navigation
                 string moniker;
                 IVsHierarchy docHierarchy;
                 uint docId;
-                IntPtr docData = IntPtr.Zero;
+                var docData = IntPtr.Zero;
                 try
                 {
                     ErrorHandler.ThrowOnFailure(

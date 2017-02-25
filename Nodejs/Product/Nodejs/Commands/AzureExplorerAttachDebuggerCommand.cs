@@ -70,17 +70,11 @@ namespace Microsoft.NodejsTools.Commands
 
         public override int CommandId => (int)PkgCmdId.cmdidAzureExplorerAttachNodejsDebugger;
 
-        public override EventHandler BeforeQueryStatus
-        {
-            get
-            {
-                return (sender, args) =>
-                {
-                    var oleMenuCmd = (OleMenuCommand)sender;
-                    oleMenuCmd.Supported = oleMenuCmd.Visible = (GetSelectedAzureWebSite() != null);
-                };
-            }
-        }
+        public override EventHandler BeforeQueryStatus => (sender, args) =>
+                                                                        {
+                                                                            var oleMenuCmd = (OleMenuCommand)sender;
+                                                                            oleMenuCmd.Supported = oleMenuCmd.Visible = (GetSelectedAzureWebSite() != null);
+                                                                        };
 
         public override void DoCommand(object sender, EventArgs args)
         {

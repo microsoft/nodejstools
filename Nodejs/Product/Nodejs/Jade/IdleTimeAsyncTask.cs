@@ -150,16 +150,8 @@ namespace Microsoft.NodejsTools.Jade
             DoTaskOnIdle();
         }
 
-        public bool TaskRunning
-        {
-            get { return this._connectedToIdle || this._taskRunning; }
-        }
-
-        public bool TaskScheduled
-        {
-            get { return this.TaskRunning; }
-        }
-
+        public bool TaskRunning => this._connectedToIdle || this._taskRunning;
+        public bool TaskScheduled => this.TaskRunning;
         private void DoTaskInternal()
         {
             if (!this._taskRunning)
@@ -249,7 +241,7 @@ namespace Microsoft.NodejsTools.Jade
 
                 // make sure our package is loaded so we can use its
                 // OnIdle event
-                Guid nodePackage = new Guid(Guids.NodejsPackageString);
+                var nodePackage = new Guid(Guids.NodejsPackageString);
                 IVsPackage package;
                 var shell = (IVsShell)NodejsPackage.GetGlobalService(typeof(SVsShell));
                 shell.LoadPackage(ref nodePackage, out package);

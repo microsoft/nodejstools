@@ -27,12 +27,6 @@ namespace Microsoft.VisualStudioTools.Project
             this._isDirty = isDirty;
         }
 
-        public bool IsDirty
-        {
-            get
-            {
-                return this._isDirty;
-            }
-        }
+        public bool IsDirty => this._isDirty;
     }
 }

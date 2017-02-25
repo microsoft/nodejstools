@@ -27,13 +27,7 @@ namespace Microsoft.NodejsTools.Project
         {
         }
 
-        protected override ImageMoniker CodeFileIconMoniker
-        {
-            get
-            {
-                return KnownMonikers.TSFileNode;
-            }
-        }
+        protected override ImageMoniker CodeFileIconMoniker => KnownMonikers.TSFileNode;
 
         protected override NodeProperties CreatePropertiesObject()
         {
@@ -49,12 +43,6 @@ namespace Microsoft.NodejsTools.Project
             return new NodejsTypeScriptFileNodeProperties(this);
         }
 
-        public new NodejsProjectNode ProjectMgr
-        {
-            get
-            {
-                return (NodejsProjectNode)base.ProjectMgr;
-            }
-        }
+        public new NodejsProjectNode ProjectMgr => (NodejsProjectNode)base.ProjectMgr;
     }
 }

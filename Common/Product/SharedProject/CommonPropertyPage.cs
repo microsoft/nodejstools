@@ -93,7 +93,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             if (this.SelectedConfigs == null)
             {
-                string condition = string.Format(System.Globalization.CultureInfo.InvariantCulture,
+                var condition = string.Format(System.Globalization.CultureInfo.InvariantCulture,
                     ConfigProvider.configPlatformString,
                     this.Project.CurrentConfig.GetPropertyValue("Configuration"),
                     this.Project.CurrentConfig.GetPropertyValue("Platform"));
@@ -102,11 +102,11 @@ namespace Microsoft.VisualStudioTools.Project
             }
             else
             {
-                StringCollection values = new StringCollection();
+                var values = new StringCollection();
 
                 foreach (var config in this.SelectedConfigs)
                 {
-                    string condition = string.Format(System.Globalization.CultureInfo.InvariantCulture,
+                    var condition = string.Format(System.Globalization.CultureInfo.InvariantCulture,
                         ConfigProvider.configPlatformString,
                         config.ConfigName,
                         config.PlatformName);
@@ -130,7 +130,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             if (this.SelectedConfigs == null)
             {
-                string condition = string.Format(System.Globalization.CultureInfo.InvariantCulture,
+                var condition = string.Format(System.Globalization.CultureInfo.InvariantCulture,
                     ConfigProvider.configPlatformString,
                     this.Project.CurrentConfig.GetPropertyValue("Configuration"),
                     this.Project.CurrentConfig.GetPropertyValue("Platform"));
@@ -141,7 +141,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 foreach (var config in this.SelectedConfigs)
                 {
-                    string condition = string.Format(System.Globalization.CultureInfo.InvariantCulture,
+                    var condition = string.Format(System.Globalization.CultureInfo.InvariantCulture,
                         ConfigProvider.configPlatformString,
                         config.ConfigName,
                         config.GetConfigurationProperty("Platform", false));
@@ -153,7 +153,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         private string GetUserPropertyUnderCondition(string propertyName, string condition)
         {
-            string conditionTrimmed = (condition == null) ? String.Empty : condition.Trim();
+            var conditionTrimmed = (condition == null) ? String.Empty : condition.Trim();
 
             if (this.Project.UserBuildProject != null)
             {
@@ -166,7 +166,7 @@ namespace Microsoft.VisualStudioTools.Project
                 // So do it ourselves.
                 ProjectPropertyGroupElement matchingGroup = null;
 
-                foreach (ProjectPropertyGroupElement group in this.Project.UserBuildProject.Xml.PropertyGroups)
+                foreach (var group in this.Project.UserBuildProject.Xml.PropertyGroups)
                 {
                     if (String.Equals(group.Condition.Trim(), conditionTrimmed, StringComparison.OrdinalIgnoreCase))
                     {
@@ -177,7 +177,7 @@ namespace Microsoft.VisualStudioTools.Project
 
                 if (matchingGroup != null)
                 {
-                    foreach (ProjectPropertyElement property in matchingGroup.PropertiesReversed) // If there's dupes, pick the last one so we win
+                    foreach (var property in matchingGroup.PropertiesReversed) // If there's dupes, pick the last one so we win
                     {
                         if (string.Equals(property.Name, propertyName, StringComparison.OrdinalIgnoreCase)
                             && (property.Condition == null || property.Condition.Length == 0))
@@ -197,7 +197,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         private void SetUserPropertyUnderCondition(string propertyName, string propertyValue, string condition)
         {
-            string conditionTrimmed = (condition == null) ? String.Empty : condition.Trim();
+            var conditionTrimmed = (condition == null) ? String.Empty : condition.Trim();
             const string userProjectCreateProperty = "UserProject";
 
             if (this.Project.UserBuildProject == null)
@@ -220,7 +220,7 @@ namespace Microsoft.VisualStudioTools.Project
             // So do it ourselves.
             ProjectPropertyGroupElement newGroup = null;
 
-            foreach (ProjectPropertyGroupElement group in this.Project.UserBuildProject.Xml.PropertyGroups)
+            foreach (var group in this.Project.UserBuildProject.Xml.PropertyGroups)
             {
                 if (String.Equals(group.Condition.Trim(), conditionTrimmed, StringComparison.OrdinalIgnoreCase))
                 {
@@ -235,7 +235,7 @@ namespace Microsoft.VisualStudioTools.Project
                 newGroup.Condition = condition;
             }
 
-            foreach (ProjectPropertyElement property in newGroup.PropertiesReversed) // If there's dupes, pick the last one so we win
+            foreach (var property in newGroup.PropertiesReversed) // If there's dupes, pick the last one so we win
             {
                 if (string.Equals(property.Name, propertyName, StringComparison.OrdinalIgnoreCase)
                     && (property.Condition == null || property.Condition.Length == 0))
@@ -307,7 +307,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             Utilities.ArgumentNotNull("pPageInfo", pPageInfo);
 
-            PROPPAGEINFO info = new PROPPAGEINFO();
+            var info = new PROPPAGEINFO();
 
             info.cb = (uint)Marshal.SizeOf(typeof(PROPPAGEINFO));
             info.dwHelpContext = 0;
@@ -332,7 +332,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             Utilities.ArgumentNotNull("pRect", pRect);
 
-            RECT r = pRect[0];
+            var r = pRect[0];
 
             this.Control.Location = new Point(r.left, r.top);
             this.Control.Size = new Size(r.right - r.left, r.bottom - r.top);
@@ -356,9 +356,9 @@ namespace Microsoft.VisualStudioTools.Project
 
                     var configs = new List<CommonProjectConfig>();
 
-                    for (int i = 0; i < count; i++)
+                    for (var i = 0; i < count; i++)
                     {
-                        CommonProjectConfig config = (CommonProjectConfig)punk[i];
+                        var config = (CommonProjectConfig)punk[i];
 
                         configs.Add(config);
                     }
@@ -399,7 +399,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             Utilities.ArgumentNotNull("pMsg", pMsg);
 
-            MSG msg = pMsg[0];
+            var msg = pMsg[0];
 
             if ((msg.message < NativeMethods.WM_KEYFIRST || msg.message > NativeMethods.WM_KEYLAST) && (msg.message < NativeMethods.WM_MOUSEFIRST || msg.message > NativeMethods.WM_MOUSELAST))
             {

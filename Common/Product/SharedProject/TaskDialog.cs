@@ -44,7 +44,7 @@ namespace Microsoft.VisualStudioTools
             string issueTrackerUrl = null
         )
         {
-            string suffix = string.IsNullOrEmpty(issueTrackerUrl) ?
+            var suffix = string.IsNullOrEmpty(issueTrackerUrl) ?
                 "Please press Ctrl+C to copy the contents of this dialog and report this error." :
                 "Please press Ctrl+C to copy the contents of this dialog and report this error to our <a href=\"issuetracker\">issue tracker</a>.";
 
@@ -91,7 +91,7 @@ namespace Microsoft.VisualStudioTools
             Func<Exception, bool> canRetry = null
         )
         {
-            for (int retryCount = 1; ; ++retryCount)
+            for (var retryCount = 1; ; ++retryCount)
             {
                 try
                 {
@@ -141,7 +141,7 @@ namespace Microsoft.VisualStudioTools
             Func<Exception, bool> canRetry = null
         )
         {
-            for (int retryCount = 1; ; ++retryCount)
+            for (var retryCount = 1; ; ++retryCount)
             {
                 try
                 {
@@ -213,7 +213,7 @@ namespace Microsoft.VisualStudioTools
                 {
                     config.cButtons = (uint)customButtons.Count;
                     var ptr = config.pButtons = Marshal.AllocHGlobal(customButtons.Count * Marshal.SizeOf(typeof(NativeMethods.TASKDIALOG_BUTTON)));
-                    for (int i = 0; i < customButtons.Count; ++i)
+                    for (var i = 0; i < customButtons.Count; ++i)
                     {
                         NativeMethods.TASKDIALOG_BUTTON data;
                         data.nButtonID = GetButtonId(null, null, i);
@@ -247,7 +247,7 @@ namespace Microsoft.VisualStudioTools
                 {
                     config.cRadioButtons = (uint)this._radioButtons.Count;
                     var ptr = config.pRadioButtons = Marshal.AllocHGlobal(this._radioButtons.Count * Marshal.SizeOf(typeof(NativeMethods.TASKDIALOG_BUTTON)));
-                    for (int i = 0; i < this._radioButtons.Count; ++i)
+                    for (var i = 0; i < this._radioButtons.Count; ++i)
                     {
                         NativeMethods.TASKDIALOG_BUTTON data;
                         data.nButtonID = GetRadioId(null, null, i);
@@ -335,7 +335,7 @@ namespace Microsoft.VisualStudioTools
 
                 if (config.pButtons != IntPtr.Zero)
                 {
-                    for (int i = 0; i < customButtons.Count; ++i)
+                    for (var i = 0; i < customButtons.Count; ++i)
                     {
                         Marshal.DestroyStructure(config.pButtons + i * Marshal.SizeOf(typeof(NativeMethods.TASKDIALOG_BUTTON)), typeof(NativeMethods.TASKDIALOG_BUTTON));
                     }
@@ -343,7 +343,7 @@ namespace Microsoft.VisualStudioTools
                 }
                 if (config.pRadioButtons != IntPtr.Zero)
                 {
-                    for (int i = 0; i < this._radioButtons.Count; ++i)
+                    for (var i = 0; i < this._radioButtons.Count; ++i)
                     {
                         Marshal.DestroyStructure(config.pRadioButtons + i * Marshal.SizeOf(typeof(NativeMethods.TASKDIALOG_BUTTON)), typeof(NativeMethods.TASKDIALOG_BUTTON));
                     }
@@ -444,21 +444,9 @@ namespace Microsoft.VisualStudioTools
         /// </summary>
         public event EventHandler<TaskDialogHyperlinkClickedEventArgs> HyperlinkClicked;
 
-        public List<TaskDialogButton> Buttons
-        {
-            get
-            {
-                return this._buttons;
-            }
-        }
+        public List<TaskDialogButton> Buttons => this._buttons;
 
-        public List<TaskDialogButton> RadioButtons
-        {
-            get
-            {
-                return this._radioButtons;
-            }
-        }
+        public List<TaskDialogButton> RadioButtons => this._radioButtons;
 
         public TaskDialogButton SelectedButton { get; set; }
         public TaskDialogButton SelectedRadioButton { get; set; }
@@ -552,7 +540,7 @@ namespace Microsoft.VisualStudioTools
             }
             else if (customButtons != null)
             {
-                int i = customButtons.IndexOf(button);
+                var i = customButtons.IndexOf(button);
                 if (i >= 0)
                 {
                     return i + 1000;
@@ -763,7 +751,7 @@ namespace Microsoft.VisualStudioTools
     {
         public TaskDialogButton(string text)
         {
-            int i = text.IndexOfAny(Environment.NewLine.ToCharArray());
+            var i = text.IndexOfAny(Environment.NewLine.ToCharArray());
             if (i < 0)
             {
                 this.Text = text;
@@ -803,7 +791,7 @@ namespace Microsoft.VisualStudioTools
             this._url = url;
         }
 
-        public string Url { get { return this._url; } }
+        public string Url => this._url;
     }
 
     internal enum TaskDialogIcon

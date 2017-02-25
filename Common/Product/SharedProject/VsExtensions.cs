@@ -49,7 +49,7 @@ namespace Microsoft.VisualStudioTools
 
         public static CommonProjectNode GetCommonProject(this EnvDTE.Project project)
         {
-            OAProject oaProj = project as OAProject;
+            var oaProj = project as OAProject;
             if (oaProj != null)
             {
                 var common = oaProj.Project as CommonProjectNode;
@@ -75,7 +75,7 @@ namespace Microsoft.VisualStudioTools
 
         internal static T[] Append<T>(this T[] list, T item)
         {
-            T[] res = new T[list.Length + 1];
+            var res = new T[list.Length + 1];
             list.CopyTo(res, 0);
             res[res.Length - 1] = item;
             return res;
@@ -160,10 +160,7 @@ namespace Microsoft.VisualStudioTools
 
             public override void MustBeCalledFromUIThreadOrThrow() { }
 
-            public override bool InvokeRequired
-            {
-                get { return false; }
-            }
+            public override bool InvokeRequired => false;
         }
 
         #endregion

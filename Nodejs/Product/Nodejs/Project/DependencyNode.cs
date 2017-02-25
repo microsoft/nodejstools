@@ -83,35 +83,15 @@ namespace Microsoft.NodejsTools.Project
             return buff.ToString();
         }
 
-        public override string Url
-        {
-            get { return new Url(this.ProjectMgr.BaseURI, GetRelativeUrlFragment()).AbsoluteUrl; }
-        }
-
-        public override string Caption
-        {
-            get { return this._displayString; }
-        }
-
-        public override Guid ItemTypeGuid
-        {
-            get { return VSConstants.GUID_ItemType_VirtualFolder; }
-        }
-
-        public override Guid MenuGroupId
-        {
-            get { return Guids.NodejsNpmCmdSet; }
-        }
-
-        public override int MenuCommandId
-        {
-            get { return PkgCmdId.menuIdNpm; }
-        }
-
+        public override string Url => new Url(this.ProjectMgr.BaseURI, GetRelativeUrlFragment()).AbsoluteUrl;
+        public override string Caption => this._displayString;
+        public override Guid ItemTypeGuid => VSConstants.GUID_ItemType_VirtualFolder;
+        public override Guid MenuGroupId => Guids.NodejsNpmCmdSet;
+        public override int MenuCommandId => PkgCmdId.menuIdNpm;
         [Obsolete]
         public override object GetIconHandle(bool open)
         {
-            int imageIndex = this._projectNode.ImageIndexFromNameDictionary[NodejsProjectImageName.Dependency];
+            var imageIndex = this._projectNode.ImageIndexFromNameDictionary[NodejsProjectImageName.Dependency];
             if (this.Package.IsMissing)
             {
                 imageIndex = this._projectNode.ImageIndexFromNameDictionary[NodejsProjectImageName.DependencyMissing];
@@ -284,7 +264,7 @@ namespace Microsoft.NodejsTools.Project
                 switch ((VsCommands2K)cmd)
                 {
                     case CommonConstants.OpenFolderInExplorerCmdId:
-                        string path = this.Package.Path;
+                        var path = this.Package.Path;
                         try
                         {
                             Process.Start(path);

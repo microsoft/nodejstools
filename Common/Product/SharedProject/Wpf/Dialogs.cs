@@ -41,7 +41,7 @@ namespace Microsoft.VisualStudioTools
                 initialPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal) + Path.DirectorySeparatorChar;
             }
 
-            IVsUIShell uiShell = GetService(typeof(SVsUIShell)) as IVsUIShell;
+            var uiShell = GetService(typeof(SVsUIShell)) as IVsUIShell;
             if (null == uiShell)
             {
                 using (var ofd = new System.Windows.Forms.OpenFileDialog())
@@ -79,7 +79,7 @@ namespace Microsoft.VisualStudioTools
                 ErrorHandler.ThrowOnFailure(uiShell.GetDialogOwnerHwnd(out owner));
             }
 
-            VSOPENFILENAMEW[] openInfo = new VSOPENFILENAMEW[1];
+            var openInfo = new VSOPENFILENAMEW[1];
             openInfo[0].lStructSize = (uint)Marshal.SizeOf(typeof(VSOPENFILENAMEW));
             openInfo[0].pwzFilter = filter.Replace('|', '\0') + "\0";
             openInfo[0].hwndOwner = owner;
@@ -92,7 +92,7 @@ namespace Microsoft.VisualStudioTools
             Marshal.Copy(nameArray, 0, pFileName, nameArray.Length);
             try
             {
-                int hr = uiShell.GetOpenFileNameViaDlg(openInfo);
+                var hr = uiShell.GetOpenFileNameViaDlg(openInfo);
                 if (hr == VSConstants.OLE_E_PROMPTSAVECANCELLED)
                 {
                     return null;
@@ -121,7 +121,7 @@ namespace Microsoft.VisualStudioTools
                 initialPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal) + Path.DirectorySeparatorChar;
             }
 
-            IVsUIShell uiShell = GetService(typeof(SVsUIShell)) as IVsUIShell;
+            var uiShell = GetService(typeof(SVsUIShell)) as IVsUIShell;
             if (null == uiShell)
             {
                 using (var sfd = new System.Windows.Forms.SaveFileDialog())
@@ -159,7 +159,7 @@ namespace Microsoft.VisualStudioTools
                 ErrorHandler.ThrowOnFailure(uiShell.GetDialogOwnerHwnd(out owner));
             }
 
-            VSSAVEFILENAMEW[] saveInfo = new VSSAVEFILENAMEW[1];
+            var saveInfo = new VSSAVEFILENAMEW[1];
             saveInfo[0].lStructSize = (uint)Marshal.SizeOf(typeof(VSSAVEFILENAMEW));
             saveInfo[0].pwzFilter = filter.Replace('|', '\0') + "\0";
             saveInfo[0].hwndOwner = owner;
@@ -172,7 +172,7 @@ namespace Microsoft.VisualStudioTools
             Marshal.Copy(nameArray, 0, pFileName, nameArray.Length);
             try
             {
-                int hr = uiShell.GetSaveFileNameViaDlg(saveInfo);
+                var hr = uiShell.GetSaveFileNameViaDlg(saveInfo);
                 if (hr == VSConstants.OLE_E_PROMPTSAVECANCELLED)
                 {
                     return null;
@@ -195,7 +195,7 @@ namespace Microsoft.VisualStudioTools
             string title = null
         )
         {
-            IVsUIShell uiShell = GetService(typeof(SVsUIShell)) as IVsUIShell;
+            var uiShell = GetService(typeof(SVsUIShell)) as IVsUIShell;
             if (null == uiShell)
             {
                 using (var ofd = new FolderBrowserDialog())
@@ -228,17 +228,17 @@ namespace Microsoft.VisualStudioTools
                 ErrorHandler.ThrowOnFailure(uiShell.GetDialogOwnerHwnd(out owner));
             }
 
-            VSBROWSEINFOW[] browseInfo = new VSBROWSEINFOW[1];
+            var browseInfo = new VSBROWSEINFOW[1];
             browseInfo[0].lStructSize = (uint)Marshal.SizeOf(typeof(VSBROWSEINFOW));
             browseInfo[0].pwzInitialDir = initialDirectory;
             browseInfo[0].pwzDlgTitle = title;
             browseInfo[0].hwndOwner = owner;
             browseInfo[0].nMaxDirName = 260;
-            IntPtr pDirName = IntPtr.Zero;
+            var pDirName = IntPtr.Zero;
             try
             {
                 browseInfo[0].pwzDirName = pDirName = Marshal.AllocCoTaskMem(520);
-                int hr = uiShell.GetDirectoryViaBrowseDlg(browseInfo);
+                var hr = uiShell.GetDirectoryViaBrowseDlg(browseInfo);
                 if (hr == VSConstants.OLE_E_PROMPTSAVECANCELLED)
                 {
                     return null;

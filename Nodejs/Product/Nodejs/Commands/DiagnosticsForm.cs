@@ -27,13 +27,7 @@ namespace Microsoft.NodejsTools.Commands
             this._textBox.Text = content;
         }
 
-        public TextBox TextBox
-        {
-            get
-            {
-                return this._textBox;
-            }
-        }
+        public TextBox TextBox => this._textBox;
 
         private void _ok_Click(object sender, EventArgs e)
         {

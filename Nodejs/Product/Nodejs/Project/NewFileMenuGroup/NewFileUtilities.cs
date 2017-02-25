@@ -28,14 +28,14 @@ namespace Microsoft.NodejsTools.Project.NewFileMenuGroup
             {
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    string itemName = dialog.TextBox.Text;
+                    var itemName = dialog.TextBox.Text;
                     if (string.IsNullOrWhiteSpace(itemName))
                     {
                         return;
                     }
                     itemName = itemName.Trim();
 
-                    VSADDRESULT[] pResult = new VSADDRESULT[1];
+                    var pResult = new VSADDRESULT[1];
                     projectNode.AddItem(
                         containerId,                                 // Identifier of the container folder. 
                         VSADDITEMOPERATION.VSADDITEMOP_CLONEFILE,    // Indicate that we want to create this new file by cloning a template file.

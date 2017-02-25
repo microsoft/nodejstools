@@ -29,13 +29,7 @@ namespace Microsoft.NodejsTools.Project
             this._name = name;
         }
 
-        public override string DisplayName
-        {
-            get
-            {
-                return SR.GetString(this._name);
-            }
-        }
+        public override string DisplayName => SR.GetString(this._name);
     }
 
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
@@ -48,13 +42,7 @@ namespace Microsoft.NodejsTools.Project
             this._name = name;
         }
 
-        public override string DisplayName
-        {
-            get
-            {
-                return Resources.ResourceManager.GetString(this._name);
-            }
-        }
+        public override string DisplayName => Resources.ResourceManager.GetString(this._name);
     }
 
     [AttributeUsage(AttributeTargets.All)]

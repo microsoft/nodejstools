@@ -53,51 +53,27 @@ namespace Microsoft.VisualStudioTools
         /// <summary>
         /// Returns the language guid.
         /// </summary>
-        public string LanguageGuid
-        {
-            get { return this._languageGuid.ToString("B"); }
-        }
-
+        public string LanguageGuid => this._languageGuid.ToString("B");
         /// <summary>
         /// Returns true if roots are shown.
         /// </summary>
-        public bool ShowRoots
-        {
-            get { return this._showRoots; }
-        }
-
+        public bool ShowRoots => this._showRoots;
         /// <summary>
         /// Returns string ID corresponding to the language name.
         /// </summary>
-        public short DisplayName
-        {
-            get { return this._displayName; }
-        }
-
+        public short DisplayName => this._displayName;
         /// <summary>
         /// Returns the string to use for the language name.
         /// </summary>
-        public string LanguageStringId
-        {
-            get { return this._languageStringId; }
-        }
-
+        public string LanguageStringId => this._languageStringId;
         /// <summary>
         /// Returns the relative path to the snippet index file.
         /// </summary>
-        public string IndexPath
-        {
-            get { return this._indexPath; }
-        }
-
+        public string IndexPath => this._indexPath;
         /// <summary>
         /// Returns the paths to look for snippets.
         /// </summary>
-        public string Paths
-        {
-            get { return this._paths; }
-        }
-
+        public string Paths => this._paths;
         /// <summary>
         /// The reg key name of the project.
         /// </summary>
@@ -119,11 +95,11 @@ namespace Microsoft.VisualStudioTools
             {
                 return;
             }
-            using (Key childKey = context.CreateKey(LanguageName()))
+            using (var childKey = context.CreateKey(LanguageName()))
             {
                 childKey.SetValue("", this.LanguageGuid);
 
-                string snippetIndexPath = context.ComponentPath;
+                var snippetIndexPath = context.ComponentPath;
                 snippetIndexPath = System.IO.Path.Combine(snippetIndexPath, this.IndexPath);
                 snippetIndexPath = context.EscapePath(System.IO.Path.GetFullPath(snippetIndexPath));
 
@@ -133,18 +109,18 @@ namespace Microsoft.VisualStudioTools
                 childKey.SetValue("Package", context.ComponentType.GUID.ToString("B"));
                 childKey.SetValue("ShowRoots", this.ShowRoots ? 1 : 0);
 
-                string snippetPaths = context.ComponentPath;
+                var snippetPaths = context.ComponentPath;
                 snippetPaths = System.IO.Path.Combine(snippetPaths, this.Paths);
                 snippetPaths = context.EscapePath(System.IO.Path.GetFullPath(snippetPaths));
 
                 //The following enables VS to look into a user directory for more user-created snippets
-                string myDocumentsPath = @";%MyDocs%\Code Snippets\" + this._languageStringId + @"\My Code Snippets\";
-                using (Key forceSubKey = childKey.CreateSubkey("ForceCreateDirs"))
+                var myDocumentsPath = @";%MyDocs%\Code Snippets\" + this._languageStringId + @"\My Code Snippets\";
+                using (var forceSubKey = childKey.CreateSubkey("ForceCreateDirs"))
                 {
                     forceSubKey.SetValue(this.LanguageStringId, snippetPaths + myDocumentsPath);
                 }
 
-                using (Key pathsSubKey = childKey.CreateSubkey("Paths"))
+                using (var pathsSubKey = childKey.CreateSubkey("Paths"))
                 {
                     pathsSubKey.SetValue(this.LanguageStringId, snippetPaths + myDocumentsPath);
                 }

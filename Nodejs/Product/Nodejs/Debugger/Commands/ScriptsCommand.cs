@@ -36,21 +36,17 @@ namespace Microsoft.NodejsTools.Debugger.Commands
             }
         }
 
-        protected override IDictionary<string, object> Arguments
-        {
-            get { return this._arguments; }
-        }
-
+        protected override IDictionary<string, object> Arguments => this._arguments;
         public List<NodeModule> Modules { get; private set; }
 
         public override void ProcessResponse(JObject response)
         {
             base.ProcessResponse(response);
 
-            JArray body = (JArray)response["body"] ?? new JArray();
+            var body = (JArray)response["body"] ?? new JArray();
             this.Modules = new List<NodeModule>(body.Count);
 
-            foreach (JToken module in body)
+            foreach (var module in body)
             {
                 var fileName = (string)module["name"];
                 if (fileName == null)

@@ -33,7 +33,7 @@ namespace Microsoft.NodejsTools.Debugger.Events
 
             this.Module = new NodeModule(scriptId, fileName);
 
-            JToken breakpoints = message["body"]["breakpoints"];
+            var breakpoints = message["body"]["breakpoints"];
             this.Breakpoints = breakpoints != null
                 ? breakpoints.Values<int>().ToList()
                 : new List<int>();

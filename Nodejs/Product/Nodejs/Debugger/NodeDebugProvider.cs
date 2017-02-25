@@ -57,9 +57,9 @@ namespace Microsoft.NodejsTools.Debugger
 
         public void SetupDebugTargetInfo(ref VsDebugTargetInfo vsDebugTargetInfo, DebugLaunchActionContext debugLaunchContext)
         {
-            string target = vsDebugTargetInfo.bstrExe;
+            var target = vsDebugTargetInfo.bstrExe;
             vsDebugTargetInfo.bstrExe = debugLaunchContext.LaunchConfiguration.GetValue<string>(NodeExeKey, Nodejs.GetPathToNodeExecutableFromEnvironment());
-            string nodeJsArgs = vsDebugTargetInfo.bstrArg;
+            var nodeJsArgs = vsDebugTargetInfo.bstrArg;
             vsDebugTargetInfo.bstrArg = "\"" + target + "\"";
             if (!string.IsNullOrEmpty(nodeJsArgs))
             {

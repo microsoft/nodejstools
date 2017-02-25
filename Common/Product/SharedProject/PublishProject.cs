@@ -44,19 +44,19 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 if (this._files == null)
                 {
-                    List<IPublishFile> files = new List<IPublishFile>();
+                    var files = new List<IPublishFile>();
                     foreach (var item in this._node.CurrentConfig.Items)
                     {
-                        bool? publish = GetPublishSetting(item);
+                        var publish = GetPublishSetting(item);
 
                         // publish if we're a Compile node and we haven't been disabled or if 
                         // we've been specifically enabled.
                         if ((item.ItemType == "Compile" && (publish == null || publish.Value)) ||
                             (publish != null && publish.Value))
                         {
-                            string file = item.GetMetadataValue("FullPath");
+                            var file = item.GetMetadataValue("FullPath");
 
-                            string destFile = Path.GetFileName(file);
+                            var destFile = Path.GetFileName(file);
                             if (CommonUtils.IsSubpathOf(this._node.ProjectHome, file))
                             {
                                 destFile = CommonUtils.GetRelativeFilePath(this._node.ProjectHome, file);
@@ -85,7 +85,7 @@ namespace Microsoft.VisualStudioTools.Project
         private static bool? GetPublishSetting(Build.Execution.ProjectItemInstance item)
         {
             bool? publish = null;
-            string pubValue = item.GetMetadataValue("Publish");
+            var pubValue = item.GetMetadataValue("Publish");
             bool pubSetting;
             if (!String.IsNullOrWhiteSpace(pubValue) && Boolean.TryParse(pubValue, out pubSetting))
             {
@@ -94,13 +94,7 @@ namespace Microsoft.VisualStudioTools.Project
             return publish;
         }
 
-        public string ProjectDir
-        {
-            get
-            {
-                return this._node.ProjectHome;
-            }
-        }
+        public string ProjectDir => this._node.ProjectHome;
 
         public int Progress
         {

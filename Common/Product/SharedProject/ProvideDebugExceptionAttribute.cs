@@ -104,7 +104,7 @@ namespace Microsoft.VisualStudioTools
             key.SetValue("Code", this._code);
             key.SetValue("State", (int)this._state);
 
-            string name = this._path.LastOrDefault() ?? "*";
+            var name = this._path.LastOrDefault() ?? "*";
             engineKey.SetValue(name, (int)(this._state & DkmValidFlags));
         }
 

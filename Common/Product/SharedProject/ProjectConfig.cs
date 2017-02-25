@@ -54,13 +54,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         #region properties
 
-        internal ProjectNode ProjectMgr
-        {
-            get
-            {
-                return this.project;
-            }
-        }
+        internal ProjectNode ProjectMgr => this.project;
 
         public string ConfigName
         {
@@ -102,14 +96,14 @@ namespace Microsoft.VisualStudioTools.Project
                         // Get the list of group names from the project.
                         // The main reason we get it from the project is to make it easier for someone to modify
                         // it by simply overriding that method and providing the correct MSBuild target(s).
-                        IList<KeyValuePair<string, string>> groupNames = this.project.GetOutputGroupNames();
+                        var groupNames = this.project.GetOutputGroupNames();
 
                         if (groupNames != null)
                         {
                             // Populate the output array
-                            foreach (KeyValuePair<string, string> group in groupNames)
+                            foreach (var group in groupNames)
                             {
-                                OutputGroup outputGroup = CreateOutputGroup(this.project, group);
+                                var outputGroup = CreateOutputGroup(this.project, group);
                                 this.outputGroups.Add(outputGroup);
                             }
                         }
@@ -128,7 +122,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             if (configuration.Contains("|"))
             { // If configuration is in the form "<Configuration>|<Platform>"
-                string[] configStrArray = configuration.Split('|');
+                var configStrArray = configuration.Split('|');
                 if (2 == configStrArray.Length)
                 {
                     this.configName = configStrArray[0];
@@ -150,7 +144,7 @@ namespace Microsoft.VisualStudioTools.Project
             Utilities.ArgumentNotNull("flavoredCfg", this.flavoredCfg);
 
             // if the flavored object support XML fragment, initialize it
-            IPersistXMLFragment persistXML = this.flavoredCfg as IPersistXMLFragment;
+            var persistXML = this.flavoredCfg as IPersistXMLFragment;
             if (null != persistXML)
             {
                 this.project.LoadXmlFragment(persistXML, this.configName, this.platformName);
@@ -162,7 +156,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         internal virtual OutputGroup CreateOutputGroup(ProjectNode project, KeyValuePair<string, string> group)
         {
-            OutputGroup outputGroup = new OutputGroup(group.Key, group.Value, project, this);
+            var outputGroup = new OutputGroup(group.Key, group.Value, project, this);
             return outputGroup;
         }
 
@@ -173,7 +167,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public virtual string GetConfigurationProperty(string propertyName, bool resetCache)
         {
-            MSBuildExecution.ProjectPropertyInstance property = GetMsBuildProperty(propertyName, resetCache);
+            var property = GetMsBuildProperty(propertyName, resetCache);
             if (property == null)
                 return null;
 
@@ -187,7 +181,7 @@ namespace Microsoft.VisualStudioTools.Project
                 throw Marshal.GetExceptionForHR(VSConstants.OLE_E_PROMPTSAVECANCELLED);
             }
 
-            string condition = String.Format(CultureInfo.InvariantCulture, ConfigProvider.configString, this.ConfigName);
+            var condition = String.Format(CultureInfo.InvariantCulture, ConfigProvider.configString, this.ConfigName);
 
             SetPropertyUnderCondition(propertyName, propertyValue, condition);
 
@@ -203,7 +197,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         private void SetPropertyUnderCondition(string propertyName, string propertyValue, string condition)
         {
-            string conditionTrimmed = (condition == null) ? String.Empty : condition.Trim();
+            var conditionTrimmed = (condition == null) ? String.Empty : condition.Trim();
 
             if (conditionTrimmed.Length == 0)
             {
@@ -215,7 +209,7 @@ namespace Microsoft.VisualStudioTools.Project
             // So do it ourselves.
             MSBuildConstruction.ProjectPropertyGroupElement newGroup = null;
 
-            foreach (MSBuildConstruction.ProjectPropertyGroupElement group in this.project.BuildProject.Xml.PropertyGroups)
+            foreach (var group in this.project.BuildProject.Xml.PropertyGroups)
             {
                 if (String.Equals(group.Condition.Trim(), conditionTrimmed, StringComparison.OrdinalIgnoreCase))
                 {
@@ -230,7 +224,7 @@ namespace Microsoft.VisualStudioTools.Project
                 newGroup.Condition = condition;
             }
 
-            foreach (MSBuildConstruction.ProjectPropertyElement property in newGroup.PropertiesReversed) // If there's dupes, pick the last one so we win
+            foreach (var property in newGroup.PropertiesReversed) // If there's dupes, pick the last one so we win
             {
                 if (String.Equals(property.Name, propertyName, StringComparison.OrdinalIgnoreCase) && property.Condition.Length == 0)
                 {
@@ -249,7 +243,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>0 = not dirty</returns>
         internal int IsFlavorDirty(_PersistStorageType storageType)
         {
-            int isDirty = 0;
+            var isDirty = 0;
             if (this.flavoredCfg != null && this.flavoredCfg is IPersistXMLFragment)
             {
                 ErrorHandler.ThrowOnFailure(((IPersistXMLFragment)this.flavoredCfg).IsFragmentDirty((uint)storageType, out isDirty));
@@ -267,10 +261,10 @@ namespace Microsoft.VisualStudioTools.Project
         internal int GetXmlFragment(Guid flavor, _PersistStorageType storageType, out string fragment)
         {
             fragment = null;
-            int hr = VSConstants.S_OK;
+            var hr = VSConstants.S_OK;
             if (this.flavoredCfg != null && this.flavoredCfg is IPersistXMLFragment)
             {
-                Guid flavorGuid = flavor;
+                var flavorGuid = flavor;
                 hr = ((IPersistXMLFragment)this.flavoredCfg).Save(ref flavorGuid, (uint)storageType, out fragment, 1);
             }
             return hr;
@@ -320,8 +314,8 @@ namespace Microsoft.VisualStudioTools.Project
             get
             {
                 string name;
-                string[] platform = new string[1];
-                uint[] actual = new uint[1];
+                var platform = new string[1];
+                var actual = new uint[1];
                 name = this.configName;
                 // currently, we only support one platform, so just add it..
                 IVsCfgProvider provider;
@@ -449,7 +443,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             ppIVsOutputGroup = null;
             // Search through our list of groups to find the one they are looking forgroupName
-            foreach (OutputGroup group in this.OutputGroups)
+            foreach (var group in this.OutputGroups)
             {
                 string groupName;
                 group.get_CanonicalName(out groupName);
@@ -472,7 +466,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             // Delegate to the flavored configuration (to enable a flavor to take control)
             // Since we can be asked for Configuration we don't support, avoid throwing and return the HRESULT directly
-            int hr = this.flavoredCfg.get_CfgType(ref iidCfg, out ppCfg);
+            var hr = this.flavoredCfg.get_CfgType(ref iidCfg, out ppCfg);
 
             return hr;
         }
@@ -504,7 +498,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             // Fill the array with our output groups
             uint count = 0;
-            foreach (OutputGroup group in this.OutputGroups)
+            foreach (var group in this.OutputGroups)
             {
                 if (rgpcfg.Length > count && celt > count && group != null)
                 {
@@ -547,11 +541,11 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>S_OK if the method succeeds, otherwise an error code</returns>
         public virtual int QueryDebugLaunch(uint flags, out int fCanLaunch)
         {
-            string assembly = this.project.GetAssemblyName(this.ConfigName);
+            var assembly = this.project.GetAssemblyName(this.ConfigName);
             fCanLaunch = (assembly != null && assembly.ToUpperInvariant().EndsWith(".exe", StringComparison.OrdinalIgnoreCase)) ? 1 : 0;
             if (fCanLaunch == 0)
             {
-                string property = GetConfigurationProperty("StartProgram", true);
+                var property = GetConfigurationProperty("StartProgram", true);
                 fCanLaunch = (property != null && property.Length > 0) ? 1 : 0;
             }
             return VSConstants.S_OK;
@@ -634,13 +628,13 @@ namespace Microsoft.VisualStudioTools.Project
 
             // Retrive the list of guids from hierarchy properties.
             // Because a flavor could modify that list we must make sure we are calling the outer most implementation of IVsHierarchy
-            string guidsList = String.Empty;
-            IVsHierarchy hierarchy = this.project.GetOuterInterface<IVsHierarchy>();
+            var guidsList = String.Empty;
+            var hierarchy = this.project.GetOuterInterface<IVsHierarchy>();
             object variant = null;
             ErrorHandler.ThrowOnFailure(hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID2.VSHPROPID_CfgPropertyPagesCLSIDList, out variant), new int[] { VSConstants.DISP_E_MEMBERNOTFOUND, VSConstants.E_NOTIMPL });
             guidsList = (string)variant;
 
-            Guid[] guids = Utilities.GuidsArrayFromSemicolonDelimitedStringOfGuids(guidsList);
+            var guids = Utilities.GuidsArrayFromSemicolonDelimitedStringOfGuids(guidsList);
             if (guids == null || guids.Length == 0)
             {
                 pages[0] = new CAUUID();
@@ -715,7 +709,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             var latestInput = DateTime.MinValue;
             var earliestOutput = DateTime.MaxValue;
-            bool mustRebuild = false;
+            var mustRebuild = false;
 
             var allInputs = new HashSet<string>(this.OutputGroups
                 .Where(g => IsInputGroup(g.Name))
@@ -978,7 +972,7 @@ namespace Microsoft.VisualStudioTools.Project
             this.config.PrepareBuild(false);
 
             // Current version of MSBuild wish to be called in an STA
-            uint flags = VSConstants.VS_BUILDABLEPROJECTCFGOPTS_REBUILD;
+            var flags = VSConstants.VS_BUILDABLEPROJECTCFGOPTS_REBUILD;
 
             // If we are not asked for a rebuild, then we build the default target (by passing null)
             this.Build(options, pane, ((options & flags) != 0) ? MsBuildTarget.Rebuild : null);
@@ -1023,7 +1017,7 @@ namespace Microsoft.VisualStudioTools.Project
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private bool NotifyBuildBegin()
         {
-            int shouldContinue = 1;
+            var shouldContinue = 1;
             foreach (IVsBuildStatusCallback cb in this.callbacks)
             {
                 try
@@ -1047,7 +1041,7 @@ namespace Microsoft.VisualStudioTools.Project
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void NotifyBuildEnd(MSBuildResult result, string buildTarget)
         {
-            int success = ((result == MSBuildResult.Successful) ? 1 : 0);
+            var success = ((result == MSBuildResult.Successful) ? 1 : 0);
 
             foreach (IVsBuildStatusCallback cb in this.callbacks)
             {
@@ -1063,7 +1057,7 @@ namespace Microsoft.VisualStudioTools.Project
                 finally
                 {
                     // We want to refresh the references if we are building with the Build or Rebuild target or if the project was opened for browsing only.
-                    bool shouldRepaintReferences = (buildTarget == null || buildTarget == MsBuildTarget.Build || buildTarget == MsBuildTarget.Rebuild);
+                    var shouldRepaintReferences = (buildTarget == null || buildTarget == MsBuildTarget.Build || buildTarget == MsBuildTarget.Rebuild);
 
                     // Now repaint references if that is needed. 
                     // We hardly rely here on the fact the ResolveAssemblyReferences target has been run as part of the build.
@@ -1112,10 +1106,10 @@ namespace Microsoft.VisualStudioTools.Project
         private void RefreshReferences()
         {
             // Refresh the reference container node for assemblies that could be resolved.
-            IReferenceContainer referenceContainer = this.config.ProjectMgr.GetReferenceContainer();
+            var referenceContainer = this.config.ProjectMgr.GetReferenceContainer();
             if (referenceContainer != null)
             {
-                foreach (ReferenceNode referenceNode in referenceContainer.EnumReferences())
+                foreach (var referenceNode in referenceContainer.EnumReferences())
                 {
                     referenceNode.RefreshReference();
                 }

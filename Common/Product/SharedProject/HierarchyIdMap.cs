@@ -60,7 +60,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public void Remove(HierarchyNode node)
         {
-            int i = (int)node.ID - 1;
+            var i = (int)node.ID - 1;
             HierarchyNode found;
             if (i < 0 ||
                 i >= this._ids.Count ||
@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                int i = (int)itemId - 1;
+                var i = (int)itemId - 1;
                 if (0 <= i && i < this._ids.Count)
                 {
                     var reference = this._ids[i];

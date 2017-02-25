@@ -37,25 +37,12 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
         #region EnvDTE.Property
 
-        public object Application
-        {
-            get { return String.Empty; }
-        }
-
-        public EnvDTE.Properties Collection
-        {
-            get
-            {
+        public object Application => String.Empty;
+        public EnvDTE.Properties Collection =>
                 //todo: EnvDTE.Property.Collection
-                return this.parent;
-            }
-        }
+                this.parent;
 
-        public EnvDTE.DTE DTE
-        {
-            get { return null; }
-        }
-
+        public EnvDTE.DTE DTE => null;
         public object get_IndexedValue(object index1, object index2, object index3, object index4)
         {
             return String.Empty;
@@ -66,16 +53,8 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             //todo: let_Value
         }
 
-        public string Name
-        {
-            get { return String.Empty; }
-        }
-
-        public short NumIndices
-        {
-            get { return 0; }
-        }
-
+        public string Name => String.Empty;
+        public short NumIndices => 0;
         public object Object
         {
             get { return this.parent.Target; }
@@ -84,11 +63,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             }
         }
 
-        public EnvDTE.Properties Parent
-        {
-            get { return this.parent; }
-        }
-
+        public EnvDTE.Properties Parent => this.parent;
         public void set_IndexedValue(object index1, object index2, object index3, object index4, object value)
         {
         }

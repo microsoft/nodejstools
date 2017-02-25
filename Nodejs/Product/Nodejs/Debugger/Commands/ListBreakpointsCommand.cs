@@ -31,12 +31,12 @@ namespace Microsoft.NodejsTools.Debugger.Commands
         {
             base.ProcessResponse(response);
 
-            JToken body = response["body"];
+            var body = response["body"];
 
-            JArray breakpoints = (JArray)body["breakpoints"] ?? new JArray();
+            var breakpoints = (JArray)body["breakpoints"] ?? new JArray();
             this.Breakpoints = new Dictionary<int, int>(breakpoints.Count);
 
-            foreach (JToken breakpoint in breakpoints)
+            foreach (var breakpoint in breakpoints)
             {
                 var breakpointId = (int)breakpoint["number"];
                 var hitCount = (int)breakpoint["hit_count"];

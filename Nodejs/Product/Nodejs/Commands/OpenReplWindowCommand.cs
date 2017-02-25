@@ -26,9 +26,6 @@ namespace Microsoft.NodejsTools.Commands
             NodejsPackage.Instance.OpenReplWindow();
         }
 
-        public override int CommandId
-        {
-            get { return (int)PkgCmdId.cmdidReplWindow; }
-        }
+        public override int CommandId => (int)PkgCmdId.cmdidReplWindow;
     }
 }

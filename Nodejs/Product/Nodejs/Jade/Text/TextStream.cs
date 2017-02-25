@@ -48,11 +48,7 @@ namespace Microsoft.NodejsTools.Jade
         /// <summary>
         /// Text length
         /// </summary>
-        public int Length
-        {
-            get { return this._text.Length; }
-        }
-
+        public int Length => this._text.Length;
         /// <summary>
         /// Retrieves character at a given position
         /// </summary>
@@ -133,8 +129,7 @@ namespace Microsoft.NodejsTools.Jade
             return new TextStream(this._text);
         }
 
-        public int Version { get { return 0; } }
-
+        public int Version => 0;
         // static string text provider does not fire text change event
 #pragma warning disable 0067
         public event EventHandler<TextChangeEventArgs> OnTextChange;

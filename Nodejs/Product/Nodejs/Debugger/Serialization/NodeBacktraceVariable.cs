@@ -27,7 +27,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization
             Utilities.ArgumentNotNull("stackFrame", stackFrame);
             Utilities.ArgumentNotNull("parameter", parameter);
 
-            JToken value = parameter["value"];
+            var value = parameter["value"];
             this.Id = (int)value["ref"];
             this.Parent = null;
             this.StackFrame = stackFrame;

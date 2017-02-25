@@ -47,13 +47,13 @@ namespace Microsoft.NodejsTools.Debugger.Commands
             this._position = breakpoint.GetPosition(this._sourceMapper);
 
             // Zero based line numbers
-            int line = this._position.Line;
+            var line = this._position.Line;
 
             // Zero based column numbers
             // Special case column to avoid (line 0, column 0) which
             // Node (V8) treats specially for script loaded via require
             // Script wrapping process: https://github.com/joyent/node/blob/v0.10.26-release/src/node.js#L880
-            int column = this._position.Column;
+            var column = this._position.Column;
             if (line == 0)
             {
                 column += NodeConstants.ScriptWrapBegin.Length;
@@ -90,7 +90,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands
                 return;
             }
 
-            int ignoreCount = NodeBreakpointBinding.GetEngineIgnoreCount(this._breakpoint.BreakOn, 0);
+            var ignoreCount = NodeBreakpointBinding.GetEngineIgnoreCount(this._breakpoint.BreakOn, 0);
             if (ignoreCount > 0)
             {
                 this._arguments["ignoreCount"] = ignoreCount;
@@ -102,11 +102,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands
             }
         }
 
-        protected override IDictionary<string, object> Arguments
-        {
-            get { return this._arguments; }
-        }
-
+        protected override IDictionary<string, object> Arguments => this._arguments;
         public int BreakpointId { get; private set; }
 
         public int? ScriptId { get; private set; }
@@ -119,14 +115,14 @@ namespace Microsoft.NodejsTools.Debugger.Commands
         {
             base.ProcessResponse(response);
 
-            JToken body = response["body"];
+            var body = response["body"];
             this.BreakpointId = (int)body["breakpoint"];
 
-            int? moduleId = this._module != null ? this._module.Id : (int?)null;
+            var moduleId = this._module != null ? this._module.Id : (int?)null;
             this.ScriptId = (int?)body["script_id"] ?? moduleId;
 
             // Handle breakpoint actual location fixup
-            JArray actualLocations = (JArray)body["actual_locations"] ?? new JArray();
+            var actualLocations = (JArray)body["actual_locations"] ?? new JArray();
             if (actualLocations.Count > 0)
             {
                 var location = actualLocations[0];
@@ -144,8 +140,8 @@ namespace Microsoft.NodejsTools.Debugger.Commands
 
         private static string CreateRemoteScriptRegExp(string filePath)
         {
-            string fileName = Path.GetFileName(filePath) ?? string.Empty;
-            string start = fileName == filePath ? "^" : _pathSeperatorCharacterGroup;
+            var fileName = Path.GetFileName(filePath) ?? string.Empty;
+            var start = fileName == filePath ? "^" : _pathSeperatorCharacterGroup;
             return string.Format(CultureInfo.InvariantCulture, "{0}{1}$", start, CreateCaseInsensitiveRegExpFromString(fileName));
         }
 
@@ -164,8 +160,8 @@ namespace Microsoft.NodejsTools.Debugger.Commands
             var builder = new StringBuilder();
             foreach (var ch in Regex.Escape(str))
             {
-                string upper = ch.ToString(CultureInfo.InvariantCulture).ToUpper();
-                string lower = ch.ToString(CultureInfo.InvariantCulture).ToLower();
+                var upper = ch.ToString(CultureInfo.InvariantCulture).ToUpper();
+                var lower = ch.ToString(CultureInfo.InvariantCulture).ToLower();
                 if (upper != lower)
                 {
                     builder.Append('[');

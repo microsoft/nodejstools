@@ -26,7 +26,7 @@ namespace Microsoft.NodejsTools.Jade
         {
             Debug.Assert(this._cs.CurrentChar == '<' && (this._cs.NextChar == '/' || Char.IsLetter(this._cs.NextChar)));
 
-            int length = this._cs.NextChar == '/' ? 2 : 1;
+            var length = this._cs.NextChar == '/' ? 2 : 1;
             AddToken(JadeTokenType.AngleBracket, this._cs.Position, length);
             this._cs.Advance(length);
 

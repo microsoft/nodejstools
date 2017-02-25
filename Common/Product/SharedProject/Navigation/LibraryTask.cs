@@ -34,20 +34,13 @@ namespace Microsoft.VisualStudioTools.Navigation
             this._moduleId = moduleId;
         }
 
-        public string FileName
-        {
-            get { return this._fileName; }
-        }
-
+        public string FileName => this._fileName;
         public ModuleId ModuleID
         {
             get { return this._moduleId; }
             set { this._moduleId = value; }
         }
 
-        public ITextBuffer TextBuffer
-        {
-            get { return this._textBuffer; }
-        }
+        public ITextBuffer TextBuffer => this._textBuffer;
     }
 }

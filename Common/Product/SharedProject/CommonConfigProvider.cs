@@ -123,15 +123,15 @@ namespace Microsoft.VisualStudioTools.Project
                     flags[0] = 0;
                 }
 
-                int i = 0;
-                string[] configList = GetPropertiesConditionedOn(ProjectFileConstants.Configuration);
-                string[] platformList = GetSupportedPlatformsFromProject();
+                var i = 0;
+                var configList = GetPropertiesConditionedOn(ProjectFileConstants.Configuration);
+                var platformList = GetSupportedPlatformsFromProject();
 
                 if (a != null)
                 {
-                    foreach (string platformName in platformList)
+                    foreach (var platformName in platformList)
                     {
-                        foreach (string configName in configList)
+                        foreach (var configName in configList)
                         {
                             a[i] = this.GetProjectConfiguration(configName + "|" + platformName);
                             i++;

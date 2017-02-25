@@ -31,7 +31,7 @@ namespace Microsoft.NodejsTools.Jade
                 {
                     AddToken(JadeTokenType.Filter, range.Start - 1, range.Length + 1);
 
-                    int blockIndent = CalculateLineIndent();
+                    var blockIndent = CalculateLineIndent();
                     SkipToEndOfBlock(blockIndent, text: true);
 
                     return;

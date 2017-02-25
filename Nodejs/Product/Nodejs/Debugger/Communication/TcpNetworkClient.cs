@@ -28,11 +28,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
             this._tcpClient = new TcpClient(hostName, portNumber);
         }
 
-        public bool Connected
-        {
-            get { return this._tcpClient.Connected; }
-        }
-
+        public bool Connected => this._tcpClient.Connected;
         public void Dispose()
         {
             this._tcpClient.Close();

@@ -122,12 +122,12 @@ namespace Microsoft.VisualStudioTools.Navigation
                 {
                     if (pobSrch[0].eSrchType == VSOBSEARCHTYPE.SO_ENTIREWORD && ListType == (uint)_LIB_LISTTYPE.LLT_MEMBERS)
                     {
-                        string srchText = pobSrch[0].szName;
+                        var srchText = pobSrch[0].szName;
                         int colonIndex;
                         if ((colonIndex = srchText.LastIndexOf(':')) != -1)
                         {
-                            string filename = srchText.Substring(0, srchText.LastIndexOf(':'));
-                            foreach (ProjectLibraryNode project in this._root.Children)
+                            var filename = srchText.Substring(0, srchText.LastIndexOf(':'));
+                            foreach (var project in this._root.Children)
                             {
                                 foreach (var item in project.Children)
                                 {

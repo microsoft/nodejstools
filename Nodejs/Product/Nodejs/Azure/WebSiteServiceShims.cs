@@ -43,9 +43,9 @@ namespace Microsoft.VisualStudio.Web.WindowsAzure.Contracts.Shims
 
         static ContractShim()
         {
-            string shimName = typeof(T).FullName;
+            var shimName = typeof(T).FullName;
             Debug.Assert(shimName.StartsWith("Microsoft.VisualStudio.Web.WindowsAzure.Contracts.Shims.", StringComparison.Ordinal));
-            string realName = shimName.Replace(".Shims.", ".");
+            var realName = shimName.Replace(".Shims.", ".");
             _interface = contractAssembly.GetType(realName, throwOnError: true);
         }
 
@@ -61,7 +61,7 @@ namespace Microsoft.VisualStudio.Web.WindowsAzure.Contracts.Shims
 
         private object InvokeByName(string name, object[] args)
         {
-            Type[] types = args != null ?
+            var types = args != null ?
                 args.Select(arg => { return arg.GetType(); }).ToArray() :
                 new Type[] { };
             var method =
@@ -184,21 +184,9 @@ namespace Microsoft.VisualStudio.Web.WindowsAzure.Contracts.Shims
         {
         }
 
-        public string SubscriptionId
-        {
-            get { return (string)Get(); }
-        }
-
-        public Uri ServiceManagementEndpointUri
-        {
-            get { return (Uri)Get(); }
-        }
-
-        public IAzureSubscriptionContext AzureCredentials
-        {
-            get { return (IAzureSubscriptionContext)Get(); }
-        }
-
+        public string SubscriptionId => (string)Get();
+        public Uri ServiceManagementEndpointUri => (Uri)Get();
+        public IAzureSubscriptionContext AzureCredentials => (IAzureSubscriptionContext)Get();
         public Task<List<IAzureResource>> GetResourcesAsync(bool refresh)
         {
             // The caller will only use websites from this list, and we don't
@@ -230,19 +218,8 @@ namespace Microsoft.VisualStudio.Web.WindowsAzure.Contracts.Shims
         {
         }
 
-        public string WebSpace
-        {
-            get { return (string)Get(); }
-        }
-
-        public string BrowseURL
-        {
-            get { return (string)Get(); }
-        }
-
-        public string Name
-        {
-            get { return (string)Get(); }
-        }
+        public string WebSpace => (string)Get();
+        public string BrowseURL => (string)Get();
+        public string Name => (string)Get();
     }
 }

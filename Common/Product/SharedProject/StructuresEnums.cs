@@ -265,18 +265,8 @@ namespace Microsoft.VisualStudioTools.Project
         /// <summary>
         /// true if the project was removed from the solution before the solution was closed. false if the project was removed from the solution while the solution was being closed.
         /// </summary>
-        internal bool Removed
-        {
-            get { return this._removed; }
-        }
-
-        internal IVsHierarchy Hierarchy
-        {
-            get
-            {
-                return this._hierarchy;
-            }
-        }
+        internal bool Removed => this._removed;
+        internal IVsHierarchy Hierarchy => this._hierarchy;
 
         #endregion
 
@@ -305,20 +295,9 @@ namespace Microsoft.VisualStudioTools.Project
             this.newValue = newValue;
         }
 
-        public string NewValue
-        {
-            get { return this.newValue; }
-        }
-
-        public string OldValue
-        {
-            get { return this.oldValue; }
-        }
-
-        public string PropertyName
-        {
-            get { return this.propertyName; }
-        }
+        public string NewValue => this.newValue;
+        public string OldValue => this.oldValue;
+        public string PropertyName => this.propertyName;
     }
 
     /// <summary>
@@ -333,10 +312,7 @@ namespace Microsoft.VisualStudioTools.Project
             this.child = child;
         }
 
-        public HierarchyNode Child
-        {
-            get { return this.child; }
-        }
+        public HierarchyNode Child => this.child;
     }
 
     /// <summary>
@@ -377,36 +353,18 @@ namespace Microsoft.VisualStudioTools.Project
         /// Gets the file name that was changed on disk.
         /// </summary>
         /// <value>The file that was changed on disk.</value>
-        public string FileName
-        {
-            get
-            {
-                return this.fileName;
-            }
-        }
+        public string FileName => this.fileName;
 
         /// <summary>
         /// Gets item id of the file that has changed
         /// </summary>
         /// <value>The file that was changed on disk.</value>
-        internal uint ItemID
-        {
-            get
-            {
-                return this.itemID;
-            }
-        }
+        internal uint ItemID => this.itemID;
 
         /// <summary>
         /// The reason while the file has chnaged on disk.
         /// </summary>
         /// <value>The reason while the file has chnaged on disk.</value>
-        public _VSFILECHANGEFLAGS FileChangeFlag
-        {
-            get
-            {
-                return this.fileChangeFlag;
-            }
-        }
+        public _VSFILECHANGEFLAGS FileChangeFlag => this.fileChangeFlag;
     }
 }

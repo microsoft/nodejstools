@@ -35,13 +35,13 @@ namespace Microsoft.NodejsTools.SourceMapping
             {
                 if (File.Exists(filename))
                 {
-                    string[] contents = File.ReadAllLines(filename);
+                    var contents = File.ReadAllLines(filename);
                     const string marker = "# sourceMappingURL=";
                     int markerStart;
-                    string markerLine = contents.Reverse().FirstOrDefault(x => x.IndexOf(marker, StringComparison.Ordinal) != -1);
+                    var markerLine = contents.Reverse().FirstOrDefault(x => x.IndexOf(marker, StringComparison.Ordinal) != -1);
                     if (markerLine != null && (markerStart = markerLine.IndexOf(marker, StringComparison.Ordinal)) != -1)
                     {
-                        string sourceMapFilename = markerLine.Substring(markerStart + marker.Length).Trim();
+                        var sourceMapFilename = markerLine.Substring(markerStart + marker.Length).Trim();
 
                         try
                         {
@@ -61,7 +61,7 @@ namespace Microsoft.NodejsTools.SourceMapping
                         {
                             if (File.Exists(sourceMapFilename))
                             {
-                                using (StreamReader reader = new StreamReader(sourceMapFilename))
+                                using (var reader = new StreamReader(sourceMapFilename))
                                 {
                                     var sourceMap = new SourceMap(reader);
                                     this._originalFileToSourceMap[filename] = mapInfo = new JavaScriptSourceMapInfo(sourceMap, contents);
@@ -100,7 +100,7 @@ namespace Microsoft.NodejsTools.SourceMapping
         /// </returns>
         internal string MapToOriginal(string filename)
         {
-            JavaScriptSourceMapInfo mapInfo = TryGetMapInfo(filename);
+            var mapInfo = TryGetMapInfo(filename);
             if (mapInfo != null && mapInfo.Map != null && mapInfo.Map.Sources.Count > 0)
             {
                 return mapInfo.Map.Sources[0];
@@ -113,13 +113,13 @@ namespace Microsoft.NodejsTools.SourceMapping
         /// </summary>
         internal SourceMapInfo MapToOriginal(string filename, int line, int column = 0)
         {
-            JavaScriptSourceMapInfo mapInfo = TryGetMapInfo(filename);
+            var mapInfo = TryGetMapInfo(filename);
             if (mapInfo != null)
             {
                 SourceMapInfo mapping;
                 if (line < mapInfo.Lines.Length)
                 {
-                    string lineText = mapInfo.Lines[line];
+                    var lineText = mapInfo.Lines[line];
                     // map to the 1st non-whitespace character on the line
                     // This ensures we get the correct line number, mapping to column 0
                     // can give us the previous line.
@@ -151,7 +151,7 @@ namespace Microsoft.NodejsTools.SourceMapping
             fileName = requestedFileName;
             lineNo = requestedLineNo;
             columnNo = requestedColumnNo;
-            ReverseSourceMap sourceMap = GetReverseSourceMap(requestedFileName);
+            var sourceMap = GetReverseSourceMap(requestedFileName);
 
             if (sourceMap != null)
             {
@@ -206,7 +206,7 @@ namespace Microsoft.NodejsTools.SourceMapping
 
             if (line != null && column != null)
             {
-                SourceMapInfo tempMapping = this.MapToOriginal(javaScriptFileName, (int)line, (int)column);
+                var tempMapping = this.MapToOriginal(javaScriptFileName, (int)line, (int)column);
 
                 if (tempMapping != null)
                 {
@@ -272,14 +272,14 @@ namespace Microsoft.NodejsTools.SourceMapping
 
                 if (!string.Equals(extension, NodejsConstants.JavaScriptExtension, StringComparison.OrdinalIgnoreCase))
                 {
-                    string baseFile = fileName.Substring(0, fileName.Length - extension.Length);
-                    string jsFile = baseFile + NodejsConstants.JavaScriptExtension;
+                    var baseFile = fileName.Substring(0, fileName.Length - extension.Length);
+                    var jsFile = baseFile + NodejsConstants.JavaScriptExtension;
                     if (File.Exists(jsFile) && File.Exists(jsFile + NodejsConstants.MapExtension))
                     {
                         // we're using source maps...
                         try
                         {
-                            using (StreamReader reader = new StreamReader(baseFile + NodejsConstants.JavaScriptExtension + NodejsConstants.MapExtension))
+                            using (var reader = new StreamReader(baseFile + NodejsConstants.JavaScriptExtension + NodejsConstants.MapExtension))
                             {
                                 this._generatedFileToSourceMap[fileName] = sourceMap = new ReverseSourceMap(
                                     new SourceMap(reader),
@@ -325,7 +325,7 @@ namespace Microsoft.NodejsTools.SourceMapping
                 {
                     try
                     {
-                        using (StreamReader reader = new StreamReader(funcInfo.Filename + ".map"))
+                        using (var reader = new StreamReader(funcInfo.Filename + ".map"))
                         {
                             map = new SourceMap(reader);
                         }
@@ -359,7 +359,7 @@ namespace Microsoft.NodejsTools.SourceMapping
                 // the time being.
                 if (map != null && map.TryMapLine(funcInfo.LineNumber.Value, out mapping))
                 {
-                    string filename = mapping.FileName;
+                    var filename = mapping.FileName;
                     if (filename != null && !Path.IsPathRooted(filename))
                     {
                         filename = Path.Combine(Path.GetDirectoryName(funcInfo.Filename), filename);

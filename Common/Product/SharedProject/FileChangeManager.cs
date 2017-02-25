@@ -138,7 +138,7 @@ namespace Microsoft.VisualStudioTools.Project
             this.disposed = true;
 
             // Unsubscribe from the observed source files.
-            foreach (ObservedItemInfo info in this.observedItems.Values)
+            foreach (var info in this.observedItems.Values)
             {
                 ErrorHandler.ThrowOnFailure(this.fileChangeService.UnadviseFileChange(info.FileChangeCookie));
             }
@@ -170,12 +170,12 @@ namespace Microsoft.VisualStudioTools.Project
 
             if (this.FileChangedOnDisk != null)
             {
-                for (int i = 0; i < numberOfFilesChanged; i++)
+                for (var i = 0; i < numberOfFilesChanged; i++)
                 {
-                    string fullFileName = Utilities.CanonicalizeFileName(filesChanged[i]);
+                    var fullFileName = Utilities.CanonicalizeFileName(filesChanged[i]);
                     if (this.observedItems.ContainsKey(fullFileName))
                     {
-                        ObservedItemInfo info = this.observedItems[fullFileName];
+                        var info = this.observedItems[fullFileName];
                         this.FileChangedOnDisk(this, new FileChangedOnDiskEventArgs(fullFileName, info.ItemID, (_VSFILECHANGEFLAGS)flags[i]));
                     }
                 }
@@ -219,14 +219,14 @@ namespace Microsoft.VisualStudioTools.Project
             }
             #endregion
 
-            string fullFileName = Utilities.CanonicalizeFileName(fileName);
+            var fullFileName = Utilities.CanonicalizeFileName(fileName);
             if (!this.observedItems.ContainsKey(fullFileName))
             {
                 // Observe changes to the file
                 uint fileChangeCookie;
                 ErrorHandler.ThrowOnFailure(this.fileChangeService.AdviseFileChange(fullFileName, (uint)(_VSFILECHANGEFLAGS.VSFILECHG_Time | _VSFILECHANGEFLAGS.VSFILECHG_Del), this, out fileChangeCookie));
 
-                ObservedItemInfo itemInfo = new ObservedItemInfo();
+                var itemInfo = new ObservedItemInfo();
                 itemInfo.ItemID = id;
                 itemInfo.FileChangeCookie = fileChangeCookie;
 
@@ -249,7 +249,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
             #endregion
 
-            string fullFileName = Utilities.CanonicalizeFileName(fileName);
+            var fullFileName = Utilities.CanonicalizeFileName(fileName);
             if (this.observedItems.ContainsKey(fullFileName))
             {
                 // Call ignore file with the flags specified.
@@ -270,12 +270,12 @@ namespace Microsoft.VisualStudioTools.Project
             }
             #endregion
 
-            string fullFileName = Utilities.CanonicalizeFileName(fileName);
+            var fullFileName = Utilities.CanonicalizeFileName(fileName);
 
             if (this.observedItems.ContainsKey(fullFileName))
             {
                 // Get the cookie that was used for this.observedItems to this file.
-                ObservedItemInfo itemInfo = this.observedItems[fullFileName];
+                var itemInfo = this.observedItems[fullFileName];
 
                 // Remove the file from our observed list. It's important that this is done before the call to 
                 // UnadviseFileChange, because for some reason, the call to UnadviseFileChange can trigger a 

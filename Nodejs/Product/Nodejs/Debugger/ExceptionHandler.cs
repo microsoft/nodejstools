@@ -29,18 +29,12 @@ namespace Microsoft.NodejsTools.Debugger
             this._exceptionTreatments = GetDefaultExceptionTreatments();
         }
 
-        public bool BreakOnAllExceptions
-        {
-            get
-            {
-                return this._defaultExceptionTreatment != ExceptionHitTreatment.BreakNever ||
+        public bool BreakOnAllExceptions => this._defaultExceptionTreatment != ExceptionHitTreatment.BreakNever ||
                        this._exceptionTreatments.Values.Any(value => value != ExceptionHitTreatment.BreakNever);
-            }
-        }
 
         public bool SetExceptionTreatments(ICollection<KeyValuePair<string, ExceptionHitTreatment>> exceptionTreatments)
         {
-            bool updated = false;
+            var updated = false;
             foreach (var exceptionTreatment in exceptionTreatments)
             {
                 ExceptionHitTreatment treatmentValue;
@@ -56,7 +50,7 @@ namespace Microsoft.NodejsTools.Debugger
 
         public bool ClearExceptionTreatments(ICollection<KeyValuePair<string, ExceptionHitTreatment>> exceptionTreatments)
         {
-            bool updated = false;
+            var updated = false;
             foreach (var exceptionTreatment in exceptionTreatments)
             {
                 ExceptionHitTreatment treatmentValue;
@@ -71,7 +65,7 @@ namespace Microsoft.NodejsTools.Debugger
 
         public bool ResetExceptionTreatments()
         {
-            bool updated = false;
+            var updated = false;
             if (this._exceptionTreatments.Values.Any(value => value != this._defaultExceptionTreatment))
             {
                 this._exceptionTreatments = GetDefaultExceptionTreatments();

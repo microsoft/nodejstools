@@ -45,10 +45,10 @@ namespace Microsoft.NodejsTools.Jade
                 Debug.Assert(e.Changes[0].OldPosition == e.Changes[0].NewPosition);
 
                 start = e.Changes[0].OldPosition;
-                int oldEnd = e.Changes[0].OldEnd;
-                int newEnd = e.Changes[0].NewEnd;
+                var oldEnd = e.Changes[0].OldEnd;
+                var newEnd = e.Changes[0].NewEnd;
 
-                for (int i = 1; i < e.Changes.Count; i++)
+                for (var i = 1; i < e.Changes.Count; i++)
                 {
                     start = Math.Min(start, e.Changes[i].OldPosition);
                     oldEnd = Math.Max(oldEnd, e.Changes[i].OldEnd);

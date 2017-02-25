@@ -25,48 +25,20 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         public const int RPC_E_SERVERFAULT = unchecked((int)0x80010105);
         public const int E_PROGRAM_DESTROY_PENDING = unchecked((int)0x80040B01);
         static private Guid _guidFilterRegisters = new Guid("223ae797-bd09-4f28-8241-2763bdc5f713");
-        static public Guid guidFilterRegisters
-        {
-            get { return _guidFilterRegisters; }
-        }
-
+        static public Guid guidFilterRegisters => _guidFilterRegisters;
         static private Guid _guidFilterLocals = new Guid("b200f725-e725-4c53-b36a-1ec27aef12ef");
-        static public Guid guidFilterLocals
-        {
-            get { return _guidFilterLocals; }
-        }
-
+        static public Guid guidFilterLocals => _guidFilterLocals;
         static private Guid _guidFilterAllLocals = new Guid("196db21f-5f22-45a9-b5a3-32cddb30db06");
-        static public Guid guidFilterAllLocals
-        {
-            get { return _guidFilterAllLocals; }
-        }
-
+        static public Guid guidFilterAllLocals => _guidFilterAllLocals;
         static private Guid _guidFilterArgs = new Guid("804bccea-0475-4ae7-8a46-1862688ab863");
-        static public Guid guidFilterArgs
-        {
-            get { return _guidFilterArgs; }
-        }
-
+        static public Guid guidFilterArgs => _guidFilterArgs;
         static private Guid _guidFilterLocalsPlusArgs = new Guid("e74721bb-10c0-40f5-807f-920d37f95419");
-        static public Guid guidFilterLocalsPlusArgs
-        {
-            get { return _guidFilterLocalsPlusArgs; }
-        }
-
+        static public Guid guidFilterLocalsPlusArgs => _guidFilterLocalsPlusArgs;
         static private Guid _guidFilterAllLocalsPlusArgs = new Guid("939729a8-4cb0-4647-9831-7ff465240d5f");
-        static public Guid guidFilterAllLocalsPlusArgs
-        {
-            get { return _guidFilterAllLocalsPlusArgs; }
-        }
-
+        static public Guid guidFilterAllLocalsPlusArgs => _guidFilterAllLocalsPlusArgs;
         // Language guid for JavaScript. Used when the language for a document context or a stack frame is requested.
         static private Guid _guidLanguageJavascript = new Guid("3A12D0B6-C26C-11D0-B442-00A0244A1DD2");
-        static public Guid guidLanguageJavascript
-        {
-            get { return _guidLanguageJavascript; }
-        }
-
+        static public Guid guidLanguageJavascript => _guidLanguageJavascript;
         public const int E_EVALUATE_BUSY_WITH_EVALUATION = unchecked((int)0x80040030);
         public const int E_EVALUATE_TIMEOUT = unchecked((int)0x80040031);
     }

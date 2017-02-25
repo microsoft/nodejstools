@@ -48,9 +48,9 @@ namespace Microsoft.NodejsTools.Repl
                 return ExecutionResult.Failed;
             }
 
-            StringBuilder text = new StringBuilder();
+            var text = new StringBuilder();
 
-            List<KeyValuePair<int, ITextBuffer>> positions = new List<KeyValuePair<int, ITextBuffer>>();
+            var positions = new List<KeyValuePair<int, ITextBuffer>>();
             foreach (var buffer in window.TextView.BufferGraph.GetTextBuffers(IsJavaScriptBuffer))
             {
                 var target = window.TextView.BufferGraph.MapUpToBuffer(
@@ -86,28 +86,14 @@ namespace Microsoft.NodejsTools.Repl
             return ExecutionResult.Succeeded;
         }
 
-        public string Description
-        {
-            get { return "Save the current REPL session to a file"; }
-        }
-
-        public string Command
-        {
-            get { return "save"; }
-        }
-
+        public string Description => "Save the current REPL session to a file";
+        public string Command => "save";
         private static bool IsJavaScriptBuffer(ITextBuffer buffer)
         {
             return buffer.ContentType.IsOfType(NodejsConstants.JavaScript);
         }
 
-        public object ButtonContent
-        {
-            get
-            {
-                return null;
-            }
-        }
+        public object ButtonContent => null;
 
         #endregion
     }

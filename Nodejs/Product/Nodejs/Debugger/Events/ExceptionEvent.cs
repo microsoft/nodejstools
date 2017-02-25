@@ -41,7 +41,7 @@ namespace Microsoft.NodejsTools.Debugger.Events
         {
             this.Running = false;
 
-            JToken body = message["body"];
+            var body = message["body"];
             this.Line = (int?)body["sourceLine"];
             this.Column = (int?)body["sourceColumn"];
             this.Uncaught = (bool)body["uncaught"];
@@ -51,7 +51,7 @@ namespace Microsoft.NodejsTools.Debugger.Events
             this.ExceptionName = GetExceptionName(message);
             this.ErrorNumber = GetExceptionCodeRef(body);
 
-            JToken script = body["script"];
+            var script = body["script"];
             if (script != null)
             {
                 var scriptId = (int)script["id"];
@@ -73,11 +73,11 @@ namespace Microsoft.NodejsTools.Debugger.Events
 
         private int? GetExceptionCodeRef(JToken body)
         {
-            JToken exception = body["exception"];
+            var exception = body["exception"];
             var properties = (JArray)exception["properties"];
             if (properties != null)
             {
-                foreach (JToken property in properties)
+                foreach (var property in properties)
                 {
                     if (((string)property["name"]) == "code")
                     {
@@ -90,15 +90,15 @@ namespace Microsoft.NodejsTools.Debugger.Events
 
         private string GetExceptionName(JObject json)
         {
-            JToken body = json["body"];
-            JToken exception = body["exception"];
+            var body = json["body"];
+            var exception = body["exception"];
             var name = (string)exception["type"];
             if (name == "error" || name == "object")
             {
-                JToken constructorFunction = exception["constructorFunction"];
+                var constructorFunction = exception["constructorFunction"];
                 var constructorFunctionHandle = (int)constructorFunction["ref"];
                 var refs = (JArray)json["refs"];
-                JToken refRecord = GetRefRecord(refs, constructorFunctionHandle);
+                var refRecord = GetRefRecord(refs, constructorFunctionHandle);
                 if (refRecord != null)
                 {
                     name = (string)refRecord["name"];
@@ -109,9 +109,9 @@ namespace Microsoft.NodejsTools.Debugger.Events
 
         private JToken GetRefRecord(JArray refs, int handle)
         {
-            foreach (JToken refRecordObj in refs)
+            foreach (var refRecordObj in refs)
             {
-                JToken refRecord = refRecordObj;
+                var refRecord = refRecordObj;
                 var refRecordHandle = (int)refRecord["handle"];
                 if (refRecordHandle == handle)
                 {
@@ -123,7 +123,7 @@ namespace Microsoft.NodejsTools.Debugger.Events
 
         private string GetExceptionType(JToken body)
         {
-            string name = (string)body["exception"]["className"]
+            var name = (string)body["exception"]["className"]
                           ?? (string)body["exception"]["type"];
             return this._typeNameMappings.ContainsKey(name) ? this._typeNameMappings[name] : name;
         }

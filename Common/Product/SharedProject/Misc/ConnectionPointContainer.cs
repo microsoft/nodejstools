@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudioTools.Project
         #region IConnectionPoint Members
         public void Advise(object pUnkSink, out uint pdwCookie)
         {
-            SinkType sink = pUnkSink as SinkType;
+            var sink = pUnkSink as SinkType;
             if (null == sink)
             {
                 Marshal.ThrowExceptionForHR(VSConstants.E_NOINTERFACE);
@@ -120,7 +120,7 @@ namespace Microsoft.VisualStudioTools.Project
         public void Unadvise(uint dwCookie)
         {
             // This will throw if the cookie is not in the list.
-            SinkType sink = this.sinks[dwCookie];
+            var sink = this.sinks[dwCookie];
             this.sinks.Remove(dwCookie);
             this.source.OnSinkRemoved(sink);
         }

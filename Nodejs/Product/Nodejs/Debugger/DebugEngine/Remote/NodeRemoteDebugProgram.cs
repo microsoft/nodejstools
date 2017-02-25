@@ -31,11 +31,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote
             this._process = process;
         }
 
-        public NodeRemoteDebugProcess DebugProcess
-        {
-            get { return this._process; }
-        }
-
+        public NodeRemoteDebugProcess DebugProcess => this._process;
         public int Attach(IDebugEventCallback2 pCallback)
         {
             throw new NotImplementedException();

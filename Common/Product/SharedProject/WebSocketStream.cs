@@ -43,21 +43,9 @@ namespace Microsoft.VisualStudioTools
             }
         }
 
-        public override bool CanRead
-        {
-            get { return true; }
-        }
-
-        public override bool CanWrite
-        {
-            get { return true; }
-        }
-
-        public override bool CanSeek
-        {
-            get { return false; }
-        }
-
+        public override bool CanRead => true;
+        public override bool CanWrite => true;
+        public override bool CanSeek => false;
         public override void Flush()
         {
         }
@@ -101,11 +89,7 @@ namespace Microsoft.VisualStudioTools
             }
         }
 
-        public override long Length
-        {
-            get { throw new NotSupportedException(); }
-        }
-
+        public override long Length => throw new NotSupportedException();
         public override long Position
         {
             get { throw new NotSupportedException(); }

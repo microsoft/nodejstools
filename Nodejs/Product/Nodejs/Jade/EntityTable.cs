@@ -27,11 +27,7 @@ namespace Microsoft.NodejsTools.Jade
             return Entities.TryGetValue(candidate, out mappedChar);
         }
 
-        public static ICollection<string> EntityNames
-        {
-            get { return Entities.Keys; }
-        }
-
+        public static ICollection<string> EntityNames => Entities.Keys;
         static EntityTable()
         {
             Entities = new Dictionary<string, char>();

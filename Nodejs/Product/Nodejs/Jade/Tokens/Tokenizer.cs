@@ -69,7 +69,7 @@ namespace Microsoft.NodejsTools.Jade
 
             if (excludePartialTokens)
             {
-                int end = start + length;
+                var end = start + length;
 
                 // Exclude tokens that are beyond the specified range
                 int i;
@@ -180,8 +180,8 @@ namespace Microsoft.NodejsTools.Jade
             //      This is nested beneath the comment as well,
             //      so it also won't appear.
 
-            int start = this._cs.Position;
-            int baseIndent = 0;
+            var start = this._cs.Position;
+            var baseIndent = 0;
 
             if (this.MultilineCppComments)
             {
@@ -189,9 +189,9 @@ namespace Microsoft.NodejsTools.Jade
                 multiline = true;
 
                 // only standalone // comments can span more than one line
-                for (int i = this._cs.Position - 1; i >= 0; i--)
+                for (var i = this._cs.Position - 1; i >= 0; i--)
                 {
-                    char ch = this._cs[i];
+                    var ch = this._cs[i];
 
                     if (ch == '\r' || ch == '\n')
                         break;
@@ -212,7 +212,7 @@ namespace Microsoft.NodejsTools.Jade
 
             while (!this._cs.IsEndOfStream())
             {
-                int eolPosition = this._cs.Position;
+                var eolPosition = this._cs.Position;
 
                 if (this._cs.IsAtNewLine())
                 {
@@ -256,7 +256,7 @@ namespace Microsoft.NodejsTools.Jade
                 this._cs.MoveToNextChar();
             }
 
-            int length = this._cs.Position - start;
+            var length = this._cs.Position - start;
             if (length > 0)
                 this.Tokens.Add(GetCommentToken(start, length));
 
@@ -269,7 +269,7 @@ namespace Microsoft.NodejsTools.Jade
         /// <returns>True if comment includes new line characters</returns>
         protected virtual void HandleCComment()
         {
-            int start = this._cs.Position;
+            var start = this._cs.Position;
 
             this._cs.Advance(2);
 
@@ -284,7 +284,7 @@ namespace Microsoft.NodejsTools.Jade
                 this._cs.MoveToNextChar();
             }
 
-            int length = this._cs.Position - start;
+            var length = this._cs.Position - start;
 
             if (length > 0)
                 this.Tokens.Add(GetCommentToken(start, length));
@@ -295,8 +295,8 @@ namespace Microsoft.NodejsTools.Jade
         /// </summary>
         protected virtual ITextRange HandleString(bool addToken = true)
         {
-            int start = this._cs.Position;
-            char quote = this._cs.CurrentChar;
+            var start = this._cs.Position;
+            var quote = this._cs.CurrentChar;
 
             // since the escape char is exactly the string openning char we say we start in escaped mode
             // it will get reset by the first char regardless what it is, but it will keep the '' case honest
@@ -343,7 +343,7 @@ namespace Microsoft.NodejsTools.Jade
         /// <returns>Sequence range</returns>
         protected virtual ITextRange GetNonWSSequence(char terminator, bool inclusive)
         {
-            int start = this._cs.Position;
+            var start = this._cs.Position;
 
             while (!this._cs.IsEndOfStream() && !this._cs.IsWhiteSpace())
             {
@@ -368,7 +368,7 @@ namespace Microsoft.NodejsTools.Jade
         /// <returns>Sequence range</returns>
         protected ITextRange GetNonWSSequence(string terminators)
         {
-            int start = this._cs.Position;
+            var start = this._cs.Position;
 
             this._cs.MoveToNextChar();
 
@@ -389,7 +389,7 @@ namespace Microsoft.NodejsTools.Jade
         /// <returns>Identifier range</returns>
         protected virtual ITextRange ParseIdentifier()
         {
-            int start = this._cs.Position;
+            var start = this._cs.Position;
 
             while (!this._cs.IsEndOfStream() && !this._cs.IsWhiteSpace() &&
                   (this._cs.IsAnsiLetter() || this._cs.IsDecimal() || this._cs.CurrentChar == '_'))
@@ -405,15 +405,15 @@ namespace Microsoft.NodejsTools.Jade
         /// </summary>
         protected int CalculateLineIndent()
         {
-            int baseIndent = -1;
+            var baseIndent = -1;
 
             // Find base tag indent
-            for (int pos = this._cs.Position - 1; pos >= 0 && baseIndent < 0; pos--)
+            for (var pos = this._cs.Position - 1; pos >= 0 && baseIndent < 0; pos--)
             {
                 if (this._cs[pos] == '\n' || this._cs[pos] == '\r')
                 {
                     pos++;
-                    for (int j = pos; j < this._cs.Position + 1; j++)
+                    for (var j = pos; j < this._cs.Position + 1; j++)
                     {
                         if (j == this._cs.Position || !Char.IsWhiteSpace(this._cs[j]))
                         {
@@ -435,7 +435,7 @@ namespace Microsoft.NodejsTools.Jade
         /// <returns>True if whitespace included newline characters</returns>
         protected virtual bool SkipWhiteSpace()
         {
-            bool newLine = false;
+            var newLine = false;
 
             while (!this._cs.IsEndOfStream())
             {
@@ -536,11 +536,11 @@ namespace Microsoft.NodejsTools.Jade
         /// </summary>
         protected virtual bool IsAllWhiteSpaceBeforeEndOfLine(int position)
         {
-            bool allWS = true;
+            var allWS = true;
 
-            for (int i = position; i < this._cs.Length; i++)
+            for (var i = position; i < this._cs.Length; i++)
             {
-                char ch = this._cs[i];
+                var ch = this._cs[i];
 
                 if (ch == '\r' || ch == '\n')
                     break;

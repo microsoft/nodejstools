@@ -43,33 +43,18 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <summary>
         /// Microsoft Internal Use Only.
         /// </summary>
-        public object Application
-        {
-            get { return null; }
-        }
-
+        public object Application => null;
         /// <summary>
         /// Gets the Collection containing the Property object supporting this property.
         /// </summary>
-        public EnvDTE.Properties Collection
-        {
-            get
-            {
+        public EnvDTE.Properties Collection =>
                 //todo: EnvDTE.Property.Collection
-                return this.parent;
-            }
-        }
+                this.parent;
 
         /// <summary>
         /// Gets the top-level extensibility object.
         /// </summary>
-        public EnvDTE.DTE DTE
-        {
-            get
-            {
-                return this.parent.DTE;
-            }
-        }
+        public EnvDTE.DTE DTE => this.parent.DTE;
 
         /// <summary>
         /// Returns one element of a list. 
@@ -113,11 +98,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <summary>
         /// Gets the number of indices required to access the value.
         /// </summary>
-        public short NumIndices
-        {
-            get { return (short)this.pi.GetIndexParameters().Length; }
-        }
-
+        public short NumIndices => (short)this.pi.GetIndexParameters().Length;
         /// <summary>
         /// Sets or gets the object supporting the Property object.
         /// </summary>
@@ -135,11 +116,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <summary>
         /// Microsoft Internal Use Only.
         /// </summary>
-        public EnvDTE.Properties Parent
-        {
-            get { return this.parent; }
-        }
-
+        public EnvDTE.Properties Parent => this.parent;
         /// <summary>
         /// Sets the value of the property at the specified index.
         /// </summary>
@@ -164,7 +141,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                using (AutomationScope scope = new AutomationScope(this.parent.Target.HierarchyNode.ProjectMgr.Site))
+                using (var scope = new AutomationScope(this.parent.Target.HierarchyNode.ProjectMgr.Site))
                 {
                     return this.parent.Target.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
                     {
@@ -188,7 +165,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             }
             set
             {
-                using (AutomationScope scope = new AutomationScope(this.parent.Target.HierarchyNode.ProjectMgr.Site))
+                using (var scope = new AutomationScope(this.parent.Target.HierarchyNode.ProjectMgr.Site))
                 {
                     this.parent.Target.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
                     {

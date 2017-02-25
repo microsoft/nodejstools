@@ -27,13 +27,7 @@ namespace Microsoft.NodejsTools.Project
             this.TextBox.Text = initialFileName;
         }
 
-        public TextBox TextBox
-        {
-            get
-            {
-                return this.textBox;
-            }
-        }
+        public TextBox TextBox => this.textBox;
 
         private void TextBox_TextChanged(object sender, EventArgs e)
         {

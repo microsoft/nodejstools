@@ -89,7 +89,7 @@ namespace Microsoft.NodejsTools.Jade
         /// <returns>Identifier range</returns>
         protected override ITextRange ParseIdentifier()
         {
-            int start = this._cs.Position;
+            var start = this._cs.Position;
 
             while (!this._cs.IsEndOfStream() && !this._cs.IsWhiteSpace() &&
                   (this._cs.IsAnsiLetter() || this._cs.IsDecimal() || this._cs.CurrentChar == '_'))

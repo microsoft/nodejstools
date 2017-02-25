@@ -29,11 +29,8 @@ namespace Microsoft.NodejsTools.Jade
             this._collection = collection;
         }
 
-        public int Start { get { return this._collection.Start; } }
-        public int End { get { return this._collection.End; } }
-
-        public int Length { get { return this._collection.Length; } }
-
+        public int Start => this._collection.Start; public int End => this._collection.End;
+        public int Length => this._collection.Length;
         public bool Contains(int position) { return this._collection.Contains(position); }
 
         public IList<T> ItemsInRange(ITextRange range)
@@ -51,14 +48,12 @@ namespace Microsoft.NodejsTools.Jade
             return this._collection.GetItemsContainingInclusiveEnd(position);
         }
 
-        public int Count { get { return this._collection.Count; } }
-
+        public int Count => this._collection.Count;
         /// <summary>
         /// Sorted list of comment tokens in the document.
         /// A new readonly collection is generated on every call to this method
         /// </summary>
-        public ReadOnlyCollection<T> Items { get { return new ReadOnlyCollection<T>(this._collection.Items); } }
-
+        public ReadOnlyCollection<T> Items => new ReadOnlyCollection<T>(this._collection.Items);
         /// <summary>
         /// Retrieves Nth item in the collection
         /// </summary>

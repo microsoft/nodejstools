@@ -33,25 +33,13 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
         #endregion
 
-        private new ReferenceContainerNode Node
-        {
-            get
-            {
-                return (ReferenceContainerNode)base.Node;
-            }
-        }
+        private new ReferenceContainerNode Node => (ReferenceContainerNode)base.Node;
 
         #region overridden methods
         /// <summary>
         /// Returns the project items collection of all the references defined for this project.
         /// </summary>
-        public override EnvDTE.ProjectItems ProjectItems
-        {
-            get
-            {
-                return new OANavigableProjectItems(this.Project, this.Node);
-            }
-        }
+        public override EnvDTE.ProjectItems ProjectItems => new OANavigableProjectItems(this.Project, this.Node);
 
         #endregion
     }

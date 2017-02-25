@@ -55,15 +55,15 @@ namespace Microsoft.NodejsTools.Jade
                 int start, oldLength, newLength;
                 TextUtility.CombineChanges(e, out start, out oldLength, out newLength);
 
-                int changeStart = Int32.MaxValue;
-                int changeEnd = 0;
+                var changeStart = Int32.MaxValue;
+                var changeEnd = 0;
 
                 lock (this._regionsLock)
                 {
                     // Remove affected regions and shift the remaining ones. Outlining 
                     // regions are not sorted and can overlap. Hence linear search.
 
-                    for (int i = 0; i < this.CurrentRegions.Count; i++)
+                    for (var i = 0; i < this.CurrentRegions.Count; i++)
                     {
                         var region = this.CurrentRegions[i];
 

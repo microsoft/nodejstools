@@ -52,43 +52,16 @@ namespace Microsoft.VisualStudioTools.Project
             ProjectFileConstants.WebPiReference
         };
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays")]
-        protected virtual string[] SupportedReferenceTypes
-        {
-            get { return supportedReferenceTypes; }
-        }
+        protected virtual string[] SupportedReferenceTypes => supportedReferenceTypes;
         #endregion
 
         #region overridden properties
-        public override int SortPriority
-        {
-            get
-            {
-                return DefaultSortOrderNode.ReferenceContainerNode;
-            }
-        }
+        public override int SortPriority => DefaultSortOrderNode.ReferenceContainerNode;
 
-        public override int MenuCommandId
-        {
-            get { return VsMenus.IDM_VS_CTXT_REFERENCEROOT; }
-        }
-
-        public override Guid ItemTypeGuid
-        {
-            get { return VSConstants.GUID_ItemType_VirtualFolder; }
-        }
-
-        public override string Url
-        {
-            get { return ReferencesNodeVirtualName; }
-        }
-
-        public override string Caption
-        {
-            get
-            {
-                return SR.GetString(SR.ReferencesNodeName);
-            }
-        }
+        public override int MenuCommandId => VsMenus.IDM_VS_CTXT_REFERENCEROOT;
+        public override Guid ItemTypeGuid => VSConstants.GUID_ItemType_VirtualFolder;
+        public override string Url => ReferencesNodeVirtualName;
+        public override string Caption => SR.GetString(SR.ReferencesNodeName);
 
         private Automation.OAReferences references;
         internal override object Object
@@ -129,11 +102,7 @@ namespace Microsoft.VisualStudioTools.Project
             return null;
         }
 
-        protected override bool SupportsIconMonikers
-        {
-            get { return true; }
-        }
-
+        protected override bool SupportsIconMonikers => true;
         protected override ImageMoniker GetIconMoniker(bool open)
         {
             return KnownMonikers.Reference;
@@ -216,10 +185,10 @@ namespace Microsoft.VisualStudioTools.Project
         #region IReferenceContainer
         public IList<ReferenceNode> EnumReferences()
         {
-            List<ReferenceNode> refs = new List<ReferenceNode>();
-            for (HierarchyNode node = this.FirstChild; node != null; node = node.NextSibling)
+            var refs = new List<ReferenceNode>();
+            for (var node = this.FirstChild; node != null; node = node.NextSibling)
             {
-                ReferenceNode refNode = node as ReferenceNode;
+                var refNode = node as ReferenceNode;
                 if (refNode != null)
                 {
                     refs.Add(refNode);
@@ -235,11 +204,11 @@ namespace Microsoft.VisualStudioTools.Project
         {
             this.ProjectMgr.Site.GetUIThread().MustBeCalledFromUIThread();
 
-            foreach (string referenceType in this.SupportedReferenceTypes)
+            foreach (var referenceType in this.SupportedReferenceTypes)
             {
                 IEnumerable<MSBuild.ProjectItem> referencesGroup = this.ProjectMgr.BuildProject.GetItems(referenceType);
 
-                bool isAssemblyReference = referenceType == ProjectFileConstants.Reference;
+                var isAssemblyReference = referenceType == ProjectFileConstants.Reference;
                 // If the project was loaded for browsing we should still create the nodes but as not resolved.
                 if (isAssemblyReference &&
                     (!this.ProjectMgr.BuildProject.Targets.ContainsKey(MsBuildTarget.ResolveAssemblyReferences) || this.ProjectMgr.Build(MsBuildTarget.ResolveAssemblyReferences) != MSBuildResult.Successful))
@@ -247,11 +216,11 @@ namespace Microsoft.VisualStudioTools.Project
                     continue;
                 }
 
-                foreach (MSBuild.ProjectItem item in referencesGroup)
+                foreach (var item in referencesGroup)
                 {
                     ProjectElement element = new MsBuildProjectElement(this.ProjectMgr, item);
 
-                    ReferenceNode node = CreateReferenceNode(referenceType, element);
+                    var node = CreateReferenceNode(referenceType, element);
 
                     if (node != null)
                     {
@@ -260,8 +229,8 @@ namespace Microsoft.VisualStudioTools.Project
                         // avoid different representation problems.
                         // Example :<Reference Include="EnvDTE80, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
                         //		  <Reference Include="EnvDTE80" />
-                        bool found = false;
-                        for (HierarchyNode n = this.FirstChild; n != null && !found; n = n.NextSibling)
+                        var found = false;
+                        for (var n = this.FirstChild; n != null && !found; n = n.NextSibling)
                         {
                             if (String.Compare(n.Caption, node.Caption, StringComparison.OrdinalIgnoreCase) == 0)
                             {
@@ -388,7 +357,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             // We have a path to a file, it could be anything
             // First see if it is a managed assembly
-            bool tryToCreateAnAssemblyReference = true;
+            var tryToCreateAnAssemblyReference = true;
             if (File.Exists(selectorData.bstrFile))
             {
                 try

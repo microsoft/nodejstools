@@ -76,7 +76,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public static void Send(AD7Engine engine)
         {
-            AD7EngineCreateEvent eventObject = new AD7EngineCreateEvent(engine);
+            var eventObject = new AD7EngineCreateEvent(engine);
             engine.Send(eventObject, IID, null, null);
         }
 
@@ -95,7 +95,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         internal static void Send(AD7Engine engine)
         {
-            AD7ProgramCreateEvent eventObject = new AD7ProgramCreateEvent();
+            var eventObject = new AD7ProgramCreateEvent();
             engine.Send(eventObject, IID, null);
         }
     }
@@ -266,7 +266,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         int IDebugBreakpointBoundEvent2.EnumBoundBreakpoints(out IEnumDebugBoundBreakpoints2 ppEnum)
         {
-            IDebugBoundBreakpoint2[] boundBreakpoints = new IDebugBoundBreakpoint2[1];
+            var boundBreakpoints = new IDebugBoundBreakpoint2[1];
             boundBreakpoints[0] = this.m_boundBreakpoint;
             ppEnum = new AD7BoundBreakpointsEnum(boundBreakpoints);
             return VSConstants.S_OK;

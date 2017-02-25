@@ -27,9 +27,6 @@ namespace Microsoft.NodejsTools.Commands
             Process.Start(@"https://aka.ms/ntvs-feedback");
         }
 
-        public override int CommandId
-        {
-            get { return (int)PkgCmdId.cmdidSendFeedback; }
-        }
+        public override int CommandId => (int)PkgCmdId.cmdidSendFeedback;
     }
 }

@@ -63,9 +63,9 @@ namespace Microsoft.NodejsTools.Jade
             var regionStack = new Stack<CodeBlock>();
             var lineLengths = new int[snapshot.LineCount];
 
-            int lastBlockIndent = 0;
+            var lastBlockIndent = 0;
 
-            for (int i = 0; i < snapshot.LineCount; i++)
+            for (var i = 0; i < snapshot.LineCount; i++)
             {
                 var line = snapshot.GetLineFromLineNumber(i);
 
@@ -77,7 +77,7 @@ namespace Microsoft.NodejsTools.Jade
                 }
 
                 lineLengths[i] = line.Length;
-                int indent = GetLineIndent(line);
+                var indent = GetLineIndent(line);
 
                 if (regionStack.Count > 0)
                     lastBlockIndent = regionStack.Peek().Indent;
@@ -94,10 +94,10 @@ namespace Microsoft.NodejsTools.Jade
                         // If we have line with the same indent, remove previously added region
                         // and replace it with a new one potentially starting with the current line.
                         var prevCodeBlock = regionStack.Pop();
-                        int startLine = snapshot.GetLineNumberFromPosition(prevCodeBlock.Start);
+                        var startLine = snapshot.GetLineNumberFromPosition(prevCodeBlock.Start);
 
                         // Trim empty lines
-                        int j = i - 1;
+                        var j = i - 1;
                         for (; j >= 0; j--)
                         {
                             if (lineLengths[j] > 0)
@@ -136,7 +136,7 @@ namespace Microsoft.NodejsTools.Jade
                 if (lineNumber > 0)
                 {
                     var prevLine = snapshot.GetLineFromLineNumber(lineNumber - 1);
-                    int indent = GetLineIndent(prevLine);
+                    var indent = GetLineIndent(prevLine);
 
                     if (indent == codeBlock.Indent)
                         regionStack.Pop();
@@ -147,7 +147,7 @@ namespace Microsoft.NodejsTools.Jade
             {
                 var codeBlock = regionStack.Pop();
 
-                int startLine = snapshot.GetLineNumberFromPosition(codeBlock.Start);
+                var startLine = snapshot.GetLineNumberFromPosition(codeBlock.Start);
                 if (snapshot.LineCount - startLine >= _minLinesToOutline)
                 {
                     newRegions.Add(OutlineRegion.FromBounds(snapshot.TextBuffer, codeBlock.Start, snapshot.Length));
@@ -159,7 +159,7 @@ namespace Microsoft.NodejsTools.Jade
         {
             for (int i = line.Start; i < line.End; i++)
             {
-                char ch = line.Snapshot.GetText(i, 1)[0];
+                var ch = line.Snapshot.GetText(i, 1)[0];
                 if (!Char.IsWhiteSpace(ch))
                     return i - line.Start;
             }

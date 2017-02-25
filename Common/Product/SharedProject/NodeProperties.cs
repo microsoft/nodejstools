@@ -43,13 +43,7 @@ namespace Microsoft.VisualStudioTools.Project
             this.browsable = browsable;
         }
 
-        public bool Browsable
-        {
-            get
-            {
-                return this.browsable;
-            }
-        }
+        public bool Browsable => this.browsable;
 
         private bool browsable;
     }
@@ -82,26 +76,14 @@ namespace Microsoft.VisualStudioTools.Project
         #region properties
         [Browsable(false)]
         [AutomationBrowsable(true)]
-        public object Node
-        {
-            get { return this.node; }
-        }
-
-        internal HierarchyNode HierarchyNode
-        {
-            get { return this.node; }
-        }
-
+        public object Node => this.node;
+        internal HierarchyNode HierarchyNode => this.node;
         /// <summary>
         /// Used by Property Pages Frame to set it's title bar. The Caption of the Hierarchy Node is returned.
         /// </summary>
         [Browsable(false)]
         [AutomationBrowsable(false)]
-        public virtual string Name
-        {
-            get { return this.node.Caption; }
-        }
-
+        public virtual string Name => this.node.Caption;
         #endregion
 
         #region ctors
@@ -164,7 +146,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>Caption of Hierarchy node instance</returns>
         public override string GetComponentName()
         {
-            string caption = this.HierarchyNode.Caption;
+            var caption = this.HierarchyNode.Caption;
             if (string.IsNullOrEmpty(caption))
             {
                 return base.GetComponentName();
@@ -179,7 +161,7 @@ namespace Microsoft.VisualStudioTools.Project
         #region helper methods
         protected string GetProperty(string name, string def)
         {
-            string a = this.HierarchyNode.ItemNode.GetMetadata(name);
+            var a = this.HierarchyNode.ItemNode.GetMetadata(name);
             return (a == null) ? def : a;
         }
 
@@ -209,13 +191,13 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 // Retrieve the list of guids from hierarchy properties.
                 // Because a flavor could modify that list we must make sure we are calling the outer most implementation of IVsHierarchy
-                string guidsList = String.Empty;
-                IVsHierarchy hierarchy = this.HierarchyNode.ProjectMgr.GetOuterInterface<IVsHierarchy>();
+                var guidsList = String.Empty;
+                var hierarchy = this.HierarchyNode.ProjectMgr.GetOuterInterface<IVsHierarchy>();
                 object variant = null;
                 ErrorHandler.ThrowOnFailure(hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID2.VSHPROPID_PropertyPagesCLSIDList, out variant));
                 guidsList = (string)variant;
 
-                Guid[] guids = Utilities.GuidsArrayFromSemicolonDelimitedStringOfGuids(guidsList);
+                var guids = Utilities.GuidsArrayFromSemicolonDelimitedStringOfGuids(guidsList);
                 if (guids == null || guids.Length == 0)
                 {
                     pages[0] = new CAUUID();
@@ -240,7 +222,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                Guid catid = this.HierarchyNode.ProjectMgr.GetCATIDForType(this.GetType());
+                var catid = this.HierarchyNode.ProjectMgr.GetCATIDForType(this.GetType());
                 if (Guid.Empty.CompareTo(catid) == 0)
                 {
                     return null;
@@ -252,7 +234,7 @@ namespace Microsoft.VisualStudioTools.Project
         [Browsable(false)]
         public object ExtenderNames()
         {
-            EnvDTE.ObjectExtenders extenderService = (EnvDTE.ObjectExtenders)this.HierarchyNode.GetService(typeof(EnvDTE.ObjectExtenders));
+            var extenderService = (EnvDTE.ObjectExtenders)this.HierarchyNode.GetService(typeof(EnvDTE.ObjectExtenders));
             Utilities.CheckNotNull(extenderService, "Could not get the ObjectExtenders object from the services exposed by this property object");
 
             return extenderService.GetExtenderNames(this.ExtenderCATID, this);
@@ -260,7 +242,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public object Extender(string extenderName)
         {
-            EnvDTE.ObjectExtenders extenderService = (EnvDTE.ObjectExtenders)this.HierarchyNode.GetService(typeof(EnvDTE.ObjectExtenders));
+            var extenderService = (EnvDTE.ObjectExtenders)this.HierarchyNode.GetService(typeof(EnvDTE.ObjectExtenders));
             Utilities.CheckNotNull(extenderService, "Could not get the ObjectExtenders object from the services exposed by this property object");
             return extenderService.GetExtender(this.ExtenderCATID, extenderName, this);
         }
@@ -292,42 +274,18 @@ namespace Microsoft.VisualStudioTools.Project
         [SRCategoryAttribute(SR.Misc)]
         [SRDisplayName(SR.FullPath)]
         [SRDescriptionAttribute(SR.FullPathDescription)]
-        public string FullPath
-        {
-            get
-            {
-                return this.HierarchyNode.Url;
-            }
-        }
+        public string FullPath => this.HierarchyNode.Url;
 
         #region non-browsable properties - used for automation only
 
         [Browsable(false)]
-        public string URL
-        {
-            get
-            {
-                return this.HierarchyNode.Url;
-            }
-        }
+        public string URL => this.HierarchyNode.Url;
 
         [Browsable(false)]
-        public string Extension
-        {
-            get
-            {
-                return Path.GetExtension(this.HierarchyNode.GetItemName());
-            }
-        }
+        public string Extension => Path.GetExtension(this.HierarchyNode.GetItemName());
 
         [Browsable(false)]
-        public bool IsLinkFile
-        {
-            get
-            {
-                return this.HierarchyNode.IsLinkFile;
-            }
-        }
+        public bool IsLinkFile => this.HierarchyNode.IsLinkFile;
 
         #endregion
 
@@ -358,13 +316,7 @@ namespace Microsoft.VisualStudioTools.Project
         [SRDisplayName(SR.BuildAction)]
         [SRDescriptionAttribute(SR.BuildActionDescription)]
         [TypeConverter(typeof(BuildActionTypeConverter))]
-        public prjBuildAction BuildAction
-        {
-            get
-            {
-                return prjBuildAction.prjBuildActionNone;
-            }
-        }
+        public prjBuildAction BuildAction => prjBuildAction.prjBuildActionNone;
     }
 
     [ComVisible(true)]
@@ -464,14 +416,9 @@ namespace Microsoft.VisualStudioTools.Project
         }
 
         [Browsable(false)]
-        public string SourceControlStatus
-        {
-            get
-            {
+        public string SourceControlStatus =>
                 // remove STATEICON_ and return rest of enum
-                return this.HierarchyNode.StateIconIndex.ToString().Substring(10);
-            }
-        }
+                this.HierarchyNode.StateIconIndex.ToString().Substring(10);
 
         [Browsable(false)]
         public string SubType
@@ -540,24 +487,12 @@ namespace Microsoft.VisualStudioTools.Project
         [SRCategoryAttribute(SR.Misc)]
         [SRDisplayName(SR.FileName)]
         [SRDescriptionAttribute(SR.FileNameDescription)]
-        public virtual string FileName
-        {
-            get
-            {
-                return this.HierarchyNode.GetItemName();
-            }
-        }
+        public virtual string FileName => this.HierarchyNode.GetItemName();
 
         [SRCategoryAttribute(SR.Misc)]
         [SRDisplayName(SR.FullPath)]
         [SRDescriptionAttribute(SR.FullPathDescription)]
-        public string FullPath
-        {
-            get
-            {
-                return this.HierarchyNode.Url;
-            }
-        }
+        public string FullPath => this.HierarchyNode.Url;
         #endregion
 
         #region ctors
@@ -622,7 +557,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             if (value is string)
             {
-                string strVal = (string)value;
+                var strVal = (string)value;
                 if (strVal.Equals(ProjectFileConstants.Compile, StringComparison.OrdinalIgnoreCase))
                 {
                     return prjBuildAction.prjBuildActionCompile;
@@ -688,7 +623,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
-            FileNodeProperties nodeProps = context.Instance as FileNodeProperties;
+            var nodeProps = context.Instance as FileNodeProperties;
             IEnumerable<string> itemNames;
             if (nodeProps != null)
             {
@@ -710,13 +645,7 @@ namespace Microsoft.VisualStudioTools.Project
         [SRDisplayName(SR.ProjectFolder)]
         [SRDescriptionAttribute(SR.ProjectFolderDescription)]
         [AutomationBrowsable(false)]
-        public string ProjectFolder
-        {
-            get
-            {
-                return this.Node.ProjectMgr.ProjectFolder;
-            }
-        }
+        public string ProjectFolder => this.Node.ProjectMgr.ProjectFolder;
 
         [SRCategoryAttribute(SR.Misc)]
         [SRDisplayName(SR.ProjectFile)]
@@ -736,13 +665,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         #region non-browsable properties - used for automation only
         [Browsable(false)]
-        public string Guid
-        {
-            get
-            {
-                return this.Node.ProjectMgr.ProjectIDGuid.ToString();
-            }
-        }
+        public string Guid => this.Node.ProjectMgr.ProjectIDGuid.ToString();
 
         [Browsable(false)]
         public string FileName
@@ -758,13 +681,7 @@ namespace Microsoft.VisualStudioTools.Project
         }
 
         [Browsable(false)]
-        public string FullPath
-        {
-            get
-            {
-                return CommonUtils.NormalizeDirectoryPath(this.Node.ProjectMgr.ProjectFolder);
-            }
-        }
+        public string FullPath => CommonUtils.NormalizeDirectoryPath(this.Node.ProjectMgr.ProjectFolder);
         #endregion
 
         #endregion
@@ -775,13 +692,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
         }
 
-        internal new ProjectNode Node
-        {
-            get
-            {
-                return (ProjectNode)base.Node;
-            }
-        }
+        internal new ProjectNode Node => (ProjectNode)base.Node;
 
         #endregion
 
@@ -832,7 +743,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         bool EnvDTE80.IInternalExtenderProvider.CanExtend(string extenderCATID, string extenderName, object extendeeObject)
         {
-            EnvDTE80.IInternalExtenderProvider outerHierarchy = this.Node.GetOuterInterface<EnvDTE80.IInternalExtenderProvider>();
+            var outerHierarchy = this.Node.GetOuterInterface<EnvDTE80.IInternalExtenderProvider>();
 
             if (outerHierarchy != null)
             {
@@ -843,7 +754,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         object EnvDTE80.IInternalExtenderProvider.GetExtender(string extenderCATID, string extenderName, object extendeeObject, EnvDTE.IExtenderSite extenderSite, int cookie)
         {
-            EnvDTE80.IInternalExtenderProvider outerHierarchy = this.Node.GetOuterInterface<EnvDTE80.IInternalExtenderProvider>();
+            var outerHierarchy = this.Node.GetOuterInterface<EnvDTE80.IInternalExtenderProvider>();
 
             if (outerHierarchy != null)
             {
@@ -908,13 +819,7 @@ namespace Microsoft.VisualStudioTools.Project
         [SRCategoryAttribute(SR.Misc)]
         [SRDisplayName(SR.FullPath)]
         [SRDescriptionAttribute(SR.FullPathDescription)]
-        public string FullPath
-        {
-            get
-            {
-                return CommonUtils.NormalizeDirectoryPath(this.HierarchyNode.GetMkDocument());
-            }
-        }
+        public string FullPath => CommonUtils.NormalizeDirectoryPath(this.HierarchyNode.GetMkDocument());
         #endregion
 
         #endregion
@@ -941,13 +846,7 @@ namespace Microsoft.VisualStudioTools.Project
         [SRDescriptionAttribute(SR.RefNameDescription)]
         [Browsable(true)]
         [AutomationBrowsable(true)]
-        public override string Name
-        {
-            get
-            {
-                return this.HierarchyNode.Caption;
-            }
-        }
+        public override string Name => this.HierarchyNode.Caption;
 
         [SRCategoryAttribute(SR.Misc)]
         [SRDisplayName(SR.CopyToLocal)]
@@ -956,7 +855,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                string copyLocal = this.GetProperty(ProjectFileConstants.Private, "False");
+                var copyLocal = this.GetProperty(ProjectFileConstants.Private, "False");
                 if (copyLocal == null || copyLocal.Length == 0)
                     return true;
                 return bool.Parse(copyLocal);
@@ -970,13 +869,7 @@ namespace Microsoft.VisualStudioTools.Project
         [SRCategoryAttribute(SR.Misc)]
         [SRDisplayName(SR.FullPath)]
         [SRDescriptionAttribute(SR.FullPathDescription)]
-        public virtual string FullPath
-        {
-            get
-            {
-                return this.HierarchyNode.Url;
-            }
-        }
+        public virtual string FullPath => this.HierarchyNode.Url;
         #endregion
 
         #region ctors
@@ -1005,13 +898,7 @@ namespace Microsoft.VisualStudioTools.Project
         #endregion
 
         #region overriden methods
-        public override string FullPath
-        {
-            get
-            {
-                return ((ProjectReferenceNode)this.Node).ReferencedProjectOutputPath;
-            }
-        }
+        public override string FullPath => ((ProjectReferenceNode)this.Node).ReferencedProjectOutputPath;
         #endregion
     }
 }

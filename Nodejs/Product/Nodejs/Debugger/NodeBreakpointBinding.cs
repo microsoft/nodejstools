@@ -51,67 +51,23 @@ namespace Microsoft.NodejsTools.Debugger
             this._fullyBould = fullyBound;
         }
 
-        public NodeDebugger Process
-        {
-            get { return this._breakpoint.Process; }
-        }
-
-        public NodeBreakpoint Breakpoint
-        {
-            get { return this._breakpoint; }
-        }
-
+        public NodeDebugger Process => this._breakpoint.Process;
+        public NodeBreakpoint Breakpoint => this._breakpoint;
         /// <summary>
         /// Line and column number that corresponds with the actual JavaScript code
         /// </summary>
-        public FilePosition Position
-        {
-            get { return this._position; }
-        }
-
+        public FilePosition Position => this._position;
         /// <summary>
         /// Line and column number that corresponds to the file the breakpoint was requested in
         /// </summary>
-        public FilePosition Target
-        {
-            get { return this._target; }
-        }
-
-        public bool Enabled
-        {
-            get { return this._enabled; }
-        }
-
-        public BreakOn BreakOn
-        {
-            get { return this._breakOn; }
-        }
-
-        public string Condition
-        {
-            get { return this._condition; }
-        }
-
-        public int BreakpointId
-        {
-            get { return this._breakpointId; }
-        }
-
-        internal int? ScriptId
-        {
-            get { return this._scriptId; }
-        }
-
-        private uint HitCount
-        {
-            get { return this._engineHitCount - this._hitCountDelta; }
-        }
-
-        internal bool FullyBound
-        {
-            get { return this._fullyBould; }
-        }
-
+        public FilePosition Target => this._target;
+        public bool Enabled => this._enabled;
+        public BreakOn BreakOn => this._breakOn;
+        public string Condition => this._condition;
+        public int BreakpointId => this._breakpointId;
+        internal int? ScriptId => this._scriptId;
+        private uint HitCount => this._engineHitCount - this._hitCountDelta;
+        internal bool FullyBound => this._fullyBould;
         public bool Unbound { get; set; }
 
         public Task Remove()
@@ -134,7 +90,7 @@ namespace Microsoft.NodejsTools.Debugger
 
             SyncCounts();
 
-            bool engineEnabled = GetEngineEnabled(enabled, this._breakOn, this.HitCount);
+            var engineEnabled = GetEngineEnabled(enabled, this._breakOn, this.HitCount);
             if (this._engineEnabled != engineEnabled)
             {
                 await this.Process.UpdateBreakpointBindingAsync(this._breakpointId, engineEnabled, validateSuccess: true).ConfigureAwait(false);
@@ -154,10 +110,10 @@ namespace Microsoft.NodejsTools.Debugger
 
             SyncCounts();
 
-            bool engineEnabled = GetEngineEnabled(this._enabled, breakOn, this.HitCount);
-            bool? enabled = (this._engineEnabled != engineEnabled) ? (bool?)engineEnabled : null;
+            var engineEnabled = GetEngineEnabled(this._enabled, breakOn, this.HitCount);
+            var enabled = (this._engineEnabled != engineEnabled) ? (bool?)engineEnabled : null;
 
-            int engineIgnoreCount = GetEngineIgnoreCount(breakOn, this.HitCount);
+            var engineIgnoreCount = GetEngineIgnoreCount(breakOn, this.HitCount);
             await this.Process.UpdateBreakpointBindingAsync(this._breakpointId, ignoreCount: engineIgnoreCount, enabled: enabled, validateSuccess: true).ConfigureAwait(false);
 
             this._engineEnabled = engineEnabled;
@@ -179,10 +135,10 @@ namespace Microsoft.NodejsTools.Debugger
             if (this._breakOn.Kind != BreakOnKind.Always)
             {
                 // When BreakOn (not BreakOnKind.Always), handle change to hit count by resetting ignore count 
-                bool engineEnabled = GetEngineEnabled(this._enabled, this._breakOn, hitCount);
-                bool? enabled = (this._engineEnabled != engineEnabled) ? (bool?)engineEnabled : null;
+                var engineEnabled = GetEngineEnabled(this._enabled, this._breakOn, hitCount);
+                var enabled = (this._engineEnabled != engineEnabled) ? (bool?)engineEnabled : null;
 
-                int engineIgnoreCount = GetEngineIgnoreCount(this._breakOn, hitCount);
+                var engineIgnoreCount = GetEngineIgnoreCount(this._breakOn, hitCount);
                 await this.Process.UpdateBreakpointBindingAsync(this._breakpointId, ignoreCount: engineIgnoreCount, enabled: enabled, validateSuccess: true).ConfigureAwait(false);
 
                 this._engineEnabled = engineEnabled;
@@ -213,8 +169,8 @@ namespace Microsoft.NodejsTools.Debugger
             Debug.Assert(GetEngineEnabled(this._enabled, this._breakOn, this.HitCount));
 
             // Compose followup handler
-            uint engineHitCount = this._engineHitCount + (uint)this._engineIgnoreCount + 1;
-            int engineIgnoreCount = 0;
+            var engineHitCount = this._engineHitCount + (uint)this._engineIgnoreCount + 1;
+            var engineIgnoreCount = 0;
 
             // Handle pass count
             switch (this._breakOn.Kind)
@@ -228,7 +184,7 @@ namespace Microsoft.NodejsTools.Debugger
                     UpdatedEngineState(false, engineHitCount, engineIgnoreCount);
                     break;
                 case BreakOnKind.Mod:
-                    uint hitCount = engineHitCount - this._hitCountDelta;
+                    var hitCount = engineHitCount - this._hitCountDelta;
                     engineIgnoreCount = GetEngineIgnoreCount(this._breakOn, hitCount);
                     await this.Process.UpdateBreakpointBindingAsync(this._breakpointId, ignoreCount: engineIgnoreCount, cancellationToken: cancellationToken).ConfigureAwait(false);
                     UpdatedEngineState(true, engineHitCount, engineIgnoreCount);
@@ -258,7 +214,7 @@ namespace Microsoft.NodejsTools.Debugger
 
         internal static int GetEngineIgnoreCount(BreakOn breakOn, uint hitCount)
         {
-            int count = 0;
+            var count = 0;
             switch (breakOn.Kind)
             {
                 case BreakOnKind.Always:
@@ -329,7 +285,7 @@ namespace Microsoft.NodejsTools.Debugger
                 return;
             }
 
-            int? hitCount = this.Process.GetBreakpointHitCountAsync(this._breakpointId).Result;
+            var hitCount = this.Process.GetBreakpointHitCountAsync(this._breakpointId).Result;
             if (hitCount == null)
             {
                 return;

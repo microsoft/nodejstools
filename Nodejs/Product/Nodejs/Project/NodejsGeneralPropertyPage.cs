@@ -31,11 +31,7 @@ namespace Microsoft.NodejsTools.Project
             this._control = new NodejsGeneralPropertyPageControl(this);
         }
 
-        public override System.Windows.Forms.Control Control
-        {
-            get { return this._control; }
-        }
-
+        public override System.Windows.Forms.Control Control => this._control;
         internal override CommonProjectNode Project
         {
             get
@@ -99,9 +95,6 @@ namespace Microsoft.NodejsTools.Project
             }
         }
 
-        public override string Name
-        {
-            get { return "General"; }
-        }
+        public override string Name => "General";
     }
 }

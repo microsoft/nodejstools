@@ -33,14 +33,7 @@ namespace Microsoft.NodejsTools.Jade
             this.Classification = classification;
         }
 
-        public override bool IsComment
-        {
-            get { return this.TokenType == JadeTokenType.Comment; }
-        }
-
-        public override bool IsString
-        {
-            get { return this.TokenType == JadeTokenType.String; }
-        }
+        public override bool IsComment => this.TokenType == JadeTokenType.Comment;
+        public override bool IsString => this.TokenType == JadeTokenType.String;
     }
 }

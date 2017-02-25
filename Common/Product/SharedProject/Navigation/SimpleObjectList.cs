@@ -39,13 +39,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             this._children = new List<T>();
         }
 
-        public List<T> Children
-        {
-            get
-            {
-                return this._children;
-            }
-        }
+        public List<T> Children => this._children;
 
         public virtual void Update()
         {
@@ -117,7 +111,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             {
                 throw new ArgumentOutOfRangeException("index");
             }
-            OleDataObject dataObject = new OleDataObject(pDataObject);
+            var dataObject = new OleDataObject(pDataObject);
             this._children[(int)index].DoDragDrop(dataObject, grfKeyState, pdwEffect);
             return VSConstants.S_OK;
         }
@@ -138,7 +132,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             {
                 throw new ArgumentOutOfRangeException("index");
             }
-            uint copied = this._children[(int)index].EnumClipboardFormats((_VSOBJCFFLAGS)grfFlags, rgcfFormats);
+            var copied = this._children[(int)index].EnumClipboardFormats((_VSOBJCFFLAGS)grfFlags, rgcfFormats);
             if ((null != pcActual) && (pcActual.Length > 0))
             {
                 pcActual[0] = copied;
@@ -204,7 +198,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             {
                 throw new ArgumentOutOfRangeException("index");
             }
-            CommandID commandId = this._children[(int)index].ContextMenuID;
+            var commandId = this._children[(int)index].ContextMenuID;
             if (null == commandId)
             {
                 pclsidActive = Guid.Empty;
@@ -354,7 +348,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             pulIndex = NullIndex;
             string nodeName;
             ErrorHandler.ThrowOnFailure(pNavInfoNode.get_Name(out nodeName));
-            for (int i = 0; i < this._children.Count; i++)
+            for (var i = 0; i < this._children.Count; i++)
             {
                 if (0 == string.Compare(this._children[i].UniqueName, nodeName, StringComparison.OrdinalIgnoreCase))
                 {
@@ -387,10 +381,8 @@ namespace Microsoft.VisualStudioTools.Navigation
             return VSConstants.S_OK;
         }
 
-        public virtual uint Capabilities { get { return 0; } }
-
-        public virtual _VSTREEFLAGS Flags { get { return 0; } }
-
+        public virtual uint Capabilities => 0;
+        public virtual _VSTREEFLAGS Flags => 0;
         public virtual uint CategoryField(LIB_CATEGORY lIB_CATEGORY)
         {
             return 0;

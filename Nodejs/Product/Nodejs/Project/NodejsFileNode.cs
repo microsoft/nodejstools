@@ -47,13 +47,7 @@ namespace Microsoft.NodejsTools.Project
             }
         }
 
-        protected override ImageMoniker CodeFileIconMoniker
-        {
-            get
-            {
-                return KnownMonikers.JSScript;
-            }
-        }
+        protected override ImageMoniker CodeFileIconMoniker => KnownMonikers.JSScript;
 
         internal override int IncludeInProject(bool includeChildren)
         {
@@ -79,12 +73,6 @@ namespace Microsoft.NodejsTools.Project
             return new NodejsIncludedFileNodeProperties(this);
         }
 
-        public new NodejsProjectNode ProjectMgr
-        {
-            get
-            {
-                return (NodejsProjectNode)base.ProjectMgr;
-            }
-        }
+        public new NodejsProjectNode ProjectMgr => (NodejsProjectNode)base.ProjectMgr;
     }
 }

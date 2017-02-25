@@ -57,7 +57,7 @@ namespace Microsoft.NodejsTools.Project
 
         public NodejsProjectNode(NodejsProjectPackage package) : base(package, null)
         {
-            Type projectNodePropsType = typeof(NodejsProjectNodeProperties);
+            var projectNodePropsType = typeof(NodejsProjectNodeProperties);
             AddCATIDMapping(projectNodePropsType, projectNodePropsType.GUID);
 #pragma warning disable 0612
             InitNodejsProjectImages();
@@ -108,11 +108,7 @@ namespace Microsoft.NodejsTools.Project
             return base.GetAvailableItemNames().Except(_excludedAvailableItems);
         }
 
-        public Dictionary<NodejsProjectImageName, int> ImageIndexFromNameDictionary
-        {
-            get { return this._imageIndexFromNameDictionary; }
-        }
-
+        public Dictionary<NodejsProjectImageName, int> ImageIndexFromNameDictionary => this._imageIndexFromNameDictionary;
         [Obsolete]
         private void InitNodejsProjectImages()
         {
@@ -127,19 +123,9 @@ namespace Microsoft.NodejsTools.Project
             AddProjectImage(NodejsProjectImageName.DependencyMissing, "Microsoft.VisualStudioTools.Resources.Icons.PackageWarning_16x.png");
         }
 
-        public bool IsTypeScriptProject
-        {
-            get
-            {
-                return StringComparer.OrdinalIgnoreCase.Equals(GetProjectProperty(NodeProjectProperty.EnableTypeScript), "true");
-            }
-        }
+        public bool IsTypeScriptProject => StringComparer.OrdinalIgnoreCase.Equals(GetProjectProperty(NodeProjectProperty.EnableTypeScript), "true");
 
-        protected override bool SupportsIconMonikers
-        {
-            get { return true; }
-        }
-
+        protected override bool SupportsIconMonikers => true;
         protected override ImageMoniker GetIconMoniker(bool open)
         {
             return this.IsTypeScriptProject ? KnownMonikers.TSProjectNode : KnownMonikers.JSProjectNode;
@@ -153,22 +139,12 @@ namespace Microsoft.NodejsTools.Project
             images.Add(Image.FromStream(typeof(NodejsProjectNode).Assembly.GetManifestResourceStream(resourceId)));
         }
 
-        public override Guid SharedCommandGuid
-        {
-            get
-            {
-                return Guids.NodejsCmdSet;
-            }
-        }
+        public override Guid SharedCommandGuid => Guids.NodejsCmdSet;
 
-        internal override string IssueTrackerUrl
-        {
-            get { return NodejsConstants.IssueTrackerUrl; }
-        }
-
+        internal override string IssueTrackerUrl => NodejsConstants.IssueTrackerUrl;
         protected override void FinishProjectCreation(string sourceFolder, string destFolder)
         {
-            foreach (MSBuild.ProjectItem item in this.BuildProject.Items)
+            foreach (var item in this.BuildProject.Items)
             {
                 if (IsProjectTypeScriptSourceFile(item.EvaluatedInclude))
                 {
@@ -240,7 +216,7 @@ namespace Microsoft.NodejsTools.Project
 
         internal override string GetItemType(string filename)
         {
-            string absFileName =
+            var absFileName =
                 Path.IsPathRooted(filename) ?
                 filename :
                 Path.Combine(this.ProjectHome, filename);
@@ -294,13 +270,7 @@ namespace Microsoft.NodejsTools.Project
             return false;
         }
 
-        public override string[] CodeFileExtensions
-        {
-            get
-            {
-                return new[] { NodejsConstants.JavaScriptExtension };
-            }
-        }
+        public override string[] CodeFileExtensions => new[] { NodejsConstants.JavaScriptExtension };
 
         protected internal override FolderNode CreateFolderNode(ProjectElement element)
         {
@@ -309,7 +279,7 @@ namespace Microsoft.NodejsTools.Project
 
         public override CommonFileNode CreateCodeFileNode(ProjectElement item)
         {
-            string fileName = item.Url;
+            var fileName = item.Url;
             if (!String.IsNullOrWhiteSpace(fileName)
                 && Path.GetExtension(fileName).Equals(NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase))
             {
@@ -385,13 +355,7 @@ namespace Microsoft.NodejsTools.Project
             return new NodejsProjectNodeProperties(this);
         }
 
-        protected override Stream ProjectIconsImageStripStream
-        {
-            get
-            {
-                return typeof(ProjectNode).Assembly.GetManifestResourceStream("Microsoft.VisualStudioTools.Resources.Icons.SharedProjectImageList.bmp");
-            }
-        }
+        protected override Stream ProjectIconsImageStripStream => typeof(ProjectNode).Assembly.GetManifestResourceStream("Microsoft.VisualStudioTools.Resources.Icons.SharedProjectImageList.bmp");
 
         public override bool IsCodeFile(string fileName)
         {
@@ -532,7 +496,7 @@ namespace Microsoft.NodejsTools.Project
                 return false;
             }
 
-            int nestedModulesDepth = 0;
+            var nestedModulesDepth = 0;
             if (this.ModulesNode.NpmController.RootPackage != null && this.ModulesNode.NpmController.RootPackage.Modules != null)
             {
                 nestedModulesDepth = this.ModulesNode.NpmController.RootPackage.Modules.GetDepth(fileNode.Url);
@@ -541,13 +505,7 @@ namespace Microsoft.NodejsTools.Project
             return true;
         }
 
-        internal override object Object
-        {
-            get
-            {
-                return this;
-            }
-        }
+        internal override object Object => this;
 
         protected override ReferenceContainerNode CreateReferenceContainerNode()
         {
@@ -564,7 +522,7 @@ namespace Microsoft.NodejsTools.Project
 
         private string GetProjectTypeGuids()
         {
-            string projectTypeGuids = "";
+            var projectTypeGuids = "";
             ErrorHandler.ThrowOnFailure(((IVsAggregatableProject)this).GetAggregateProjectTypeGuids(out projectTypeGuids));
             return projectTypeGuids;
         }
@@ -594,16 +552,8 @@ namespace Microsoft.NodejsTools.Project
             throw new NotImplementedException();
         }
 
-        public VsWebSite.CodeFolders CodeFolders
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public EnvDTE.DTE DTE
-        {
-            get { return this.Project.DTE; }
-        }
-
+        public VsWebSite.CodeFolders CodeFolders => throw new NotImplementedException();
+        public EnvDTE.DTE DTE => this.Project.DTE;
         public string EnsureServerRunning()
         {
             throw new NotImplementedException();
@@ -619,54 +569,22 @@ namespace Microsoft.NodejsTools.Project
             throw new NotImplementedException();
         }
 
-        public EnvDTE.Project Project
-        {
-            get { return (OAProject)GetAutomationObject(); }
-        }
-
-        public VsWebSite.AssemblyReferences References
-        {
-            get { throw new NotImplementedException(); }
-        }
-
+        public EnvDTE.Project Project => (OAProject)GetAutomationObject();
+        public VsWebSite.AssemblyReferences References => throw new NotImplementedException();
         public void Refresh()
         {
         }
 
-        public string TemplatePath
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public string URL
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public string UserTemplatePath
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public VsWebSite.VSWebSiteEvents VSWebSiteEvents
-        {
-            get { throw new NotImplementedException(); }
-        }
-
+        public string TemplatePath => throw new NotImplementedException();
+        public string URL => throw new NotImplementedException();
+        public string UserTemplatePath => throw new NotImplementedException();
+        public VsWebSite.VSWebSiteEvents VSWebSiteEvents => throw new NotImplementedException();
         public void WaitUntilReady()
         {
         }
 
-        public VsWebSite.WebReferences WebReferences
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public VsWebSite.WebServices WebServices
-        {
-            get { throw new NotImplementedException(); }
-        }
-
+        public VsWebSite.WebReferences WebReferences => throw new NotImplementedException();
+        public VsWebSite.WebServices WebServices => throw new NotImplementedException();
         #endregion
 
         Task INodePackageModulesCommands.InstallMissingModulesAsync()
@@ -783,7 +701,7 @@ namespace Microsoft.NodejsTools.Project
             basePath = CommonUtils.EnsureEndSeparator(basePath);
 
             WIN32_FIND_DATA wfd;
-            IntPtr hFind = NativeMethods.FindFirstFile(basePath + path + "\\*", out wfd);
+            var hFind = NativeMethods.FindFirstFile(basePath + path + "\\*", out wfd);
             if (hFind == NativeMethods.INVALID_HANDLE_VALUE)
             {
                 yield break;
@@ -798,16 +716,16 @@ namespace Microsoft.NodejsTools.Project
                         continue;
                     }
 
-                    bool isDirectory = (wfd.dwFileAttributes & NativeMethods.FILE_ATTRIBUTE_DIRECTORY) != 0;
+                    var isDirectory = (wfd.dwFileAttributes & NativeMethods.FILE_ATTRIBUTE_DIRECTORY) != 0;
 
-                    string childPath = path;
+                    var childPath = path;
                     if (childPath != String.Empty)
                     {
                         childPath += "\\";
                     }
                     childPath += wfd.cFileName;
 
-                    string fullChildPath = basePath + childPath;
+                    var fullChildPath = basePath + childPath;
                     bool isTooLong;
                     try
                     {
@@ -930,7 +848,7 @@ namespace Microsoft.NodejsTools.Project
                         {
                             // We enable "Set as StartUp File" command only on current language code files, 
                             // the file is in project home dir and if the file is not the startup file already.
-                            string startupFile = ((CommonProjectNode)this.ProjectMgr).GetStartupFile();
+                            var startupFile = ((CommonProjectNode)this.ProjectMgr).GetStartupFile();
                             if (!CommonUtils.IsSamePath(startupFile, selectedNodes[0].Url))
                             {
                                 return QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
@@ -1065,7 +983,7 @@ namespace Microsoft.NodejsTools.Project
 
             if (this.IsPlatformAware())
             {
-                EnvDTE.Project automationObject = GetAutomationObject() as EnvDTE.Project;
+                var automationObject = GetAutomationObject() as EnvDTE.Project;
 
                 this.BuildProject.SetGlobalProperty(ProjectFileConstants.Platform, automationObject.ConfigurationManager.ActiveConfiguration.PlatformName);
             }

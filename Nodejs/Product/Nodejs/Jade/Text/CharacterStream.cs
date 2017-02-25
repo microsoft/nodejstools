@@ -45,7 +45,7 @@ namespace Microsoft.NodejsTools.Jade
         {
             this._text = textProvider;
 
-            int end = Math.Min(this._text.Length, range.End);
+            var end = Math.Min(this._text.Length, range.End);
 
             this._range = TextRange.FromBounds(range.Start, end);
 
@@ -63,11 +63,7 @@ namespace Microsoft.NodejsTools.Jade
         /// <summary>
         /// Text provider that supplies underlying text. May be a string, a text buffer or a buffer snapshot.
         /// </summary>
-        public ITextProvider Text
-        {
-            get { return this._text; }
-        }
-
+        public ITextProvider Text => this._text;
         /// <summary>
         /// Determines if current position is at the end of text
         /// </summary>
@@ -77,11 +73,7 @@ namespace Microsoft.NodejsTools.Jade
             return this._isEndOfStream;
         }
 
-        public int DistanceFromEnd
-        {
-            get { return this._range.End - this.Position; }
-        }
-
+        public int DistanceFromEnd => this._range.End - this.Position;
         /// <summary>
         /// Returns character at a given position. If position is beyond text limits, returns '\0'
         /// </summary>
@@ -109,13 +101,8 @@ namespace Microsoft.NodejsTools.Jade
             return this._text.CompareTo(position, length, text, ignoreCase);
         }
 
-        public char CurrentChar { get { return this._currentChar; } }
-
-        public char NextChar
-        {
-            get { return this.Position + 1 < this._range.End ? this._text[this.Position + 1] : '\0'; }
-        }
-
+        public char CurrentChar => this._currentChar;
+        public char NextChar => this.Position + 1 < this._range.End ? this._text[this.Position + 1] : '\0';
         /// <summary>
         /// Returns characters at an offset from the current position
         /// </summary>
@@ -123,7 +110,7 @@ namespace Microsoft.NodejsTools.Jade
         /// <returns>Character or '\0' if offset is beyond text boundaries</returns>
         public char LookAhead(int offset)
         {
-            int pos = this.Position + offset;
+            var pos = this.Position + offset;
 
             if (pos < 0 || pos >= this._text.Length)
                 return '\0';
@@ -150,11 +137,7 @@ namespace Microsoft.NodejsTools.Jade
         /// <summary>
         /// Length of the stream
         /// </summary>
-        public int Length
-        {
-            get { return this._range.Length; }
-        }
-
+        public int Length => this._range.Length;
         /// <summary>
         /// Moves current position forward or backward
         /// </summary>
@@ -245,7 +228,7 @@ namespace Microsoft.NodejsTools.Jade
             if (this._position < 0)
                 this._position = 0;
 
-            int maxPosition = Math.Min(this._text.Length, this._range.End);
+            var maxPosition = Math.Min(this._text.Length, this._range.End);
 
             this._isEndOfStream = this._position >= maxPosition;
             if (this._isEndOfStream)

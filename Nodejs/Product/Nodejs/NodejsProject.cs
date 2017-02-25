@@ -62,8 +62,8 @@ namespace Microsoft.NodejsTools
 
         protected override void InitializeForOuter(string fileName, string location, string name, uint flags, ref Guid guidProject, out bool cancel)
         {
-            CommandID menuCommandID = new CommandID(VSConstants.GUID_VSStandardCommandSet97, (int)VSConstants.VSStd97CmdID.Open);
-            OleMenuCommand menuItem = new OleMenuCommand(this.OpenFile, null, this.OpenFileBeforeQueryStatus, menuCommandID);
+            var menuCommandID = new CommandID(VSConstants.GUID_VSStandardCommandSet97, (int)VSConstants.VSStd97CmdID.Open);
+            var menuItem = new OleMenuCommand(this.OpenFile, null, this.OpenFileBeforeQueryStatus, menuCommandID);
             AddCommand(menuItem);
 
             menuCommandID = new CommandID(VSConstants.GUID_VSStandardCommandSet97, (int)VSConstants.VSStd97CmdID.ViewCode);
@@ -90,7 +90,7 @@ namespace Microsoft.NodejsTools
             {
                 try
                 {
-                    object webAppExtender = proj.get_Extender("WebApplication");
+                    var webAppExtender = proj.get_Extender("WebApplication");
                     if (webAppExtender != null && webAppExtender is WebAppExtenderFilter)
                     {
                         ((dynamic)((WebAppExtenderFilter)webAppExtender).InnerObject).StartWebServerOnDebug = false;
@@ -158,9 +158,9 @@ namespace Microsoft.NodejsTools
 
         private int OpenWithDefaultEditor(uint selectionItemId)
         {
-            Guid view = Guid.Empty;
+            var view = Guid.Empty;
             IVsWindowFrame frame;
-            int hr = ((IVsProject)this._innerVsHierarchy).OpenItem(
+            var hr = ((IVsProject)this._innerVsHierarchy).OpenItem(
                 selectionItemId,
                 ref view,
                 IntPtr.Zero,
@@ -197,7 +197,7 @@ namespace Microsoft.NodejsTools
 
         private bool TryHandleRightClick(IntPtr pvaIn, out int res)
         {
-            Guid itemType = GetSelectedItemType();
+            var itemType = GetSelectedItemType();
 
             if (TryShowContextMenu(pvaIn, itemType, out res))
             {
@@ -213,10 +213,10 @@ namespace Microsoft.NodejsTools
         /// <returns></returns>
         private IEnumerable<VSITEMSELECTION> GetSelectedItems()
         {
-            IVsMonitorSelection monitorSelection = this._package.GetService(typeof(IVsMonitorSelection)) as IVsMonitorSelection;
+            var monitorSelection = this._package.GetService(typeof(IVsMonitorSelection)) as IVsMonitorSelection;
 
-            IntPtr hierarchyPtr = IntPtr.Zero;
-            IntPtr selectionContainer = IntPtr.Zero;
+            var hierarchyPtr = IntPtr.Zero;
+            var selectionContainer = IntPtr.Zero;
             try
             {
                 uint selectionItemId;
@@ -225,7 +225,7 @@ namespace Microsoft.NodejsTools
 
                 if (selectionItemId != VSConstants.VSITEMID_NIL && hierarchyPtr != IntPtr.Zero)
                 {
-                    IVsHierarchy hierarchy = Marshal.GetObjectForIUnknown(hierarchyPtr) as IVsHierarchy;
+                    var hierarchy = Marshal.GetObjectForIUnknown(hierarchyPtr) as IVsHierarchy;
 
                     if (selectionItemId != VSConstants.VSITEMID_SELECTION)
                     {
@@ -243,17 +243,17 @@ namespace Microsoft.NodejsTools
                         uint numberOfSelectedItems;
                         int isSingleHierarchyInt;
                         ErrorHandler.ThrowOnFailure(multiItemSelect.GetSelectionInfo(out numberOfSelectedItems, out isSingleHierarchyInt));
-                        bool isSingleHierarchy = (isSingleHierarchyInt != 0);
+                        var isSingleHierarchy = (isSingleHierarchyInt != 0);
 
                         // Now loop all selected items and add to the list only those that are selected within this hierarchy
                         if (!isSingleHierarchy || (isSingleHierarchy && Utilities.IsSameComObject(this, hierarchy)))
                         {
                             Debug.Assert(numberOfSelectedItems > 0, "Bad number of selected itemd");
-                            VSITEMSELECTION[] vsItemSelections = new VSITEMSELECTION[numberOfSelectedItems];
-                            uint flags = (isSingleHierarchy) ? (uint)__VSGSIFLAGS.GSI_fOmitHierPtrs : 0;
+                            var vsItemSelections = new VSITEMSELECTION[numberOfSelectedItems];
+                            var flags = (isSingleHierarchy) ? (uint)__VSGSIFLAGS.GSI_fOmitHierPtrs : 0;
                             ErrorHandler.ThrowOnFailure(multiItemSelect.GetSelectedItems(flags, numberOfSelectedItems, vsItemSelections));
 
-                            foreach (VSITEMSELECTION vsItemSelection in vsItemSelections)
+                            foreach (var vsItemSelection in vsItemSelections)
                             {
                                 yield return new VSITEMSELECTION() { itemid = vsItemSelection.itemid, pHier = hierarchy };
                             }
@@ -276,10 +276,10 @@ namespace Microsoft.NodejsTools
 
         private Guid GetSelectedItemType()
         {
-            Guid itemType = Guid.Empty;
+            var itemType = Guid.Empty;
             foreach (var vsItemSelection in GetSelectedItems())
             {
-                Guid typeGuid = GetItemType(vsItemSelection);
+                var typeGuid = GetItemType(vsItemSelection);
 
                 if (itemType == Guid.Empty)
                 {
@@ -320,12 +320,12 @@ namespace Microsoft.NodejsTools
 
         private int ShowContextMenu(IntPtr pvaIn, int ctxMenu)
         {
-            object variant = Marshal.GetObjectForNativeVariant(pvaIn);
-            UInt32 pointsAsUint = (UInt32)variant;
-            short x = (short)(pointsAsUint & 0x0000ffff);
-            short y = (short)((pointsAsUint & 0xffff0000) / 0x10000);
+            var variant = Marshal.GetObjectForNativeVariant(pvaIn);
+            var pointsAsUint = (UInt32)variant;
+            var x = (short)(pointsAsUint & 0x0000ffff);
+            var y = (short)((pointsAsUint & 0xffff0000) / 0x10000);
 
-            POINTS points = new POINTS();
+            var points = new POINTS();
             points.x = x;
             points.y = y;
 
@@ -340,14 +340,14 @@ namespace Microsoft.NodejsTools
         /// <param name="points">The location at which to show the menu.</param>
         internal int ShowContextMenu(int menuId, Guid menuGroup, POINTS points)
         {
-            IVsUIShell shell = this._package.GetService(typeof(SVsUIShell)) as IVsUIShell;
+            var shell = this._package.GetService(typeof(SVsUIShell)) as IVsUIShell;
 
             Debug.Assert(shell != null, "Could not get the ui shell from the project");
             if (shell == null)
             {
                 return VSConstants.E_FAIL;
             }
-            POINTS[] pnts = new POINTS[1];
+            var pnts = new POINTS[1];
             pnts[0].x = points.x;
             pnts[0].y = points.y;
             return shell.ShowContextMenu(0, ref menuGroup, menuId, pnts, (Microsoft.VisualStudio.OLE.Interop.IOleCommandTarget)this);
@@ -371,7 +371,7 @@ namespace Microsoft.NodejsTools
                         // open the document if it's an JavaScript file
                         if (IsJavaScriptFile(this._innerVsHierarchy, itemid))
                         {
-                            int hr = OpenWithNodejsEditor(itemid);
+                            var hr = OpenWithNodejsEditor(itemid);
 
                             if (ErrorHandler.Succeeded(hr))
                             {
@@ -401,7 +401,7 @@ namespace Microsoft.NodejsTools
 
         private static bool IsJavaScriptFile(object name)
         {
-            string strName = name as string;
+            var strName = name as string;
             if (strName != null)
             {
                 var ext = Path.GetExtension(strName);
@@ -417,7 +417,7 @@ namespace Microsoft.NodejsTools
         {
             if (pguidCmdGroup == Guids.Eureka)
             {
-                for (int i = 0; i < prgCmds.Length; i++)
+                for (var i = 0; i < prgCmds.Length; i++)
                 {
                     switch (prgCmds[i].cmdID)
                     {
@@ -429,7 +429,7 @@ namespace Microsoft.NodejsTools
             }
             else if (pguidCmdGroup == Guids.VenusCommandId)
             {
-                for (int i = 0; i < prgCmds.Length; i++)
+                for (var i = 0; i < prgCmds.Length; i++)
                 {
                     switch (prgCmds[i].cmdID)
                     {
@@ -457,7 +457,7 @@ namespace Microsoft.NodejsTools
             }
             else if (pguidCmdGroup == Guids.WebAppCmdId)
             {
-                for (int i = 0; i < prgCmds.Length; i++)
+                for (var i = 0; i < prgCmds.Length; i++)
                 {
                     switch (prgCmds[i].cmdID)
                     {
@@ -469,7 +469,7 @@ namespace Microsoft.NodejsTools
             }
             else if (pguidCmdGroup == VSConstants.VSStd2K)
             {
-                for (int i = 0; i < prgCmds.Length; i++)
+                for (var i = 0; i < prgCmds.Length; i++)
                 {
                     switch ((VSConstants.VSStd2KCmdID)prgCmds[i].cmdID)
                     {
@@ -482,7 +482,7 @@ namespace Microsoft.NodejsTools
             }
             else if (pguidCmdGroup == VSConstants.GUID_VSStandardCommandSet97)
             {
-                for (int i = 0; i < prgCmds.Length; i++)
+                for (var i = 0; i < prgCmds.Length; i++)
                 {
                     switch ((VSConstants.VSStd97CmdID)prgCmds[i].cmdID)
                     {
@@ -585,13 +585,13 @@ namespace Microsoft.NodejsTools
             if (pagesToRemove != null)
             {
                 propertyPagesList = propertyPagesList.ToUpper(CultureInfo.InvariantCulture);
-                foreach (string s in pagesToRemove)
+                foreach (var s in pagesToRemove)
                 {
-                    int index = propertyPagesList.IndexOf(s, StringComparison.Ordinal);
+                    var index = propertyPagesList.IndexOf(s, StringComparison.Ordinal);
                     if (index != -1)
                     {
                         // Guids are separated by ';' so if we remove the last one also remove the last ';'
-                        int index2 = index + s.Length + 1;
+                        var index2 = index + s.Length + 1;
                         if (index2 >= propertyPagesList.Length)
                             propertyPagesList = propertyPagesList.Substring(0, index).TrimEnd(';');
                         else
@@ -640,17 +640,17 @@ namespace Microsoft.NodejsTools
         private int OpenWithNodejsEditor(uint selectionItemId)
         {
             // If the item type of this file is not compile, we don't actually want to open with Nodejs and should instead use the default.
-            Guid ourEditor = Guid.Empty;
+            var ourEditor = Guid.Empty;
             var properties = GetExtensionObject(this._innerVsHierarchy, selectionItemId).Properties;
 
-            Guid view = Guid.Empty;
+            var view = Guid.Empty;
             IVsWindowFrame frame;
 
             // DOCDATAEXISTING_UNKNOWN http://msdn.microsoft.com/en-us/library/vstudio/bb139396(v=vs.110).aspx
             // Force OpenStandardEditor to lookup if the document is currently open or not, and if it is.  If it's
             // open in a different editor the user will be prompted to close it.
             var docDataExistingUnknown = new IntPtr(-1);
-            int hr = ((IVsProject3)this._innerVsHierarchy).OpenItemWithSpecific(
+            var hr = ((IVsProject3)this._innerVsHierarchy).OpenItemWithSpecific(
                 selectionItemId,
                 0,
                 ref ourEditor,
@@ -685,8 +685,8 @@ namespace Microsoft.NodejsTools
 
             if (this._innerProject3 != null && IsJavaScriptFile(pszItemName))
             {
-                Guid ourEditor = Guid.Empty;
-                Guid view = Guid.Empty;
+                var ourEditor = Guid.Empty;
+                var view = Guid.Empty;
                 return this._innerProject3.AddItemWithSpecific(
                     itemidLoc,
                     dwAddItemOperation,
@@ -731,9 +731,9 @@ namespace Microsoft.NodejsTools
             if (this._innerProject3 != null && IsJavaScriptFile(GetItemName(this._innerVsHierarchy, itemid)))
             {
                 // force .js files opened w/o an editor type to be opened w/ our editor factory.
-                Guid guid = Guid.Empty;
-                Guid view = Guid.Empty;
-                int hr = this._innerProject3.OpenItemWithSpecific(
+                var guid = Guid.Empty;
+                var view = Guid.Empty;
+                var hr = this._innerProject3.OpenItemWithSpecific(
                     itemid,
                     0,
                     ref guid,
@@ -771,7 +771,7 @@ namespace Microsoft.NodejsTools
                     // force .js files opened w/o an editor type to be opened w/ our editor factory.
                     // If the item type of this file is not compile, we don't actually want to open with Nodejs and should instead use the default.
                     var itemType = GetExtensionObject(this._innerVsHierarchy, itemid).Properties.Item("ItemType").Value;
-                    Guid guid = Guid.Empty;
+                    var guid = Guid.Empty;
 
                     return this._innerProject3.ReopenItem(
                         itemid,
@@ -890,7 +890,7 @@ namespace Microsoft.NodejsTools
                     uint docId, docCookie;
                     IntPtr pDocData;
 
-                    bool updateFileOnDisk = true;
+                    var updateFileOnDisk = true;
 
                     if (ErrorHandler.Succeeded(rdt.FindAndLockDocument(
                         (uint)_VSRDTFLAGS.RDT_EditLock,
@@ -983,10 +983,7 @@ namespace Microsoft.NodejsTools
                 this._encoding = encoding;
             }
 
-            public override Encoding Encoding
-            {
-                get { return this._encoding; }
-            }
+            public override Encoding Encoding => this._encoding;
         }
 
         private static void UpdateServiceDefinition(IVsTextLines lines, string roleType, string projectName)
@@ -1088,8 +1085,8 @@ namespace Microsoft.NodejsTools
         /// </exception>
         internal static void UpdateServiceDefinition(XmlDocument doc, string roleType, string projectName)
         {
-            bool isWeb = roleType == "Web";
-            bool isWorker = roleType == "Worker";
+            var isWeb = roleType == "Web";
+            var isWorker = roleType == "Worker";
             if (isWeb == isWorker)
             {
                 throw new ArgumentException("Unknown role type: " + (roleType ?? "(null)"), "roleType");

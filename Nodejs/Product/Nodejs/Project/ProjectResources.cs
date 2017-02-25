@@ -34,25 +34,13 @@ namespace Microsoft.NodejsTools.Project
             LazyThreadSafetyMode.ExecutionAndPublication
         );
 
-        private static ResourceManager Manager
-        {
-            get
-            {
-                return _manager.Value;
-            }
-        }
+        private static ResourceManager Manager => _manager.Value;
 
         internal static new string GetString(string value, params object[] args)
         {
             return GetStringInternal(Manager, value, args) ?? CommonSR.GetString(value, args);
         }
 
-        internal static string ProductName
-        {
-            get
-            {
-                return GetString(NodejsToolsForVisualStudio);
-            }
-        }
+        internal static string ProductName => GetString(NodejsToolsForVisualStudio);
     }
 }

@@ -53,29 +53,11 @@ namespace Microsoft.VisualStudioTools.Project
         #endregion
 
         #region properties
-        protected uint EventsCookie
-        {
-            get
-            {
-                return this.eventsCookie;
-            }
-        }
+        protected uint EventsCookie => this.eventsCookie;
 
-        protected IVsSolution Solution
-        {
-            get
-            {
-                return this.solution;
-            }
-        }
+        protected IVsSolution Solution => this.solution;
 
-        protected IServiceProvider ServiceProvider
-        {
-            get
-            {
-                return this.serviceProvider;
-            }
-        }
+        protected IServiceProvider ServiceProvider => this.serviceProvider;
         #endregion
 
         #region IVsSolutionEvents3, IVsSolutionEvents2, IVsSolutionEvents methods

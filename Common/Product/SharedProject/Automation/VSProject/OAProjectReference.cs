@@ -33,34 +33,10 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
         }
 
-        internal new ProjectReferenceNode BaseReferenceNode
-        {
-            get { return (ProjectReferenceNode)base.BaseReferenceNode; }
-        }
-
+        internal new ProjectReferenceNode BaseReferenceNode => (ProjectReferenceNode)base.BaseReferenceNode;
         #region Reference override
-        public override string Culture
-        {
-            get { return string.Empty; }
-        }
-        public override string Name
-        {
-            get { return this.BaseReferenceNode.ReferencedProjectName; }
-        }
-        public override string Identity
-        {
-            get
-            {
-                return this.BaseReferenceNode.Caption;
-            }
-        }
-        public override string Path
-        {
-            get
-            {
-                return this.BaseReferenceNode.ReferencedProjectOutputPath;
-            }
-        }
+        public override string Culture => string.Empty; public override string Name => this.BaseReferenceNode.ReferencedProjectName; public override string Identity => this.BaseReferenceNode.Caption;
+        public override string Path => this.BaseReferenceNode.ReferencedProjectOutputPath;
         public override EnvDTE.Project SourceProject
         {
             get
@@ -69,7 +45,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                 {
                     return null;
                 }
-                IVsHierarchy hierarchy = VsShellUtilities.GetHierarchy(this.BaseReferenceNode.ProjectMgr.Site, this.BaseReferenceNode.ReferencedProjectGuid);
+                var hierarchy = VsShellUtilities.GetHierarchy(this.BaseReferenceNode.ProjectMgr.Site, this.BaseReferenceNode.ReferencedProjectGuid);
                 if (null == hierarchy)
                 {
                     return null;
@@ -83,15 +59,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                 return null;
             }
         }
-        public override prjReferenceType Type
-        {
-            // TODO: Write the code that finds out the type of the output of the source project.
-            get { return prjReferenceType.prjReferenceTypeAssembly; }
-        }
-        public override string Version
-        {
-            get { return string.Empty; }
-        }
+        public override prjReferenceType Type => prjReferenceType.prjReferenceTypeAssembly; public override string Version => string.Empty;
         #endregion
     }
 }

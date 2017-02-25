@@ -83,21 +83,9 @@ namespace Microsoft.VisualStudioTools.Project
             set;
         }
 
-        internal ProjectNode ItemProject
-        {
-            get
-            {
-                return this._itemProject;
-            }
-        }
+        internal ProjectNode ItemProject => this._itemProject;
 
-        protected virtual bool Deleted
-        {
-            get
-            {
-                return this._deleted;
-            }
-        }
+        protected virtual bool Deleted => this._deleted;
 
         /// <summary>
         /// Calling this method remove this item from the project file.
@@ -109,13 +97,7 @@ namespace Microsoft.VisualStudioTools.Project
             this._deleted = true;
         }
 
-        public virtual bool IsExcluded
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public virtual bool IsExcluded => false;
 
         /// <summary>
         /// Set an attribute on the project element
@@ -158,11 +140,11 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                string path = this.GetMetadata(ProjectFileConstants.Include);
+                var path = this.GetMetadata(ProjectFileConstants.Include);
 
                 // we use Path.GetFileName and reverse it because it's much faster 
                 // than Path.GetDirectoryName
-                string filename = Path.GetFileName(path);
+                var filename = Path.GetFileName(path);
                 if (path.IndexOf('.', 0, path.Length - filename.Length) != -1)
                 {
                     // possibly non-canonical form...

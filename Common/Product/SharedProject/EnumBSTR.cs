@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             pceltFetched = 0;
 
-            int i = 0;
+            var i = 0;
             for (; i < celt && this._enumerator.MoveNext(); ++i)
             {
                 ++pceltFetched;

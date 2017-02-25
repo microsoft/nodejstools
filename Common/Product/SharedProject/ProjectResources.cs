@@ -187,13 +187,7 @@ namespace Microsoft.VisualStudioTools.Project
             LazyThreadSafetyMode.ExecutionAndPublication
         );
 
-        private static ResourceManager Manager
-        {
-            get
-            {
-                return _manager.Value;
-            }
-        }
+        private static ResourceManager Manager => _manager.Value;
 
 #if DEBUG
         // Detect incorrect calls
@@ -206,7 +200,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         protected static string GetStringInternal(ResourceManager manager, string value, object[] args)
         {
-            string result = manager.GetString(value, CultureInfo.CurrentUICulture);
+            var result = manager.GetString(value, CultureInfo.CurrentUICulture);
             if (result == null)
             {
                 return null;

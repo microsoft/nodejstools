@@ -60,11 +60,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         #region properties
 
-        public IServiceProvider ServiceProvider
-        {
-            get { return this.serviceProvider; }
-        }
-
+        public IServiceProvider ServiceProvider => this.serviceProvider;
         public string WarningString
         {
             get { return this.warningString; }
@@ -83,11 +79,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <remarks>
         /// The only known way to detect an interactive build is to check this.outputWindowPane for null.
         /// </remarks>
-        protected bool InteractiveBuild
-        {
-            get { return this.outputWindowPane != null; }
-        }
-
+        protected bool InteractiveBuild => this.outputWindowPane != null;
         /// <summary>
         /// Set to null to avoid writing to the output window
         /// </summary>
@@ -197,7 +189,7 @@ namespace Microsoft.VisualStudioTools.Project
         protected virtual void BuildFinishedHandler(object sender, BuildFinishedEventArgs buildEvent)
         {
             // NOTE: This may run on a background thread!
-            MessageImportance importance = buildEvent.Succeeded ? MessageImportance.Low : MessageImportance.High;
+            var importance = buildEvent.Succeeded ? MessageImportance.Low : MessageImportance.High;
             QueueOutputText(importance, Environment.NewLine);
             QueueOutputEvent(importance, buildEvent);
 
@@ -323,7 +315,7 @@ namespace Microsoft.VisualStudioTools.Project
             // NOTE: This may run on a background thread!
             if (LogAtImportance(importance) && !string.IsNullOrEmpty(buildEvent.Message))
             {
-                StringBuilder message = new StringBuilder(this.currentIndent + buildEvent.Message.Length);
+                var message = new StringBuilder(this.currentIndent + buildEvent.Message.Length);
                 if (this.currentIndent > 0)
                 {
                     message.Append('\t', this.currentIndent);
@@ -430,7 +422,7 @@ namespace Microsoft.VisualStudioTools.Project
 
                 if (errorEvent is BuildErrorEventArgs)
                 {
-                    BuildErrorEventArgs errorArgs = (BuildErrorEventArgs)errorEvent;
+                    var errorArgs = (BuildErrorEventArgs)errorEvent;
                     task.Document = errorArgs.File;
                     task.ErrorCategory = TaskErrorCategory.Error;
                     task.Line = errorArgs.LineNumber - 1; // The task list does +1 before showing this number.
@@ -439,7 +431,7 @@ namespace Microsoft.VisualStudioTools.Project
                 }
                 else if (errorEvent is BuildWarningEventArgs)
                 {
-                    BuildWarningEventArgs warningArgs = (BuildWarningEventArgs)errorEvent;
+                    var warningArgs = (BuildWarningEventArgs)errorEvent;
                     task.Document = warningArgs.File;
                     task.ErrorCategory = TaskErrorCategory.Warning;
                     task.Line = warningArgs.LineNumber - 1; // The task list does +1 before showing this number.
@@ -472,7 +464,7 @@ namespace Microsoft.VisualStudioTools.Project
                     while (this.taskQueue.TryDequeue(out taskFunc))
                     {
                         // Create the error task
-                        ErrorTask task = taskFunc();
+                        var task = taskFunc();
 
                         // Log the task
                         this.taskProvider.Tasks.Add(task);
@@ -511,7 +503,7 @@ namespace Microsoft.VisualStudioTools.Project
         private bool LogAtImportance(MessageImportance importance)
         {
             // If importance is too low for current settings, ignore the event
-            bool logIt = false;
+            var logIt = false;
 
             switch (this.Verbosity)
             {
@@ -548,9 +540,9 @@ namespace Microsoft.VisualStudioTools.Project
             string errorNumber,
             string errorText)
         {
-            string errorCode = isWarning ? this.WarningString : this.ErrorString;
+            var errorCode = isWarning ? this.WarningString : this.ErrorString;
 
-            StringBuilder message = new StringBuilder();
+            var message = new StringBuilder();
             if (!string.IsNullOrEmpty(fileName))
             {
                 message.AppendFormat(CultureInfo.CurrentCulture, "{0}({1},{2}):", fileName, line, column);
@@ -634,7 +626,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="exception">exception</param>
         private static void ShowErrorMessage(IServiceProvider serviceProvider, Exception exception)
         {
-            IUIService UIservice = (IUIService)serviceProvider.GetService(typeof(IUIService));
+            var UIservice = (IUIService)serviceProvider.GetService(typeof(IUIService));
             if (UIservice != null && exception != null)
             {
                 UIservice.ShowError(exception);

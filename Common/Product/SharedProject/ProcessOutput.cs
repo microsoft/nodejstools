@@ -366,8 +366,8 @@ namespace Microsoft.VisualStudioTools.Project
 
         internal static IEnumerable<string> SplitLines(string source)
         {
-            int start = 0;
-            int end = source.IndexOfAny(EolChars);
+            var start = 0;
+            var end = source.IndexOfAny(EolChars);
             while (end >= start)
             {
                 yield return source.Substring(start, end - start);
@@ -409,8 +409,8 @@ namespace Microsoft.VisualStudioTools.Project
 
             if (arg.StartsWith("\"") && arg.EndsWith("\""))
             {
-                bool inQuote = false;
-                int consecutiveBackslashes = 0;
+                var inQuote = false;
+                var consecutiveBackslashes = 0;
                 foreach (var c in arg)
                 {
                     if (c == '"')
@@ -597,35 +597,17 @@ namespace Microsoft.VisualStudioTools.Project
             }
         }
 
-        public int? ProcessId
-        {
-            get
-            {
-                return this._process != null ? this._process.Id : (int?)null;
-            }
-        }
+        public int? ProcessId => this._process != null ? this._process.Id : (int?)null;
 
         /// <summary>
         /// The arguments that were originally passed, including the filename.
         /// </summary>
-        public string Arguments
-        {
-            get
-            {
-                return this._arguments;
-            }
-        }
+        public string Arguments => this._arguments;
 
         /// <summary>
         /// True if the process started. False if an error occurred.
         /// </summary>
-        public bool IsStarted
-        {
-            get
-            {
-                return this._process != null;
-            }
-        }
+        public bool IsStarted => this._process != null;
 
         /// <summary>
         /// The exit code or null if the process never started or has not
@@ -690,11 +672,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <summary>
         /// The redirector that was originally passed.
         /// </summary>
-        public Redirector Redirector
-        {
-            get { return this._redirector; }
-        }
-
+        public Redirector Redirector => this._redirector;
         private void FlushAndCloseOutput()
         {
             if (this._process == null)
@@ -741,25 +719,13 @@ namespace Microsoft.VisualStudioTools.Project
         /// The lines of text sent to standard output. These do not include
         /// newline characters.
         /// </summary>
-        public IEnumerable<string> StandardOutputLines
-        {
-            get
-            {
-                return this._output;
-            }
-        }
+        public IEnumerable<string> StandardOutputLines => this._output;
 
         /// <summary>
         /// The lines of text sent to standard error. These do not include
         /// newline characters.
         /// </summary>
-        public IEnumerable<string> StandardErrorLines
-        {
-            get
-            {
-                return this._error;
-            }
-        }
+        public IEnumerable<string> StandardErrorLines => this._error;
 
         /// <summary>
         /// A handle that can be waited on. It triggers when the process exits.
@@ -804,7 +770,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             if (this._process != null)
             {
-                bool exited = this._process.WaitForExit((int)timeout.TotalMilliseconds);
+                var exited = this._process.WaitForExit((int)timeout.TotalMilliseconds);
                 if (exited)
                 {
                     // Should have already been called, in which case this is a no-op

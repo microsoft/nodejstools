@@ -259,14 +259,14 @@ namespace Microsoft.NodejsTools.Project.ImportWizard
 
         public Task<string> CreateRequestedProjectAsync()
         {
-            string projectPath = this.ProjectPath;
-            string sourcePath = this.SourcePath;
-            string filters = this.Filters;
-            string startupFile = this.StartupFile;
+            var projectPath = this.ProjectPath;
+            var sourcePath = this.SourcePath;
+            var filters = this.Filters;
+            var startupFile = this.StartupFile;
 
             return Task.Run<string>(() =>
             {
-                bool success = false;
+                var success = false;
                 Guid projectGuid;
                 try
                 {
@@ -352,7 +352,7 @@ namespace Microsoft.NodejsTools.Project.ImportWizard
             writer.WriteElementString("WorkingDirectory", ".");
             writer.WriteElementString("OutputPath", ".");
             writer.WriteElementString("ProjectTypeGuids", "{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}");
-            bool typeScriptSupport = EnumerateAllFiles(sourcePath, filters, excludeNodeModules)
+            var typeScriptSupport = EnumerateAllFiles(sourcePath, filters, excludeNodeModules)
                 .Any(filename => NodejsConstants.TypeScriptExtension.Equals(Path.GetExtension(filename), StringComparison.OrdinalIgnoreCase));
 
             if (typeScriptSupport)

@@ -24,12 +24,12 @@ namespace Microsoft.NodejsTools.Jade
         {
             if (this._jsTagger != null)
             {
-                int start = this._cs.Position;
+                var start = this._cs.Position;
 
                 SkipToEndOfBlock(blockIndent, text: false);
 
-                int end = this._cs.Position;
-                int length = end - start;
+                var end = this._cs.Position;
+                var length = end - start;
 
                 if (length > 0)
                 {

@@ -33,19 +33,11 @@ namespace Microsoft.NodejsTools.Debugger
         /// <summary>
         /// The line number where the current function/class/module starts
         /// </summary>
-        public int StartLine
-        {
-            get { return this.Line; }
-        }
-
+        public int StartLine => this.Line;
         /// <summary>
         /// The line number where the current function/class/module ends.
         /// </summary>
-        public int EndLine
-        {
-            get { return this.Line; }
-        }
-
+        public int EndLine => this.Line;
         /// <summary>
         /// Gets a thread which executes stack frame.
         /// </summary>
@@ -69,11 +61,7 @@ namespace Microsoft.NodejsTools.Debugger
         /// <summary>
         /// Gets a script file name which holds a code segment of the frame.
         /// </summary>
-        public string FileName
-        {
-            get { return this.Module != null ? this.Module.FileName : null; }
-        }
-
+        public string FileName => this.Module != null ? this.Module.FileName : null;
         /// <summary>
         /// Gets a script which holds a code segment of the frame.
         /// </summary>
@@ -83,11 +71,7 @@ namespace Microsoft.NodejsTools.Debugger
         /// Gets the ID of the frame.  Frame 0 is the currently executing frame, 1 is the caller of the currently executing frame,
         /// etc...
         /// </summary>
-        public int FrameId
-        {
-            get { return this._frameId; }
-        }
-
+        public int FrameId => this._frameId;
         /// <summary>
         /// Gets or sets a local variables of the frame.
         /// </summary>
@@ -146,7 +130,7 @@ namespace Microsoft.NodejsTools.Debugger
         {
             Utilities.CheckNotNull(this.Process);
 
-            NodeEvaluationResult result = await this.Process.SetVariableValueAsync(this, name, value, cancellationToken).ConfigureAwait(false);
+            var result = await this.Process.SetVariableValueAsync(this, name, value, cancellationToken).ConfigureAwait(false);
 
             if (result == null)
             {
@@ -154,9 +138,9 @@ namespace Microsoft.NodejsTools.Debugger
             }
 
             // Update variable in locals
-            for (int i = 0; i < this.Locals.Count; i++)
+            for (var i = 0; i < this.Locals.Count; i++)
             {
-                NodeEvaluationResult evaluationResult = this.Locals[i];
+                var evaluationResult = this.Locals[i];
                 if (evaluationResult.Expression == name)
                 {
                     this.Locals[i] = result;
@@ -164,9 +148,9 @@ namespace Microsoft.NodejsTools.Debugger
             }
 
             // Update variable in parameters
-            for (int i = 0; i < this.Parameters.Count; i++)
+            for (var i = 0; i < this.Parameters.Count; i++)
             {
-                NodeEvaluationResult evaluationResult = this.Parameters[i];
+                var evaluationResult = this.Parameters[i];
                 if (evaluationResult.Expression == name)
                 {
                     this.Parameters[i] = result;

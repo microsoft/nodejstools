@@ -27,13 +27,7 @@ namespace Microsoft.VisualStudioTools.Project
             this._name = name;
         }
 
-        public override string DisplayName
-        {
-            get
-            {
-                return SR.GetString(this._name);
-            }
-        }
+        public override string DisplayName => SR.GetString(this._name);
     }
 
     [AttributeUsage(AttributeTargets.All)]

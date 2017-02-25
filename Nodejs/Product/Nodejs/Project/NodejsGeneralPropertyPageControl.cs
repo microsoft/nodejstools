@@ -190,7 +190,7 @@ namespace Microsoft.NodejsTools.Project
 
         private void SetCueBanner()
         {
-            string cueBanner = Nodejs.NodeExePath;
+            var cueBanner = Nodejs.NodeExePath;
             if (String.IsNullOrEmpty(cueBanner))
             {
                 cueBanner = Resources.NodejsNotInstalledShort;
@@ -232,7 +232,7 @@ namespace Microsoft.NodejsTools.Project
 
         private void BrowseDirectoryClick(object sender, EventArgs e)
         {
-            string dir = this._workingDir.Text;
+            var dir = this._workingDir.Text;
             if (string.IsNullOrEmpty(dir))
             {
                 dir = this._propPage.Project.ProjectHome;

@@ -40,7 +40,7 @@ namespace Microsoft.VisualStudioTools
 
         public override bool OpenClipboard()
         {
-            int res = UnsafeNativeMethods.OpenClipboard(IntPtr.Zero);
+            var res = UnsafeNativeMethods.OpenClipboard(IntPtr.Zero);
             ErrorHandler.ThrowOnFailure(res);
             return res == 1;
         }

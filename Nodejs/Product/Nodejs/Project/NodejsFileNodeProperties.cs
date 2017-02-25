@@ -116,8 +116,8 @@ namespace Microsoft.NodejsTools.Project
 
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
-            TestFrameworkDirectories discover = new TestFrameworkDirectories();
-            List<string> knownFrameworkList = discover.GetFrameworkNames();
+            var discover = new TestFrameworkDirectories();
+            var knownFrameworkList = discover.GetFrameworkNames();
             return new StandardValuesCollection(knownFrameworkList);
         }
     }

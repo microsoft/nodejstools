@@ -47,8 +47,8 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code.</returns>
         public override int Open(ref Guid logicalView, IntPtr docDataExisting, out IVsWindowFrame windowFrame, WindowFrameShowAction windowFrameAction)
         {
-            bool newFile = false;
-            bool openWith = false;
+            var newFile = false;
+            var openWith = false;
             return this.Open(newFile, openWith, ref logicalView, docDataExisting, out windowFrame, windowFrameAction);
         }
 
@@ -66,8 +66,8 @@ namespace Microsoft.VisualStudioTools.Project
         public override int OpenWithSpecific(uint editorFlags, ref Guid editorType, string physicalView, ref Guid logicalView, IntPtr docDataExisting, out IVsWindowFrame windowFrame, WindowFrameShowAction windowFrameAction)
         {
             windowFrame = null;
-            bool newFile = false;
-            bool openWith = false;
+            var newFile = false;
+            var openWith = false;
             return Open(newFile, openWith, editorFlags, ref editorType, physicalView, ref logicalView, docDataExisting, out windowFrame, windowFrameAction);
         }
 
@@ -85,8 +85,8 @@ namespace Microsoft.VisualStudioTools.Project
         public override int ReOpenWithSpecific(uint editorFlags, ref Guid editorType, string physicalView, ref Guid logicalView, IntPtr docDataExisting, out IVsWindowFrame windowFrame, WindowFrameShowAction windowFrameAction)
         {
             windowFrame = null;
-            bool newFile = false;
-            bool openWith = false;
+            var newFile = false;
+            var openWith = false;
             return Open(newFile, openWith, editorFlags, ref editorType, physicalView, ref logicalView, docDataExisting, out windowFrame, windowFrameAction, reopen: true);
         }
 
@@ -102,7 +102,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code.</returns>
         public int Open(bool newFile, bool openWith, WindowFrameShowAction windowFrameAction)
         {
-            Guid logicalView = Guid.Empty;
+            var logicalView = Guid.Empty;
             IVsWindowFrame windowFrame = null;
             return this.Open(newFile, openWith, logicalView, out windowFrame, windowFrameAction);
         }
@@ -119,7 +119,7 @@ namespace Microsoft.VisualStudioTools.Project
         public int Open(bool newFile, bool openWith, Guid logicalView, out IVsWindowFrame frame, WindowFrameShowAction windowFrameAction)
         {
             frame = null;
-            IVsRunningDocumentTable rdt = this.Node.ProjectMgr.Site.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
+            var rdt = this.Node.ProjectMgr.Site.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
             Debug.Assert(rdt != null, " Could not get running document table from the services exposed by this project");
             if (rdt == null)
             {
@@ -127,13 +127,13 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             // First we see if someone else has opened the requested view of the file.
-            _VSRDTFLAGS flags = _VSRDTFLAGS.RDT_NoLock;
+            var flags = _VSRDTFLAGS.RDT_NoLock;
             uint itemid;
-            IntPtr docData = IntPtr.Zero;
+            var docData = IntPtr.Zero;
             IVsHierarchy ivsHierarchy;
             uint docCookie;
-            string path = this.GetFullPathForDocument();
-            int returnValue = VSConstants.S_OK;
+            var path = this.GetFullPathForDocument();
+            var returnValue = VSConstants.S_OK;
 
             try
             {
@@ -172,7 +172,7 @@ namespace Microsoft.VisualStudioTools.Project
         public virtual int Open(bool newFile, bool openWith, ref Guid logicalView, IntPtr docDataExisting, out IVsWindowFrame windowFrame, WindowFrameShowAction windowFrameAction)
         {
             windowFrame = null;
-            Guid editorType = Guid.Empty;
+            var editorType = Guid.Empty;
             return this.Open(newFile, openWith, 0, ref editorType, null, ref logicalView, docDataExisting, out windowFrame, windowFrameAction);
         }
 
@@ -192,15 +192,15 @@ namespace Microsoft.VisualStudioTools.Project
                 return VSConstants.E_FAIL;
             }
 
-            int returnValue = VSConstants.S_OK;
-            string caption = this.GetOwnerCaption();
-            string fullPath = this.GetFullPathForDocument();
+            var returnValue = VSConstants.S_OK;
+            var caption = this.GetOwnerCaption();
+            var fullPath = this.GetFullPathForDocument();
 
-            IVsUIShellOpenDocument uiShellOpenDocument = this.Node.ProjectMgr.Site.GetService(typeof(SVsUIShellOpenDocument)) as IVsUIShellOpenDocument;
-            IOleServiceProvider serviceProvider = this.Node.ProjectMgr.Site.GetService(typeof(IOleServiceProvider)) as IOleServiceProvider;
+            var uiShellOpenDocument = this.Node.ProjectMgr.Site.GetService(typeof(SVsUIShellOpenDocument)) as IVsUIShellOpenDocument;
+            var serviceProvider = this.Node.ProjectMgr.Site.GetService(typeof(IOleServiceProvider)) as IOleServiceProvider;
 
             var openState = uiShellOpenDocument as IVsUIShellOpenDocument3;
-            bool showDialog = !reopen && (openState == null || !((__VSNEWDOCUMENTSTATE)openState.NewDocumentState).HasFlag(__VSNEWDOCUMENTSTATE.NDS_Provisional));
+            var showDialog = !reopen && (openState == null || !((__VSNEWDOCUMENTSTATE)openState.NewDocumentState).HasFlag(__VSNEWDOCUMENTSTATE.NDS_Provisional));
 
             // Make sure that the file is on disk before we open the editor and display message if not found
             if (!((FileNode)this.Node).IsFileOnDisk(showDialog))
@@ -214,7 +214,7 @@ namespace Microsoft.VisualStudioTools.Project
             try
             {
                 this.Node.ProjectMgr.OnOpenItem(fullPath);
-                int result = VSConstants.E_FAIL;
+                var result = VSConstants.E_FAIL;
 
                 if (openWith)
                 {
@@ -253,7 +253,7 @@ namespace Microsoft.VisualStudioTools.Project
                     if (newFile)
                     {
                         ErrorHandler.ThrowOnFailure(windowFrame.GetProperty((int)__VSFPROPID.VSFPROPID_DocData, out var));
-                        IVsPersistDocData persistDocData = (IVsPersistDocData)var;
+                        var persistDocData = (IVsPersistDocData)var;
                         ErrorHandler.ThrowOnFailure(persistDocData.SetUntitledDocPath(fullPath));
                     }
 
@@ -287,12 +287,6 @@ namespace Microsoft.VisualStudioTools.Project
 
         #endregion
 
-        private new FileNode Node
-        {
-            get
-            {
-                return (FileNode)base.Node;
-            }
-        }
+        private new FileNode Node => (FileNode)base.Node;
     }
 }

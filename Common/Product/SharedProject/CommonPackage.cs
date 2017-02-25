@@ -77,21 +77,9 @@ namespace Microsoft.VisualStudioTools
         }
 
 
-        internal static Dictionary<Command, MenuCommand> Commands
-        {
-            get
-            {
-                return _commands;
-            }
-        }
+        internal static Dictionary<Command, MenuCommand> Commands => _commands;
 
-        internal static object CommandsLock
-        {
-            get
-            {
-                return _commandsLock;
-            }
-        }
+        internal static object CommandsLock => _commandsLock;
 
         protected override void Dispose(bool disposing)
         {
@@ -99,7 +87,7 @@ namespace Microsoft.VisualStudioTools
             {
                 if (this._componentID != 0)
                 {
-                    IOleComponentManager mgr = GetService(typeof(SOleComponentManager)) as IOleComponentManager;
+                    var mgr = GetService(typeof(SOleComponentManager)) as IOleComponentManager;
                     if (mgr != null)
                     {
                         mgr.FRevokeComponent(this._componentID);
@@ -129,7 +117,7 @@ namespace Microsoft.VisualStudioTools
 
         internal void RegisterCommands(IEnumerable<Command> commands, Guid cmdSet)
         {
-            OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
+            var mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (null != mcs)
             {
                 lock (_commandsLock)
@@ -137,8 +125,8 @@ namespace Microsoft.VisualStudioTools
                     foreach (var command in commands)
                     {
                         var beforeQueryStatus = command.BeforeQueryStatus;
-                        CommandID toolwndCommandID = new CommandID(cmdSet, command.CommandId);
-                        OleMenuCommand menuToolWin = new OleMenuCommand(command.DoCommand, toolwndCommandID);
+                        var toolwndCommandID = new CommandID(cmdSet, command.CommandId);
+                        var menuToolWin = new OleMenuCommand(command.DoCommand, toolwndCommandID);
                         if (beforeQueryStatus != null)
                         {
                             menuToolWin.BeforeQueryStatus += beforeQueryStatus;
@@ -174,7 +162,7 @@ namespace Microsoft.VisualStudioTools
                 return null;
             }
 
-            IVsWindowFrame frame = curDocument as IVsWindowFrame;
+            var frame = curDocument as IVsWindowFrame;
             if (frame == null)
             {
                 // TODO: Report error
@@ -206,13 +194,7 @@ namespace Microsoft.VisualStudioTools
         }
 
         [Obsolete("ComponentModel should be retrieved from an IServiceProvider")]
-        public static IComponentModel ComponentModel
-        {
-            get
-            {
-                return (IComponentModel)GetGlobalService(typeof(SComponentModel));
-            }
-        }
+        public static IComponentModel ComponentModel => (IComponentModel)GetGlobalService(typeof(SComponentModel));
 
         internal static CommonProjectNode GetStartupProject(System.IServiceProvider serviceProvider)
         {
@@ -237,7 +219,7 @@ namespace Microsoft.VisualStudioTools
             container.AddService(GetLibraryManagerType(), this.CreateService, true);
 
             var componentManager = this._compMgr = (IOleComponentManager)GetService(typeof(SOleComponentManager));
-            OLECRINFO[] crinfo = new OLECRINFO[1];
+            var crinfo = new OLECRINFO[1];
             crinfo[0].cbSize = (uint)Marshal.SizeOf(typeof(OLECRINFO));
             crinfo[0].grfcrf = (uint)_OLECRF.olecrfNeedIdleTime;
             crinfo[0].grfcadvf = (uint)_OLECADVF.olecadvfModal | (uint)_OLECADVF.olecadvfRedrawOff | (uint)_OLECADVF.olecadvfWarningsOff;
@@ -348,12 +330,6 @@ namespace Microsoft.VisualStudioTools
             this._compMgr = compMgr;
         }
 
-        public IOleComponentManager ComponentManager
-        {
-            get
-            {
-                return this._compMgr;
-            }
-        }
+        public IOleComponentManager ComponentManager => this._compMgr;
     }
 }

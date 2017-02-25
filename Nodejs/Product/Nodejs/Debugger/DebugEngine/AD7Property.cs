@@ -72,7 +72,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
             if (dwFields.HasFlag(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE))
             {
-                string value = radix == 16 ? this._evaluationResult.HexValue ?? this._evaluationResult.StringValue : this._evaluationResult.StringValue;
+                var value = radix == 16 ? this._evaluationResult.HexValue ?? this._evaluationResult.StringValue : this._evaluationResult.StringValue;
                 propertyInfo.bstrValue = this._evaluationResult.Type.HasFlag(NodeExpressionType.String) ? string.Format(CultureInfo.InvariantCulture, "\"{0}\"", value) : value;
                 propertyInfo.dwFields |= enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE;
             }
@@ -128,10 +128,10 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         // The sample debugger only supports pointer dereferencing as children. This means there is only ever one child.
         public int EnumChildren(enum_DEBUGPROP_INFO_FLAGS dwFields, uint dwRadix, ref Guid guidFilter, enum_DBG_ATTRIB_FLAGS dwAttribFilter, string pszNameFilter, uint dwTimeout, out IEnumDebugPropertyInfo2 ppEnum)
         {
-            TimeSpan timeout = TimeSpan.FromMilliseconds(dwTimeout);
+            var timeout = TimeSpan.FromMilliseconds(dwTimeout);
             var tokenSource = new CancellationTokenSource(timeout);
 
-            List<NodeEvaluationResult> children = this._evaluationResult.GetChildrenAsync(tokenSource.Token)
+            var children = this._evaluationResult.GetChildrenAsync(tokenSource.Token)
                 .WaitAsync(timeout, tokenSource.Token).Result;
 
             DEBUG_PROPERTY_INFO[] properties;
@@ -142,7 +142,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             else
             {
                 properties = new DEBUG_PROPERTY_INFO[children.Count];
-                for (int i = 0; i < children.Count; i++)
+                for (var i = 0; i < children.Count; i++)
                 {
                     properties[i] = new AD7Property(this._frame, children[i], this).ConstructDebugPropertyInfo(dwRadix, dwFields);
                 }
@@ -314,7 +314,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                     .WaitAsync(timeout, tokenSource.Token);
             }
 
-            string expression = string.Format(CultureInfo.InvariantCulture, "{0} = {1}", this._evaluationResult.FullName, value);
+            var expression = string.Format(CultureInfo.InvariantCulture, "{0} = {1}", this._evaluationResult.FullName, value);
             return this._evaluationResult.Frame.ExecuteTextAsync(expression, tokenSource.Token).WaitAsync(timeout, tokenSource.Token);
         }
 

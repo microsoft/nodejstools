@@ -36,7 +36,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         // A helper method used to construct a new pending breakpoint.
         public void CreatePendingBreakpoint(IDebugBreakpointRequest2 pBPRequest, out IDebugPendingBreakpoint2 ppPendingBP)
         {
-            AD7PendingBreakpoint pendingBreakpoint = new AD7PendingBreakpoint(pBPRequest, this.m_engine, this);
+            var pendingBreakpoint = new AD7PendingBreakpoint(pBPRequest, this.m_engine, this);
             ppPendingBP = (IDebugPendingBreakpoint2)pendingBreakpoint;
             this.m_pendingBreakpoints.Add(pendingBreakpoint);
         }
@@ -44,7 +44,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         // Called from the engine's detach method to remove the debugger's breakpoint instructions.
         public void ClearBreakpointBindingResults()
         {
-            foreach (AD7PendingBreakpoint pendingBreakpoint in this.m_pendingBreakpoints)
+            foreach (var pendingBreakpoint in this.m_pendingBreakpoints)
             {
                 pendingBreakpoint.ClearBreakpointBindingResults();
             }

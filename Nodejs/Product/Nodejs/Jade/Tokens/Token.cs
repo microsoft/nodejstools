@@ -61,64 +61,30 @@ namespace Microsoft.NodejsTools.Jade
         /// <summary>
         /// Token type
         /// </summary>
-        public virtual T TokenType
-        {
-            get { return this._tokenType; }
-        }
-
+        public virtual T TokenType => this._tokenType;
         /// <summary>
         /// Determines if token is a comment
         /// </summary>
-        public virtual bool IsComment
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public virtual bool IsComment => false;
 
         /// <summary>
         /// Determines if token is a string
         /// </summary>
-        public virtual bool IsString
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public virtual bool IsString => false;
 
         /// <summary>
         /// Token is a number
         /// </summary>
-        public virtual bool IsNumber
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public virtual bool IsNumber => false;
 
         /// <summary>
         /// Token is a punctuator (comma, semicolon, plus, minus, ...)
         /// </summary>
-        public virtual bool IsPunctuator
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public virtual bool IsPunctuator => false;
 
         /// <summary>
         /// Token is a language keyword (if, do, while, for, ...)
         /// </summary>
-        public virtual bool IsKeyword
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public virtual bool IsKeyword => false;
     }
 }

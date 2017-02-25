@@ -38,21 +38,9 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
         #region VSProjectItem Members
 
-        public virtual EnvDTE.Project ContainingProject
-        {
-            get { return this.fileNode.ProjectMgr.GetAutomationObject() as EnvDTE.Project; }
-        }
-
-        public virtual ProjectItem ProjectItem
-        {
-            get { return this.fileNode.GetAutomationObject() as ProjectItem; }
-        }
-
-        public virtual DTE DTE
-        {
-            get { return (DTE)this.fileNode.ProjectMgr.Site.GetService(typeof(DTE)); }
-        }
-
+        public virtual EnvDTE.Project ContainingProject => this.fileNode.ProjectMgr.GetAutomationObject() as EnvDTE.Project;
+        public virtual ProjectItem ProjectItem => this.fileNode.GetAutomationObject() as ProjectItem;
+        public virtual DTE DTE => (DTE)this.fileNode.ProjectMgr.Site.GetService(typeof(DTE));
         public void RunCustomTool()
         {
         }

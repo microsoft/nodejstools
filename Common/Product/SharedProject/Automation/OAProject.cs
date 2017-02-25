@@ -30,14 +30,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         #endregion
 
         #region properties
-        public object Project
-        {
-            get { return this.project; }
-        }
-        internal ProjectNode ProjectNode
-        {
-            get { return this.project; }
-        }
+        public object Project => this.project; internal ProjectNode ProjectNode => this.project;
         #endregion
 
         #region ctor
@@ -61,7 +54,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             {
                 CheckProjectIsValid();
 
-                using (AutomationScope scope = new AutomationScope(this.project.Site))
+                using (var scope = new AutomationScope(this.project.Site))
                 {
                     this.ProjectNode.Site.GetUIThread().Invoke(() =>
                     {
@@ -79,13 +72,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <summary>
         /// Microsoft Internal Use Only.  Gets the file name of the project.
         /// </summary>
-        public virtual string FileName
-        {
-            get
-            {
-                return this.project.ProjectFile;
-            }
-        }
+        public virtual string FileName => this.project.ProjectFile;
 
         /// <summary>
         /// Microsoft Internal Use Only. Specfies if the project is dirty.
@@ -103,7 +90,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             {
                 CheckProjectIsValid();
 
-                using (AutomationScope scope = new AutomationScope(this.project.Site))
+                using (var scope = new AutomationScope(this.project.Site))
                 {
                     this.ProjectNode.Site.GetUIThread().Invoke(() =>
                     {
@@ -124,51 +111,25 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <summary>
         /// Gets the Projects collection containing the Project object supporting this property.
         /// </summary>
-        public virtual EnvDTE.Projects Collection
-        {
-            get { return null; }
-        }
-
+        public virtual EnvDTE.Projects Collection => null;
         /// <summary>
         /// Gets the top-level extensibility object.
         /// </summary>
-        public virtual EnvDTE.DTE DTE
-        {
-            get
-            {
-                return (EnvDTE.DTE)this.project.Site.GetService(typeof(EnvDTE.DTE));
-            }
-        }
+        public virtual EnvDTE.DTE DTE => (EnvDTE.DTE)this.project.Site.GetService(typeof(EnvDTE.DTE));
 
         /// <summary>
         /// Gets a GUID string indicating the kind or type of the object.
         /// </summary>
-        public virtual string Kind
-        {
-            get { return this.project.ProjectGuid.ToString("B"); }
-        }
-
+        public virtual string Kind => this.project.ProjectGuid.ToString("B");
         /// <summary>
         /// Gets a ProjectItems collection for the Project object.
         /// </summary>
-        public virtual EnvDTE.ProjectItems ProjectItems
-        {
-            get
-            {
-                return new OAProjectItems(this, this.project);
-            }
-        }
+        public virtual EnvDTE.ProjectItems ProjectItems => new OAProjectItems(this, this.project);
 
         /// <summary>
         /// Gets a collection of all properties that pertain to the Project object.
         /// </summary>
-        public virtual EnvDTE.Properties Properties
-        {
-            get
-            {
-                return new OAProperties(this.project.NodeProperties);
-            }
-        }
+        public virtual EnvDTE.Properties Properties => new OAProperties(this.project.NodeProperties);
 
         /// <summary>
         /// Returns the name of project as a relative path from the directory containing the solution file to the project file
@@ -185,7 +146,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                 else
                 {
                     // Get Solution service
-                    IVsSolution solution = this.project.GetService(typeof(IVsSolution)) as IVsSolution;
+                    var solution = this.project.GetService(typeof(IVsSolution)) as IVsSolution;
                     Utilities.CheckNotNull(solution);
 
                     // Ask solution for unique name of project
@@ -205,11 +166,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <summary>
         /// Gets an interface or object that can be accessed by name at run time.
         /// </summary>
-        public virtual object Object
-        {
-            get { return this.project.Object; }
-        }
-
+        public virtual object Object => this.project.Object;
         /// <summary>
         /// Gets the requested Extender object if it is available for this object.
         /// </summary>
@@ -225,19 +182,11 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <summary>
         /// Gets a list of available Extenders for the object.
         /// </summary>
-        public virtual object ExtenderNames
-        {
-            get { return this.DTE.ObjectExtenders.GetExtenderNames(this.project.NodeProperties.ExtenderCATID.ToUpper(), this.project.NodeProperties); }
-        }
-
+        public virtual object ExtenderNames => this.DTE.ObjectExtenders.GetExtenderNames(this.project.NodeProperties.ExtenderCATID.ToUpper(), this.project.NodeProperties);
         /// <summary>
         /// Gets the Extender category ID (CATID) for the object.
         /// </summary>
-        public virtual string ExtenderCATID
-        {
-            get { return this.project.NodeProperties.ExtenderCATID; }
-        }
-
+        public virtual string ExtenderCATID => this.project.NodeProperties.ExtenderCATID;
         /// <summary>
         /// Gets the full path and name of the Project object's file.
         /// </summary>
@@ -270,59 +219,41 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <summary>
         /// Gets the ConfigurationManager object for this Project .
         /// </summary>
-        public virtual EnvDTE.ConfigurationManager ConfigurationManager
-        {
-            get
-            {
-                return this.ProjectNode.Site.GetUIThread().Invoke(() =>
-                {
-                    if (this.configurationManager == null)
-                    {
-                        IVsExtensibility3 extensibility = this.project.Site.GetService(typeof(IVsExtensibility)) as IVsExtensibility3;
+        public virtual EnvDTE.ConfigurationManager ConfigurationManager => this.ProjectNode.Site.GetUIThread().Invoke(() =>
+                                                                                         {
+                                                                                             if (this.configurationManager == null)
+                                                                                             {
+                                                                                                 var extensibility = this.project.Site.GetService(typeof(IVsExtensibility)) as IVsExtensibility3;
 
-                        Utilities.CheckNotNull(extensibility);
+                                                                                                 Utilities.CheckNotNull(extensibility);
 
-                        object configurationManagerAsObject;
-                        ErrorHandler.ThrowOnFailure(extensibility.GetConfigMgr(
-                            this.project.GetOuterInterface<IVsHierarchy>(),
-                            VSConstants.VSITEMID_ROOT,
-                            out configurationManagerAsObject
-                        ));
+                                                                                                 object configurationManagerAsObject;
+                                                                                                 ErrorHandler.ThrowOnFailure(extensibility.GetConfigMgr(
+                                                                                                     this.project.GetOuterInterface<IVsHierarchy>(),
+                                                                                                     VSConstants.VSITEMID_ROOT,
+                                                                                                     out configurationManagerAsObject
+                                                                                                 ));
 
-                        Utilities.CheckNotNull(configurationManagerAsObject);
+                                                                                                 Utilities.CheckNotNull(configurationManagerAsObject);
 
-                        this.configurationManager = (ConfigurationManager)configurationManagerAsObject;
-                    }
+                                                                                                 this.configurationManager = (ConfigurationManager)configurationManagerAsObject;
+                                                                                             }
 
-                    return this.configurationManager;
-                });
-            }
-        }
+                                                                                             return this.configurationManager;
+                                                                                         });
 
         /// <summary>
         /// Gets the Globals object containing add-in values that may be saved in the solution (.sln) file, the project file, or in the user's profile data.
         /// </summary>
-        public virtual EnvDTE.Globals Globals
-        {
-            get { return null; }
-        }
-
+        public virtual EnvDTE.Globals Globals => null;
         /// <summary>
         /// Gets a ProjectItem object for the nested project in the host project. 
         /// </summary>
-        public virtual EnvDTE.ProjectItem ParentProjectItem
-        {
-            get { return null; }
-        }
-
+        public virtual EnvDTE.ProjectItem ParentProjectItem => null;
         /// <summary>
         /// Gets the CodeModel object for the project.
         /// </summary>
-        public virtual EnvDTE.CodeModel CodeModel
-        {
-            get { return null; }
-        }
-
+        public virtual EnvDTE.CodeModel CodeModel => null;
         /// <summary>
         /// Saves the project. 
         /// </summary>
@@ -358,7 +289,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             CheckProjectIsValid();
 
-            using (AutomationScope scope = new AutomationScope(this.project.Site))
+            using (var scope = new AutomationScope(this.project.Site))
             {
                 this.ProjectNode.Site.GetUIThread().Invoke(() =>
                 {
@@ -389,7 +320,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
             CheckProjectIsValid();
 
-            using (AutomationScope scope = new AutomationScope(this.project.Site))
+            using (var scope = new AutomationScope(this.project.Site))
             {
                 // If an empty file name is passed in for Save then make the file name the project name.
                 if (!isCalledFromSaveAs && string.IsNullOrEmpty(fileName))
@@ -399,7 +330,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                     // all the file change listenters registered by the shell are suspended.
 
                     // Get the cookie of the project file from the RTD.
-                    IVsRunningDocumentTable rdt = this.project.Site.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
+                    var rdt = this.project.Site.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
                     Utilities.CheckNotNull(rdt);
 
                     IVsHierarchy hier;
@@ -421,10 +352,10 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                     }
 
                     // Get the IVsHierarchy for the project.
-                    IVsHierarchy prjHierarchy = this.project.GetOuterInterface<IVsHierarchy>();
+                    var prjHierarchy = this.project.GetOuterInterface<IVsHierarchy>();
 
                     // Now get the soulution.
-                    IVsSolution solution = this.project.Site.GetService(typeof(SVsSolution)) as IVsSolution;
+                    var solution = this.project.Site.GetService(typeof(SVsSolution)) as IVsSolution;
                     // Verify that we have both solution and hierarchy.
                     Utilities.CheckNotNull(prjHierarchy);
                     Utilities.CheckNotNull(solution);
@@ -439,7 +370,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                     // file name itself is not validated only the whole path. (thus a file name like file\file is accepted, since as a path is valid)
 
                     // 1. The file name has to be valid. 
-                    string fullPath = fileName;
+                    var fullPath = fileName;
                     try
                     {
                         fullPath = CommonUtils.GetAbsoluteFilePath(((ProjectNode)this.Project).ProjectFolder, fileName);

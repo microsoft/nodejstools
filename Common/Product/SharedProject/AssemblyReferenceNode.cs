@@ -48,39 +48,17 @@ namespace Microsoft.VisualStudioTools.Project
         /// The name of the assembly this reference represents.
         /// </summary>
         /// <value></value>
-        internal System.Reflection.AssemblyName AssemblyName
-        {
-            get
-            {
-                return this.assemblyName;
-            }
-        }
+        internal System.Reflection.AssemblyName AssemblyName => this.assemblyName;
 
         /// <summary>
         /// Returns the name of the assembly this reference refers to on this specific
         /// machine. It can be different from the AssemblyName property because it can
         /// be more specific.
         /// </summary>
-        internal System.Reflection.AssemblyName ResolvedAssembly
-        {
-            get { return this.resolvedAssemblyName; }
-        }
+        internal System.Reflection.AssemblyName ResolvedAssembly => this.resolvedAssemblyName;
+        public override string Url => this.assemblyPath;
 
-        public override string Url
-        {
-            get
-            {
-                return this.assemblyPath;
-            }
-        }
-
-        public override string Caption
-        {
-            get
-            {
-                return this.assemblyName.Name;
-            }
-        }
+        public override string Caption => this.assemblyName.Name;
 
         private Automation.OAAssemblyReference assemblyRef;
         internal override object Object
@@ -112,7 +90,7 @@ namespace Microsoft.VisualStudioTools.Project
                 this.fileChangeListener.ObserveItem(this.assemblyPath);
             }
 
-            string include = this.ItemNode.GetMetadata(ProjectFileConstants.Include);
+            var include = this.ItemNode.GetMetadata(ProjectFileConstants.Include);
 
             this.CreateFromAssemblyName(new System.Reflection.AssemblyName(include));
         }
@@ -232,7 +210,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>true if the assembly has already been added.</returns>
         protected override bool IsAlreadyAdded()
         {
-            ReferenceContainerNode referencesFolder = this.ProjectMgr.GetReferenceContainer() as ReferenceContainerNode;
+            var referencesFolder = this.ProjectMgr.GetReferenceContainer() as ReferenceContainerNode;
             Debug.Assert(referencesFolder != null, "Could not find the References node");
             if (referencesFolder == null)
             {
@@ -240,11 +218,11 @@ namespace Microsoft.VisualStudioTools.Project
                 return true;
             }
 
-            bool shouldCheckPath = !string.IsNullOrEmpty(this.Url);
+            var shouldCheckPath = !string.IsNullOrEmpty(this.Url);
 
-            for (HierarchyNode n = referencesFolder.FirstChild; n != null; n = n.NextSibling)
+            for (var n = referencesFolder.FirstChild; n != null; n = n.NextSibling)
             {
-                AssemblyReferenceNode assemblyRefererenceNode = n as AssemblyReferenceNode;
+                var assemblyRefererenceNode = n as AssemblyReferenceNode;
                 if (null != assemblyRefererenceNode)
                 {
                     // We will check if the full assemblynames are the same or if the Url of the assemblies is the same.
@@ -270,7 +248,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         private void GetPathNameFromProjectFile()
         {
-            string result = this.ItemNode.GetMetadata(ProjectFileConstants.HintPath);
+            var result = this.ItemNode.GetMetadata(ProjectFileConstants.HintPath);
             if (String.IsNullOrEmpty(result))
             {
                 result = this.ItemNode.GetMetadata(ProjectFileConstants.AssemblyName);
@@ -298,7 +276,7 @@ namespace Microsoft.VisualStudioTools.Project
         private void SetHintPathAndPrivateValue()
         {
             // Private means local copy; we want to know if it is already set to not override the default
-            string privateValue = this.ItemNode.GetMetadata(ProjectFileConstants.Private);
+            var privateValue = this.ItemNode.GetMetadata(ProjectFileConstants.Private);
 
             // Get the list of items which require HintPath
             var references = this.ProjectMgr.CurrentConfig.GetItems(MsBuildGeneratedItemType.ReferenceCopyLocalPaths);
@@ -306,7 +284,7 @@ namespace Microsoft.VisualStudioTools.Project
             // Now loop through the generated References to find the corresponding one
             foreach (var reference in references)
             {
-                string fileName = Path.GetFileNameWithoutExtension(reference.EvaluatedInclude);
+                var fileName = Path.GetFileNameWithoutExtension(reference.EvaluatedInclude);
                 if (String.Compare(fileName, this.assemblyName.Name, StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     // We found it, now set some properties based on this.
@@ -317,7 +295,7 @@ namespace Microsoft.VisualStudioTools.Project
                         this.ItemNode.SetMetadata(ProjectFileConstants.HintPath, null);
                     }
 
-                    string hintPath = reference.GetMetadataValue(ProjectFileConstants.HintPath);
+                    var hintPath = reference.GetMetadataValue(ProjectFileConstants.HintPath);
                     if (!String.IsNullOrEmpty(hintPath))
                     {
                         hintPath = CommonUtils.GetRelativeFilePath(this.ProjectMgr.ProjectHome, hintPath);
@@ -380,9 +358,9 @@ namespace Microsoft.VisualStudioTools.Project
             var group = this.ProjectMgr.CurrentConfig.GetItems(ProjectFileConstants.ReferencePath);
             foreach (var item in group)
             {
-                string fullPath = CommonUtils.GetAbsoluteFilePath(this.ProjectMgr.ProjectHome, item.EvaluatedInclude);
+                var fullPath = CommonUtils.GetAbsoluteFilePath(this.ProjectMgr.ProjectHome, item.EvaluatedInclude);
 
-                System.Reflection.AssemblyName name = System.Reflection.AssemblyName.GetAssemblyName(fullPath);
+                var name = System.Reflection.AssemblyName.GetAssemblyName(fullPath);
 
                 // Try with full assembly name and then with weak assembly name.
                 if (String.Equals(name.FullName, this.assemblyName.FullName, StringComparison.OrdinalIgnoreCase) || String.Equals(name.Name, this.assemblyName.Name, StringComparison.OrdinalIgnoreCase))

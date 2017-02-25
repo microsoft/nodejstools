@@ -30,11 +30,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote
             Reset();
         }
 
-        protected T Element
-        {
-            get { return this._elem; }
-        }
-
+        protected T Element => this._elem;
         public int GetCount(out uint pcelt)
         {
             pcelt = (this._elem == null) ? 0u : 1u;

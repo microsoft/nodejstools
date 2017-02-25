@@ -133,8 +133,8 @@ namespace Microsoft.NodejsTools.Jade
 
         protected override ITextRange HandleString(bool addToken = true)
         {
-            int start = this._cs.Position;
-            char quote = this._cs.CurrentChar;
+            var start = this._cs.Position;
+            var quote = this._cs.CurrentChar;
 
             // since the escape char is exactly the string openning char we say we start in escaped mode
             // it will get reset by the first char regardless what it is, but it will keep the '' case honest
@@ -177,7 +177,7 @@ namespace Microsoft.NodejsTools.Jade
 
         private ITextRange GetAttribute()
         {
-            int start = this._cs.Position;
+            var start = this._cs.Position;
 
             while (!this._cs.IsEndOfStream() && !this._cs.IsWhiteSpace() &&
                   (this._cs.IsAnsiLetter() || this._cs.IsDecimal() ||
@@ -192,7 +192,7 @@ namespace Microsoft.NodejsTools.Jade
 
         private ITextRange GetAttributeValue()
         {
-            int start = this._cs.Position;
+            var start = this._cs.Position;
 
             while (!this._cs.IsEndOfStream() && !this._cs.IsWhiteSpace() && this._cs.CurrentChar != ')')
             {

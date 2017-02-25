@@ -27,11 +27,7 @@ namespace Microsoft.NodejsTools.Project
     {
         internal NpmNodeProperties(AbstractNpmNode node) : base(node) { }
 
-        private AbstractNpmNode NpmNode
-        {
-            get { return this.Node as AbstractNpmNode; }
-        }
-
+        private AbstractNpmNode NpmNode => this.Node as AbstractNpmNode;
         public override string GetClassName()
         {
             return Resources.PropertiesClassNpm;
@@ -40,13 +36,7 @@ namespace Microsoft.NodejsTools.Project
         [SRCategory(SR.General)]
         [ResourcesDisplayName(nameof(Resources.NpmNodePackageInstallation))]
         [ResourcesDescription(nameof(Resources.NpmNodePackageInstallationDescription))]
-        public string PackageInstallation
-        {
-            get
-            {
-                return Resources.PackageInstallationLocal;
-            }
-        }
+        public string PackageInstallation => Resources.PackageInstallationLocal;
 
         [SRCategory(SR.General)]
         [ResourcesDisplayName(nameof(Resources.NpmNodePath))]

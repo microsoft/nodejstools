@@ -41,14 +41,14 @@ namespace Microsoft.NodejsTools.Jade
                 yield break;
 
             var snapshot = this._textBuffer.CurrentSnapshot;
-            SnapshotSpan entire = new SnapshotSpan(spans[0].Start, spans[spans.Count - 1].End).TranslateTo(snapshot, SpanTrackingMode.EdgeExclusive);
+            var entire = new SnapshotSpan(spans[0].Start, spans[spans.Count - 1].End).TranslateTo(snapshot, SpanTrackingMode.EdgeExclusive);
 
             int startPosition = entire.Start.GetContainingLine().Start;
             int endPosition = entire.End.GetContainingLine().End;
 
             foreach (var region in this._currentRegions)
             {
-                int end = Math.Min(region.End, snapshot.Length);
+                var end = Math.Min(region.End, snapshot.Length);
 
                 if (region.Start <= endPosition && end >= startPosition)
                 {
@@ -70,8 +70,8 @@ namespace Microsoft.NodejsTools.Jade
             {
                 if (TagsChanged != null)
                 {
-                    int start = Math.Min(e.ChangedRange.Start, snapshot.Length);
-                    int end = Math.Min(e.ChangedRange.End, snapshot.Length);
+                    var start = Math.Min(e.ChangedRange.Start, snapshot.Length);
+                    var end = Math.Min(e.ChangedRange.End, snapshot.Length);
 
                     TagsChanged(this, new SnapshotSpanEventArgs(
                         new SnapshotSpan(snapshot, Span.FromBounds(start, end))));

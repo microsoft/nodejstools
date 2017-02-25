@@ -37,7 +37,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         // This is how the debugger obtains most of the information about the module.
         int IDebugModule2.GetInfo(enum_MODULE_INFO_FIELDS dwFields, MODULE_INFO[] infoArray)
         {
-            MODULE_INFO info = new MODULE_INFO();
+            var info = new MODULE_INFO();
 
             if ((dwFields & enum_MODULE_INFO_FIELDS.MIF_NAME) != 0)
             {

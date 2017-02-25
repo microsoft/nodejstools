@@ -81,7 +81,7 @@ namespace Microsoft.NodejsTools.Options
 
         internal int? LoadInt(string name)
         {
-            string res = LoadString(name);
+            var res = LoadString(name);
             if (res == null)
             {
                 return null;
@@ -97,7 +97,7 @@ namespace Microsoft.NodejsTools.Options
 
         internal virtual bool? LoadBool(string name)
         {
-            string res = LoadString(name);
+            var res = LoadString(name);
             if (res == null)
             {
                 return null;
@@ -132,7 +132,7 @@ namespace Microsoft.NodejsTools.Options
 
         internal T? LoadEnum<T>(string name) where T : struct
         {
-            string res = LoadString(name);
+            var res = LoadString(name);
             if (res == null)
             {
                 return null;
@@ -148,7 +148,7 @@ namespace Microsoft.NodejsTools.Options
 
         internal DateTime? LoadDateTime(string name)
         {
-            string res = LoadString(name);
+            var res = LoadString(name);
             if (res == null)
             {
                 return null;

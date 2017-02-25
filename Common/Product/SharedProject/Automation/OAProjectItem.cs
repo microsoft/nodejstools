@@ -29,24 +29,12 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         #endregion
 
         #region properties
-        internal HierarchyNode Node
-        {
-            get
-            {
-                return this.node;
-            }
-        }
+        internal HierarchyNode Node => this.node;
 
         /// <summary>
         /// Returns the automation project
         /// </summary>
-        protected OAProject Project
-        {
-            get
-            {
-                return this.project;
-            }
-        }
+        protected OAProject Project => this.project;
         #endregion
 
         #region ctors
@@ -72,35 +60,17 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <summary>
         /// Gets an object that can be accessed by name at run time.
         /// </summary>
-        public virtual object Object
-        {
-            get
-            {
-                return this.node.Object;
-            }
-        }
+        public virtual object Object => this.node.Object;
 
         /// <summary>
         /// Gets the Document associated with the item, if one exists.
         /// </summary>
-        public virtual EnvDTE.Document Document
-        {
-            get
-            {
-                return null;
-            }
-        }
+        public virtual EnvDTE.Document Document => null;
 
         /// <summary>
         /// Gets the number of files associated with a ProjectItem.
         /// </summary>
-        public virtual short FileCount
-        {
-            get
-            {
-                return (short)1;
-            }
-        }
+        public virtual short FileCount => (short)1;
 
         /// <summary>
         /// Gets a collection of all properties that pertain to the object. 
@@ -120,24 +90,12 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <summary>
         /// Gets the FileCodeModel object for the project item.
         /// </summary>
-        public virtual EnvDTE.FileCodeModel FileCodeModel
-        {
-            get
-            {
-                return null;
-            }
-        }
+        public virtual EnvDTE.FileCodeModel FileCodeModel => null;
 
         /// <summary>
         /// Gets a ProjectItems for the object.
         /// </summary>
-        public virtual EnvDTE.ProjectItems ProjectItems
-        {
-            get
-            {
-                return null;
-            }
-        }
+        public virtual EnvDTE.ProjectItems ProjectItems => null;
 
         /// <summary>
         /// Gets a GUID string indicating the kind or type of the object.
@@ -165,13 +123,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <summary>
         /// Gets the top-level extensibility object.
         /// </summary>
-        public virtual EnvDTE.DTE DTE
-        {
-            get
-            {
-                return (EnvDTE.DTE)this.project.DTE;
-            }
-        }
+        public virtual EnvDTE.DTE DTE => (EnvDTE.DTE)this.project.DTE;
 
         /// <summary>
         /// Gets the ProjectItems collection containing the ProjectItem object supporting this property.
@@ -181,7 +133,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             get
             {
                 // Get the parent node
-                HierarchyNode parentNode = this.node.Parent;
+                var parentNode = this.node.Parent;
                 Debug.Assert(parentNode != null, "Failed to get the parent node");
 
                 // Get the ProjectItems object for the parent node
@@ -200,36 +152,18 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <summary>
         /// Gets a list of available Extenders for the object.
         /// </summary>
-        public virtual object ExtenderNames
-        {
-            get
-            {
-                return null;
-            }
-        }
+        public virtual object ExtenderNames => null;
 
         /// <summary>
         /// Gets the ConfigurationManager object for this ProjectItem. 
         /// </summary>
         /// <remarks>We do not support config management based per item.</remarks>
-        public virtual EnvDTE.ConfigurationManager ConfigurationManager
-        {
-            get
-            {
-                return null;
-            }
-        }
+        public virtual EnvDTE.ConfigurationManager ConfigurationManager => null;
 
         /// <summary>
         /// Gets the project hosting the ProjectItem.
         /// </summary>
-        public virtual EnvDTE.Project ContainingProject
-        {
-            get
-            {
-                return this.project;
-            }
-        }
+        public virtual EnvDTE.Project ContainingProject => this.project;
 
         /// <summary>
         /// Gets or sets a value indicating whether or not the object has been modified since last being saved or opened.
@@ -249,24 +183,12 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <summary>
         /// Gets the Extender category ID (CATID) for the object.
         /// </summary>
-        public virtual string ExtenderCATID
-        {
-            get
-            {
-                return null;
-            }
-        }
+        public virtual string ExtenderCATID => null;
 
         /// <summary>
         /// If the project item is the root of a subproject, then the SubProject property returns the Project object for the subproject.
         /// </summary>
-        public virtual EnvDTE.Project SubProject
-        {
-            get
-            {
-                return null;
-            }
-        }
+        public virtual EnvDTE.Project SubProject => null;
 
         /// <summary>
         /// Microsoft Internal Use Only. Checks if the document associated to this item is dirty.
@@ -295,7 +217,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             {
                 CheckProjectIsValid();
 
-                using (AutomationScope scope = new AutomationScope(this.Node.ProjectMgr.Site))
+                using (var scope = new AutomationScope(this.Node.ProjectMgr.Site))
                 {
                     this.Node.ProjectMgr.Site.GetUIThread().Invoke(() => this.node.SetEditLabel(value));
                 }
@@ -320,7 +242,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             CheckProjectIsValid();
 
-            using (AutomationScope scope = new AutomationScope(this.Node.ProjectMgr.Site))
+            using (var scope = new AutomationScope(this.Node.ProjectMgr.Site))
             {
                 this.Node.ProjectMgr.Site.GetUIThread().Invoke(() => this.node.Remove(false));
             }
@@ -333,7 +255,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             CheckProjectIsValid();
 
-            using (AutomationScope scope = new AutomationScope(this.Node.ProjectMgr.Site))
+            using (var scope = new AutomationScope(this.Node.ProjectMgr.Site))
             {
                 this.Node.ProjectMgr.Site.GetUIThread().Invoke(() => this.node.Remove(true));
             }
@@ -386,7 +308,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             CheckProjectIsValid();
 
-            using (AutomationScope scope = new AutomationScope(this.Node.ProjectMgr.Site))
+            using (var scope = new AutomationScope(this.Node.ProjectMgr.Site))
             {
                 this.Node.ProjectMgr.Site.GetUIThread().Invoke(() => this.node.ExpandItem(EXPANDFLAGS.EXPF_ExpandFolder));
             }

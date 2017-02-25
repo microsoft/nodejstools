@@ -63,7 +63,7 @@ namespace Microsoft.NodejsTools.Logging
 
         public override string ToString()
         {
-            StringBuilder res = new StringBuilder();
+            var res = new StringBuilder();
             res.AppendLine("    SurveyNewsFrequency: " + this._surveyNewsPolicy);
             res.AppendLine("    Debug Launches: " + this._debugLaunchCount);
             res.AppendLine("    Normal Launches: " + this._normalLaunchCount);

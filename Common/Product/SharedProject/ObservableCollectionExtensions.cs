@@ -31,7 +31,7 @@ namespace Microsoft.VisualStudioTools
             var toAdd = new SortedList<T, T>(compareSortKey);
             var toRemove = new Dictionary<T, int>(compareId);
             var alsoRemove = new List<int>();
-            int index = 0;
+            var index = 0;
             foreach (var item in left)
             {
                 if (toRemove.ContainsKey(item))

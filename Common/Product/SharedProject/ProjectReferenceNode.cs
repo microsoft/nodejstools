@@ -63,29 +63,11 @@ namespace Microsoft.VisualStudioTools.Project
 
         #region properties
 
-        public override string Url
-        {
-            get
-            {
-                return this.referencedProjectFullPath;
-            }
-        }
+        public override string Url => this.referencedProjectFullPath;
 
-        public override string Caption
-        {
-            get
-            {
-                return this.referencedProjectName;
-            }
-        }
+        public override string Caption => this.referencedProjectName;
 
-        internal Guid ReferencedProjectGuid
-        {
-            get
-            {
-                return this.referencedProjectGuid;
-            }
-        }
+        internal Guid ReferencedProjectGuid => this.referencedProjectGuid;
 
         /// <summary>
         /// Possiblity to shortcut and set the dangling project reference icon.
@@ -118,11 +100,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
         }
 
-        internal string ReferencedProjectName
-        {
-            get { return this.referencedProjectName; }
-        }
-
+        internal string ReferencedProjectName => this.referencedProjectName;
         /// <summary>
         /// Gets the automation object for the referenced project.
         /// </summary>
@@ -169,14 +147,14 @@ namespace Microsoft.VisualStudioTools.Project
                 }
 
                 // Get the configuration manager from the project.
-                EnvDTE.ConfigurationManager confManager = this.ReferencedProjectObject.ConfigurationManager;
+                var confManager = this.ReferencedProjectObject.ConfigurationManager;
                 if (null == confManager)
                 {
                     return null;
                 }
 
                 // Get the active configuration.
-                EnvDTE.Configuration config = confManager.ActiveConfiguration;
+                var config = confManager.ActiveConfiguration;
 
                 if (null == config)
                 {
@@ -189,7 +167,7 @@ namespace Microsoft.VisualStudioTools.Project
                 }
 
                 // Get the output path for the current configuration.
-                EnvDTE.Property outputPathProperty = config.Properties.Item("OutputPath");
+                var outputPathProperty = config.Properties.Item("OutputPath");
                 if (null == outputPathProperty || outputPathProperty.Value == null)
                 {
                     return null;
@@ -197,7 +175,7 @@ namespace Microsoft.VisualStudioTools.Project
 
                 // Usually the output path is relative to the project path. If it is set as an
                 // absolute path, this call has no effect.
-                string outputPath = CommonUtils.GetAbsoluteDirectoryPath(
+                var outputPath = CommonUtils.GetAbsoluteDirectoryPath(
                     Path.GetDirectoryName(this.referencedProjectFullPath),
                     outputPathProperty.Value.ToString());
 
@@ -291,7 +269,7 @@ namespace Microsoft.VisualStudioTools.Project
             this.referencedProjectRelativePath = this.ItemNode.GetMetadata(ProjectFileConstants.Include);
             Debug.Assert(!String.IsNullOrEmpty(this.referencedProjectRelativePath), "Could not retrieve referenced project path form project file");
 
-            string guidString = this.ItemNode.GetMetadata(ProjectFileConstants.Project);
+            var guidString = this.ItemNode.GetMetadata(ProjectFileConstants.Project);
 
             // Continue even if project setttings cannot be read.
             try
@@ -330,18 +308,18 @@ namespace Microsoft.VisualStudioTools.Project
 
             this.referencedProjectName = referencedProjectName;
 
-            int indexOfSeparator = projectReference.IndexOf('|');
+            var indexOfSeparator = projectReference.IndexOf('|');
 
-            string fileName = String.Empty;
+            var fileName = String.Empty;
 
             // Unfortunately we cannot use the path part of the projectReference string since it is not resolving correctly relative pathes.
             if (indexOfSeparator != -1)
             {
-                string projectGuid = projectReference.Substring(0, indexOfSeparator);
+                var projectGuid = projectReference.Substring(0, indexOfSeparator);
                 this.referencedProjectGuid = new Guid(projectGuid);
                 if (indexOfSeparator + 1 < projectReference.Length)
                 {
-                    string remaining = projectReference.Substring(indexOfSeparator + 1);
+                    var remaining = projectReference.Substring(indexOfSeparator + 1);
                     indexOfSeparator = remaining.IndexOf('|');
 
                     if (indexOfSeparator == -1)
@@ -357,7 +335,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             Debug.Assert(!String.IsNullOrEmpty(fileName), "Can not add a project reference because the input for adding one is invalid.");
 
-            string justTheFileName = Path.GetFileName(fileName);
+            var justTheFileName = Path.GetFileName(fileName);
             this.referencedProjectFullPath = CommonUtils.GetAbsoluteFilePath(projectPath, justTheFileName);
             // TODO: Maybe referenced projects should be relative to ProjectDir?
             this.referencedProjectRelativePath = CommonUtils.GetRelativeFilePath(this.ProjectMgr.ProjectHome, this.referencedProjectFullPath);
@@ -475,11 +453,11 @@ namespace Microsoft.VisualStudioTools.Project
 
         private void ShowCircularReferenceErrorMessage()
         {
-            string message = SR.GetString(SR.ProjectContainsCircularReferences, this.referencedProjectName);
-            string title = string.Empty;
-            OLEMSGICON icon = OLEMSGICON.OLEMSGICON_CRITICAL;
-            OLEMSGBUTTON buttons = OLEMSGBUTTON.OLEMSGBUTTON_OK;
-            OLEMSGDEFBUTTON defaultButton = OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST;
+            var message = SR.GetString(SR.ProjectContainsCircularReferences, this.referencedProjectName);
+            var title = string.Empty;
+            var icon = OLEMSGICON.OLEMSGICON_CRITICAL;
+            var buttons = OLEMSGBUTTON.OLEMSGBUTTON_OK;
+            var defaultButton = OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST;
             VsShellUtilities.ShowMessageBox(this.ProjectMgr.Site, title, message, icon, buttons, defaultButton);
         }
 
@@ -489,18 +467,18 @@ namespace Microsoft.VisualStudioTools.Project
         private bool IsReferenceInCycle(Guid projectGuid)
         {
             // TODO: This has got to be wrong, it doesn't work w/ other project types.
-            IVsHierarchy hierarchy = VsShellUtilities.GetHierarchy(this.ProjectMgr.Site, projectGuid);
+            var hierarchy = VsShellUtilities.GetHierarchy(this.ProjectMgr.Site, projectGuid);
 
-            IReferenceContainerProvider provider = hierarchy.GetProject().GetCommonProject() as IReferenceContainerProvider;
+            var provider = hierarchy.GetProject().GetCommonProject() as IReferenceContainerProvider;
             if (provider != null)
             {
-                IReferenceContainer referenceContainer = provider.GetReferenceContainer();
+                var referenceContainer = provider.GetReferenceContainer();
 
                 Utilities.CheckNotNull(referenceContainer, "Could not found the References virtual node");
 
-                foreach (ReferenceNode refNode in referenceContainer.EnumReferences())
+                foreach (var refNode in referenceContainer.EnumReferences())
                 {
-                    ProjectReferenceNode projRefNode = refNode as ProjectReferenceNode;
+                    var projRefNode = refNode as ProjectReferenceNode;
                     if (projRefNode != null)
                     {
                         if (projRefNode.ReferencedProjectGuid == this.ProjectMgr.ProjectIDGuid)

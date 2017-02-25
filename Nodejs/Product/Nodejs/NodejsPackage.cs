@@ -122,37 +122,13 @@ namespace Microsoft.NodejsTools
             Instance = this;
         }
 
-        public NodejsGeneralOptionsPage GeneralOptionsPage
-        {
-            get
-            {
-                return (NodejsGeneralOptionsPage)GetDialogPage(typeof(NodejsGeneralOptionsPage));
-            }
-        }
+        public NodejsGeneralOptionsPage GeneralOptionsPage => (NodejsGeneralOptionsPage)GetDialogPage(typeof(NodejsGeneralOptionsPage));
 
-        public NodejsNpmOptionsPage NpmOptionsPage
-        {
-            get
-            {
-                return (NodejsNpmOptionsPage)GetDialogPage(typeof(NodejsNpmOptionsPage));
-            }
-        }
+        public NodejsNpmOptionsPage NpmOptionsPage => (NodejsNpmOptionsPage)GetDialogPage(typeof(NodejsNpmOptionsPage));
 
-        public NodejsDiagnosticsOptionsPage DiagnosticsOptionsPage
-        {
-            get
-            {
-                return (NodejsDiagnosticsOptionsPage)GetDialogPage(typeof(NodejsDiagnosticsOptionsPage));
-            }
-        }
+        public NodejsDiagnosticsOptionsPage DiagnosticsOptionsPage => (NodejsDiagnosticsOptionsPage)GetDialogPage(typeof(NodejsDiagnosticsOptionsPage));
 
-        public EnvDTE.DTE DTE
-        {
-            get
-            {
-                return (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
-            }
-        }
+        public EnvDTE.DTE DTE => (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
 
         /////////////////////////////////////////////////////////////////////////////
         // Overridden Package Implementation
@@ -268,29 +244,11 @@ namespace Microsoft.NodejsTools
             TelemetrySetup.Instance.LogPackageLoad(this._telemetryLogger, Guid.Parse(Guids.NodejsPackageString), thisAssembly, Application.ProductVersion);
         }
 
-        public new IComponentModel ComponentModel
-        {
-            get
-            {
-                return this.GetComponentModel();
-            }
-        }
+        public new IComponentModel ComponentModel => this.GetComponentModel();
 
-        internal NodejsToolsLogger Logger
-        {
-            get
-            {
-                return this._logger;
-            }
-        }
+        internal NodejsToolsLogger Logger => this._logger;
 
-        internal ITelemetryLogger TelemetryLogger
-        {
-            get
-            {
-                return this._telemetryLogger;
-            }
-        }
+        internal ITelemetryLogger TelemetryLogger => this._telemetryLogger;
 
         /// <summary>
         /// Makes the debugger context available - this enables our debugger when we're installed into
@@ -299,7 +257,7 @@ namespace Microsoft.NodejsTools
         private void MakeDebuggerContextAvailable()
         {
             var monitorSelection = (IVsMonitorSelection)GetService(typeof(SVsShellMonitorSelection));
-            Guid debugEngineGuid = AD7Engine.DebugEngineGuid;
+            var debugEngineGuid = AD7Engine.DebugEngineGuid;
             uint contextCookie;
             if (ErrorHandler.Succeeded(monitorSelection.GetCmdUIContextCookie(ref debugEngineGuid, out contextCookie)))
             {
@@ -323,7 +281,7 @@ namespace Microsoft.NodejsTools
                 );
             }
 
-            IVsWindowFrame windowFrame = (IVsWindowFrame)((ToolWindowPane)window).Frame;
+            var windowFrame = (IVsWindowFrame)((ToolWindowPane)window).Frame;
             ErrorHandler.ThrowOnFailure(windowFrame.Show());
 
             if (focus)
@@ -395,7 +353,7 @@ namespace Microsoft.NodejsTools
 
         public string BrowseForDirectory(IntPtr owner, string initialDirectory = null)
         {
-            IVsUIShell uiShell = GetService(typeof(SVsUIShell)) as IVsUIShell;
+            var uiShell = GetService(typeof(SVsUIShell)) as IVsUIShell;
             if (null == uiShell)
             {
                 using (var ofd = new FolderBrowserDialog())
@@ -427,16 +385,16 @@ namespace Microsoft.NodejsTools
                 ErrorHandler.ThrowOnFailure(uiShell.GetDialogOwnerHwnd(out owner));
             }
 
-            VSBROWSEINFOW[] browseInfo = new VSBROWSEINFOW[1];
+            var browseInfo = new VSBROWSEINFOW[1];
             browseInfo[0].lStructSize = (uint)Marshal.SizeOf(typeof(VSBROWSEINFOW));
             browseInfo[0].pwzInitialDir = initialDirectory;
             browseInfo[0].hwndOwner = owner;
             browseInfo[0].nMaxDirName = 260;
-            IntPtr pDirName = IntPtr.Zero;
+            var pDirName = IntPtr.Zero;
             try
             {
                 browseInfo[0].pwzDirName = pDirName = Marshal.AllocCoTaskMem(520);
-                int hr = uiShell.GetDirectoryViaBrowseDlg(browseInfo);
+                var hr = uiShell.GetDirectoryViaBrowseDlg(browseInfo);
                 if (hr == VSConstants.OLE_E_PROMPTSAVECANCELLED)
                 {
                     return null;
@@ -505,13 +463,13 @@ namespace Microsoft.NodejsTools
             {
                 List<string> available = null;
 
-                string json = br.DocumentText;
+                var json = br.DocumentText;
                 if (!string.IsNullOrEmpty(json))
                 {
-                    int startIndex = json.IndexOf("<PRE>");
+                    var startIndex = json.IndexOf("<PRE>");
                     if (startIndex > 0)
                     {
-                        int endIndex = json.IndexOf("</PRE>", startIndex);
+                        var endIndex = json.IndexOf("</PRE>", startIndex);
                         if (endIndex > 0)
                         {
                             json = json.Substring(startIndex + 5, endIndex - startIndex - 5);
@@ -534,7 +492,7 @@ namespace Microsoft.NodejsTools
                                 // voted: cookie found
                                 // notvoted: cookie not found
                                 // canvoteagain: cookie found, but multiple votes are allowed
-                                JavaScriptSerializer serializer = new JavaScriptSerializer();
+                                var serializer = new JavaScriptSerializer();
                                 var results = serializer.Deserialize<Dictionary<string, List<string>>>(json);
                                 available = results["notvoted"];
                             }

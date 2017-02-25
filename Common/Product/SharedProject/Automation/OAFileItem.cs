@@ -39,13 +39,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
         #endregion
 
-        private new FileNode Node
-        {
-            get
-            {
-                return (FileNode)base.Node;
-            }
-        }
+        private new FileNode Node => (FileNode)base.Node;
 
         public override string Name
         {
@@ -71,13 +65,13 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             {
                 CheckProjectIsValid();
 
-                bool isDirty = false;
+                var isDirty = false;
 
-                using (AutomationScope scope = new AutomationScope(this.Node.ProjectMgr.Site))
+                using (var scope = new AutomationScope(this.Node.ProjectMgr.Site))
                 {
                     this.Node.ProjectMgr.Site.GetUIThread().Invoke(() =>
                     {
-                        DocumentManager manager = this.Node.GetDocumentManager();
+                        var manager = this.Node.GetDocumentManager();
                         Utilities.CheckNotNull(manager);
 
                         isDirty = manager.IsDirty;
@@ -98,7 +92,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
                 EnvDTE.Document document = null;
 
-                using (AutomationScope scope = new AutomationScope(this.Node.ProjectMgr.Site))
+                using (var scope = new AutomationScope(this.Node.ProjectMgr.Site))
                 {
                     this.Node.ProjectMgr.Site.GetUIThread().Invoke(() =>
                     {
@@ -136,16 +130,16 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             CheckProjectIsValid();
 
             IVsWindowFrame windowFrame = null;
-            IntPtr docData = IntPtr.Zero;
+            var docData = IntPtr.Zero;
 
-            using (AutomationScope scope = new AutomationScope(this.Node.ProjectMgr.Site))
+            using (var scope = new AutomationScope(this.Node.ProjectMgr.Site))
             {
                 this.Node.ProjectMgr.Site.GetUIThread().Invoke(() =>
                 {
                     try
                     {
                         // Validate input params
-                        Guid logicalViewGuid = VSConstants.LOGVIEWID_Primary;
+                        var logicalViewGuid = VSConstants.LOGVIEWID_Primary;
                         try
                         {
                             if (!(String.IsNullOrEmpty(viewKind)))
@@ -162,7 +156,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                         uint itemid;
                         IVsHierarchy ivsHierarchy;
                         uint docCookie;
-                        IVsRunningDocumentTable rdt = this.Node.ProjectMgr.Site.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
+                        var rdt = this.Node.ProjectMgr.Site.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
                         if (rdt == null)
                         {
                             throw new InvalidOperationException("Could not get running document table from the services exposed by this project");
@@ -238,7 +232,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             CheckProjectIsValid();
 
             // Validate input params
-            Guid logicalViewGuid = VSConstants.LOGVIEWID_Primary;
+            var logicalViewGuid = VSConstants.LOGVIEWID_Primary;
             try
             {
                 if (!(String.IsNullOrEmpty(viewKind)))
@@ -252,9 +246,9 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                 throw new ArgumentException(SR.GetString(SR.ParameterMustBeAValidGuid), "viewKind");
             }
 
-            bool isOpen = false;
+            var isOpen = false;
 
-            using (AutomationScope scope = new AutomationScope(this.Node.ProjectMgr.Site))
+            using (var scope = new AutomationScope(this.Node.ProjectMgr.Site))
             {
                 this.Node.ProjectMgr.Site.GetUIThread().Invoke(() =>
                 {
@@ -273,19 +267,13 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <summary>
         /// Gets the ProjectItems for the object.
         /// </summary>
-        public override ProjectItems ProjectItems
-        {
-            get
-            {
-                return this.Node.ProjectMgr.Site.GetUIThread().Invoke<ProjectItems>(() =>
-                {
-                    if (this.Project.ProjectNode.CanFileNodesHaveChilds)
-                        return new OAProjectItems(this.Project, this.Node);
-                    else
-                        return base.ProjectItems;
-                });
-            }
-        }
+        public override ProjectItems ProjectItems => this.Node.ProjectMgr.Site.GetUIThread().Invoke<ProjectItems>(() =>
+                                                                   {
+                                                                       if (this.Project.ProjectNode.CanFileNodesHaveChilds)
+                                                                           return new OAProjectItems(this.Project, this.Node);
+                                                                       else
+                                                                           return base.ProjectItems;
+                                                                   });
 
         #endregion
 
@@ -301,15 +289,15 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
             CheckProjectIsValid();
 
-            using (AutomationScope scope = new AutomationScope(this.Node.ProjectMgr.Site))
+            using (var scope = new AutomationScope(this.Node.ProjectMgr.Site))
             {
                 this.Node.ProjectMgr.Site.GetUIThread().Invoke(() =>
                 {
-                    IntPtr docData = IntPtr.Zero;
+                    var docData = IntPtr.Zero;
 
                     try
                     {
-                        IVsRunningDocumentTable rdt = this.Node.ProjectMgr.Site.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
+                        var rdt = this.Node.ProjectMgr.Site.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
                         if (rdt == null)
                         {
                             throw new InvalidOperationException("Could not get running document table from the services exposed by this project");
@@ -320,7 +308,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                         IVsHierarchy ivsHierarchy;
                         uint docCookie;
                         int canceled;
-                        string url = this.Node.Url;
+                        var url = this.Node.Url;
 
                         ErrorHandler.ThrowOnFailure(rdt.FindAndLockDocument((uint)_VSRDTFLAGS.RDT_NoLock, url, out ivsHierarchy, out itemid, out docData, out docCookie));
 
@@ -334,7 +322,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                             Utilities.ValidateFileName(this.Node.ProjectMgr.Site, fileName);
 
                             // Compute the fullpath from the directory of the existing Url.
-                            string fullPath = CommonUtils.GetAbsoluteFilePath(Path.GetDirectoryName(url), fileName);
+                            var fullPath = CommonUtils.GetAbsoluteFilePath(Path.GetDirectoryName(url), fileName);
 
                             if (!isCalledFromSaveAs)
                             {

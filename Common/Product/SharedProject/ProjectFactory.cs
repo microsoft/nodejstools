@@ -55,13 +55,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         #region properties
         [Obsolete("Use Site instead")]
-        protected Microsoft.VisualStudio.Shell.Package Package
-        {
-            get
-            {
-                return (Microsoft.VisualStudio.Shell.Package)this.site;
-            }
-        }
+        protected Microsoft.VisualStudio.Shell.Package Package => (Microsoft.VisualStudio.Shell.Package)this.site;
 
         protected internal System.IServiceProvider Site
         {
@@ -114,11 +108,11 @@ namespace Microsoft.VisualStudioTools.Project
                 canceled = 0;
 
                 // Get the list of GUIDs from the project/template
-                string guidsList = this.ProjectTypeGuids(fileName);
+                var guidsList = this.ProjectTypeGuids(fileName);
 
                 // Launch the aggregate creation process (we should be called back on our IVsAggregatableProjectFactoryCorrected implementation)
-                IVsCreateAggregateProject aggregateProjectFactory = (IVsCreateAggregateProject)this.Site.GetService(typeof(SVsCreateAggregateProject));
-                int hr = aggregateProjectFactory.CreateAggregateProject(guidsList, fileName, location, name, flags, ref projectGuid, out project);
+                var aggregateProjectFactory = (IVsCreateAggregateProject)this.Site.GetService(typeof(SVsCreateAggregateProject));
+                var hr = aggregateProjectFactory.CreateAggregateProject(guidsList, fileName, location, name, flags, ref projectGuid, out project);
                 if (hr == VSConstants.E_ABORT)
                     canceled = 1;
                 ErrorHandler.ThrowOnFailure(hr);
@@ -141,7 +135,7 @@ namespace Microsoft.VisualStudioTools.Project
             // Please be very carefull what is initialized here on the ProjectNode. Normally this should only instantiate and return a project node.
             // The reason why one should very carefully add state to the project node here is that at this point the aggregation has not yet been created and anything that would cause a CCW for the project to be created would cause the aggregation to fail
             // Our reasoning is that there is no other place where state on the project node can be set that is known by the Factory and has to execute before the Load method.
-            ProjectNode node = this.CreateProject();
+            var node = this.CreateProject();
             Utilities.CheckNotNull(node, "The project failed to be created");
             node.BuildEngine = this.buildEngine;
             node.BuildProject = this.buildProject;
@@ -163,7 +157,7 @@ namespace Microsoft.VisualStudioTools.Project
             this.buildProject = Utilities.ReinitializeMsBuildProject(this.buildEngine, file, this.buildProject);
 
             // Retrieve the list of GUIDs, if it is not specify, make it our GUID
-            string guids = this.buildProject.GetPropertyValue(ProjectFileConstants.ProjectTypeGuids);
+            var guids = this.buildProject.GetPropertyValue(ProjectFileConstants.ProjectTypeGuids);
             if (String.IsNullOrEmpty(guids))
                 guids = this.GetType().GUID.ToString("B");
 
@@ -182,7 +176,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public IVsTask CreateProjectAsync(ref Guid rguidProjectID, string filename, string location, string pszName, uint flags)
         {
-            Guid iid = typeof(IVsHierarchy).GUID;
+            var iid = typeof(IVsHierarchy).GUID;
             return VsTaskLibraryHelper.CreateAndStartTask(this.taskSchedulerService.Value, VsTaskRunContext.UIThreadBackgroundPriority, VsTaskLibraryHelper.CreateTaskBody(() =>
             {
                 IntPtr project;
@@ -389,7 +383,7 @@ namespace Microsoft.VisualStudioTools.Project
                     var namePart = Path.GetFileNameWithoutExtension(bstrFileName);
                     var extPart = Path.GetExtension(bstrFileName) + (sxsBackup ? ".old" : "");
                     var projectFileBackup = Path.Combine(bstrCopyLocation, namePart + extPart);
-                    for (int i = 1; File.Exists(projectFileBackup); ++i)
+                    for (var i = 1; File.Exists(projectFileBackup); ++i)
                     {
                         projectFileBackup = Path.Combine(
                             bstrCopyLocation,

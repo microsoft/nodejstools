@@ -56,62 +56,19 @@ namespace Microsoft.NodejsTools.NpmUI
             this._localVersion = localVersion;
         }
 
-        public virtual string Name
-        {
-            get { return this._name; }
-        }
-
-        public string Version
-        {
-            get { return ToString(this._version); }
-        }
-
-        public IEnumerable<SemverVersion> AvailableVersions
-        {
-            get { return this._availableVersions; }
-        }
-
-        public string Author
-        {
-            get { return this._author; }
-        }
-
-        public Visibility AuthorVisibility
-        {
-            get { return string.IsNullOrEmpty(this._author) ? Visibility.Collapsed : Visibility.Visible; }
-        }
-
-        public string Description { get { return this._description; } }
-
-        public Visibility DescriptionVisibility { get { return string.IsNullOrEmpty(this._description) ? Visibility.Collapsed : Visibility.Visible; } }
-
-        public IEnumerable<string> Homepages { get { return this._homepages; } }
-
-        public Visibility HomepagesVisibility
-        {
-            get { return this._homepages.Any() ? Visibility.Visible : Visibility.Collapsed; }
-        }
-
-        public string Keywords
-        {
-            get { return this._keywords; }
-        }
-
-        public bool IsInstalledLocally
-        {
-            get { return this._localVersion.HasValue; }
-        }
-
-        public bool IsLocalInstallOutOfDate
-        {
-            get { return this._localVersion.HasValue && this._localVersion < this._version; }
-        }
-
-        public string LocalVersion
-        {
-            get { return ToString(this._localVersion); }
-        }
-
+        public virtual string Name => this._name;
+        public string Version => ToString(this._version);
+        public IEnumerable<SemverVersion> AvailableVersions => this._availableVersions;
+        public string Author => this._author;
+        public Visibility AuthorVisibility => string.IsNullOrEmpty(this._author) ? Visibility.Collapsed : Visibility.Visible;
+        public string Description => this._description;
+        public Visibility DescriptionVisibility => string.IsNullOrEmpty(this._description) ? Visibility.Collapsed : Visibility.Visible;
+        public IEnumerable<string> Homepages => this._homepages;
+        public Visibility HomepagesVisibility => this._homepages.Any() ? Visibility.Visible : Visibility.Collapsed;
+        public string Keywords => this._keywords;
+        public bool IsInstalledLocally => this._localVersion.HasValue;
+        public bool IsLocalInstallOutOfDate => this._localVersion.HasValue && this._localVersion < this._version;
+        public string LocalVersion => ToString(this._localVersion);
         private static string ToString(SemverVersion? version)
         {
             return version.HasValue ? version.ToString() : string.Empty;

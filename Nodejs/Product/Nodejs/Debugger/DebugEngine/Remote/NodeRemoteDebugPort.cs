@@ -35,11 +35,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote
             this._uri = uri;
         }
 
-        public Uri Uri
-        {
-            get { return this._uri; }
-        }
-
+        public Uri Uri => this._uri;
         public int EnumProcesses(out IEnumDebugProcesses2 ppEnum)
         {
             ppEnum = new NodeRemoteEnumDebugProcesses(this, new NetworkClientFactory());
@@ -80,7 +76,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote
             }
 
             IEnumDebugProcesses2 processEnum;
-            int hr = EnumProcesses(out processEnum);
+            var hr = EnumProcesses(out processEnum);
             if (ErrorHandler.Failed(hr))
             {
                 return hr;

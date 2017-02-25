@@ -38,11 +38,7 @@ namespace Microsoft.NodejsTools.Jade
         /// <summary>
         /// Returns an empty, invalid range.
         /// </summary>
-        public static TextRange EmptyRange
-        {
-            get { return _emptyRange; }
-        }
-
+        public static TextRange EmptyRange => _emptyRange;
         /// <summary>
         /// Creates text range starting at position 0
         /// and length of 1
@@ -140,21 +136,15 @@ namespace Microsoft.NodejsTools.Jade
         /// <summary>
         /// Text range start position
         /// </summary>
-        public int Start { get { return this._start; } }
-
+        public int Start => this._start;
         /// <summary>
         /// Text range end position (excluded)
         /// </summary>
-        public int End { get { return this._end; } }
-
+        public int End => this._end;
         /// <summary>
         /// Text range length
         /// </summary>
-        public int Length
-        {
-            get { return this.End - this.Start; }
-        }
-
+        public int Length => this.End - this.Start;
         /// <summary>
         /// Determines if range contains given position
         /// </summary>
@@ -181,7 +171,7 @@ namespace Microsoft.NodejsTools.Jade
             if (ranges == null)
                 return false;
 
-            bool contains = false;
+            var contains = false;
 
             foreach (var range in ranges)
             {
@@ -346,8 +336,8 @@ namespace Microsoft.NodejsTools.Jade
         /// </summary>
         public static ITextRange Union(ITextRange range1, ITextRange range2)
         {
-            int start = Math.Min(range1.Start, range2.Start);
-            int end = Math.Max(range1.End, range2.End);
+            var start = Math.Min(range1.Start, range2.Start);
+            var end = Math.Max(range1.End, range2.End);
 
             return start <= end ? TextRange.FromBounds(start, end) : TextRange.EmptyRange;
         }
@@ -357,8 +347,8 @@ namespace Microsoft.NodejsTools.Jade
         /// </summary>
         public static ITextRange Union(ITextRange range1, int rangeStart, int rangeLength)
         {
-            int start = Math.Min(range1.Start, rangeStart);
-            int end = Math.Max(range1.End, rangeStart + rangeLength);
+            var start = Math.Min(range1.Start, rangeStart);
+            var end = Math.Max(range1.End, rangeStart + rangeLength);
 
             return start <= end ? TextRange.FromBounds(start, end) : TextRange.EmptyRange;
         }
@@ -369,8 +359,8 @@ namespace Microsoft.NodejsTools.Jade
         /// <returns>Intersection or empty range if ranges don't intersect</returns>
         public static ITextRange Intersection(ITextRange range1, ITextRange range2)
         {
-            int start = Math.Max(range1.Start, range2.Start);
-            int end = Math.Min(range1.End, range2.End);
+            var start = Math.Max(range1.Start, range2.Start);
+            var end = Math.Min(range1.End, range2.End);
 
             return start <= end ? TextRange.FromBounds(start, end) : TextRange.EmptyRange;
         }
@@ -381,8 +371,8 @@ namespace Microsoft.NodejsTools.Jade
         /// <returns>Intersection or empty range if ranges don't intersect</returns>
         public static ITextRange Intersection(ITextRange range1, int rangeStart, int rangeLength)
         {
-            int start = Math.Max(range1.Start, rangeStart);
-            int end = Math.Min(range1.End, rangeStart + rangeLength);
+            var start = Math.Max(range1.Start, rangeStart);
+            var end = Math.Min(range1.End, rangeStart + rangeLength);
 
             return start <= end ? TextRange.FromBounds(start, end) : TextRange.EmptyRange;
         }
@@ -397,7 +387,7 @@ namespace Microsoft.NodejsTools.Jade
 
         public int CompareTo(object obj)
         {
-            TextRange other = obj as TextRange;
+            var other = obj as TextRange;
 
             if (other == null)
                 return -1;

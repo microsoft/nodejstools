@@ -51,12 +51,6 @@ namespace Microsoft.VisualStudioTools.Navigation
             }
         }
 
-        public override StandardGlyphGroup GlyphType
-        {
-            get
-            {
-                return StandardGlyphGroup.GlyphCoolProject;
-            }
-        }
+        public override StandardGlyphGroup GlyphType => StandardGlyphGroup.GlyphCoolProject;
     }
 }

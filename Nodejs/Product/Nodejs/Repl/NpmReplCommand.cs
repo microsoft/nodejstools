@@ -42,8 +42,8 @@ namespace Microsoft.NodejsTools.Repl
 
         public async Task<ExecutionResult> Execute(IReplWindow window, string arguments)
         {
-            string projectPath = string.Empty;
-            string npmArguments = arguments.Trim(' ', '\t');
+            var projectPath = string.Empty;
+            var npmArguments = arguments.Trim(' ', '\t');
 
             // Parse project name/directory in square brackets
             if (npmArguments.StartsWith("[", StringComparison.Ordinal))
@@ -66,10 +66,10 @@ namespace Microsoft.NodejsTools.Repl
             }
 
             var solution = Package.GetGlobalService(typeof(SVsSolution)) as IVsSolution;
-            IEnumerable<IVsProject> loadedProjects = solution.EnumerateLoadedProjects(onlyNodeProjects: false);
+            var loadedProjects = solution.EnumerateLoadedProjects(onlyNodeProjects: false);
 
             var projectNameToDirectoryDictionary = new Dictionary<string, Tuple<string, IVsHierarchy>>(StringComparer.OrdinalIgnoreCase);
-            foreach (IVsProject project in loadedProjects)
+            foreach (var project in loadedProjects)
             {
                 var hierarchy = (IVsHierarchy)project;
                 object extObject;
@@ -80,20 +80,20 @@ namespace Microsoft.NodejsTools.Repl
                     continue;
                 }
 
-                EnvDTE.Project dteProject = extObject as EnvDTE.Project;
+                var dteProject = extObject as EnvDTE.Project;
                 if (dteProject == null)
                 {
                     continue;
                 }
 
-                string projectName = dteProject.Name;
+                var projectName = dteProject.Name;
                 if (string.IsNullOrEmpty(projectName))
                 {
                     continue;
                 }
 
                 // Try checking the `ProjectHome` property first
-                EnvDTE.Properties properties = dteProject.Properties;
+                var properties = dteProject.Properties;
                 if (dteProject.Properties != null)
                 {
                     EnvDTE.Property projectHome = null;
@@ -118,7 +118,7 @@ namespace Microsoft.NodejsTools.Repl
                 }
 
                 // Otherwise, fall back to using fullname
-                string projectDirectory = string.IsNullOrEmpty(dteProject.FullName) ? null : Path.GetDirectoryName(dteProject.FullName);
+                var projectDirectory = string.IsNullOrEmpty(dteProject.FullName) ? null : Path.GetDirectoryName(dteProject.FullName);
                 if (!string.IsNullOrEmpty(projectDirectory))
                 {
                     projectNameToDirectoryDictionary.Add(projectName, Tuple.Create(projectDirectory, hierarchy));
@@ -145,7 +145,7 @@ namespace Microsoft.NodejsTools.Repl
                 }
             }
 
-            bool isGlobalCommand = false;
+            var isGlobalCommand = false;
             if (string.IsNullOrWhiteSpace(npmArguments) ||
                 npmArguments.Contains(" -g ") || npmArguments.Contains(" --global "))
             {
@@ -154,7 +154,7 @@ namespace Microsoft.NodejsTools.Repl
             }
 
             // In case someone copies filename
-            string projectDirectoryPath = File.Exists(projectPath) ? Path.GetDirectoryName(projectPath) : projectPath;
+            var projectDirectoryPath = File.Exists(projectPath) ? Path.GetDirectoryName(projectPath) : projectPath;
 
             if (!isGlobalCommand && !Directory.Exists(projectDirectoryPath))
             {
@@ -203,21 +203,9 @@ namespace Microsoft.NodejsTools.Repl
             return ExecutionResult.Success;
         }
 
-        public string Description
-        {
-            get { return "Executes npm command. If solution contains multiple projects, specify target project using .npm [ProjectName] <npm arguments>"; }
-        }
-
-        public string Command
-        {
-            get { return "npm"; }
-        }
-
-        public object ButtonContent
-        {
-            get { return null; }
-        }
-
+        public string Description => "Executes npm command. If solution contains multiple projects, specify target project using .npm [ProjectName] <npm arguments>";
+        public string Command => "npm";
+        public object ButtonContent => null;
         // TODO: This is duplicated from Npm project
         // We should consider using InternalsVisibleTo to avoid code duplication
         internal static async Task<IEnumerable<string>> ExecuteNpmCommandAsync(
@@ -308,7 +296,7 @@ namespace Microsoft.NodejsTools.Repl
             public override void WriteLine(string decodedString)
             {
                 var substring = string.Empty;
-                string outputString = string.Empty;
+                var outputString = string.Empty;
 
                 if (decodedString.StartsWith(ErrorText, StringComparison.Ordinal))
                 {

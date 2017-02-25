@@ -24,7 +24,7 @@ namespace Microsoft.NodejsTools
     {
         private static string GetFromAssembly(Assembly assembly, string filename)
         {
-            string path = Path.Combine(
+            var path = Path.Combine(
                 Path.GetDirectoryName(assembly.Location),
                 filename);
             if (File.Exists(path))
@@ -36,7 +36,7 @@ namespace Microsoft.NodejsTools
 
         public static string GetFile(string filename)
         {
-            string path = GetFromAssembly(typeof(NodejsToolsInstallPath).Assembly, filename);
+            var path = GetFromAssembly(typeof(NodejsToolsInstallPath).Assembly, filename);
             if (!string.IsNullOrEmpty(path))
             {
                 return path;

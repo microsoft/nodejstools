@@ -41,18 +41,18 @@ namespace Microsoft.NodejsTools.TypeScript
         internal static string GetTypeScriptBackedJavaScriptFile(IVsProject project, string pathToFile)
         {
             //Need to deal with the format being relative and explicit
-            IVsBuildPropertyStorage props = (IVsBuildPropertyStorage)project;
+            var props = (IVsBuildPropertyStorage)project;
             String outDir;
             ErrorHandler.ThrowOnFailure(props.GetPropertyValue(NodeProjectProperty.TypeScriptOutDir, null, 0, out outDir));
 
-            string projHome = GetProjectHome(project);
+            var projHome = GetProjectHome(project);
 
             return GetTypeScriptBackedJavaScriptFile(projHome, outDir, pathToFile);
         }
 
         private static string GetTypeScriptBackedJavaScriptFile(string projectHome, string typeScriptOutDir, string pathToFile)
         {
-            string jsFilePath = Path.ChangeExtension(pathToFile, NodejsConstants.JavaScriptExtension);
+            var jsFilePath = Path.ChangeExtension(pathToFile, NodejsConstants.JavaScriptExtension);
 
             if (String.IsNullOrEmpty(typeScriptOutDir))
             {
@@ -63,11 +63,11 @@ namespace Microsoft.NodejsTools.TypeScript
 
             //Get the full path to outDir
             //  If outDir is rooted then outDirPath is going to be outDir ending with backslash
-            string outDirPath = CommonUtils.GetAbsoluteDirectoryPath(projectHome, typeScriptOutDir);
+            var outDirPath = CommonUtils.GetAbsoluteDirectoryPath(projectHome, typeScriptOutDir);
 
             //Find the relative path to the file from projectRoot
             //  This folder structure will be mirrored in the TypeScriptOutDir
-            string relativeJSFilePath = CommonUtils.GetRelativeFilePath(projectHome, jsFilePath);
+            var relativeJSFilePath = CommonUtils.GetRelativeFilePath(projectHome, jsFilePath);
 
             return Path.Combine(outDirPath, relativeJSFilePath);
         }

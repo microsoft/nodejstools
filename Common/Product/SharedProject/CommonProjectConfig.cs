@@ -31,9 +31,9 @@ namespace Microsoft.VisualStudioTools.Project
 
         public override int DebugLaunch(uint flags)
         {
-            IProjectLauncher starter = this._project.GetLauncher();
+            var starter = this._project.GetLauncher();
 
-            __VSDBGLAUNCHFLAGS launchFlags = (__VSDBGLAUNCHFLAGS)flags;
+            var launchFlags = (__VSDBGLAUNCHFLAGS)flags;
             if ((launchFlags & __VSDBGLAUNCHFLAGS.DBGLAUNCH_NoDebug) == __VSDBGLAUNCHFLAGS.DBGLAUNCH_NoDebug)
             {
                 //Start project with no debugger

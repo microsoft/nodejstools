@@ -42,7 +42,7 @@ namespace Microsoft.VisualStudioTools.Project
                 throw new ArgumentNullException("serviceProvider");
             }
 
-            IVsUIShell shell = serviceProvider.GetService(typeof(SVsUIShell)) as IVsUIShell;
+            var shell = serviceProvider.GetService(typeof(SVsUIShell)) as IVsUIShell;
             if (shell == null)
             {
                 throw new InvalidOperationException("Could not get the UI shell from the project");
@@ -107,7 +107,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         internal static void OpenDocument(IServiceProvider serviceProvider, string filename, out IVsTextView viewAdapter, out IVsWindowFrame pWindowFrame)
         {
-            IVsTextManager textMgr = (IVsTextManager)serviceProvider.GetService(typeof(SVsTextManager));
+            var textMgr = (IVsTextManager)serviceProvider.GetService(typeof(SVsTextManager));
 
             IVsUIHierarchy hierarchy;
             uint itemid;

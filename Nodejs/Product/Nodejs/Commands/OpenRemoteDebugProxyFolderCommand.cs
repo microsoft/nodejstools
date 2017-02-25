@@ -29,15 +29,9 @@ namespace Microsoft.NodejsTools.Commands
     {
         private const string remoteDebugJsFileName = "RemoteDebug.js";
 
-        private static string RemoteDebugProxyFolder
-        {
-            get
-            {
-                return Path.Combine(
+        private static string RemoteDebugProxyFolder => Path.Combine(
                     Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                     "RemoteDebug");
-            }
-        }
 
         public override void DoCommand(object sender, EventArgs args)
         {
@@ -60,9 +54,6 @@ namespace Microsoft.NodejsTools.Commands
             }
         }
 
-        public override int CommandId
-        {
-            get { return (int)PkgCmdId.cmdidOpenRemoteDebugProxyFolder; }
-        }
+        public override int CommandId => (int)PkgCmdId.cmdidOpenRemoteDebugProxyFolder;
     }
 }

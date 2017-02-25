@@ -28,13 +28,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
         }
 
-        internal new AssemblyReferenceNode BaseReferenceNode
-        {
-            get
-            {
-                return (AssemblyReferenceNode)base.BaseReferenceNode;
-            }
-        }
+        internal new AssemblyReferenceNode BaseReferenceNode => (AssemblyReferenceNode)base.BaseReferenceNode;
 
         #region Reference override
         public override int BuildNumber
@@ -110,9 +104,9 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                 {
                     return null;
                 }
-                StringBuilder builder = new StringBuilder();
-                byte[] publicKeyToken = this.BaseReferenceNode.ResolvedAssembly.GetPublicKeyToken();
-                for (int i = 0; i < publicKeyToken.Length; i++)
+                var builder = new StringBuilder();
+                var publicKeyToken = this.BaseReferenceNode.ResolvedAssembly.GetPublicKeyToken();
+                for (var i = 0; i < publicKeyToken.Length; i++)
                 {
                     // changed from MPFProj:
                     // http://mpfproj10.codeplex.com/WorkItem/View.aspx?WorkItemId=8257
@@ -161,13 +155,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                 return true;
             }
         }
-        public override prjReferenceType Type
-        {
-            get
-            {
-                return prjReferenceType.prjReferenceTypeAssembly;
-            }
-        }
+        public override prjReferenceType Type => prjReferenceType.prjReferenceTypeAssembly;
         public override string Version
         {
             get

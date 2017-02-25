@@ -53,7 +53,7 @@ namespace Microsoft.VisualStudioTools.Project
         protected virtual bool CanCreateProject(string fileName, uint flags)
         {
             // Validate the filename
-            bool canCreate = !string.IsNullOrEmpty(fileName);
+            var canCreate = !string.IsNullOrEmpty(fileName);
             canCreate |= !PackageUtilities.ContainsInvalidFileNameChars(fileName);
             return canCreate;
         }
@@ -118,19 +118,19 @@ namespace Microsoft.VisualStudioTools.Project
         {
             projectIUnknown = IntPtr.Zero;  // always initialize out parameters of COM interfaces!
 
-            object newProject = PreCreateForOuter(outerProjectIUnknown);
+            var newProject = PreCreateForOuter(outerProjectIUnknown);
 
-            IntPtr newProjectIUnknown = IntPtr.Zero;
-            ILocalRegistryCorrected localRegistry = (ILocalRegistryCorrected)this._serviceProvider.GetService(typeof(SLocalRegistry));
+            var newProjectIUnknown = IntPtr.Zero;
+            var localRegistry = (ILocalRegistryCorrected)this._serviceProvider.GetService(typeof(SLocalRegistry));
             Debug.Assert(localRegistry != null, "Could not get the ILocalRegistry object");
             if (localRegistry == null)
             {
                 throw new InvalidOperationException();
             }
-            Guid clsid = typeof(Microsoft.VisualStudio.ProjectAggregator.CProjectAggregatorClass).GUID;
-            Guid riid = VSConstants.IID_IUnknown;
-            uint dwClsCtx = (uint)CLSCTX.CLSCTX_INPROC_SERVER;
-            IntPtr aggregateProjectIUnknown = IntPtr.Zero;
+            var clsid = typeof(Microsoft.VisualStudio.ProjectAggregator.CProjectAggregatorClass).GUID;
+            var riid = VSConstants.IID_IUnknown;
+            var dwClsCtx = (uint)CLSCTX.CLSCTX_INPROC_SERVER;
+            var aggregateProjectIUnknown = IntPtr.Zero;
             IVsProjectAggregator2 vsProjectAggregator2 = null;
 
             try

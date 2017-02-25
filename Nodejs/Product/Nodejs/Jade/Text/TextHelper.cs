@@ -27,11 +27,11 @@ namespace Microsoft.NodejsTools.Jade
         public static string ConvertTabsToSpaces(string text, int tabSize, bool replaceNonWhitespaceChars = false)
         {
             var sb = new StringBuilder(text.Length);
-            int charsSoFar = 0;
+            var charsSoFar = 0;
 
-            for (int i = 0; i < text.Length; i++)
+            for (var i = 0; i < text.Length; i++)
             {
-                char ch = text[i];
+                var ch = text[i];
 
                 if (ch == '\t')
                 {

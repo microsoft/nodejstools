@@ -63,11 +63,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <summary>
         /// Gets the IVsExtensibility3 interface used in the automation function.
         /// </summary>
-        public IVsExtensibility3 Extensibility
-        {
-            get { return this.extensibility; }
-        }
-
+        public IVsExtensibility3 Extensibility => this.extensibility;
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>

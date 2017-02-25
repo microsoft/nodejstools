@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             Debug.Assert(this.projectMgr != null && !this.projectMgr.IsClosed && this.projectMgr.Site != null);
 
-            IVsTrackProjectDocuments2 documentTracker = this.projectMgr.Site.GetService(typeof(SVsTrackProjectDocuments)) as IVsTrackProjectDocuments2;
+            var documentTracker = this.projectMgr.Site.GetService(typeof(SVsTrackProjectDocuments)) as IVsTrackProjectDocuments2;
             Utilities.CheckNotNull(documentTracker);
 
             return documentTracker;
@@ -72,8 +72,8 @@ namespace Microsoft.VisualStudioTools.Project
                 return false;
             }
 
-            int len = files.Length;
-            VSQUERYADDFILERESULTS[] summary = new VSQUERYADDFILERESULTS[1];
+            var len = files.Length;
+            var summary = new VSQUERYADDFILERESULTS[1];
             ErrorHandler.ThrowOnFailure(this.GetIVsTrackProjectDocuments2().OnQueryAddFiles(this.projectMgr.GetOuterInterface<IVsProject>(), len, files, flags, summary, null));
             if (summary[0] == VSQUERYADDFILERESULTS.VSQUERYADDFILERESULTS_AddNotOK)
             {
@@ -124,9 +124,9 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 return false;
             }
-            int length = files.Length;
+            var length = files.Length;
 
-            VSQUERYREMOVEFILERESULTS[] summary = new VSQUERYREMOVEFILERESULTS[1];
+            var summary = new VSQUERYREMOVEFILERESULTS[1];
 
             ErrorHandler.ThrowOnFailure(this.GetIVsTrackProjectDocuments2().OnQueryRemoveFiles(this.projectMgr.GetOuterInterface<IVsProject>(), length, files, flags, summary, null));
             if (summary[0] == VSQUERYREMOVEFILERESULTS.VSQUERYREMOVEFILERESULTS_RemoveNotOK)
@@ -178,7 +178,7 @@ namespace Microsoft.VisualStudioTools.Project
                 return true;
             }
 
-            int iCanContinue = 0;
+            var iCanContinue = 0;
             ErrorHandler.ThrowOnFailure(this.GetIVsTrackProjectDocuments2().OnQueryRenameFile(this.projectMgr.GetOuterInterface<IVsProject>(), oldFileName, newFileName, flag, out iCanContinue));
             return (iCanContinue != 0);
         }

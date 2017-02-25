@@ -75,7 +75,7 @@ namespace Microsoft.NodejsTools.Repl
         public Task<ExecutionResult> Reset()
         {
             var buffersBeforeReset = this._window.TextView.BufferGraph.GetTextBuffers(TruePredicate);
-            for (int i = 0; i < buffersBeforeReset.Count - 1; i++)
+            for (var i = 0; i < buffersBeforeReset.Count - 1; i++)
             {
                 var buffer = buffersBeforeReset[i];
 
@@ -156,7 +156,7 @@ namespace Microsoft.NodejsTools.Repl
                 this._listener = null;
             }
 
-            string nodeExePath = GetNodeExePath();
+            var nodeExePath = GetNodeExePath();
             if (String.IsNullOrWhiteSpace(nodeExePath))
             {
                 this._window.WriteError(Resources.NodejsNotInstalled);
@@ -379,9 +379,9 @@ namespace Microsoft.NodejsTools.Repl
 
             internal void SendRequest(Dictionary<string, object> request)
             {
-                string json = this._serializer.Serialize(request);
+                var json = this._serializer.Serialize(request);
 
-                byte[] bytes = System.Text.Encoding.UTF8.GetBytes(json);
+                var bytes = System.Text.Encoding.UTF8.GetBytes(json);
                 var length = "Content-length: " + bytes.Length + "\r\n\r\n";
                 var lengthBytes = System.Text.Encoding.UTF8.GetBytes(length);
                 this.Socket.Send(lengthBytes);
@@ -441,8 +441,8 @@ namespace Microsoft.NodejsTools.Repl
                 var res = result.ToString();
                 if (res.IndexOf('\n') != -1)
                 {
-                    StringBuilder fixedStr = new StringBuilder();
-                    for (int i = 0; i < res.Length; i++)
+                    var fixedStr = new StringBuilder();
+                    for (var i = 0; i < res.Length; i++)
                     {
                         if (res[i] == '\r')
                         {

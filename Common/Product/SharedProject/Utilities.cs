@@ -52,10 +52,10 @@ namespace Microsoft.VisualStudioTools.Project
         {
             Utilities.ArgumentNotNull("site", site);
 
-            IVsMonitorSelection selectionMonitor = site.GetService(typeof(IVsMonitorSelection)) as IVsMonitorSelection;
+            var selectionMonitor = site.GetService(typeof(IVsMonitorSelection)) as IVsMonitorSelection;
             uint cookie = 0;
-            int active = 0;
-            Guid designContext = VSConstants.UICONTEXT_DesignMode;
+            var active = 0;
+            var designContext = VSConstants.UICONTEXT_DesignMode;
             ErrorHandler.ThrowOnFailure(selectionMonitor.GetCmdUIContextCookie(ref designContext, out cookie));
             ErrorHandler.ThrowOnFailure(selectionMonitor.IsCmdUIContextActive(cookie, out active));
             return active != 0;
@@ -71,13 +71,13 @@ namespace Microsoft.VisualStudioTools.Project
         {
             Utilities.ArgumentNotNull("serviceProvider", serviceProvider);
 
-            IVsExtensibility3 extensibility = serviceProvider.GetService(typeof(EnvDTE.IVsExtensibility)) as IVsExtensibility3;
+            var extensibility = serviceProvider.GetService(typeof(EnvDTE.IVsExtensibility)) as IVsExtensibility3;
 
             if (extensibility == null)
             {
                 throw new InvalidOperationException();
             }
-            int inAutomation = 0;
+            var inAutomation = 0;
             ErrorHandler.ThrowOnFailure(extensibility.IsInAutomationFunction(out inAutomation));
             return inAutomation != 0;
         }
@@ -88,15 +88,15 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public static int ShowMessageBox(IServiceProvider serviceProvider, string message, string title, OLEMSGICON icon, OLEMSGBUTTON msgButton, OLEMSGDEFBUTTON defaultButton)
         {
-            IVsUIShell uiShell = serviceProvider.GetService(typeof(IVsUIShell)) as IVsUIShell;
+            var uiShell = serviceProvider.GetService(typeof(IVsUIShell)) as IVsUIShell;
             Debug.Assert(uiShell != null, "Could not get the IVsUIShell object from the services exposed by this serviceprovider");
             if (uiShell == null)
             {
                 throw new InvalidOperationException();
             }
 
-            Guid emptyGuid = Guid.Empty;
-            int result = 0;
+            var emptyGuid = Guid.Empty;
+            var result = 0;
 
             serviceProvider.GetUIThread().Invoke(() =>
             {
@@ -131,8 +131,8 @@ namespace Microsoft.VisualStudioTools.Project
 
             // Create a StringBuilder with a pre-allocated buffer big enough for the
             // final string. 39 is the length of a GUID in the "B" form plus the final ';'
-            StringBuilder stringList = new StringBuilder(39 * guids.Length);
-            for (int i = 0; i < guids.Length; i++)
+            var stringList = new StringBuilder(39 * guids.Length);
+            for (var i = 0; i < guids.Length; i++)
             {
                 stringList.Append(guids[i].ToString("B"));
                 stringList.Append(";");
@@ -155,9 +155,9 @@ namespace Microsoft.VisualStudioTools.Project
                 return null;
             }
 
-            List<Guid> guids = new List<Guid>();
-            string[] guidsStrings = guidList.Split(';');
-            foreach (string guid in guidsStrings)
+            var guids = new List<Guid>();
+            var guidsStrings = guidList.Split(';');
+            foreach (var guid in guidsStrings)
             {
                 if (!String.IsNullOrEmpty(guid))
                     guids.Add(new Guid(guid.Trim(curlyBraces)));
@@ -209,7 +209,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <exception cref="InvalidOperationException">In case of failure an InvalidOperationException is thrown.</exception>
         public static void ValidateFileName(IServiceProvider serviceProvider, string filePath)
         {
-            string errorMessage = String.Empty;
+            var errorMessage = String.Empty;
             if (String.IsNullOrEmpty(filePath))
             {
                 errorMessage = SR.GetString(SR.ErrorInvalidFileName, filePath);
@@ -225,7 +225,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             if (errorMessage.Length == 0)
             {
-                string fileName = Path.GetFileName(filePath);
+                var fileName = Path.GetFileName(filePath);
                 if (String.IsNullOrEmpty(fileName) || IsFileNameInvalid(fileName))
                 {
                     errorMessage = SR.GetString(SR.ErrorInvalidFileName, filePath);
@@ -238,9 +238,9 @@ namespace Microsoft.VisualStudioTools.Project
                 if (!Utilities.IsInAutomationFunction(serviceProvider))
                 {
                     string title = null;
-                    OLEMSGICON icon = OLEMSGICON.OLEMSGICON_CRITICAL;
-                    OLEMSGBUTTON buttons = OLEMSGBUTTON.OLEMSGBUTTON_OK;
-                    OLEMSGDEFBUTTON defaultButton = OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST;
+                    var icon = OLEMSGICON.OLEMSGICON_CRITICAL;
+                    var buttons = OLEMSGBUTTON.OLEMSGBUTTON_OK;
+                    var defaultButton = OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST;
                     VsShellUtilities.ShowMessageBox(serviceProvider, title, errorMessage, icon, buttons, defaultButton);
                 }
                 else
@@ -258,7 +258,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>A CALPOLESTR that was created from the the list of strings.</returns>
         public static CALPOLESTR CreateCALPOLESTR(IList<string> strings)
         {
-            CALPOLESTR calpolStr = new CALPOLESTR();
+            var calpolStr = new CALPOLESTR();
 
             if (strings != null)
             {
@@ -267,15 +267,15 @@ namespace Microsoft.VisualStudioTools.Project
 
                 calpolStr.cElems = (uint)strings.Count;
 
-                int size = Marshal.SizeOf(typeof(IntPtr));
+                var size = Marshal.SizeOf(typeof(IntPtr));
 
                 calpolStr.pElems = Marshal.AllocCoTaskMem(strings.Count * size);
 
-                IntPtr ptr = calpolStr.pElems;
+                var ptr = calpolStr.pElems;
 
-                foreach (string aString in strings)
+                foreach (var aString in strings)
                 {
-                    IntPtr tempPtr = Marshal.StringToCoTaskMemUni(aString);
+                    var tempPtr = Marshal.StringToCoTaskMemUni(aString);
                     Marshal.WriteIntPtr(ptr, tempPtr);
                     ptr = new IntPtr(ptr.ToInt64() + size);
                 }
@@ -292,7 +292,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>A CADWORD created from the list of tagVsSccFilesFlags.</returns>
         public static CADWORD CreateCADWORD(IList<tagVsSccFilesFlags> flags)
         {
-            CADWORD cadWord = new CADWORD();
+            var cadWord = new CADWORD();
 
             if (flags != null)
             {
@@ -301,13 +301,13 @@ namespace Microsoft.VisualStudioTools.Project
 
                 cadWord.cElems = (uint)flags.Count;
 
-                int size = Marshal.SizeOf(typeof(UInt32));
+                var size = Marshal.SizeOf(typeof(UInt32));
 
                 cadWord.pElems = Marshal.AllocCoTaskMem(flags.Count * size);
 
-                IntPtr ptr = cadWord.pElems;
+                var ptr = cadWord.pElems;
 
-                foreach (tagVsSccFilesFlags flag in flags)
+                foreach (var flag in flags)
                 {
                     Marshal.WriteInt32(ptr, (int)flag);
                     ptr = new IntPtr(ptr.ToInt64() + size);
@@ -325,7 +325,7 @@ namespace Microsoft.VisualStudioTools.Project
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public static ImageList GetImageList(Stream imageStream)
         {
-            ImageList ilist = new ImageList();
+            var ilist = new ImageList();
 
             if (imageStream == null)
             {
@@ -334,7 +334,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
             ilist.ColorDepth = ColorDepth.Depth24Bit;
             ilist.ImageSize = new Size(16, 16);
-            Bitmap bitmap = new Bitmap(imageStream);
+            var bitmap = new Bitmap(imageStream);
             ilist.Images.AddStrip(bitmap);
             ilist.TransparentColor = Color.Magenta;
             return ilist;
@@ -349,12 +349,12 @@ namespace Microsoft.VisualStudioTools.Project
         {
             Utilities.ArgumentNotNull("automationObject", automationObject);
 
-            string currentConfigName = string.Empty;
+            var currentConfigName = string.Empty;
             if (automationObject.ConfigurationManager != null)
             {
                 try
                 {
-                    EnvDTE.Configuration activeConfig = automationObject.ConfigurationManager.ActiveConfiguration;
+                    var activeConfig = automationObject.ConfigurationManager.ActiveConfiguration;
                     if (activeConfig != null)
                     {
                         currentConfigName = activeConfig.ConfigurationName;
@@ -378,9 +378,9 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>True if the 2 items represent the same thing</returns>
         public static bool IsSameComObject(object obj1, object obj2)
         {
-            bool isSame = false;
-            IntPtr unknown1 = IntPtr.Zero;
-            IntPtr unknown2 = IntPtr.Zero;
+            var isSame = false;
+            var unknown1 = IntPtr.Zero;
+            var unknown2 = IntPtr.Zero;
             try
             {
                 // If we have 2 null, then they are not COM objects and as such "it's not the same COM object"
@@ -415,8 +415,8 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>Pointer to the IUnknown interface of the object.</returns>
         internal static IntPtr QueryInterfaceIUnknown(object objToQuery)
         {
-            bool releaseIt = false;
-            IntPtr unknown = IntPtr.Zero;
+            var releaseIt = false;
+            var unknown = IntPtr.Zero;
             IntPtr result;
             try
             {
@@ -433,7 +433,7 @@ namespace Microsoft.VisualStudioTools.Project
 
                 // We might already have an IUnknown, but if this is an aggregated
                 // object, it may not be THE IUnknown until we QI for it.
-                Guid IID_IUnknown = VSConstants.IID_IUnknown;
+                var IID_IUnknown = VSConstants.IID_IUnknown;
                 ErrorHandler.ThrowOnFailure(Marshal.QueryInterface(unknown, ref IID_IUnknown, out result));
             }
             finally
@@ -465,7 +465,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 if (Path.IsPathRooted(name) && !name.StartsWith(@"\\", StringComparison.Ordinal))
                 {
-                    string root = Path.GetPathRoot(name);
+                    var root = Path.GetPathRoot(name);
                     name = name.Substring(root.Length);
                 }
             }
@@ -475,15 +475,15 @@ namespace Microsoft.VisualStudioTools.Project
                 return true;
             }
 
-            Microsoft.VisualStudio.Shell.Url uri = new Microsoft.VisualStudio.Shell.Url(name);
+            var uri = new Microsoft.VisualStudio.Shell.Url(name);
 
             // This might be confusing bur Url.IsFile means that the uri represented by the name is either absolut or relative.
             if (uri.IsFile)
             {
-                string[] segments = uri.Segments;
+                var segments = uri.Segments;
                 if (segments != null && segments.Length > 0)
                 {
-                    foreach (string segment in segments)
+                    foreach (var segment in segments)
                     {
                         if (IsFilePartInValid(segment))
                         {
@@ -492,8 +492,8 @@ namespace Microsoft.VisualStudioTools.Project
                     }
 
                     // Now the last segment should be specially taken care, since that cannot be all dots or spaces.
-                    string lastSegment = segments[segments.Length - 1];
-                    string filePart = Path.GetFileNameWithoutExtension(lastSegment);
+                    var lastSegment = segments[segments.Length - 1];
+                    var filePart = Path.GetFileNameWithoutExtension(lastSegment);
                     // if the file is only an extension (.fob) then it's ok, otherwise we need to do the special checks.
                     if (filePart.Length != 0 && (IsFileNameAllGivenCharacter('.', filePart) || IsFileNameAllGivenCharacter(' ', filePart)))
                     {
@@ -504,7 +504,7 @@ namespace Microsoft.VisualStudioTools.Project
             else
             {
                 // The assumption here is that we got a file name.
-                string filePart = Path.GetFileNameWithoutExtension(name);
+                var filePart = Path.GetFileNameWithoutExtension(name);
                 if (IsFileNameAllGivenCharacter('.', filePart) || IsFileNameAllGivenCharacter(' ', filePart))
                 {
                     return true;
@@ -549,8 +549,8 @@ namespace Microsoft.VisualStudioTools.Project
             fullProjectPath = CommonUtils.NormalizePath(fullProjectPath);
 
             // Check if the project already has been loaded with the fullProjectPath. If yes return the build project associated to it.
-            List<MSBuild.Project> loadedProject = new List<MSBuild.Project>(buildEngine.GetLoadedProjects(fullProjectPath));
-            MSBuild.Project buildProject = loadedProject != null && loadedProject.Count > 0 && loadedProject[0] != null ? loadedProject[0] : null;
+            var loadedProject = new List<MSBuild.Project>(buildEngine.GetLoadedProjects(fullProjectPath));
+            var buildProject = loadedProject != null && loadedProject.Count > 0 && loadedProject[0] != null ? loadedProject[0] : null;
 
             if (buildProject == null)
             {
@@ -592,7 +592,7 @@ namespace Microsoft.VisualStudioTools.Project
         private static bool IsFileNameAllGivenCharacter(char c, string fileName)
         {
             // A valid file name cannot be all "c" .
-            int charFound = 0;
+            var charFound = 0;
             for (charFound = 0; charFound < fileName.Length && fileName[charFound] == c; ++charFound)
                 ;
             if (charFound >= fileName.Length)
@@ -620,13 +620,13 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 return true;
             }
-            String fileNameToVerify = filePart;
+            var fileNameToVerify = filePart;
 
             // Define a regular expression that covers all characters that are not in the safe character sets.
             // It is compiled for performance.
 
             // The filePart might still be a file and extension. If it is like that then we must check them separately, since different rules apply
-            string extension = String.Empty;
+            var extension = String.Empty;
             try
             {
                 extension = Path.GetExtension(filePart);
@@ -640,7 +640,7 @@ namespace Microsoft.VisualStudioTools.Project
             if (!String.IsNullOrEmpty(extension))
             {
                 // Check the extension first
-                bool isMatch = _unsafeCharactersRegex.IsMatch(extension);
+                var isMatch = _unsafeCharactersRegex.IsMatch(extension);
                 if (isMatch)
                 {
                     return isMatch;
@@ -679,16 +679,16 @@ namespace Microsoft.VisualStudioTools.Project
                 throw new ArgumentException(SR.GetString(SR.FileOrFolderAlreadyExists, target));
 
             Directory.CreateDirectory(target);
-            DirectoryInfo directory = new DirectoryInfo(source);
+            var directory = new DirectoryInfo(source);
 
             // Copy files
-            foreach (FileInfo file in directory.GetFiles())
+            foreach (var file in directory.GetFiles())
             {
                 file.CopyTo(Path.Combine(target, file.Name));
             }
 
             // Now recurse to child directories
-            foreach (DirectoryInfo child in directory.GetDirectories())
+            foreach (var child in directory.GetDirectories())
             {
                 RecursivelyCopyDirectory(child.FullName, Path.Combine(target, child.Name));
             }
@@ -708,8 +708,8 @@ namespace Microsoft.VisualStudioTools.Project
         {
             // Get absolute path
             // Note: this will not handle UNC paths
-            FileInfo fileInfo = new FileInfo(anyFileName);
-            string fullPath = fileInfo.FullName;
+            var fileInfo = new FileInfo(anyFileName);
+            var fullPath = fileInfo.FullName;
 
             // Cast to upper-case
             fullPath = fullPath.ToUpperInvariant();
@@ -729,7 +729,7 @@ namespace Microsoft.VisualStudioTools.Project
                 return false;
             }
 
-            string extension = Path.GetExtension(fileName);
+            var extension = Path.GetExtension(fileName);
             return (String.Equals(extension, ".vstemplate", StringComparison.OrdinalIgnoreCase) || string.Equals(extension, ".vsz", StringComparison.OrdinalIgnoreCase));
         }
 

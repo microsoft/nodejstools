@@ -32,7 +32,7 @@ namespace Microsoft.NodejsTools.Debugger
         /// <param name="files">List of project files.</param>
         public FuzzyLogicFileNameMapper(IEnumerable<string> files)
         {
-            foreach (string fileName in files)
+            foreach (var fileName in files)
             {
                 AddModuleToTree(fileName);
             }
@@ -46,12 +46,12 @@ namespace Microsoft.NodejsTools.Debugger
         public string GetLocalFileName(string remoteFileName)
         {
             // Try to find best file name match
-            IEnumerable<string> pathComponents = GetPathComponents(remoteFileName);
-            ScriptTree curTree = this._scripts;
+            var pathComponents = GetPathComponents(remoteFileName);
+            var curTree = this._scripts;
 
             // Walk up the remote path, matching it against known local files.
-            int matchedCount = 0;
-            foreach (string component in pathComponents.Reverse())
+            var matchedCount = 0;
+            foreach (var component in pathComponents.Reverse())
             {
                 ScriptTree nextTree;
                 if (!curTree.Parents.TryGetValue(component, out nextTree))
@@ -92,9 +92,9 @@ namespace Microsoft.NodejsTools.Debugger
 
         private void AddModuleToTree(string fileName)
         {
-            ScriptTree curTree = this._scripts;
-            IEnumerable<string> pathComponents = GetPathComponents(fileName);
-            foreach (string component in pathComponents.Reverse())
+            var curTree = this._scripts;
+            var pathComponents = GetPathComponents(fileName);
+            foreach (var component in pathComponents.Reverse())
             {
                 ScriptTree nextTree;
                 if (!curTree.Parents.TryGetValue(component, out nextTree))

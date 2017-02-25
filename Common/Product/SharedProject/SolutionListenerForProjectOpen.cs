@@ -42,14 +42,14 @@ namespace Microsoft.VisualStudioTools.Project
             // If this is a new project and our project. We use here that it is only our project that will implemnet the "internal"  IBuildDependencyOnProjectContainer.
             if (added != 0 && hierarchy is IBuildDependencyUpdate)
             {
-                IVsUIHierarchy uiHierarchy = hierarchy as IVsUIHierarchy;
+                var uiHierarchy = hierarchy as IVsUIHierarchy;
                 Debug.Assert(uiHierarchy != null, "The ProjectNode should implement IVsUIHierarchy");
                 if (uiHierarchy == null)
                 {
                     return VSConstants.E_FAIL;
                 }
                 // Expand and select project node
-                IVsUIHierarchyWindow uiWindow = UIHierarchyUtilities.GetUIHierarchyWindow(this.ServiceProvider, HierarchyNode.SolutionExplorer);
+                var uiWindow = UIHierarchyUtilities.GetUIHierarchyWindow(this.ServiceProvider, HierarchyNode.SolutionExplorer);
                 if (uiWindow != null)
                 {
                     __VSHIERARCHYITEMSTATE state;

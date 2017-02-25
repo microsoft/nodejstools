@@ -37,14 +37,14 @@ namespace Microsoft.NodejsTools.Debugger.Serialization
         {
             Utilities.ArgumentNotNull("variable", variable);
 
-            int id = variable.Id;
-            NodeStackFrame stackFrame = variable.StackFrame;
-            NodeEvaluationResult parent = variable.Parent;
+            var id = variable.Id;
+            var stackFrame = variable.StackFrame;
+            var parent = variable.Parent;
 
-            string name = variable.Name;
-            string fullName = GetFullName(parent, variable.Name, ref name);
+            var name = variable.Name;
+            var fullName = GetFullName(parent, variable.Name, ref name);
             string stringValue, hexValue = null;
-            string typeName = variable.TypeName;
+            var typeName = variable.TypeName;
             var type = NodeExpressionType.None;
 
             switch (typeName)

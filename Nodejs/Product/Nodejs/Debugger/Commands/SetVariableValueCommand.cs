@@ -46,11 +46,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands
             };
         }
 
-        protected override IDictionary<string, object> Arguments
-        {
-            get { return this._arguments; }
-        }
-
+        protected override IDictionary<string, object> Arguments => this._arguments;
         public NodeEvaluationResult Result { get; private set; }
 
         public override void ProcessResponse(JObject response)

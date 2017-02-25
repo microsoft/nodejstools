@@ -193,16 +193,8 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             }
         }
 
-        public string ExtenderCATID
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public object ExtenderNames
-        {
-            get { throw new NotImplementedException(); }
-        }
-
+        public string ExtenderCATID => throw new NotImplementedException();
+        public object ExtenderNames => throw new NotImplementedException();
         public uint FileAlignment
         {
             get
@@ -419,11 +411,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             }
         }
 
-        public string __id
-        {
-            get { throw new NotImplementedException(); }
-        }
-
+        public string __id => throw new NotImplementedException();
         public object get_Extender(string ExtenderName)
         {
             throw new NotImplementedException();

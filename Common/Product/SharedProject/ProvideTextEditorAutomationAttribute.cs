@@ -43,44 +43,16 @@ namespace Microsoft.VisualStudioTools
             this._migrationType = migrationType;
         }
 
-        public override object TypeId
-        {
-            get { return this; }
-        }
-
-        public string CategoryName
-        {
-            get { return this._categoryName; }
-        }
-
-        public short CategoryResourceId
-        {
-            get { return this._categoryResourceId; }
-        }
-
-        public short DescriptionResourceId
-        {
-            get { return this._descriptionResourceId; }
-        }
-
-        public ProfileMigrationType MigrationType
-        {
-            get { return this._migrationType; }
-        }
-
-        private string AutomationTextEditorRegKey
-        {
-            get { return "AutomationProperties\\TextEditor"; }
-        }
-
-        private string AutomationCategoryRegKey
-        {
-            get { return string.Format(CultureInfo.InvariantCulture, "{0}\\{1}", this.AutomationTextEditorRegKey, this.CategoryName); }
-        }
-
+        public override object TypeId => this;
+        public string CategoryName => this._categoryName;
+        public short CategoryResourceId => this._categoryResourceId;
+        public short DescriptionResourceId => this._descriptionResourceId;
+        public ProfileMigrationType MigrationType => this._migrationType;
+        private string AutomationTextEditorRegKey => "AutomationProperties\\TextEditor";
+        private string AutomationCategoryRegKey => string.Format(CultureInfo.InvariantCulture, "{0}\\{1}", this.AutomationTextEditorRegKey, this.CategoryName);
         public override void Register(RegistrationContext context)
         {
-            using (Key automationKey = context.CreateKey(this.AutomationCategoryRegKey))
+            using (var automationKey = context.CreateKey(this.AutomationCategoryRegKey))
             {
                 automationKey.SetValue(null, "#" + this.CategoryResourceId);
                 automationKey.SetValue("Description", "#" + this.DescriptionResourceId);

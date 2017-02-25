@@ -40,7 +40,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public static int GetProcessId(IDebugProcess2 process)
         {
-            AD_PROCESS_ID[] pid = new AD_PROCESS_ID[1];
+            var pid = new AD_PROCESS_ID[1];
             EngineUtils.RequireOk(process.GetPhysicalProcessId(pid));
 
             if (pid[0].ProcessIdType != (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM)

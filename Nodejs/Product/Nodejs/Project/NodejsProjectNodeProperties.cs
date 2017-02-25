@@ -36,32 +36,14 @@ namespace Microsoft.NodejsTools.Project
 
         [PropertyNameAttribute("WebApplication.AspNetDebugging")]
         [Browsable(false)]
-        public bool AspNetDebugging
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public bool AspNetDebugging => true;
 
         [PropertyNameAttribute("WebApplication.NativeDebugging")]
         [Browsable(false)]
-        public bool NativeDebugging
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool NativeDebugging => false;
 
         [Browsable(false)]
-        public uint TargetFramework
-        {
-            get
-            {
-                return 0x40005;
-            }
-        }
+        public uint TargetFramework => 0x40005;
 
         [SRCategory(SR.General)]
         [ResourcesDisplayName(nameof(Resources.NodeExePath))]
@@ -203,7 +185,7 @@ namespace Microsoft.NodejsTools.Project
 
         object EnvDTE80.IInternalExtenderProvider.GetExtender(string extenderCATID, string extenderName, object extendeeObject, EnvDTE.IExtenderSite extenderSite, int cookie)
         {
-            EnvDTE80.IInternalExtenderProvider outerHierarchy = this.Node.GetOuterInterface<EnvDTE80.IInternalExtenderProvider>();
+            var outerHierarchy = this.Node.GetOuterInterface<EnvDTE80.IInternalExtenderProvider>();
 
             if (outerHierarchy != null)
             {
@@ -231,13 +213,7 @@ namespace Microsoft.NodejsTools.Project
             this._innerObject = innerObject;
         }
 
-        internal object InnerObject
-        {
-            get
-            {
-                return this._innerObject;
-            }
-        }
+        internal object InnerObject => this._innerObject;
 
         #region ICustomTypeDescriptor Members
 
@@ -288,7 +264,7 @@ namespace Microsoft.NodejsTools.Project
 
         public PropertyDescriptorCollection GetProperties(Attribute[] attributes)
         {
-            List<PropertyDescriptor> res = new List<PropertyDescriptor>();
+            var res = new List<PropertyDescriptor>();
             var original = this._innerObject.GetProperties(attributes);
             foreach (PropertyDescriptor item in original)
             {
@@ -308,7 +284,7 @@ namespace Microsoft.NodejsTools.Project
 
         public PropertyDescriptorCollection GetProperties()
         {
-            List<PropertyDescriptor> res = new List<PropertyDescriptor>();
+            var res = new List<PropertyDescriptor>();
             var original = this._innerObject.GetProperties();
             foreach (PropertyDescriptor item in original)
             {

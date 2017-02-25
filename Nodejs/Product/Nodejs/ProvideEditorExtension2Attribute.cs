@@ -83,37 +83,19 @@ namespace Microsoft.NodejsTools
         /// <devdoc>
         ///     The file extension of the file.
         /// </devdoc>
-        public string Extension
-        {
-            get
-            {
-                return this._extension;
-            }
-        }
+        public string Extension => this._extension;
 
         /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="ProvideEditorExtensionAttribute.Factory"]' />
         /// <devdoc>
         ///     The editor factory guid.
         /// </devdoc>
-        public Guid Factory
-        {
-            get
-            {
-                return this._factory;
-            }
-        }
+        public Guid Factory => this._factory;
 
         /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="ProvideEditorExtensionAttribute.Priority"]' />
         /// <devdoc>
         ///     The priority of this extension registration.
         /// </devdoc>
-        public int Priority
-        {
-            get
-            {
-                return this._priority;
-            }
-        }
+        public int Priority => this._priority;
 
         /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="ProvideEditorExtensionAttribute.ProjectGuid"]/*' />
         public string ProjectGuid
@@ -128,13 +110,7 @@ namespace Microsoft.NodejsTools
             set { this._linkedEditorGuid = new System.Guid(value); }
         }
 
-        public __VSPHYSICALVIEWATTRIBUTES CommonPhysicalViewAttributes
-        {
-            get
-            {
-                return this._commonViewAttrs;
-            }
-        }
+        public __VSPHYSICALVIEWATTRIBUTES CommonPhysicalViewAttributes => this._commonViewAttrs;
 
         /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="ProvideEditorExtensionAttribute.EditorFactoryNotify"]/*' />
         public bool EditorFactoryNotify
@@ -173,13 +149,7 @@ namespace Microsoft.NodejsTools
         /// <summary>
         ///        The reg key name of this extension.
         /// </summary>
-        private string RegKeyName
-        {
-            get
-            {
-                return string.Format(CultureInfo.InvariantCulture, "Editors\\{0}", this.Factory.ToString("B"));
-            }
-        }
+        private string RegKeyName => string.Format(CultureInfo.InvariantCulture, "Editors\\{0}", this.Factory.ToString("B"));
 
         /// <summary>
         ///        The reg key name of the project.
@@ -192,15 +162,9 @@ namespace Microsoft.NodejsTools
                                  context.ComponentType.GUID.ToString("B"));
         }
 
-        private string EditorFactoryNotifyKey
-        {
-            get
-            {
-                return string.Format(CultureInfo.InvariantCulture, "Projects\\{0}\\FileExtensions\\{1}",
+        private string EditorFactoryNotifyKey => string.Format(CultureInfo.InvariantCulture, "Projects\\{0}\\FileExtensions\\{1}",
                                      this._project.ToString("B"),
                                      this.Extension);
-            }
-        }
 
         /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="Register"]' />
         /// <devdoc>
@@ -213,7 +177,7 @@ namespace Microsoft.NodejsTools
         /// </devdoc>
         public override void Register(RegistrationContext context)
         {
-            using (Key editorKey = context.CreateKey(this.RegKeyName))
+            using (var editorKey = context.CreateKey(this.RegKeyName))
             {
                 if (!string.IsNullOrEmpty(this.DefaultName))
                 {
@@ -234,7 +198,7 @@ namespace Microsoft.NodejsTools
                 editorKey.SetValue("Package", context.ComponentType.GUID.ToString("B"));
             }
 
-            using (Key extensionKey = context.CreateKey(this.RegKeyName + "\\Extensions"))
+            using (var extensionKey = context.CreateKey(this.RegKeyName + "\\Extensions"))
             {
                 extensionKey.SetValue(this.Extension.Substring(1), this.Priority);
 
@@ -257,15 +221,15 @@ namespace Microsoft.NodejsTools
             // Build the path of the registry key for the "Add file to project" entry
             if (this._project != Guid.Empty)
             {
-                string prjRegKey = ProjectRegKeyName(context) + "\\/1";
-                using (Key projectKey = context.CreateKey(prjRegKey))
+                var prjRegKey = ProjectRegKeyName(context) + "\\/1";
+                using (var projectKey = context.CreateKey(prjRegKey))
                 {
                     if (0 != this._resId)
                         projectKey.SetValue("", "#" + this._resId.ToString(CultureInfo.InvariantCulture));
                     if (this._templateDir.Length != 0)
                     {
-                        Uri url = new Uri(context.ComponentType.Assembly.CodeBase);
-                        string templates = url.LocalPath;
+                        var url = new Uri(context.ComponentType.Assembly.CodeBase);
+                        var templates = url.LocalPath;
                         templates = CommonUtils.GetAbsoluteDirectoryPath(Path.GetDirectoryName(templates), this._templateDir);
                         templates = context.EscapePath(templates);
                         projectKey.SetValue("TemplatesDir", templates);
@@ -283,7 +247,7 @@ namespace Microsoft.NodejsTools
                     throw new ArgumentException("project");
 
                 // Create the registry key
-                using (Key edtFactoryNotifyKey = context.CreateKey(this.EditorFactoryNotifyKey))
+                using (var edtFactoryNotifyKey = context.CreateKey(this.EditorFactoryNotifyKey))
                 {
                     edtFactoryNotifyKey.SetValue("EditorFactoryNotify", this.Factory.ToString("B"));
                 }

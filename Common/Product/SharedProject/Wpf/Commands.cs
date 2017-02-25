@@ -35,20 +35,17 @@ namespace Microsoft.VisualStudioTools.Wpf
         /// Displays UI to browse for a single folder and sets the TextBox that
         /// is specified as the CommandTarget to the selected path.
         /// </summary>
-        public static RoutedCommand BrowseFolder { get { return _browseFolder; } }
-        /// <summary>
-        /// Displays UI to open a single file using the filter in
-        /// CommandParameter and sets the TextBox that is specified as the
-        /// CommandTarget to the selected path.
-        /// </summary>
-        public static RoutedCommand BrowseOpenFile { get { return _browseOpenFile; } }
-        /// <summary>
-        /// Displays UI to save a single file using the filter in
-        /// CommandParameter and sets the TextBox that is specified as the
-        /// CommandTarget to the selected path.
-        /// </summary>
-        public static RoutedCommand BrowseSaveFile { get { return _browseSaveFile; } }
-
+        public static RoutedCommand BrowseFolder => _browseFolder;         /// <summary>
+                                                                           /// Displays UI to open a single file using the filter in
+                                                                           /// CommandParameter and sets the TextBox that is specified as the
+                                                                           /// CommandTarget to the selected path.
+                                                                           /// </summary>
+        public static RoutedCommand BrowseOpenFile => _browseOpenFile;         /// <summary>
+                                                                               /// Displays UI to save a single file using the filter in
+                                                                               /// CommandParameter and sets the TextBox that is specified as the
+                                                                               /// CommandTarget to the selected path.
+                                                                               /// </summary>
+        public static RoutedCommand BrowseSaveFile => _browseSaveFile;
         /// <summary>
         /// Handles the CanExecute event for all commands defined in this class.
         /// </summary>

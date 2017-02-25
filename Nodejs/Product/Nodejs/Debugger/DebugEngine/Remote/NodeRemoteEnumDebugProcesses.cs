@@ -89,8 +89,8 @@ namespace Microsoft.NodejsTools.Debugger.Remote
 
                         // Receive greeting.
                         var buffer = new byte[1024];
-                        int len = stream.ReadAsync(buffer, 0, buffer.Length, new CancellationTokenSource(5000).Token).GetAwaiter().GetResult();
-                        string response = Encoding.UTF8.GetString(buffer, 0, len);
+                        var len = stream.ReadAsync(buffer, 0, buffer.Length, new CancellationTokenSource(5000).Token).GetAwaiter().GetResult();
+                        var response = Encoding.UTF8.GetString(buffer, 0, len);
                         LiveLogger.WriteLine("NodeRemoteEnumDebugProcesses debugger greeting: " + response);
 
                         // There's no error code, so we have to do the string comparison. Luckily, it is hardcoded into V8 and is not localized.
@@ -100,7 +100,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote
                         }
 
                         // Send "disconnect" request.
-                        string request = @"{""command"":""disconnect"",""seq"":1,""type"":""request"",""arguments"":null}";
+                        var request = @"{""command"":""disconnect"",""seq"":1,""type"":""request"",""arguments"":null}";
                         request = string.Format(CultureInfo.InvariantCulture, "Content-Length: {0}\r\n\r\n{1}", request.Length, request);
                         buffer = Encoding.UTF8.GetBytes(request);
                         stream.WriteAsync(buffer, 0, buffer.Length, new CancellationTokenSource(5000).Token).GetAwaiter().GetResult();
@@ -168,7 +168,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote
                     }
                 }
 
-                string errText = string.Format(CultureInfo.CurrentCulture,
+                var errText = string.Format(CultureInfo.CurrentCulture,
                     Resources.RemoteDebugCouldNotAttachErrorMessage,
                     port.Uri,
                     exception != null ? ":\r\n\r\n" + exception.Message : ".");
@@ -184,7 +184,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote
                     }
                 }
 
-                DialogResult dlgRes = MessageBox.Show(errText, null, MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
+                var dlgRes = MessageBox.Show(errText, null, MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
                 if (dlgRes != DialogResult.Retry)
                 {
                     break;

@@ -42,46 +42,19 @@ namespace Microsoft.VisualStudioTools.Project
         #endregion
 
         #region overridden properties
-        public override bool CanOpenCommandPrompt
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool CanOpenCommandPrompt => true;
 
-        internal override string FullPathToChildren
-        {
-            get
-            {
-                return this.Url;
-            }
-        }
+        internal override string FullPathToChildren => this.Url;
 
-        public override int SortPriority
-        {
-            get { return DefaultSortOrderNode.FolderNode; }
-        }
-
+        public override int SortPriority => DefaultSortOrderNode.FolderNode;
         /// <summary>
         /// This relates to the SCC glyph
         /// </summary>
-        public override VsStateIcon StateIconIndex
-        {
-            get
-            {
+        public override VsStateIcon StateIconIndex =>
                 // The SCC manager does not support being asked for the state icon of a folder (result of the operation is undefined)
-                return VsStateIcon.STATEICON_NOSTATEICON;
-            }
-        }
+                VsStateIcon.STATEICON_NOSTATEICON;
 
-        public override bool CanAddFiles
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool CanAddFiles => true;
 
         #endregion
 
@@ -110,11 +83,7 @@ namespace Microsoft.VisualStudioTools.Project
             return new Automation.OAFolderItem(this.ProjectMgr.GetAutomationObject() as Automation.OAProject, this);
         }
 
-        protected override bool SupportsIconMonikers
-        {
-            get { return true; }
-        }
-
+        protected override bool SupportsIconMonikers => true;
         protected override ImageMoniker GetIconMoniker(bool open)
         {
             return open ? KnownMonikers.FolderOpened : KnownMonikers.FolderClosed;
@@ -139,7 +108,7 @@ namespace Microsoft.VisualStudioTools.Project
                     return VSConstants.S_OK;
                 }
 
-                string newPath = CommonUtils.GetAbsoluteDirectoryPath(CommonUtils.GetParent(this.Url), label);
+                var newPath = CommonUtils.GetAbsoluteDirectoryPath(CommonUtils.GetParent(this.Url), label);
 
                 // Verify that No Directory/file already exists with the new name among current children
                 var existingChild = this.Parent.FindImmediateChildByName(label);
@@ -175,7 +144,7 @@ namespace Microsoft.VisualStudioTools.Project
                 }
 
                 //Refresh the properties in the properties window
-                IVsUIShell shell = this.ProjectMgr.GetService(typeof(SVsUIShell)) as IVsUIShell;
+                var shell = this.ProjectMgr.GetService(typeof(SVsUIShell)) as IVsUIShell;
                 Utilities.CheckNotNull(shell, "Could not get the UI shell from the project");
                 ErrorHandler.ThrowOnFailure(shell.RefreshPropertyBrowser(0));
 
@@ -194,18 +163,12 @@ namespace Microsoft.VisualStudioTools.Project
             return VSConstants.S_OK;
         }
 
-        internal static string PathTooLongMessage
-        {
-            get
-            {
-                return SR.GetString(SR.PathTooLongShortMessage);
-            }
-        }
+        internal static string PathTooLongMessage => SR.GetString(SR.PathTooLongShortMessage);
 
         private int FinishFolderAdd(string label, bool wasCancelled)
         {
             // finish creation
-            string filename = label.Trim();
+            var filename = label.Trim();
             if (filename == "." || filename == "..")
             {
                 Debug.Assert(!wasCancelled);   // cancelling leaves us with a valid label
@@ -272,36 +235,15 @@ namespace Microsoft.VisualStudioTools.Project
             return VSConstants.S_OK;
         }
 
-        public override int MenuCommandId
-        {
-            get { return VsMenus.IDM_VS_CTXT_FOLDERNODE; }
-        }
+        public override int MenuCommandId => VsMenus.IDM_VS_CTXT_FOLDERNODE;
+        public override Guid ItemTypeGuid => VSConstants.GUID_ItemType_PhysicalFolder;
 
-        public override Guid ItemTypeGuid
-        {
-            get
-            {
-                return VSConstants.GUID_ItemType_PhysicalFolder;
-            }
-        }
+        public override string Url => CommonUtils.EnsureEndSeparator(this.ItemNode.Url);
 
-        public override string Url
-        {
-            get
-            {
-                return CommonUtils.EnsureEndSeparator(this.ItemNode.Url);
-            }
-        }
-
-        public override string Caption
-        {
-            get
-            {
+        public override string Caption =>
                 // it might have a backslash at the end... 
                 // and it might consist of Grandparent\parent\this\
-                return CommonUtils.GetFileOrDirectoryName(this.Url);
-            }
-        }
+                CommonUtils.GetFileOrDirectoryName(this.Url);
 
         public override string GetMkDocument()
         {
@@ -316,7 +258,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         protected internal override void UpdateSccStateIcons()
         {
-            for (HierarchyNode child = this.FirstChild; child != null; child = child.NextSibling)
+            for (var child = this.FirstChild; child != null; child = child.NextSibling)
             {
                 child.UpdateSccStateIcons();
             }
@@ -370,7 +312,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         protected internal override void GetSccFiles(IList<string> files, IList<tagVsSccFilesFlags> flags)
         {
-            for (HierarchyNode n = this.FirstChild; n != null; n = n.NextSibling)
+            for (var n = this.FirstChild; n != null; n = n.NextSibling)
             {
                 n.GetSccFiles(files, flags);
             }
@@ -378,7 +320,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         protected internal override void GetSccSpecialFiles(string sccFile, IList<string> files, IList<tagVsSccFilesFlags> flags)
         {
-            for (HierarchyNode n = this.FirstChild; n != null; n = n.NextSibling)
+            for (var n = this.FirstChild; n != null; n = n.NextSibling)
             {
                 n.GetSccSpecialFiles(sccFile, files, flags);
             }
@@ -456,7 +398,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             // on a new dir && enter, we get called with the same name (so do nothing if name is the same
-            string strNewDir = CommonUtils.GetAbsoluteDirectoryPath(CommonUtils.GetParent(this.Url), newName);
+            var strNewDir = CommonUtils.GetAbsoluteDirectoryPath(CommonUtils.GetParent(this.Url), newName);
 
             if (!CommonUtils.IsSameDirectory(this.Url, strNewDir))
             {
@@ -502,8 +444,8 @@ namespace Microsoft.VisualStudioTools.Project
 
         void IDiskBasedNode.RenameForDeferredSave(string basePath, string baseNewPath)
         {
-            string oldPath = Path.Combine(basePath, this.ItemNode.GetMetadata(ProjectFileConstants.Include));
-            string newPath = Path.Combine(baseNewPath, this.ItemNode.GetMetadata(ProjectFileConstants.Include));
+            var oldPath = Path.Combine(basePath, this.ItemNode.GetMetadata(ProjectFileConstants.Include));
+            var newPath = Path.Combine(baseNewPath, this.ItemNode.GetMetadata(ProjectFileConstants.Include));
             Directory.CreateDirectory(newPath);
 
             this.ProjectMgr.UpdatePathForDeferredSave(oldPath, newPath);
@@ -519,14 +461,14 @@ namespace Microsoft.VisualStudioTools.Project
         public virtual void RenameFolder(string newName)
         {
             // Do the rename (note that we only do the physical rename if the leaf name changed)
-            string newPath = Path.Combine(this.Parent.FullPathToChildren, newName);
-            string oldPath = this.Url;
+            var newPath = Path.Combine(this.Parent.FullPathToChildren, newName);
+            var oldPath = this.Url;
             if (!String.Equals(Path.GetFileName(this.Url), newName, StringComparison.Ordinal))
             {
                 RenameDirectory(CommonUtils.GetAbsoluteDirectoryPath(this.ProjectMgr.ProjectHome, newPath));
             }
 
-            bool wasExpanded = GetIsExpanded();
+            var wasExpanded = GetIsExpanded();
 
             ReparentFolder(newPath);
 
@@ -535,9 +477,9 @@ namespace Microsoft.VisualStudioTools.Project
             try
             {
                 // Let all children know of the new path
-                for (HierarchyNode child = this.FirstChild; child != null; child = child.NextSibling)
+                for (var child = this.FirstChild; child != null; child = child.NextSibling)
                 {
-                    FolderNode node = child as FolderNode;
+                    var node = child as FolderNode;
 
                     if (node == null)
                     {
@@ -593,13 +535,13 @@ namespace Microsoft.VisualStudioTools.Project
         {
             //A file or folder with the name '{0}' already exists on disk at this location. Please choose another name.
             //If this file or folder does not appear in the Solution Explorer, then it is not currently part of your project. To view files which exist on disk, but are not in the project, select Show All Files from the Project menu.
-            string errorMessage = SR.GetString(SR.FileOrFolderAlreadyExists, newPath);
+            var errorMessage = SR.GetString(SR.FileOrFolderAlreadyExists, newPath);
             if (!Utilities.IsInAutomationFunction(this.ProjectMgr.Site))
             {
                 string title = null;
-                OLEMSGICON icon = OLEMSGICON.OLEMSGICON_CRITICAL;
-                OLEMSGBUTTON buttons = OLEMSGBUTTON.OLEMSGBUTTON_OK;
-                OLEMSGDEFBUTTON defaultButton = OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST;
+                var icon = OLEMSGICON.OLEMSGICON_CRITICAL;
+                var buttons = OLEMSGBUTTON.OLEMSGBUTTON_OK;
+                var defaultButton = OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST;
                 Utilities.ShowMessageBox(this.ProjectMgr.Site, title, errorMessage, icon, buttons, defaultButton);
                 return VSConstants.S_OK;
             }
@@ -641,7 +583,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         protected override void RaiseOnItemRemoved(string documentToRemove, string[] filesToBeDeleted)
         {
-            VSREMOVEDIRECTORYFLAGS[] removeFlags = new VSREMOVEDIRECTORYFLAGS[1];
+            var removeFlags = new VSREMOVEDIRECTORYFLAGS[1];
             this.ProjectMgr.Tracker.OnFolderRemoved(documentToRemove, removeFlags[0]);
         }
     }

@@ -135,13 +135,7 @@ namespace Microsoft.NodejsTools.Project
                 this._owner = owner;
             }
 
-            public string PathToNpm
-            {
-                get
-                {
-                    return this._owner.GetNpmPathFromNodePathInProject();
-                }
-            }
+            public string PathToNpm => this._owner.GetNpmPathFromNodePathInProject();
         }
 
         private static INpmController DefaultNpmController(string projectHome, NpmPathProvider pathProvider)
@@ -167,13 +161,7 @@ namespace Microsoft.NodejsTools.Project
             ReloadHierarchySafe();
         }
 
-        public INpmController NpmController
-        {
-            get
-            {
-                return this._npmController;
-            }
-        }
+        public INpmController NpmController => this._npmController;
 
         internal IRootPackage RootPackage
         {
@@ -215,13 +203,7 @@ namespace Microsoft.NodejsTools.Project
 
         #region Logging and status bar updates
 
-        private OutputWindowRedirector NpmOutputPane
-        {
-            get
-            {
-                return this._projectNode.NpmOutputPane;
-            }
-        }
+        private OutputWindowRedirector NpmOutputPane => this._projectNode.NpmOutputPane;
 
         private void ConditionallyShowNpmOutputPane()
         {
@@ -429,21 +411,9 @@ namespace Microsoft.NodejsTools.Project
 
         #region HierarchyNode implementation
 
-        public override int SortPriority
-        {
-            get { return DefaultSortOrderNode.ReferenceContainerNode + 1; }
-        }
-
-        public override string Url
-        {
-            get { return NodeModulesVirtualName; }
-        }
-
-        public override string Caption
-        {
-            get { return _cCaption; }
-        }
-
+        public override int SortPriority => DefaultSortOrderNode.ReferenceContainerNode + 1;
+        public override string Url => NodeModulesVirtualName;
+        public override string Caption => _cCaption;
         #endregion
 
         #region Command handling

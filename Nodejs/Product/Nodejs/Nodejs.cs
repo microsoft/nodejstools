@@ -32,13 +32,7 @@ namespace Microsoft.NodejsTools
         private const string NodejsRegPath = "Software\\Node.js";
         private const string InstallPath = "InstallPath";
 
-        public static string NodeExePath
-        {
-            get
-            {
-                return GetPathToNodeExecutableFromEnvironment();
-            }
-        }
+        public static string NodeExePath => GetPathToNodeExecutableFromEnvironment();
 
         public static string GetAbsoluteNodeExePath(string root, string relativePath)
         {
@@ -69,7 +63,7 @@ namespace Microsoft.NodejsTools
             {
                 if (node != null)
                 {
-                    string key = (node.GetValue(InstallPath) as string) ?? string.Empty;
+                    var key = (node.GetValue(InstallPath) as string) ?? string.Empty;
                     var execPath = Path.Combine(key, executable);
                     if (File.Exists(execPath))
                     {
@@ -86,7 +80,7 @@ namespace Microsoft.NodejsTools
                 {
                     if (node64 != null)
                     {
-                        string key = (node64.GetValue(InstallPath) as string) ?? string.Empty;
+                        var key = (node64.GetValue(InstallPath) as string) ?? string.Empty;
                         var execPath = Path.Combine(key, executable);
                         if (File.Exists(execPath))
                         {
@@ -102,7 +96,7 @@ namespace Microsoft.NodejsTools
             {
                 if (node != null)
                 {
-                    string key = (node.GetValue(InstallPath) as string) ?? string.Empty;
+                    var key = (node.GetValue(InstallPath) as string) ?? string.Empty;
                     var execPath = Path.Combine(key, executable);
                     if (File.Exists(execPath))
                     {
@@ -126,7 +120,7 @@ namespace Microsoft.NodejsTools
             }
 
             // It wasn't in the users path.  Check Program Files for the nodejs folder.
-            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "nodejs", executable);
+            var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "nodejs", executable);
             if (File.Exists(path))
             {
                 return path;

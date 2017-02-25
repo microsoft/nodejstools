@@ -52,11 +52,7 @@ namespace Microsoft.NodejsTools.Debugger
         /// <summary>
         /// Gets the string representation length.
         /// </summary>
-        public int StringLength
-        {
-            get { return GetStringLength(this.StringValue); }
-        }
-
+        public int StringLength => GetStringLength(this.StringValue);
         /// <summary>
         /// Gets the string representation of this evaluation in hexadecimal or null if the hex value was not computable.
         /// </summary>
@@ -117,7 +113,7 @@ namespace Microsoft.NodejsTools.Debugger
                 return 0;
             }
 
-            Match match = this._stringLengthExpression.Match(stringValue);
+            var match = this._stringLengthExpression.Match(stringValue);
             if (!match.Success)
             {
                 return stringValue.Length;

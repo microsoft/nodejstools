@@ -30,9 +30,9 @@ namespace Microsoft.NodejsTools.TestFrameworks
         public TestFrameworkDirectories()
         {
             this._frameworkDirectories = new Dictionary<string, string>(System.StringComparer.OrdinalIgnoreCase);
-            foreach (string directory in Directory.GetDirectories(GetBaseTestframeworkFolder()))
+            foreach (var directory in Directory.GetDirectories(GetBaseTestframeworkFolder()))
             {
-                string name = Path.GetFileName(directory);
+                var name = Path.GetFileName(directory);
                 this._frameworkDirectories.Add(name, directory);
             }
             string defaultFx;
@@ -55,8 +55,8 @@ namespace Microsoft.NodejsTools.TestFrameworks
 
         private static string GetBaseTestframeworkFolder()
         {
-            string installFolder = GetExecutingAssemblyPath();
-            string baseDirectory = Path.Combine(installFolder, TestFrameworksDirectory);
+            var installFolder = GetExecutingAssemblyPath();
+            var baseDirectory = Path.Combine(installFolder, TestFrameworksDirectory);
 #if DEBUG
             // To allow easier debugging of the test adapter, try to use the local directory as a fallback.
             baseDirectory = Directory.Exists(baseDirectory) ? baseDirectory : Path.Combine(Directory.GetCurrentDirectory(), TestFrameworksDirectory);
@@ -66,9 +66,9 @@ namespace Microsoft.NodejsTools.TestFrameworks
 
         private static string GetExecutingAssemblyPath()
         {
-            string codeBase = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
-            UriBuilder uri = new UriBuilder(codeBase);
-            string path = Uri.UnescapeDataString(uri.Path);
+            var codeBase = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
+            var uri = new UriBuilder(codeBase);
+            var path = Uri.UnescapeDataString(uri.Path);
             return Path.GetDirectoryName(path);
         }
     }

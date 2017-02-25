@@ -46,10 +46,10 @@ namespace Microsoft.VisualStudioTools.Project
             if (this.isSuspending)
                 return;
 
-            IntPtr docData = IntPtr.Zero;
+            var docData = IntPtr.Zero;
             try
             {
-                IVsRunningDocumentTable rdt = this.site.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
+                var rdt = this.site.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
 
                 IVsHierarchy hierarchy;
                 uint itemId;
@@ -75,7 +75,7 @@ namespace Microsoft.VisualStudioTools.Project
                         IVsPersistDocData persistDocData = null;
 
                         // if interface is not supported, return null
-                        object unknown = Marshal.GetObjectForIUnknown(docData);
+                        var unknown = Marshal.GetObjectForIUnknown(docData);
                         if (unknown is IVsPersistDocData)
                         {
                             persistDocData = (IVsPersistDocData)unknown;

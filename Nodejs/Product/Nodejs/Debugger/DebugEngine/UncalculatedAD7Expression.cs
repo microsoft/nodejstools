@@ -104,7 +104,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         // This method evaluates the expression synchronously.
         int IDebugExpression2.EvaluateSync(enum_EVALFLAGS dwFlags, uint dwTimeout, IDebugEventCallback2 pExprCallback, out IDebugProperty2 ppResult)
         {
-            TimeSpan timeout = TimeSpan.FromMilliseconds(dwTimeout);
+            var timeout = TimeSpan.FromMilliseconds(dwTimeout);
             var tokenSource = new CancellationTokenSource(timeout);
             ppResult = null;
 

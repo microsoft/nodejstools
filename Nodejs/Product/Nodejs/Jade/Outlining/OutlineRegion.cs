@@ -52,7 +52,7 @@ namespace Microsoft.NodejsTools.Jade
             {
                 if (this._textBuffer != null)
                 {
-                    int hoverTextLength = Math.Min(this.Length, 512);
+                    var hoverTextLength = Math.Min(this.Length, 512);
                     hoverTextLength = Math.Min(hoverTextLength, this._textBuffer.CurrentSnapshot.Length - this.Start);
 
                     var text = this._textBuffer.CurrentSnapshot.GetText(this.Start, hoverTextLength);
@@ -69,12 +69,6 @@ namespace Microsoft.NodejsTools.Jade
         /// <summary>
         /// Text to display instead of a region when region is collapsed
         /// </summary>
-        public virtual string DisplayText
-        {
-            get
-            {
-                return _outlineDisplayText;
-            }
-        }
+        public virtual string DisplayText => _outlineDisplayText;
     }
 }

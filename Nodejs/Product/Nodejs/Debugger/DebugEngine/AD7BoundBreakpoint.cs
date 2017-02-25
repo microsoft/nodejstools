@@ -145,7 +145,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         {
             AssertMainThread();
 
-            BreakOn breakOn = GetBreakOnForPassCount(bpPassCount);
+            var breakOn = GetBreakOnForPassCount(bpPassCount);
             if (!this._breakpointBinding.SetBreakOnAsync(breakOn).GetAwaiter().GetResult())
             {
                 return VSConstants.E_FAIL;
@@ -163,7 +163,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         internal static BreakOn GetBreakOnForPassCount(BP_PASSCOUNT bpPassCount)
         {
             BreakOn breakOn;
-            uint count = bpPassCount.dwPassCount;
+            var count = bpPassCount.dwPassCount;
             switch (bpPassCount.stylePassCount)
             {
                 case enum_BP_PASSCOUNT_STYLE.BP_PASSCOUNT_NONE:

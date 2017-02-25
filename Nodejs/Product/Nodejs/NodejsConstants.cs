@@ -58,44 +58,26 @@ namespace Microsoft.NodejsTools
         internal const string NodeToolsProcessIdEnvironmentVariable = "_NTVS_PID";
         internal const string NodeToolsVsInstallRootEnvironmentVariable = "_NTVS_VSINSTALLROOT";
 
-        public static string NtvsLocalAppData
-        {
-            get
-            {
-                return Path.Combine(
+        public static string NtvsLocalAppData => Path.Combine(
                     System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData),
                     "Microsoft",
                     "Node.js Tools");
-            }
-        }
 
         /// <summary>
         /// Path to the private package where NTVS tools are installed.
         /// </summary>
-        public static string ExternalToolsPath
-        {
-            get
-            {
-                return Path.Combine(NtvsLocalAppData, "ExternalTools");
-            }
-        }
+        public static string ExternalToolsPath => Path.Combine(NtvsLocalAppData, "ExternalTools");
         /// <summary>
         /// Path to where NTVS caches Npm data.
         /// </summary>
-        public static string NpmCachePath
-        {
-            get
-            {
-                return Path.Combine(NtvsLocalAppData, "NpmCache");
-            }
-        }
+        public static string NpmCachePath => Path.Combine(NtvsLocalAppData, "NpmCache");
 
         /// <summary>
         /// Checks whether a relative and double-backslashed seperated path contains a folder name.
         /// </summary>
         internal static bool ContainsNodeModulesOrBowerComponentsFolder(string path)
         {
-            string tmp = "\\" + path + "\\";
+            var tmp = "\\" + path + "\\";
             return tmp.IndexOf("\\" + NodeModulesFolder + "\\", StringComparison.OrdinalIgnoreCase) >= 0
                 || tmp.IndexOf("\\" + BowerComponentsFolder + "\\", StringComparison.OrdinalIgnoreCase) >= 0;
         }

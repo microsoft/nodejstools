@@ -38,11 +38,7 @@ namespace Microsoft.NodejsTools.Debugger
             this._javaScriptFileName = javaScriptFileName;
         }
 
-        public int Id
-        {
-            get { return this._id; }
-        }
-
+        public int Id => this._id;
         public string Name
         {
             get
@@ -55,26 +51,13 @@ namespace Microsoft.NodejsTools.Debugger
             }
         }
 
-        public string JavaScriptFileName
-        {
-            get { return this._javaScriptFileName; }
-        }
-
-        public string FileName
-        {
-            get { return this._fileName; }
-        }
-
+        public string JavaScriptFileName => this._javaScriptFileName;
+        public string FileName => this._fileName;
         public string Source { get; set; }
 
-        public bool BuiltIn
-        {
-            get
-            {
+        public bool BuiltIn =>
                 // No directory separator characters implies builtin
-                return (this._fileName.IndexOfAny(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }) == -1);
-            }
-        }
+                (this._fileName.IndexOfAny(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }) == -1);
 
         public object Document { get; set; }
     }

@@ -46,12 +46,12 @@ namespace Microsoft.VisualStudioTools.Project
             if (!this._project.IsRefreshing)
             {
                 //Get the current value of the StartupFile Property
-                string currentStartupFile = this._project.GetProjectProperty(CommonConstants.StartupFile, true);
-                string fullPathToStartupFile = CommonUtils.GetAbsoluteFilePath(this._project.ProjectHome, currentStartupFile);
+                var currentStartupFile = this._project.GetProjectProperty(CommonConstants.StartupFile, true);
+                var fullPathToStartupFile = CommonUtils.GetAbsoluteFilePath(this._project.ProjectHome, currentStartupFile);
 
                 //Investigate all of the oldFileNames if they are equal to the current StartupFile
-                int index = 0;
-                foreach (string oldfile in oldFileNames)
+                var index = 0;
+                foreach (var oldfile in oldFileNames)
                 {
                     FileNode node = null;
                     if ((flags[index] & VSRENAMEFILEFLAGS.VSRENAMEFILEFLAGS_Directory) != 0)
@@ -59,7 +59,7 @@ namespace Microsoft.VisualStudioTools.Project
                         if (CommonUtils.IsSubpathOf(oldfile, fullPathToStartupFile))
                         {
                             // Get the newfilename and update the StartupFile property
-                            string newfilename = Path.Combine(
+                            var newfilename = Path.Combine(
                                 newFileNames[index],
                                 CommonUtils.GetRelativeFilePath(oldfile, fullPathToStartupFile)
                             );
@@ -71,7 +71,7 @@ namespace Microsoft.VisualStudioTools.Project
                     else if (CommonUtils.IsSamePath(oldfile, fullPathToStartupFile))
                     {
                         //Get the newfilename and update the StartupFile property
-                        string newfilename = newFileNames[index];
+                        var newfilename = newFileNames[index];
                         node = this._project.FindNodeByFullPath(newfilename) as FileNode;
                         Debug.Assert(node != null);
                     }
@@ -95,12 +95,12 @@ namespace Microsoft.VisualStudioTools.Project
             if (!this._project.IsRefreshing)
             {
                 //Get the current value of the StartupFile Property
-                string currentStartupFile = this._project.GetProjectProperty(CommonConstants.StartupFile, true);
-                string fullPathToStartupFile = CommonUtils.GetAbsoluteFilePath(this._project.ProjectHome, currentStartupFile);
+                var currentStartupFile = this._project.GetProjectProperty(CommonConstants.StartupFile, true);
+                var fullPathToStartupFile = CommonUtils.GetAbsoluteFilePath(this._project.ProjectHome, currentStartupFile);
 
                 //Investigate all of the oldFileNames if they are equal to the current StartupFile
-                int index = 0;
-                foreach (string oldfile in oldFileNames)
+                var index = 0;
+                foreach (var oldfile in oldFileNames)
                 {
                     //Compare the files and update the StartupFile Property if the currentStartupFile is an old file
                     if (CommonUtils.IsSamePath(oldfile, fullPathToStartupFile))

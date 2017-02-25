@@ -60,12 +60,6 @@ namespace Microsoft.VisualStudioTools
             Close();
         }
 
-        public bool AllItems
-        {
-            get
-            {
-                return this._allItems.IsChecked.Value;
-            }
-        }
+        public bool AllItems => this._allItems.IsChecked.Value;
     }
 }

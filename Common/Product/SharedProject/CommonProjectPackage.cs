@@ -78,7 +78,7 @@ namespace Microsoft.VisualStudioTools.Project
                 RegisterEditorFactory(encodingEditorFactory);
             }
             var componentManager = this._compMgr = (IOleComponentManager)GetService(typeof(SOleComponentManager));
-            OLECRINFO[] crinfo = new OLECRINFO[1];
+            var crinfo = new OLECRINFO[1];
             crinfo[0].cbSize = (uint)Marshal.SizeOf(typeof(OLECRINFO));
             crinfo[0].grfcrf = (uint)_OLECRF.olecrfNeedIdleTime;
             crinfo[0].grfcadvf = (uint)_OLECADVF.olecadvfModal | (uint)_OLECADVF.olecadvfRedrawOff | (uint)_OLECADVF.olecadvfWarningsOff;
@@ -92,7 +92,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 if (this._componentID != 0)
                 {
-                    IOleComponentManager mgr = GetService(typeof(SOleComponentManager)) as IOleComponentManager;
+                    var mgr = GetService(typeof(SOleComponentManager)) as IOleComponentManager;
                     if (mgr != null)
                     {
                         mgr.FRevokeComponent(this._componentID);
@@ -114,13 +114,13 @@ namespace Microsoft.VisualStudioTools.Project
         public string GetResourceString(string resourceName)
         {
             string resourceValue;
-            IVsResourceManager resourceManager = (IVsResourceManager)GetService(typeof(SVsResourceManager));
+            var resourceManager = (IVsResourceManager)GetService(typeof(SVsResourceManager));
             if (resourceManager == null)
             {
                 throw new InvalidOperationException("Could not get SVsResourceManager service. Make sure the package is Sited before calling this method");
             }
-            Guid packageGuid = this.GetType().GUID;
-            int hr = resourceManager.LoadResourceString(ref packageGuid, -1, resourceName, out resourceValue);
+            var packageGuid = this.GetType().GUID;
+            var hr = resourceManager.LoadResourceString(ref packageGuid, -1, resourceName, out resourceValue);
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(hr);
             return resourceValue;
         }

@@ -34,29 +34,12 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             this._codeContext = codeContext;
         }
 
-        public AD7Engine Engine
-        {
-            get { return this._codeContext.Engine; }
-        }
-
-        public NodeModule Module
-        {
-            get { return this._codeContext.Module; }
-        }
-
-        public string FileName
-        {
-            get { return this._codeContext.FileName; }
-        }
-
-        public bool Downloaded
-        {
-            get
-            {
+        public AD7Engine Engine => this._codeContext.Engine;
+        public NodeModule Module => this._codeContext.Module;
+        public string FileName => this._codeContext.FileName;
+        public bool Downloaded =>
                 // No directory separator characters implies downloaded
-                return (this.FileName.IndexOf(Path.DirectorySeparatorChar) == -1);
-            }
-        }
+                (this.FileName.IndexOf(Path.DirectorySeparatorChar) == -1);
 
         #region IDebugDocumentContext2 Members
 
@@ -88,7 +71,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             ppDocument = null;
             if (this.Downloaded)
             {
-                NodeModule module = this.Module;
+                var module = this.Module;
                 if (module != null)
                 {
                     // Lazily create document per module

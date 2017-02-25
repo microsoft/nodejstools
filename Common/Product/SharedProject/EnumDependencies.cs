@@ -28,7 +28,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             Utilities.ArgumentNotNull("dependencyList", dependencyList);
 
-            foreach (IVsDependency dependency in dependencyList)
+            foreach (var dependency in dependencyList)
             {
                 this.dependencyList.Add(dependency);
             }
@@ -38,7 +38,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             Utilities.ArgumentNotNull("dependencyList", dependencyList);
 
-            foreach (IVsBuildDependency dependency in dependencyList)
+            foreach (var dependency in dependencyList)
             {
                 this.dependencyList.Add(dependency);
             }
@@ -57,7 +57,7 @@ namespace Microsoft.VisualStudioTools.Project
             Utilities.ArgumentNotNull("dependencies", dependencies);
 
             uint fetched = 0;
-            int count = this.dependencyList.Count;
+            var count = this.dependencyList.Count;
 
             while (this.nextIndex < count && elements > 0 && fetched < count)
             {
@@ -82,7 +82,7 @@ namespace Microsoft.VisualStudioTools.Project
         public int Skip(uint elements)
         {
             this.nextIndex += elements;
-            uint count = (uint)this.dependencyList.Count;
+            var count = (uint)this.dependencyList.Count;
 
             if (this.nextIndex > count)
             {

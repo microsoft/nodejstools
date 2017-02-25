@@ -72,7 +72,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         {
             lock (this)
             {
-                int hr = VSConstants.S_OK;
+                var hr = VSConstants.S_OK;
                 celtFetched = (uint)this.m_data.Length - this.m_position;
 
                 if (celt > celtFetched)
@@ -86,7 +86,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
                 if (rgelt != null)
                 {
-                    for (int c = 0; c < celtFetched; c++)
+                    for (var c = 0; c < celtFetched; c++)
                     {
                         rgelt[c] = this.m_data[this.m_position + c];
                     }

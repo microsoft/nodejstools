@@ -60,11 +60,7 @@ namespace Microsoft.VisualStudioTools.Project
             throw new NotImplementedException();
         }
 
-        protected override bool SupportsIconMonikers
-        {
-            get { return true; }
-        }
-
+        protected override bool SupportsIconMonikers => true;
         protected override ImageMoniker GetIconMoniker(bool open)
         {
             return CanShowDefaultIcon() ?

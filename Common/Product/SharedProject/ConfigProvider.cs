@@ -136,7 +136,9 @@ namespace Microsoft.VisualStudioTools.Project
                 {
                     // Only care about conditional property groups
                     if (currentConfig.Condition == null || currentConfig.Condition.Length == 0)
+                    {
                         continue;
+                    }
 
                     // Skip if it isn't the group we want
                     if (String.Compare(currentConfig.Condition.Trim(), condition, StringComparison.OrdinalIgnoreCase) != 0)
@@ -348,7 +350,9 @@ namespace Microsoft.VisualStudioTools.Project
         public virtual int GetCfgs(uint celt, IVsCfg[] a, uint[] actual, uint[] flags)
         {
             if (flags != null)
+            {
                 flags[0] = 0;
+            }
 
             int i = 0;
             string[] configList = GetPropertiesConditionedOn(ProjectFileConstants.Configuration);
@@ -361,14 +365,20 @@ namespace Microsoft.VisualStudioTools.Project
 
                     i++;
                     if (i == celt)
+                    {
                         break;
+                    }
                 }
             }
             else
+            {
                 i = configList.Length;
+            }
 
             if (actual != null)
+            {
                 actual[0] = (uint)i;
+            }
 
             return VSConstants.S_OK;
         }

@@ -44,8 +44,8 @@ namespace Microsoft.NodejsTools.Options
 
         private void ClearCacheButton_Click(object sender, EventArgs e)
         {
-            bool didClearNpmCache = TryDeleteCacheDirectory(NodejsConstants.NpmCachePath);
-            bool didClearTools = TryDeleteCacheDirectory(NodejsConstants.ExternalToolsPath);
+            var didClearNpmCache = TryDeleteCacheDirectory(NodejsConstants.NpmCachePath);
+            var didClearTools = TryDeleteCacheDirectory(NodejsConstants.ExternalToolsPath);
 
             if (!didClearNpmCache || !didClearTools)
             {
@@ -69,7 +69,7 @@ namespace Microsoft.NodejsTools.Options
             try
             {
                 // To handle long paths, nuke the directory contents with robocopy
-                string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                var tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
                 Directory.CreateDirectory(tempDirectory);
                 var psi = new ProcessStartInfo("cmd.exe", string.Format(CultureInfo.InvariantCulture, @"/C robocopy /mir ""{0}"" ""{1}""", tempDirectory, cachePath))
                 {

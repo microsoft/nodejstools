@@ -68,7 +68,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             if (ErrorHandler.Succeeded(this._waitResult))
             {
-                int cancelled = 0;
+                var cancelled = 0;
                 this._waitDialog.EndWaitDialog(out cancelled);
             }
         }

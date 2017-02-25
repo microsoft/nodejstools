@@ -34,66 +34,42 @@ namespace Microsoft.VisualStudioTools.Project
         /// <summary>
         /// Delegates to base.
         /// </summary>
-        public override string DisplayName
-        {
-            get
-            {
-                return this.displayName;
-            }
-        }
+        public override string DisplayName => this.displayName;
 
         /// <summary>
         /// Delegates to base.
         /// </summary>
-        public override Type ComponentType
-        {
-            get
-            {
-                return this.property.ComponentType;
-            }
-        }
+        public override Type ComponentType => this.property.ComponentType;
 
         /// <summary>
         /// Delegates to base.
         /// </summary>
-        public override bool IsReadOnly
-        {
-            get
-            {
-                return this.property.IsReadOnly;
-            }
-        }
+        public override bool IsReadOnly => this.property.IsReadOnly;
 
         /// <summary>
         /// Delegates to base.
         /// </summary>
-        public override Type PropertyType
-        {
-            get
-            {
-                return this.property.PropertyType;
-            }
-        }
+        public override Type PropertyType => this.property.PropertyType;
 
         /// <summary>
         /// Delegates to base.
         /// </summary>
         public override object GetEditor(Type editorBaseType)
         {
-            object editor = this.editors[editorBaseType];
+            var editor = this.editors[editorBaseType];
             if (editor == null)
             {
-                for (int i = 0; i < this.Attributes.Count; i++)
+                for (var i = 0; i < this.Attributes.Count; i++)
                 {
-                    EditorAttribute attr = this.Attributes[i] as EditorAttribute;
+                    var attr = this.Attributes[i] as EditorAttribute;
                     if (attr == null)
                     {
                         continue;
                     }
-                    Type editorType = Type.GetType(attr.EditorBaseTypeName);
+                    var editorType = Type.GetType(attr.EditorBaseTypeName);
                     if (editorBaseType == editorType)
                     {
-                        Type type = GetTypeFromNameProperty(attr.EditorTypeName);
+                        var type = GetTypeFromNameProperty(attr.EditorTypeName);
                         if (type != null)
                         {
                             editor = CreateInstance(type);
@@ -134,7 +110,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public override bool CanResetValue(object component)
         {
-            bool result = this.property.CanResetValue(component);
+            var result = this.property.CanResetValue(component);
             return result;
         }
 
@@ -143,7 +119,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public override object GetValue(object component)
         {
-            object value = this.property.GetValue(component);
+            var value = this.property.GetValue(component);
             return value;
         }
 
@@ -175,7 +151,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
             else
             {
-                bool result = this.property.ShouldSerializeValue(component);
+                var result = this.property.ShouldSerializeValue(component);
                 return result;
             }
         }
@@ -191,7 +167,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             this.property = prop;
 
-            DisplayNameAttribute attr = prop.Attributes[typeof(DisplayNameAttribute)] as DisplayNameAttribute;
+            var attr = prop.Attributes[typeof(DisplayNameAttribute)] as DisplayNameAttribute;
 
             if (attr != null)
             {

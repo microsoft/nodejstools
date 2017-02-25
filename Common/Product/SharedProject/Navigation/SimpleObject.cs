@@ -22,64 +22,22 @@ namespace Microsoft.VisualStudioTools.Navigation
     {
         #region ISimpleObject Members
 
-        public virtual bool CanDelete
-        {
-            get { return false; }
-        }
-
-        public virtual bool CanGoToSource
-        {
-            get { return false; }
-        }
-
-        public virtual bool CanRename
-        {
-            get { return false; }
-        }
-
-        public virtual string Name
-        {
-            get { return String.Empty; }
-        }
-
-        public virtual string UniqueName
-        {
-            get { return String.Empty; }
-        }
-
-        public virtual string FullName
-        {
-            get
-            {
-                return this.Name;
-            }
-        }
+        public virtual bool CanDelete => false;
+        public virtual bool CanGoToSource => false;
+        public virtual bool CanRename => false;
+        public virtual string Name => String.Empty;
+        public virtual string UniqueName => String.Empty;
+        public virtual string FullName => this.Name;
 
         public virtual string GetTextRepresentation(VSTREETEXTOPTIONS options)
         {
             return this.Name;
         }
 
-        public virtual string TooltipText
-        {
-            get { return String.Empty; }
-        }
-
-        public virtual object BrowseObject
-        {
-            get { return null; }
-        }
-
-        public virtual System.ComponentModel.Design.CommandID ContextMenuID
-        {
-            get { return null; }
-        }
-
-        public virtual VSTREEDISPLAYDATA DisplayData
-        {
-            get { return new VSTREEDISPLAYDATA(); }
-        }
-
+        public virtual string TooltipText => String.Empty;
+        public virtual object BrowseObject => null;
+        public virtual System.ComponentModel.Design.CommandID ContextMenuID => null;
+        public virtual VSTREEDISPLAYDATA DisplayData => new VSTREEDISPLAYDATA();
         public virtual uint CategoryField(LIB_CATEGORY lIB_CATEGORY)
         {
             return 0;

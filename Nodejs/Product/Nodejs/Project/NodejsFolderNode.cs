@@ -30,13 +30,7 @@ namespace Microsoft.NodejsTools.Project
             this._project = root;
         }
 
-        public override string Caption
-        {
-            get
-            {
-                return base.Caption;
-            }
-        }
+        public override string Caption => base.Caption;
 
         public override void RemoveChild(HierarchyNode node)
         {
@@ -48,7 +42,7 @@ namespace Microsoft.NodejsTools.Project
             // Include node_modules folder is generally unecessary and can cause VS to hang.
             // http://nodejstools.codeplex.com/workitem/1432
             // Check if the folder is node_modules, and warn the user to ensure they don't run into this issue or at least set expectations appropriately.
-            string nodeModulesPath = Path.Combine(this._project.FullPathToChildren, "node_modules");
+            var nodeModulesPath = Path.Combine(this._project.FullPathToChildren, "node_modules");
             if (CommonUtils.IsSameDirectory(nodeModulesPath, this.ItemNode.Url) &&
                 !ShouldIncludeNodeModulesFolderInProject())
             {

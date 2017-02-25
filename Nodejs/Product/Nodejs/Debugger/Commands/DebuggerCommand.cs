@@ -33,11 +33,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands
         /// <summary>
         /// Gets a command arguments.
         /// </summary>
-        protected virtual IDictionary<string, object> Arguments
-        {
-            get { return null; }
-        }
-
+        protected virtual IDictionary<string, object> Arguments => null;
         /// <summary>
         /// Gets a command identifier.
         /// </summary>

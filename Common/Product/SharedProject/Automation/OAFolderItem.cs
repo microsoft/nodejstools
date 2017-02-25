@@ -32,13 +32,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
         #endregion
 
-        private new FolderNode Node
-        {
-            get
-            {
-                return (FolderNode)base.Node;
-            }
-        }
+        private new FolderNode Node => (FolderNode)base.Node;
 
         #region overridden methods
         public override ProjectItems Collection
@@ -50,13 +44,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             }
         }
 
-        public override ProjectItems ProjectItems
-        {
-            get
-            {
-                return new OAProjectItems(this.Project, this.Node);
-            }
-        }
+        public override ProjectItems ProjectItems => new OAProjectItems(this.Project, this.Node);
         #endregion
     }
 }

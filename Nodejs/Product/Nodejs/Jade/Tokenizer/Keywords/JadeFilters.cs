@@ -22,7 +22,7 @@ namespace Microsoft.NodejsTools.Jade
     {
         public static bool IsFilter(string candidate)
         {
-            string lower = candidate.ToLowerInvariant();
+            var lower = candidate.ToLowerInvariant();
             return Array.BinarySearch<string>(_filters, lower) >= 0;
         }
 

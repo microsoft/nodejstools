@@ -94,7 +94,7 @@ namespace Microsoft.NodejsTools.SourceMapping
                 this._names = Array.Empty<string>();
             }
 
-            List<LineInfo> lineInfos = new List<LineInfo>();
+            var lineInfos = new List<LineInfo>();
             object mappingsObj;
             if (this._mapInfo.TryGetValue("mappings", out mappingsObj) && mappingsObj is string)
             {
@@ -114,8 +114,8 @@ namespace Microsoft.NodejsTools.SourceMapping
                     var segments = line.Split(',');
 
                     // each , separated section represents a segment of the line
-                    int generatedColumn = 0;
-                    List<SegmentInfo> segmentInfos = new List<SegmentInfo>();
+                    var generatedColumn = 0;
+                    var segmentInfos = new List<SegmentInfo>();
                     foreach (var segment in segments)
                     {
                         // each segment is Base64 VLQ encoded
@@ -170,9 +170,9 @@ namespace Microsoft.NodejsTools.SourceMapping
 
         private int[] DecodeVLQ(string value)
         {
-            List<int> res = new List<int>();
+            var res = new List<int>();
 
-            int curPos = 0;
+            var curPos = 0;
             while (curPos < value.Length)
             {
                 long intValue = 0;
@@ -217,58 +217,28 @@ namespace Microsoft.NodejsTools.SourceMapping
         /// <summary>
         /// Version number of the source map.
         /// </summary>
-        internal int Version
-        {
-            get
-            {
-                return GetValue("version", -1);
-            }
-        }
+        internal int Version => GetValue("version", -1);
 
         /// <summary>
         /// Filename of the generated code
         /// </summary>
-        internal string File
-        {
-            get
-            {
-                return GetValue("file", String.Empty);
-            }
-        }
+        internal string File => GetValue("file", String.Empty);
 
         /// <summary>
         /// Provides the root for the sources to save space, automatically
         /// included in the Sources array so it's not public.
         /// </summary>
-        private string SourceRoot
-        {
-            get
-            {
-                return GetValue("sourceRoot", String.Empty);
-            }
-        }
+        private string SourceRoot => GetValue("sourceRoot", String.Empty);
 
         /// <summary>
         /// All of the filenames that were combined.
         /// </summary>
-        internal ReadOnlyCollection<string> Sources
-        {
-            get
-            {
-                return new ReadOnlyCollection<string>(this._sources);
-            }
-        }
+        internal ReadOnlyCollection<string> Sources => new ReadOnlyCollection<string>(this._sources);
 
         /// <summary>
         /// All of the variable/method names that appear in the code
         /// </summary>
-        internal ReadOnlyCollection<string> Names
-        {
-            get
-            {
-                return new ReadOnlyCollection<string>(this._names);
-            }
-        }
+        internal ReadOnlyCollection<string> Names => new ReadOnlyCollection<string>(this._names);
 
         /// <summary>
         /// Maps a location in the generated code into a location in the source code.
@@ -278,7 +248,7 @@ namespace Microsoft.NodejsTools.SourceMapping
             if (lineNo < this._lines.Length)
             {
                 var line = this._lines[lineNo];
-                for (int i = line.Segments.Length - 1; i >= 0; i--)
+                for (var i = line.Segments.Length - 1; i >= 0; i--)
                 {
                     if (line.Segments[i].GeneratedColumn <= columnNo)
                     {
@@ -339,7 +309,7 @@ namespace Microsoft.NodejsTools.SourceMapping
         internal bool TryMapPointBack(int lineNo, int columnNo, out SourceMapInfo res)
         {
             int? firstBestLine = null, secondBestLine = null;
-            for (int i = 0; i < this._lines.Length; i++)
+            for (var i = 0; i < this._lines.Length; i++)
             {
                 var line = this._lines[i];
                 int? originalColumn = null;
@@ -409,8 +379,8 @@ namespace Microsoft.NodejsTools.SourceMapping
         {
             const string base64mapping = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-            Dictionary<char, int> mapping = new Dictionary<char, int>();
-            for (int i = 0; i < base64mapping.Length; i++)
+            var mapping = new Dictionary<char, int>();
+            for (var i = 0; i < base64mapping.Length; i++)
             {
                 mapping[base64mapping[i]] = i;
             }

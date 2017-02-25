@@ -27,9 +27,6 @@ namespace Microsoft.NodejsTools.Commands
             Process.Start(@"https://go.microsoft.com/fwlink/?linkid=785972");
         }
 
-        public override int CommandId
-        {
-            get { return (int)PkgCmdId.cmdidShowDocumentation; }
-        }
+        public override int CommandId => (int)PkgCmdId.cmdidShowDocumentation;
     }
 }

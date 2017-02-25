@@ -52,13 +52,7 @@ namespace Microsoft.NodejsTools.Debugger
             this._process.SendResumeThread(this._identity);
         }
 
-        public bool IsWorkerThread
-        {
-            get
-            {
-                return this._isWorkerThread;
-            }
-        }
+        public bool IsWorkerThread => this._isWorkerThread;
 
         internal void ClearSteppingState()
         {
@@ -67,38 +61,14 @@ namespace Microsoft.NodejsTools.Debugger
 
         public IList<NodeStackFrame> Frames { get; set; }
 
-        public int CallstackDepth
-        {
-            get
-            {
-                return this.Frames != null ? this.Frames.Count : 0;
-            }
-        }
+        public int CallstackDepth => this.Frames != null ? this.Frames.Count : 0;
 
-        public NodeStackFrame TopStackFrame
-        {
-            get
-            {
-                return this.Frames != null && this.Frames.Count > 0 ? this.Frames[0] : null;
-            }
-        }
+        public NodeStackFrame TopStackFrame => this.Frames != null && this.Frames.Count > 0 ? this.Frames[0] : null;
 
-        public NodeDebugger Process
-        {
-            get
-            {
-                return this._process;
-            }
-        }
+        public NodeDebugger Process => this._process;
 
         public string Name { get; set; }
 
-        internal int Id
-        {
-            get
-            {
-                return this._identity;
-            }
-        }
+        internal int Id => this._identity;
     }
 }

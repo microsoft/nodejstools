@@ -53,11 +53,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             this._deleted = false;
         }
 
-        public BP_PASSCOUNT PassCount
-        {
-            get { return this._bpRequestInfo.bpPassCount; }
-        }
-
+        public BP_PASSCOUNT PassCount => this._bpRequestInfo.bpPassCount;
         public string DocumentName
         {
             get
@@ -141,7 +137,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             {
                 lock (this._breakpoint)
                 {
-                    foreach (NodeBreakpointBinding binding in this._breakpoint.GetBindings())
+                    foreach (var binding in this._breakpoint.GetBindings())
                     {
                         var boundBreakpoint = (IDebugBoundBreakpoint2)this._bpManager.GetBoundBreakpoint(binding);
                         boundBreakpoint.Enable(fEnable);
@@ -161,7 +157,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             {
                 lock (this._breakpoint)
                 {
-                    IDebugBoundBreakpoint2[] boundBreakpoints = this._breakpoint.GetBindings()
+                    var boundBreakpoints = this._breakpoint.GetBindings()
                         .Select(binding => this._bpManager.GetBoundBreakpoint(binding))
                         .Cast<IDebugBoundBreakpoint2>().ToArray();
 
@@ -180,7 +176,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             // display information about why the breakpoint did not bind to the user.
             lock (this._breakpointErrors)
             {
-                IDebugErrorBreakpoint2[] breakpointErrors = this._breakpointErrors.Cast<IDebugErrorBreakpoint2>().ToArray();
+                var breakpointErrors = this._breakpointErrors.Cast<IDebugErrorBreakpoint2>().ToArray();
                 ppEnum = new AD7ErrorBreakpointsEnum(breakpointErrors);
             }
 
@@ -265,7 +261,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             {
                 lock (this._breakpoint)
                 {
-                    foreach (NodeBreakpointBinding binding in this._breakpoint.GetBindings())
+                    foreach (var binding in this._breakpoint.GetBindings())
                     {
                         var boundBreakpoint = (IDebugBoundBreakpoint2)this._bpManager.GetBoundBreakpoint(binding);
                         if (boundBreakpoint != null)

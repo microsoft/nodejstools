@@ -45,19 +45,11 @@ namespace Microsoft.VisualStudioTools
         /// <summary>
         /// Returns the string to use for the language name.
         /// </summary>
-        public string LanguageStringId
-        {
-            get { return this._languageStringId; }
-        }
-
+        public string LanguageStringId => this._languageStringId;
         /// <summary>
         /// Returns the paths to look for snippets.
         /// </summary>
-        public string Paths
-        {
-            get { return this._paths; }
-        }
-
+        public string Paths => this._paths;
         /// <summary>
         /// The reg key name of the project.
         /// </summary>
@@ -75,13 +67,13 @@ namespace Microsoft.VisualStudioTools
         /// </param>
         public override void Register(RegistrationContext context)
         {
-            using (Key childKey = context.CreateKey(LanguageName()))
+            using (var childKey = context.CreateKey(LanguageName()))
             {
-                string snippetPaths = context.ComponentPath;
+                var snippetPaths = context.ComponentPath;
                 snippetPaths = System.IO.Path.Combine(snippetPaths, this.Paths);
                 snippetPaths = context.EscapePath(System.IO.Path.GetFullPath(snippetPaths));
 
-                using (Key pathsSubKey = childKey.CreateSubkey("Paths"))
+                using (var pathsSubKey = childKey.CreateSubkey("Paths"))
                 {
                     pathsSubKey.SetValue(this._description, snippetPaths);
                 }

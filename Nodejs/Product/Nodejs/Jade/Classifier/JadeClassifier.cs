@@ -38,7 +38,7 @@ namespace Microsoft.NodejsTools.Jade
                 var index = tokens.GetFirstItemAfterPosition(line.Start);
                 if (index >= 0)
                 {
-                    for (int i = index; i >= 0; i--)
+                    for (var i = index; i >= 0; i--)
                     {
                         if (IsAnchorToken(tokens[i].TokenType))
                         {
@@ -49,7 +49,7 @@ namespace Microsoft.NodejsTools.Jade
                 }
 
                 int start = line.Start;
-                int end = tokens[tokens.Count - 1].End;
+                var end = tokens[tokens.Count - 1].End;
 
                 if (start < end)
                     tokens.RemoveInRange(TextRange.FromBounds(start, end), true);
@@ -70,7 +70,7 @@ namespace Microsoft.NodejsTools.Jade
                 if (index < 0)
                     index = this.Tokens.Count - 1;
 
-                for (int i = index; i >= 0; i--)
+                for (var i = index; i >= 0; i--)
                 {
                     if (IsAnchorToken(this.Tokens[i].TokenType))
                     {

@@ -53,7 +53,7 @@ namespace Microsoft.VisualStudioTools
                         if (this._compMgr == null)
                         {
                             this._compMgr = (IOleComponentManager)this._serviceProvider.GetService(typeof(SOleComponentManager));
-                            OLECRINFO[] crInfo = new OLECRINFO[1];
+                            var crInfo = new OLECRINFO[1];
                             crInfo[0].cbSize = (uint)Marshal.SizeOf(typeof(OLECRINFO));
                             crInfo[0].grfcrf = (uint)_OLECRF.olecrfNeedIdleTime;
                             crInfo[0].grfcadvf = (uint)0;
