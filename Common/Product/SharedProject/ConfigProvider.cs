@@ -13,10 +13,7 @@
  * ***************************************************************************/
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -45,26 +42,18 @@ namespace Microsoft.VisualStudioTools.Project
         internal const string x64Platform = "x64";
         internal const string ARMPlatform = "ARM";
 
-        private ProjectNode project;
         private EventSinkCollection cfgEventSinks = new EventSinkCollection();
-        private List<KeyValuePair<KeyValuePair<string, string>, string>> newCfgProps = new List<KeyValuePair<KeyValuePair<string, string>, string>>();
         private Dictionary<string, ProjectConfig> configurationsList = new Dictionary<string, ProjectConfig>();
 
         public ConfigProvider(ProjectNode manager)
         {
-            this.project = manager;
+            this.ProjectMgr = manager;
         }
 
         /// <summary>
         /// The associated project.
         /// </summary>
-        internal ProjectNode ProjectMgr
-        {
-            get
-            {
-                return this.project;
-            }
-        }
+        internal ProjectNode ProjectMgr { get; }
 
         /// <summary>
         /// If the project system wants to add custom properties to the property group then 
@@ -72,17 +61,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// Returns/sets the [(<propName, propCondition>) <propValue>] collection
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual List<KeyValuePair<KeyValuePair<string, string>, string>> NewConfigProperties
-        {
-            get
-            {
-                return this.newCfgProps;
-            }
-            set
-            {
-                this.newCfgProps = value;
-            }
-        }
+        public virtual List<KeyValuePair<KeyValuePair<string, string>, string>> NewConfigProperties { get; set; } = new List<KeyValuePair<KeyValuePair<string, string>, string>>();
 
         /// <summary>
         /// Creates new Project Configuartion objects based on the configuration name.
@@ -97,7 +76,7 @@ namespace Microsoft.VisualStudioTools.Project
                 return this.configurationsList[configName];
             }
 
-            ProjectConfig requestedConfiguration = CreateProjectConfiguration(configName);
+            var requestedConfiguration = CreateProjectConfiguration(configName);
             this.configurationsList.Add(configName, requestedConfiguration);
 
             return requestedConfiguration;
@@ -123,16 +102,16 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             // First create the condition that represent the configuration we want to clone
-            string condition = (cloneName == null ? String.Empty : String.Format(CultureInfo.InvariantCulture, configString, cloneName).Trim());
+            var condition = (cloneName == null ? string.Empty : string.Format(CultureInfo.InvariantCulture, configString, cloneName).Trim());
 
             // Get all configs
-            List<ProjectPropertyGroupElement> configGroup = new List<ProjectPropertyGroupElement>(this.project.BuildProject.Xml.PropertyGroups);
+            var configGroup = new List<ProjectPropertyGroupElement>(this.ProjectMgr.BuildProject.Xml.PropertyGroups);
             ProjectPropertyGroupElement configToClone = null;
 
             if (cloneName != null)
             {
                 // Find the configuration to clone
-                foreach (ProjectPropertyGroupElement currentConfig in configGroup)
+                foreach (var currentConfig in configGroup)
                 {
                     // Only care about conditional property groups
                     if (currentConfig.Condition == null || currentConfig.Condition.Length == 0)
@@ -141,8 +120,10 @@ namespace Microsoft.VisualStudioTools.Project
                     }
 
                     // Skip if it isn't the group we want
-                    if (String.Compare(currentConfig.Condition.Trim(), condition, StringComparison.OrdinalIgnoreCase) != 0)
+                    if (StringComparer.OrdinalIgnoreCase.Equals(currentConfig.Condition.Trim(), condition))
+                    {
                         continue;
+                    }
 
                     configToClone = currentConfig;
                 }
@@ -152,10 +133,10 @@ namespace Microsoft.VisualStudioTools.Project
             if (configToClone != null)
             {
                 // Clone the configuration settings
-                newConfig = this.project.ClonePropertyGroup(configToClone);
+                newConfig = this.ProjectMgr.ClonePropertyGroup(configToClone);
                 //Will be added later with the new values to the path
 
-                foreach (ProjectPropertyElement property in newConfig.Properties)
+                foreach (var property in newConfig.Properties)
                 {
                     if (property.Name.Equals("OutputPath", StringComparison.OrdinalIgnoreCase))
                     {
@@ -166,25 +147,27 @@ namespace Microsoft.VisualStudioTools.Project
             else
             {
                 // no source to clone from, lets just create a new empty config
-                newConfig = this.project.BuildProject.Xml.AddPropertyGroup();
+                newConfig = this.ProjectMgr.BuildProject.Xml.AddPropertyGroup();
                 // Get the list of property name, condition value from the config provider
-                IList<KeyValuePair<KeyValuePair<string, string>, string>> propVals = this.NewConfigProperties;
-                foreach (KeyValuePair<KeyValuePair<string, string>, string> data in propVals)
+                var propVals = this.NewConfigProperties;
+                foreach (var data in propVals)
                 {
-                    KeyValuePair<string, string> propData = data.Key;
-                    string value = data.Value;
-                    ProjectPropertyElement newProperty = newConfig.AddProperty(propData.Key, value);
-                    if (!String.IsNullOrEmpty(propData.Value))
+                    var propData = data.Key;
+                    var value = data.Value;
+                    var newProperty = newConfig.AddProperty(propData.Key, value);
+                    if (!string.IsNullOrEmpty(propData.Value))
+                    {
                         newProperty.Condition = propData.Value;
+                    }
                 }
             }
 
             //add the output path
-            string outputBasePath = this.ProjectMgr.OutputBaseRelativePath;
+            var outputBasePath = this.ProjectMgr.OutputBaseRelativePath;
             newConfig.AddProperty("OutputPath", CommonUtils.NormalizeDirectoryPath(Path.Combine(outputBasePath, name)));
 
             // Set the condition that will define the new configuration
-            string newCondition = String.Format(CultureInfo.InvariantCulture, configString, name);
+            var newCondition = string.Format(CultureInfo.InvariantCulture, configString, name);
             newConfig.Condition = newCondition;
 
             NotifyOnCfgNameAdded(name);
@@ -222,17 +205,17 @@ namespace Microsoft.VisualStudioTools.Project
                 return VSConstants.S_OK;
             }
             // Verify that this config exist
-            string[] configs = GetPropertiesConditionedOn(ProjectFileConstants.Configuration);
-            foreach (string config in configs)
+            var configs = GetPropertiesConditionedOn(ProjectFileConstants.Configuration);
+            foreach (var config in configs)
             {
-                if (String.Compare(config, name, StringComparison.OrdinalIgnoreCase) == 0)
+                if (string.Compare(config, name, StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     // Create condition of config to remove
-                    string condition = String.Format(CultureInfo.InvariantCulture, configString, config);
+                    var condition = string.Format(CultureInfo.InvariantCulture, configString, config);
 
-                    foreach (ProjectPropertyGroupElement element in this.project.BuildProject.Xml.PropertyGroups)
+                    foreach (var element in this.ProjectMgr.BuildProject.Xml.PropertyGroups)
                     {
-                        if (String.Equals(element.Condition, condition, StringComparison.OrdinalIgnoreCase))
+                        if (StringComparer.OrdinalIgnoreCase.Equals(element.Condition, condition))
                         {
                             element.Parent.RemoveChild(element);
                         }
@@ -266,21 +249,25 @@ namespace Microsoft.VisualStudioTools.Project
         public virtual int GetCfgNames(uint celt, string[] names, uint[] actual)
         {
             // get's called twice, once for allocation, then for retrieval            
-            int i = 0;
+            var i = 0;
 
-            string[] configList = GetPropertiesConditionedOn(ProjectFileConstants.Configuration);
+            var configList = GetPropertiesConditionedOn(ProjectFileConstants.Configuration);
 
             if (names != null)
             {
-                foreach (string config in configList)
+                foreach (var config in configList)
                 {
                     names[i++] = config;
                     if (i == celt)
+                    {
                         break;
+                    }
                 }
             }
             else
+            {
                 i = configList.Length;
+            }
 
             if (actual != null)
             {
@@ -354,12 +341,12 @@ namespace Microsoft.VisualStudioTools.Project
                 flags[0] = 0;
             }
 
-            int i = 0;
-            string[] configList = GetPropertiesConditionedOn(ProjectFileConstants.Configuration);
+            var i = 0;
+            var configList = GetPropertiesConditionedOn(ProjectFileConstants.Configuration);
 
             if (a != null)
             {
-                foreach (string configName in configList)
+                foreach (var configName in configList)
                 {
                     a[i] = this.GetProjectConfiguration(configName);
 
@@ -392,7 +379,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code.</returns>
         public virtual int GetPlatformNames(uint celt, string[] names, uint[] actual)
         {
-            string[] platforms = this.GetPlatformsFromProject();
+            var platforms = this.GetPlatformsFromProject();
             return GetPlatforms(celt, names, actual, platforms);
         }
 
@@ -405,7 +392,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code.</returns>
         public virtual int GetSupportedPlatformNames(uint celt, string[] names, uint[] actual)
         {
-            string[] platforms = this.GetSupportedPlatformsFromProject();
+            var platforms = this.GetSupportedPlatformsFromProject();
             return GetPlatforms(celt, names, actual, platforms);
         }
 
@@ -418,24 +405,28 @@ namespace Microsoft.VisualStudioTools.Project
         public virtual int RenameCfgsOfCfgName(string old, string newname)
         {
             // First create the condition that represent the configuration we want to rename
-            string condition = String.Format(CultureInfo.InvariantCulture, configString, old).Trim();
+            var condition = string.Format(CultureInfo.InvariantCulture, configString, old).Trim();
 
-            foreach (ProjectPropertyGroupElement config in this.project.BuildProject.Xml.PropertyGroups)
+            foreach (var config in this.ProjectMgr.BuildProject.Xml.PropertyGroups)
             {
                 // Only care about conditional property groups
                 if (config.Condition == null || config.Condition.Length == 0)
+                {
                     continue;
+                }
 
                 // Skip if it isn't the group we want
-                if (String.Compare(config.Condition.Trim(), condition, StringComparison.OrdinalIgnoreCase) != 0)
+                if (StringComparer.OrdinalIgnoreCase.Equals(config.Condition.Trim(), condition))
+                {
                     continue;
+                }
 
                 // Change the name 
-                config.Condition = String.Format(CultureInfo.InvariantCulture, configString, newname);
+                config.Condition = string.Format(CultureInfo.InvariantCulture, configString, newname);
                 // Update the name in our config list
                 if (this.configurationsList.ContainsKey(old))
                 {
-                    ProjectConfig configuration = this.configurationsList[old];
+                    var configuration = this.configurationsList[old];
                     this.configurationsList.Remove(old);
                     this.configurationsList.Add(newname, configuration);
                     // notify the configuration of its new name
@@ -541,14 +532,14 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>An array of platform names.</returns>
         private string[] GetPlatformsFromProject()
         {
-            string[] platforms = GetPropertiesConditionedOn(ProjectFileConstants.Platform);
+            var platforms = GetPropertiesConditionedOn(ProjectFileConstants.Platform);
 
             if (platforms == null || platforms.Length == 0)
             {
-                return new string[] { x86Platform, AnyCPUPlatform, x64Platform, ARMPlatform };
+                return new[] { x86Platform, AnyCPUPlatform, x64Platform, ARMPlatform };
             }
 
-            for (int i = 0; i < platforms.Length; i++)
+            for (var i = 0; i < platforms.Length; i++)
             {
                 platforms[i] = ConvertPlatformToVsProject(platforms[i]);
             }
@@ -562,11 +553,11 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>An array of supported platform names.</returns>
         internal string[] GetSupportedPlatformsFromProject()
         {
-            string platforms = this.ProjectMgr.BuildProject.GetPropertyValue(ProjectFileConstants.AvailablePlatforms);
+            var platforms = this.ProjectMgr.BuildProject.GetPropertyValue(ProjectFileConstants.AvailablePlatforms);
 
             if (platforms == null)
             {
-                return new string[] { };
+                return Array.Empty<string>();
             }
 
             if (platforms.Contains(","))
@@ -574,7 +565,7 @@ namespace Microsoft.VisualStudioTools.Project
                 return platforms.Split(',');
             }
 
-            return new string[] { platforms };
+            return new[] { platforms };
         }
 
         /// <summary>
@@ -584,7 +575,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>The new name.</returns>
         private static string ConvertPlatformToVsProject(string oldPlatformName)
         {
-            if (String.Compare(oldPlatformName, ProjectFileValues.AnyCPU, StringComparison.OrdinalIgnoreCase) == 0)
+            if (StringComparer.OrdinalIgnoreCase.Equals(oldPlatformName, ProjectFileValues.AnyCPU))
             {
                 return AnyCPUPlatform;
             }
@@ -627,7 +618,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             uint returned = 0;
-            for (int i = 0; i < platforms.Length && names.Length > returned; i++)
+            for (var i = 0; i < platforms.Length && names.Length > returned; i++)
             {
                 names[returned] = platforms[i];
                 returned++;
@@ -652,11 +643,10 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         internal string[] GetPropertiesConditionedOn(string constant)
         {
-            List<string> configurations = null;
-            this.project.BuildProject.ReevaluateIfNecessary();
-            this.project.BuildProject.ConditionedProperties.TryGetValue(constant, out configurations);
+            this.ProjectMgr.BuildProject.ReevaluateIfNecessary();
+            this.ProjectMgr.BuildProject.ConditionedProperties.TryGetValue(constant, out var configurations);
 
-            return (configurations == null) ? new string[] { } : configurations.ToArray();
+            return (configurations == null) ? Array.Empty<string>() : configurations.ToArray();
         }
     }
 }

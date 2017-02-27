@@ -44,32 +44,18 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <summary>
         /// Defines the NodeProperties object that contains the defines the properties.
         /// </summary>
-        public NodeProperties Target
-        {
-            get
-            {
-                return this.target;
-            }
-        }
+        public NodeProperties Target => this.target;
 
         #region EnvDTE.Properties
 
         /// <summary>
         /// Microsoft Internal Use Only.
         /// </summary>
-        public virtual object Application
-        {
-            get { return null; }
-        }
-
+        public virtual object Application => null;
         /// <summary>
         /// Gets a value indicating the number of objects in the collection.
         /// </summary>
-        public int Count
-        {
-            get { return this.properties.Count; }
-        }
-
+        public int Count => this.properties.Count;
         /// <summary>
         /// Gets the top-level extensibility object.
         /// </summary>
@@ -114,7 +100,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             if (index is string)
             {
-                string indexAsString = (string)index;
+                var indexAsString = (string)index;
                 if (this.properties.ContainsKey(indexAsString))
                 {
                     return (EnvDTE.Property)this.properties[indexAsString];
@@ -122,12 +108,12 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             }
             else if (index is int)
             {
-                int realIndex = (int)index - 1;
+                var realIndex = (int)index - 1;
                 if (realIndex >= 0 && realIndex < this.properties.Count)
                 {
-                    IEnumerator enumerator = this.properties.Values.GetEnumerator();
+                    var enumerator = this.properties.Values.GetEnumerator();
 
-                    int i = 0;
+                    var i = 0;
                     while (enumerator.MoveNext())
                     {
                         if (i++ == realIndex)
@@ -143,10 +129,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <summary>
         /// Gets the immediate parent object of a Properties collection.
         /// </summary>
-        public virtual object Parent
-        {
-            get { return null; }
-        }
+        public virtual object Parent => null;
         #endregion
 
         #region methods
@@ -165,8 +148,8 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             }
 
             // Add all properties being ComVisible and AutomationVisible 
-            PropertyInfo[] propertyInfos = targetType.GetProperties();
-            foreach (PropertyInfo propertyInfo in propertyInfos)
+            var propertyInfos = targetType.GetProperties();
+            foreach (var propertyInfo in propertyInfos)
             {
                 if (!IsInMap(propertyInfo) && IsComVisible(propertyInfo) && IsAutomationVisible(propertyInfo))
                 {
@@ -184,7 +167,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         private void AddProperty(PropertyInfo propertyInfo)
         {
             var attrs = propertyInfo.GetCustomAttributes(typeof(PropertyNameAttribute), false);
-            string name = propertyInfo.Name;
+            var name = propertyInfo.Name;
             if (attrs.Length > 0)
             {
                 name = ((PropertyNameAttribute)attrs[0]).Name;
@@ -202,7 +185,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
         private static bool IsAutomationVisible(PropertyInfo propertyInfo)
         {
-            object[] customAttributesOnProperty = propertyInfo.GetCustomAttributes(typeof(AutomationBrowsableAttribute), true);
+            var customAttributesOnProperty = propertyInfo.GetCustomAttributes(typeof(AutomationBrowsableAttribute), true);
 
             foreach (AutomationBrowsableAttribute attr in customAttributesOnProperty)
             {
@@ -216,7 +199,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
         private static bool IsComVisible(Type targetType)
         {
-            object[] customAttributesOnProperty = targetType.GetCustomAttributes(typeof(ComVisibleAttribute), true);
+            var customAttributesOnProperty = targetType.GetCustomAttributes(typeof(ComVisibleAttribute), true);
 
             foreach (ComVisibleAttribute attr in customAttributesOnProperty)
             {
@@ -230,7 +213,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
         private static bool IsComVisible(PropertyInfo propertyInfo)
         {
-            object[] customAttributesOnProperty = propertyInfo.GetCustomAttributes(typeof(ComVisibleAttribute), true);
+            var customAttributesOnProperty = propertyInfo.GetCustomAttributes(typeof(ComVisibleAttribute), true);
 
             foreach (ComVisibleAttribute attr in customAttributesOnProperty)
             {

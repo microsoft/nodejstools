@@ -15,8 +15,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Security.Permissions;
 using Microsoft.VisualStudio;
@@ -53,39 +51,15 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         private static volatile object Mutex = new object();
 
-        private FORMATETC format;
-
-        private long data;
-
-        private DATADIR dataDir;
-
         private bool isDisposed;
         #endregion
 
         #region properties
-        internal FORMATETC Format
-        {
-            get
-            {
-                return this.format;
-            }
-        }
+        internal FORMATETC Format { get; }
 
-        internal long Data
-        {
-            get
-            {
-                return this.data;
-            }
-        }
+        internal long Data { get; private set; }
 
-        internal DATADIR DataDir
-        {
-            get
-            {
-                return this.dataDir;
-            }
-        }
+        internal DATADIR DataDir { get; }
 
         #endregion
 
@@ -94,9 +68,9 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         internal DataCacheEntry(FORMATETC fmt, IntPtr data, DATADIR dir)
         {
-            this.format = fmt;
-            this.data = (long)data;
-            this.dataDir = dir;
+            this.Format = fmt;
+            this.Data = (long)data;
+            this.DataDir = dir;
         }
 
         #region Dispose
@@ -126,10 +100,10 @@ namespace Microsoft.VisualStudioTools.Project
                 // Synchronize calls to the Dispose simulteniously.
                 lock (Mutex)
                 {
-                    if (disposing && this.data != 0)
+                    if (disposing && this.Data != 0)
                     {
-                        Marshal.FreeHGlobal((IntPtr)this.data);
-                        this.data = 0;
+                        Marshal.FreeHGlobal((IntPtr)this.Data);
+                        this.Data = 0;
                     }
 
                     this.isDisposed = true;
@@ -167,7 +141,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             Utilities.ArgumentNotNull("e", e);
 
-            STATDATA sdata = new STATDATA();
+            var sdata = new STATDATA();
 
             sdata.ADVF = adv;
             sdata.FORMATETC = e[0];
@@ -201,10 +175,12 @@ namespace Microsoft.VisualStudioTools.Project
 
         void IDataObject.GetData(FORMATETC[] fmt, STGMEDIUM[] m)
         {
-            STGMEDIUM retMedium = new STGMEDIUM();
+            var retMedium = new STGMEDIUM();
 
             if (fmt == null || fmt.Length < 1)
+            {
                 return;
+            }
 
             foreach (DataCacheEntry e in this.entries)
             {
@@ -219,7 +195,9 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             if (m != null && m.Length > 0)
+            {
                 m[0] = retMedium;
+            }
         }
 
         void IDataObject.GetDataHere(FORMATETC[] fmt, STGMEDIUM[] m)
@@ -229,12 +207,16 @@ namespace Microsoft.VisualStudioTools.Project
         int IDataObject.QueryGetData(FORMATETC[] fmt)
         {
             if (fmt == null || fmt.Length < 1)
+            {
                 return VSConstants.S_FALSE;
+            }
 
             foreach (DataCacheEntry e in this.entries)
             {
                 if (e.Format.cfFormat == fmt[0].cfFormat /*|| fmt[0].cfFormat == InternalNativeMethods.CF_HDROP*/)
+                {
                     return VSConstants.S_OK;
+                }
             }
 
             return VSConstants.S_FALSE;
@@ -265,7 +247,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public static FORMATETC CreateFormatEtc(ushort iFormat)
         {
-            FORMATETC fmt = new FORMATETC();
+            var fmt = new FORMATETC();
             fmt.cfFormat = iFormat;
             fmt.ptd = IntPtr.Zero;
             fmt.dwAspect = (uint)DVASPECT.DVASPECT_CONTENT;
@@ -276,9 +258,9 @@ namespace Microsoft.VisualStudioTools.Project
 
         public static int QueryGetData(Microsoft.VisualStudio.OLE.Interop.IDataObject pDataObject, ref FORMATETC fmtetc)
         {
-            FORMATETC[] af = new FORMATETC[1];
+            var af = new FORMATETC[1];
             af[0] = fmtetc;
-            int result = pDataObject.QueryGetData(af);
+            var result = pDataObject.QueryGetData(af);
             if (result == VSConstants.S_OK)
             {
                 fmtetc = af[0];
@@ -289,9 +271,9 @@ namespace Microsoft.VisualStudioTools.Project
 
         public static STGMEDIUM GetData(Microsoft.VisualStudio.OLE.Interop.IDataObject pDataObject, ref FORMATETC fmtetc)
         {
-            FORMATETC[] af = new FORMATETC[1];
+            var af = new FORMATETC[1];
             af[0] = fmtetc;
-            STGMEDIUM[] sm = new STGMEDIUM[1];
+            var sm = new STGMEDIUM[1];
             pDataObject.GetData(af, sm);
             fmtetc = af[0];
             return sm[0];
@@ -303,34 +285,34 @@ namespace Microsoft.VisualStudioTools.Project
         public static List<string> GetDroppedFiles(ushort format, Microsoft.VisualStudio.OLE.Interop.IDataObject dataObject, out DropDataType ddt)
         {
             ddt = DropDataType.None;
-            List<string> droppedFiles = new List<string>();
+            var droppedFiles = new List<string>();
 
             // try HDROP
-            FORMATETC fmtetc = CreateFormatEtc(format);
+            var fmtetc = CreateFormatEtc(format);
 
             if (QueryGetData(dataObject, ref fmtetc) == VSConstants.S_OK)
             {
-                STGMEDIUM stgmedium = DragDropHelper.GetData(dataObject, ref fmtetc);
+                var stgmedium = DragDropHelper.GetData(dataObject, ref fmtetc);
                 if (stgmedium.tymed == (uint)TYMED.TYMED_HGLOBAL)
                 {
                     // We are releasing the cloned hglobal here.
-                    IntPtr dropInfoHandle = stgmedium.unionmember;
+                    var dropInfoHandle = stgmedium.unionmember;
                     if (dropInfoHandle != IntPtr.Zero)
                     {
                         ddt = DropDataType.Shell;
                         try
                         {
-                            uint numFiles = UnsafeNativeMethods.DragQueryFile(dropInfoHandle, 0xFFFFFFFF, null, 0);
+                            var numFiles = UnsafeNativeMethods.DragQueryFile(dropInfoHandle, 0xFFFFFFFF, null, 0);
 
                             // We are a directory based project thus a projref string is placed on the clipboard.
                             // We assign the maximum length of a projref string.
                             // The format of a projref is : <Proj Guid>|<project rel path>|<file path>
-                            uint lenght = (uint)Guid.Empty.ToString().Length + 2 * NativeMethods.MAX_PATH + 2;
-                            char[] moniker = new char[lenght + 1];
+                            var lenght = (uint)Guid.Empty.ToString().Length + 2 * NativeMethods.MAX_PATH + 2;
+                            var moniker = new char[lenght + 1];
                             for (uint fileIndex = 0; fileIndex < numFiles; fileIndex++)
                             {
-                                uint queryFileLength = UnsafeNativeMethods.DragQueryFile(dropInfoHandle, fileIndex, moniker, lenght);
-                                string filename = new String(moniker, 0, (int)queryFileLength);
+                                var queryFileLength = UnsafeNativeMethods.DragQueryFile(dropInfoHandle, fileIndex, moniker, lenght);
+                                var filename = new string(moniker, 0, (int)queryFileLength);
                                 droppedFiles.Add(filename);
                             }
                         }
@@ -345,28 +327,28 @@ namespace Microsoft.VisualStudioTools.Project
             return droppedFiles;
         }
 
-        public static string GetSourceProjectPath(Microsoft.VisualStudio.OLE.Interop.IDataObject dataObject)
+        public static string GetSourceProjectPath(IDataObject dataObject)
         {
             string projectPath = null;
-            FORMATETC fmtetc = CreateFormatEtc(CF_VSPROJECTCLIPDESCRIPTOR);
+            var fmtetc = CreateFormatEtc(CF_VSPROJECTCLIPDESCRIPTOR);
 
             if (QueryGetData(dataObject, ref fmtetc) == VSConstants.S_OK)
             {
-                STGMEDIUM stgmedium = DragDropHelper.GetData(dataObject, ref fmtetc);
+                var stgmedium = DragDropHelper.GetData(dataObject, ref fmtetc);
                 if (stgmedium.tymed == (uint)TYMED.TYMED_HGLOBAL)
                 {
                     // We are releasing the cloned hglobal here.
-                    IntPtr dropInfoHandle = stgmedium.unionmember;
+                    var dropInfoHandle = stgmedium.unionmember;
                     if (dropInfoHandle != IntPtr.Zero)
                     {
                         try
                         {
-                            string path = GetData(dropInfoHandle);
+                            var path = GetData(dropInfoHandle);
 
                             // Clone the path that we can release our memory.
-                            if (!String.IsNullOrEmpty(path))
+                            if (!string.IsNullOrEmpty(path))
                             {
-                                projectPath = String.Copy(path);
+                                projectPath = string.Copy(path);
                             }
                         }
                         finally
@@ -387,13 +369,13 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns></returns>
         internal static string GetData(IntPtr dropHandle)
         {
-            IntPtr data = UnsafeNativeMethods.GlobalLock(dropHandle);
+            var data = UnsafeNativeMethods.GlobalLock(dropHandle);
             try
             {
-                _DROPFILES df = (_DROPFILES)Marshal.PtrToStructure(data, typeof(_DROPFILES));
+                var df = (_DROPFILES)Marshal.PtrToStructure(data, typeof(_DROPFILES));
                 if (df.fWide != 0)
                 {
-                    IntPtr pdata = new IntPtr((long)data + df.pFiles);
+                    var pdata = new IntPtr((long)data + df.pFiles);
                     return Marshal.PtrToStringUni(pdata);
                 }
             }
@@ -410,16 +392,16 @@ namespace Microsoft.VisualStudioTools.Project
 
         internal static IntPtr CopyHGlobal(IntPtr data)
         {
-            IntPtr src = UnsafeNativeMethods.GlobalLock(data);
+            var src = UnsafeNativeMethods.GlobalLock(data);
             var size = UnsafeNativeMethods.GlobalSize(data).ToInt32();
-            IntPtr ptr = Marshal.AllocHGlobal(size);
-            IntPtr buffer = UnsafeNativeMethods.GlobalLock(ptr);
+            var ptr = Marshal.AllocHGlobal(size);
+            var buffer = UnsafeNativeMethods.GlobalLock(ptr);
 
             try
             {
-                for (int i = 0; i < size; i++)
+                for (var i = 0; i < size; i++)
                 {
-                    byte val = Marshal.ReadByte(new IntPtr((long)src + i));
+                    var val = Marshal.ReadByte(new IntPtr((long)src + i));
 
                     Marshal.WriteByte(new IntPtr((long)buffer + i), val);
                 }
@@ -441,11 +423,13 @@ namespace Microsoft.VisualStudioTools.Project
 
         internal static void CopyStringToHGlobal(string s, IntPtr data, int bufferSize)
         {
-            Int16 nullTerminator = 0;
-            int dwSize = Marshal.SizeOf(nullTerminator);
+            const short nullTerminator = 0;
+            var dwSize = Marshal.SizeOf(nullTerminator);
 
             if ((s.Length + 1) * Marshal.SizeOf(s[0]) > bufferSize)
+            {
                 throw new System.IO.InternalBufferOverflowException();
+            }
             // IntPtr memory already locked...
             for (int i = 0, len = s.Length; i < len; i++)
             {
@@ -481,7 +465,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 if (this.e.MoveNext())
                 {
-                    STATDATA sdata = (STATDATA)this.e.Current;
+                    var sdata = (STATDATA)this.e.Current;
 
                     rc++;
                     if (d != null && d.Length > i)
@@ -540,7 +524,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 if (this.e.MoveNext())
                 {
-                    DataCacheEntry entry = (DataCacheEntry)this.e.Current;
+                    var entry = (DataCacheEntry)this.e.Current;
 
                     rc++;
                     if (d != null && d.Length > i)
@@ -555,7 +539,10 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             if (fetched != null && fetched.Length > 0)
+            {
                 fetched[0] = rc;
+            }
+
             return VSConstants.S_OK;
         }
 

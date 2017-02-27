@@ -117,7 +117,7 @@ namespace Microsoft.VisualStudioTools.Project
         private void GetFeeds(string feed)
         {
             var doc = new XPathDocument(feed);
-            XmlNamespaceManager mngr = new XmlNamespaceManager(new NameTable());
+            var mngr = new XmlNamespaceManager(new NameTable());
             mngr.AddNamespace("x", "http://www.w3.org/2005/Atom");
 
             var nav = doc.CreateNavigator();
@@ -212,8 +212,8 @@ namespace Microsoft.VisualStudioTools.Project
 
             public int Compare(object x, object y)
             {
-                ListViewItem itemX = (ListViewItem)x;
-                ListViewItem itemY = (ListViewItem)y;
+                var itemX = (ListViewItem)x;
+                var itemY = (ListViewItem)y;
 
                 int? res = null;
                 if (this.Column == 1)
@@ -228,7 +228,7 @@ namespace Microsoft.VisualStudioTools.Project
 
                 if (res == null)
                 {
-                    res = String.Compare(
+                    res = string.Compare(
                        itemX.SubItems[0].Text,
                        itemY.SubItems[0].Text,
                        true
@@ -273,24 +273,24 @@ namespace Microsoft.VisualStudioTools.Project
                     break;
                 case VSConstants.CPPM_GETSELECTION:
                     var items = new PackageInfo[this._productsList.SelectedItems.Count];
-                    for (int i = 0; i < items.Length; i++)
+                    for (var i = 0; i < items.Length; i++)
                     {
                         items[i] = (PackageInfo)this._productsList.SelectedItems[0].Tag;
                     }
-                    int count = items != null ? items.Length : 0;
+                    var count = items != null ? items.Length : 0;
                     Marshal.WriteByte(m.WParam, Convert.ToByte(count));
                     if (count > 0)
                     {
-                        IntPtr ppItems = Marshal.AllocCoTaskMem(
+                        var ppItems = Marshal.AllocCoTaskMem(
                           count * Marshal.SizeOf(typeof(IntPtr)));
-                        for (int i = 0; i < count; i++)
+                        for (var i = 0; i < count; i++)
                         {
-                            IntPtr pItem = Marshal.AllocCoTaskMem(
+                            var pItem = Marshal.AllocCoTaskMem(
                                     Marshal.SizeOf(typeof(VSCOMPONENTSELECTORDATA)));
                             Marshal.WriteIntPtr(
                                 ppItems + i * Marshal.SizeOf(typeof(IntPtr)),
                                 pItem);
-                            VSCOMPONENTSELECTORDATA data = new VSCOMPONENTSELECTORDATA()
+                            var data = new VSCOMPONENTSELECTORDATA()
                             {
                                 dwSize = (uint)Marshal.SizeOf(typeof(VSCOMPONENTSELECTORDATA)),
                                 bstrFile = items[i].Feed,
@@ -304,19 +304,19 @@ namespace Microsoft.VisualStudioTools.Project
                     }
                     break;
                 case NativeMethods.WM_SIZE:
-                    IntPtr parentHwnd = NativeMethods.GetParent(this.Handle);
+                    var parentHwnd = NativeMethods.GetParent(this.Handle);
 
                     if (parentHwnd != IntPtr.Zero)
                     {
-                        IntPtr grandParentHwnd = NativeMethods.GetParent(parentHwnd);
+                        var grandParentHwnd = NativeMethods.GetParent(parentHwnd);
 
                         User32RECT parentClientRect, grandParentClientRect;
                         if (grandParentHwnd != IntPtr.Zero &&
                             NativeMethods.GetClientRect(parentHwnd, out parentClientRect) &&
                                 NativeMethods.GetClientRect(grandParentHwnd, out grandParentClientRect))
                         {
-                            int width = grandParentClientRect.Width;
-                            int height = grandParentClientRect.Height;
+                            var width = grandParentClientRect.Width;
+                            var height = grandParentClientRect.Height;
 
                             if ((parentClientRect.Width != width) || (parentClientRect.Height != height))
                             {
