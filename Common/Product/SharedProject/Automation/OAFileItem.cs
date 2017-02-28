@@ -267,13 +267,23 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <summary>
         /// Gets the ProjectItems for the object.
         /// </summary>
-        public override ProjectItems ProjectItems => this.Node.ProjectMgr.Site.GetUIThread().Invoke<ProjectItems>(() =>
-                                                                   {
-                                                                       if (this.Project.ProjectNode.CanFileNodesHaveChilds)
-                                                                           return new OAProjectItems(this.Project, this.Node);
-                                                                       else
-                                                                           return base.ProjectItems;
-                                                                   });
+        public override ProjectItems ProjectItems
+        {
+            get
+            {
+                return this.Node.ProjectMgr.Site.GetUIThread().Invoke<ProjectItems>(() =>
+                {
+                    if (this.Project.ProjectNode.CanFileNodesHaveChilds)
+                    {
+                        return new OAProjectItems(this.Project, this.Node);
+                    }
+                    else
+                    {
+                        return base.ProjectItems;
+                    }
+                });
+            }
+        }
 
         #endregion
 
@@ -359,6 +369,5 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             }
         }
         #endregion
-
     }
 }

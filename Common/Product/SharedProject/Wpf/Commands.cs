@@ -35,16 +35,20 @@ namespace Microsoft.VisualStudioTools.Wpf
         /// Displays UI to browse for a single folder and sets the TextBox that
         /// is specified as the CommandTarget to the selected path.
         /// </summary>
-        public static RoutedCommand BrowseFolder => _browseFolder;         /// <summary>
-                                                                           /// Displays UI to open a single file using the filter in
-                                                                           /// CommandParameter and sets the TextBox that is specified as the
-                                                                           /// CommandTarget to the selected path.
-                                                                           /// </summary>
-        public static RoutedCommand BrowseOpenFile => _browseOpenFile;         /// <summary>
-                                                                               /// Displays UI to save a single file using the filter in
-                                                                               /// CommandParameter and sets the TextBox that is specified as the
-                                                                               /// CommandTarget to the selected path.
-                                                                               /// </summary>
+        public static RoutedCommand BrowseFolder => _browseFolder;
+
+        /// <summary>
+        /// Displays UI to open a single file using the filter in
+        /// CommandParameter and sets the TextBox that is specified as the
+        /// CommandTarget to the selected path.
+        /// </summary>
+        public static RoutedCommand BrowseOpenFile => _browseOpenFile;
+
+        /// <summary>
+        /// Displays UI to save a single file using the filter in
+        /// CommandParameter and sets the TextBox that is specified as the
+        /// CommandTarget to the selected path.
+        /// </summary>
         public static RoutedCommand BrowseSaveFile => _browseSaveFile;
         /// <summary>
         /// Handles the CanExecute event for all commands defined in this class.
@@ -140,8 +144,8 @@ namespace Microsoft.VisualStudioTools.Wpf
             path = Dialogs.BrowseForFileOpen(
                 window == null ? IntPtr.Zero : new WindowInteropHelper(window).Handle,
                 filter,
-                path
-            );
+                path);
+
             if (path != null)
             {
                 tb.SetCurrentValue(TextBox.TextProperty, path);
@@ -162,8 +166,8 @@ namespace Microsoft.VisualStudioTools.Wpf
             path = Dialogs.BrowseForFileSave(
                 window == null ? IntPtr.Zero : new WindowInteropHelper(window).Handle,
                 filter,
-                path
-            );
+                path);
+
             if (path != null)
             {
                 tb.SetCurrentValue(TextBox.TextProperty, path);
