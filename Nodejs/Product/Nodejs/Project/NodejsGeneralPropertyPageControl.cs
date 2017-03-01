@@ -153,7 +153,7 @@ namespace Microsoft.NodejsTools.Project
             {
                 // TextBox requires \r\n for line separators, but XML can have either \n or \r\n, and we should treat those equally.
                 // (It will always have \r\n when we write it out, but users can edit it by other means.)
-                this._envVars.Text = lfToCrLfRegex.Replace(value ?? String.Empty, "\r\n");
+                this._envVars.Text = lfToCrLfRegex.Replace(value ?? string.Empty, "\r\n");
             }
         }
 
@@ -177,7 +177,7 @@ namespace Microsoft.NodejsTools.Project
         private void SetCueBanner()
         {
             var cueBanner = Nodejs.NodeExePath;
-            if (String.IsNullOrEmpty(cueBanner))
+            if (string.IsNullOrEmpty(cueBanner))
             {
                 cueBanner = Resources.NodejsNotInstalledShort;
             }
@@ -192,10 +192,10 @@ namespace Microsoft.NodejsTools.Project
 
         private void NodeExePathChanged(object sender, EventArgs e)
         {
-            if (String.IsNullOrEmpty(this._nodeExePath.Text) || this._nodeExePath.Text.Contains("$(") ||
+            if (string.IsNullOrEmpty(this._nodeExePath.Text) || this._nodeExePath.Text.Contains("$(") ||
                 File.Exists(Nodejs.GetAbsoluteNodeExePath(this._propPage.Project.ProjectHome, this._nodeExePath.Text)))
             {
-                this._nodeExeErrorProvider.SetError(this._nodeExePath, String.Empty);
+                this._nodeExeErrorProvider.SetError(this._nodeExePath, string.Empty);
             }
             else
             {
@@ -240,7 +240,7 @@ namespace Microsoft.NodejsTools.Project
             }
             else
             {
-                this._nodeExeErrorProvider.SetError(textSender, String.Empty);
+                this._nodeExeErrorProvider.SetError(textSender, string.Empty);
             }
             Changed(sender, e);
         }
@@ -253,7 +253,7 @@ namespace Microsoft.NodejsTools.Project
             }
             else
             {
-                this._nodeExeErrorProvider.SetError(this._workingDir, String.Empty);
+                this._nodeExeErrorProvider.SetError(this._workingDir, string.Empty);
             }
             Changed(sender, e);
         }

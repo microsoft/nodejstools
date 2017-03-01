@@ -47,7 +47,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote
         {
             if (port.Uri.Fragment == "#ping=0")
             {
-                return new NodeRemoteDebugProcess(port, "node.exe", String.Empty, String.Empty);
+                return new NodeRemoteDebugProcess(port, "node.exe", string.Empty, string.Empty);
             }
 
             NodeRemoteDebugProcess process = null;
@@ -98,7 +98,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote
                         LiveLogger.WriteLine("NodeRemoteEnumDebugProcesses debugger response: " + response);
 
                         // If we got to this point, the debuggee is behaving as expected, and we can report it as a valid Node.js process.
-                        process = new NodeRemoteDebugProcess(port, "node.exe", String.Empty, String.Empty);
+                        process = new NodeRemoteDebugProcess(port, "node.exe", string.Empty, string.Empty);
                         LiveLogger.WriteLine("NodeRemoteEnumDebugProcesses ping successful.");
                         break;
                     }

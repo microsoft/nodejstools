@@ -142,7 +142,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                     {
                         return existingChild.GetAutomationObject() as ProjectItem;
                     }
-                    throw new ArgumentException(String.Format(CultureInfo.CurrentCulture, "Folder already exists with the name '{0}'", name));
+                    throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "Folder already exists with the name '{0}'", name));
                 }
 
                 var proj = this.Project.ProjectNode;

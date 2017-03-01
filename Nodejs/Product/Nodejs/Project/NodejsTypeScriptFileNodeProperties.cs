@@ -23,9 +23,9 @@ namespace Microsoft.NodejsTools.Project
             get
             {
                 var framework = this.HierarchyNode.ItemNode.GetMetadata(SR.TestFramework);
-                if (String.IsNullOrWhiteSpace(framework))
+                if (string.IsNullOrWhiteSpace(framework))
                 {
-                    return String.Empty;
+                    return string.Empty;
                 }
                 return Convert.ToString(framework);
             }
@@ -52,9 +52,9 @@ namespace Microsoft.NodejsTools.Project
             get
             {
                 var framework = this.HierarchyNode.ItemNode.GetMetadata(SR.TestFramework);
-                if (String.IsNullOrEmpty(framework))
+                if (string.IsNullOrEmpty(framework))
                 {
-                    return String.Empty;
+                    return string.Empty;
                 }
                 return Convert.ToString(framework);
             }

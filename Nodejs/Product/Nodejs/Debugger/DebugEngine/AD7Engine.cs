@@ -263,7 +263,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
             this._loadComplete = true;
 
-            if (!String.IsNullOrWhiteSpace(this._webBrowserUrl))
+            if (!string.IsNullOrWhiteSpace(this._webBrowserUrl))
             {
                 var uri = new Uri(this._webBrowserUrl);
                 lock (this._syncLock)
@@ -1379,7 +1379,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             }
 
             // For .ts files, we need to build the project to regenerate .js code.
-            if (String.Equals(Path.GetExtension(module.FileName), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase))
+            if (StringComparer.OrdinalIgnoreCase.Equals(Path.GetExtension(module.FileName), NodejsConstants.TypeScriptExtension))
             {
                 if (document.ProjectItem.ContainingProject.GetNodeProject().Build(null, null) != MSBuildResult.Successful)
                 {
@@ -1404,7 +1404,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         internal static void MapLanguageInfo(string filename, out string pbstrLanguage, out Guid pguidLanguage)
         {
-            if (String.Equals(Path.GetExtension(filename), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase))
+            if (StringComparer.OrdinalIgnoreCase.Equals(Path.GetExtension(filename), NodejsConstants.TypeScriptExtension))
             {
                 pbstrLanguage = NodejsConstants.TypeScript;
                 pguidLanguage = Guids.TypeScriptDebugLanguage;

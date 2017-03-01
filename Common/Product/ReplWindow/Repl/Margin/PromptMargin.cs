@@ -189,7 +189,7 @@ namespace Microsoft.VisualStudio.Repl {
 
         public ITextViewMargin GetTextViewMargin(string marginName)
         {
-            return string.Compare(marginName, MarginName, StringComparison.OrdinalIgnoreCase) == 0 ? this : (ITextViewMargin)null;
+            return StringComparer.OrdinalIgnoreCase.Equals(marginName, MarginName) ? this : (ITextViewMargin)null;
         }
 
         public void Dispose()

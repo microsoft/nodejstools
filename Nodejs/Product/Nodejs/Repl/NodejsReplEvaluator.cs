@@ -143,7 +143,7 @@ namespace Microsoft.NodejsTools.Repl
             }
 
             var nodeExePath = GetNodeExePath();
-            if (String.IsNullOrWhiteSpace(nodeExePath))
+            if (string.IsNullOrWhiteSpace(nodeExePath))
             {
                 this._window.WriteError(Resources.NodejsNotInstalled);
                 this._window.WriteError(Environment.NewLine);

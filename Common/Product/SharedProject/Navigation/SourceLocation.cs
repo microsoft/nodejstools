@@ -197,7 +197,7 @@ namespace Microsoft.VisualStudioTools.Parsing
 
         internal string ToDebugString()
         {
-            return String.Format(CultureInfo.CurrentCulture, "({0},{1},{2})", this._index, this._line, this._column);
+            return string.Format(CultureInfo.CurrentCulture, "({0},{1},{2})", this._index, this._line, this._column);
         }
     }
 }

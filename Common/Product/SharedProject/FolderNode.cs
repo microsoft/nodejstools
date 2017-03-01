@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
             else
             {
-                if (String.Equals(CommonUtils.GetFileOrDirectoryName(this.Url), label, StringComparison.Ordinal))
+                if (StringComparer.Ordinal.Equals(CommonUtils.GetFileOrDirectoryName(this.Url), label))
                 {
                     // Label matches current Name
                     return VSConstants.S_OK;
@@ -380,7 +380,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns></returns>
         public virtual void CreateDirectory(string newName)
         {
-            if (String.IsNullOrEmpty(newName))
+            if (string.IsNullOrEmpty(newName))
             {
                 throw new ArgumentException(SR.GetString(SR.ParameterCannotBeNullOrEmpty), "newName");
             }
@@ -451,7 +451,7 @@ namespace Microsoft.VisualStudioTools.Project
             // Do the rename (note that we only do the physical rename if the leaf name changed)
             var newPath = Path.Combine(this.Parent.FullPathToChildren, newName);
             var oldPath = this.Url;
-            if (!String.Equals(Path.GetFileName(this.Url), newName, StringComparison.Ordinal))
+            if (!StringComparer.Ordinal.Equals(Path.GetFileName(this.Url), newName))
             {
                 RenameDirectory(CommonUtils.GetAbsoluteDirectoryPath(this.ProjectMgr.ProjectHome, newPath));
             }

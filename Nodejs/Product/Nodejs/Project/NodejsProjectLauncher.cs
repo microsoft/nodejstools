@@ -83,7 +83,7 @@ namespace Microsoft.NodejsTools.Project
 
                 var webBrowserUrl = GetFullUrl();
                 Uri uri = null;
-                if (!String.IsNullOrWhiteSpace(webBrowserUrl))
+                if (!string.IsNullOrWhiteSpace(webBrowserUrl))
                 {
                     uri = new Uri(webBrowserUrl);
 
@@ -118,18 +118,18 @@ namespace Microsoft.NodejsTools.Project
 
         private string GetFullArguments(string file, bool includeNodeArgs = true)
         {
-            var res = String.Empty;
+            var res = string.Empty;
             if (includeNodeArgs)
             {
                 var nodeArgs = this._project.GetProjectProperty(NodeProjectProperty.NodeExeArguments);
-                if (!String.IsNullOrWhiteSpace(nodeArgs))
+                if (!string.IsNullOrWhiteSpace(nodeArgs))
                 {
                     res = nodeArgs + " ";
                 }
             }
             res += "\"" + file + "\"";
             var scriptArgs = this._project.GetProjectProperty(NodeProjectProperty.ScriptArguments);
-            if (!String.IsNullOrWhiteSpace(scriptArgs))
+            if (!string.IsNullOrWhiteSpace(scriptArgs))
             {
                 res += " " + scriptArgs;
             }
@@ -242,7 +242,7 @@ namespace Microsoft.NodejsTools.Project
 
         private void AppendOption(ref VsDebugTargetInfo dbgInfo, string option, string value)
         {
-            if (!String.IsNullOrWhiteSpace(dbgInfo.bstrOptions))
+            if (!string.IsNullOrWhiteSpace(dbgInfo.bstrOptions))
             {
                 dbgInfo.bstrOptions += ";";
             }
@@ -262,19 +262,19 @@ namespace Microsoft.NodejsTools.Project
             dbgInfo.bstrArg = GetFullArguments(startupFile, includeNodeArgs: false);    // we need to supply node args via options
             dbgInfo.bstrRemoteMachine = null;
             var nodeArgs = this._project.GetProjectProperty(NodeProjectProperty.NodeExeArguments);
-            if (!String.IsNullOrWhiteSpace(nodeArgs))
+            if (!string.IsNullOrWhiteSpace(nodeArgs))
             {
                 AppendOption(ref dbgInfo, AD7Engine.InterpreterOptions, nodeArgs);
             }
 
             var url = GetFullUrl();
-            if (ShouldStartBrowser() && !String.IsNullOrWhiteSpace(url))
+            if (ShouldStartBrowser() && !string.IsNullOrWhiteSpace(url))
             {
                 AppendOption(ref dbgInfo, AD7Engine.WebBrowserUrl, url);
             }
 
             var debuggerPort = this._project.GetProjectProperty(NodeProjectProperty.DebuggerPort);
-            if (!String.IsNullOrWhiteSpace(debuggerPort))
+            if (!string.IsNullOrWhiteSpace(debuggerPort))
             {
                 AppendOption(ref dbgInfo, AD7Engine.DebuggerPort, debuggerPort);
             }
@@ -292,7 +292,7 @@ namespace Microsoft.NodejsTools.Project
             dbgInfo.fSendStdoutToOutputWindow = 0;
 
             var env = new StringDictionary();
-            if (!String.IsNullOrWhiteSpace(url))
+            if (!string.IsNullOrWhiteSpace(url))
             {
                 var webUrl = new Uri(url);
                 env["PORT"] = webUrl.Port.ToString();
@@ -338,7 +338,7 @@ namespace Microsoft.NodejsTools.Project
         {
             var startBrowser = this._project.GetProjectProperty(NodeProjectProperty.StartWebBrowser);
             bool fStartBrowser;
-            if (!String.IsNullOrEmpty(startBrowser) &&
+            if (!string.IsNullOrEmpty(startBrowser) &&
                 Boolean.TryParse(startBrowser, out fStartBrowser))
             {
                 return fStartBrowser;

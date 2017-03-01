@@ -130,7 +130,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                         var logicalViewGuid = VSConstants.LOGVIEWID_Primary;
                         try
                         {
-                            if (!(String.IsNullOrEmpty(viewKind)))
+                            if (!(string.IsNullOrEmpty(viewKind)))
                             {
                                 logicalViewGuid = new Guid(viewKind);
                             }
@@ -223,7 +223,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             var logicalViewGuid = VSConstants.LOGVIEWID_Primary;
             try
             {
-                if (!(String.IsNullOrEmpty(viewKind)))
+                if (!(string.IsNullOrEmpty(viewKind)))
                 {
                     logicalViewGuid = new Guid(viewKind);
                 }

@@ -116,7 +116,7 @@ namespace Microsoft.NodejsTools.Debugger
                 foreach (var curValue in envValues)
                 {
                     var nameValue = curValue.Split(new[] { '=' }, 2);
-                    if (nameValue.Length == 2 && !String.IsNullOrWhiteSpace(nameValue[0]))
+                    if (nameValue.Length == 2 && !string.IsNullOrWhiteSpace(nameValue[0]))
                     {
                         psi.EnvironmentVariables[nameValue[0]] = nameValue[1];
                     }
@@ -772,7 +772,7 @@ namespace Microsoft.NodejsTools.Debugger
             foreach (var hitBinding in hitBindings)
             {
                 var localFileName = this.fileNameMapper.GetLocalFileName(fileName);
-                if (string.Equals(localFileName, hitBinding.Position.FileName, StringComparison.OrdinalIgnoreCase))
+                if (StringComparer.OrdinalIgnoreCase.Equals(localFileName, hitBinding.Position.FileName))
                 {
                     yield return hitBinding;
                 }

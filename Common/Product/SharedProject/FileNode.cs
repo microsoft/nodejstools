@@ -201,7 +201,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             // Validate the filename. 
-            if (String.IsNullOrEmpty(label))
+            if (string.IsNullOrEmpty(label))
             {
                 throw new InvalidOperationException(SR.GetString(SR.ErrorInvalidFileName, label));
             }
@@ -217,7 +217,7 @@ namespace Microsoft.VisualStudioTools.Project
             for (var n = this.Parent.FirstChild; n != null; n = n.NextSibling)
             {
                 // TODO: Distinguish between real Urls and fake ones (eg. "References")
-                if (n != this && String.Equals(n.GetItemName(), label, StringComparison.OrdinalIgnoreCase))
+                if (n != this && StringComparer.OrdinalIgnoreCase.Equals(n.GetItemName(), label))
                 {
                     //A file or folder with the name '{0}' already exists on disk at this location. Please choose another name.
                     //If this file or folder does not appear in the Solution Explorer, then it is not currently part of your project. To view files which exist on disk, but are not in the project, select Show All Files from the Project menu.
@@ -230,7 +230,7 @@ namespace Microsoft.VisualStudioTools.Project
             // Verify that the file extension is unchanged
             var strRelPath = Path.GetFileName(this.ItemNode.GetMetadata(ProjectFileConstants.Include));
             if (!Utilities.IsInAutomationFunction(this.ProjectMgr.Site) &&
-                !String.Equals(Path.GetExtension(strRelPath), Path.GetExtension(label), StringComparison.OrdinalIgnoreCase))
+                !StringComparer.OrdinalIgnoreCase.Equals(Path.GetExtension(strRelPath), Path.GetExtension(label)))
             {
                 // Prompt to confirm that they really want to change the extension of the file
                 var message = SR.GetString(SR.ConfirmExtensionChange, label);
@@ -291,12 +291,12 @@ namespace Microsoft.VisualStudioTools.Project
             strSavePath = CommonUtils.GetAbsoluteDirectoryPath(this.ProjectMgr.ProjectHome, strSavePath);
             var newName = Path.Combine(strSavePath, label);
 
-            if (String.Equals(newName, this.Url, StringComparison.Ordinal))
+            if (StringComparer.OrdinalIgnoreCase.Equals(newName, this.Url))
             {
                 // This is really a no-op (including changing case), so there is nothing to do
                 return VSConstants.S_FALSE;
             }
-            else if (String.Equals(newName, this.Url, StringComparison.OrdinalIgnoreCase))
+            else if (StringComparer.OrdinalIgnoreCase.Equals(newName, this.Url))
             {
                 // This is a change of file casing only.
             }
@@ -305,7 +305,7 @@ namespace Microsoft.VisualStudioTools.Project
                 // If the renamed file already exists then quit (unless it is the result of the parent having done the move).
                 if (IsFileOnDisk(newName)
                     && (IsFileOnDisk(this.Url)
-                    || !String.Equals(Path.GetFileName(newName), Path.GetFileName(this.Url), StringComparison.OrdinalIgnoreCase)))
+                    || !StringComparer.OrdinalIgnoreCase.Equals(Path.GetFileName(newName), Path.GetFileName(this.Url))))
                 {
                     throw new InvalidOperationException(SR.GetString(SR.FileCannotBeRenamedToAnExistingFile, label));
                 }
@@ -750,7 +750,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="originalFileName">The original filenamee</param>
         protected virtual void RecoverFromRenameFailure(string fileThatFailed, string originalFileName)
         {
-            if (this.ItemNode != null && !String.IsNullOrEmpty(originalFileName))
+            if (this.ItemNode != null && !string.IsNullOrEmpty(originalFileName))
             {
                 this.ItemNode.Rename(originalFileName);
             }
@@ -936,8 +936,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             //Update the include for this item.
             var relName = CommonUtils.GetRelativeFilePath(this.ProjectMgr.ProjectHome, newName);
-            Debug.Assert(String.Equals(this.ItemNode.GetMetadata(ProjectFileConstants.Include), relName, StringComparison.OrdinalIgnoreCase),
-                "Not just changing the filename case");
+            Debug.Assert(StringComparer.OrdinalIgnoreCase.Equals(this.ItemNode.GetMetadata(ProjectFileConstants.Include), relName), "Not just changing the filename case");
 
             this.ItemNode.Rename(relName);
             this.ItemNode.RefreshProperties();

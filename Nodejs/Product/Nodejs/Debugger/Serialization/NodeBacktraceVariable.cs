@@ -27,7 +27,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization
             }
             catch (ArgumentException)
             {
-                this.Text = String.Empty;
+                this.Text = string.Empty;
             }
             this.Attributes = NodePropertyAttributes.None;
             this.Type = NodePropertyType.Normal;

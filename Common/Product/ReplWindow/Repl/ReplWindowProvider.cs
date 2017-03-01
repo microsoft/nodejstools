@@ -60,7 +60,7 @@ namespace Microsoft.VisualStudio.Repl {
                 }
             }
 
-            throw new InvalidOperationException(String.Format("ReplId {0} was not provided by an IReplWindowProvider", replId));
+            throw new InvalidOperationException(string.Format("ReplId {0} was not provided by an IReplWindowProvider", replId));
         }
 
         public IReplWindow FindReplWindow(string replId)

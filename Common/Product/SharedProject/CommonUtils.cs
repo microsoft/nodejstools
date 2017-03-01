@@ -115,16 +115,7 @@ namespace Microsoft.VisualStudioTools
         /// </summary>
         public static bool IsSameDirectory(string path1, string path2)
         {
-            if (string.IsNullOrEmpty(path1))
-            {
-                return string.IsNullOrEmpty(path2);
-            }
-            else if (string.IsNullOrEmpty(path2))
-            {
-                return false;
-            }
-
-            if (String.Equals(path1, path2, StringComparison.Ordinal))
+            if (StringComparer.Ordinal.Equals(path1, path2))
             {
                 // Quick return, but will only work where the paths are already normalized and
                 // have matching case.
@@ -143,16 +134,7 @@ namespace Microsoft.VisualStudioTools
         /// </summary>
         public static bool IsSamePath(string file1, string file2)
         {
-            if (string.IsNullOrEmpty(file1))
-            {
-                return string.IsNullOrEmpty(file2);
-            }
-            else if (string.IsNullOrEmpty(file2))
-            {
-                return false;
-            }
-
-            if (String.Equals(file1, file2, StringComparison.Ordinal))
+            if (StringComparer.Ordinal.Equals(file1, file2))
             {
                 // Quick return, but will only work where the paths are already normalized and
                 // have matching case.

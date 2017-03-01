@@ -42,10 +42,14 @@ namespace Microsoft.VisualStudioTools.Project
             get
             {
                 var result = this.ItemNode.GetMetadata(ProjectFileConstants.SubType);
-                if (!String.IsNullOrEmpty(result) && string.Compare(result, ProjectFileAttributeValue.Form, true, CultureInfo.InvariantCulture) == 0)
+                if (!string.IsNullOrEmpty(result) && StringComparer.InvariantCultureIgnoreCase.Equals(result, ProjectFileAttributeValue.Form))
+                {
                     return true;
+                }
                 else
+                {
                     return false;
+                }
             }
         }
         /// <summary>

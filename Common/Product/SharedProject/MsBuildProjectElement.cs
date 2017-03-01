@@ -70,10 +70,10 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="attributeValue">Value to give to the attribute</param>
         public override void SetMetadata(string attributeName, string attributeValue)
         {
-            Debug.Assert(String.Compare(attributeName, ProjectFileConstants.Include, StringComparison.OrdinalIgnoreCase) != 0, "Use rename as this won't work");
+            Debug.Assert(StringComparer.OrdinalIgnoreCase.Equals(attributeName, ProjectFileConstants.Include), "Use rename as this won't work");
 
             // Build Action is the type, not a property, so intercept
-            if (String.Compare(attributeName, ProjectFileConstants.BuildAction, StringComparison.OrdinalIgnoreCase) == 0)
+            if (StringComparer.OrdinalIgnoreCase.Equals(attributeName, ProjectFileConstants.BuildAction))
             {
                 this._item.ItemType = attributeValue;
                 return;
@@ -103,13 +103,13 @@ namespace Microsoft.VisualStudioTools.Project
         public override string GetMetadata(string attributeName)
         {
             // cannot ask MSBuild for Include, so intercept it and return the corresponding property
-            if (String.Compare(attributeName, ProjectFileConstants.Include, StringComparison.OrdinalIgnoreCase) == 0)
+            if (StringComparer.OrdinalIgnoreCase.Equals(attributeName, ProjectFileConstants.Include))
             {
                 return this._item.EvaluatedInclude;
             }
 
             // Build Action is the type, not a property, so intercept this one as well
-            if (String.Compare(attributeName, ProjectFileConstants.BuildAction, StringComparison.OrdinalIgnoreCase) == 0)
+            if (StringComparer.OrdinalIgnoreCase.Equals(attributeName, ProjectFileConstants.BuildAction))
             {
                 return this._item.ItemType;
             }
@@ -183,14 +183,7 @@ namespace Microsoft.VisualStudioTools.Project
             var include1 = GetMetadata(ProjectFileConstants.Include);
             var include2 = msBuildProjElem.GetMetadata(ProjectFileConstants.Include);
 
-            // Unfortunately the checking for nulls have to be done again, since neither String.Equals nor String.Compare can handle nulls.
-            // Virtual folders should not be handled here.
-            if (include1 == null || include2 == null)
-            {
-                return false;
-            }
-
-            return String.Equals(include1, include2, StringComparison.OrdinalIgnoreCase);
+            return StringComparer.OrdinalIgnoreCase.Equals(include1, include2);
         }
 
         public override int GetHashCode()

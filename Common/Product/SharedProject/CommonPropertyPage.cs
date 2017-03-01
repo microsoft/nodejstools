@@ -141,7 +141,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         private string GetUserPropertyUnderCondition(string propertyName, string condition)
         {
-            var conditionTrimmed = (condition == null) ? String.Empty : condition.Trim();
+            var conditionTrimmed = (condition == null) ? string.Empty : condition.Trim();
 
             if (this.Project.UserBuildProject != null)
             {
@@ -156,7 +156,7 @@ namespace Microsoft.VisualStudioTools.Project
 
                 foreach (var group in this.Project.UserBuildProject.Xml.PropertyGroups)
                 {
-                    if (String.Equals(group.Condition.Trim(), conditionTrimmed, StringComparison.OrdinalIgnoreCase))
+                    if (StringComparer.OrdinalIgnoreCase.Equals(group.Condition.Trim(), conditionTrimmed))
                     {
                         matchingGroup = group;
                         break;
@@ -167,7 +167,7 @@ namespace Microsoft.VisualStudioTools.Project
                 {
                     foreach (var property in matchingGroup.PropertiesReversed) // If there's dupes, pick the last one so we win
                     {
-                        if (string.Equals(property.Name, propertyName, StringComparison.OrdinalIgnoreCase)
+                        if (StringComparer.OrdinalIgnoreCase.Equals(property.Name, propertyName)
                             && (property.Condition == null || property.Condition.Length == 0))
                         {
                             return property.Value;
@@ -185,7 +185,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         private void SetUserPropertyUnderCondition(string propertyName, string propertyValue, string condition)
         {
-            var conditionTrimmed = (condition == null) ? String.Empty : condition.Trim();
+            var conditionTrimmed = (condition == null) ? string.Empty : condition.Trim();
             const string userProjectCreateProperty = "UserProject";
 
             if (this.Project.UserBuildProject == null)
@@ -210,7 +210,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             foreach (var group in this.Project.UserBuildProject.Xml.PropertyGroups)
             {
-                if (String.Equals(group.Condition.Trim(), conditionTrimmed, StringComparison.OrdinalIgnoreCase))
+                if (StringComparer.OrdinalIgnoreCase.Equals(group.Condition.Trim(), conditionTrimmed))
                 {
                     newGroup = group;
                     break;
@@ -225,7 +225,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             foreach (var property in newGroup.PropertiesReversed) // If there's dupes, pick the last one so we win
             {
-                if (string.Equals(property.Name, propertyName, StringComparison.OrdinalIgnoreCase)
+                if (StringComparer.OrdinalIgnoreCase.Equals(property.Name, propertyName)
                     && (property.Condition == null || property.Condition.Length == 0))
                 {
                     property.Value = propertyValue;

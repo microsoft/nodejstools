@@ -48,7 +48,7 @@ namespace Microsoft.NodejsTools.Jade
                     return text;
                 }
 
-                return String.Empty;
+                return string.Empty;
             }
         }
 

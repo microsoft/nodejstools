@@ -243,7 +243,7 @@ namespace Microsoft.VisualStudioTools.Project
                 callerName = callerType.FullName + "." + callerName;
             }
 
-            return GetString(UnhandledException, ex, callerFile ?? String.Empty, callerLineNumber, callerName);
+            return GetString(UnhandledException, ex, callerFile ?? string.Empty, callerLineNumber, callerName);
         }
     }
 }

@@ -151,7 +151,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         internal static bool IsValidTestFramework(string testFramework)
         {
-            return !String.IsNullOrWhiteSpace(testFramework);
+            return !string.IsNullOrWhiteSpace(testFramework);
         }
 
         internal bool IsTestFile(string pathToFile)
@@ -374,7 +374,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             // save all the open files in the project...
             foreach (var itemPath in project.GetProjectItems())
             {
-                if (String.IsNullOrEmpty(itemPath))
+                if (string.IsNullOrEmpty(itemPath))
                 {
                     continue;
                 }

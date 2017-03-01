@@ -119,7 +119,7 @@ namespace Microsoft.VisualStudioTools
                         // Do nothing, there is something in the ROT that we do not have access to.
                     }
 
-                    if (!string.IsNullOrEmpty(name) && string.Equals(name, progId, StringComparison.Ordinal))
+                    if (!StringComparer.Ordinal.Equals(name, progId))
                     {
                         rot.GetObject(runningObjectMoniker, out runningObject);
                         break;

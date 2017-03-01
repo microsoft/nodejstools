@@ -208,13 +208,13 @@ namespace Microsoft.NodejsTools.SourceMapping
         /// <summary>
         /// Filename of the generated code
         /// </summary>
-        internal string File => GetValue("file", String.Empty);
+        internal string File => GetValue("file", string.Empty);
 
         /// <summary>
         /// Provides the root for the sources to save space, automatically
         /// included in the Sources array so it's not public.
         /// </summary>
-        private string SourceRoot => GetValue("sourceRoot", String.Empty);
+        private string SourceRoot => GetValue("sourceRoot", string.Empty);
 
         /// <summary>
         /// All of the filenames that were combined.

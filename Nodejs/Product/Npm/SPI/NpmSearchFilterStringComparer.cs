@@ -49,7 +49,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
                     {
                         var result = base.CompareBasedOnKeywords(x, y);
                         return 0 == result
-                            ? string.Compare(x.Name, y.Name, StringComparison.CurrentCulture)
+                            ? StringComparer.CurrentCulture.Compare(x.Name, y.Name)
                             : result;
                     }
                 }
@@ -79,7 +79,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             if (d1.Contains(_filterString))
             {
                 return d2.Contains(_filterString)
-                    ? string.Compare(d1, d2, StringComparison.CurrentCulture)
+                    ? StringComparer.CurrentCulture.Compare(d1, d2)
                     : -1;
             }
 
@@ -96,7 +96,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             if (string.IsNullOrEmpty(_filterString))
             {
                 //  Version numbers are irrelevant, and names are good enough since they must be unique in the repo
-                return string.Compare(x.Name, y.Name, StringComparison.CurrentCulture);
+                return StringComparer.CurrentCulture.Compare(x.Name, y.Name);
             }
 
             if (x.Name == _filterString)
@@ -116,7 +116,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             {
                 if (y.Name.StartsWith(_filterString, StringComparison.CurrentCulture))
                 {
-                    var result = string.Compare(x.Name, y.Name, StringComparison.CurrentCulture);
+                    var result = StringComparer.CurrentCulture.Compare(x.Name, y.Name);
                     return 0 == result ? CompareBasedOnDescriptions(x, y) : result;
                 }
 
@@ -131,7 +131,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             if (x.Name.Contains(_filterString))
             {
                 return y.Name.Contains(_filterString)
-                    ? string.Compare(x.Name, y.Name, StringComparison.CurrentCulture)
+                    ? StringComparer.CurrentCulture.Compare(x.Name, y.Name)
                     : -1;
             }
 

@@ -216,11 +216,7 @@ namespace Microsoft.VisualStudioTools.Project
 
                 if (res == null)
                 {
-                    res = string.Compare(
-                       itemX.SubItems[0].Text,
-                       itemY.SubItems[0].Text,
-                       true
-                   );
+                    res = StringComparer.CurrentCultureIgnoreCase.Compare(itemX.SubItems[0].Text, itemY.SubItems[0].Text);
                 }
 
                 if (this.Order == SortOrder.Descending)

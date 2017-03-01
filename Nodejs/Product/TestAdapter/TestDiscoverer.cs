@@ -149,7 +149,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                     FunctionInformation fi = null;
                     if (entry.IsTypeScriptTest)
                     {
-                        fi = SourceMapper.MaybeMap(new FunctionInformation(String.Empty,
+                        fi = SourceMapper.MaybeMap(new FunctionInformation(string.Empty,
                                                                            discoveredTest.TestName,
                                                                            discoveredTest.SourceLine,
                                                                            entry.File));

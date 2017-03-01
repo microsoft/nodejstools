@@ -156,7 +156,7 @@ namespace Microsoft.NodejsTools.Jade
             if (span.Length <= 2)
             {
                 var ws = textSnapshot.GetText(span);
-                if (String.IsNullOrWhiteSpace(ws))
+                if (string.IsNullOrWhiteSpace(ws))
                     return classifications;
             }
 

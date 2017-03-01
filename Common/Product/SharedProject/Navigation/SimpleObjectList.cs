@@ -338,7 +338,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             ErrorHandler.ThrowOnFailure(pNavInfoNode.get_Name(out nodeName));
             for (var i = 0; i < this._children.Count; i++)
             {
-                if (0 == string.Compare(this._children[i].UniqueName, nodeName, StringComparison.OrdinalIgnoreCase))
+                if (StringComparer.OrdinalIgnoreCase.Equals(this._children[i].UniqueName, nodeName))
                 {
                     pulIndex = (uint)i;
                     return VSConstants.S_OK;

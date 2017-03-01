@@ -179,7 +179,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 // Retrieve the list of guids from hierarchy properties.
                 // Because a flavor could modify that list we must make sure we are calling the outer most implementation of IVsHierarchy
-                var guidsList = String.Empty;
+                var guidsList = string.Empty;
                 var hierarchy = this.HierarchyNode.ProjectMgr.GetOuterInterface<IVsHierarchy>();
                 object variant = null;
                 ErrorHandler.ThrowOnFailure(hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID2.VSHPROPID_PropertyPagesCLSIDList, out variant));
@@ -365,7 +365,7 @@ namespace Microsoft.VisualStudioTools.Project
             get
             {
                 var publish = this.HierarchyNode.ItemNode.GetMetadata("Publish");
-                if (String.IsNullOrEmpty(publish))
+                if (string.IsNullOrEmpty(publish))
                 {
                     if (this.HierarchyNode.ItemNode.ItemTypeName == ProjectFileConstants.Compile)
                     {

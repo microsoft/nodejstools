@@ -433,12 +433,18 @@ namespace Microsoft.VisualStudioTools.Project
             get
             {
                 if (this.parentNode == null)
+                {
                     return null;
+                }
+
                 HierarchyNode prev = null;
                 for (var child = this.parentNode.firstChild; child != null; child = child.nextSibling)
                 {
                     if (child == this)
+                    {
                         break;
+                    }
+
                     prev = child;
                 }
                 return prev;
@@ -710,7 +716,10 @@ namespace Microsoft.VisualStudioTools.Project
                 case __VSHPROPID.VSHPROPID_BrowseObject:
                     result = this.NodeProperties;
                     if (result != null)
+                    {
                         result = new DispatchWrapper(result);
+                    }
+
                     break;
 
                 case __VSHPROPID.VSHPROPID_EditLabel:
@@ -735,7 +744,7 @@ namespace Microsoft.VisualStudioTools.Project
                     }
                     catch (Exception e)
                     {
-                        Debug.WriteLine(String.Format("Failed to get automation object for node {1}: {0}", e, this));
+                        Debug.WriteLine(string.Format("Failed to get automation object for node {1}: {0}", e, this));
                         throw;
                     }
 #endif
@@ -759,10 +768,14 @@ namespace Microsoft.VisualStudioTools.Project
                         if (browseObject != null)
                         {
                             if (browseObject is DispatchWrapper)
+                            {
                                 browseObject = ((DispatchWrapper)browseObject).WrappedObject;
+                            }
                             result = this.ProjectMgr.GetCATIDForType(browseObject.GetType()).ToString("B");
-                            if (String.Equals(result as string, Guid.Empty.ToString("B"), StringComparison.Ordinal))
+                            if (StringComparer.Ordinal.Equals(result as string, Guid.Empty.ToString("B")))
+                            {
                                 result = null;
+                            }
                         }
                         break;
                     }
@@ -773,10 +786,14 @@ namespace Microsoft.VisualStudioTools.Project
                         if (extObject != null)
                         {
                             if (extObject is DispatchWrapper)
+                            {
                                 extObject = ((DispatchWrapper)extObject).WrappedObject;
+                            }
                             result = this.ProjectMgr.GetCATIDForType(extObject.GetType()).ToString("B");
-                            if (String.Equals(result as string, Guid.Empty.ToString("B"), StringComparison.Ordinal))
+                            if (StringComparer.Ordinal.Equals(result as string, Guid.Empty.ToString("B")))
+                            {
                                 result = null;
+                            }
                         }
                         break;
                     }
@@ -930,7 +947,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>The moniker for this item</returns>
         public virtual string GetMkDocument()
         {
-            return String.Empty;
+            return string.Empty;
         }
 
         /// <summary>
@@ -943,7 +960,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             // Ask Document tracker listeners if we can remove the item.
             var filesToBeDeleted = new string[1] { documentToRemove };
-            if (!String.IsNullOrWhiteSpace(documentToRemove))
+            if (!string.IsNullOrWhiteSpace(documentToRemove))
             {
                 var queryRemoveFlags = this.GetQueryRemoveFileFlags(filesToBeDeleted);
                 if (!this.ProjectMgr.Tracker.CanRemoveItems(filesToBeDeleted, queryRemoveFlags))
@@ -1013,7 +1030,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         protected virtual void RaiseOnItemRemoved(string documentToRemove, string[] filesToBeDeleted)
         {
-            if (!String.IsNullOrWhiteSpace(documentToRemove))
+            if (!string.IsNullOrWhiteSpace(documentToRemove))
             {
                 // Notify document tracker listeners that we have removed the item.
                 var removeFlags = this.GetRemoveFileFlags(filesToBeDeleted);
@@ -1120,7 +1137,9 @@ namespace Microsoft.VisualStudioTools.Project
                         ErrorHandler.ThrowOnFailure(soln.CloseSolutionElement(saveOptions, srpOurHier, cookie[0]));
                     }
                     if (ppunkDocData != IntPtr.Zero)
+                    {
                         Marshal.Release(ppunkDocData);
+                    }
                 }
             }
         }
@@ -1173,7 +1192,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 // Generate a new folder name
                 string newFolderName;
-                ErrorHandler.ThrowOnFailure(this.projectMgr.GenerateUniqueItemName(this.hierarchyId, String.Empty, String.Empty, out newFolderName));
+                ErrorHandler.ThrowOnFailure(this.projectMgr.GenerateUniqueItemName(this.hierarchyId, string.Empty, string.Empty, out newFolderName));
 
                 // create the folder node, this will add it to MS build but we won't have the directory created yet.
                 var folderNode = this.ProjectMgr.CreateFolderNode(Path.Combine(this.FullPathToChildren, newFolderName));
@@ -1206,7 +1225,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             IVsAddProjectItemDlg addItemDialog;
 
-            var strFilter = String.Empty;
+            var strFilter = string.Empty;
             int iDontShowAgain;
             uint uiFlags;
             var project = (IVsProject3)this.projectMgr;
@@ -1218,9 +1237,13 @@ namespace Microsoft.VisualStudioTools.Project
             addItemDialog = this.GetService(typeof(IVsAddProjectItemDlg)) as IVsAddProjectItemDlg;
 
             if (addType == HierarchyAddType.AddNewItem)
+            {
                 uiFlags = (uint)(__VSADDITEMFLAGS.VSADDITEM_AddNewItems | __VSADDITEMFLAGS.VSADDITEM_SuggestTemplateName | __VSADDITEMFLAGS.VSADDITEM_AllowHiddenTreeView);
+            }
             else
+            {
                 uiFlags = (uint)(__VSADDITEMFLAGS.VSADDITEM_AddExistingItems | __VSADDITEMFLAGS.VSADDITEM_ProjectHandlesLinks | __VSADDITEMFLAGS.VSADDITEM_AllowMultiSelect | __VSADDITEMFLAGS.VSADDITEM_AllowStickyFilter);
+            }
 
             return addItemDialog.AddProjectItemDlg(this.hierarchyId, ref projectGuid, project, uiFlags, null, null, ref strBrowseLocations, ref strFilter, out iDontShowAgain); /*&fDontShowAgain*/
         }
@@ -1325,12 +1348,12 @@ namespace Microsoft.VisualStudioTools.Project
                 this.ProjectMgr.ItemsDraggedOrCutOrCopied.Add(this);
             }
 
-            var projref = String.Empty;
+            var projref = string.Empty;
             var solution = this.GetService(typeof(IVsSolution)) as IVsSolution;
             if (solution != null)
             {
                 ErrorHandler.ThrowOnFailure(solution.GetProjrefOfItem(this.ProjectMgr, this.hierarchyId, out projref));
-                if (String.IsNullOrEmpty(projref))
+                if (string.IsNullOrEmpty(projref))
                 {
                     if (this.ProjectMgr.ItemsDraggedOrCutOrCopied != null)
                     {
@@ -1934,7 +1957,10 @@ namespace Microsoft.VisualStudioTools.Project
                 for (var n = this.firstChild; n != null; n = n.nextSibling)
                 {
                     if (this.ProjectMgr.CompareNodes(node, n) > 0)
+                    {
                         break;
+                    }
+
                     previous = n;
                     if (previous.IsVisible)
                     {
@@ -1968,7 +1994,10 @@ namespace Microsoft.VisualStudioTools.Project
             Utilities.ArgumentNotNull("type", type);
 
             if (this.projectMgr == null || this.projectMgr.Site == null)
+            {
                 return null;
+            }
+
             return this.projectMgr.Site.GetService(type);
         }
 
@@ -2030,13 +2059,13 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         internal HierarchyNode FindImmediateChildByName(string name)
         {
-            Debug.Assert(!String.IsNullOrEmpty(GetMkDocument()));
+            Debug.Assert(!string.IsNullOrEmpty(GetMkDocument()));
 
             for (var child = this.firstChild; child != null; child = child.NextSibling)
             {
                 var filename = CommonUtils.GetFileOrDirectoryName(child.ItemNode.GetMetadata(ProjectFileConstants.Include));
 
-                if (String.Equals(filename, name, StringComparison.OrdinalIgnoreCase))
+                if (StringComparer.OrdinalIgnoreCase.Equals(filename, name))
                 {
                     return child;
                 }

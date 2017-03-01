@@ -80,7 +80,7 @@ namespace Microsoft.NodejsTools
                             }
                         }
 
-                        var body = String.Empty;
+                        var body = string.Empty;
                         string contentLen;
                         if (headers.TryGetValue("Content-Length", out contentLen))
                         {

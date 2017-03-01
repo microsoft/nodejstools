@@ -230,7 +230,7 @@ namespace SQLite
             Handle = handle;
             if (r != SQLite3.Result.OK)
             {
-                throw SQLiteException.New(r, String.Format("Could not open database file: {0} ({1})", DatabasePath, r));
+                throw SQLiteException.New(r, string.Format("Could not open database file: {0} ({1})", DatabasePath, r));
             }
             _open = true;
 
@@ -474,7 +474,7 @@ namespace SQLite
         public int CreateIndex(string indexName, string tableName, string[] columnNames, bool unique = false)
         {
             const string sqlFormat = "create {2} index if not exists \"{3}\" on \"{0}\"(\"{1}\")";
-            var sql = String.Format(sqlFormat, tableName, string.Join("\", \"", columnNames), unique ? "unique" : "", indexName);
+            var sql = string.Format(sqlFormat, tableName, string.Join("\", \"", columnNames), unique ? "unique" : "", indexName);
             return Execute(sql);
         }
 
@@ -583,7 +583,7 @@ namespace SQLite
                 var found = false;
                 foreach (var c in existingCols)
                 {
-                    found = (string.Compare(p.Name, c.Name, StringComparison.OrdinalIgnoreCase) == 0);
+                    found = (StringComparer.OrdinalIgnoreCase.Equals(p.Name, c.Name));
                     if (found)
                         break;
                 }
@@ -1059,7 +1059,7 @@ namespace SQLite
             //    and leaves the transaction stack empty.   
             try
             {
-                if (String.IsNullOrEmpty(savepoint))
+                if (string.IsNullOrEmpty(savepoint))
                 {
                     if (Interlocked.Exchange(ref _transactionDepth, 0) > 0)
                     {
@@ -1392,7 +1392,7 @@ namespace SQLite
             }
 #endif
 
-            var replacing = string.Compare(extra, "OR REPLACE", StringComparison.OrdinalIgnoreCase) == 0;
+            var replacing = StringComparer.OrdinalIgnoreCase.Equals(extra, "OR REPLACE");
 
             var cols = replacing ? map.InsertOrReplaceColumns : map.InsertColumns;
             var vals = new object[cols.Length];
@@ -1949,7 +1949,7 @@ namespace SQLite
             }
             else
             {
-                var replacing = string.Compare(extra, "OR REPLACE", StringComparison.OrdinalIgnoreCase) == 0;
+                var replacing = StringComparer.OrdinalIgnoreCase.Equals(extra, "OR REPLACE");
 
                 if (replacing)
                 {
@@ -2012,7 +2012,7 @@ namespace SQLite
 
                 IsPK = Orm.IsPK(prop) ||
                     (((createFlags & CreateFlags.ImplicitPK) == CreateFlags.ImplicitPK) &&
-                         string.Compare(prop.Name, Orm.ImplicitPkName, StringComparison.OrdinalIgnoreCase) == 0);
+                         StringComparer.OrdinalIgnoreCase.Equals(prop.Name, Orm.ImplicitPkName));
 
                 var isAuto = Orm.IsAutoInc(prop) || (IsPK && ((createFlags & CreateFlags.AutoIncPK) == CreateFlags.AutoIncPK));
                 IsAutoGuid = isAuto && ColumnType == typeof(Guid);

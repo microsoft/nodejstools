@@ -68,7 +68,7 @@ namespace Microsoft.NodejsTools.Commands
                             }
                             else
                             {
-                                var exName = String.Empty;
+                                var exName = string.Empty;
                                 if (ex.InnerException != null)
                                 {
                                     exName = "(" + ex.InnerException.GetType().Name + ")";
@@ -84,7 +84,7 @@ namespace Microsoft.NodejsTools.Commands
                         {
                             object outRef = null, pathRef = "\"" + path + "\"";
                             NodejsPackage.Instance.DTE.Commands.Raise(VSConstants.GUID_VSStandardCommandSet97.ToString("B"), commandIdToRaise, ref pathRef, ref outRef);
-                            statusBar.SetText(String.Empty);
+                            statusBar.SetText(string.Empty);
                         }
                         else
                         {

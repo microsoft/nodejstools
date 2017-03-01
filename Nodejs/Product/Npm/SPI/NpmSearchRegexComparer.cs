@@ -69,7 +69,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
                     result = CompareBasedOnKeywords(x, y);
                     if (0 == result)
                     {
-                        result = string.Compare(d1, d2, StringComparison.CurrentCulture);
+                        result = StringComparer.CurrentCulture.Compare(d1, d2);
                     }
                 }
             }
@@ -91,7 +91,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
                     result = CompareBasedOnDescriptions(x, y);
                     if (0 == result)
                     {
-                        result = string.Compare(x.Name, y.Name, StringComparison.CurrentCulture);
+                        result = StringComparer.CurrentCulture.Compare(x.Name, y.Name);
                     }
                 }
             }
