@@ -126,7 +126,7 @@ namespace Microsoft.NodejsTools.Debugger {
             var debuggerPortOrDefault = debuggerPort ?? GetDebuggerPort();
 
             // Node usage: node [options] [ -e script | script.js ] [arguments]
-            var allArgs = $"--debug-brk={debuggerPortOrDefault} --nolazy {interpreterOptions} \"{script}\"";
+            var allArgs = $"--debug-brk={debuggerPortOrDefault} --nolazy {interpreterOptions} \"{CommonUtils.UnquotePath(script)}\""; /* unquote the path so we can safely add quotes */
 
             return StartNodeProcess(exe, dir, env, debugOptions, debuggerPortOrDefault, allArgs, createNodeWindow);
         }
@@ -144,7 +144,7 @@ namespace Microsoft.NodejsTools.Debugger {
             var debuggerPortOrDefault = debuggerPort ?? GetDebuggerPort();
 
             // Node usage: node [options] [ -e script | script.js ] [arguments]
-            string allArgs = $"--inspect={debuggerPortOrDefault} --debug-brk --nolazy {interpreterOptions} \"{script}\"";
+            var allArgs = $"--inspect={debuggerPortOrDefault} --debug-brk --nolazy {interpreterOptions} \"{CommonUtils.UnquotePath(script)}\""; /* unquote the path so we can safely add quotes */
 
             return StartNodeProcess(exe, dir, env, debugOptions, debuggerPortOrDefault, allArgs, createNodeWindow);
         }
@@ -169,7 +169,7 @@ namespace Microsoft.NodejsTools.Debugger {
                 var envValues = env.Split('\0');
                 foreach (var curValue in envValues) {
                     var nameValue = curValue.Split(new[] { '=' }, 2);
-                    if (nameValue.Length == 2 && !String.IsNullOrWhiteSpace(nameValue[0])) {
+                    if (nameValue.Length == 2 && !string.IsNullOrWhiteSpace(nameValue[0])) {
                         psi.EnvironmentVariables[nameValue[0]] = nameValue[1];
                     }
                 }
