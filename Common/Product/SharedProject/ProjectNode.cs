@@ -4496,7 +4496,6 @@ If the files in the existing folder have the same names as files in the folder y
             }
 
             return VSConstants.S_OK;
-
         }
 
         protected virtual bool IncludeNonMemberItemInProject(HierarchyNode node) {

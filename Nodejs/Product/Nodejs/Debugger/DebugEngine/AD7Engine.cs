@@ -86,11 +86,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         public const string WaitOnNormalExitSetting = "WAIT_ON_NORMAL_EXIT";
 
         /// <summary>
-        /// Specifies if the output should be redirected to the visual studio output window.
-        /// </summary>
-        public const string RedirectOutputSetting = "REDIRECT_OUTPUT";
-
-        /// <summary>
         /// Specifies options which should be passed to the Node runtime before the script.  If
         /// the interpreter options should include a semicolon then it should be escaped as a double
         /// semi-colon.
@@ -517,11 +512,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                                     debugOptions |= NodeDebugOptions.WaitOnNormalExit;
                                 }
                                 break;
-                            case RedirectOutputSetting:
-                                if (Boolean.TryParse(setting[1], out value) && value) {
-                                    debugOptions |= NodeDebugOptions.RedirectOutput;
-                                }
-                                break;
                             case DirMappingSetting:
                                 string[] dirs = setting[1].Split('|');
                                 if (dirs.Length == 2) {
@@ -565,9 +555,10 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
             AttachEvents(_process);
 
-            var adProcessId = new AD_PROCESS_ID();
-            adProcessId.ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM;
-            adProcessId.dwProcessId = (uint)_process.Id;
+            var adProcessId = new AD_PROCESS_ID() {
+                ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM,
+                dwProcessId = (uint)_process.Id
+            };
 
             EngineUtils.RequireOk(port.GetProcess(adProcessId, out process));
             LiveLogger.WriteLine("AD7Engine LaunchSuspended returning S_OK");

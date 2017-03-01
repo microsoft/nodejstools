@@ -29,13 +29,17 @@ namespace Microsoft.NodejsTools.Debugger {
     sealed class NodeProcess : IDisposable {
         private readonly ProcessStartInfo _psi;
         private readonly bool _waitOnAbnormal, _waitOnNormal, _enableRaisingEvents;
-        private Process _process, _pressAnyKeyProcess;
+        private Process _process;
+        private Process _pressAnyKeyProcess;
 
-        public NodeProcess(ProcessStartInfo psi, bool waitOnAbnormal, bool waitOnNormal, bool enableRaisingEvents) {
+        public ushort DebuggerPort { get; }
+
+        public NodeProcess(ProcessStartInfo psi, bool waitOnAbnormal, bool waitOnNormal, bool enableRaisingEvents, ushort debuggerPort = 0) {
             _psi = psi;
             _waitOnAbnormal = waitOnAbnormal;
             _waitOnNormal = waitOnNormal;
             _enableRaisingEvents = enableRaisingEvents;
+            DebuggerPort = debuggerPort;
         }
 
         public static NodeProcess Start(ProcessStartInfo psi, bool waitOnAbnormal, bool waitOnNormal) {
