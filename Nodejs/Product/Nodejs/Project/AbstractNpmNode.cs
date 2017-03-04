@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.NodejsTools.Npm;
@@ -26,6 +28,7 @@ namespace Microsoft.NodejsTools.Project
         public override Guid ItemTypeGuid => VSConstants.GUID_ItemType_VirtualFolder;
         public override Guid MenuGroupId => Guids.NodejsNpmCmdSet;
         public override int MenuCommandId => PkgCmdId.menuIdNpm;
+        
         /// <summary>
         /// Disable inline editing of Caption.
         /// </summary>
@@ -35,6 +38,7 @@ namespace Microsoft.NodejsTools.Project
         }
 
         protected override bool SupportsIconMonikers => true;
+        
         /// <summary>
         /// Returns the icon to use.
         /// </summary>

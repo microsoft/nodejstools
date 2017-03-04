@@ -1,16 +1,4 @@
-/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -631,7 +619,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 extension = Path.GetExtension(filePart);
             }
-            // We catch the ArgumentException because we want this method to return true if the filename is not valid. FilePart could be for example #¤&%"¤&"% and that would throw ArgumentException on GetExtension
+            // We catch the ArgumentException because we want this method to return true if the filename is not valid. FilePart could be for example #ï¿½&%"ï¿½&"% and that would throw ArgumentException on GetExtension
             catch (ArgumentException)
             {
                 return true;
@@ -756,3 +744,4 @@ namespace Microsoft.VisualStudioTools.Project
         }
     }
 }
+

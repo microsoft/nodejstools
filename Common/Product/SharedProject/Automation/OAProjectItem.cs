@@ -1,16 +1,4 @@
-/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Diagnostics;
@@ -324,7 +312,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             throw new NotImplementedException();
         }
 
-        // We're managed and we don't use COM’s IDispatch which would resolve parametrized property FileNames and IsOpen correctly. 
+        // We're managed and we don't use COMï¿½s IDispatch which would resolve parametrized property FileNames and IsOpen correctly. 
         // Powershell scripts are using reflection to find (or rather, not find) the methodss. Thus FileNames call ends with exception: method's not defined.
         // Implementing these as regular methods satisfies the situation.
         // This is required for Nuget support.
@@ -342,3 +330,4 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         #endregion
     }
 }
+
