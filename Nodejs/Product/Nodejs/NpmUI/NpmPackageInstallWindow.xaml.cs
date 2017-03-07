@@ -14,13 +14,13 @@ namespace Microsoft.NodejsTools.NpmUI
     /// </summary>
     internal sealed partial class NpmPackageInstallWindow : DialogWindowVersioningWorkaround, IDisposable
     {
-        private readonly NpmPackageInstallViewModel _vm;
-        private NpmOutputWindow _outputWindow;
+        private readonly NpmPackageInstallViewModel viewModel;
+        private NpmOutputWindow outputWindow;
 
         internal NpmPackageInstallWindow(INpmController controller, NpmOutputViewModel executeVm, DependencyType dependencyType = DependencyType.Standard)
         {
-            this.DataContext = this._vm = new NpmPackageInstallViewModel(executeVm, this.Dispatcher);
-            this._vm.NpmController = controller;
+            this.DataContext = this.viewModel = new NpmPackageInstallViewModel(executeVm, this.Dispatcher);
+            this.viewModel.NpmController = controller;
             InitializeComponent();
             this.DependencyComboBox.SelectedIndex = (int)dependencyType;
         }
@@ -29,23 +29,23 @@ namespace Microsoft.NodejsTools.NpmUI
         {
             //  This will unregister event handlers on the controller and prevent
             //  us from leaking view models.
-            if (this._outputWindow != null)
+            if (this.outputWindow != null)
             {
-                this._outputWindow.Closing -= this._outputWindow_Closing;
-                this._outputWindow.Close();
+                this.outputWindow.Closing -= this.outputWindow_Closing;
+                this.outputWindow.Close();
             }
 
-            this._vm.NpmController = null;
+            this.viewModel.NpmController = null;
 
             // The catalog refresh operation spawns many long-lived Gen 2 objects,
             // so the garbage collector will take a while to get to them otherwise.
             GC.Collect();
         }
 
-        private void _outputWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void outputWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             e.Cancel = true;
-            this._outputWindow.Hide();
+            this.outputWindow.Hide();
         }
 
         private void Close_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -61,34 +61,34 @@ namespace Microsoft.NodejsTools.NpmUI
 
         private void InstallCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this._vm.Install(e.Parameter as PackageCatalogEntryViewModel);
+            this.viewModel.Install(e.Parameter as PackageCatalogEntryViewModel);
         }
 
         private void InstallCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = !this.FilterTextBox.IsFocused && this._vm.CanInstall(e.Parameter as PackageCatalogEntryViewModel);
+            e.CanExecute = !this.FilterTextBox.IsFocused && this.viewModel.CanInstall(e.Parameter as PackageCatalogEntryViewModel);
             e.Handled = true;
         }
 
         private void RefreshCatalogCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this._vm.RefreshCatalog();
+            this.viewModel.RefreshCatalog();
         }
 
         private void RefreshCatalogCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this._vm.CanRefreshCatalog;
+            e.CanExecute = this.viewModel.CanRefreshCatalog;
             e.Handled = true;
         }
 
         private void OpenHomepageCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this._vm.OpenHomepage(e.Parameter as string);
+            this.viewModel.OpenHomepage(e.Parameter as string);
         }
 
         private void OpenHomepageCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = this._vm.CanOpenHomepage(e.Parameter as string);
+            e.CanExecute = this.viewModel.CanOpenHomepage(e.Parameter as string);
             e.Handled = true;
         }
 
@@ -106,9 +106,9 @@ namespace Microsoft.NodejsTools.NpmUI
             {
                 case Key.Down:
                 case Key.Enter:
-                    if (this._packageList.SelectedIndex == -1 && this._packageList.Items.Count > 0)
+                    if (this.packageList.SelectedIndex == -1 && this.packageList.Items.Count > 0)
                     {
-                        this._packageList.SelectedIndex = 0;
+                        this.packageList.SelectedIndex = 0;
                     }
 
                     FocusOnSelectedItemInPackageList();
@@ -119,22 +119,22 @@ namespace Microsoft.NodejsTools.NpmUI
 
         private void FocusOnSelectedItemInPackageList()
         {
-            this._packageList.ScrollIntoView(this._packageList.SelectedItem);
-            var itemContainer = (ListViewItem)this._packageList.ItemContainerGenerator.ContainerFromItem(this._packageList.SelectedItem);
+            this.packageList.ScrollIntoView(this.packageList.SelectedItem);
+            var itemContainer = (ListViewItem)this.packageList.ItemContainerGenerator.ContainerFromItem(this.packageList.SelectedItem);
             if (itemContainer != null)
             {
                 itemContainer.Focus();
             }
         }
 
-        private void _packageList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void packageList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            this._packageList.ScrollIntoView(this._packageList.SelectedItem);
+            this.packageList.ScrollIntoView(this.packageList.SelectedItem);
         }
 
-        private void _packageList_PreviewKeyDown(object sender, KeyEventArgs e)
+        private void packageList_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Up && this._packageList.SelectedIndex == 0)
+            if (e.Key == Key.Up && this.packageList.SelectedIndex == 0)
             {
                 this.FilterTextBox.Focus();
                 e.Handled = true;
@@ -143,25 +143,25 @@ namespace Microsoft.NodejsTools.NpmUI
 
         private void ShowOutputWindow_Click(object sender, RoutedEventArgs e)
         {
-            if (this._outputWindow == null)
+            if (this.outputWindow == null)
             {
-                this._outputWindow = new NpmOutputWindow()
+                this.outputWindow = new NpmOutputWindow()
                 {
                     Owner = this,
-                    WindowStartupLocation = System.Windows.WindowStartupLocation.Manual
+                    WindowStartupLocation = WindowStartupLocation.Manual
                 };
 
-                this._outputWindow.Left = Math.Max(0, this.Left - this._outputWindow.Width - 30);
-                this._outputWindow.Top = Math.Max(0, this.Top);
+                this.outputWindow.Left = Math.Max(0, this.Left - this.outputWindow.Width - 30);
+                this.outputWindow.Top = Math.Max(0, this.Top);
 
-                this._outputWindow.Closing += this._outputWindow_Closing;
-                this._outputWindow.DataContext = this._vm.ExecuteViewModel;
+                this.outputWindow.Closing += this.outputWindow_Closing;
+                this.outputWindow.DataContext = this.viewModel.ExecuteViewModel;
             }
 
-            this._outputWindow.Show();
-            if (this._outputWindow.WindowState == WindowState.Minimized)
+            this.outputWindow.Show();
+            if (this.outputWindow.WindowState == WindowState.Minimized)
             {
-                this._outputWindow.WindowState = WindowState.Normal;
+                this.outputWindow.WindowState = WindowState.Normal;
             }
         }
 
@@ -183,4 +183,3 @@ namespace Microsoft.NodejsTools.NpmUI
         }
     }
 }
-

@@ -42,7 +42,10 @@ namespace Microsoft.NodejsTools.Npm
         public override int GetHashCode(IPackage obj)
         {
             if (obj.Name == null || obj.Version == null)
+            {
                 return obj.GetHashCode();
+            }
+
             return obj.Name.GetHashCode() ^ obj.Version.GetHashCode();
         }
     }

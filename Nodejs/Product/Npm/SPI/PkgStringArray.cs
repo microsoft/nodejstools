@@ -11,29 +11,29 @@ namespace Microsoft.NodejsTools.Npm.SPI
 {
     internal abstract class PkgStringArray : IPkgStringArray
     {
-        private IList<string> elements;
+        private readonly IList<string> elements;
 
         protected PkgStringArray(JObject package, params string[] arrayPropertyNames)
         {
             var token = GetArrayProperty(package, arrayPropertyNames);
             if (token == null)
             {
-                elements = new List<string>();
+                this.elements = new List<string>();
             }
             else
             {
                 switch (token.Type)
                 {
                     case JTokenType.String:
-                        elements = new[] { token.Value<string>() };
+                        this.elements = new[] { token.Value<string>() };
                         break;
 
                     case JTokenType.Array:
-                        elements = (token as JArray).Select(value => value.Value<string>()).ToList();
+                        this.elements = (token as JArray).Select(value => value.Value<string>()).ToList();
                         break;
 
                     default:
-                        elements = new List<string>();
+                        this.elements = new List<string>();
                         break;
                 }
             }
@@ -52,44 +52,32 @@ namespace Microsoft.NodejsTools.Npm.SPI
             return null;
         }
 
-        public int Count
-        {
-            get
-            {
-                return elements.Count;
-            }
-        }
+        public int Count => this.elements.Count;
 
         public string this[int index]
         {
             get
             {
-                if (Count <= 0)
+                if (this.Count <= 0)
                 {
                     throw new IndexOutOfRangeException(
                         "Cannot retrieve item from empty package.json string array.");
                 }
 
-                if (index > Count)
+                if (index > this.Count)
                 {
                     throw new IndexOutOfRangeException(
                         string.Format(CultureInfo.CurrentCulture,
                             "Cannot retrieve value from index '{0}' in a package.json string array containing only 1 item.",
                             index));
                 }
-                return elements[index];
+                return this.elements[index];
             }
         }
 
-        public IEnumerator<string> GetEnumerator()
-        {
-            return elements.GetEnumerator();
-        }
+        public IEnumerator<string> GetEnumerator() => this.elements.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
 

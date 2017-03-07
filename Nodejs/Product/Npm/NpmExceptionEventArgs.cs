@@ -8,10 +8,10 @@ namespace Microsoft.NodejsTools.Npm
     {
         public NpmExceptionEventArgs(Exception cause)
         {
-            Exception = cause;
+            this.Exception = cause;
         }
 
-        public Exception Exception { get; private set; }
+        public Exception Exception { get; }
     }
 }
 

@@ -37,15 +37,15 @@ namespace Microsoft.NodejsTools.Npm.SPI
                 fullPathToRootPackageDirectory,
                 pathToNpm)
         {
-            _cachePath = cachePath;
-            Arguments = "search";
-            _forceDownload = forceDownload;
+            this._cachePath = cachePath;
+            this.Arguments = "search";
+            this._forceDownload = forceDownload;
             if (registryUrl != null)
             {
-                _registryUrl = new Uri(registryUrl);
+                this._registryUrl = new Uri(registryUrl);
             }
-            LastRefreshed = DateTime.MinValue;
-            _progress = progress;
+            this.LastRefreshed = DateTime.MinValue;
+            this._progress = progress;
         }
 
         internal void ParseResultsAndAddToDatabase(TextReader reader,
@@ -382,7 +382,7 @@ etc.
         {
             get
             {
-                return _cachePath;
+                return this._cachePath;
             }
         }
 
@@ -392,7 +392,7 @@ etc.
 
         private string DatabaseCacheFilePath
         {
-            get { return Path.Combine(CachePath, DatabaseCacheFilename); }
+            get { return Path.Combine(this.CachePath, DatabaseCacheFilename); }
         }
 
         private async Task<string> DownloadPackageJsonCache(Uri registry, string cachePath, long refreshStartKey = 0)
@@ -439,16 +439,19 @@ etc.
 
                 var progress = string.Format(CultureInfo.CurrentCulture, Resources.PackagesDownloadStarting, packageUri.AbsoluteUri);
                 OnOutputLogged(progress);
-                if (_progress != null)
+                if (this._progress != null)
                 {
-                    _progress.Report(progress);
+                    this._progress.Report(progress);
                 }
 
                 var buffer = new byte[4096];
 
                 using (var stream = response.GetResponseStream())
                 {
-                    if (stream == null) return null;
+                    if (stream == null)
+                    {
+                        return null;
+                    }
 
                     int bytesRead;
                     while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
@@ -473,9 +476,9 @@ etc.
                                 );
                             }
                             OnOutputLogged(progress);
-                            if (_progress != null)
+                            if (this._progress != null)
                             {
-                                _progress.Report(progress);
+                                this._progress.Report(progress);
                             }
                             nextNotification += 1;
                         }
@@ -485,9 +488,9 @@ etc.
 
                     OnOutputLogged(Resources.PackagesDownloadComplete);
 
-                    if (_progress != null)
+                    if (this._progress != null)
                     {
-                        _progress.Report(Resources.PackagesDownloadComplete);
+                        this._progress.Report(Resources.PackagesDownloadComplete);
                     }
                 }
             }
@@ -500,13 +503,13 @@ etc.
             var output = await NpmHelpers.ExecuteNpmCommandAsync(
                 null,
                 GetPathToNpm(),
-                FullPathToRootPackageDirectory,
+                this.FullPathToRootPackageDirectory,
                 new[] { "config", "get", "registry" },
                 null);
 
             if (output != null)
             {
-                _registryUrl = output
+                this._registryUrl = output
                     .Select(s =>
                     {
                         Uri u;
@@ -514,13 +517,13 @@ etc.
                     })
                     .FirstOrDefault(u => u != null);
             }
-            _registryUrl = _registryUrl ?? new Uri("https://registry.npmjs.org/");
-            return _registryUrl;
+            this._registryUrl = this._registryUrl ?? new Uri("https://registry.npmjs.org/");
+            return this._registryUrl;
         }
 
         public override async Task<bool> ExecuteAsync()
         {
-            var dbFilename = DatabaseCacheFilePath;
+            var dbFilename = this.DatabaseCacheFilePath;
             bool catalogUpdated = false;
             string filename = null;
             string registryCacheDirectory = null;
@@ -559,7 +562,7 @@ etc.
                     }
 
                     registryCacheDirectory = registryFileMapping != null ? registryFileMapping.DbFileLocation : Guid.NewGuid().ToString();
-                    registryCachePath = Path.Combine(CachePath, registryCacheDirectory);
+                    registryCachePath = Path.Combine(this.CachePath, registryCacheDirectory);
                     registryCacheFilePath = Path.Combine(registryCachePath, RegistryCacheFilename);
 
                     Directory.CreateDirectory(Path.GetDirectoryName(registryCacheFilePath));
@@ -575,17 +578,17 @@ etc.
                     }
 
                     bool correctDatabaseSchema = version != null && version.Id == _databaseSchemaVersion;
-                    bool incrementalUpdate = correctDatabaseSchema && _forceDownload && registryInfo != null && registryInfo.Revision > 0;
+                    bool incrementalUpdate = correctDatabaseSchema && this._forceDownload && registryInfo != null && registryInfo.Revision > 0;
                     bool fullUpdate = correctDatabaseSchema && (registryInfo == null || registryInfo.Revision <= 0);
 
                     if (!correctDatabaseSchema)
                     {
                         OnOutputLogged(Resources.InfoCatalogUpgrade);
-                        SafeDeleteFolder(CachePath);
+                        SafeDeleteFolder(this.CachePath);
 
                         CreateCatalogDatabaseAndInsertEntries(dbFilename, registryUrl, registryCacheDirectory);
 
-                        filename = await UpdatePackageCache(registryUrl, CachePath);
+                        filename = await UpdatePackageCache(registryUrl, this.CachePath);
                         catalogUpdated = true;
                     }
                     else if (incrementalUpdate)
@@ -615,7 +618,7 @@ etc.
                     using (var db = new SQLiteConnection(registryCacheFilePath))
                     {
                         db.CreateRegistryTableIfNotExists();
-                        ResultsCount = db.Table<CatalogEntry>().Count();
+                        this.ResultsCount = db.Table<CatalogEntry>().Count();
                     }
                 }
                 catch (Exception ex)
@@ -633,12 +636,12 @@ etc.
                 }
                 finally
                 {
-                    if (ResultsCount == null)
+                    if (this.ResultsCount == null)
                     {
-                        OnOutputLogged(string.Format(CultureInfo.CurrentCulture, Resources.DownloadOrParsingFailed, CachePath));
+                        OnOutputLogged(string.Format(CultureInfo.CurrentCulture, Resources.DownloadOrParsingFailed, this.CachePath));
                         SafeDeleteFolder(registryCacheDirectory);
                     }
-                    else if (ResultsCount <= 0)
+                    else if (this.ResultsCount <= 0)
                     {
                         // Database file exists, but is corrupt. Delete database, so that we can download the file next time arround.
                         OnOutputLogged(string.Format(CultureInfo.CurrentCulture, Resources.DatabaseCorrupt, dbFilename));
@@ -649,13 +652,13 @@ etc.
                 }
             }
 
-            LastRefreshed = File.GetLastWriteTime(registryCacheFilePath);
+            this.LastRefreshed = File.GetLastWriteTime(registryCacheFilePath);
 
             OnOutputLogged(string.Format(CultureInfo.CurrentCulture, Resources.InfoCurrentTime, DateTime.Now));
-            OnOutputLogged(string.Format(CultureInfo.CurrentCulture, Resources.InfoLastRefreshed, LastRefreshed));
-            if (ResultsCount != null)
+            OnOutputLogged(string.Format(CultureInfo.CurrentCulture, Resources.InfoLastRefreshed, this.LastRefreshed));
+            if (this.ResultsCount != null)
             {
-                OnOutputLogged(string.Format(CultureInfo.CurrentCulture, Resources.InfoNumberOfResults, ResultsCount));
+                OnOutputLogged(string.Format(CultureInfo.CurrentCulture, Resources.InfoNumberOfResults, this.ResultsCount));
             }
 
             return true;
@@ -713,7 +716,7 @@ etc.
 
         private Semaphore GetDatabaseSemaphore()
         {
-            return new Semaphore(1, 1, DatabaseCacheFilePath.Replace('\\', '/'));
+            return new Semaphore(1, 1, this.DatabaseCacheFilePath.Replace('\\', '/'));
         }
 
         private async Task<string> UpdatePackageCache(Uri registry, string cachePath, long refreshStartKey = 0)
@@ -748,14 +751,14 @@ etc.
                 {
                     registryUrl = registryUrl ?? await GetRegistryUrl();
                     RegistryFileMapping registryFileMapping = null;
-                    using (var db = new SQLiteConnection(DatabaseCacheFilePath))
+                    using (var db = new SQLiteConnection(this.DatabaseCacheFilePath))
                     {
                         registryFileMapping = db.Table<RegistryFileMapping>().FirstOrDefault(info => info.RegistryUrl == registryUrl.ToString());
                     }
 
                     if (registryFileMapping != null)
                     {
-                        string registryFileLocation = Path.Combine(CachePath, registryFileMapping.DbFileLocation, RegistryCacheFilename);
+                        string registryFileLocation = Path.Combine(this.CachePath, registryFileMapping.DbFileLocation, RegistryCacheFilename);
 
                         var packagesEnumerable = new DatabasePackageCatalogFilter(registryFileLocation).Filter(filterText);
                         packages = await Task.Run(() => packagesEnumerable.ToList());

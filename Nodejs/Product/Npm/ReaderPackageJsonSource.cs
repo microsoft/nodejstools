@@ -20,11 +20,11 @@ namespace Microsoft.NodejsTools.Npm
                     // JsonConvert and JObject.Parse exhibit slightly different behavior,
                     // so fall back to JObject.Parse if JsonConvert does not properly deserialize
                     // the object.
-                    Package = JsonConvert.DeserializeObject(text);
+                    this.Package = JsonConvert.DeserializeObject(text);
                 }
                 catch (ArgumentException)
                 {
-                    Package = JObject.Parse(text);
+                    this.Package = JObject.Parse(text);
                 }
             }
             catch (JsonReaderException jre)

@@ -11,7 +11,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             fullPathToRootPackageDirectory,
             pathToNpm)
         {
-            Arguments = arguments;
+            this.Arguments = arguments;
         }
     }
 }

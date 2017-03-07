@@ -14,20 +14,20 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         public PackageJson(dynamic package)
         {
-            Keywords = LoadKeywords(package);
-            Homepages = LoadHomepages(package);
-            Files = LoadFiles(package);
-            Dependencies = LoadDependencies(package);
-            DevDependencies = LoadDevDependencies(package);
-            BundledDependencies = LoadBundledDependencies(package);
-            OptionalDependencies = LoadOptionalDependencies(package);
-            AllDependencies = LoadAllDependencies(package);
-            RequiredBy = LoadRequiredBy(package);
+            this.Keywords = LoadKeywords(package);
+            this.Homepages = LoadHomepages(package);
+            this.Files = LoadFiles(package);
+            this.Dependencies = LoadDependencies(package);
+            this.DevDependencies = LoadDevDependencies(package);
+            this.BundledDependencies = LoadBundledDependencies(package);
+            this.OptionalDependencies = LoadOptionalDependencies(package);
+            this.AllDependencies = LoadAllDependencies(package);
+            this.RequiredBy = LoadRequiredBy(package);
 
-            Name = package.name == null ? null : package.name.ToString();
-            _versionString = package.version;
-            Description = package.description == null ? null : package.description.ToString();
-            Author = package.author == null ? null : Person.CreateFromJsonSource(package.author.ToString());
+            this.Name = package.name == null ? null : package.name.ToString();
+            this._versionString = package.version;
+            this.Description = package.description == null ? null : package.description.ToString();
+            this.Author = package.author == null ? null : Person.CreateFromJsonSource(package.author.ToString());
         }
 
         private static PackageJsonException WrapRuntimeBinderException(string errorProperty, RuntimeBinderException rbe)
@@ -157,7 +157,7 @@ The following error occurred:
         {
             get
             {
-                return _versionString == null ? new SemverVersion() : SemverVersion.Parse(_versionString);
+                return this._versionString == null ? new SemverVersion() : SemverVersion.Parse(this._versionString);
             }
         }
 

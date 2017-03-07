@@ -11,7 +11,6 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Microsoft.NodejsTools.Npm;
-using Microsoft.NodejsTools.Project;
 
 namespace Microsoft.NodejsTools.NpmUI
 {
@@ -21,7 +20,7 @@ namespace Microsoft.NodejsTools.NpmUI
         {
             IndexStandard = 0,
             IndexDev = 1,
-            IndexOptional = 2
+            IndexOptional = 2,
         }
 
         internal enum FilterState
@@ -29,7 +28,7 @@ namespace Microsoft.NodejsTools.NpmUI
             NoFilterText,
             Filtering,
             ResultsAvailable,
-            NoResults
+            NoResults,
         }
 
         public static readonly ICommand InstallCommand = new RoutedCommand();
@@ -73,14 +72,6 @@ namespace Microsoft.NodejsTools.NpmUI
             this._filterTimer = new Timer(this.FilterTimer_Elapsed, null, Timeout.Infinite, Timeout.Infinite);
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
-        }
-
         public INpmController NpmController
         {
             get { return this._npmController; }
@@ -106,7 +97,9 @@ namespace Microsoft.NodejsTools.NpmUI
         }
 
         public NpmOutputViewModel ExecuteViewModel => this._executeViewModel;
+
         #region Catalog control and refresh
+
         public bool IsLoadingCatalog
         {
             get { return this._isLoadingCatalog; }
@@ -119,6 +112,7 @@ namespace Microsoft.NodejsTools.NpmUI
         }
 
         public bool CanRefreshCatalog => !this.IsLoadingCatalog;
+
         public bool IsCatalogEmpty
         {
             get { return this._isCatalogEmpty; }
@@ -255,6 +249,7 @@ namespace Microsoft.NodejsTools.NpmUI
         #endregion
 
         #region Filtering
+
         public FilterState PackageFilterState
         {
             get
@@ -424,10 +419,7 @@ namespace Microsoft.NodejsTools.NpmUI
             GC.Collect();
         }
 
-        private string GetTrimmedTextSafe(string text)
-        {
-            return text != null ? text.Trim() : string.Empty;
-        }
+        private string GetTrimmedTextSafe(string text) => text?.Trim() ?? string.Empty;
 
         public LastRefreshedMessageProvider LastRefreshedMessage
         {
@@ -464,10 +456,7 @@ namespace Microsoft.NodejsTools.NpmUI
             }
         }
 
-        internal bool CanInstall(PackageCatalogEntryViewModel package)
-        {
-            return package != null;
-        }
+        internal bool CanInstall(PackageCatalogEntryViewModel package) => package != null;
 
         internal void Install(PackageCatalogEntryViewModel package)
         {
@@ -497,11 +486,9 @@ namespace Microsoft.NodejsTools.NpmUI
             }
         }
 
-        internal bool CanOpenHomepage(string homepage)
-        {
-            return !string.IsNullOrEmpty(homepage);
-        }
+        internal bool CanOpenHomepage(string homepage) => !string.IsNullOrEmpty(homepage);
 
+        // todo: harden this
         internal void OpenHomepage(string homepage)
         {
             if (!string.IsNullOrEmpty(homepage))
@@ -541,6 +528,16 @@ namespace Microsoft.NodejsTools.NpmUI
         }
 
         #endregion
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            var handler = this.PropertyChanged;
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
     }
 }
-

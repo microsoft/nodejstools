@@ -12,22 +12,22 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         public NpmSearchFilterStringComparer(string filterString)
         {
-            _filterString = filterString;
+            this._filterString = filterString;
         }
 
         private int GetExactKeywordMatchCount(IPackage source)
         {
-            return source.Keywords == null ? 0 : source.Keywords.Count(keyword => keyword.ToLower(CultureInfo.InvariantCulture) == _filterString);
+            return source.Keywords == null ? 0 : source.Keywords.Count(keyword => keyword.ToLower(CultureInfo.InvariantCulture) == this._filterString);
         }
 
         private int GetStartsWithMatchCount(IPackage source)
         {
-            return source.Keywords == null ? 0 : source.Keywords.Count(keyword => keyword.ToLower(CultureInfo.InvariantCulture).StartsWith(_filterString, StringComparison.Ordinal));
+            return source.Keywords == null ? 0 : source.Keywords.Count(keyword => keyword.ToLower(CultureInfo.InvariantCulture).StartsWith(this._filterString, StringComparison.Ordinal));
         }
 
         private int GetPartialKeywordMatchCount(IPackage source)
         {
-            return source.Keywords == null ? 0 : source.Keywords.Count(keyword => keyword.ToLower(CultureInfo.InvariantCulture).Contains(_filterString));
+            return source.Keywords == null ? 0 : source.Keywords.Count(keyword => keyword.ToLower(CultureInfo.InvariantCulture).Contains(this._filterString));
         }
 
         private new int CompareBasedOnKeywords(IPackage x, IPackage y)
@@ -68,22 +68,22 @@ namespace Microsoft.NodejsTools.Npm.SPI
                     return CompareBasedOnKeywords(x, y);
                 }
 
-                return d2.Contains(_filterString) ? 1 : CompareBasedOnKeywords(x, y);
+                return d2.Contains(this._filterString) ? 1 : CompareBasedOnKeywords(x, y);
             }
 
             if (null == d2)
             {
-                return d1.Contains(_filterString) ? -1 : CompareBasedOnKeywords(x, y);
+                return d1.Contains(this._filterString) ? -1 : CompareBasedOnKeywords(x, y);
             }
 
-            if (d1.Contains(_filterString))
+            if (d1.Contains(this._filterString))
             {
-                return d2.Contains(_filterString)
+                return d2.Contains(this._filterString)
                     ? string.Compare(d1, d2, StringComparison.CurrentCulture)
                     : -1;
             }
 
-            if (d2.Contains(_filterString))
+            if (d2.Contains(this._filterString))
             {
                 return 1;
             }
@@ -93,28 +93,28 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         public override int Compare(IPackage x, IPackage y)
         {
-            if (string.IsNullOrEmpty(_filterString))
+            if (string.IsNullOrEmpty(this._filterString))
             {
                 //  Version numbers are irrelevant, and names are good enough since they must be unique in the repo
                 return string.Compare(x.Name, y.Name, StringComparison.CurrentCulture);
             }
 
-            if (x.Name == _filterString)
+            if (x.Name == this._filterString)
             {
-                return y.Name == _filterString
+                return y.Name == this._filterString
                     ? 0 //  In theory should never happen since package names have to be unique
                     : -1; //  Exact matches are always the best
             }
 
-            if (y.Name == _filterString)
+            if (y.Name == this._filterString)
             {  //  Again, exact matches are always best
                 return 1;
             }
 
             // Matches at the beginning are better than matches in the string
-            if (x.Name.StartsWith(_filterString, StringComparison.CurrentCulture))
+            if (x.Name.StartsWith(this._filterString, StringComparison.CurrentCulture))
             {
-                if (y.Name.StartsWith(_filterString, StringComparison.CurrentCulture))
+                if (y.Name.StartsWith(this._filterString, StringComparison.CurrentCulture))
                 {
                     var result = string.Compare(x.Name, y.Name, StringComparison.CurrentCulture);
                     return 0 == result ? CompareBasedOnDescriptions(x, y) : result;
@@ -123,19 +123,19 @@ namespace Microsoft.NodejsTools.Npm.SPI
                 return -1;
             }
 
-            if (y.Name.StartsWith(_filterString, StringComparison.CurrentCulture))
+            if (y.Name.StartsWith(this._filterString, StringComparison.CurrentCulture))
             {
                 return 1;
             }
 
-            if (x.Name.Contains(_filterString))
+            if (x.Name.Contains(this._filterString))
             {
-                return y.Name.Contains(_filterString)
+                return y.Name.Contains(this._filterString)
                     ? string.Compare(x.Name, y.Name, StringComparison.CurrentCulture)
                     : -1;
             }
 
-            if (y.Name.Contains(_filterString))
+            if (y.Name.Contains(this._filterString))
             {
                 return 1;
             }

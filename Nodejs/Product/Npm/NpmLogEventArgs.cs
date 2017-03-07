@@ -8,7 +8,7 @@ namespace Microsoft.NodejsTools.Npm
     {
         public NpmLogEventArgs(string logText)
         {
-            LogText = logText;
+            this.LogText = logText;
         }
 
         public string LogText { get; private set; }

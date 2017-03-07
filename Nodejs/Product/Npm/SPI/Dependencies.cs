@@ -13,7 +13,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         public Dependencies(JObject package, params string[] dependencyPropertyNames)
         {
-            _dependencyProperties = new List<Dependency>();
+            this._dependencyProperties = new List<Dependency>();
             foreach (var propertyName in dependencyPropertyNames)
             {
                 var dependencies = package[propertyName] as JObject;
@@ -23,7 +23,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
                     {
                         if (property.Value.Type == JTokenType.String)
                         {
-                            _dependencyProperties.Add(new Dependency(property.Name, property.Value.Value<string>()));
+                            this._dependencyProperties.Add(new Dependency(property.Name, property.Value.Value<string>()));
                         }
                     }
                 }
@@ -32,7 +32,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         public IEnumerator<IDependency> GetEnumerator()
         {
-            return _dependencyProperties.GetEnumerator();
+            return this._dependencyProperties.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -49,7 +49,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             get
             {
-                foreach (var dependeny in _dependencyProperties)
+                foreach (var dependeny in this._dependencyProperties)
                 {
                     if (dependeny.Name == name)
                     {

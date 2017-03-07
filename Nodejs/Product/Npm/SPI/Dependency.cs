@@ -8,25 +8,25 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         public Dependency(string name, string retreivalInfo)
         {
-            Name = name;
-            _versionRangeUrlText = retreivalInfo;
+            this.Name = name;
+            this._versionRangeUrlText = retreivalInfo;
         }
 
         public string Name { get; private set; }
 
         private bool IsVersionRange
         {
-            get { return _versionRangeUrlText.IndexOf('/') < 0; }
+            get { return this._versionRangeUrlText.IndexOf('/') < 0; }
         }
 
         public IDependencyUrl Url
         {
-            get { return IsVersionRange ? null : new DependencyUrl(_versionRangeUrlText); }
+            get { return this.IsVersionRange ? null : new DependencyUrl(this._versionRangeUrlText); }
         }
 
         public string VersionRangeText
         {
-            get { return IsVersionRange ? _versionRangeUrlText : null; }
+            get { return this.IsVersionRange ? this._versionRangeUrlText : null; }
         }
     }
 }

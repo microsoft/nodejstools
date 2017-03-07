@@ -13,27 +13,27 @@ namespace Microsoft.NodejsTools.Npm
     {
         public NpmCommandCompletedEventArgs(string arguments, bool withErrors, bool cancelled)
         {
-            Arguments = arguments;
-            WithErrors = withErrors;
-            Cancelled = cancelled;
+            this.Arguments = arguments;
+            this.WithErrors = withErrors;
+            this.Cancelled = cancelled;
         }
 
-        public string Arguments { get; private set; }
+        public string Arguments { get; }
 
         public string CommandText
         {
-            get { return string.IsNullOrEmpty(Arguments) ? "npm" : string.Format(CultureInfo.InvariantCulture, "npm {0}", Arguments); }
+            get { return string.IsNullOrEmpty(this.Arguments) ? "npm" : string.Format(CultureInfo.InvariantCulture, "npm {0}", this.Arguments); }
         }
 
         /// <summary>
         /// Indicates whether or not there were errors whilst executing npm.
         /// </summary>
-        public bool WithErrors { get; private set; }
+        public bool WithErrors { get; }
 
         /// <summary>
         /// Indicates whether or not the command was cancelled, with or without errors.
         /// </summary>
-        public bool Cancelled { get; private set; }
+        public bool Cancelled { get; }
     }
 }
 

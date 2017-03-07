@@ -35,7 +35,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             {
                 buff.Append(" --save");
             }
-            Arguments = buff.ToString();
+            this.Arguments = buff.ToString();
         }
     }
 }

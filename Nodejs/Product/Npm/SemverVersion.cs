@@ -105,11 +105,11 @@ namespace Microsoft.NodejsTools.Npm
                     "buildMetadata");
             }
 
-            Major = major;
-            Minor = minor;
-            Patch = patch;
-            PreReleaseVersion = preReleaseVersion;
-            BuildMetadata = buildMetadata;
+            this.Major = major;
+            this.Minor = minor;
+            this.Patch = patch;
+            this.PreReleaseVersion = preReleaseVersion;
+            this.BuildMetadata = buildMetadata;
         }
 
         [JsonProperty]
@@ -133,28 +133,28 @@ namespace Microsoft.NodejsTools.Npm
 
         public bool HasPreReleaseVersion
         {
-            get { return !string.IsNullOrEmpty(PreReleaseVersion); }
+            get { return !string.IsNullOrEmpty(this.PreReleaseVersion); }
         }
 
         public bool HasBuildMetadata
         {
-            get { return !string.IsNullOrEmpty(BuildMetadata); }
+            get { return !string.IsNullOrEmpty(this.BuildMetadata); }
         }
 
         public override string ToString()
         {
-            var builder = new StringBuilder(string.Format(CultureInfo.InvariantCulture, "{0}.{1}.{2}", Major, Minor, Patch));
+            var builder = new StringBuilder(string.Format(CultureInfo.InvariantCulture, "{0}.{1}.{2}", this.Major, this.Minor, this.Patch));
 
-            if (HasPreReleaseVersion)
+            if (this.HasPreReleaseVersion)
             {
                 builder.Append('-');
-                builder.Append(PreReleaseVersion);
+                builder.Append(this.PreReleaseVersion);
             }
 
-            if (HasBuildMetadata)
+            if (this.HasBuildMetadata)
             {
                 builder.Append('+');
-                builder.Append(BuildMetadata);
+                builder.Append(this.BuildMetadata);
             }
 
             return builder.ToString();
@@ -177,10 +177,10 @@ namespace Microsoft.NodejsTools.Npm
             //  Note that we do NOT include build metadata in the comparison,
             //  since semver specifies that this is ignored when determining whether or
             //  not versions are equal. See point 11 at http://semver.org/.
-            return Major == other.Major
-                   && Minor == other.Minor
-                   && Patch == other.Patch
-                   && PreReleaseVersion == other.PreReleaseVersion;
+            return this.Major == other.Major
+                   && this.Minor == other.Minor
+                   && this.Patch == other.Patch
+                   && this.PreReleaseVersion == other.PreReleaseVersion;
         }
 
         public static bool operator ==(SemverVersion v1, SemverVersion v2)

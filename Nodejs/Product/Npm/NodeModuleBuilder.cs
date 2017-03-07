@@ -27,43 +27,43 @@ namespace Microsoft.NodejsTools.Npm
 
         public void Reset()
         {
-            Name = null;
+            this.Name = null;
 
             // We should double check, but I believe that the package no longer exists when "latest" is not set.
             // If that's the case, we should include an option to filter out those packages.
             // https://nodejstools.codeplex.com/workitem/1452
-            LatestVersion = SemverVersion.UnknownVersion;
-            _availableVersions = new List<SemverVersion>();
+            this.LatestVersion = SemverVersion.UnknownVersion;
+            this._availableVersions = new List<SemverVersion>();
 
-            Flags = PackageFlags.None;
-            RequestedVersionRange = null;
+            this.Flags = PackageFlags.None;
+            this.RequestedVersionRange = null;
 
             //  These *have* to be reinitialised or they'll be cleared
             //  in any packages that have been created using the builder
             //  because they're passed by reference.
-            _dependencies = new List<IPackage>();
-            _keywords = new List<string>();
-            _homepages = new List<string>();
+            this._dependencies = new List<IPackage>();
+            this._keywords = new List<string>();
+            this._homepages = new List<string>();
 
-            _descriptionBuff.Length = 0;
-            _authorBuff.Length = 0;
-            _publishDateTime.Length = 0;
+            this._descriptionBuff.Length = 0;
+            this._authorBuff.Length = 0;
+            this._publishDateTime.Length = 0;
         }
 
         public void AddAuthor(string text)
         {
-            if (_authorBuff.Length > 0)
+            if (this._authorBuff.Length > 0)
             {
-                _authorBuff.Append(' ');
+                this._authorBuff.Append(' ');
             }
-            _authorBuff.Append(text);
+            this._authorBuff.Append(text);
         }
 
         public IPerson Author
         {
             get
             {
-                var text = _authorBuff.ToString().Trim();
+                var text = this._authorBuff.ToString().Trim();
                 return string.IsNullOrEmpty(text) ? null : Person.CreateFromJsonSource(text);
             }
         }
@@ -74,68 +74,68 @@ namespace Microsoft.NodejsTools.Npm
 
         public IEnumerable<SemverVersion> AvailableVersions
         {
-            get { return _availableVersions; }
-            set { _availableVersions = value != null ? value.ToList() : new List<SemverVersion>(); }
+            get { return this._availableVersions; }
+            set { this._availableVersions = value != null ? value.ToList() : new List<SemverVersion>(); }
         }
 
         public IEnumerable<string> Homepages
         {
             get
             {
-                return _homepages;
+                return this._homepages;
             }
         }
 
         public void AddHomepage(string homepage)
         {
-            _homepages.Add(homepage);
+            this._homepages.Add(homepage);
         }
 
         public void AppendToDescription(string text)
         {
-            _descriptionBuff.Append(text);
+            this._descriptionBuff.Append(text);
         }
 
         public string Description
         {
             get
             {
-                var text = _descriptionBuff.ToString().Trim();
+                var text = this._descriptionBuff.ToString().Trim();
                 return string.IsNullOrEmpty(text) ? null : text;
             }
         }
 
         public void AppendToDate(string text)
         {
-            if (_publishDateTime.Length > 0)
+            if (this._publishDateTime.Length > 0)
             {
-                _publishDateTime.Append(' ');
+                this._publishDateTime.Append(' ');
             }
-            _publishDateTime.Append(text);
+            this._publishDateTime.Append(text);
         }
 
         public string PublishDateTimeString
         {
             get
             {
-                var text = _publishDateTime.ToString().Trim();
+                var text = this._publishDateTime.ToString().Trim();
                 return string.IsNullOrEmpty(text) ? null : text;
             }
         }
 
         public IEnumerable<IPackage> Dependencies
         {
-            get { return _dependencies; }
+            get { return this._dependencies; }
         }
 
         public void AddDependency(IPackage module)
         {
-            _dependencies.Add(module);
+            this._dependencies.Add(module);
         }
 
         public void AddDependencies(IEnumerable<IPackage> packages)
         {
-            _dependencies.AddRange(packages);
+            this._dependencies.AddRange(packages);
         }
 
         public PackageFlags Flags { get; set; }
@@ -144,14 +144,14 @@ namespace Microsoft.NodejsTools.Npm
 
         public void AddKeyword(string keyword)
         {
-            _keywords.Add(keyword);
+            this._keywords.Add(keyword);
         }
 
         public IEnumerable<string> Keywords
         {
             get
             {
-                return _keywords;
+                return this._keywords;
             }
         }
 
@@ -159,20 +159,20 @@ namespace Microsoft.NodejsTools.Npm
         {
             var proxy = new PackageProxy
             {
-                Author = Author,
-                Name = Name,
-                Version = LatestVersion,
-                AvailableVersions = AvailableVersions,
-                Description = Description,
-                Homepages = Homepages,
-                PublishDateTimeString = PublishDateTimeString,
-                RequestedVersionRange = RequestedVersionRange,
-                Flags = Flags,
-                Keywords = _keywords
+                Author = this.Author,
+                Name = this.Name,
+                Version = this.LatestVersion,
+                AvailableVersions = this.AvailableVersions,
+                Description = this.Description,
+                Homepages = this.Homepages,
+                PublishDateTimeString = this.PublishDateTimeString,
+                RequestedVersionRange = this.RequestedVersionRange,
+                Flags = this.Flags,
+                Keywords = this._keywords
             };
 
             var modules = new NodeModulesProxy();
-            foreach (var dep in Dependencies)
+            foreach (var dep in this.Dependencies)
             {
                 modules.AddModule(dep);
             }

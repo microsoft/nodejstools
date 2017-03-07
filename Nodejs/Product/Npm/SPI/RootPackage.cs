@@ -16,13 +16,13 @@ namespace Microsoft.NodejsTools.Npm.SPI
             int depth = 0,
             int maxDepth = 1)
         {
-            Path = fullPathToRootDirectory;
+            this.Path = fullPathToRootDirectory;
             var packageJsonFile = System.IO.Path.Combine(fullPathToRootDirectory, "package.json");
             try
             {
                 if (packageJsonFile.Length < 260)
                 {
-                    PackageJson = PackageJsonFactory.Create(new DirectoryPackageJsonSource(fullPathToRootDirectory));
+                    this.PackageJson = PackageJsonFactory.Create(new DirectoryPackageJsonSource(fullPathToRootDirectory));
                 }
             }
             catch (RuntimeBinderException rbe)
@@ -40,7 +40,7 @@ The following error was reported:
 
             try
             {
-                Modules = new NodeModules(this, showMissingDevOptionalSubPackages, allModules, depth, maxDepth);
+                this.Modules = new NodeModules(this, showMissingDevOptionalSubPackages, allModules, depth, maxDepth);
             }
             catch (PathTooLongException)
             {
@@ -48,41 +48,23 @@ The following error was reported:
             }
         }
 
-        public IPackageJson PackageJson { get; private set; }
+        public IPackageJson PackageJson { get; }
 
-        public bool HasPackageJson
-        {
-            get { return null != PackageJson; }
-        }
+        public INodeModules Modules { get; }
 
-        public string Name
-        {
-            get { return null == PackageJson ? new DirectoryInfo(Path).Name : PackageJson.Name; }
-        }
+        public string Path { get; }
 
-        public SemverVersion Version
-        {
-            get { return null == PackageJson ? new SemverVersion() : PackageJson.Version; }
-        }
+        public IEnumerable<string> Homepages => this.PackageJson?.Homepages;
 
-        public IPerson Author
-        {
-            get { return null == PackageJson ? null : PackageJson.Author; }
-        }
+        public bool HasPackageJson => this.PackageJson != null;
 
-        public string Description
-        {
-            get { return null == PackageJson ? null : PackageJson.Description; }
-        }
+        public string Name => HasPackageJson ? new DirectoryInfo(this.Path).Name : this.PackageJson.Name;
 
-        public IEnumerable<string> Homepages
-        {
-            get { return null == PackageJson ? null : PackageJson.Homepages; }
-        }
+        public SemverVersion Version => HasPackageJson ? new SemverVersion() : this.PackageJson.Version;
 
-        public string Path { get; private set; }
+        public IPerson Author => this.PackageJson?.Author;
 
-        public INodeModules Modules { get; private set; }
+        public string Description => this.PackageJson?.Description;
     }
 }
 

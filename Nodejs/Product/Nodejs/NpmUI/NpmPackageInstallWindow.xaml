@@ -259,7 +259,7 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <ProgressBar Name="_progress"
+            <ProgressBar Name="progressBar"
                              Height="4"
                              IsIndeterminate="true"
                              Visibility="{Binding Path=ExecuteViewModel.ExecutionProgressVisibility}" Grid.Row="1" Grid.ColumnSpan="2"/>
@@ -328,19 +328,19 @@
             </Grid>
 
             <ContentControl Style="{StaticResource SearchStyle}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsTabStop="False" Focusable="False" />
-            <Grid Grid.Row="1" Background="{Binding ElementName=_packageList, Path=Background}">
-                <ListView x:Name="_packageList"
+            <Grid Grid.Row="1" Background="{Binding ElementName=packageList, Path=Background}">
+                <ListView x:Name="packageList"
                           ItemsSource="{Binding FilteredPackages}"
                           SelectedItem="{Binding SelectedPackage}"
-                          SelectionChanged="_packageList_SelectionChanged"
-                          PreviewKeyDown="_packageList_PreviewKeyDown"
+                          SelectionChanged="packageList_SelectionChanged"
+                          PreviewKeyDown="packageList_PreviewKeyDown"
                           HorizontalContentAlignment="Stretch"
                           ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                           MinHeight="0"
                           KeyboardNavigation.TabIndex="1" 
                           Visibility="{Binding PackageFilterState, Converter={wpf:Lambda '(NpmPackageInstallViewModel.FilterState b) => NpmPackageInstallViewModel.FilterState.ResultsAvailable == b ? Visibility.Visible : Visibility.Hidden'}}"/>
-                <Border BorderBrush="{Binding ElementName=_packageList, Path=BorderBrush}"
-                        BorderThickness="{Binding ElementName=_packageList,Path=BorderThickness}">
+                <Border BorderBrush="{Binding ElementName=packageList, Path=BorderBrush}"
+                        BorderThickness="{Binding ElementName=packageList,Path=BorderThickness}">
                     <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TextBlock HorizontalAlignment="Center"
                                    Visibility="{Binding PackageFilterState, Converter={wpf:Lambda '(NpmPackageInstallViewModel.FilterState b) => NpmPackageInstallViewModel.FilterState.NoFilterText == b ? Visibility.Visible : Visibility.Hidden'}}"

@@ -21,7 +21,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             int maxDepth = 1)
             : base(fullPathToRootDirectory, showMissingDevOptionalSubPackages, allModules, depth, maxDepth)
         {
-            _parent = parent;
+            this._parent = parent;
         }
 
         public string PublishDateTimeString { get { return null; } }
@@ -34,7 +34,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             get
             {
-                var keywords = null == PackageJson ? null : PackageJson.Keywords;
+                var keywords = null == this.PackageJson ? null : this.PackageJson.Keywords;
                 return keywords ?? (IEnumerable<string>)new List<string>();
             }
         }
@@ -43,22 +43,22 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             get
             {
-                IPackageJson parentPackageJson = _parent.PackageJson;
-                return (null != parentPackageJson && parentPackageJson.AllDependencies.Contains(Name));
+                IPackageJson parentPackageJson = this._parent.PackageJson;
+                return (null != parentPackageJson && parentPackageJson.AllDependencies.Contains(this.Name));
             }
         }
 
         public bool IsMissing
         {
-            get { return IsListedInParentPackageJson && !Directory.Exists(Path); }
+            get { return this.IsListedInParentPackageJson && !Directory.Exists(this.Path); }
         }
 
         public bool IsDevDependency
         {
             get
             {
-                IPackageJson parentPackageJson = _parent.PackageJson;
-                return null != parentPackageJson && parentPackageJson.DevDependencies.Contains(Name);
+                IPackageJson parentPackageJson = this._parent.PackageJson;
+                return null != parentPackageJson && parentPackageJson.DevDependencies.Contains(this.Name);
             }
         }
 
@@ -66,8 +66,8 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             get
             {
-                IPackageJson parentPackageJson = _parent.PackageJson;
-                return null != parentPackageJson && parentPackageJson.Dependencies.Contains(Name);
+                IPackageJson parentPackageJson = this._parent.PackageJson;
+                return null != parentPackageJson && parentPackageJson.Dependencies.Contains(this.Name);
             }
         }
 
@@ -75,8 +75,8 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             get
             {
-                IPackageJson parentPackageJson = _parent.PackageJson;
-                return null != parentPackageJson && parentPackageJson.OptionalDependencies.Contains(Name);
+                IPackageJson parentPackageJson = this._parent.PackageJson;
+                return null != parentPackageJson && parentPackageJson.OptionalDependencies.Contains(this.Name);
             }
         }
 
@@ -84,8 +84,8 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             get
             {
-                IPackageJson parentPackageJson = _parent.PackageJson;
-                return null != parentPackageJson && parentPackageJson.BundledDependencies.Contains(Name);
+                IPackageJson parentPackageJson = this._parent.PackageJson;
+                return null != parentPackageJson && parentPackageJson.BundledDependencies.Contains(this.Name);
             }
         }
 
@@ -93,17 +93,17 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             get
             {
-                return (!IsListedInParentPackageJson ? PackageFlags.NotListedAsDependency : 0)
-                       | (IsMissing ? PackageFlags.Missing : 0)
-                       | (IsDevDependency ? PackageFlags.Dev : 0)
-                       | (IsOptionalDependency ? PackageFlags.Optional : 0)
-                       | (IsBundledDependency ? PackageFlags.Bundled : 0);
+                return (!this.IsListedInParentPackageJson ? PackageFlags.NotListedAsDependency : 0)
+                       | (this.IsMissing ? PackageFlags.Missing : 0)
+                       | (this.IsDevDependency ? PackageFlags.Dev : 0)
+                       | (this.IsOptionalDependency ? PackageFlags.Optional : 0)
+                       | (this.IsBundledDependency ? PackageFlags.Bundled : 0);
             }
         }
 
         public override string ToString()
         {
-            return string.Format(CultureInfo.InvariantCulture, "{0} {1}", Name, Version);
+            return string.Format(CultureInfo.InvariantCulture, "{0} {1}", this.Name, this.Version);
         }
     }
 }

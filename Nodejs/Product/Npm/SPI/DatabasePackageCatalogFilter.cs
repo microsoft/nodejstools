@@ -15,7 +15,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         public DatabasePackageCatalogFilter(string dbFilename)
         {
-            _dbFilename = dbFilename;
+            this._dbFilename = dbFilename;
         }
 
         public IEnumerable<IPackage> Filter(string filterString)
@@ -27,7 +27,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             // Lastly, trim whitespace because otherwise no results will be found.
             string escapedFilterString = filterString.Replace("'", "''").Replace('-', ' ').Trim();
 
-            using (var db = new SQLiteConnection(_dbFilename))
+            using (var db = new SQLiteConnection(this._dbFilename))
             {
                 if (filterString.Length >= 3)
                 {
@@ -57,12 +57,12 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
             public CatalogEntryComparer(string filterText)
             {
-                _filterText = filterText;
+                this._filterText = filterText;
             }
 
             public int Compare(CatalogEntry x, CatalogEntry y)
             {
-                if (string.IsNullOrEmpty(_filterText))
+                if (string.IsNullOrEmpty(this._filterText))
                 {
                     return String.Compare(x.Name, y.Name, StringComparison.OrdinalIgnoreCase);
                 }
@@ -71,8 +71,8 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
             private int? CompareEntryStrings(string x, string y)
             {
-                var xIndex = string.IsNullOrEmpty(x) ? -1 : x.ToLower(CultureInfo.InvariantCulture).IndexOf(_filterText, StringComparison.OrdinalIgnoreCase);
-                var yIndex = string.IsNullOrEmpty(y) ? -1 : y.ToLower(CultureInfo.InvariantCulture).IndexOf(_filterText, StringComparison.OrdinalIgnoreCase);
+                var xIndex = string.IsNullOrEmpty(x) ? -1 : x.ToLower(CultureInfo.InvariantCulture).IndexOf(this._filterText, StringComparison.OrdinalIgnoreCase);
+                var yIndex = string.IsNullOrEmpty(y) ? -1 : y.ToLower(CultureInfo.InvariantCulture).IndexOf(this._filterText, StringComparison.OrdinalIgnoreCase);
 
                 int? xEqualsY = null;
                 const int xBeforeY = -1;

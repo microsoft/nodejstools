@@ -13,7 +13,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         public NpmSearchRegexComparer(Regex regex)
         {
-            _regex = regex;
+            this._regex = regex;
         }
 
         private int GetFirstMatchIndex(MatchCollection matches)
@@ -23,7 +23,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         private IList<MatchCollection> GetKeywordMatches(IPackage x)
         {
-            return x.Keywords.Select(keyword => _regex.Matches(keyword)).Where(matches => matches.Count > 0).ToList();
+            return x.Keywords.Select(keyword => this._regex.Matches(keyword)).Where(matches => matches.Count > 0).ToList();
         }
 
         private int GetSumOfLowestMatchIndexes(IList<MatchCollection> matches)
@@ -57,8 +57,8 @@ namespace Microsoft.NodejsTools.Npm.SPI
                 return CompareBasedOnKeywords(x, y);
             }
 
-            var xMatches = _regex.Matches(d1);
-            var yMatches = _regex.Matches(d2);
+            var xMatches = this._regex.Matches(d1);
+            var yMatches = this._regex.Matches(d2);
 
             var result = GetFirstMatchIndex(xMatches).CompareTo(GetFirstMatchIndex(yMatches));
             if (0 == result)
@@ -79,8 +79,8 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         public override int Compare(IPackage x, IPackage y)
         {
-            var xMatches = _regex.Matches(x.Name);
-            var yMatches = _regex.Matches(y.Name);
+            var xMatches = this._regex.Matches(x.Name);
+            var yMatches = this._regex.Matches(y.Name);
 
             var result = GetFirstMatchIndex(xMatches).CompareTo(GetFirstMatchIndex(yMatches));
             if (0 == result)

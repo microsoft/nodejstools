@@ -11,7 +11,6 @@ using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
 using Microsoft.NodejsTools.Npm;
-using Microsoft.NodejsTools.Project;
 
 namespace Microsoft.NodejsTools.NpmUI
 {
@@ -474,4 +473,3 @@ namespace Microsoft.NodejsTools.NpmUI
         }
     }
 }
-
