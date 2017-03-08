@@ -9,11 +9,6 @@ namespace Microsoft.NodejsTools.Npm
     public interface INpmCommander : INpmLogSource, IDisposable
     {
         /// <summary>
-        /// Cancels the currently running command
-        /// </summary>
-        void CancelCurrentCommand();
-
-        /// <summary>
         /// Executes npm install to install all packages in package.json.
         /// </summary>
         /// <returns></returns>
@@ -34,12 +29,6 @@ namespace Microsoft.NodejsTools.Npm
             DependencyType type,
             bool saveToPackageJson);
 
-        Task<bool> InstallPackageToFolderByVersionAsync(
-            string pathToRootDirectory,
-            string packageName,
-            string versionRange,
-            bool saveToPackageJson);
-
         /// <summary>
         /// 
         /// </summary>
@@ -47,8 +36,6 @@ namespace Microsoft.NodejsTools.Npm
         /// <exception cref="PackageJsonException">If there is an error reading a package.json file when modules are refreshed.</exception>
         /// <returns></returns>
         Task<bool> UninstallPackageAsync(string packageName);
-
-        Task<IPackageCatalog> GetCatalogAsync(bool forceDownload, IProgress<string> progress);
 
         Task<bool> UpdatePackagesAsync();
 

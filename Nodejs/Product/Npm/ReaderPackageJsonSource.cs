@@ -63,7 +63,6 @@ Reading failed because the following error occurred:
                 ex);
         }
 
-        public dynamic Package { get; private set; }
+        public dynamic Package { get; }
     }
 }
-

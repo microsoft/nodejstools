@@ -11,7 +11,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             this.Address = address;
         }
 
-        public string Address { get; private set; }
+        public string Address { get; }
 
         public DependencyUrlType Type
         {

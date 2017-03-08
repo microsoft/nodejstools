@@ -58,9 +58,9 @@ The following error was reported:
 
         public bool HasPackageJson => this.PackageJson != null;
 
-        public string Name => HasPackageJson ? new DirectoryInfo(this.Path).Name : this.PackageJson.Name;
+        public string Name => this.HasPackageJson ? new DirectoryInfo(this.Path).Name : this.PackageJson.Name;
 
-        public SemverVersion Version => HasPackageJson ? new SemverVersion() : this.PackageJson.Version;
+        public SemverVersion Version => this.HasPackageJson ? new SemverVersion() : this.PackageJson.Version;
 
         public IPerson Author => this.PackageJson?.Author;
 

@@ -181,45 +181,6 @@
                             </MultiDataTrigger>
                         </DataTemplate.Triggers>
                     </DataTemplate>
-
-                    <DataTemplate DataType="{x:Type npmUi:LastRefreshedMessageProvider}">
-                        <Grid HorizontalAlignment="Stretch">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0"
-                                       Margin="0 0 3 0"
-                                       VerticalAlignment="Center"
-                                       Text="{x:Static resx:NpmInstallWindowResources.InstalledLocallyMessage}" />
-                            
-                            <TextBlock Grid.Column="1"
-                                       x:Name="Message"
-                                       Text="{Binding Description}"
-                                       VerticalAlignment="Center"/>
-                        </Grid>
-                        <DataTemplate.Triggers>
-                            <DataTrigger Binding="{Binding IsAncient}" Value="True">
-                                <Setter TargetName="Message" Property="Foreground" Value="Red" />
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding IsOld}" Value="True">
-                                <Setter TargetName="Message" Property="FontWeight" Value="Bold" />
-                            </DataTrigger>
-                        </DataTemplate.Triggers>
-                    </DataTemplate>
-
-                    <DataTemplate DataType="{x:Type npmUi:NpmOutputViewModel}">
-                        <Ellipse x:Name="StatusIcon" Width="14" Height="14" Stroke="Gray" StrokeThickness="1" Margin="0 0 2 0" VerticalAlignment="Center"/>
-
-                        <DataTemplate.Triggers>
-                            <DataTrigger Binding="{Binding WithErrors}" Value="True">
-                                <Setter TargetName="StatusIcon" Property="Fill" Value="Red"/>
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding WithErrors}" Value="False">
-                                <Setter TargetName="StatusIcon" Property="Fill" Value="#80B5FFA9"/>
-                            </DataTrigger>
-                        </DataTemplate.Triggers>
-                    </DataTemplate>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -232,9 +193,6 @@
         <CommandBinding Command="{x:Static npmUi:NpmPackageInstallViewModel.InstallCommand}"
                         Executed="InstallCommand_Executed"
                         CanExecute="InstallCommand_CanExecute" />
-        <CommandBinding Command="{x:Static npmUi:NpmPackageInstallViewModel.RefreshCatalogCommand}"
-                        Executed="RefreshCatalogCommand_Executed"
-                        CanExecute="RefreshCatalogCommand_CanExecute" />
         <CommandBinding Command="{x:Static npmUi:NpmPackageInstallViewModel.OpenHomepageCommand}"
                         Executed="OpenHomepageCommand_Executed"
                         CanExecute="OpenHomepageCommand_CanExecute" />
@@ -259,23 +217,6 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <ProgressBar Name="progressBar"
-                             Height="4"
-                             IsIndeterminate="true"
-                             Visibility="{Binding Path=ExecuteViewModel.ExecutionProgressVisibility}" Grid.Row="1" Grid.ColumnSpan="2"/>
-            <StackPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">
-                <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Margin="4" Orientation="Horizontal">
-
-                    <ContentControl Content="{Binding ExecuteViewModel}" Focusable="False" IsTabStop="False"/>
-
-                    <Button x:Name="npmInstallOutputLink"
-                            Style="{StaticResource NavigationButton}"
-                            Click="ShowOutputWindow_Click"
-                            KeyboardNavigation.TabIndex="9"
-                            ContentStringFormat="{}npm install Output: {0}"
-                            Content="{Binding ExecuteViewModel.StatusText}" />
-                </StackPanel>
-            </StackPanel>
 
             <Button x:Name="CloseButton"
                         Grid.Column="1"
@@ -358,30 +299,6 @@
                 </Border>
             </Grid>
             <GridSplitter Grid.Column="1" Grid.Row="0" Grid.RowSpan="3" Width="6" Background="Transparent" VerticalAlignment="Stretch" HorizontalAlignment="Center" ShowsPreview="True" />
-
-            <Grid Grid.Row="2" VerticalAlignment="Top" Margin="0 4 0 0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-
-                <!-- Package cache control -->
-
-                <ContentControl Grid.Column="0"
-                                    Content="{Binding LastRefreshedMessage}"
-                                    Foreground="{DynamicResource {x:Static wpf:Controls.ForegroundKey}}"
-                                    VerticalAlignment="Center"
-                                    HorizontalAlignment="Stretch"
-                                    Focusable="False"
-                                    IsTabStop="False"/>
-
-                <Button Grid.Column="1" HorizontalAlignment="Right" Margin="0"
-                        Name="RefreshButton"
-                        Command="{x:Static npmUi:NpmPackageInstallViewModel.RefreshCatalogCommand}"
-                        KeyboardNavigation.TabIndex="8"
-                        xml:space="preserve"
-                        Content="{x:Static resx:NpmInstallWindowResources.RefreshButtonContent}" />
-            </Grid>
 
             <Grid Grid.Column="2" Grid.RowSpan="2" Margin="8 0 0 0" >
                 <Grid.RowDefinitions>
@@ -478,26 +395,6 @@
                     </StackPanel>
                 </StackPanel>
             </Grid>
-
-            <!-- Cache control and output -->
-            <!-- (Together in the same grid so the splitter works) -->
-
-        </Grid>
-
-        <Grid Visibility="{Binding LoadingCatalogControlVisibility}">
-            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Center">
-                <Label Content="{Binding LoadingCatalogMessage}"
-                       HorizontalAlignment="Center"
-                       HorizontalContentAlignment="Center" />
-
-                <ProgressBar x:Name="_loadingProgress"
-                             Height="16"
-                             Margin="50, 4, 50, 4"
-                             IsIndeterminate="True"
-                             IsEnabled="{Binding IsLoadingCatalog}" />
-                <TextBlock Text="{Binding LoadingCatalogProgressMessage}"
-                           HorizontalAlignment="Center" />
-            </StackPanel>
         </Grid>
     </Grid>
 

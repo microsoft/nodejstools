@@ -15,11 +15,10 @@ namespace Microsoft.NodejsTools.NpmUI
     internal sealed partial class NpmPackageInstallWindow : DialogWindowVersioningWorkaround, IDisposable
     {
         private readonly NpmPackageInstallViewModel viewModel;
-        private NpmOutputWindow outputWindow;
 
-        internal NpmPackageInstallWindow(INpmController controller, NpmOutputViewModel executeVm, DependencyType dependencyType = DependencyType.Standard)
+        internal NpmPackageInstallWindow(INpmController controller, NpmWorker npmWorker, DependencyType dependencyType = DependencyType.Standard)
         {
-            this.DataContext = this.viewModel = new NpmPackageInstallViewModel(executeVm, this.Dispatcher);
+            this.DataContext = this.viewModel = new NpmPackageInstallViewModel(npmWorker, this.Dispatcher);
             this.viewModel.NpmController = controller;
             InitializeComponent();
             this.DependencyComboBox.SelectedIndex = (int)dependencyType;
@@ -27,25 +26,11 @@ namespace Microsoft.NodejsTools.NpmUI
 
         public void Dispose()
         {
-            //  This will unregister event handlers on the controller and prevent
-            //  us from leaking view models.
-            if (this.outputWindow != null)
-            {
-                this.outputWindow.Closing -= this.outputWindow_Closing;
-                this.outputWindow.Close();
-            }
-
             this.viewModel.NpmController = null;
 
             // The catalog refresh operation spawns many long-lived Gen 2 objects,
             // so the garbage collector will take a while to get to them otherwise.
             GC.Collect();
-        }
-
-        private void outputWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            e.Cancel = true;
-            this.outputWindow.Hide();
         }
 
         private void Close_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -67,17 +52,6 @@ namespace Microsoft.NodejsTools.NpmUI
         private void InstallCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = !this.FilterTextBox.IsFocused && this.viewModel.CanInstall(e.Parameter as PackageCatalogEntryViewModel);
-            e.Handled = true;
-        }
-
-        private void RefreshCatalogCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            this.viewModel.RefreshCatalog();
-        }
-
-        private void RefreshCatalogCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = this.viewModel.CanRefreshCatalog;
             e.Handled = true;
         }
 
@@ -138,30 +112,6 @@ namespace Microsoft.NodejsTools.NpmUI
             {
                 this.FilterTextBox.Focus();
                 e.Handled = true;
-            }
-        }
-
-        private void ShowOutputWindow_Click(object sender, RoutedEventArgs e)
-        {
-            if (this.outputWindow == null)
-            {
-                this.outputWindow = new NpmOutputWindow()
-                {
-                    Owner = this,
-                    WindowStartupLocation = WindowStartupLocation.Manual
-                };
-
-                this.outputWindow.Left = Math.Max(0, this.Left - this.outputWindow.Width - 30);
-                this.outputWindow.Top = Math.Max(0, this.Top);
-
-                this.outputWindow.Closing += this.outputWindow_Closing;
-                this.outputWindow.DataContext = this.viewModel.ExecuteViewModel;
-            }
-
-            this.outputWindow.Show();
-            if (this.outputWindow.WindowState == WindowState.Minimized)
-            {
-                this.outputWindow.WindowState = WindowState.Normal;
             }
         }
 

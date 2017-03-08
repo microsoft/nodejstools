@@ -4,29 +4,27 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Npm.SPI
 {
     internal class NpmController : AbstractNpmLogSource, INpmController
     {
-        private IPackageCatalog _sRepoCatalog;
-        private string _fullPathToRootPackageDirectory;
-        private string _cachePath;
-        private bool _showMissingDevOptionalSubPackages;
-        private INpmPathProvider _npmPathProvider;
-        private IRootPackage _rootPackage;
-        private readonly object _lock = new object();
+        private string fullPathToRootPackageDirectory;
+        private string cachePath;
+        private bool showMissingDevOptionalSubPackages;
+        private INpmPathProvider npmPathProvider;
+        private IRootPackage rootPackage;
+        private readonly object packageLock = new object();
 
-        private readonly FileSystemWatcher _localWatcher;
+        private readonly FileSystemWatcher localWatcher;
 
-        private Timer _fileSystemWatcherTimer;
-        private int _refreshRetryCount;
+        private Timer fileSystemWatcherTimer;
+        private int refreshRetryCount;
 
-        private readonly object _fileBitsLock = new object();
+        private readonly object fileBitsLock = new object();
 
-        private bool _isDisposed;
-        private bool _isReloadingModules = false;
+        private bool isDisposed;
+        private bool isReloadingModules = false;
 
         public NpmController(
             string fullPathToRootPackageDirectory,
@@ -34,12 +32,12 @@ namespace Microsoft.NodejsTools.Npm.SPI
             bool showMissingDevOptionalSubPackages = false,
             INpmPathProvider npmPathProvider = null)
         {
-            this._fullPathToRootPackageDirectory = fullPathToRootPackageDirectory;
-            this._cachePath = cachePath;
-            this._showMissingDevOptionalSubPackages = showMissingDevOptionalSubPackages;
-            this._npmPathProvider = npmPathProvider;
+            this.fullPathToRootPackageDirectory = fullPathToRootPackageDirectory;
+            this.cachePath = cachePath;
+            this.showMissingDevOptionalSubPackages = showMissingDevOptionalSubPackages;
+            this.npmPathProvider = npmPathProvider;
 
-            this._localWatcher = CreateModuleDirectoryWatcherIfDirectoryExists(this._fullPathToRootPackageDirectory);
+            this.localWatcher = CreateModuleDirectoryWatcherIfDirectoryExists(this.fullPathToRootPackageDirectory);
 
             try
             {
@@ -50,7 +48,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         internal string FullPathToRootPackageDirectory
         {
-            get { return this._fullPathToRootPackageDirectory; }
+            get { return this.fullPathToRootPackageDirectory; }
         }
 
         internal string PathToNpm
@@ -59,7 +57,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             {
                 try
                 {
-                    return null == this._npmPathProvider ? null : this._npmPathProvider.PathToNpm;
+                    return this.npmPathProvider?.PathToNpm;
                 }
                 catch (NpmNotFoundException)
                 {
@@ -68,14 +66,9 @@ namespace Microsoft.NodejsTools.Npm.SPI
             }
         }
 
-        internal string CachePath
-        {
-            get { return this._cachePath; }
-        }
-
         public event EventHandler StartingRefresh;
 
-        private void Fire(EventHandler handlers)
+        private void RaiseEvents(EventHandler handlers)
         {
             if (null != handlers)
             {
@@ -85,14 +78,14 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         private void OnStartingRefresh()
         {
-            Fire(StartingRefresh);
+            RaiseEvents(StartingRefresh);
         }
 
         public event EventHandler FinishedRefresh;
 
         private void OnFinishedRefresh()
         {
-            Fire(FinishedRefresh);
+            RaiseEvents(FinishedRefresh);
         }
 
         public void Refresh()
@@ -118,22 +111,22 @@ namespace Microsoft.NodejsTools.Npm.SPI
             OnStartingRefresh();
             try
             {
-                lock (this._fileBitsLock)
+                lock (this.fileBitsLock)
                 {
-                    if (this._isReloadingModules)
+                    if (this.isReloadingModules)
                     {
                         RestartFileSystemWatcherTimer();
                         return;
                     }
                     else
                     {
-                        this._isReloadingModules = true;
+                        this.isReloadingModules = true;
                     }
                 }
 
                 this.RootPackage = RootPackageFactory.Create(
-                            this._fullPathToRootPackageDirectory,
-                            this._showMissingDevOptionalSubPackages);
+                            this.fullPathToRootPackageDirectory,
+                            this.showMissingDevOptionalSubPackages);
                 return;
             }
             catch (IOException)
@@ -142,9 +135,9 @@ namespace Microsoft.NodejsTools.Npm.SPI
             }
             finally
             {
-                lock (this._fileBitsLock)
+                lock (this.fileBitsLock)
                 {
-                    this._isReloadingModules = false;
+                    this.isReloadingModules = false;
                 }
                 if (this.RootPackage == null)
                 {
@@ -158,17 +151,17 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             get
             {
-                lock (this._lock)
+                lock (this.packageLock)
                 {
-                    return this._rootPackage;
+                    return this.rootPackage;
                 }
             }
 
             private set
             {
-                lock (this._lock)
+                lock (this.packageLock)
                 {
-                    this._rootPackage = value;
+                    this.rootPackage = value;
                 }
             }
         }
@@ -203,39 +196,6 @@ namespace Microsoft.NodejsTools.Npm.SPI
             OnCommandCompleted(e.Arguments, e.WithErrors, e.Cancelled);
         }
 
-        public async Task<IPackageCatalog> GetRepositoryCatalogAsync(bool forceDownload, IProgress<string> progress)
-        {
-            //  This should really be thread-safe but await can't be inside a lock so
-            //  we'll just have to hope and pray this doesn't happen concurrently. Worst
-            //  case is we'll end up with two retrievals, one of which will be binned,
-            //  which isn't the end of the world.
-            this._sRepoCatalog = null;
-            if (null == this._sRepoCatalog || this._sRepoCatalog.ResultsCount == 0 || forceDownload)
-            {
-                Exception ex = null;
-                using (var commander = CreateNpmCommander())
-                {
-                    EventHandler<NpmExceptionEventArgs> exHandler = (sender, args) => { LogException(sender, args); ex = args.Exception; };
-                    commander.ErrorLogged += this.LogError;
-                    commander.ExceptionLogged += exHandler;
-                    this._sRepoCatalog = await commander.GetCatalogAsync(forceDownload, progress);
-                    commander.ErrorLogged -= this.LogError;
-                    commander.ExceptionLogged -= exHandler;
-                }
-                if (null != ex)
-                {
-                    OnOutputLogged(ex.ToString());
-                    throw ex;
-                }
-            }
-            return this._sRepoCatalog;
-        }
-
-        public IPackageCatalog MostRecentlyLoadedCatalog
-        {
-            get { return this._sRepoCatalog; }
-        }
-
         private FileSystemWatcher CreateModuleDirectoryWatcherIfDirectoryExists(string directory)
         {
             if (!Directory.Exists(directory))
@@ -252,9 +212,9 @@ namespace Microsoft.NodejsTools.Npm.SPI
                     IncludeSubdirectories = true
                 };
 
-                watcher.Changed += this.Watcher_Modified;
-                watcher.Created += this.Watcher_Modified;
-                watcher.Deleted += this.Watcher_Modified;
+                watcher.Changed += this.WatcherModified;
+                watcher.Created += this.WatcherModified;
+                watcher.Deleted += this.WatcherModified;
                 watcher.EnableRaisingEvents = true;
             }
             catch (Exception ex)
@@ -276,11 +236,11 @@ namespace Microsoft.NodejsTools.Npm.SPI
             return watcher;
         }
 
-        private void Watcher_Modified(object sender, FileSystemEventArgs e)
+        private void WatcherModified(object sender, FileSystemEventArgs e)
         {
             string path = e.FullPath;
 
-            // Check that the file is either a package.json file, or exists in the node_modules directory
+            // Check that the file is either a package.json file, or exists in the nodemodules directory
             // This allows us to properly detect both installed and uninstalled/linked packages (where we don't receive an event for package.json)
             if (path.EndsWith("package.json", StringComparison.OrdinalIgnoreCase) || path.IndexOf(NodejsConstants.NodeModulesFolder, StringComparison.OrdinalIgnoreCase) != -1)
             {
@@ -292,26 +252,26 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         private void RestartFileSystemWatcherTimer()
         {
-            lock (this._fileBitsLock)
+            lock (this.fileBitsLock)
             {
-                if (null != this._fileSystemWatcherTimer)
+                if (null != this.fileSystemWatcherTimer)
                 {
-                    this._fileSystemWatcherTimer.Dispose();
+                    this.fileSystemWatcherTimer.Dispose();
                 }
 
                 // Be sure to update the FileWatcher in NodejsProjectNode if the dueTime value changes.
-                this._fileSystemWatcherTimer = new Timer(o => UpdateModulesFromTimer(), null, 1000, Timeout.Infinite);
+                this.fileSystemWatcherTimer = new Timer(o => UpdateModulesFromTimer(), null, 1000, Timeout.Infinite);
             }
         }
 
         private void UpdateModulesFromTimer()
         {
-            lock (this._fileBitsLock)
+            lock (this.fileBitsLock)
             {
-                if (null != this._fileSystemWatcherTimer)
+                if (null != this.fileSystemWatcherTimer)
                 {
-                    this._fileSystemWatcherTimer.Dispose();
-                    this._fileSystemWatcherTimer = null;
+                    this.fileSystemWatcherTimer.Dispose();
+                    this.fileSystemWatcherTimer = null;
                 }
             }
 
@@ -345,9 +305,9 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
             if (retry)
             {
-                if (this._refreshRetryCount < 5)
+                if (this.refreshRetryCount < 5)
                 {
-                    ++this._refreshRetryCount;
+                    ++this.refreshRetryCount;
                     RestartFileSystemWatcherTimer();
                 }
                 else
@@ -359,29 +319,29 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         public void Dispose()
         {
-            if (!this._isDisposed)
+            if (!this.isDisposed)
             {
-                lock (this._fileBitsLock)
+                lock (this.fileBitsLock)
                 {
-                    if (this._localWatcher != null)
+                    if (this.localWatcher != null)
                     {
-                        this._localWatcher.Changed -= this.Watcher_Modified;
-                        this._localWatcher.Created -= this.Watcher_Modified;
-                        this._localWatcher.Deleted -= this.Watcher_Modified;
-                        this._localWatcher.Dispose();
+                        this.localWatcher.Changed -= this.WatcherModified;
+                        this.localWatcher.Created -= this.WatcherModified;
+                        this.localWatcher.Deleted -= this.WatcherModified;
+                        this.localWatcher.Dispose();
                     }
                 }
 
-                lock (this._fileBitsLock)
+                lock (this.fileBitsLock)
                 {
-                    if (null != this._fileSystemWatcherTimer)
+                    if (null != this.fileSystemWatcherTimer)
                     {
-                        this._fileSystemWatcherTimer.Dispose();
-                        this._fileSystemWatcherTimer = null;
+                        this.fileSystemWatcherTimer.Dispose();
+                        this.fileSystemWatcherTimer = null;
                     }
                 }
 
-                this._isDisposed = true;
+                this.isDisposed = true;
             }
         }
     }

@@ -11,77 +11,70 @@ namespace Microsoft.NodejsTools.Npm.SPI
     {
         private class NmpCommandRunner : IDisposable
         {
-            private NpmCommander _commander;
-            private NpmCommand _command;
+            private NpmCommander commander;
+            private NpmCommand command;
 
             public static async Task<bool> ExecuteAsync(NpmCommander commander, NpmCommand command)
             {
                 using (var runner = new NmpCommandRunner(commander, command))
                 {
-                    return await runner._command.ExecuteAsync();
+                    return await runner.command.ExecuteAsync();
                 }
             }
 
             private NmpCommandRunner(NpmCommander commander, NpmCommand command)
             {
-                this._commander = commander;
-                this._command = command;
+                this.commander = commander;
+                this.command = command;
 
-                this._commander._executingCommand = command;
+                this.commander.executingCommand = command;
 
-                this._command.CommandStarted += this._commander.command_CommandStarted;
-                this._command.OutputLogged += this._commander.command_OutputLogged;
-                this._command.CommandCompleted += this._commander.command_CommandCompleted;
+                this.command.CommandStarted += this.commander.command_CommandStarted;
+                this.command.OutputLogged += this.commander.command_OutputLogged;
+                this.command.CommandCompleted += this.commander.command_CommandCompleted;
 
-                this._command.ErrorLogged += this._commander.command_ErrorLogged;
-                this._command.ExceptionLogged += this._commander.command_ExceptionLogged;
+                this.command.ErrorLogged += this.commander.command_ErrorLogged;
+                this.command.ExceptionLogged += this.commander.command_ExceptionLogged;
             }
 
             public void Dispose()
             {
-                this._commander._executingCommand = null;
+                this.commander.executingCommand = null;
 
-                this._command.CommandStarted -= this._commander.command_CommandStarted;
-                this._command.OutputLogged -= this._commander.command_OutputLogged;
-                this._command.CommandCompleted -= this._commander.command_CommandCompleted;
+                this.command.CommandStarted -= this.commander.command_CommandStarted;
+                this.command.OutputLogged -= this.commander.command_OutputLogged;
+                this.command.CommandCompleted -= this.commander.command_CommandCompleted;
 
-                this._command.ErrorLogged -= this._commander.command_ErrorLogged;
-                this._command.ExceptionLogged -= this._commander.command_ExceptionLogged;
+                this.command.ErrorLogged -= this.commander.command_ErrorLogged;
+                this.command.ExceptionLogged -= this.commander.command_ExceptionLogged;
             }
         }
 
-        private NpmController _npmController;
-        private NpmCommand _executingCommand;
-        private bool _disposed;
+        private readonly NpmController npmController;
+        private NpmCommand executingCommand;
+        private bool disposed;
 
         public NpmCommander(NpmController controller)
         {
-            this._npmController = controller;
-            CommandStarted += this._npmController.LogCommandStarted;
-            OutputLogged += this._npmController.LogOutput;
-            ErrorLogged += this._npmController.LogError;
-            ExceptionLogged += this._npmController.LogException;
-            CommandCompleted += this._npmController.LogCommandCompleted;
+            this.npmController = controller;
+
+            CommandStarted += this.npmController.LogCommandStarted;
+            OutputLogged += this.npmController.LogOutput;
+            ErrorLogged += this.npmController.LogError;
+            ExceptionLogged += this.npmController.LogException;
+            CommandCompleted += this.npmController.LogCommandCompleted;
         }
 
         public void Dispose()
         {
-            if (!this._disposed)
+            if (!this.disposed)
             {
-                this._disposed = true;
-                CommandStarted -= this._npmController.LogCommandStarted;
-                OutputLogged -= this._npmController.LogOutput;
-                ErrorLogged -= this._npmController.LogError;
-                ExceptionLogged -= this._npmController.LogException;
-                CommandCompleted -= this._npmController.LogCommandCompleted;
-            }
-        }
-
-        public void CancelCurrentCommand()
-        {
-            if (null != this._executingCommand)
-            {
-                this._executingCommand.CancelCurrentTask();
+                this.disposed = true;
+                CommandStarted -= this.npmController.LogCommandStarted;
+                OutputLogged -= this.npmController.LogOutput;
+                ErrorLogged -= this.npmController.LogError;
+                ExceptionLogged -= this.npmController.LogException;
+                CommandCompleted -= this.npmController.LogCommandCompleted;
             }
         }
 
@@ -112,13 +105,13 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         private async Task<bool> DoCommandExecute(bool refreshNpmController, NpmCommand command)
         {
-            Debug.Assert(this._executingCommand == null, "Attempting to execute multiple commands at the same time.");
+            Debug.Assert(this.executingCommand == null, "Attempting to execute multiple commands at the same time.");
             try
             {
-                bool success = await NmpCommandRunner.ExecuteAsync(this, command);
+                var success = await NmpCommandRunner.ExecuteAsync(this, command);
                 if (refreshNpmController)
                 {
-                    this._npmController.Refresh();
+                    this.npmController.Refresh();
                 }
                 return success;
             }
@@ -133,8 +126,8 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             return await DoCommandExecute(true,
                 new NpmInstallCommand(
-                    this._npmController.FullPathToRootPackageDirectory,
-                    this._npmController.PathToNpm));
+                    this.npmController.FullPathToRootPackageDirectory,
+                    this.npmController.PathToNpm));
         }
 
         private Task<bool> InstallPackageByVersionAsync(
@@ -153,7 +146,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
                     type,
                     global,
                     saveToPackageJson,
-                    this._npmController.PathToNpm));
+                    this.npmController.PathToNpm));
         }
 
         public Task<bool> InstallPackageByVersionAsync(
@@ -162,18 +155,13 @@ namespace Microsoft.NodejsTools.Npm.SPI
             DependencyType type,
             bool saveToPackageJson)
         {
-            return InstallPackageByVersionAsync(this._npmController.FullPathToRootPackageDirectory, packageName, versionRange, type, false, saveToPackageJson);
-        }
-
-        public Task<bool> InstallPackageToFolderByVersionAsync(string pathToRootDirectory, string packageName, string versionRange, bool saveToPackageJson)
-        {
-            return InstallPackageByVersionAsync(pathToRootDirectory, packageName, versionRange, DependencyType.Standard, false, saveToPackageJson);
+            return InstallPackageByVersionAsync(this.npmController.FullPathToRootPackageDirectory, packageName, versionRange, type, false, saveToPackageJson);
         }
 
         private DependencyType GetDependencyType(string packageName)
         {
             var type = DependencyType.Standard;
-            var root = this._npmController.RootPackage;
+            var root = this.npmController.RootPackage;
             if (null != root)
             {
                 var match = root.Modules[packageName];
@@ -196,23 +184,11 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             return await DoCommandExecute(true,
                 new NpmUninstallCommand(
-                    this._npmController.FullPathToRootPackageDirectory,
+                    this.npmController.FullPathToRootPackageDirectory,
                     packageName,
                     GetDependencyType(packageName),
                     false,
-                    this._npmController.PathToNpm));
-        }
-
-        public async Task<IPackageCatalog> GetCatalogAsync(bool forceDownload, IProgress<string> progress)
-        {
-            var command = new NpmGetCatalogCommand(
-                this._npmController.FullPathToRootPackageDirectory,
-                this._npmController.CachePath,
-                forceDownload,
-                pathToNpm: this._npmController.PathToNpm,
-                progress: progress);
-            await DoCommandExecute(false, command);
-            return (command as NpmGetCatalogCommand).Catalog;
+                    this.npmController.PathToNpm));
         }
 
         public async Task<bool> UpdatePackagesAsync()
@@ -224,20 +200,19 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             return await DoCommandExecute(true,
                 new NpmUpdateCommand(
-                    this._npmController.FullPathToRootPackageDirectory,
+                    this.npmController.FullPathToRootPackageDirectory,
                     packages,
                     false,
-                    this._npmController.PathToNpm));
+                    this.npmController.PathToNpm));
         }
 
         public async Task<bool> ExecuteNpmCommandAsync(string arguments)
         {
             return await DoCommandExecute(true,
                 new GenericNpmCommand(
-                    this._npmController.FullPathToRootPackageDirectory,
+                    this.npmController.FullPathToRootPackageDirectory,
                     arguments,
-                    this._npmController.PathToNpm));
+                    this.npmController.PathToNpm));
         }
     }
 }
-

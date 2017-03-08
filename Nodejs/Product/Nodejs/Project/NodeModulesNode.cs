@@ -191,13 +191,6 @@ namespace Microsoft.NodejsTools.Project
 
         private OutputWindowRedirector NpmOutputPane => this._projectNode.NpmOutputPane;
 
-        private void ConditionallyShowNpmOutputPane()
-        {
-            if (NodejsPackage.Instance.NpmOptionsPage.ShowOutputWindowWhenExecutingNpm)
-            {
-                this.NpmOutputPane?.ShowAndActivate();
-            }
-        }
         private void ForceUpdateStatusBarWithNpmActivity(string activity)
         {
             if (string.IsNullOrEmpty(activity) || string.IsNullOrEmpty(activity.Trim()))
@@ -506,8 +499,8 @@ namespace Microsoft.NodejsTools.Project
                 }
             }
 
-            using (var executeVm = new NpmOutputViewModel(this.NpmController))
-            using (var manager = new NpmPackageInstallWindow(this.NpmController, executeVm, dependencyType))
+            using (var npmWorker = new NpmWorker(this.NpmController))
+            using (var manager = new NpmPackageInstallWindow(this.NpmController, npmWorker, dependencyType))
             {
                 manager.Owner = System.Windows.Application.Current.MainWindow;
                 manager.ShowModal();
@@ -519,7 +512,6 @@ namespace Microsoft.NodejsTools.Project
         {
             CheckNotDisposed();
             SuppressCommands();
-            ConditionallyShowNpmOutputPane();
         }
 
         private bool CheckValidCommandTarget(DependencyNode node)

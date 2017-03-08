@@ -10,7 +10,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
 {
     internal class PackageJson : IPackageJson
     {
-        private string _versionString;
+        private readonly string versionString;
 
         public PackageJson(dynamic package)
         {
@@ -24,9 +24,9 @@ namespace Microsoft.NodejsTools.Npm.SPI
             this.AllDependencies = LoadAllDependencies(package);
             this.RequiredBy = LoadRequiredBy(package);
 
-            this.Name = package.name == null ? null : package.name.ToString();
-            this._versionString = package.version;
-            this.Description = package.description == null ? null : package.description.ToString();
+            this.Name = package.name?.ToString();
+            this.versionString = package.version;
+            this.Description = package.description?.ToString();
             this.Author = package.author == null ? null : Person.CreateFromJsonSource(package.author.ToString());
         }
 
@@ -151,34 +151,34 @@ The following error occurred:
             }
         }
 
-        public string Name { get; private set; }
+        public string Name { get; }
 
         public SemverVersion Version
         {
             get
             {
-                return this._versionString == null ? new SemverVersion() : SemverVersion.Parse(this._versionString);
+                return this.versionString == null ? new SemverVersion() : SemverVersion.Parse(this.versionString);
             }
         }
 
-        public IPerson Author { get; private set; }
+        public IPerson Author { get; }
 
-        public string Description { get; private set; }
+        public string Description { get; }
 
-        public IKeywords Keywords { get; private set; }
+        public IKeywords Keywords { get; }
 
-        public IHomepages Homepages { get; private set; }
+        public IHomepages Homepages { get; }
 
-        public ILicenses Licenses { get; private set; }
+        public ILicenses Licenses { get; }
 
-        public IFiles Files { get; private set; }
+        public IFiles Files { get; }
 
-        public IDependencies Dependencies { get; private set; }
-        public IDependencies DevDependencies { get; private set; }
-        public IBundledDependencies BundledDependencies { get; private set; }
-        public IDependencies OptionalDependencies { get; private set; }
-        public IDependencies AllDependencies { get; private set; }
-        public IEnumerable<string> RequiredBy { get; private set; }
+        public IDependencies Dependencies { get; }
+        public IDependencies DevDependencies { get; }
+        public IBundledDependencies BundledDependencies { get; }
+        public IDependencies OptionalDependencies { get; }
+        public IDependencies AllDependencies { get; }
+        public IEnumerable<string> RequiredBy { get; }
     }
 }
 

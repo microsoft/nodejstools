@@ -7,7 +7,8 @@ namespace Microsoft.NodejsTools.Npm.SPI
         public GenericNpmCommand(
             string fullPathToRootPackageDirectory,
             string arguments,
-            string pathToNpm = null) : base(
+            string pathToNpm = null) 
+            : base(
             fullPathToRootPackageDirectory,
             pathToNpm)
         {

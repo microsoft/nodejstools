@@ -35,25 +35,11 @@ namespace Microsoft.NodejsTools.NpmUI
         }
 
         public virtual string Name { get; }
-        public string Version => ToString(this.version);
         public IEnumerable<SemverVersion> AvailableVersions { get; }
         public string Author { get; }
         public string Description { get; }
         public IEnumerable<string> Homepages { get; }
         public string Keywords { get; }
-
-        public Visibility AuthorVisibility => string.IsNullOrEmpty(this.Author) ? Visibility.Collapsed : Visibility.Visible;
-
-        public Visibility DescriptionVisibility => string.IsNullOrEmpty(this.Description) ? Visibility.Collapsed : Visibility.Visible;
-        public Visibility HomepagesVisibility => this.Homepages.Any() ? Visibility.Visible : Visibility.Collapsed;
-        public bool IsInstalledLocally => this.localVersion.HasValue;
-        public bool IsLocalInstallOutOfDate => this.localVersion.HasValue && this.localVersion < this.version;
-        public string LocalVersion => ToString(this.localVersion);
-
-        private static string ToString(SemverVersion? version)
-        {
-            return version.HasValue ? version.ToString() : string.Empty;
-        }
     }
 
     internal class ReadOnlyPackageCatalogEntryViewModel : PackageCatalogEntryViewModel

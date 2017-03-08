@@ -237,20 +237,12 @@
     <Compile Include="Logging\NodejsToolsLogEvent.cs" />
     <Compile Include="Logging\NodejsToolsLogger.cs" />
     <Compile Include="NodejsPackage.Debugger.cs" />
-    <Compile Include="NpmUI\NpmInstallOutputWindowResources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>NpmInstallOutputWindowResources.resx</DependentUpon>
-    </Compile>
     <Compile Include="NpmUI\NpmInstallWindowResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>NpmInstallWindowResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="NpmUI\NpmOutputWindow.xaml.cs">
-      <DependentUpon>NpmOutputWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="NpmUI\NpmOutputViewModel.cs" />
+    <Compile Include="NpmUI\NpmWorker.cs" />
     <Compile Include="NpmUI\NpmPackageInstallViewModel.cs" />
     <Compile Include="NpmUI\NpmPackageInstallWindow.xaml.cs">
       <DependentUpon>NpmPackageInstallWindow.xaml</DependentUpon>
@@ -259,15 +251,6 @@
     <Compile Include="Options\TypeScriptRegistrySwitches.cs" />
     <Compile Include="Options\NodejsDiagnosticsOptionsPage.cs">
       <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Options\NodejsNpmOptionsPage.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Options\NodejsNpmOptionsControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Options\NodejsNpmOptionsControl.Designer.cs">
-      <DependentUpon>NodejsNpmOptionsControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Project\AzureToolsContracts.cs" />
     <Compile Include="Project\NewFileMenuGroup\NewFileUtilities.cs" />
@@ -437,10 +420,6 @@
     <Compile Include="Project\ImportWizard\ImportWizard.xaml.cs">
       <DependentUpon>ImportWizard.xaml</DependentUpon>
     </Compile>
-    <Page Include="NpmUI\NpmOutputWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="NpmUI\NpmPackageInstallWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -725,23 +704,6 @@
     </ConditionalEmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.en.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>NpmInstallOutputWindowResources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.cs.resx" />
-    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.de.resx" />
-    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.es.resx" />
-    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.fr.resx" />
-    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.it.resx" />
-    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.ja.resx" />
-    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.ko.resx" />
-    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.pl.resx" />
-    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.pt-BR.resx" />
-    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.ru.resx" />
-    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.tr.resx" />
-    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.zh-Hans.resx" />
-    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.zh-Hant.resx" />
     <EmbeddedResource Include="NpmUI\NpmInstallWindowResources.en.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>NpmInstallWindowResources.Designer.cs</LastGenOutput>
@@ -822,25 +784,6 @@
     <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.tr.resx" />
     <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.zh-Hans.resx" />
     <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.zh-Hant.resx" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.en.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <DependentUpon>NodejsNpmOptionsControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.cs.resx" />
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.de.resx" />
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.es.resx" />
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.fr.resx" />
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.it.resx" />
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.ja.resx" />
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.ko.resx" />
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.pl.resx" />
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.pt-BR.resx" />
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.ru.resx" />
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.tr.resx" />
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.zh-Hans.resx" />
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.zh-Hant.resx" />
   </ItemGroup>
   <ItemGroup>
     <ZipItem Include="Templates\Files\EmptyCss\EmptyCss.css" />

@@ -11,10 +11,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             base.AddModule(package);
         }
 
-        public override int GetDepth(string filepath)
-        {
-            throw new NotImplementedException();
-        }
+        public override int GetDepth(string filepath) => throw new NotImplementedException();
     }
 }
 

@@ -7,10 +7,6 @@ namespace Microsoft.NodejsTools.Npm.SPI
 {
     internal class NpmUpdateCommand : NpmCommand
     {
-        public NpmUpdateCommand(string fullPathToRootPackageDirectory, bool global, string pathToNpm = null)
-            : this(fullPathToRootPackageDirectory, new List<IPackage>(), global, pathToNpm)
-        { }
-
         public NpmUpdateCommand(
             string fullPathToRootPackageDirectory,
             IEnumerable<IPackage> packages,

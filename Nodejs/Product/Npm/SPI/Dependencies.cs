@@ -40,10 +40,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             return GetEnumerator();
         }
 
-        public int Count
-        {
-            get { return this.Count(); }
-        }
+        public int Count => this.Count();
 
         public IDependency this[string name]
         {

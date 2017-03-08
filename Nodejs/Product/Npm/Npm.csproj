@@ -93,8 +93,6 @@
     <Compile Include="NpmNotFoundException.cs" />
     <Compile Include="SPI\GenericNpmCommand.cs" />
     <Compile Include="SPI\Homepages.cs" />
-    <Compile Include="SPI\NpmSearchRegexComparer.cs" />
-    <Compile Include="SPI\NpmSearchFilterStringComparer.cs" />
     <Compile Include="PackageComparer.cs" />
     <Compile Include="PackageFlags.cs" />
     <Compile Include="PackageJsonException.cs" />
@@ -107,10 +105,8 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="RootPackageFactory.cs" />
-    <Compile Include="ScriptName.cs" />
     <Compile Include="SPI\AbstractNpmLogSource.cs" />
     <Compile Include="SPI\NpmCommander.cs" />
-    <Compile Include="SPI\NpmGetCatalogCommand.cs" />
     <Compile Include="SemverVersion.cs" />
     <Compile Include="SemverVersionFormatException.cs" />
     <Compile Include="SPI\AbstractNodeModules.cs" />
@@ -127,17 +123,12 @@
     <Compile Include="SPI\NpmUninstallCommand.cs" />
     <Compile Include="SPI\NpmUpdateCommand.cs" />
     <Compile Include="SPI\Package.cs" />
-    <Compile Include="SPI\DatabasePackageCatalogFilter.cs" />
-    <Compile Include="SPI\PackageCatalogHelper.cs" />
     <Compile Include="SPI\PackageJson.cs" />
     <Compile Include="SPI\PackageProxy.cs" />
     <Compile Include="SPI\Person.cs" />
     <Compile Include="SPI\PkgStringArray.cs" />
     <Compile Include="SPI\PkgFiles.cs" />
     <Compile Include="SPI\RootPackage.cs" />
-    <Compile Include="SQLite\CatalogTables.cs" />
-    <Compile Include="SQLite\SQLite.cs" />
-    <Compile Include="SQLite\SQLiteAsync.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.cs.resx" />
@@ -158,14 +149,6 @@
     <EmbeddedResource Include="Resources.tr.resx" />
     <EmbeddedResource Include="Resources.zh-Hans.resx" />
     <EmbeddedResource Include="Resources.zh-Hant.resx" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\..\Common\SQLite\sqlite3.dll">
-      <Link>sqlite3.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>True</IncludeInVSIX>
-      <VSIXSubPath>.</VSIXSubPath>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

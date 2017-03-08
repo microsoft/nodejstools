@@ -10,7 +10,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
 {
     internal class Package : RootPackage, IPackage
     {
-        private IRootPackage _parent;
+        private IRootPackage parent;
 
         public Package(
             IRootPackage parent,
@@ -21,10 +21,10 @@ namespace Microsoft.NodejsTools.Npm.SPI
             int maxDepth = 1)
             : base(fullPathToRootDirectory, showMissingDevOptionalSubPackages, allModules, depth, maxDepth)
         {
-            this._parent = parent;
+            this.parent = parent;
         }
 
-        public string PublishDateTimeString { get { return null; } }
+        public string PublishDateTimeString => null;
 
         public IEnumerable<SemverVersion> AvailableVersions { get { throw new NotImplementedException(); } }
 
@@ -43,7 +43,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             get
             {
-                IPackageJson parentPackageJson = this._parent.PackageJson;
+                var parentPackageJson = this.parent.PackageJson;
                 return (null != parentPackageJson && parentPackageJson.AllDependencies.Contains(this.Name));
             }
         }
@@ -57,7 +57,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             get
             {
-                IPackageJson parentPackageJson = this._parent.PackageJson;
+                var parentPackageJson = this.parent.PackageJson;
                 return null != parentPackageJson && parentPackageJson.DevDependencies.Contains(this.Name);
             }
         }
@@ -66,7 +66,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             get
             {
-                IPackageJson parentPackageJson = this._parent.PackageJson;
+                var parentPackageJson = this.parent.PackageJson;
                 return null != parentPackageJson && parentPackageJson.Dependencies.Contains(this.Name);
             }
         }
@@ -75,7 +75,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             get
             {
-                IPackageJson parentPackageJson = this._parent.PackageJson;
+                var parentPackageJson = this.parent.PackageJson;
                 return null != parentPackageJson && parentPackageJson.OptionalDependencies.Contains(this.Name);
             }
         }
@@ -84,7 +84,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             get
             {
-                IPackageJson parentPackageJson = this._parent.PackageJson;
+                var parentPackageJson = this.parent.PackageJson;
                 return null != parentPackageJson && parentPackageJson.BundledDependencies.Contains(this.Name);
             }
         }
