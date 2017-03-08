@@ -830,6 +830,10 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>NpmInstallWindowResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="Commands\DiagnosticsForm.resx">
+      <DependentUpon>DiagnosticsForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup Condition="$(VSTarget) == '15.0'">
     <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.en.resx">
@@ -866,12 +870,12 @@
     <EmbeddedResource Include="NpmUI\NpmInstallWindowResources.tr.resx" />
     <EmbeddedResource Include="NpmUI\NpmInstallWindowResources.zh-Hans.resx" />
     <EmbeddedResource Include="NpmUI\NpmInstallWindowResources.zh-Hant.resx" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Commands\DiagnosticsForm.resx">
+    <EmbeddedResource Include="Commands\DiagnosticsForm.en.resx">
       <DependentUpon>DiagnosticsForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="Options\NodejsIntellisenseOptionsControl.resx">
       <DependentUpon>NodejsIntellisenseOptionsControl.cs</DependentUpon>
       <SubType>Designer</SubType>
